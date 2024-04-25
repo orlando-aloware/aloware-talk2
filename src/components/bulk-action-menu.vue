@@ -69,7 +69,7 @@
          v-if="isCheckboxAllChecked">
       {{ checkedCount | numFormat }} contacts on this page selected.&nbsp;
       <a href=""
-         v-if="!isAllSelected && checkedCount < totalRows && !isDatatableCountLoading"
+         v-if="canSelectAll"
          @click.prevent="onClickAll">
           Select all {{ totalRows | numFormat }} contacts.
           <slot name="checkall-tooltip"/>
@@ -213,6 +213,10 @@ export default {
 
     canDelete () {
       return this.hideDeleteOnAllSelected ? !this.isDatatableSelectedAll : true
+    },
+
+    canSelectAll () {
+      return !this.isAllSelected && this.checkedCount < this.totalRows && !this.isDatatableCountLoading
     }
   },
 
