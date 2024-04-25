@@ -440,7 +440,7 @@ export default {
     },
 
     isCancelledAccount () {
-      return this.currentCompany && this.currentCompany.subscription.status === 'cancelled';
+      return this.currentCompany && this.currentCompany.subscription?.status === 'cancelled' && !this.currentCompany.is_whitelabel
     },
 
     pageClass () {
