@@ -633,8 +633,9 @@ export default {
       this.updateFormValidity()
     },
 
-    resetCommunicationFlags () {
+    resetCommunicationFlags (field) {
       const fields = ['myCalls', 'myTexts', 'myVoicemails', 'myContacts', 'myAppointments', 'myReminders', 'myFaxes', 'myMentions']
+      const fieldsThatShouldDisableCommunicationNotifications = ['inAppNotifications', 'desktopNotifications', 'mobileNotifications', 'emailNotifications', 'textNotifications']
 
       fields.forEach((field) => {
         this[field] = false
@@ -644,7 +645,9 @@ export default {
         })
       })
 
-      this.$generalNotification('Please enable at least one Notification Channel to be able to enable Communication Notifications.', 'warning')
+      if (fieldsThatShouldDisableCommunicationNotifications.includes(field)) {
+        this.$generalNotification('Please enable at least one Notification Channel to be able to enable Communication Notifications.', 'warning')
+      }
     },
 
     resetSettingsForm () {
