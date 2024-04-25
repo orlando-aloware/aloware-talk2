@@ -580,7 +580,7 @@ export default {
       if (taskType === TaskType.IN_QUEUE) {
         const totalInQueue = group.length + 1 // items in current queue + the one in progress
         const totalSkipped = this.powerDialerTasks.skipped.length
-        if (this.powerDialerTaskFilters?.in_queue?.total_queued && (totalInQueue + totalSkipped) >= this.powerDialerTaskFilters.in_queue.total_queued) {
+        if (this.powerDialerTaskFilters.in_queue.total_queued && (totalInQueue + totalSkipped) >= this.powerDialerTaskFilters.in_queue.total_queued) {
           return false
         }
       }
