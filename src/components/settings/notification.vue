@@ -534,7 +534,7 @@ export default {
     ...mapActions('settings', ['updateChangedUserProperties', 'setFormValidity']),
     onUpdateFields (value, prop) {
       if (this.isCommunicationNotificationsDisabled) {
-        this.resetCommunicationFlags()
+        this.resetCommunicationFlags(prop)
       }
 
       if (!['shouldObserve', 'myCalls', 'myTexts', 'myVoicemails', 'myContacts', 'myAppointments', 'myFaxes', 'myReminders', 'myMentions'].includes(prop)) {
