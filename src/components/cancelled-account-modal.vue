@@ -63,7 +63,7 @@ import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'trial-expired-modal',
+  name: 'cancelled-account-modal',
 
   mixins: [
     aclMixin
