@@ -289,7 +289,8 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
       'Failed to fetch',
       'NetworkError',
       'Navigation cancelled from',
-      'Blocked a frame with origin'
+      'Blocked a frame with origin',
+      'AxiosError'
     ],
 
     // This sets the sample rate to be 10%. You may want this to be 100% while
