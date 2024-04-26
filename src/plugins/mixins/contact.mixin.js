@@ -1342,7 +1342,7 @@ export default {
           console.log('An error occurred while getting the contact', err?.response?.data || err)
           this.loadingContact = false
           this.$generalNotification('Contact not found, please try again.', 'error')
-          return Promise.resolve(err)
+          return Promise.reject(err)
         } else {
           this.getContactByPhoneNumber(phoneNumber, getContactTry)
         }

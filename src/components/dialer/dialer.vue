@@ -541,7 +541,7 @@ export default {
           this.$VueEvent.fire('communicationLoaded')
           this.loadingCommunication = false
 
-          return Promise.resolve(err)
+          return Promise.reject(err)
         }
 
         return this.getCommunication(sid, from, getCommunicationTry)
