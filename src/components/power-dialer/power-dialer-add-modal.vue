@@ -130,14 +130,14 @@
     </b-modal>
   </div>
   <div v-else>
-    <b-modal v-model="showContactModals[1]"
-             no-close-on-backdrop
+    <b-modal no-close-on-backdrop
              no-close-on-esc
-             hide-footer>
+             hide-footer
+             v-model="showContactModals['add']">
       <template #modal-header>
         <h2>Power Dialer Task Options</h2>
         <slot name="header-close-content">
-          <b-button @click="openPDModalInContacts(2)"
+          <b-button @click="openPDModalInContacts('confirmation')"
                     variant="transparent">
             <i class="fas fa-times"></i>
           </b-button>
@@ -146,8 +146,8 @@
       <q-card class="my-card"
               data-testid="power-dialer-add-modal-card"
               flat>
-        <b-overlay :show="loading > 0"
-                   data-testid="power-dialer-add-modal-overlay">
+        <b-overlay data-testid="power-dialer-add-modal-overlay"
+                   :show="loading > 0">
           <div data-testid="power-dialer-add-modal-converting-message">
             You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
           </div>
@@ -159,10 +159,10 @@
             Conversion Options
           </label>
           <b-form-checkbox class="mb-2"
+                           data-testid="power-dialer-add-modal-conversion-checkbox"
                            :value="option.value"
                            :key="option.value"
                            v-model="conversion"
-                           data-testid="power-dialer-add-modal-conversion-checkbox"
                            v-for="option in conversionOptions">
             {{ option.text }}
             <information-circle-icon color="#2F80ED"
@@ -187,8 +187,8 @@
                         dense
                         spread
                         unelevated
-                        :options="directionOptions"
                         data-testid="power-dialer-add-modal-direction-toggle"
+                        :options="directionOptions"
                         v-model="direction"/>
 
           <hr>
@@ -197,21 +197,21 @@
               Where do you want to add these tasks?
           </label>
           <b-form-radio class="mb-2"
+                        data-testid="power-dialer-add-modal-where-radio"
                         :value="option.value"
                         :key="option.value"
                         v-model="where"
-                        data-testid="power-dialer-add-modal-where-radio"
                         v-for="option in whereOptions">
             {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
           </b-form-radio>
           <date-picker mode="dateTime"
                        title-position="left"
                        color="blue"
+                       data-testid="power-dialer-add-modal-date-picker"
                        :min-date="new Date()"
                        :masks="masks"
                        :popover="popover_config"
                        v-model="schedule"
-                       data-testid="power-dialer-add-modal-date-picker"
                        v-if="where === 'scheduled'">
             <template v-slot="{ inputValue, inputEvents }">
               <div class="ml-4 text-sm">
@@ -220,9 +220,9 @@
                 </small>
                 <br>
                 <input class="px-2 py-1 border rounded text-grey"
+                       data-testid="power-dialer-add-modal-date-picker-input"
                        style="width: 155px"
                        :value="inputValue"
-                       data-testid="power-dialer-add-modal-date-picker-input"
                        v-on="inputEvents"/>
               </div>
             </template>
@@ -252,8 +252,8 @@
       </q-card>
     </b-modal>
 
-    <b-modal v-model="showContactModals[2]"
-             title="Confirmation">
+    <b-modal title="Confirmation"
+             v-model="showContactModals['confirmation']">
       <p class="my-1">
         Are you sure you want to cancel the action?. The contacts will not be added to the queue.
       </p>
@@ -340,8 +340,8 @@ export default {
     count: 0,
     stay: false,
     showContactModals: {
-      1: false,
-      2: false
+      add: false,
+      confirmation: false
     }
   }),
 
@@ -458,7 +458,7 @@ export default {
     }
 
     if (this.showInContactsPage) {
-      this.showContactModals[1] = true
+      this.showContactModals['add'] = true
     }
 
     this.setCount()
@@ -508,9 +508,9 @@ export default {
       this.$emit('hidden')
     },
 
-    openPDModalInContacts (modalNumber) {
+    openPDModalInContacts (type) {
       // Show the specified modal
-      this.showContactModals[modalNumber] = true
+      this.showContactModals[type] = true
     },
 
     hidePDModalsInContacts () {
