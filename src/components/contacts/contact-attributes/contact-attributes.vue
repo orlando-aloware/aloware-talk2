@@ -32,7 +32,7 @@
 import { mapActions, mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import _ from 'lodash'
-import { ContactAttributetTypeEnum } from 'components/contacts/contact-attributes/enums/contact-attributet-type-enum'
+import { ContactAttributeTypeEnum } from 'components/contacts/contact-attributes/enums/contact-attribute-type-enum'
 import AttributeTypeText from 'components/contacts/contact-attributes/attribute-types/attribute-type-text'
 import AttributeTypeDatePicker from 'components/contacts/contact-attributes/attribute-types/attribute-type-date-picker'
 
@@ -58,7 +58,7 @@ export default {
   data () {
     return {
       attributes: [],
-      ContactAttributetTypeEnum
+      ContactAttributetTypeEnum: ContactAttributeTypeEnum
     }
   },
 

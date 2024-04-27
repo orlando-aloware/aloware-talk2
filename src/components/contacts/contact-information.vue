@@ -158,7 +158,7 @@
                        :borderless="true"
                        :outlined="false"
                        v-model="contact.initial_campaign_id"
-                       data-testid=""
+                       data-testid="contact-information-initial-line-selector"
                        @change="(eventPayload) => onUpdateFields(eventPayload, 'initial_campaign_id')">
         </line-selector>
       </div>

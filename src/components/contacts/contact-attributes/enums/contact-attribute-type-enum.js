@@ -1,4 +1,4 @@
-export const ContactAttributetTypeEnum = Object.freeze({
+export const ContactAttributeTypeEnum = Object.freeze({
   NUMBER: 1,
   TEXT: 2,
   DROPDOWN: 3,
