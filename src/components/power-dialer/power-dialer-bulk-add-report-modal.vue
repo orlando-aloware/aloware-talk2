@@ -5,17 +5,33 @@
            no-close-on-esc
            v-model="isOpen">
     <div class="container">
-      <p class="text-h5">{{ selected }} {{ fixMessage('contact(s)', selected) }} selected</p>
-      <p class="m-0">{{ fixMessage('Contact(s)', addedFromContact) }} added</p>
+      <p class="text-h6">
+        {{ selected }} {{ fixMessage('contact(s)', selected) }} selected
+      </p>
+      <p class="m-0">
+        {{ fixMessage('Contact(s)', addedFromContact) }} added
+      </p>
       <ul>
-        <li>{{ addedFromContact }} {{ fixMessage('task(s)', addedFromContact) }} from {{ fixMessage('contact(s)', selected) }}</li>
-        <li v-if="hasAddedFromMultipleNumbers">{{ addedFromMultipleNumbers }} {{ fixMessage('task(s)', addedFromMultipleNumbers) }} from multiple numbers</li>
-        <li v-if="hasAddedDuplicates">{{ addedDuplicates }} duplicate phone {{ fixMessage('number(s)', addedDuplicates) }}</li>
-        <li v-if="hasAddedOwnContacts">{{ addedOwnContacts }} owned {{ fixMessage('contact(s)', addedOwnContacts) }}</li>
-        <li v-if="hasAddedInternationalPhoneNumbers">{{ addedInternationalPhoneNumbers }} international phone {{ fixMessage('number(s)', addedInternationalPhoneNumbers) }}</li>
+        <li>
+          {{ addedFromContact }} {{ fixMessage('task(s)', addedFromContact) }} from {{ fixMessage('contact(s)', selected) }}
+        </li>
+        <li v-if="hasAddedFromMultipleNumbers">
+          {{ addedFromMultipleNumbers }} {{ fixMessage('task(s)', addedFromMultipleNumbers) }} from multiple numbers
+        </li>
+        <li v-if="hasAddedDuplicates">
+          {{ addedDuplicates }} duplicate phone {{ fixMessage('number(s)', addedDuplicates) }}
+        </li>
+        <li v-if="hasAddedOwnContacts">
+          {{ addedOwnContacts }} owned {{ fixMessage('contact(s)', addedOwnContacts) }}
+        </li>
+        <li v-if="hasAddedInternationalPhoneNumbers">
+          {{ addedInternationalPhoneNumbers }} international phone {{ fixMessage('number(s)', addedInternationalPhoneNumbers) }}
+        </li>
       </ul>
       <template v-if="skipped.length > 0">
-        <p class="m-0">Contacts not added/skipped</p>
+        <p class="m-0">
+          Contacts not added/skipped
+        </p>
         <ul>
           <li v-for="(error, id) in skipped"
               v-bind:key="id">
@@ -23,7 +39,9 @@
           </li>
         </ul>
       </template>
-      <p class="text-h5 font-weigh-bold">{{ addedFromContact }} Total {{ fixMessage('task(s)', addedFromContact) }} added to queue</p>
+      <p class="text-h6 font-weigh-bold">
+        {{ addedFromContact }} Total {{ fixMessage('task(s)', addedFromContact) }} added to queue
+      </p>
     </div>
     <template slot="modal-footer">
       <button class="btn btn-block mt-0 mr-2"
@@ -78,7 +96,7 @@ export default {
     },
 
     selected () {
-      return this.fullReport?.info?.selected ?? 0
+      return this.$isNumeric(this.fullReport?.info?.selected) ? this.fullReport?.info?.selected : 0
     },
 
     addedFromContact () {
