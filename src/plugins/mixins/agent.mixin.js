@@ -60,10 +60,11 @@ export default {
         this.setAgentStatus(res.data.agent_status)
         console.log('Changed agent status [pull]: ', res.data.agent_status)
       }).catch((err) => {
+        let errorCode = err?.response?.status
         console.log(err)
         getTry++
         // check if we could get agent status after 3 retries
-        if (getTry > 3) {
+        if (getTry > 3 || [401, 429].includes(errorCode)) {
           // error
           this.$Sentry.captureException(err)
         } else {
