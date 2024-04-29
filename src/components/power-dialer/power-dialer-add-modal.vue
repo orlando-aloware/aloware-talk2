@@ -1,132 +1,132 @@
 <template>
   <div v-if="!showInContactsPage">
     <b-modal dialog-class="modal-pd-add"
+             data-testid="power-dialer-add-modal"
              centered
              hide-footer
              no-close-on-backdrop
              no-close-on-esc
              v-model="isOpen"
-             data-testid="power-dialer-add-modal"
              @hidden="onHidden">
-        <template #modal-title>
-            <h2>Power Dialer Task Options</h2>
-        </template>
-        <q-card class="my-card"
-                data-testid="power-dialer-add-modal-card"
-                flat>
-            <b-overlay :show="loading > 0"
-                       data-testid="power-dialer-add-modal-overlay">
-                <div  data-testid="power-dialer-add-modal-converting-message">
-                    You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
-                </div>
+      <template #modal-title>
+        <h2>Power Dialer Task Options</h2>
+      </template>
+      <q-card class="my-card"
+              data-testid="power-dialer-add-modal-card"
+              flat>
+        <b-overlay data-testid="power-dialer-add-modal-overlay"
+                   :show="loading > 0">
+          <div data-testid="power-dialer-add-modal-converting-message">
+            You're converting <strong>~{{ contactsDescription }}</strong> into a Power Dialer task and adding it to your queue.
+          </div>
 
-                <hr>
+          <hr>
 
-                <label class="label mb-1 text-weight-bold"
-                       data-testid="power-dialer-add-modal-conversion-options">
-                    Conversion Options
-                </label>
-                <b-form-checkbox class="mb-2"
-                                 :value="option.value"
-                                 :key="option.value"
-                                 v-model="conversion"
-                                 data-testid="power-dialer-add-modal-conversion-checkbox"
-                                 v-for="option in conversionOptions">
-                    {{ option.text }}
-                    <information-circle-icon color="#2F80ED"
-                                             data-testid="power-dialer-add-modal-circle-icon"
-                                             v-if="option.helper"/>
-                    <q-tooltip anchor="top middle"
-                               self="bottom middle"
-                               data-testid="power-dialer-add-modal-helper-tooltip"
-                               v-if="option.helper">
-                        {{ option.helper }}
-                    </q-tooltip>
-                </b-form-checkbox>
+          <label class="label mb-1 text-weight-bold"
+                 data-testid="power-dialer-add-modal-conversion-options">
+            Conversion Options
+          </label>
+          <b-form-checkbox class="mb-2"
+                           data-testid="power-dialer-add-modal-conversion-checkbox"
+                           :value="option.value"
+                           :key="option.value"
+                           v-model="conversion"
+                           v-for="option in conversionOptions">
+            {{ option.text }}
+            <information-circle-icon color="#2F80ED"
+                                     data-testid="power-dialer-add-modal-circle-icon"
+                                     v-if="option.helper"/>
+            <q-tooltip anchor="top middle"
+                       self="bottom middle"
+                       data-testid="power-dialer-add-modal-helper-tooltip"
+                       v-if="option.helper">
+              {{ option.helper }}
+            </q-tooltip>
+          </b-form-checkbox>
 
-                <label class="label mt-2 mb-1 text-weight-bold">
-                    Direction
-                </label>
-                <q-btn-toggle class="custom-toggle-button"
-                              toggle-color="primary active"
-                              color="transparent"
-                              text-color="grey-90"
-                              no-caps
-                              dense
-                              spread
-                              unelevated
-                              :options="directionOptions"
-                              data-testid="power-dialer-add-modal-direction-toggle"
-                              v-model="direction"/>
+          <label class="label mt-2 mb-1 text-weight-bold">
+            Direction
+          </label>
+          <q-btn-toggle class="custom-toggle-button"
+                        toggle-color="primary active"
+                        color="transparent"
+                        text-color="grey-90"
+                        data-testid="power-dialer-add-modal-direction-toggle"
+                        no-caps
+                        dense
+                        spread
+                        unelevated
+                        :options="directionOptions"
+                        v-model="direction"/>
 
-                <hr>
+          <hr>
 
-                <label class="label mb-1 text-weight-bold">
-                    Where do you want to add these tasks?
-                </label>
-                <b-form-radio class="mb-2"
-                              :value="option.value"
-                              :key="option.value"
-                              v-model="where"
-                              data-testid="power-dialer-add-modal-where-radio"
-                              v-for="option in whereOptions">
-                    {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
-                </b-form-radio>
-                <date-picker mode="dateTime"
-                             title-position="left"
-                             color="blue"
-                             :min-date="new Date()"
-                             :masks="masks"
-                             :popover="popover_config"
-                             v-model="schedule"
-                             data-testid="power-dialer-add-modal-date-picker"
-                             v-if="where === 'scheduled'">
-                    <template v-slot="{ inputValue, inputEvents }">
-                        <div class="ml-4 text-sm">
-                            <small class="text-grey">
-                                Scheduled time:
-                            </small>
-                            <br>
-                            <input class="px-2 py-1 border rounded text-grey"
-                                   style="width: 155px"
-                                   :value="inputValue"
-                                   data-testid="power-dialer-add-modal-date-picker-input"
-                                   v-on="inputEvents"/>
-                        </div>
-                    </template>
-                </date-picker>
-
-                <b-button class="btn-block mt-4"
-                          variant="primary"
-                          size="sm"
-                          data-testid="power-dialer-add-modal-save-button"
-                          @click="save">
-                  Ok
-                </b-button>
-            </b-overlay>
-        </q-card>
-        <b-modal modal-class="confirm-dialog"
-                 title="Continue"
-                 centered
-                 v-model="confirm"
-                 data-testid="power-dialer-add-modal-confirm-dialog"
-                 @close="onHidden">
-            <div class="text-left">
-                <div class="text-dark">
-                    {{ confirm_message }}
-                </div>
-            </div>
-            <template slot="modal-footer">
-                <div class="d-flex w-100">
-                    <div class="flex-grow-1"></div>
-                    <button class="btn btn-sm btn-primary mr-2"
-                            data-testid="power-dialer-add-modal-confirm-dialog-continue-button"
-                            @click="closeConfirmDialog">
-                        Continue
-                    </button>
-                </div>
+          <label class="label mb-1 text-weight-bold">
+            Where do you want to add these tasks?
+          </label>
+          <b-form-radio class="mb-2"
+                        data-testid="power-dialer-add-modal-where-radio"
+                        :value="option.value"
+                        :key="option.value"
+                        v-model="where"
+                        v-for="option in whereOptions">
+            {{ option.text }} - <span style="color: var(--gray);">{{ option.description }}</span>
+          </b-form-radio>
+          <date-picker mode="dateTime"
+                       title-position="left"
+                       color="blue"
+                       data-testid="power-dialer-add-modal-date-picker"
+                       :min-date="new Date()"
+                       :masks="masks"
+                       :popover="popover_config"
+                       v-model="schedule"
+                       v-if="where === 'scheduled'">
+            <template v-slot="{ inputValue, inputEvents }">
+              <div class="ml-4 text-sm">
+                <small class="text-grey">
+                  Scheduled time:
+                </small>
+                <br>
+                <input class="px-2 py-1 border rounded text-grey"
+                       data-testid="power-dialer-add-modal-date-picker-input"
+                       style="width: 155px"
+                       :value="inputValue"
+                       v-on="inputEvents"/>
+              </div>
             </template>
-        </b-modal>
+          </date-picker>
+
+          <b-button class="btn-block mt-4"
+                    variant="primary"
+                    size="sm"
+                    data-testid="power-dialer-add-modal-save-button"
+                    @click="save">
+            Ok
+          </b-button>
+        </b-overlay>
+      </q-card>
+      <b-modal modal-class="confirm-dialog"
+               title="Continue"
+               data-testid="power-dialer-add-modal-confirm-dialog"
+               centered
+               v-model="confirm"
+               @close="onHidden">
+        <div class="text-left">
+          <div class="text-dark">
+            {{ confirm_message }}
+          </div>
+        </div>
+        <template slot="modal-footer">
+          <div class="d-flex w-100">
+            <div class="flex-grow-1"></div>
+            <button class="btn btn-sm btn-primary mr-2"
+                    data-testid="power-dialer-add-modal-confirm-dialog-continue-button"
+                    @click="closeConfirmDialog">
+              Continue
+            </button>
+          </div>
+        </template>
+      </b-modal>
     </b-modal>
   </div>
   <div v-else>
@@ -137,8 +137,8 @@
       <template #modal-header>
         <h2>Power Dialer Task Options</h2>
         <slot name="header-close-content">
-          <b-button @click="openPDModalInContacts('confirmation')"
-                    variant="transparent">
+          <b-button variant="transparent"
+                    @click="openPDModalInContacts('confirmation')">
             <i class="fas fa-times"></i>
           </b-button>
         </slot>

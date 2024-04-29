@@ -270,8 +270,8 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
-                           v-if="shouldShowPowerDialer"
                            :disabled="isAddToPowerDialerDisabled"
+                           v-if="shouldShowPowerDialer"
                            @click="addSelectedContacts">
             <power-dialer-mobile-icon width="14"
                                       height="14"
