@@ -230,7 +230,8 @@ import ContactInQueueIcon from 'components/icons/contact-in-queue-icon'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { avatarMixin, powerDialerMixin } from 'src/plugins/mixins'
+import * as TaskType from 'src/constants/task-types'
+import { avatarMixin, powerDialerMixin, sessionCallStatusMixin } from 'src/plugins/mixins'
 
 const DIRECTION = {
   top: 1,
@@ -242,6 +243,7 @@ export default {
 
   mixins: [
     avatarMixin,
+    sessionCallStatusMixin,
     powerDialerMixin
   ],
 
@@ -271,7 +273,7 @@ export default {
         scheduled: false,
         all: false
       },
-      itemsPerPage: 20,
+      itemsPerPage: 50,
       isMoving: false,
       isDeleting: false
     }
@@ -424,12 +426,40 @@ export default {
       })
 
       if (res.status === 200) {
-        const res = await this.getSessionTaskByFilter(this.prepareFilters({
-          id: this.selectedList.id,
-          task_status: 1
-        }))
+        const totalInQueue = this.powerDialerTasks.in_queue.length
 
-        this.powerDialerTasks['in_queue'] = res.data.data
+        // find in this.powerDialerTasks['in_queue'] the element with the same id as the item
+        const index = this.powerDialerTasks.in_queue.findIndex(element => element.id === item.id)
+        // remove it from the array
+        this.powerDialerTasks.in_queue.splice(index, 1)
+
+        // add it to the top of the array
+        if (direction === this.moveDirection.top) {
+          this.powerDialerTasks.in_queue.unshift(item)
+        }
+
+        if (direction === this.moveDirection.bottom) {
+          // add it to the bottom of the array
+          if (totalInQueue === this.powerDialerTaskFilters.in_queue.total_queued) {
+            this.powerDialerTasks.in_queue.push(item)
+          }
+
+          // if the total of items in current queue (UI) is less than the actual total of items queued
+          // then we need to fetch again the first 50 items from the API
+          if (totalInQueue < this.powerDialerTaskFilters.in_queue.total_queued) {
+            this.inQueueFetchTasks.currentPage = 1
+            const res = await this.getSessionTaskByFilter(this.prepareFilters({
+              id: this.selectedList.id,
+              task_status: 1,
+              per_page: 50,
+              page: this.inQueueFetchTasks.currentPage
+            }))
+
+            const newInQueueList = this.filterNewInQueueTasks(res.data.data, TaskType.IN_QUEUE, false, false)
+            this.powerDialerTasks[TaskType.IN_QUEUE] = newInQueueList
+          }
+        }
+
         this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
         this.isMoving = false
 
@@ -448,12 +478,17 @@ export default {
           `/api/v2/power-dialer-lists/${this.selectedList.id}/items/${data.contact_list_item_id}`
         )
         .then(async (res) => {
+          this.inQueueFetchTasks.currentPage = 1
           let response = await this.getSessionTaskByFilter(this.prepareFilters({
             id: this.selectedList.id,
-            task_status: 1
+            task_status: 1,
+            per_page: 50,
+            page: this.inQueueFetchTasks.currentPage
           }))
 
-          this.powerDialerTasks['in_queue'] = response.data.data
+          const newInQueueList = this.filterNewInQueueTasks(response.data.data, TaskType.IN_QUEUE, false, false)
+          this.powerDialerTasks[TaskType.IN_QUEUE] = newInQueueList
+
           this.$generalNotification(res.data.message)
           this.isDeleting = false
         })
@@ -463,23 +498,43 @@ export default {
         })
     },
 
-    async loadMore (key) {
-      this.filterDisabled[key] = true
-      this.groupPageFilters[key]++
+    async loadMore (taskType) {
+      this.filterDisabled[taskType] = true
 
+      // If there is a next page, increment the page number
+      if (this.powerDialerTaskFilters[taskType].next_page_url) {
+        this.groupPageFilters[taskType]++
+      }
+
+      // Set the page properly
+      const inQueueTaskType = taskType === TaskType.IN_QUEUE
+      const page = inQueueTaskType && this.inQueueFetchTasks ? this.inQueueFetchTasks.currentPage + 1 : this.groupPageFilters[taskType]
+
+      // Fetch the next page of tasks
       const res = await this.getSessionTaskByFilter(this.prepareFilters({
         id: this.selectedList.id,
-        task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[key]].status],
+        task_status: AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[taskType]].status],
         per_page: this.itemsPerPage,
-        page: this.groupPageFilters[key]
+        page: page
       }))
 
       if (res.status === 200) {
-        this.powerDialerTasks[key] = this.powerDialerTasks[key].concat(res.data.data)
-        this.powerDialerTaskFilters[key] = res.data
-      }
+        this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
+        delete this.powerDialerTaskFilters[taskType].data
 
-      this.filterDisabled[key] = false
+        if (inQueueTaskType) {
+          const newInQueueList = this.filterNewInQueueTasks(res.data.data, taskType, true, true)
+
+          if (newInQueueList.length) {
+            this.powerDialerTasks[taskType] = [...this.powerDialerTasks[taskType], ...newInQueueList]
+          }
+        } else {
+          // Add the list of retrieved tasks to the current list, this is for all but IN QUEUE tasks
+          const tempSet = new Set([...this.powerDialerTasks[taskType], ...res.data.data].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          this.powerDialerTasks[taskType] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+        }
+      }
+      this.filterDisabled[taskType] = false
     },
 
     chipped (data) {
@@ -515,19 +570,35 @@ export default {
       }
     },
 
-    hasMoreItems (group = [], key) {
-      if (group.length < this.itemsPerPage) {
+    hasMoreItems (group = [], taskType) {
+      if (taskType !== TaskType.IN_QUEUE && group.length < this.itemsPerPage) {
         return false
       }
 
-      return group.length < this.getTotalItem(key)
+      // If the task type is IN QUEUE, we check if the total of items in queue plus the total of skipped tasks
+      // is greater than or equal to the total of items in queue that are allowed to be queued
+      if (taskType === TaskType.IN_QUEUE) {
+        const totalInQueue = group.length + 1 // items in current queue + the one in progress
+        const totalSkipped = this.powerDialerTasks.skipped.length
+        if (this.powerDialerTaskFilters.in_queue.total_queued && (totalInQueue + totalSkipped) >= this.powerDialerTaskFilters.in_queue.total_queued) {
+          return false
+        }
+      }
+
+      return group.length < this.getTotalItem(taskType)
     },
 
     getTotalItem (key) {
+      // Sanity check: if the key is not in the powerDialerTaskFilters, return 0
+      // here we are getting the total of items for each group
+      // to be displayed during the PD session: In Queue, Called, Failed, Scheduled.
+      if (!this.powerDialerTaskFilters[key]) {
+        return 0
+      }
+
       switch (key) {
         case 'in_queue':
-          const inQueue = get(this.powerDialerTasks, 'in_queue', null)
-          return inQueue ? inQueue.filter(task => task.contact_list_item_id !== this.taskToCall.contact_list_item_id).length : 0
+          return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_queued - 1 : 0 // Get the actual number of tasks in queue -1 (for the one in progress)
         case 'called':
           return this.powerDialerTaskFilters[key] ? this.powerDialerTaskFilters[key].total_called : 0
         case 'failed':

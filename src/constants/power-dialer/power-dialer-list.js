@@ -34,6 +34,14 @@ export const DEFAULT_FILTER_LIST = {
     order: 4,
     status: 'STATUS_SCHEDULED'
   },
+  SKIPPED: {
+    id: 'skipped',
+    name: 'Skipped',
+    link: '/skipped/',
+    meta: 'skipped',
+    order: 2,
+    status: 'STATUS_SKIPPED'
+  },
   ALL: {
     id: 'all',
     name: 'All',
