@@ -39,7 +39,8 @@
                    dense
                    input-class="input-text-sm"
                    placeholder="Type to search"
-                   v-model.lazy="search">
+                   :debounce="500"
+                   v-model="search">
           </q-input>
         </template>
       </q-field>
@@ -52,7 +53,8 @@
                              :offset="100"
                              :initial-index="1"
                              @load="getTags">
-            <div class="mr-1">
+            <div class="mr-1"
+                 :class="{ 'hidden': isEmptyData }">
               <div role="button"
                    class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
                    :key="item.id"
@@ -75,14 +77,16 @@
                 </div>
               </div>
             </div>
-            <template v-slot:loading>
-              <div class="row justify-center q-my-sm"
-                   v-if="loadingTags">
-                <q-spinner-dots color="primary"
-                                size="20px" />
-              </div>
-            </template>
           </q-infinite-scroll>
+          <div class="text-center w-100"
+               v-if="search.length && !searchList[0].children.length && !searchList[1].children.length && !loadingTags">
+            <span>No options to select</span>
+          </div>
+          <div class="row justify-center q-my-md"
+               v-else-if="loadingTags">
+            <q-spinner-dots color="primary"
+                            size="20px" />
+          </div>
         </div>
         <div v-else>
           <q-infinite-scroll ref="infiniteScroll"
@@ -91,6 +95,7 @@
                              :initial-index="1"
                              @load="getTags">
             <div class="mr-1"
+                 :class="{ 'hidden': isEmptyData }"
                  :key="`title-${index}`"
                  v-for="(item, index) in searchList">
               <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
@@ -120,14 +125,16 @@
                               v-if="isSelected(child.id)"/>
               </div>
             </div>
-            <template v-slot:loading>
-              <div class="row justify-center q-my-sm"
-                   v-if="loadingTags">
-                <q-spinner-dots color="primary"
-                                size="20px" />
-              </div>
-            </template>
           </q-infinite-scroll>
+          <div class="text-center w-100"
+               v-if="search.length && !searchList[0].children.length && !searchList[1].children.length && !loadingTags">
+            <span>No options to select</span>
+          </div>
+          <div class="row justify-center q-my-md"
+               v-else-if="loadingTags">
+            <q-spinner-dots color="primary"
+                            size="20px" />
+          </div>
         </div>
       </div>
       <div class="text-center w-100"
@@ -170,7 +177,7 @@
 </template>
 
 <script>
-import _, { debounce } from 'lodash'
+import _ from 'lodash'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import CheckOIcon from 'components/icons/check-o-icon'
@@ -275,6 +282,10 @@ export default {
       }
       this.getTags()
       return []
+    },
+
+    isEmptyData () {
+      return !this.searchList[0].children.length && !this.searchList[1].children.length
     }
   },
 
@@ -303,16 +314,19 @@ export default {
           this.$refs.search.focus()
         }
       })
-      this.search = ''
     },
 
     handleBlur () {
-      this.search = ''
       this.isEdit = false
     },
 
     onEdit () {
       this.isEdit = true
+
+      if (!this.isEmptyData) {
+        return
+      }
+
       this.$nextTick(() => {
         this.$refs.infiniteScroll.trigger()
         this.$refs.search.focus()
@@ -373,13 +387,26 @@ export default {
       })
     },
 
+    resetInfiniteScroll () {
+      this.isEdit = false
+
+      this.$nextTick(() => {
+        this.isEdit = true
+
+        this.$nextTick(() => {
+          this.$refs.search.focus()
+          this.$refs.infiniteScroll.reset(0)
+          this.$refs.infiniteScroll.trigger()
+        })
+      })
+    },
+
     resetTags () {
       this.page = 1
       this.hasMorePages = true
       this.searchList[0].children = []
       this.searchList[1].children = []
-
-      this.getTags()
+      this.resetInfiniteScroll()
     }
   },
 
@@ -390,11 +417,11 @@ export default {
         this.selectedValues = this.values
       }
     },
-    search: debounce(function (newValue) {
+    search: function (newValue) {
       if ((newValue && newValue.length >= this.threshold) || !newValue.length) {
         this.resetTags()
       }
-    }, 500)
+    }
   }
 }
 </script>
