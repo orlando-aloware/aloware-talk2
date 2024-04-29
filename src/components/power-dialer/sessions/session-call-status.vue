@@ -759,8 +759,6 @@ export default {
       'removeFirstInQueueTask'
     ]),
 
-    // This debounce function is used to prevent rapid consecutive calls to the `removeFirstInQueueTask` method.
-    // It ensures that the method is only called once every 500 milliseconds, even if it is triggered multiple times.
     processRemoveFirstInQueueTask: debounce(function () {
       this.removeFirstInQueueTask()
     }, 500),
