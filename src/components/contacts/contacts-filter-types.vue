@@ -127,12 +127,13 @@
                   map-options
                   emit-value
                   use-input
+                  data-testid="contacts-filter-operator-value-tags-select"
                   :options="options"
                   v-model="filterOperatorValue"
-                  data-testid="contacts-filter-operator-value-tags-select"
                   v-if="operator.value === filterOperator && hasValue"
                   @input="onInput"
-                  @filter="filterTagFn"/>
+                  @filter="filterTagFn"
+        />
         <label v-if="operator.value === filterOperator && hasSecondaryOperator">
           Content:
         </label>
