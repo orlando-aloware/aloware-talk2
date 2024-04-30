@@ -220,7 +220,7 @@ export default {
 
             params = {
               ...params,
-              contacts: contacts.map(contact => contact.id)
+              contact_ids: contacts.map(contact => contact.id)
             }
 
             break
@@ -273,7 +273,7 @@ export default {
       const apiUrl = !url ? this.listsEndpoint : url
 
       if (chunkedContactIds.length > 0) {
-        params.contacts = chunkedContactIds[0]
+        params.contact_ids = chunkedContactIds[0]
       }
 
       this.$axios
@@ -351,7 +351,7 @@ export default {
     processSubmit (skipListLoading = false) {
       this.isLoading = true
       const params = this.getParams()
-      let ids = params?.contacts ?? []
+      let ids = params?.contact_ids ?? []
       ids = chunk(ids, 50)
 
       const isChunked = !params?.selected_all && ids.length > 0
