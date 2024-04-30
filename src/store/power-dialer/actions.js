@@ -30,13 +30,17 @@ export default {
   },
 
   getMyQueueList: async ({ commit }) => {
-    const res = await window.axios.get(`api/v2/power-dialer-lists/my-queue`)
+    try {
+      const res = await window.axios.get('api/v2/power-dialer-lists/my-queue')
 
-    if (res.status === 200) {
-      commit('SET_MY_QUEUE_LIST', res.data)
+      if (res.status === 200) {
+        commit('SET_MY_QUEUE_LIST', res.data)
+      }
+
+      return res
+    } catch (error) {
+      console.log('Error getting my queue list:', error)
     }
-
-    return res
   },
 
   getPowerDialerList: async ({ commit }, id = '') => {

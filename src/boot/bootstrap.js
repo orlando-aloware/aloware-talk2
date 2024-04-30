@@ -33,6 +33,7 @@ import log from 'electron-log'
 import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
 import { Userpilot } from 'userpilot'
 import { cloneDeep } from 'src/plugins/helpers/functions'
+import { AxiosError } from 'axios'
 
 Screen.setSizes({
   sm: 300,
@@ -289,7 +290,8 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
       'Failed to fetch',
       'NetworkError',
       'Navigation cancelled from',
-      'Blocked a frame with origin'
+      'Blocked a frame with origin',
+      'AxiosError: Request failed with status code 404'
     ],
 
     // This sets the sample rate to be 10%. You may want this to be 100% while
@@ -302,7 +304,17 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
 
     integrations: [
       new Sentry.BrowserTracing()
-    ]
+    ],
+
+    beforeSend (event, hint) {
+      if (hint?.originalException instanceof AxiosError && hint.originalException?.response) {
+        if (hint.originalException.response?.status === 404) {
+          return null
+        }
+      }
+
+      return event
+    }
   })
 
   Sentry.configureScope((scope) => {
