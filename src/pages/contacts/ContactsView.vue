@@ -289,12 +289,14 @@
             Edit Columns
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           data-testid="contacts-view-power-dialer-option-dropdown"
-                           :disabled="true">
+                           data-testid="contacts-view-add-to-power-dialer-option-dropdown"
+                           :disabled="isAddToPowerDialerDisabled"
+                           v-if="shouldShowPowerDialer"
+                           @click="addSelectedContacts">
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
-            Power Dialer
+            Add to My Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
@@ -718,6 +720,11 @@
     <template slot="footer"
               v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
+      <power-dialer-add-modal :params="attachedParams()"
+                              :show-in-contacts-page="true"
+                              v-if="openPDModal"
+                              @hidden="openPDModal = false">
+      </power-dialer-add-modal>
     </template>
   </contacts-screen>
 </template>
@@ -763,6 +770,7 @@ import {
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 
 export default {
   name: 'contacts-view',
@@ -799,7 +807,8 @@ export default {
     ContactsScreen,
     Datatable,
     ImportContactsModal,
-    BlockTooltip
+    BlockTooltip,
+    PowerDialerAddModal
   },
 
   props: {
@@ -876,7 +885,9 @@ export default {
       myContacts: false,
       hasNextPage: false,
       viewListeners: {},
-      ContactListTypes
+      ContactListTypes,
+      openPDModal: false,
+      isContactModule: false
     }
   },
 
@@ -1088,6 +1099,20 @@ export default {
         : this.$jsonClone(this.currentListFilters)
 
       return currentFilters
+    },
+
+    checkedItemIds () {
+      const ids = []
+
+      this.checked.forEach(check => {
+        ids.push(check.id)
+      })
+
+      return ids
+    },
+
+    isAddToPowerDialerDisabled () {
+      return !this.checked.length
     }
   },
 
@@ -1182,7 +1207,8 @@ export default {
       'updateContactsListFilter',
       'setListContactsLoaded',
       'setPreviouslySavedListId',
-      'setPreviousListFilters'
+      'setPreviousListFilters',
+      'addPowerDialerOpen'
     ]),
 
     onSearch (searchText) {
@@ -1289,6 +1315,17 @@ export default {
         headers: this.columns,
         name: this.list.name
       })
+    },
+
+    addSelectedContacts () {
+      this.openPDModal = true
+      this.addPowerDialerOpen(true)
+    },
+
+    attachedParams () {
+      return {
+        contact_ids: this.checkedItemIds
+      }
     },
 
     onImportContactsClicked () {

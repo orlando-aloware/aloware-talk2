@@ -63,7 +63,7 @@ export default {
 
     ...mapState('auth', ['profile', 'authenticated']),
 
-    ...mapState('powerDialer', ['activeTask']),
+    ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
 
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
@@ -483,6 +483,12 @@ export default {
         }
 
         const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // If the communication was rejected by app then move it to skipped list
+        if (res.data?.rejected_by_app) {
+          const tempSet = new Set([...this.powerDialerTasks.skipped, this.activeTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+        }
 
         // we need to prevent proceeding to the next steps if current task's contact id
         // is not the same as the communication's contact id in power dialer session

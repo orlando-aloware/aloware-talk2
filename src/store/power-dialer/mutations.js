@@ -127,6 +127,7 @@ export default {
   RESET_POWER_DIALER_TASKS: (state) => {
     state.powerDialerTasks = {
       in_queue: [],
+      skipped: [],
       called: [],
       failed: [],
       scheduled: [],
