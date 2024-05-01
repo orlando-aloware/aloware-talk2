@@ -1,5 +1,6 @@
 <template>
   <section class="transcription chat-area"
+           data-testid="comm-conversation-section"
            ref="chatArea">
     <div v-if="!isEmpty(messages)">
       <div :key="message_index"
@@ -21,6 +22,7 @@
 
         <!-- Show the speaker's sentiment below each message. -->
         <span class="sentiment flex items-center justify-start"
+              data-testid="comm-conversation-section-speaker-sentiment"
               :class="message.classes.sentimentClass">
           <span class="sentiment-circle"
                 :style="{ background: message.sentimentBackgroundColor }" />
@@ -32,7 +34,7 @@
     <!-- If no conversation was detected. -->
     <div class="text-center"
          v-else>
-      <span>No Conversation</span>
+      <span data-testid="comm-conversation-section-no-conversation">No Conversation</span>
     </div>
   </section>
 </template>
