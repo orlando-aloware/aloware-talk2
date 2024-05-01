@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-yellow-12 px-2 w-100 py-2 px-3 position-relative"
+  <div class="bg-yellow-12 px-2 w-100 py-2 px-3 position-relative notification-container-header"
        id="notification-container"
        v-if="isShow">
     <div class="d-flex">
