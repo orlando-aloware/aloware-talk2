@@ -440,13 +440,13 @@ export default {
 
         if (direction === this.moveDirection.bottom) {
           // add it to the bottom of the array
-          if (totalInQueue === this.powerDialerTaskFilters.in_queue.total_queued) {
+          if (totalInQueue === this.powerDialerTaskFilters?.in_queue?.total_queued) {
             this.powerDialerTasks.in_queue.push(item)
           }
 
           // if the total of items in current queue (UI) is less than the actual total of items queued
           // then we need to fetch again the first 50 items from the API
-          if (totalInQueue < this.powerDialerTaskFilters.in_queue.total_queued) {
+          if (totalInQueue < this.powerDialerTaskFilters?.in_queue?.total_queued) {
             this.inQueueFetchTasks.currentPage = 1
             const res = await this.getSessionTaskByFilter(this.prepareFilters({
               id: this.selectedList.id,
@@ -580,7 +580,7 @@ export default {
       if (taskType === TaskType.IN_QUEUE) {
         const totalInQueue = group.length + 1 // items in current queue + the one in progress
         const totalSkipped = this.powerDialerTasks.skipped.length
-        if (this.powerDialerTaskFilters.in_queue.total_queued && (totalInQueue + totalSkipped) >= this.powerDialerTaskFilters.in_queue.total_queued) {
+        if (this.powerDialerTaskFilters?.in_queue?.total_queued && (totalInQueue + totalSkipped) >= this.powerDialerTaskFilters?.in_queue?.total_queued) {
           return false
         }
       }
