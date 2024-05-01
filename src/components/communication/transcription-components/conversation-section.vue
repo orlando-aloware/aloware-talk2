@@ -11,6 +11,7 @@
           Also, we need to change the background color based on the message sentiment.
         -->
         <p class="message-box break-word"
+           data-testid="comm-conversation-section-message-box"
            :class="message.classes.messageBoxClass"
            :style="{ border: message.sentimentBorder }">
           <strong>Speaker: {{ message.speaker }}</strong>

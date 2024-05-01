@@ -5,6 +5,7 @@
            flat
            round
            dense
+           data-testid="comm-transcription-modal-single-btn"
            :size="buttonSize"
            v-if="singleButton"
            @click="fetchSmartTranscriptionData">
@@ -16,6 +17,7 @@
     </q-btn>
     <div class="flex items-center mr-1 h-100"
          v-else
+         data-testid="comm-transcription-modal-btn"
          @click="fetchSmartTranscriptionData">
       <span class="text-blue cursor-pointer">
         {{ buttonText }}
@@ -23,15 +25,16 @@
     </div>
 
     <!-- Smart Transcription modal. -->
-    <q-dialog v-model="show_form">
+    <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
-          <div class="text-h6 pl-3">Smart Transcription</div>
+          <div class="text-h6 pl-3" data-testid="comm-transcription-modal-smart-title">Smart Transcription</div>
           <q-space></q-space>
           <q-btn class="pr-1"
                  icon="close"
                  flat
                  round
+                 data-testid="comm-transcription-modal-close-dialog-btn"
                  @click="handleClose">
           </q-btn>
         </q-card-section>
@@ -40,33 +43,39 @@
           <div class="q-pa-md mx-3 py-0 border border-rounded"
                v-if="remote_url && !isLoading">
             <waveform :remote-url="remote_url"
-                      :unique-id="communication.id"/>
+                      :unique-id="communication.id"
+                      data-testid="comm-transcription-modal-waveform"/>
           </div>
 
           <div class="h-100 w-100 flex items-center justify-center"
                v-if="isLoading">
             <q-spinner-bars color="primary"
-                            size="40px"/>
+                            size="40px"
+                            data-testid="comm-transcription-modal-spinner-bars"/>
           </div>
 
           <div class="flex row py-4"
                v-else>
             <div class="col-6">
               <categories-section :categories="iab_categories"
-                                  :is-empty="isEmpty"/>
+                                  :is-empty="isEmpty"
+                                  data-testid="comm-transcription-modal-category-section"/>
 
               <highlights-section :highlights="highlights"
                                   :speakers="speakers"
-                                  :is-empty="isEmpty"/>
+                                  :is-empty="isEmpty"
+                                  data-testid="comm-transcription-modal-highlights-section"/>
 
               <entities-section :entities="entities"
                                 :entity-types="entity_types"
                                 :speakers="speakers"
-                                :is-empty="isEmpty"/>
+                                :is-empty="isEmpty"
+                                data-testid="comm-transcription-modal-entities-section"/>
 
               <custom-keywords-section :custom-keywords="custom_keywords"
                                        :speakers="speakers"
-                                       :is-empty="isEmpty"/>
+                                       :is-empty="isEmpty"
+                                       data-testid="comm-transcription-modal-custom-keywords-section"/>
             </div>
 
             <div class="col-6">
@@ -74,16 +83,19 @@
                 <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
                                             :sentiment-chip-colors="sentimentChipColors"
                                             :is-empty="isEmpty"
-                                            :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"/>
+                                            :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
+                                            data-testid="comm-transcription-modal-sentiment-analysis-section"/>
 
                 <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
                                             :speakers="speakers"
-                                            :is-empty="isEmpty"/>
+                                            :is-empty="isEmpty"
+                                            data-testid="comm-transcription-modal-talk-time-analysis-section"/>
               </div>
 
               <conversation-section :messages="messages"
                                     :formatted-messages="formattedMessages"
-                                    :is-empty="isEmpty"/>
+                                    :is-empty="isEmpty"
+                                    data-testid="comm-transcription-modal-conversation-section"/>
             </div>
           </div>
         </q-card-section>
