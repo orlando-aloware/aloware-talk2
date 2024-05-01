@@ -329,7 +329,7 @@ export default {
 
     userPersonalLine () {
       return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
-    },
+    }
   },
 
   methods: {
@@ -353,7 +353,7 @@ export default {
         this.togglingSleepMode = false
         this.$handleErrors(err.response)
       })
-    },
+    }
   }
 }
 </script>

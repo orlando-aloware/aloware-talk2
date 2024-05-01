@@ -208,26 +208,26 @@ export default _.merge({
 
     hideMenu () {
       if (this.$refs && this.$refs.menu) {
-          this.$refs.menu.hide()
+        this.$refs.menu.hide()
       }
     },
 
     logoutAction () {
       try {
-          this.hideMenu()
-          const isImpersonating = storage.local.getItem('impersonate') === 'true'
-          this.logout()
-              .then(() => {
-                  this.resetVuex(['all'])
-                  if (isImpersonating) {
-                      window.location.href = this.classicLogOutUrl
-                  }
-                  if (!isImpersonating) {
-                      this.$router.push({ name: 'Login' })
-                  }
-              })
+        this.hideMenu()
+        const isImpersonating = storage.local.getItem('impersonate') === 'true'
+        this.logout()
+          .then(() => {
+            this.resetVuex(['all'])
+            if (isImpersonating) {
+              window.location.href = this.classicLogOutUrl
+            }
+            if (!isImpersonating) {
+              this.$router.push({ name: 'Login' })
+            }
+          })
       } catch (err) {
-          console.error(err)
+        console.error(err)
       }
     }
   },
@@ -327,12 +327,12 @@ export default _.merge({
       return false
     },
 
-    logoutLabel() {
+    logoutLabel () {
       return localStorage.getItem('impersonate') === 'true' ? 'Stop Impersonating' : 'Logout'
     },
 
     classicLogOutUrl () {
       return process.env.API_URL + '?from_talk_2=1&logout=1'
-    },
+    }
   }
 }, goBackMixin)

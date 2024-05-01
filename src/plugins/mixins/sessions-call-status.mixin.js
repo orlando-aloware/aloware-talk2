@@ -29,6 +29,7 @@ export default {
   computed: {
     ...mapState('powerDialer', [
       'powerDialerTasks',
+      'inQueueFetchTasks',
       'redialed'
     ]),
 
@@ -269,6 +270,8 @@ export default {
         .then(res => {
           if (!this.skippedTasks.includes(contactListItemId)) {
             this.skippedTasks.push(contactListItemId)
+            const tempSet = new Set([...this.powerDialerTasks.skipped, autoDialTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+            this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
           }
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
           //   // add to bottom of list
@@ -347,6 +350,51 @@ export default {
 
     removeTaskFromList () {
       // TODOs: Remove task from list
+    },
+
+    getSkippedAndActiveTasks () {
+      return [...this.powerDialerTasks.skipped, this.activeTask]
+    },
+
+    updateNumberOfFetchedTasks (taskType, taskCount) {
+      // if the current page is the same as the last page, then we keep the total of fetched tasks the same
+      if (this.powerDialerTaskFilters[taskType].current_page === this.inQueueFetchTasks.currentPage) {
+        this.inQueueFetchTasks.fetchedTasks = taskCount
+      }
+
+      // if the current page is greater than the last page, then we increment the total of fetched tasks
+      if (this.powerDialerTaskFilters[taskType].current_page > this.inQueueFetchTasks.currentPage) {
+        this.inQueueFetchTasks.fetchedTasks += taskCount
+      }
+    },
+
+    updateCurrentPage (taskType) {
+      this.inQueueFetchTasks.currentPage = this.powerDialerTaskFilters[taskType].current_page
+    },
+
+    filterNewInQueueTasks (currentList, taskType, updateFetched = false, updatePagination = false) {
+      // Get list of processed tasks at this point
+      // (Total of skipped tasks in the current PD session + active task)
+      const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
+
+      // The new set of IN QUEUE tasks that are retrieved by the API
+      const currInQueue = [...currentList]
+
+      if (updateFetched) {
+        // Update the number of fetched tasks in the current session
+        this.updateNumberOfFetchedTasks(taskType, currInQueue.length)
+      }
+
+      if (updatePagination) {
+        // Update the current page in the current session
+        this.updateCurrentPage(taskType)
+      }
+
+      // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
+      // but discarding the ones have been skipped so we don't list them again
+      const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+
+      return newInQueueList
     }
   }
 }

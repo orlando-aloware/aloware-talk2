@@ -324,7 +324,7 @@ import {
   sessionCallStatusMixin,
   dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
-import { isEmpty, cloneDeep, get } from 'lodash'
+import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
@@ -759,6 +759,10 @@ export default {
       'removeFirstInQueueTask'
     ]),
 
+    processRemoveFirstInQueueTask: debounce(function () {
+      this.removeFirstInQueueTask()
+    }, 500),
+
     processHangup () {
       this.$VueEvent.fire('hangupCall')
 
@@ -948,7 +952,7 @@ export default {
         this.taskToCall = cloneDeep(task)
 
         if (this.taskToCall) {
-          this.removeFirstInQueueTask()
+          this.processRemoveFirstInQueueTask()
         }
 
         this.activeTask = this.taskToCall
@@ -1265,8 +1269,12 @@ export default {
           return
         }
 
-        this.removeFirstInQueueTask()
+        this.processRemoveFirstInQueueTask()
         this.processSession(noWrapUp)
+        // Add task to skipped list when users clicks on the Next button
+        if (!forceSkip && skipWrapUp && this.sessionPaused) {
+          this.powerDialerTasks.skipped.push(cloneDeep(this.taskToCall))
+        }
         return
       }
 
@@ -1281,7 +1289,7 @@ export default {
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
       if (this.taskToCall) {
-        this.removeFirstInQueueTask()
+        this.processRemoveFirstInQueueTask()
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
         this.hangUpIntervalCounter = 0
@@ -1327,7 +1335,7 @@ export default {
 
       if (this.taskToCall && this.isSessionRunning) {
         setTimeout(() => {
-          this.removeFirstInQueueTask()
+          this.processRemoveFirstInQueueTask()
           this.processSession(true)
         }, 200)
 
@@ -1428,6 +1436,19 @@ export default {
     onUnholdFailed () {
       this.loadingUnhold = false
       this.toggleHold = true
+    },
+
+    manageTaskTransition () {
+      const task = this.powerDialerTasks.in_queue.shift()
+      this.taskToCall = cloneDeep(task)
+
+      if (isEmpty(task)) {
+        this.hasActiveTask = false
+        this.reRoute()
+        return
+      }
+
+      this.processSession(false)
     }
   },
 
@@ -1471,6 +1492,26 @@ export default {
         }
       },
       deep: true
+    },
+
+    contact (value) {
+      const phoneNumber = this.$options.filters.fixPhone(value.phone_number)
+      const outboundCampaing = this.campaigns.find(campaign => campaign.id === this.sessionSettings.campaign_id)
+      // Skip contact since we are trying to make a self call
+      if (outboundCampaing && outboundCampaing.incoming_number === phoneNumber) {
+        const newTask = this.powerDialerTasks.skipped.find(task => task.id === value.id)
+        // Move the contact/task to the list of skipped ones
+        if (!newTask) {
+          this.powerDialerTasks.skipped.push(value)
+        }
+
+        // Continue with next task/contact
+        if (this.dialer.currentStatus !== 'CALL_CONNECTED') {
+          this.wrapUp = false
+          this.hasActiveTask = false
+          this.manageTaskTransition()
+        }
+      }
     },
 
     currentSessionStatus (status) {

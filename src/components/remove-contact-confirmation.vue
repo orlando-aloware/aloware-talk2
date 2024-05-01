@@ -189,7 +189,7 @@ export default {
         .delete(url.data, { params: params })
         .then(() => {
           this.$emit('contactsRemoved', this.selectedList)
-          this.$generalNotification('Contacts was successfully removed.')
+          this.$generalNotification('Contacts were successfully removed.')
         })
         .catch((_err) => {
           this.$generalNotification('Unable to remove contacts please try again.', 'error')

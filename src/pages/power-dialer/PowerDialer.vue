@@ -96,6 +96,7 @@ import {
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import qs from 'qs'
+import * as TaskType from 'src/constants/task-types'
 
 export default {
   name: 'PowerDialer',
@@ -306,11 +307,11 @@ export default {
         this.updateMyQueueListData(this.contactsData)
       }
 
-      index = this.powerDialerTasks['in_queue'].findIndex(contact => contact.id === contactId)
+      index = this.powerDialerTasks[TaskType.IN_QUEUE].findIndex(contact => contact.id === contactId)
 
       // try to remove the contact from the session
       if (index >= 0) {
-        this.powerDialerTasks['in_queue'].splice(index, 1)
+        this.powerDialerTasks[TaskType.IN_QUEUE].splice(index, 1)
       }
     }
 
@@ -379,7 +380,7 @@ export default {
 
           const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
           this.fetch(params, false, true)
-          this.$generalNotification('Contacts was successfully removed.')
+          this.$generalNotification('Contacts were successfully removed.')
         })
         .catch((_err) => {
           this.$generalNotification('Unable to remove contacts please try again.', 'error')
