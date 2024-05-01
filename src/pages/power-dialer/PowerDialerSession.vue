@@ -293,6 +293,7 @@ export default {
       ])
         .then(([listResponse, sessionMetricsResponse]) => {
           console.log('sessionMetricsResponse: ', sessionMetricsResponse)
+          console.log('listResponse: ', listResponse)
           this.activeList = listResponse
           this.activeMetrics = sessionMetricsResponse.data.session_metrics
 
