@@ -243,7 +243,7 @@ export default {
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
               const newInQueueList = this.filterNewInQueueTasks(res.data.data, taskType, true, true)
 
-              if (newInQueueList.length) {
+              if (newInQueueList?.length) {
                 this.powerDialerTasks[taskType] = newInQueueList
               }
             } else {

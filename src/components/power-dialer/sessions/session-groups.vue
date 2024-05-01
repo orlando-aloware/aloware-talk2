@@ -426,7 +426,7 @@ export default {
       })
 
       if (res.status === 200) {
-        const totalInQueue = this.powerDialerTasks.in_queue.length
+        const totalInQueue = this.powerDialerTasks?.in_queue?.length
 
         // find in this.powerDialerTasks['in_queue'] the element with the same id as the item
         const index = this.powerDialerTasks.in_queue.findIndex(element => element.id === item.id)
@@ -525,7 +525,7 @@ export default {
         if (inQueueTaskType) {
           const newInQueueList = this.filterNewInQueueTasks(res.data.data, taskType, true, true)
 
-          if (newInQueueList.length) {
+          if (newInQueueList?.length) {
             this.powerDialerTasks[taskType] = [...this.powerDialerTasks[taskType], ...newInQueueList]
           }
         } else {
@@ -579,7 +579,7 @@ export default {
       // is greater than or equal to the total of items in queue that are allowed to be queued
       if (taskType === TaskType.IN_QUEUE) {
         const totalInQueue = group.length + 1 // items in current queue + the one in progress
-        const totalSkipped = this.powerDialerTasks.skipped.length
+        const totalSkipped = this.powerDialerTasks?.skipped?.length
         if (this.powerDialerTaskFilters?.in_queue?.total_queued && (totalInQueue + totalSkipped) >= this.powerDialerTaskFilters?.in_queue?.total_queued) {
           return false
         }
