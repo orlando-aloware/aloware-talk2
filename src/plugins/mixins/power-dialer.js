@@ -93,8 +93,10 @@ export default {
         filters.filter_groups = currentFilters
       }
 
+      console.log('preparing filters listId', listId)
+      console.log('preparing filters this.currentSelectedContacts', this.currentSelectedContacts)
       // add selected contacts to the params, when they arent empty
-      if (Array.isArray(this.currentSelectedContacts[listId])) {
+      if (this.currentSelectedContacts && Array.isArray(this.currentSelectedContacts[listId]) && this.currentSelectedContacts[listId].length) {
         const contactIds = this.currentSelectedContacts[listId].map(contact => contact.id)
 
         if (contactIds.length) {
