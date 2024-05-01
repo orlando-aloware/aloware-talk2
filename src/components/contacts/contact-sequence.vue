@@ -76,7 +76,8 @@
           </b-button>
         </div>
 
-        <enroll-sequence-modal></enroll-sequence-modal>
+        <enroll-sequence-modal @onContactEnrolled="onContactEnrolled"
+                               @onContactEnrolledWithoutSequence="onContactEnrolledWithoutSequence"/>
       </div>
     </b-card>
     <template #overlay>
@@ -95,9 +96,9 @@ import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import EnrollSequenceModal from 'components/enroll-sequence-modal'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import _ from 'lodash'
 import BlockTooltip from 'components/kyc/block-tooltip'
 import { kycMixin } from 'src/plugins/mixins'
+import { isEmpty, debounce } from 'lodash'
 
 export default {
   name: 'contact-sequence',
@@ -151,9 +152,34 @@ export default {
 
   methods: {
     ...mapActions('contacts', ['enrollSequenceOpen']),
+
     openSequenceModal () {
       this.enrollSequenceOpen(true)
     },
+
+    onContactEnrolled ({ workflow, sequence }) {
+      this.isBusy = true
+
+      setTimeout(() => {
+        this.workflow = workflow
+        this.sequence = sequence
+
+        this.emitSequenceInfo()
+        this.isBusy = false
+      }, 1000)
+    },
+
+    onContactEnrolledWithoutSequence (contactId) {
+      if (this.contact.id !== contactId) {
+        return
+      }
+
+      this.isBusy = true
+      setTimeout(() => {
+        this.getSequenceInfo()
+      }, 3000)
+    },
+
     getSequenceInfo () {
       if (!this.contact.id) {
         return
@@ -168,9 +194,11 @@ export default {
         this.isBusy = false
       })
     },
+
     emitSequenceInfo () {
       this.$emit('sequenceLoaded', { sequence: this.sequence, workflow: this.workflow })
     },
+
     disenrollContact () {
       this.$bvModal.msgBoxConfirm('Do you wish to disenroll this contact from all sequences?', {
         okTitle: 'Yes, disenroll',
@@ -187,10 +215,12 @@ export default {
         }
       })
     },
+
     resetSequence () {
       this.sequence = null
       this.workflow = null
     },
+
     getIconUrl (src) {
       return process.env.API_URL + src
     }
@@ -200,24 +230,13 @@ export default {
     this.sequence = this.sequenceInfo.sequence
     this.workflow = this.sequenceInfo.workflow
 
-    if (!_.isEmpty(this.sequence) && !_.isEmpty(this.workflow)) {
+    if (!isEmpty(this.sequence) && !isEmpty(this.workflow)) {
       this.emitSequenceInfo()
     }
-
-    this.$VueEvent.listen('contactSequenceEnrolled', (contactId) => {
-      if (this.contact.id !== contactId) {
-        return
-      }
-
-      this.isBusy = true
-      setTimeout(() => {
-        this.getSequenceInfo()
-      }, 3000)
-    })
   },
 
   watch: {
-    'contact.id': _.debounce(function (value) {
+    'contact.id': debounce(function (value) {
       if (this.isContactAndRouteValid) {
         this.resetSequence()
         this.getSequenceInfo()
