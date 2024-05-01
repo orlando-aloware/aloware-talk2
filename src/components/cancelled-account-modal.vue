@@ -47,7 +47,7 @@
                   @click="emailCsmRep">
             Restore Account
           </button>
-          <button class="btn btn-primary ml-1"
+          <button class="btn btn-danger ml-1"
                   @click="logoutAction">
             {{ logoutLabel }}
           </button>
