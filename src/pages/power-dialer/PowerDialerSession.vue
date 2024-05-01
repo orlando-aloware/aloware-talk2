@@ -279,25 +279,29 @@ export default {
     },
 
     async fetchCurrentList () {
-      let response = null
       let id = ''
 
       if (this.isValidList) {
         id = this.selectedList.id
-        response = await this.getPowerDialerList(id)
       } else {
-        id = this.selectedList?.name?.length === 0 || this.selectedList?.name === 'My Queue' ? 'my-queue' : this.selectedList?.id
-        response = await this.getPowerDialerList(this.$route.params.id)
+        id = this.$route.params.id
       }
 
-      this.activeList = response
-      this.activeMetrics = response.session_metrics
+      Promise.all([
+        this.getPowerDialerList(id),
+        this.$axios.get(`/api/v2/power-dialer-lists/${id}/session-metrics`)
+      ])
+        .then(([listResponse, sessionMetricsResponse]) => {
+          console.log('sessionMetricsResponse: ', sessionMetricsResponse)
+          this.activeList = listResponse
+          this.activeMetrics = sessionMetricsResponse.data.session_metrics
 
-      this.setSelectedPDList({
-        id: response.id,
-        name: response.name,
-        type: response.type
-      })
+          this.setSelectedPDList({
+            id: listResponse.id,
+            name: listResponse.name,
+            type: listResponse.type
+          })
+        })
     },
 
     redirectRoute (route) {

@@ -129,7 +129,6 @@ export const DEFAULT_STATE = {
     target: null
   },
   contactResources: [],
-  selectedContacts: {},
   isStartingDial: false,
   searchedListItem: '',
   currentListFilters: [],

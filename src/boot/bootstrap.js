@@ -475,7 +475,7 @@ Vue.prototype.$downloadFileWithUrl = async function (url, filename, type = 'comm
 }
 
 Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, actionOptions = {}) {
-  if (window._.isEmpty(message.trim())) {
+  if (!message || window._.isEmpty(message.trim())) {
     return
   }
 
@@ -656,7 +656,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
       if (unqueuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
         clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
       }
-    }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+    }, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 
     return
   }
@@ -693,7 +693,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     if (queuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
       clearInterval(window.actionNotificationQueuedIntervals[settings.type])
     }
-  }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+  }, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 }, 100)
 
 Vue.prototype.$closeActionNotification = function (type) {
@@ -756,7 +756,7 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     autoHideDelay: '30000',
     isStatus: true
   })
-}, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+}, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 
 Vue.prototype.$jsonClone = (value) => {
   return cloneDeep(value)

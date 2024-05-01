@@ -1,19 +1,26 @@
 import qs from 'qs'
 import { mapActions, mapGetters } from 'vuex'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
+import { STATIC } from 'src/constants/contacts-list-types'
 
 export default {
   data () {
     return {
       countCancelToken: null,
       countSource: null,
-      contactsListCountListeners: {}
+      contactsListCountListeners: {},
+      fetchCount: 0,
+      fetchCountTimeout: null,
+      bulkActions: ['bulk-created', 'bulk-deleted'],
+      STATIC
     }
   },
 
   computed: {
     ...mapGetters('contacts', [
-      'pinnedLists'
+      'pinnedLists',
+      'lists',
+      'selectedList'
     ])
   },
 
@@ -22,78 +29,149 @@ export default {
     this.countSource = this.countCancelToken.source()
 
     this.contactsListCountListeners.getListCount = (data) => {
-      const skipCancelToken = get(data, 'skipCancelToken', false)
-      const listId = get(data, 'id', null)
-
-      this.getListDataCount(data.data, skipCancelToken).then(response => {
-        if (data.thenFunctions) {
-          const funcs = Object.keys(data.thenFunctions)
-
-          for (let func of funcs) {
-            if (typeof this[func] !== 'undefined') {
-              this[func](this.fixFunctionData(data.thenFunctions[func], response))
-            }
-          }
-        }
-
-        if (data.thenEventFires) {
-          const events = Object.keys(data.thenEventFires)
-          for (let event of events) {
-            this.$VueEvent.fire(event, this.fixFunctionData(data.thenEventFires[event], response))
-          }
-        }
-
-        if (listId) {
-          this.$VueEvent.fire('listCountUpdated', {
-            list: {
-              id: listId
-            },
-            count: response.data.count
-          })
-        }
-      }).catch((err) => {
-        const className = get(err, 'constructor.name', null)
-
-        if (className && className === 'Cancel') {
-          return
-        }
-
-        if (data.catchFunctions) {
-          const funcs = Object.keys(data.catchFunctions)
-          for (let func in funcs) {
-            if (typeof this[func] !== 'undefined') {
-              this[func](data.catchFunctions[func])
-            }
-          }
-        }
-
-        if (data.catchEventFires) {
-          const events = Object.keys(data.catchEventFires)
-          for (let event of events) {
-            this.$VueEvent.fire(event, data.catchEventFires[event])
-          }
-        }
-      })
+      this.fetchCount = 0
+      this.processGetListCount(data)
     }
 
     this.$VueEvent.listen('get-list-count', this.contactsListCountListeners.getListCount)
   },
 
   methods: {
-    getListDataCount (data, skipCancelToken = false) {
+    processGetListCount (data) {
+      const skipCancelToken = get(data, 'skipCancelToken', false)
+      const listId = get(data, 'id', null)
+      const isStaticList = listId !== null && this.lists?.[listId] && this.lists[listId]?.type === STATIC
+      // bulk event data
+      const event = data?.event
+      // flag needed for checking if it's a new search/filter
+      const clear = data?.clear ?? false
+      const skipCache = data?.skipCache ?? false
+
+      this.setIsDatatableCountLoading(true)
+      clearTimeout(this.fetchCountTimeout)
+
+      this.getListDataCount(data.data, skipCancelToken, isStaticList, listId, skipCache)
+        .then(response => {
+          const count = response.data.count
+          const currentTotalCount = this.selectedList.contactCount
+          // check if the count is not what we're expecting or
+          // is not the latest count due to redshift delay
+          const isInvalidCountWithoutEvent = isEmpty(event) &&
+            count < currentTotalCount && !clear
+          const isInvalidCountWithEvent = !isEmpty(event) &&
+            this.isFromBulkActionInvalidCount(event, count)
+          const isInvalidCount = isInvalidCountWithoutEvent ||
+            isInvalidCountWithEvent
+
+          // we have to re-fetch the count if count is not correct
+          if (!this.$route.path.includes('/add') && this.contactsData &&
+            this.contactsData?.data.length > 0 &&
+            listId === this.selectedList.id &&
+            isInvalidCount) {
+            this.fetchCount++
+
+            if (this.fetchCount < 5) {
+              this.fetchCountTimeout = setTimeout(() => {
+                this.processGetListCount(data)
+              }, 5000)
+
+              return
+            }
+          }
+
+          this.fetchCount = 0
+
+          if (data.thenFunctions) {
+            const funcs = Object.keys(data.thenFunctions)
+
+            for (let func of funcs) {
+              if (typeof this[func] !== 'undefined') {
+                this[func](this.fixFunctionData(data.thenFunctions[func], response))
+              }
+            }
+          }
+
+          if (data.thenEventFires) {
+            const events = Object.keys(data.thenEventFires)
+            for (let event of events) {
+              this.$VueEvent.fire(event, this.fixFunctionData(data.thenEventFires[event], response))
+            }
+          }
+
+          if (listId) {
+            this.$VueEvent.fire('listCountUpdated', {
+              list: {
+                id: listId
+              },
+              count: count
+            })
+          }
+
+          this.setIsDatatableCountLoading(false)
+        }).catch((err) => {
+          const className = get(err, 'constructor.name', null)
+
+          if (className && className === 'Cancel') {
+            return
+          }
+
+          if (data.catchFunctions) {
+            const funcs = Object.keys(data.catchFunctions)
+            for (let func in funcs) {
+              if (typeof this[func] !== 'undefined') {
+                this[func](data.catchFunctions[func])
+              }
+            }
+          }
+
+          if (data.catchEventFires) {
+            const events = Object.keys(data.catchEventFires)
+            for (let event of events) {
+              this.$VueEvent.fire(event, data.catchEventFires[event])
+            }
+          }
+
+          this.setIsDatatableCountLoading(false)
+        })
+    },
+
+    getListDataCount (data, skipCancelToken = false, isStaticList = false, listId = null, skipCache = false) {
       if (!skipCancelToken) {
         this.countSource.cancel('Loading of contacts list count operation is canceled by the user.')
         this.countSource = this.countCancelToken.source()
       }
 
+      const filters = typeof data.filters === 'object'
+        ? this.$jsonClone(data.filters)
+        : JSON.parse(data.filters)
+      const tempFilters = this.$jsonClone(filters)
+
+      // we remove unnecessary filter so we can check for emptiness
+      if (tempFilters?.list_id) {
+        delete tempFilters.list_id
+      }
+
+      // check if list is a static list, then we should fetch
+      // from the static list count endpoint
+      if (isStaticList && !this.$route.path.includes('/add') && isEmpty(tempFilters)) {
+        return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${listId}/count`, {
+          cancelToken: this.countSource.token
+        })
+      }
+
+      const params = this.getQueryString(filters, true)
+
       return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
-        params: this.getQueryString(typeof data.filters === 'object' ? data.filters : JSON.parse(data.filters)),
+        params: {
+          skip_cache: skipCache,
+          ...params
+        },
         paramsSerializer: qs.stringify,
         cancelToken: this.countSource.token
       })
     },
 
-    getQueryString (filters) {
+    getQueryString (filters, isCount = false) {
       const query = {}
       const keys = Object.keys(filters)
 
@@ -136,6 +214,24 @@ export default {
           if (key === 'my_contacts') {
             query.my_contacts = filters[key]
           }
+
+          // non-grouped filters
+          if (key === 'filters') {
+            query.filters = filters[key]
+          }
+        })
+      }
+
+      if (query?.list_id && query?.filter_groups && query.filter_groups.length) {
+        query.filter_groups.forEach((item, index) => {
+          Object.assign(query.filter_groups[index].filters, {
+            'contact_lists': [
+              {
+                value: [query.list_id],
+                operator: 1
+              }
+            ]
+          })
         })
       }
 
@@ -167,11 +263,25 @@ export default {
         : params
     },
 
+    isFromBulkActionInvalidCount (event, count) {
+      const eventName = event.name
+
+      if (!this.bulkActions.includes(eventName)) {
+        return false
+      }
+
+      let estimatedCount = this.selectedList.contactCount
+
+      return count === estimatedCount && event.count > 0
+    },
+
     ...mapActions('contacts', [
       'pinnedCountLoaded',
       'setPinnedListsLoaded',
       'setSelectedListContactCount'
-    ])
+    ]),
+
+    ...mapActions(['setIsDatatableCountLoading'])
   },
 
   beforeDestroy () {

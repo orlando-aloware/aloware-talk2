@@ -23,7 +23,6 @@
                      :is-loading-more="isLoadingMore"
                      :filters-count="filtersCount"
                      :selected-list-id="filteredId"
-                     :add-contacts-in-progress-data="powerDialerListAddRemoveContactsProgress"
                      :onFetch="fetch"
                      v-if="!isPowerDialerSession"
                      @search="onSearch"
@@ -31,7 +30,7 @@
                      @sort="onSortByField"
                      @paginated="onPaginate"
                      @loadMore="beforeOnLoadMore(selectedList)"
-                     @onFiltersCount="getFiltersCount"
+                     @onSelectedCountChange="onSelectedCountChange"
                      @on-list-update="updateList"
                      @on-my-queue-list="myQueueList">
         </router-view>
@@ -49,9 +48,11 @@
                            v-if="isActive" />
         <remove-list-confirmation v-if="isActive" />
         <remove-contact :is-contact-module-type="false"
+                        :selected-count="selectedContactsCount"
                         v-if="isActive"
                         @on-remove="onRemove" />
-        <remove-contact-confirmation v-if="isActive"
+        <remove-contact-confirmation :selected-count="selectedContactsCount"
+                                     v-if="isActive"
                                      @contactsRemoved="updateList" />
         <remove-folder-dialog :is-contact-module-type="false" />
         <create-list-modal :is-default="false" />
@@ -91,7 +92,8 @@ import {
   sessionsEngineMixin,
   aclMixin,
   visibilityMixin,
-  contactListCountMixin
+  contactListCountMixin,
+  mainViewMixin
 } from 'src/plugins/mixins'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
@@ -123,28 +125,22 @@ export default {
     sessionsEngineMixin,
     aclMixin,
     visibilityMixin,
-    contactListCountMixin
+    contactListCountMixin,
+    mainViewMixin
   ],
-
-  provide () {
-    return {
-      contactsData: this.powerDialerActiveList
-    }
-  },
 
   data () {
     return {
       powerDialerListeners: {},
-      powerDialerListAddRemoveContactsProgress: {
-        id: null,
-        loading: false
-      },
       ContactsListRemoveFromTypes
     }
   },
 
   computed: {
-    ...mapState(['isMobile']),
+    ...mapState([
+      'isMobile',
+      'isDatatableSelectedAll'
+    ]),
 
     ...mapFields('powerDialer', [
       'activeMetrics',
@@ -166,7 +162,6 @@ export default {
       'selectedList',
       'contactToRemove',
       'isBulkDelete',
-      'selectedContacts',
       'removeContactActionType',
       'currentListFilters'
     ]),
@@ -233,14 +228,6 @@ export default {
       const routeMetaTitle = get(this.$route, 'meta.title', '')
 
       return routeMetaTitle === 'Power Dialer Sessions'
-    },
-
-    isComponentLoading () {
-      const eventListId = this.getCleanedListId(this.powerDialerListAddRemoveContactsProgress.id)
-      const isListLoading = this.isInPowerDialerList && this.cleanedListId === eventListId &&
-        this.powerDialerListAddRemoveContactsProgress.loading
-
-      return this.isLoading || isListLoading
     }
   },
 
@@ -332,8 +319,7 @@ export default {
 
     ...mapActions('contacts', [
       'listLoaded',
-      'clearList',
-      'setListSelectedContacts'
+      'clearList'
     ]),
 
     ...mapMutations('powerDialer', [
@@ -368,17 +354,26 @@ export default {
 
       this.isBusy = true
       const ids = this.selectedContacts[this.listId].map(contact => contact.contact_list_item_id)
-      const params = { contact_list_items: ids }
+      const data = {
+        params: {
+          contact_list_items: ids
+        },
+        data: {
+          selected_all: this.isDatatableSelectedAll
+        }
+      }
 
       return this.$axios
-        .delete(url.data, { params: params })
+        .delete(url.data, data)
         .then(() => {
-          this.powerDialerListAddRemoveContactsProgress = {
+          this.listAddRemoveContactsProgress = {
             id: null,
             loading: false
           }
 
-          const params = typeof this.currentListFilters === 'string' ? {} : this.currentListFilters
+          const params = typeof this.currentListFilters === 'string'
+            ? {}
+            : this.$jsonClone(this.currentListFilters)
           this.fetch(params, false, true)
           this.$generalNotification('Contacts were successfully removed.')
         })
@@ -394,8 +389,8 @@ export default {
       if (Object.keys(this.selectedContacts).length !== 0 &&
         this.selectedContacts[this.selectedList.id].constructor !== Object &&
         this.isBulkDelete) {
-        this.powerDialerListAddRemoveContactsProgress = {
-          id: this.cleanedListId,
+        this.listAddRemoveContactsProgress = {
+          id: this.getCleanedListId(this.$route?.params?.id),
           loading: true
         }
 
@@ -461,14 +456,6 @@ export default {
       this.onLoadMore(selectedList)
     },
 
-    forcedCheckAllItems () {
-      const elem = document.querySelector('.data-table-check-all')
-
-      if (elem.checked) {
-        this.setListSelectedContacts({ id: this.tempId, contacts: this.contactsData.data })
-      }
-    },
-
     async updateList (data) {
       await this.loadList(data.id)
     },
@@ -516,6 +503,8 @@ export default {
     '$route': {
       handler (val) {
         this.isLoading = true
+        this.setAllContactsSelected(false)
+        this.setIsDatatableSelectedAll(false)
       },
       deep: true
     },
@@ -538,6 +527,7 @@ export default {
   beforeRouteLeave (to, from, next) {
     this.stopEvents()
     this.stopPDEvents()
+    this.stopMainViewEvents()
 
     setTimeout(() => {
       next()

@@ -519,9 +519,6 @@ export default {
     avatarMixin,
     addViewMixin
   ],
-  inject: [
-    'pdContactsData'
-  ],
 
   components: {
     ContactsFilters,
