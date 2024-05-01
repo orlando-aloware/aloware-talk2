@@ -58,7 +58,7 @@
                           @click="openDemo">
                       Upgrade Now
                   </button>
-                  <button class="btn btn-primary ml-1"
+                  <button class="btn btn-danger ml-1"
                           @click="logoutAction">
                       {{ logoutLabel }}
                   </button>
@@ -139,7 +139,7 @@ export default {
     },
 
     mailToSalesRep () {
-        return 'mailto:' + this.currentCompany.sales_rep?.email;
+      return 'mailto:' + this.currentCompany.sales_rep?.email
     }
   },
 
