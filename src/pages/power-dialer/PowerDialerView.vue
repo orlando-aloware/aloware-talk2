@@ -861,7 +861,7 @@ export default {
     },
 
     filteredList () {
-      if (this.selectedListId === 'my-queue') {
+      if (this.selectedListId === 'my-queue' || this.selectedListId === this.myQueue.id) {
         return this.myQueue
       }
 

@@ -502,9 +502,6 @@ export default {
   },
 
   async mounted () {
-    console.log('*** mounted this.selectedItem', this.selectedItem)
-    console.log('*** mounted this.defaultValues', this.defaultValues)
-    console.log('*** mounted this.list', this.list)
     this.selectedItem = this.defaultValues
   },
 
@@ -582,8 +579,6 @@ export default {
       this.loading = true
       this.isDialing = true
       this.loadingText = this.defaultTrigger ? 'Redirecting you to Power Dialer session..' : 'Applying changes to session settings..'
-      console.log('beginDial => this.temporarySetting.id', this.temporarySetting.id)
-      console.log('beginDial => this.selectedItem.id', this.selectedItem.id)
       if (this.temporarySetting.id === this.selectedItem.id) {
         const newSettings = { ...this.filterSelectedItem }
 
@@ -607,7 +602,6 @@ export default {
           dialer_session_id: this.selectedItem.id
         })
 
-        console.log('beginDial => this.selectedItem', this.selectedItem)
         this.SET_SESSION_SETTINGS(this.selectedItem)
       }
 
@@ -700,8 +694,6 @@ export default {
       )
 
       if (res?.data) {
-        console.log('updateSelectedSetting', res.data)
-        console.log('sessionSettings', this.sessionSettings)
         if (this.sessionSettings.id === res.data.id) {
           await this.getPowerDialerList(this.selectedList.id)
         }
@@ -870,10 +862,7 @@ export default {
         const fetchedSettings = this.dialerSessionSettings.find((setting) => {
           return setting.id === this.selectedItemId
         })
-        console.log('*** dialog this.temporarySetting', this.temporarySetting)
-        console.log('*** dialog this.selectedItemId', this.selectedItemId)
-        console.log('*** dialog this.fetchedSettings', this.fetchedSettings)
-        console.log('*** dialog this.list', this.list)
+
         if (fetchedSettings?.id) {
           this.selectedItem = fetchedSettings
         } else if (this.temporarySetting?.id) {
