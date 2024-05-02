@@ -39,7 +39,8 @@
                            @clicked="onClickAppliedFilterButton">
                 <q-tooltip v-if="appliedFilter"
                            anchor="top middle"
-                           self="center middle">
+                           self="center middle"
+                           data-testid="inbox-tab-applied-filter-compact-btn-tooltip">
                   {{ appliedFilter.name }}
                 </q-tooltip>
                 <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
@@ -81,7 +82,7 @@
           <template v-slot:one>
             <div class="w-100 options"
                  :class="[currentTask !== ContactTaskStatusAll ? 'text-grey-90' : 'active']">
-                <span class="text-center task-status-name">
+                <span class="text-center task-status-name" data-testid="inbox-tab-all-status">
                   All
                 </span>
             </div>
@@ -90,7 +91,7 @@
           <template v-slot:two>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusOpen ? 'text-grey-90' : 'active']">
-              <span class="text-left task-status-name">
+              <span class="text-left task-status-name" data-testid="inbox-tab-open-status">
                 Open
               </span>
               <div class="text-center task-count ml-1">
@@ -120,7 +121,7 @@
           <template v-slot:three>
             <div class="d-flex justify-content-center w-100 options"
                  :class="[currentTask !== ContactTaskStatusPending ? 'text-grey-90' : 'active']">
-              <span class="text-left task-status-name">
+              <span class="text-left task-status-name" data-testid="inbox-tab-pending-status">
                 Pending
               </span>
               <div class="text-center task-count ml-1">
@@ -139,7 +140,7 @@
           <template v-slot:four>
             <div class="w-100 options"
                  :class="[currentTask !== ContactTaskStatusClosed ? 'text-grey-90' : 'active']">
-                <span class="text-center task-status-name">
+                <span class="text-center task-status-name" data-testid="inbox-tab-closed-status">
                   Closed
                 </span>
             </div>
