@@ -861,11 +861,12 @@ export default {
     },
 
     filteredList () {
-      if (this.selectedListId === 'my-queue' || this.selectedListId === this.myQueue.id) {
+      if (this.selectedListId === 'my-queue' || this.selectedListId === this.myQueue?.id) {
         return this.myQueue
       }
 
-      return this.selectedList
+      const selectedList = Object.values(this.lists).find(list => list.id === this.selectedListId)
+      return selectedList
     },
 
     filteredListId () {
