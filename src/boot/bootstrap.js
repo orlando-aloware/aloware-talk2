@@ -292,6 +292,7 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
       'Navigation cancelled from',
       'Blocked a frame with origin',
       'AxiosError: Request failed with status code 404',
+      'AxiosError: Request aborted',
       /^CanceledError:/
     ],
 
