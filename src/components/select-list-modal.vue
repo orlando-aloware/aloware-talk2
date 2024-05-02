@@ -1,51 +1,41 @@
 <template>
-  <b-modal
-    v-model="isOpen"
-    title="Select A List"
-    size="lg"
-    modal-class="select-list-modal"
-    scrollable
-    centered
-    hide-footer
-    hide-header
-    no-close-on-esc
-  >
-    <b-overlay
-      :show="isLoading"
-      spinner-variant="primary"
-      spinner-type="grow"
-      spinner-small
-      rounded="sm"
-    >
+  <b-modal title="Select A List"
+           size="lg"
+           modal-class="select-list-modal"
+           scrollable
+           centered
+           hide-footer
+           hide-header
+           no-close-on-esc
+           v-model="isOpen">
+    <b-overlay spinner-variant="primary"
+               spinner-type="grow"
+               spinner-small
+               rounded="sm"
+               :show="isLoading">
       <div class="d-flex flex-column select-list-modal__body position-relative">
         <div class="d-flex align-items-center">
           <div class="flex-grow-1 select-list-modal__title">{{ getTitle }}</div>
-          <button
-            class="btn btn-link small text-muted select-list-modal__close"
-            @click="onClose"
-          >
-            <i class="fa fa-times"></i>
+          <button class="btn btn-link small text-muted select-list-modal__close"
+                  @click="onClose">
+            <i class="fa fa-times"/>
           </button>
         </div>
 
         <div class="pt-3">
           <b-form-row>
             <b-col md="10">
-              <search
-                placeholder="Search static list..."
-                searchOnKeyup
-                @search="onSearch"
-              />
+              <search placeholder="Search static list..."
+                      searchOnKeyup
+                      @search="onSearch"/>
             </b-col>
             <b-col md="2">
               <b-form-group>
-                <b-button
-                  block
-                  variant="primary"
-                  size="sm"
-                  :disabled="isLoading || !selectedStaticList.id"
-                  @click="onSubmit"
-                >
+                <b-button variant="primary"
+                          size="sm"
+                          block
+                          :disabled="isLoading || !selectedStaticList.id"
+                          @click="onSubmit">
                   Add to
                 </b-button>
               </b-form-group>
@@ -53,19 +43,17 @@
           </b-form-row>
         </div>
         <div class="tree-container">
-          <select-list-tree-folder
-            class="select-list-tree-folder"
-            v-for="folder in folders"
-            :name="folder.name"
-            :key="folder.id"
-            :id="folder.id"
-            :order="folder.order"
-            :hasEdit="folder.has_edit"
-            :hasDelete="folder.has_delete"
-            :folders="folder.child_folders"
-            :lists="folder.lists.filter(list => list.type === ContactListTypes.STATIC && list.id !== selectedList.id)"
-            :layer="0"
-          />
+          <select-list-tree-folder class="select-list-tree-folder"
+                                   :name="folder.name"
+                                   :key="folder.id"
+                                   :id="folder.id"
+                                   :order="folder.order"
+                                   :hasEdit="folder.has_edit"
+                                   :hasDelete="folder.has_delete"
+                                   :folders="folder.child_folders"
+                                   :lists="folder.lists.filter(list => list.type === ContactListTypes.STATIC && list.id !== selectedList.id)"
+                                   :layer="0"
+                                   v-for="folder in folders"/>
         </div>
       </div>
     </b-overlay>
@@ -78,38 +66,72 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import SelectListTreeFolder from 'src/components/select-list-tree-folder/select-list-tree-folder'
 import Search from 'src/components/search'
+import { chunk, isEmpty } from 'lodash'
+
 export default {
+  inject: [
+    'selectedContacts'
+  ],
+
   components: { Search, SelectListTreeFolder },
+
   computed: {
-    ...mapState('contacts', ['isAllContactsSelected']),
-    ...mapGetters('contacts', ['selectList', 'currentListFilters', 'selectedStaticList', 'selectedList', 'selectedContacts', 'folders']),
+    ...mapGetters('contacts', [
+      'selectList',
+      'currentListFilters',
+      'selectedStaticList',
+      'selectedList',
+      'folders'
+    ]),
+
+    ...mapState(['isDatatableSelectedAll']),
+
     getTitle () {
       return 'Add to Static Lists'
     }
   },
+
   methods: {
-    ...mapActions('contacts', ['selectListClose', 'foldersLoaded', 'setSelectListSearchValue']),
+    ...mapActions('contacts', [
+      'selectListClose',
+      'foldersLoaded',
+      'setSelectListSearchValue'
+    ]),
+
     onClose () {
       if (!this.isLoading) {
         this.selectListClose()
       }
     },
+
     onSearch (searchValue) {
       this.setSelectListSearchValue(searchValue)
     },
-    onSubmit () {
-      if (!this.selectedStaticList.hasEdit) {
-        this.$generalNotification('You are not authorized to edit this resource.', 'error')
-        return
+
+    processRequest (params, isChunked = false, chunkedContactIds = []) {
+      if (chunkedContactIds.length > 0) {
+        params.contacts = chunkedContactIds[0]
       }
 
-      this.isLoading = true
+      const url = `/api/v2/contacts-list/${this.selectedStaticList.id}/items`
       this.$axios
-        .post(`/api/v2/contacts-list/${this.selectedStaticList.id}/items`, {
-          contacts: this.selectedContacts[this.selectedList.id].map(item => item.id),
-          include_all_contacts: this.isAllContactsSelected
-        })
+        .post(url, params)
         .then((response) => {
+          if (isChunked) {
+            // remove the used set of contact ids
+            chunkedContactIds.splice(0, 1)
+            const hasMoreChunks = chunkedContactIds.length > 1
+
+            // process the next set of contact ids
+            if (chunkedContactIds.length > 0) {
+              this.processRequest(params, hasMoreChunks, chunkedContactIds)
+
+              return
+            } else {
+              isChunked = false
+            }
+          }
+
           const message = response.data.message
 
           this.$router.push(`/contacts/list/${this.selectedStaticList.id}`)
@@ -121,14 +143,101 @@ export default {
           this.loadFolders()
         })
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
+          if (!isChunked) {
+            this.$VueEvent.fire('addContactsProgress', {
+              id: null,
+              loading: false
+            })
+
+            const { message, html } = extractErrorMessage(error)
+            console.log(html)
+            this.$generalNotification(message, 'error')
+          }
         })
         .finally(() => {
-          this.isLoading = false
+          if (!isChunked) {
+            this.isLoading = false
+          }
         })
     },
+
+    processSubmit () {
+      this.isLoading = true
+
+      let params = {}
+      let ids = []
+
+      if (this.isDatatableSelectedAll) {
+        params.selected_all = true
+      } else {
+        ids = this.selectedContacts[this.selectedList.id].map(item => item.id)
+        ids = chunk(ids, 50)
+      }
+
+      const allFilters = this.$jsonClone(this.currentListFilters)
+
+      // we have to use the dynamic list's filters deconstructed if the source list is DYNAMIC
+      if (this.selectedStaticList.type === this.ContactListTypes.DYNAMIC && !isEmpty(allFilters)) {
+        Object.keys(allFilters).forEach(index => {
+          // include all other filters
+          if (!this.$isNumeric(index)) {
+            params[index] = allFilters[index]
+            delete allFilters[index]
+          }
+        })
+
+        // include the filter groups
+        params.filter_groups = allFilters
+      } else if (!isEmpty(allFilters)) {
+        // just pass the filters when not empty, if list is STATIC
+        params.filter_groups = allFilters
+      } else {
+        // else, just pass the contacts list id filter
+        params.filter_groups = [
+          {
+            'filters': {
+              'contact_lists': [
+                {
+                  value: [this.selectedList.id],
+                  operator: 1
+                }
+              ]
+            },
+            is_conjunction: true
+          }
+        ]
+      }
+
+      // only show list's loading view if all contacts were selected
+      if (params?.selected_all) {
+        this.$VueEvent.fire('addContactsProgress', {
+          id: this.selectedStaticList.id,
+          loading: true
+        })
+      }
+
+      const isChunked = !params?.selected_all && ids.length > 0
+      this.processRequest(params, isChunked, ids)
+    },
+
+    onSubmit () {
+      if (!this.selectedStaticList.hasEdit) {
+        this.$generalNotification('You are not authorized to edit this resource.', 'error')
+        return
+      }
+
+      this.$bvModal.msgBoxConfirm('Are you sure you want to continue?', {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'No',
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          this.processSubmit()
+        }
+      })
+    },
+
     loadFolders () {
       this.$axios
         .get('/api/v2/contact-folders')
@@ -139,6 +248,7 @@ export default {
         })
     }
   },
+
   data () {
     return {
       isOpen: false,
@@ -147,6 +257,7 @@ export default {
       ContactListTypes
     }
   },
+
   watch: {
     selectList ({ open }) {
       this.isOpen = open

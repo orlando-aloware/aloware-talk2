@@ -12,7 +12,6 @@ export default {
   createList: (state) => state.createList,
   isRemoveListOpen: (state) => !!state.removeList,
   pinned: (state) => state.pinned,
-  selectedContacts: (state) => state.selectedContacts,
   isStartingDial: (state) => state.isStartingDial,
   folderToRemove: (state) => state.removeFolder || {},
   listToRemove: (state) => state.removeList || {},

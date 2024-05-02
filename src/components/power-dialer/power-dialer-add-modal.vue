@@ -282,7 +282,7 @@ import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import { integrationMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -318,6 +318,11 @@ export default {
     showInContactsPage: {
       type: Boolean,
       default: false
+    },
+
+    checkedCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -346,11 +351,16 @@ export default {
   }),
 
   computed: {
-    ...mapState('contacts', ['isAddPowerDialerOpen']),
+    ...mapState('contacts', [
+      'isAddPowerDialerOpen',
+      'currentListFilters'
+    ]),
 
     ...mapState('cache', ['currentCompany']),
 
     ...mapGetters('powerDialer', ['myQueueId']),
+
+    ...mapState(['isDatatableSelectedAll']),
 
     isOpen: {
       get () {
@@ -371,6 +381,18 @@ export default {
         'direction': this.direction
       }
 
+      if (this.isDatatableSelectedAll) {
+        params.selected_all = true
+
+        if (params?.contact_ids) {
+          delete params.contact_ids
+        }
+      }
+
+      if (!isEmpty(this.currentListFilters)) {
+        params.filter_groups = this.$jsonClone(this.currentListFilters)
+      }
+
       if (this.where === 'scheduled') {
         params.future_scheduled_time = this.schedule.toISOString().slice(0, 19).replace('T', ' ')
       }
@@ -382,7 +404,7 @@ export default {
       let description = ''
 
       if (this.count !== null) {
-        description += this.count
+        description += this.$options.filters.numFormat(this.count)
       }
 
       description += (this.count === 1 ? ' contact' : ' contacts')
@@ -474,6 +496,12 @@ export default {
     ]),
 
     setCount () {
+      if (this.checkedCount) {
+        this.count = this.checkedCount
+        this.loading--
+        return
+      }
+
       if (this.params.contact_ids) {
         this.count = this.params.contact_ids.length
         this.loading--
@@ -558,7 +586,7 @@ export default {
     addContacts () {
       const listId = get(this.requestParams, 'contact_list_id', this.myQueueId)
 
-      this.$VueEvent.fire('add_contacts_progress', {
+      this.$VueEvent.fire('addContactsProgress', {
         id: listId,
         loading: true
       })
@@ -585,7 +613,7 @@ export default {
             this.stay = false
           }
         }).catch(error => {
-          this.$VueEvent.fire('add_contacts_progress', {
+          this.$VueEvent.fire('addContactsProgress', {
             id: null,
             loading: false
           })

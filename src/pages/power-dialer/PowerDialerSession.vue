@@ -224,8 +224,8 @@ export default {
 
         // Check if the number of tasks in the IN QUEUE list is equal
         // to the minimum number of tasks required to check/increment the page for pagination
-        const lastItemsInCurrentQueue = this.powerDialerTasks[TaskType.IN_QUEUE].length === this.minNumberOfInQueueTasks
-        const hasSkippedTasks = this.powerDialerTasks[TaskType.SKIPPED].length > 0
+        const lastItemsInCurrentQueue = this.powerDialerTasks[TaskType.IN_QUEUE]?.length === this.minNumberOfInQueueTasks
+        const hasSkippedTasks = this.powerDialerTasks[TaskType.SKIPPED]?.length > 0
         const remainingInQueueTasks = this.powerDialerTaskFilters[TaskType.IN_QUEUE] ? this.powerDialerTaskFilters[TaskType.IN_QUEUE].total_queued > this.inQueueFetchTasks.fetchedTasks : false
 
         // Increment the pagination when the last items in the current list of IN QUEUE taks are reached
@@ -243,7 +243,7 @@ export default {
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
               const newInQueueList = this.filterNewInQueueTasks(res.data.data, taskType, true, true)
 
-              if (newInQueueList.length) {
+              if (newInQueueList?.length) {
                 this.powerDialerTasks[taskType] = newInQueueList
               }
             } else {
@@ -254,7 +254,7 @@ export default {
             }
 
             // no more queued tasks
-            if (this.powerDialerTasks.in_queue.length === 0 && status === AutoDialTaskStatus.STATUS_QUEUED) {
+            if (this.powerDialerTasks?.in_queue?.length === 0 && status === AutoDialTaskStatus.STATUS_QUEUED) {
               this.$VueEvent.fire('initiate_session_no_tasks')
             }
 
@@ -279,25 +279,29 @@ export default {
     },
 
     async fetchCurrentList () {
-      let response = null
       let id = ''
 
       if (this.isValidList) {
         id = this.selectedList.id
-        response = await this.getPowerDialerList(id)
       } else {
-        id = this.selectedList?.name?.length === 0 || this.selectedList?.name === 'My Queue' ? 'my-queue' : this.selectedList?.id
-        response = await this.getPowerDialerList(this.$route.params.id)
+        id = this.$route.params.id
       }
 
-      this.activeList = response
-      this.activeMetrics = response.session_metrics
+      Promise.all([
+        this.getPowerDialerList(id),
+        this.$axios.get(`/api/v2/power-dialer-lists/${id}/session-metrics`)
+      ])
+        .then(([listResponse, sessionMetricsResponse]) => {
+          console.log('sessionMetricsResponse: ', sessionMetricsResponse)
+          this.activeList = listResponse
+          this.activeMetrics = sessionMetricsResponse.data.session_metrics
 
-      this.setSelectedPDList({
-        id: response.id,
-        name: response.name,
-        type: response.type
-      })
+          this.setSelectedPDList({
+            id: listResponse.id,
+            name: listResponse.name,
+            type: listResponse.type
+          })
+        })
     },
 
     redirectRoute (route) {
