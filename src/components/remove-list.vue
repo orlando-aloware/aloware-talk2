@@ -141,12 +141,11 @@ export default {
     },
 
     onClearList () {
-      console.log('Clearing up My Queue list...')
       return this.$axios
         .post(`/api/v2/power-dialer-list-items/clear-tasks/${this.listToRemove.id}`)
         .then((response) => response.data)
         .then((response) => {
-          this.$generalNotification('My Queue list items has been cleared!', 'success')
+          this.$generalNotification(`${this.listToRemove.name} list items has been cleared!`, 'success')
         })
         .catch(() => {
           this.$generalNotification('Unable to load folders please try again.', 'error')

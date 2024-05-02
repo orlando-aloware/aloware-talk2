@@ -61,16 +61,7 @@ export default function () {
       'in-queue': {
         id: 'in-queue',
         headers: DEFAULT_COLUMNS,
-        filters: [
-          // {
-          //   filters: {
-          //     in_queue: {
-          //       value: 1
-          //     }
-          //   },
-          //   is_conjunction: true
-          // }
-        ],
+        filters: [],
         name: 'In Queue'
       },
       'called': {
@@ -140,10 +131,7 @@ export default function () {
       type: 'list',
       target: null
     },
-    // powerDialerList: null,
     contactResources: [],
-    // contacts: [],
-    selectedContacts: {},
     isStartingDial: false,
     searchedListItem: '',
     currentListFilters: [],
@@ -163,6 +151,7 @@ export default function () {
     warmupDurations: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
     powerDialerTasks: {
       in_queue: [],
+      skipped: [],
       called: [],
       failed: [],
       scheduled: [],
@@ -170,10 +159,16 @@ export default function () {
     },
     powerDialerTaskFilters: {
       in_queue: null,
+      skipped: [],
       called: null,
       failed: null,
       scheduled: null,
       all: null
+    },
+    inQueueFetchTasks: {
+      currentPage: 0,
+      fetchedTasks: 0,
+      totalTasks: 0
     },
     activeTask: {},
     hasActiveTask: false,

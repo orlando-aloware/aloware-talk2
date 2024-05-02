@@ -7,6 +7,7 @@
     </div>
     <trial-banner v-if="isTrialKYC && isAuthenticated"/>
     <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/>
+    <cancelled-account-modal v-if="isCancelledAccount && isAuthenticated"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -284,6 +285,7 @@ import {
 import TrialBanner from 'components/trial-banner.vue'
 import * as TrialStatus from 'src/constants/trial-account-status'
 import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
+import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 
 export default {
   name: 'MyLayout',
@@ -301,7 +303,8 @@ export default {
     KycReloadDialog,
     Modal,
     TrialBanner,
-    TrialExpiredModal
+    TrialExpiredModal,
+    CancelledAccountModal
   },
 
   mixins: [
@@ -434,6 +437,10 @@ export default {
 
     isTrialExpired () {
       return this.currentCompany && [TrialStatus.TRIAL_STATUS_EXPIRED, TrialStatus.TRIAL_STATUS_PURGE_ELIGIBLE].includes(this.currentCompany.trial_status)
+    },
+
+    isCancelledAccount () {
+      return this.currentCompany && this.currentCompany.subscription?.status === 'cancelled' && !this.currentCompany.is_whitelabel
     },
 
     pageClass () {

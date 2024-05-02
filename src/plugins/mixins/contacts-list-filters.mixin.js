@@ -24,7 +24,9 @@ export default {
         oldIdValue: get(params, 'oldIdValue', null),
         selectedListId: get(this.selectedList, 'id', null),
         pinnedListFound: null,
-        currentListFilters: this.currentListFilters !== undefined ? this.currentListFilters : undefined,
+        currentListFilters: this.currentListFilters !== undefined
+          ? this.$jsonClone(this.currentListFilters)
+          : undefined,
         showMyContacts: this.showMyContacts !== undefined ? this.showMyContacts : undefined
       }
       data.pinnedListFound = this.pinnedLists.find(pinnedList => String(pinnedList.id) === String(data.selectedListId))

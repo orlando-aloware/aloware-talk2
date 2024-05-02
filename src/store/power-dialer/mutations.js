@@ -30,13 +30,6 @@ export default {
     state.lists = []
   },
 
-  SET_LIST_SELECTED_CONTACTS: (state, data) => {
-    state.selectedContacts = {
-      ...state.selectedContacts,
-      [data.id]: data.contacts
-    }
-  },
-
   /**
    * GENERAL MUTATIONS
    */
@@ -135,6 +128,7 @@ export default {
   RESET_POWER_DIALER_TASKS: (state) => {
     state.powerDialerTasks = {
       in_queue: [],
+      skipped: [],
       called: [],
       failed: [],
       scheduled: [],

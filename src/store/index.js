@@ -286,6 +286,8 @@ export default function (/* { ssrContext } */) {
       isIntroVideoVisible: false,
       showedKycDialog: false,
       integrationPDImportSummaries: {},
+      isDatatableSelectedAll: false,
+      isDatatableCountLoading: false,
       showedKycReloadDialog: false,
       isTrialBannerVisible: false
     },
@@ -827,6 +829,14 @@ export default function (/* { ssrContext } */) {
 
       setIsContactDisposed ({ commit }, value) {
         commit('SET_IS_CONTACT_DISPOSED', value)
+      },
+
+      setIsDatatableSelectedAll ({ commit }, value) {
+        commit('SET_IS_DATATABLE_SELECTED_ALL', value)
+      },
+
+      setIsDatatableCountLoading ({ commit }, value) {
+        commit('SET_IS_DATATABLE_COUNT_LOADING', value)
       },
 
       async fetchContactsLists ({ commit }) {
@@ -1606,6 +1616,14 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_CONTACT_DISPOSED (state, value) {
         state.isContactDisposed = value
+      },
+
+      SET_IS_DATATABLE_SELECTED_ALL (state, value) {
+        state.isDatatableSelectedAll = value
+      },
+
+      SET_IS_DATATABLE_COUNT_LOADING (state, value) {
+        state.isDatatableCountLoading = value
       },
 
       SET_CONTACTS_LISTS (state, lists) {

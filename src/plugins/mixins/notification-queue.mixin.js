@@ -32,7 +32,7 @@ export default {
 
     removeQueuedNotification (commId, commDispStatus, commCurrStatus) {
       const isCallNotInProgressOrIncoming = this.isCallNotInProgressOrIncoming(commDispStatus, commCurrStatus)
-      const isCallInCallFishingnQueues = this.notifications?.callFishing?.queue?.find(queue => queue.communicationId === commId) ||
+      const isCallInCallFishingQueues = this.notifications?.callFishing?.queue?.find(queue => queue.communicationId === commId) ||
         this.isCommunicationInCallFishingQueue(commId)
 
       // remove call fishing notification from queues if
@@ -41,7 +41,7 @@ export default {
       // (brought from notification queue) when the current notification closes.
       if (this.communicationId !== commId &&
         isCallNotInProgressOrIncoming &&
-        isCallInCallFishingnQueues) {
+        isCallInCallFishingQueues) {
         this.removeFromCallFishingQueue(commId)
         this.removeFromCallFishingNotificationQueue(commId)
       }

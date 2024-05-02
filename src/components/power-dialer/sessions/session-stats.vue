@@ -81,7 +81,7 @@ export default {
       'ongoingSession'
     ]),
     completedTasks () {
-      return this.powerDialerTaskFilters?.all?.total_called || 0 + this.powerDialerTaskFilters?.all?.total_failed || 0
+      return this.powerDialerTaskFilters?.called?.total_called || 0 + this.powerDialerTaskFilters?.failed?.total_failed || 0
     },
     allTasks () {
       return this.powerDialerTaskFilters?.all?.total_found || this.powerDialerTaskFilters?.all?.total_queued || 0

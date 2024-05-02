@@ -230,5 +230,7 @@ export const DEFAULT_STATE = {
   isCallDisposed: false,
   isContactDisposed: false,
   integrationPDImportSummaries: {},
-  isWhiteLabel: false
+  isWhiteLabel: false,
+  isDatatableSelectedAll: false,
+  isDatatableCountLoading: false
 }
