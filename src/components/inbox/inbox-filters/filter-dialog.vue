@@ -101,7 +101,7 @@
             <span class="filter-name">{{ filterFormDisplayName }}</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
-                       data-testid="filter-dialog-hide-compact-btn"
+                       data-testid="filter-dialog-close-compact-btn"
                        @clicked="onHide">
             <close-icon iconColor="#000000" />
           </compact-btn>
@@ -115,22 +115,26 @@
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
                          :disabled="!filterHasChanges"
+                         data-testid="filter-dialog-reset-compact-btn"
                          @clicked="onResetFilter">
               Reset
             </compact-btn>
             <compact-btn class="btn-primary"
                          :class="isViewEditModeOrNonView ? 'mr-2' : ''"
                          :disabled="isSaveAsNewDisabled"
+                         data-testid="filter-dialog-save-as-new-compact-btn"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
             <compact-btn variant="success"
                          :disabled="isUpdatingFilter"
                          v-if="isViewEditModeOrNonView"
+                         data-testid="filter-dialog-apply-compact-btn"
                          @clicked="onApply">
               <q-spinner-bars color="white"
                               class="mr-1"
-                              v-if="isUpdatingFilter"/>
+                              v-if="isUpdatingFilter"
+                              data-testid="filter-dialog-spinners-bars"/>
               {{ applyButtonText }}
             </compact-btn>
           </div>
@@ -141,6 +145,7 @@
       <b-button variant="success"
                 class="custom-btn"
                 size="sm"
+                data-testid="filter-dialog-close-btn"
                 @click="hide()">
         Close
       </b-button>

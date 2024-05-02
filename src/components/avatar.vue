@@ -1,13 +1,14 @@
 <template>
   <div class="avatar"
        :class="{ 'avatar--src': src, 'avatar--active': active }"
-       :style="computedStyle">
+       :style="computedStyle"
+       data-testid="avatar-wrapper">
     <div class="avatar__inner"
          :class="{ 'avatar__inner--active': active }"
          :style="{ 'background-image': (src ? `url(${src})` : 'none') }">
-      <sequence-icon v-if="sequenceIcon" />
+      <sequence-icon v-if="sequenceIcon" data-testid="avatar-sequence-icon"/>
       <span v-else-if="!name || !name.length">
-        <i class="fa fa-user"/>
+        <i class="fa fa-user" data-testid="avatar-icon"/>
       </span>
       <span v-else>
         {{ avatarText }}
