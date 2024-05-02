@@ -18,13 +18,13 @@
           <q-card flat
                   bordered
                   class="my-card">
-            <q-card-section class="text-center" data-testid="comm-communication-details-error-outline">
+            <q-card-section class="text-center" data-testid="communication-error-outline">
                  <span class="material-icons fs-45">
                   error_outline
                 </span>
             </q-card-section>
 
-            <q-card-section class="q-pt-none text-center" data-testid="comm-communication-details-requested-resource">
+            <q-card-section class="q-pt-none text-center" data-testid="communication-not-find-request">
               We could not find the requested resource.
             </q-card-section>
           </q-card>
@@ -32,7 +32,7 @@
       </b-row>
 
       <template #overlay>
-        <div class="text-center" data-testid="comm-communication-details-fetching-comm">
+        <div class="text-center" data-testid="communication-fetching-communication">
           <q-spinner-bars color="primary"
                           size="2em"/>
           <p>Fetching Communication...</p>
