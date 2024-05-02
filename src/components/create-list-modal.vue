@@ -306,7 +306,7 @@ export default {
           }
 
           const newStaticListWithContacts = isEmpty(params.contact_folder_id) &&
-            !isEmpty(params.contacts)
+            !isEmpty(params.contact_ids)
 
           // skip list's loading view too if we're sending contact ids
           if (this.isDefault && !skipListLoading && !newStaticListWithContacts) {
