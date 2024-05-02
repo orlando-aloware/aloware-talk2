@@ -865,7 +865,8 @@ export default {
         return this.myQueue
       }
 
-      return this.selectedList
+      const selectedList = Object.values(this.lists).find(list => list.id === this.selectedListId)
+      return selectedList
     },
 
     filteredListId () {
