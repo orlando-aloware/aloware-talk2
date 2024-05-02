@@ -175,6 +175,11 @@ export default {
       }
 
       const allFilters = this.$jsonClone(this.currentListFilters)
+      // delete attributes that wont be considered as filter
+      delete allFilters.order
+      delete allFilters.relations
+      delete allFilters.sort
+      delete allFilters.search
 
       // we have to use the dynamic list's filters deconstructed if the source list is DYNAMIC
       if (this.selectedStaticList.type === this.ContactListTypes.DYNAMIC && !isEmpty(allFilters)) {
