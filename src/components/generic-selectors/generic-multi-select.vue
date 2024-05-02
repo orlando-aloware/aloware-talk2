@@ -1,5 +1,5 @@
 <template>
-  <div class="generic-multi-select">
+  <div class="generic-multi-select" data-testid="generic-multi-select-wrapper">
     <h4 class="mb-1">
       {{ label | ucwords }}
     </h4>
@@ -7,6 +7,7 @@
              outlined
              stack-label
              v-if="isEdit"
+             data-testid="generic-multi-select-hnadle-blur"
              v-on:blur="handleBlur">
       <q-field class="w-100"
                outlined
@@ -20,6 +21,7 @@
                 <q-badge class="is-dot"
                          rounded
                          :style="{ background: item.color }"
+                         data-testid="generic-multi-select-badge"
                          v-if="typeof item.color !== 'undefined'">
                 </q-badge>
               </div>
@@ -28,7 +30,7 @@
               <div role="button" class="custom__remove d-flex align-items-center"
                    data-testid="generic-multi-select-remove-item"
                    @click="remove(item.id)">
-                <remove-tag-icon class="ml-1 remove-tag-icon"/>
+                <remove-tag-icon class="ml-1 remove-tag-icon" data-testid="generic-multi-select-remove-tag-icon"/>
               </div>
             </div>
           </div>
@@ -52,12 +54,14 @@
                  class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
                  :key="item.id"
                  v-for="item in filteredOptions"
+                 data-testid="generic-multi-select-select-option"
                  @click="onSelectOption(item.id)">
               <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
                     class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
                 <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
                          rounded
                          :style="{ background: item.color }"
+                         data-testid="generic-multi-select-select-option-badge"
                          v-if="typeof item.color !== 'undefined'">
                 </q-badge>
                 <span class="tag-text text-grey-100">{{ item.name }}</span>
@@ -66,6 +70,7 @@
                 <check-o-icon color="#256EFF"
                               width="12"
                               height="8"
+                              data-testid="generic-multi-select-check-o-icon"
                               v-if="isSelected(item.id)"/>
               </div>
             </div>
@@ -99,6 +104,7 @@
               <check-o-icon color="#256EFF"
                             width="12"
                             height="8"
+                            data-testid="generic-multi-select-check-o-icon"
                             v-if="isSelected(child.id)"/>
             </div>
           </div>

@@ -2,8 +2,9 @@
   <q-btn borderless
          flat
          class="mobile-back-btn"
+         data-testid="back-button-btn"
          @click="$emit('click')">
-    <back-button-icon/>
+    <back-button-icon  data-testid="back-button-icon"/>
   </q-btn>
 </template>
 

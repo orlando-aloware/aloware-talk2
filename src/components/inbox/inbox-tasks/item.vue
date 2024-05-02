@@ -1,5 +1,6 @@
 <template>
   <div class="contact-task-item task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom position-relative"
+       data-testid="inbox-tasks-item-wrapper"
        :class="inboxItemClass"
        @click="onItemClick">
     <div class="d-flex justify-content-center avatar-wrapper">
@@ -7,6 +8,7 @@
            role="button">
         <b-badge class="contact-unread-badge d-flex justify-center align-items-center position-absolute"
                  variant="danger"
+                 data-testid="inbox-tasks-item-badge"
                  pill
                  v-if="totalUnreads > 0">
           <span v-if="totalUnreads < 99">{{ totalUnreads }}</span>
@@ -14,6 +16,7 @@
         </b-badge>
         <avatar width="34"
                 height="34"
+                data-testid="inbox-tasks-item-avatar"
                 :style="avatarStyle(false)"
                 :name="contactAvatar">
         </avatar>
@@ -27,6 +30,7 @@
         <q-tooltip content-class="bg-grey-light11"
                    anchor="top left"
                    self="top left"
+                   data-testid="inbox-tasks-item-tooltip"
                    :offset="[0, 33]">
           {{ contactName }}
         </q-tooltip>
@@ -36,6 +40,7 @@
         <div class="pr-2">
           <component height="18px"
                      width="18px"
+                     data-testid="inbox-tasks-item-component"
                      :is="stateToIcon(contact.last_communication.disposition_status2, contact.last_communication.type, contact.last_communication.direction, contact.last_communication.callback_status)">
           </component>
         </div>
@@ -43,7 +48,7 @@
           <div class="truncated-text"
                :class="[callStatusClass, hasUnreadsClass]"
                v-if="[CommunicationTypes.CALL, CommunicationTypes.FAX].includes(contact.last_communication.type)">
-            <q-tooltip>
+            <q-tooltip data-testid="inbox-tasks-item-tooltip">
               {{ communicationLabel }}
             </q-tooltip>
             {{ communicationLabel }}
@@ -77,7 +82,8 @@
             v-if="hasRelativeTime && !isLive">
         <task-item-time :key="taskItemKey"
                         :from-time="lastEngagement"
-                        :update-interval="6000">
+                        :update-interval="6000"
+                        data-testid="inbox-tasks-item-time">
         </task-item-time>
       </span>
 
@@ -93,17 +99,19 @@
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
                       v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
+                      data-testid="item-reject-btn"
                       @click="onRejectCall">
               <!-- show remove icon for call fishing mode -->
               <ignore-call-icon height="24"
                                 width="24"
+                                data-testid="item-ignore-call-icon"
                                 v-if="isShowIgnoreCallIcon"/>
               <q-tooltip anchor="top middle"
                          self="center middle">
                 {{ isShowIgnoreCallIcon ? 'Ignore' : 'Decline' }}
               </q-tooltip>
               <!-- only show reject button if -->
-              <cancel-call-icon v-if="isShowCancelCallIcon"/>
+              <cancel-call-icon data-testid="item-cancel-call-icon" v-if="isShowCancelCallIcon"/>
             </b-button>
           </div>
           <div v-if="isIncomingCall"
@@ -111,39 +119,46 @@
             <b-button variant="light"
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
+                      data-testid="item-answer-btn"
                       @click="onAcceptCall">
               <q-tooltip anchor="top middle"
                          self="center middle"
+                         data-testid="item-answer-tooltip"
                          v-if="!showIncomingCallMenu">
                 Answer
               </q-tooltip>
-              <accept-call-icon/>
+              <accept-call-icon data-testid="item-accept-call-icon"/>
               <q-menu content-class="live-call-options"
                       anchor="top right"
                       self="top left"
                       fit
                       :offset="[5, 9]"
+                      data-testid="item-answer-menu"
                       v-model="showIncomingCallMenu"
                       v-if="isDialerConnected"
                       @hide="showIncomingCallMenu = false">
                 <q-list>
                   <q-item clickable
                           v-close-popup
+                          data-testid="item-current-call-answer-item"
                           @click="onParkCurrentCallAndAnswer">
                     <q-item-section class="d-inline-flex">
                       <park-call-icon color="#9B51E0"
                                       class="park-call-icon"
                                       width="11.7"
+                                      data-testid="item-park-call-icon"
                                       height="12.35"/>
                       <span>Park Current Call &amp; Answer</span>
                     </q-item-section>
                   </q-item>
                   <q-item clickable
                           v-close-popup
+                          data-testid="item-hang-up-call-answer-item"
                           @click="onHangUpCurrentCallAndAnswer">
                     <q-item-section>
                       <hangup-icon  width="16"
                                     height="16"
+                                    data-testid="item-hang-up-icon"
                                     class="hangup-icon"/>
                       <span>Hang up Current Call &amp; Answer</span>
                     </q-item-section>
@@ -161,6 +176,7 @@
             <b-button variant="light"
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
+                      data-testid="item-hang-up-btn-call"
                       @click="onHangUpCall">
               <q-tooltip anchor="top middle"
                          self="center middle">
@@ -178,10 +194,12 @@
             <b-button variant="light"
                       size="sm"
                       class="bg-transparent no-border no-box-shadow p-0"
+                      data-testid="item-unpark-btn"
                       @click="onUnparkCall">
               <parked-call-icon/>
               <q-tooltip anchor="top middle"
                          self="center middle"
+                         data-testid="item-unpark-tooltip"
                          v-if="!showParkedCallMenu">
                 Unpark
               </q-tooltip>
@@ -192,10 +210,12 @@
                       :offset="[5, 9]"
                       v-model="showParkedCallMenu"
                       v-if="isDialerConnected"
+                      data-testid="item-parked-menu"
                       @hide="showParkedCallMenu = false">
                 <q-list>
                   <q-item clickable
                           v-close-popup
+                          data-testid="item-park-call-connect-item"
                           @click="onParkCurrentCallAndConnect">
                     <q-item-section class="d-inline-flex">
                       <park-call-icon color="#9B51E0"
@@ -207,10 +227,12 @@
                   </q-item>
                   <q-item clickable
                           v-close-popup
+                          data-testid="item-hang-up-call-connect-item"
                           @click="onHangupCurrentCallAndConnect">
                     <q-item-section>
                       <hangup-icon  width="16"
                                     height="16"
+                                    data-testid="item-hangup-icon"
                                     class="hangup-icon"/>
                       <span>Hang up Current Call &amp; Connect</span>
                     </q-item-section>
@@ -227,10 +249,11 @@
          v-if="isReopened && !isSearch">
       <avatar width="34"
               height="34"
+              data-testid="item-contact-name-avatar"
               :style="avatarStyle(false)"
               :name="contactName">
       </avatar>
-      <p class="text-muted _500">This conversation has been reopened</p>
+      <p class="text-muted _500" data-testid="item-reopened-conversation">This conversation has been reopened</p>
     </div>
   </div>
 </template>

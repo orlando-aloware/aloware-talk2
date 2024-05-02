@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="task-item-time-wrapper">
     <span v-html="dateTimePassed" class="text-nowrap"></span>
     <q-tooltip content-class="bg-grey-light11"
                anchor="top middle" self="center middle">

@@ -1,16 +1,18 @@
 <template>
-    <div class="w-100 h-100 d-flex flex-column">
+    <div class="w-100 h-100 d-flex flex-column" data-testid="inbox-tab-wrapper">
       <calls-header :openCount="taskCounts.open"
                     :pendingCount="taskCounts.pending"
                     :commCampaigns="[]"
                     :commRingGroups="[]"
                     :has-custom-left-content="true"
                     :is-search="isSearch"
+                    data-testid="inbox-tab-calls-header"
                     @sort="sortContactTasks">
         <template slot="customLeftContent">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isFetchingContacts"
                             :search-icon-color="isSearch ? '#256EFF' : '#62666E'"
+                            data-testid="inbox-tab-inbox-searcher"
                             @search="onSearch"
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
@@ -25,6 +27,7 @@
                            borderless
                            customClass="pr-2 pl-0 fs-14 _500 position-relative primary not-focusable"
                            :variant="filterButtonVariant"
+                           data-testid="inbox-tab-reset-compact-btn"
                            @clicked="onResetFilter">
                 <i class="fa fa-times"></i>
               </compact-btn>
@@ -32,6 +35,7 @@
               <!-- applied/selected filter name -->
               <compact-btn borderless
                            customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
+                           data-testid="inbox-tab-applied-filter-compact-btn"
                            @clicked="onClickAppliedFilterButton">
                 <q-tooltip v-if="appliedFilter"
                            anchor="top middle"
@@ -40,6 +44,7 @@
                 </q-tooltip>
                 <filter-icon v-if="!appliedFilter && channelChangedFilterFields.length < 1"
                              color="#62666E"
+                             data-testid="inbox-tab-filter-icon"
                              class="filter-icon">
                 </filter-icon>
                 {{ !appliedFilter ? '' : appliedFilter.name }}
@@ -50,6 +55,7 @@
               <b-badge v-if="hasChannelFilterChanges"
                        class="ml-1 fs-12"
                        variant="primary"
+                       data-testid="inbox-tab-applied-filter-badge"
                        v-b-modal:inbox-channel-filter-modal>
                 {{ changedFilterFieldCount }}
               </b-badge>
@@ -67,6 +73,7 @@
                       spread
                       dense
                       unelevated
+                      data-testid="inbox-tab-all-btn-toggle"
                       :toggle-color="statusToggleColor"
                       :options="options"
                       v-model="currentTask"
@@ -89,6 +96,7 @@
               <div class="text-center task-count ml-1">
                 <span v-if="isLoadingOpenTaskCount">
                   <q-spinner-tail size="12px"
+                                data-testid="inbox-tab-spinner-tail"
                                 color="white" />
                 </span>
                 <span v-if="!isLoadingOpenTaskCount">
@@ -97,10 +105,12 @@
                 <b-badge v-if="hasIncomingLiveCall"
                          variant="danger"
                          class="live-call-badge d-flex justify-center align-items-center position-absolute"
+                         data-testid="inbox-tab-open-badge"
                          pill></b-badge>
               </div>
               <q-tooltip anchor="bottom start"
                          self="center start"
+                         data-testid="inbox-tab-recent-comm-tooltip"
                          :offset="[7, 18]">
                 See most recent communication with contacts you have visibility over
               </q-tooltip>
@@ -116,6 +126,7 @@
               <div class="text-center task-count ml-1">
                  <span v-if="isLoadingPendingTaskCount">
                   <q-spinner-tail size="12px"
+                                  data-testid="inbox-tab-pending-spinner-tail"
                                   color="white" />
                 </span>
                 <span v-if="!isLoadingPendingTaskCount">
@@ -138,6 +149,7 @@
 
       <search-toggle ref="searchToggle"
                      v-if="isSearch"
+                     data-testid="inbox-tab-search-toggle"
                      @searching="searching"
                      @closed="onSearchClosed">
       </search-toggle>
@@ -149,12 +161,14 @@
                          :loading-contacts="isFetchingContacts"
                          :search-text="searchText"
                          :is-search="isSearch"
+                         data-testid="inbox-tab-inbox-task-list"
                          @onItemSelected="onItemSelected">
         </inbox-task-list>
       </div>
 
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
            ref="taskListScroller"
+           data-testid="inbox-tab-scroll-div"
            @scroll="handleScroll">
         <inbox-task-list key-prefix="task"
                          :contacts="contactTasks"
@@ -162,27 +176,32 @@
                          :search-text="searchText"
                          :is-search="isSearch"
                          v-if="!taskListHasError"
+                         data-testid="inbox-tab-task-list"
                          @onItemRemoved="onItemRemoved"
                          @onItemSelected="onItemSelected">
         </inbox-task-list>
         <div v-if="taskListHasError"
-             class="text-center mt-5">
+             class="text-center mt-5"
+             data-testid="inbox-tab-unable-fetch-contact">
           Unable to fetch contact tasks.
           <br/>
           <b-btn variant="primary"
                  class="mt-3"
                  size="sm"
+                 data-testid="inbox-tab-retry-btn"
                  @click="loadContactTasks(false)">Retry</b-btn>
         </div>
         <div :class="[isFetchingContacts ? 'py-5' : 'py-4', 'relative']">
           <b-overlay :show="isLoadingMore || isFetchingContacts"
                      rounded="sm"
-                     variant="white">
+                     variant="white"
+                     data-testid="inbox-tab-overlay">
             <template #overlay>
               <div class="text-center">
                 <q-spinner-bars
                   color="primary"
                   size="2em"
+                  data-testid="inbox-tab-spinner-bar"
                 />
               </div>
             </template>
@@ -191,12 +210,13 @@
       </div>
 
       <filter-dialog :default-filter-model="defaultFilterModel"
+                     data-testid="inbox-tab-filter-dialog"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
                      @onResetFilter="onResetFilter"
                      v-model="filter" />
 
-      <create-filter-dialog :filter-model="newFilterModel" />
+      <create-filter-dialog data-testid="inbox-tab-create-filter-dialog" :filter-model="newFilterModel" />
     </div>
 </template>
 
