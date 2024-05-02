@@ -642,7 +642,13 @@
                  v-if="dialer.communication">
               <label class="form-control-label text-grey-90">Tags</label>
               <div class="d-flex align-items-center w-100">
-                <communication-tags :communication="dialer.communication"/>
+                <entity-tags data-testid="phone-communication-tags-multi-select"
+                             entity="communication"
+                             entity-type="contacts"
+                             :entity-object="dialer.communication"
+                             :category="TagCategories.CAT_COMMUNICATIONS"
+                             :use-card="false"
+                             :use-add-icon="true" />
               </div>
             </div>
 
@@ -901,10 +907,14 @@
             </template>
             <template v-if="bottomExpansion === 'tags'">
               <q-card-section class="height-240 mx-2 px-3">
-                <communication-tags ref="communicationTags"
-                                    buttonText="Modify Tags"
-                                    :communication="dialer.communication">
-                </communication-tags>
+                <entity-tags data-testid="phone-communication-tags-multi-select"
+                             button-text="Modify Tags"
+                             entity="communication"
+                             entity-type="contacts"
+                             :entity-object="dialer.communication"
+                             :category="TagCategories.CAT_COMMUNICATIONS"
+                             :use-card="false"
+                             :use-add-icon="true" />
               </q-card-section>
             </template>
             <template v-if="bottomExpansion === 'scripts'">
@@ -1288,6 +1298,7 @@ import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as InboundCallRecordingModes from 'src/constants/inbound-call-recording-modes'
 import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import CopyIcon from 'components/icons/copy-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
@@ -1295,6 +1306,7 @@ import DeviceSelector from 'components/generic-selectors/device-selector'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import API from 'src/plugins/api/api'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
+import EntityTags from 'components/generic-selectors/entity-tags'
 
 export default {
   name: 'phone',
@@ -1342,7 +1354,8 @@ export default {
     AcceptCallIcon,
     CancelCallIcon,
     ContactIntegrations,
-    DeviceSelector
+    DeviceSelector,
+    EntityTags
   },
 
   mixins: [
@@ -1441,7 +1454,8 @@ export default {
       CommunicationStatus,
       CommunicationCurrentStatus,
       CommunicationTypes,
-      UploadedFileTypes
+      UploadedFileTypes,
+      TagCategories
     }
   },
 

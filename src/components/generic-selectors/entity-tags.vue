@@ -74,6 +74,11 @@ export default {
       type: String
     },
 
+    entityType: {
+      required: true,
+      type: String
+    },
+
     label: {
       required: false,
       type: String,
@@ -110,7 +115,7 @@ export default {
 
     category: {
       required: false,
-      type: String,
+      type: Number,
       default: null
     }
   },
@@ -150,9 +155,9 @@ export default {
       return this.$alphabeticalSort(tags)
     },
 
-    entityTagsAlphabeticalOrder () {
+    companyTagsAlphabeticalOrder () {
       if (this.tagsAlphabeticalOrder.length) {
-        return this.tagsAlphabeticalOrder.filter(tag => tag.type === TagTypes[`TYPE_${this.entityType.toUpperCase()}`])
+        return this.tagsAlphabeticalOrder.filter(tag => tag.type === TagTypes.TYPE_COMPANY)
       }
 
       return []
@@ -171,7 +176,7 @@ export default {
     },
 
     combinedTags () {
-      const entityTags = this.entityTagsAlphabeticalOrder
+      const entityTags = this.companyTagsAlphabeticalOrder
       const importTags = this.importTagsAlphabeticalOrder
 
       const tags = []
@@ -194,16 +199,16 @@ export default {
     },
 
     currentTags () {
-      return this.entity?.tags ?? []
+      return this.entityObject?.tags ?? []
     },
 
     tagIds () {
-      if (this.entity?.tag_ids) {
-        return this.entity.tag_ids
+      if (this.entityObject?.tag_ids) {
+        return this.entityObject.tag_ids
       }
 
-      if (this.entity?.tags) {
-        return this.entity.tags.map((tag) => tag.id)
+      if (this.entityObject?.tags) {
+        return this.entityObject.tags.map((tag) => tag.id)
       }
 
       return []

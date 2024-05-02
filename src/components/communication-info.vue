@@ -711,7 +711,13 @@
 
                 <label class="form-control-label w-100 mb-1">Tags</label>
                 <div class="d-flex align-items-center w-100 pb-2 mb-2 border-bottom">
-                  <communication-tags data-testid="communication-info-communication-tags" :communication="communication"/>
+                  <entity-tags data-testid="communication-info-communication-tags"
+                               entity="communication"
+                               entity-type="contacts"
+                               :entity-object="communication"
+                               :category="TagCategories.CAT_COMMUNICATIONS"
+                               :use-card="false"
+                               :use-add-icon="true" />
                 </div>
 
                 <label class="form-control-label mb-1">Notes</label>
@@ -829,7 +835,6 @@ import TargetUsersTree from './target-users-tree'
 import ChevronRight from 'components/icons/contact-activity/chevron-right'
 import CommunicationAudio from 'components/communication-audio'
 import CommunicationNote from 'components/communication-note'
-import CommunicationTags from 'components/generic-selectors/communication-tags'
 import CallDispositionSelector from 'components/call-disposition-selector'
 import CalendarIcon from 'components/icons/calendar-icon'
 import * as AnswerTypes from '../constants/answer-types'
@@ -840,6 +845,7 @@ import * as CommunicationDirections from '../constants/communication-direction'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
 import * as CommunicationRejectionReasons from '../constants/communication-rejection-reasons'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
@@ -850,6 +856,7 @@ import OpenCalendarButton from 'components/open-calendar-button'
 import DownloadButton from 'components/download-button'
 import API from 'src/plugins/api/api'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
+import EntityTags from 'components/generic-selectors/entity-tags'
 
 export default {
   name: 'communication-info',
@@ -879,10 +886,10 @@ export default {
     CallDispositionSelector,
     CommunicationAudio,
     CommunicationNote,
-    CommunicationTags,
     SmsReminders,
     TargetUsersTree,
-    DownloadButton
+    DownloadButton,
+    EntityTags
   },
 
   props: {
@@ -992,7 +999,8 @@ export default {
       CommunicationTypes,
       UploadedFileTypes,
       CommunicationRejectionReasons,
-      CommunicationCallbackStatus
+      CommunicationCallbackStatus,
+      TagCategories
     }
   },
 
