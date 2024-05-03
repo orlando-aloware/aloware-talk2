@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="transcription-modal-wrapper">
     <q-btn icon="chat"
            color="primary"
            flat

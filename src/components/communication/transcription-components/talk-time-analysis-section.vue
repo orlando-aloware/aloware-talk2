@@ -1,6 +1,7 @@
 <template>
   <div class="flex items-center"
-       v-if="!isEmpty(talk_time_analysis)">
+       v-if="!isEmpty(talk_time_analysis)"
+       data-testid="comm-talk-time-analysis-wrapper">
     <strong class="mr-2" data-testid="comm-talk-time-analysis-section">Talk Time:</strong>
     <div>
       <!--

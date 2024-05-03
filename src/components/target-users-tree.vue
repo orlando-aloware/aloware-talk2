@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="target-users-tree-wrapper">
     <template v-if="!isForm">
       <p class="_600 mb-0" v-if="showLabel">
         Target Users
@@ -10,14 +10,16 @@
           :nodes="generateTargetUsersTree"
           node-key="label"
           selected-color="primary"
-          :expanded.sync="attemptPath">
+          :expanded.sync="attemptPath"
+          data-testid="target-users-tree">
         </q-tree>
       </template>
       <template v-else-if="isTargetUsersWithNoAttempts">
         <q-tree
           :nodes="generateTargetUsersTree"
           node-key="label"
-          selected-color="primary">
+          selected-color="primary"
+          data-testid="target-users-tree">
         </q-tree>
       </template>
       <span v-else>-</span>
@@ -33,14 +35,16 @@
             :nodes="generateTargetUsersTree"
             node-key="label"
             selected-color="primary"
-            :expanded.sync="attemptPath">
+            :expanded.sync="attemptPath"
+            data-testid="target-users-tree">
           </q-tree>
         </template>
         <template v-else-if="isTargetUsersWithNoAttempts">
           <q-tree
             :nodes="generateTargetUsersTree"
             node-key="label"
-            selected-color="primary">
+            selected-color="primary"
+            data-testid="target-users-tree">
           </q-tree>
         </template>
         <span v-else>-</span>
