@@ -43,6 +43,7 @@
 
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex'
+import { kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'KycFillDialog',
@@ -53,6 +54,8 @@ export default {
       default: false
     }
   },
+
+  mixins: [kycMixin],
 
   data () {
     return {
@@ -75,10 +78,17 @@ export default {
     openKycBusinessRegistration () {
       this.changeShowedKycDialog()
 
-      this.$router.push({
-        name: 'Business Information',
-        params: { company_id: this.currentCompany.id }
-      })
+      if (this.isCompanyKYC) {
+        this.$router.push({
+          name: 'Business Information',
+          params: { company_id: this.currentCompany.id }
+        })
+        return true
+      }
+
+      let link = `${process.env.API_URL}/account?tab=compliance`
+
+      return window.open(link, '_blank')
     },
 
     changeShowedKycDialog () {
