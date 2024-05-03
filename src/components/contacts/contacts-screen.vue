@@ -9,18 +9,18 @@
           </div>
           <slot name="options" />
         </div>
-        <div class="table-header d-flex align-items-center border-bottom flex-grow-0"
+        <div class="table-header d-flex align-items-center flex-grow-0"
              v-if="!noHeader">
           <div class="pl-3 py-lg-0 w-100">
-            <div class="row mx-0 relative-position">
+            <div class="row mx-0 relative-position w-100">
               <slot name="actions" />
             </div>
           </div>
         </div>
         <b-overlay class="flex-grow-1 overflow-hidden-y"
-                   :show="loading"
                    data-testid="contacts-screen-overlay"
-                   rounded="sm">
+                   rounded="sm"
+                   :show="loading">
           <div class="datatable-wrapper h-100 overflow-hidden-y">
             <slot name="table" />
           </div>
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import card from 'components/card.vue'
+import card from 'components/card'
 
 export default {
   components: {

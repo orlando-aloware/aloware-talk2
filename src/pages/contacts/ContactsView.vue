@@ -74,11 +74,21 @@
           <div class="contacts-total mobile">
             <div class="small text-muted fs-13 text-right"
                  v-if="selectedList.type === ContactListTypes.DYNAMIC">
-              {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+              <template v-if="!isDatatableCountLoading">
+                {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+              </template>
+              <q-skeleton type="text"
+                          style="width: 80px;"
+                          v-else/>
             </div>
             <div class="small text-muted fs-13 text-right"
                  v-else>
-              {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+              <template v-if="!isDatatableCountLoading">
+                {{ listItemsTotalContacts }} of {{ selectedList.contactCount }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+              </template>
+              <q-skeleton type="text"
+                          style="width: 80px;"
+                          v-else/>
             </div>
           </div>
         </div>
@@ -140,11 +150,21 @@
         <div class="contacts-total desktop">
           <div class="small text-muted fs-13 text-right"
                v-if="selectedList.type === ContactListTypes.DYNAMIC">
-            {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            <template v-if="!isDatatableCountLoading">
+              {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            </template>
+            <q-skeleton type="text"
+                        style="width: 80px;"
+                        v-else/>
           </div>
           <div class="small text-muted fs-13 text-right"
                v-else>
-            {{ listItemsTotalContacts }} of {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            <template v-if="!isDatatableCountLoading">
+              {{ listItemsTotalContacts }} of {{ selectedList.contactCount | numFormat }} {{ selectedList.contactCount == 1 ? 'Contact' : 'Contacts' }}
+            </template>
+            <q-skeleton type="text"
+                        style="width: 80px;"
+                        v-else/>
           </div>
         </div>
         <hr role="separator" aria-orientation="vertical" class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
@@ -269,12 +289,14 @@
             Edit Columns
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           data-testid="contacts-view-power-dialer-option-dropdown"
-                           :disabled="true">
+                           data-testid="contacts-view-add-to-power-dialer-option-dropdown"
+                           :disabled="isAddToPowerDialerDisabled"
+                           v-if="shouldShowPowerDialer"
+                           @click="addSelectedContacts">
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
-            Power Dialer
+            Add to My Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
@@ -298,14 +320,17 @@
     </template>
     <template slot="actions"
               v-if="!simpleTable">
-      <bulk-action-menu :id="id"
-                        v-if="checked.length > 0"
-                        data-testid="contacts-view-bulk-action-menu"
-                        @onSetAllContactsSelected="onCheckAllItemsFromTheList" />
+      <bulk-action-menu data-testid="contacts-view-bulk-action-menu"
+                        :id="id"
+                        :total-rows="totalRows"
+                        :checked-count="selectedAllCount"
+                        :hide-delete-on-all-selected="true"
+                        @onSelectedAll="onSelectedAll" />
     </template>
 
     <template slot="table">
       <datatable ref="contactsTable"
+                 data-testid="contacts-view-datatable"
                  :stickyHeaders="true"
                  :columns="columns"
                  :isEmpty="isEmpty || isStartState"
@@ -314,11 +339,10 @@
                  :contact-list-id="id"
                  :paginated="false"
                  :show-pagination="!isStartState"
-                 :total-rows="fixedContactsData.total"
                  :current-page="fixedContactsData.current_page"
                  :last-page="fixedContactsData.last_page"
                  :useEmptySlot="canSeeAddContacts && canAddContacts && isEmpty"
-                 data-testid="contacts-view-datatable"
+                 :total-rows="totalRows"
                  v-if="listItemsHasData"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
@@ -696,6 +720,11 @@
     <template slot="footer"
               v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
+      <power-dialer-add-modal :params="attachedParams()"
+                              :show-in-contacts-page="true"
+                              v-if="openPDModal"
+                              @hidden="openPDModal = false">
+      </power-dialer-add-modal>
     </template>
   </contacts-screen>
 </template>
@@ -741,6 +770,7 @@ import {
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 
 export default {
   name: 'contacts-view',
@@ -753,10 +783,6 @@ export default {
     contactsListFiltersMixin,
     simpsocialMixin,
     kycMixin
-  ],
-
-  inject: [
-    'contactsData'
   ],
 
   components: {
@@ -781,14 +807,13 @@ export default {
     ContactsScreen,
     Datatable,
     ImportContactsModal,
-    BlockTooltip
+    BlockTooltip,
+    PowerDialerAddModal
   },
 
   props: {
-    // contactsData: {
-    //   type: Object,
-    //   default: () => {}
-    // },
+    onFetch: Function,
+
     list: {
       type: Object,
       default: () => {}
@@ -860,7 +885,9 @@ export default {
       myContacts: false,
       hasNextPage: false,
       viewListeners: {},
-      ContactListTypes
+      ContactListTypes,
+      openPDModal: false,
+      isContactModule: false
     }
   },
 
@@ -882,7 +909,6 @@ export default {
     ...mapGetters('contacts', [
       'lists',
       'listItems',
-      'selectedContacts',
       'isFiltersOpen',
       'selectedList',
       'currentListFilters',
@@ -934,10 +960,6 @@ export default {
         this.lists[String(this.id)])
     },
 
-    checked () {
-      return this.selectedContacts[this.id] || []
-    },
-
     saveFilterButtonClass () {
       return {
         'disabledButton': this.selectedList.type === this.ContactListTypes.STATIC ||
@@ -954,11 +976,6 @@ export default {
     listItemsDataCount () {
       const total = _.get(this.fixedContactsData, 'data.length', null)
       return total !== null ? total : 0
-    },
-
-    listItemsTotalContacts () {
-      const data = _.get(this.fixedContactsData, `data`, null)
-      return data.length || 0
     },
 
     filterButtonVariant () {
@@ -1079,13 +1096,30 @@ export default {
     cleanedCurrentListFilters () {
       const currentFilters = _.isEmpty(this.currentListFilters)
         ? {}
-        : this.currentListFilters
+        : this.$jsonClone(this.currentListFilters)
 
       return currentFilters
+    },
+
+    checkedItemIds () {
+      const ids = []
+
+      this.checked.forEach(check => {
+        ids.push(check.id)
+      })
+
+      return ids
+    },
+
+    isAddToPowerDialerDisabled () {
+      return !this.checked.length
     }
   },
 
   mounted () {
+    // clear the selected contacts
+    this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
+
     // an  actual list is loaded (contact/list URL)
     if (this.$route.name === 'Contacts' && ['Contacts List', 'Public Contacts List'].includes(this.$route.meta.page)) {
       this.loadList(this.$route.params.id)
@@ -1108,23 +1142,34 @@ export default {
 
     this.$VueEvent.listen('shouldUpdateListCount', () => {
       if (this.list.type === this.ContactListTypes.DYNAMIC) {
-        this.setDataCount(!_.isEmpty(this.currentListFilters) ? this.currentListFilters : this.list.filters)
+        this.setDataCount(
+          !_.isEmpty(this.currentListFilters)
+            ? this.currentListFilters
+            : this.list.filters
+        )
+
         return
       }
 
       this.setDataCount({
         filters: {
-          contact_lists: {
-            operator: OPERATORS.IS_ANY_OF,
-            value: [this.list.id]
-          }
+          contact_lists: [
+            {
+              operator: OPERATORS.IS_ANY_OF,
+              value: [this.list.id]
+            }
+          ]
         },
         is_conjunction: true
       })
     })
 
-    this.viewListeners.setDataCount = _.debounce((filters) => {
-      this.setDataCount(filters)
+    this.viewListeners.setDataCount = _.debounce((data) => {
+      const event = data.event
+      const filters = data.filters
+      const clear = data?.clear ?? false
+      const skipCache = data?.skipCache ?? false
+      this.setDataCount(filters, event, false, clear, skipCache)
     }, 100)
 
     this.viewListeners.updateHasFilterChanges = () => {
@@ -1162,7 +1207,8 @@ export default {
       'updateContactsListFilter',
       'setListContactsLoaded',
       'setPreviouslySavedListId',
-      'setPreviousListFilters'
+      'setPreviousListFilters',
+      'addPowerDialerOpen'
     ]),
 
     onSearch (searchText) {
@@ -1214,10 +1260,12 @@ export default {
       const listFilter = typeof this.list.filters === 'string' ? JSON.parse(this.list.filters) : this.list.filters
 
       const filters = this.list.type === this.ContactListTypes.DYNAMIC ? listFilter : {
-        contact_lists: {
-          operator: OPERATORS.IS_ANY_OF,
-          value: [stringId]
-        }
+        contact_lists: [
+          {
+            operator: OPERATORS.IS_ANY_OF,
+            value: [stringId]
+          }
+        ]
       }
 
       this.setCurrentListFilters(filters)
@@ -1241,33 +1289,24 @@ export default {
     },
 
     onCheckAllItems (checked) {
-      const items = { data: [] }
+      let checkedItems = []
+
+      if (!checked) {
+        this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
+        return
+      }
 
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
           if (checked) {
-            items.data.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
+            checkedItems.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
           } else {
-            items.data = items.data.filter(item => item.id !== Number(checkbox.value))
+            checkedItems = checkedItems.filter(item => item.id !== Number(checkbox.value))
           }
         })
 
-      this.setAllContactsSelected(false)
-      this.setListSelectedContacts({ id: this.id, contacts: items.data })
-    },
-
-    onCheckAllItemsFromTheList (checked) {
-      const items = { data: [] }
-
-      document
-        .querySelectorAll('.checker')
-        .forEach((checkbox) => {
-          items.data.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
-        })
-
-      this.setAllContactsSelected(true)
-      this.setListSelectedContacts({ id: this.id, contacts: items.data })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
     },
 
     onEditColumnsClicked () {
@@ -1276,6 +1315,17 @@ export default {
         headers: this.columns,
         name: this.list.name
       })
+    },
+
+    addSelectedContacts () {
+      this.openPDModal = true
+      this.addPowerDialerOpen(true)
+    },
+
+    attachedParams () {
+      return {
+        contact_ids: this.checkedItemIds
+      }
     },
 
     onImportContactsClicked () {
@@ -1327,8 +1377,12 @@ export default {
         console.log('Updating existing dynamic list...')
         const currentFilters = this.findFilters(this.currentListFilters)
 
+        const params = {
+          filters: _.pickBy(this.currentListFilters)
+        }
+
         return this.$axios
-          .put('/api/v2/contacts-list/' + this.selectedList.id, { filters: currentFilters })
+          .put('/api/v2/contacts-list/' + this.selectedList.id, params)
           .then((res) => {
             this.setPreviouslySavedListId(this.selectedList.id)
             this.updateContactsList(res.data.data)
@@ -1351,7 +1405,7 @@ export default {
             if (this.list.type === this.ContactListTypes.DYNAMIC) {
               this.setDataCount({
                 filter_groups: this.currentListFilters
-              }, true)
+              }, null, true)
               return
             }
 
@@ -1369,7 +1423,7 @@ export default {
                   is_conjunction: true
                 }
               ]
-            }, true)
+            }, null, true)
           })
           .catch((_err) => {
             console.log(_err)
@@ -1710,10 +1764,15 @@ export default {
       })
     },
 
-    setDataCount (data, updatePinned = false) {
+    setDataCount (data, event = null, updatePinned = false, clear = false, skipCache = false) {
       const fireData = {
-        data: { filters: data },
+        data: {
+          filters: this.$jsonClone(data)
+        },
         id: this.id,
+        event: event,
+        clear: clear,
+        skipCache: skipCache,
         thenFunctions: {
           setSelectedListContactCount: 'response.data.count'
         }
@@ -1763,6 +1822,7 @@ export default {
       if (this.$route.params.id === 'unsaved') {
         this.$VueEvent.fire('get-list-count', {
           data: { filters: JSON.stringify(this.list.filters) },
+          clear: true,
           thenFunctions: {
             'setSelectedListContactCount': {
               count: 'response.data.count'
@@ -1770,13 +1830,15 @@ export default {
           }
         })
       }
+
       this.setAllContactsSelected(false)
     },
 
     selectedList: function (value) {
       if (this.selectedContacts[value.id]) {
-        this.setListSelectedContacts({ id: value.id, contacts: [] })
+        this.$VueEvent.fire('setListSelectedContacts', { id: value.id, contacts: [] })
       }
+
       this.folderPath = this.generateFolderPath(this.folders)
     },
 
@@ -1797,6 +1859,7 @@ export default {
 
     checked: function (value) {
       const elem = document.querySelector('.data-table-check-all')
+
       if (elem) {
         elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
       }

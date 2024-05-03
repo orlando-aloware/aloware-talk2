@@ -2,6 +2,7 @@ import { mapGetters, mapActions } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import { isEmpty } from 'lodash'
+import * as TaskType from 'src/constants/task-types'
 
 export default {
   data () {
@@ -63,14 +64,26 @@ export default {
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
     },
     onStatusCompleted (task) {
-      let contactTask = this.powerDialerTasks.in_queue.find(item => item.id === task.contact.id)
-      this.powerDialerTasks.called.push(contactTask)
+      if (isEmpty(task)) {
+        return
+      }
+
+      const contactTask = this.powerDialerTasks.all.find(item => item.id === task.contact.id)
+
+      if (contactTask) {
+        this.addTaskToList(TaskType.CALLED, contactTask)
+      }
       // window.VueEvent.fire('initiate_session', task)
     },
     onStatusFailed (task) {
-      let contactTask = this.powerDialerTasks.in_queue.find(item => item.id === task.contact.id)
+      if (isEmpty(task)) {
+        return
+      }
+
+      const contactTask = this.powerDialerTasks.all.find(item => item.id === task.contact.id)
+
       if (contactTask) {
-        this.powerDialerTasks.failed.push(contactTask)
+        this.addTaskToList(TaskType.FAILED, contactTask)
       }
     },
     onStatusQueued (task) {
@@ -100,6 +113,11 @@ export default {
         next: false,
         mute: false
       }
+    },
+    addTaskToList (taskType, task) {
+      // Add the task to the specified taskType list, ensuring no duplicates
+      const tempSet = new Set([...this.powerDialerTasks[taskType], task].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+      this.powerDialerTasks[taskType] = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
     }
   }
 }
