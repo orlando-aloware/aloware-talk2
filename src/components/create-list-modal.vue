@@ -1,56 +1,44 @@
 <template>
-  <b-modal
-    v-model="isOpen"
-    title="Create A List"
-    size="lg"
-    modal-class="create-list-modal"
-    scrollable
-    centered
-    hide-footer
-    hide-header
-    no-close-on-esc
-  >
-    <b-overlay
-      :show="isLoading"
-      spinner-variant="primary"
-      spinner-type="grow"
-      spinner-small
-      rounded="sm"
-    >
+  <b-modal modal-class="create-list-modal"
+           title="Create A List"
+           size="lg"
+           scrollable
+           centered
+           hide-footer
+           hide-header
+           no-close-on-esc
+           v-model="isOpen">
+    <b-overlay spinner-variant="primary"
+               spinner-type="grow"
+               rounded="sm"
+               spinner-smal
+               :show="isLoading">
       <div class="d-flex flex-column create-list-modal__body position-relative">
         <div class="d-flex align-items-center">
           <div class="flex-grow-1 create-list-modal__title">{{ getTitle }}</div>
-          <button
-            class="btn btn-link small text-muted create-list-modal__close"
-            @click="onClose"
-          >
-            <i class="fa fa-times"></i>
+          <button class="btn btn-link small text-muted create-list-modal__close"
+                  @click="onClose">
+            <i class="fa fa-times"/>
           </button>
         </div>
 
         <div class="pt-3">
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Untitled List"
-            :disabled="isLoading"
-            autofocus
-            v-model="createList.name"
-          />
+          <input class="form-control"
+                 type="text"
+                 placeholder="Untitled List"
+                 autofocus
+                 :disabled="isLoading"
+                 v-model="createList.name"/>
         </div>
 
-        <div
-          class="flex-grow-1 py-4"
-          v-if="![CreateListMode.FROM_FILTERS, CreateListMode.FROM_BULK_MENU].includes(createList.mode) && isDefault">
-          <div
-            class="form-check mb-2"
-            @click="createList.type = ContactListTypes.DYNAMIC">
-            <input
-              class="form-check-input"
-              type="radio"
-              id="dynamicList"
-              :checked="createList.type === ContactListTypes.DYNAMIC"
-            />
+        <div class="flex-grow-1 py-4"
+             v-if="![CreateListMode.FROM_FILTERS, CreateListMode.FROM_BULK_MENU].includes(createList.mode) && isDefault">
+          <div class="form-check mb-2"
+               @click="createList.type = ContactListTypes.DYNAMIC">
+            <input class="form-check-input"
+                   type="radio"
+                   id="dynamicList"
+                   :checked="createList.type === ContactListTypes.DYNAMIC"/>
             <label for="dynamicList">
               <div class="create-list-modal__list-title">Dynamic List</div>
               <div class="create-list-modal__list-desc">
@@ -59,15 +47,12 @@
               </div>
             </label>
           </div>
-          <div
-            class="form-check"
-            @click="createList.type = ContactListTypes.STATIC">
-            <input
-              class="form-check-input"
-              type="radio"
-              id="staticList"
-              :checked="createList.type === ContactListTypes.STATIC"
-            />
+          <div class="form-check"
+               @click="createList.type = ContactListTypes.STATIC">
+            <input class="form-check-input"
+                   type="radio"
+                   id="staticList"
+                   :checked="createList.type === ContactListTypes.STATIC"/>
             <label for="staticList">
               <div class="create-list-modal__list-title">Static List</div>
               <div class="create-list-modal__list-desc">
@@ -83,18 +68,14 @@
         </div>
 
         <div class="d-flex align-items-center pt-3">
-          <button
-            class="btn btn-block btn-light mt-0 mr-2"
-            @click="onClose"
-            :disabled="isLoading"
-          >
+          <button class="btn btn-block btn-light mt-0 mr-2"
+                  :disabled="isLoading"
+                  @click="onClose">
             Cancel
           </button>
-          <button
-            class="btn btn-block btn-primary mt-0"
-            @click="onSubmit"
-            :disabled="!isNameValid || isLoading"
-          >
+          <button class="btn btn-block btn-primary mt-0"
+                  :disabled="!isNameValid || isLoading"
+                  @click="onSubmit">
             Create
           </button>
         </div>
@@ -104,7 +85,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import {
   DEFAULT_COLUMNS,
@@ -120,50 +101,69 @@ import {
   FROM_FOLDERS,
   FROM_BULK_MENU
 } from 'src/constants/contacts-list-create-mode'
+import { chunk, isEmpty } from 'lodash'
 
 export default {
+  inject: [
+    'selectedContacts'
+  ],
+
   props: {
     isDefault: {
       type: Boolean,
       default: true
     }
   },
+
   computed: {
     ...mapGetters('contacts', [
       'createList',
       'currentListFilters',
       'selectedList',
-      'selectedContacts',
       'unsavedList',
       'isAllContactsSelected'
     ]),
+
+    ...mapState(['isDatatableSelectedAll']),
+
     getTitle () {
       if ([this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)) {
         const typeText = (this.createList.type === this.ContactListTypes.STATIC) ? 'Static' : 'Dynamic'
-        return `New ${typeText} Lists`
+        return `New ${typeText} List`
       }
 
-      return 'New Lists'
+      return 'New List'
     },
+
     isNameValid () {
       return this.createList.name && this.createList.name.length > 0
     },
+
     listsEndpoint () {
       return this.isDefault ? '/api/v2/contacts-list' : '/api/v2/power-dialer-lists'
     },
+
     foldersEndpoint () {
       return this.isDefault ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
+
     redirectPath () {
       return this.isDefault ? `/contacts/list` : `/power-dialer/list`
     },
+
     defaultTemplateRequest () {
       return DEFAULT_DYNAMIC_LIST_TEMPLATE_REQUEST
     },
+
     defaultTemplateResponse () {
       return DEFAULT_DYNAMIC_LIST_TEMPLATE_RESPONSE
+    },
+
+    isPowerDialer () {
+      return this.$route.name.includes('Power Dialer')
     }
   },
+
   methods: {
     ...mapActions('contacts', [
       'createListClose',
@@ -171,84 +171,213 @@ export default {
       'setUnsavedList',
       'setCurrentListFilters'
     ]),
+
     onClose () {
       if (!this.isLoading) {
         this.createListClose()
       }
     },
+
     getParams () {
       let headers = DEFAULT_COLUMNS
 
-      if (this.$route.name.includes('Power Dialer')) {
+      if (this.isPowerDialer) {
         headers = POWER_DIALER_DEFAULT_COLUMNS
       }
 
-      const params = {
-        data: {
-          contact_folder_id: this.createList.contact_folder_id,
-          name: this.createList.name,
-          type: this.createList.type,
-          headers: headers,
-          mode: this.createList.mode,
-          order: 0,
-          include_all_contacts: this.isAllContactsSelected
-        }
+      let params = {
+        contact_folder_id: this.createList.contact_folder_id,
+        name: this.createList.name,
+        type: this.createList.type,
+        headers: headers,
+        mode: this.createList.mode,
+        order: 0,
+        include_all_contacts: this.isAllContactsSelected
       }
 
-      switch (true) {
-        case this.createList.mode === FROM_FILTERS:
-          const clonedCurrentListFilters = { ...this.currentListFilters }
-          if (this.createList.type === this.ContactListTypes.DYNAMIC) {
-            // remove contact_lists filter since we are creating dynamic one
-            delete clonedCurrentListFilters.contact_lists
-          }
-          params.data = { ...params.data, filters: clonedCurrentListFilters }
+      const clonedCurrentListFilters = this.$jsonClone(this.currentListFilters)
 
-          break
-        case this.createList.mode === FROM_BULK_MENU:
-          const contacts = { data: [] }
-
-          if (this.selectedContacts[this.selectedList.id]) {
-            contacts.data = this.selectedContacts[this.selectedList.id]
-          }
-          params.data = { ...params.data, contacts: contacts.data.map(contact => contact.id) }
-          break
-        case this.createList.mode === FROM_FOLDERS:
-        default:
+      // remove contact_lists filter since we are creating dynamic one
+      if (clonedCurrentListFilters?.contact_lists) {
+        delete clonedCurrentListFilters.contact_lists
       }
 
-      return params.data
-    },
-    onSubmit () {
-      this.isLoading = true
-      if (this.createList.type === this.ContactListTypes.STATIC) {
-        this.$axios
-          .post(this.listsEndpoint, this.getParams())
-          .then((response) => {
-            const data = response.data.data
-            const message = response.data.message
-
-            if (this.createList.mode === FROM_BULK_MENU) {
-              this.$router.push(`${this.redirectPath}/${data.id}`)
-            } else {
-              this.$router.push(`${this.redirectPath}/${data.id}?start=1`)
+      if (!this.isDatatableSelectedAll) {
+        switch (true) {
+          case this.createList.mode === FROM_FILTERS:
+            params = {
+              ...params,
+              filters: clonedCurrentListFilters
             }
 
-            this.createListClose()
+            break
+          case this.createList.mode === FROM_BULK_MENU:
+            let contacts = []
 
-            this.$generalNotification(message)
+            if (this.selectedContacts[this.selectedList.id]) {
+              contacts = this.selectedContacts[this.selectedList.id]
+            }
 
-            this.loadFolders()
-          })
-          .catch((error) => {
+            params = {
+              ...params,
+              contact_ids: contacts.map(contact => contact.id)
+            }
+
+            break
+          case this.createList.mode === FROM_FOLDERS:
+          default:
+        }
+      } else {
+        params.selected_all = true
+      }
+
+      // we have to use the dynamic list's filters if the source list
+      // is of type DYNAMIC
+      if (this.isDefault && this.selectedList.type === this.ContactListTypes.DYNAMIC &&
+        !isEmpty(this.currentListFilters)) {
+        const allFilters = this.$jsonClone(this.currentListFilters)
+
+        Object.keys(allFilters).forEach(index => {
+          // include all other filters
+          if (!this.$isNumeric(index)) {
+            params[index] = allFilters[index]
+            delete allFilters[index]
+          }
+        })
+
+        if (!isEmpty(allFilters)) {
+          // include the filter groups
+          params.filter_groups = allFilters
+        }
+      } else {
+        // else, list is of type STATIC. Just pass the contacts list id filter
+        params.filter_groups = [
+          {
+            'filters': {
+              'contact_lists': [
+                {
+                  value: [this.selectedList.id],
+                  operator: 1
+                }
+              ]
+            },
+            is_conjunction: true
+          }
+        ]
+      }
+
+      return params
+    },
+
+    processRequest (url = null, params, isChunked = false, chunkedContactIds = [], listId = null, message = null, skipListLoading = false) {
+      const apiUrl = !url ? this.listsEndpoint : url
+
+      if (chunkedContactIds.length > 0) {
+        params.contact_ids = chunkedContactIds[0]
+      }
+
+      this.$axios
+        .post(apiUrl, params)
+        .then((response) => {
+          let message = null
+          let id = null
+
+          if (!url) {
+            message = response?.data?.message
+            id = response?.data?.id || response?.data?.data?.id
+          }
+
+          // recover the id for bulk add contacts with chunked contacts
+          id = !id && this.$isNumeric(listId) ? listId : id
+
+          if (isChunked && this.isDefault) {
+            // remove the used set of contact ids
+            chunkedContactIds.splice(0, 1)
+            const hasMoreChunks = chunkedContactIds.length > 1
+
+            // process the next set of contact ids
+            if (chunkedContactIds.length > 0) {
+              this.processRequest(`/api/v2/contacts-list/${id}/items`, params, hasMoreChunks, chunkedContactIds, id, message, skipListLoading)
+
+              return
+            } else {
+              isChunked = false
+            }
+          }
+
+          const newStaticListWithContacts = isEmpty(params.contact_folder_id) &&
+            !isEmpty(params.contact_ids)
+
+          // skip list's loading view too if we're sending contact ids
+          if (this.isDefault && !skipListLoading && !newStaticListWithContacts) {
+            this.$VueEvent.fire('addContactsProgress', {
+              id: id,
+              loading: true
+            })
+          }
+
+          if (this.createList.mode === FROM_BULK_MENU) {
+            this.$router.push(`${this.redirectPath}/${id}`)
+          } else {
+            this.$router.push(`${this.redirectPath}/${id}?start=1`)
+          }
+
+          this.createListClose()
+
+          this.$generalNotification(message)
+
+          this.loadFolders()
+        })
+        .catch((error) => {
+          if (!isChunked) {
+            this.$VueEvent.fire('addContactsProgress', {
+              id: null,
+              loading: false
+            })
+
             const { message, html } = extractErrorMessage(error)
             console.log(html)
             this.errorMsg = message
             this.$generalNotification(message, 'error')
-          })
-          .finally(() => {
+          }
+        })
+        .finally(() => {
+          if (!isChunked) {
             this.isLoading = false
-          })
+          }
+        })
+    },
+
+    processSubmit (skipListLoading = false) {
+      this.isLoading = true
+      const params = this.getParams()
+      let ids = params?.contact_ids ?? []
+      ids = chunk(ids, 50)
+
+      const isChunked = !params?.selected_all && ids.length > 0
+      this.processRequest(null, params, isChunked, ids, null, null, skipListLoading)
+    },
+
+    onSubmit () {
+      // should skip list's loading view after creating the list
+      if (this.createList.type === this.ContactListTypes.STATIC &&
+        !this.isDatatableSelectedAll &&
+        isEmpty(this.selectedContacts[this.selectedList.id])) {
+        this.processSubmit(true)
+        return
+      }
+
+      if (this.createList.type === this.ContactListTypes.STATIC) {
+        this.$bvModal.msgBoxConfirm('Are you sure you want to continue?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.processSubmit()
+          }
+        })
       } else {
         if (this.unsavedList) {
           this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action will overwrite any unsaved data. Do you wish to continue?', {
@@ -264,11 +393,14 @@ export default {
         } else {
           this.handleDynamicListCreation()
         }
+
         this.isLoading = false
       }
     },
 
     handleDynamicListCreation () {
+      this.isLoading = true
+
       const data = {
         ...this.defaultTemplateResponse,
         name: this.getParams().name,
@@ -280,12 +412,21 @@ export default {
       this.setUnsavedList(data)
       this.isLoading = false
       this.createListClose()
+
       if (this.$route.path !== '/contacts/list/unsaved') {
         this.$router.push(`${this.redirectPath}/unsaved`)
       }
+
       this.$VueEvent.fire('resetContactsListFilter')
-      this.setCurrentListFilters({ sort: this.currentListFilters.sort, order: this.currentListFilters.order, search: this.currentListFilters.search, relations: this.currentListFilters.relations })
+
+      this.setCurrentListFilters({
+        sort: this.currentListFilters.sort,
+        order: this.currentListFilters.order,
+        search: this.currentListFilters.search,
+        relations: this.currentListFilters.relations
+      })
     },
+
     loadFolders () {
       this.$axios
         .get(this.foldersEndpoint)
@@ -296,17 +437,23 @@ export default {
         })
     }
   },
+
   data () {
     return {
       isOpen: false,
       name: null,
-      ContactListTypes,
       type: ContactListTypes.DYNAMIC,
       isLoading: false,
-      CreateListMode: { FROM_FILTERS, FROM_FOLDERS, FROM_BULK_MENU },
-      errorMsg: ''
+      CreateListMode: {
+        FROM_FILTERS,
+        FROM_FOLDERS,
+        FROM_BULK_MENU
+      },
+      errorMsg: '',
+      ContactListTypes
     }
   },
+
   watch: {
     createList ({ open }) {
       this.isOpen = open

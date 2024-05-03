@@ -30,13 +30,19 @@
                 v-for="(column, key) in fixedColumns"
                 @mouseout="onInitReorder(false, null)">
               <label class="custom-checkbox-container check-all"
+                     :class="customCheckboxContainerClass"
                      v-if="column.name === 'checkbox' && showSelectAll">
                 <input ref="dataTableCheckAll"
                        class="data-table-check-all"
                        type="checkbox"
+                       :class="checkAllClass"
+                       :disabled="isDisabledCheckAll"
                        :checked="isSelectedAll"
                        @change="onCheckboxClicked" />
-                <span class="checkmark"/>
+                <span class="checkmark"
+                      :class="checkAllClass">
+                  <slot name="checkall-tooltip"/>
+                </span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
                 <div class="move-icon-drag-container"
@@ -334,6 +340,40 @@ export default {
       }
 
       return 'No contacts found on the current list'
+    },
+
+    tableColumnSpan () {
+      return this.fixedColumns.length
+    },
+
+    customCheckboxContainerClass () {
+      const isCheckedClass = this.isCheckboxAllChecked ? 'checked' : ''
+      let pageClass = ''
+
+      if (this.isPowerDialerAdd) {
+        pageClass = 'pd-add'
+      } else if (this.isContacts) {
+        pageClass = 'contacts'
+      }
+
+      return [
+        isCheckedClass,
+        pageClass
+      ].concat(this.checkAllClass)
+    },
+
+    isDisabledCheckAll () {
+      const isEmpty = this.totalRows === 0 && this.hasEmptySlot
+
+      return this.isLoading || this.isLoadingMore || isEmpty
+    },
+
+    checkAllClass () {
+      const isDisabledClass = this.isDisabledCheckAll ? 'cursor-blocked pe-none' : ''
+
+      return [
+        isDisabledClass
+      ]
     }
   },
 
@@ -364,6 +404,10 @@ export default {
   methods: {
     ...mapActions(['setDefaultDateFilter']),
 
+    ...mapActions('contacts', [
+      'setAllContactsSelected'
+    ]),
+
     getHeaderStyle (name, minWidth, maxWidth) {
       let minWidthPixels = minWidth ? `${minWidth}px` : ''
       let maxWidthPixels = maxWidth ? `${maxWidth}px` : ''
@@ -380,7 +424,7 @@ export default {
     },
 
     getHeaderCheckboxClass (key, sticky, name) {
-      const checkboxClass = name === 'checkbox' ? name : ''
+      const checkboxClass = name === 'checkbox' ? `${name} cursor-default` : ''
       const stickyClass = sticky ? 'sticky' : ''
       const hoveringClass = this.hoverKey === key && this.isHovering
         ? 'hovering' : ''
@@ -462,10 +506,6 @@ export default {
       this.column = evt.target.parentNode
       this.startOffset = this.column.offsetWidth - evt.pageX
       document.body.style.cursor = 'col-resize'
-    },
-
-    onCheckboxClicked (evt) {
-      this.$emit('checked', evt.target.checked)
     },
 
     onOrderChanged ({ oldIndex, newIndex }) {
@@ -555,6 +595,11 @@ export default {
       this.moveColor = value ? '#256eff' : '#4F4F4F'
       this.isHovering = value
       this.hoverKey = key
+    },
+
+    onCheckboxClicked (evt) {
+      this.$emit('checked', evt.target.checked)
+      this.setAllContactsSelected(evt.target.checked)
     }
   },
 

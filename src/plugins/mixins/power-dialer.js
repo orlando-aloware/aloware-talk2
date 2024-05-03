@@ -9,8 +9,8 @@ export default {
       filterParams: {
         'page': 1,
         'per_page': 25,
-        'filter_groups[0][filters][contact_lists][value][0]': 18,
-        'filter_groups[0][filters][contact_lists][operator]': 1,
+        'filter_groups[0][filters][contact_lists][0][value][0]': 18,
+        'filter_groups[0][filters][contact_lists][0][operator]': 1,
         'filter_groups[0][is_conjunction]': true,
         'order': 'desc'
       }
@@ -25,7 +25,7 @@ export default {
     ]),
 
     ...mapGetters('contacts', {
-      selectedContacts: 'selectedContacts',
+      currentSelectedContacts: 'selectedContacts',
       selectedFilters: 'currentListFilters',
       search: 'search'
     }),
@@ -52,10 +52,6 @@ export default {
 
     dialogName () {
       return `remove-power-dialer-item-dialog`
-    },
-
-    cleanedListId () {
-      return this.getCleanedListId(this.$route?.params?.id)
     }
   },
 
@@ -98,8 +94,8 @@ export default {
       }
 
       // add selected contacts to the params, when they arent empty
-      if (Array.isArray(this.selectedContacts[listId])) {
-        const contactIds = this.selectedContacts[listId].map(contact => contact.id)
+      if (this.currentSelectedContacts && Array.isArray(this.currentSelectedContacts[listId]) && this.currentSelectedContacts[listId].length) {
+        const contactIds = this.currentSelectedContacts[listId].map(contact => contact.id)
 
         if (contactIds.length) {
           filters.contact_ids = contactIds

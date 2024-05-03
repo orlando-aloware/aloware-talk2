@@ -1,5 +1,5 @@
 <template>
-  <contacts-screen :loading="isLoadingDisabled">
+  <contacts-screen :loading="isLoadingDisabled || clicked">
     <template slot="title">
       <div class="d-flex flex-column">
         <div class="d-flex align-items-center">
@@ -34,15 +34,16 @@
     <template slot="options">
       <div class="d-flex align-items-center">
         <div class="selected-contacts text-muted mr-2">
-          {{ checkedItems.length }} Selected Contact
+          {{ selectedAllCount | numFormat }} Selected Contact
         </div>
         <compact-btn class="mr-2"
                      variant="primary"
-                     :disabled="!checkedItems.length || clicked"
+                     :disabled="!selectedAllCount || clicked"
                      @clicked="addSelectedContacts">
           Add Selected Contacts
         </compact-btn>
         <compact-btn variant="outlined-light"
+                     :disabled="clicked"
                      @clicked="onCancel">
           Cancel
         </compact-btn>
@@ -66,7 +67,12 @@
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
         <div class="flex-grow-1 text-right pr-2 d-flex align-items-center justify-content-end">
-          <span class="small text-muted selected-contacts mr-2">{{ contactCount | numFormat }} Contacts</span>
+          <span class="small text-muted selected-contacts mr-2">
+            <template v-if="!isDatatableCountLoading">{{ contactsCountText }}</template>
+            <q-skeleton type="text"
+                        style="width:80px"
+                        v-else/>
+          </span>
           <div class="v-divider">
           </div>
           <div :class="['btn-filter-wrapper mr-2', hasAppliedFilters ? 'background' : '' ]">
@@ -80,7 +86,7 @@
                        v-if="hasAppliedFilters">
                 {{ filtersCount }}
               </b-badge>
-              <span class="pl-2  pr-2">Filters</span>
+              <span class="pl-2  pr-2">{{ filtersText }}</span>
             </compact-btn>
             <compact-btn customClass="mr-2 pr-0 pl-0 fs-14 _500 position-relative primary not-focusable"
                          variant="outlined-light"
@@ -94,6 +100,13 @@
         </div>
       </div>
     </template>
+    <template slot="actions">
+      <bulk-action-menu :id="id"
+                        :total-rows="totalRows"
+                        :checked-count="selectedAllCount"
+                        @onSelectedAll="onSelectedAll"
+                        @on-delete="clearSelectAll" />
+    </template>
 
     <template slot="table">
       <datatable scroll-area-class="pd-datatable"
@@ -104,9 +117,9 @@
                  :is-loading="isLoading"
                  :paginated="false"
                  :show-pagination="!isStartState"
-                 :total-rows="fixedContactsData.total"
                  :current-page="fixedContactsData.current_page"
                  :last-page="fixedContactsData.last_page"
+                 :total-rows="totalRows"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
                  @reordered="onColumnsReordered"
@@ -129,7 +142,7 @@
                   <input type="checkbox"
                          class="checker"
                          :value="contact.id"
-                         :checked="checkedItems.find(item => item.id === contact.id) || isAllContactsSelected"
+                         :checked="checked.find(item => item.id === contact.id) || isAllContactsSelected"
                          @change="onCheckerClicked(contact)" />
                   <span class="checkmark"></span>
                 </label>
@@ -435,6 +448,7 @@ import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
 import TextPopover from 'components/popover/text-popover'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import ContactsFilters from 'components/contacts/contacts-filters'
+import BulkActionMenu from 'src/components/bulk-action-menu'
 import {
   aclMixin,
   visibilityMixin,
@@ -442,7 +456,7 @@ import {
   avatarMixin,
   addViewMixin
 } from 'src/plugins/mixins'
-import { isEqual } from 'lodash'
+import { isEqual, isEmpty, chunk, pickBy } from 'lodash'
 
 export default {
   components: {
@@ -453,7 +467,8 @@ export default {
     Datatable,
     ImportContactsModal,
     TextPopover,
-    FolderStaticIcon
+    FolderStaticIcon,
+    BulkActionMenu
   },
 
   props: {
@@ -521,10 +536,6 @@ export default {
     addViewMixin
   ],
 
-  inject: [
-    'contactsData'
-  ],
-
   computed: {
     ...mapGetters('auth', ['profile']),
 
@@ -533,7 +544,8 @@ export default {
     ...mapGetters('contacts', [
       'lists',
       'listItems',
-      'isFiltersOpen'
+      'isFiltersOpen',
+      'currentListFilters'
     ]),
 
     contactList () {
@@ -572,25 +584,8 @@ export default {
       return this.columns.filter(column => column.label !== 'Actions')
     },
 
-    urlRoutePath () {
-      if (this.isContactModule) {
-        return '/contacts/list/'
-      }
-
-      return '/power-dialer/list/'
-    },
-
     addItemEndpoint () {
       return this.isContactModule ? 'api/v2/contact-list-items' : 'api/v2/power-dialer-list-items'
-    },
-
-    checkedItemIds () {
-      const ids = []
-      this.checkedItems.forEach(check => {
-        ids.push(check.id)
-      })
-
-      return ids
     },
 
     contactListName () {
@@ -607,10 +602,6 @@ export default {
 
     lastPage () {
       return this.listItems?.[this.id]?.last_page || 0
-    },
-
-    totalRows () {
-      return this.listItems?.[this.id]?.total || 0
     },
 
     contactWithNoPrimaryNumbers () {
@@ -630,15 +621,13 @@ export default {
 
   data () {
     return {
-      ContactListTypes,
       openEdit: true,
       isContactModule: true,
-      checkedItems: [],
       filterHasChanges: false,
       listName: '',
       myContacts: false,
-      clicked: false,
-      contactCount: 0
+      urlRoutePath: '/contacts/list/',
+      ContactListTypes
     }
   },
 
@@ -706,60 +695,102 @@ export default {
         })
     },
 
-    addSelectedContacts () {
-      this.clicked = true
-      this.closeFilters()
+    processRequest (params, isChunked = false, chunkedContactIds = []) {
+      if (chunkedContactIds.length > 0) {
+        params.contacts = chunkedContactIds[0]
+      }
 
       return this.$axios
-        .post(this.addItemEndpoint, this.attachedParams())
-        .then(() => {
-          this.setShouldUpdateSelectedListContactCount(true)
+        .post(this.addItemEndpoint, params)
+        .then((res) => {
+          if (isChunked) {
+            // remove the used set of contact ids
+            chunkedContactIds.splice(0, 1)
+            const hasMoreChunks = chunkedContactIds.length > 1
 
-          if (this.contactList.id === 'my-queue') {
-            this.$router.push(`/power-dialer`)
-          } else {
-            this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+            // process the next set of contact ids
+            if (chunkedContactIds.length > 0) {
+              this.processRequest(params, hasMoreChunks, chunkedContactIds)
+
+              return
+            } else {
+              isChunked = false
+            }
           }
 
+          this.setShouldUpdateSelectedListContactCount(true)
+
+          if (this.isDatatableSelectedAll) {
+            this.$VueEvent.fire('addContactsProgress', {
+              id: this.contactList.id,
+              loading: true
+            })
+          }
+
+          this.$router.push(`${this.urlRoutePath}${this.contactList.id}`)
+          this.clicked = false
           this.setSearch('')
-          this.$generalNotification('Selected contacts were successfully added.')
+          this.$generalNotification(res.data.message)
         })
         .catch((err) => {
-          const { message, html } = extractErrorMessage(err)
-          console.log(html)
-          this.$generalNotification(message, 'error')
+          if (!isChunked) {
+            this.clicked = false
+            const { message, html } = extractErrorMessage(err)
+            console.log(html)
+            this.$generalNotification(message, 'error')
+          }
         })
     },
 
-    attachedParams () {
-      if (this.isContactModule) {
-        return {
-          contact_list_id: this.contactList.id,
-          contacts: this.checkedItems
-        }
+    processAddSelectedContacts () {
+      this.clicked = true
+      this.closeFilters()
+
+      let params = {
+        contact_list_id: parseInt(this.contactList.id)
+      }
+      let ids = []
+
+      if (this.isDatatableSelectedAll) {
+        params.selected_all = true
+      } else {
+        // we only submit needed contact properties which has values
+        ids = this.selectedContacts[this.selectedList.id].map(item => pickBy({
+          id: item.id,
+          incoming_number_id: item?.incoming_number_id,
+          contact_phone_number_id: item?.contact_phone_number_id
+        }, i => ![undefined, null].includes(i)))
+        ids = chunk(ids, 50)
       }
 
-      if (this.contactList.id === 'my-queue') {
-        return {
-          // allow_international_phone_numbers: 1,
-          // multiple_phone_numbers: 1,
-          // future_scheduled_time: '2022-03-09T14:41:36.296Z',
-          contact_ids: this.checkedItemIds
-        }
+      if (!isEmpty(this.currentListFilters)) {
+        params.filter_groups = this.$jsonClone(this.currentListFilters)
       }
 
-      return {
-        // allow_international_phone_numbers: 1,
-        // multiple_phone_numbers: 1,
-        // future_scheduled_time: '2022-03-09T14:41:36.296Z',
-        contact_list_id: this.contactList.id,
-        contact_ids: this.checkedItemIds
+      const isChunked = !params?.selected_all && ids.length > 0
+      this.processRequest(params, isChunked, ids)
+    },
+
+    addSelectedContacts () {
+      if (this.clicked) {
+        return
       }
+
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to add the selected contacts?`, {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'Cancel',
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          this.processAddSelectedContacts()
+        }
+      })
     },
 
     getSelectedContacts () {
       return this.listItems[this.id].data.filter((i) =>
-        this.checkedItems.includes(i.id)
+        this.checked.includes(i.id)
       )
     },
 
@@ -782,32 +813,32 @@ export default {
     },
 
     onCheckAllItems (checked) {
-      this.checkedItems = []
+      let checkedItems = []
+
+      if (!checked) {
+        this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
+        return
+      }
 
       document
         .querySelectorAll('.checker')
         .forEach((checkbox) => {
-          if (checked && this.isContactModule) {
-            this.checkedItems.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
-            return
-          }
-
-          if (checked && !this.isContactModule) {
+          if (this.isContactModule) {
+            checkedItems.push(this.fixedContactsData.data.find(item => item.id === Number(checkbox.value)))
+          } else {
             let foundContact = this.fixedContactsData.data.find(item => item.id === Number(checkbox.value))
 
             if (!(foundContact.is_blocked || foundContact.is_dnc)) {
-              this.checkedItems.push(foundContact)
+              checkedItems.push(foundContact)
             }
-
-            return
           }
-
-          this.checkedItems = this.checkedItems.filter(item => item.id !== Number(checkbox.value))
         })
+
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checkedItems })
     },
 
     onCheckedRows (checked) {
-      this.checkedItems = checked
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checked })
     },
 
     onFiltersClicked () {
@@ -845,7 +876,7 @@ export default {
     },
 
     onPagination (params) {
-      this.checkedItems = []
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
       this.onPaginate(params)
     },
 
@@ -872,22 +903,24 @@ export default {
     },
 
     onCheckerClicked (contact) {
-      const items = { data: [] }
-      const found = this.checkedItems.find(item => item.id === contact.id)
+      let items = []
+      const found = this.checked.find(item => item.id === contact.id)
 
       if (found) {
-        items.data = this.checkedItems.filter(item => item.id !== contact.id)
+        items = this.checked.filter(item => item.id !== contact.id)
       } else {
-        items.data = [...this.checkedItems]
-        items.data.push(contact)
+        items = [...this.checked]
+        items.push(contact)
       }
 
       this.setAllContactsSelected(false)
-      this.onCheckedRows(items.data)
+      this.onCheckedRows(items)
     }
   },
 
   mounted () {
+    this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
+
     this.loadList(this.$route.params.id)
 
     if (this.contactList && this.contactList.type === this.ContactListTypes.DYNAMIC) {
@@ -901,25 +934,6 @@ export default {
     '$route.params.id': function (id) {
       if (this.$route.name === 'Contacts' && id) {
         this.loadList(id)
-      }
-    },
-
-    checkedItemIds: function (value) {
-      if (this.isContactModule) {
-        document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === this.fixedContactsData.data.length
-        return
-      }
-
-      const filteredContacts = this.fixedContactsData.data.filter(c => {
-        return !c.is_dnc && !c.is_blocked
-      })
-
-      document.querySelector('.data-table-check-all').checked = this.fixedContactsData.data.length > 0 && value.length === filteredContacts.length
-    },
-
-    clicked: function (value) {
-      if (value) {
-        setTimeout(() => { this.clicked = false }, 2000)
       }
     }
   }
