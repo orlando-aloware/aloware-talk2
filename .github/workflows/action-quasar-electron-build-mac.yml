@@ -110,7 +110,7 @@ jobs:
           file-name: .env.prod
 
       - name: Build/release Electron mac app
-        run: quasar build -d -m electron -T mac -b builder -P always -B --universal
+        run: quasar build -d -m electron -T darwin -b builder -P always
         env:
           NODE_OPTIONS: --openssl-legacy-provider
           APP_NAME: ${{ secrets.app_name }}
