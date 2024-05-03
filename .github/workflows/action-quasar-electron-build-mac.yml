@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ 'macos-latest' ]
+        os: [ 'macos-13' ]
         node-version: [ '18.x' ]
         yarn-version: [ '1.x' ]
 
@@ -110,7 +110,7 @@ jobs:
           file-name: .env.prod
 
       - name: Build/release Electron mac app
-        run: quasar build -d -m electron -T darwin -b builder -P always
+        run: quasar build -d -m electron -T mac -b builder -P always -B --universal
         env:
           NODE_OPTIONS: --openssl-legacy-provider
           APP_NAME: ${{ secrets.app_name }}
