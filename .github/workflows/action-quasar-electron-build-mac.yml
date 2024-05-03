@@ -193,6 +193,7 @@ jobs:
 
       - name: Rename and Move macOS DMG File
         run: |
+          ls -R ./dist/electron/Packaged
           mv "./dist/electron/Packaged/${{ steps.pkg.outputs.PRODUCT_NAME }}-${{ steps.pkg.outputs.VERSION }}.dmg" "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }}-Latest.dmg"
 
       - name: Install AWS CLI
