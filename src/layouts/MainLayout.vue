@@ -7,7 +7,7 @@
     </div>
     <trial-banner v-if="isTrialKYC && isAuthenticated"/>
     <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/>
-    <cancelled-account-modal v-if="isCancelledAccount && isAuthenticated"/>
+    <cancelled-account-modal v-if="isCancelledAccount && isAuthenticated && !isTrialExpired"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
