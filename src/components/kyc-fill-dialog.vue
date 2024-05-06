@@ -78,17 +78,9 @@ export default {
     openKycBusinessRegistration () {
       this.changeShowedKycDialog()
 
-      if (this.isCompanyKYC) {
-        this.$router.push({
-          name: 'Business Information',
-          params: { company_id: this.currentCompany.id }
-        })
-        return true
-      }
-
       let link = `${process.env.API_URL}/account?tab=compliance`
 
-      return window.open(link, '_blank')
+      return window.open(link, '_self')
     },
 
     changeShowedKycDialog () {
