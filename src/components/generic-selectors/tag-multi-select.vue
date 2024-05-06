@@ -6,8 +6,9 @@
     <q-field class="edit-wrapper mt-2 w-100"
              outlined
              stack-label
-             v-if="isEdit"
-             v-on:blur="handleBlur">
+             v-if="isEdit || isFilter"
+             @focus="onEdit"
+             @blur="handleBlur">
       <q-field class="w-100"
                outlined
                stack-label>
@@ -46,7 +47,7 @@
       </q-field>
       <div class="dropdown-select scrollableArea mt-2 ml-2 mx-0 w-100"
            :style="height ? `height: ${height}px !important` : ''"
-           v-if="isEdit || searchList[0].children.length || searchList[1].children.length">
+           v-if="shouldShowList">
         <div v-if="!optionsIsGrouped">
           <q-infinite-scroll ref="infiniteScroll"
                              scroll-target=".scrollableArea"
@@ -54,12 +55,12 @@
                              :initial-index="1"
                              @load="getTags">
             <div class="mr-1"
-                 :class="{ 'hidden': isEmptyData }">
+                 :class="{ 'hidden': isEmptyData || !isEdit }">
               <div role="button"
                    class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
                    :key="item.id"
                    v-for="item in filteredOptions"
-                   @click="onSelectOption(item.id)">
+                   @click="onSelectOption(item)">
                 <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
                       class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
                   <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
@@ -95,7 +96,7 @@
                              :initial-index="1"
                              @load="getTags">
             <div class="mr-1"
-                 :class="{ 'hidden': isEmptyData }"
+                 :class="{ 'hidden': isEmptyData || !isEdit }"
                  :key="`title-${index}`"
                  v-for="(item, index) in searchList">
               <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
@@ -109,7 +110,7 @@
                    class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
                    :key="`child-${child.id}`"
                    v-for="child in item.children"
-                   @click="onSelectOption(child.id)">
+                   @click="onSelectOption(child)">
                 <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
                       v-if="typeof child.color !== 'undefined'">
                   <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
@@ -138,7 +139,7 @@
         </div>
       </div>
       <div class="text-center w-100"
-           v-else>
+           v-else-if="!isFilter">
         <span>No options to select</span>
       </div>
     </q-field>
@@ -160,7 +161,7 @@
         </div>
       </div>
       <div class="w-100 mt-1"
-           v-if="canEdit">
+           v-if="canEdit && !isFilter">
         <b-link href="#"
                 class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
                 @click="onEdit">
@@ -247,6 +248,12 @@ export default {
     category: {
       required: true,
       type: Number
+    },
+
+    isFilter: {
+      required: false,
+      type: Boolean,
+      default: false
     }
   },
 
@@ -256,6 +263,7 @@ export default {
       isEdit: false,
       loadingTags: false,
       selectedValues: [],
+      selectedValuesObjects: [],
       searchList: [
         {
           title: 'Account Tags',
@@ -273,7 +281,11 @@ export default {
 
   computed: {
     formattedValues () {
-      return this.current
+      if (this.isEmptyData) {
+        return this.current || []
+      }
+
+      return this.selectedValuesObjects
     },
 
     filteredOptions () {
@@ -286,6 +298,10 @@ export default {
 
     isEmptyData () {
       return !this.searchList[0].children.length && !this.searchList[1].children.length
+    },
+
+    shouldShowList () {
+      return this.isEdit || this.searchList[0].children.length || this.searchList[1].children.length
     }
   },
 
@@ -302,13 +318,20 @@ export default {
       return this.selectedValues.includes(id)
     },
 
-    onSelectOption (id) {
-      if (this.isSelected(id)) {
-        this.remove(id)
+    onSelectOption (item) {
+      const selectedValues = this.selectedValues?.length ? [...this.selectedValues, item?.id] : [item?.id]
+
+      if (this.isSelected(item?.id)) {
+        this.remove(item?.id)
         return
       }
-      this.selectedValues.push(id)
-      this.$emit('valuesUpdated', this.selectedValues)
+
+      if (!this.isFilter) {
+        this.selectedValues.push(item?.id)
+      }
+
+      this.selectedValuesObjects.push(item)
+      this.$emit('values-updated', selectedValues, this.selectedValuesObjects)
       this.$nextTick(() => {
         if (typeof this.$refs.search !== 'undefined') {
           this.$refs.search.focus()
@@ -339,7 +362,9 @@ export default {
       if (found.data !== null && found.data !== -1) {
         this.selectedValues.splice(found.data, 1)
       }
-      this.$emit('valuesUpdated', this.selectedValues)
+
+      this.selectedValuesObjects = this.selectedValuesObjects.filter(tag => tag.id !== id)
+      this.$emit('values-updated', this.selectedValues, this.selectedValuesObjects)
     },
 
     filterByTagType (tags, tagType) {
@@ -416,6 +441,13 @@ export default {
       handler () {
         this.selectedValues = this.values
       }
+    },
+    current: {
+      deep: true,
+      handler () {
+        this.selectedValuesObjects = this.current
+      },
+      immediate: true
     },
     search: function (newValue) {
       if ((newValue && newValue.length >= this.threshold) || !newValue.length) {

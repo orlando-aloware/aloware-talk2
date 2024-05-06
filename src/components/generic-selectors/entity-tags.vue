@@ -13,7 +13,8 @@
                         :optionsIsGrouped="true"
                         :height="height"
                         :category="category"
-                        @valuesUpdated="saveTags">
+                        :is-filter="isFilter"
+                        @values-updated="handleSaveTagsOrFilteringTags">
         <template v-slot:button
                   v-if="useAddIcon">
           <add-icon-circle height="14"
@@ -39,7 +40,8 @@
                         :optionsIsGrouped="true"
                         :height="height"
                         :category="category"
-                        @valuesUpdated="saveTags">
+                        :is-filter="isFilter"
+                        @values-updated="handleSaveTagsOrFilteringTags">
       </tag-multi-select>
     </b-card>
   </div>
@@ -66,7 +68,9 @@ export default {
 
   props: {
     entityObject: {
-      required: true
+      required: false,
+      type: Object,
+      default: null
     },
 
     entity: {
@@ -117,6 +121,24 @@ export default {
       required: false,
       type: Number,
       default: null
+    },
+
+    isFilter: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+
+    filterValues: {
+      required: false,
+      type: Array,
+      default: () => []
+    },
+
+    filterValuesObjects: {
+      required: false,
+      type: Array,
+      default: () => []
     }
   },
 
@@ -124,7 +146,8 @@ export default {
     return {
       loadingTag: false,
       loadingTags: false,
-      options: []
+      options: [],
+      selectedTagsObjects: []
     }
   },
 
@@ -199,10 +222,18 @@ export default {
     },
 
     currentTags () {
+      if (this.isFilter) {
+        return this.filterValuesObjects ?? []
+      }
+
       return this.entityObject?.tags ?? []
     },
 
     tagIds () {
+      if (this.isFilter) {
+        return this.filterValues
+      }
+
       if (this.entityObject?.tag_ids) {
         return this.entityObject.tag_ids
       }
@@ -230,6 +261,14 @@ export default {
   },
 
   methods: {
+    handleSaveTagsOrFilteringTags (tagsIds, tagsObjects) {
+      if (this.isFilter) {
+        return this.updateFilteringTags(tagsIds, tagsObjects)
+      }
+
+      return this.saveTags(tagsIds)
+    },
+
     saveTags (tags) {
       if (!this.hasPermissionTo(`tag ${this.entity}`)) {
         return
@@ -251,6 +290,11 @@ export default {
           this.entityObject.tag_ids = this.entityObject.tags.map((o) => o.id)
         }
       })
+    },
+
+    updateFilteringTags (tagsIds, tagsObjects) {
+      this.selectedTagsObjects = tagsObjects
+      this.$emit('filter', tagsIds, tagsObjects)
     }
   },
   watch: {

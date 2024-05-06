@@ -238,6 +238,7 @@ body,
   &.q-field--with-bottom {
     padding-bottom: 15px;
     height: initial !important;
+    max-width: 100px !important;
     .q-field__bottom {
       min-height: 15px;
       padding-left: 0;
@@ -7724,6 +7725,7 @@ table.datatable {
 
 div.q-menu {
   min-width: 0;
+  max-width: 100px !important;
 }
 
 button.primary {

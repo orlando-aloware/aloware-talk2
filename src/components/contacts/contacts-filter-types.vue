@@ -113,7 +113,7 @@
                   @input="addSecondaryValue"/>
       </template>
       <template v-if="isTagsFilterType(filter.type, filter.key)">
-        <q-select ref="filterOperation"
+        <!-- <q-select ref="filterOperation"
                   class="filter-operation border"
                   hint="Type at least 3 characters"
                   input-debounce="1000"
@@ -133,7 +133,16 @@
                   v-if="operator.value === filterOperator && hasValue"
                   @input="onInput"
                   @filter="filterTagFn"
-        />
+        /> -->
+        <entity-tags data-testid="contact-details-tags"
+                     entity="contact"
+                     entity-type="contacts"
+                     :category="TagCategories.CAT_CONTACTS"
+                     :is-filter="true"
+                     :filter-values="filterOperatorValue"
+                     :filter-values-objects="appliedTags"
+                     v-if="operator.value === filterOperator && hasValue"
+                     @filter="filterTagFn"/>
         <label v-if="operator.value === filterOperator && hasSecondaryOperator">
           Content:
         </label>
@@ -203,14 +212,19 @@ import {
   uniqBy
 } from 'lodash'
 import * as Countries from 'src/constants/countries'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { State } from 'country-state-city'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import talk2Api from 'src/plugins/api/api'
+import EntityTags from 'components/generic-selectors/entity-tags'
 
 export default {
   name: 'contacts-filter-types',
 
-  components: { CompactBtn },
+  components: {
+    CompactBtn,
+    EntityTags
+  },
 
   props: {
     filter: {
@@ -264,7 +278,8 @@ export default {
       filterOperatorValueDebounceInProgress: false,
       secondaryFilterOperatorValueDebounceInProgress: false,
       appliedFiltersInProgress: false,
-      appliedTags: []
+      appliedTags: [],
+      TagCategories
     }
   },
 
@@ -668,13 +683,9 @@ export default {
       applyFilterInterval = setInterval(() => {
         if (!this.isDebounceInProgress) {
           if (this.filter.key === 'tags' && this.filterOperatorValue) {
-            let selectedOptions = this.options.filter(option => this.filterOperatorValue.includes(option.id))
-            // Create a temporary set to handle unique items
-            let tempSet = new Set([...this.appliedTags, ...selectedOptions])
-            // Convert the temporary set back to an array
-            this.appliedTags = Array.from(tempSet)
             this.filter.options = this.appliedTags
           }
+
           this.processFilters()
           this.appliedFiltersInProgress = false
           clearInterval(applyFilterInterval)
@@ -834,8 +845,8 @@ export default {
       this.filterOperatorValue = 1
     },
 
-    filterTagFn (val, updateFn, abortFn) {
-      this.getTags(val, false, updateFn, abortFn)
+    filterTagFn (val) {
+      this.filterOperatorValue = val
     },
 
     getTags (search = '', force, updateFn, abortFn) {
