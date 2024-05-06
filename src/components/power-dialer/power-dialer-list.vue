@@ -107,7 +107,7 @@ export default {
       if (event.user_id !== this.profile.id) {
         return
       }
-
+      console.log('handleImportFinishedEvent event: ', event)
       // dismiss the previous notification
       if (this.notification) {
         this.notification()

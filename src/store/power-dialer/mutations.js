@@ -2,7 +2,7 @@
 import { updateField } from 'vuex-map-fields'
 import { isArray, isEmpty, merge } from 'lodash'
 import * as PowerDialerDefault from 'src/constants/power-dialer-default'
-import { mergeObjectsAndAddValues } from 'src/plugins/helpers/functions'
+// import { mergeObjectsAndAddValues } from 'src/plugins/helpers/functions'
 
 export default {
   updateField,
@@ -238,7 +238,8 @@ export default {
   },
 
   STORE_BULK_ACTION_NOTIFICATION (state, value) {
-    if (isEmpty(state.bulkAddContactsNotification?.[value.contact_list_id])) {
+    state.bulkAddContactsNotification[value.contact_list_id] = value
+    /* if (isEmpty(state.bulkAddContactsNotification?.[value.contact_list_id])) {
       state.bulkAddContactsNotification[value.contact_list_id] = value
 
       return
@@ -247,7 +248,7 @@ export default {
     state.bulkAddContactsNotification[value.contact_list_id] = mergeObjectsAndAddValues(
       state.bulkAddContactsNotification[value.contact_list_id],
       value
-    )
+    ) */
   },
 
   CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {

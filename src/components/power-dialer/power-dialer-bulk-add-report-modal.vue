@@ -5,15 +5,15 @@
            no-close-on-esc
            v-model="isOpen">
     <div class="container">
-      <p class="text-h6">
+      <p class="font-weight-bold">
         {{ selected }} {{ fixMessage('contact(s)', selected) }} selected
       </p>
-      <p class="m-0">
+      <p class="m-0 font-weight-bold">
         {{ fixMessage('Contact(s)', addedFromContact) }} added
       </p>
       <ul>
         <li>
-          {{ addedFromContact }} {{ fixMessage('task(s)', addedFromContact) }} from {{ fixMessage('contact(s)', selected) }}
+          {{ totalAddedFromContacts }} {{ fixMessage('task(s)', addedFromContact) }} from {{ fixMessage('contact(s)', selected) }}
         </li>
         <li v-if="hasAddedFromMultipleNumbers">
           {{ addedFromMultipleNumbers }} {{ fixMessage('task(s)', addedFromMultipleNumbers) }} from multiple numbers
@@ -29,7 +29,7 @@
         </li>
       </ul>
       <template v-if="skipped.length > 0">
-        <p class="m-0">
+        <p class="m-0 font-weight-bold">
           Contacts not added/skipped
         </p>
         <ul>
@@ -39,8 +39,16 @@
           </li>
         </ul>
       </template>
-      <p class="text-h6 font-weigh-bold">
+      <p class="font-weigh-light-bold">
         {{ addedFromContact }} Total {{ fixMessage('task(s)', addedFromContact) }} added to queue
+      </p>
+      <p class="font-weight-light-bold"
+         v-if="existingContactsBeforeImport">
+        {{ existingContactsBeforeImport }} existing {{ fixMessage('task(s)', existingContactsBeforeImport) }} before import
+      </p>
+      <hr/>
+      <p class="font-weight-bold">
+        {{ addedFromContact + existingContactsBeforeImport }} Total {{ fixMessage('task(s)', addedFromContact + existingContactsBeforeImport) }} in queue
       </p>
     </div>
     <template slot="modal-footer">
@@ -100,7 +108,25 @@ export default {
     },
 
     addedFromContact () {
+      console.log('addedFromContact this.fullReport', this.fullReport)
       return this.fullReport?.success?.total ?? 0
+    },
+
+    totalAddedFromContacts () {
+      if (this.addedFromMultipleNumbers) {
+        return this.uniqueContactsCount - this.addedFromMultipleNumbers
+      }
+
+      return this.addedFromContact
+    },
+
+    uniqueContactsCount () {
+      console.log('uniqueContactsCount this.fullReport', this.fullReport)
+      return this.fullReport?.info?.selected ?? 0
+    },
+
+    existingContactsBeforeImport () {
+      return this.fullReport?.extra?.total_items_before_import ?? 0
     },
 
     addedFromMultipleNumbers () {
@@ -175,6 +201,7 @@ export default {
     },
 
     buildReport () {
+      console.log('buildReport this.statusReport', this.statusReport)
       this.fullReport = cloneDeep(this.statusReport)
 
       if (isEmpty(this.fullReport)) {
@@ -241,6 +268,8 @@ export default {
         ...integrationReport,
         ...failReport
       }
+
+      console.log('buildReport this.fullReport', this.fullReport)
 
       // clean-up
       this.removeIntegrationPDImportSummary(id)
