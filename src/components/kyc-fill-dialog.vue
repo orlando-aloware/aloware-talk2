@@ -33,7 +33,7 @@
                color="primary"
                text-color="white"
                rounded
-               @click="openKycBusinessRegistration"
+               @click="onOpenFinishRegistration"
                v-close-popup>
         </q-btn>
       </q-card-actions>
@@ -74,12 +74,6 @@ export default {
 
   methods: {
     ...mapActions(['setShowedKycDialog']),
-
-    openKycBusinessRegistration () {
-      this.changeShowedKycDialog()
-      let link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
-      return window.open(link, '_self')
-    },
 
     changeShowedKycDialog () {
       this.setShowedKycDialog(true)
