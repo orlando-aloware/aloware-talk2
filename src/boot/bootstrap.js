@@ -291,7 +291,9 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
       'NetworkError',
       'Navigation cancelled from',
       'Blocked a frame with origin',
-      'AxiosError: Request failed with status code 404'
+      'AxiosError: Request failed with status code 404',
+      'AxiosError: Request aborted',
+      /^CanceledError:/
     ],
 
     // This sets the sample rate to be 10%. You may want this to be 100% while

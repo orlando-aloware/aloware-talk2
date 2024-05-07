@@ -382,7 +382,7 @@ export default {
 
       if (updateFetched) {
         // Update the number of fetched tasks in the current session
-        this.updateNumberOfFetchedTasks(taskType, currInQueue.length)
+        this.updateNumberOfFetchedTasks(taskType, currInQueue?.length)
       }
 
       if (updatePagination) {
