@@ -187,15 +187,6 @@ export default {
 
         return window.open(link, '_self')
       }
-
-      if (this.$router.currentRoute.name === 'Business Information') {
-        return
-      }
-
-      this.$router.push({
-        name: 'Business Information',
-        params: { company_id: this.currentCompany.id }
-      })
     },
 
     getLink (link) {
