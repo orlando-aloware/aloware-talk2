@@ -77,9 +77,7 @@ export default {
 
     openKycBusinessRegistration () {
       this.changeShowedKycDialog()
-
-      let link = `${process.env.API_URL}/account?tab=compliance`
-
+      let link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
       return window.open(link, '_self')
     },
 
