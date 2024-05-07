@@ -113,27 +113,6 @@
                   @input="addSecondaryValue"/>
       </template>
       <template v-if="isTagsFilterType(filter.type, filter.key)">
-        <!-- <q-select ref="filterOperation"
-                  class="filter-operation border"
-                  hint="Type at least 3 characters"
-                  input-debounce="1000"
-                  option-disable="disabled"
-                  option-value="id"
-                  option-label="name"
-                  borderless
-                  dense
-                  use-chips
-                  multiple
-                  map-options
-                  emit-value
-                  use-input
-                  data-testid="contacts-filter-operator-value-tags-select"
-                  :options="options"
-                  v-model="filterOperatorValue"
-                  v-if="operator.value === filterOperator && hasValue"
-                  @input="onInput"
-                  @filter="filterTagFn"
-        /> -->
         <entity-tags data-testid="contact-details-tags"
                      entity="contact"
                      entity-type="contacts"

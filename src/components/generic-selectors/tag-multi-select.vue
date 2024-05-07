@@ -39,10 +39,27 @@
                    borderless
                    dense
                    input-class="input-text-sm"
-                   placeholder="Type to search"
+                   :placeholder="inputPlaceholder"
                    :debounce="500"
                    v-model="search">
           </q-input>
+        </template>
+
+        <template v-slot:append>
+          <q-icon class="q-select__dropdown-icon q-icon notranslate cursor-pointer"
+                  name="expand_less"
+                  v-if="isEdit"/>
+          <q-icon class="q-select__dropdown-icon q-icon notranslate cursor-pointer"
+                  name="expand_more"
+                  v-else/>
+        </template>
+
+        <template v-slot:hint>
+          <div class="q-field__bottom row items-start q-field__bottom--animated">
+            <div class="q-field__messages col">
+              <div>Type at least 3 characters</div>
+            </div>
+          </div>
         </template>
       </q-field>
       <div class="dropdown-select scrollableArea mt-2 ml-2 mx-0 w-100"
@@ -53,6 +70,7 @@
                              scroll-target=".scrollableArea"
                              :offset="100"
                              :initial-index="1"
+                             v-if="isEdit"
                              @load="getTags">
             <div class="mr-1"
                  :class="{ 'hidden': isEmptyData || !isEdit }">
@@ -92,8 +110,9 @@
         <div v-else>
           <q-infinite-scroll ref="infiniteScroll"
                              scroll-target=".scrollableArea"
-                             :offset="6"
+                             :offset="100"
                              :initial-index="1"
+                             v-if="isEdit"
                              @load="getTags">
             <div class="mr-1"
                  :class="{ 'hidden': isEmptyData || !isEdit }"
@@ -301,7 +320,11 @@ export default {
     },
 
     shouldShowList () {
-      return this.isEdit || this.searchList[0].children.length || this.searchList[1].children.length
+      return this.isEdit
+    },
+
+    inputPlaceholder () {
+      return this.isFilter ? 'Type at least 3 characters' : 'Type to search'
     }
   },
 
@@ -351,7 +374,6 @@ export default {
       }
 
       this.$nextTick(() => {
-        this.$refs.infiniteScroll.trigger()
         this.$refs.search.focus()
       })
     },

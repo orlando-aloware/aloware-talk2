@@ -28,6 +28,7 @@
       </tag-multi-select>
     </div>
     <b-card class="border-0 tags-wrapper"
+            :class="{ 'filter-wrapper': isFilter }"
             data-testid="contact-tags-wrapper"
             v-else>
       <tag-multi-select :data-testid="`${entity}-tags-multi-select`"
