@@ -239,16 +239,6 @@ export default {
 
   STORE_BULK_ACTION_NOTIFICATION (state, value) {
     state.bulkAddContactsNotification[value.contact_list_id] = value
-    /* if (isEmpty(state.bulkAddContactsNotification?.[value.contact_list_id])) {
-      state.bulkAddContactsNotification[value.contact_list_id] = value
-
-      return
-    }
-
-    state.bulkAddContactsNotification[value.contact_list_id] = mergeObjectsAndAddValues(
-      state.bulkAddContactsNotification[value.contact_list_id],
-      value
-    ) */
   },
 
   CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {

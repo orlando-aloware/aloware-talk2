@@ -1251,9 +1251,7 @@ export default {
      */
     checkTaskAddedNotification () {
       const notification = this.bulkAddNotifications(this.$route.params.id)
-      console.log('checkTaskAddedNotification notification', notification)
       this.bulkAddStatusReport = notification?.status_report
-      console.log('checkTaskAddedNotification this.bulkAddStatusReport', this.bulkAddStatusReport)
     },
 
     onTaskAddedNotificationClose () {

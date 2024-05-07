@@ -18,9 +18,6 @@
         <li v-if="hasAddedFromMultipleNumbers">
           {{ addedFromMultipleNumbers }} {{ fixMessage('task(s)', addedFromMultipleNumbers) }} from multiple numbers
         </li>
-        <li v-if="hasAddedDuplicates">
-          {{ addedDuplicates }} duplicate phone {{ fixMessage('number(s)', addedDuplicates) }}
-        </li>
         <li v-if="hasAddedOwnContacts">
           {{ addedOwnContacts }} owned {{ fixMessage('contact(s)', addedOwnContacts) }}
         </li>
@@ -34,7 +31,7 @@
         </p>
         <ul>
           <li v-for="(error, id) in skipped"
-              v-bind:key="id">
+              :key="id">
             {{ error[1] }} {{ getErrorMessage(error[0], error[1]) }}
           </li>
         </ul>
@@ -46,8 +43,9 @@
          v-if="existingContactsBeforeImport">
         {{ existingContactsBeforeImport }} existing {{ fixMessage('task(s)', existingContactsBeforeImport) }} before import
       </p>
-      <hr/>
-      <p class="font-weight-bold">
+      <hr v-if="existingContactsBeforeImport"/>
+      <p class="font-weight-bold"
+         v-if="existingContactsBeforeImport">
         {{ addedFromContact + existingContactsBeforeImport }} Total {{ fixMessage('task(s)', addedFromContact + existingContactsBeforeImport) }} in queue
       </p>
     </div>
@@ -108,7 +106,6 @@ export default {
     },
 
     addedFromContact () {
-      console.log('addedFromContact this.fullReport', this.fullReport)
       return this.fullReport?.success?.total ?? 0
     },
 
@@ -121,7 +118,6 @@ export default {
     },
 
     uniqueContactsCount () {
-      console.log('uniqueContactsCount this.fullReport', this.fullReport)
       return this.fullReport?.info?.selected ?? 0
     },
 
@@ -134,15 +130,11 @@ export default {
     },
 
     hasAddedFromMultipleNumbers () {
-      const flag = get(this.fullReport, 'success.multiple_numbers', false)
-
-      return this.$isNumeric(flag) ? true : flag
+      return this.fullReport?.success?.multiple_numbers ?? 0
     },
 
     hasAddedDuplicates () {
-      const flag = get(this.fullReport, 'success.duplicates', false)
-
-      return this.$isNumeric(flag) ? true : flag
+      return this.fullReport?.success?.duplicates ?? 0
     },
 
     addedDuplicates () {
@@ -150,9 +142,7 @@ export default {
     },
 
     hasAddedOwnContacts () {
-      const flag = get(this.fullReport, 'success.own_contacts', false)
-
-      return this.$isNumeric(flag) ? true : flag
+      return this.fullReport?.success?.own_contacts ?? 0
     },
 
     addedOwnContacts () {
@@ -201,7 +191,6 @@ export default {
     },
 
     buildReport () {
-      console.log('buildReport this.statusReport', this.statusReport)
       this.fullReport = cloneDeep(this.statusReport)
 
       if (isEmpty(this.fullReport)) {
@@ -268,8 +257,6 @@ export default {
         ...integrationReport,
         ...failReport
       }
-
-      console.log('buildReport this.fullReport', this.fullReport)
 
       // clean-up
       this.removeIntegrationPDImportSummary(id)
