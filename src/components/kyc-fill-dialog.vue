@@ -7,7 +7,9 @@
             style="width: 635px; border-radius: 30px">
       <q-card-section>
         <div class="text-h6">
-          Welcome aboard! 🎉 We're thrilled to have you join us! 🌟
+          Welcome aboard! 🎉
+          <br>
+          We're thrilled to have you join us! 🌟
         </div>
 
         <div class="text-body2 q-pt-lg">
