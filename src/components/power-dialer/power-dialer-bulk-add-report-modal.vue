@@ -79,7 +79,8 @@ export default {
   },
 
   data: () => ({
-    fullReport: {}
+    fullReport: {},
+    duplicated_tasks: 0
   }),
 
   computed: {
@@ -174,7 +175,12 @@ export default {
 
     getErrorMessage (index, value) {
       if (this.$isNumeric(index)) {
-        return this.fixMessage(PD_BULK_ADD_MESSAGES[index], value)
+        let message = this.fixMessage(PD_BULK_ADD_MESSAGES[index], value)
+        // complement message if there are skipped contacts with duplicates
+        if (index === '1') {
+          message += this.duplicated_tasks ? ' (' + this.duplicated_tasks + ' duplicates)' : ''
+        }
+        return message
       }
 
       return this.fixMessage(PD_INTEGRATION_IMPORT_MESSAGES[index], value)
@@ -243,6 +249,13 @@ export default {
       // update the total selected contacts to the correct total count
       this.fullReport.info.selected = totalSelected
 
+      // how many contacts have duplicates
+      const duplicates = integrationReport?.duplicates ?? 0
+      // the total of duplicates
+      const duplicatedTasks = integrationReport?.duplicated_tasks ?? 0
+
+      this.duplicated_tasks = duplicatedTasks ? duplicatedTasks - duplicates : 0
+
       // remove reports having no message or with 0 value
       Object.keys(integrationReport).forEach(key => {
         const reportMessage = this.fixMessage(PD_INTEGRATION_IMPORT_MESSAGES[key], integrationReport[key])
@@ -258,7 +271,7 @@ export default {
         ...integrationReport,
         ...failReport
       }
-      console.log('buildReport this.fullReport', this.fullReport)
+
       // clean-up
       this.removeIntegrationPDImportSummary(id)
     }
