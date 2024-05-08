@@ -102,7 +102,7 @@ export default {
     },
 
     selected () {
-      return this.$isNumeric(this.fullReport?.info?.selected) ? this.fullReport?.info?.selected : 0
+      return this.$isNumeric(this.fullReport?.info?.total_selected_contacts) ? this.fullReport?.info?.total_selected_contacts : 0
     },
 
     addedFromContact () {
@@ -199,6 +199,7 @@ export default {
 
       const id = this.$route.params.id
       let integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
+      this.fullReport.info.total_selected_contacts = integrationReport?.total_selected_contacts ?? 0
 
       if (isEmpty(integrationReport)) {
         integrationReport = {
@@ -257,7 +258,7 @@ export default {
         ...integrationReport,
         ...failReport
       }
-
+      console.log('buildReport this.fullReport', this.fullReport)
       // clean-up
       this.removeIntegrationPDImportSummary(id)
     }
