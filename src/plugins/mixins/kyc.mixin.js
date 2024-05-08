@@ -168,6 +168,11 @@ export default _.merge({
       }
 
       return KycLogs.VIEW_ONLY_ALLOWED.includes(kycStatus)
+    },
+
+    onOpenFinishRegistration () {
+      const link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
+      return window.open(link, '_self')
     }
   }
 })

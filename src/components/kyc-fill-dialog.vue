@@ -22,6 +22,7 @@
         <q-btn class="text-regular"
                label="Remind me later"
                text-color="grey"
+               rounded
                v-close-popup
                flat
                @click="changeShowedKycDialog">
@@ -31,7 +32,7 @@
                color="primary"
                text-color="white"
                rounded
-               @click="openKycBusinessRegistration"
+               @click="onOpenFinishRegistration"
                v-close-popup>
         </q-btn>
       </q-card-actions>
@@ -72,22 +73,6 @@ export default {
 
   methods: {
     ...mapActions(['setShowedKycDialog']),
-
-    openKycBusinessRegistration () {
-      this.changeShowedKycDialog()
-
-      if (this.isCompanyKYC) {
-        this.$router.push({
-          name: 'Business Information',
-          params: { company_id: this.currentCompany.id }
-        })
-        return true
-      }
-
-      let link = `${process.env.API_URL}/account?tab=compliance`
-
-      return window.open(link, '_blank')
-    },
 
     changeShowedKycDialog () {
       this.setShowedKycDialog(true)
