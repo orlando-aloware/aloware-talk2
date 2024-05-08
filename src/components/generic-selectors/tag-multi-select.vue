@@ -6,41 +6,46 @@
     <q-field class="edit-wrapper mt-2 w-100"
              outlined
              stack-label
+             :dense="dense"
              v-if="isEdit || isFilter"
              @focus="onEdit"
              @blur="handleBlur">
       <q-field class="w-100"
                outlined
-               stack-label>
+               stack-label
+               :dense="dense">
         <template v-slot:control>
-          <div class="w-100 text-break"
-               :key="item.id"
-               v-for="item in formattedValues">
-            <div class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
-              <div class="dot-wrapper d-flex align-items-center position-absolute">
-                <q-badge class="is-dot"
-                         rounded
-                         :style="{ background: item.color }"
-                         v-if="typeof item.color !== 'undefined'">
-                </q-badge>
-              </div>
-              <div class="tag-text"
-                   :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">
-                {{ item.name }}
-              </div>
-              <div role="button" class="custom__remove d-flex align-items-center"
-                   @click="remove(item.id)">
-                <remove-tag-icon class="ml-1 remove-tag-icon"/>
+          <div :class="{ 'with-value': dense && formattedValues?.length }">
+            <div class="w-100 text-break"
+                 :key="item.id"
+                 v-for="item in formattedValues">
+              <div class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
+                <div class="dot-wrapper d-flex align-items-center position-absolute">
+                  <q-badge class="is-dot"
+                           rounded
+                           :style="{ background: item.color }"
+                           v-if="typeof item.color !== 'undefined'">
+                  </q-badge>
+                </div>
+                <div class="tag-text"
+                     :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">
+                  {{ item.name }}
+                </div>
+                <div role="button" class="custom__remove d-flex align-items-center"
+                     @click="remove(item.id)">
+                  <remove-tag-icon class="ml-1 remove-tag-icon"/>
+                </div>
               </div>
             </div>
           </div>
+
           <q-input class="input-text-sm no-after-border w-100 mb-0 mt-1"
                    ref="search"
                    borderless
-                   dense
                    input-class="input-text-sm"
                    :placeholder="inputPlaceholder"
-                   :debounce="500"
+                   :debounce="1100"
+                   :dense="dense"
                    v-model="search">
           </q-input>
         </template>
@@ -197,7 +202,7 @@
 </template>
 
 <script>
-import _ from 'lodash'
+import { isEmpty, sortBy, union } from 'lodash'
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import CheckOIcon from 'components/icons/check-o-icon'
@@ -273,6 +278,18 @@ export default {
       required: false,
       type: Boolean,
       default: false
+    },
+
+    dense: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+
+    placeholder: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
 
@@ -324,6 +341,10 @@ export default {
     },
 
     inputPlaceholder () {
+      if (this.placeholder) {
+        return this.placeholder
+      }
+
       return this.isFilter ? 'Type at least 3 characters' : 'Type to search'
     }
   },
@@ -334,7 +355,7 @@ export default {
 
   methods: {
     isSelected (id) {
-      if (_.isEmpty(this.selectedValues)) {
+      if (isEmpty(this.selectedValues)) {
         return false
       }
 
@@ -390,15 +411,22 @@ export default {
     },
 
     filterByTagType (tags, tagType) {
-      return tags.filter(tag => tag.type === tagType).map(tag => ({
-        id: tag.id,
-        name: tag.name,
-        color: tag.color
-      }))
+      return tags
+        .filter(tag => tag.type === tagType)
+        .map(tag => ({
+          id: tag.id,
+          name: tag.name,
+          color: tag.color
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name))
+    },
+
+    mergeWithoutDuplicatingAndSortAlphabetically (array1, array2) {
+      return array1.concat(array2).filter((item, index, self) => index === self.findIndex(t => t.id === item.id)).sort((a, b) => a.name.localeCompare(b.name))
     },
 
     getTags (page, done) {
-      if (!this.hasMorePages || this.loadingTags) {
+      if (!this.hasMorePages) {
         return
       }
 
@@ -418,8 +446,8 @@ export default {
         const accountTags = this.filterByTagType(tags, TagTypes.TYPE_COMPANY)
         const importTags = this.filterByTagType(tags, TagTypes.TYPE_IMPORT)
 
-        this.searchList[0].children = [...this.searchList[0].children, ...accountTags]
-        this.searchList[1].children = [...this.searchList[1].children, ...importTags]
+        this.searchList[0].children = sortBy(union(this.searchList[0].children, accountTags))
+        this.searchList[1].children = sortBy(union(this.searchList[1].children, importTags))
 
         this.page++
         this.hasMorePages = res.data.current_page < res.data.last_page

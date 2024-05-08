@@ -2415,6 +2415,22 @@ i.option-separator {
   .custom-badge-dark {
     color: $dark;
   }
+
+  &--dense {
+    .q-field__native.row {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .q-field__native.q-placeholder.input-text-sm {
+      padding-left: 0 !important;
+    }
+
+    .with-value {
+      padding-top: 10px !important;
+    }
+  }
+
 }
 
 .filter-wrapper {

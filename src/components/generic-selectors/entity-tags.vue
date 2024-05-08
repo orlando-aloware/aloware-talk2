@@ -1,6 +1,7 @@
 <template>
   <div v-if="hasPermissionTo(`tag ${entity}`)">
     <div class="w-100 tags-wrapper"
+         :class="{ 'tags-wrapper--dense': dense }"
          :data-testid="`${entity}-tags-wrapper`"
          v-if="!useCard">
       <tag-multi-select :data-testid="`${entity}-tags-multi-select`"
@@ -14,6 +15,8 @@
                         :height="height"
                         :category="category"
                         :is-filter="isFilter"
+                        :dense="dense"
+                        :placeholder="placeholder"
                         @values-updated="handleSaveTagsOrFilteringTags">
         <template v-slot:button
                   v-if="useAddIcon">
@@ -28,7 +31,7 @@
       </tag-multi-select>
     </div>
     <b-card class="border-0 tags-wrapper"
-            :class="{ 'filter-wrapper': isFilter }"
+            :class="{ 'filter-wrapper': isFilter, 'tags-wrapper--dense': dense }"
             data-testid="contact-tags-wrapper"
             v-else>
       <tag-multi-select :data-testid="`${entity}-tags-multi-select`"
@@ -42,6 +45,8 @@
                         :height="height"
                         :category="category"
                         :is-filter="isFilter"
+                        :dense="dense"
+                        :placeholder="placeholder"
                         @values-updated="handleSaveTagsOrFilteringTags">
       </tag-multi-select>
     </b-card>
@@ -140,6 +145,18 @@ export default {
       required: false,
       type: Array,
       default: () => []
+    },
+
+    dense: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+
+    placeholder: {
+      required: false,
+      type: String,
+      default: 'Type at least 3 characters'
     }
   },
 
