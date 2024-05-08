@@ -7,15 +7,13 @@
             style="width: 635px; border-radius: 30px">
       <q-card-section>
         <div class="text-h6">
-          Welcome, {{ userFullName }}! 🎉
+          Welcome aboard! 🎉
+          <br>
+          We're thrilled to have you join us! 🌟
         </div>
 
         <div class="text-body2 q-pt-lg">
-          Do you know that you can make your trial <strong>so much better</strong> and with <strong>more features to test</strong>? 🚀
-        </div>
-
-        <div class="text-body2 q-pt-lg">
-          It's easy, you just need to submit some important information about your business and then you're ready to <strong>explore even more</strong>! 🤩
+          To unlock your full trial and explore all the features, please submit your business information. Until then, you're set to call only your own numbers. 📞🔒
         </div>
       </q-card-section>
 
