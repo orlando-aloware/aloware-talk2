@@ -24,6 +24,7 @@
         <q-btn class="text-regular"
                label="Remind me later"
                text-color="grey"
+               rounded
                v-close-popup
                flat
                @click="changeShowedKycDialog">
