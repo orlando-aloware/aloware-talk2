@@ -57,13 +57,13 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
+    ...mapState('cache', ['currentCompany', 'profile']),
 
     ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
 
     ...mapState('auth', ['profile', 'authenticated']),
 
-    ...mapState('powerDialer', ['activeTask']),
+    ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
 
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
@@ -290,6 +290,7 @@ export default {
       console.log('Ready to start')
       this.setDialerIsReady(true)
       this.setDialerCurrentStatus('READY')
+      this.checkForcedStatus()
     })
 
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
@@ -379,6 +380,23 @@ export default {
   },
 
   methods: {
+    checkForcedStatus () {
+      if (!this.profile.last_call) {
+        return
+      }
+      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
+        !this.profile.last_call.contact.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
+        !this.profile.last_call.call_disposition_id
+      if (shouldForceContactDisposition || shouldForceCallDisposition) {
+        this.forceStartOnWrapUp()
+      }
+    },
+    forceStartOnWrapUp () {
+      this.setDialerCommunication(this.profile.last_call)
+      this.setDialerContact(this.profile.last_call.contact)
+      this.startWrapUpTimer()
+    },
     startDialerEvents () {
       this.$VueEvent.listen('update_communication', this.dialerListeners.updateCommunication)
       this.$VueEvent.listen('webrtc_update_communication', this.dialerListeners.updateCommunication)
@@ -469,7 +487,8 @@ export default {
       return this.$axios.get('/api/v1/communication/info', {
         params: {
           sid: sid,
-          phone_number: from
+          phone_number: from,
+          live: true
         }
       }).then(res => {
         if (this.dialer.communication && !force) {
@@ -477,6 +496,12 @@ export default {
         }
 
         const routeTitle = _.get(this.$route, 'meta.title', null)
+
+        // If the communication was rejected by app then move it to skipped list
+        if (res.data?.rejected_by_app) {
+          const tempSet = new Set([...this.powerDialerTasks.skipped, this.activeTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+        }
 
         // we need to prevent proceeding to the next steps if current task's contact id
         // is not the same as the communication's contact id in power dialer session
@@ -603,6 +628,11 @@ export default {
 
       // reject ongoing call if there is one
       this.rejectCall()
+
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+        console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
+        return
+      }
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({

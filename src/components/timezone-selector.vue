@@ -12,6 +12,7 @@
                      :show-labels="false"
                      :allow-empty="false"
                      v-model="timezone"
+                     data-testid="timezone-multiselector"
                      @select="onSelect" />
   </div>
 </template>

@@ -5,6 +5,7 @@
                           :values="selectedTags"
                           :options="optionsAlphabeticalOrder"
                           :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                          data-testid="tags-selector-generic-multi-select"
                           v-if="genericMultiselect"
                           @valuesUpdated="select">
     </generic-multi-select>
@@ -13,7 +14,7 @@
               color="primary"
               option-value="id"
               option-label="name"
-              input-debounce="0"
+              input-debounce="1000"
               style="word-break: break-all;"
               use-input
               emit-value
@@ -21,6 +22,7 @@
               menu-shrink
               outlined
               dense
+              data-testid="tags-selector-select"
               :options="optionsAlphabeticalOrder"
               :placeholder="placeholder"
               :disable="disable"
@@ -34,7 +36,7 @@
 
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey">
+          <q-item-section class="no-results text-grey" data-testid="tags-selector-select-no-results">
             No results
           </q-item-section>
         </q-item>
@@ -56,6 +58,7 @@
                 :tabindex="scope.tabindex"
                 color="white"
                 class="tag-selected-chip"
+                data-testid="tags-selector-selected-chip"
                 text-color="secondary">
           <i class="fa fa-circle position-absolute"
              :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`">
@@ -63,6 +66,7 @@
           <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
           <div role="button"
                class="custom__remove d-flex align-items-center position-absolute r-0"
+               data-testid="tags-selector-remove-at-index"
                @click="scope.removeAtIndex(scope.index)">
             <remove-tag-icon class="ml-1 remove-tag-icon">
             </remove-tag-icon>
@@ -86,7 +90,10 @@ export default {
 
   mixins: [aclMixin],
 
-  components: { RemoveTagIcon, GenericMultiSelect },
+  components: {
+    RemoveTagIcon,
+    GenericMultiSelect
+  },
 
   props: {
 
@@ -145,6 +152,11 @@ export default {
     category: {
       type: Number,
       default: null
+    },
+
+    threshold: {
+      type: Number,
+      default: 3
     }
   },
 
@@ -164,7 +176,7 @@ export default {
     placeholder () {
       switch (true) {
         case this.multiple && this.selectedTags.length < 1:
-          return 'Select Tags'
+          return 'Type to search tags'
         case !this.multiple && !this.selectedTags:
           return 'Select Tag'
         case this.multiple && this.selectedTags.length > 0:
@@ -192,10 +204,11 @@ export default {
   data () {
     return {
       isEdit: false,
-      tagsArray: [],
       tagsOptions: [],
       selectedTags: this.value,
-      selectWidth: 0
+      selectWidth: 0,
+      preliminarOptions: [],
+      defaultOptions: []
     }
   },
 
@@ -204,22 +217,8 @@ export default {
       this.selectWidth = this.$refs.tagSelect.$el.offsetWidth
     },
 
-    filterFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.tagsOptions = this.tagsArray
-        })
-        return
-      }
-
-      update(() => {
-        const needle = val.toLowerCase()
-        this.tagsOptions = this.tagsArray.filter(campaign => campaign.name.toLowerCase().indexOf(needle) > -1)
-      })
-    },
-
-    changeTags (event) {
-      this.tagsArray = event
+    filterFn (val, updateFn) {
+      this.getTags(val, false, updateFn)
     },
 
     onSelectClose () {
@@ -230,32 +229,50 @@ export default {
       this.isEdit = true
     },
 
-    getTags () {
+    getTags (search = '', force, updateFn) {
       if (!this.hasPermissionTo('list tag')) {
+        updateFn()
         return
       }
 
-      if (this.tags && this.tags.length > 0) {
-        this.tagsArray = this.tags
-        this.tagsOptions = this.tags
-        this.selectedTags = this.value
+      if (search.length < 3 && !force) {
+        this.tagsOptions = this.defaultOptions
+        updateFn()
         return
       }
 
-      return talk2Api.V1.tags.get({
-        params: { full_load: true }
-      }).then(res => {
-        this.tagsArray = res.data
-        this.tagsOptions = this.tags
-        this.selectedTags = this.value
-      }).catch(err => {
-        console.log(err)
-      })
+      if (search.length >= this.threshold || force) {
+        const params = {
+          page: 1,
+          per_page: 50,
+          search: search
+        }
+
+        return talk2Api.V1.tags.get({
+          params: params
+        }).then(res => {
+          if (force) {
+            this.defaultOptions = res.data.data
+          }
+
+          this.tagsOptions = res.data.data
+          this.selectedTags = this.value
+          updateFn()
+        }).catch(err => {
+          console.log(err)
+          updateFn()
+        })
+      }
     }
   },
 
   mounted () {
-    this.getTags()
+    if (this.tags.length) {
+      this.tagsOptions = this.tags
+      this.preliminarOptions = this.tags
+    }
+
+    this.getTags('', true, () => {})
   },
 
   watch: {
@@ -272,9 +289,16 @@ export default {
     },
 
     selectedTags (val) {
+      const matching = this.tagsOptions.filter(tag => val.includes(tag.id))
+      this.preliminarOptions = [...new Set([...this.preliminarOptions, ...matching])]
       if (this.selectedTags !== this.value) {
         this.$emit('change', val)
+        this.$emit('preliminar', this.preliminarOptions)
       }
+    },
+
+    tags (val) {
+      this.tagsOptions = val
     }
   }
 }

@@ -13,6 +13,7 @@
                      :allow-empty="false"
                      :preselect-first="preselectFirst"
                      v-model="line"
+                     data-testid="contact-line-selector"
                      @select="onSelect"/>
   </div>
 </template>

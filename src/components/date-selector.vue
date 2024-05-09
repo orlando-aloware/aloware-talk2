@@ -14,6 +14,7 @@
                               :no-value-to-custom-elem="noValueToCustomElem"
                               :no-clear-button="noClearButton"
                               :only-time="onlyTime"
+                              data-testid="date-select-time-picker"
                               no-keyboard
                               v-model="date"
                               @input="onInput">

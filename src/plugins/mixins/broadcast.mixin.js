@@ -37,6 +37,8 @@ export default {
       'deleteDispositionStatus',
       'newBulkCallDisposition',
       'newCallDisposition',
+      'newActivityType',
+      'deleteActivityType',
       'updateCallDisposition',
       'deleteCallDisposition'
     ]),
@@ -356,6 +358,12 @@ export default {
         .listen('.bulk_contact_list_items.created', (event) => {
           window.VueEvent.fire('contact_list_bulk_created', event)
         })
+        .listen('.bulk_contact_list_items.deleted', (event) => {
+          window.VueEvent.fire('contact_list_bulk_deleted', event)
+        })
+        .listen('.bulk_contacts.deleted', (event) => {
+          window.VueEvent.fire('contacts_bulk_deleted', event)
+        })
         .listen('.export-events', (event) => {
           window.VueEvent.fire('export_event_updates', event)
         })
@@ -522,6 +530,14 @@ export default {
         .listen('.call_disposition.deleted', (event) => {
           this.deleteCallDisposition(event.call_disposition)
           this.$VueEvent.fire('call_disposition_deleted', event.call_disposition)
+        })
+        .listen('.activity_type.created', (event) => {
+          this.newActivityType(event.activity_type)
+          this.$VueEvent.fire('activity_type_created', event.activity_type)
+        })
+        .listen('.activity_type.deleted', (event) => {
+          this.deleteActivityType(event.activity_type)
+          this.$VueEvent.fire('activity_type_deleted', event.activity_type)
         })
         .listen('.contact.created', (event) => {
           if (event.contact) {

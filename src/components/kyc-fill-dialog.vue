@@ -7,15 +7,13 @@
             style="width: 635px; border-radius: 30px">
       <q-card-section>
         <div class="text-h6">
-          Welcome, {{ userFullName }}! 🎉
+          Welcome aboard! 🎉
+          <br>
+          We're thrilled to have you join us! 🌟
         </div>
 
         <div class="text-body2 q-pt-lg">
-          Do you know that you can make your trial <strong>so much better</strong> and with <strong>more features to test</strong>? 🚀
-        </div>
-
-        <div class="text-body2 q-pt-lg">
-          It's easy, you just need to submit some important information about your business and then you're ready to <strong>explore even more</strong>! 🤩
+          To unlock your full trial and explore all the features, please submit your business information. Until then, you're set to call only your own numbers. 📞🔒
         </div>
       </q-card-section>
 
@@ -24,6 +22,7 @@
         <q-btn class="text-regular"
                label="Remind me later"
                text-color="grey"
+               rounded
                v-close-popup
                flat
                @click="changeShowedKycDialog">
@@ -33,7 +32,7 @@
                color="primary"
                text-color="white"
                rounded
-               @click="openKycBusinessRegistration"
+               @click="onOpenFinishRegistration"
                v-close-popup>
         </q-btn>
       </q-card-actions>
@@ -43,6 +42,7 @@
 
 <script>
 import { mapActions, mapState, mapGetters } from 'vuex'
+import { kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'KycFillDialog',
@@ -53,6 +53,8 @@ export default {
       default: false
     }
   },
+
+  mixins: [kycMixin],
 
   data () {
     return {
@@ -71,15 +73,6 @@ export default {
 
   methods: {
     ...mapActions(['setShowedKycDialog']),
-
-    openKycBusinessRegistration () {
-      this.changeShowedKycDialog()
-
-      this.$router.push({
-        name: 'Business Information',
-        params: { company_id: this.currentCompany.id }
-      })
-    },
 
     changeShowedKycDialog () {
       this.setShowedKycDialog(true)

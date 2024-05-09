@@ -1,5 +1,5 @@
 <template>
-  <div class="contact-menu d-flex flex-column">
+  <div class="contact-menu d-flex flex-column" data-testid="contact-menu-wrapper">
     <div
       class="contact-menu__title d-flex align-items-center mb-2"
       v-if="title"

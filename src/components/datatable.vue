@@ -9,9 +9,11 @@
          @scroll="handleScroll">
 
       <table ref="table"
+             data-testid="datatable-table"
              :class="tableClass">
-        <thead>
+        <thead data-testid="datatable-header">
           <draggable class="dragable-header"
+                     data-testid="datatable-draggable-header"
                      tag="tr"
                      ghost-class="ghost"
                      handle=".handle"
@@ -20,6 +22,7 @@
                      @change="onOrderChanged">
 
             <th :class="getHeaderCheckboxClass(key, column.sticky, column.name)"
+                :data-testid="`datatable-header-${column.name.replace('_', '-')}`"
                 :key="column.name"
                 :data-column-id="column.name"
                 :id="`cols-${column.name}`"
@@ -27,13 +30,19 @@
                 v-for="(column, key) in fixedColumns"
                 @mouseout="onInitReorder(false, null)">
               <label class="custom-checkbox-container check-all"
+                     :class="customCheckboxContainerClass"
                      v-if="column.name === 'checkbox' && showSelectAll">
                 <input ref="dataTableCheckAll"
                        class="data-table-check-all"
                        type="checkbox"
+                       :class="checkAllClass"
+                       :disabled="isDisabledCheckAll"
                        :checked="isSelectedAll"
                        @change="onCheckboxClicked" />
-                <span class="checkmark"/>
+                <span class="checkmark"
+                      :class="checkAllClass">
+                  <slot name="checkall-tooltip"/>
+                </span>
               </label>
               <template v-if="column.name && column.name !== 'checkbox'">
                 <div class="move-icon-drag-container"
@@ -55,12 +64,14 @@
                    href="#"
                    :class="getSorterClass(column.name)"
                    v-if="column.sortable"
+                   :data-testid="`datatable-sorter-${column.name.replace('_', '-')}`"
                    @click.prevent="onColumnSort(column)">
                 </a>
                 </div>
                 <div class="tableResizer"
                      :data-resizer-id="column.name"
                      v-if="column.resizable"
+                     :data-testid="`datatable-resizer-${column.name.replace('_', '-')}`"
                      @mousedown="onResizerMouseDown">
                   {{ column.label }}
                 </div>
@@ -70,7 +81,7 @@
           </draggable>
         </thead>
 
-        <tbody>
+        <tbody data-testid="datatable-body">
           <slot name="tbody" />
         </tbody>
       </table>
@@ -103,6 +114,7 @@
                     boundary-links
                     direction-links
                     dense
+                    data-testid="datatable-pagination"
                     :max="lastPage"
                     :max-pages="maxPaginationPages"
                     :ellipses="false"
@@ -116,6 +128,7 @@
                 outlined
                 dense
                 emit-value
+                data-testid="datatable-per-page-select"
                 :options="perPageOptions"
                 :display-value="`${perPage} per page`"
                 v-model="perPage" />
@@ -327,6 +340,40 @@ export default {
       }
 
       return 'No contacts found on the current list'
+    },
+
+    tableColumnSpan () {
+      return this.fixedColumns.length
+    },
+
+    customCheckboxContainerClass () {
+      const isCheckedClass = this.isCheckboxAllChecked ? 'checked' : ''
+      let pageClass = ''
+
+      if (this.isPowerDialerAdd) {
+        pageClass = 'pd-add'
+      } else if (this.isContacts) {
+        pageClass = 'contacts'
+      }
+
+      return [
+        isCheckedClass,
+        pageClass
+      ].concat(this.checkAllClass)
+    },
+
+    isDisabledCheckAll () {
+      const isEmpty = this.totalRows === 0 && this.hasEmptySlot
+
+      return this.isLoading || this.isLoadingMore || isEmpty
+    },
+
+    checkAllClass () {
+      const isDisabledClass = this.isDisabledCheckAll ? 'cursor-blocked pe-none' : ''
+
+      return [
+        isDisabledClass
+      ]
     }
   },
 
@@ -357,6 +404,10 @@ export default {
   methods: {
     ...mapActions(['setDefaultDateFilter']),
 
+    ...mapActions('contacts', [
+      'setAllContactsSelected'
+    ]),
+
     getHeaderStyle (name, minWidth, maxWidth) {
       let minWidthPixels = minWidth ? `${minWidth}px` : ''
       let maxWidthPixels = maxWidth ? `${maxWidth}px` : ''
@@ -373,7 +424,7 @@ export default {
     },
 
     getHeaderCheckboxClass (key, sticky, name) {
-      const checkboxClass = name === 'checkbox' ? name : ''
+      const checkboxClass = name === 'checkbox' ? `${name} cursor-default` : ''
       const stickyClass = sticky ? 'sticky' : ''
       const hoveringClass = this.hoverKey === key && this.isHovering
         ? 'hovering' : ''
@@ -457,10 +508,6 @@ export default {
       document.body.style.cursor = 'col-resize'
     },
 
-    onCheckboxClicked (evt) {
-      this.$emit('checked', evt.target.checked)
-    },
-
     onOrderChanged ({ oldIndex, newIndex }) {
       const columns = [...this.fixedColumns]
 
@@ -471,6 +518,11 @@ export default {
     },
 
     onColumnSort (column) {
+      /* sorts object will be like this:
+       - first click: {sort: column, order: 'asc'}
+       - second click: {sort: column, order: 'desc'}
+       - third click: {sort: column, order: ''}
+      */
       let sorts = Object.assign({}, this.getColumnSorts(column))
 
       setTimeout(() => {
@@ -543,6 +595,11 @@ export default {
       this.moveColor = value ? '#256eff' : '#4F4F4F'
       this.isHovering = value
       this.hoverKey = key
+    },
+
+    onCheckboxClicked (evt) {
+      this.$emit('checked', evt.target.checked)
+      this.setAllContactsSelected(evt.target.checked)
     }
   },
 

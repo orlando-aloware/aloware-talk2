@@ -19,7 +19,6 @@ export default {
   columns: (state) => state.columns,
   moveDialog: (state) => state.moveDialog,
   createDialog: (state) => state.createDialog,
-  selectedContacts: (state) => state.selectedContacts,
   selectedList: (state) => state.selectedList,
   selectedStaticList: (state) => state.selectedStaticList,
   createList: (state) => state.createList,
@@ -27,6 +26,7 @@ export default {
   filters: (state) => state.filters,
   isFiltersOpen: (state) => state.isFiltersOpen,
   isBulkDelete: (state) => state.isBulkDelete,
+  search: (state) => state.search,
   pinnedLists: (state) => {
     return Object.values(DEFAULT_PINNED_LIST)
       .map((item) => {

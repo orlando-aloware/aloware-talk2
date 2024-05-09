@@ -14,10 +14,10 @@ export default {
     return res.data
   },
 
-  getPublicContactLists: async ({ commit }) => {
-    const res = await talk2Api.V2.contactList.public()
+  getPublicContactLists: async ({ commit }, params = {}) => {
+    const res = await talk2Api.V2.contactList.public(params)
 
-    return res.data.data
+    return res.data
   },
 
   /**
@@ -30,13 +30,19 @@ export default {
   },
 
   getMyQueueList: async ({ commit }) => {
-    const res = await window.axios.get(`api/v2/power-dialer-lists/my-queue`)
+    try {
+      return Promise.all([
+        window.axios.get(`api/v2/power-dialer-lists/my-queue`),
+        window.axios.get(`api/v2/power-dialer-lists/my-queue/session-metrics`)
+      ]).then(([listResponse, sessionMetricsResponse]) => {
+        listResponse.data.session_metrics = sessionMetricsResponse.data.session_metrics
+        commit('SET_MY_QUEUE_LIST', listResponse.data)
 
-    if (res.status === 200) {
-      commit('SET_MY_QUEUE_LIST', res.data)
+        return listResponse
+      })
+    } catch (error) {
+      console.log('Error getting my queue list:', error)
     }
-
-    return res
   },
 
   getPowerDialerList: async ({ commit }, id = '') => {

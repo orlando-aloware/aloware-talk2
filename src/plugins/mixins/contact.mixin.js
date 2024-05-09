@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
@@ -375,20 +376,19 @@ export default {
       }
     },
 
-    processContactUpdate (contact, communciation = null, deleteCommsAndAudits = false) {
-      const updatedContact = this.$jsonClone(this.contact)
+    processContactUpdate (contact, communication = null, deleteCommsAndAudits = false) {
       const contactEvent = this.$jsonClone(contact)
       let newCommunication = null
-
-      if (communciation) {
-        newCommunication = this.$jsonClone(communciation)
+      if (communication) {
+        newCommunication = this.$jsonClone(communication)
       }
-
-      // add the v2 contact attributes that we need
-      Object.assign(contact, this.addV2ContactAttributes(contactEvent, newCommunication, updatedContact))
 
       // check if communication's contact is the same as the current contact
       if (parseInt(contact.id) === parseInt(this.contact.id)) {
+        const updatedContact = this.$jsonClone(this.contact)
+        // add the v2 contact attributes that we need
+        Object.assign(contact, this.addV2ContactAttributes(contactEvent, newCommunication, updatedContact))
+
         if (deleteCommsAndAudits) {
           delete contact.communications_and_audits
         }
@@ -645,8 +645,9 @@ export default {
 
       // 2. if contact has communications select last communication campaign
       if (!this.selectedCampaignId && this.communicationsAndAudits.length) {
+        // Get the latest communication that is either SMS or CALL
         const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
-          return item.type === CommunicationTypes.SMS
+          return item.type === CommunicationTypes.SMS || item.type === CommunicationTypes.CALL
         })
 
         if (latestCommunication) {
@@ -865,7 +866,6 @@ export default {
 
           this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
-          this.$VueEvent.fire('fetchInbox')
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loadingMarkAsRead = false
@@ -1218,15 +1218,17 @@ export default {
           return
         }
 
+        const contactTaskStatus = this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase()
+        const isAllCurrentTaskStatus = this.$route.params.status === InboxTaskStatus.STATUS_ALL
+
         // if contact status changes then redirect to the right url
-        if (this.$route.name === 'Inbox Contact Task' &&
-          this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase() !== this.$route.params.status) {
+        if (this.$route.name === 'Inbox Contact Task' && contactTaskStatus !== this.$route.params.status && !isAllCurrentTaskStatus) {
           this.$router.push({
             name: 'Inbox Contact Task',
             params: {
               id: res.data.id,
               channel: 'inbox',
-              status: this.$options.filters.fixTaskStatusName(res.data.task_status).toLowerCase()
+              status: contactTaskStatus
             }
           }).catch(err => {
             console.log(err)
@@ -1240,7 +1242,7 @@ export default {
             params: {
               id: res.data.id,
               channel: 'inbox',
-              status: 'all'
+              status: InboxTaskStatus.DEFAULT_STATUS
             }
           }).catch(err => {
             console.log(err)
@@ -1337,8 +1339,9 @@ export default {
         // check if we have found the contact after 3 retries
         if (getContactTry > 3) {
           // error
-          console.log('An error occurred while getting the contact', err)
+          console.log('An error occurred while getting the contact', err?.response?.data || err)
           this.loadingContact = false
+          this.$generalNotification('Contact not found, please try again.', 'error')
           return Promise.reject(err)
         } else {
           this.getContactByPhoneNumber(phoneNumber, getContactTry)

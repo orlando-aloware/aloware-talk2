@@ -6,6 +6,8 @@
       <span>This screen size is not supported.</span>
     </div>
     <trial-banner v-if="isTrialKYC && isAuthenticated"/>
+    <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/>
+    <cancelled-account-modal v-if="isCancelledAccount && isAuthenticated"/>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -223,6 +225,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   htmlMixin,
@@ -280,6 +283,9 @@ import {
   MAX_SCREEN_WIDTH_MOBILE_HEADER
 } from 'src/constants/viewport-sizes'
 import TrialBanner from 'components/trial-banner.vue'
+import * as TrialStatus from 'src/constants/trial-account-status'
+import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
+import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 
 export default {
   name: 'MyLayout',
@@ -296,7 +302,9 @@ export default {
     KycFillDialog,
     KycReloadDialog,
     Modal,
-    TrialBanner
+    TrialBanner,
+    TrialExpiredModal,
+    CancelledAccountModal
   },
 
   mixins: [
@@ -328,6 +336,7 @@ export default {
       loadingWorkflows: false,
       loadingDispositionStatuses: false,
       loadingCallDispositionStatuses: false,
+      loadingActivityTypes: false,
       loadingScripts: false,
       loadingTemplates: false,
       loadingBroadcasts: false,
@@ -418,8 +427,20 @@ export default {
 
     ...mapState(['xmasEnabled']),
 
+    ...mapFields('powerDialer', [
+      'sessionPaused'
+    ]),
+
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
+    },
+
+    isTrialExpired () {
+      return this.currentCompany && [TrialStatus.TRIAL_STATUS_EXPIRED, TrialStatus.TRIAL_STATUS_PURGE_ELIGIBLE].includes(this.currentCompany.trial_status)
+    },
+
+    isCancelledAccount () {
+      return this.currentCompany && this.currentCompany.subscription?.status === 'cancelled' && !this.currentCompany.is_whitelabel
     },
 
     pageClass () {
@@ -1437,7 +1458,6 @@ export default {
       let fetchingStatics = false
       this.loading = true
       this.setCampaignsIsLoading(true)
-      this.setTagsFullyLoaded(true)
 
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
@@ -1480,14 +1500,11 @@ export default {
         this.getRingGroups()
         this.getBroadcasts()
         this.getTemplates()
-
         this.getCampaigns()
-        this.getFullTags()
-        // this.getTags()
         this.getWorkflows()
-
         this.getDispositionStatuses()
         this.getCallDispositions()
+        this.getActivityTypes()
         this.getLeadSources()
         this.getMyQueueList()
       })
@@ -1641,68 +1658,6 @@ export default {
       }
     },
 
-    getFullTags () {
-      this.loadingTags = true
-
-      return this.$axios
-        .get('/api/v1/tag', { params: { full_load: true } })
-        .then((res) => {
-          this.setTags(res.data)
-          this.$VueEvent.fire('tags_loaded')
-          this.loadingTags = false
-
-          return Promise.resolve()
-        })
-        .catch((err) => {
-          this.setTagsFullyLoaded(false)
-          console.log(err)
-          this.loadingTags = false
-
-          return Promise.reject()
-        })
-    },
-
-    getTags (page = 1) {
-      if (page === 1) {
-        this.loadingTags = true
-      }
-
-      const params = {
-        page: page
-      }
-
-      return this.$axios
-        .get('/api/v1/tag', { params })
-        .then((res) => {
-          this.setTagsFullyLoaded(false)
-
-          if (res.data.data && res.data.data.length) {
-            res.data.data.forEach((tag) => {
-              this.newTag(tag)
-            })
-          }
-
-          if (res.data.to !== res.data.total) {
-            this.getTags(page + 1)
-
-            return Promise.resolve()
-          }
-
-          this.setTagsFullyLoaded(true)
-          this.$VueEvent.fire('tags_loaded')
-          this.loadingTags = false
-
-          return Promise.resolve()
-        })
-        .catch((err) => {
-          this.setTagsFullyLoaded(false)
-          console.log(err)
-          this.loadingTags = false
-
-          return Promise.reject()
-        })
-    },
-
     getWorkflows (page = 1) {
       if (this.hasPermissionTo('list workflow')) {
         this.loadingWorkflows = true
@@ -1777,6 +1732,22 @@ export default {
             return Promise.reject()
           })
       }
+    },
+
+    getActivityTypes () {
+      this.loadingActivityTypes = true
+      return this.$axios
+        .get('/api/v1/activity-types').then(res => {
+          this.setActivityTypes(res.data)
+          this.loadingActivityTypes = false
+
+          return Promise.resolve()
+        }).catch(err => {
+          console.log(err)
+          this.loadingActivityTypes = false
+
+          return Promise.reject()
+        })
     },
 
     getTemplates () {
@@ -2559,6 +2530,7 @@ export default {
       'newWorkflow',
       'setDispositionStatuses',
       'setCallDispositions',
+      'setActivityTypes',
       'setTemplates',
       'setBroadcasts',
       'setDialerToken',
@@ -2570,7 +2542,6 @@ export default {
       'setDialerIsMuted',
       'setDialerParkedCall',
       'setFilters',
-      'setTagsFullyLoaded',
       'setNotifications',
       'resetNotifications',
       'setTags',
@@ -2726,6 +2697,11 @@ export default {
       // temporary
       if (this.$route.name === 'Broadcasts' && !this.canUseBroadcast) {
         this.$router.back()
+      }
+
+      // Power Dialer session control - mark as false every time the session module is exited
+      if (from.meta.id === 'power-dialer-session') {
+        this.sessionPaused = false
       }
     },
 

@@ -32,6 +32,8 @@ import { VALID_ENG_COUNTRIES, VALID_NA_COUNTRIES } from 'src/constants/valid-cou
 import log from 'electron-log'
 import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
 import { Userpilot } from 'userpilot'
+import { cloneDeep } from 'src/plugins/helpers/functions'
+import { AxiosError } from 'axios'
 
 Screen.setSizes({
   sm: 300,
@@ -288,7 +290,10 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
       'Failed to fetch',
       'NetworkError',
       'Navigation cancelled from',
-      'Blocked a frame with origin'
+      'Blocked a frame with origin',
+      'AxiosError: Request failed with status code 404',
+      'AxiosError: Request aborted',
+      /^CanceledError:/
     ],
 
     // This sets the sample rate to be 10%. You may want this to be 100% while
@@ -301,7 +306,17 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
 
     integrations: [
       new Sentry.BrowserTracing()
-    ]
+    ],
+
+    beforeSend (event, hint) {
+      if (hint?.originalException instanceof AxiosError && hint.originalException?.response) {
+        if (hint.originalException.response?.status === 404) {
+          return null
+        }
+      }
+
+      return event
+    }
   })
 
   Sentry.configureScope((scope) => {
@@ -462,7 +477,7 @@ Vue.prototype.$downloadFileWithUrl = async function (url, filename, type = 'comm
 }
 
 Vue.prototype.$generalNotification = function (message, type = null, timeout = 5000, html = false, actionOptions = {}) {
-  if (window._.isEmpty(message.trim())) {
+  if (!message || window._.isEmpty(message.trim())) {
     return
   }
 
@@ -643,7 +658,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
       if (unqueuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
         clearInterval(window.actionNotificationUnqueuedIntervals?.[settings.type])
       }
-    }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+    }, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 
     return
   }
@@ -680,7 +695,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     if (queuedCounter > NOTIFICATION_CONFIGURATION.clearIntervalSecondsLimit) {
       clearInterval(window.actionNotificationQueuedIntervals[settings.type])
     }
-  }, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+  }, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 }, 100)
 
 Vue.prototype.$closeActionNotification = function (type) {
@@ -743,14 +758,10 @@ Vue.prototype.$generalActionNotification = window._.debounce(function (title = '
     autoHideDelay: '30000',
     isStatus: true
   })
-}, NOTIFICATION_CONFIGURATION.notificationIntervalSeconds)
+}, NOTIFICATION_CONFIGURATION.notificationIntervalMilliseconds)
 
 Vue.prototype.$jsonClone = (value) => {
-  if (value) {
-    return JSON.parse(JSON.stringify(value))
-  }
-
-  return value
+  return cloneDeep(value)
 }
 
 Vue.prototype.$copyToClipboard = (value) => {

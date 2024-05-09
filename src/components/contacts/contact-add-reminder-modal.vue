@@ -2,30 +2,35 @@
   <b-modal title="Add Reminder"
            size="md"
            v-model="isOpen"
+           data-testid="contact-add-reminder-modal"
            @hidden="onHidden"
            @show="onShow">
-    <b-form @submit.prevent="onSubmit">
+    <b-form @submit.prevent="onSubmit" data-testid="contact-add-reminder-modal-form-modal">
       <b-form-group id="input-group-1"
                     label="Date"
+                    data-testid="contact-add-reminder-modal-date-form-group"
                     label-for="input-1">
         <date-selector :min-date="minDate"
                        :no-clear-button="true"
                        v-model="reminder.date"
+                       data-testid="contact-add-reminder-modal-date-selector"
                        @dateSelected="dateSelected">
         </date-selector>
       </b-form-group>
 
       <b-form-group id="input-group-2"
                     label="Time"
+                    data-testid="contact-add-reminder-modal-time-form-group"
                     label-for="input-2">
         <predefined-time-selector v-model="reminder.time"
+                                  data-testid="contact-add-reminder-modal-predefined-time-selector"
                                   @select="onTimeSelected"/>
       </b-form-group>
 
       <b-form-group id="input-group-2"
                     label="Timezone"
                     label-for="input-2">
-        <timezone-selector @select="timezoneSelected"/>
+        <timezone-selector data-testid="contact-add-reminder-modal-timezone-selector" @select="timezoneSelected"/>
       </b-form-group>
 
       <b-form-group id="input-group-2"
@@ -36,6 +41,7 @@
                          rows="3"
                          max-rows="8"
                          no-auto-shrink
+                         data-testid="contact-add-reminder-modal-notes-textarea"
                          v-model="reminder.note"/>
       </b-form-group>
     </b-form>
@@ -43,6 +49,7 @@
       <b-button variant="success"
                 class="custom-btn"
                 size="sm"
+                data-testid="contact-add-reminder-modal-close-button"
                 @click="onHidden">
         Close
       </b-button>
@@ -50,6 +57,7 @@
                 size="sm"
                 variant="primary"
                 :disabled="isAdding || !isValid"
+                data-testid="contact-add-reminder-modal-submit-button"
                 @click="onSubmit">
         <q-spinner-bars color="white"
                         v-if="isAdding"/>

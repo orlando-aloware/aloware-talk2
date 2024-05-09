@@ -145,7 +145,6 @@ export default {
       'contactDetailsDrawer',
       'campaignsIsLoading',
       'usersIsLoading',
-      'tagsFullyLoaded',
       'campaigns',
       'users',
       'tags',
@@ -166,13 +165,12 @@ export default {
       }
 
       return this.changingSelectedContact || this.campaignsIsLoading ||
-        this.usersIsLoading || !this.tagsFullyLoaded || !this.campaigns ||
+        this.usersIsLoading || !this.campaigns ||
         !this.users || !this.tags || this.leaving || this.loadingContact || this.isEmptyContact
     },
 
     isShowContactActivities () {
-      return !this.campaignsIsLoading && !this.usersIsLoading &&
-        this.tagsFullyLoaded && this.campaigns && this.users && this.tags
+      return !this.campaignsIsLoading && !this.usersIsLoading && this.campaigns && this.users && this.tags
     },
 
     isMediumScreen () {
@@ -286,8 +284,8 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
-
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication'].includes(this.$route.name)) {
+      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication']
+      if (validRoutes.includes(this.$route.name)) {
         this.fetchTaskCounts()
       }
     }

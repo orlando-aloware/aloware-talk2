@@ -12,6 +12,7 @@
                      :show-labels="false"
                      :allow-empty="false"
                      v-model="time"
+                     data-testid="predefined-time-multiselector"
                      @select="onSelect" />
   </div>
 </template>

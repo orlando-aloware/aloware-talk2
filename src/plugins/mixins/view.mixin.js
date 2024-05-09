@@ -1,12 +1,17 @@
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import moment from 'moment'
 import { get, debounce, isEmpty } from 'lodash'
 import { COUNT_FIELDS } from 'src/constants/count-fields-default'
-import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import { POWER_DIALER_DEFAULT_COLUMNS } from 'src/constants/contacts-columns'
 import talk2Api from 'src/plugins/api/api'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
+  inject: [
+    'contactsData',
+    'selectedContacts'
+  ],
+
   data () {
     return {
       moment,
@@ -19,16 +24,57 @@ export default {
         data: [],
         dataLength: 0
       },
-      countFields: COUNT_FIELDS
+      countFields: COUNT_FIELDS,
+      clicked: false,
+      isSelectedAll: false,
+      pdViewListeners: {},
+      bulkViewListeners: {}
     }
   },
 
   computed: {
-    ...mapState('contacts', ['isAllContactsSelected', 'showMyContacts']),
+    ...mapState('contacts', [
+      'isAllContactsSelected',
+      'showMyContacts',
+      'lists'
+    ]),
+
     ...mapState([
       'users',
-      'campaigns'
+      'campaigns',
+      'isDatatableSelectedAll',
+      'isDatatableCountLoading'
     ]),
+
+    ...mapState('powerDialer', [
+      'myQueue'
+    ]),
+
+    ...mapFields('powerDialer', [
+      'powerDialerActiveList'
+    ]),
+
+    ...mapGetters('contacts', [
+      'selectedList'
+    ]),
+
+    ...mapGetters('powerDialer', [
+      'myQueueId'
+    ]),
+
+    isMainView () {
+      const isListPages = this.isContacts || this.isPowerDialer
+
+      return isListPages && this.$route.path && !this.$route.path.includes('/add')
+    },
+
+    isPowerDialer () {
+      return this.$route.name === 'Power Dialer'
+    },
+
+    isContacts () {
+      return this.$route.name === 'Contacts'
+    },
 
     checked () {
       return get(this.selectedContacts, this.id, [])
@@ -50,33 +96,173 @@ export default {
       if (this.$route.name === 'Power Dialer') {
         return this.pdColumns
       }
+    },
+
+    filteredSelectedListId () {
+      let route = this.$route.meta.id
+
+      return route === 'power-dialer-queue-filter' ? this.myQueue?.id : this.selectedListId
+    },
+
+    currentTotalListCount () {
+      const list = this.powerDialerActiveList
+
+      switch (this.filter) {
+        case 'in-queue':
+          return list.total_queued
+        case 'called':
+          return list.total_called
+        case 'failed':
+          return list.total_failed
+        case 'scheduled':
+          return list.total_scheduled
+        default:
+          return list.total_items
+      }
+    },
+
+    id () {
+      if (this.$route.name === 'Power Dialer') {
+        return this.filteredSelectedListId
+      }
+
+      return this.$route.params.id
+    },
+
+    totalRows () {
+      if (this.$route?.path && this.$route.path.includes('/add')) {
+        return parseInt(this.contactCount)
+      }
+
+      if (this.isPowerDialer) {
+        return this.currentTotalListCount
+      }
+
+      return parseInt(this.selectedList.contactCount)
+    },
+
+    selectedAllCount () {
+      if (this.isSelectedAll && this.contactDCNCount > 0) {
+        return this.totalRows - this.contactDCNCount
+      }
+
+      if (this.isSelectedAll && this.checked.length < this.fixedContactsData.data.length) {
+        return this.totalRows - (this.fixedContactsData.data.length - this.checked.length)
+      }
+
+      if (this.isSelectedAll) {
+        return this.totalRows
+      }
+
+      return this.checked.length
+    },
+
+    contactsCountText () {
+      const postfix = this.contactCount > 1 ? 's' : ''
+
+      return `${this.$options.filters.numFormat(this.contactCount)} Contact${postfix}`
+    },
+
+    filtersText () {
+      return this.filtersCount > 1 ? 'Filters' : 'Filter'
+    },
+
+    listItemsTotalContacts () {
+      const data = get(this.fixedContactsData, `data`, null)
+      return data.length || 0
+    }
+  },
+
+  created () {
+    this.bulkViewListeners.contactListBulkCreated = (event) => {
+      if (typeof this.onFetch !== 'function') {
+        return
+      }
+
+      const eventListId = this.getCleanedListId(event.contact_list_id)
+      const cleanedListId = this.getCleanedListId(this.$route?.params?.id)
+
+      if (cleanedListId && eventListId && cleanedListId === eventListId) {
+        if (this.isMainView) {
+          this.$VueEvent.fire('addContactsProgress', {
+            id: null,
+            loading: false
+          })
+        }
+
+        let params = typeof this.currentListFilters === 'string'
+          ? {}
+          : this.$jsonClone(this.currentListFilters)
+        params.event = {
+          name: 'bulk-created',
+          count: event.items_count
+        }
+        this.onFetch(params, false, true)
+      }
+    }
+
+    this.bulkViewListeners.contactListBulkDeleted = (event) => {
+      if (typeof this.onFetch !== 'function') {
+        return
+      }
+
+      const eventListId = this.getCleanedListId(event.contact_list_id)
+      const cleanedListId = this.getCleanedListId(this.$route?.params?.id)
+
+      if (cleanedListId && eventListId && cleanedListId === eventListId) {
+        if (this.isMainView) {
+          this.$VueEvent.fire('deleteContactsProgress', {
+            id: null,
+            loading: false
+          })
+        }
+
+        let params = typeof this.currentListFilters === 'string' ? {} : this.$jsonClone(this.currentListFilters)
+        params.event = {
+          name: 'bulk-deleted',
+          count: event.count
+        }
+        this.onFetch(params, false, true)
+      }
+    }
+
+    if (this.isMainView) {
+      this.$VueEvent.stop('contact_list_bulk_created', this.bulkViewListeners.contactListBulkCreated)
+      this.$VueEvent.stop('contact_list_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+      this.$VueEvent.listen('contact_list_bulk_created', this.bulkViewListeners.contactListBulkCreated)
+      this.$VueEvent.listen('contact_list_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+    }
+
+    if (this.$route.name === 'Contacts') {
+      this.$VueEvent.stop('contacts_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+      this.$VueEvent.listen('contacts_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
     }
   },
 
   methods: {
     ...mapActions('contacts', [
-      'setListSelectedContacts',
       'setAllContactsSelected'
     ]),
 
     onCheckerClicked (contact) {
-      const items = { data: [] }
+      let items = []
       const found = this.checked.find(item => item.id === contact.id)
 
       if (found) {
-        items.data = this.checked.filter(item => item.id !== contact.id)
+        items = this.checked.filter(item => item.id !== contact.id)
       } else {
-        items.data = [...this.checked]
-        items.data.push(contact)
+        items = [...this.checked]
+        items.push(contact)
       }
 
-      this.setAllContactsSelected(false)
-      this.onCheckedRows(items.data)
+      this.clearSelectAll()
+      document.querySelector('.data-table-check-all').checked = false
+      this.onCheckedRows(items)
     },
 
     onCheckedRows (checked) {
       this.setAllContactsSelected(false)
-      this.setListSelectedContacts({ id: this.id, contacts: checked })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: checked })
     },
 
     generateRoute (contactId) {
@@ -118,9 +304,14 @@ export default {
         return
       }
 
+      if (!this.fixedContactsData?.data?.[index]?.[colName]) {
+        return
+      }
+
       this.hoverPopover.key = (this.hoverPopover.key + 1)
       this.hoverPopover.title = title
       this.hoverPopover.target = id
+
       const data = this.fixedContactsData.data[index][colName]
       this.hoverPopover.data = data ? data.slice(0, 10) : ''
       this.hoverPopover.dataLength = data.length
@@ -177,17 +368,7 @@ export default {
       }
 
       if (module === 'contacts') {
-        switch (integerTaskStatus) {
-          case ContactTaskStatus.STATUS_PENDING:
-            return 'Pending'
-          case ContactTaskStatus.STATUS_CLOSED:
-            return 'Closed'
-          case ContactTaskStatus.STATUS_NEW:
-            return 'New'
-          case ContactTaskStatus.STATUS_OPEN:
-          default:
-            return 'Open'
-        }
+        return this.$options.filters.fixTaskStatusName(integerTaskStatus)
       }
 
       switch (integerTaskStatus) {
@@ -218,7 +399,7 @@ export default {
       return this.countFields.includes(columnName)
     },
 
-    exportAsCsv () {
+    processExportAsCsv () {
       let id = null
       let module = null
 
@@ -254,6 +435,19 @@ export default {
         .catch(() => {
           this.$generalNotification('Unable to process export request! Please try again later.', 'error')
         })
+    },
+
+    exportAsCsv () {
+      this.$bvModal.msgBoxConfirm('Do you want to proceed with the export?', {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'Cancel',
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          this.processExportAsCsv()
+        }
+      })
     },
 
     isColumnArrayValueEmpty (columnValue) {
@@ -302,6 +496,48 @@ export default {
         textAlignmentClass,
         draggableClass
       ]
+    },
+
+    clearSelectAll () {
+      this.setAllContactsSelected(false)
+    },
+
+    async onMovedContacts () {
+      await this.onFetch({}, false)
+      this.clearSelectAll()
+    },
+
+    onSelectedAll (value) {
+      this.isSelectedAll = value
+      this.$emit('onSelectedAll', value)
+
+      if (!value) {
+        this.clearSelectAll()
+        this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
+      }
+    },
+
+    stopEvents () {
+      this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
+      this.$VueEvent.stop('contact_list_bulk_created', this.bulkViewListeners.contactListBulkCreated)
+      this.$VueEvent.stop('contact_list_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+      this.$VueEvent.stop('contacts_bulk_deleted', this.bulkViewListeners.contactListBulkDeleted)
+    },
+
+    getCleanedListId (id) {
+      let cleanedId = this.$isNumeric(id) ? parseInt(id) : id
+
+      return cleanedId === 'in-queue' ? this.myQueueId : cleanedId
     }
+  },
+
+  watch: {
+    selectedAllCount (value) {
+      this.$emit('onSelectedCountChange', value)
+    }
+  },
+
+  beforeDestroy () {
+    this.stopEvents()
   }
 }

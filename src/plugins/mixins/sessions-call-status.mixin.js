@@ -3,6 +3,7 @@ import { mapGetters, mapActions, mapState, mapMutations } from 'vuex'
 import * as AutoDialTaskStatus from 'src/constants/power-dialer/task-status'
 import moment from 'moment-timezone'
 import { get } from 'lodash'
+import * as AgentStatus from '../../constants/agent-status'
 
 const DIRECTION = {
   top: 1,
@@ -20,13 +21,15 @@ export default {
       reRouteModal: false,
       loadingNext: false,
       sessionNotReady: false,
-      skipWrapUp: false
+      skipWrapUp: false,
+      verifyAgentOnCall: false
     }
   },
 
   computed: {
     ...mapState('powerDialer', [
       'powerDialerTasks',
+      'inQueueFetchTasks',
       'redialed'
     ]),
 
@@ -229,6 +232,20 @@ export default {
       this.hasActiveTask = true
       this.skipWrapUp = false
 
+      // check if redial is true (this.redialedTask?.redialed_now) and if agent status is on call
+      // then do not continue until agent status is not on call
+      if (this.verifyAgentOnCall && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+        await new Promise(resolve => {
+          const checkAgentStatus = setInterval(() => {
+            if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
+              clearInterval(checkAgentStatus)
+              this.verifyAgentOnCall = false
+              resolve()
+            }
+          }, 1000)
+        })
+      }
+
       // Fires an event to make a call
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
@@ -253,6 +270,8 @@ export default {
         .then(res => {
           if (!this.skippedTasks.includes(contactListItemId)) {
             this.skippedTasks.push(contactListItemId)
+            const tempSet = new Set([...this.powerDialerTasks.skipped, autoDialTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+            this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
           }
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
           //   // add to bottom of list
@@ -331,6 +350,51 @@ export default {
 
     removeTaskFromList () {
       // TODOs: Remove task from list
+    },
+
+    getSkippedAndActiveTasks () {
+      return [...this.powerDialerTasks.skipped, this.activeTask]
+    },
+
+    updateNumberOfFetchedTasks (taskType, taskCount) {
+      // if the current page is the same as the last page, then we keep the total of fetched tasks the same
+      if (this.powerDialerTaskFilters[taskType].current_page === this.inQueueFetchTasks.currentPage) {
+        this.inQueueFetchTasks.fetchedTasks = taskCount
+      }
+
+      // if the current page is greater than the last page, then we increment the total of fetched tasks
+      if (this.powerDialerTaskFilters[taskType].current_page > this.inQueueFetchTasks.currentPage) {
+        this.inQueueFetchTasks.fetchedTasks += taskCount
+      }
+    },
+
+    updateCurrentPage (taskType) {
+      this.inQueueFetchTasks.currentPage = this.powerDialerTaskFilters[taskType].current_page
+    },
+
+    filterNewInQueueTasks (currentList, taskType, updateFetched = false, updatePagination = false) {
+      // Get list of processed tasks at this point
+      // (Total of skipped tasks in the current PD session + active task)
+      const currSkippedAndInProgress = this.getSkippedAndActiveTasks()
+
+      // The new set of IN QUEUE tasks that are retrieved by the API
+      const currInQueue = [...currentList]
+
+      if (updateFetched) {
+        // Update the number of fetched tasks in the current session
+        this.updateNumberOfFetchedTasks(taskType, currInQueue?.length)
+      }
+
+      if (updatePagination) {
+        // Update the current page in the current session
+        this.updateCurrentPage(taskType)
+      }
+
+      // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
+      // but discarding the ones have been skipped so we don't list them again
+      const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+
+      return newInQueueList
     }
   }
 }

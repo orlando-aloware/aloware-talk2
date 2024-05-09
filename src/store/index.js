@@ -61,6 +61,7 @@ export default function (/* { ssrContext } */) {
       broadcasts: [],
       dispositionStatuses: [],
       callDispositions: [],
+      activityTypes: [],
       templates: [],
       filters: [],
       firstLogin: false,
@@ -284,6 +285,8 @@ export default function (/* { ssrContext } */) {
       isContactDisposed: false,
       isIntroVideoVisible: false,
       showedKycDialog: false,
+      isDatatableSelectedAll: false,
+      isDatatableCountLoading: false,
       showedKycReloadDialog: false,
       isTrialBannerVisible: false
     },
@@ -462,6 +465,18 @@ export default function (/* { ssrContext } */) {
 
       setCallDispositions ({ commit }, callDispositions) {
         commit('SET_CALL_DISPOSITIONS', callDispositions)
+      },
+
+      setActivityTypes ({ commit }, activityTypes) {
+        commit('SET_ACTIVITY_TYPES', activityTypes)
+      },
+
+      newActivityType ({ commit }, activityType) {
+        commit('NEW_ACTIVITY_TYPE', activityType)
+      },
+
+      deleteActivityType ({ commit }, activityType) {
+        commit('DELETE_ACTIVITY_TYPE', activityType)
       },
 
       setBroadcasts ({ commit }, broadcasts) {
@@ -815,6 +830,14 @@ export default function (/* { ssrContext } */) {
         commit('SET_IS_CONTACT_DISPOSED', value)
       },
 
+      setIsDatatableSelectedAll ({ commit }, value) {
+        commit('SET_IS_DATATABLE_SELECTED_ALL', value)
+      },
+
+      setIsDatatableCountLoading ({ commit }, value) {
+        commit('SET_IS_DATATABLE_COUNT_LOADING', value)
+      },
+
       async fetchContactsLists ({ commit }) {
         const lists = []
         let res = null
@@ -1084,6 +1107,27 @@ export default function (/* { ssrContext } */) {
 
       SET_CALL_DISPOSITIONS (state, callDispositions) {
         state.callDispositions = callDispositions
+      },
+
+      NEW_ACTIVITY_TYPE (state, activityType) {
+        if (state.activityTypes.find(item => item === activityType)) {
+          return
+        }
+        state.activityTypes.push(activityType)
+      },
+
+      DELETE_ACTIVITY_TYPE (state, activityType) {
+        const found = state.activityTypes.find(o => o === activityType)
+        if (found) {
+          state.activityTypes.splice(
+            state.activityTypes.indexOf(found),
+            1
+          )
+        }
+      },
+
+      SET_ACTIVITY_TYPES (state, activityTypes) {
+        state.activityTypes = activityTypes
       },
 
       SET_TEMPLATES (state, templates) {
@@ -1563,6 +1607,14 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_CONTACT_DISPOSED (state, value) {
         state.isContactDisposed = value
+      },
+
+      SET_IS_DATATABLE_SELECTED_ALL (state, value) {
+        state.isDatatableSelectedAll = value
+      },
+
+      SET_IS_DATATABLE_COUNT_LOADING (state, value) {
+        state.isDatatableCountLoading = value
       },
 
       SET_CONTACTS_LISTS (state, lists) {

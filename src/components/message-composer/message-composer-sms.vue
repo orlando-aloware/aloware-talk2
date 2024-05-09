@@ -1,13 +1,16 @@
 <template>
     <div class="pt-2 message-composer-text-wrapper"
+          data-testid="message-composer-sms"
          :disabled="isDisabled || isTCPAApprovedTextNotAuthorized">
         <div class="file-dropper position-absolute"
              v-cloak
+             data-testid="sms-file-dropper"
              @paste.prevent="onPaste"
              @drop.prevent="onDrop"
              @dragover.prevent>
         </div>
-        <div @dragover.prevent
+        <div data-testid="sms-file-paster"
+             @dragover.prevent
              @drop.prevent="onDrop"
              @paste="onPaste">
             <div class="mb-2 d-inline-flex media-preview-wrapper">
@@ -17,23 +20,27 @@
                     <div v-if="file.type.includes('audio')"
                          class="audio-thumbnail-wrapper">
                         <audio-placeholder :file="file"
+                                           data-testid="sms-audio-placeholder-remove-file"
                                            @remove="onRemoveFileInQueue">
                         </audio-placeholder>
                     </div>
                     <div v-if="file.type.includes('pdf')"
                          class="pdf-thumbnail-wrapper">
                         <application-placeholder :file="file"
+                                                 data-testid="sms-application-placeholder-remove-file"
                                                  @remove="onRemoveFileInQueue">
                         </application-placeholder>
                     </div>
                     <div v-if="file.type.includes('video')"
                          class="video-thumbnail-wrapper">
                         <video-placeholder :file="file"
+                                           data-testid="sms-video-placeholder-remove-file"
                                            @remove="onRemoveFileInQueue">
                         </video-placeholder>
                     </div>
                     <div v-if="file.type.includes('image')">
                         <image-placeholder :file="file"
+                                           data-testid="sms-image-placeholder-remove-file"
                                            @remove="onRemoveFileInQueue">
                         </image-placeholder>
                     </div>
@@ -42,9 +49,11 @@
                 <div v-if="messageComposer.sms.gif_url"
                      class="media-preview">
                     <img class="img-preview"
+                         data-testid="sms-gif-preview"
                          :src="messageComposer.sms.gif_url"/>
                     <b-button size="sm"
                               class="btn-remove-attachments"
+                              data-testid="sms-remove-message-gif-button"
                               @click="removeMessageGif"
                               pill>
                         <i class="fa fa-times"></i>
@@ -62,6 +71,7 @@
                         <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
                         <b-button size="sm"
                                   class="btn-remove-attachments"
+                                  data-testid="sms-remove-audio-button"
                                   @click="removeAttachment(attachment)"
                                   pill>
                             <i class="fa fa-times"></i>
@@ -75,6 +85,7 @@
                         <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
                         <b-button size="sm"
                                   class="btn-remove-attachments"
+                                  data-testid="sms-remove-pdf-button"
                                   @click="removeAttachment(attachment)"
                                   pill>
                             <i class="fa fa-times"></i>
@@ -83,18 +94,22 @@
                     <div v-if="attachment.mimetype.includes('video')"
                          class="video-thumbnail-wrapper">
                         <b-embed type="video"
+                                 data-testid="sms-video-embed"
                                  aspect="1by1">
                             <source :src="getPreviewLink(attachment.uuid)"
+                                    data-testid="sms-video-source"
                                     :type="attachment.mimetype">
                         </b-embed>
                         <b-button size="sm"
                                   variant="light"
                                   class="btn-play"
+                                  data-testid="sms-video-play-button"
                                   pill>
                             <i class="fa fa-play"></i>
                         </b-button>
                         <b-button size="sm"
                                   class="btn-remove-attachments"
+                                  data-testid="sms-remove-video-button"
                                   @click="removeAttachment(attachment)"
                                   pill>
                             <i class="fa fa-times"></i>
@@ -102,9 +117,11 @@
                     </div>
                     <div v-if="attachment.mimetype.includes('image')">
                         <img class="img-preview"
+                             data-testid="sms-image-preview"
                              :src="getPreviewLink(attachment.uuid)"/>
                         <b-button size="sm"
                                   class="btn-remove-attachments"
+                                  data-testid="sms-remove-image-button"
                                   @click="removeAttachment(attachment)"
                                   pill>
                             <i class="fa fa-times"></i>
@@ -122,6 +139,7 @@
                        type="textarea"
                        placeholder="Type your message"
                        v-model="messageComposer.sms.body"
+                       data-testid="sms-message-body-input"
                        :disable="isSendTextInputDisabled"
                        @input="imposeCharactersLimit"
                        @keydown="onKeyDown"
@@ -132,30 +150,35 @@
             <q-dialog v-model="urlShortenerDialog"
                       persistent
                       transition-show="scale"
+                      data-testid="url-shortener-dialog"
                       transition-hide="scale">
                 <q-card flat
                         style="width: 420px; max-width: 90vw;"
+                        data-testid="url-shortener-dialog-card"
                         class="pb-2 px-2">
-                    <q-card-section>
+                    <q-card-section data-testid="long-url-detected-section">
                         <div class="text-h6">Long URL detected</div>
                     </q-card-section>
 
-                    <q-card-section class="q-pt-none">
+                    <q-card-section class="q-pt-none" data-testid="url-shortened-question-section">
                         Do you want URLs to be shortened to <u>{{ urlShortenerDomain }}</u>?
                     </q-card-section>
 
                     <q-checkbox v-model="urlShortenerDontAsk"
                                 class="pl-1"
+                                data-testid="url-shortener-dont-ask-checkbox"
                                 label="Don't ask me again"/>
 
-                    <q-card-actions class="bg-white text-teal mt-2">
+                    <q-card-actions class="bg-white text-teal mt-2" data-testid="buttons-sections">
                         <q-btn label="No"
                                v-close-popup
+                               data-testid="close-url-shortener-button"
                                @click="closeUrlShortener"/>
                         <q-btn color="blue"
                                class="ml-auto"
                                label="Yes"
                                :loading="generatingShortUrl"
+                               data-testid="generate-short-url-button"
                                @click="generateShortUrl(false)"/>
                     </q-card-actions>
                 </q-card>
@@ -166,6 +189,7 @@
             <message-composer-options :campaign-id="campaignId"
                                       :max-attachments="maxAttachments"
                                       :is-broadcast="isBroadcast"
+                                      data-testid="sms-message-composer-options"
                                       @gifSelected="gifSelected"
                                       @attachmentUploaded="attachmentUploaded"
                                       @templateSelected="templateSelected"
@@ -182,6 +206,7 @@
                                   color="primary"
                                   size="sm"
                                   padding="0px 12px"
+                                  data-testid="sms-send-dropdown-button"
                                   :ripple="false"
                                   :disable="isSendTextDisabled"
                                   :disable-dropdown="isSendTextDisabled"
@@ -191,12 +216,14 @@
                       <template slot="label">
                           <q-spinner-bars class="mr-1"
                                           color="white"
+                                          data-testid="sms-send-spinner"
                                           v-if="isSending || generatingShortUrl"/>
                           {{ sendButtonText }}
                       </template>
                       <q-list class="message-composer-send-dropdown-button-list">
                           <q-item clickable
                                   v-close-popup
+                                  data-testid="sms-schedule-send-button"
                                   @click="showScheduleMessage">
                               <q-item-section>
                                   <q-item-label>Schedule Send</q-item-label>
@@ -206,6 +233,7 @@
                   </q-btn-dropdown>
                   <q-tooltip anchor="top middle"
                              self="center middle"
+                             data-testid="sms-cannot-be-texted-tooltip"
                              v-if="isTCPAApprovedTextNotAuthorized">
                     <span class="text-black-dk">
                       This number cannot be texted based on TCPA enforcement.
@@ -214,8 +242,8 @@
               </div>
             </div>
         </div>
-        <scheduled-message></scheduled-message>
-        <sms-template-modal></sms-template-modal>
+        <scheduled-message data-testid="sms-scheduled-message"></scheduled-message>
+        <sms-template-modal data-testid="sms-template-modal"></sms-template-modal>
     </div>
 </template>
 
@@ -339,7 +367,7 @@ export default {
     },
 
     isSendTextDisabled () {
-      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber || this.isSending
     },
 
     isSendTextInputDisabled () {
@@ -480,9 +508,10 @@ export default {
     },
 
     onKeyDown (evt) {
-      if (this.isSendTextInputDisabled) {
+      if (this.isSendTextInputDisabled || this.isSendTextDisabled) {
         return
       }
+
       if (evt.keyCode === 13 && !evt.shiftKey && !this.isBroadcast) {
         if (this.validSms) {
           this.onSend()

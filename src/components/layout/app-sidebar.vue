@@ -52,10 +52,12 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
+           data-testid="contacts-sidebar-btn"
            v-show="isActive('Contacts')"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 data-testid="contacts-sidebar-tooltip"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Contacts</span>
       </q-tooltip>

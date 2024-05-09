@@ -2,7 +2,7 @@
   <div class="row summary-info-labels d-flex px-0">
     <div
       class="summary-info-labels__div d-flex pl-0 pr-4 pt-1"
-      v-if="hasNoMetricData">
+      v-if="!hasNoMetricData">
       &nbsp;
     </div>
     <template v-for="(info, key) in filteredMetrics">

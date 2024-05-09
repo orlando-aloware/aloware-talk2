@@ -1,49 +1,58 @@
 <template>
-  <div class="pt-2 message-composer-fax-wrapper">
+  <div class="pt-2 message-composer-fax-wrapper" data-testid="message-composer-fax-wrapper">
     <div v-if="validFax"
          class="d-inline-flex media-preview-wrapper">
       <div class="media-preview">
         <div class="pdf-thumbnail-wrapper">
           <div class="text-center media-icon-wrapper mt-2">
-            <i class="far fa-file-pdf media-icon"></i>
+            <i class="far fa-file-pdf media-icon" data-testid="message-composer-fax-file-icon"></i>
           </div>
           <p class="ellipsis mt-1 text-center">{{ messageComposer.fax.filename }}</p>
-          <b-button pill size="sm" class="btn-remove-attachments" @click="onRemoveFile"><i class="fa fa-times"></i></b-button>
+          <b-button pill size="sm"
+                    class="btn-remove-attachments"
+                    data-testid="message-composer-fax-remove-file-button"
+                    @click="onRemoveFile"><i class="fa fa-times"></i></b-button>
         </div>
       </div>
     </div>
     <div v-if="!validFax"
          class="fax-file-wrapper cursor-pointer"
+         data-testid="message-composer-fax-file-wrapper"
          @click="onBrowse"
          @drop.prevent="onDrop"
          @dragover.prevent>
-      <form ref="faxForm">
+      <form ref="faxForm" data-testid="fax-form">
         <b-form-group id="fileInput"
+                      data-testid="fax-form-group"
                       class="dragdrop">
           <div class="text-center uploader-label"
                v-if="!isUploading">
             <upload-icon height="20"
                          width="20"
+                         data-testid="fax-form-upload-icon"
                          class="pb-1">
             </upload-icon>
-            <p class="text-xs mb-0">Drop PDF files here, or <span class="text-primary">Browse</span></p>
-            <p class="text-xxs file-info">Maximum PDF file size is 8MB</p>
+            <p class="text-xs mb-0" data-testid="fax-form-drop-pdf-files">Drop PDF files here, or <span class="text-primary">Browse</span></p>
+            <p class="text-xxs file-info" data-testid="fax-form-maximun-pdf-size">Maximum PDF file size is 8MB</p>
           </div>
           <div v-if="isUploading" class="text-center uploading-label pl-2 pr-2">
             <b-progress :max="100"
                         variant="success"
+                        data-testid="fax-form-upload-file-progress"
                         class="100">
               <b-progress-bar :value="uploadPercentage"
+                              data-testid="fax-form-upload-file-progress-bar"
                               :label="`${uploadPercentage}%`">
               </b-progress-bar>
             </b-progress>
-            <p class="mb-0">Uploading PDF File...</p>
+            <p class="mb-0" data-testid="fax-form-uploading-pdf-file">Uploading PDF File...</p>
           </div>
           <input v-if="!isUploading"
                  type="file"
                  class="w-px h-px opacity-0 overflow-hidden absolute d-none"
                  ref="file"
                  accept="application/pdf"
+                 data-testid="fax-form-file-input"
                  @change="onSelect"
                  v-cloak
                  multiple/>
@@ -55,10 +64,12 @@
       <q-btn color="primary"
              class="message-composer-send-button"
              :disable="isSending || !validFax"
+             data-testid="message-composer-fax-send-button"
              @click="send">
         <template slot="default">
           <q-spinner-bars v-if="isSending"
                           class="mr-1"
+                          data-testid="message-composer-fax-sending-spinner"
                           color="white">
           </q-spinner-bars>
           {{ isSending ? ' Sending Fax...' : 'Send Fax' }}

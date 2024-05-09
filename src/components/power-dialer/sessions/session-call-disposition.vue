@@ -114,7 +114,6 @@ export default {
   },
 
   mounted () {
-    this.sessionPaused = false
     this.initCallDisposition()
 
     if (!this.isCallInProgressStatus) {

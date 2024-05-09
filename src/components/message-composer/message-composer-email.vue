@@ -1,10 +1,11 @@
 <template>
-  <div class="message-composer-email">
+  <div class="message-composer-email" data-testid="message-composer-email-wrapper">
     <div class="pt-2 form-input-container">
-      <form>
+      <form data-testid="email-form">
         <q-input placeholder="Subject"
                  input-class="q-input-pl-0 q-input-pr-0"
                  bottom-slots
+                 data-testid="email-subject-input"
                  v-model="messageComposer.email.subject" >
         </q-input>
 
@@ -16,21 +17,25 @@
                  type="textarea"
                  placeholder="Type your message"
                  v-model="messageComposer.email.body"
+                 data-testid="email-message-body-input"
                  @input="updateMessage"
         />
       </form>
     </div>
     <div class="d-flex justify-content-between">
       <message-composer-options :campaign-id="campaignId"
+                                data-testid="email-message-composer-options"
                                 @templateSelected="templateSelected"
                                 @variableSelected="variableSelected"/>
       <div>
         <q-btn color="primary"
                class="message-composer-send-button"
                :disable="isSending || !validEmail"
+               data-testid="email-send-button"
                @click="onSend">
           <template slot="default">
             <q-spinner-bars v-if="isSending"
+                            data-testid="email-sending-spinner"
                             color="white" class="mr-1">
             </q-spinner-bars>
             {{ isSending ? ' Sending Email...' : 'Send Email' }}
@@ -38,7 +43,7 @@
         </q-btn>
       </div>
     </div>
-    <sms-template-modal></sms-template-modal>
+    <sms-template-modal data-testid="email-sms-template-modal"></sms-template-modal>
   </div>
 </template>
 
