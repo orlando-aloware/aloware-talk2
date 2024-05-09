@@ -396,6 +396,7 @@ export default {
 
       this.$nextTick(() => {
         this.$refs.search.focus()
+        this.$refs.infiniteScroll.trigger()
       })
     },
 
