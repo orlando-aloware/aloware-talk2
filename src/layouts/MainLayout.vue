@@ -5,7 +5,7 @@
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
-    <template v-if="isAuthenticated && !loading && currentCompany.trial_status">
+    <template v-if="isAuthenticated && !loading && companyHasTrialStatus">
       <trial-expired-modal v-if="isTrialExpired"/>
       <cancelled-account-modal v-else-if="isCancelledAccount"/>
       <trial-banner v-else-if="isTrialKYC"/>
@@ -443,6 +443,10 @@ export default {
 
     isCancelledAccount () {
       return this.currentCompany && this.currentCompany.subscription?.status === 'cancelled' && !this.currentCompany.is_whitelabel
+    },
+
+    companyHasTrialStatus () {
+      return this.currentCompany?.trial_status
     },
 
     pageClass () {
