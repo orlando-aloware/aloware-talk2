@@ -194,7 +194,6 @@ import * as Countries from 'src/constants/countries'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { State } from 'country-state-city'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
-import talk2Api from 'src/plugins/api/api'
 import EntityTags from 'components/generic-selectors/entity-tags'
 
 export default {
@@ -405,8 +404,6 @@ export default {
       // Prevent duplicated options when loading tags previously added
       const optionsSet = new Set(this.filter.options)
       this.filter.options = [...optionsSet]
-      this.appliedTags = [...new Set([...this.appliedTags, ...this.filter.options])]
-      this.getTags('', true, () => {})
     }
     this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = this.$jsonClone(this.currentListFilters)
@@ -444,6 +441,10 @@ export default {
 
         default:
           this.filterOperatorValue = value
+
+          if (this.filter.key === 'tags') {
+            this.appliedTags = this.filter?.options?.filter(option => this.filterOperatorValue?.includes(option.id))
+          }
       }
     },
 
@@ -828,34 +829,6 @@ export default {
       this.filterOperatorValue = val
     },
 
-    getTags (search = '', force, updateFn, abortFn) {
-      if (search.length < 3 && !force) {
-        updateFn()
-        return
-      }
-
-      if (search.length >= this.threshold || force) {
-        let params = {
-          page: 1,
-          per_page: 50,
-          search: search
-        }
-
-        if (force && this.filterOperatorValue?.length) {
-          params.tag_ids = this.filterOperatorValue
-        }
-
-        return talk2Api.V1.tags.get({
-          params: params
-        }).then(res => {
-          this.options = res.data.data
-          updateFn()
-        }).catch(err => {
-          console.log(err)
-        })
-      }
-    },
-
     filterFn (val, update) {
       if (this.filterOperatorValue && val === this.filterOperatorValue) {
         update(() => {
@@ -900,6 +873,10 @@ export default {
     filterOperator () {
       this.filterOperatorValue = null
       this.secondaryFilterOperatorValue = null
+
+      if (this.filter.key === 'tags') {
+        this.appliedTags = []
+      }
 
       if (!this.hasValue) {
         this.filterOperatorDebounceInProgress = true
