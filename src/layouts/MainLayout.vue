@@ -5,9 +5,11 @@
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
-    <trial-banner v-if="isTrialKYC && isAuthenticated"/>
-    <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/>
-    <cancelled-account-modal v-if="isCancelledAccount && isAuthenticated && !isTrialExpired"/>
+    <template v-if="isAuthenticated">
+      <trial-expired-modal v-if="isTrialExpired"/>
+      <cancelled-account-modal v-else-if="isCancelledAccount"/>
+      <trial-banner v-else-if="isTrialKYC"/>
+    </template>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
