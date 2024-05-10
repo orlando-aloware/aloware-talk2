@@ -113,14 +113,16 @@
                 <b-form-group
                   label="Tags (Optional)"
                   class="form-label">
-                  <q-tooltip anchor="top middle">
-                    Type at least 3 characters to search in tags
-                  </q-tooltip>
-                  <tag-selector :multiple="true"
-                                v-model="contact.tag_ids"
-                                data-testid="contact-create-tag-selector"
-                                @change="onTagsSelected">
-                  </tag-selector>
+                  <entity-tags data-testid="contact-create-tag-selector"
+                               entity="contact"
+                               entity-type="contacts"
+                               placeholder="Type to search tags"
+                               :dense="true"
+                               :category="TagCategories.CAT_CONTACTS"
+                               :is-filter="true"
+                               :filter-values="contact.tag_ids"
+                               :filter-values-objects="appliedTags"
+                               @filter="onTagsSelected"/>
                 </b-form-group>
               </b-col>
             </b-form-row>
@@ -160,8 +162,10 @@ import { mapState } from 'vuex'
 import { formValidationMixin } from 'src/plugins/mixins'
 import LineSelector from 'components/generic-selectors/line-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
-import TagSelector from 'components/generic-selectors/tag-selector'
+import EntityTags from 'components/generic-selectors/entity-tags'
+// import TagSelector from 'components/generic-selectors/tag-selector'
 import talk2Api from 'src/plugins/api/api'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 
 import { required, maxLength, email } from 'vuelidate/lib/validators'
 export default {
@@ -176,7 +180,11 @@ export default {
     }
   },
 
-  components: { UserSelector, LineSelector, TagSelector },
+  components: {
+    UserSelector,
+    LineSelector,
+    EntityTags
+  },
 
   computed: {
     ...mapState('contacts', ['selectedList', 'lists']),
@@ -222,7 +230,9 @@ export default {
       },
       isCreating: false,
       isDupeContact: false,
-      createdContact: null
+      createdContact: null,
+      appliedTags: [],
+      TagCategories
     }
   },
 
@@ -247,6 +257,8 @@ export default {
         user_id: null,
         tag_ids: []
       }
+
+      this.appliedTags = []
       this.isDupeContact = false
       this.$v.contact.$reset()
     },
@@ -289,8 +301,9 @@ export default {
       this.contact.user_id = userId
     },
 
-    onTagsSelected (tags) {
+    onTagsSelected (tags, tagsObjects) {
       this.contact.tag_ids = tags
+      this.appliedTags = tagsObjects
     },
     notifyForExistingContact (contact) {
       const h = this.$createElement
