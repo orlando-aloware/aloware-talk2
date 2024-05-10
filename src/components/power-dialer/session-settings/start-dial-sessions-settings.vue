@@ -400,6 +400,10 @@ export default {
       'sessionSettingGroups'
     ]),
 
+    ...mapGetters('contacts', [
+      'selectedList'
+    ]),
+
     defaultValues () {
       return { ...DEFAULT_SETTING_VALUES }
     },
@@ -581,13 +585,13 @@ export default {
 
         requests.res = await this.createDialerSessionSetting({
           ...this.removeEmptyParams(newSettings),
-          contact_list_id: this.listId,
+          contact_list_id: this.selectedList.id,
           name: `${this.list.name}-${new Date().valueOf()}`
         })
 
         if (requests.res?.id) {
           requests.newList = await this.updateContactsList({
-            id: this.listId,
+            id: this.selectedList.id,
             dialer_session_id: null
           })
 
@@ -595,7 +599,7 @@ export default {
         }
       } else {
         requests.newList = await this.updateContactsList({
-          id: this.listId,
+          id: this.selectedList.id,
           dialer_session_id: this.selectedItem.id
         })
 
@@ -637,7 +641,7 @@ export default {
         request.res = await this.getSessionSetting(data.id)
       } else {
         this.loadingText = 'Fetching temporary session settings data..'
-        request.res = await this.getTemporarySessionSetting(this.listId)
+        request.res = await this.getTemporarySessionSetting(this.selectedList.id)
       }
 
       this.selectedItemId = request.res.id || ''
@@ -692,7 +696,7 @@ export default {
 
       if (res?.data) {
         if (this.sessionSettings.id === res.data.id) {
-          await this.getPowerDialerList(this.listId)
+          await this.getPowerDialerList(this.selectedList.id)
         }
 
         this.$generalNotification(`Dialer session setting has been updated!`)
@@ -852,7 +856,7 @@ export default {
         await this.getDialerSessionSettings()
 
         // Fetch temporary session settings, if there is
-        const temporarySetting = await this.getTemporarySessionSetting(this.listId)
+        const temporarySetting = await this.getTemporarySessionSetting(this.selectedList.id)
         this.temporarySetting = temporarySetting || {}
         this.selectedItemId = this.list?.dialer_session_id
 

@@ -29,8 +29,8 @@
       </compact-btn>
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading || contactsRefreshIsDisabled"
-                   v-if="$route.name === 'Contacts'"
+                   :disabled="loading || (contactsRefreshIsDisabled && isInPowerDialerListPage)"
+                   v-if="isContactsPage"
                    @clicked="refreshContacts">
         <refresh-icon :class="hideRefreshLabelClass"/>
         {{ refreshButtonLabel }}
@@ -38,7 +38,7 @@
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
                    :disabled="loading"
-                   v-if="isInPowerDialerPage"
+                   v-if="isInPowerDialerListPage"
                    @clicked="refreshPowerDialerListItems">
         <refresh-icon :class="hideRefreshLabelClass"/>
         {{ refreshButtonLabel }}
@@ -359,8 +359,12 @@ export default {
           path.includes('channels')
     },
 
-    isInPowerDialerPage () {
-      return this.$route.name === 'Power Dialer' && this.$route.meta?.id !== 'power-dialer-session'
+    isContactsPage () {
+      return this.$route.name === 'Contacts' || (this.$route.name === 'Power Dialer' && ['power-dialer-add-queue-list', 'power-dialer-add-list'].includes(this.$route.meta?.id))
+    },
+
+    isInPowerDialerListPage () {
+      return this.$route.name === 'Power Dialer' && !['power-dialer-session', 'power-dialer-add-list', 'power-dialer-add-queue-list'].includes(this.$route.meta?.id)
     },
 
     settingsTabHeaderName () {
@@ -492,7 +496,11 @@ export default {
 
     refreshContacts () {
       this.initiateUpdateContactsListFilter()
-      this.$VueEvent.fire('fetchContacts', { fromRefresh: true })
+      this.$VueEvent.fire('fetchContacts', {
+        fromRefresh: true,
+        clear: true,
+        skipCache: true
+      })
       this.$VueEvent.fire('fetchContactsLists')
     },
 

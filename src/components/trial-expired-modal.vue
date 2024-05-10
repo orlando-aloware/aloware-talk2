@@ -45,17 +45,47 @@
                           </div>
                       </div>
                   </div>
-
               </div>
 
               <div class="d-flex align-items-center flex-center pt-3">
-                  <button class="btn btn-primary mt-0" @click="openDemo">
+                  <button v-if="currentCompany.sales_rep"
+                          class="btn btn-primary mr-1"
+                          @click="emailSalesRep">
                       Upgrade Now
+                  </button>
+                  <button v-if="!currentCompany.sales_rep"
+                          class="btn btn-primary mr-1"
+                          @click="openDemo">
+                      Upgrade Now
+                  </button>
+                  <button class="btn btn-danger ml-1"
+                          @click="logoutAction">
+                      {{ logoutLabel }}
                   </button>
               </div>
 
+              <div v-if="currentCompany.sales_rep">
+                  <div class="d-flex align-items-center flex-center pt-3">
+                      <p class="mb-0">Sales Contact:
+                          <strong class="mb-0 text-dark">
+                              {{ currentCompany.sales_rep.name }}
+                          </strong>
+                      </p>
+                  </div>
+                  <div class="d-flex align-items-center flex-center pt-0">
+                      <p class="mb-0">Email address:
+                          <strong class="mb-0 text-dark">
+                              <a :href="mailToSalesRep"
+                                 target="_blank">
+                                  {{ currentCompany.sales_rep.email }}
+                              </a>
+                          </strong>
+                      </p>
+                  </div>
+              </div>
+
               <div class="d-flex align-items-center flex flex-column pt-3">
-                <p class="mt-3">Contact Support:</p>
+                <p class="mt-3 mb-0">Contact Support:</p>
                 <p class="my-2">
                   <a href="tel:(855) 256-2001">
                       <i class="fa fa-phone-alt"></i>
@@ -77,9 +107,14 @@
 <script>
 import VueCookies from 'vue-cookies'
 import { mapState } from 'vuex'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'trial-expired-modal',
+
+  mixins: [
+    aclMixin
+  ],
 
   props: {
     title: {
@@ -101,6 +136,10 @@ export default {
 
     parsedCookieName () {
       return `${this.cookieName}-${this.profile?.id}`
+    },
+
+    mailToSalesRep () {
+      return 'mailto:' + this.currentCompany.sales_rep?.email
     }
   },
 
@@ -115,6 +154,10 @@ export default {
 
     openDemo () {
       window.open('https://meetings.hubspot.com/alwr/aloware-demo', '_blank')
+    },
+
+    emailSalesRep () {
+      window.open(this.mailToSalesRep, '_blank')
     }
   }
 }

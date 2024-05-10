@@ -1,6 +1,6 @@
 <template>
-  <power-dialer-view-screen :loading="isLoading"
-                            v-if="list">
+  <contacts-screen :loading="isLoading"
+                   v-if="list">
     <template slot="title">
       <breadcrumbs :directory-list="folders" />
     </template>
@@ -16,9 +16,9 @@
     </template>
 
     <template slot="actions">
-      <div>
+      <div class="w-100">
         <summary-info-labels />
-        <b-container class="bv-example-row m-0 p-0 pb-0 border-bottom"
+        <b-container class="bv-example-row m-0 p-0 pb-0"
                      fluid>
           <b-row class="pr-2 pt-4 pb-3"
                  v-if="showMobileFilters">
@@ -163,6 +163,12 @@
                       Clearing of task is currently disabled.
                     </q-tooltip>
                   </b-dropdown-item>
+                  <!--b-dropdown-item href="#"
+                                   v-else
+                                   @click="onRemoveList">
+                    <i class="fa fa-trash-alt mr-1 text-red"/>
+                    <span class="text-red">Delete</span>
+                  </b-dropdown-item-->
                 </b-dropdown>
 
               </div>
@@ -173,10 +179,15 @@
     </template>
 
     <template slot="actions">
-      <power-dialer-bulk-action-menu :id="filteredSelectedListId"
-                                     :disabledDelete="taskAddAndClearingDisabled"
-                                     v-if="checked.length > 0"
-                                     @moved-contacts="onFetch({}, false)" />
+      <bulk-action-menu :id="filteredSelectedListId"
+                        :disabled-delete="taskAddAndClearingDisabled"
+                        :total-rows="totalRows"
+                        :checked-count="selectedAllCount"
+                        :is-loading-more="isLoadingMore"
+                        :is-loading="isLoading"
+                        v-if="filteredSelectedListId"
+                        @moved-contacts="onMovedContacts"
+                        @onSelectedAll="onSelectedAll"/>
     </template>
 
     <template slot="table">
@@ -189,9 +200,9 @@
                  :contact-list-id="selectedListId"
                  :paginated="false"
                  :show-pagination="!isStartState"
-                 :total-rows="fixedContactsData.total"
                  :current-page="currentPage"
                  :last-page="lastPage"
+                 :total-rows="totalRows"
                  @onMouseMove="datatableOnMouseMove"
                  @onMouseLeave="datatableOnMouseMove"
                  @reordered="onColumnsReordered"
@@ -210,12 +221,11 @@
               <td class="text-left pull-left datatable-row__checkbox"
                   :key="`c-${key}`"
                   v-if="column.name === 'checkbox'">
-
                 <label class="custom-checkbox-container">
                   <input type="checkbox"
                          class="checker"
                          :value="contact.id"
-                         :checked="checked.find(item => item.id === contact.id) || isAllContactsSelected"
+                         :checked="checked.find(item => item.id === contact.id)"
                          @change="onCheckerClicked(contact)" />
                   <span class="checkmark"/>
                 </label>
@@ -513,18 +523,18 @@
       </b-popover>
 
       <confirm-dialog title="Are you really really sure?"
-                     size="sm"
-                     :id="dialogName"
-                     :is-open="isOpen"
-                     :hide-header="true"
-                     :hide-footer="true"
-                     v-model="isOpen"
-                     v-if="selectedItem"
-                     @close="closeModal">
+                      size="sm"
+                      :id="dialogName"
+                      :is-open="isOpen"
+                      :hide-header="true"
+                      :hide-footer="true"
+                      v-model="isOpen"
+                      v-if="selectedItem"
+                      @close="closeModal">
         <div slot="content">
           <div class="text-center text-h6 pb-4">
             <trash-o-icon height="20"
-                        width="20" />
+                          width="20" />
             Remove Contact?
           </div>
           <div class="text-center py-3">
@@ -558,15 +568,15 @@
     <template slot="filters">
       <contacts-filters v-if="isFiltersOpen" />
     </template>
-  </power-dialer-view-screen>
+  </contacts-screen>
 </template>
 
 <script>
 
 import { mapFields } from 'vuex-map-fields'
 import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
+import ContactsScreen from 'src/components/contacts/contacts-screen'
 import CompactBtn from 'src/components/compact-btn.vue'
-import PowerDialerViewScreen from 'src/components/power-dialer/power-dialer-view-screen'
 import PowerDialerFilter from 'src/components/power-dialer/details/power-dialer-filters'
 import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-labels'
 import Datatable from 'src/components/datatable'
@@ -576,7 +586,7 @@ import ContactsFilters from 'src/components/contacts/contacts-filters'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
-import PowerDialerBulkActionMenu from 'src/components/power-dialer-bulk-action-menu'
+import BulkActionMenu from 'src/components/bulk-action-menu'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import BlockTooltip from 'components/kyc/block-tooltip'
 import talk2Api from 'src/plugins/api/api'
@@ -662,11 +672,6 @@ export default {
     selectedListId: {
       type: [String, Number],
       default: null
-    },
-
-    addContactsInProgressData: {
-      type: Object,
-      default: () => {}
     }
   },
 
@@ -679,13 +684,9 @@ export default {
     kycMixin
   ],
 
-  inject: [
-    'contactsData'
-  ],
-
   components: {
+    ContactsScreen,
     CompactBtn,
-    PowerDialerViewScreen,
     PowerDialerFilter,
     Datatable,
     SearchList,
@@ -695,7 +696,7 @@ export default {
     ConfirmDialog,
     Breadcrumbs,
     ContactCreateModal,
-    PowerDialerBulkActionMenu,
+    BulkActionMenu,
     BlockTooltip,
     RefreshIcon,
     ContactsFilters
@@ -709,6 +710,8 @@ export default {
   },
 
   async mounted () {
+    this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
+
     this.removeListClose()
 
     if (!this.isMyQueue) {
@@ -749,7 +752,6 @@ export default {
       'folders',
       'lists',
       'listItems',
-      'selectedContacts',
       'selectedList',
       'isFiltersOpen',
       'currentListFilters',
@@ -795,7 +797,6 @@ export default {
     labelForNumberOfContacts () {
       let list = this.powerDialerActiveList
       let total = 0
-      let currentTotal = this.fixedContactsData?.data.length
 
       switch (this.filter) {
         case 'in-queue':
@@ -814,7 +815,10 @@ export default {
           total = list.total_items
       }
 
-      return `${currentTotal} of ${total || 0} Contacts`
+      const totalContacts = total || 0
+      const postfix = totalContacts > 1 ? 's' : ''
+
+      return `${this.$options.filters.numFormat(this.listItemsTotalContacts)} of ${this.$options.filters.numFormat(totalContacts)} Contact${postfix}`
     },
 
     activeList () {
@@ -857,12 +861,12 @@ export default {
     },
 
     filteredList () {
-      if (this.selectedListId === 'my-queue') {
+      if (this.selectedListId === 'my-queue' || this.selectedListId === this.myQueue?.id) {
         return this.myQueue
-        // return this.lists['my-queue']
       }
 
-      return this.list
+      const selectedList = Object.values(this.lists).find(list => list.id === this.selectedListId)
+      return selectedList
     },
 
     filteredListId () {
@@ -898,15 +902,8 @@ export default {
       return total !== null ? total : 0
     },
 
-    filteredSelectedListId () {
-      let route = this.$route.meta.id
-      let id = route === 'power-dialer-queue-filter' ? this.myQueue?.id : this.selectedListId
-
-      return id
-    },
-
-    checked () {
-      return this.selectedContacts[this.filteredSelectedListId] || []
+    checkedCount () {
+      return this.checked.length
     },
 
     createContactToListText () {
@@ -979,7 +976,6 @@ export default {
       'openFilters',
       'closeFilters',
       'columnsReordered',
-      'setListSelectedContacts',
       'createListOpen',
       'removeListClose',
       'setCurrentListFilters',
@@ -1069,19 +1065,25 @@ export default {
     },
 
     onCheckboxCheck (obj) {
-      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: obj.data })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.filteredSelectedListId, contacts: obj.data })
     },
 
     onCheckAllItems (checked) {
       let items = []
 
       if (checked) {
-        items = this.fixedContactsDataItems
-      } else {
-        items = []
+        document
+          .querySelectorAll('.checker')
+          .forEach((checkbox) => {
+            let foundContact = this.fixedContactsData.data.find(item => item.id === Number(checkbox.value))
+
+            if (!(foundContact.is_blocked || foundContact.is_dnc)) {
+              items.push(foundContact)
+            }
+          })
       }
 
-      this.setListSelectedContacts({ id: this.filteredSelectedListId, contacts: items })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.filteredSelectedListId, contacts: items })
     },
 
     onRemoveList () {
@@ -1103,7 +1105,7 @@ export default {
     },
 
     onCheckedRows (checked) {
-      this.setListSelectedContacts({ id: this.selectedListId, contacts: checked })
+      this.$VueEvent.fire('setListSelectedContacts', { id: this.selectedListId, contacts: checked })
     },
 
     onEditColumnsClicked () {
@@ -1201,7 +1203,7 @@ export default {
     init (loadList = true) {
       this.resetFilters(true)
       this.$VueEvent.fire('clearContacts')
-      this.initialListFilters = this.currentListFilters
+      this.initialListFilters = this.$jsonClone(this.currentListFilters)
 
       if (loadList) {
         this.loadList(this.selectedListId)
@@ -1226,14 +1228,6 @@ export default {
       }
 
       return obj
-    },
-
-    onForcedCheckAll (value) {
-      const elem = document.querySelector('.data-table-check-all')
-
-      if (elem) {
-        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
-      }
     }
   },
 
@@ -1270,21 +1264,16 @@ export default {
     },
 
     selectedList (value) {
-      this.setListSelectedContacts({ id: value.id, contacts: [] })
+      this.$VueEvent.fire('setListSelectedContacts', { id: value.id, contacts: [] })
     },
 
     clearList (value) {
       this.onFetch()
-    },
-
-    checked: function (value) {
-      this.onForcedCheckAll(value)
     }
   },
 
   beforeDestroy () {
     this.$VueEvent.stop('contact_list_item_deleting', this.pdViewListeners.contactListItemDeleting)
-    this.$VueEvent.stop('contact_list_bulk_created', this.pdViewListeners.contactListBulkCreated)
   }
 }
 </script>
