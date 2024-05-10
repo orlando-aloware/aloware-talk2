@@ -120,7 +120,8 @@ export default {
 
     height: {
       required: false,
-      type: Number
+      type: Number,
+      default: 350
     },
 
     category: {

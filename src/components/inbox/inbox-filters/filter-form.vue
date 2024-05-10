@@ -146,10 +146,6 @@
                    sm="12">
               <b-form-group class="form-label"
                             :label="tagsFilterLabel">
-                <q-tooltip anchor="top middle">
-                  Type at least 3 characters to search in tags
-                </q-tooltip>
-
                 <entity-tags ref="tagSelector"
                              data-testid="communication-tags-multi-select"
                              entity="contact"

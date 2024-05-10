@@ -67,13 +67,13 @@
           </div>
         </template>
       </q-field>
-      <div class="dropdown-select scrollableArea mt-2 ml-2 mx-0 w-100"
-           :style="height ? `height: ${height}px !important` : ''"
+      <div class="dropdown-select scrollable-tags-area mt-2 ml-2 mx-0 w-100"
+           :style="height && !loadingTags ? `height: ${height}px !important` : ''"
            v-if="shouldShowList">
         <div v-if="!optionsIsGrouped">
           <q-infinite-scroll ref="infiniteScroll"
-                             scroll-target=".scrollableArea"
-                             :offset="325"
+                             scroll-target=".scrollable-tags-area"
+                             :offset="offsetHeight"
                              :initial-index="1"
                              v-if="isEdit"
                              @load="getTags">
@@ -114,8 +114,8 @@
         </div>
         <div v-else>
           <q-infinite-scroll ref="infiniteScroll"
-                             scroll-target=".scrollableArea"
-                             :offset="325"
+                             scroll-target=".scrollable-tags-area"
+                             :offset="offsetHeight"
                              :initial-index="1"
                              v-if="isEdit"
                              @load="getTags">
@@ -346,6 +346,10 @@ export default {
       }
 
       return this.isFilter ? 'Type at least 3 characters' : 'Type to search'
+    },
+
+    offsetHeight () {
+      return this.height - 20
     }
   },
 
