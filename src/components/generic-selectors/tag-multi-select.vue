@@ -73,7 +73,7 @@
         <div v-if="!optionsIsGrouped">
           <q-infinite-scroll ref="infiniteScroll"
                              scroll-target=".scrollableArea"
-                             :offset="100"
+                             :offset="325"
                              :initial-index="1"
                              v-if="isEdit"
                              @load="getTags">
@@ -115,7 +115,7 @@
         <div v-else>
           <q-infinite-scroll ref="infiniteScroll"
                              scroll-target=".scrollableArea"
-                             :offset="100"
+                             :offset="325"
                              :initial-index="1"
                              v-if="isEdit"
                              @load="getTags">
@@ -396,7 +396,9 @@ export default {
 
       this.$nextTick(() => {
         this.$refs.search.focus()
-        this.$refs.infiniteScroll.trigger()
+        if (this.isFilter) {
+          this.$refs.infiniteScroll.trigger()
+        }
       })
     },
 
@@ -450,8 +452,8 @@ export default {
         this.searchList[0].children = sortBy(union(this.searchList[0].children, accountTags))
         this.searchList[1].children = sortBy(union(this.searchList[1].children, importTags))
 
-        this.page++
         this.hasMorePages = res.data.current_page < res.data.last_page
+        this.page++
 
         if (this.hasMorePages) {
           done && done()

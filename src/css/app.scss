@@ -238,7 +238,6 @@ body,
   &.q-field--with-bottom {
     padding-bottom: 15px;
     height: initial !important;
-    max-width: 100px !important;
     .q-field__bottom {
       min-height: 15px;
       padding-left: 0;
@@ -2431,9 +2430,12 @@ i.option-separator {
     }
   }
 
+  &.q-field--with-bottom {
+    max-width: 100px !important;
+  }
 }
 
-.filter-wrapper {
+.tags-filter-wrapper {
   .card-body {
     padding: 0 !important;
   }
@@ -7751,7 +7753,6 @@ table.datatable {
 
 div.q-menu {
   min-width: 0;
-  max-width: 100px !important;
 }
 
 button.primary {

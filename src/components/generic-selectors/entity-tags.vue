@@ -31,7 +31,7 @@
       </tag-multi-select>
     </div>
     <b-card class="border-0 tags-wrapper"
-            :class="{ 'filter-wrapper': isFilter, 'tags-wrapper--dense': dense }"
+            :class="{ 'tags-filter-wrapper': isFilter, 'tags-wrapper--dense': dense }"
             data-testid="contact-tags-wrapper"
             v-else>
       <tag-multi-select :data-testid="`${entity}-tags-multi-select`"

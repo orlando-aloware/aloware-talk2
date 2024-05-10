@@ -163,7 +163,6 @@ import { formValidationMixin } from 'src/plugins/mixins'
 import LineSelector from 'components/generic-selectors/line-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
 import EntityTags from 'components/generic-selectors/entity-tags'
-// import TagSelector from 'components/generic-selectors/tag-selector'
 import talk2Api from 'src/plugins/api/api'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 
