@@ -47,7 +47,7 @@
 
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey"  data-testid="ring-group-selector-no-results-select">
+          <q-item-section class="no-results text-grey" data-testid="ring-group-selector-no-results-select">
             No results
           </q-item-section>
         </q-item>
@@ -80,7 +80,7 @@
           <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
                data-testid="ring-group-selector-remove-btn"
                @click="scope.removeAtIndex(scope.index)">
-            <remove-tag-icon class="ml-1 remove-tag-icon"  data-testid="ring-group-selector-remove-tag-icon">
+            <remove-tag-icon class="ml-1 remove-tag-icon" data-testid="ring-group-selector-remove-tag-icon">
             </remove-tag-icon>
           </div>
         </q-chip>
