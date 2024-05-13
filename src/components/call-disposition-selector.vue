@@ -1,6 +1,7 @@
 <template>
   <div class="w-full flex-grow-1"
-       v-if="hasPermissionTo('list disposition status')">
+       v-if="hasPermissionTo('list disposition status')"
+       data-testid="call-disposition-selector-wrapper">
     <multiselect class="chip__clear-blue shrink-options options__no-border options__relative b-radius__equal"
                  v-model="callDispositionId"
                  label="name"
@@ -33,11 +34,13 @@
         <div class="option__desc">
           <q-icon name="fa fa-bolt"
                   :style="{ color: props.option.color }"
-                  v-show="!props.option.is_external">
+                  v-show="!props.option.is_external"
+                  data-testid="call-disposition-selector-icon-no-external">
           </q-icon>
           <q-icon name="fa fa-lock"
                   :style="{ color: props.option.color }"
-                  v-show="props.option.is_external">
+                  v-show="props.option.is_external"
+                  data-testid="call-disposition-selector-icon-external">
           </q-icon>
           <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
@@ -77,16 +80,18 @@
         <div class="option__desc">
           <q-icon name="fa fa-bolt"
                   :style="{ color: props.option.color }"
-                  v-show="!props.option.is_external">
+                  v-show="!props.option.is_external"
+                  data-testid="call-disposition-selector-icon-no-external">
           </q-icon>
           <q-icon name="fa fa-lock"
                   :style="{ color: props.option.color }"
-                  v-show="props.option.is_external">
+                  v-show="props.option.is_external"
+                  data-testid="call-disposition-selector-icon-external">
           </q-icon>
           <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
       </template>
-      <span slot="noResult">
+      <span slot="noResult" data-testid="call-disposition-selector-no-call-found">
         No call dispositions found.
       </span>
     </multiselect>

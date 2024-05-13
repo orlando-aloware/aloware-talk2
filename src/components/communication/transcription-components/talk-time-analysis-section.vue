@@ -1,7 +1,8 @@
 <template>
   <div class="flex items-center"
-       v-if="!isEmpty(talk_time_analysis)">
-    <strong class="mr-2">Talk Time:</strong>
+       v-if="!isEmpty(talk_time_analysis)"
+       data-testid="comm-talk-time-analysis-wrapper">
+    <strong class="mr-2" data-testid="comm-talk-time-analysis-section">Talk Time:</strong>
     <div>
       <!--
           Talk time analysis contains:
@@ -11,7 +12,7 @@
       <div class="flex inline items-center mr-3"
             :key="speaker_index"
             v-for="(speaker, speaker_index) in speakers">
-        <div class="flex mr-2">
+        <div class="flex mr-2" data-testid="comm-talk-time-analysis-section-speaker">
           {{ speaker }}:<strong class="ml-1">{{ talk_time_analysis[speaker] }}%</strong>
         </div>
       </div>

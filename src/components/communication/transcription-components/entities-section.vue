@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Entities section. -->
-    <h2 class="mt-4 mb-1 text-dark">Entities</h2>
+    <h2 class="mt-4 mb-1 text-dark" data-testid="comm-entities-section">Entities</h2>
     <hr class="my-1">
     <!-- Sanity check. -->
     <div v-if="!isEmpty(entities)">
@@ -21,6 +21,7 @@
                     text-color="white"
                     dense
                     :key="entity_index"
+                    data-testid="comm-entities-section-chip"
                     v-for="(entity, entity_index) in entities[speaker][type]">
               {{ entity }}
             </q-chip>
@@ -34,6 +35,7 @@
       <span class="mt-3">
         We couldn't find any specific entities in this call. For more information please check
         <a style="color: blue"
+           data-testid="comm-entities-section-this-article"
            href="https://support.aloware.com/en/articles/9037887-frequently-asked-questions-smart-transcription">
           this article.
         </a>

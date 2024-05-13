@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="broadcast-selector-wrapper">
     <q-select ref="broadcastSelect"
               options-selected-class="text-primary"
               color="primary"
@@ -20,6 +20,7 @@
               :class="[ prepend ? 'with-prepend' : '', genericStyling ? 'generic-selector' : '', highlighted ? highlightedClass : '']"
               :use-chips="useChips"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              data-testid="broadcast-selector-select"
               @popup-show="onShowMenu"
               @filter="filterFn">
       <template v-slot:prepend
@@ -29,7 +30,7 @@
 
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey">
+          <q-item-section class="no-results text-grey" data-testid="broadcast-selector-select-no-results">
             No results
           </q-item-section>
         </q-item>
@@ -38,7 +39,8 @@
       <template v-slot:option="scope">
         <q-item v-if="!scope.opt.group"
                 v-bind="scope.itemProps"
-                v-on="scope.itemEvents">
+                v-on="scope.itemEvents"
+                data-testid="broadcast-selector-select-item">
           <q-item-section>
             <q-item-label>
               <q-item-label v-html="scope.opt.name" ></q-item-label>
@@ -59,13 +61,15 @@
           color="white"
           class="tag-selected-chip"
           text-color="secondary"
+          data-testid="broadcast-selector-select-chip"
         >
           <i class="fa fa-circle position-absolute"
              :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
           <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
           <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+               data-testid="broadcast-selector-select-remove-btn"
                @click="scope.removeAtIndex(scope.index)">
-            <remove-tag-icon class="ml-1 remove-tag-icon">
+            <remove-tag-icon class="ml-1 remove-tag-icon" data-testid="broadcast-selector-select-remove-tag-icon">
             </remove-tag-icon>
           </div>
         </q-chip>

@@ -6,26 +6,30 @@
            hide-header-close
            hide-header
            hide-footer
+           data-testid="create-filter-dialog-modal"
            v-model="isOpen"
            @show="onShow"
            @shown="onShown"
            @hide="onHide"
            @hidden="onHidden">
-  <b-form @submit.prevent="onSubmit">
-    <b-form-row>
+  <b-form @submit.prevent="onSubmit" data-testid="create-filter-dialog-form">
+    <b-form-row data-testid="create-filter-dialog-form-row">
       <b-col sm="12"
              md="12"
-             class="mb-3">
+             class="mb-3"
+             data-testid="create-filter-dialog-form-col">
         <span class="text-bold fs-20">Create New {{ dialogTitleLabel }}</span>
       </b-col>
       <b-col sm="12"
-             md="12">
+             md="12"
+             data-testid="create-filter-dialog-form-col">
         <b-form-group label="Filter Name"
                       class="form-label">
           <b-form-input ref="filterNameInput"
                         size="md"
                         type="text"
                         placeholder="Name"
+                        data-testid="create-filter-dialog-form-input-name"
                         :state="validateState('name')"
                         v-model.trim="$v.filter.name.$model" />
           <b-form-invalid-feedback v-if="!$v.filter.name.required">Enter filter name</b-form-invalid-feedback>
@@ -33,7 +37,8 @@
       </b-col>
 
       <b-col sm="12"
-             md="12">
+             md="12"
+             data-testid="create-filter-dialog-form-col">
         <b-form-group label="Filter Type"
                       class="form-label">
           <q-select color="primary"
@@ -48,6 +53,7 @@
                     :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
                     :options="scopeOptions"
                     :disable="true"
+                    data-testid="create-filter-dialog-form-filter-select"
                     v-model="filter.scope"
                     @popup-show="onFilterTypeShowMenu">
           </q-select>
@@ -55,9 +61,11 @@
       </b-col>
 
       <b-col sm="12"
-             md="6">
+             md="6"
+             data-testid="create-filter-dialog-form-col">
         <b-button class="bg-grey-70 text-black border-0"
                   block
+                  data-testid="create-filter-dialog-form-cancel-btn"
                   @click="onCancel">
           Cancel
         </b-button>
@@ -67,6 +75,7 @@
         <b-button type="submit"
                   variant="primary"
                   block
+                  data-testid="create-filter-dialog-form-create-btn"
                   :disabled="isCreating">
           <q-spinner-bars color="white"
                           v-if="isCreating" />

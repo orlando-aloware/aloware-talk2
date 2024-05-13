@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100">
+  <div class="w-100" data-testid="ring-group-selector-wrapper">
     <generic-multi-select :label="label"
                           buttonText="Ring Groups"
                           :values="selectedId"
@@ -7,6 +7,7 @@
                           :disable="disable"
                           :canEdit="hasPermissionTo(['list ring group', 'view ring group'])"
                           v-if="genericMultiselect"
+                          data-testid="ring-group-selector-generic-multi-select"
                           @valuesUpdated="updateRingGroups">
     </generic-multi-select>
     <q-select v-else
@@ -33,6 +34,7 @@
               :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '', isGenericSelectorStyle ? 'generic-selector': '']"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               v-model="selectedId"
+              data-testid="ring-group-selector-select"
               @popup-show="onShowMenu"
               @filter="filterFn"
               @focus="onFocus"
@@ -45,7 +47,7 @@
 
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey">
+          <q-item-section class="no-results text-grey" data-testid="ring-group-selector-no-results-select">
             No results
           </q-item-section>
         </q-item>
@@ -70,13 +72,15 @@
           color="white"
           class="tag-selected-chip"
           text-color="secondary"
+          data-testid="ring-group-selector-chip"
         >
           <i class="fa fa-circle position-absolute"
              :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"></i>
           <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
           <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+               data-testid="ring-group-selector-remove-btn"
                @click="scope.removeAtIndex(scope.index)">
-            <remove-tag-icon class="ml-1 remove-tag-icon">
+            <remove-tag-icon class="ml-1 remove-tag-icon" data-testid="ring-group-selector-remove-tag-icon">
             </remove-tag-icon>
           </div>
         </q-chip>
