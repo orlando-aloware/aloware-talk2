@@ -29,7 +29,7 @@
           <span class="option__small ml-2">{{ props.option }}</span>
         </div>
       </template>
-      <span slot="noResult"  data-testid="hubspot-activity-type-selector-not-found">
+      <span slot="noResult" data-testid="hubspot-activity-type-selector-not-found">
         No activity types found.
       </span>
     </multiselect>
