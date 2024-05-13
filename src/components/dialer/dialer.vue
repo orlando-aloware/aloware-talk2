@@ -1532,7 +1532,6 @@ export default {
       'setDialerWrapUpTimer',
       'setDialerParkedCallDuration',
       'setDialerParkedCallTimer',
-      'setOldAgentStatus',
       'setWarnings',
       'setShouldIntroduce',
       'setAddedParty',
