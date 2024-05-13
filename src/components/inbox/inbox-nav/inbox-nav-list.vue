@@ -52,7 +52,7 @@
 
         <div class="py-3 text-center text-13 text-word-wrap"
              v-if="pinnedViews.length < 1">
-          <span  data-testid="inbox-nav-list-no-pinned-views">No Pinned Views</span>
+          <span data-testid="inbox-nav-list-no-pinned-views">No Pinned Views</span>
         </div>
 
       <inbox-views target="#edit-views-icon"
