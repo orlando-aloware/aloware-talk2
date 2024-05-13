@@ -59,7 +59,7 @@
       </calls-header>
 
       <div class="w-100"
-           v-if="!isSearch">
+           v-if="!isSearch && isContactStatusControlEnabled">
         <q-btn-toggle class="mx-2 mt-2 mb-1 custom-toggle-button"
                       color="transparent"
                       text-color="primary"

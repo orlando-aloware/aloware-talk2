@@ -27,7 +27,7 @@
           {{ label }}
         </div>
         <span class="count-label h-100"
-              v-if="value === 'inbox'">
+              v-if="value === 'inbox' && isContactStatusControlEnabled">
           <span class="border-right pr-1"
                 v-if="isLoadingOpenTaskCount">
             <q-spinner-tail size="12px"
@@ -68,7 +68,7 @@
 
 <script>
 import Icon from './inbox-nav-icon.vue'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'inbox-nav-item',
@@ -82,6 +82,8 @@ export default {
       'isLoadingOpenTaskCount',
       'isLoadingPendingTaskCount'
     ]),
+
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
     navItemClass () {
       return {
