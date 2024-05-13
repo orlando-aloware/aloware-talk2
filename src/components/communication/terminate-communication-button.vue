@@ -6,7 +6,7 @@
         @click="dialog">
     <power-icon height="22"
                 width="22"/>
-    <q-tooltip  data-testid="comm-terminate-comm-button-tooltip">
+    <q-tooltip data-testid="comm-terminate-comm-button-tooltip">
       Terminate
     </q-tooltip>
   </span>
