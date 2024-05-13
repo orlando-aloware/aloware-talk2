@@ -4,9 +4,11 @@
                variant="white"
                rounded="sm"
                :show="isLoadingCommunication"
+               data-testid="communication-screen"
                :opacity="0.85">
       <communication-details :verbose="true"
                              :communication="communication"
+                             data-testid="comm-communication-details"
                              v-if="!hasError && communication">
       </communication-details>
       <b-row v-else-if="hasError && !isLoadingCommunication">
@@ -16,13 +18,13 @@
           <q-card flat
                   bordered
                   class="my-card">
-            <q-card-section class="text-center">
+            <q-card-section class="text-center" data-testid="communication-error-outline">
                  <span class="material-icons fs-45">
                   error_outline
                 </span>
             </q-card-section>
 
-            <q-card-section class="q-pt-none text-center">
+            <q-card-section class="q-pt-none text-center" data-testid="communication-not-find-request">
               We could not find the requested resource.
             </q-card-section>
           </q-card>
@@ -30,7 +32,7 @@
       </b-row>
 
       <template #overlay>
-        <div class="text-center">
+        <div class="text-center" data-testid="communication-fetching-communication">
           <q-spinner-bars color="primary"
                           size="2em"/>
           <p>Fetching Communication...</p>

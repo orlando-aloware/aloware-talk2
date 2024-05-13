@@ -1,10 +1,11 @@
 <template>
-  <div class="task-list scrollable w-100">
+  <div class="task-list scrollable w-100" data-testid="task-mention-list-wrapper">
     <p class="text-center mt-5" v-if="communications.length < 1">{{ emptyPlaceholder }}</p>
     <task-mention-item v-for="communication in communications"
                        :key="communication.id"
                        :mention="communication"
-                       :direction="direction">
+                       :direction="direction"
+                       data-testid="task-mention-list-item">
     </task-mention-item>
   </div>
 </template>

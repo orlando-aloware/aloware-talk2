@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="transfer-type-selector-wrapper">
     <q-select ref="transferTypeSelect"
               options-selected-class="text-primary"
               color="primary"
@@ -19,11 +19,12 @@
               :disable="disable"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               :class="[ highlighted ? highlightedClass : '', customClass]"
+              data-testid="transfer-type-selector-select"
               @popup-show="onShowMenu"
               @filter="filterFn">
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey">
+          <q-item-section class="no-results text-grey" data-testid="transfer-type-selector-select-no-results">
             No results
           </q-item-section>
         </q-item>
@@ -31,7 +32,8 @@
 
       <template v-slot:option="scope">
         <q-item v-bind="scope.itemProps"
-                v-on="scope.itemEvents">
+                v-on="scope.itemEvents"
+                data-testid="transfer-type-selector-select-item">
           <q-item-section>
             <q-item-label v-html="scope.opt.label"/>
           </q-item-section>

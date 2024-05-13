@@ -5,9 +5,11 @@
     <div class=" h-100 w-100 d-flex align-items-center justify-content-center text-center unsupported">
       <span>This screen size is not supported.</span>
     </div>
-    <trial-banner v-if="isTrialKYC && isAuthenticated"/>
-    <trial-expired-modal v-if="isTrialExpired && isAuthenticated"/>
-    <cancelled-account-modal v-if="isCancelledAccount && isAuthenticated"/>
+    <template v-if="isAuthenticated && !loading && companyHasTrialStatus">
+      <trial-expired-modal v-if="isTrialExpired"/>
+      <cancelled-account-modal v-else-if="isCancelledAccount"/>
+      <trial-banner v-else-if="isTrialKYC"/>
+    </template>
     <div class="page h-100">
       <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                 view="lHh Lpr lff"
@@ -422,7 +424,8 @@ export default {
     ]),
 
     ...mapState('powerDialer', [
-      'ongoingSession'
+      'ongoingSession',
+      'isSessionRunning'
     ]),
 
     ...mapState(['xmasEnabled']),
@@ -441,6 +444,10 @@ export default {
 
     isCancelledAccount () {
       return this.currentCompany && this.currentCompany.subscription?.status === 'cancelled' && !this.currentCompany.is_whitelabel
+    },
+
+    companyHasTrialStatus () {
+      return this.currentCompany?.trial_status
     },
 
     pageClass () {
@@ -937,7 +944,10 @@ export default {
       if (this.profile && user.id === this.profile.id) {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
-        console.log('Changed agent status [event]: ', user.agent_status)
+
+        if (!this.isSessionRunning) {
+          this.verifyOldAgentStatus(user.agent_status)
+        }
       }
     }
 
@@ -954,10 +964,15 @@ export default {
     this.mainListeners.agentStatusUpdated = (event) => {
       this.updateUserStatus(event)
 
+      console.log('Old Agent Status: ', this.getStatusLabel(this.oldAgentStatus))
       if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
         this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
-        this.setAgentStatus(event.agent_status)
-        console.log('Changed agent status [event]: ', event.agent_status)
+        if (this.oldAgentStatus !== null && !this.isSessionRunning) {
+          return this.verifyOldAgentStatus(true)
+        }
+
+        console.log('Changed agent status [event]: ', this.getStatusLabel(event.agent_status))
+        return this.setAgentStatus(event.agent_status)
       }
     }
 

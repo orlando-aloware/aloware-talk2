@@ -1,5 +1,5 @@
 <template>
-  <div class="no-bg">
+  <div class="no-bg" data-testid="download-button-wrapper">
     <q-btn class="absolute all-pointer-events"
            icon="file_download"
            color="primary"
@@ -10,6 +10,7 @@
            :loading="isLoading"
            :disabled="isLoading"
            v-if="!isSimple && !isSimpleAttachment && hasFilenameExtension"
+           data-testid="download-button-btn"
            @click="onDownload(false)" />
     <q-btn-dropdown class="download-dropdown absolute all-pointer-events"
                     icon="file_download"
@@ -21,6 +22,7 @@
                     :style="buttonStyle"
                     :loading="isLoading"
                     :disabled="isLoading"
+                    data-testid="download-button-btn-dropdown"
                     v-if="!isSimple && !isSimpleAttachment && !hasFilenameExtension">
       <portal-target :name="uniqueIdentifier"/>
     </q-btn-dropdown>
@@ -40,9 +42,11 @@
              :loading="isLoading"
              :disabled="isLoading"
              v-if="hasFilenameExtension"
+             data-testid="download-button-download-btn"
              @click="onDownload(false)">
         <download-icon height="16"
-                       width="16">
+                       width="16"
+                       data-testid="download-button-download-icon">
         </download-icon>
       </q-btn>
       <q-btn-dropdown color="download-dropdown text-dark-greenish"
@@ -55,29 +59,33 @@
                       no-icon-animation
                       :loading="isLoading"
                       :disabled="isLoading"
+                      data-testid="download-button-btn-dropdown"
                       v-if="!hasFilenameExtension">
         <download-icon height="16"
-                       width="16">
+                       width="16"
+                       data-testid="download-button-download-icon">
         </download-icon>
         <portal-target :name="uniqueIdentifier"/>
       </q-btn-dropdown>
     </div>
     <a role="button"
        v-if="isSimpleAttachment && !isSimple"
+       data-testid="download-button-a-link"
        @click.prevent="onDownload(false)">
       <div class="py-2 text-right">
-        <file-icon width="100" height="100" />
+        <file-icon width="100" height="100" data-testid="download-button-file-icon"/>
         <p class="mb-0 mt-2"
            style="font-size:.7rem;word-break: break-all;">
           {{ newFilename }}
         </p>
       </div>
     </a>
-    <portal :to="uniqueIdentifier">
+    <portal :to="uniqueIdentifier" data-testid="download-button-portal">
       <q-list>
         <q-item class="p-2"
                 clickable
                 v-close-popup
+                data-testid="download-button-portal-item"
                 @click="onDownload(true)">
           <q-item-section>
             <q-item-label>Direct download</q-item-label>
@@ -87,6 +95,7 @@
         <q-item class="p-2"
                 clickable
                 v-close-popup
+                data-testid="download-button-popen-in-browser-item"
                 @click="onOpenBrowserTab(false)">
           <q-item-section>
             <q-item-label>Open in a new browser tab</q-item-label>

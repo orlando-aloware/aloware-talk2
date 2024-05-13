@@ -1,14 +1,14 @@
 <template>
-  <div class="mt-4">
+  <div class="mt-4" data-testid="ring-group-rounting-table-wrapper">
     <div class="text-center mb-4">
-      <arrow-down-icon></arrow-down-icon>
+      <arrow-down-icon data-testid="ring-group-rounting-table-arrow-down-icon"></arrow-down-icon>
     </div>
-    <q-card flat bordered class="my-card">
-      <q-card-section>
+    <q-card flat bordered class="my-card" data-testid="ring-group-rounting-table-card">
+      <q-card-section data-testid="ring-group-rounting-table-card-section">
         <div class="text-h6 text-center">Layer {{ layer.layer }}</div>
       </q-card-section>
 
-      <q-card-section class="text-center">
+      <q-card-section class="text-center" data-testid="ring-group-rounting-table-card-section">
         <q-table
           hide-pagination
           class="ring-group-snapshot-table"
@@ -16,14 +16,16 @@
           row-key="user"
           :data="rows"
           :columns="columns"
+          data-testid="ring-group-rounting-table-table"
         >
 
           <template v-slot:header="props">
-            <q-tr :props="props">
+            <q-tr :props="props" data-testid="ring-group-rounting-table-tr">
               <q-th
                 v-for="col in props.cols"
                 :key="col.name"
                 :props="props"
+                data-testid="ring-group-rounting-table-th"
               >
                 {{ col.label }}
               </q-th>
@@ -31,9 +33,10 @@
           </template>
 
           <template v-slot:body="props">
-            <q-tr :props="props">
+            <q-tr :props="props" data-testid="ring-group-rounting-table-tr">
               <q-td
                 v-for="col in props.cols"
+                data-testid="ring-group-rounting-table-td"
                 :key="col.name"
                 :props="props"
                 :class="[col.name === 'user' ? 'cursor-pointer' : '']"
@@ -43,6 +46,7 @@
                   <span>
                     <b-badge v-if="col.name === 'status'"
                              class="fs-12"
+                             data-testid="ring-group-rounting-table-badge"
                              :variant="col.value === 'Available' ? 'success' : 'danger'">
                       {{ col.value }}
                     </b-badge>
@@ -55,18 +59,21 @@
 
               </q-td>
             </q-tr>
-            <q-tr v-show="props.expand" :props="props">
-              <q-td></q-td>
-              <q-td></q-td>
-              <q-td colspan="100%" class="text-left">
-                <ul class="list-unstyled">
+            <q-tr v-show="props.expand" :props="props" data-testid="ring-group-rounting-table-tr">
+              <q-td data-testid="ring-group-rounting-table-td"></q-td>
+              <q-td data-testid="ring-group-rounting-table-td"></q-td>
+              <q-td data-testid="ring-group-rounting-table-td" colspan="100%" class="text-left">
+                <ul class="list-unstyled" data-testid="ring-group-rounting-table-ul">
                   <li v-for="result in props.row.results"
+                      data-testid="ring-group-rounting-table-li"
                       :key="result.key">
                     <i v-if="result.value"
+                       data-testid="ring-group-rounting-table-i-check"
                        class="material-icons text-dark-greenish">
                       check
                     </i>
                     <i v-else
+                       data-testid="ring-group-rounting-table-i-close"
                        class="material-icons text-danger">
                       close
                     </i>

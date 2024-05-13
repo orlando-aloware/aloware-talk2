@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Custom Keywords section. -->
-    <h2 class="mt-4 mb-1 text-dark">Custom Keywords Frequency</h2>
+    <h2 class="mt-4 mb-1 text-dark" data-testid="comm-custom-keywords-section">Custom Keywords Frequency</h2>
     <hr class="my-1">
     <!-- Sanity check. -->
     <div v-if="!isEmpty(customKeywords)">
@@ -15,6 +15,7 @@
                   color="amber-2"
                   text-color="white"
                   dense
+                  data-testid="comm-custom-keywords-section-chip"
                   :key="idx"
                   v-for="(keyword, idx) in Object.keys(customKeywords[speaker])">
             {{ keyword | ucfirst }}<span class="ml-1 text-grey-30">{{ ` x ${customKeywords[speaker][keyword]}` }}</span>
@@ -28,7 +29,8 @@
       <span>
         We couldn't find any custom keywords in this call. For more information please check
         <a style="color: blue"
-            href="https://support.aloware.com/en/articles/9037887-frequently-asked-questions-smart-transcription">
+           data-testid="comm-custom-keywords-section-this-article-link"
+           href="https://support.aloware.com/en/articles/9037887-frequently-asked-questions-smart-transcription">
           this article.
         </a>
       </span>

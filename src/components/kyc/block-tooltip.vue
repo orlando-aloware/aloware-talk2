@@ -76,9 +76,7 @@ export default {
     customMessage () {
       const status = this.currentKycStatus
       const action = this.textForTask
-      const url = process.env.APP_URL ?? ''
-      const companyId = this.currentCompany.id
-      const link = url ? `${url}business-information-registration/${companyId}` : '#'
+      const link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
       let message = ''
 
       if (this.task === 'text' && this.isTrialKYC) {

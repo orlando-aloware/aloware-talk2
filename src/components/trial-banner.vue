@@ -167,17 +167,6 @@ export default {
       window.open('https://meetings.hubspot.com/alwr/aloware-demo', '_blank')
     },
 
-    onOpenFinishRegistration () {
-      if (this.$router.currentRoute.name === 'Business Information') {
-        return
-      }
-
-      this.$router.push({
-        name: 'Business Information',
-        params: { company_id: this.currentCompany.id }
-      })
-    },
-
     onOpenRegistrationInReview () {
       window.location.href = this.classicUrlCompliancePage
     },
