@@ -1,5 +1,6 @@
 <template>
   <section class="transcription chat-area"
+           data-testid="comm-conversation-section"
            ref="chatArea">
     <div v-if="!isEmpty(messages)">
       <div :key="message_index"
@@ -10,6 +11,7 @@
           Also, we need to change the background color based on the message sentiment.
         -->
         <p class="message-box break-word"
+           data-testid="comm-conversation-section-message-box"
            :class="message.classes.messageBoxClass"
            :style="{ border: message.sentimentBorder }">
           <strong>Speaker: {{ message.speaker }}</strong>
@@ -21,6 +23,7 @@
 
         <!-- Show the speaker's sentiment below each message. -->
         <span class="sentiment flex items-center justify-start"
+              data-testid="comm-conversation-section-speaker-sentiment"
               :class="message.classes.sentimentClass">
           <span class="sentiment-circle"
                 :style="{ background: message.sentimentBackgroundColor }" />
@@ -32,7 +35,7 @@
     <!-- If no conversation was detected. -->
     <div class="text-center"
          v-else>
-      <span>No Conversation</span>
+      <span data-testid="comm-conversation-section-no-conversation">No Conversation</span>
     </div>
   </section>
 </template>

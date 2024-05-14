@@ -241,7 +241,7 @@ export default {
     }
 
     this.dialerListeners.answerCallFishing = (data) => {
-      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
+      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup, data.middleOfPowerDialer)
     }
 
     this.dialerListeners.setInputDevice = (inputDevice) => {
@@ -298,6 +298,7 @@ export default {
 
       if (this.dialer.isReady) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
+        console.warn('[UNREGISTERED] Twilio token', this.dialer.token)
         this.setDialerIsReady(false)
         this.setDialerCurrentStatus('OFFLINE')
       }
@@ -459,11 +460,24 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
     },
 
-    forceRefreshCommunication () {
-      return this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
+    async forceRefreshCommunication (isFishingMode = false) {
+      let communication = null
+
+      await new Promise(resolve => {
+        const interval = setInterval(() => {
+          console.log('Trying to get callSid...', this.dialer?.call?.callSid)
+          if (this.dialer?.call?.callSid) {
+            communication = this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true, isFishingMode)
+            clearInterval(interval)
+            resolve()
+          }
+        }, 1000)
+      })
+
+      return communication
     },
 
-    getCommunication (sid, from, getCommunicationTry = 1, force = false) {
+    getCommunication (sid, from, getCommunicationTry = 1, force = false, isFishingMode = false) {
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {
@@ -501,7 +515,8 @@ export default {
         // seconds, which is being prevented here:
         if (routeTitle && this.activeTask &&
           routeTitle === 'Power Dialer Sessions' &&
-          this.activeTask.id !== res.data.contact_id) {
+          this.activeTask.id !== res.data.contact_id &&
+          !isFishingMode) {
           return Promise.resolve()
         }
 
@@ -510,12 +525,9 @@ export default {
         // if in power dialer session, we must match the active task (contact)'s id
         // with the communication's contact id
         // else, set the contact.
-        if ((routeTitle &&
-            this.activeTask &&
-            routeTitle === 'Power Dialer Sessions' &&
-            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
-          (routeTitle !== 'Power Dialer Sessions' &&
-            this.dialer.communication.contact)) {
+        const isPowerDialerSameContact = routeTitle && this.activeTask && routeTitle === 'Power Dialer Sessions' && (parseInt(this.activeTask.id) === parseInt(res.data.contact_id) || isFishingMode)
+
+        if (isPowerDialerSameContact || (routeTitle !== 'Power Dialer Sessions' && this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
         }
 
@@ -1435,7 +1447,7 @@ export default {
       err.code = error.code
       error.token = this.dialer.token
 
-      console.log(error)
+      console.error(error)
 
       // 31000 => General Twilio Client error.
       // 31005 => WebSocket connection to Twilio's signaling servers were unexpectedly ended. If this is happening consistently,
@@ -1474,12 +1486,26 @@ export default {
       this.setDialerCurrentStatus('READY')
     },
 
-    answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+    answerCallFishing (communication, shouldPark = false, shouldHangup = false, middleOfPowerDialer = false) {
       this.setShowIncomingCallNotification(false)
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
           name: 'Phone'
+        })
+      }
+
+      // if the call is being answered in the middle of a power dialer session
+      if (middleOfPowerDialer) {
+        console.log('Asking to toggle pause power dialer session')
+        this.$VueEvent.fire('pauseSessionForFishingModeCall')
+        // regardless of the result, we need to refresh the communication of the dialer
+        // https://lodash.com/docs/4.17.15#defer
+        _.defer(() => {
+          setTimeout(() => {
+            console.log('Refreshing communication')
+            this.forceRefreshCommunication(true)
+          }, 1000)
         })
       }
 
@@ -1532,7 +1558,6 @@ export default {
       'setDialerWrapUpTimer',
       'setDialerParkedCallDuration',
       'setDialerParkedCallTimer',
-      'setOldAgentStatus',
       'setWarnings',
       'setShouldIntroduce',
       'setAddedParty',

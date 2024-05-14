@@ -1,20 +1,21 @@
 <template>
-  <div>
-    <b-form class="inbox-channel-filter-form">
+  <div data-testid="filter-form-wrapper">
+    <b-form class="inbox-channel-filter-form" data-testid="filter-form-quick-access-form">
       <b-container>
         <div v-if="$route.name === 'Inbox' || !isMentionsChannel || isFilterDialogForView">
           <h5 class="section-header">Quick Access</h5>
-          <b-form-row class="mt-2 quick-access">
+          <b-form-row class="mt-2 quick-access" data-testid="filter-form-quick-access-form-row">
             <b-col sm="12"
                    md="6">
-              <b-form-group class="form-label">
+              <b-form-group class="form-label" data-testid="filter-form-quick-access-form-group">
                 <template v-slot:label>
                   <span>{{ dateRangeLabel }}</span>
                   <span class="pl-1"
                         v-if="isInboxOrAllComms || isFilterDialogForView">
                     <information-circle-icon color="#2F80ED"/>
                     <q-tooltip anchor="top middle"
-                               self="center middle">
+                               self="center middle"
+                               data-testid="filter-form-form-tooltip">
                       <span class="text-13">Filter contacts based on last engagement date (last time agent or contact sent an SMS or called)</span>
                     </q-tooltip>
                   </span>
@@ -26,6 +27,7 @@
                                    :ranges="ranges"
                                    :always-show-calendars="true"
                                    :auto-apply="true"
+                                   data-testid="filter-form-date-range-picker"
                                    v-model="dateRange">
                   <template v-slot:input="picker" style="min-width: 350px;">
                     {{ getDateRangeInputLabel(picker) }}
@@ -45,12 +47,13 @@
                                :highlighted="isChanged('campaigns')"
                                :disable="isLineSelectorDisabled"
                                v-model="filter.campaigns"
+                               data-testid="filter-form-line-selector"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'campaigns')">
                 </line-selector>
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row class="mt-2">
+          <b-form-row class="mt-2" data-testid="filter-form-quick-access-form-row">
             <b-col sm="12"
                    md="6"
                    v-if="isInboxOrAllCallsChannel">
@@ -61,6 +64,7 @@
                                      :highlighted="isChanged('ring_groups')"
                                      :generic-multiselect="false"
                                      v-model="filter.ring_groups"
+                                     data-testid="filter-form-ring-group-selector"
                                      @change="(eventPayload) => onFilterChange(eventPayload, 'ring_groups')">
                 </ring-group-selector>
               </b-form-group>
@@ -70,7 +74,7 @@
 
         <div v-if="!isMentionsOrInboxChannel && !isFilterDialogForView">
           <h5 class="mt-4 section-header">Handling</h5>
-          <b-form-row class="mt-2">
+          <b-form-row class="mt-2" data-testid="filter-form-handling-form-row">
             <b-col sm="12"
                    md="6">
               <b-form-group class="form-label"
@@ -79,6 +83,7 @@
                                                   :highlighted="isChanged('direction')"
                                                   :use-input="false"
                                                   v-model="filter.direction"
+                                                  data-testid="filter-form-comm-direction-selector"
                                                   @select="(eventPayload) => onFilterChange(eventPayload, 'direction')">
                 </communication-direction-selector>
               </b-form-group>
@@ -92,6 +97,7 @@
                                         :highlighted="isChanged('answer_status')"
                                         :use-input="false"
                                         v-model="filter.answer_status"
+                                        data-testid="filter-form-answer-status-selector"
                                         @select="(eventPayload) => onFilterChange(eventPayload, 'answer_status')">
                 </answer-status-selector>
               </b-form-group>
@@ -105,6 +111,7 @@
                                     :highlighted="isChanged('min_talk_time')"
                                     :use-input="false"
                                     v-model="filter.min_talk_time"
+                                    data-testid="filter-form-talk-time-selector"
                                     @select="(eventPayload) => onFilterChange(eventPayload, 'min_talk_time')">
                 </talk-time-selector>
               </b-form-group>
@@ -118,6 +125,7 @@
                                         :highlighted="isChanged('transfer_type')"
                                         :use-input="false"
                                         v-model="filter.transfer_type"
+                                        data-testid="filter-form-transfer-type-selector"
                                         @select="(eventPayload) => onFilterChange(eventPayload, 'transfer_type')">
                 </transfer-type-selector>
               </b-form-group>
@@ -132,6 +140,7 @@
                                           :highlighted="isChanged('callback_status')"
                                           :use-input="false"
                                           v-model="filter.callback_status"
+                                          data-testid="filter-form-callback-status-selector"
                                           @select="(eventPayload) => onFilterChange(eventPayload, 'callback_status')">
                 </callback-status-selector>
               </b-form-group>
@@ -141,7 +150,7 @@
 
         <div v-if="!isMentionsChannel || isFilterDialogForView">
           <h5 class="mt-4 section-header">Properties</h5>
-          <b-form-row class="mt-2">
+          <b-form-row class="mt-2" data-testid="filter-form-properties-form-row">
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
@@ -172,7 +181,7 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row v-if="!isInboxOrInboxViews">
+          <b-form-row v-if="!isInboxOrInboxViews" data-testid="filter-form-properties-form-row">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -237,7 +246,7 @@
             </b-col>
 
           </b-form-row>
-          <b-form-row v-if="isInboxOrInboxViews">
+          <b-form-row v-if="isInboxOrInboxViews" data-testid="filter-form-properties-form-row">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -248,6 +257,7 @@
                                    switch
                                    :value="1"
                                    :unchecked-value="0"
+                                   data-testid="filter-form-properties-form-checkbox"
                                    v-model="filter.has_unread">
                   </b-form-checkbox>
                 </div>
@@ -258,7 +268,7 @@
 
         <div v-if="isInboxOrInboxViews">
           <h5 class="mt-4 section-header">Has Communicated Within</h5>
-          <b-form-row class="mt-2">
+          <b-form-row class="mt-2" data-testid="filter-form-has-communicated-within-form-row">
             <b-col sm="12"
                      md="6">
               <b-form-group class="form-label">
@@ -267,7 +277,8 @@
                   <span class="pl-1">
                     <information-circle-icon color="#2F80ED"/>
                     <q-tooltip anchor="top middle"
-                               self="center middle">
+                               self="center middle"
+                               data-testid="filter-form-has-communicated-within-form-tooltip">
                       <span class="text-13">Filter based on the last communication date; always  dynamic based on the selected relative period</span>
                     </q-tooltip>
                   </span>
@@ -283,6 +294,7 @@
                           dense
                           outlined
                           :options="relativeRanges"
+                          data-testid="filter-form-has-communicated-within-form-select"
                           v-model="filter.dynamic_engagement_date_range" />
               </b-form-group>
             </b-col>
@@ -291,7 +303,7 @@
 
         <div>
           <h5 class="mt-4 section-header">Attribution</h5>
-          <b-form-row class="mt-2">
+          <b-form-row class="mt-2" data-testid="filter-form-attributions-form-row">
             <b-col sm="12"
                    md="6"
                    v-if="!isMentionsOrInboxChannel">
@@ -301,6 +313,7 @@
                                           :use-chips="true"
                                           :highlighted="isChanged('incoming_numbers')"
                                           v-model="filter.incoming_numbers"
+                                          data-testid="filter-form-incoming-number-selector"
                                           @change="(eventPayload) => onFilterChange(eventPayload, 'incoming_numbers')">
                 </incoming-number-selector>
               </b-form-group>
@@ -310,7 +323,7 @@
                    v-if="isInboxOrAllCallsChannel || isMessagesOnlyChannel">
               <b-form-group class="form-label">
                 <template v-slot:label>
-                  <span>Communication Owners</span>
+                  <span data-testid="filter-form-communication-owners-row">Communication Owners</span>
                   <span class="pl-1">
                     <information-circle-icon color="#2F80ED"/>
                     <q-tooltip anchor="top middle"
@@ -337,6 +350,7 @@
                                :multiple="true"
                                :use-chips="true"
                                :highlighted="isChanged('users')"
+                               data-testid="filter-form-user-selector"
                                v-model="filter.users"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'users')">
                 </user-selector>
@@ -371,6 +385,7 @@
                                :clearable="false"
                                :disable="disableContactOwner"
                                v-model="filter.contact_owner"
+                               data-testid="filter-form-user-selector"
                                @change="(eventPayload) => onFilterChange(eventPayload, 'contact_owner')">
                 </user-selector>
               </b-form-group>
@@ -385,6 +400,7 @@
                                     :use-chips="true"
                                     :highlighted="isChanged('broadcasts')"
                                     v-model="filter.broadcasts"
+                                    data-testid="filter-form-broadcast-selector"
                                     @change="(eventPayload) => onFilterChange(eventPayload, 'broadcasts')">
                 </broadcast-selector>
               </b-form-group>

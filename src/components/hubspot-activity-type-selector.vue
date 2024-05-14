@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full flex-grow-1">
+  <div class="w-full flex-grow-1" data-testid="hubspot-activity-type-selector-wrapper">
     <multiselect class="chip__clear-blue shrink-options options__no-border options__relative b-radius__equal"
                  open-direction="bottom"
                  placeholder="Select Activity Type"
@@ -20,6 +20,7 @@
                  :class="selectClass"
                  v-model="activityType"
                  v-if="activityTypes"
+                 data-testid="hubspot-activity-type-selector-multiselect"
                  @open="onSelectOpen"
                  @close="onSelectClose"
                  @input="changeActivityType">
@@ -28,7 +29,7 @@
           <span class="option__small ml-2">{{ props.option }}</span>
         </div>
       </template>
-      <span slot="noResult">
+      <span slot="noResult" data-testid="hubspot-activity-type-selector-not-found">
         No activity types found.
       </span>
     </multiselect>

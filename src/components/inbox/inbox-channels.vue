@@ -1,5 +1,5 @@
 <template>
-    <div class="w-100 h-100 d-flex flex-column">
+    <div class="w-100 h-100 d-flex flex-column" data-testid="inbox-channels-wrapper">
       <div class="header w-100"
            :class="{ 'border-bottom-transparent': isSearch }"
            v-if="$route.params.channel !== 'mentions'">
@@ -7,6 +7,7 @@
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isGettingTasksList"
                             :search-icon-color="searchIconColor"
+                            data-testid="inbox-channels-inbox-searcher"
                             @search="onSearch"
                             @closed="onSearchClosed"
                             @opened="onSearchOpened">
@@ -20,25 +21,30 @@
                            borderless
                            :variant="filterButtonVariant"
                            v-if="hasChannelFilterChanges"
+                           data-testid="inbox-channels-reset-filters-btn"
                            @clicked="onResetFilters">
                 <i class="fa fa-times"></i>
               </compact-btn>
               <compact-btn customClass="pl-0 pr-0 fs-14 _500 position-relative text-grey-90 not-focusable filter-toggle-button"
                            borderless
+                           data-testid="inbox-channels-apply-filters"
                            @clicked="onClickAppliedFilterButton">
                 <q-tooltip anchor="top middle"
                            self="center middle"
+                           data-testid="inbox-channels-apply-filters-tooltip"
                            v-if="appliedFilter">
                   {{ appliedFilter.name }}
                 </q-tooltip>
                 <filter-icon color="#62666E"
                              class="filter-icon"
+                             data-testid="inbox-channels-filter-icon"
                              v-if="!appliedFilter && channelChangedFilterFields.length < 1">
                 </filter-icon> {{ appliedFilterName }}
                 {{ filtersText }}
               </compact-btn>
               <b-badge class="ml-1 fs-12"
                        variant="primary"
+                       data-testid="inbox-channels-filter-badge"
                        v-if="hasChannelFilterChanges"
                        v-b-modal:inbox-channel-filter-modal>
                 {{ changedFilterFieldCount }}
@@ -53,6 +59,7 @@
                     :options="optionsRight"
                     :append="[{icon: 'ion-ios-arrow-down'}]"
                     v-model="filterRight"
+                    data-testid="inbox-channels-sort-filter-select"
                     @input="sortFilter">
           </q-select>
         </div>
@@ -63,7 +70,7 @@
           <div class="mentions-filter-actions-wrapper inbox-tab--filter pr-1 d-inline-flex">
             <div class="filter-wrapper">
               <div class="position-absolute filter-icon">
-                <filter-icon />
+                <filter-icon data-testid="inbox-channels-filter-icon"/>
               </div>
               <user-selector custom-placeholder="Filter by User"
                              :clearable="true"
@@ -71,6 +78,7 @@
                              :outlined="false"
                              :borderless="true"
                              :value="mentionUserId"
+                             data-testid="inbox-channels-user-selector"
                              @change="userMentionSelected">
               </user-selector>
             </div>
@@ -83,6 +91,7 @@
                     :options="optionsRight"
                     :append="[{icon: 'ion-ios-arrow-down'}]"
                     v-model="filterRight"
+                    data-testid="inbox-channels-sort-filter-select"
                     @input="sortFilter">
           </q-select>
         </div>
@@ -99,6 +108,7 @@
                       dense
                       :options="mentionTypeOptions"
                       v-model="mentionType"
+                      data-testid="inbox-channels-mention-toggle"
                       @click="toggleMentionType">
           <template v-slot:one>
             <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
@@ -111,7 +121,8 @@
 
           <template v-slot:two>
             <div class="d-flex justify-content-center align-items-center w-100 px-1 options"
-                 :class="sentTabClass">
+                 :class="sentTabClass"
+                 data-testid="inbox-channels-sent-div">
                 <span class="text-left">
                   Sent
                 </span>
@@ -121,52 +132,62 @@
       </div>
       <search-toggle ref="searchToggle"
                      v-if="isSearch"
+                     data-testid="inbox-channels-search-toggle"
                      @searching="searching"
                      @closed="onSearchClosed">
       </search-toggle>
       <div class="h-100 w-100 flex-grow-1 scroll-y task-list-scroller"
+           data-testid="inbox-channels-handle-scroll"
            @scroll="handleScroll">
         <task-list :communications="communications"
                    :answer-status="answerStatus"
                    :channel="channel"
                    :search-text="searchText"
+                   data-testid="inbox-channels-task-list"
                    v-if="!isGettingTasksList && $route.params.channel !== 'mentions' && communications.length">
         </task-list>
         <task-mention-list :communications="communications"
                            :direction="mentionType"
                            :search-text="searchText"
+                           data-testid="inbox-channels-task-mention-list"
                            v-if="!isGettingTasksList && $route.params.channel === 'mentions' && communications.length">
         </task-mention-list>
         <div :class="spinnerClass">
           <b-overlay rounded="sm"
-                     :show="isLoadingMore || isGettingTasksList">
+                     :show="isLoadingMore || isGettingTasksList"
+                     data-testid="inbox-channels-overlay">
             <template #overlay>
               <q-spinner-bars color="primary"
-                              size="2em"/>
+                              size="2em"
+                              data-testid="inbox-channels-spinners-bars"/>
             </template>
           </b-overlay>
         </div>
         <div class="text-center mt-3"
-             v-if="hasNoData">
+             v-if="hasNoData"
+             data-testid="inbox-channels-no-data-found">
           No data found based on the given filter criteria
         </div>
         <div class="text-center mt-3"
-             v-if="communicationsListHasError">
+             v-if="communicationsListHasError"
+             data-testid="inbox-channels-unable-to-fetch">
           Unable to fetch {{ $route.params.channel !== 'mentions' ? 'communications' : 'mentions' }}.
           <br/>
           <b-btn variant="primary"
                  class="mt-3"
                  size="sm"
+                 data-testid="inbox-channels-retry-btn"
                  @click="getCommunications(filter)">Retry</b-btn>
         </div>
       </div>
       <filter-dialog :default-filter-model="channelDefaultFilterModel"
                      v-model="filter"
+                     data-testid="inbox-channels-filter-dialog"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
                      @onResetFilter="resetFilters">
       </filter-dialog>
-      <create-filter-dialog :filter-model="newFilterModel" />
+      <create-filter-dialog :filter-model="newFilterModel" data-testid="inbox-channels-create-filter-dialog"/>
     </div>
 </template>
 

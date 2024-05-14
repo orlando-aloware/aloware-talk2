@@ -1,12 +1,12 @@
 <template>
-  <div class="inbox-wrapper border-right">
+  <div class="inbox-wrapper border-right" data-testid="inbox-side-wrapper">
     <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
-        <back-button @click="back"/>
+        <back-button data-testid="inbox-side-back-btn" @click="back"/>
         <span class="truncated-text"
               v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
-        <inbox-my-contacts-filter />
+        <inbox-my-contacts-filter data-testid="inbox-side-my-contacts-filter"/>
       </div>
       <profile class="p-0"
                :hide-profile-info="true"/>
@@ -21,6 +21,7 @@
                             :pendingCount="inboxTaskCounts.pending"
                             :value.sync="active"
                             v-model="active"
+                            data-testid="inbox-side-nav-list"
                             @active="newActive"
                             @toInbox="navigateToInbox">
             </inbox-nav-list>
@@ -32,6 +33,7 @@
         <!-- Inbox Tab (Inbox/Inbox View) UI -->
         <inbox-tab :search-text="searchText"
                    v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
+                   data-testid="inbox-side-inbox-tab"
                    @itemSelected="onItemSelected" />
 
         <!-- Channels (Communications) UI -->
@@ -41,6 +43,7 @@
                         :channel="activeChannel?.value"
                         :search-text="searchText"
                         :sort="sort"
+                        data-testid="inbox-side-inbox-channels"
                         v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
       </div>
     </div>
