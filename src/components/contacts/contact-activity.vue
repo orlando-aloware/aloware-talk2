@@ -365,7 +365,7 @@ import {
   avatarMixin,
   userMixin
 } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -475,15 +475,13 @@ export default {
 
   computed: {
     ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources']),
-    ...mapState('cache', [
-      'currentCompany',
-      'isContactStatusControlEnabled'
-    ]),
+    ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     ...mapState('inbox', [
       'communications',
       'channelChangedFilterFields'
     ]),
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
     getCommunicationClass () {
       if (this.communication.current_status2 === undefined) {
@@ -543,7 +541,11 @@ export default {
     },
 
     isTaskStatusLogsDisabled () {
-      return !this.isContactStatusControlEnabled ? true : (this.currentCompany.hasOwnProperty('task_status_logs') && !this.currentCompany.task_status_logs)
+      if (this.isContactStatusControlEnabled !== undefined) {
+        return !this.isContactStatusControlEnabled || (this.currentCompany.hasOwnProperty('task_status_logs') && !this.currentCompany.task_status_logs)
+      }
+
+      return (this.currentCompany.hasOwnProperty('task_status_logs') && !this.currentCompany.task_status_logs)
     }
   },
 
@@ -587,10 +589,6 @@ export default {
     },
 
     getContactTaskAllowedStatuses () {
-      if (!this.isContactStatusControlEnabled) {
-        return []
-      }
-
       return [
         ContactTaskStatus.STATUS_NEW,
         ContactTaskStatus.STATUS_OPEN,
