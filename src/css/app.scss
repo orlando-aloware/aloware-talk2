@@ -9738,6 +9738,9 @@ screen and (max-width: 956px) {
       }
     }
   }
+  .notification-container-header {
+    display: none !important;
+  }
 }
 
 @media (min-width: 605px) and (max-width: 780px),
