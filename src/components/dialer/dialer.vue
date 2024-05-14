@@ -241,7 +241,7 @@ export default {
     }
 
     this.dialerListeners.answerCallFishing = (data) => {
-      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup, data.middleOfPowerDialer)
+      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
     }
 
     this.dialerListeners.setInputDevice = (inputDevice) => {
@@ -460,24 +460,11 @@ export default {
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
     },
 
-    async forceRefreshCommunication (isFishingMode = false) {
-      let communication = null
-
-      await new Promise(resolve => {
-        const interval = setInterval(() => {
-          console.log('Trying to get callSid...', this.dialer?.call?.callSid)
-          if (this.dialer?.call?.callSid) {
-            communication = this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true, isFishingMode)
-            clearInterval(interval)
-            resolve()
-          }
-        }, 1000)
-      })
-
-      return communication
+    forceRefreshCommunication () {
+      return this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
     },
 
-    getCommunication (sid, from, getCommunicationTry = 1, force = false, isFishingMode = false) {
+    getCommunication (sid, from, getCommunicationTry = 1, force = false) {
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {
@@ -515,8 +502,7 @@ export default {
         // seconds, which is being prevented here:
         if (routeTitle && this.activeTask &&
           routeTitle === 'Power Dialer Sessions' &&
-          this.activeTask.id !== res.data.contact_id &&
-          !isFishingMode) {
+          this.activeTask.id !== res.data.contact_id) {
           return Promise.resolve()
         }
 
@@ -525,9 +511,12 @@ export default {
         // if in power dialer session, we must match the active task (contact)'s id
         // with the communication's contact id
         // else, set the contact.
-        const isPowerDialerSameContact = routeTitle && this.activeTask && routeTitle === 'Power Dialer Sessions' && (parseInt(this.activeTask.id) === parseInt(res.data.contact_id) || isFishingMode)
-
-        if (isPowerDialerSameContact || (routeTitle !== 'Power Dialer Sessions' && this.dialer.communication.contact)) {
+        if ((routeTitle &&
+            this.activeTask &&
+            routeTitle === 'Power Dialer Sessions' &&
+            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+          (routeTitle !== 'Power Dialer Sessions' &&
+            this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
         }
 
@@ -1486,26 +1475,12 @@ export default {
       this.setDialerCurrentStatus('READY')
     },
 
-    answerCallFishing (communication, shouldPark = false, shouldHangup = false, middleOfPowerDialer = false) {
+    answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
       this.setShowIncomingCallNotification(false)
 
       if (this.isMobile && this.$route.name !== 'Phone') {
         this.$router.push({
           name: 'Phone'
-        })
-      }
-
-      // if the call is being answered in the middle of a power dialer session
-      if (middleOfPowerDialer) {
-        console.log('Asking to toggle pause power dialer session')
-        this.$VueEvent.fire('pauseSessionForFishingModeCall')
-        // regardless of the result, we need to refresh the communication of the dialer
-        // https://lodash.com/docs/4.17.15#defer
-        _.defer(() => {
-          setTimeout(() => {
-            console.log('Refreshing communication')
-            this.forceRefreshCommunication(true)
-          }, 1000)
         })
       }
 
