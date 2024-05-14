@@ -30,18 +30,12 @@ export default {
       active: '',
       toggleFolders: true,
       isIntegrationImportDialogOpen: false,
-      notification: null,
-      minimunContacts: 100
+      notification: null
     }
   },
 
   computed: {
-    ...mapGetters('auth', ['profile']),
-
-    isMyQueue () {
-      return this.$route.meta.id === 'power-dialer' ||
-        this.$route.meta.id === 'power-dialer-queue-filter'
-    }
+    ...mapGetters('auth', ['profile'])
   },
 
   mounted () {
@@ -126,25 +120,13 @@ export default {
         summary: event?.summary ?? []
       })
 
-      const path = `/power-dialer/list/${event.contact_list.id}/in-queue`
-
-      // Do not show notification when user is not leaving PD queue or
-      // the imported list has less than 100 contacts. In both cases
-      // we should just go to the imported list and see the popup summary
-      if (this.isMyQueue || event?.summary?.pull_contacts_count < this.minimunContacts) {
-        this.$router.push({
-          path: path
-        })
-        return
-      }
-
       this.$generalNotification(
         'Success! Your power dialer queue import is ready.',
         'redirect',
         0,
         false,
         {
-          path: path
+          path: `/power-dialer/list/${event.contact_list.id}/in-queue`
         })
     }
   },
