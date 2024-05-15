@@ -40,9 +40,9 @@
             Move to Pending
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           :disable="isUpdatingStatus"
-                           v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && isContactStatusControlEnabled"
                            data-testid="contact-activities-close-item"
+                           :disable="isUpdatingStatus"
+                           v-if="shouldDisplayContact"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
             <check-o-icon class="dropdown-icon"></check-o-icon>
             Close
@@ -112,17 +112,16 @@
                           size="20px"
           />
         </q-btn>
-        <q-btn
-          v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && isContactStatusControlEnabled"
-          borderless
-          flat
-          no-caps
-          type="a"
-          color="primary"
-          class="text-decoration-none"
-          :disable="isUpdatingStatus"
-          data-testid="contact-activities-reopen-btn"
-          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
+        <q-btn borderless
+               flat
+               no-caps
+               type="a"
+               color="primary"
+               class="text-decoration-none"
+               :disable="isUpdatingStatus"
+               data-testid="contact-activities-reopen-btn"
+               @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)"
+               v-if="shouldDisplayClosedOrPendingContact">
           <q-tooltip anchor="top middle"
                      self="center middle">
             Reopen
@@ -138,7 +137,6 @@
           />
         </q-btn>
         <q-btn
-          v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status) && isContactStatusControlEnabled"
           borderless
           flat
           no-caps
@@ -147,7 +145,8 @@
           class="text-decoration-none"
           :disable="isUpdatingStatus"
           data-testid="contact-activities-close-btn"
-          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
+          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)"
+          v-if="shouldDisplayContact">
           <q-tooltip anchor="top middle"
                      self="center middle">
             Close
@@ -237,6 +236,14 @@ export default {
       set (activityContact) {
         return activityContact
       }
+    },
+
+    shouldDisplayContact () {
+      return [ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.contact?.task_status) && this.isContactStatusControlEnabled
+    },
+
+    shouldDisplayClosedOrPendingContact () {
+      return [ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(this.contact?.task_status) && this.isContactStatusControlEnabled
     }
   },
   data () {

@@ -1,6 +1,6 @@
 <template>
   <div class="message p-3 pb-1 d-flex flex-row align-items-start" data-testid="contact-activity-wrapper"
-       v-if="(communication.property !== undefined && !excluded_audits.includes(communication.property)) || (communication.property === undefined)"
+       v-if="shouldDisplayCommunication"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
     <div class="d-flex flex-row align-items-center position-relative"
          v-if="communication.property === undefined">
@@ -546,6 +546,10 @@ export default {
       }
 
       return (this.currentCompany.hasOwnProperty('task_status_logs') && !this.currentCompany.task_status_logs)
+    },
+
+    shouldDisplayCommunication () {
+      return (this.communication.property !== undefined && !this.excluded_audits.includes(this.communication.property)) || this.communication.property === undefined
     }
   },
 
