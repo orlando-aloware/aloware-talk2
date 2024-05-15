@@ -1434,14 +1434,6 @@ export default {
       this.toggleHold = true
     },
 
-    pauseSessionForFishingModeCall () {
-      // pause the session
-      this.togglePause = true
-      this.sessionPaused = true
-      // notify the user that the session is paused and should be resumed manually
-      this.$generalNotification('The session is paused. Please resume the session after the call manually.')
-    },
-
     manageTaskTransition () {
       const task = this.powerDialerTasks.in_queue.shift()
       this.taskToCall = cloneDeep(task)
