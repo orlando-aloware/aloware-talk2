@@ -743,7 +743,7 @@ export default {
     this.$VueEvent.listen('redial_task', this.requeueTask)
     this.$VueEvent.listen('holdFailed', this.onHoldFailed)
     this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
-    this.$VueEvent.listen('pauseSessionForFishingModeCall', this.pauseSessionForFishingModeCall)
+
     this.isSessionRunning = false
   },
 
@@ -1432,14 +1432,6 @@ export default {
     onUnholdFailed () {
       this.loadingUnhold = false
       this.toggleHold = true
-    },
-
-    pauseSessionForFishingModeCall () {
-      // pause the session
-      this.togglePause = true
-      this.sessionPaused = true
-      // notify the user that the session is paused and should be resumed manually
-      this.$generalNotification('The session is paused. Please resume the session after the call manually.')
     },
 
     manageTaskTransition () {

@@ -242,10 +242,6 @@ export default {
   computed: {
     ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState('powerDialer', [
-      'sessionPaused',
-      'isSessionRunning'
-    ]),
 
     isCall () {
       return ['incomingCall', 'callFishing'].includes(this.id)
@@ -702,11 +698,9 @@ export default {
           contactId: this.contactId,
           phoneNumber: this.phoneNumber
         },
-        middleOfPowerDialer: this.isSessionRunning && !this.sessionPaused,
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
-      // pause the power dialer session
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
       this.setShowPhone(true)
