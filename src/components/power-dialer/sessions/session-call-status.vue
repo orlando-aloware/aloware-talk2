@@ -743,7 +743,7 @@ export default {
     this.$VueEvent.listen('redial_task', this.requeueTask)
     this.$VueEvent.listen('holdFailed', this.onHoldFailed)
     this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
-    this.$VueEvent.listen('pauseSessionForFishingModeCall', this.pauseSessionForFishingModeCall)
+
     this.isSessionRunning = false
   },
 

@@ -232,7 +232,6 @@ export default {
         if (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) {
           const data = {
             communication: communication,
-            middleOfPowerDialer: false,
             shouldPark: false,
             shouldHangup: false
           }
@@ -353,7 +352,6 @@ export default {
           contactId: this.contact.id,
           phoneNumber: this.contact.phone_number
         },
-        middleOfPowerDialer: false,
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
