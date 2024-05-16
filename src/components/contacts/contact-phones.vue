@@ -7,21 +7,14 @@
       <b-card-body :class="bodyClass" data-testid="contact-phones-body">
         <div class="w-100">
           <h4>All Numbers</h4>
-          <contact-phones-list-items :phones="primaryPhone"
-                                     data-testid="contact-phones-list-items-primary"
+          <contact-phones-list-items :phones="sortedPhones"
+                                     data-testid="contact-phones-list-items"
                                      @edit="onEditPhone"
                                      @delete="onDeletePhone"
                                      @composerMedia="setComposerVariables"
-                                     @call="onCall">
-          </contact-phones-list-items>
-
-          <contact-phones-list-items :phones="otherPhones"
-                                     data-testid="contact-phones-list-items-other"
-                                     @edit="onEditPhone"
-                                     @delete="onDeletePhone"
-                                     @composerMedia="setComposerVariables"
-                                     @call="onCall">
-          </contact-phones-list-items>
+                                     @call="onCall"/>
+          <contact-phones-list-conflicted-items :phones="conflictedPhones"
+                                                data-testid="contact-phones-list-conflicted-items"/>
 
           <b-link ref="phone_form"
                   href="#"
@@ -61,6 +54,7 @@ import PlusCircleIcon from 'components/icons/plus-circle-icon'
 import ContactPhonesListItems from 'src/components/contacts/contact-phones-list-items'
 import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
 import _ from 'lodash'
+import ContactPhonesListConflictedItems from 'components/contacts/contact-phones-list-conflicted-items.vue'
 
 export default {
   name: 'contact-phones',
@@ -75,6 +69,7 @@ export default {
   },
 
   components: {
+    ContactPhonesListConflictedItems,
     ContactPhonesListItems,
     PlusCircleIcon,
     ContactPhonesForm
@@ -83,17 +78,25 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'contact',
-      'contactPhoneNumbers'
+      'contactPhoneNumbers',
+      'conflictedContactPhoneNumbers'
     ]),
 
-    otherPhones () {
-      return this.contactPhoneNumbers.filter(phone => phone.phone_number !== this.contact.phone_number)
+    conflictedPhones () {
+      console.log(this.conflictedContactPhoneNumbers)
+      return this.conflictedContactPhoneNumbers
     },
 
-    primaryPhone () {
-      return this.contact.phone_number === '0'
-        ? []
-        : this.contactPhoneNumbers.filter(phone => phone.phone_number === this.contact.phone_number)
+    sortedPhones () {
+      // Create a copy of the array before sorting
+      let phoneNumbersCopy = [...this.contactPhoneNumbers]
+
+      // move primary phone to the top
+      return phoneNumbersCopy.sort((a, b) => {
+        if (a.phone_number === this.contact.phone_number) return -1
+        if (b.phone_number === this.contact.phone_number) return 1
+        return 0
+      })
     },
 
     bodyClass () {

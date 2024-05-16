@@ -523,6 +523,15 @@ export default {
           this.fetchFailedNotification(err.response)
         })
 
+      // get conflicted contact phone numbers
+      talk2Api.V1.contact.getConflictedPhoneNumbers(contactIdToFetch)
+        .then(response => {
+          this.setConflictedContactPhoneNumbers(response.data)
+        }).catch(err => {
+          console.log(err)
+          this.fetchFailedNotification(err.response)
+        })
+
       // get contact's communication summary
       talk2Api.V1.contact.getCommunicationsSummary(contactIdToFetch)
         .then(response => {
@@ -1367,6 +1376,7 @@ export default {
       'resetChangedContactProperties',
       'updateContacts',
       'setContactPhoneNumbers',
+      'setConflictedContactPhoneNumbers',
       'setSequenceInfoLoading',
       'setSequenceInfo',
       'setLineIncomingNumberLoading',

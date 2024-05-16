@@ -14794,3 +14794,15 @@ h1.contact-list-name-label {
   color: #d0d0d0;
   font-size: 120px
 }
+
+thead.conflicted-contact-thead-class tr th {
+  border-top: none;
+  border-bottom-width: 1px;
+}
+
+.center-modal-header .modal-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}

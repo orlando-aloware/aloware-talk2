@@ -26,6 +26,13 @@
 
         <b-badge variant="danger"
                  class="badge-phone-info"
+                 data-testid="contact-phones-list-items-has-conflict"
+                 v-if="phone.conflicted_contacts.length !== 0">
+          Has conflicts
+        </b-badge>
+
+        <b-badge variant="danger"
+                 class="badge-phone-info"
                  data-testid="contact-phones-list-items-invalid-number-badge"
                  v-if="phone.is_invalid">
           Invalid Number
@@ -39,7 +46,7 @@
         </b-badge>
       </div>
 
-      <div class="d-inline-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center">
         <div class="phone-number m-0">
           {{ phone.phone_number | fixPhone }}
         </div>
@@ -97,6 +104,11 @@
             </b-dropdown-item>
           </b-dropdown>
         </div>
+        <div class="phone-number-duplicates-icon">
+          <contact-phone-number-duplicates
+            v-if="phone.conflicted_contacts.length !== 0"
+            :phone_number="phone" />
+        </div>
       </div>
     </div>
   </div>
@@ -110,6 +122,7 @@ import TextIcon from 'components/icons/text-icon'
 import CallIcon from 'components/icons/call-icon'
 import FaxIcon from 'components/icons/fax-icon'
 import TrashIcon from 'components/icons/trash-icon'
+import ContactPhoneNumberDuplicates from 'components/contacts/contact-phone-number-duplicates'
 
 export default {
   name: 'contact-phones-list-items',
@@ -117,6 +130,7 @@ export default {
   mixins: [aclMixin],
 
   components: {
+    ContactPhoneNumberDuplicates,
     TrashIcon,
     FaxIcon,
     CallIcon,

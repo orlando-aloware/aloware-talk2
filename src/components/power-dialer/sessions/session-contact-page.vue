@@ -83,7 +83,8 @@ export default {
     ...mapActions('contacts', [
       'setContact',
       'setContactClone',
-      'setContactPhoneNumbers'
+      'setContactPhoneNumbers',
+      'setConflictedContactPhoneNumbers'
     ]),
 
     ...mapActions('powerDialer', ['setActiveTask']),
@@ -105,6 +106,16 @@ export default {
       talk2Api.V1.contact.getPhoneNumbers(contactId)
         .then(response => {
           this.setContactPhoneNumbers(response.data)
+        }).catch(err => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+    },
+
+    getConflictedContactPhoneNumbers (contactId) {
+      talk2Api.V1.contact.getConflictedPhoneNumbers(contactId)
+        .then(response => {
+          this.setConflictedContactPhoneNumbers(response.data)
         }).catch(err => {
           console.log(err)
           this.$handleErrors(err.response)
@@ -145,6 +156,7 @@ export default {
           this.$VueEvent.fire('contact_activity_update_contact', res.data)
 
           this.getContactPhoneNumbers(res.data.id)
+          this.getConflictedContactPhoneNumbers(res.data.id)
           this.getContactIntegrationData(res.data)
         }).catch(err => {
           this.$handleErrors(err.response)
