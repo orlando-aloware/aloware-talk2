@@ -1,17 +1,20 @@
 <template>
   <div id="activity-graph"
        class="activity-graph"
-       v-if="graphCanLoad">
+       v-if="graphCanLoad"
+       data-testid="comm-activity-graph-wrapper">
     <div class="activity-graph__header">
       <div>
         <span class="call-log-head"
-              v-if="filter.from_date">
+              v-if="filter.from_date"
+              data-testid="comm-activity-graph-filter-date">
           Communications
           from <strong>{{ filter.from_date | fixFullDateLocal }}</strong>
           to <strong>{{ filter.to_date | fixFullDateLocal }}</strong>
         </span>
         <span class="call-log-head"
-              v-if="!filter.from_date">
+              v-if="!filter.from_date"
+              data-testid="comm-activity-graph-all-time-filter">
           Communications
           <strong>All Time</strong>
         </span>
@@ -26,22 +29,26 @@
                       unelevated
                       dense
                       :options="chartOptions"
-                      v-model="chartType">
+                      v-model="chartType"
+                      data-testid="comm-activity-graph-btn-toggle-type">
           <template v-slot:one>
             <span class="text-grey-90 px-3"
-                  :class="[chartType === 'spline' ? 'text-white' : 'text-grey-90']">
+                  :class="[chartType === 'spline' ? 'text-white' : 'text-grey-90']"
+                  data-testid="comm-activity-graph-spline">
               {{ chartOptions[0].labelValue }}
             </span>
           </template>
           <template v-slot:two>
             <span class="text-grey-90 px-3"
-                  :class="[chartType === 'areaspline' ? 'text-white' : 'text-grey-90']">
+                  :class="[chartType === 'areaspline' ? 'text-white' : 'text-grey-90']"
+                  data-testid="comm-activity-graph-areaspline">
               {{ chartOptions[1].labelValue }}
             </span>
           </template>
           <template v-slot:three>
             <span class="text-grey-90 px-3"
-                  :class="[chartType === 'column' ? 'text-white' : 'text-grey-90']">
+                  :class="[chartType === 'column' ? 'text-white' : 'text-grey-90']"
+                  data-testid="comm-activity-graph-column">
               {{ chartOptions[2].labelValue }}
             </span>
           </template>
@@ -53,20 +60,23 @@
          :class="{ blink: loading }"
          v-if="loading">
       <img src="images/placeholder-number-of-communications.png"
-           class="img-responsive"/>
+           class="img-responsive"
+           data-testid="comm-activity-graph-img-responsive"/>
     </div>
     <div v-else>
       <highstock ref="highchart"
                  :options="options"
                  :style="getStyle"
                  :id="graphId"
-                 v-if="ready && options.series.length > 0">
+                 v-if="ready && options.series.length > 0"
+                 data-testid="comm-activity-graph-highstock">
       </highstock>
       <div class="d-flex justify-content-center align-items-center"
            :style="{ height: '450px' }"
            v-if="isNoData">
         <span class="text-h3 text-weight-medium"
-              :style="{color: '#606266'}">
+              :style="{color: '#606266'}"
+              data-testid="comm-activity-graph-no-data">
           No Data
         </span>
       </div>

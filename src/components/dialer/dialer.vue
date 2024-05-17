@@ -298,6 +298,7 @@ export default {
 
       if (this.dialer.isReady) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
+        console.warn('[UNREGISTERED] Twilio token', this.dialer.token)
         this.setDialerIsReady(false)
         this.setDialerCurrentStatus('OFFLINE')
       }
@@ -1435,7 +1436,7 @@ export default {
       err.code = error.code
       error.token = this.dialer.token
 
-      console.log(error)
+      console.error(error)
 
       // 31000 => General Twilio Client error.
       // 31005 => WebSocket connection to Twilio's signaling servers were unexpectedly ended. If this is happening consistently,
@@ -1532,7 +1533,6 @@ export default {
       'setDialerWrapUpTimer',
       'setDialerParkedCallDuration',
       'setDialerParkedCallTimer',
-      'setOldAgentStatus',
       'setWarnings',
       'setShouldIntroduce',
       'setAddedParty',

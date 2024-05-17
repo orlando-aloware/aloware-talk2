@@ -1,6 +1,7 @@
 <template>
   <div class="header w-100"
-       :class="{'border-bottom-transparent': isSearch}">
+       :class="{'border-bottom-transparent': isSearch}"
+       data-testid="calls-header-wrapper">
     <div class="calls-header__label w-100 d-flex justify-content-between pl-0 pr-2">
       <slot name="customLeftContent" v-if="hasCustomLeftContent"></slot>
       <q-select class="m-0"
@@ -8,6 +9,7 @@
                 borderless
                 emit-value
                 map-options
+                data-testid="calls-header-select"
                 v-model="filterLeft"
                 v-else
                 :disable="true"
@@ -16,6 +18,7 @@
         <template v-slot:option="scope">
           <q-item v-if="!scope.opt.group && !scope.opt.first"
                   v-bind="scope.itemProps"
+                  data-testid="calls-header-select-item"
                   v-on="scope.itemEvents">
             <q-item-section :class="[scope.opt.value !== 'everything' ? 'pl-2' : '']">
               <q-item-label v-html="scope.opt.label"></q-item-label>
@@ -48,6 +51,7 @@
                 v-model="filterRight"
                 :options="optionsRight"
                 :append="[{icon: 'ion-ios-arrow-down'}]"
+                data-testid="calls-header-select-sort"
                 @input="sort">
       </q-select>
     </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="task-list scrollable w-100">
+  <div class="task-list scrollable w-100" data-testid="task-list-wrapper">
     <p class="text-center mt-5" v-if="communications.length < 1">
         {{ emptyPlaceholder }}
     </p>
@@ -7,7 +7,8 @@
                :key="communication.id"
                :communication="communication"
                :channel="channel"
-               :answer-status="answerStatus">
+               :answer-status="answerStatus"
+               data-testid="task-list-task-item">
     </task-item>
   </div>
 </template>

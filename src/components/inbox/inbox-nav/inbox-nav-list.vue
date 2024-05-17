@@ -1,8 +1,10 @@
 <template>
   <div class="inbox-nav-list h-100 overflow-x-hidden"
+       data-testid="inbox-nav-list-wrapper"
        :class="{'inbox-nav-list--closed': closed}">
     <nav-item badge-value="20"
               badge-color="danger"
+              data-testid="inbox-nav-list-nav-item"
               :key="item.name"
               :label="item.label"
               :value="item.value"
@@ -25,6 +27,7 @@
                 icon=""
                 value=""
                 label="Views"
+                data-testid="inbox-nav-list-nav-item"
                 :group="true">
         <template #action-icon>
             <q-btn id="edit-views-icon"
@@ -32,6 +35,7 @@
                    icon="edit"
                    size="xs"
                    flat
+                   data-testid="inbox-nav-list-nav-item-btn"
                    @click="onShowViewsList"/>
         </template>
       </nav-item>
@@ -42,16 +46,18 @@
                 :label="view.filter.name"
                 :is-active="isActive(view, 'view')"
                 :key="`${view.filter.name}-${index}`"
+                data-testid="inbox-nav-list-nav-item"
                 v-for="(view, index) in pinnedViews"
                 @click="onItemClicked" />
 
         <div class="py-3 text-center text-13 text-word-wrap"
              v-if="pinnedViews.length < 1">
-          <span>No Pinned Views</span>
+          <span data-testid="inbox-nav-list-no-pinned-views">No Pinned Views</span>
         </div>
 
       <inbox-views target="#edit-views-icon"
                    :views="allInboxFilters"
+                   data-testid="inbox-nav-list-inbox-views"
                    @closed="onCloseViewsList"/>
     </div>
   </div>
