@@ -578,10 +578,14 @@ export default {
          * particularly noticeable in poor network conditions.
          */
         // initialize twilio client
-        this.device.initialize(this.dialer.token, {
+        const options = {
           edge: ['umatilla', 'ashburn', 'roaming'],
           codecPreferences: ['opus', 'pcmu']
-        })
+        }
+        if (this.currentCompany && this.currentCompany.twilio_debug_log) {
+          options.logLevel = 1
+        }
+        this.device.initialize(this.dialer.token, options)
 
         console.log(reset)
         if (!reset) {
