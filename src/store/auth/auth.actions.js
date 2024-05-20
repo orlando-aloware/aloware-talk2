@@ -29,7 +29,6 @@ const check = async ({ commit }, payload, skipSetAuthenticated) => {
     commit('SET_LOADING', false)
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
-    commit('SET_OLD_AGENT_STATUS', response.data.user.agent_status, { root: true })
 
     // auth user in Userpilot
     userpilot.auth(response.data.user)

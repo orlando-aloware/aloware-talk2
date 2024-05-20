@@ -424,8 +424,7 @@ export default {
     ]),
 
     ...mapState('powerDialer', [
-      'ongoingSession',
-      'isSessionRunning'
+      'ongoingSession'
     ]),
 
     ...mapState(['xmasEnabled']),
@@ -944,10 +943,7 @@ export default {
       if (this.profile && user.id === this.profile.id) {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
-
-        if (!this.isSessionRunning) {
-          this.verifyOldAgentStatus(user.agent_status)
-        }
+        console.log('Changed agent status [event]: ', user.agent_status)
       }
     }
 
@@ -964,15 +960,10 @@ export default {
     this.mainListeners.agentStatusUpdated = (event) => {
       this.updateUserStatus(event)
 
-      console.log('Old Agent Status: ', this.getStatusLabel(this.oldAgentStatus))
       if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
         this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
-        if (this.oldAgentStatus !== null && !this.isSessionRunning) {
-          return this.verifyOldAgentStatus(true)
-        }
-
-        console.log('Changed agent status [event]: ', this.getStatusLabel(event.agent_status))
-        return this.setAgentStatus(event.agent_status)
+        this.setAgentStatus(event.agent_status)
+        console.log('Changed agent status [event]: ', event.agent_status)
       }
     }
 
