@@ -93,7 +93,7 @@
               <fax-icon /> Fax
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions"
-                             v-if="hasPermissionTo('archive contact') && phone.phone_number !== contact.phone_number"
+                             v-if="phoneCanBeDeleted(phone)"
                              data-testid="contact-phones-list-items-delete-item"
                              @click="onDelete(phone)">
               <trash-icon color="#62666E"
@@ -150,6 +150,11 @@ export default {
   },
 
   methods: {
+    phoneCanBeDeleted (phone) {
+      return this.hasPermissionTo('archive contact') &&
+        phone.phone_number !== this.contact.phone_number &&
+        phone.external_integration_data.length === 0
+    },
     onEdit (phone) {
       this.$emit('edit', phone)
     },

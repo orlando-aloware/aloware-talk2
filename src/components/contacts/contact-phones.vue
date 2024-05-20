@@ -13,7 +13,7 @@
                                      @delete="onDeletePhone"
                                      @composerMedia="setComposerVariables"
                                      @call="onCall"/>
-          <contact-phones-list-conflicted-items :phones="conflictedPhones"
+          <contact-phones-list-conflicted-items :phones="conflictedContactPhoneNumbers"
                                                 data-testid="contact-phones-list-conflicted-items"/>
 
           <b-link ref="phone_form"
@@ -82,11 +82,6 @@ export default {
       'conflictedContactPhoneNumbers'
     ]),
 
-    conflictedPhones () {
-      console.log(this.conflictedContactPhoneNumbers)
-      return this.conflictedContactPhoneNumbers
-    },
-
     sortedPhones () {
       // Create a copy of the array before sorting
       let phoneNumbersCopy = [...this.contactPhoneNumbers]
@@ -120,7 +115,8 @@ export default {
         title: '',
         number: '',
         isPrimary: false,
-        isOptedOut: false
+        isOptedOut: false,
+        hasExternalData: false
       }
     }
   },
@@ -151,7 +147,8 @@ export default {
         title: phone.title,
         number: phone.phone_number,
         isPrimary: phone.phone_number === this.contact.phone_number || false,
-        isOptedOut: phone.is_opted_out
+        isOptedOut: phone.is_opted_out,
+        hasExternalData: phone.external_integration_data.length !== 0
       }
       this.showPhonesForm = true
     },

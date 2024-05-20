@@ -2,7 +2,7 @@
   <div>
     <b-modal hide-footer
              size='lg'
-             header-class='border-bottom-0 font-weight-bold center-modal-header'
+             header-class='border-bottom-0 font-weight-bold center-modal-header pb-0'
              header-close-variant='primary'
              title-tag='div'
              :title='getTitle'
@@ -29,8 +29,7 @@
         </template>
       </b-table>
     </b-modal>
-    <b-button
-              size='sm'
+    <b-button class="btn-tiny"
               @click="dialogTableVisible = !dialogTableVisible"
               variant='outline-danger'
               data-testid='phone-number-duplicates-button'

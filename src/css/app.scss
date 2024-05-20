@@ -14806,3 +14806,9 @@ thead.conflicted-contact-thead-class tr th {
   align-items: center;
   width: 100%;
 }
+
+.btn-tiny, .btn-group-tiny > .btn {
+  padding: 2px 5px;
+  font-size: 6px;
+  line-height: 1.5;
+}
