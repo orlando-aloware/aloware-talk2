@@ -93,8 +93,11 @@ export default {
         return 1
       }
 
-      if (this.selectedCount) {
-        return this.selectedCount
+      if (this.selectedContacts[this.listId]) {
+        return this.selectedContacts[this.listId]
+          // do not include contacts with integrations
+          .filter(contact => !contact.has_integration)
+          .length
       }
 
       return 0
@@ -242,6 +245,8 @@ export default {
 
       this.isBusy = true
       let ids = this.selectedContacts[this.listId]
+        // do not include contacts with integrations
+        .filter(contact => !contact.has_integration)
         .map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
       ids = chunk(ids, 50)
 

@@ -568,12 +568,30 @@
                     <!--message-o-icon></message-o-icon-->
                     <span class="aloicons action-icons">A</span>
                   </button>
-                  <button class="btn btn-sm datatable-row__actions__action--trash"
-                          v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
-                          data-testid="contact-remove-option"
-                          @click="onRemove(contact, id)">
-                    <span class="aloicons action-icons">B</span>
-                  </button>
+
+                  <span class='d-inline-block'
+                        tabindex='0'
+                        v-if='hasIntegration(contact)'
+                        :id='`contact-remove-option-disabled-wrapper-${index}`'>
+                    <button class='btn btn-sm datatable-row__actions__action--trash'
+                            :disabled='true'
+                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
+                            data-testid='contact-remove-option-disabled'>
+                      <span class='aloicons action-icons'>B</span>
+                    </button>
+                    <b-tooltip :target='`contact-remove-option-disabled-wrapper-${index}`'>
+                      This contact is from integration and can't be deleted.
+                    </b-tooltip>
+                  </span>
+
+                  <span v-else>
+                    <button class='btn btn-sm datatable-row__actions__action--trash'
+                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
+                            data-testid='contact-remove-option'
+                            @click='onRemove(contact, id)'>
+                      <span class='aloicons action-icons'>B</span>
+                    </button>
+                  </span>
                 </div>
               </td>
 
@@ -1210,6 +1228,10 @@ export default {
       'setPreviousListFilters',
       'addPowerDialerOpen'
     ]),
+
+    hasIntegration (contact) {
+      return Boolean(contact.external_integration_data && contact.external_integration_data.length > 0)
+    },
 
     onSearch (searchText) {
       this.$emit('search', searchText.trim())
