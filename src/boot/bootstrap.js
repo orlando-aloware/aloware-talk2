@@ -293,6 +293,7 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
       'Blocked a frame with origin',
       'AxiosError: Request failed with status code 404',
       'AxiosError: Request aborted',
+      'AxiosError: timeout exceeded',
       /^CanceledError:/
     ],
 
