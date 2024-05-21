@@ -17,7 +17,7 @@
                data-testid="integration-salesforce-salesforce-a-tag"
                onclick="return false;">
               <i class="fab fa-salesforce salesforce-icon"></i>
-              <span class="integration-title">Salesforce</span>
+              <span class="integration-title"> Salesforce</span>
             </a>
           </q-item-section>
         </q-item>
