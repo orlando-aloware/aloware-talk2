@@ -148,7 +148,7 @@ export default {
         number: phone.phone_number,
         isPrimary: phone.phone_number === this.contact.phone_number || false,
         isOptedOut: phone.is_opted_out,
-        hasExternalData: phone.external_integration_data.length !== 0
+        hasExternalData: phone.integration_data && phone.integration_data.length !== 0
       }
       this.showPhonesForm = true
     },

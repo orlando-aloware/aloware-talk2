@@ -153,7 +153,8 @@ export default {
     phoneCanBeDeleted (phone) {
       return this.hasPermissionTo('archive contact') &&
         phone.phone_number !== this.contact.phone_number &&
-        phone.external_integration_data.length === 0
+        phone.integration_data &&
+        phone.integration_data.length === 0
     },
     onEdit (phone) {
       this.$emit('edit', phone)
