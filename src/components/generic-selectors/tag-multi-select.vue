@@ -331,6 +331,7 @@ export default {
       if (!this.loadingTags && (this.searchList[0].children.length || this.searchList[1].children.length)) {
         return this.searchList
       }
+
       this.getTags()
       return []
     },
