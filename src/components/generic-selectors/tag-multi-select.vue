@@ -106,7 +106,7 @@
             </div>
           </q-infinite-scroll>
           <div class="text-center w-100"
-               v-if="search.length && !searchList[0].children.length && !searchList[1].children.length && !loadingTags">
+               v-if="search.length && isEmptyData && !loadingTags">
             <span>No options to select</span>
           </div>
           <div class="row justify-center q-my-md"
@@ -155,7 +155,7 @@
             </div>
           </q-infinite-scroll>
           <div class="text-center w-100"
-               v-if="search.length && !searchList[0].children.length && !searchList[1].children.length && !loadingTags">
+               v-if="search.length && isEmptyData && !loadingTags">
             <span>No options to select</span>
           </div>
           <div class="row justify-center q-my-md"
