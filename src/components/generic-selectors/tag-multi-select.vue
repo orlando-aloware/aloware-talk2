@@ -33,7 +33,8 @@
                      :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">
                   {{ item.name }}
                 </div>
-                <div role="button" class="custom__remove d-flex align-items-center"
+                <div class="custom__remove d-flex align-items-center"
+                     role="button"
                      @click="remove(item.id)">
                   <remove-tag-icon class="ml-1 remove-tag-icon"/>
                 </div>
