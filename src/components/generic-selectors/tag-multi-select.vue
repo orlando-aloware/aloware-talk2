@@ -1,9 +1,11 @@
 <template>
   <div class="generic-multi-select">
-    <h4 class="mb-1">
+    <h4 class="mb-1"
+        v-if="label">
       {{ label | ucwords }}
     </h4>
-    <q-field class="edit-wrapper mt-2 w-100"
+    <q-field class="edit-wrapper w-100"
+             :class="{ 'mt-2': label }"
              outlined
              stack-label
              :dense="dense"
