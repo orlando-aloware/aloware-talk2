@@ -112,10 +112,24 @@ export default {
 
     totalAddedFromContacts () {
       if (this.addedFromMultipleNumbers) {
-        return this.uniqueContactsCount - this.addedFromMultipleNumbers
+        return this.totalTasks - this.addedFromMultipleNumbers
       }
 
       return this.addedFromContact
+    },
+
+    totalTasks () {
+      return this.addedFromContact + this.totalFailedTasks
+    },
+
+    totalFailedTasks () {
+      let sum = 0
+      for (const key in this.fullReport.fail) {
+        if (typeof this.fullReport.fail[key] === 'number') {
+          sum += this.fullReport.fail[key]
+        }
+      }
+      return sum
     },
 
     uniqueContactsCount () {
@@ -198,6 +212,7 @@ export default {
 
     buildReport () {
       this.fullReport = cloneDeep(this.statusReport)
+      console.log('buildReport this.statusReport', this.statusReport)
 
       if (isEmpty(this.fullReport)) {
         return
@@ -205,7 +220,14 @@ export default {
 
       const id = this.$route.params.id
       let integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
-      this.fullReport.info.total_selected_contacts = integrationReport?.total_selected_contacts ?? 0
+      console.log('buildReport integrationReport', integrationReport)
+      if (integrationReport) {
+        this.fullReport.info.total_selected_contacts = integrationReport.total_selected_contacts
+      }
+
+      if (!integrationReport) {
+        this.fullReport.info.total_selected_contacts = this.statusReport.extra.total_selected
+      }
 
       if (isEmpty(integrationReport)) {
         integrationReport = {
@@ -271,6 +293,8 @@ export default {
         ...integrationReport,
         ...failReport
       }
+
+      console.log('buildReport this.fullReport', this.fullReport)
 
       // clean-up
       this.removeIntegrationPDImportSummary(id)
