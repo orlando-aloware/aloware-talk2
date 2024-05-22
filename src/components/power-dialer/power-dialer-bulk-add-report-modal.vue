@@ -5,20 +5,25 @@
            no-close-on-esc
            v-model="isOpen">
     <div class="container">
-      <p class="font-weight-bold">
-        {{ selected }} {{ fixMessage('contact(s)', selected) }} selected
+      <p>
+        <span class="font-weight-bold">
+          {{ selected }} {{ fixMessage('contact(s)', selected) }} selected
+        </span>
+        <span class="font-weight-light-bold">
+          ({{ totalTasksToBeAdded }} {{ fixMessage('task(s)', totalTasksToBeAdded) }} to be added)
+        </span>
       </p>
       <p class="m-0 font-weight-bold">
         {{ fixMessage('Contact(s)', addedFromContact) }} added
       </p>
       <ul>
         <li>
-          {{ totalAddedFromContacts }} {{ fixMessage('task(s)', addedFromContact) }} from {{ fixMessage('contact(s)', selected) }}
+          {{ totalAddedFromContacts }} {{ fixMessage('task(s)', totalAddedFromContacts) }} from {{ fixMessage('contact(s)', totalAddedFromContacts) }}
         </li>
-        <li v-if="hasAddedFromMultipleNumbers">
+        <li v-if="addedFromMultipleNumbers">
           {{ addedFromMultipleNumbers }} {{ fixMessage('task(s)', addedFromMultipleNumbers) }} from multiple numbers
         </li>
-        <li v-if="hasAddedOwnContacts">
+        <li v-if="addedOwnContacts">
           {{ addedOwnContacts }} owned {{ fixMessage('contact(s)', addedOwnContacts) }}
         </li>
         <li v-if="hasAddedInternationalPhoneNumbers">
@@ -111,7 +116,7 @@ export default {
     },
 
     totalAddedFromContacts () {
-      let total = this.totalTasks
+      let total = this.addedFromContact
 
       if (this.addedFromMultipleNumbers) {
         total -= this.addedFromMultipleNumbers
@@ -125,10 +130,14 @@ export default {
         total -= this.addedInternationalPhoneNumbers
       }
 
+      if (this.addedDuplicates) {
+        total -= this.addedDuplicates
+      }
+
       return total
     },
 
-    totalTasks () {
+    totalTasksToBeAdded () {
       return this.addedFromContact + this.totalFailedTasks
     },
 
@@ -154,20 +163,8 @@ export default {
       return this.fullReport?.success?.multiple_numbers ?? 0
     },
 
-    hasAddedFromMultipleNumbers () {
-      return this.fullReport?.success?.multiple_numbers ?? 0
-    },
-
-    hasAddedDuplicates () {
-      return this.fullReport?.success?.duplicates ?? 0
-    },
-
     addedDuplicates () {
       return this.fullReport?.success?.duplicates ?? 0
-    },
-
-    hasAddedOwnContacts () {
-      return this.fullReport?.success?.own_contacts ?? 0
     },
 
     addedOwnContacts () {
