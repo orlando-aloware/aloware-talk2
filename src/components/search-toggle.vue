@@ -1,12 +1,13 @@
 <template>
-  <div class="w-100 inbox-search">
+  <div class="w-100 inbox-search" data-testid="search-toggle-wrapper">
     <q-list>
       <q-item>
-        <q-item-section>
+        <q-item-section data-testid="search-toggle-section">
           <q-input filled
                    ref="inboxSearchInput"
                    placeholder="Search Contacts & Phone Numbers"
                    debounce="500"
+                   data-testid="search-toggle-input-search-text"
                    v-model="searchText">
             <template v-slot:append>
               <q-item-section @click.stop="$emit('closed')"
@@ -16,6 +17,7 @@
             </template>
             <q-tooltip anchor="bottom left"
                        self="bottom left"
+                       data-testid="search-toggle-tooltip"
                        v-if="!searchText || (searchText && searchText.length < 3)">
               Search requires at least 3 characters
             </q-tooltip>

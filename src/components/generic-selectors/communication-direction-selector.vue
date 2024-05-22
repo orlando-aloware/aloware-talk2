@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-testid="comm-direction-selector-wrapper">
     <q-select ref="communicationDirectionSelect"
               options-selected-class="text-primary"
               color="primary"
@@ -17,12 +17,13 @@
               :placeholder="placeholder"
               :disable="disable"
               :class="[ highlighted ? highlightedClass : '', customClass]"
+              data-testid="comm-direction-selector-select"
               @popup-show="onShowMenu"
               @filter="filterFn">
 
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey">
+          <q-item-section class="no-results text-grey" data-testid="comm-direction-selector-no-results">
             No results
           </q-item-section>
         </q-item>
@@ -30,6 +31,7 @@
 
       <template v-slot:option="scope">
         <q-item v-bind="scope.itemProps"
+                data-testid="comm-direction-selector-item"
                 v-on="scope.itemEvents">
           <q-item-section>
             <q-item-label v-html="scope.opt.label"/>

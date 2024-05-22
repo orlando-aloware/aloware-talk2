@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <div data-testid="inbox-nav-item-wrapper">
     <hr class="nav-item-separator"
         v-if="value === 'voicemails' || label === 'Channels'"/>
 
     <a class="inbox-nav-item mx-2 px-1"
        href="/"
+       data-testid="inbox-nav-item-link"
        :class="navItemClass"
        :disabled="disabled"
        v-if="!group"
@@ -14,26 +15,30 @@
         <div class="inbox-nav-item__icon"
              :class="navItemIconClass">
           <i class="fa fa-circle text-10"
+             data-testid="inbox-nav-item-i"
              v-if="icon === 'view'">
           </i>
           <icon :icon="icon"
                 :isActive="isActive"
+                data-testid="inbox-nav-item-icon"
                 v-if="icon !== 'view'"/>
         </div>
         <div class="inbox-nav-item__label h-100 text-truncate">
-          <q-tooltip>
+          <q-tooltip data-testid="inbox-nav-item-tooltip">
             {{ tooltip || label }}
           </q-tooltip>
           {{ label }}
         </div>
         <span class="count-label h-100"
-              v-if="value === 'inbox'">
+              v-if="value === 'inbox' && isContactStatusControlEnabled">
           <span class="border-right pr-1"
                 v-if="isLoadingOpenTaskCount">
             <q-spinner-tail size="12px"
+                            data-testid="inbox-nav-item-spinner-tail-open-task"
                             color="blue" />
           </span>
           <span class="open-count border-right pr-1"
+                data-testid="inbox-nav-item-open-count"
                 v-if="!isLoadingOpenTaskCount">
             {{ openCount | numberPlusFormatter(99) }}
           </span>
@@ -41,23 +46,26 @@
           <span class="ml-1"
                 v-if="isLoadingPendingTaskCount">
             <q-spinner-tail size="12px"
+                            data-testid="inbox-nav-item-spinner-tail-pending-task"
                             color="blue" />
           </span>
           <span class="pending-count ml-1"
-                v-if="!isLoadingPendingTaskCount">
+                v-if="!isLoadingPendingTaskCount"
+                data-testid="inbox-nav-item-pending-count">
             {{ pendingCount | numberPlusFormatter(99) }}
           </span>
         </span>
 
         <span class="count-label h-100"
               v-if="customCount !== null">
-          <span class="open-count pr-1">
+          <span class="open-count pr-1"
+                data-testid="inbox-nav-item-custom-count">
             {{ customCount | numberPlusFormatter(99) }}
           </span>
         </span>
       </div>
     </a>
-    <div class="inbox-nav-item-group-header mx-2 px-1 text-uppercase"
+    <div class="inbox-nav-item-group-header mx-2 px-1 text-uppercase" data-testid="inbox-nav-item-label"
          v-else>
       {{ label }}
     </div>
@@ -68,7 +76,7 @@
 
 <script>
 import Icon from './inbox-nav-icon.vue'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'inbox-nav-item',
@@ -82,6 +90,8 @@ export default {
       'isLoadingOpenTaskCount',
       'isLoadingPendingTaskCount'
     ]),
+
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
     navItemClass () {
       return {

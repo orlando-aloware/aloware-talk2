@@ -291,8 +291,11 @@ if (isNotLocal && process.env.APP_ENV !== 'local') {
       'NetworkError',
       'Navigation cancelled from',
       'Blocked a frame with origin',
+      'AxiosError: Request failed with status code 401',
       'AxiosError: Request failed with status code 404',
+      'AxiosError: Request failed with status code 422',
       'AxiosError: Request aborted',
+      'AxiosError: timeout exceeded',
       /^CanceledError:/
     ],
 
@@ -493,6 +496,9 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   switch (type) {
     case 'updated':
       colorClass.data = 'bg-blue-10'
+      break
+    case 'warning':
+      colorClass.data = 'bg-orange-2'
       break
     case 'deleted':
     case 'error':

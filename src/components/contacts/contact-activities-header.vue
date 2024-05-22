@@ -9,7 +9,7 @@
       <b-badge class="d-flex align-items-center badge-task-status"
                :variant="resolveVariant"
                data-testid="contact-activities-status-badge"
-               v-if="contact.task_status">
+               v-if="contact.task_status && isContactStatusControlEnabled">
         {{ contact.task_status | fixTaskStatusName }}
       </b-badge>
     </div>
@@ -33,16 +33,16 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            :disable="isUpdatingStatus"
-                           v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN"
+                           v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
                            data-testid="contact-activities-move-to-pending-item"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
             <timer-o-icon class="dropdown-icon"></timer-o-icon>
             Move to Pending
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           :disable="isUpdatingStatus"
-                           v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
                            data-testid="contact-activities-close-item"
+                           :disable="isUpdatingStatus"
+                           v-if="shouldDisplayContact"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
             <check-o-icon class="dropdown-icon"></check-o-icon>
             Close
@@ -88,7 +88,7 @@
           </span>
         </q-btn>
         <q-btn
-          v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN"
+          v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
           borderless
           flat
           no-caps
@@ -112,17 +112,16 @@
                           size="20px"
           />
         </q-btn>
-        <q-btn
-          v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
-          borderless
-          flat
-          no-caps
-          type="a"
-          color="primary"
-          class="text-decoration-none"
-          :disable="isUpdatingStatus"
-          data-testid="contact-activities-reopen-btn"
-          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
+        <q-btn borderless
+               flat
+               no-caps
+               type="a"
+               color="primary"
+               class="text-decoration-none"
+               :disable="isUpdatingStatus"
+               data-testid="contact-activities-reopen-btn"
+               @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)"
+               v-if="shouldDisplayClosedOrPendingContact">
           <q-tooltip anchor="top middle"
                      self="center middle">
             Reopen
@@ -138,7 +137,6 @@
           />
         </q-btn>
         <q-btn
-          v-if="[ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
           borderless
           flat
           no-caps
@@ -147,7 +145,8 @@
           class="text-decoration-none"
           :disable="isUpdatingStatus"
           data-testid="contact-activities-close-btn"
-          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
+          @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)"
+          v-if="shouldDisplayContact">
           <q-tooltip anchor="top middle"
                      self="center middle">
             Close
@@ -180,7 +179,7 @@ import MailOpenIcon from 'components/icons/mail-open-icon'
 import EllipsisIcon from 'components/icons/ellipsis-icon'
 import BackButton from 'components/back-button'
 import Profile from 'components/profile'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 export default {
   name: 'contact-activities-header',
@@ -219,6 +218,7 @@ export default {
 
   computed: {
     ...mapState(['isMobile']),
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:
@@ -236,6 +236,14 @@ export default {
       set (activityContact) {
         return activityContact
       }
+    },
+
+    shouldDisplayContact () {
+      return [ContactTaskStatus.STATUS_OPEN, ContactTaskStatus.STATUS_PENDING].includes(this.contact?.task_status) && this.isContactStatusControlEnabled
+    },
+
+    shouldDisplayClosedOrPendingContact () {
+      return [ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(this.contact?.task_status) && this.isContactStatusControlEnabled
     }
   },
   data () {

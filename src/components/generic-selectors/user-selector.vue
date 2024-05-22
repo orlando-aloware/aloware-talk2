@@ -24,7 +24,7 @@
             :use-chips="useChips"
             :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
             v-model="selectedId"
-            data-testid="user-selector"
+            data-testid="user-selector-select"
             @popup-show="onShowMenu"
             @focus="onFocus"
             @blur="onBlur"
@@ -37,7 +37,7 @@
 
     <template v-slot:no-option>
       <q-item>
-        <q-item-section class="no-results text-grey">
+        <q-item-section class="no-results text-grey" data-testid="user-selector-select-no-results">
           No results
         </q-item-section>
       </q-item>
@@ -46,7 +46,8 @@
     <template v-slot:option="scope">
       <q-item v-bind="scope.itemProps"
               v-on="scope.itemEvents"
-              v-if="!scope.opt.group">
+              v-if="!scope.opt.group"
+              data-testid="user-selector-select-item">
         <q-item-section>
           <q-item-label>
             <div class="break-all">{{ scope.opt.name }}</div>
@@ -74,13 +75,15 @@
               class="tag-selected-chip"
               text-color="secondary"
               dense
-              :tabindex="scope.tabindex">
+              :tabindex="scope.tabindex"
+              data-testid="user-selector-select-chip">
         <i class="fa fa-circle position-absolute"
            :style="`color: ${scope.opt.color}; font-size: 50%; left: 4px; top: 40%; margin-right: 10px;`"/>
         <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
         <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+             data-testid="user-selector-select-remove-btn"
              @click="scope.removeAtIndex(scope.index)">
-          <remove-tag-icon class="ml-1 remove-tag-icon"/>
+          <remove-tag-icon class="ml-1 remove-tag-icon" data-testid="user-selector-select-remove-tag-icon"/>
         </div>
       </q-chip>
     </template>

@@ -7923,6 +7923,10 @@ button.grey-90 {
     border: 1px solid $red-90;
   }
 
+  &.bg-orange-2 {
+    border: 1px solid $yellow-9;
+  }
+
   .close-button {
     .q-btn__wrapper {
       min-height: auto !important;
@@ -9762,6 +9766,9 @@ screen and (max-width: 956px) {
         height: calc(100% - 16px);
       }
     }
+  }
+  .notification-container-header {
+    display: none !important;
   }
 }
 

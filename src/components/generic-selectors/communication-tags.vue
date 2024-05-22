@@ -1,6 +1,7 @@
 <template>
   <div class="w-100 tags-wrapper"
-       v-if="hasPermissionTo('tag communication')">
+       v-if="hasPermissionTo('tag communication')"
+       data-testid="comm-tags-wrapper">
     <tag-multi-select :values="communication.tag_ids"
                       :options="combinedTags"
                       :current="currentTags"

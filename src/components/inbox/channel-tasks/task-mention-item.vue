@@ -1,5 +1,6 @@
 <template>
   <div :class="`task-item w-100 d-flex flex-row py-2 pr-2 align-items-center border-bottom ${activeClass}`"
+       data-testid="task-mention-item-wrapper"
        @click="onItemClick(mention)">
     <div class="d-flex justify-content-center avatar-wrapper">
       <div class="d-flex justify-content-center avatar d-flex justify-content-center pb-1"
@@ -11,7 +12,8 @@
         <avatar width="34"
                 height="34"
                 :style="avatarStyle(false)"
-                :name="contactAvatar">
+                :name="contactAvatar"
+                data-testid="task-mention-item-avatar">
         </avatar>
       </div>
     </div>
@@ -21,7 +23,8 @@
         {{ contactName }}
         <q-tooltip content-class="bg-grey-light11"
                    anchor="top middle"
-                   self="center middle">
+                   self="center middle"
+                   data-testid="task-mention-item-tooltip">
           {{ contactName }}
         </q-tooltip>
       </div>
@@ -38,7 +41,8 @@
       <span class="time-passed text-grey-90 mr-2"
             role="button">
         <task-item-time :from-time="mention.created_at"
-                        :update-interval="6000">
+                        :update-interval="6000"
+                        data-testid="task-mention-item-time">
         </task-item-time>
       </span>
     </div>
