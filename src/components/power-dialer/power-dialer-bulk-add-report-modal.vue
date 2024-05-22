@@ -111,11 +111,21 @@ export default {
     },
 
     totalAddedFromContacts () {
+      let total = this.totalTasks
+
       if (this.addedFromMultipleNumbers) {
-        return this.totalTasks - this.addedFromMultipleNumbers
+        total -= this.addedFromMultipleNumbers
       }
 
-      return this.addedFromContact
+      if (this.addedOwnContacts) {
+        total -= this.addedOwnContacts
+      }
+
+      if (this.addedInternationalPhoneNumbers) {
+        total -= this.addedInternationalPhoneNumbers
+      }
+
+      return total
     },
 
     totalTasks () {
