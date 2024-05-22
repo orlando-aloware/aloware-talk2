@@ -9,7 +9,8 @@
         <span class="font-weight-bold">
           {{ selected }} {{ fixMessage('contact(s)', selected) }} selected
         </span>
-        <span class="font-weight-light-bold">
+        <span class="font-weight-light-bold"
+              v-if="totalTasksToBeAdded > selected">
           ({{ totalTasksToBeAdded }} {{ fixMessage('task(s)', totalTasksToBeAdded) }} to be added)
         </span>
       </p>
@@ -88,7 +89,7 @@ export default {
 
   data: () => ({
     fullReport: {},
-    duplicated_tasks: 0
+    duplicatedTasks: 0
   }),
 
   computed: {
@@ -201,8 +202,8 @@ export default {
       if (this.$isNumeric(index)) {
         let message = this.fixMessage(PD_BULK_ADD_MESSAGES[index], value)
         // complement message if there are skipped contacts with duplicates
-        if (index === '1') {
-          message += this.duplicated_tasks ? ' (' + this.duplicated_tasks + ' duplicates)' : ''
+        if (index === '1' && this.duplicatedTasks > value) {
+          message += ' (' + this.duplicatedTasks + ' duplicates)'
         }
         return message
       }
@@ -230,6 +231,8 @@ export default {
 
       const id = this.$route.params.id
       let integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
+      console.log('buildReport id', id)
+      console.log('buildReport this.integrationPDImportSummaries', this.integrationPDImportSummaries)
       console.log('buildReport integrationReport', integrationReport)
       if (integrationReport) {
         this.fullReport.info.total_selected_contacts = integrationReport.total_selected_contacts
@@ -286,7 +289,7 @@ export default {
       // the total of duplicates
       const duplicatedTasks = integrationReport?.duplicated_tasks ?? 0
 
-      this.duplicated_tasks = duplicatedTasks ? duplicatedTasks - duplicates : 0
+      this.duplicatedTasks = duplicatedTasks ? duplicatedTasks - duplicates : 0
 
       // remove reports having no message or with 0 value
       Object.keys(integrationReport).forEach(key => {
@@ -304,7 +307,12 @@ export default {
         ...failReport
       }
 
+      if (!this.fullReport.extra.settings.prevent_duplicates && this.duplicatedTasks) {
+        this.fullReport.fail[1] = this.duplicatedTasks
+      }
+
       console.log('buildReport this.fullReport', this.fullReport)
+      console.log('buildReport this.duplicatedTasks', this.duplicatedTasks)
 
       // clean-up
       this.removeIntegrationPDImportSummary(id)

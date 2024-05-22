@@ -115,6 +115,7 @@ export default {
       }
 
       this.reloadFolders()
+      console.log('addIntegrationPDImportSummary event?.summary', event?.summary)
       this.addIntegrationPDImportSummary({
         id: event.contact_list.id,
         summary: event?.summary ?? []
