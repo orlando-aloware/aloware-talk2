@@ -662,10 +662,6 @@ export default {
 
       applyFilterInterval = setInterval(() => {
         if (!this.isDebounceInProgress) {
-          if (this.filter.key === 'tags' && this.filterOperatorValue) {
-            this.filter.options = this.appliedTags
-          }
-
           this.processFilters()
           this.appliedFiltersInProgress = false
           clearInterval(applyFilterInterval)
