@@ -584,6 +584,7 @@ export default {
         }
         if (this.currentCompany && this.currentCompany.twilio_debug_log) {
           options.logLevel = 1
+          options.enableImprovedSignalingErrorPrecision = true
         }
         this.device.initialize(this.dialer.token, options)
 
@@ -1454,12 +1455,19 @@ export default {
       // 31205 => JWT token expired.
       // 9221 => Cannot connect to insights
       // 20101 => Invalid token
-      if (![53405, 31204, 31205, 9221, 31000, 31005, 31009, 20101].includes(err.code)) {
+      // 31102 => MalformedRequestErrors.AuthorizationTokenMissingError, SignatureValidationErrors.AccessTokenSignatureValidationFailed
+      // 31207 => AuthorizationErrors.JWTTokenExpirationTooLongError
+      // 31404 => ClientErrors.NotFound
+      // 31480 => ClientErrors.TemporarilyUnavilable
+      // 31486 => ClientErrors.BusyHere
+      // 31603 => SIPServerErrors.Decline
+      // 31002 => GeneralErrors.ConnectionDeclinedError
+      if (![9221, 20101, 31000, 31005, 31009, 31102, 31203, 31204, 31205, 31207, 53405].includes(err.code)) {
         this.$Sentry.captureException(err)
       }
 
       // Request new token if error
-      if ([31204, 31205, 20101].includes(err.code)) {
+      if ([20101, 31102, 31203, 31204, 31205, 31207].includes(err.code)) {
         return this.getDesktopToken(true)
       }
 
