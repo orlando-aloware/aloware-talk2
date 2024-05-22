@@ -663,6 +663,10 @@ export default {
       return 'All Time'
     },
 
+    getTagsObjectsByIds (tagsIds = []) {
+      return tagsIds?.map((tagId) => this.tags?.find((tag) => tag.id === tagId))
+    },
+
     onPreliminarChange (tags) {
       this.setTags(tags)
     }
@@ -687,7 +691,7 @@ export default {
     this.dateRange.startDate = this.filter.from_date
     this.dateRange.endDate = this.filter.to_date
     this.rangePicker = this.$refs.picker
-    this.selectedTags = this.tags
+    this.selectedTags = this.getTagsObjectsByIds(this.filter?.tags)
 
     setTimeout(() => {
       if (this.inboxShowMyContacts) {
@@ -724,6 +728,13 @@ export default {
         if (value && value.length) {
           this.filter.my_contact = 0
         }
+      }
+    },
+
+    'filter.tags': {
+      deep: true,
+      handler (value) {
+        this.selectedTags = this.getTagsObjectsByIds(value)
       }
     },
 
