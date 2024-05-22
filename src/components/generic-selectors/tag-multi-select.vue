@@ -421,14 +421,21 @@ export default {
     },
 
     filterByTagType (tags, tagType) {
-      return tags
-        .filter(tag => tag.type === tagType)
-        .map(tag => ({
-          id: tag.id,
-          name: tag.name,
-          color: tag.color
-        }))
-        .sort((a, b) => a.name.localeCompare(b.name))
+      const filteredMappedTags = []
+
+      for (const tag of tags) {
+        if (tag.type === tagType) {
+          filteredMappedTags.push({
+            id: tag.id,
+            name: tag.name,
+            color: tag.color
+          })
+        }
+      }
+
+      filteredMappedTags.sort((a, b) => a.name.localeCompare(b.name))
+
+      return filteredMappedTags
     },
 
     mergeWithoutDuplicatingAndSortAlphabetically (array1, array2) {
@@ -462,6 +469,9 @@ export default {
         this.hasMorePages = res.data.current_page < res.data.last_page
         this.page++
 
+        // Call done() if there are more pages to load
+        // This signals the infinite scroll component that it can fetch more data if needed.
+        // Without this, the infinite scroll component cannot identify that the request is finished and can load more items
         if (this.hasMorePages) {
           done && done()
         }
