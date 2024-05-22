@@ -314,6 +314,7 @@ export default {
       this.$emit('filter', tagsIds, tagsObjects)
     }
   },
+
   watch: {
     tags: {
       deep: true,
