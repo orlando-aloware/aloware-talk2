@@ -11,7 +11,7 @@
                         :options="combinedTags"
                         :current="currentTags"
                         :canEdit="hasPermissionTo(['list tag', 'view tag'])"
-                        :optionsIsGrouped="true"
+                        :options-is-grouped="true"
                         :height="height"
                         :category="category"
                         :is-filter="isFilter"
