@@ -1,26 +1,42 @@
 export const DATE_RANGES = [
   {
     id: 1,
-    label: 'Recent (Last 30 days + Today)'
+    label: 'Custom'
   },
   {
     id: 2,
-    label: 'Today'
+    label: 'Recent (Last 30 days + Today)'
   },
   {
     id: 3,
-    label: 'Last 7 days'
+    label: 'Today'
   },
   {
     id: 4,
-    label: 'This Month So Far'
+    label: 'Yesterday'
   },
   {
     id: 5,
-    label: 'This Year So Far'
+    label: 'Last 7 days'
   },
   {
     id: 6,
+    label: 'Last 30 days'
+  },
+  {
+    id: 7,
+    label: 'This Month So Far'
+  },
+  {
+    id: 8,
+    label: 'Last Month'
+  },
+  {
+    id: 9,
+    label: 'This Year So Far'
+  },
+  {
+    id: 10,
     label: 'All Time'
   }
 ]
