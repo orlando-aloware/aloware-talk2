@@ -10,7 +10,7 @@
         v-if="attribute.type === ContactAttributetTypeEnum.DATE_PICKER"
         :attribute="attribute"
         :disabled="!hasPermissionTo('update contact')"
-        :timezone="contact.timezone"
+        :timezone="contact.timezone ?? ''"
         data-testid="contact-attributes-type-date-picker"
         @updateField="(eventPayload) => onUpdateFields(eventPayload, attribute.name)"
       />
