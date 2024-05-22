@@ -129,7 +129,7 @@ export default {
     },
 
     totalTasks () {
-      return this.selected + this.totalFailedTasks
+      return this.addedFromContact + this.totalFailedTasks
     },
 
     totalFailedTasks () {
