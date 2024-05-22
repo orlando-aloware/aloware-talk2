@@ -23,6 +23,9 @@
         <li v-if="addedFromMultipleNumbers">
           {{ addedFromMultipleNumbers }} {{ fixMessage('task(s)', addedFromMultipleNumbers) }} from multiple numbers
         </li>
+        <li v-if="addedDuplicates">
+          {{ addedDuplicates }} duplicate phone {{ fixMessage('number(s)', addedDuplicates) }}
+        </li>
         <li v-if="addedOwnContacts">
           {{ addedOwnContacts }} owned {{ fixMessage('contact(s)', addedOwnContacts) }}
         </li>
