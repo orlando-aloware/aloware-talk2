@@ -1,7 +1,6 @@
 <template>
   <div class="message p-3 pb-1 d-flex flex-row align-items-start" data-testid="contact-activity-wrapper"
-       v-if="(communication.property !== undefined && !excluded_audits.includes(communication.property)) ||
-       (communication.property === undefined)"
+       v-if="shouldDisplayCommunication"
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
     <div class="d-flex flex-row align-items-center position-relative"
          v-if="communication.property === undefined">
@@ -366,7 +365,7 @@ import {
   avatarMixin,
   userMixin
 } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -482,6 +481,7 @@ export default {
       'communications',
       'channelChangedFilterFields'
     ]),
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
     getCommunicationClass () {
       if (this.communication.current_status2 === undefined) {
@@ -523,7 +523,7 @@ export default {
       // Markable if communication is SMS and the comm direction is INBOUND or
       // Markable if communication is a CALL and disposition_status2 is VOICEMAIL_NEW or MISSED_NEW
       return (this.communication.type === CommunicationTypes.SMS &&
-          this.communication.direction === CommunicationDirection.INBOUND) ||
+        this.communication.direction === CommunicationDirection.INBOUND) ||
         (this.communication.type === CommunicationTypes.CALL &&
           [CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW, CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW].includes(this.communication.disposition_status2) &&
           this.communication.direction === CommunicationDirection.INBOUND)
@@ -541,8 +541,15 @@ export default {
     },
 
     isTaskStatusLogsDisabled () {
-      return this.currentCompany.hasOwnProperty('task_status_logs') &&
-        !this.currentCompany.task_status_logs
+      if (this.isContactStatusControlEnabled !== undefined) {
+        return !this.isContactStatusControlEnabled || (this.currentCompany.hasOwnProperty('task_status_logs') && !this.currentCompany.task_status_logs)
+      }
+
+      return (this.currentCompany.hasOwnProperty('task_status_logs') && !this.currentCompany.task_status_logs)
+    },
+
+    shouldDisplayCommunication () {
+      return (this.communication.property !== undefined && !this.excluded_audits.includes(this.communication.property)) || this.communication.property === undefined
     }
   },
 
@@ -577,17 +584,21 @@ export default {
         case 'is_blocked':
           return [0, 1].includes((data.to !== null ? parseInt(data.to) : data.to))
         case 'contact_task_status':
-          const allowedStatus = [
-            ContactTaskStatus.STATUS_NEW,
-            ContactTaskStatus.STATUS_OPEN,
-            ContactTaskStatus.STATUS_PENDING,
-            ContactTaskStatus.STATUS_CLOSED
-          ]
+          const allowedStatus = this.getContactTaskAllowedStatuses()
           return allowedStatus.includes((data.from !== null ? parseInt(data.from) : data.from)) ||
             allowedStatus.includes((data.to !== null ? parseInt(data.to) : data.to))
         default:
           return false
       }
+    },
+
+    getContactTaskAllowedStatuses () {
+      return [
+        ContactTaskStatus.STATUS_NEW,
+        ContactTaskStatus.STATUS_OPEN,
+        ContactTaskStatus.STATUS_PENDING,
+        ContactTaskStatus.STATUS_CLOSED
+      ]
     },
 
     hasAuditNotes (data) {
