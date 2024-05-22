@@ -266,10 +266,8 @@ export default {
   },
 
   created () {
-    if (this.entityObject && !this.entityObject.tag_ids) {
-      if (this.entityObject.tags) {
-        this.entityObject.tag_ids = this.entityObject.tags.map((o) => o.id)
-      }
+    if (this.entityObject && !this.entityObject.tag_ids && this.entityObject.tags) {
+      this.entityObject.tag_ids = this.entityObject.tags.map((o) => o.id)
     }
   },
 
