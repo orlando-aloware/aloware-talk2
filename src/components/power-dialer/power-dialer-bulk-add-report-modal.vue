@@ -223,7 +223,6 @@ export default {
 
     buildReport () {
       this.fullReport = cloneDeep(this.statusReport)
-      console.log('buildReport this.statusReport', this.statusReport)
 
       if (isEmpty(this.fullReport)) {
         return
@@ -232,9 +231,7 @@ export default {
       const id = this.$route.params.id
       let integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
       this.fullReport.info.total_selected_contacts = this.statusReport.info.selected
-      console.log('buildReport id', id)
-      console.log('buildReport this.integrationPDImportSummaries', this.integrationPDImportSummaries)
-      console.log('buildReport integrationReport', integrationReport)
+
       if (integrationReport) {
         this.fullReport.info.total_selected_contacts = integrationReport.total_selected_contacts
       }
@@ -305,11 +302,8 @@ export default {
       }
 
       if (!this.fullReport.extra.settings.prevent_duplicates && this.duplicatedTasks) {
-        this.fullReport.fail[1] = this.duplicatedTasks
+        this.fullReport.fail[DUPLICATED] = this.duplicatedTasks
       }
-
-      console.log('buildReport this.fullReport', this.fullReport)
-      console.log('buildReport this.duplicatedTasks', this.duplicatedTasks)
 
       // clean-up
       this.removeIntegrationPDImportSummary(id)
