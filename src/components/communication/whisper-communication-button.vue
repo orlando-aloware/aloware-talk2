@@ -6,22 +6,27 @@
                  triggers="hover"
                  placement="top"
                  custom-class="btn-primary"
+                 data-testid="comm-whisper-button-popover"
                  delay="100">
         <span class="text-white">
           The whisper option is not included in your current plan, to use it, you have
           to upgrade to one of our plans that offers it!
           <u class="cursor-pointer"
+             data-testid="comm-whisper-button-read-more"
              @click="openKnowledgeBaseLink">Read more</u>
           or
           <u class="cursor-pointer"
+             data-testid="comm-whisper-button-read-request-plan"
              @click="checkClick">Request Plan Upgrade</u>
         </span>
       </b-popover>
       <ear-icon id="whisper-popover"
                 height="22"
+                data-testid="comm-whisper-button-ear-icon"
                 width="22"/>
     </span>
     <span class="cursor-pointer"
+          data-testid="comm-whisper-button-whisper-span"
           @click="dialog"
           v-if="!isBlockedFrom('barge & whisper') && userCanBargeAndWhisper(communication)">
       <ear-icon height="22"

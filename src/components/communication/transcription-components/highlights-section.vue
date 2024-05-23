@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Highlights section. -->
-    <h2 class="mt-4 mb-1 text-dark">Highlights</h2>
+    <h2 class="mt-4 mb-1 text-dark" data-testid="comm-highlights-section">Highlights</h2>
     <hr class="my-1">
     <!-- Sanity check. -->
     <div v-if="!isEmpty(highlights)">
@@ -16,6 +16,7 @@
                 text-color="white"
                 dense
                 :key="highlight_index"
+                data-testid="comm-highlights-section-chip"
                 v-for="(highlight, highlight_index) in highlights[speaker]">
           {{ highlight }}
         </q-chip>
@@ -27,6 +28,7 @@
       <span class="mt-3">
         We couldn't find any highlights in this call. For more information please check
         <a style="color: blue"
+           data-testid="comm-highlights-section-this-article-link"
            href="https://support.aloware.com/en/articles/9037887-frequently-asked-questions-smart-transcription">
           this article.
         </a>

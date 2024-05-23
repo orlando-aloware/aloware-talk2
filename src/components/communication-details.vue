@@ -1,24 +1,28 @@
 <template>
-  <div v-if="communication">
-    <b-row>
+  <div v-if="communication" data-testid="comm-details-wrapper">
+    <b-row data-testid="comm-details-row">
       <b-col md="4"
              sm="12"
+             data-testid="comm-details-col"
              class="pl-0 pr-0">
 
         <q-card flat
                 bordered
-                class="communication-details-card bg-grey-1">
-          <q-card-section class="pb-0">
+                class="communication-details-card bg-grey-1"
+                data-testid="comm-details-card">
+          <q-card-section class="pb-0" data-testid="comm-details-archive-card-section">
             <div class="d-flex justify-content-between header">
               <div class="fs-14 mt-1 header-title">Communication Info</div>
 
               <div class="d-flex header-btn-wrapper">
                 <transcription-modal class="mr-2"
                                      :communication="communication"
+                                     data-testid="comm-details-transcription-modal"
                                      v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
                 <b-button variant="danger"
                           size="sm"
                           v-if="hasPermissionTo('archive communication')"
+                          data-testid="comm-details-archive-button"
                           @click="onArchive">
                   Archive
                 </b-button>
@@ -28,7 +32,7 @@
           </q-card-section>
 
           <!--COMM TYPE-->
-          <q-card-section class="pt-0 comm-type-container">
+          <q-card-section class="pt-0 comm-type-container" data-testid="comm-details-comm-type-card-section">
             <div class="text-lt p-x d-inline-flex"
                  :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
               <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
@@ -45,7 +49,8 @@
 
           <!--ATTACHMENTS-->
           <q-card-section class="pt-0 pb-0"
-                          v-if="typeAcceptAttachment">
+                          v-if="typeAcceptAttachment"
+                          data-testid="comm-details-attachment-section">
 
             <div v-if="communication.attachments && communication.attachments.length > 0">
               <div :key="index"
@@ -55,14 +60,16 @@
                        native-context-menu
                        :class="index > 0 ? 'mb-1 mt-1' : ''"
                        :src="attachment.url"
+                       data-testid="comm-details-attachment-img"
                        v-if="(attachment.mime_type && isAttachmentImage(attachment.mime_type)) || !attachment.mime_type">
                   <template v-slot:error>
-                    <div class="absolute-full flex flex-center bg-negative text-white">
+                    <div class="absolute-full flex flex-center bg-negative text-white" data-testid="comm-details-attachment-error">
                       Error!
                     </div>
                   </template>
                   <template v-slot:default>
                     <download-button buttonStyle="top: 8px; left: 8px"
+                                     data-testid="comm-details-attachment-download-btn"
                                      :communication-id="communication.id"
                                      :filename="attachment.name"
                                      :file-mime-type="attachment.mime_type"
@@ -73,9 +80,11 @@
                 <template v-if="attachment.mime_type">
                   <div v-if="isAttachmentAudio(attachment.mime_type)">
                     <audio class="audio-player"
-                           controls>
+                           controls
+                           data-testid="comm-details-audio">
                       <source :src="attachment.url"
-                              :type="attachment.mime_type">
+                              :type="attachment.mime_type"
+                              data-testid="comm-details-source">
                       Your browser does not support the audio element.
                     </audio>
                   </div>
@@ -83,9 +92,11 @@
                   <div v-if="isAttachmentVideo(attachment.mime_type)">
                     <video width="320"
                            class="rounded"
-                           controls>
+                           controls
+                           data-testid="comm-details-video">
                       <source :src="attachment.url"
-                              :type="attachment.mime_type">
+                              :type="attachment.mime_type"
+                              data-testid="comm-details-video-source">
                       Your browser does not support the video tag.
                     </video>
                   </div>
@@ -95,6 +106,7 @@
                                    :filename="attachment.name"
                                    :file-mime-type="attachment.mime_type"
                                    :attachment-url="attachment.url"
+                                   data-testid="comm-details-download-btn"
                                    v-if="isAttachmentText(attachment.mime_type) || isAttachmentApplication(attachment.mime_type)">
                   </download-button>
                 </template>
@@ -116,7 +128,7 @@
           </q-card-section>
 
           <!--COMM DESCRIPTION-->
-          <q-card-section class="pb-0 comm-description-card">
+          <q-card-section class="pb-0 comm-description-card" data-testid="comm-details-comm-description-section">
             <div class="fs-13 my-2 text-grey-90"
                  v-if="communication.type === CommunicationTypes.CALL">
               <span>{{ callDescriptionText }}</span>
@@ -127,14 +139,16 @@
           </q-card-section>
 
           <q-card-section class="pt-0 pb-0"
-                          v-if="communication?.contact">
+                          v-if="communication?.contact"
+                          data-testid="comm-details-contact-section">
             <!--CONTACT-->
-            <b-form-row>
+            <b-form-row data-testid="comm-details-contact-row">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Contact: </q-item-label>
               </b-col>
               <b-col>
-                <router-link :to="{ name: 'Contact', params: { id: communication.contact.id }}">
+                <router-link :to="{ name: 'Contact', params: { id: communication.contact.id }}"
+                             data-testid="comm-details-contact-router-link">
                   {{ communication.contact.name | fixContactName }}
                 </router-link>
 
@@ -143,7 +157,7 @@
             <hr/>
 
             <!--DISPOSITION-->
-            <b-form-row>
+            <b-form-row data-testid="comm-details-disposition-row">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Disposition: </q-item-label>
               </b-col>
@@ -161,11 +175,11 @@
               </b-col>
             </b-form-row>
             <hr/>
-            <b-form-row>
-              <b-col class="pl-0 pr-0">
+            <b-form-row data-testid="comm-details-disposition-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-disposition-col">
                 <q-item-label>From: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-disposition-col">
                 <div class="d-flex align-items-center"
                      v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
                   {{ communication.lead_number | fixPhone }}
@@ -179,10 +193,12 @@
                   <div>
                     <div class="flex items-center mr-1 h-100"
                          v-if="usedCampaign?.id"
+                         data-testid="comm-details-disposition-click-more-info"
                          @click="onOpenLineInClassicClicked(usedCampaign?.id)">
                       <q-tooltip anchor="top middle"
                                  self="bottom middle"
-                                 max-width="150px">
+                                 max-width="150px"
+                                 data-testid="comm-details-disposition-click-more-info-tooltip">
                         Click for more info
                       </q-tooltip>
                       <span class="text-blue cursor-pointer">
@@ -197,6 +213,7 @@
                   <div>
                     <div class="flex items-center mr-1 h-100 w-100"
                          v-if="usedCampaign?.id"
+                         data-testid="comm-details-disposition-click-more-info"
                          @click="onOpenLineInClassicClicked(usedCampaign?.id)">
                       <q-tooltip anchor="top middle"
                                  self="bottom middle"
@@ -213,21 +230,23 @@
               </b-col>
             </b-form-row>
           </q-card-section>
-          <q-card-section class="pt-0 pb-0">
-            <b-form-row>
-              <b-col class="pl-0 pr-0">
+          <q-card-section class="pt-0 pb-0" data-testid="comm-details-card-section">
+            <b-form-row data-testid="comm-details-disposition-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-disposition-col">
                 <q-item-label>To: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-disposition-col">
                 <div class="d-flex align-items-center"
                      v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
                   <div>
                       <div class="flex items-center mr-1 h-100"
                            v-if="usedCampaign?.id"
+                           data-testid="comm-details-disposition-click-more-info"
                            @click="onOpenLineInClassicClicked(usedCampaign?.id)">
                       <q-tooltip anchor="top middle"
                                  self="bottom middle"
-                                 max-width="150px">
+                                 max-width="150px"
+                                 data-testid="comm-details-disposition-tooltip">
                         Click for more info
                       </q-tooltip>
                       <span class="text-blue cursor-pointer">
@@ -242,6 +261,7 @@
                   <div>
                     <div class="flex items-center mr-1 h-100"
                          v-if="usedCampaign?.id"
+                         data-testid="comm-details-disposition-click-more-info"
                          @click="onOpenLineInClassicClicked(usedCampaign?.id)">
                       <q-tooltip anchor="top middle"
                                  self="bottom middle"
@@ -267,8 +287,8 @@
             </b-form-row>
             <hr/>
             <div v-if="[CommunicationTypes.CALL].includes(communication.type)">
-              <b-form-row>
-                <b-col class="pl-0 pr-0">
+              <b-form-row data-testid="comm-details-disposition-row">
+                <b-col class="pl-0 pr-0" data-testid="comm-details-disposition-col">
                   <q-item-label class="mt-2">
                     Target Users <span v-if="communication.target_users && communication.target_users.length">({{ attemptLabel }})</span>:
                   </q-item-label>
@@ -276,14 +296,15 @@
                 <b-col>
                   <target-users-tree class="w-100"
                                      :communication="communication"
-                                     :show-label="false"/>
+                                     :show-label="false"
+                                     data-testid="comm-details-disposition-target-users-tree"/>
                 </b-col>
               </b-form-row>
               <hr/>
             </div>
 
             <div v-if="[CommunicationTypes.CALL, CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-              <b-form-row>
+              <b-form-row data-testid="comm-details-disposition-row">
               <b-col class="pl-0 pr-0">
                 <q-item-label>User: </q-item-label>
               </b-col>
@@ -294,19 +315,22 @@
                         v-if="communication.rejected_by_app !== 0">
                   <q-tooltip anchor="top middle"
                              self="bottom middle"
-                             max-width="150px">
+                             max-width="150px"
+                             data-testid="comm-details-tooltip">
                     {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                   </q-tooltip>
                 </q-icon>
                 <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
                   <div class="flex items-center mr-1 h-100"
+                       data-testid="comm-details-open-users"
                        @click="onOpenUserInClassicClicked(communication?.user_id)">
                     <span class="text-blue cursor-pointer"
                           :title="getUserName(getUser(communication.user_id))">
                       <q-tooltip class="item"
                                  content-class="bg-grey-light11"
                                  anchor="top left"
-                                 self="center middle">
+                                 self="center middle"
+                                 data-testid="comm-details-click-more-info-tooltip">
                         Click For More Info
                       </q-tooltip>
                       {{ getUserName(getUser(communication.user_id)) }}
@@ -323,7 +347,7 @@
               <hr/>
             </div>
             <div v-if="communication.type === CommunicationTypes.CALL && communication.attempting_users && communication.attempting_users.length > 0 && verbose">
-              <b-form-row >
+              <b-form-row data-testid="comm-details-row">
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Attempting Users: </q-item-label>
                 </b-col>
@@ -405,10 +429,10 @@
               </b-col>
             </b-form-row>
           </q-card-section>
-          <q-card-section class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0" data-testid="comm-details-card-section">
             <div v-if="communication.type === CommunicationTypes.SMS">
-              <b-form-row>
-                <b-col class="pl-0 pr-0">
+              <b-form-row data-testid="comm-details-current-status-row">
+                <b-col class="pl-0 pr-0" data-testid="comm-details-current-status-col">
                   <q-item-label>Current Status: </q-item-label>
                 </b-col>
                 <b-col>
@@ -464,14 +488,14 @@
             </div>
           </q-card-section>
 
-          <q-card-section class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0" data-testid="comm-details-card-section">
             <!--TALK TIME-->
             <div v-if="communication.type === CommunicationTypes.CALL">
-              <b-form-row>
-                <b-col class="pl-0 pr-0">
+              <b-form-row data-testid="comm-details-talk-time-form-row">
+                <b-col class="pl-0 pr-0" data-testid="comm-details-talk-time-form-col">
                   <q-item-label>Talk Time: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col data-testid="comm-details-talk-time-form-col">
                   <div class="d-flex align-items-center">
                     {{ communication.talk_time | fixDuration }}
                   </div>
@@ -498,22 +522,25 @@
           </q-card-section>
 
           <q-card-section class="pt-0 pb-0"
-                          v-if="typeHaveLine">
+                          v-if="typeHaveLine"
+                          data-testid="comm-details-card-section">
             <!--RING GROUP-->
-            <b-form-row v-if="communication.ring_group_id">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.ring_group_id" data-testid="comm-details-ring-group-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-ring-group-col">
                 <q-item-label>Ring Group: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-ring-group-col">
                 <div class="d-flex align-items-center">
                   <div class="flex items-center mr-1 h-100"
+                       data-testid="comm-details-ring-group-open-rg-in-classic"
                        @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
                        v-if="usedRingGroup && !usedRingGroup?.call_waiting">
                     <span class="text-blue cursor-pointer"
                           :title="usedRingGroup.name">
                       <q-tooltip anchor="top middle"
                                  self="bottom middle"
-                                 max-width="150px">
+                                 max-width="150px"
+                                 data-testid="comm-details-ring-group-tooltip">
                         Click For More Info
                       </q-tooltip>
                       {{ usedRingGroup.name }}
@@ -532,20 +559,22 @@
             </b-form-row>
 
             <!--SEQUENCE-->
-            <b-form-row v-if="communication.workflow_id">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.workflow_id" data-testid="comm-details-sequence-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-sequence-col">
                 <q-item-label>Sequence: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-sequence-col">
                 <div class="d-flex align-items-center">
                   <div class="flex items-center mr-1 h-100"
+                       data-testid="comm-details-sequence-open-sequence-in-classic"
                        @click="onOpenSequenceInClassicClicked(useSequence?.id)"
                        v-if="useSequence">
                     <span class="text-blue cursor-pointer"
                           :title="useSequence?.name">
                       <q-tooltip anchor="top middle"
                                  self="bottom middle"
-                                 max-width="150px">
+                                 max-width="150px"
+                                 data-testid="comm-details-sequence-tooltip">
                         Click For More Info
                       </q-tooltip>
                       {{ useSequence?.name }}
@@ -559,19 +588,21 @@
             </b-form-row>
 
             <!--BROADCAST-->
-            <b-form-row v-if="communication.broadcast_id">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.broadcast_id" data-testid="comm-details-broadcast-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-broadcast-col">
                 <q-item-label>Broadcast: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-broadcast-col">
                 <div class="d-flex align-items-center">
                   <div class="flex items-center mr-1 h-100"
+                       data-testid="comm-details-broadcast-open-broadcast-in-classic"
                        @click="onOpenBroadcastInClassicClicked(communication.broadcast_id)"
                        v-if="useBroadCast">
                     <span class="text-blue cursor-pointer"
                           :title="useBroadCast.name">
                       <q-tooltip anchor="top middle"
                                  self="bottom middle"
+                                 data-testid="comm-details-broadcast-tooltip"
                                  max-width="150px">
                         Click For More Info
                       </q-tooltip>
@@ -586,14 +617,15 @@
             </b-form-row>
 
             <!--TRANSFERRED FROM-->
-            <b-form-row v-if="communication.transfer_prior_user_ids">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.transfer_prior_user_ids" data-testid="comm-details-transferred-from-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-transferred-from-col">
                 <q-item-label>Transferred from: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-transferred-from-col">
                 <div class="d-flex align-items-center">
                   <div class="flex items-center mr-1 h-100"
                        :key="userId + '-user-' + index"
+                       data-testid="comm-details-transferred-from-open-user-in-classic"
                        @click="onOpenUserInClassicClicked(userId)"
                        v-for="(userId, index) in communication.transfer_prior_user_ids">
                     <span class="text-blue cursor-pointer"
@@ -601,6 +633,7 @@
                       <q-tooltip class="item"
                                  content-class="bg-grey-light11"
                                  anchor="top middle"
+                                 data-testid="comm-details-transferred-from-tooltip"
                                  self="bottom middle">
                         {{ getUserName(getUser(userId)) }}
                       </q-tooltip>
@@ -612,14 +645,15 @@
             </b-form-row>
 
             <!--TRANSFERRED TO-->
-            <b-form-row v-if="communication.transfer_target_user_ids">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.transfer_target_user_ids" data-testid="comm-details-transferred-to-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-transferred-to-col">
                 <q-item-label>Transferred to: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-transferred-to-col">
                 <div class="d-flex align-items-center">
                   <div class="flex items-center mr-1 h-100"
                        :key="userId + '-user-' + index"
+                       data-testid="comm-details-transferred-to-open-user-in-classic"
                        @click="onOpenUserInClassicClicked(userId)"
                        v-for="(userId, index) in communication.transfer_target_user_ids">
                     <span class="text-blue cursor-pointer"
@@ -627,6 +661,7 @@
                       <q-tooltip class="item"
                                  content-class="bg-grey-light11"
                                  anchor="top middle"
+                                 data-testid="comm-details-transferred-to-tooltip"
                                  self="bottom middle">
                         {{ getUserName(getUser(userId)) }}
                       </q-tooltip>
@@ -638,11 +673,11 @@
             </b-form-row>
 
             <!--COLD TRANSFER-->
-            <b-form-row v-if="communication.transfer_target_user_ids">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.transfer_target_user_ids" data-testid="comm-details-cold-transfer-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-cold-transfer-col">
                 <q-item-label>Cold transferred: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-cold-transfer-col">
                 <div class="d-flex align-items-center">
                   {{ communication.in_cold_transfer | fixBooleanType }}
                 </div>
@@ -650,13 +685,15 @@
             </b-form-row>
 
             <!--CHILD CALL - NEW-->
-            <b-form-row v-if="communication.metadata && communication.metadata.new_communication_id">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.metadata && communication.metadata.new_communication_id"
+                        data-testid="comm-details-new-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-new-col">
                 <q-item-label>Child Call: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-new-col">
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.new_communication_id }}">
+                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.new_communication_id }}"
+                                data-testid="comm-details-new-more-info-link">
                     More info
                   </router-link>
                 </div>
@@ -664,13 +701,15 @@
             </b-form-row>
 
             <!--PARENT CALL - ORIGINAL-->
-            <b-form-row v-if="communication.metadata && communication.metadata.original_communication_id">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.metadata && communication.metadata.original_communication_id"
+                        data-testid="comm-details-original-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-original-col">
                 <q-item-label>Parent Call: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-original-col">
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.original_communication_id }}">
+                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.original_communication_id }}"
+                               data-testid="comm-details-original-more-info-link">
                     More info
                   </router-link>
                 </div>
@@ -678,13 +717,15 @@
             </b-form-row>
 
             <!--CHILD CALL - ACTIVE-->
-            <b-form-row v-if="communication.metadata && communication.metadata.active_communication_id">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.metadata && communication.metadata.active_communication_id"
+                        data-testid="comm-details-child-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-child-col">
                 <q-item-label>Child Call: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-child-col">
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.active_communication_id }}">
+                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.active_communication_id }}"
+                               data-testid="comm-details-child-more-info-row">
                     More info
                   </router-link>
                 </div>
@@ -692,13 +733,15 @@
             </b-form-row>
 
             <!--PARENT CALL - FAKE-->
-            <b-form-row v-if="communication.metadata && communication.metadata.fake_communication_id">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.metadata && communication.metadata.fake_communication_id"
+                        data-testid="comm-details-fake-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-fake-col">
                 <q-item-label>Parent Call: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-fake-col">
                 <div class="d-flex align-items-center">
-                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.fake_communication_id }}">
+                  <router-link :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.fake_communication_id }}"
+                                data-testid="comm-details-fake-more-info-link">
                     More info
                   </router-link>
                 </div>
@@ -706,8 +749,9 @@
             </b-form-row>
 
             <!--RECEIVED/SENT BY-->
-            <b-form-row v-if="getUser(communication.user_id) && communication.type === CommunicationTypes.SMS">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="getUser(communication.user_id) && communication.type === CommunicationTypes.SMS"
+                        data-testid="comm-details-sent-by-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-sent-by-col">
                 <q-item-label v-if="communication.direction === CommunicationDirections.INBOUND">
                   Received by:
                 </q-item-label>
@@ -715,7 +759,7 @@
                   Sent by:
                 </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-sent-by-col">
                 <div class="d-flex align-items-center">
                   {{ getUser(communication.user_id).name }}
                 </div>
@@ -723,14 +767,15 @@
             </b-form-row>
 
             <!--RECORDING-->
-            <b-form-row v-if="communication.type === CommunicationTypes.CALL">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="communication.type === CommunicationTypes.CALL" data-testid="comm-details-recording-card">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-recording-col">
                 <q-item-label class="mt-3 custom-item-label">Recording: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-recording-col">
                 <div class="d-flex align-items-center"
                      v-if="showAudio(communication)">
                   <communication-audio class="mb-2"
+                                       data-testid="comm-details-recording-comm-audio"
                                        :communication="communication"
                                        :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                        :uniqueId="communication.id + '1'"/>
@@ -743,19 +788,22 @@
             </b-form-row>
 
             <!--VM-->
-            <b-form-row v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)">
-              <b-col class="pl-0 pr-0">
+            <b-form-row v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)"
+                        data-testid="comm-details-vm-card">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-vm-col">
                 <q-item-label>Voicemail: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center"
                      v-if="communication.has_voicemail">
                   <communication-audio class="mb-2"
+                                       data-testid="comm-details-vm-comm-audio"
                                        :communication="communication"
                                        :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                        :uniqueId="communication.id + '2'"/>
                 </div>
                 <div class="d-flex align-items-center"
+                     data-testid="comm-details-vm-no-voicemail"
                      v-else>
                   No Voicemail
                 </div>
@@ -765,8 +813,9 @@
 
           <!--FILES HERE-->
           <q-card-section class="pt-0 pb-0"
-                          v-if="typeHaveAttachments">
-            <b-form-row>
+                          v-if="typeHaveAttachments"
+                          data-testid="comm-details-files-card">
+            <b-form-row data-testid="comm-details-files-row">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Files: </q-item-label>
               </b-col>
@@ -777,6 +826,7 @@
                      v-for="(attachment, index) in communication.attachments">
                   <download-button is-simple
                                    show-file-name
+                                   data-testid="comm-details-files-download-btn"
                                    :communication-id="communication.id"
                                    :filename="attachment.name"
                                    :file-mime-type="attachment.mime_type"
@@ -787,8 +837,8 @@
           </q-card-section>
 
           <!--NOTES-->
-          <q-card-section class="pt-0 pb-0">
-            <b-form-row>
+          <q-card-section class="pt-0 pb-0" data-testid="comm-details-notes-card">
+            <b-form-row data-testid="comm-details-row">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Notes: </q-item-label>
               </b-col>
@@ -799,6 +849,7 @@
                        v-html="$options.filters.nl2br(communication.notes)"/>
                   <b-link href="#"
                           class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
+                          data-testid="comm-details-link-edit-note"
                           @click="onEditNote">
                     <slot name="button">
                       <span>
@@ -811,6 +862,7 @@
                      v-if="isEditingNote">
                   <communication-note ref="communicationNotes"
                                       :communication="communication"
+                                      data-testid="comm-details-comm-note"
                                       @notesBlurred="isEditingNote = false"/>
                 </div>
               </b-col>
@@ -818,8 +870,8 @@
           </q-card-section>
 
           <!-- CREATOR TYPE -->
-          <q-card-section class="pt-0 pb-0">
-            <b-form-row>
+          <q-card-section class="pt-0 pb-0" data-testid="comm-details-creator-type-card">
+            <b-form-row data-testid="comm-details-creator-type-row">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Creator Type: </q-item-label>
               </b-col>
@@ -831,15 +883,15 @@
             </b-form-row>
           </q-card-section>
 
-          <q-card-section class="pt-0 pb-0">
+          <q-card-section class="pt-0 pb-0" data-testid="comm-details-tags-card">
             <!--TAGS-->
-            <b-form-row>
+            <b-form-row data-testid="comm-details-tags-row">
               <b-col class="pl-0 pr-0">
                 <q-item-label>Tags: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <communication-tags :communication="communication"/>
+                  <communication-tags data-testid="comm-details-tags-comm-tags" :communication="communication"/>
                 </div>
               </b-col>
             </b-form-row>
@@ -847,24 +899,25 @@
 
           <!--CALL DISPOSITION-->
           <q-card-section class="pt-0 pb-0"
-                          v-if="isCallAndHaveCallDisposition">
-            <b-form-row>
-              <b-col class="pl-0 pr-0">
-                <q-item-label class="mt-3 custom-item-label">Call Disposition: </q-item-label>
+                          v-if="isCallAndHaveCallDisposition"
+                          data-testid="comm-details-call-disposition-card">
+            <b-form-row data-testid="comm-details-call-disposition-row">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-call-disposition-col">
+                <q-item-label class="mt-3 custom-item-label" data-testid="comm-details-call-disposition-item">Call Disposition: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col data-testid="comm-details-call-disposition-col">
                 <div class="d-flex align-items-center">
-                  <call-disposition-selector :communication="communication"/>
+                  <call-disposition-selector data-testid="comm-details-disposition-selector" :communication="communication"/>
                 </div>
               </b-col>
             </b-form-row>
-            <b-form-row v-if="currentCompany.hubspot_integration_enabled">
+            <b-form-row v-if="currentCompany.hubspot_integration_enabled" data-testid="comm-details-call-disposition-row">
               <b-col class="pl-0 pr-0">
                 <q-item-label class="mt-3 custom-item-label">Hubspot Type: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>
+                  <hubspot-activity-type-selector data-testid="comm-details-call-disposition-hubspot" :communication="communication"></hubspot-activity-type-selector>
                 </div>
               </b-col>
             </b-form-row>
@@ -873,9 +926,11 @@
       </b-col>
       <b-col md="8"
              class="pr-0 ring-group-snapshot-wrapper"
+             data-testid="comm-details-col"
              v-if="communication && communication.type === CommunicationTypes.CALL">
         <ring-group-snapshot :communication="communication"
-                             :ring-group="usedRingGroup"/>
+                             :ring-group="usedRingGroup"
+                             data-testid="comm-details-ring-group-snapshot"/>
       </b-col>
     </b-row>
   </div>

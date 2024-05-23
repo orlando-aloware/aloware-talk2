@@ -23,6 +23,7 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
+           data-testid="communication-active-sidebar-btn"
            v-show="isActive('Inbox')"
            flat>
       <q-tooltip anchor="center right"
@@ -37,6 +38,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
+           data-testid="communication-no-active-sidebar-btn"
            v-show="!isActive('Inbox')"
            flat>
       <q-tooltip anchor="center right"
@@ -68,6 +70,7 @@
            align="center"
            padding="none"
            class="nav-icons w-100"
+           data-testid="contacts-no-active-sidebar-btn"
            v-show="!isActive('Contacts')"
            flat>
       <q-tooltip anchor="center right"

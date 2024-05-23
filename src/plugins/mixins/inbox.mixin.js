@@ -1,4 +1,4 @@
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
@@ -25,6 +25,8 @@ export default {
     ]),
 
     ...mapState('auth', ['profile']),
+
+    ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
     nextPage () {
       return this.contactsCurrentPage + 1
@@ -523,6 +525,27 @@ export default {
         .catch(err => {
           console.log(err)
         })
+    },
+
+    getContactStatusOptions () {
+      if (!this.isContactStatusControlEnabled) {
+        return []
+      }
+
+      return [
+        {
+          value: ContactTaskStatus.STATUS_OPEN,
+          label: 'Open'
+        },
+        {
+          value: ContactTaskStatus.STATUS_PENDING,
+          label: 'Pending'
+        },
+        {
+          value: ContactTaskStatus.STATUS_CLOSED,
+          label: 'Closed'
+        }
+      ]
     }
   },
 
