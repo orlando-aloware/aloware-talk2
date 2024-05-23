@@ -231,15 +231,12 @@ export default {
 
       const id = this.$route.params.id
       let integrationReport = this.$jsonClone(this.integrationPDImportSummaries[id])
+      this.fullReport.info.total_selected_contacts = this.statusReport.info.selected
       console.log('buildReport id', id)
       console.log('buildReport this.integrationPDImportSummaries', this.integrationPDImportSummaries)
       console.log('buildReport integrationReport', integrationReport)
       if (integrationReport) {
         this.fullReport.info.total_selected_contacts = integrationReport.total_selected_contacts
-      }
-
-      if (!integrationReport) {
-        this.fullReport.info.total_selected_contacts = this.statusReport.extra.total_selected
       }
 
       if (isEmpty(integrationReport)) {
