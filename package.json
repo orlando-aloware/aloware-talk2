@@ -30,7 +30,7 @@
     "@riophae/vue-treeselect": "^0.4.0",
     "@sentry/vue": "^7.106.1",
     "@sentry/webpack-plugin": "^1.21.0",
-    "@twilio/voice-sdk": "^2.10.2",
+    "@twilio/voice-sdk": "^2.8",
     "@vue-bootstrap-components/vue-bootstrap-autocomplete": "^2.15.3",
     "announcekit-vue": "^2.3.0",
     "axios": "^1.6.7",
