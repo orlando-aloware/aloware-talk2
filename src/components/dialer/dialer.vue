@@ -1459,6 +1459,7 @@ export default {
       // 9221 => Cannot connect to insights
       // 20101 => Invalid token
       // 31102 => MalformedRequestErrors.AuthorizationTokenMissingError, SignatureValidationErrors.AccessTokenSignatureValidationFailed
+      // 31203 => AuthorizationErrors.NoValidAccountError
       // 31207 => AuthorizationErrors.JWTTokenExpirationTooLongError
       // 31404 => ClientErrors.NotFound
       // 31480 => ClientErrors.TemporarilyUnavilable
