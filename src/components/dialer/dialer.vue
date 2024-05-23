@@ -586,6 +586,9 @@ export default {
           options.logLevel = 1
           options.enableImprovedSignalingErrorPrecision = true
         }
+        if (this.isCompanyPartOfCustomEdgeLocations(this.currentCompany.id)) {
+          options.edge = 'ashburn'
+        }
         this.device.initialize(this.dialer.token, options)
 
         console.log(reset)
