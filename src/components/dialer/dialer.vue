@@ -587,7 +587,7 @@ export default {
           options.enableImprovedSignalingErrorPrecision = true
         }
         if (this.isCompanyPartOfCustomEdgeLocations(this.currentCompany.id)) {
-          options.edge = 'ashburn'
+          options.edge = ['ashburn', 'umatilla', 'roaming'],
         }
         this.device.initialize(this.dialer.token, options)
 
