@@ -591,7 +591,7 @@ export default {
         }
         this.device.initialize(this.dialer.token, options)
 
-        console.log(reset)
+        console.log('Reset device', reset)
         if (!reset) {
           this.device.register()
         } else {
