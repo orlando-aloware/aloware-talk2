@@ -352,6 +352,7 @@ export default {
       'appliedFilter',
       'hasMoreCommunications',
       'inboxShowMyContacts',
+      'inboxShowUnreads',
       'isFilterDialogForView'
     ]),
 
@@ -402,7 +403,8 @@ export default {
           contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
           from_date: Filters.DEFAULT_STATE.filter.from_date,
           to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact
+          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+          unread_only: Filters.DEFAULT_STATE.filter.unread_only
         }
         return defaultFilterModel
       }
@@ -428,7 +430,8 @@ export default {
           contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
           from_date: Filters.DEFAULT_STATE.filter.from_date,
           to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact
+          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+          unread_only: Filters.DEFAULT_STATE.filter.unread_only
         }
 
         if (['recordings'].includes(this.$route.params.channel)) {
@@ -491,6 +494,7 @@ export default {
         from_date: Filters.DEFAULT_STATE.filter.from_date,
         to_date: Filters.DEFAULT_STATE.filter.to_date,
         my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+        unread_only: Filters.DEFAULT_STATE.filter.unread_only,
         creator_type: Filters.DEFAULT_STATE.filter.creator_type
       }
 
@@ -864,6 +868,7 @@ export default {
       'setIsInboxFiltersLoaded',
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
+      'setInboxShowUnreads',
       'setFilterDialogForView',
       'setIsEditingView'
     ]),
@@ -1046,7 +1051,8 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-      params = this.filterMyContacts(params)
+      console.log('this.filtersToggle(params) -->', this.filtersToggle(params))
+      params = this.filtersToggle(params)
 
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
@@ -1088,6 +1094,12 @@ export default {
 
       if (this.inboxShowMyContacts) {
         params.my_contact = 1
+      }
+
+      console.log('inbox-channels -->', this.inboxShowUnreads)
+      if (this.inboxShowUnreads) {
+        params.unread_only = 1
+        params.has_unread = this.inboxShowUnreads ? 1 : 0
       }
 
       let api = talk2Api.V1.reports.communications
@@ -1373,6 +1385,28 @@ export default {
       }
 
       return params
+    },
+
+    filterUnreadOnly (params, showUnreads) {
+      if (showUnreads === undefined) {
+        showUnreads = this.inboxShowUnreads
+      }
+
+      const unreadOnlyFilter = _.get(params, 'unread_only', null)
+
+      if (unreadOnlyFilter !== (showUnreads | 0)) {
+        params.unread_only = (showUnreads | 0)
+        console.log('params.unread_only -->', params.unread_only)
+      }
+
+      return params
+    },
+
+    filtersToggle (params) {
+      return {
+        ...this.filterMyContacts(params),
+        ...this.filterUnreadOnly(params)
+      }
     },
 
     onClickAppliedFilterButton () {

@@ -17,6 +17,7 @@ export default {
       'contactsCurrentPage',
       'liveContacts',
       'inboxShowMyContacts',
+      'inboxShowUnreads',
       'activeChannel',
       'pinnedViews',
       'contacts',
@@ -367,6 +368,8 @@ export default {
           ]
         }
       }
+
+      query.unread_only = this.inboxShowUnreads ? 1 : 0
 
       if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {
