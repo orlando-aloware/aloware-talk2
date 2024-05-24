@@ -1678,10 +1678,10 @@
   resolved "https://registry.yarnpkg.com/@twilio/voice-errors/-/voice-errors-1.4.0.tgz#0ab954085a32a00442814e56c95936908871ff6e"
   integrity sha512-7BCg9MPz+KQ0JJ6Rl5W3Zw3E+i3Tt77VZw3/2i3Z+IPZITmCOQLu1nKx/0Nlj505Xtfr7eY9Mcern5PfIoBW0w==
 
-"@twilio/voice-sdk@^2.10.2":
-  version "2.10.2"
-  resolved "https://registry.yarnpkg.com/@twilio/voice-sdk/-/voice-sdk-2.10.2.tgz#99c668f1af9ea135c026c43a2f293678bd68afc3"
-  integrity sha512-+isGRUI5nkjD0fxl6UeO1hfUYx0SnynFePSmw186QxCHiWqToxnA6hg9SGiC9I4RDJKBDmnKlxA/4egupPQ7wg==
+"@twilio/voice-sdk@2.8":
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@twilio/voice-sdk/-/voice-sdk-2.8.0.tgz#9ae50a9d32a879fb295d011c68d6dd12078e4826"
+  integrity sha512-0mEi1I6skZoHmc27wNin8TnWr0PWLVFQ4v9W16FEi8sLURC1bE7w1zvaK8n92Jm8AdN9xMSnnop2iYnkCokQzA==
   dependencies:
     "@twilio/voice-errors" "1.4.0"
     "@types/md5" "2.3.2"
@@ -13407,7 +13407,7 @@ vue-at@^2.5.0-beta:
   resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/163ebf60d026752f54282f6fb542a105861525b9"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.26"
-    "@fortawesome/free-solid-svg-icons" "^6.5.2"
+    "@fortawesome/free-solid-svg-icons" "^5.12.0"
     "@fortawesome/vue-fontawesome" "^0.1.9"
     axios "^0.18.1"
     core-js "^2.6.11"
