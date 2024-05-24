@@ -107,6 +107,7 @@ jobs:
           ENV_XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
           ENV_USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
+          ENV_CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
           file-name: .env.prod
 
       - name: Build/release Electron mac app
@@ -184,6 +185,9 @@ jobs:
 
           # Userpilot
           USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
+
+          # Custom Edge Location
+          CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
 
       - name: Extract Metadata from package.json
         id: pkg
