@@ -105,9 +105,8 @@
           </b-dropdown>
         </div>
         <div class="phone-number-duplicates-icon">
-          <contact-phone-number-duplicates
-            v-if="phone.conflicted_contacts.length !== 0"
-            :phone_number="phone" />
+          <contact-phone-number-duplicates :phone_number="phone"
+                                           v-if="phone.conflicted_contacts.length !== 0" />
         </div>
       </div>
     </div>

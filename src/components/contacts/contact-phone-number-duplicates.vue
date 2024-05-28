@@ -16,7 +16,7 @@
                :fields="mainFields"
                :items="[phone_number.contact]">
         <template #cell(main)="data">
-          <router-link :to="{ name: 'Contact', params: { id: data.item.id }}" >{{ data.item.id }}</router-link>
+          <router-link :to="{ name: 'Contact', params: { id: data.item.id }}">{{ data.item.id }}</router-link>
         </template>
       </b-table>
       <b-table class='mb-0'
@@ -25,7 +25,7 @@
                :fields="conflictedFields"
                :items="phone_number.conflicted_contacts">
         <template #cell(conflicted)="data">
-          <router-link :to="{ name: 'Contact', params: { id: data.item.id }}" >{{ data.item.id }}</router-link>
+          <router-link :to="{ name: 'Contact', params: { id: data.item.id }}">{{ data.item.id }}</router-link>
         </template>
       </b-table>
     </b-modal>
