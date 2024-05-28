@@ -28,10 +28,6 @@
                       v-if="statics.whitelabel">
                       Sets all users' statuses to 'Offline' by default after they login or have 5 minutes of app inactivity
                     </span>
-                    <span class="d-flex mb-2"
-                          v-else>
-                      By default, we set all users' statuses to 'Offline' after they login or have 5 minutes of app inactivity
-                    </span>
                     <span class="d-flex font-weight-bold">Turning on 'Force Users to Always Available' Setting:</span>
                     <ul class="mb-0">
                       <li>Users' statuses are set to 'Available' even after they login or have 5 minutes of app inactivity</li>
