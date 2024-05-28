@@ -17,7 +17,11 @@
                      :class="toggleFiltersClass"
                      :disabled="toggleFiltersEnabled"
                      v-model="inboxShowMyContactsFilter">
-      <q-tooltip content-class="bg-grey-light11">Toggle My Contacts</q-tooltip>
+      <q-tooltip content-class="bg-grey-10 text-white"
+                 anchor="bottom left"
+                 self="top middle">
+        Toggle My Contacts
+      </q-tooltip>
     </b-form-checkbox>
     <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
           :class="toggleFiltersClass"
@@ -39,7 +43,11 @@
                        :class="toggleFiltersClass"
                        :disabled="toggleFiltersEnabled"
                        v-model="inboxShowUnreadsFilter">
-        <q-tooltip content-class="bg-grey-light11">Toggle Unreads</q-tooltip>
+        <q-tooltip content-class="bg-grey-10 text-white"
+                   anchor="bottom left"
+                   self="top middle">
+          Toggle Unreads
+        </q-tooltip>
       </b-form-checkbox>
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
              :class="toggleFiltersClass"
