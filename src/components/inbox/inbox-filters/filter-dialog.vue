@@ -6,6 +6,7 @@
            hide-header-close
            hide-header
            hide-footer
+           data-testid="filter-dialog-modal"
            v-model="isOpen"
            @hidden="onHidden"
            @show="onShow"
@@ -21,28 +22,32 @@
             <div class="mb-4">
               <div class="filter-items cursor-pointer position-relative"
                    v-bind:class="{ 'active' : !selectedFilter }"
+                   data-testid="filter-dialog-set-new-filter"
                    @click="setToNewFilter">
                 <div>
                   <span>New (Untitled)</span>
                   <span class="position-absolute check-icon"
                         v-if="!selectedFilter">
-                    <check-o-icon color="#040404" />
+                    <check-o-icon data-testid="filter-dialog-check-o-icon" color="#040404" />
                   </span>
                 </div>
               </div>
             </div>
-            <h5 class="text-uppercase filter-group-title">Personal Filters</h5>
+            <h5 class="text-uppercase filter-group-title" data-testid="filter-dialog-personal-filter-title">Personal Filters</h5>
             <div class="saved-filters">
               <q-skeleton type="rect"
-                          v-if="isGettingFilters" />
+                          v-if="isGettingFilters"
+                          data-testid="filter-dialog-skeleton"/>
               <p class="text-muted fs-12 empty-filter-placeholder pl-2"
                  v-show="!isGettingFilters"
-                 v-if="personalFilters.length < 1">
+                 v-if="personalFilters.length < 1"
+                 data-testid="filter-dialog-none-p">
                 None
               </p>
               <filter-list-items :key="item.id"
                                  :filter="item"
                                  v-for="item in personalFilters"
+                                 data-testid="filter-dialog-filter-list-items"
                                  @filterSelected="onSelectFilter"
                                  @filterRename="onRenameFilter"
                                  @filterDelete="(e) => onDeleteFilter(e, item)">
@@ -51,6 +56,7 @@
             <h5 class="text-uppercase filter-group-title mt-4">Company Filters</h5>
             <div class="saved-filters">
               <q-skeleton type="rect"
+                          data-testid="filter-dialog-skeleton"
                           v-if="isGettingFilters" />
               <p class="text-muted fs-12 empty-filter-placeholder pl-2"
                  v-show="!isGettingFilters"
@@ -62,6 +68,7 @@
                    :class="getFilterItemClass(item)"
                    :key="item.id"
                    v-for="item in companyFilters"
+                   data-testid="filter-dialog-select-filter"
                    @click="onSelectFilter(item)">
                 <span>
                   <q-tooltip anchor="top middle"
@@ -85,6 +92,7 @@
                    :label="filterFormDisplayName"
                    :dense="true"
                    clearable
+                   data-testid="filter-dialog-view-name-input"
                    v-model.trim="viewName"
                    v-if="isEditingView && selectedFilter && (!+selectedFilter?.is_on_company || selectedFilter?.scope === 'user')"
                    @keyup.enter="renameFilter" />
@@ -93,34 +101,40 @@
             <span class="filter-name">{{ filterFormDisplayName }}</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
+                       data-testid="filter-dialog-close-compact-btn"
                        @clicked="onHide">
             <close-icon iconColor="#000000" />
           </compact-btn>
         </div>
         <filter-form ref="inboxChannelFilterForm"
                      :default-filter-model="loadedDefaultFilterModel"
-                     :filter="filter">
+                     :filter="filter"
+                     data-testid="filter-dialog-filter-form">
         </filter-form>
         <div class="d-flex justify-content-end mt-sm-3 px-3">
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
                          :disabled="!filterHasChanges"
+                         data-testid="filter-dialog-reset-compact-btn"
                          @clicked="onResetFilter">
               Reset
             </compact-btn>
             <compact-btn class="btn-primary"
                          :class="isViewEditModeOrNonView ? 'mr-2' : ''"
                          :disabled="isSaveAsNewDisabled"
+                         data-testid="filter-dialog-save-as-new-compact-btn"
                          @clicked="onSaveNewFilter">
               Save as New
             </compact-btn>
             <compact-btn variant="success"
                          :disabled="isUpdatingFilter"
                          v-if="isViewEditModeOrNonView"
+                         data-testid="filter-dialog-apply-compact-btn"
                          @clicked="onApply">
               <q-spinner-bars color="white"
                               class="mr-1"
-                              v-if="isUpdatingFilter"/>
+                              v-if="isUpdatingFilter"
+                              data-testid="filter-dialog-spinners-bars"/>
               {{ applyButtonText }}
             </compact-btn>
           </div>
@@ -131,6 +145,7 @@
       <b-button variant="success"
                 class="custom-btn"
                 size="sm"
+                data-testid="filter-dialog-close-btn"
                 @click="hide()">
         Close
       </b-button>

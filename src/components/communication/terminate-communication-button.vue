@@ -1,11 +1,12 @@
 <template>
   <span :class="classes"
         :disabled="loading"
+        data-testid="comm-terminate-comm-button"
         v-if="show"
         @click="dialog">
     <power-icon height="22"
                 width="22"/>
-    <q-tooltip>
+    <q-tooltip data-testid="comm-terminate-comm-button-tooltip">
       Terminate
     </q-tooltip>
   </span>

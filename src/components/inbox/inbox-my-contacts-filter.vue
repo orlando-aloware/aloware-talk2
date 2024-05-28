@@ -1,16 +1,19 @@
 <template>
   <div class="d-inline-flex align-items-center"
-       v-if="isShown">
+       v-if="isShown"
+       data-testid="inbox-my-contacts-filter-wrapper">
     <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center mr-1"
                  :disabled="isInboxRefreshBtnLoading"
+                 data-testid="inbox-my-contacts-filter-compact-btn"
                  @clicked="refreshInbox">
-      <refresh-icon :class="$q.screen.width < 450 ? 'm-0': ''"/>
+      <refresh-icon :class="$q.screen.width < 450 ? 'm-0': ''" data-testid="inbox-my-contacts-filter-refresh-icon"/>
       {{ refreshButtonLabel }}
     </compact-btn>
 
     <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                      size="sm"
                      switch
+                     data-testid="inbox-my-contacts-filter-form-checkbox"
                      :class="myContactsToggleClass"
                      :disabled="myContactsToggleEnabled"
                      v-model="inboxShowMyContactsFilter">
@@ -18,6 +21,7 @@
     </b-form-checkbox>
     <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
            :class="myContactsToggleClass"
+           data-testid="inbox-my-contacts-filter-my-contacts-label"
            @click="myContactsFilterChange">
       <span class="label-my-contacts"
             :class="{ hidden: $q.screen.width < 390 }"

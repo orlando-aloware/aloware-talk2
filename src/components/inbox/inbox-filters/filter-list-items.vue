@@ -1,6 +1,7 @@
 <template>
   <div class="filter-items cursor-pointer d-flex justify-content-between position-relative"
        v-bind:class="{ 'active' : selectedFilter && selectedFilter.id === filter.id && !isRenaming }"
+       data-testid="filter-list-items-wrapper"
        @click="onItemSelect">
     <span v-if="!isRenaming">
       <q-tooltip anchor="top middle"
@@ -13,6 +14,7 @@
                   :value="filter.name"
                   :id="'filter-input-' + filter.id"
                   v-if="isRenaming"
+                  data-testid="filter-list-items-form-input"
                   @blur="onInputBlur"
                   @keydown="onKeyDown">
     </b-form-input>
@@ -20,15 +22,18 @@
                 no-caret
                 :popper-opts="{ positionFixed: true }"
                 variant="light"
+                data-testid="filter-list-items-dropdown"
                 v-if="!isRenaming">
       <template #button-content>
         <i class="fa fa-ellipsis-h"></i>
       </template>
       <b-dropdown-item href="#"
+                       data-testid="filter-list-items-rename-dropdown-item"
                        @click="(e) => onEdit(e)">
         <pencil-icon></pencil-icon> Rename
       </b-dropdown-item>
       <b-dropdown-item href="#"
+                       data-testid="filter-list-items-delete-dropdown-item"
                        @click="(e) => onDelete(e)">
         <trash-o-icon></trash-o-icon> Delete
       </b-dropdown-item>

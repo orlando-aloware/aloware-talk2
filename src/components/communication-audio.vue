@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100">
+  <div class="w-100" data-testid="comm-audio-wrapper">
     <div v-if="!isDeleted && hasAudio">
       <div class="audio-player p-2">
         <div class="d-flex flex-row align-items-center w-100"

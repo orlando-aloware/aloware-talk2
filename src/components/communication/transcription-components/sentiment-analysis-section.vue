@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center">
-    <strong class="mr-2">Overall Sentiment:</strong>
+    <strong class="mr-2" data-testid="comm-sentiment-analysis-section">Overall Sentiment:</strong>
     <div v-if="!isEmpty(sentiment_analysis)">
       <!--
           Sentiment analysis object contains:
@@ -13,9 +13,10 @@
         <div class="mr-2">{{ sentimentSummary.speaker }}:</div>
         <q-chip text-color="black"
                 dense
+                data-testid="comm-sentiment-analysis-section-chip"
                 :color="sentimentChipColors[sentimentSummary.overall]">
           <strong>{{ sentimentSummary.overall }}</strong>
-          <q-tooltip>
+          <q-tooltip data-testid="comm-sentiment-analysis-section-tooltip">
             {{ calculateOverAllSentimentBySpeaker(sentimentSummary) }}
           </q-tooltip>
         </q-chip>

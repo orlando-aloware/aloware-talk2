@@ -1,7 +1,8 @@
 <template>
-  <div class="waveform-container d-flex align-items-center flex-row flex-grow-1">
+  <div class="waveform-container d-flex align-items-center flex-row flex-grow-1" data-testid="waveform-wrapper">
     <button class="play-button mr-2 px-0"
             :disabled="!ready"
+            data-testid="waveform-button"
             @click.prevent="handlePlay">
       <i class="fa fa-pause"
          v-if="playing"></i>
@@ -14,7 +15,8 @@
              v-if="loading">
           <q-spinner-bars color="success"
                         size="28px"
-                        class="position-absolute">
+                        class="position-absolute"
+                        data-testid="waveform-spinner-bars">
           </q-spinner-bars>
         </div>
       </div>
@@ -26,6 +28,7 @@
         class="mt-2 q-select-pager"
         option-value="value"
         option-label="label"
+        data-testid="waveform-select-payback-speed"
         @input="changePlaybackSpeed"
         v-model="playbackSpeed"
         :options="playbackOptions"
@@ -38,7 +41,8 @@
     <vue-wave-surfer :src="remoteUrl"
                      :options="options"
                      ref="surf"
-                     v-if="remoteUrl">
+                     v-if="remoteUrl"
+                     data-testid="waveform-wave-surfer">
     </vue-wave-surfer>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex position-relative w-100 flex-column">
+  <div class="d-flex position-relative w-100 flex-column" data-testid="comm-note-wrapper">
     <q-input :disabled="!hasPermissionTo('note communication') || loadingBtn"
              :borderless="borderless"
              :outlined="!borderless"

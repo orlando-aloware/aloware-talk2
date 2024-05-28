@@ -1,5 +1,6 @@
 <template>
   <span class="cursor-pointer"
+        data-testid="comm-unpark-comm-button"
         v-if="canUnparkCommunication(communication)"
         @click="unpark">
     <check-o-icon height="22"
