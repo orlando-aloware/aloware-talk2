@@ -90,14 +90,12 @@ export default {
 
       if (this.selectedContacts[this.selectedList.id]) {
         const hasIntegrationsCount = this.integrationsCount()
-        let text = []
+        const text = []
 
-        if (hasIntegrationsCount > 0) {
-          if (hasIntegrationsCount > 1) {
-            text.push(`There are ${hasIntegrationsCount} contacts from integrations and can't be deleted.`)
-          } else {
-            text.push(`There is a contact from integrations and can't be deleted.`)
-          }
+        if (hasIntegrationsCount > 1) {
+          text.push(`There are ${hasIntegrationsCount} contacts from integrations and can't be deleted.`)
+        } else if (hasIntegrationsCount > 0) {
+          text.push(`There is a contact from integrations and can't be deleted.`)
         }
 
         const canBeDeleted = this.selectedCount - hasIntegrationsCount
@@ -153,6 +151,7 @@ export default {
       if (!this.contactToRemove && this.selectedContacts[this.selectedList.id]) {
         return this.selectedContacts[this.selectedList.id].filter(contact => contact.has_integration).length
       }
+
       return 0
     },
 
