@@ -27,7 +27,13 @@
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>
-          <contact-tags data-testid="contact-details-tags" :contact="contact"/>
+          <entity-tags data-testid="contact-details-tags"
+                       entity="contact"
+                       entity-type="contacts"
+                       label="Tags"
+                       button-text="Modify Tags"
+                       :entity-object="contact"
+                       :category="TagCategories.CAT_CONTACTS"/>
           <contact-notes v-if="contact"
                          :contact="contact"
                          data-testid="contact-details-notes"
@@ -62,7 +68,6 @@ import ContactBroadcast from 'src/components/contacts/contact-broadcast'
 import ContactInformation from 'src/components/contacts/contact-information'
 import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
-import ContactTags from 'src/components/generic-selectors/contact-tags'
 import BackButton from 'components/back-button'
 import { mapGetters, mapActions, mapState } from 'vuex'
 import { CALL, SMS } from 'src/constants/communication-types'
@@ -74,6 +79,8 @@ import ContactSequence from 'components/contacts/contact-sequence'
 import ContactAlohaBot from 'components/contacts/contact-aloha-bot'
 import ContactReservations from 'components/contacts/contact-reservations.vue'
 import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
+import EntityTags from 'components/generic-selectors/entity-tags'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import {
   aclMixin,
   contactMixin,
@@ -123,11 +130,17 @@ export default {
     ContactNotes,
     ContactInfo,
     ContactPhones,
-    ContactTags,
     BackButton,
     ContactAlohaBot,
     ContactReservations,
-    ContactReservationsMessages
+    ContactReservationsMessages,
+    EntityTags
+  },
+
+  data () {
+    return {
+      TagCategories
+    }
   },
 
   computed: {

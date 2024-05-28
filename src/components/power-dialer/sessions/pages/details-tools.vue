@@ -36,8 +36,13 @@
         </b-card-body>
       </b-card>
     </div>
-    <contact-tags class="mb-2"
-                  :contact="contact" />
+    <entity-tags data-testid="contact-details-tags"
+                 entity="contact"
+                 entity-type="contacts"
+                 label="Tags"
+                 button-text="Modify Tags"
+                 :entity-object="contact"
+                 :category="TagCategories.CAT_CONTACTS"/>
     <contact-notes class="mb-2"
                    :contact="contact"
                    @input="onNotesInput" />
@@ -56,7 +61,6 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import ContactSequence from 'components/contacts/contact-sequence'
 import ContactPhones from 'components/contacts/contact-phones'
-import ContactTags from 'components/generic-selectors/contact-tags'
 import ContactNotes from 'components/contacts/contact-notes'
 import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactActivityCounts from 'src/components/contacts/contact-activity-counts'
@@ -66,6 +70,8 @@ import ContactBroadcast from 'src/components/contacts/contact-broadcast'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import TimerIcon from 'src/components/icons/timer-icon'
 import CalendarIcon from 'src/components/icons/calendar-icon'
+import EntityTags from 'components/generic-selectors/entity-tags'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import {
   aclMixin,
   contactMixin
@@ -79,7 +85,7 @@ export default {
   components: {
     ContactSequence,
     ContactPhones,
-    ContactTags,
+    EntityTags,
     ContactNotes,
     ContactIntegrations,
     ContactScheduledMessages,
@@ -95,6 +101,12 @@ export default {
     aclMixin,
     contactMixin
   ],
+
+  data () {
+    return {
+      TagCategories
+    }
+  },
 
   computed: {
     ...mapGetters('powerDialer', [
