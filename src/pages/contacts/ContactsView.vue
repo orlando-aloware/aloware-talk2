@@ -571,12 +571,12 @@
 
                   <span class='d-inline-block'
                         tabindex='0'
-                        v-if='hasIntegration(contact)'
-                        :id='`contact-remove-option-disabled-wrapper-${index}`'>
+                        :id='`contact-remove-option-disabled-wrapper-${index}`'
+                        v-if='hasIntegration(contact)'>
                     <button class='btn btn-sm datatable-row__actions__action--trash'
+                            data-testid='contact-remove-option-disabled'
                             :disabled='true'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
-                            data-testid='contact-remove-option-disabled'>
+                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')">
                       <span class='aloicons action-icons'>B</span>
                     </button>
                     <b-tooltip :target='`contact-remove-option-disabled-wrapper-${index}`'>
@@ -586,8 +586,8 @@
 
                   <span v-else>
                     <button class='btn btn-sm datatable-row__actions__action--trash'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
                             data-testid='contact-remove-option'
+                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
                             @click='onRemove(contact, id)'>
                       <span class='aloicons action-icons'>B</span>
                     </button>

@@ -4,16 +4,16 @@
              size='lg'
              header-class='border-bottom-0 font-weight-bold center-modal-header pb-0'
              header-close-variant='primary'
+             modal-class='contact-phone-number-duplicates-modal'
+             data-testid='contact-phone-number-duplicates-modal'
              title-tag='div'
              :title='getTitle'
              v-model="dialogTableVisible"
-             modal-class='contact-phone-number-duplicates-modal'
-             data-testid='contact-phone-number-duplicates-modal'
     >
       <b-table class='mb-0'
                fixed
                thead-class='conflicted-contact-thead-class'
-               :fields="main_fields"
+               :fields="mainFields"
                :items="[phone_number.contact]">
         <template #cell(main)="data">
           <router-link :to="{ name: 'Contact', params: { id: data.item.id }}" >{{ data.item.id }}</router-link>
@@ -22,7 +22,7 @@
       <b-table class='mb-0'
                fixed
                thead-class='conflicted-contact-thead-class'
-               :fields="conflicted_fields"
+               :fields="conflictedFields"
                :items="phone_number.conflicted_contacts">
         <template #cell(conflicted)="data">
           <router-link :to="{ name: 'Contact', params: { id: data.item.id }}" >{{ data.item.id }}</router-link>
@@ -30,10 +30,10 @@
       </b-table>
     </b-modal>
     <b-button class="btn-tiny"
-              @click="dialogTableVisible = !dialogTableVisible"
               variant='outline-danger'
               data-testid='phone-number-duplicates-button'
-              title='Show conflicted contacts'>
+              title='Show conflicted contacts'
+              @click="dialogTableVisible = !dialogTableVisible">
       <b-icon aria-hidden='true'
               icon='exclamation-lg'
               data-testid='phone-number-duplicates-icon' />
@@ -44,15 +44,16 @@
 export default {
   props: {
     phone_number: {
-      required: true
+      required: true,
+      type: Object
     }
   },
   data () {
     return {
-      main_fields: [
+      mainFields: [
         { key: 'main', label: 'Main Contacts' }, 'first_name', 'last_name'
       ],
-      conflicted_fields: [
+      conflictedFields: [
         { key: 'conflicted', label: 'Conflicted Contacts' }, 'first_name', 'last_name'
       ],
       dialogTableVisible: false

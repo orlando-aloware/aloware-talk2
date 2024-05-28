@@ -93,9 +93,9 @@
               <fax-icon /> Fax
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions"
-                             v-if="phoneCanBeDeleted(phone)"
                              data-testid="contact-phones-list-items-delete-item"
-                             @click="onDelete(phone)">
+                             @click="onDelete(phone)"
+                             v-if="phoneCanBeDeleted(phone)">
               <trash-icon color="#62666E"
                           width="13"
                           data-testid="contact-phones-list-items-delete-icon"

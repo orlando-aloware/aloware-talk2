@@ -7,14 +7,14 @@
       <b-card-body :class="bodyClass" data-testid="contact-phones-body">
         <div class="w-100">
           <h4>All Numbers</h4>
-          <contact-phones-list-items :phones="sortedPhones"
-                                     data-testid="contact-phones-list-items"
+          <contact-phones-list-items data-testid="contact-phones-list-items"
+                                     :phones="sortedPhones"
                                      @edit="onEditPhone"
                                      @delete="onDeletePhone"
                                      @composerMedia="setComposerVariables"
                                      @call="onCall"/>
-          <contact-phones-list-conflicted-items :phones="conflictedContactPhoneNumbers"
-                                                data-testid="contact-phones-list-conflicted-items"/>
+          <contact-phones-list-conflicted-items data-testid="contact-phones-list-conflicted-items"
+                                                :phones="conflictedContactPhoneNumbers" />
 
           <b-link ref="phone_form"
                   href="#"

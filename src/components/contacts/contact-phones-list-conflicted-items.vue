@@ -2,8 +2,8 @@
   <div>
     <div class="phone-number-wrapper"
          data-testid="contact-phones-list-conflicted-items-wrapper"
-         v-for="phone in phones"
-         :key="phone.id">
+         :key="phone.id"
+         v-for="phone in phones">
       <div>
         <span class="text-muted phone-number-title mr-1"
               v-if="phone.title">
@@ -11,8 +11,8 @@
         </span>
 
         <b-badge class="badge-phone-info mr-1"
-                 :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
                  data-testid="contact-phones-list-conflicted-items-lrn-badge"
+                 :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
                  v-if="(phone.lrn_type || phone.lrn_type === 0) && $options.filters.validLrnType(phone.lrn_type)">
           {{ phone.lrn_type | fixLrnType }}
         </b-badge>

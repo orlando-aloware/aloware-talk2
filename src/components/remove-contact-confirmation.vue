@@ -244,10 +244,13 @@ export default {
       }
 
       this.isBusy = true
-      let ids = this.selectedContacts[this.listId]
-        // do not include contacts with integrations
-        .filter(contact => !contact.has_integration)
-        .map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+      let ids = this.selectedContacts[this.listId].reduce((acc, contact) => {
+        if (!contact.has_integration) {
+          acc.push(this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+        }
+        return acc
+      }, [])
+
       ids = chunk(ids, 50)
 
       if (this.isDatatableSelectedAll) {
