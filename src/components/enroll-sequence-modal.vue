@@ -3,7 +3,8 @@
            size="md"
            v-model="isOpen"
            data-testid="enroll-sequence-modal"
-           @hidden="onHidden">
+           @hidden="onHidden"
+           @shown="onShown">
     <b-form @submit.prevent="onSubmit" data-testid="enroll-sequence-modal-form">
       <b-form-group
         id="input-group-1"
@@ -11,7 +12,8 @@
         description="Choose the sequence you want this contact to enroll"
         data-testid="enroll-sequence-modal-form-group"
       >
-        <sequence-selector :multiple="false"
+        <sequence-selector ref="sequenceSelector"
+                           :multiple="false"
                            :use-chips="false"
                            :clearable="true"
                            :generic-styling="false"
@@ -94,9 +96,18 @@ export default {
     },
     onHidden () {
       this.enrollSequenceOpen(false)
+    },
+    onShown () {
+      this.$nextTick(() => {
+        if (this.$refs.sequenceSelector) {
+          const inputElement = this.$refs.sequenceSelector.$el.querySelector('input')
+          if (inputElement) {
+            inputElement.focus()
+          }
+        }
+      })
     }
   },
-
   watch: {
     isEnrollSequenceOpen: function (value) {
       this.open = value
