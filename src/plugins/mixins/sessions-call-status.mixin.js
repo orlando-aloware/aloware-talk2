@@ -354,7 +354,6 @@ export default {
     },
 
     getSkippedAndActiveTasks () {
-      // return [...this.powerDialerTasks.skipped, this.activeTask]
       const skippedTasks = Array.isArray(this.powerDialerTasks.skipped) ? this.powerDialerTasks.skipped : []
       return [...skippedTasks, this.activeTask]
     },
