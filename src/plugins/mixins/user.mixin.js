@@ -79,6 +79,10 @@ export default {
 
     isCompanyPartOfAlowareDemoCompanies (companyId) {
       return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
+    },
+
+    isCompanyPartOfCustomEdgeLocations (companyId) {
+      return storage.local.getItem('custom_edge_location_companies') && storage.local.getItem('custom_edge_location_companies').split(',').includes(String(companyId))
     }
   }
 }

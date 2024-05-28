@@ -85,6 +85,7 @@ storage.local.setItem('pusher_cluster', process.env.PUSHER_CLUSTER)
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 storage.local.setItem('ak_widget_url', process.env.AK_WIDGET_URL)
 storage.local.setItem('aloware_demo_companies', Object.values(process.env.DEMO_COMPANY_IDS).join(','))
+storage.local.setItem('custom_edge_location_companies', Object.values(process.env.CUSTOM_EDGE_LOCATION_COMPANY_IDS).join(','))
 
 Vue.use(infiniteScroll)
 Vue.use(BootstrapVue)
