@@ -53,7 +53,7 @@
         </q-tooltip>
       </a>
 
-      <inbox-toggle-filters :should-show-unreads-toggle="shouldShowUnreadsToggle"
+      <inbox-toggle-filters :should-show-unreads-toggle="true"
                             v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage" />
     </div>
 

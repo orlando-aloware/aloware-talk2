@@ -6,7 +6,7 @@
                  :disabled="isInboxRefreshBtnLoading"
                  data-testid="inbox-toggle-filters-compact-btn"
                  @clicked="refreshInbox">
-      <refresh-icon :class="$q.screen.width < 450 ? 'm-0': ''" data-testid="inbox-toggle-filters-refresh-icon"/>
+      <refresh-icon :class="$q.screen.width < MOBILE_LARGE_WIDTH ? 'm-0': ''" data-testid="inbox-toggle-filters-refresh-icon"/>
       {{ refreshButtonLabel }}
     </compact-btn>
 
@@ -14,13 +14,13 @@
                      size="sm"
                      switch
                      data-testid="inbox-my-contacts-filter-form-checkbox"
-                     :class="myContactsToggleClass"
-                     :disabled="myContactsToggleEnabled"
+                     :class="toggleFiltersClass"
+                     :disabled="toggleFiltersEnabled"
                      v-model="inboxShowMyContactsFilter">
       <q-tooltip content-class="bg-grey-light11">Toggle My Contacts</q-tooltip>
     </b-form-checkbox>
     <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-          :class="myContactsToggleClass"
+          :class="toggleFiltersClass"
           data-testid="inbox-my-contacts-filter-my-contacts-label"
           @click="myContactsFilterChange">
       <span class="label-my-contacts"
@@ -36,17 +36,17 @@
                        size="sm"
                        switch
                        data-testid="inbox-unreads-filter-form-checkbox"
-                       :class="unreadsToggleClass"
-                       :disabled="unreadsToggleEnabled"
+                       :class="toggleFiltersClass"
+                       :disabled="toggleFiltersEnabled"
                        v-model="inboxShowUnreadsFilter">
         <q-tooltip content-class="bg-grey-light11">Toggle Unreads</q-tooltip>
       </b-form-checkbox>
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-             :class="unreadsToggleClass"
+             :class="toggleFiltersClass"
              data-testid="inbox-unreads-filter-my-contacts-label"
              @click="unreadsFilterChange">
         <span class="label-my-contacts"
-              :class="{ hidden: $q.screen.width < 390 }"
+              :class="{ hidden: $q.screen.width < EXTRA_SMALL_MOBILE_WIDTH }"
               v-if="$q.screen.width > 300">
           Unreads
         </span>
@@ -61,7 +61,7 @@ import { mapActions, mapState } from 'vuex'
 import { inboxRoutesMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
-import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
+import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
   name: 'inbox-toggle-filters',
@@ -82,6 +82,15 @@ export default {
     }
   },
 
+  data () {
+    return {
+      inboxShowMyContactsFilter: false,
+      inboxShowUnreadsFilter: false,
+      MOBILE_LARGE_WIDTH,
+      EXTRA_SMALL_MOBILE_WIDTH
+    }
+  },
+
   computed: {
     ...mapState('inbox', [
       'inboxShowMyContacts',
@@ -98,37 +107,17 @@ export default {
           this.$route.params.channel !== 'mentions')
     },
 
-    myContactsToggleClass () {
-      return { disabled: this.myContactsToggleEnabled }
+    toggleFiltersClass () {
+      return { disabled: this.toggleFiltersEnabled }
     },
 
-    myContactsToggleEnabled () {
-      return !this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts
-    },
-
-    unreadsToggleClass () {
-      return { disabled: this.unreadsToggleEnabled }
-    },
-
-    unreadsToggleEnabled () {
+    toggleFiltersEnabled () {
       return !this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts
     },
 
     refreshButtonLabel () {
-      return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH ? '' : 'Refresh'
+      return this.$q.screen.width < MOBILE_LARGE_WIDTH ? '' : 'Refresh'
     }
-  },
-
-  data () {
-    return {
-      inboxShowMyContactsFilter: false,
-      inboxShowUnreadsFilter: false
-    }
-  },
-
-  created () {
-    this.inboxShowMyContactsFilter = this.inboxShowMyContacts
-    this.inboxShowUnreadsFilter = this.inboxShowUnreads
   },
 
   methods: {
@@ -146,16 +135,23 @@ export default {
       this.inboxShowMyContactsFilter = !this.inboxShowMyContactsFilter
     },
 
-    onMyContactsChange () {
-      this.setInboxShowMyContacts(this.inboxShowMyContactsFilter)
-
+    fireInboxLoadEvent () {
       if (this.inboxTaskRoutes.includes(this.$route.name)) {
-        this.$VueEvent.fire('inbox_load_contacts', this.inboxShowMyContactsFilter)
+        this.$VueEvent.fire('inbox_load_contacts', this.inboxShowMyContactsFilter, this.inboxShowUnreadsFilter)
         return
       }
 
-      // for inbox channels
-      this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter)
+      this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter, this.inboxShowUnreadsFilter)
+    },
+
+    onMyContactsChange () {
+      this.setInboxShowMyContacts(this.inboxShowMyContactsFilter)
+      this.fireInboxLoadEvent()
+    },
+
+    onUnreadsChange () {
+      this.setInboxShowUnreads(this.inboxShowUnreadsFilter)
+      this.fireInboxLoadEvent()
     },
 
     unreadsFilterChange () {
@@ -164,18 +160,6 @@ export default {
       }
 
       this.inboxShowUnreadsFilter = !this.inboxShowUnreadsFilter
-    },
-
-    onUnreadsChange () {
-      this.setInboxShowUnreads(this.inboxShowUnreadsFilter)
-
-      if (this.inboxTaskRoutes.includes(this.$route.name)) {
-        this.$VueEvent.fire('inbox_load_contacts', this.inboxShowMyContactsFilter)
-        return
-      }
-
-      // for inbox channels
-      this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter)
     },
 
     refreshInbox () {
@@ -204,6 +188,11 @@ export default {
     inboxShowUnreadsFilter () {
       this.onUnreadsChange()
     }
+  },
+
+  created () {
+    this.inboxShowMyContactsFilter = this.inboxShowMyContacts
+    this.inboxShowUnreadsFilter = this.inboxShowUnreads
   }
 }
 </script>

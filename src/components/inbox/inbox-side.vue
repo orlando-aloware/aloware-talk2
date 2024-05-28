@@ -6,7 +6,8 @@
         <back-button data-testid="inbox-side-back-btn" @click="back"/>
         <span class="truncated-text"
               v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
-        <inbox-toggle-filters data-testid="inbox-side-my-contacts-filter"/>
+        <inbox-toggle-filters :should-show-unreads-toggle="true"
+                              data-testid="inbox-side-my-contacts-filter"/>
       </div>
       <profile class="p-0"
                :hide-profile-info="true"/>

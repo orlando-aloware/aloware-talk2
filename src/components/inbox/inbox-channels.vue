@@ -1096,10 +1096,9 @@ export default {
         params.my_contact = 1
       }
 
-      console.log('inbox-channels -->', this.inboxShowUnreads)
       if (this.inboxShowUnreads) {
         params.unread_only = 1
-        params.has_unread = this.inboxShowUnreads ? 1 : 0
+        params.has_unread = 1
       }
 
       let api = talk2Api.V1.reports.communications
@@ -1396,6 +1395,7 @@ export default {
 
       if (unreadOnlyFilter !== (showUnreads | 0)) {
         params.unread_only = (showUnreads | 0)
+        params.has_unread = (showUnreads | 0)
         console.log('params.unread_only -->', params.unread_only)
       }
 
