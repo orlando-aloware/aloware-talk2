@@ -26,7 +26,7 @@
                   <div>
                     <span class="d-flex font-weight-bold">Turning on 'Force Users to Always Available' Setting:</span>
                     <ul class="mb-0">
-                      <li>Users' statuses are set to 'Available' even after they login or have 5 minutes of app inactivity</li>
+                      <li>Users' statuses are set to 'Available' even after they login</li>
                       <li>Users cannot manually change their status</li>
                       <li>User's application will receive inbound calls until they logout</li>
                       <li>Admins can still manually change agent's statuses in Wallboard</li>
