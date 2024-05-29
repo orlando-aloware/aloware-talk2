@@ -84,7 +84,7 @@ export default {
 
     sortedPhones () {
       // Create a copy of the array before sorting
-      let phoneNumbersCopy = [...this.contactPhoneNumbers]
+      const phoneNumbersCopy = [...this.contactPhoneNumbers]
 
       // move primary phone to the top
       return phoneNumbersCopy.sort((a, b) => {
