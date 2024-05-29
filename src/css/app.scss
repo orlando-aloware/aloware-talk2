@@ -2414,6 +2414,31 @@ i.option-separator {
   .custom-badge-dark {
     color: $dark;
   }
+
+  &--dense {
+    .q-field__native.row {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .q-field__native.q-placeholder.input-text-sm {
+      padding-left: 0 !important;
+    }
+
+    .with-value {
+      padding-top: 10px !important;
+    }
+  }
+
+  &.q-field--with-bottom {
+    max-width: 100px !important;
+  }
+}
+
+.tags-filter-wrapper {
+  .card-body {
+    padding: 0 !important;
+  }
 }
 
 //CONTACT NOTES
@@ -14811,4 +14836,8 @@ thead.conflicted-contact-thead-class tr th {
   padding: 2px 5px;
   font-size: 6px;
   line-height: 1.5;
+}
+
+.scrollable-tags-area {
+  overflow-y: auto;
 }

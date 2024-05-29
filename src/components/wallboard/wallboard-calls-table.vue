@@ -285,8 +285,14 @@
               <td class="calls__table__tags"
                   :key="`col-${colIndex}`"
                   v-if="column.name === 'tags'">
-                <communication-tags :communication="call"
-                                    :height="300" />
+                <entity-tags data-testid="wallboard-calls-communication-tags-multi-select"
+                             entity="communication"
+                             entity-type="contacts"
+                             :entity-object="call"
+                             :category="TagCategories.CAT_COMMUNICATIONS"
+                             :use-card="false"
+                             :use-add-icon="true"
+                             :height="300" />
               </td>
 
               <!-- notes -->
@@ -385,8 +391,8 @@
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import BargeCommunicationButton from 'src/components/communication/barge-communication-button.vue'
-import CommunicationTags from 'src/components/generic-selectors/communication-tags.vue'
 import Datatable from 'src/components/datatable.vue'
 import InformationCircleIcon from 'src/components/icons/information-circle-icon.vue'
 import RelativeTime from 'src/components/relative-time.vue'
@@ -395,6 +401,7 @@ import TerminateCommunicationButton from 'src/components/communication/terminate
 import UnparkCommunicationButton from 'src/components/communication/unpark-communication-button.vue'
 import WallboardCallsNote from 'src/components/wallboard/wallboard-calls-note.vue'
 import WhisperCommunicationButton from 'src/components/communication/whisper-communication-button.vue'
+import EntityTags from 'components/generic-selectors/entity-tags'
 import { COLUMNS } from 'src/constants/wallboard/calls-columns'
 import { isParkedCall } from 'src/plugins/helpers/functions'
 import {
@@ -421,7 +428,6 @@ export default {
 
   components: {
     BargeCommunicationButton,
-    CommunicationTags,
     Datatable,
     InformationCircleIcon,
     RelativeTime,
@@ -429,13 +435,34 @@ export default {
     TerminateCommunicationButton,
     UnparkCommunicationButton,
     WallboardCallsNote,
-    WhisperCommunicationButton
+    WhisperCommunicationButton,
+    EntityTags
   },
 
   props: {
     calls: {
       type: Array,
       required: true
+    }
+  },
+
+  data () {
+    return {
+      pagination: {
+        page: 1,
+        perPage: 25
+      },
+      sort: {
+        orderBy: 'id',
+        order: 'asc'
+      },
+      columns: COLUMNS,
+      expandedItem: null,
+      showMoreList: [],
+      CommunicationCurrentStatus,
+      CommunicationDispositionStatus,
+      CommunicationTypes,
+      TagCategories
     }
   },
 
@@ -521,23 +548,6 @@ export default {
       return Math.ceil(this.calls.length / this.pagination.perPage)
     }
   },
-
-  data: () => ({
-    pagination: {
-      page: 1,
-      perPage: 25
-    },
-    sort: {
-      orderBy: 'id',
-      order: 'asc'
-    },
-    columns: COLUMNS,
-    expandedItem: null,
-    showMoreList: [],
-    CommunicationCurrentStatus,
-    CommunicationDispositionStatus,
-    CommunicationTypes
-  }),
 
   methods: {
     isParkedCall,

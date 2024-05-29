@@ -47,6 +47,8 @@
 import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { isEmpty } from 'lodash'
+
 export default {
   name: 'enroll-sequence-modal',
 
@@ -83,8 +85,19 @@ export default {
       talk2Api.V1.automations.workflows.enroll(this.sequenceId, { id: this.contact.id, model: 'contact' })
         .then(response => {
           this.enrollSequenceOpen(false)
-          this.$VueEvent.fire('contactSequenceEnrolled', this.contact.id)
           this.$generalNotification('Contact has been enrolled to sequence.')
+
+          // when sequence is returned, there's no need to execute a request to gather the info
+          if (!isEmpty(response.data.sequence)) {
+            this.$emit('onContactEnrolled', {
+              workflow: response.data.workflow,
+              sequence: response.data.sequence
+            })
+
+            return
+          }
+
+          this.$emit('onContactEnrolledWithoutSequence', this.contact.id)
         }).catch(error => {
           console.log(error)
           this.$generalNotification('Error while enrolling contact to sequence.', 'error')
