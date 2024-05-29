@@ -7,6 +7,16 @@ import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-
 export default {
   V1: {
     contact: {
+      createAxiosError (message, status) {
+        let error = new Error(message)
+        error.response = {
+          status: status,
+          data: {
+            error: message
+          }
+        }
+        return error
+      },
       get: function (id) {
         if (!id) {
           return null
@@ -45,7 +55,7 @@ export default {
 
       getConflictedPhoneNumbers (id) {
         if (!id) {
-          return null
+          return Promise.reject(this.createAxiosError('Failed to get conflicted phone numbers: Missing contact id!', 400))
         }
 
         return window.axios.get(`${suffixV1}contact/${id}/conflicted-phone-numbers`)

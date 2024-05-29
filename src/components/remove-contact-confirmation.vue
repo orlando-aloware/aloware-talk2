@@ -244,6 +244,7 @@ export default {
       }
 
       this.isBusy = true
+      // exclude contacts with integrations and get the contact ids
       let ids = this.selectedContacts[this.listId].reduce((acc, contact) => {
         if (!contact.has_integration) {
           acc.push(this.isContactsRoute ? contact.id : contact.contact_list_item_id)

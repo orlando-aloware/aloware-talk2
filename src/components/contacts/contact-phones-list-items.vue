@@ -94,8 +94,8 @@
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions"
                              data-testid="contact-phones-list-items-delete-item"
-                             @click="onDelete(phone)"
-                             v-if="phoneCanBeDeleted(phone)">
+                             v-if="phoneCanBeDeleted(phone)"
+                             @click="onDelete(phone)">
               <trash-icon color="#62666E"
                           width="13"
                           data-testid="contact-phones-list-items-delete-icon"
