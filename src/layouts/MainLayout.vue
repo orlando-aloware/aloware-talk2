@@ -1482,11 +1482,6 @@ export default {
       this.initAccount().then(() => {
         this.loading = false
 
-        if (this.profile && this.profile.live_calls === 0 && this.dialer.call &&
-          !this.profile.go_to_available_after_login) {
-          this.changeAgentStatus(AgentStatus.AGENT_STATUS_OFFLINE, false, 1, 'Talk-InitAuth')
-        }
-
         if (this.profile && this.profile.go_to_available_after_login && !this.dialer.call) {
           this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-2')
         }

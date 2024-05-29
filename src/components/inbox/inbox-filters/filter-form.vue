@@ -48,7 +48,7 @@
                                :disable="isLineSelectorDisabled"
                                v-model="filter.campaigns"
                                data-testid="filter-form-line-selector"
-                               @change="(eventPayload) => onFilterChange(eventPayload, 'campaigns')">
+                               @change="eventPayload => onFilterChange(eventPayload, 'campaigns')">
                 </line-selector>
               </b-form-group>
             </b-col>
@@ -65,7 +65,7 @@
                                      :generic-multiselect="false"
                                      v-model="filter.ring_groups"
                                      data-testid="filter-form-ring-group-selector"
-                                     @change="(eventPayload) => onFilterChange(eventPayload, 'ring_groups')">
+                                     @change="eventPayload => onFilterChange(eventPayload, 'ring_groups')">
                 </ring-group-selector>
               </b-form-group>
             </b-col>
@@ -84,7 +84,7 @@
                                                   :use-input="false"
                                                   v-model="filter.direction"
                                                   data-testid="filter-form-comm-direction-selector"
-                                                  @select="(eventPayload) => onFilterChange(eventPayload, 'direction')">
+                                                  @select="eventPayload => onFilterChange(eventPayload, 'direction')">
                 </communication-direction-selector>
               </b-form-group>
             </b-col>
@@ -98,7 +98,7 @@
                                         :use-input="false"
                                         v-model="filter.answer_status"
                                         data-testid="filter-form-answer-status-selector"
-                                        @select="(eventPayload) => onFilterChange(eventPayload, 'answer_status')">
+                                        @select="eventPayload => onFilterChange(eventPayload, 'answer_status')">
                 </answer-status-selector>
               </b-form-group>
             </b-col>
@@ -112,7 +112,7 @@
                                     :use-input="false"
                                     v-model="filter.min_talk_time"
                                     data-testid="filter-form-talk-time-selector"
-                                    @select="(eventPayload) => onFilterChange(eventPayload, 'min_talk_time')">
+                                    @select="eventPayload => onFilterChange(eventPayload, 'min_talk_time')">
                 </talk-time-selector>
               </b-form-group>
             </b-col>
@@ -126,7 +126,7 @@
                                         :use-input="false"
                                         v-model="filter.transfer_type"
                                         data-testid="filter-form-transfer-type-selector"
-                                        @select="(eventPayload) => onFilterChange(eventPayload, 'transfer_type')">
+                                        @select="eventPayload => onFilterChange(eventPayload, 'transfer_type')">
                 </transfer-type-selector>
               </b-form-group>
             </b-col>
@@ -141,7 +141,7 @@
                                           :use-input="false"
                                           v-model="filter.callback_status"
                                           data-testid="filter-form-callback-status-selector"
-                                          @select="(eventPayload) => onFilterChange(eventPayload, 'callback_status')">
+                                          @select="eventPayload => onFilterChange(eventPayload, 'callback_status')">
                 </callback-status-selector>
               </b-form-group>
             </b-col>
@@ -155,17 +155,17 @@
                    sm="12">
               <b-form-group class="form-label"
                             :label="tagsFilterLabel">
-                <q-tooltip anchor="top middle">
-                  Type at least 3 characters to search in tags
-                </q-tooltip>
-                <tag-selector ref="tagSelector"
-                              :multiple="true"
-                              :highlighted="isChanged('tags')"
-                              :category="tagsFilterCategory"
-                              v-model="filter.tags"
-                              @change="(eventPayload) => onFilterChange(eventPayload, 'tags')"
-                              @preliminar="onPreliminarChange">
-                </tag-selector>
+                <entity-tags ref="tagSelector"
+                             data-testid="communication-tags-multi-select"
+                             entity="contact"
+                             entity-type="contacts"
+                             placeholder="Type to search tags"
+                             :category="tagsFilterCategory"
+                             :is-filter="true"
+                             :dense="true"
+                             :filter-values="filter.tags"
+                             :filter-values-objects="selectedTags"
+                             @filter="onFilterTagsChange"/>
               </b-form-group>
             </b-col>
             <b-col md="6"
@@ -176,7 +176,7 @@
                 <call-disposition-selector :multiple="true"
                                            :highlighted="isChanged('call_dispositions')"
                                            v-model="filter.call_dispositions"
-                                           @change="(eventPayload) => onFilterChange(eventPayload, 'call_dispositions')">
+                                           @change="eventPayload => onFilterChange(eventPayload, 'call_dispositions')">
                 </call-disposition-selector>
               </b-form-group>
             </b-col>
@@ -255,7 +255,7 @@
                                          :highlighted="isChanged('creator_type')"
                                          :use-input="false"
                                          v-model="filter.creator_type"
-                                         @select="(eventPayload) => onFilterChange(eventPayload, 'creator_type')">
+                                         @select="eventPayload => onFilterChange(eventPayload, 'creator_type')">
                   </creator-type-selector>
                 </div>
               </b-form-group>
@@ -330,7 +330,7 @@
                                           :highlighted="isChanged('incoming_numbers')"
                                           v-model="filter.incoming_numbers"
                                           data-testid="filter-form-incoming-number-selector"
-                                          @change="(eventPayload) => onFilterChange(eventPayload, 'incoming_numbers')">
+                                          @change="eventPayload => onFilterChange(eventPayload, 'incoming_numbers')">
                 </incoming-number-selector>
               </b-form-group>
             </b-col>
@@ -368,7 +368,7 @@
                                :highlighted="isChanged('users')"
                                data-testid="filter-form-user-selector"
                                v-model="filter.users"
-                               @change="(eventPayload) => onFilterChange(eventPayload, 'users')">
+                               @change="eventPayload => onFilterChange(eventPayload, 'users')">
                 </user-selector>
               </b-form-group>
             </b-col>
@@ -383,7 +383,7 @@
                                    :use-chips="true"
                                    :highlighted="isChanged('workflows')"
                                    v-model="filter.workflows"
-                                   @change="(eventPayload) => onFilterChange(eventPayload, 'workflows')">
+                                   @change="eventPayload => onFilterChange(eventPayload, 'workflows')">
                 </sequence-selector>
               </b-form-group>
             </b-col>
@@ -402,7 +402,7 @@
                                :disable="disableContactOwner"
                                v-model="filter.contact_owner"
                                data-testid="filter-form-user-selector"
-                               @change="(eventPayload) => onFilterChange(eventPayload, 'contact_owner')">
+                               @change="eventPayload => onFilterChange(eventPayload, 'contact_owner')">
                 </user-selector>
               </b-form-group>
             </b-col>
@@ -417,7 +417,7 @@
                                     :highlighted="isChanged('broadcasts')"
                                     v-model="filter.broadcasts"
                                     data-testid="filter-form-broadcast-selector"
-                                    @change="(eventPayload) => onFilterChange(eventPayload, 'broadcasts')">
+                                    @change="eventPayload => onFilterChange(eventPayload, 'broadcasts')">
                 </broadcast-selector>
               </b-form-group>
             </b-col>
@@ -436,7 +436,6 @@ import TalkTimeSelector from 'components/generic-selectors/talk-time-selector'
 import AnswerStatusSelector from 'components/generic-selectors/answer-status-selector'
 import CommunicationDirectionSelector from 'components/generic-selectors/communication-direction-selector'
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
-import TagSelector from 'components/generic-selectors/tag-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
 import IncomingNumberSelector from 'components/generic-selectors/incoming-number-selector'
 import SequenceSelector from 'components/generic-selectors/sequence-selector'
@@ -449,6 +448,7 @@ import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { inboxRoutesMixin } from 'src/plugins/mixins'
+import EntityTags from 'components/generic-selectors/entity-tags'
 
 export default {
   name: 'filter-form',
@@ -469,11 +469,11 @@ export default {
     LineSelector,
     RingGroupSelector,
     CallDispositionSelector,
-    TagSelector,
     CallbackStatusSelector,
     BroadcastSelector,
     DateRangePicker,
-    CreatorTypeSelector
+    CreatorTypeSelector,
+    EntityTags
   },
 
   props: {
@@ -489,6 +489,8 @@ export default {
   },
 
   computed: {
+    ...mapState(['tags']),
+
     ...mapState('inbox', [
       'channelChangedFilterFields',
       'isFilterDialogShown',
@@ -642,7 +644,8 @@ export default {
           id: 9,
           name: 'Recent (Last 30 Days + Today)'
         }
-      ]
+      ],
+      selectedTags: []
     }
   },
 
@@ -659,6 +662,11 @@ export default {
       this.filter[prop] = value
     },
 
+    onFilterTagsChange (tagsIds, tagsObjects) {
+      this.filter.tags = tagsIds
+      this.setTags(tagsObjects)
+    },
+
     isChanged (property) {
       return JSON.stringify(this.filter[property]) !== JSON.stringify(this.defaultFilterModel.filter[property])
     },
@@ -669,6 +677,10 @@ export default {
       }
 
       return 'All Time'
+    },
+
+    getTagsObjectsByIds (tagsIds = []) {
+      return tagsIds?.map((tagId) => this.tags?.find((tag) => tag.id === tagId))
     },
 
     onPreliminarChange (tags) {
@@ -695,6 +707,7 @@ export default {
     this.dateRange.startDate = this.filter.from_date
     this.dateRange.endDate = this.filter.to_date
     this.rangePicker = this.$refs.picker
+    this.selectedTags = this.getTagsObjectsByIds(this.filter?.tags)
 
     setTimeout(() => {
       if (this.inboxShowMyContacts) {
@@ -731,6 +744,13 @@ export default {
         if (value && value.length) {
           this.filter.my_contact = 0
         }
+      }
+    },
+
+    'filter.tags': {
+      deep: true,
+      handler (value) {
+        this.selectedTags = this.getTagsObjectsByIds(value)
       }
     },
 
