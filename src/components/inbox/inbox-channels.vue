@@ -1051,7 +1051,6 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-      console.log('this.filtersToggle(params) -->', this.filtersToggle(params))
       params = this.filtersToggle(params)
 
       this.source.cancel('Loading of communication operation is canceled by the user.')
@@ -1396,7 +1395,6 @@ export default {
       if (unreadOnlyFilter !== (showUnreads | 0)) {
         params.unread_only = (showUnreads | 0)
         params.has_unread = (showUnreads | 0)
-        console.log('params.unread_only -->', params.unread_only)
       }
 
       return params
