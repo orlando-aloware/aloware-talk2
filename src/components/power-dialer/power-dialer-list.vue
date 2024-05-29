@@ -116,7 +116,7 @@ export default {
 
       this.reloadFolders()
       this.addIntegrationPDImportSummary({
-        id: event.contact_list.id,
+        id: event.contact_list_id,
         summary: event?.summary ?? []
       })
 
@@ -126,7 +126,7 @@ export default {
         0,
         false,
         {
-          path: `/power-dialer/list/${event.contact_list.id}/in-queue`
+          path: `/power-dialer/list/${event.contact_list_id}/in-queue`
         })
     }
   },
