@@ -1544,6 +1544,10 @@ export default {
         this.runTask()
         this.sessionNotReady = false
       }
+    },
+
+    'dialer.isHeld': function (value) {
+      this.toggleHold = value
     }
   },
 
