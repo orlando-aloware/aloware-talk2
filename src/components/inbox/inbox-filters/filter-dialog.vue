@@ -497,19 +497,7 @@ export default {
     },
 
     onShown () {
-      this.refreshTagSelector()
       this.applyFilter()
-    },
-
-    refreshTagSelector () {
-      if (this.$refs.inboxChannelFilterForm?.$refs.tagSelector) {
-        this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
-
-        setTimeout(() => {
-          this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
-          this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.hidePopup()
-        }, 200)
-      }
     },
 
     onResetFilter () {
@@ -797,10 +785,6 @@ export default {
         exclude_automated_communications: +this.filter.exclude_automated_communications,
         my_contact: +this.filter.my_contact
       }
-
-      setTimeout(() => {
-        this.refreshTagSelector()
-      }, 1000)
     },
 
     getFilterItemClass (item) {
