@@ -26,6 +26,19 @@
         v-model="timeline"
         @input="changedFilter($event)">
       </q-select>
+      <date-selector date-only
+                         noValueToCustomElem
+                         @dateSelected="onDateSelected">
+            <b-button size="sm"
+                      variant="light"
+                      class="btn-white btn-rounded px-3 mx-2 d-flex align-items-center">
+              <calendar-icon class="mr-2"/>
+              {{ currentDate }}
+              <q-tooltip anchor="top middle">
+                Select date
+              </q-tooltip>
+            </b-button>
+          </date-selector>
     </div>
     <div
       v-if="resources"
@@ -142,6 +155,10 @@ import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
 import TitlePopover from 'components/popover/text-popover'
 import * as DateRanges from 'src/constants/dates'
+// import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+import DateSelector from '../../components/date-selector.vue'
+import moment from 'moment'
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
 
 export default {
   name: 'MetricGroup',
@@ -162,7 +179,9 @@ export default {
     MetricLoader,
     ConfirmDialog,
     TrashIcon,
-    TitlePopover
+    TitlePopover,
+    // VueCtkDateTimePicker
+    DateSelector
   },
   data () {
     return {
@@ -182,7 +201,12 @@ export default {
       metricsList: [],
       loaderToggled: false,
       updateLoading: false,
-      DateRanges
+      DateRanges,
+      show_custom_date_range: false,
+      customDate: {
+        start_date: '',
+        end_date: ''
+      }
     }
   },
   computed: {
@@ -267,10 +291,26 @@ export default {
       }
     },
     async changedFilter (val) {
+      const range = this.DateRanges.DATE_RANGES.find(range => {
+        if (range.label === 'Custom') {
+          return range
+        }
+      })
+
+      if (range.id === val) {
+        this.show_custom_date_range = true
+        return
+      }
+
+      this.getMetricGroupsStatistics(val)
+    },
+    getMetricGroupsStatistics (val, start_date = null, end_date = null) {
       this.toggleLoader(true)
       this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.resources.id}`, {
         name: this.metricGroupName,
-        date_range_type: val
+        date_range_type: val,
+        custom_start_date: start_date,
+        custom_end_date: end_date
       }).then(res => {
         this.toggleLoader(false)
         this.updateMetricGroup(res.data)
@@ -343,6 +383,19 @@ export default {
     },
     onLoaderToggled (toggle) {
       this.loaderToggled = toggle
+    },
+    changeCustomDateRange () {
+      if (!this.customDate) {
+        return
+      }
+
+      console.log(this.customDate)
+
+      const startDate = moment(this.customDate.start, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm')
+      const endDate = moment(this.customDate.end, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm')
+      console.log(startDate)
+      console.log(endDate)
+      this.getMetricGroupsStatistics(8, startDate, endDate)
     }
   },
   watch: {
@@ -367,3 +420,11 @@ export default {
 }
 
 </script>
+
+<style>
+#date-time-picker-wrapper {
+  width: 40%;
+  margin: 0 0;
+}
+
+#dat
