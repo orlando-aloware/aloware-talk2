@@ -117,6 +117,12 @@
                          :disabled="!filterHasChanges"
                          data-testid="filter-dialog-reset-compact-btn"
                          @clicked="onResetFilter">
+              <q-tooltip anchor="top middle"
+                         self="center middle"
+                         content-class="dark-tooltip"
+                         :offset="[24, 24]">
+                <span>After clicking the <strong>Reset</strong> button, please make sure to click <strong>Apply</strong> to confirm the changes.</span>
+              </q-tooltip>
               Reset
             </compact-btn>
             <compact-btn class="btn-primary"
@@ -513,8 +519,6 @@ export default {
 
         this.filter[item] = useFilter[item]
       }
-
-      this.setChannelClonedFilter(this.filter)
     },
 
     onApply (skipChangedFields = false) {
