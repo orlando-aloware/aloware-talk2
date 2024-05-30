@@ -10,6 +10,7 @@
           @close="editClosed"/>
       </div>
       <q-select
+        v-if="!show_custom_date_range"
         class="mini-select"
         outlined
         rounded
@@ -26,19 +27,42 @@
         v-model="timeline"
         @input="changedFilter($event)">
       </q-select>
-      <date-selector date-only
-                         noValueToCustomElem
-                         @dateSelected="onDateSelected">
-            <b-button size="sm"
-                      variant="light"
-                      class="btn-white btn-rounded px-3 mx-2 d-flex align-items-center">
-              <calendar-icon class="mr-2"/>
-              {{ currentDate }}
-              <q-tooltip anchor="top middle">
-                Select date
-              </q-tooltip>
-            </b-button>
-          </date-selector>
+      <div class="custom-date-time-picker" v-if="show_custom_date_range">
+        <vue-ctk-date-time-picker id="start-date-time-picker"
+                                  formatted="lll"
+                                  v-model="customStartDate"
+                                  label="Start date and Time"
+                                  :noButtonNow="true"
+                                  :no-header="true"
+                                  @is-hidden="enableCustomEndDate"
+                                  />
+
+        <vue-ctk-date-time-picker id="end-date-time-picker"
+                                  formatted="lll"
+                                  v-model="customEndDate"
+                                  label="End date and Time"
+                                  :noButtonNow="true"
+                                  :minDate="customStartDate"
+                                  :no-header="true"
+                                  :disabled="isEndDateTimePickerDisabled"
+                                  @is-hidden="enableButtonPicker"
+                                  />
+        <div class="btn-custom-date">
+          <b-button class="text-sm btn-apply"
+                  variant="primary"
+                  :disabled="isApplyButtonPickerDisabled"
+                  @click="applyCustomDateFilter">
+                  Apply
+          </b-button>
+          <b-button
+                variant="dark-grey"
+                class="f-btn--cancel btn-cancel"
+                size="sm"
+                @click="cancelCustomDateFilter">
+                  Cancel
+          </b-button>
+        </div>
+      </div>
     </div>
     <div
       v-if="resources"
@@ -155,9 +179,8 @@ import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
 import TitlePopover from 'components/popover/text-popover'
 import * as DateRanges from 'src/constants/dates'
-// import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
-import DateSelector from '../../components/date-selector.vue'
 import moment from 'moment'
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
 
 export default {
@@ -180,8 +203,7 @@ export default {
     ConfirmDialog,
     TrashIcon,
     TitlePopover,
-    // VueCtkDateTimePicker
-    DateSelector
+    VueCtkDateTimePicker
   },
   data () {
     return {
@@ -206,7 +228,12 @@ export default {
       customDate: {
         start_date: '',
         end_date: ''
-      }
+      },
+      customStartDate: '',
+      customEndDate: '',
+      isEndDateTimePickerDisabled: true,
+      isApplyButtonPickerDisabled: true,
+      customRange: {}
     }
   },
   computed: {
@@ -246,6 +273,15 @@ export default {
   mounted () {
     this.timeline = this.resources.date_range_type || 1
     this.metricsList = this.arrangedMetricList ? JSON.parse(JSON.stringify(this.arrangedMetricList)) : []
+    this.customRange = this.DateRanges.DATE_RANGES.find(range => {
+      if (range.label === 'Custom') {
+        return range
+      }
+    })
+
+    if (this.timeline === this.customRange.id) {
+      this.show_custom_date_range = true
+    }
   },
   methods: {
     ...mapActions('stats', [
@@ -291,13 +327,7 @@ export default {
       }
     },
     async changedFilter (val) {
-      const range = this.DateRanges.DATE_RANGES.find(range => {
-        if (range.label === 'Custom') {
-          return range
-        }
-      })
-
-      if (range.id === val) {
+      if (this.customRange.id === val) {
         this.show_custom_date_range = true
         return
       }
@@ -384,18 +414,37 @@ export default {
     onLoaderToggled (toggle) {
       this.loaderToggled = toggle
     },
-    changeCustomDateRange () {
-      if (!this.customDate) {
+    cancelCustomDateFilter () {
+      this.show_custom_date_range = false
+      this.isEndDateTimePickerDisabled = true
+      this.isApplyButtonPickerDisabled = true
+      this.customStartDate = ''
+      this.customEndDate = ''
+
+      this.timeline = 1
+
+      if (this.resources.date_range_type && this.resources.date_range_type !== this.customRange.id) {
+        this.timeline = this.resources.date_range_type
         return
       }
 
-      console.log(this.customDate)
+      this.getMetricGroupsStatistics(this.timeline)
+    },
+    applyCustomDateFilter () {
+      const startDate = moment(this.customStartDate, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm:ss')
+      const endDate = moment(this.customEndDate, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm:ss')
 
-      const startDate = moment(this.customDate.start, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm')
-      const endDate = moment(this.customDate.end, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm')
-      console.log(startDate)
-      console.log(endDate)
-      this.getMetricGroupsStatistics(8, startDate, endDate)
+      this.getMetricGroupsStatistics(this.customRange.id, startDate, endDate)
+    },
+    enableCustomEndDate (date) {
+      if (this.customStartDate) {
+        this.isEndDateTimePickerDisabled = false
+      }
+    },
+    enableButtonPicker () {
+      if (this.customEndDate) {
+        this.isApplyButtonPickerDisabled = false
+      }
     }
   },
   watch: {
@@ -422,9 +471,42 @@ export default {
 </script>
 
 <style>
-#date-time-picker-wrapper {
-  width: 40%;
-  margin: 0 0;
+
+.custom-date-time-picker{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }
 
-#dat
+#start-date-time-picker-wrapper, #end-date-time-picker-input{
+  margin-right: 5px;
+}
+
+#start-date-time-picker-input, #end-date-time-picker-input{
+  min-height: 32px;
+  height: 32px;
+  border-radius: 24px;
+}
+
+label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input"] {
+  top: -4px !important;
+}
+
+.btn-custom-date{
+  display: flex;
+}
+
+.btn-custom-date .btn-apply{
+  margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+  .custom-date-time-picker{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+}
+</style>
