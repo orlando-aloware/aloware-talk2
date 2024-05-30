@@ -19,7 +19,7 @@
         <template v-slot:control>
           <div :class="{ 'with-value': dense && formattedValues?.length }">
             <div class="w-100 text-break"
-                 :key="item.id"
+                 :key="item?.id"
                  v-for="item in formattedValues">
               <div class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
                 <div class="dot-wrapper d-flex align-items-center position-absolute">
@@ -35,7 +35,7 @@
                 </div>
                 <div class="custom__remove d-flex align-items-center"
                      role="button"
-                     @click="remove(item.id)">
+                     @click="remove(item?.id)">
                   <remove-tag-icon class="ml-1 remove-tag-icon"/>
                 </div>
               </div>
@@ -84,7 +84,7 @@
                  :class="{ 'hidden': isEmptyData || !isEdit }">
               <div role="button"
                    class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                   :key="item.id"
+                   :key="item?.id"
                    v-for="item in filteredOptions"
                    @click="onSelectOption(item)">
                 <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
@@ -100,7 +100,7 @@
                   <check-o-icon color="#256EFF"
                                 width="12"
                                 height="8"
-                                v-if="isSelected(item.id)"/>
+                                v-if="isSelected(item?.id)"/>
                 </div>
               </div>
             </div>
@@ -135,7 +135,7 @@
               </div>
               <div role="button"
                    class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                   :key="`child-${child.id}`"
+                   :key="`child-${child?.id}`"
                    v-for="child in item.children"
                    @click="onSelectOption(child)">
                 <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
@@ -150,7 +150,7 @@
                 <check-o-icon color="#256EFF"
                               width="12"
                               height="8"
-                              v-if="isSelected(child.id)"/>
+                              v-if="isSelected(child?.id)"/>
               </div>
             </div>
           </q-infinite-scroll>
@@ -174,7 +174,7 @@
          v-else>
       <div class="selected-items-wrapper">
         <div class="d-inline-block"
-             :key="item.id"
+             :key="item?.id"
              v-for="item in formattedValues">
           <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
             <q-badge class="is-dot"
@@ -427,7 +427,7 @@ export default {
       for (const tag of tags) {
         if (tag.type === tagType) {
           filteredMappedTags.push({
-            id: tag.id,
+            id: tag?.id,
             name: tag.name,
             color: tag.color
           })
