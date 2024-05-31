@@ -2,12 +2,11 @@
   <div class="pt-0 pb-4">
     <div class="row no-wrap report-group-header q-pt-none text-subtitle1 text-bold text-capitalize">
       <div class="cursor-pointer">
-        <TitlePopover
-          :id="metricGroupId"
-          :editMetricGroupId="editMetricGroupId"
-          v-model="metricGroupName"
-          @input="updateGroup"
-          @close="editClosed"/>
+        <TitlePopover :id="metricGroupId"
+                      :editMetricGroupId="editMetricGroupId"
+                      v-model="metricGroupName"
+                      @input="updateGroup"
+                      @close="editClosed"/>
       </div>
       <q-select class="mini-select"
                 outlined
@@ -32,8 +31,7 @@
                                   label="Start date and Time"
                                   :noButtonNow="true"
                                   :no-header="true"
-                                  v-model="customStartDate"
-                                  @is-hidden="enableCustomEndDate"/>
+                                  v-model="customStartDate"/>
         <vue-ctk-date-time-picker id="end-date-time-picker"
                                   formatted="lll"
                                   label="End date and Time"
@@ -41,8 +39,7 @@
                                   :minDate="customStartDate"
                                   :no-header="true"
                                   :disabled="isEndDateTimePickerDisabled"
-                                  v-model="customEndDate"
-                                  @is-hidden="enableButtonPicker" />
+                                  v-model="customEndDate"/>
         <div class="btn-custom-date">
           <b-button class="text-sm btn-apply"
                     variant="primary"
@@ -222,8 +219,6 @@ export default {
       show_custom_date_range: false,
       customStartDate: '',
       customEndDate: '',
-      isEndDateTimePickerDisabled: true,
-      isApplyButtonPickerDisabled: true,
       customRange: {}
     }
   },
@@ -259,6 +254,12 @@ export default {
           .sort((a, b) => (a.order > b.order) ? 1 : -1)
       }
       return agentMetrics
+    },
+    isEndDateTimePickerDisabled () {
+      return !this.customStartDate
+    },
+    isApplyButtonPickerDisabled () {
+      return !this.customEndDate
     }
   },
   mounted () {
@@ -407,8 +408,6 @@ export default {
     },
     cancelCustomDateFilter () {
       this.show_custom_date_range = false
-      this.isEndDateTimePickerDisabled = true
-      this.isApplyButtonPickerDisabled = true
       this.customStartDate = ''
       this.customEndDate = ''
 
@@ -426,16 +425,6 @@ export default {
       const endDate = moment(this.customEndDate, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm:ss')
 
       this.getMetricGroupsStatistics(this.customRange.id, startDate, endDate)
-    },
-    enableCustomEndDate (date) {
-      if (this.customStartDate) {
-        this.isEndDateTimePickerDisabled = false
-      }
-    },
-    enableButtonPicker () {
-      if (this.customEndDate) {
-        this.isApplyButtonPickerDisabled = false
-      }
     }
   },
   watch: {
