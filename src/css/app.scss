@@ -14866,4 +14866,8 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
     align-items: center;
     width: 100%;
   }
+
+  #start-date-time-picker-input, #end-date-time-picker-input{
+    margin-bottom: 10px;
+  }
 }
