@@ -32,7 +32,6 @@ yarn-error.log*
 *.njsproj
 *.sln
 /.env
-/.env-copy
 /.env.dev
 /.env.pre-prod
 /.env.prod
