@@ -891,7 +891,13 @@
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
-                  <communication-tags data-testid="comm-details-tags-comm-tags" :communication="communication"/>
+                  <entity-tags data-testid="communication-tags-multi-select"
+                               entity="communication"
+                               entity-type="contacts"
+                               :entity-object="communication"
+                               :category="TagCategories.CAT_COMMUNICATIONS"
+                               :use-card="false"
+                               :use-add-icon="true" />
                 </div>
               </b-col>
             </b-form-row>
@@ -950,12 +956,12 @@ import * as CommunicationDispositionStatus from '../constants/communication-disp
 import * as CommunicationDirections from '../constants/communication-direction'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 
 import talk2Api from 'src/plugins/api/api'
 import TargetUsersTree from 'components/target-users-tree'
 import CommunicationAudio from 'components/communication-audio'
 import CommunicationNote from 'components/communication-note'
-import CommunicationTags from 'components/generic-selectors/communication-tags'
 import CallDispositionSelector from 'components/call-disposition-selector'
 
 import RingGroupSnapshot from 'components/ring-group-snapshot'
@@ -965,6 +971,7 @@ import DownloadButton from 'components/download-button'
 import TranscriptionModal from 'src/components/communication/transcription-modal'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
+import EntityTags from 'components/generic-selectors/entity-tags'
 
 export default {
   name: 'communication-details',
@@ -975,12 +982,12 @@ export default {
     PredefinedTimeDurationSelector,
     RingGroupSnapshot,
     CallDispositionSelector,
-    CommunicationTags,
     CommunicationNote,
     CommunicationAudio,
     TargetUsersTree,
     DownloadButton,
-    TranscriptionModal
+    TranscriptionModal,
+    EntityTags
   },
 
   mixins: [
@@ -998,7 +1005,8 @@ export default {
       CommunicationDispositionStatus,
       CommunicationDirections,
       UploadedFileTypes,
-      CommunicationCallbackStatus
+      CommunicationCallbackStatus,
+      TagCategories
     }
   },
 

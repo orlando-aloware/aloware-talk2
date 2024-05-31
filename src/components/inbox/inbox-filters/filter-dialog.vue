@@ -117,6 +117,12 @@
                          :disabled="!filterHasChanges"
                          data-testid="filter-dialog-reset-compact-btn"
                          @clicked="onResetFilter">
+              <q-tooltip anchor="top middle"
+                         self="center middle"
+                         content-class="dark-tooltip"
+                         :offset="[24, 24]">
+                <span>After clicking the <strong>Reset</strong> button, please make sure to click <strong>Apply</strong> to confirm the changes.</span>
+              </q-tooltip>
               Reset
             </compact-btn>
             <compact-btn class="btn-primary"
@@ -497,19 +503,7 @@ export default {
     },
 
     onShown () {
-      this.refreshTagSelector()
       this.applyFilter()
-    },
-
-    refreshTagSelector () {
-      if (this.$refs.inboxChannelFilterForm?.$refs.tagSelector) {
-        this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.focus()
-
-        setTimeout(() => {
-          this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.blur()
-          this.$refs.inboxChannelFilterForm.$refs.tagSelector.$refs.tagSelect.hidePopup()
-        }, 200)
-      }
     },
 
     onResetFilter () {
@@ -525,8 +519,6 @@ export default {
 
         this.filter[item] = useFilter[item]
       }
-
-      this.setChannelClonedFilter(this.filter)
     },
 
     onApply (skipChangedFields = false) {
@@ -797,10 +789,6 @@ export default {
         exclude_automated_communications: +this.filter.exclude_automated_communications,
         my_contact: +this.filter.my_contact
       }
-
-      setTimeout(() => {
-        this.refreshTagSelector()
-      }, 1000)
     },
 
     getFilterItemClass (item) {
