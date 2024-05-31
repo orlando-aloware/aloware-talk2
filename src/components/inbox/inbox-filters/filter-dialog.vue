@@ -661,8 +661,13 @@ export default {
           this.personalFilters = response.data.data.user || []
           this.companyFilters = response.data.data.company || []
 
-          // Gather all tags IDs from personal and company filters into a single list for display in select
+          // Gather all tags IDs from, filter data, personal and company filters into a single list for display in select
           let tagsIds = []
+
+          if (this.filter.tags) {
+            tagsIds = [...new Set([...tagsIds, ...this.filter.tags])]
+          }
+
           this.personalFilters.forEach(filter => {
             if (filter.filter.tags) {
               tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]
