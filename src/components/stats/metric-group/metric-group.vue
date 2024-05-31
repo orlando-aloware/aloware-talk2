@@ -225,10 +225,6 @@ export default {
       updateLoading: false,
       DateRanges,
       show_custom_date_range: false,
-      customDate: {
-        start_date: '',
-        end_date: ''
-      },
       customStartDate: '',
       customEndDate: '',
       isEndDateTimePickerDisabled: true,
