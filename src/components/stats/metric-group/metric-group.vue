@@ -3,63 +3,58 @@
     <div class="row no-wrap report-group-header q-pt-none text-subtitle1 text-bold text-capitalize">
       <div class="cursor-pointer">
         <TitlePopover
-          v-model="metricGroupName"
           :id="metricGroupId"
           :editMetricGroupId="editMetricGroupId"
+          v-model="metricGroupName"
           @input="updateGroup"
           @close="editClosed"/>
       </div>
-      <q-select
-        v-if="!show_custom_date_range"
-        class="mini-select"
-        outlined
-        rounded
-        map-options
-        emit-value
-        option-value="id"
-        option-label="label"
-        bg-color="white"
-        :options="dateRange"
-        :dense="dense"
-        :options-dense="denseOpts"
-        :disabled="updateLoading || metricsList.length === 0"
-        :readonly="updateLoading || metricsList.length === 0"
-        v-model="timeline"
-        @input="changedFilter($event)">
+      <q-select class="mini-select"
+                outlined
+                rounded
+                map-options
+                emit-value
+                option-value="id"
+                option-label="label"
+                bg-color="white"
+                :options="dateRange"
+                :dense="dense"
+                :options-dense="denseOpts"
+                :disabled="updateLoading || metricsList.length === 0"
+                :readonly="updateLoading || metricsList.length === 0"
+                v-if="!show_custom_date_range"
+                v-model="timeline"
+                @input="changedFilter($event)">
       </q-select>
       <div class="custom-date-time-picker" v-if="show_custom_date_range">
         <vue-ctk-date-time-picker id="start-date-time-picker"
                                   formatted="lll"
-                                  v-model="customStartDate"
                                   label="Start date and Time"
                                   :noButtonNow="true"
                                   :no-header="true"
-                                  @is-hidden="enableCustomEndDate"
-                                  />
-
+                                  v-model="customStartDate"
+                                  @is-hidden="enableCustomEndDate"/>
         <vue-ctk-date-time-picker id="end-date-time-picker"
                                   formatted="lll"
-                                  v-model="customEndDate"
                                   label="End date and Time"
                                   :noButtonNow="true"
                                   :minDate="customStartDate"
                                   :no-header="true"
                                   :disabled="isEndDateTimePickerDisabled"
-                                  @is-hidden="enableButtonPicker"
-                                  />
+                                  v-model="customEndDate"
+                                  @is-hidden="enableButtonPicker" />
         <div class="btn-custom-date">
           <b-button class="text-sm btn-apply"
-                  variant="primary"
-                  :disabled="isApplyButtonPickerDisabled"
-                  @click="applyCustomDateFilter">
-                  Apply
+                    variant="primary"
+                    :disabled="isApplyButtonPickerDisabled"
+                    @click="applyCustomDateFilter">
+            Apply
           </b-button>
-          <b-button
-                variant="dark-grey"
-                class="f-btn--cancel btn-cancel"
-                size="sm"
-                @click="cancelCustomDateFilter">
-                  Cancel
+          <b-button variant="dark-grey"
+                    class="f-btn--cancel btn-cancel"
+                    size="sm"
+                    @click="cancelCustomDateFilter">
+            Cancel
           </b-button>
         </div>
       </div>
@@ -465,44 +460,3 @@ export default {
 }
 
 </script>
-
-<style>
-
-.custom-date-time-picker{
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-
-#start-date-time-picker-wrapper, #end-date-time-picker-input{
-  margin-right: 5px;
-}
-
-#start-date-time-picker-input, #end-date-time-picker-input{
-  min-height: 32px;
-  height: 32px;
-  border-radius: 24px;
-}
-
-label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input"] {
-  top: -4px !important;
-}
-
-.btn-custom-date{
-  display: flex;
-}
-
-.btn-custom-date .btn-apply{
-  margin-right: 10px;
-}
-
-@media (max-width: 768px) {
-  .custom-date-time-picker{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
-}
-</style>
