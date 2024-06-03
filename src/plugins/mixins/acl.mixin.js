@@ -333,6 +333,14 @@ export default _.merge({
 
     classicLogOutUrl () {
       return process.env.API_URL + '?from_talk_2=1&logout=1'
+    },
+
+    isBetaFeaturesEnabled () {
+      if (process.env.APP_ENV !== 'production') {
+        return true
+      }
+
+      return Object.values(process.env.BETA_FEATURES_COMPANY_IDS).includes(this.currentCompany.id)
     }
   }
 }, goBackMixin)
