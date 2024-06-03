@@ -4598,6 +4598,12 @@ i.option-separator {
   }
 }
 
+.phone-widget {
+  position: relative;
+  top: 0;
+  right: 0;
+}
+
 .phone-settings {
   width: 210px;
   @extend .q-pa-md;
@@ -10363,7 +10369,7 @@ screen and (max-width: 956px) {
   }
 }
 
-@media (max-width: 300px) {
+@media (max-width: 299px) {
   .unsupported {
     display: flex !important;
     height: 100%;

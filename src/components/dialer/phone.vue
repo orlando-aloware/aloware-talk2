@@ -1,7 +1,7 @@
 <template>
   <div class="phone d-flex flex-column"
        ref="phone"
-       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone }"
+       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center flex-grow-0"
