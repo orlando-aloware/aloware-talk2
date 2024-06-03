@@ -153,6 +153,26 @@ export default {
         open_time: '09:00:00',
         close_time: '18:00:00'
       }
+    },
+
+    fullName () {
+      const isEmptyFirstName = this.taskToCall?.first_name === null ||
+        this.taskToCall?.first_name === ''
+      const isEmptyLastName = this.taskToCall?.last_name === null ||
+        this.taskToCall?.last_name === ''
+
+      if (isEmptyFirstName && isEmptyLastName) {
+        return `No Name`
+      }
+
+      const firstName = this.taskToCall?.first_name || ''
+      const lastName = this.taskToCall?.last_name || ''
+
+      return `${firstName} ${lastName}`
+    },
+
+    phoneNumber () {
+      return this.taskToCall?.phone_number
     }
   },
 
