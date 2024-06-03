@@ -117,6 +117,12 @@
                          :disabled="!filterHasChanges"
                          data-testid="filter-dialog-reset-compact-btn"
                          @clicked="onResetFilter">
+              <q-tooltip anchor="top middle"
+                         self="center middle"
+                         content-class="dark-tooltip"
+                         :offset="[24, 24]">
+                <span>After clicking the <strong>Reset</strong> button, please make sure to click <strong>Apply</strong> to confirm the changes.</span>
+              </q-tooltip>
               Reset
             </compact-btn>
             <compact-btn class="btn-primary"
@@ -515,8 +521,6 @@ export default {
 
         this.filter[item] = useFilter[item]
       }
-
-      this.setChannelClonedFilter(this.filter)
     },
 
     onApply (skipChangedFields = false) {
@@ -665,8 +669,13 @@ export default {
           this.personalFilters = response.data.data.user || []
           this.companyFilters = response.data.data.company || []
 
-          // Gather all tags IDs from personal and company filters into a single list for display in select
+          // Gather all tags IDs from, filter data, personal and company filters into a single list for display in select
           let tagsIds = []
+
+          if (this.filter.tags) {
+            tagsIds = [...new Set([...tagsIds, ...this.filter.tags])]
+          }
+
           this.personalFilters.forEach(filter => {
             if (filter.filter.tags) {
               tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]

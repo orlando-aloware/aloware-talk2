@@ -19,23 +19,23 @@
         <template v-slot:control>
           <div :class="{ 'with-value': dense && formattedValues?.length }">
             <div class="w-100 text-break"
-                 :key="item.id"
+                 :key="item?.id"
                  v-for="item in formattedValues">
               <div class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 tag-items">
                 <div class="dot-wrapper d-flex align-items-center position-absolute">
                   <q-badge class="is-dot"
                            rounded
-                           :style="{ background: item.color }"
-                           v-if="typeof item.color !== 'undefined'">
+                           :style="{ background: item?.color }"
+                           v-if="typeof item?.color !== 'undefined'">
                   </q-badge>
                 </div>
                 <div class="tag-text"
-                     :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">
-                  {{ item.name }}
+                     :class="[typeof item?.color !== 'undefined' ? 'ml-2' : '']">
+                  {{ item?.name }}
                 </div>
                 <div class="custom__remove d-flex align-items-center"
                      role="button"
-                     @click="remove(item.id)">
+                     @click="remove(item?.id)">
                   <remove-tag-icon class="ml-1 remove-tag-icon"/>
                 </div>
               </div>
@@ -84,23 +84,23 @@
                  :class="{ 'hidden': isEmptyData || !isEdit }">
               <div role="button"
                    class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                   :key="item.id"
+                   :key="item?.id"
                    v-for="item in filteredOptions"
                    @click="onSelectOption(item)">
-                <span :style="{ color: (typeof item.color !== 'undefined' ? item.color : null) }"
+                <span :style="{ color: (typeof item?.color !== 'undefined' ? item?.color : null) }"
                       class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
                   <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
                            rounded
-                           :style="{ background: item.color }"
-                           v-if="typeof item.color !== 'undefined'">
+                           :style="{ background: item?.color }"
+                           v-if="typeof item?.color !== 'undefined'">
                   </q-badge>
-                  <span class="tag-text text-grey-100">{{ item.name }}</span>
+                  <span class="tag-text text-grey-100">{{ item?.name }}</span>
                 </span>
                 <div>
                   <check-o-icon color="#256EFF"
                                 width="12"
                                 height="8"
-                                v-if="isSelected(item.id)"/>
+                                v-if="isSelected(item?.id)"/>
                 </div>
               </div>
             </div>
@@ -127,30 +127,30 @@
                  :key="`title-${index}`"
                  v-for="(item, index) in searchList">
               <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
-                   :class="[index !== 0 && item.children?.length ? 'border-top' : '']">
+                   :class="[index !== 0 && item?.children?.length ? 'border-top' : '']">
                 <span class="d-inline-flex align-items-center text-grey-100 w-100"
-                      v-if="item.children.length">
-                  <span class="tag-text">{{ item.title }}</span>
+                      v-if="item?.children.length">
+                  <span class="tag-text">{{ item?.title }}</span>
                 </span>
               </div>
               <div role="button"
                    class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
-                   :key="`child-${child.id}`"
-                   v-for="child in item.children"
+                   :key="`child-${child?.id}`"
+                   v-for="child in item?.children"
                    @click="onSelectOption(child)">
                 <span class="d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative"
-                      v-if="typeof child.color !== 'undefined'">
+                      v-if="typeof child?.color !== 'undefined'">
                   <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
                            rounded
-                           :style="{ background: child.color }"
-                           v-if="typeof child.color !== 'undefined'">
+                           :style="{ background: child?.color }"
+                           v-if="typeof child?.color !== 'undefined'">
                   </q-badge>
-                  <span class="tag-text text-grey-100">{{ child.name }}</span>
+                  <span class="tag-text text-grey-100">{{ child?.name }}</span>
                 </span>
                 <check-o-icon color="#256EFF"
                               width="12"
                               height="8"
-                              v-if="isSelected(child.id)"/>
+                              v-if="isSelected(child?.id)"/>
               </div>
             </div>
           </q-infinite-scroll>
@@ -174,16 +174,16 @@
          v-else>
       <div class="selected-items-wrapper">
         <div class="d-inline-block"
-             :key="item.id"
+             :key="item?.id"
              v-for="item in formattedValues">
           <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 tag-items text-break position-relative">
             <q-badge class="is-dot"
                      rounded
-                     :style="{ background: item.color }"
-                     v-if="typeof item.color !== 'undefined'">
+                     :style="{ background: item?.color }"
+                     v-if="typeof item?.color !== 'undefined'">
             </q-badge>
             <span class="tag-text"
-                  :class="[typeof item.color !== 'undefined' ? 'ml-2' : '']">{{ item.name }}</span>
+                  :class="[typeof item?.color !== 'undefined' ? 'ml-2' : '']">{{ item?.name }}</span>
           </span>
         </div>
       </div>
@@ -427,9 +427,9 @@ export default {
       for (const tag of tags) {
         if (tag.type === tagType) {
           filteredMappedTags.push({
-            id: tag.id,
-            name: tag.name,
-            color: tag.color
+            id: tag?.id,
+            name: tag?.name,
+            color: tag?.color
           })
         }
       }
@@ -440,7 +440,7 @@ export default {
     },
 
     mergeWithoutDuplicatingAndSortAlphabetically (array1, array2) {
-      return array1.concat(array2).filter((item, index, self) => index === self.findIndex(t => t.id === item.id)).sort((a, b) => a.name.localeCompare(b.name))
+      return array1.concat(array2).filter((item, index, self) => index === self.findIndex(t => t.id === item?.id)).sort((a, b) => a.name.localeCompare(b.name))
     },
 
     getTags (page, done) {
