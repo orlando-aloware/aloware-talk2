@@ -336,11 +336,13 @@ export default _.merge({
     },
 
     isBetaFeaturesEnabled () {
-      if (process.env.APP_ENV !== 'production') {
+      const betaFeaturesCompanyIds = process.env.BETA_FEATURES_COMPANY_IDS
+
+      if (process.env.APP_ENV !== 'production' || !betaFeaturesCompanyIds) {
         return true
       }
 
-      return Object.values(process.env.BETA_FEATURES_COMPANY_IDS).includes(this.currentCompany.id)
+      return Object.values(betaFeaturesCompanyIds).includes(this.currentCompany.id)
     }
   }
 }, goBackMixin)
