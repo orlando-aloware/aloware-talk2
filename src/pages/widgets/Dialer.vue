@@ -21,6 +21,7 @@ import { mapActions, mapGetters } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import CallingExtensions from '@hubspot/calling-extensions-sdk'
 import Webrtc from 'components/webrtc'
+import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'Dialer',
@@ -119,13 +120,13 @@ export default {
     ...mapActions('cache', ['setCurrentCompany']),
 
     init () {
-      if (this.api_key) {
-        localStorage.setItem('api_token', this.api_key)
+      if (this.apiKey) {
+        storage.local.setItem('api_token', this.apiKey)
       }
       this.loading = true
       this.check().then((res) => {
         if (!this.needsExtensions) {
-          localStorage.setItem('company_id', res.data.user.company.id)
+          storage.local.setItem('company_id', res.data.user.company.id)
           this.setCurrentCompany(res.data.user.company)
           this.resetVuex(['all'])
         }
@@ -185,7 +186,7 @@ export default {
       console.log('Extension visibility: ' + this.extensionsVisibility)
 
       if (this.extensionsVisibility) {
-        this.showAlertAgentOnCall = this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+        this.showAlertAgentOnCall = this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
       }
     }
   }

@@ -352,20 +352,20 @@ Vue.prototype.$handleErrors = function (response, title = null) {
 
     switch (response.status) {
       case 401:
-        if (!response.data.errors.length && response.data.error) {
+        if ((!response.data.errors || !response.data.errors.length) && response.data.error) {
           message.data = `${response.data.error}`
         }
 
-        if (response.data.errors.length && response.data.error) {
+        if (response.data.errors && response.data.errors.length && response.data.error) {
           message.data = `<p class="pt-1 pb-1">- ${response.data.error}</p>`
         }
 
-        if (response.data.errors.length) {
-          response.data.errors = ''
-
+        if (response.data.errors && response.data.errors.length) {
           for (error.data of response.data.errors) {
             message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
           }
+
+          response.data.errors = ''
         }
 
         break
