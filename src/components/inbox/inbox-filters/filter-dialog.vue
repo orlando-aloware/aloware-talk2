@@ -28,7 +28,7 @@
                   <span>New (Untitled)</span>
                   <span class="position-absolute check-icon"
                         v-if="!selectedFilter">
-                    <check-o-icon data-testid="filter-dialog-check-o-icon" color="#040404" />
+                    <check-o-icon data-testid="filter-dialog-check-o-icon" color="#040404"/>
                   </span>
                 </div>
               </div>
@@ -57,7 +57,7 @@
             <div class="saved-filters">
               <q-skeleton type="rect"
                           data-testid="filter-dialog-skeleton"
-                          v-if="isGettingFilters" />
+                          v-if="isGettingFilters"/>
               <p class="text-muted fs-12 empty-filter-placeholder pl-2"
                  v-show="!isGettingFilters"
                  v-if="companyFilters.length < 1">
@@ -95,15 +95,15 @@
                    data-testid="filter-dialog-view-name-input"
                    v-model.trim="viewName"
                    v-if="isEditingView && selectedFilter && (!+selectedFilter?.is_on_company || selectedFilter?.scope === 'user')"
-                   @keyup.enter="renameFilter" />
+                   @keyup.enter="renameFilter"/>
           <div class="w-100 text-left pt-2 pb-1"
-              v-else>
+               v-else>
             <span class="filter-name">{{ filterFormDisplayName }}</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
                        data-testid="filter-dialog-close-compact-btn"
                        @clicked="onHide">
-            <close-icon iconColor="#000000" />
+            <close-icon iconColor="#000000"/>
           </compact-btn>
         </div>
         <filter-form ref="inboxChannelFilterForm"
@@ -186,7 +186,8 @@ export default {
   props: {
     value: {
       type: Object,
-      default: () => {}
+      default: () => {
+      }
     },
 
     defaultFilterModel: {
@@ -661,8 +662,13 @@ export default {
           this.personalFilters = response.data.data.user || []
           this.companyFilters = response.data.data.company || []
 
-          // Gather all tags IDs from personal and company filters into a single list for display in select
+          // Gather all tags IDs from, filter data, personal and company filters into a single list for display in select
           let tagsIds = []
+
+          if (this.filter.tags) {
+            tagsIds = [...new Set([...tagsIds, ...this.filter.tags])]
+          }
+
           this.personalFilters.forEach(filter => {
             if (filter.filter.tags) {
               tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]
@@ -688,7 +694,10 @@ export default {
     updateFilter (filter, params) {
       if (!params.scope) {
         const scope = [1, '1', true].includes(filter.is_on_company) ? 'company' : 'user'
-        params = { ...params, scope: scope }
+        params = {
+          ...params,
+          scope: scope
+        }
       }
 
       if (this.loadedDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
