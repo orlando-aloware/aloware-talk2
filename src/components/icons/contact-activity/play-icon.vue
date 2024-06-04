@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'play-icon',
+  name: 'play-bar-icon',
   props: {
     width: {
       type: [Number, String],

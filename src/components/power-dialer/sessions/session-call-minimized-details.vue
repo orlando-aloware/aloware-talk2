@@ -1,7 +1,7 @@
 <template>
   <q-card flat>
     <div class="">
-      <div class="d-flex p-2 flex-wrap justify-content-between align-items-center bg-white border-bottom">
+      <div class="d-flex p-2 flex-wrap justify-content-between align-items-center bg-white">
 
         <div class="font-weight-bold flex-grow-0 session-call-status lex-0 ml-2"
              style="max-width: 176px">
@@ -36,7 +36,7 @@
           <i class="material-icons font-weight-bold text-body2">keyboard_arrow_right</i>
         </q-btn>
 
-        <q-btn class="my-1"
+        <q-btn class="my-1 ml-2"
                size="sm"
                unelevated
                no-wrap
@@ -55,7 +55,7 @@
           </div>
         </q-btn>
 
-        <q-btn class="my-1 sessions-button free-width ml-2"
+        <q-btn class="my-1 sessions-button free-width ml-1"
                size="sm"
                no-wrap
                outline
@@ -116,25 +116,19 @@
           </div>
         </q-btn>
 
-        <q-btn class="sessions-button free-width my-1 ml-2"
+        <q-btn class="sessions-button free-width my-1 ml-2 border"
                size="sm"
                no-wrap
                unelevated
                no-caps
                :disabled="!canNextTask "
-               :color="canNextTask  ? 'red-7' : 'grey-8'"
+               :class="canNextTask ? 'border-danger' : ''"
+               :color="canNextTask  ? 'white' : 'grey-8'"
                @click="onNextTask(false, true)">
-          <CallDropIcon class="mr-1"
-                        color="white"/>
-          <div class="text-body2">Next</div>
+          <PlayBarIcon class="mr-1"
+                       :color="canNextTask ? '#FF3B3B' : 'white'"/>
+          <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
         </q-btn>
-
-        <b-button size="sm"
-                  variant="light"
-                  class="btn-white btn-contact-prev-next ml-2"
-        >
-          <i class="material-icons">keyboard_arrow_down</i>
-        </b-button>
       </div>
 
       <div class="d-flex align-items-center p-0 justify-content-between flex-wrap px-3">
@@ -177,7 +171,6 @@
 import DropIcon from 'components/icons/drop-location-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
 import UnHoldIcon from 'components/icons/pause-icon-3'
-import CallDropIcon from 'components/icons/call-drop-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
 import RecordIcon from 'components/icons/record-icon'
@@ -185,15 +178,16 @@ import {
   sessionCallStatusMixin,
   dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
+import PlayBarIcon from 'components/icons/play-bar-icon'
 
 export default {
   name: 'SessionCallMinimizedDetails',
 
   components: {
+    PlayBarIcon,
     DropIcon,
     PauseIcon,
     UnHoldIcon,
-    CallDropIcon,
     StopIcon,
     EndCallIcon,
     RecordIcon

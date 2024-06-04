@@ -12,16 +12,28 @@
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
-          <div style="background: blue;width: 100%">
-            <session-call-minimized-details @on-redirect="redirectRoute"
-                                            @no-tasks-found="onNoTasksFound"
-                                            @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
+          <div v-if="isStatusMinimized" class="flex flex-direction-row d-flex flex-1 align-items-center bg-white border-bottom">
+            <session-call-minimized-details
+              class="flex-1 flex-grow-1"
+              @on-redirect="redirectRoute"
+              @no-tasks-found="onNoTasksFound"
+              @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
+            <b-button size="sm"
+                      variant="light mr-2"
+                      class="btn-white btn-contact-prev-next flex-0"
+                      @click="onToggleStatusMinimized"
+            >
+              <i class="material-icons">keyboard_arrow_down</i>
+            </b-button>
+
           </div>
-          <div class="d-flex bg-white flex-grow-0">
-            <div class="col-7 p-0 bordered-right">
+          <div class="d-flex bg-white flex-grow-0"
+               v-if="!isStatusMinimized"
+          >
+            <div class="col-6 p-0 bordered-right">
               <session-call-disposition/>
             </div>
-            <div class="col-5 p-0">
+            <div class="col-6 p-0">
               <session-call-status @on-redirect="redirectRoute"
                                    @no-tasks-found="onNoTasksFound"
                                    @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
@@ -31,6 +43,8 @@
                     variant="light"
                     class="btn-white btn-contact-prev-next"
                     style="z-index: 999;margin: auto;margin-top: -14px;margin-bottom:-14px;"
+                    v-if="!isStatusMinimized"
+                    @click="onToggleStatusMinimized"
           >
             <i class="material-icons">keyboard_arrow_up</i>
           </b-button>
@@ -136,7 +150,8 @@ export default {
       source: null,
       tasksProcessed: 0,
       inProgressFetchTasks: {},
-      minNumberOfInQueueTasks: 5
+      minNumberOfInQueueTasks: 5,
+      isStatusMinimized: false
     }
   },
 
@@ -346,6 +361,10 @@ export default {
       // fetch IN QUEUE tasks through the API every time the active task changes (could be skipped, completed, or failed)
       this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
       this.$VueEvent.fire('redial_task')
+    },
+
+    onToggleStatusMinimized () {
+      this.isStatusMinimized = !this.isStatusMinimized
     }
   },
 

@@ -109,17 +109,18 @@
             </q-list>
           </q-btn-dropdown>
 
-          <q-btn class="sessions-button free-width my-1 ml-1"
+          <q-btn class="sessions-button free-width my-1 ml-1 border"
                  size="sm"
                  no-wrap
                  unelevated
                  no-caps
                  :disabled="!canNextTask "
-                 :color="canNextTask  ? 'red-7' : 'grey-8'"
+                 :class="canNextTask ? 'border-danger' : ''"
+                 :color="canNextTask ? 'white' : 'grey-8'"
                  @click="onNextTask(false, true)">
-            <CallDropIcon class="mr-1"
-                          color="white"/>
-            <div class="text-body2">Next</div>
+            <PlayBarIcon class="mr-1"
+                         :color="canNextTask ? '#FF3B3B' : 'white'"/>
+            <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
           </q-btn>
 
           <b-dropdown class="my-1 ml-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
@@ -310,7 +311,6 @@ import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
 import UnHoldIcon from 'components/icons/pause-icon-3'
-import CallDropIcon from 'components/icons/call-drop-icon'
 import RefreshIcon from 'components/icons/refresh-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
@@ -323,11 +323,13 @@ import { cloneDeep } from 'lodash'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import talk2Api from 'src/plugins/api/api'
+import PlayBarIcon from 'components/icons/play-bar-icon.vue'
 
 export default {
   name: 'SessionCallStatus',
 
   components: {
+    PlayBarIcon,
     MuteIcon,
     UnmuteIcon,
     CalendarIcon,
@@ -338,7 +340,6 @@ export default {
     HeadphoneIcon,
     PauseIcon,
     UnHoldIcon,
-    CallDropIcon,
     StopIcon,
     EndCallIcon,
     RecordIcon,
