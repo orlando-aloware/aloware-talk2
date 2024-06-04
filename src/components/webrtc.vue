@@ -23,9 +23,6 @@ export default {
     }
   },
 
-  data () {
-    return {}
-  },
   mounted () {
     this.$VueEvent.fire('showLoadingPhone')
   }
