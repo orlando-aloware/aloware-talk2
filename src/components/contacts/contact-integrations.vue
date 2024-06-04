@@ -22,7 +22,7 @@
                              data-testid="contact-integrations-gohighlevel"
                              :contact="contact"/>
 
-    <integration-salesforce v-if="isSalesforceEnabled"
+    <integration-salesforce v-if="isSalesforceEnabled && contactHasSalesforceData"
       data-testid="contact-integrations-salesforce"
       :contact="contact"/>
 
@@ -114,6 +114,10 @@ export default {
 
     isSalesforceEnabled () {
       return !!(this.currentCompany && this.currentCompany.salesforce_integration_enabled)
+    },
+
+    contactHasSalesforceData () {
+      return !!(this.contact.integration_data?.salesforce)
     }
   }
 }
