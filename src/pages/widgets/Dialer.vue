@@ -24,6 +24,7 @@ import Webrtc from 'components/webrtc'
 
 export default {
   name: 'Dialer',
+
   components: { Webrtc },
 
   props: {
@@ -116,6 +117,7 @@ export default {
     }),
     ...mapActions(['resetVuex']),
     ...mapActions('cache', ['setCurrentCompany']),
+
     init () {
       if (this.api_key) {
         localStorage.setItem('api_token', this.api_key)
@@ -169,6 +171,7 @@ export default {
       }
     }
   },
+
   watch: {
     initialized () {
       if (this.initialized) {
@@ -188,6 +191,7 @@ export default {
   }
 }
 </script>
+
 <style scoped>
 html, body {
   background: transparent !important;
