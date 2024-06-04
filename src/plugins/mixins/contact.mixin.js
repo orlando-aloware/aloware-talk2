@@ -887,7 +887,7 @@ export default {
       }).then(res => {
         this.reply_text = ''
         this.loadingSendMessage = false
-        this.$generalNotification('Message sent')
+        this.$generalNotification('Your message has been added to the queue. It will be sent shortly. Thank you for your patience.')
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingSendMessage = false
@@ -904,7 +904,7 @@ export default {
         phone_number: this.selectedPhoneNumber
       }).then(res => {
         this.loadingSendMessage = false
-        this.$generalNotification('Message sent')
+        this.$generalNotification('Your message has been added to the queue. It will be sent shortly. Thank you for your patience.')
       }).catch(err => {
         this.$handleErrors(err.response)
         this.loadingSendMessage = false
@@ -994,7 +994,7 @@ export default {
           this.uploadPercentage.upload = 0
           this.uploadStatus.upload = 'success'
           this.uploadFileList.upload = []
-          this.$generalNotification('Message sent')
+          this.$generalNotification('Your message has been added to the queue. It will be sent shortly. Thank you for your patience.')
         })
         .catch(err => {
           console.log(err)
