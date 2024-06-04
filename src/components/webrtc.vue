@@ -1,7 +1,7 @@
 <template>
-    <div>
-      <phone is_widget/>
-    </div>
+  <div>
+    <phone :is_widget='isWidget' />
+  </div>
 </template>
 
 <script>
@@ -11,12 +11,12 @@ export default {
   components: { Phone },
 
   props: {
-    carrier_name: {
+    carrierName: {
       required: true,
       type: String
     },
 
-    is_widget: {
+    isWidget: {
       default: false,
       type: Boolean,
       required: false

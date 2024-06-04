@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div v-if="showAlertAgentOnCall"
-         class="p-3">
+    <div class="p-3"
+         v-if="showAlertAgentOnCall">
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
     </div>
-    <webrtc :carrier_name="profile.carrier_name"
-            :is_widget="true"
+    <webrtc :carrierName="profile.carrier_name"
+            :isWidget="true"
             :class="[small ? 'small' : '']"
             v-else-if="allowed"
             @callConnected="handleCallConnectedEvent"
@@ -27,7 +27,7 @@ export default {
   components: { Webrtc },
 
   props: {
-    api_key: {
+    apiKey: {
       required: false
     }
   },
@@ -36,9 +36,9 @@ export default {
       loading: false,
       small: false,
       initialized: false,
-      needs_extensions: false,
-      extensions_initialized: false,
-      extensions_visibility: false,
+      needsExtensions: false,
+      extensionsInitialized: false,
+      extensionsVisibility: false,
       phoneNumber: null,
       extensions: null,
       timeout: null,
@@ -59,7 +59,7 @@ export default {
               }
             }
             this.extensions.initialized(payload)
-            this.extensions_initialized = true
+            this.extensionsInitialized = true
           },
           onDialNumber: event => {
             if (event.phone_number) {
@@ -71,7 +71,7 @@ export default {
             }
           },
           onVisibilityChanged: data => {
-            this.extensions_visibility = !data.isHidden
+            this.extensionsVisibility = !data.isHidden
           }
         }
       }
@@ -92,13 +92,13 @@ export default {
     }
 
     if (this.$route.name === 'Hubspot Call Extension') {
-      this.needs_extensions = true
+      this.needsExtensions = true
     } else {
-      this.needs_extensions = false
+      this.needsExtensions = false
     }
 
-    if (!this.needs_extensions) {
-      this.extensions_visibility = true
+    if (!this.needsExtensions) {
+      this.extensionsVisibility = true
     }
 
     this.extensions = new CallingExtensions(this.callSdkOptions)
@@ -114,13 +114,15 @@ export default {
       check: 'check',
       clear: 'clear'
     }),
+    ...mapActions(['resetVuex']),
+    ...mapActions('cache', ['setCurrentCompany']),
     init () {
       if (this.api_key) {
         localStorage.setItem('api_token', this.api_key)
       }
       this.loading = true
       this.check().then((res) => {
-        if (!this.needs_extensions) {
+        if (!this.needsExtensions) {
           localStorage.setItem('company_id', res.data.user.company.id)
           this.setCurrentCompany(res.data.user.company)
           this.resetVuex(['all'])
@@ -137,11 +139,11 @@ export default {
     },
 
     handleDialNumber (phoneNumber) {
-      if (this.needs_extensions && this.extensions_initialized && this.initialized) {
-        this.extensions_visibility = true
+      if (this.needsExtensions && this.extensionsInitialized && this.initialized) {
+        this.extensionsVisibility = true
         this.phoneNumber = null
         this.$VueEvent.fire('make_hs_new_call', { phone_number: phoneNumber })
-      } else if (this.needs_extensions && this.extensions_initialized && !this.initialized) {
+      } else if (this.needsExtensions && this.extensionsInitialized && !this.initialized) {
         this.timeout = setTimeout(() => {
           console.log('Retry calling ' + phoneNumber)
           this.handleDialNumber(phoneNumber)
@@ -150,25 +152,22 @@ export default {
     },
 
     handleUserLogin () {
-      if (this.needs_extensions && this.extensions_initialized) {
+      if (this.needsExtensions && this.extensionsInitialized) {
         this.extensions.userLoggedIn()
       }
     },
 
     handleCallConnectedEvent () {
-      if (this.needs_extensions && this.extensions_initialized) {
+      if (this.needsExtensions && this.extensionsInitialized) {
         this.extensions.callAnswered()
       }
     },
 
     handleCallCompletedEvent () {
-      if (this.needs_extensions && this.extensions_initialized) {
+      if (this.needsExtensions && this.extensionsInitialized) {
         this.extensions.callEnded()
       }
-    },
-
-    ...mapActions(['resetVuex']),
-    ...mapActions('cache', ['setCurrentCompany'])
+    }
   },
   watch: {
     initialized () {
@@ -179,10 +178,10 @@ export default {
       }
     },
 
-    extensions_visibility () {
-      console.log('Extension visibility: ' + this.extensions_visibility)
+    extensionsVisibility () {
+      console.log('Extension visibility: ' + this.extensionsVisibility)
 
-      if (this.extensions_visibility) {
+      if (this.extensionsVisibility) {
         this.showAlertAgentOnCall = this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
       }
     }

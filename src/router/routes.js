@@ -480,7 +480,7 @@ const routes = [
   // Dialer Widget (Browser / Apps)
   {
     name: 'Dialer Widget (API)',
-    path: '/widgets/dialer/api_key/:api_key',
+    path: '/widgets/dialer/api_key/:apiKey',
     props: true,
     component: Dialer
   },
