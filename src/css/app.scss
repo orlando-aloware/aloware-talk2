@@ -14859,6 +14859,10 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   margin-right: 10px;
 }
 
+.time-picker-column{
+  height: 100%;
+}
+
 @media (max-width: 768px) {
   .custom-date-time-picker{
     display: flex;

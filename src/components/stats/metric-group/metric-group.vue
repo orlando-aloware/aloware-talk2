@@ -28,12 +28,14 @@
       <div class="custom-date-time-picker" v-if="show_custom_date_range">
         <vue-ctk-date-time-picker id="start-date-time-picker"
                                   formatted="lll"
+                                  minuteInterval="5"
                                   label="Start date and Time"
                                   :noButtonNow="true"
                                   :no-header="true"
                                   v-model="customStartDate"/>
         <vue-ctk-date-time-picker id="end-date-time-picker"
                                   formatted="lll"
+                                  minuteInterval="5"
                                   label="End date and Time"
                                   :noButtonNow="true"
                                   :minDate="customStartDate"
