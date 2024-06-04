@@ -270,7 +270,8 @@ export default {
         .then(res => {
           if (!this.skippedTasks.includes(contactListItemId)) {
             this.skippedTasks.push(contactListItemId)
-            const tempSet = new Set([...this.powerDialerTasks.skipped, autoDialTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+            const skippedTasks = Array.isArray(this.powerDialerTasks.skipped) ? this.powerDialerTasks.skipped : []
+            const tempSet = new Set([...skippedTasks, autoDialTask].map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
             this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
           }
           // if (autoDialTask.status !== AutoDialTaskStatus.STATUS_QUEUED) {
@@ -353,7 +354,8 @@ export default {
     },
 
     getSkippedAndActiveTasks () {
-      return [...this.powerDialerTasks.skipped, this.activeTask]
+      const skippedTasks = Array.isArray(this.powerDialerTasks.skipped) ? this.powerDialerTasks.skipped : []
+      return [...skippedTasks, this.activeTask]
     },
 
     updateNumberOfFetchedTasks (taskType, taskCount) {

@@ -174,7 +174,7 @@
                        variant="outlined-light"
                        tooltip-text="Clear"
                        borderless
-                       :disabled="defaultIds.includes(id)"
+                       :disabled="isClearFiltersDisabled"
                        data-testid="contacts-view-clear-filters-button"
                        v-if="hasAppliedFilters && !isCurrentAndPreviousFiltersMismatch && listContactsLoaded"
                        @clicked="clearFilters">
@@ -957,6 +957,14 @@ export default {
       }
 
       return 'all'
+    },
+
+    isClearFiltersDisabled () {
+      if (this.id === 'all') {
+        return false
+      }
+
+      return this.defaultIds.includes(this.id)
     },
 
     defaultIds () {
