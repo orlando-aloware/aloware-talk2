@@ -231,7 +231,7 @@ export default {
       const isBlockedFromImport = this.fullReport?.extra?.is_blocked || 0
 
       console.log('buildReport this.fullReport', this.fullReport)
-      console.log('buildReport integrationReport', integrationReport)
+      console.log('buildReport integrationReport', this.$jsonClone(this.integrationPDImportSummaries[id]))
 
       if (isDncFromImport > integrationReport.is_dnc) {
         integrationReport.is_dnc = isDncFromImport
@@ -252,7 +252,7 @@ export default {
       console.log('buildReport duplicatePhoneNumbers', duplicatePhoneNumbers)
 
       if (!creationSettings?.prevent_duplicates) {
-        this.fullReport.fail[DUPLICATED] += integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
+        this.fullReport.fail[DUPLICATED] = integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
       } else if (creationSettings?.prevent_duplicates) {
         const duplicates = this.fullReport?.fail?.[DUPLICATED] || 0
         this.fullReport.fail[DUPLICATED] = integrationReport.duplicates > duplicates ? integrationReport.duplicates : duplicates
@@ -298,9 +298,9 @@ export default {
         ...failReport
       }
 
-      /* if (!this.fullReport.extra.settings.prevent_duplicates && this.duplicatedTasks) {
-        this.fullReport.fail[DUPLICATED] = this.duplicatedTasks
-      } */
+      if (!this.fullReport.extra.settings.prevent_duplicates && this.duplicatedTasks) {
+        this.fullReport.fail[DUPLICATED] = Number(this.fullReport.fail[DUPLICATED]) + Number(this.duplicatedTasks)
+      }
 
       console.log('buildReport this.fullReport', this.fullReport)
       console.log('buildReport integrationReport', integrationReport)
