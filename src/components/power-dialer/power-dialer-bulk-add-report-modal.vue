@@ -252,7 +252,7 @@ export default {
       console.log('buildReport duplicatePhoneNumbers', duplicatePhoneNumbers)
 
       if (!creationSettings?.prevent_duplicates) {
-        this.fullReport.fail[DUPLICATED].duplicates = integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
+        this.fullReport.fail[DUPLICATED] += integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
       } else if (creationSettings?.prevent_duplicates) {
         const duplicates = this.fullReport?.fail?.[DUPLICATED] || 0
         this.fullReport.fail[DUPLICATED] = integrationReport.duplicates > duplicates ? integrationReport.duplicates : duplicates
