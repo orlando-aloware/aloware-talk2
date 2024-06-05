@@ -200,10 +200,13 @@ export default {
       $event.stopPropagation()
       $event.preventDefault()
 
+      alert('handup Call')
+      console.log('########### Calling hangup call', this.dialer.currentStatus)
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
       }
 
+      console.log('hangupCall')
       this.$VueEvent.fire('hangupCall')
     },
 

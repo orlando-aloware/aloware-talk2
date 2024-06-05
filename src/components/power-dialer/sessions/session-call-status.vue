@@ -109,17 +109,32 @@
             </q-list>
           </q-btn-dropdown>
 
-          <q-btn class="sessions-button free-width my-1 ml-1 border"
+          <q-btn v-if="statusCallConnected" class="sessions-button my-1 ml-1 free-width"
                  size="sm"
                  no-wrap
-                 unelevated
                  no-caps
-                 :disabled="!canNextTask "
-                 :class="canNextTask ? 'border-danger' : ''"
-                 :color="canNextTask ? 'white' : 'grey-8'"
+                 unelevated
+                 outline
+                 @click="onNextTask(false, true)">
+            <HangupIcon class="mr-1"
+                         :color="statusCallConnected ? '#FF3B3B' : '#62666E'"
+            />
+            <div class="text-body2" :class="statusCallConnected ? 'white' : 'text-red-7'">End Call</div>
+          </q-btn>
+
+          <q-btn class="sessions-button my-1 ml-1 free-width"
+                 size="sm"
+                 no-wrap
+                 no-caps
+                 unelevated
+                 outline
+                 :class="canNextTask ? 'border border-danger' : ''"
+                 :color="canNextTask ? 'grey-4' : 'grey-8'"
+                 :disabled="!canNextTask"
                  @click="onNextTask(false, true)">
             <PlayBarIcon class="mr-1"
-                         :color="canNextTask ? '#FF3B3B' : 'white'"/>
+                         :color="canNextTask ? '#FF3B3B' : '#62666E'"
+            />
             <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
           </q-btn>
 
@@ -324,11 +339,13 @@ import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import talk2Api from 'src/plugins/api/api'
 import PlayBarIcon from 'components/icons/play-bar-icon.vue'
+import HangupIcon from 'components/icons/hangup-icon.vue'
 
 export default {
   name: 'SessionCallStatus',
 
   components: {
+    HangupIcon,
     PlayBarIcon,
     MuteIcon,
     UnmuteIcon,
@@ -451,6 +468,21 @@ export default {
   },
 
   methods: {
+
+    hangupCall ($event) {
+      this.isHangingUp = true
+      $event.stopPropagation()
+      $event.preventDefault()
+
+      alert('handup Call')
+      console.log('########### Calling hangup call', this.dialer.currentStatus)
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      console.log('hangupCall')
+      this.$VueEvent.fire('hangupCall')
+    },
 
     onToggleMute () {
       this.$VueEvent.fire('toggleMute')

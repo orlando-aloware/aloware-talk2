@@ -116,17 +116,19 @@
           </div>
         </q-btn>
 
-        <q-btn class="sessions-button free-width my-1 ml-2 border"
+        <q-btn class="sessions-button my-1 ml-1 free-width"
                size="sm"
                no-wrap
-               unelevated
                no-caps
-               :disabled="!canNextTask "
-               :class="canNextTask ? 'border-danger' : ''"
-               :color="canNextTask  ? 'white' : 'grey-8'"
+               unelevated
+               outline
+               :class="canNextTask ? 'border border-danger' : ''"
+               :color="canNextTask ? 'grey-4' : 'grey-8'"
+               :disabled="!canNextTask"
                @click="onNextTask(false, true)">
           <PlayBarIcon class="mr-1"
-                       :color="canNextTask ? '#FF3B3B' : 'white'"/>
+                       :color="canNextTask ? '#FF3B3B' : '#62666E'"
+          />
           <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
         </q-btn>
       </div>

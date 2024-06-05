@@ -42,7 +42,7 @@
           <b-button size="sm"
                     variant="light"
                     class="btn-white btn-contact-prev-next"
-                    style="z-index: 999;margin: auto;margin-top: -14px;margin-bottom:-14px;"
+                    style="z-index: 1;margin: auto;margin-top: -15px;margin-bottom:-14px;"
                     v-if="!isStatusMinimized"
                     @click="onToggleStatusMinimized"
           >
