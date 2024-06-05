@@ -27,9 +27,10 @@
                no-wrap
                outline
                no-caps
-               :disable="true"
+               color="grey-8"
+               disabled="true"
         >
-          <div class="text-body2 text-black">
+          <div class="text-13 text-black">
             DISPOSITIONS
           </div>
 
@@ -102,7 +103,7 @@
                no-caps
                unelevated
                outline
-               :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
+               :color="isHoldDisabled ? 'grey-8' : 'grey-4'"
                :disabled="isHoldDisabled"
                @click="onToggleHold">
           <UnHoldIcon class="mr-1"
@@ -116,12 +117,13 @@
           </div>
         </q-btn>
 
-        <q-btn v-if="statusCallConnected" class="sessions-button free-width my-1 ml-1"
+        <q-btn class="sessions-button free-width my-1 ml-1"
                size="sm"
                no-wrap
                unelevated
                no-caps
                color="red-7"
+               v-if="statusCallConnected"
                @click="hangupCall">
           <HangupIcon class="mr-1"
                       color="white"/>
@@ -238,15 +240,6 @@ export default {
       this.findDefaultOutboundCampaign()
     }
 
-    this.$VueEvent.listen('initiate_session', this.onInitiateSession)
-    this.$VueEvent.listen('initiate_wrapup', this.onInitiateWrapUp)
-    this.$VueEvent.listen('initiate_session_no_tasks', this.closePowerDialerNoTasks)
-    this.$VueEvent.listen('endWrapUpPDSession', this.onEndWrapUp)
-    this.$VueEvent.listen('phoneExpansionReset', this.onPhoneExpansionReset)
-    this.$VueEvent.listen('redial_task', this.requeueTask)
-    this.$VueEvent.listen('holdFailed', this.onHoldFailed)
-    this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
-
     this.isSessionRunning = false
   },
 
@@ -353,22 +346,6 @@ export default {
     next(vm => {
       vm.prevRoute = from
     })
-  },
-
-  beforeDestroy () {
-    this.clearWarmUpCountDown()
-    clearInterval(this.hangUpInterval)
-    clearInterval(this.countdownInterval)
-    clearInterval(this.$options.holdInterval)
-
-    this.$VueEvent.stop('initiate_session', this.onInitiateSession)
-    this.$VueEvent.stop('initiate_wrapup', this.onInitiateWrapUp)
-    this.$VueEvent.stop('initiate_session_no_tasks', this.closePowerDialerNoTasks)
-    this.$VueEvent.stop('endWrapUpPDSession', this.onEndWrapUp)
-    this.$VueEvent.stop('phoneExpansionReset', this.onPhoneExpansionReset)
-    this.$VueEvent.stop('redial_task', this.requeueTask)
-    this.$VueEvent.stop('holdFailed', this.onHoldFailed)
-    this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
   }
 }
 </script>

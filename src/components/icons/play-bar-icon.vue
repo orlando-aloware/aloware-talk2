@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'NextIcon',
+  name: 'PlayBarIcon',
   props: {
     width: {
       type: [Number, String],

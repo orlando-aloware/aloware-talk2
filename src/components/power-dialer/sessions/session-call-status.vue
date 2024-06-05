@@ -109,12 +109,13 @@
             </q-list>
           </q-btn-dropdown>
 
-          <q-btn v-if="statusCallConnected" class="sessions-button free-width my-1 ml-1"
+          <q-btn class="sessions-button free-width my-1 ml-1"
                  size="sm"
                  no-wrap
                  unelevated
                  no-caps
                  color="red-7"
+                 v-if="statusCallConnected"
                  @click="hangupCall">
             <HangupIcon class="mr-1"
                         color="white"/>
