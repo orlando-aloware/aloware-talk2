@@ -113,7 +113,7 @@ export default {
     },
 
     isSalesforceEnabled () {
-      return !!(this.currentCompany && this.currentCompany.salesforce_integration_enabled)
+      return this.currentCompany && this.currentCompany.salesforce_integration_enabled
     },
 
     contactHasSalesforceData () {
