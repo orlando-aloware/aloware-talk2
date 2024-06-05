@@ -1279,6 +1279,18 @@ export default {
       }
 
       this.processSession(false)
+    },
+
+    hangupCall ($event) {
+      this.isHangingUp = true
+      $event.stopPropagation()
+      $event.preventDefault()
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      this.$VueEvent.fire('hangupCall')
     }
   }
 }

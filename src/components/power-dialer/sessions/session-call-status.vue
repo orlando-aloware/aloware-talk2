@@ -109,17 +109,16 @@
             </q-list>
           </q-btn-dropdown>
 
-          <q-btn v-if="statusCallConnected" class="sessions-button my-1 ml-1 free-width"
+          <q-btn v-if="statusCallConnected" class="sessions-button free-width my-1 ml-1"
                  size="sm"
                  no-wrap
-                 no-caps
                  unelevated
-                 outline
-                 @click="onNextTask(false, true)">
+                 no-caps
+                 color="red-7"
+                 @click="hangupCall">
             <HangupIcon class="mr-1"
-                         :color="statusCallConnected ? '#FF3B3B' : '#62666E'"
-            />
-            <div class="text-body2" :class="statusCallConnected ? 'white' : 'text-red-7'">End Call</div>
+                        color="white"/>
+            <div class="text-body2">End Call</div>
           </q-btn>
 
           <q-btn class="sessions-button my-1 ml-1 free-width"
@@ -468,22 +467,6 @@ export default {
   },
 
   methods: {
-
-    hangupCall ($event) {
-      this.isHangingUp = true
-      $event.stopPropagation()
-      $event.preventDefault()
-
-      alert('handup Call')
-      console.log('########### Calling hangup call', this.dialer.currentStatus)
-      if (this.dialer.currentStatus === 'WRAP_UP') {
-        this.$VueEvent.fire('endWrapUp')
-      }
-
-      console.log('hangupCall')
-      this.$VueEvent.fire('hangupCall')
-    },
-
     onToggleMute () {
       this.$VueEvent.fire('toggleMute')
     },

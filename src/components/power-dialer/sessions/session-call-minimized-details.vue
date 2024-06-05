@@ -116,6 +116,18 @@
           </div>
         </q-btn>
 
+        <q-btn v-if="statusCallConnected" class="sessions-button free-width my-1 ml-1"
+               size="sm"
+               no-wrap
+               unelevated
+               no-caps
+               color="red-7"
+               @click="hangupCall">
+          <HangupIcon class="mr-1"
+                      color="white"/>
+          <div class="text-body2">End Call</div>
+        </q-btn>
+
         <q-btn class="sessions-button my-1 ml-1 free-width"
                size="sm"
                no-wrap
@@ -181,11 +193,13 @@ import {
   dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
 import PlayBarIcon from 'components/icons/play-bar-icon'
+import HangupIcon from 'components/icons/hangup-icon.vue'
 
 export default {
   name: 'SessionCallMinimizedDetails',
 
   components: {
+    HangupIcon,
     PlayBarIcon,
     DropIcon,
     PauseIcon,
