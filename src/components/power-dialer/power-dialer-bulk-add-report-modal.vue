@@ -245,7 +245,7 @@ export default {
       const duplicatePhoneNumbers = this.fullReport?.success?.duplicates || 0
 
       if (!creationSettings?.prevent_duplicates) {
-        this.fullReport.success.duplicates = integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
+        this.fullReport.fail.duplicates = integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
       } else if (creationSettings?.prevent_duplicates) {
         const duplicates = this.fullReport?.fail?.[DUPLICATED] || 0
         this.fullReport.fail[DUPLICATED] = integrationReport.duplicates > duplicates ? integrationReport.duplicates : duplicates
@@ -284,9 +284,9 @@ export default {
         ...failReport
       }
 
-      if (!this.fullReport.extra.settings.prevent_duplicates && this.duplicatedTasks) {
+      /* if (!this.fullReport.extra.settings.prevent_duplicates && this.duplicatedTasks) {
         this.fullReport.fail[DUPLICATED] = this.duplicatedTasks
-      }
+      } */
 
       // clean-up
       this.removeIntegrationPDImportSummary(id)
