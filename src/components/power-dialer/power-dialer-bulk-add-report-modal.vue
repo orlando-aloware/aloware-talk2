@@ -120,27 +120,8 @@ export default {
     },
 
     totalAddedFromContacts () {
-      let total = this.addedFromContact
-
-      if (total) {
-        if (this.addedFromMultipleNumbers) {
-          total -= this.addedFromMultipleNumbers
-        }
-
-        if (this.addedOwnContacts) {
-          total -= this.addedOwnContacts
-        }
-
-        if (this.addedInternationalPhoneNumbers) {
-          total -= this.addedInternationalPhoneNumbers
-        }
-
-        if (this.addedDuplicates) {
-          total -= this.addedDuplicates
-        }
-      }
-
-      return total
+      let total = this.addedFromContact - (this.addedFromMultipleNumbers + this.addedOwnContacts + this.addedInternationalPhoneNumbers + this.addedDuplicates)
+      return total < 0 ? 0 : total
     },
 
     totalTasksToBeAdded () {
