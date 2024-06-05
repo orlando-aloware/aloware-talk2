@@ -104,6 +104,7 @@ export const DEFAULT_STATE = {
   isLoadingOpenTaskCount: false,
   isLoadingPendingTaskCount: false,
   inboxShowMyContacts: true,
+  inboxShowUndreads: true,
   isInboxFiltersLoaded: true,
   pinnedViews: [],
   inboxPersonalFilters: [],

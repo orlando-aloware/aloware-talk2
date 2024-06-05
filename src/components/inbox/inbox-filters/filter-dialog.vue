@@ -289,6 +289,7 @@ export default {
       'isFilterModelFormShown',
       'appliedFilter',
       'inboxShowMyContacts',
+      'inboxShowUnreads',
       'pinnedViews',
       'isFilterDialogForView',
       'isEditingView',
@@ -433,6 +434,7 @@ export default {
       'toggleFilterDialogWithFilters',
       'setChannelClonedFilter',
       'setInboxShowMyContacts',
+      'setInboxShowUnreads',
       'setPinnedViews',
       'setFilterDialogForView',
       'setFilterDialogForView',
@@ -529,6 +531,12 @@ export default {
 
       if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
         this.setInboxShowMyContacts(Boolean(myContactsFilter))
+      }
+
+      const unreadsFilter = _.get(this.filter, 'unread_only', null)
+
+      if (unreadsFilter !== null && unreadsFilter !== (this.inboxShowUnreads | 0)) {
+        this.setInboxShowUnreads(Boolean(unreadsFilter))
       }
 
       const booleanProps = [
@@ -796,7 +804,8 @@ export default {
         untagged_only: +this.filter.untagged_only,
         first_time_only: +this.filter.first_time_only,
         exclude_automated_communications: +this.filter.exclude_automated_communications,
-        my_contact: +this.filter.my_contact
+        my_contact: +this.filter.my_contact,
+        has_unread: +this.filter.unread_only
       }
     },
 
@@ -841,6 +850,10 @@ export default {
 
     inboxShowMyContacts (newValue) {
       this.filter.my_contact = +newValue // convert boolean to numeric
+    },
+
+    inboxShowUnreads (newValue) {
+      this.filter.unread_only = +newValue // convert boolean to numeric
     }
   },
 
