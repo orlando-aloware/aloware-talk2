@@ -12,7 +12,9 @@
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
-          <div v-if="isStatusMinimized" class="flex flex-direction-row d-flex flex-1 align-items-center bg-white border-bottom">
+          <div class="flex flex-direction-row flex-1 align-items-center bg-white border-bottom"
+               :class="isStatusMinimized ? 'd-flex' : 'd-none'"
+          >
             <session-call-minimized-details
               class="flex-1 flex-grow-1"
               @on-redirect="redirectRoute"
@@ -27,8 +29,8 @@
             </b-button>
 
           </div>
-          <div class="d-flex bg-white flex-grow-0"
-               v-if="!isStatusMinimized"
+          <div class="bg-white flex-grow-0"
+               :class="isStatusMinimized ? 'd-none' : 'd-flex'"
           >
             <div class="col-6 p-0 bordered-right">
               <session-call-disposition/>
@@ -43,7 +45,7 @@
                     variant="light"
                     class="btn-white btn-contact-prev-next"
                     style="z-index: 1;margin: auto;margin-top: -15px;margin-bottom:-14px;"
-                    v-if="!isStatusMinimized"
+                    :class="isStatusMinimized ? 'd-none' : ''"
                     @click="onToggleStatusMinimized"
           >
             <i class="material-icons">keyboard_arrow_up</i>
