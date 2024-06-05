@@ -18,7 +18,7 @@
         {{ fixMessage('Contact(s)', addedFromContact) }} added
       </p>
       <ul>
-        <li>
+        <li v-if="totalAddedFromContacts">
           {{ totalAddedFromContacts }} {{ fixMessage('task(s)', totalAddedFromContacts) }} from {{ fixMessage('contact(s)', totalAddedFromContacts) }}
         </li>
         <li v-if="addedFromMultipleNumbers">
@@ -122,20 +122,22 @@ export default {
     totalAddedFromContacts () {
       let total = this.addedFromContact
 
-      if (this.addedFromMultipleNumbers) {
-        total -= this.addedFromMultipleNumbers
-      }
+      if (total) {
+        if (this.addedFromMultipleNumbers) {
+          total -= this.addedFromMultipleNumbers
+        }
 
-      if (this.addedOwnContacts) {
-        total -= this.addedOwnContacts
-      }
+        if (this.addedOwnContacts) {
+          total -= this.addedOwnContacts
+        }
 
-      if (this.addedInternationalPhoneNumbers) {
-        total -= this.addedInternationalPhoneNumbers
-      }
+        if (this.addedInternationalPhoneNumbers) {
+          total -= this.addedInternationalPhoneNumbers
+        }
 
-      if (this.addedDuplicates) {
-        total -= this.addedDuplicates
+        if (this.addedDuplicates) {
+          total -= this.addedDuplicates
+        }
       }
 
       return total
