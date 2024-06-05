@@ -22,11 +22,9 @@
                              data-testid="contact-integrations-gohighlevel"
                              :contact="contact"/>
 
-    <integration-salesforce
-      data-testid="contact-integrations-salesforce"
-      :contact="contact"
-      v-if="isSalesforceEnabled && contactHasSalesforceData"
-    />
+    <integration-salesforce data-testid="contact-integrations-salesforce"
+        :contact="contact"
+        v-if="isSalesforceEnabled && contactHasSalesforceData"/>
 
     <contact-crm-links data-testid="contact-integrations-crm-links" :contact="contact"/>
   </b-card>
