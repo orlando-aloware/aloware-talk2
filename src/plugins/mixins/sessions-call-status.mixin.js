@@ -168,6 +168,10 @@ export default {
       }
     },
 
+    muteText () {
+      return this.toggleMute ? 'Unmute' : 'Mute'
+    },
+
     timerIsOver () {
       return this.countdownTimer === -1
     },
