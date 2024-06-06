@@ -149,17 +149,6 @@
           </q-btn>
         </div>
       </div>
-
-      <div class="d-flex align-items-center p-0 justify-content-between flex-wrap px-3">
-        <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize py-0 m-1"
-             v-if="timezone">
-          <DropIcon width="18px"
-                    height="18px"
-                    class="mr-0 py-0"
-                    style="position:relative;top:-2px;"/>
-          {{ timezone }} - {{ getTimeZone }}
-        </div>
-      </div>
     </div>
 
     <q-dialog persistent
@@ -187,7 +176,6 @@
 </template>
 
 <script>
-import DropIcon from 'components/icons/drop-location-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
 import UnHoldIcon from 'components/icons/pause-icon-3'
 import StopIcon from 'components/icons/stop-icon'
@@ -206,7 +194,6 @@ export default {
   components: {
     HangupIcon,
     PlayBarIcon,
-    DropIcon,
     PauseIcon,
     UnHoldIcon,
     StopIcon,
