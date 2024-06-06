@@ -1,150 +1,153 @@
 <template>
   <q-card flat>
     <div class="">
-      <div class="d-flex p-2 flex-wrap justify-content-between align-items-center bg-white">
+      <div class="d-flex p-2 flex-direction-row justify-content-between align-items-center bg-white">
+        <div class="d-flex flew-direction-rows flex-grow-1 align-items-center">
+          <div class="font-weight-bold flex-grow-0 session-call-status lex-0 ml-2"
+               style="max-width: 176px">
+            <q-chip color="grey-50"
+                    class="p-0">
+              <div :class="`text-15 text-lowercase text-capitalize px-2`"
+                   v-html="statusDisplayText">
+              </div>
+            </q-chip>
+          </div>
 
-        <div class="font-weight-bold flex-grow-0 session-call-status lex-0 ml-2"
-             style="max-width: 176px">
-          <q-chip color="grey-50"
-                  class="p-0">
-            <div :class="`text-15 text-lowercase text-capitalize px-2`"
-                 v-html="statusDisplayText">
-            </div>
-          </q-chip>
-        </div>
-
-        <div class="d-flex p-0 flex-grow-1">
-          <div class="text-18 font-weight-bold">
-            {{ fullName }}
-            <span class="text-15 text-subtitle1">
+          <div class="d-flex p-0 flex-grow-1">
+            <div class="text-18 font-weight-bold">
+              {{ fullName }}
+              <span class="text-15 text-subtitle1">
             {{ phoneNumber }}
           </span>
+            </div>
           </div>
         </div>
 
-        <q-btn class="my-1 sessions-button free-width ml-2"
-               size="sm"
-               no-wrap
-               outline
-               no-caps
-               color="grey-8"
-               disabled="true"
-        >
-          <div class="text-13 text-black">
-            DISPOSITIONS
-          </div>
+        <div class="d-flex flex-direction-row justify-content-end align-items-center flex-wrap flex-grow-1">
+          <q-btn class="my-1 sessions-button free-width ml-2"
+                 size="sm"
+                 no-wrap
+                 outline
+                 no-caps
+                 color="grey-8"
+                 disabled="true"
+          >
+            <div class="text-13 text-black">
+              DISPOSITIONS
+            </div>
 
-          <i class="material-icons font-weight-bold text-body2">keyboard_arrow_right</i>
-        </q-btn>
+            <i class="material-icons font-weight-bold text-body2">keyboard_arrow_right</i>
+          </q-btn>
 
-        <q-btn class="my-1 ml-2"
-               size="sm"
-               unelevated
-               no-wrap
-               no-caps
-               :outline="!sessionPaused"
-               :color="pauseButtonColor"
-               :disabled="toggleEnd"
-               :class="pauseButtonClass"
-               @click="onTogglePause">
+          <q-btn class="my-1 ml-1"
+                 size="sm"
+                 unelevated
+                 no-wrap
+                 no-caps
+                 :outline="!sessionPaused"
+                 :color="pauseButtonColor"
+                 :disabled="toggleEnd"
+                 :class="pauseButtonClass"
+                 @click="onTogglePause">
 
-          <PauseIcon class="mr-2"
-                     :color="pauseIconColor"/>
+            <PauseIcon class="mr-2"
+                       :color="pauseIconColor"/>
 
-          <div :class="pauseButtonTextClass">
-            {{ pauseButtonText }}
-          </div>
-        </q-btn>
+            <div :class="pauseButtonTextClass">
+              {{ pauseButtonText }}
+            </div>
+          </q-btn>
 
-        <q-btn class="my-1 sessions-button free-width ml-1"
-               size="sm"
-               no-wrap
-               outline
-               no-caps
-               :disable="isEndSessionDisabled"
-               :color="endSessionButtonColor"
-               :class="endSessionButtonClass"
-               @click="onToggleEnd">
+          <q-btn class="my-1 sessions-button free-width"
+                 size="sm"
+                 no-wrap
+                 outline
+                 no-caps
+                 :disable="isEndSessionDisabled"
+                 :color="endSessionButtonColor"
+                 :class="endSessionButtonClass"
+                 @click="onToggleEnd">
 
-          <EndCallIcon class="mr-2"
-                       color="#62666E"/>
+            <EndCallIcon class="mr-2"
+                         color="#62666E"/>
 
-          <div class="text-body2 text-black">
-            {{ endSessionText }}
-          </div>
-        </q-btn>
+            <div class="text-body2 text-black">
+              {{ endSessionText }}
+            </div>
+          </q-btn>
 
-        <q-btn class="sessions-button free-width ml-2"
-               size="sm"
-               color="grey-4"
-               outline
-               no-wrap
-               no-caps
-               :disabled="isRecordDisabled"
-               @click="onToggleRecording">
+          <q-btn class="sessions-button free-width my-1 ml-1"
+                 size="sm"
+                 color="grey-4"
+                 outline
+                 no-wrap
+                 no-caps
+                 :disabled="isRecordDisabled"
+                 @click="onToggleRecording">
 
-          <StopIcon class="mr-2"
-                    color="#62666E"
-                    v-if="toggleRecording"/>
+            <StopIcon class="mr-2"
+                      color="#62666E"
+                      v-if="toggleRecording"/>
 
-          <RecordIcon class="mr-2"
-                      color="red"
-                      v-else/>
+            <RecordIcon class="mr-2"
+                        color="red"
+                        v-else/>
 
-          <div class="text-body2 text-black">
-            {{ recordText }}
-          </div>
-        </q-btn>
+            <div class="text-body2 text-black">
+              {{ recordText }}
+            </div>
+          </q-btn>
 
-        <q-btn class="sessions-button my-1 ml-2"
-               size="sm"
-               style="width: 75.72px;"
-               no-wrap
-               no-caps
-               unelevated
-               outline
-               :color="isHoldDisabled ? 'grey-8' : 'grey-4'"
-               :disabled="isHoldDisabled"
-               @click="onToggleHold">
-          <UnHoldIcon class="mr-1"
-                      color="#F2997A"
-                      v-if="toggleHold"/>
-          <PauseIcon class="mr-1"
-                     color="#62666E"
-                     v-else/>
-          <div class="text-body2 text-black">
-            {{ holdText }}
-          </div>
-        </q-btn>
+          <q-btn class="sessions-button my-1 ml-1"
+                 size="sm"
+                 style="width: 75.72px;"
+                 no-wrap
+                 no-caps
+                 unelevated
+                 outline
+                 :color="isHoldDisabled ? 'grey-8' : 'grey-4'"
+                 :disabled="isHoldDisabled"
+                 @click="onToggleHold">
+            <UnHoldIcon class="mr-1"
+                        color="#F2997A"
+                        v-if="toggleHold"/>
+            <PauseIcon class="mr-1"
+                       color="#62666E"
+                       v-else/>
+            <div class="text-body2 text-black">
+              {{ holdText }}
+            </div>
+          </q-btn>
 
-        <q-btn class="sessions-button free-width my-1 ml-1"
-               size="sm"
-               no-wrap
-               unelevated
-               no-caps
-               color="red-7"
-               v-if="statusCallConnected"
-               @click="hangupCall">
-          <HangupIcon class="mr-1"
-                      color="white"/>
-          <div class="text-body2">End Call</div>
-        </q-btn>
+          <q-btn class="sessions-button free-width my-1 ml-1"
+                 size="sm"
+                 no-wrap
+                 unelevated
+                 no-caps
+                 color="red-7"
+                 v-if="statusCallConnected"
+                 @click="hangupCall">
+            <HangupIcon class="mr-1"
+                        color="white"/>
+            <div class="text-body2">End Call</div>
+          </q-btn>
 
-        <q-btn class="sessions-button my-1 ml-1 free-width"
-               size="sm"
-               no-wrap
-               no-caps
-               unelevated
-               outline
-               :class="canNextTask ? 'border border-danger' : ''"
-               :color="canNextTask ? 'grey-4' : 'grey-8'"
-               :disabled="!canNextTask"
-               @click="onNextTask(false, true)">
-          <PlayBarIcon class="mr-1"
-                       :color="canNextTask ? '#FF3B3B' : '#62666E'"
-          />
-          <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
-        </q-btn>
+          <q-btn class="sessions-button my-1 ml-1 free-width"
+                 size="sm"
+                 no-wrap
+                 no-caps
+                 unelevated
+                 outline
+                 :class="canNextTask ? 'border border-danger' : ''"
+                 :color="canNextTask ? 'grey-4' : 'grey-8'"
+                 :disabled="!canNextTask"
+                 @click="onNextTask(false, true)">
+            <PlayBarIcon class="mr-1"
+                         :color="canNextTask ? '#FF3B3B' : '#62666E'"
+            />
+            <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
+          </q-btn>
+        </div>
       </div>
 
       <div class="d-flex align-items-center p-0 justify-content-between flex-wrap px-3">

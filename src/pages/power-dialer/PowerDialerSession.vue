@@ -12,22 +12,22 @@
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
-          <div class="flex flex-direction-row flex-1 align-items-center bg-white border-bottom"
+          <div class="flex-direction-row align-items-center bg-white border-bottom"
                :class="isStatusMinimized ? 'd-flex' : 'd-none'"
           >
             <session-call-minimized-details
-              class="flex-1 flex-grow-1"
+              class="flex-grow-1"
               @on-redirect="redirectRoute"
               @no-tasks-found="onNoTasksFound"
               @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
+
             <b-button size="sm"
                       variant="light mr-2"
-                      class="btn-white btn-contact-prev-next flex-0"
+                      class="btn-white btn-contact-prev-next flex-grow-0"
                       @click="onToggleStatusMinimized"
             >
               <i class="material-icons">keyboard_arrow_down</i>
             </b-button>
-
           </div>
           <div class="bg-white flex-grow-0"
                :class="isStatusMinimized ? 'd-none' : 'd-flex'"
