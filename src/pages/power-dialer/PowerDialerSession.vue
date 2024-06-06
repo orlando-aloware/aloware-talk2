@@ -12,7 +12,7 @@
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
-          <div class="flex-direction-row align-items-center bg-white border-bottom"
+          <div class="flex-direction-row align-items-start bg-white border-bottom"
                :class="isStatusMinimized ? 'd-flex' : 'd-none'"
           >
             <session-call-minimized-details
@@ -24,6 +24,7 @@
             <b-button size="sm"
                       variant="light mr-2"
                       class="btn-white btn-contact-prev-next flex-grow-0"
+                      style="margin-top: 12px"
                       @click="onToggleStatusMinimized"
             >
               <i class="material-icons">keyboard_arrow_down</i>
