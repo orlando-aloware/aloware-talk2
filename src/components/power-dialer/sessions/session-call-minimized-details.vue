@@ -16,9 +16,6 @@
           <div class="d-flex p-0 flex-grow-1">
             <div class="text-18 font-weight-bold">
               {{ fullName }}
-              <span class="text-15 text-subtitle1">
-            {{ phoneNumber }}
-          </span>
             </div>
           </div>
         </div>

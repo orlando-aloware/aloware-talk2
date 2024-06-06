@@ -45,7 +45,7 @@
           <b-button size="sm"
                     variant="light"
                     class="btn-white btn-contact-prev-next m-auto power-dialer-session-toggle-button"
-                    style="height: 32px"
+                    style="height: 34px"
                     :class="isStatusMinimized ? 'd-none' : ''"
                     @click="onToggleStatusMinimized"
           >
