@@ -100,6 +100,7 @@ jobs:
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
           ENV_USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
           ENV_CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
+          ENV_BETA_FEATURES_COMPANY_IDS: ${{ secrets.beta_features_company_ids }}
           file-name: .env.prod
 
       - name: Build/release Electron win app
@@ -174,6 +175,9 @@ jobs:
 
           # Custom Edge Location
           CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
+
+          # Company IDs with beta features enabled
+          BETA_FEATURES_COMPANY_IDS: ${{ secrets.beta_features_company_ids }}
 
       - name: Extract Metadata from package.json
         id: pkg

@@ -195,6 +195,9 @@ export default {
   SET_INBOX_SHOW_MY_CONTACTS (state, value) {
     state.inboxShowMyContacts = value
   },
+  SET_INBOX_SHOW_UNREADS (state, value) {
+    state.inboxShowUnreads = value
+  },
   SET_DEFAULT_SHOW_MY_CONTACTS (state, value) {
     state.showMyContacts = InboxDefault.DEFAULT_STATE.showMyContacts
   },

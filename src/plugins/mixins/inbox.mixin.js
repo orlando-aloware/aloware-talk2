@@ -17,6 +17,7 @@ export default {
       'contactsCurrentPage',
       'liveContacts',
       'inboxShowMyContacts',
+      'inboxShowUnreads',
       'activeChannel',
       'pinnedViews',
       'contacts',
@@ -367,7 +368,6 @@ export default {
           ]
         }
       }
-
       if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {
           ...this.filters,
@@ -397,7 +397,9 @@ export default {
         }
       }
 
-      if (filter && !!+filter.has_unread) {
+      query.has_unread = this.inboxShowUnreads
+
+      if ((filter && !!+filter.has_unread) || (query.has_unread && this.inboxShowUnreads)) {
         this.filters = {
           ...this.filters,
           'is_unanswered_contact': [
