@@ -2,7 +2,7 @@
   <q-card flat>
     <div class="">
       <div class="d-flex p-2 flex-direction-row justify-content-between align-items-center bg-white">
-        <div class="d-flex flew-direction-rows flex-grow-1 align-items-center">
+        <div class="d-flex flew-direction-rows flex-grow-0 align-items-center">
           <div class="font-weight-bold flex-grow-0 session-call-status lex-0 ml-2"
                style="max-width: 176px">
             <q-chip color="grey-50"
