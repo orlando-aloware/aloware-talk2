@@ -177,6 +177,7 @@ export default function () {
     changedContactProperties: [],
     changedContactAttributes: [],
     contactPhoneNumbers: [],
+    conflictedContactPhoneNumbers: [],
     contactRingGroups: [],
     contactAttributes: [],
     isSidebarCollapsed: false,

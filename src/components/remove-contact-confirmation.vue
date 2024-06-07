@@ -93,8 +93,11 @@ export default {
         return 1
       }
 
-      if (this.selectedCount) {
-        return this.selectedCount
+      if (this.selectedContacts[this.listId]) {
+        return this.selectedContacts[this.listId]
+          // do not include contacts with integrations
+          .filter(contact => !contact.has_integration)
+          .length
       }
 
       return 0
@@ -241,8 +244,14 @@ export default {
       }
 
       this.isBusy = true
-      let ids = this.selectedContacts[this.listId]
-        .map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+      // exclude contacts with integrations and get the contact ids
+      let ids = this.selectedContacts[this.listId].reduce((acc, contact) => {
+        if (!contact.has_integration) {
+          acc.push(this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+        }
+        return acc
+      }, [])
+
       ids = chunk(ids, 50)
 
       if (this.isDatatableSelectedAll) {

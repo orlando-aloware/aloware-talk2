@@ -54,6 +54,7 @@ export default {
   ringGroups: (state) => state.ringGroups,
   contactAttributes: (state) => state.contactAttributes,
   contactPhoneNumbers: (state) => state.contactPhoneNumbers,
+  conflictedContactPhoneNumbers: (state) => state.conflictedContactPhoneNumbers,
   contactRingGroups: (state) => state.contactRingGroups,
   isSidebarCollapsed: (state) => state.isSidebarCollapsed,
   isContactNameEditOpen: (state) => state.isContactNameEditOpen,

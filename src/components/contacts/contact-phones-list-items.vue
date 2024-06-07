@@ -26,6 +26,13 @@
 
         <b-badge variant="danger"
                  class="badge-phone-info"
+                 data-testid="contact-phones-list-items-has-conflict"
+                 v-if="phone.conflicted_contacts.length !== 0">
+          Has conflicts
+        </b-badge>
+
+        <b-badge variant="danger"
+                 class="badge-phone-info"
                  data-testid="contact-phones-list-items-invalid-number-badge"
                  v-if="phone.is_invalid">
           Invalid Number
@@ -39,7 +46,7 @@
         </b-badge>
       </div>
 
-      <div class="d-inline-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center">
         <div class="phone-number m-0">
           {{ phone.phone_number | fixPhone }}
         </div>
@@ -86,8 +93,8 @@
               <fax-icon /> Fax
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions"
-                             v-if="hasPermissionTo('archive contact') && phone.phone_number !== contact.phone_number"
                              data-testid="contact-phones-list-items-delete-item"
+                             v-if="phoneCanBeDeleted(phone)"
                              @click="onDelete(phone)">
               <trash-icon color="#62666E"
                           width="13"
@@ -96,6 +103,10 @@
               </trash-icon> Delete
             </b-dropdown-item>
           </b-dropdown>
+        </div>
+        <div class="phone-number-duplicates-icon">
+          <contact-phone-number-duplicates :phone_number="phone"
+                                           v-if="phone.conflicted_contacts.length !== 0" />
         </div>
       </div>
     </div>
@@ -110,6 +121,7 @@ import TextIcon from 'components/icons/text-icon'
 import CallIcon from 'components/icons/call-icon'
 import FaxIcon from 'components/icons/fax-icon'
 import TrashIcon from 'components/icons/trash-icon'
+import ContactPhoneNumberDuplicates from 'components/contacts/contact-phone-number-duplicates'
 
 export default {
   name: 'contact-phones-list-items',
@@ -117,6 +129,7 @@ export default {
   mixins: [aclMixin],
 
   components: {
+    ContactPhoneNumberDuplicates,
     TrashIcon,
     FaxIcon,
     CallIcon,
@@ -136,6 +149,12 @@ export default {
   },
 
   methods: {
+    phoneCanBeDeleted (phone) {
+      return this.hasPermissionTo('archive contact') &&
+        phone.phone_number !== this.contact.phone_number &&
+        phone.integration_data &&
+        phone.integration_data.length === 0
+    },
     onEdit (phone) {
       this.$emit('edit', phone)
     },
