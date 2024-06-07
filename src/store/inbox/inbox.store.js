@@ -113,6 +113,7 @@ export default function () {
     isLoadingOpenTaskCount: false,
     isLoadingPendingTaskCount: false,
     inboxShowMyContacts: true,
+    inboxShowUnreads: false,
     isInboxFiltersLoaded: true,
     pinnedViews: [],
     inboxPersonalFilters: [],

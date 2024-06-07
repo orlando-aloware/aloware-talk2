@@ -6,7 +6,8 @@
         <back-button data-testid="inbox-side-back-btn" @click="back"/>
         <span class="truncated-text"
               v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
-        <inbox-my-contacts-filter data-testid="inbox-side-my-contacts-filter"/>
+        <inbox-toggle-filters :should-show-unreads-toggle="true"
+                              data-testid="inbox-side-my-contacts-filter"/>
       </div>
       <profile class="p-0"
                :hide-profile-info="true"/>
@@ -57,7 +58,7 @@ import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
 import BackButton from 'components/back-button'
-import InboxMyContactsFilter from 'components/inbox/inbox-my-contacts-filter'
+import InboxToggleFilters from 'components/inbox/inbox-toggle-filters'
 import Profile from 'components/profile'
 
 export default {
@@ -69,7 +70,7 @@ export default {
     InboxChannels,
     InboxNavList,
     Profile,
-    InboxMyContactsFilter
+    InboxToggleFilters
   },
 
   data () {
