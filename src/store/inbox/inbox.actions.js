@@ -101,6 +101,9 @@ export default {
   setInboxShowMyContacts: ({ commit }, value) => {
     commit('SET_INBOX_SHOW_MY_CONTACTS', value)
   },
+  setInboxShowUnreads: ({ commit }, value) => {
+    commit('SET_INBOX_SHOW_UNREADS', value)
+  },
   setDefaultShowMyContacts: ({ commit }, value) => {
     commit('SET_DEFAULT_SHOW_MY_CONTACTS', value)
   },

@@ -28,7 +28,7 @@
                   <span>New (Untitled)</span>
                   <span class="position-absolute check-icon"
                         v-if="!selectedFilter">
-                    <check-o-icon data-testid="filter-dialog-check-o-icon" color="#040404" />
+                    <check-o-icon data-testid="filter-dialog-check-o-icon" color="#040404"/>
                   </span>
                 </div>
               </div>
@@ -57,7 +57,7 @@
             <div class="saved-filters">
               <q-skeleton type="rect"
                           data-testid="filter-dialog-skeleton"
-                          v-if="isGettingFilters" />
+                          v-if="isGettingFilters"/>
               <p class="text-muted fs-12 empty-filter-placeholder pl-2"
                  v-show="!isGettingFilters"
                  v-if="companyFilters.length < 1">
@@ -95,15 +95,15 @@
                    data-testid="filter-dialog-view-name-input"
                    v-model.trim="viewName"
                    v-if="isEditingView && selectedFilter && (!+selectedFilter?.is_on_company || selectedFilter?.scope === 'user')"
-                   @keyup.enter="renameFilter" />
+                   @keyup.enter="renameFilter"/>
           <div class="w-100 text-left pt-2 pb-1"
-              v-else>
+               v-else>
             <span class="filter-name">{{ filterFormDisplayName }}</span>
           </div>
           <compact-btn class="border-0 pl-0 pr-0"
                        data-testid="filter-dialog-close-compact-btn"
                        @clicked="onHide">
-            <close-icon iconColor="#000000" />
+            <close-icon iconColor="#000000"/>
           </compact-btn>
         </div>
         <filter-form ref="inboxChannelFilterForm"
@@ -186,7 +186,8 @@ export default {
   props: {
     value: {
       type: Object,
-      default: () => {}
+      default: () => {
+      }
     },
 
     defaultFilterModel: {
@@ -288,6 +289,7 @@ export default {
       'isFilterModelFormShown',
       'appliedFilter',
       'inboxShowMyContacts',
+      'inboxShowUnreads',
       'pinnedViews',
       'isFilterDialogForView',
       'isEditingView',
@@ -432,6 +434,7 @@ export default {
       'toggleFilterDialogWithFilters',
       'setChannelClonedFilter',
       'setInboxShowMyContacts',
+      'setInboxShowUnreads',
       'setPinnedViews',
       'setFilterDialogForView',
       'setFilterDialogForView',
@@ -528,6 +531,12 @@ export default {
 
       if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
         this.setInboxShowMyContacts(Boolean(myContactsFilter))
+      }
+
+      const unreadsFilter = _.get(this.filter, 'unread_only', null)
+
+      if (unreadsFilter !== null && unreadsFilter !== (this.inboxShowUnreads | 0)) {
+        this.setInboxShowUnreads(Boolean(unreadsFilter))
       }
 
       const booleanProps = [
@@ -693,7 +702,10 @@ export default {
     updateFilter (filter, params) {
       if (!params.scope) {
         const scope = [1, '1', true].includes(filter.is_on_company) ? 'company' : 'user'
-        params = { ...params, scope: scope }
+        params = {
+          ...params,
+          scope: scope
+        }
       }
 
       if (this.loadedDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
@@ -792,7 +804,8 @@ export default {
         untagged_only: +this.filter.untagged_only,
         first_time_only: +this.filter.first_time_only,
         exclude_automated_communications: +this.filter.exclude_automated_communications,
-        my_contact: +this.filter.my_contact
+        my_contact: +this.filter.my_contact,
+        has_unread: +this.filter.unread_only
       }
     },
 
@@ -837,6 +850,10 @@ export default {
 
     inboxShowMyContacts (newValue) {
       this.filter.my_contact = +newValue // convert boolean to numeric
+    },
+
+    inboxShowUnreads (newValue) {
+      this.filter.unread_only = +newValue // convert boolean to numeric
     }
   },
 
