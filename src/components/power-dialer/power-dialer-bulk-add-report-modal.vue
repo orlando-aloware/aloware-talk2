@@ -71,7 +71,8 @@
 import {
   DUPLICATED,
   PD_BULK_ADD_MESSAGES,
-  PD_INTEGRATION_IMPORT_MESSAGES
+  PD_INTEGRATION_IMPORT_MESSAGES,
+  NOT_OWNED
 } from 'src/constants/power-dialer-add-errors'
 import { cloneDeep, get, isNil, isEmpty, omitBy } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -298,8 +299,15 @@ export default {
         ...failReport
       }
 
-      if (!this.fullReport.extra.settings.prevent_duplicates && this.duplicatedTasks) {
-        this.fullReport.fail[DUPLICATED] = Number(this.fullReport.fail[DUPLICATED]) + Number(this.duplicatedTasks)
+      if (!creationSettings.prevent_duplicates && this.duplicatedTasks) {
+        this.fullReport.fail[DUPLICATED] = this.duplicatedTasks
+      }
+
+      if (creationSettings.own_contacts_only) {
+        const notOwnedContactsCount = this.selected - this.totalTasksToBeAdded
+        if (notOwnedContactsCount) {
+          this.fullReport.fail[NOT_OWNED] = notOwnedContactsCount
+        }
       }
 
       console.log('buildReport this.fullReport', this.fullReport)
