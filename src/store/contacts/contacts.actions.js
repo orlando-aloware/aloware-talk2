@@ -149,6 +149,9 @@ export default {
   setContactPhoneNumbers: ({ commit }, phoneNumbers) => {
     commit('SET_CONTACT_PHONE_NUMBERS', phoneNumbers)
   },
+  setConflictedContactPhoneNumbers: ({ commit }, phoneNumbers) => {
+    commit('SET_CONFLICTED_CONTACT_PHONE_NUMBERS', phoneNumbers)
+  },
   setContactRingGroups: ({ commit }, ringGroups) => {
     commit('SET_CONTACT_RING_GROUPS', ringGroups)
   },

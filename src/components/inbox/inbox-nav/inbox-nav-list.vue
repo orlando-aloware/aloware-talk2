@@ -238,6 +238,8 @@ export default {
       'resetChannelChangedFilterFields',
       'setAppliedFilter',
       'setInboxShowMyContacts',
+      'setInboxShowUnreads',
+      'setInbox',
       'setChannelClonedFilter',
       'setFilterDialogForView',
       'setInboxPersonalFilters',
@@ -351,6 +353,12 @@ export default {
       // set My Contacts toggle state
       if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
         this.setInboxShowMyContacts(Boolean(myContactsFilter))
+      }
+
+      const unreadsFilter = get(this.filter, 'unread_only', null)
+
+      if (unreadsFilter !== null && unreadsFilter !== (this.inboxShowUnreads | 0)) {
+        this.setInboxShowUnreads(Boolean(unreadsFilter))
       }
 
       this.setAppliedFilter(this.selectedFilter)

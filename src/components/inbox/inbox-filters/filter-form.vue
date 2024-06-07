@@ -233,6 +233,22 @@
             <b-col md="6"
                    sm="12">
               <b-form-group>
+                <span class="form-label">Show Only Unread Communications</span>
+                <div>
+                  <b-form-checkbox class="cursor-pointer switch-success"
+                                   size="lg"
+                                   switch
+                                   :value="1"
+                                   :unchecked-value="0"
+                                   v-model="filter.unread_only">
+                  </b-form-checkbox>
+                </div>
+              </b-form-group>
+            </b-col>
+
+            <b-col md="6"
+                   sm="12">
+              <b-form-group>
                 <span class="form-label">Creator Type</span>
                 <div>
                   <creator-type-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"

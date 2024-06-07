@@ -11,11 +11,27 @@
       </b-form-input>
     </b-form-group>
 
-    <b-form-group label="Phone Number"
-                  :invalid-feedback="invalidPhoneNumber"
+    <b-form-group :invalid-feedback="invalidPhoneNumber"
                   :state="validPhoneNumber">
+      <template #label>
+        <span>
+          Phone Number
+          <b-icon class='ml-2 contact-phones-form-locked-by-integration-info-icon'
+                  icon='info-circle'
+                  data-testid='contact-phones-form-locked-by-integration-info-icon'
+                  style='color: #F3B803;'
+                  v-if='phone.hasExternalData'/>
+          <q-tooltip target='.contact-phones-form-locked-by-integration-info-icon'
+                     anchor='top middle'
+                     self='top middle'
+                     data-testid='contact-phones-form-locked-by-integration-info-tooltip'>
+          It's not possible to edit phone number which came from integration.
+            </q-tooltip>
+        </span>
+      </template>
       <b-form-input type="text"
                     placeholder="Phone Number"
+                    :disabled="phone.hasExternalData"
                     data-testid="contact-phones-form-phone-number-input"
                     v-model="phone.number"
                     required>

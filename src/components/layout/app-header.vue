@@ -53,7 +53,8 @@
         </q-tooltip>
       </a>
 
-      <inbox-my-contacts-filter v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage"/>
+      <inbox-toggle-filters :should-show-unreads-toggle="true"
+                            v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage" />
     </div>
 
     <tutorial-video-button />
@@ -181,7 +182,7 @@ import RefreshIcon from 'components/icons/refresh-icon'
 import SharedLoginMenu from 'components/shared-login-menu'
 import BackButton from 'components/back-button'
 import HeaderHelp from 'components/header-help'
-import InboxMyContactsFilter from 'components/inbox/inbox-my-contacts-filter'
+import InboxToggleFilters from 'components/inbox/inbox-toggle-filters'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
@@ -222,7 +223,7 @@ export default {
     CompactBtn,
     RefreshIcon,
     HeaderHelp,
-    InboxMyContactsFilter,
+    InboxToggleFilters,
     AnnounceKit,
     InformationCircleIcon,
     TutorialVideoButton
@@ -357,6 +358,10 @@ export default {
       return this.$route.name === 'Inbox' ||
           path.includes('inbox') ||
           path.includes('channels')
+    },
+
+    shouldShowUnreadsToggle () {
+      return this.$route.path.includes('channels') && !this.$route.path.includes('inbox')
     },
 
     isContactsPage () {
