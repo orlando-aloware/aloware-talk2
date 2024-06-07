@@ -1277,7 +1277,7 @@ export default {
       }
     }
 
-    this.listeners.inboxLoadContacts = debounce((showMyContacts) => {
+    this.listeners.inboxLoadContacts = debounce((showMyContacts, showUnreads) => {
       if (!this.isLoaded) {
         return
       }
