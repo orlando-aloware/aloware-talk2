@@ -247,6 +247,31 @@ export default {
       }
     },
 
+    'powerDialerTasks.in_queue': {
+      handler (tasks) {
+        // end the session if:
+        // there's no tasks in queue
+        // and there's no active task
+        if (tasks.length === 0 && !this.hasActiveTask) {
+          this.shouldRedirect = true
+          return
+        }
+
+        if (tasks.length === 0 && !this.togglePause) {
+          this.shouldRedirect = true
+        }
+
+        if (tasks.length > 0 && !this.isSessionRunning) {
+          this.shouldRedirect = false
+          if (!this.wrapUp) {
+            // Calls this function the first time the page loads
+            this.start()
+          }
+        }
+      },
+      deep: true
+    },
+
     contact (value) {
       const phoneNumber = this.$options.filters.fixPhone(value.phone_number)
       const outboundCampaing = this.campaigns.find(campaign => campaign.id === this.sessionSettings.campaign_id)
