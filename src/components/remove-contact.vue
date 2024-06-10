@@ -21,6 +21,7 @@
           Remove From List Only
         </button>
         <button class="btn btn-sm btn-danger mr-2"
+                :disabled="!canBeDeleted"
                 @click="onRemoveFromContacts">
           Remove Contact{{ hasMultipleSelection ? 's' : '' }}
         </button>
@@ -88,10 +89,29 @@ export default {
       }
 
       if (this.selectedContacts[this.selectedList.id]) {
-        return `Are you sure you want to remove <span>${this.$options.filters.numFormat(this.selectedCount)}</span> contact${this.hasMultipleSelection ? 's' : ''}?`
+        const hasIntegrationsCount = this.integrationsCount()
+        const text = []
+
+        if (hasIntegrationsCount > 1) {
+          text.push(`There are ${hasIntegrationsCount} contacts from integrations and can't be deleted.`)
+        } else if (hasIntegrationsCount > 0) {
+          text.push(`There is a contact from integrations and can't be deleted.`)
+        }
+
+        const canBeDeleted = this.selectedCount - hasIntegrationsCount
+
+        if (canBeDeleted > 0) {
+          text.push(`Are you sure you want to remove <span>${this.$options.filters.numFormat(canBeDeleted)}</span> contact${canBeDeleted > 1 ? 's' : ''}?`)
+        }
+
+        return text.join('<br /><br />')
       }
 
       return ''
+    },
+
+    canBeDeleted () {
+      return this.contactToRemove || (this.selectedContacts[this.selectedList.id] && this.integrationsCount() < this.selectedCount)
     },
 
     listId () {
@@ -126,6 +146,14 @@ export default {
       'removeContactClose',
       'setContactRemoveActionType'
     ]),
+
+    integrationsCount () {
+      if (!this.contactToRemove && this.selectedContacts[this.selectedList.id]) {
+        return this.selectedContacts[this.selectedList.id].filter(contact => contact.has_integration).length
+      }
+
+      return 0
+    },
 
     onRemoveFromList () {
       this.flag = true

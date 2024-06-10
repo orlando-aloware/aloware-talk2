@@ -219,6 +219,9 @@ export default {
 
     state.contactPhoneNumbers.splice(index, 1)
   },
+  SET_CONFLICTED_CONTACT_PHONE_NUMBERS: (state, phoneNumbers) => {
+    state.conflictedContactPhoneNumbers = phoneNumbers
+  },
   SET_SIDEBAR_COLLAPSED: (state, isCollapsed) => {
     state.isSidebarCollapsed = isCollapsed
   },
