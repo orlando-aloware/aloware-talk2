@@ -533,7 +533,7 @@
             </div>
 
             <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
-                 v-if="dialer.communication">
+                 v-if="dialer.communication && currentCompany.hubspot_integration_enabled">
               <label class="form-control-label text-grey-90">
                 Hubspot Type
               </label>
