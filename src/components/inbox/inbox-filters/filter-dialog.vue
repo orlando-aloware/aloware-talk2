@@ -630,6 +630,8 @@ export default {
         finalFilters.answer_status = communicationAnswerStatus
       }
 
+      this.filter.dynamic_engagement_date_range = 0
+      console.log('onAPPLY finalFilters', finalFilters)
       this.$emit('applyFilter', finalFilters)
       this.hideModal()
     },

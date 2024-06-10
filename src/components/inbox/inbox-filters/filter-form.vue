@@ -28,7 +28,8 @@
                                    :always-show-calendars="true"
                                    :auto-apply="true"
                                    data-testid="filter-form-date-range-picker"
-                                   v-model="dateRange">
+                                   v-model="dateRange"
+                                   @change="onChangeRangePicker">
                   <template v-slot:input="picker" style="min-width: 350px;">
                     {{ getDateRangeInputLabel(picker) }}
                   </template>
@@ -502,6 +503,9 @@ export default {
     ...mapState('auth', [
       'profile'
     ]),
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
 
     isInboxOrAllComms () {
       return this.inboxTaskRoutes.includes(this.$route.name) ||
@@ -597,7 +601,7 @@ export default {
         'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
         'This Month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
         'Last 7 Days': [window.moment().subtract(7, 'day')._d, window.moment()._d],
-        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment().subtract(1, 'day')._d],
+        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment()._d],
         'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
         'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       },
@@ -639,13 +643,10 @@ export default {
         {
           id: 8,
           name: 'Last 30 Days'
-        },
-        {
-          id: 9,
-          name: 'Recent (Last 30 Days + Today)'
         }
       ],
-      selectedTags: []
+      selectedTags: [],
+      changedManually: false
     }
   },
 
@@ -672,11 +673,48 @@ export default {
     },
 
     getDateRangeInputLabel () {
-      if (this.dateRange.startDate && this.dateRange.endDate) {
-        return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
+      /* ranges: {
+        'All Time': [null, null],
+        'Today': [window.moment()._d, window.moment()._d],
+        'Yesterday': [window.moment().subtract(1, 'day')._d, window.moment().subtract(1, 'day')._d],
+        'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
+        'This Month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
+        'Last 7 Days': [window.moment().subtract(7, 'day')._d, window.moment()._d],
+        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment().subtract(1, 'day')._d],
+        'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
+        'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
+      } */
+      console.log('getDateRangeInputLabel this.startDate', this.dateRange.startDate)
+      console.log('getDateRangeInputLabel this.dateRange.endDate', this.dateRange.endDate)
+      console.log('getDateRangeInputLabel this.changedManually', this.changedManually)
+      console.log('getDateRangeInputLabel this.filter', this.filter)
+      if (!this.filter.from_date && !this.filter.to_date) {
+        // this.changedManually = false
+        return 'All Time'
       }
 
-      return 'All Time'
+      if (!this.changedManually && !this.dateRange.startDate) {
+        if (this.currentCompany?.default_report_period) {
+          switch (this.currentCompany.default_report_period) {
+            case 'month':
+              this.dateRange.startDate = window.moment().subtract(30, 'day')._d
+              break
+            case 'week':
+              this.dateRange.startDate = window.moment().subtract(7, 'day')._d
+              break
+            case 'day':
+              this.dateRange.startDate = window.moment()._d
+              break
+          }
+          console.log('getDateRangeInputLabel this.dateRange.startDate', this.dateRange.startDate)
+        }
+      }
+      if (!this.changedManually && !this.dateRange.endDate) {
+        this.dateRange.endDate = window.moment()._d
+        console.log('getDateRangeInputLabel this.dateRange.endDate', this.dateRange.endDate)
+      }
+
+      return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
     },
 
     getTagsObjectsByIds (tagsIds = []) {
@@ -685,6 +723,10 @@ export default {
 
     onPreliminarChange (tags) {
       this.setTags(tags)
+    },
+
+    onChangeRangePicker () {
+      console.log('cambiando manualmente!')
     }
   },
 
@@ -720,12 +762,17 @@ export default {
     dateRange: {
       deep: true,
       handler () {
+        console.log('WATCH dateRange this.dateRange.startDate', this.dateRange.startDate)
+        console.log('WATCH dateRange this.dateRange.endDate', this.dateRange.endDate)
         this.filter.from_date = this.dateRange.startDate
           ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD')
           : null
         this.filter.to_date = this.dateRange.endDate
           ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD')
           : null
+        this.changedManually = true
+        console.log('WATCH dateRange this.dateRange.startDate', this.dateRange.startDate)
+        console.log('WATCH dateRange this.dateRange.endDate', this.dateRange.endDate)
       }
     },
 

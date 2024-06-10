@@ -263,6 +263,7 @@ export default {
       this.source.cancel('Loading of contact task operation is canceled by the user.')
       this.source = this.cancelToken.source()
 
+      console.log('*** getContactsByTaskStatus *** this.getParameters(taskId)', this.getParameters(taskId))
       return talk2Api.V2.contacts.list(this.getParameters(taskId), this.source.token)
     },
 
@@ -368,6 +369,33 @@ export default {
           ]
         }
       }
+      console.log('*** getParameters ***, filter?.from_date', filter?.from_date)
+      console.log('*** getParameters ***, filter?.to_date', filter?.to_date)
+      console.log('*** getParameters ***, this.filter.dynamic_engagement_date_range ', this.filter.dynamic_engagement_date_range )
+
+      console.trace('*** getParameters ***')
+      if (filter && filter?.from_date === null && this.profile?.default_report_period) {
+        switch (this.profile.default_report_period) {
+          case 'month':
+            filter.from_date = window.moment().subtract(30, 'day')._d
+            filter.dynamic_engagement_date_range = 8
+            break
+          case 'week':
+            filter.from_date = window.moment().subtract(7, 'day')._d
+            filter.dynamic_engagement_date_range = 5
+            break
+          case 'day':
+            filter.from_date = window.moment()._d
+            filter.dynamic_engagement_date_range = 1
+            break
+        }
+        console.log('getParameters filter.from_date', filter.from_date)
+      }
+      if (filter && filter?.to_date === null && this.profile?.default_report_period) {
+        filter.to_date = window.moment()._d
+        console.log('getParameters filter.to_date', filter.to_date)
+      }
+
       if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {
           ...this.filters,
@@ -375,6 +403,7 @@ export default {
             { value: [filter.from_date, filter.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
           ]
         }
+        console.log('getParameters this.filters', this.filters)
       }
 
       if (filter && !isEmpty(filter.tags)) {
@@ -388,6 +417,7 @@ export default {
       }
 
       // apply only if filter is not "All Time"
+      console.log('filter.dynamic_engagement_date_range', filter.dynamic_engagement_date_range)
       if (filter && filter.dynamic_engagement_date_range > 0) {
         this.filters = {
           ...this.filters,
