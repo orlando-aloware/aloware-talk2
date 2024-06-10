@@ -19,11 +19,12 @@ export default {
     return {
       prevRoute: null,
       shouldRedirect: false,
+      redirectDelay: 3000,
       skippedTasks: [],
       countdownInterval: null,
       callInProgress: false,
       countdownStarted: false,
-      wrapUp: false,
+      // wrapUp: false, // should be a state
       reRouteModal: false,
       loadingNext: false,
       sessionNotReady: false,
@@ -49,7 +50,8 @@ export default {
 
     ...mapState([
       'dialer',
-      'campaigns'
+      'campaigns',
+      'wrapUp'
     ]),
 
     ...mapFields([
@@ -208,6 +210,11 @@ export default {
     phoneNumber () {
       return this.taskToCall?.phone_number
     },
+
+    statusReady () {
+      return this.dialer.currentStatus === 'READY'
+    },
+
     forcedWrapUpAccount () {
       return this.profile.company.force_wrap_up
     },
@@ -437,7 +444,7 @@ export default {
       'setContactClone'
     ]),
 
-    ...mapActions(['setShowPhone', 'setDialerContact']),
+    ...mapActions(['setShowPhone', 'setDialerContact', 'setWrapUp']),
 
     ...mapActions('powerDialer', [
       'moveContactItems',
@@ -745,6 +752,7 @@ export default {
         this.wrapUpPaused
 
       this.countdownInterval = setInterval(() => {
+        console.log('#### WRAP UP COUNTER')
         // if status in wrap-up and has wrap-up seconds but wrap up is paused due to
         // forced call or contact disposition, we should not continue the countdown
         if (this.wrapUpSeconds !== -1 && this.dialer.currentStatus === 'WRAP_UP' &&
@@ -791,7 +799,7 @@ export default {
         // end wrap-up if wrap-up seconds
         // is not indefinite
         if (this.wrapUp && this.wrapUpSeconds !== 0) {
-          this.wrapUp = false
+          this.setWrapUp(false)
           this.isSessionRunning = false
         }
 
@@ -1052,12 +1060,12 @@ export default {
               this.$VueEvent.fire('endWrapUp')
             }
 
-            this.wrapUp = false
+            this.setWrapUp(false)
             this.skipWrapUp = false
             return
           }
 
-          this.wrapUp = true
+          this.setWrapUp(true)
           this.countdownTimer = this.wrapUpSeconds
 
           // if status is wrap-up and wrap-up seconds
@@ -1127,7 +1135,7 @@ export default {
       }
 
       if (this.dialer.currentStatus !== 'CALL_CONNECTED' || forceSkip) {
-        this.wrapUp = false
+        this.setWrapUp(false)
         this.hasActiveTask = false
         const task = get(this.powerDialerTasks.in_queue, '0', null)
 
@@ -1164,7 +1172,7 @@ export default {
     },
 
     onEndWrapUp () {
-      this.wrapUp = false
+      this.setWrapUp(false)
       this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
 
       if (this.taskToCall && this.isSessionRunning) {
@@ -1221,7 +1229,7 @@ export default {
           setTimeout(() => {
             this.isRedialClicked = false
             // if it's redial now, we should skip wrap up
-            this.wrapUp = false
+            this.setWrapUp(false)
             this.skipWrapUp = redial
             this.processSession()
           }, 1000)
@@ -1295,6 +1303,40 @@ export default {
       }
 
       this.$VueEvent.fire('hangupCall')
+    },
+    async onNextTaskWhenOnWrapUp () {
+      this.onPhoneExpansionReset()
+      this.setWrapUp(false)
+      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
+
+      if (this.taskToCall) {
+        this.processRemoveFirstInQueueTask()
+        this.activeTask = this.taskToCall
+        this.hasActiveTask = true
+        this.hangUpIntervalCounter = 0
+
+        this.hangUpInterval = setInterval(() => {
+          if (this.dialer.currentStatus === 'WRAP_UP') {
+            this.processSession()
+            clearInterval(this.hangUpInterval)
+          }
+
+          this.hangUpIntervalCounter++
+
+          if (this.hangUpIntervalCounter >= 120) {
+            clearInterval(this.hangUpInterval)
+          }
+        }, 500)
+
+        return
+      }
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      this.hasActiveTask = false
+      this.reRoute()
     }
   }
 }

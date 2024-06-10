@@ -334,7 +334,6 @@ import {
   sessionCallStatusMixin,
   dialerWrapUpMixin, aclMixin
 } from 'src/plugins/mixins'
-import { cloneDeep } from 'lodash'
 import MuteIcon from 'components/icons/mute-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
 import talk2Api from 'src/plugins/api/api'
@@ -375,8 +374,7 @@ export default {
       autoDialer: {
         outbound_campaign_id: null,
         ratio: 1
-      },
-      redirectDelay: 3000
+      }
     }
   },
 
@@ -399,10 +397,6 @@ export default {
 
     phoneNumber () {
       return this.taskToCall?.phone_number
-    },
-
-    statusReady () {
-      return this.dialer.currentStatus === 'READY'
     },
 
     canRedialLater () {
@@ -504,43 +498,7 @@ export default {
     openTransfer () {
       this.$VueEvent.fire('togglePhone')
       this.sessionPhoneExpansion = 'transfer'
-    },
-
-    async onNextTaskWhenOnWrapUp () {
-      this.onPhoneExpansionReset()
-      this.wrapUp = false
-      this.taskToCall = cloneDeep(this.powerDialerTasks.in_queue[0])
-
-      if (this.taskToCall) {
-        this.processRemoveFirstInQueueTask()
-        this.activeTask = this.taskToCall
-        this.hasActiveTask = true
-        this.hangUpIntervalCounter = 0
-
-        this.hangUpInterval = setInterval(() => {
-          if (this.dialer.currentStatus === 'WRAP_UP') {
-            this.processSession()
-            clearInterval(this.hangUpInterval)
-          }
-
-          this.hangUpIntervalCounter++
-
-          if (this.hangUpIntervalCounter >= 120) {
-            clearInterval(this.hangUpInterval)
-          }
-        }, 500)
-
-        return
-      }
-
-      if (this.dialer.currentStatus === 'WRAP_UP') {
-        this.$VueEvent.fire('endWrapUp')
-      }
-
-      this.hasActiveTask = false
-      this.reRoute()
     }
-
   },
 
   watch: {
