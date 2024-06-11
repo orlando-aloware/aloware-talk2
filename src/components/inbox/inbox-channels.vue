@@ -971,8 +971,6 @@ export default {
         return
       }
 
-      console.log('=== onApplyFilter this.filter', this.filter)
-      console.log('=== onApplyFilter filter', filter)
       this.filter = filter
 
       if (this.$route.params.channel === 'recordings') {
@@ -1051,7 +1049,6 @@ export default {
         this.filter.to_date = window.moment().format('YYYY-MM-DD')
         this.firstTimeLoading = false
       }
-      console.log('getCommunications this.filter', this.filter)
 
       // payload specific for Mentions
       if (this.$route.params.channel === 'mentions') {
