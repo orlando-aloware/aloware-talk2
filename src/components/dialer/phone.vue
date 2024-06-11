@@ -262,14 +262,10 @@
               <div class="text-grey-100 text-center">
                 <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                               v-if="contact">
-                  <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
-                  <q-btn class="text-size-rg d-inline-flex ml-1"
-                         color="text-grey-100"
-                         icon="o_info"
-                         flat
-                         round
-                         @click="goToContact">
-                  </q-btn>
+                  <span class="d-inline-flex cursor-pointer"
+                        @click="goToContact">
+                    {{ contactName | truncate(15) }}
+                  </span>
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
                   <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
@@ -478,14 +474,10 @@
                 <div class="ml-2 flex-grow-1 d-inline-flex justify-content-between contact-details">
                   <div class="mr-auto">
                     <p class="contact-name mb-1">
-                      <span class="d-inline-flex">{{ contactName }}</span>
-                      <q-btn class="text-size-rg d-inline-flex ml-1"
-                             color="black"
-                             icon="o_info"
-                             flat
-                             round
-                             @click="goToContact">
-                      </q-btn>
+                      <span class="d-inline-flex cursor-pointer"
+                            @click="goToContact">
+                        {{ contactName }}
+                      </span>
                     </p>
                     <p class="text-sm-left contact-phone mb-1"
                        v-if="contact">
