@@ -302,18 +302,6 @@ export default {
       }
     },
 
-    wrapUp (value) {
-      if (value) {
-        this.startWarmUpCountDown()
-        return
-      }
-
-      // re-run/re-initialize only if no manual skip wrap-up
-      if (!this.skipWrapUp) {
-        this.initialize()
-      }
-    },
-
     'dialer.isReady': function () {
       // session is not ready if session failed to call the contact
       // because dialer is not ready. If dialer reconnects and status
