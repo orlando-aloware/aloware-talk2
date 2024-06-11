@@ -40,7 +40,7 @@
 
 <script>
 import ConfirmDialog from 'components/confirm-dialog.vue'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 
@@ -70,6 +70,8 @@ export default {
       'contactToRemove',
       'selectedList'
     ]),
+
+    ...mapState('cache', ['currentCompany']),
 
     title () {
       if (this.contactToRemove) {
@@ -149,6 +151,10 @@ export default {
 
     integrationsCount () {
       if (!this.contactToRemove && this.selectedContacts[this.selectedList.id]) {
+        // disable integrations count if multi entity is not activated
+        if (!this.currentCompany.activate_multi_entity) {
+          return 0
+        }
         return this.selectedContacts[this.selectedList.id].filter(contact => contact.has_integration).length
       }
 

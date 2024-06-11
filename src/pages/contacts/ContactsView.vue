@@ -1238,7 +1238,8 @@ export default {
     ]),
 
     hasIntegration (contact) {
-      return Boolean(contact.external_integration_data && contact.external_integration_data.length > 0)
+      // activate only for multi-entity allowed company
+      return Boolean(this.currentCompany.activate_multi_entity ? contact.external_integration_data && contact.external_integration_data.length > 0 : false)
     },
 
     onSearch (searchText) {
