@@ -20,6 +20,7 @@
                  :class="isStatusMinimized ? 'd-flex w-100 flex-direction-row' : 'col-6'">
               <div class="flex-grow-1">
                 <session-call-status :isMinimized="isStatusMinimized"
+                                     @on-dispositions="onToggleStatusMinimized"
                                      @on-redirect="redirectRoute"
                                      @no-tasks-found="onNoTasksFound"
                                      @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>

@@ -21,19 +21,19 @@
         </div>
 
         <div class="d-flex flex-direction-row justify-content-end align-items-center flex-wrap flex-grow-1">
-          <q-btn class="my-1 sessions-button free-width ml-2"
+          <q-btn class="my-1 sessions-button free-width"
                  size="sm"
                  no-wrap
                  outline
                  no-caps
-                 color="grey-8"
-                 disabled="true"
+                 color="grey-4"
+                 @click="onDispositionsClick"
           >
             <div class="text-13 text-black">
               DISPOSITIONS
             </div>
 
-            <i class="material-icons font-weight-bold text-body2">keyboard_arrow_right</i>
+            <i class="material-icons font-weight-bold text-body2 text-black">keyboard_arrow_right</i>
           </q-btn>
 
           <q-btn class="my-1 ml-1"
@@ -129,10 +129,6 @@
             <div class="text-body2">End Call</div>
           </q-btn>
 
-          <!--          <next-button-slot-->
-          <!--            :canNextTask="canNextTask"-->
-          <!--            @onNextTask="onNextTask(false, true)"-->
-          <!--          />-->
           <q-btn class="sessions-button my-1 ml-1 free-width"
                  size="sm"
                  no-wrap
@@ -498,15 +494,15 @@ import UnmuteIcon from 'components/icons/unmute-icon'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import talk2Api from 'src/plugins/api/api'
-import PlayBarIcon from 'components/icons/play-bar-icon.vue'
 import HangupIcon from 'components/icons/hangup-icon.vue'
+import PlayBarIcon from 'components/icons/play-bar-icon.vue'
 
 export default {
   name: 'SessionCallStatus',
 
   components: {
-    HangupIcon,
     PlayBarIcon,
+    HangupIcon,
     MuteIcon,
     UnmuteIcon,
     CalendarIcon,
@@ -930,6 +926,10 @@ export default {
       'reQueuePowerDialerTask',
       'removeFirstInQueueTask'
     ]),
+
+    onDispositionsClick () {
+      this.$emit('on-dispositions')
+    },
 
     processRemoveFirstInQueueTask: debounce(function () {
       this.removeFirstInQueueTask()
