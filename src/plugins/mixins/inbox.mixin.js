@@ -372,19 +372,18 @@ export default {
       if (this.firstTimeLoading && this.profile.default_report_period) {
         switch (this.profile.default_report_period) {
           case 'month':
-            filter.from_date = window.moment().subtract(30, 'day')._d
+            filter.from_date = window.moment().subtract(30, 'day').format('YYYY-MM-DD')
             break
           case 'week':
-            filter.from_date = window.moment().subtract(7, 'day')._d
+            filter.from_date = window.moment().subtract(7, 'day').format('YYYY-MM-DD')
             break
           case 'day':
-            filter.from_date = window.moment()._d
+            filter.from_date = window.moment().format('YYYY-MM-DD')
             break
         }
-        filter.to_date = window.moment()._d
+        filter.to_date = window.moment().format('YYYY-MM-DD')
         this.firstTimeLoading = false
       }
-      console.log('getParameters filter', filter)
 
       if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {

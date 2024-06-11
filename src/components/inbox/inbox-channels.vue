@@ -880,6 +880,7 @@ export default {
     },
 
     onResetFilters () {
+      this.firstTimeLoading = true
       this.resetFilters()
       this.getCommunications(this.filter)
     },
@@ -1034,20 +1035,20 @@ export default {
       if (this.firstTimeLoading && this.profile.default_report_period) {
         switch (this.profile.default_report_period) {
           case 'month':
-            params.from_date = window.moment().subtract(30, 'day')._d
-            this.filter.from_date = window.moment().subtract(30, 'day')._d
+            params.from_date = window.moment().subtract(30, 'day').format('YYYY-MM-DD')
+            this.filter.from_date = window.moment().subtract(30, 'day').format('YYYY-MM-DD')
             break
           case 'week':
-            params.from_date = window.moment().subtract(7, 'day')._d
-            this.filter.from_date = window.moment().subtract(7, 'day')._d
+            params.from_date = window.moment().subtract(7, 'day').format('YYYY-MM-DD')
+            this.filter.from_date = window.moment().subtract(7, 'day').format('YYYY-MM-DD')
             break
           case 'day':
-            params.from_date = window.moment()._d
-            this.filter.from_date = window.moment()._d
+            params.from_date = window.moment().format('YYYY-MM-DD')
+            this.filter.from_date = window.moment().format('YYYY-MM-DD')
             break
         }
-        params.to_date = window.moment()._d
-        this.filter.to_date = window.moment()._d
+        params.to_date = window.moment().format('YYYY-MM-DD')
+        this.filter.to_date = window.moment().format('YYYY-MM-DD')
         this.firstTimeLoading = false
       }
       console.log('getCommunications this.filter', this.filter)
