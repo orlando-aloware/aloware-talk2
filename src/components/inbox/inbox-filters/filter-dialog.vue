@@ -171,14 +171,9 @@ import _ from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as Filters from 'src/constants/filters'
-import { inboxMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'filter-dialog',
-
-  mixins: [
-    inboxMixin
-  ],
 
   components: {
     CloseIcon,
@@ -530,9 +525,6 @@ export default {
     },
 
     onApply (skipChangedFields = false) {
-      // this.filterChanged = true
-      console.log('onApply this.filter', this.filter)
-      // console.log('onApply this.filterChanged', this.filterChanged)
       this.resetChannelChangedFilterFields()
 
       const myContactsFilter = _.get(this.filter, 'my_contact', null)
@@ -593,8 +585,7 @@ export default {
       // save filter changes
       const userScope = (this.selectedFilter?.scope === 'user' || !+this.selectedFilter?.is_on_company)
       const hasSelectedFilterChanges = this.selectedFilter && userScope && this.filterHasChanges
-      console.log('onApply this.filter', this.filter)
-      console.log('onApply this.filterChanged', this.filterChanged)
+
       if (hasSelectedFilterChanges) {
         this.isUpdatingFilter = true
 
@@ -639,8 +630,6 @@ export default {
         finalFilters.answer_status = communicationAnswerStatus
       }
 
-      this.filter.dynamic_engagement_date_range = 0
-      console.log('onAPPLY finalFilters', finalFilters)
       this.$emit('applyFilter', finalFilters)
       this.hideModal()
     },
