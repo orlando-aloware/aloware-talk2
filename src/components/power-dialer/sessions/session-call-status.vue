@@ -36,7 +36,7 @@
             <i class="material-icons font-weight-bold text-body2 text-black">keyboard_arrow_right</i>
           </q-btn>
 
-          <q-btn class="my-1 ml-1"
+          <q-btn class="my-1 ml-2"
                  size="sm"
                  unelevated
                  no-wrap
@@ -73,7 +73,7 @@
             </div>
           </q-btn>
 
-          <q-btn class="sessions-button free-width my-1 ml-1"
+          <q-btn class="sessions-button free-width my-1 ml-2"
                  size="sm"
                  color="grey-4"
                  outline
@@ -95,7 +95,7 @@
             </div>
           </q-btn>
 
-          <q-btn class="sessions-button my-1 ml-1"
+          <q-btn class="sessions-button my-1 ml-2"
                  size="sm"
                  style="width: 75.72px;"
                  no-wrap
@@ -116,7 +116,7 @@
             </div>
           </q-btn>
 
-          <q-btn class="sessions-button free-width my-1 ml-1"
+          <q-btn class="sessions-button free-width my-1 ml-2"
                  size="sm"
                  no-wrap
                  unelevated
@@ -129,7 +129,7 @@
             <div class="text-body2">End Call</div>
           </q-btn>
 
-          <q-btn class="sessions-button my-1 ml-1 free-width"
+          <q-btn class="sessions-button my-1 ml-2 free-width"
                  size="sm"
                  no-wrap
                  no-caps
@@ -161,34 +161,10 @@
           </q-chip>
         </div>
 
-        <div class="w-100"
+        <div class="w-100 justify-content-end d-flex align-items-center"
              style="max-width: 370px;">
-          <q-btn class="sessions-button my-1 ml-1"
-                 size="sm"
-                 style="width: 79.55px;"
-                 no-wrap
-                 no-caps
-                 unelevated
-                 outline
-                 :color="statusCallConnected ? 'grey-4' : 'grey-8'"
-                 :disabled="!statusCallConnected"
-                 @click="onToggleMute">
-            <mute-icon class="mr-1"
-                       :width="12"
-                       :height="12"
-                       v-show="!toggleMute">
-            </mute-icon>
-            <unmute-icon class="mr-1"
-                         :width="12"
-                         :height="12"
-                         v-show="toggleMute">
-            </unmute-icon>
-            <div class="text-body2 text-black">
-              {{ muteText }}
-            </div>
-          </q-btn>
 
-          <q-btn class="sessions-button my-1 ml-1"
+          <q-btn class="sessions-button my-1 ml-2"
                  size="sm"
                  style="width: 75.72px;"
                  no-wrap
@@ -210,7 +186,7 @@
           </q-btn>
 
           <q-btn-dropdown
-            class="sessions-button free-width my-1 ml-1"
+            class="sessions-button free-width my-1 ml-2"
             size="sm"
             no-wrap
             unelevated
@@ -257,7 +233,7 @@
             </q-list>
           </q-btn-dropdown>
 
-          <q-btn class="sessions-button free-width my-1 ml-1"
+          <q-btn class="sessions-button free-width my-1 ml-2"
                  size="sm"
                  no-wrap
                  unelevated
@@ -270,7 +246,7 @@
             <div class="text-body2">End Call</div>
           </q-btn>
 
-          <q-btn class="sessions-button my-1 ml-1 free-width"
+          <q-btn class="sessions-button my-1 ml-2 free-width"
                  size="sm"
                  no-wrap
                  no-caps
@@ -286,7 +262,7 @@
             <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
           </q-btn>
 
-          <b-dropdown class="my-1 ml-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+          <b-dropdown class="my-1 ml-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                       text="..."
                       right size="sm"
                       variant="white"
@@ -350,7 +326,7 @@
           {{ timezone }} - {{ getTimeZone }}
         </div>
 
-        <q-btn class="sessions-button free-width ml-1"
+        <q-btn class="sessions-button free-width ml-2"
                size="sm"
                color="grey-4"
                no-wrap
@@ -420,7 +396,7 @@
             </div>
           </q-btn>
 
-          <q-btn class="my-1 sessions-button free-width ml-1"
+          <q-btn class="my-1 sessions-button free-width ml-2"
                  size="sm"
                  no-wrap
                  outline
@@ -489,8 +465,6 @@ import {
 } from 'src/plugins/mixins'
 import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
-import MuteIcon from 'components/icons/mute-icon'
-import UnmuteIcon from 'components/icons/unmute-icon'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import talk2Api from 'src/plugins/api/api'
@@ -503,8 +477,6 @@ export default {
   components: {
     PlayBarIcon,
     HangupIcon,
-    MuteIcon,
-    UnmuteIcon,
     CalendarIcon,
     TransferIcon,
     DialPadIcon,
