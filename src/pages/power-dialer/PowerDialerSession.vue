@@ -32,8 +32,7 @@
                           variant="light mr-2"
                           class="btn-white btn-contact-prev-next flex-grow-0"
                           style="margin-top: 12px"
-                          @click="onToggleStatusMinimized"
-                >
+                          @click="onToggleStatusMinimized">
                   <i class="material-icons">keyboard_arrow_down</i>
                 </b-button>
               </div>

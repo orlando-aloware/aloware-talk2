@@ -1456,7 +1456,6 @@ export default {
     },
 
     hangupCall ($event) {
-      this.isHangingUp = true
       $event.stopPropagation()
       $event.preventDefault()
 
