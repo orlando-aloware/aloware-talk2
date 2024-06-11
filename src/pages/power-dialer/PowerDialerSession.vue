@@ -12,40 +12,36 @@
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
-          <div class="flex-direction-row align-items-start bg-white border-bottom"
-               :class="isStatusMinimized ? 'd-flex' : 'd-none'"
-          >
-            <session-call-minimized-details
-              class="flex-grow-1"
-              @on-redirect="redirectRoute"
-              @no-tasks-found="onNoTasksFound"
-              @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
-
-            <b-button size="sm"
-                      variant="light mr-2"
-                      class="btn-white btn-contact-prev-next flex-grow-0"
-                      style="margin-top: 12px"
-                      @click="onToggleStatusMinimized"
-            >
-              <i class="material-icons">keyboard_arrow_down</i>
-            </b-button>
-          </div>
-          <div class="bg-white flex-grow-0"
-               :class="isStatusMinimized ? 'd-none' : 'd-flex'"
-          >
-            <div class="col-6 p-0 bordered-right">
+          <div class="bg-white flex-grow-0 d-flex">
+            <div class="col-6 p-0 bordered-right" :class="isStatusMinimized ? 'd-none' : ''">
               <session-call-disposition/>
             </div>
-            <div class="col-6 p-0">
-              <session-call-status @on-redirect="redirectRoute"
-                                   @no-tasks-found="onNoTasksFound"
-                                   @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
+            <div class="p-0 d-flex "
+                 :class="isStatusMinimized ? 'd-flex w-100 flex-direction-row' : 'col-6'">
+              <div class="flex-grow-1">
+                <session-call-status :isMinimized="isStatusMinimized"
+                                     @on-redirect="redirectRoute"
+                                     @no-tasks-found="onNoTasksFound"
+                                     @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
+              </div>
+
+              <div class="flex-grow-0"
+                   :class="!isStatusMinimized ? 'd-none' : ''">
+                <b-button size="sm"
+                          variant="light mr-2"
+                          class="btn-white btn-contact-prev-next flex-grow-0"
+                          style="margin-top: 12px"
+                          @click="onToggleStatusMinimized"
+                >
+                  <i class="material-icons">keyboard_arrow_down</i>
+                </b-button>
+              </div>
             </div>
           </div>
           <b-button size="sm"
                     variant="light"
                     class="btn-white btn-contact-prev-next m-auto power-dialer-session-toggle-button"
-                    style="height: 34px"
+                    style="height: 32px"
                     :class="isStatusMinimized ? 'd-none' : ''"
                     @click="onToggleStatusMinimized"
           >
@@ -77,7 +73,6 @@ import { mapFields } from 'vuex-map-fields'
 import SessionSidebar from 'src/components/power-dialer/sessions/session-sidebar'
 import SessionCallDisposition from 'src/components/power-dialer/sessions/session-call-disposition'
 import SessionCallStatus from 'src/components/power-dialer/sessions/session-call-status'
-import SessionCallMinimizedDetails from 'src/components/power-dialer/sessions/session-call-minimized-details'
 import SessionContactPage from 'src/components/power-dialer/sessions/session-contact-page'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
@@ -96,7 +91,6 @@ export default {
     SessionSidebar,
     SessionCallDisposition,
     SessionCallStatus,
-    SessionCallMinimizedDetails,
     SessionContactPage,
     AppointmentFormModal,
     ContactAddReminderModal

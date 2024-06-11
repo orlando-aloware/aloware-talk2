@@ -96,7 +96,6 @@ export default function (/* { ssrContext } */) {
           code: null
         }
       },
-      wrapUp: false,
       warnings: [],
       shouldIntroduce: false,
       addedParty: null,
@@ -382,10 +381,6 @@ export default function (/* { ssrContext } */) {
 
       setDialerError ({ commit }, error) {
         commit('SET_DIALER_ERROR', error)
-      },
-
-      setWrapUp ({ commit }, value) {
-        commit('SET_WRAP_UP', value)
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -961,10 +956,6 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_WRAP_UP_TIMER (state, timer) {
         state.dialer.wrapUpTimer = timer
-      },
-
-      SET_WRAP_UP (state, value) {
-        state.wrapUp = value
       },
 
       SET_DIALER_PARKED_CALL_DURATION (state, duration) {
