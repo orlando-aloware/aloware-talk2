@@ -448,14 +448,15 @@ import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import { inboxRoutesMixin } from 'src/plugins/mixins'
+import { inboxRoutesMixin, inboxMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
 
 export default {
   name: 'filter-form',
 
   mixins: [
-    inboxRoutesMixin
+    inboxRoutesMixin,
+    inboxMixin
   ],
 
   components: {
@@ -591,7 +592,8 @@ export default {
       disableContactOwner: false,
       dateRange: {
         startDate: null, // window.moment('2015-01-01')._d,
-        endDate: null // window.moment()._d
+        endDate: null, // window.moment()._d
+        manualChange: false
       },
       opens: 'right',
       ranges: {
@@ -645,8 +647,7 @@ export default {
           name: 'Last 30 Days'
         }
       ],
-      selectedTags: [],
-      changedManually: false
+      selectedTags: []
     }
   },
 
@@ -673,6 +674,11 @@ export default {
     },
 
     getDateRangeInputLabel () {
+      if (this.dateRange.startDate && this.dateRange.endDate) {
+        return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
+      }
+
+      return 'All Time'
       /* ranges: {
         'All Time': [null, null],
         'Today': [window.moment()._d, window.moment()._d],
@@ -684,16 +690,13 @@ export default {
         'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
         'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       } */
-      console.log('getDateRangeInputLabel this.startDate', this.dateRange.startDate)
-      console.log('getDateRangeInputLabel this.dateRange.endDate', this.dateRange.endDate)
-      console.log('getDateRangeInputLabel this.changedManually', this.changedManually)
-      console.log('getDateRangeInputLabel this.filter', this.filter)
-      if (!this.filter.from_date && !this.filter.to_date) {
+      /* console.log('getDateRangeInputLabel this.filter', this.filter)
+      if (this.dateRange.manualChange && !this.dateRange.startDate && !this.dateRange.endDate) {
         // this.changedManually = false
         return 'All Time'
       }
 
-      if (!this.changedManually && !this.dateRange.startDate) {
+      if (!this.dateRange.manualChange && !this.dateRange.startDate && !this.dateRange.endDate) {
         if (this.currentCompany?.default_report_period) {
           switch (this.currentCompany.default_report_period) {
             case 'month':
@@ -709,12 +712,13 @@ export default {
           console.log('getDateRangeInputLabel this.dateRange.startDate', this.dateRange.startDate)
         }
       }
-      if (!this.changedManually && !this.dateRange.endDate) {
+      if (!this.dateRange.manualChange && !this.dateRange.endDate) {
         this.dateRange.endDate = window.moment()._d
         console.log('getDateRangeInputLabel this.dateRange.endDate', this.dateRange.endDate)
       }
 
       return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
+      */
     },
 
     getTagsObjectsByIds (tagsIds = []) {
@@ -746,11 +750,27 @@ export default {
   },
 
   mounted () {
+    console.log('MOUNTED filer', this.filter)
     this.dateRange.startDate = this.filter.from_date
     this.dateRange.endDate = this.filter.to_date
     this.rangePicker = this.$refs.picker
     this.selectedTags = this.getTagsObjectsByIds(this.filter?.tags)
-
+    /* if (!this.dateRange.manualChange && !this.dateRange.startDate && !this.dateRange.endDate) {
+      if (this.currentCompany?.default_report_period) {
+        switch (this.currentCompany.default_report_period) {
+          case 'month':
+            this.dateRange.startDate = window.moment().subtract(30, 'day')._d
+            break
+          case 'week':
+            this.dateRange.startDate = window.moment().subtract(7, 'day')._d
+            break
+          case 'day':
+            this.dateRange.startDate = window.moment()._d
+            break
+        }
+        console.log('getDateRangeInputLabel this.dateRange.startDate', this.dateRange.startDate)
+      }
+    */
     setTimeout(() => {
       if (this.inboxShowMyContacts) {
         this.filter.my_contact = 1
@@ -762,17 +782,13 @@ export default {
     dateRange: {
       deep: true,
       handler () {
-        console.log('WATCH dateRange this.dateRange.startDate', this.dateRange.startDate)
-        console.log('WATCH dateRange this.dateRange.endDate', this.dateRange.endDate)
         this.filter.from_date = this.dateRange.startDate
           ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD')
           : null
         this.filter.to_date = this.dateRange.endDate
           ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD')
           : null
-        this.changedManually = true
-        console.log('WATCH dateRange this.dateRange.startDate', this.dateRange.startDate)
-        console.log('WATCH dateRange this.dateRange.endDate', this.dateRange.endDate)
+        this.dateRange.manualChange = true
       }
     },
 

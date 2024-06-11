@@ -338,7 +338,8 @@ export default {
       scrollTimeout: null,
       cancelToken: null,
       source: null,
-      listeners: {}
+      listeners: {},
+      firstTimeLoading: true
     }
   },
 
@@ -1026,41 +1027,28 @@ export default {
     getCommunications (filters, callback) {
       let params = this.$jsonClone(filters)
       let api = talk2Api.V1.reports.communications
-      console.log('getCommunications params', params)
-      console.log('getCommunications this.filter', this.filter)
-      console.log('getCommunications api', api)
-      console.trace('trace getCommunications')
       this.setIsInboxFiltersLoaded(true)
       this.gettingTasksList(true)
       this.communicationsListHasError = false
 
-      if (params && params?.from_date === null && this.profile?.default_report_period) {
+      if (this.firstTimeLoading && this.profile.default_report_period) {
         switch (this.profile.default_report_period) {
           case 'month':
             params.from_date = window.moment().subtract(30, 'day')._d
-            params.dynamic_engagement_date_range = 8
             this.filter.from_date = window.moment().subtract(30, 'day')._d
-            this.filter.dynamic_engagement_date_range = 8
             break
           case 'week':
             params.from_date = window.moment().subtract(7, 'day')._d
-            params.dynamic_engagement_date_range = 5
             this.filter.from_date = window.moment().subtract(7, 'day')._d
-            this.filter.dynamic_engagement_date_range = 5
             break
           case 'day':
             params.from_date = window.moment()._d
-            params.dynamic_engagement_date_range = 1
             this.filter.from_date = window.moment()._d
-            this.filter.dynamic_engagement_date_range = 1
             break
         }
-        console.log('getCommunications params.from_date', params.from_date)
-      }
-      if (params && params?.to_date === null && this.profile?.default_report_period) {
         params.to_date = window.moment()._d
         this.filter.to_date = window.moment()._d
-        console.log('getCommunications params.to_date', params.to_date)
+        this.firstTimeLoading = false
       }
       console.log('getCommunications this.filter', this.filter)
 
@@ -1458,6 +1446,7 @@ export default {
       if (inboxRoutes.includes(this.$route.name)) {
         this.isLoaded = false
       }
+      this.firstTimeLoading = true
     },
 
     activeChannel (newValue, oldValue) {
