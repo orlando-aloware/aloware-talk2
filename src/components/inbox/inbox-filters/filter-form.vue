@@ -28,8 +28,7 @@
                                    :always-show-calendars="true"
                                    :auto-apply="true"
                                    data-testid="filter-form-date-range-picker"
-                                   v-model="dateRange"
-                                   @change="onChangeRangePicker">
+                                   v-model="dateRange">
                   <template v-slot:input="picker" style="min-width: 350px;">
                     {{ getDateRangeInputLabel(picker) }}
                   </template>

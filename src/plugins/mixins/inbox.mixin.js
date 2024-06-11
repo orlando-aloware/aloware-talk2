@@ -324,6 +324,7 @@ export default {
       }
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
+
       // add the line filter if there is
       if (filter && !isEmpty(filter?.campaigns)) {
         this.filters.lines = [
