@@ -2378,7 +2378,7 @@ export default {
         this.template = null
         this.templateId = null
         this.loadingSendMessage = false
-        this.$generalNotification('Message sent')
+        this.$generalNotification('Your message has been added to the queue. It will be sent shortly. Thank you for your patience.')
       }).catch(err => {
         console.log(err)
       }).finally(_ => {
