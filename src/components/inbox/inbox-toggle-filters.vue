@@ -35,7 +35,7 @@
     </label>
 
     <div class="d-flex align-items-center ml-2"
-         v-if="isBetaFeaturesEnabled && shouldShowUnreadsToggle">
+         v-if="shouldShowUnreadsToggle">
       <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                        size="sm"
                        switch
@@ -66,7 +66,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, inboxRoutesMixin } from 'src/plugins/mixins'
+import { inboxRoutesMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
@@ -75,7 +75,6 @@ export default {
   name: 'inbox-toggle-filters',
 
   mixins: [
-    aclMixin,
     inboxRoutesMixin
   ],
 
