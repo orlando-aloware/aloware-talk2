@@ -496,6 +496,14 @@ body,
   line-height: 18px;
 }
 
+.link-only {
+  color: $blue;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .mark-as {
   color: $blue;
   font-family: $font-family-body;
