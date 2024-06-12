@@ -116,7 +116,7 @@
 <script>
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import { aclMixin } from 'src/plugins/mixins'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import TextIcon from 'components/icons/text-icon'
 import CallIcon from 'components/icons/call-icon'
 import FaxIcon from 'components/icons/fax-icon'
@@ -145,15 +145,15 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', ['contact'])
+    ...mapGetters('contacts', ['contact']),
+    ...mapState('cache', ['currentCompany'])
   },
 
   methods: {
     phoneCanBeDeleted (phone) {
       return this.hasPermissionTo('archive contact') &&
         phone.phone_number !== this.contact.phone_number &&
-        phone.integration_data &&
-        phone.integration_data.length === 0
+        this.currentCompany.activate_multi_entity ? phone.integration_data && phone.integration_data.length === 0 : true
     },
     onEdit (phone) {
       this.$emit('edit', phone)
