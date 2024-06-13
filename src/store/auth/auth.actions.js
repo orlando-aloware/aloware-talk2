@@ -134,6 +134,22 @@ const getSharedCookie = () => {
   return null
 }
 
+const getCookieByName = (name) => {
+  const namePattern = name + '='
+  const cookies = document.cookie.split(';')
+
+  for (let i = 0; i < cookies.length; i++) {
+    let cookie = cookies[i].trim()
+    // If the cookie starts with the name pattern, return its value
+    if (cookie.indexOf(namePattern) === 0) {
+      return cookie.substring(namePattern.length, cookie.length)
+    }
+  }
+
+  // If the cookie is not found, return null
+  return null
+}
+
 const getCookieUser = async ({ commit }) => {
   try {
     commit('SET_LOADING', true)
@@ -335,6 +351,7 @@ export default {
   check,
   login,
   getSharedCookie,
+  getCookieByName,
   getCookieUser,
   logout,
   clear,

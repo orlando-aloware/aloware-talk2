@@ -31,7 +31,7 @@
 </template>
 <script>
 import * as storage from 'src/plugins/helpers/storage'
-import { customScriptsMixin, helperMixin } from 'src/plugins/mixins'
+import { customScriptsMixin } from 'src/plugins/mixins'
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
@@ -41,7 +41,7 @@ import HeaderNotification from 'components/header-notification'
 export default {
   name: 'App',
 
-  mixins: [customScriptsMixin, helperMixin],
+  mixins: [customScriptsMixin],
 
   components: {
     HeaderNotification,
@@ -183,8 +183,8 @@ export default {
       })
     })
 
-    this.$VueEvent.listen('user_logout', (data) => {
-      const currentAuthToken = this.getCookie('aloware_shared_auth_token')
+    this.$VueEvent.listen('user_logout', async (data) => {
+      const currentAuthToken = await this.getCookieByName('aloware_shared_auth_token')
       console.log('User logged out > event >', data, 'currentAuthToken >', currentAuthToken)
 
       if (this.authenticated && currentAuthToken === data.cookie_auth_token) {
@@ -307,6 +307,7 @@ export default {
       logoutUser: 'logout',
       getCookieUser: 'getCookieUser',
       getSharedCookie: 'getSharedCookie',
+      getCookieByName: 'getCookieByName',
       clearUser: 'clear'
     }),
 
