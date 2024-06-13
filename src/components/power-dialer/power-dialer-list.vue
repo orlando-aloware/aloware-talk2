@@ -35,7 +35,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['profile'])
+    ...mapGetters('auth', ['profile']),
+
+    ...mapGetters('powerDialer', [
+      'bulkAddNotifications'
+    ])
   },
 
   mounted () {
@@ -120,14 +124,23 @@ export default {
         summary: event?.summary ?? []
       })
 
-      this.$generalNotification(
-        'Success! Your power dialer queue import is ready.',
-        'redirect',
-        0,
-        false,
-        {
-          path: `/power-dialer/list/${event.contact_list_id}/in-queue`
-        })
+      // Look for the the report of items created until it is ready
+      let intervalId = setInterval(() => {
+        const bulkCreatedNotification = this.bulkAddNotifications(event.contact_list_id)
+        const bulkAddStatusReport = bulkCreatedNotification?.status_report ?? null
+
+        if (bulkAddStatusReport) {
+          clearInterval(intervalId)
+          this.$generalNotification(
+            'Success! Your power dialer queue import is ready.',
+            'redirect',
+            0,
+            false,
+            {
+              path: `/power-dialer/list/${event.contact_list_id}/in-queue`
+            })
+        }
+      }, 1000)
     }
   },
 
