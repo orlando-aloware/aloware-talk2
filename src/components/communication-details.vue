@@ -919,7 +919,7 @@
             </b-form-row>
             <b-form-row v-if="currentCompany.hubspot_integration_enabled" data-testid="comm-details-call-disposition-row">
               <b-col class="pl-0 pr-0">
-                <q-item-label class="mt-3 custom-item-label">Hubspot Type: </q-item-label>
+                <q-item-label class="mt-3 custom-item-label">HubSpot Type: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
