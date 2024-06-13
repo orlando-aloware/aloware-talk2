@@ -184,7 +184,10 @@ export default {
     })
 
     this.$VueEvent.listen('user_logout', (data) => {
-      if (this.authenticated) {
+      const currentAuthToken = this.getCookie('aloware_shared_auth_token')
+      console.log('User logged out > event >', data, 'currentAuthToken >', currentAuthToken)
+
+      if (this.authenticated && currentAuthToken === data.cookie_auth_token) {
         this.clearUser()
         this.$router.push({ name: 'Login' })
           .catch(this.$handleRouteError)
