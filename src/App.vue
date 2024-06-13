@@ -31,7 +31,7 @@
 </template>
 <script>
 import * as storage from 'src/plugins/helpers/storage'
-import { customScriptsMixin } from 'src/plugins/mixins'
+import { customScriptsMixin, helperMixin } from 'src/plugins/mixins'
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
@@ -41,7 +41,7 @@ import HeaderNotification from 'components/header-notification'
 export default {
   name: 'App',
 
-  mixins: [customScriptsMixin],
+  mixins: [customScriptsMixin, helperMixin],
 
   components: {
     HeaderNotification,
