@@ -184,7 +184,8 @@ export default {
     })
 
     this.$VueEvent.listen('user_logout', async (data) => {
-      const currentAuthToken = await this.getCookieByName('aloware_shared_auth_token')
+      const currentAuthToken = storage.local.getItem('shared_cookie')
+
       console.log('User logged out > event >', data, 'currentAuthToken >', currentAuthToken)
 
       if (this.authenticated && currentAuthToken === data.cookie_auth_token) {
