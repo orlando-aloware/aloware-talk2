@@ -306,7 +306,6 @@ export default {
       logoutUser: 'logout',
       getCookieUser: 'getCookieUser',
       getSharedCookie: 'getSharedCookie',
-      getCookieByName: 'getCookieByName',
       clearUser: 'clear'
     }),
 
