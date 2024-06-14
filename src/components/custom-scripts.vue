@@ -115,7 +115,13 @@ export default {
       }
 
       window.HubSpotConversations.widget.remove()
-      document.querySelector('#hs-script-loader').remove()
+      const hsScriptLoader = document.querySelector('#hs-script-loader')
+
+      if (!hsScriptLoader) {
+        return
+      }
+
+      hsScriptLoader.remove()
     },
 
     refresh () {
