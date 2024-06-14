@@ -126,7 +126,7 @@ export default {
       }).then(res => {
         this.message = null
         this.loading_send_message = false
-        this.$generalNotification('Your message has been added to the queue. It will be sent shortly. Thank you for your patience.')
+        this.$generalNotification('Message sent')
         this.$emit('messageSent')
       }).catch(err => {
         this.$handleErrors(err.response)

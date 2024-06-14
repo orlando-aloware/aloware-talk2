@@ -564,7 +564,7 @@ export default {
       }).then(res => {
         this.isSending = false
         this.hideDialer()
-        this.$generalNotification('Your message has been added to the queue. It will be sent shortly. Thank you for your patience.')
+        this.$generalNotification('Message sent')
 
         if (!this.isMobile) {
           this.$router.push({
