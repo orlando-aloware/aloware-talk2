@@ -525,9 +525,9 @@
             </div>
 
             <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
-                 v-if="dialer.communication">
+                 v-if="dialer.communication && currentCompany.hubspot_integration_enabled">
               <label class="form-control-label text-grey-90">
-                Hubspot Type
+                HubSpot Type
               </label>
               <div class="d-flex flex-row align-items-center w-100">
                 <hubspot-activity-type-selector :communication="dialer.communication"></hubspot-activity-type-selector>
@@ -2370,7 +2370,7 @@ export default {
         this.template = null
         this.templateId = null
         this.loadingSendMessage = false
-        this.$generalNotification('Message sent')
+        this.$generalNotification('Your message has been added to the queue. It will be sent shortly. Thank you for your patience.')
       }).catch(err => {
         console.log(err)
       }).finally(_ => {

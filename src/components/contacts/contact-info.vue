@@ -23,7 +23,7 @@
                         <h2 class="contact-name pb-1">{{ contactName }}</h2>
                     </div>
                     <p class="contact-phone">
-            <span v-if="contact.phone_number !== '0'">
+            <span v-if="contact.phone_number !== '0' && contact.phone_number !== null">
               <span class="contact-primary-phone">{{ contact.phone_number | fixPhone }}</span>
 
               <b-link href="#"

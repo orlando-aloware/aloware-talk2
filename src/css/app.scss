@@ -14828,6 +14828,24 @@ h1.contact-list-name-label {
   font-size: 120px
 }
 
+thead.conflicted-contact-thead-class tr th {
+  border-top: none;
+  border-bottom-width: 1px;
+}
+
+.center-modal-header .modal-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-tiny, .btn-group-tiny > .btn {
+  padding: 2px 5px;
+  font-size: 6px;
+  line-height: 1.5;
+}
+
 .scrollable-tags-area {
   overflow-y: auto;
 }

@@ -902,7 +902,7 @@ export default {
           gif: ''
         }
       ).then(response => {
-        this.$generalNotification('Message sent.')
+        this.$generalNotification('Your message has been added to the queue. It will be sent shortly. Thank you for your patience.')
       }).catch(error => {
         console.log(error)
         this.$handleErrors(error.response)
