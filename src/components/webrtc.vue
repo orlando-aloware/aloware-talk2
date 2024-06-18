@@ -1,14 +1,16 @@
 <template>
   <div>
     <phone :is_widget='isWidget' />
+    <dialer />
   </div>
 </template>
 
 <script>
 import Phone from 'components/dialer/phone'
+import Dialer from 'components/dialer/dialer'
 
 export default {
-  components: { Phone },
+  components: { Phone, Dialer },
 
   props: {
     carrierName: {
