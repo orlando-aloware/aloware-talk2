@@ -164,7 +164,7 @@ export default {
       }
 
       return contacts.filter(contact => (contact.last_communication &&
-          !this.communicationInProgressStatuses.includes(contact.last_communication.current_status2)) ||
+        !this.communicationInProgressStatuses.includes(contact.last_communication.current_status2)) ||
         !contact.last_communication)
     },
 
@@ -178,7 +178,6 @@ export default {
       this.gettingTasksList(false)
       this.taskListHasError = false
 
-      console.log('FILTERS loadContactTasks')
       if (showLoading) {
         this.gettingContactsList(true)
         this.setContacts([])
@@ -191,7 +190,6 @@ export default {
         this.fetchTaskCounts()
       }
 
-      console.log('FILTERS getContactsByTaskStatus', this.currentTask)
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
           this.taskListHasError = false
@@ -266,7 +264,6 @@ export default {
       this.source.cancel('Loading of contact task operation is canceled by the user.')
       this.source = this.cancelToken.source()
 
-      console.log('FILTERS getParameters', this.getParameters(taskId))
       return talk2Api.V2.contacts.list(this.getParameters(taskId), this.source.token)
     },
 
@@ -328,7 +325,6 @@ export default {
       }
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
-      console.log('FILTERS filter inside getParamenters', filter)
 
       // add the line filter if there is
       if (filter && !isEmpty(filter?.campaigns)) {
@@ -393,6 +389,7 @@ export default {
         relations.push('tags')
       }
 
+      // New filters from all communications
       if (filter && !isEmpty(filter.direction) && filter.direction !== 'all') {
         this.filters = {
           ...this.filters,
@@ -401,6 +398,33 @@ export default {
           ]
         }
       }
+
+      const filterList = [
+        'answer_status',
+        'callback_status',
+        'broadcasts',
+        'call_dispositions',
+        'callback_status',
+        'incoming_numbers',
+        'min_talk_time',
+        'creator_type',
+        'workflows',
+        'transfer_type'
+      ]
+
+      filterList.forEach(key => {
+        if (filter && (!isEmpty(filter[key]) || filter[key] > 0)) {
+          this.filters = {
+            ...this.filters,
+            [key]: [
+              {
+                value: Array.isArray(filter[key]) ? filter[key] : [filter[key]],
+                operator: OPERATORS.IS_ANY_OF
+              }
+            ]
+          }
+        }
+      })
 
       // apply only if filter is not "All Time"
       if (filter && filter.dynamic_engagement_date_range > 0) {
@@ -413,6 +437,18 @@ export default {
       }
 
       query.has_unread = this.inboxShowUnreads
+
+      const boolQueryFilters = [
+        'untagged_only',
+        'exclude_automated_communications',
+        'first_time_only'
+      ]
+
+      boolQueryFilters.forEach(key => {
+        if (filter?.[key] && filter[key] === 1) {
+          query[key] = true
+        }
+      })
 
       if ((filter && !!+filter.has_unread) || (query.has_unread && this.inboxShowUnreads)) {
         this.filters = {
@@ -434,8 +470,6 @@ export default {
       }
 
       query.timezone = window.timezone
-
-      console.log('FILTERS final query', query)
 
       return query
     },
