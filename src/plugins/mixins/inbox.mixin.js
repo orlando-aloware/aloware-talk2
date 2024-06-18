@@ -369,19 +369,8 @@ export default {
           ]
         }
       }
-      if (this.firstTimeLoading && this.profile.default_report_period) {
-        switch (this.profile.default_report_period) {
-          case 'month':
-            filter.from_date = window.moment().subtract(30, 'day').format('YYYY-MM-DD')
-            break
-          case 'week':
-            filter.from_date = window.moment().subtract(7, 'day').format('YYYY-MM-DD')
-            break
-          case 'day':
-            filter.from_date = window.moment().format('YYYY-MM-DD')
-            break
-        }
-        filter.to_date = window.moment().format('YYYY-MM-DD')
+      if (this.firstTimeLoading && this.profile?.default_report_period) {
+        this.setDateFilter(filter, this.profile.default_report_period);
         this.firstTimeLoading = false
       }
 
@@ -439,6 +428,22 @@ export default {
 
       return query
     },
+
+    // Method to set date filters
+    setDateFilter(filter, default_report_period) {
+      switch (default_report_period) {
+        case 'month':
+          filter.from_date = window.moment().subtract(30, 'day').format('YYYY-MM-DD');
+          break;
+        case 'week':
+          filter.from_date = window.moment().subtract(7, 'day').format('YYYY-MM-DD');
+          break;
+        case 'day':
+          filter.from_date = window.moment().format('YYYY-MM-DD');
+          break;
+      }
+      filter.to_date = window.moment().format('YYYY-MM-DD');
+    }
 
     reInitFilters (taskId) {
       this.filters = {

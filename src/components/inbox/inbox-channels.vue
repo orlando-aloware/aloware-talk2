@@ -1030,23 +1030,9 @@ export default {
       this.gettingTasksList(true)
       this.communicationsListHasError = false
 
-      if (this.firstTimeLoading && this.profile.default_report_period) {
-        switch (this.profile.default_report_period) {
-          case 'month':
-            params.from_date = window.moment().subtract(30, 'day').format('YYYY-MM-DD')
-            this.filter.from_date = window.moment().subtract(30, 'day').format('YYYY-MM-DD')
-            break
-          case 'week':
-            params.from_date = window.moment().subtract(7, 'day').format('YYYY-MM-DD')
-            this.filter.from_date = window.moment().subtract(7, 'day').format('YYYY-MM-DD')
-            break
-          case 'day':
-            params.from_date = window.moment().format('YYYY-MM-DD')
-            this.filter.from_date = window.moment().format('YYYY-MM-DD')
-            break
-        }
-        params.to_date = window.moment().format('YYYY-MM-DD')
-        this.filter.to_date = window.moment().format('YYYY-MM-DD')
+      if (this.firstTimeLoading && this.profile?.default_report_period) {
+        this.setDateFilter(params, this.profile.default_report_period)
+        this.setDateFilter(this.filter, this.profile.default_report_period)
         this.firstTimeLoading = false
       }
 
