@@ -9,6 +9,7 @@ import { DATE_OPERATORS } from 'src/constants/contacts-date-filter-operators'
 import * as Filters from 'src/constants/filters'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 
 export default {
   computed: {
@@ -163,7 +164,7 @@ export default {
       }
 
       return contacts.filter(contact => (contact.last_communication &&
-        !this.communicationInProgressStatuses.includes(contact.last_communication.current_status2)) ||
+          !this.communicationInProgressStatuses.includes(contact.last_communication.current_status2)) ||
         !contact.last_communication)
     },
 
@@ -177,6 +178,7 @@ export default {
       this.gettingTasksList(false)
       this.taskListHasError = false
 
+      console.log('FILTERS loadContactTasks')
       if (showLoading) {
         this.gettingContactsList(true)
         this.setContacts([])
@@ -189,6 +191,7 @@ export default {
         this.fetchTaskCounts()
       }
 
+      console.log('FILTERS getContactsByTaskStatus', this.currentTask)
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
           this.taskListHasError = false
@@ -263,6 +266,7 @@ export default {
       this.source.cancel('Loading of contact task operation is canceled by the user.')
       this.source = this.cancelToken.source()
 
+      console.log('FILTERS getParameters', this.getParameters(taskId))
       return talk2Api.V2.contacts.list(this.getParameters(taskId), this.source.token)
     },
 
@@ -304,6 +308,7 @@ export default {
     },
 
     getParameters (taskId, count = false, filters = null) {
+      console.log('FILTERS inside getParameters', filters)
       const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
       let relations = []
 
@@ -323,6 +328,7 @@ export default {
       }
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
+      console.log('FILTERS filter inside getParamenters', filter)
 
       // add the line filter if there is
       if (filter && !isEmpty(filter?.campaigns)) {
@@ -387,6 +393,15 @@ export default {
         relations.push('tags')
       }
 
+      if (filter && !isEmpty(filter.direction) && filter.direction !== 'all') {
+        this.filters = {
+          ...this.filters,
+          'direction': [
+            { value: [filter.direction === 'inbound' ? INBOUND : OUTBOUND], operator: OPERATORS.IS_ANY_OF }
+          ]
+        }
+      }
+
       // apply only if filter is not "All Time"
       if (filter && filter.dynamic_engagement_date_range > 0) {
         this.filters = {
@@ -419,6 +434,8 @@ export default {
       }
 
       query.timezone = window.timezone
+
+      console.log('FILTERS final query', query)
 
       return query
     },

@@ -630,6 +630,8 @@ export default {
         finalFilters.answer_status = communicationAnswerStatus
       }
 
+      console.log('FILTERS calling applyFilter', finalFilters)
+
       this.$emit('applyFilter', finalFilters)
       this.hideModal()
     },
