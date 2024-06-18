@@ -443,7 +443,7 @@ export default {
           break;
       }
       filter.to_date = window.moment().format('YYYY-MM-DD');
-    }
+    },
 
     reInitFilters (taskId) {
       this.filters = {
