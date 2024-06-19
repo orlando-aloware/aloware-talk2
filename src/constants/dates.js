@@ -13,11 +13,11 @@ export const DATE_RANGES = [
   },
   {
     id: 3,
-    label: 'Last 7 days'
+    label: 'Last 7 Days'
   },
   {
     id: 1,
-    label: 'Last 30 days'
+    label: 'Last 30 Days'
   },
   {
     id: 4,
