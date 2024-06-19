@@ -21,7 +21,10 @@
           {{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}
         </span>
       </div>
-      <div class="d-flex flex-row justify-content-between align-items-center width-65">
+      <div :class="[
+              'd-flex', 'flex-row', 'justify-content-between', 'align-items-center',
+              ((is_widget && isCallCompleted) || (is_widget && loadingPhone)) ? 'width-32' : 'width-65'
+            ]">
         <pause-record-icon width="14"
                            height="14"
                            v-show="pauseRecordIconShow">
@@ -92,7 +95,8 @@
           </div>
         </q-btn-dropdown>
 
-        <q-btn class="icon-btn auto-size height-12"
+        <q-btn v-show="!is_widget"
+               class="icon-btn auto-size height-12"
                icon="img:app-icons/dialer/phone_exit.svg"
                size="12px"
                padding="none"
@@ -143,7 +147,8 @@
                 <span class="d-inline-flex">
                   {{ contactName | truncate(15) }}
                 </span>
-                <q-btn class="text-size-rg d-inline-flex ml-1"
+                <q-btn v-if="!is_widget"
+                       class="text-size-rg d-inline-flex ml-1"
                        color="white"
                        icon="o_info"
                        flat
@@ -263,7 +268,8 @@
                 <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                               v-if="contact">
                   <span class="d-inline-flex">{{ contactName | truncate(15) }}</span>
-                  <q-btn class="text-size-rg d-inline-flex ml-1"
+                  <q-btn v-if="!is_widget"
+                         class="text-size-rg d-inline-flex ml-1"
                          color="text-grey-100"
                          icon="o_info"
                          flat
@@ -479,7 +485,8 @@
                   <div class="mr-auto">
                     <p class="contact-name mb-1">
                       <span class="d-inline-flex">{{ contactName }}</span>
-                      <q-btn class="text-size-rg d-inline-flex ml-1"
+                      <q-btn v-if="!is_widget"
+                             class="text-size-rg d-inline-flex ml-1"
                              color="black"
                              icon="o_info"
                              flat
