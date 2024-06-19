@@ -262,17 +262,6 @@ export default {
       this.isRejecting = true
       if (this.isCallFishingMode && this.isCallFishing) {
         this.removeFromCallFishingQueue(this.communication.id)
-        // const liveContacts = _.cloneDeep(this.liveContacts)
-        // if (this.liveContacts.find(item => item.id === this.contact.id)) {
-        //   liveContacts.splice(this.liveContacts.findIndex(item => item.id === this.contact.id), 1)
-        //   this.setLiveContacts(liveContacts)
-        // }
-        // const contacts = _.cloneDeep(this.contacts)
-        // if (!this.contacts.find(item => item.id === this.contact.id)) {
-        //   contacts.unshift(this.contact)
-        //   this.setContacts(contacts)
-        // }
-
         this.isRejecting = false
         this.processRemoveFromNotification(this.communication)
         e.stopImmediatePropagation()
@@ -335,11 +324,6 @@ export default {
     },
     onHangUpCurrentCallAndAnswer () {
       this.showIncomingCallMenu = false
-
-      // if (_.isEmpty(this.dialer.parkedCall)) {
-      //   this.setDialerParkedCall(this.communication)
-      // }
-
       this.answerCommunication(false, true)
     },
     answerCommunication (shouldPark = false, shouldHangup = false) {

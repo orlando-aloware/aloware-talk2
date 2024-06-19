@@ -20,7 +20,7 @@
                   icon='info-circle'
                   data-testid='contact-phones-form-locked-by-integration-info-icon'
                   style='color: #F3B803;'
-                  v-if='phone.hasExternalData'/>
+                  v-if='phoneCanNotBeEdited(phone)'/>
           <q-tooltip target='.contact-phones-form-locked-by-integration-info-icon'
                      anchor='top middle'
                      self='top middle'
@@ -31,7 +31,7 @@
       </template>
       <b-form-input type="text"
                     placeholder="Phone Number"
-                    :disabled="phone.hasExternalData"
+                    :disabled="phoneCanNotBeEdited(phone)"
                     data-testid="contact-phones-form-phone-number-input"
                     v-model="phone.number"
                     required>
@@ -98,13 +98,14 @@
 
 <script>
 import _ from 'lodash'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 export default {
   name: 'contact-phones-form',
 
   computed: {
     ...mapGetters('contacts', ['contact', 'contactSelectedPhone']),
+    ...mapState('cache', ['currentCompany']),
     validPhoneNumber () {
       return this.$options.filters.fixPhone(this.phone.number) !== false
     },
@@ -138,6 +139,9 @@ export default {
         this.handleCreate()
       }
       e.preventDefault()
+    },
+    phoneCanNotBeEdited (phone) {
+      return this.currentCompany.activate_multi_entity ? phone.hasExternalData : false
     },
     onClose () {
       this.removeSelectedPhone()

@@ -902,7 +902,7 @@ export default {
           gif: ''
         }
       ).then(response => {
-        this.$generalNotification('Message sent.')
+        this.$generalNotification('Message sent')
       }).catch(error => {
         console.log(error)
         this.$handleErrors(error.response)
