@@ -367,9 +367,6 @@ export default {
   setDefaultIsShortenedUrlRemembered: ({ commit }) => {
     commit('SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED')
   },
-  setShowContactResourceUnavailable: ({ commit }, value) => {
-    commit('SET_SHOW_CONTACT_RESOURCE_UNAVAILABLE', value)
-  },
   addAxiosUniqueId ({ commit }, value) {
     commit('ADD_AXIOS_UNIQUE_ID', value)
   },
