@@ -6745,9 +6745,9 @@ globby@^6.1.0:
     pinkie-promise "^2.0.0"
 
 google-libphonenumber@^3.2.34:
-  version "3.2.34"
-  resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.34.tgz#ef29b53be0f9fb517aaa53d26a541150f86ec921"
-  integrity sha512-CLwkp0lZvMywh6dCh0T3Fm8XsfJhLAupc8AECwYkJNQBPW8wQPrv/tV0oFKCs8FMw+pTQyNPZoycgBzYjqtTZQ==
+  version "3.2.35"
+  resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.35.tgz#887bbac68b0e13c6a3a52e3971129b320ceb1759"
+  integrity sha512-en9hgw54urlwBT0F+IULsJmdpeLpq5aQoTONIdp5jVIRviONPMfplUKdaCPBrHBlZNm49iVuZGR/V05IWqlvLQ==
 
 gopd@^1.0.1:
   version "1.0.1"
