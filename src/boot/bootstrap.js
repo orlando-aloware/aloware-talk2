@@ -130,16 +130,6 @@ window.getLocaleIfPhoneNumberIsFromNorthAmerica = function (phoneNumber) {
       if (isPossible && window.phoneUtil.isValidNumberForRegion(number, validCountry)) {
         return validCountry
       }
-      // for US get the national number
-      if (validCountry === 'US') {
-        const nationalNumber = number.getNationalNumber()
-        // get the area code
-        const areaCode = nationalNumber.toString().substring(0, 3)
-        // if it's 728 then return US
-        if (areaCode === '728') {
-          return validCountry
-        }
-      }
     }
 
     return false
