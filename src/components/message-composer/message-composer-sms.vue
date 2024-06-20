@@ -325,7 +325,8 @@ export default {
       'messageComposer',
       'selectedLine',
       'isOptoutActive',
-      'optoutText'
+      'optoutText',
+      'selectedLine'
     ]),
 
     ...mapState('contacts', [
@@ -484,6 +485,10 @@ export default {
     },
 
     onPaste (e) {
+      if (!this.selectedLine) {
+        this.$generalNotification('Please select line before copy & paste attachments', 'error')
+        return
+      }
       const index = {
         i: 0,
         item: null,
