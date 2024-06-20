@@ -84,21 +84,21 @@ module.exports = function (/* ctx */) {
           }
         })
 
-        // if (process.env.APP_ENV !== 'local') {
-        //   const SentryWebpackPlugin = require('@sentry/webpack-plugin')
-        //   const sentryPluginInstance = new SentryWebpackPlugin({
-        //     authToken: process.env.SENTRY_AUTH_TOKEN,
-        //     org: process.env.SENTRY_ORG,
-        //     project: process.env.SENTRY_PROJECT,
-        //     // release: process.env.SENTRY_VERSION,
-        //
-        //     // webpack specific configuration
-        //     include: cfg.output.path,
-        //     ignore: ['node_modules']
-        //   })
-        //
-        //   cfg.plugins.push(sentryPluginInstance)
-        // }
+        if (process.env.APP_ENV !== 'local') {
+          const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+          const sentryPluginInstance = new SentryWebpackPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            // release: process.env.SENTRY_VERSION,
+
+            // webpack specific configuration
+            include: cfg.output.path,
+            ignore: ['node_modules']
+          })
+
+          cfg.plugins.push(sentryPluginInstance)
+        }
       }
     },
 
