@@ -507,7 +507,6 @@ export default {
         console.log('Failed to fetch contact info: Missing contact id!')
         this.loadingContact = false
         this.loadingContactCommunications = false
-        this.setShowContactResourceUnavailable(true)
         return false
       }
 
@@ -571,7 +570,6 @@ export default {
 
           if (!res) {
             this.loadingContactCommunications = false
-            this.setShowContactResourceUnavailable(true)
 
             return
           }
@@ -619,7 +617,6 @@ export default {
           if (this.$axios.isCancel(err) && err) {
             console.log('Request canceled', err.message)
             this.loadingContact = false
-            this.setShowContactResourceUnavailable(true)
 
             return
           }
@@ -628,9 +625,6 @@ export default {
 
           // inside Inbox
           if (this.$route.name.includes('Inbox')) {
-            // instead of redirecting to inbox, show contact is delete info
-            this.setShowContactResourceUnavailable(true)
-
             return
           }
 
@@ -1383,8 +1377,7 @@ export default {
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed',
-      'setShowContactResourceUnavailable'
+      'setIsContactMixinUsed'
     ]),
 
     ...mapActions('inbox', ['setSelectedContact'])

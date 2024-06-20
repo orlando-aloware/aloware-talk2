@@ -537,9 +537,6 @@ export default {
   SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED (state) {
     state.isShortenedUrlRemembered = false
   },
-  SET_SHOW_CONTACT_RESOURCE_UNAVAILABLE (state, value) {
-    state.showContactResourceUnavailable = value
-  },
   ADD_AXIOS_UNIQUE_ID (state, value) {
     state.inProgressAxiosUniqueIds.push(value)
   },
