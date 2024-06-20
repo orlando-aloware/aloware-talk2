@@ -302,11 +302,6 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      // don't attempt to fetch communications, there's nothing to fetch
-      if (!this.changingSelectedContact) {
-        return
-      }
-
       if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication'].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
