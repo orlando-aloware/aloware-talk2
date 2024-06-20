@@ -1472,7 +1472,7 @@ export default {
       }
 
       // Request new token if error
-      if ([20101, 31102, 31204, 31205, 31207].includes(err.code)) {
+      if ([20101, 31102, 31204, 31205, 31207, 31009].includes(err.code)) {
         return this.getDesktopToken(true)
       }
 
