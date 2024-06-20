@@ -150,7 +150,6 @@ export default {
   },
 
   created () {
-    this.setShowContactResourceUnavailable(false)
     this.setListContactOwner(this.profile.id)
   },
 
@@ -180,7 +179,6 @@ export default {
       'setPreviousListFilters',
       'setPreviouslySavedListId',
       'setPreviousListId',
-      'setShowContactResourceUnavailable',
       'setSelectedListContactCount'
     ]),
 
@@ -234,10 +232,6 @@ export default {
       this.setSelectedListContactCount(0)
       this.setAllContactsSelected(false)
       this.setIsDatatableSelectedAll(false)
-
-      if (to.name.includes('Contact')) {
-        this.setShowContactResourceUnavailable(false)
-      }
 
       // clear previous list state when moving out from Contacts page
       if (to.name !== 'Contacts' && from?.name === 'Contacts') {

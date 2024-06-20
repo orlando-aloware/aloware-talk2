@@ -368,8 +368,6 @@ export default {
 
     ...mapActions(['setShowPhone']),
 
-    ...mapActions('contacts', ['setShowContactResourceUnavailable']),
-
     markable (communication) {
       // Markable if communication is SMS and the comm direction is INBOUND
       const smsRule = communication.type === CommunicationTypes.SMS &&
