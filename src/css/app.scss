@@ -14835,3 +14835,50 @@ h1.contact-list-name-label {
   color: #fff;
   font-size: 12px;
 }
+
+.select-campaign-dialog {
+
+  .label {
+    font-family: Inter;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 15.73px;
+    text-align: left;
+    margin-bottom: 2px;
+  }
+
+  .q-dialog__backdrop {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .q-dialog__inner > div {
+    border-radius: 8px 8px 0 0;
+  }
+
+  .card {
+    width: 375px;
+    height: 130px;
+    padding: 36px 36px 0 36px;
+  }
+
+  .q-btn {
+    border-radius: 6px;
+    height: 40px;
+    margin-left: 16px;
+  }
+
+  .q-btn__content {
+    padding-right: 14px;
+    padding-left: 14px;
+    text-transform: capitalize;
+  }
+
+  .line-selector {
+    width: 75%;
+  }
+
+  .inline-select.q-select--with-input {
+    min-width: 75% !important;
+  }
+}
