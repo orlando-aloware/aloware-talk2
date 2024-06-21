@@ -25,7 +25,8 @@
                 v-model="timeline"
                 @input="changedFilter($event)">
       </q-select>
-      <div class="custom-date-time-picker" v-if="show_custom_date_range">
+      <div class="custom-date-time-picker"
+           v-if="show_custom_date_range">
         <vue-ctk-date-time-picker id="start-date-time-picker"
                                   formatted="lll"
                                   minuteInterval="5"
