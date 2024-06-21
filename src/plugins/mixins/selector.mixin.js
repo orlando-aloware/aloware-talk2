@@ -49,6 +49,7 @@ export default {
 
   mounted () {
     this.element = this.$el ? this.$el : document
+    this.showInputPlaceholder()
 
     if (this.referenceElement) {
       this.element = this.$refs[this.referenceElement].$el
