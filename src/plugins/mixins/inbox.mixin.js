@@ -399,20 +399,31 @@ export default {
         }
       }
 
-      const filterList = [
-        'answer_status',
+      if (filter && !isEmpty(filter.answer_status) && filter.answer_status !== 'all') {
+        this.filters = {
+          ...this.filters,
+          'answer_status': [
+            { value: [filter.answer_status], operator: OPERATORS.IS_ANY_OF }
+          ]
+        }
+      }
+
+      const otherFiltersList = [
         'callback_status',
         'broadcasts',
         'call_dispositions',
         'callback_status',
         'incoming_numbers',
-        'min_talk_time',
         'creator_type',
         'workflows',
-        'transfer_type'
+        'transfer_type',
+        'min_talk_time',
+        'untagged_only',
+        'exclude_automated_communications',
+        'first_time_only'
       ]
 
-      filterList.forEach(key => {
+      otherFiltersList.forEach(key => {
         if (filter && (!isEmpty(filter[key]) || filter[key] > 0)) {
           this.filters = {
             ...this.filters,
@@ -437,18 +448,6 @@ export default {
       }
 
       query.has_unread = this.inboxShowUnreads
-
-      const boolQueryFilters = [
-        'untagged_only',
-        'exclude_automated_communications',
-        'first_time_only'
-      ]
-
-      boolQueryFilters.forEach(key => {
-        if (filter?.[key] && filter[key] === 1) {
-          query[key] = true
-        }
-      })
 
       if ((filter && !!+filter.has_unread) || (query.has_unread && this.inboxShowUnreads)) {
         this.filters = {

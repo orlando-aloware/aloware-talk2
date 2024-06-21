@@ -495,15 +495,15 @@ export default {
     },
 
     isInboxOrCallsChannel () {
-      const callsChannels = ['calls', 'inbox', 'all-communications', 'my-personal-line']
+      const callsChannels = ['calls', 'all-communications', 'my-personal-line']
 
-      return callsChannels.includes(this.$route.params.channel)
+      return this.isInboxOrInboxViews || callsChannels.includes(this.$route.params.channel)
     },
 
     isInboxCallsAndRecordingsChannel () {
-      const allCallsChannels = ['calls', 'inbox', 'recordings', 'all-communications', 'my-personal-line']
+      const allCallsChannels = ['calls', 'recordings', 'all-communications', 'my-personal-line']
 
-      return allCallsChannels.includes(this.$route.params.channel)
+      return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
     },
 
     isMessagesOnlyChannel () {
