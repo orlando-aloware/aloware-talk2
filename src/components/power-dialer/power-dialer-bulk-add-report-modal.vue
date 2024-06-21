@@ -171,7 +171,7 @@ export default {
 
     skipped () {
       let skippedItems = this.fullReport?.fail ?? {}
-      skippedItems = Object.entries(skippedItems)
+      skippedItems = Object.entries(skippedItems).filter(([key, value]) => value > 0)
 
       return skippedItems
     }
