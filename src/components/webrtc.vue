@@ -1,20 +1,33 @@
 <template>
   <div>
-    <phone :is_widget='isWidget' />
+    <phone :is_widget='isWidget' @callCompleted="handleCallCompleted" />
     <dialer />
+    <select-campaign-dialog :show="showSelectCampaignDialog"
+                            :campaignId="campaignId"
+                            @call="handleCall"
+                            @change-campaign-id="handleChangeCampaignId" />
   </div>
 </template>
 
 <script>
-import Phone from 'components/dialer/phone'
 import Dialer from 'components/dialer/dialer'
-import { mapActions } from 'vuex'
-import { aclMixin } from 'src/boot/mixins'
+import Phone from 'components/dialer/phone'
+import SelectCampaignDialog from 'components/dialer/select-campaign-dialog.vue'
+import { mapActions, mapState } from 'vuex' //
+import {
+  aclMixin,
+  agentMixin,
+  broadcastMixin
+} from 'src/boot/mixins'
 
 export default {
-  components: { Phone, Dialer },
+  components: { Dialer, Phone, SelectCampaignDialog },
 
-  mixins: [ aclMixin ],
+  mixins: [
+    aclMixin,
+    agentMixin,
+    broadcastMixin
+  ],
 
   props: {
     carrierName: {
@@ -26,24 +39,47 @@ export default {
       default: false,
       type: Boolean,
       required: false
+    },
+
+    campaignId: {
+      type: Number,
+      required: false
     }
   },
 
   data () {
     return {
+      mainListeners: {},
+      isMainEventsStarted: false,
+
       loadingDispositionStatuses: false,
       loadingCallDispositionStatuses: false,
       loadingActivityTypes: false,
-      loadingTemplates: false
+      loadingTemplates: false,
+      loadingCampaigns: false
+    }
+  },
+
+  computed: {
+    ...mapState('cache', [
+      'currentCompany',
+      'timezones'
+    ]),
+
+    showSelectCampaignDialog () {
+      return this.campaignId === null
     }
   },
 
   methods: {
     initAuth () {
+      this.broadcastInit()
+
       this.getDispositionStatuses()
       this.getCallDispositions()
       this.getActivityTypes()
       this.getTemplates()
+      this.getCampaigns()
     },
 
     getDispositionStatuses () {
@@ -124,15 +160,97 @@ export default {
       }
     },
 
-    ...mapActions(['setDispositionStatuses', 'setCallDispositions', 'setActivityTypes', 'setTemplates'])
+    getCampaigns () {
+      if (this.hasPermissionTo('list campaign')) {
+        this.loadingCampaigns = true
+
+        return this.$axios
+          .get('/api/v1/campaign', {
+            mode: 'no-cors',
+            params: {
+              is_lite: true
+            }
+          })
+          .then((res) => {
+            this.setCampaigns(res.data)
+            this.loadingCampaigns = false
+            this.setCampaignsIsLoading(false)
+
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingCampaigns = false
+
+            return Promise.reject()
+          })
+      }
+    },
+
+    startMainEvents () {
+      this.$VueEvent.listen('agent_status_updated', this.mainListeners.agentStatusUpdated)
+    },
+
+    stopMainEvents () {
+      this.$VueEvent.stop('agent_status_updated', this.mainListeners.agentStatusUpdated)
+    },
+
+    unsubscribeFromPusher () {
+      if (this.authenticated) {
+        // just leave the channels
+        this.broadcastLeave()
+      }
+    },
+
+    handleChangeCampaignId (campaignId) {
+      this.$emit('changeCampaignId', campaignId)
+    },
+
+    handleCall (campaignId) {
+      this.$emit('handleCall')
+    },
+
+    handleCallCompleted () {
+      this.$emit('callCompleted')
+    },
+
+    ...mapActions([
+      'setDispositionStatuses',
+      'setCallDispositions',
+      'setActivityTypes',
+      'setTemplates',
+      'setCampaigns',
+      'setCampaignsIsLoading',
+      'updateUserStatus'
+    ])
   },
 
   created () {
     this.initAuth()
+
+    this.mainListeners.agentStatusUpdated = (event) => { // Keyner
+      this.updateUserStatus(event)
+
+      if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
+        this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
+        this.setAgentStatus(event.agent_status)
+        console.log('Changed agent status [event]: ', event.agent_status)
+      }
+    }
+
+    if (!this.isMainEventsStarted) {
+      this.isMainEventsStarted = true
+      this.startMainEvents()
+    }
   },
 
   mounted () {
     this.$VueEvent.fire('showLoadingPhone')
+  },
+
+  beforeDestroy () {
+    this.stopMainEvents()
+    this.unsubscribeFromPusher()
   }
 }
 </script>

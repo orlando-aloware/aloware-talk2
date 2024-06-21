@@ -2577,6 +2577,10 @@ export default {
       if (!this.shouldShow) {
         this.$emit('onPhoneVisible', false)
 
+        if (this.is_widget) {
+          this.$emit('callCompleted')
+        }
+
         return
       }
 
