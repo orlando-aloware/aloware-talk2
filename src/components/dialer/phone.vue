@@ -1462,7 +1462,8 @@ export default {
       CommunicationCurrentStatus,
       CommunicationTypes,
       UploadedFileTypes,
-      TagCategories
+      TagCategories,
+      callbackAction: false
     }
   },
 
@@ -2197,12 +2198,15 @@ export default {
       this.$emit('onPhoneVisible', false)
     },
 
-    endWrapUp () {
+    endWrapUp (type = 'finish') {
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
       }
 
       this.$VueEvent.fire('endWrapUp')
+
+      this.callbackAction = type === 'callback'
+
       this.$emit('onPhoneVisible', false)
     },
 
@@ -2219,7 +2223,7 @@ export default {
         contactId: this.dialer.communication.contact_id
       }
 
-      this.endWrapUp()
+      this.endWrapUp('callback')
 
       this.$VueEvent.fire('makeCall', data)
     },
@@ -2577,7 +2581,9 @@ export default {
       if (!this.shouldShow) {
         this.$emit('onPhoneVisible', false)
 
-        if (this.is_widget) {
+        // emit the callCompleted event to display a message to close the widget.
+        // only emit the event if is_widget=true and the finish button is clicked.
+        if (this.is_widget && !this.callbackAction) {
           this.$emit('callCompleted')
         }
 
