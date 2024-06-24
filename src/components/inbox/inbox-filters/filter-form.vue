@@ -283,7 +283,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isMessagesOnlyChannel">
+                   v-if="isInbox || isMessagesOnlyChannel">
               <b-form-group class="form-label">
                 <template v-slot:label>
                   <span data-testid="filter-form-communication-owners-row">Communication Owners</span>
@@ -355,7 +355,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isMessagesOnlyChannel && !isFilterDialogForView">
+                   v-if="(isInbox || isMessagesOnlyChannel) && !isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Broadcasts">
                 <broadcast-selector :multiple="true"
