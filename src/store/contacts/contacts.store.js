@@ -263,7 +263,6 @@ export default function () {
     isContactMixinUsed: false,
     isShortenedUrlRemembered: false,
     newCommunicationInprogressContactFetch: [],
-    showContactResourceUnavailable: false,
     inProgressAxiosUniqueIds: []
   }
 }
