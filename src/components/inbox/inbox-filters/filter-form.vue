@@ -597,7 +597,7 @@ export default {
         'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
         'This Month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
         'Last 7 Days': [window.moment().subtract(7, 'day')._d, window.moment()._d],
-        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment().subtract(1, 'day')._d],
+        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment()._d],
         'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
         'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
       },
@@ -639,10 +639,6 @@ export default {
         {
           id: 8,
           name: 'Last 30 Days'
-        },
-        {
-          id: 9,
-          name: 'Recent (Last 30 Days + Today)'
         }
       ],
       selectedTags: []
