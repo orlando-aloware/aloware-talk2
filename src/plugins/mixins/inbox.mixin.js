@@ -305,7 +305,6 @@ export default {
     },
 
     getParameters (taskId, count = false, filters = null) {
-      console.log('FILTERS inside getParameters', filters)
       const query = !count ? { page: this.page, sort: this.sorting.sort, order: this.sorting.order } : {}
       let relations = []
 
