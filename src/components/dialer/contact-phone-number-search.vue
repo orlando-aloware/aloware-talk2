@@ -27,9 +27,12 @@
 
 <script>
 import { debounce } from 'lodash'
+import { helperMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-phone-number-search',
+
+  mixins: [ helperMixin ],
 
   props: {
     value: {
@@ -131,14 +134,6 @@ export default {
         contactTimezone: $event.timezone
       })
       // this.blurInput()
-    },
-
-    getContactName (item) {
-      if (!item.first_name || !item.last_name) {
-        return 'No Name'
-      }
-
-      return (item.first_name + ' ' + item.last_name).trim()
     },
 
     lookupPhoneNumber: debounce(function (newVal) {
