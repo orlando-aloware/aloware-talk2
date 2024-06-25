@@ -28,7 +28,7 @@ pipeline {
         stage('Build and Analysis') {
             parallel {
                 stage('Build and deployment') {
-                    steps {
+                    stages {
                         stage('Send Job Start Notification') {
                             steps {
                                 script {
