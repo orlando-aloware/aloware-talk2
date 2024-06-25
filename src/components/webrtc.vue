@@ -17,7 +17,8 @@ import SelectCampaignDialog from 'components/dialer/select-campaign-dialog.vue'
 import {
   aclMixin,
   agentMixin,
-  broadcastMixin
+  broadcastMixin,
+  dialerDataMixin
 } from 'src/boot/mixins'
 
 export default {
@@ -26,7 +27,8 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    broadcastMixin
+    broadcastMixin,
+    dialerDataMixin
   ],
 
   props: {
@@ -50,13 +52,7 @@ export default {
   data () {
     return {
       mainListeners: {},
-      isMainEventsStarted: false,
-
-      loadingDispositionStatuses: false,
-      loadingCallDispositionStatuses: false,
-      loadingActivityTypes: false,
-      loadingTemplates: false,
-      loadingCampaigns: false
+      isMainEventsStarted: false
     }
   },
 
@@ -73,12 +69,6 @@ export default {
 
   methods: {
     ...mapActions([
-      'setDispositionStatuses',
-      'setCallDispositions',
-      'setActivityTypes',
-      'setTemplates',
-      'setCampaigns',
-      'setCampaignsIsLoading',
       'updateUserStatus'
     ]),
 
@@ -92,111 +82,6 @@ export default {
       this.getCampaigns()
     },
 
-    getDispositionStatuses () {
-      if (this.hasPermissionTo('list disposition status')) {
-        this.loadingDispositionStatuses = true
-
-        return this.$axios
-          .get('/api/v1/disposition-status')
-          .then((res) => {
-            this.setDispositionStatuses(res.data)
-            this.loadingDispositionStatuses = false
-
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingDispositionStatuses = false
-
-            return Promise.reject()
-          })
-      }
-    },
-
-    getCallDispositions () {
-      if (this.hasPermissionTo('list disposition status')) {
-        this.loadingCallDispositionStatuses = true
-
-        return this.$axios
-          .get('/api/v1/call-disposition')
-          .then((res) => {
-            this.setCallDispositions(res.data)
-            this.loadingCallDispositionStatuses = false
-
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingCallDispositionStatuses = false
-
-            return Promise.reject()
-          })
-      }
-    },
-
-    getActivityTypes () {
-      this.loadingActivityTypes = true
-      return this.$axios
-        .get('/api/v1/activity-types').then(res => {
-          this.setActivityTypes(res.data)
-          this.loadingActivityTypes = false
-
-          return Promise.resolve()
-        }).catch(err => {
-          console.log(err)
-          this.loadingActivityTypes = false
-
-          return Promise.reject()
-        })
-    },
-
-    getTemplates () {
-      if (this.hasPermissionTo('list sms template')) {
-        this.loadingTemplates = true
-
-        return this.$axios.get('/api/v1/sms-template', {
-          mode: 'no-cors'
-        }).then(res => {
-          this.loadingTemplates = false
-          this.setTemplates(res.data)
-
-          return Promise.resolve()
-        }).catch(err => {
-          console.log(err)
-          this.loadingTemplates = false
-
-          return Promise.reject()
-        })
-      }
-    },
-
-    getCampaigns () {
-      if (this.hasPermissionTo('list campaign')) {
-        this.loadingCampaigns = true
-
-        return this.$axios
-          .get('/api/v1/campaign', {
-            mode: 'no-cors',
-            params: {
-              is_lite: true
-            }
-          })
-          .then((res) => {
-            this.setCampaigns(res.data)
-            this.loadingCampaigns = false
-            this.setCampaignsIsLoading(false)
-
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingCampaigns = false
-
-            return Promise.reject()
-          })
-      }
-    },
-
     startMainEvents () {
       this.$VueEvent.listen('agent_status_updated', this.mainListeners.agentStatusUpdated)
     },
@@ -207,7 +92,6 @@ export default {
 
     unsubscribeFromPusher () {
       if (this.authenticated) {
-        // just leave the channels
         this.broadcastLeave()
       }
     },
@@ -228,7 +112,7 @@ export default {
   created () {
     this.initAuth()
 
-    this.mainListeners.agentStatusUpdated = (event) => { // Keyner
+    this.mainListeners.agentStatusUpdated = (event) => {
       this.updateUserStatus(event)
 
       if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
