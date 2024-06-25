@@ -47,7 +47,7 @@
                  :class="pauseButtonClass"
                  @click="onTogglePause">
 
-            <PauseIcon class="mr-2"
+            <pause-icon class="mr-2"
                        :color="pauseIconColor"/>
 
             <div :class="pauseButtonTextClass">
@@ -65,7 +65,7 @@
                  :class="endSessionButtonClass"
                  @click="onToggleEnd">
 
-            <EndCallIcon class="mr-2"
+            <end-call-icon class="mr-2"
                          color="#62666E"/>
 
             <div class="text-body2 text-black">
@@ -82,11 +82,11 @@
                  :disabled="isRecordDisabled"
                  @click="onToggleRecording">
 
-            <StopIcon class="mr-2"
+            <stop-icon class="mr-2"
                       color="#62666E"
                       v-if="toggleRecording"/>
 
-            <RecordIcon class="mr-2"
+            <record-icon class="mr-2"
                         color="red"
                         v-else/>
 
@@ -105,10 +105,10 @@
                  :color="isHoldDisabled ? 'grey-8' : 'grey-4'"
                  :disabled="isHoldDisabled"
                  @click="onToggleHold">
-            <UnHoldIcon class="mr-1"
+            <un-hold-icon class="mr-1"
                         color="#F2997A"
                         v-if="toggleHold"/>
-            <PauseIcon class="mr-1"
+            <pause-icon class="mr-1"
                        color="#62666E"
                        v-else/>
             <div class="text-body2 text-black">
@@ -124,7 +124,7 @@
                  color="red-7"
                  v-if="statusCallConnected"
                  @click="hangupCall">
-            <HangupIcon class="mr-1"
+            <hangup-icon class="mr-1"
                         color="white"/>
             <div class="text-body2">End Call</div>
           </q-btn>
@@ -139,7 +139,7 @@
                  :color="canNextTask ? 'grey-4' : 'grey-8'"
                  :disabled="!canNextTask"
                  @click="onNextTask(false, true)">
-            <PlayBarIcon class="mr-1"
+            <play-bar-icon class="mr-1"
                          :color="canNextTask ? '#FF3B3B' : '#62666E'"
             />
             <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
@@ -174,10 +174,10 @@
                  :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
                  :disabled="isHoldDisabled"
                  @click="onToggleHold">
-            <UnHoldIcon class="mr-1"
+            <un-hold-icon class="mr-1"
                         color="#F2997A"
                         v-if="toggleHold"/>
-            <PauseIcon class="mr-1"
+            <pause-icon class="mr-1"
                        color="#62666E"
                        v-else/>
             <div class="text-body2 text-black">
@@ -196,7 +196,7 @@
             :disable="!canRedialNow && !canRedialLater"
             :color="canRedialNow || canRedialLater ? 'blue-7' : 'grey-8'">
             <template v-slot:label>
-              <RefreshIcon class="mr-2"
+              <refresh-icon class="mr-2"
                            color="white"/>
               <div class="text-body2">
                 <q-tooltip content-class="bg-grey-light11"
@@ -241,7 +241,7 @@
                  color="red-7"
                  v-if="statusCallConnected"
                  @click="hangupCall">
-            <HangupIcon class="mr-1"
+            <hangup-icon class="mr-1"
                         color="white"/>
             <div class="text-body2">End Call</div>
           </q-btn>
@@ -256,7 +256,7 @@
                  :color="canNextTask ? 'grey-4' : 'grey-8'"
                  :disabled="!canNextTask"
                  @click="onNextTask(false, true)">
-            <PlayBarIcon class="mr-1"
+            <play-bar-icon class="mr-1"
                          :color="canNextTask ? '#FF3B3B' : '#62666E'"
             />
             <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
@@ -283,24 +283,24 @@
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
                              @click="openDialPad">
-              <DialPadIcon/>
+              <dial-pad-icon/>
               Dial Pad
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
                              @click="openAdd">
-              <AddUserIcon color="#62666E"/>
+              <add-user-icon color="#62666E"/>
               Add
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
                              @click="openTransfer">
-              <TransferIcon color="#62666E"/>
+              <transfer-icon color="#62666E"/>
               Transfer
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              disabled>
-              <CalendarIcon/>
+              <calendar-icon/>
               Schedule Callback
             </b-dropdown-item>
           </b-dropdown>
@@ -319,7 +319,7 @@
       <div class="d-flex align-items-center p-0 justify-content-between flex-wrap px-3">
         <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize py-0 m-1"
              v-if="timezone">
-          <DropIcon width="18px"
+          <drop-icon width="18px"
                     height="18px"
                     class="mr-0 py-0"
                     style="position:relative;top:-2px;"/>
@@ -335,11 +335,11 @@
                :disabled="isRecordDisabled"
                @click="onToggleRecording">
 
-          <StopIcon class="mr-2"
+          <stop-icon class="mr-2"
                     color="#62666E"
                     v-if="toggleRecording"/>
 
-          <RecordIcon class="mr-2"
+          <record-icon class="mr-2"
                       color="red"
                       v-else/>
 
@@ -367,7 +367,7 @@
 
           <span class="text-subtitle2 text-grey"/>
           <div class="text-10 pt-1">
-            <HeadphoneIcon width="12px"
+            <headphone-icon width="12px"
                            height="12px"
                            class="mr-0 py-0"
                            style="position:relative;top:-2px;"/>
@@ -388,7 +388,7 @@
                  :class="pauseButtonClass"
                  @click="onTogglePause">
 
-            <PauseIcon class="mr-2"
+            <pause-icon class="mr-2"
                        :color="pauseIconColor"/>
 
             <div :class="pauseButtonTextClass">
@@ -406,7 +406,7 @@
                  :class="endSessionButtonClass"
                  @click="onToggleEnd">
 
-            <EndCallIcon class="mr-2"
+            <end-call-icon class="mr-2"
                          color="#62666E"/>
 
             <div class="text-body2 text-black">
@@ -497,7 +497,12 @@ export default {
     dialerWrapUpMixin
   ],
 
-  props: ['isMinimized'],
+  props: {
+    isMinimized: {
+      type: Boolean,
+      default: false
+    }
+  },
 
   data () {
     return {
@@ -1427,9 +1432,9 @@ export default {
       }
     },
 
-    hangupCall ($event) {
-      $event.stopPropagation()
-      $event.preventDefault()
+    hangupCall (event) {
+      event.stopPropagation()
+      event.preventDefault()
 
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')

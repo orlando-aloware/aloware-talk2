@@ -13,19 +13,19 @@
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
           <div class="bg-white flex-grow-0 d-flex">
-            <div class="col-6 p-0 bordered-right" :class="isStatusMinimized ? 'd-none' : ''">
+            <div class="col-6 p-0 bordered-right"
+                :class="isStatusMinimized ? 'd-none' : ''">
               <session-call-disposition/>
             </div>
             <div class="p-0 d-flex "
                  :class="isStatusMinimized ? 'd-flex w-100 flex-direction-row' : 'col-6'">
               <div class="flex-grow-1">
-                <session-call-status :isMinimized="isStatusMinimized"
+                <session-call-status :is-minimized="isStatusMinimized"
                                      @on-dispositions="onToggleStatusMinimized"
                                      @on-redirect="redirectRoute"
                                      @no-tasks-found="onNoTasksFound"
                                      @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
               </div>
-
               <div class="flex-grow-0"
                    :class="!isStatusMinimized ? 'd-none' : ''">
                 <b-button size="sm"
@@ -293,9 +293,9 @@ export default {
 
       // load non-queue tasks
       Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
-        let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
+        const taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
 
-        let params = stat === 'all' ? { id: this.selectedList.id } : {
+        const params = stat === 'all' ? { id: this.selectedList.id } : {
           id: this.selectedList.id,
           task_status: taskStatus
         }
