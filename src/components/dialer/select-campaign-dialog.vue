@@ -17,30 +17,41 @@
                        @change="changeCampaignId">
         </line-selector>
 
-        <q-btn color="primary"
-               rounded
-               :disabled="!campaignId"
-               @click="onCallClick">
-          Call
-        </q-btn>
+        <div>
+          <q-btn color="primary"
+                rounded
+                :disabled="!campaignId || isAgentOnCall"
+                @click="onCallClick">
+            Call
+          </q-btn>
+          <q-tooltip v-if="isAgentOnCall">
+            There is a call in progress on another device.
+          </q-tooltip>
+        </div>
       </div>
     </q-card>
   </q-dialog>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import * as AgentStatus from 'src/constants/agent-status'
 import LineSelector from 'components/generic-selectors/line-selector'
+
 export default {
   name: 'SelectCampaignDialog',
+
   components: {
     LineSelector
   },
+
   props: {
     show: {
       type: Boolean,
       default: false
     }
   },
+
   data () {
     return {
       visible: false,
@@ -48,20 +59,15 @@ export default {
       campaignId: null
     }
   },
-  methods: {
-    open () {
-      this.show = true
-    },
-    changeCampaignId (campaignId) {
-      this.campaignId = campaignId
-    },
-    onCallClick () {
-      this.$emit('change-campaign-id', this.campaignId)
 
-      this.$emit('call', this.campaignId)
-      this.visible = false
+  computed: {
+    ...mapGetters('auth', ['profile']),
+
+    isAgentOnCall () {
+      return this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
     }
   },
+
   watch: {
     show (val) {
       this.visible = val
@@ -69,8 +75,26 @@ export default {
       this.campaignId = null
     }
   },
+
   mounted () {
     this.visible = this.show
+  },
+
+  methods: {
+    open () {
+      this.show = true
+    },
+
+    changeCampaignId (campaignId) {
+      this.campaignId = campaignId
+    },
+
+    onCallClick () {
+      this.$emit('change-campaign-id', this.campaignId)
+
+      this.$emit('call', this.campaignId)
+      this.visible = false
+    }
   }
 }
 </script>
