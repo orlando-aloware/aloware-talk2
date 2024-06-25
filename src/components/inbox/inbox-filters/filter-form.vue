@@ -347,6 +347,7 @@
                                :highlighted="isChanged('contact_owner')"
                                :clearable="false"
                                :disable="disableContactOwner"
+                               :with-unassigned="isInboxOrAllCallsChannel"
                                v-model="filter.contact_owner"
                                data-testid="filter-form-user-selector"
                                @change="eventPayload => onFilterChange(eventPayload, 'contact_owner')">
