@@ -10,7 +10,7 @@
                       data-testid="integration-salesforce-salesforce-link"
                       :href="contactLink">
                       <i class="fab fa-salesforce salesforce-icon"></i>
-                      <span class="integration-title"> Salesforce</span>
+                      <span class="integration-title"> Salesforce {{ salesforceModule }}</span>
                     </b-link>
                 </q-item-section>
                 <q-item-section v-else>
@@ -27,52 +27,46 @@
 
             <q-card-section
                 data-testid="integration-salesforce-card-section-1"
-                v-if="contact">
+                v-if="integrationData">
                 <p class="mb-0"
                     data-testid="integration-salesforce-first-name"
-                    v-if="contact.first_name !== undefined">
+                    v-if="integrationData.first_name !== undefined">
                     <span class="data-icon-label">First Name: </span>
                     <span class="data-value">
                       <q-tooltip
                         anchor="top middle"
                         self="center middle"
                       >
-                        {{ contact.first_name }}
+                        {{ integrationData.first_name }}
                       </q-tooltip>
-                      {{ contact.first_name }}
+                      {{ integrationData.first_name }}
                     </span>
                 </p>
                 <p class="mb-0"
                     data-testid="integration-salesforce-last-name"
-                    v-if="contact.last_name !== undefined">
+                    v-if="integrationData.last_name !== undefined">
                     <span class="data-icon-label">Last Name: </span>
                     <span class="data-value">
                       <q-tooltip
                         anchor="top middle"
                         self="center middle"
                       >
-                        {{ contact.last_name }}
+                        {{ integrationData.last_name }}
                       </q-tooltip>
-                      {{ contact.last_name }}
+                      {{ integrationData.last_name }}
                     </span>
                 </p>
                 <p class="mb-0"
                     data-testid="integration-salesforce-email"
-                    v-if="contact.email">
+                    v-if="integrationData.email">
                     <span class="data-icon-label">Email: </span>
-                    <span class="data-value">{{ contact.email }}</span>
+                    <span class="data-value">{{ integrationData.email }}</span>
                 </p>
                 <p class="mb-0"
                     data-testid="integration-salesforce-phone"
-                    v-if="contact.phone_number">
+                    v-if="integrationData.phone">
                     <span class="data-icon-label">Phone: </span>
-                    <span class="data-value">{{ contact.phone_number }}</span>
-                </p>
-                <p class="mb-0"
-                    data-testid="integration-salesforce-module"
-                    v-if="contact.phone_number">
-                    <span class="data-icon-label">Salesforce: </span>
-                    <span class="data-value">{{ salesforceModule }}</span>
+                    <span class="data-value">{{ integrationData.phone }}</span>
                 </p>
             </q-card-section>
         </q-card>
@@ -109,26 +103,43 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     contactLink () {
-      if (!this.contact.integration_data?.salesforce?.contact_link && !this.contact.integration_data?.salesforce?.lead_link) {
-        return
+      if (!this.contactIntegrationDataLoaded || !this.integrationData.link) {
+        return false
       }
 
-      return this.contact.integration_data.salesforce.lead_link || this.contact.integration_data.salesforce.contact_link
+      return this.integrationData.link
     },
 
     salesforceModule () {
-      if (this.contact.integration_data?.salesforce?.contact_link) return 'Contacts'
-      if (this.contact.integration_data?.salesforce?.lead_link) return 'Leads'
+      if (this.integrationData) return this.integrationData.type.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
 
       return null
     }
 
   },
 
+  async mounted () {
+    if (this.contact && this.contact.id) {
+      await this.getData()
+    }
+  },
+
   data () {
     return {
       integrationData: null,
       contactIntegrationDataLoaded: false
+    }
+  },
+
+  methods: {
+    getData () {
+      this.contactIntegrationDataLoaded = false
+
+      return this.getIntegrationData(this.contact, 'salesforce')
+        .then(response => {
+          this.integrationData = response.data
+          this.contactIntegrationDataLoaded = true
+        })
     }
   }
 }
