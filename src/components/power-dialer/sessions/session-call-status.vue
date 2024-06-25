@@ -142,7 +142,10 @@
             <play-bar-icon class="mr-1"
                          :color="canNextTask ? '#FF3B3B' : '#62666E'"
             />
-            <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
+            <div class="text-body2"
+                 :class="canNextTask ? 'text-red-7' : 'white'">
+                Next
+            </div>
           </q-btn>
         </div>
       </div>
