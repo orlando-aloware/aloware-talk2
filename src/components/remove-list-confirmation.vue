@@ -163,12 +163,12 @@ export default {
       for (let i = 0; i < haystack.length; i++) {
         list = haystack[i].lists.find(item => item.id === id)
 
-        if (list) {
-          haystack[i].lists.splice(haystack[i].lists.indexOf(list), 1)
-        } else {
+        if (!list) {
           this.removeListFromFolders(id, haystack[i].child_folders)
           return
         }
+
+        haystack[i].lists.splice(haystack[i].lists.indexOf(list), 1)
       }
 
       this.foldersLoaded(this.folders)
