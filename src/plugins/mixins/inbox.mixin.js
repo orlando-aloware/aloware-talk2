@@ -369,6 +369,12 @@ export default {
           ]
         }
       }
+
+      if (this.firstTimeLoading && this.profile?.default_report_period) {
+        this.setDateFilter(filter, this.profile.default_report_period)
+        this.firstTimeLoading = false
+      }
+
       if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {
           ...this.filters,
