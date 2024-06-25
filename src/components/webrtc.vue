@@ -10,10 +10,10 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex'
 import Dialer from 'components/dialer/dialer'
 import Phone from 'components/dialer/phone'
 import SelectCampaignDialog from 'components/dialer/select-campaign-dialog.vue'
-import { mapActions, mapState } from 'vuex' //
 import {
   aclMixin,
   agentMixin,
@@ -72,6 +72,16 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'setDispositionStatuses',
+      'setCallDispositions',
+      'setActivityTypes',
+      'setTemplates',
+      'setCampaigns',
+      'setCampaignsIsLoading',
+      'updateUserStatus'
+    ]),
+
     initAuth () {
       this.broadcastInit()
 
@@ -212,17 +222,7 @@ export default {
 
     handleCallCompleted () {
       this.$emit('callCompleted')
-    },
-
-    ...mapActions([
-      'setDispositionStatuses',
-      'setCallDispositions',
-      'setActivityTypes',
-      'setTemplates',
-      'setCampaigns',
-      'setCampaignsIsLoading',
-      'updateUserStatus'
-    ])
+    }
   },
 
   created () {
