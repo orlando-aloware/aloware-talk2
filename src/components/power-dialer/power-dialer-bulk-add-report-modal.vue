@@ -231,9 +231,6 @@ export default {
       const isDncFromImport = this.fullReport?.extra?.is_dnc || 0
       const isBlockedFromImport = this.fullReport?.extra?.is_blocked || 0
 
-      console.log('buildReport this.fullReport', this.fullReport)
-      console.log('buildReport integrationReport', this.$jsonClone(this.integrationPDImportSummaries[id]))
-
       if (isDncFromImport > integrationReport.is_dnc) {
         integrationReport.is_dnc = isDncFromImport
       }
@@ -248,10 +245,6 @@ export default {
       const integrationDuplicates = integrationReport?.duplicates || 0
       const duplicatePhoneNumbers = this.fullReport?.success?.duplicates || 0
 
-      console.log('buildReport creationSettings', creationSettings)
-      console.log('buildReport integrationDuplicates', integrationDuplicates)
-      console.log('buildReport duplicatePhoneNumbers', duplicatePhoneNumbers)
-
       if (!creationSettings?.prevent_duplicates) {
         this.fullReport.fail[DUPLICATED] = integrationDuplicates > duplicatePhoneNumbers ? integrationDuplicates : duplicatePhoneNumbers
       } else if (creationSettings?.prevent_duplicates) {
@@ -263,10 +256,6 @@ export default {
       const updatedContactsCount = integrationReport?.updated_contacts_count || 0
       const selected = integrationReport?.total_selected || 0
 
-      console.log('buildReport createdContactsCount', createdContactsCount)
-      console.log('buildReport updatedContactsCount', updatedContactsCount)
-      console.log('buildReport selected', selected)
-
       let totalSelected = createdContactsCount + updatedContactsCount
       totalSelected = selected > totalSelected ? selected : totalSelected
 
@@ -277,10 +266,6 @@ export default {
       const duplicates = integrationReport?.duplicates ?? 0
       // the total of duplicates
       const duplicatedTasks = integrationReport?.duplicated_tasks ?? 0
-
-      console.log('buildReport duplicates', duplicates)
-      console.log('buildReport duplicatedTasks', duplicatedTasks)
-
       this.duplicatedTasks = duplicatedTasks ? duplicatedTasks - duplicates : 0
 
       // remove reports having no message or with 0 value
@@ -309,9 +294,6 @@ export default {
           this.fullReport.fail[NOT_OWNED] = notOwnedContactsCount
         }
       }
-
-      console.log('buildReport this.fullReport', this.fullReport)
-      console.log('buildReport integrationReport', integrationReport)
 
       // clean-up
       this.removeIntegrationPDImportSummary(id)
