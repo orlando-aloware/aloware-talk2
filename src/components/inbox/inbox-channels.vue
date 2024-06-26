@@ -338,7 +338,8 @@ export default {
       scrollTimeout: null,
       cancelToken: null,
       source: null,
-      listeners: {}
+      listeners: {},
+      firstTimeLoading: true
     }
   },
 
@@ -352,6 +353,7 @@ export default {
       'appliedFilter',
       'hasMoreCommunications',
       'inboxShowMyContacts',
+      'inboxShowUnreads',
       'isFilterDialogForView'
     ]),
 
@@ -402,7 +404,8 @@ export default {
           contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
           from_date: Filters.DEFAULT_STATE.filter.from_date,
           to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact
+          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+          unread_only: Filters.DEFAULT_STATE.filter.unread_only
         }
         return defaultFilterModel
       }
@@ -428,7 +431,8 @@ export default {
           contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
           from_date: Filters.DEFAULT_STATE.filter.from_date,
           to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact
+          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+          unread_only: Filters.DEFAULT_STATE.filter.unread_only
         }
 
         if (['recordings'].includes(this.$route.params.channel)) {
@@ -491,6 +495,7 @@ export default {
         from_date: Filters.DEFAULT_STATE.filter.from_date,
         to_date: Filters.DEFAULT_STATE.filter.to_date,
         my_contact: Filters.DEFAULT_STATE.filter.my_contact,
+        unread_only: Filters.DEFAULT_STATE.filter.unread_only,
         creator_type: Filters.DEFAULT_STATE.filter.creator_type
       }
 
@@ -864,6 +869,7 @@ export default {
       'setIsInboxFiltersLoaded',
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
+      'setInboxShowUnreads',
       'setFilterDialogForView',
       'setIsEditingView'
     ]),
@@ -874,6 +880,7 @@ export default {
     },
 
     onResetFilters () {
+      this.firstTimeLoading = true
       this.resetFilters()
       this.getCommunications(this.filter)
     },
@@ -1023,6 +1030,12 @@ export default {
       this.gettingTasksList(true)
       this.communicationsListHasError = false
 
+      if (this.firstTimeLoading && this.profile?.default_report_period) {
+        this.setDateFilter(params, this.profile.default_report_period)
+        this.setDateFilter(this.filter, this.profile.default_report_period)
+        this.firstTimeLoading = false
+      }
+
       // payload specific for Mentions
       if (this.$route.params.channel === 'mentions') {
         api = talk2Api.V2.mentions
@@ -1046,7 +1059,7 @@ export default {
       }
 
       params = this.removeUnnecessaryParameters(params)
-      params = this.filterMyContacts(params)
+      params = this.filtersToggle(params)
 
       this.source.cancel('Loading of communication operation is canceled by the user.')
       this.source = this.cancelToken.source()
@@ -1088,6 +1101,11 @@ export default {
 
       if (this.inboxShowMyContacts) {
         params.my_contact = 1
+      }
+
+      if (this.inboxShowUnreads) {
+        params.unread_only = 1
+        params.has_unread = 1
       }
 
       let api = talk2Api.V1.reports.communications
@@ -1375,6 +1393,28 @@ export default {
       return params
     },
 
+    filterUnreadOnly (params, showUnreads) {
+      if (showUnreads === undefined) {
+        showUnreads = this.inboxShowUnreads
+      }
+
+      const unreadOnlyFilter = _.get(params, 'unread_only', null)
+
+      if (unreadOnlyFilter !== (showUnreads | 0)) {
+        params.unread_only = (showUnreads | 0)
+        params.has_unread = (showUnreads | 0)
+      }
+
+      return params
+    },
+
+    filtersToggle (params) {
+      return {
+        ...this.filterMyContacts(params),
+        ...this.filterUnreadOnly(params)
+      }
+    },
+
     onClickAppliedFilterButton () {
       this.setFilterDialogForView(false)
       this.setIsEditingView(false)
@@ -1390,6 +1430,7 @@ export default {
       if (inboxRoutes.includes(this.$route.name)) {
         this.isLoaded = false
       }
+      this.firstTimeLoading = true
     },
 
     activeChannel (newValue, oldValue) {

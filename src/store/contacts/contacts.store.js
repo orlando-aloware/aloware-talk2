@@ -177,6 +177,7 @@ export default function () {
     changedContactProperties: [],
     changedContactAttributes: [],
     contactPhoneNumbers: [],
+    conflictedContactPhoneNumbers: [],
     contactRingGroups: [],
     contactAttributes: [],
     isSidebarCollapsed: false,
@@ -262,7 +263,6 @@ export default function () {
     isContactMixinUsed: false,
     isShortenedUrlRemembered: false,
     newCommunicationInprogressContactFetch: [],
-    showContactResourceUnavailable: false,
     inProgressAxiosUniqueIds: []
   }
 }

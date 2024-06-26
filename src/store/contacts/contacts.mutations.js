@@ -219,6 +219,9 @@ export default {
 
     state.contactPhoneNumbers.splice(index, 1)
   },
+  SET_CONFLICTED_CONTACT_PHONE_NUMBERS: (state, phoneNumbers) => {
+    state.conflictedContactPhoneNumbers = phoneNumbers
+  },
   SET_SIDEBAR_COLLAPSED: (state, isCollapsed) => {
     state.isSidebarCollapsed = isCollapsed
   },
@@ -533,9 +536,6 @@ export default {
   },
   SET_DEFAULT_IS_SHORTENED_URL_REMEMBERED (state) {
     state.isShortenedUrlRemembered = false
-  },
-  SET_SHOW_CONTACT_RESOURCE_UNAVAILABLE (state, value) {
-    state.showContactResourceUnavailable = value
   },
   ADD_AXIOS_UNIQUE_ID (state, value) {
     state.inProgressAxiosUniqueIds.push(value)

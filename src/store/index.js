@@ -285,6 +285,7 @@ export default function (/* { ssrContext } */) {
       isContactDisposed: false,
       isIntroVideoVisible: false,
       showedKycDialog: false,
+      integrationPDImportSummaries: {},
       isDatatableSelectedAll: false,
       isDatatableCountLoading: false,
       showedKycReloadDialog: false,
@@ -861,6 +862,14 @@ export default function (/* { ssrContext } */) {
 
       setShowedKycDialog ({ commit }, value) {
         commit('SET_SHOWED_KYC_DIALOG', value)
+      },
+
+      addIntegrationPDImportSummary ({ commit }, payload) {
+        commit('ADD_INTEGRATION_PD_IMPORT_SUMMARY', payload)
+      },
+
+      removeIntegrationPDImportSummary ({ commit }, id) {
+        commit('REMOVE_INTEGRATION_PD_IMPORT_SUMMARY', id)
       },
 
       setShowedKycReloadDialog ({ commit }, value) {
@@ -1627,6 +1636,17 @@ export default function (/* { ssrContext } */) {
 
       SET_SHOWED_KYC_DIALOG (state, value) {
         state.showedKycDialog = value
+      },
+
+      ADD_INTEGRATION_PD_IMPORT_SUMMARY (state, payload) {
+        state.integrationPDImportSummaries[payload.id] = payload.summary
+      },
+
+      REMOVE_INTEGRATION_PD_IMPORT_SUMMARY (state, id) {
+        if (!state.integrationPDImportSummaries?.[id]) {
+          return
+        }
+        delete state.integrationPDImportSummaries[id]
       },
 
       SET_SHOWED_KYC_RELOAD_DIALOG (state, value) {

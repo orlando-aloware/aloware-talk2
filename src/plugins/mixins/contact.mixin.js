@@ -507,7 +507,6 @@ export default {
         console.log('Failed to fetch contact info: Missing contact id!')
         this.loadingContact = false
         this.loadingContactCommunications = false
-        this.setShowContactResourceUnavailable(true)
         return false
       }
 
@@ -518,6 +517,15 @@ export default {
       talk2Api.V1.contact.getPhoneNumbers(contactIdToFetch)
         .then(response => {
           this.setContactPhoneNumbers(response.data)
+        }).catch(err => {
+          console.log(err)
+          this.fetchFailedNotification(err.response)
+        })
+
+      // get conflicted contact phone numbers
+      talk2Api.V1.contact.getConflictedPhoneNumbers(contactIdToFetch)
+        .then(response => {
+          this.setConflictedContactPhoneNumbers(response.data)
         }).catch(err => {
           console.log(err)
           this.fetchFailedNotification(err.response)
@@ -562,7 +570,6 @@ export default {
 
           if (!res) {
             this.loadingContactCommunications = false
-            this.setShowContactResourceUnavailable(true)
 
             return
           }
@@ -610,7 +617,6 @@ export default {
           if (this.$axios.isCancel(err) && err) {
             console.log('Request canceled', err.message)
             this.loadingContact = false
-            this.setShowContactResourceUnavailable(true)
 
             return
           }
@@ -619,9 +625,6 @@ export default {
 
           // inside Inbox
           if (this.$route.name.includes('Inbox')) {
-            // instead of redirecting to inbox, show contact is delete info
-            this.setShowContactResourceUnavailable(true)
-
             return
           }
 
@@ -1367,14 +1370,14 @@ export default {
       'resetChangedContactProperties',
       'updateContacts',
       'setContactPhoneNumbers',
+      'setConflictedContactPhoneNumbers',
       'setSequenceInfoLoading',
       'setSequenceInfo',
       'setLineIncomingNumberLoading',
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed',
-      'setShowContactResourceUnavailable'
+      'setIsContactMixinUsed'
     ]),
 
     ...mapActions('inbox', ['setSelectedContact'])

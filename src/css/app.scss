@@ -496,6 +496,14 @@ body,
   line-height: 18px;
 }
 
+.link-only {
+  color: $blue;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .mark-as {
   color: $blue;
   font-family: $font-family-body;
@@ -14401,10 +14409,6 @@ h1.contact-list-name-label {
   @media (min-height: 720px) {
     .business-information-actions {
       top: calc(100vh - 30vh);
-    }
-  }
-
-  @media (min-height: 900px) {
     .business-information-actions {
       top: calc(100vh - 22vh);
       height: 65vh;
@@ -14440,6 +14444,10 @@ h1.contact-list-name-label {
   .loading-text {
     font-size: 20px;
     font-weight: 500;
+    }
+  }
+
+  @media (min-height: 900px) {
     margin-top: 20px;
   }
 }
@@ -14826,6 +14834,24 @@ h1.contact-list-name-label {
   font-size: 120px
 }
 
+thead.conflicted-contact-thead-class tr th {
+  border-top: none;
+  border-bottom-width: 1px;
+}
+
+.center-modal-header .modal-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.btn-tiny, .btn-group-tiny > .btn {
+  padding: 2px 5px;
+  font-size: 6px;
+  line-height: 1.5;
+}
+
 .scrollable-tags-area {
   overflow-y: auto;
 }
@@ -14834,6 +14860,12 @@ h1.contact-list-name-label {
   background-color: #161922;
   color: #fff;
   font-size: 12px;
+}
+
+.power-dialer-session-toggle-button {
+  z-index: 1;
+  margin-top: -14px !important;
+  margin-bottom:-12px !important;
 }
 
 .select-campaign-dialog {

@@ -325,7 +325,8 @@ export default {
       'messageComposer',
       'selectedLine',
       'isOptoutActive',
-      'optoutText'
+      'optoutText',
+      'selectedLine'
     ]),
 
     ...mapState('contacts', [
@@ -484,6 +485,10 @@ export default {
     },
 
     onPaste (e) {
+      if (!this.selectedLine) {
+        this.$generalNotification('Please select line before copy & paste attachments', 'error')
+        return
+      }
       const index = {
         i: 0,
         item: null,
@@ -584,7 +589,7 @@ export default {
       return talk2Api.V1.message.send(message)
         .then(response => {
           this.resetMessageComposerSms()
-          this.$generalNotification('Message sent.')
+          this.$generalNotification('Message sent')
         }).catch(error => {
           console.log(error)
           this.$handleErrors(error.response)

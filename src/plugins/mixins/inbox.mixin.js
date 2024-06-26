@@ -17,6 +17,7 @@ export default {
       'contactsCurrentPage',
       'liveContacts',
       'inboxShowMyContacts',
+      'inboxShowUnreads',
       'activeChannel',
       'pinnedViews',
       'contacts',
@@ -118,7 +119,8 @@ export default {
         type: ChannelType.CHANNEL_INBOX,
         filter: Filters.EXCERPT,
         scope: 'user'
-      }
+      },
+      firstTimeLoading: true
     }
   },
 
@@ -367,6 +369,10 @@ export default {
           ]
         }
       }
+      if (this.firstTimeLoading && this.profile?.default_report_period) {
+        this.setDateFilter(filter, this.profile.default_report_period)
+        this.firstTimeLoading = false
+      }
 
       if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {
@@ -397,7 +403,9 @@ export default {
         }
       }
 
-      if (filter && !!+filter.has_unread) {
+      query.has_unread = this.inboxShowUnreads
+
+      if ((filter && !!+filter.has_unread) || (query.has_unread && this.inboxShowUnreads)) {
         this.filters = {
           ...this.filters,
           'is_unanswered_contact': [
@@ -419,6 +427,22 @@ export default {
       query.timezone = window.timezone
 
       return query
+    },
+
+    // Method to set date filters
+    setDateFilter (filter, defaultReportPeriod) {
+      switch (defaultReportPeriod) {
+        case 'month':
+          filter.from_date = window.moment().subtract(30, 'day').format('YYYY-MM-DD')
+          break
+        case 'week':
+          filter.from_date = window.moment().subtract(7, 'day').format('YYYY-MM-DD')
+          break
+        case 'day':
+          filter.from_date = window.moment().format('YYYY-MM-DD')
+          break
+      }
+      filter.to_date = window.moment().format('YYYY-MM-DD')
     },
 
     reInitFilters (taskId) {

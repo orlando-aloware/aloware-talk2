@@ -77,7 +77,7 @@ export default {
     computedCommunicationActivityType () {
       if (this.communication && this.activityTypes) {
         return this.activityTypes.find(
-          activityType => activityType === this.communication.metadata?.activity_type
+          activityType => activityType === this.communication.public_metadata?.activity_type
         )
       }
 
@@ -118,7 +118,7 @@ export default {
       }).then((res) => {
         this.loadingActivityType = false
         this.$generalNotification('Activity type updated.')
-        this.$emit('activityTypeChosen', res.data.metadata?.activity_type)
+        this.$emit('activityTypeChosen', res.data.public_metadata?.activity_type)
       }).catch((err) => {
         this.loadingActivityType = false
         this.$handleErrors(err.response)

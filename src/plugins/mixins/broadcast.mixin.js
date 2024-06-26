@@ -334,8 +334,8 @@ export default {
             this.$VueEvent.fire('new_desktop_fax', event.communication)
           }
         })
-        .listen('.user.logout', () => {
-          this.$VueEvent.fire('user_logout')
+        .listen('.user.logout', (event) => {
+          this.$VueEvent.fire('user_logout', event)
         })
 
         /**

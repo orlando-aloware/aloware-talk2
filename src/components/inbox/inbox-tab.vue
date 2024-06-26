@@ -678,6 +678,7 @@ export default {
     },
 
     onResetFilter () {
+      this.firstTimeLoading = true
       this.resetFilter()
 
       // redirect
@@ -1277,7 +1278,7 @@ export default {
       }
     }
 
-    this.listeners.inboxLoadContacts = debounce((showMyContacts) => {
+    this.listeners.inboxLoadContacts = debounce((showMyContacts, showUnreads) => {
       if (!this.isLoaded) {
         return
       }

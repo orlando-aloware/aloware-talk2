@@ -84,6 +84,8 @@ export default {
       'isDatatableSelectedAll'
     ]),
 
+    ...mapState('cache', ['currentCompany']),
+
     title () {
       return `Delete ${this.$options.filters.numFormat(this.contactToDeleteCount)} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
     },
@@ -93,8 +95,14 @@ export default {
         return 1
       }
 
-      if (this.selectedCount) {
-        return this.selectedCount
+      if (this.selectedContacts[this.listId]) {
+        let list = this.selectedContacts[this.listId]
+        if (this.currentCompany.activate_multi_entity) {
+          // do not include contacts with integrations
+          list = list.filter(contact => !contact.hasExternalData)
+        }
+
+        return list.length
       }
 
       return 0
@@ -241,8 +249,14 @@ export default {
       }
 
       this.isBusy = true
-      let ids = this.selectedContacts[this.listId]
-        .map(contact => this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+      // exclude contacts with integrations and get the contact ids
+      let ids = this.selectedContacts[this.listId].reduce((acc, contact) => {
+        if (this.currentCompany.activate_multi_entity ? !contact.has_integration : true) {
+          acc.push(this.isContactsRoute ? contact.id : contact.contact_list_item_id)
+        }
+        return acc
+      }, [])
+
       ids = chunk(ids, 50)
 
       if (this.isDatatableSelectedAll) {

@@ -22,6 +22,10 @@
                              data-testid="contact-integrations-gohighlevel"
                              :contact="contact"/>
 
+    <integration-salesforce data-testid="contact-integrations-salesforce"
+        :contact="contact"
+        v-if="isSalesforceEnabled"/>
+
     <contact-crm-links data-testid="contact-integrations-crm-links" :contact="contact"/>
   </b-card>
 </template>
@@ -32,6 +36,7 @@ import IntegrationHubspot from 'src/components/integrations/integration-hubspot'
 import IntegrationPipedrive from 'src/components/integrations/integration-pipedrive'
 import ContactCrmLinks from 'components/contacts/contact-crm-links'
 import IntegrationGohighlevel from 'components/integrations/integration-gohighlevel.vue'
+import IntegrationSalesforce from 'components/integrations/integration-salesforce.vue'
 
 export default {
   name: 'contact-integrations',
@@ -49,7 +54,13 @@ export default {
     }
   },
 
-  components: { IntegrationGohighlevel, ContactCrmLinks, IntegrationHubspot, IntegrationPipedrive },
+  components: {
+    IntegrationGohighlevel,
+    ContactCrmLinks,
+    IntegrationHubspot,
+    IntegrationPipedrive,
+    IntegrationSalesforce
+  },
 
   computed: {
     ...mapState('cache', ['currentCompany']),
@@ -69,7 +80,8 @@ export default {
         !this.currentCompany.zoho_integration_enabled &&
         !this.currentCompany.helpscout_integration_enabled &&
         !this.currentCompany.guesty_integration_enabled &&
-        !this.currentCompany.gohighlevel_integration_enabled
+        !this.currentCompany.gohighlevel_integration_enabled &&
+        !this.currentCompany.salesforce_integration_enabled
     },
 
     isHubspotEnabled () {
@@ -98,6 +110,10 @@ export default {
     isGuestyEnabled () {
       return !!(this.currentCompany &&
         this.currentCompany.guesty_integration_enabled)
+    },
+
+    isSalesforceEnabled () {
+      return this.currentCompany && this.currentCompany.salesforce_integration_enabled
     }
   }
 }

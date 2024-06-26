@@ -110,7 +110,7 @@ export default {
 
     processRequest (params, isChunked = false, chunkedContactIds = []) {
       if (chunkedContactIds.length > 0) {
-        params.contacts = chunkedContactIds[0]
+        params.contact_ids = chunkedContactIds[0]
       }
 
       const url = `/api/v2/contacts-list/${this.selectedStaticList.id}/items`

@@ -183,8 +183,10 @@ export default {
       })
     })
 
-    this.$VueEvent.listen('user_logout', (data) => {
-      if (this.authenticated) {
+    this.$VueEvent.listen('user_logout', async (data) => {
+      const currentAuthToken = storage.local.getItem('shared_cookie')
+
+      if (this.authenticated && currentAuthToken === data.cookie_auth_token) {
         this.clearUser()
         this.$router.push({ name: 'Login' })
           .catch(this.$handleRouteError)
