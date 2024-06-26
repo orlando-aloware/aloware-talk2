@@ -1,7 +1,8 @@
 // import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { updateField } from 'vuex-map-fields'
-import _ from 'lodash'
+import { isArray, isEmpty, merge } from 'lodash'
 import * as PowerDialerDefault from 'src/constants/power-dialer-default'
+// import { mergeObjectsAndAddValues } from 'src/plugins/helpers/functions'
 
 export default {
   updateField,
@@ -174,7 +175,7 @@ export default {
   },
 
   UPDATE_ONGOING_SESSION: (state, data) => {
-    state.ongoingSession = _.merge(state.ongoingSession, data)
+    state.ongoingSession = merge(state.ongoingSession, data)
   },
 
   ADD_REDIALED_TASK: (state, taskId) => {
@@ -188,7 +189,7 @@ export default {
   },
 
   RESET_VUEX (state, value) {
-    if (!_.isArray(value) || _.isEmpty(value)) {
+    if (!isArray(value) || isEmpty(value)) {
       return
     }
 
@@ -234,5 +235,13 @@ export default {
 
     // add the task to the end of the queue
     state.powerDialerTasks.in_queue.push(task)
+  },
+
+  STORE_BULK_ACTION_NOTIFICATION (state, value) {
+    state.bulkAddContactsNotification[value.contact_list_id] = value
+  },
+
+  CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {
+    delete state.bulkAddContactsNotification[contactListId]
   }
 }
