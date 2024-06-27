@@ -4,7 +4,7 @@
     <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
       <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar sidebar-1"
            :class="`${sessionSidebarExpanded ? 'minimized' : ''}`">
-        <session-sidebar />
+        <session-sidebar/>
       </div>
 
       <div class="sessions-main-page px-0 mb-0 main flex-1 bg-grey-1 px-0 mb-0 h-100"
@@ -12,31 +12,57 @@
            :style="`${sessionSidebarExpanded ? 'padding-left:0px !important;' : ''}`">
         <div class="d-flex flex-column h-100">
           <!-- Session Header -->
-          <div class="d-flex bg-white flex-grow-0">
-            <div class="col-7 p-0 bordered-right">
-              <session-call-disposition />
+          <div class="bg-white flex-grow-0 d-flex">
+            <div class="col-6 p-0 bordered-right"
+                :class="isStatusMinimized ? 'd-none' : ''">
+              <session-call-disposition/>
             </div>
-            <div class="col-5 p-0">
-              <session-call-status @on-redirect="redirectRoute"
-                                   @no-tasks-found="onNoTasksFound"
-                                   @on-all-tasks-are-skipped="onAllTasksAreSkipped" />
+            <div class="p-0 d-flex "
+                 :class="isStatusMinimized ? 'd-flex w-100 flex-direction-row' : 'col-6'">
+              <div class="flex-grow-1">
+                <session-call-status :is-minimized="isStatusMinimized"
+                                     @on-dispositions="onToggleStatusMinimized"
+                                     @on-redirect="redirectRoute"
+                                     @no-tasks-found="onNoTasksFound"
+                                     @on-all-tasks-are-skipped="onAllTasksAreSkipped"/>
+              </div>
+              <div class="flex-grow-0"
+                   :class="!isStatusMinimized ? 'd-none' : ''">
+                <b-button size="sm"
+                          variant="light mr-2"
+                          class="btn-white btn-contact-prev-next flex-grow-0"
+                          style="margin-top: 12px"
+                          @click="onToggleStatusMinimized">
+                  <i class="material-icons">keyboard_arrow_down</i>
+                </b-button>
+              </div>
             </div>
           </div>
+          <b-button size="sm"
+                    variant="light"
+                    class="btn-white btn-contact-prev-next m-auto power-dialer-session-toggle-button"
+                    style="height: 32px"
+                    :class="isStatusMinimized ? 'd-none' : ''"
+                    @click="onToggleStatusMinimized"
+          >
+            <i class="material-icons">keyboard_arrow_up</i>
+          </b-button>
+
           <!-- Session Main Page -->
-          <session-contact-page class="flex-grow-1 overflow-hidden" />
+          <session-contact-page class="flex-grow-1 overflow-hidden"/>
         </div>
       </div>
     </div>
     <template #overlay>
       <div class="text-center">
         <q-spinner-bars color="primary"
-                        size="2em" />
+                        size="2em"/>
         <div>Preparing session...</div>
       </div>
     </template>
     <appointment-form-modal :contact="contact">
     </appointment-form-modal>
-    <contact-add-reminder-modal />
+    <contact-add-reminder-modal/>
   </b-overlay>
 </template>
 
@@ -121,7 +147,8 @@ export default {
       source: null,
       tasksProcessed: 0,
       inProgressFetchTasks: {},
-      minNumberOfInQueueTasks: 5
+      minNumberOfInQueueTasks: 5,
+      isStatusMinimized: false
     }
   },
 
@@ -266,9 +293,12 @@ export default {
 
       // load non-queue tasks
       Object.keys(AutoDialTaskStatus.STATUSES_POSTLOAD).forEach(stat => {
-        let taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
+        const taskStatus = AutoDialTaskStatus[this.listFilters[AutoDialTaskStatus.STATUSES[stat]].status]
 
-        let params = stat === 'all' ? { id: this.selectedList.id } : { id: this.selectedList.id, task_status: taskStatus }
+        const params = stat === 'all' ? { id: this.selectedList.id } : {
+          id: this.selectedList.id,
+          task_status: taskStatus
+        }
         params.per_page = 50
 
         this.getTaskByFilter(params).then(res => {
@@ -328,6 +358,10 @@ export default {
       // fetch IN QUEUE tasks through the API every time the active task changes (could be skipped, completed, or failed)
       this.fetchTasks(AutoDialTaskStatus.STATUS_QUEUED)
       this.$VueEvent.fire('redial_task')
+    },
+
+    onToggleStatusMinimized () {
+      this.isStatusMinimized = !this.isStatusMinimized
     }
   },
 

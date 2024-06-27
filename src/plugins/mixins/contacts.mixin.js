@@ -416,13 +416,12 @@ export default {
             this.removeAxiosUniqueId(axiosUniqueId)
           }
 
-          // revert  list's filters to previous
+          // revert  list's filters to previous state if the request is not cancelled by the user
           if (!_.isEmpty(this.appliedFiltersPreviousFilters)) {
-            this.setCurrentListFilters(this.appliedFiltersPreviousFilters)
-            this.$VueEvent.fire('updateHasFilterChanges')
-
-            // alert the user that some error happened
             if (!this.$axios.isCancel(err)) {
+              this.setCurrentListFilters(this.appliedFiltersPreviousFilters)
+              this.$VueEvent.fire('updateHasFilterChanges')
+
               this.$generalNotification('The selected filters took too long to apply. Please change your selected filters.', 'error')
             }
           }

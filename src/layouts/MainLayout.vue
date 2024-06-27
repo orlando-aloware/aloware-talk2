@@ -1015,6 +1015,21 @@ export default {
       this.$generalNotification(event.message)
     }
 
+    this.mainListeners.contactListBulkCreated = (event) => {
+      // Save the event to vuex
+      this.storeBulkActionNotification(event)
+
+      // Verify if we're in the contact list page
+      const isContactsListPage = this.$route.meta?.id === 'power-dialer-list-filter'
+      const isIdMatch = this.$route.params.id === event.contact_list_id
+      if (isContactsListPage && isIdMatch) {
+        // Notify user of finish and push user to power dialer list
+        this.$generalNotification('Contacts were added to your Power Dialer list', null, null, false, {
+          path: `/power-dialer/list/${event.contact_list_id}/in-queue`
+        })
+      }
+    }
+
     // new in-app fax notification
     // this.$VueEvent.listen('new_in_app_fax', (communication) => {
     //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
@@ -1279,6 +1294,7 @@ export default {
       this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.listen('hide_mobile_footer', this.mainListeners.hideMobileFooter)
       this.$VueEvent.listen('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
+      this.$VueEvent.listen('contact_list_bulk_created', this.mainListeners.contactListBulkCreated)
       this.$VueEvent.listen('kyc_status_updated', this.mainListeners.kycStatusUpdated)
     },
 
@@ -2517,7 +2533,8 @@ export default {
     ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
     ...mapActions('powerDialer', [
       'setFinishedPowerDialerSession',
-      'getMyQueueList'
+      'getMyQueueList',
+      'storeBulkActionNotification'
     ]),
     ...mapActions([
       'resetVuex',
