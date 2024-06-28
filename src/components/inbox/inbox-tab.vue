@@ -678,6 +678,7 @@ export default {
     },
 
     onResetFilter () {
+      this.firstTimeLoading = true
       this.resetFilter()
 
       // redirect

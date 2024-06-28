@@ -1,8 +1,159 @@
 <template>
   <q-card flat>
-    <div class="t-menu-2 no-border">
-      <div class="d-flex align-items-center pt-3 px-3 pb-0 flex-wrap justify-content-between">
+    <div :class="!isMinimized ? 'd-none' : ''">
+      <div class="d-flex p-2 flex-direction-row justify-content-between align-items-center bg-white">
+        <div class="d-flex flew-direction-rows flex-grow-0 align-items-center">
+          <div class="font-weight-bold flex-grow-0 session-call-status lex-0 ml-2"
+               style="max-width: 176px">
+            <q-chip color="grey-50"
+                    class="p-0">
+              <div :class="`text-15 text-lowercase text-capitalize px-2`"
+                   v-html="statusDisplayText">
+              </div>
+            </q-chip>
+          </div>
 
+          <div class="d-flex p-0 flex-grow-1">
+            <div class="text-18 font-weight-bold">
+              {{ fullName }}
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-direction-row justify-content-end align-items-center flex-wrap flex-grow-1">
+          <q-btn class="my-1 sessions-button free-width"
+                 size="sm"
+                 no-wrap
+                 outline
+                 no-caps
+                 color="grey-4"
+                 @click="onDispositionsClick"
+          >
+            <div class="text-13 text-black">
+              DISPOSITIONS
+            </div>
+
+            <i class="material-icons font-weight-bold text-body2 text-black">keyboard_arrow_right</i>
+          </q-btn>
+
+          <q-btn class="my-1 ml-2"
+                 size="sm"
+                 unelevated
+                 no-wrap
+                 no-caps
+                 :outline="!sessionPaused"
+                 :color="pauseButtonColor"
+                 :disabled="toggleEnd"
+                 :class="pauseButtonClass"
+                 @click="onTogglePause">
+
+            <pause-icon class="mr-2"
+                       :color="pauseIconColor"/>
+
+            <div :class="pauseButtonTextClass">
+              {{ pauseButtonText }}
+            </div>
+          </q-btn>
+
+          <q-btn class="my-1 sessions-button free-width"
+                 size="sm"
+                 no-wrap
+                 outline
+                 no-caps
+                 :disable="isEndSessionDisabled"
+                 :color="endSessionButtonColor"
+                 :class="endSessionButtonClass"
+                 @click="onToggleEnd">
+
+            <end-call-icon class="mr-2"
+                         color="#62666E"/>
+
+            <div class="text-body2 text-black">
+              {{ endSessionText }}
+            </div>
+          </q-btn>
+
+          <q-btn class="sessions-button free-width my-1 ml-2"
+                 size="sm"
+                 color="grey-4"
+                 outline
+                 no-wrap
+                 no-caps
+                 :disabled="isRecordDisabled"
+                 @click="onToggleRecording">
+
+            <stop-icon class="mr-2"
+                      color="#62666E"
+                      v-if="toggleRecording"/>
+
+            <record-icon class="mr-2"
+                        color="red"
+                        v-else/>
+
+            <div class="text-body2 text-black">
+              {{ recordText }}
+            </div>
+          </q-btn>
+
+          <q-btn class="sessions-button my-1 ml-2"
+                 size="sm"
+                 style="width: 75.72px;"
+                 no-wrap
+                 no-caps
+                 unelevated
+                 outline
+                 :color="isHoldDisabled ? 'grey-8' : 'grey-4'"
+                 :disabled="isHoldDisabled"
+                 @click="onToggleHold">
+            <un-hold-icon class="mr-1"
+                        color="#F2997A"
+                        v-if="toggleHold"/>
+            <pause-icon class="mr-1"
+                       color="#62666E"
+                       v-else/>
+            <div class="text-body2 text-black">
+              {{ holdText }}
+            </div>
+          </q-btn>
+
+          <q-btn class="sessions-button free-width my-1 ml-2"
+                 size="sm"
+                 no-wrap
+                 unelevated
+                 no-caps
+                 color="red-7"
+                 v-if="statusCallConnected"
+                 @click="hangupCall">
+            <hangup-icon class="mr-1"
+                        color="white"/>
+            <div class="text-body2">End Call</div>
+          </q-btn>
+
+          <q-btn class="sessions-button my-1 ml-2 free-width"
+                 size="sm"
+                 no-wrap
+                 no-caps
+                 unelevated
+                 outline
+                 :class="canNextTask ? 'border border-danger' : ''"
+                 :color="canNextTask ? 'grey-4' : 'grey-8'"
+                 :disabled="!canNextTask"
+                 @click="onNextTask(false, true)">
+            <play-bar-icon class="mr-1"
+                         :color="canNextTask ? '#FF3B3B' : '#62666E'"
+            />
+            <div class="text-body2"
+                 :class="canNextTask ? 'text-red-7' : 'white'">
+                Next
+            </div>
+          </q-btn>
+        </div>
+      </div>
+    </div>
+
+    <div class="t-menu-2 no-border w-100"
+         :class="isMinimized ? 'd-none' : ''">
+      <div class="d-flex align-items-center pt-3 px-3 pb-0 flex-wrap justify-content-between">
         <div class="font-weight-bold flex-grow-1 session-call-status w-100"
              style="max-width: 176px;">
           <q-chip color="grey-50"
@@ -13,34 +164,10 @@
           </q-chip>
         </div>
 
-        <div class="w-100"
+        <div class="w-100 justify-content-end d-flex align-items-center"
              style="max-width: 370px;">
-          <q-btn class="sessions-button my-1 ml-1"
-                 size="sm"
-                 style="width: 79.55px;"
-                 no-wrap
-                 no-caps
-                 unelevated
-                 outline
-                 :color="statusCallConnected ? 'grey-4' : 'grey-8'"
-                 :disabled="!statusCallConnected"
-                 @click="onToggleMute">
-            <mute-icon class="mr-1"
-                       :width="12"
-                       :height="12"
-                       v-show="!toggleMute">
-            </mute-icon>
-            <unmute-icon class="mr-1"
-                         :width="12"
-                         :height="12"
-                         v-show="toggleMute">
-            </unmute-icon>
-            <div class="text-body2 text-black">
-              {{ muteText }}
-            </div>
-          </q-btn>
 
-          <q-btn class="sessions-button my-1 ml-1"
+          <q-btn class="sessions-button my-1 ml-2"
                  size="sm"
                  style="width: 75.72px;"
                  no-wrap
@@ -50,10 +177,10 @@
                  :color="!isHoldDisabled ? 'grey-4' : 'grey-8'"
                  :disabled="isHoldDisabled"
                  @click="onToggleHold">
-            <UnHoldIcon class="mr-1"
+            <un-hold-icon class="mr-1"
                         color="#F2997A"
                         v-if="toggleHold"/>
-            <PauseIcon class="mr-1"
+            <pause-icon class="mr-1"
                        color="#62666E"
                        v-else/>
             <div class="text-body2 text-black">
@@ -62,7 +189,7 @@
           </q-btn>
 
           <q-btn-dropdown
-            class="sessions-button free-width my-1 ml-1"
+            class="sessions-button free-width my-1 ml-2"
             size="sm"
             no-wrap
             unelevated
@@ -72,8 +199,8 @@
             :disable="!canRedialNow && !canRedialLater"
             :color="canRedialNow || canRedialLater ? 'blue-7' : 'grey-8'">
             <template v-slot:label>
-              <RefreshIcon class="mr-2"
-                           color="white" />
+              <refresh-icon class="mr-2"
+                           color="white"/>
               <div class="text-body2">
                 <q-tooltip content-class="bg-grey-light11"
                            anchor="bottom middle"
@@ -109,20 +236,36 @@
             </q-list>
           </q-btn-dropdown>
 
-          <q-btn class="sessions-button free-width my-1 ml-1"
+          <q-btn class="sessions-button free-width my-1 ml-2"
                  size="sm"
                  no-wrap
                  unelevated
                  no-caps
-                 :disabled="!canNextTask "
-                 :color="canNextTask  ? 'red-7' : 'grey-8'"
-                 @click="onNextTask(false, true)">
-            <CallDropIcon class="mr-1"
-                          color="white"/>
-            <div class="text-body2">Next</div>
+                 color="red-7"
+                 v-if="statusCallConnected"
+                 @click="hangupCall">
+            <hangup-icon class="mr-1"
+                        color="white"/>
+            <div class="text-body2">End Call</div>
           </q-btn>
 
-          <b-dropdown class="my-1 ml-1 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+          <q-btn class="sessions-button my-1 ml-2 free-width"
+                 size="sm"
+                 no-wrap
+                 no-caps
+                 unelevated
+                 outline
+                 :class="canNextTask ? 'border border-danger' : ''"
+                 :color="canNextTask ? 'grey-4' : 'grey-8'"
+                 :disabled="!canNextTask"
+                 @click="onNextTask(false, true)">
+            <play-bar-icon class="mr-1"
+                         :color="canNextTask ? '#FF3B3B' : '#62666E'"
+            />
+            <div class="text-body2" :class="canNextTask ? 'text-red-7' : 'white'">Next</div>
+          </q-btn>
+
+          <b-dropdown class="my-1 ml-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                       text="..."
                       right size="sm"
                       variant="white"
@@ -136,31 +279,31 @@
                              @click="dncContact">
               <q-spinner-bars v-if="isProcessingDNC"
                               class="mr-1"
-                              color="blue" />
+                              color="blue"/>
               <i class="fa fa-ban"></i>
               DNC
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
                              @click="openDialPad">
-              <DialPadIcon />
+              <dial-pad-icon/>
               Dial Pad
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
                              @click="openAdd">
-              <AddUserIcon color="#62666E" />
+              <add-user-icon color="#62666E"/>
               Add
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              :disabled="!statusCallConnected"
                              @click="openTransfer">
-              <TransferIcon color="#62666E" />
+              <transfer-icon color="#62666E"/>
               Transfer
             </b-dropdown-item>
             <b-dropdown-item href="#"
                              disabled>
-              <CalendarIcon />
+              <calendar-icon/>
               Schedule Callback
             </b-dropdown-item>
           </b-dropdown>
@@ -179,14 +322,14 @@
       <div class="d-flex align-items-center p-0 justify-content-between flex-wrap px-3">
         <div class="flex-grow-1 text-14 text-subtitle1 text-capitalize py-0 m-1"
              v-if="timezone">
-          <DropIcon width="18px"
+          <drop-icon width="18px"
                     height="18px"
                     class="mr-0 py-0"
-                    style="position:relative;top:-2px;" />
+                    style="position:relative;top:-2px;"/>
           {{ timezone }} - {{ getTimeZone }}
         </div>
 
-        <q-btn class="sessions-button free-width ml-1"
+        <q-btn class="sessions-button free-width ml-2"
                size="sm"
                color="grey-4"
                no-wrap
@@ -195,11 +338,11 @@
                :disabled="isRecordDisabled"
                @click="onToggleRecording">
 
-          <StopIcon class="mr-2"
+          <stop-icon class="mr-2"
                     color="#62666E"
                     v-if="toggleRecording"/>
 
-          <RecordIcon class="mr-2"
+          <record-icon class="mr-2"
                       color="red"
                       v-else/>
 
@@ -227,10 +370,10 @@
 
           <span class="text-subtitle2 text-grey"/>
           <div class="text-10 pt-1">
-            <HeadphoneIcon width="12px"
+            <headphone-icon width="12px"
                            height="12px"
                            class="mr-0 py-0"
-                           style="position:relative;top:-2px;" />
+                           style="position:relative;top:-2px;"/>
             {{ lineName }}
           </div>
 
@@ -248,15 +391,15 @@
                  :class="pauseButtonClass"
                  @click="onTogglePause">
 
-            <PauseIcon class="mr-2"
-                       :color="pauseIconColor" />
+            <pause-icon class="mr-2"
+                       :color="pauseIconColor"/>
 
             <div :class="pauseButtonTextClass">
               {{ pauseButtonText }}
             </div>
           </q-btn>
 
-          <q-btn class="my-1 sessions-button free-width ml-1"
+          <q-btn class="my-1 sessions-button free-width ml-2"
                  size="sm"
                  no-wrap
                  outline
@@ -266,8 +409,8 @@
                  :class="endSessionButtonClass"
                  @click="onToggleEnd">
 
-            <EndCallIcon class="mr-2"
-                         color="#62666E" />
+            <end-call-icon class="mr-2"
+                         color="#62666E"/>
 
             <div class="text-body2 text-black">
               {{ endSessionText }}
@@ -312,7 +455,6 @@ import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
 import UnHoldIcon from 'components/icons/pause-icon-3'
-import CallDropIcon from 'components/icons/call-drop-icon'
 import RefreshIcon from 'components/icons/refresh-icon'
 import StopIcon from 'components/icons/stop-icon'
 import EndCallIcon from 'components/icons/stop-icon-2'
@@ -326,18 +468,18 @@ import {
 } from 'src/plugins/mixins'
 import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
-import MuteIcon from 'components/icons/mute-icon'
-import UnmuteIcon from 'components/icons/unmute-icon'
 import * as CommunicationStatus from 'src/constants/communication-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import talk2Api from 'src/plugins/api/api'
+import HangupIcon from 'components/icons/hangup-icon.vue'
+import PlayBarIcon from 'components/icons/play-bar-icon.vue'
 
 export default {
   name: 'SessionCallStatus',
 
   components: {
-    MuteIcon,
-    UnmuteIcon,
+    PlayBarIcon,
+    HangupIcon,
     CalendarIcon,
     TransferIcon,
     DialPadIcon,
@@ -346,7 +488,6 @@ export default {
     HeadphoneIcon,
     PauseIcon,
     UnHoldIcon,
-    CallDropIcon,
     StopIcon,
     EndCallIcon,
     RecordIcon,
@@ -358,6 +499,13 @@ export default {
     sessionCallStatusMixin,
     dialerWrapUpMixin
   ],
+
+  props: {
+    isMinimized: {
+      type: Boolean,
+      default: false
+    }
+  },
 
   data () {
     return {
@@ -758,6 +906,10 @@ export default {
       'reQueuePowerDialerTask',
       'removeFirstInQueueTask'
     ]),
+
+    onDispositionsClick () {
+      this.$emit('on-dispositions')
+    },
 
     processRemoveFirstInQueueTask: debounce(function () {
       this.removeFirstInQueueTask()
@@ -1281,6 +1433,17 @@ export default {
       if (this.dialer.currentStatus === 'CALL_CONNECTED') {
         this.processHangup()
       }
+    },
+
+    hangupCall (event) {
+      event.stopPropagation()
+      event.preventDefault()
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      this.$VueEvent.fire('hangupCall')
     },
 
     async onNextTaskWhenOnWrapUp () {

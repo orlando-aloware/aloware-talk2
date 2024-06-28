@@ -134,8 +134,9 @@ export default {
       })
     },
 
-    onBrowse () {
+    onBrowse (event) {
       this.$refs.file.click()
+      event.stopPropagation()
     }
   },
 

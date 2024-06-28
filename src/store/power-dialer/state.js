@@ -192,6 +192,7 @@ export default function () {
     },
     redialed: [],
     pdViewSource: null,
-    pdViewCancelToken: null
+    pdViewCancelToken: null,
+    bulkAddContactsNotification: {}
   }
 }
