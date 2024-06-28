@@ -338,8 +338,7 @@ export default {
       scrollTimeout: null,
       cancelToken: null,
       source: null,
-      listeners: {},
-      firstTimeLoading: true
+      listeners: {}
     }
   },
 
@@ -880,7 +879,6 @@ export default {
     },
 
     onResetFilters () {
-      this.firstTimeLoading = true
       this.resetFilters()
       this.getCommunications(this.filter)
     },
@@ -1029,12 +1027,6 @@ export default {
       this.setIsInboxFiltersLoaded(true)
       this.gettingTasksList(true)
       this.communicationsListHasError = false
-
-      if (this.firstTimeLoading && this.profile?.default_report_period) {
-        this.setDateFilter(params, this.profile.default_report_period)
-        this.setDateFilter(this.filter, this.profile.default_report_period)
-        this.firstTimeLoading = false
-      }
 
       // payload specific for Mentions
       if (this.$route.params.channel === 'mentions') {
@@ -1430,7 +1422,6 @@ export default {
       if (inboxRoutes.includes(this.$route.name)) {
         this.isLoaded = false
       }
-      this.firstTimeLoading = true
     },
 
     activeChannel (newValue, oldValue) {
