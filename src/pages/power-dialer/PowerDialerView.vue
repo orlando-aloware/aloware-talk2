@@ -1300,7 +1300,7 @@ export default {
       this.onFetch()
     },
 
-    checked: function (value) {
+    checked (value) {
       this.onForcedCheckAll(value)
     },
 
