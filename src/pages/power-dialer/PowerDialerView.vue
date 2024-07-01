@@ -13,6 +13,8 @@
                                    :list="filteredList"
                                    @start="beginDial"
                                    @on-update-session-metrics="onSessionMetricsUpdate" />
+      <power-dialer-bulk-add-report-modal :statusReport="bulkAddStatusReport"
+                                          @close="onTaskAddedNotificationClose"/>
     </template>
 
     <template slot="actions">
@@ -582,6 +584,7 @@ import SummaryInfoLabels from 'src/components/power-dialer/details/summary-info-
 import Datatable from 'src/components/datatable'
 import SearchList from 'src/components/search'
 import StartDialSessionSettings from 'src/components/power-dialer/session-settings/start-dial-sessions-settings'
+import PowerDialerBulkAddReportModal from 'src/components/power-dialer/power-dialer-bulk-add-report-modal'
 import ContactsFilters from 'src/components/contacts/contacts-filters'
 import Breadcrumbs from 'src/components/breadcrumbs'
 import TrashOIcon from 'components/icons/trash-o-icon'
@@ -698,6 +701,7 @@ export default {
     ContactCreateModal,
     BulkActionMenu,
     BlockTooltip,
+    PowerDialerBulkAddReportModal,
     RefreshIcon,
     ContactsFilters
   },
@@ -745,7 +749,8 @@ export default {
       'powerDialerLists',
       'powerDialerDirectoryList',
       'datatableLoader',
-      'activeFilter'
+      'activeFilter',
+      'bulkAddNotifications'
     ]),
 
     ...mapGetters('contacts', [
@@ -924,7 +929,9 @@ export default {
   data () {
     return {
       selectedItem: null,
-      pdViewListeners: {}
+      hasFilters: false,
+      pdViewListeners: {},
+      bulkAddStatusReport: {}
     }
   },
 
@@ -990,7 +997,8 @@ export default {
       'updateContactsList',
       'getMyQueueList',
       'setPDListSource',
-      'setPDListCancelToken'
+      'setPDListCancelToken',
+      'clearBulkActionNotification'
     ]),
 
     createNewPowerDialerContact (contact) {
@@ -1228,6 +1236,27 @@ export default {
       }
 
       return obj
+    },
+
+    onForcedCheckAll (value) {
+      const elem = document.querySelector('.data-table-check-all')
+
+      if (elem) {
+        elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
+      }
+    },
+
+    /**
+     * Notifies summary of contacts added to PD list
+     */
+    checkTaskAddedNotification () {
+      const notification = this.bulkAddNotifications(this.$route.params.id)
+      this.bulkAddStatusReport = notification?.status_report
+    },
+
+    onTaskAddedNotificationClose () {
+      this.clearBulkActionNotification(this.$route.params.id)
+      this.bulkAddStatusReport = {}
     }
   },
 
@@ -1241,13 +1270,13 @@ export default {
       deep: true
     },
 
-    '$route.params.id': {
-      handler () {
-        if (!this.$route.name.includes('Contact')) {
-          this.init(true)
-        }
-      },
-      deep: true
+    '$route.params.id': function (newId, oldId) {
+      if (!this.$route.name.includes('Contact')) {
+        this.init(true)
+      }
+
+      this.clearBulkActionNotification(oldId)
+      this.bulkAddStatusReport = {}
     },
 
     currentListFilters: {
@@ -1269,6 +1298,16 @@ export default {
 
     clearList (value) {
       this.onFetch()
+    },
+
+    checked (value) {
+      this.onForcedCheckAll(value)
+    },
+
+    isLoading (loading) {
+      if (!loading) {
+        this.checkTaskAddedNotification()
+      }
     }
   },
 

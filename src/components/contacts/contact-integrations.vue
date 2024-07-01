@@ -24,7 +24,7 @@
 
     <integration-salesforce data-testid="contact-integrations-salesforce"
         :contact="contact"
-        v-if="isSalesforceEnabled && contactHasSalesforceData"/>
+        v-if="isSalesforceEnabled"/>
 
     <contact-crm-links data-testid="contact-integrations-crm-links" :contact="contact"/>
   </b-card>
@@ -114,10 +114,6 @@ export default {
 
     isSalesforceEnabled () {
       return this.currentCompany && this.currentCompany.salesforce_integration_enabled
-    },
-
-    contactHasSalesforceData () {
-      return this.contact.integration_data?.salesforce
     }
   }
 }
