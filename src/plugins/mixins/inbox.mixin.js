@@ -328,7 +328,7 @@ export default {
 
       // add the line filter if there is
       if (filter && !isEmpty(filter?.campaigns)) {
-        this.filters.lines = [
+        this.filters.communication_lines = [
           { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
         ]
       }
