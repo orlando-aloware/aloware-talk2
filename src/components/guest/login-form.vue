@@ -307,12 +307,11 @@ export default {
 
     ...mapActions('contacts', [
       'setDefaultIsShortenedUrlRemembered'
-    ]),
+    ])
+  },
 
-    mounted () {
-      console.log('login-form mounted', this.$route.query.redirect)
-      this.hubspotWidget = this.$route.query.redirect === '/widgets/hubspot-call-extension'
-    }
+  mounted () {
+    this.hubspotWidget = this.$route.query.redirect === '/widgets/hubspot-call-extension'
   }
 }
 </script>
