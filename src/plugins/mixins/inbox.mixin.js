@@ -379,7 +379,7 @@ export default {
       if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {
           ...this.filters,
-          'last_engagement_at': [
+          'communication_created_at': [
             { value: [filter.from_date, filter.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
           ]
         }

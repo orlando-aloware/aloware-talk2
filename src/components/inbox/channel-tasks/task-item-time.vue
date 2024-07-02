@@ -44,7 +44,7 @@ export default {
       this.relativeDateTime = this.$options.filters.fixRelativeDatetimeFormat(this.fromTime)
     },
     getDateTimePassed () {
-      this.dateTimePassed = this.$options.filters.shortDateTimePassedLessThan(this.fromTime)
+      this.dateTimePassed = this.$options.filters.shortDateTimePassed(this.fromTime)
     }
   }
 }

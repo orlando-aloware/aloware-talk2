@@ -168,7 +168,7 @@ export const shortDateTimePassedLessThan = (dt, replaceAgo = true) => {
     if (dateTimePassed.text[1].trim() === unit.data.trim()) {
       dateTimePassed.text[1] = dateTimePassed.text[1].trim().replace(unit.data.trim(), units[unit.data])
       unit.cond = future[dateTimePassed.text[1]].max ? dateTimePassed.num < future[dateTimePassed.text[1]].max : true
-      dateTimePassed.text[0] = unit.cond ? `${dateTimePassed.num + 1}` : '1'
+      dateTimePassed.text[0] = unit.cond ? `${dateTimePassed.num}` : '1'
       dateTimePassed.text[1] = unit.cond ? dateTimePassed.text[1] : future[dateTimePassed.text[1]].unit
       break
     }
