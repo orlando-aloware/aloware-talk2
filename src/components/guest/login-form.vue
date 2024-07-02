@@ -310,6 +310,7 @@ export default {
     ]),
 
     mounted () {
+      console.log('mounted', this.$route.query.redirect)
       this.hubspotWidget = this.$route.query.redirect === '/widgets/hubspot-call-extension'
     }
   }
