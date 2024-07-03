@@ -335,7 +335,7 @@ export default {
       if (filter && filter?.ring_groups && filter.ring_groups.length) {
         this.filters = {
           ...this.filters,
-          'ring_groups': [
+          'communication_ring_groups': [
             { value: filter.ring_groups, operator: OPERATORS.IS_ANY_OF }
           ]
         }
