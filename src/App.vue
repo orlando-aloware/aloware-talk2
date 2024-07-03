@@ -26,7 +26,7 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-show="isLoggedIn"/>
-    <intercom v-if="isIntercomEnabled"/>
+    <intercom v-if="isIntercomEnabled && !isWidget"/>
   </div>
 </template>
 <script>
@@ -63,7 +63,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
 
-    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel']),
+    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)

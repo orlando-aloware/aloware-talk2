@@ -60,6 +60,7 @@
                flat
                class="contact-activities-actions__drawer_btn"
                data-testid="contact-activities-drawer-btn"
+               v-if='! isWidget'
                @click="$emit('toggleDrawer')">
           <information-circle-icon/>
         </q-btn>
@@ -67,6 +68,7 @@
                flat
                class="contact-activities-actions__mobile_btn"
                data-testid="contact-activities-details-mobile-btn"
+               v-if='! isWidget'
                @click="$emit('toggleDetails')">
           <information-circle-icon width="33"
                                    height="33"/>
@@ -217,7 +219,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['isMobile']),
+    ...mapState(['isMobile', 'isWidget']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
     resolveVariant () {
       switch (this.contact.task_status) {

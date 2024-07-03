@@ -48,6 +48,7 @@ export default function (/* { ssrContext } */) {
     },
 
     state: {
+      isWidget: false,
       showMenu: false,
       filter: {},
       tags: [],
@@ -300,6 +301,10 @@ export default function (/* { ssrContext } */) {
     },
 
     actions: {
+      setIsWidget ({ commit }, value) {
+        commit('SET_IS_WIDGET', value)
+      },
+
       setDialerToken ({ commit }, token) {
         commit('SET_DIALER_TOKEN', token)
       },
@@ -882,6 +887,10 @@ export default function (/* { ssrContext } */) {
     },
 
     mutations: {
+      SET_IS_WIDGET (state, value) {
+        state.isWidget = value
+      },
+
       SET_DIALER_TOKEN (state, token) {
         state.dialer.token = token
       },

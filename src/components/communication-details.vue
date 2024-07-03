@@ -1,7 +1,7 @@
 <template>
   <div v-if="communication" data-testid="comm-details-wrapper">
     <b-row data-testid="comm-details-row">
-      <b-col md="4"
+      <b-col :md="isWidget ? 12 : 4"
              sm="12"
              data-testid="comm-details-col"
              class="pl-0 pr-0">
@@ -1029,7 +1029,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions']),
+    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions', 'isWidget']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     usedCampaign () {
