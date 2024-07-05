@@ -1,9 +1,11 @@
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import * as AnswerTypes from '../../constants/answer-types'
 import _ from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
+  mixins: [aclMixin],
   computed: {
     ...mapState(['users']),
 
@@ -20,6 +22,31 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'setUsersIsLoading',
+      'setUsers'
+    ]),
+    getUsers () {
+      if (this.hasPermissionTo('list user')) {
+        this.setUsersIsLoading(true)
+
+        return this.$axios
+          .get('/api/v2/users', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setUsers(res.data)
+            this.setUsersIsLoading(false)
+
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+
+            return Promise.reject()
+          })
+      }
+    },
     getUser (id) {
       const users = _.get(this, 'users', null)
 
