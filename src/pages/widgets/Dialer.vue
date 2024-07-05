@@ -35,7 +35,6 @@ import { timezoneCheckMixin, helperMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'Dialer',
-
   components: { Webrtc },
 
   mixins: [ timezoneCheckMixin, helperMixin ],
