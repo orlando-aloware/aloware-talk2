@@ -29,7 +29,6 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import CallingExtensions from '@hubspot/calling-extensions-sdk'
 import Webrtc from 'components/webrtc'
-import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { timezoneCheckMixin, helperMixin } from 'src/plugins/mixins'
 
@@ -144,25 +143,9 @@ export default {
     ...mapActions('cache', ['setCurrentCompany']),
 
     init () {
-      if (this.apiKey) {
-        storage.local.setItem('api_token', this.apiKey)
-      }
-      this.loading = true
-      this.check().then((res) => {
-        if (!this.needsExtensions) {
-          storage.local.setItem('company_id', res.data.user.company.id)
-          this.setCurrentCompany(res.data.user.company)
-          this.resetVuex(['all'])
-        }
-        this.loading = false
-        this.initialized = true
-        this.handleUserLogin()
-      }).catch((err) => {
-        console.log('Error: api key is not valid', err)
-        this.$handleErrors(err.response)
-        this.loading = false
-        this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
-      })
+      this.loading = false
+      this.initialized = true
+      this.handleUserLogin()
     },
 
     setContactDetails (contact) {
