@@ -50,7 +50,10 @@ export default {
   },
 
   data () {
-    return {}
+    return {
+      mainListeners: {},
+      isMainEventsStarted: false
+    }
   },
 
   computed: {
@@ -69,6 +72,30 @@ export default {
       'updateUserStatus'
     ]),
 
+    initAuth () {
+      this.broadcastInit()
+
+      this.getDispositionStatuses()
+      this.getCallDispositions()
+      this.getActivityTypes()
+      this.getTemplates()
+      this.getCampaigns()
+    },
+
+    startMainEvents () {
+      this.$VueEvent.listen('agent_status_updated', this.mainListeners.agentStatusUpdated)
+    },
+
+    stopMainEvents () {
+      this.$VueEvent.stop('agent_status_updated', this.mainListeners.agentStatusUpdated)
+    },
+
+    unsubscribeFromPusher () {
+      if (this.authenticated) {
+        this.broadcastLeave()
+      }
+    },
+
     handleChangeCampaignId (campaignId) {
       this.$emit('changeCampaignId', campaignId)
     },
@@ -82,8 +109,32 @@ export default {
     }
   },
 
+  created () {
+    this.initAuth()
+
+    this.mainListeners.agentStatusUpdated = (event) => {
+      this.updateUserStatus(event)
+
+      if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
+        this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
+        this.setAgentStatus(event.agent_status)
+        console.log('Changed agent status [event]: ', event.agent_status)
+      }
+    }
+
+    if (!this.isMainEventsStarted) {
+      this.isMainEventsStarted = true
+      this.startMainEvents()
+    }
+  },
+
   mounted () {
     this.$VueEvent.fire('showLoadingPhone')
+  },
+
+  beforeDestroy () {
+    this.stopMainEvents()
+    this.unsubscribeFromPusher()
   }
 }
 </script>

@@ -67,7 +67,7 @@
                   :breakpoint="0"
                   :width="64"
                   v-model="sidebarVisible"
-                  v-if="authenticated && !suspended && !isWidget">
+                  v-if="authenticated && !suspended">
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
@@ -85,7 +85,7 @@
                   :class="mobilePhoneDrawerClass"
                   :breakpoint="789"
                   v-model="mobilePhoneDrawer"
-                  v-if="authenticated && !suspended && !isWidget"
+                  v-if="authenticated && !suspended"
                   @hide="onCloseMobilePhone">
           <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
                     v-if="!isPhoneVisible && isMobile">
@@ -244,8 +244,7 @@ import {
   simpsocialMixin,
   userMixin,
   settingsMixin,
-  broadcastsMixin,
-  dialerDataMixin
+  broadcastsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -292,13 +291,7 @@ import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 
 export default {
   name: 'MyLayout',
-  props: {
-    api_key: {
-      type: String,
-      required: false,
-      default: null
-    }
-  },
+
   components: {
     MobileLiveCallBar,
     DialerForm,
@@ -332,8 +325,7 @@ export default {
     simpsocialMixin,
     userMixin,
     settingsMixin,
-    broadcastsMixin,
-    dialerDataMixin
+    broadcastsMixin
   ],
 
   data () {
@@ -341,14 +333,19 @@ export default {
       loading: true,
       loadingCampaigns: false,
       loadingRingGroups: false,
+      loadingUsers: false,
       loadingTags: false,
       loadingWorkflows: false,
+      loadingDispositionStatuses: false,
+      loadingCallDispositionStatuses: false,
+      loadingActivityTypes: false,
       loadingScripts: false,
       loadingTemplates: false,
       loadingBroadcasts: false,
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       loadingLeadSources: false,
+      isWidget: false,
       transitionName: null,
       prevHeight: 0,
       push: null,
@@ -405,8 +402,7 @@ export default {
       'isIntroVideoVisible',
       'showedKycDialog',
       'showedKycReloadDialog',
-      'statics',
-      'isWidget'
+      'statics'
     ]),
 
     ...mapState('auth', [
@@ -582,10 +578,6 @@ export default {
   },
 
   created () {
-    if (this.api_key) {
-      localStorage.setItem('api_token', this.api_key)
-    }
-
     this.showMobileFooter = this.isMobile
     this.checkDebounce = _.debounce(this.check, 1000)
 
@@ -1608,6 +1600,33 @@ export default {
         })
     },
 
+    getCampaigns () {
+      if (this.hasPermissionTo('list campaign')) {
+        this.loadingCampaigns = true
+
+        return this.$axios
+          .get('/api/v1/campaign', {
+            mode: 'no-cors',
+            params: {
+              is_lite: true
+            }
+          })
+          .then((res) => {
+            this.setCampaigns(res.data)
+            this.loadingCampaigns = false
+            this.setCampaignsIsLoading(false)
+
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingCampaigns = false
+
+            return Promise.reject()
+          })
+      }
+    },
+
     getRingGroups () {
       if (this.hasPermissionTo('list ring group')) {
         this.loadingRingGroups = true
@@ -1625,6 +1644,31 @@ export default {
           .catch((err) => {
             console.log(err)
             this.loadingRingGroups = false
+
+            return Promise.reject()
+          })
+      }
+    },
+
+    getUsers () {
+      if (this.hasPermissionTo('list user')) {
+        this.loadingUsers = true
+        this.setUsersIsLoading(true)
+
+        return this.$axios
+          .get('/api/v2/users', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setUsers(res.data)
+            this.loadingUsers = false
+            this.setUsersIsLoading(false)
+
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingUsers = false
 
             return Promise.reject()
           })
@@ -1663,6 +1707,64 @@ export default {
           return Promise.reject()
         })
       }
+    },
+
+    getDispositionStatuses () {
+      if (this.hasPermissionTo('list disposition status')) {
+        this.loadingDispositionStatuses = true
+
+        return this.$axios
+          .get('/api/v1/disposition-status')
+          .then((res) => {
+            this.setDispositionStatuses(res.data)
+            this.loadingDispositionStatuses = false
+
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingDispositionStatuses = false
+
+            return Promise.reject()
+          })
+      }
+    },
+
+    getCallDispositions () {
+      if (this.hasPermissionTo('list disposition status')) {
+        this.loadingCallDispositionStatuses = true
+
+        return this.$axios
+          .get('/api/v1/call-disposition')
+          .then((res) => {
+            this.setCallDispositions(res.data)
+            this.loadingCallDispositionStatuses = false
+
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingCallDispositionStatuses = false
+
+            return Promise.reject()
+          })
+      }
+    },
+
+    getActivityTypes () {
+      this.loadingActivityTypes = true
+      return this.$axios
+        .get('/api/v1/activity-types').then(res => {
+          this.setActivityTypes(res.data)
+          this.loadingActivityTypes = false
+
+          return Promise.resolve()
+        }).catch(err => {
+          console.log(err)
+          this.loadingActivityTypes = false
+
+          return Promise.reject()
+        })
     },
 
     getTemplates () {

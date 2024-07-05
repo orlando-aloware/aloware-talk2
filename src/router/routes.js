@@ -474,36 +474,27 @@ const routes = [
           isGuest: true
         },
         component: AccountRegistration
-      },
-      // Dialer Widget (Browser / Apps)
-      {
-        name: 'Dialer Widget (API)',
-        path: '/widgets/dialer/api_key/:api_key',
-        props: true,
-        meta: {
-          isWidget: true
-        },
-        component: Dialer
-      },
-      {
-        name: 'Dialer Widget',
-        path: '/widgets/dialer',
-        props: true,
-        meta: {
-          isWidget: true
-        },
-        component: Dialer
-      },
-      {
-        name: 'Hubspot Call Extension',
-        path: '/widgets/hubspot-call-extension',
-        props: true,
-        meta: {
-          isWidget: true
-        },
-        component: Dialer
       }
     ]
+  },
+  // Dialer Widget (Browser / Apps)
+  {
+    name: 'Dialer Widget (API)',
+    path: '/widgets/dialer/api_key/:apiKey',
+    props: true,
+    component: Dialer
+  },
+  {
+    name: 'Dialer Widget',
+    path: '/widgets/dialer',
+    props: true,
+    component: Dialer
+  },
+  {
+    name: 'Hubspot Call Extension',
+    path: '/widgets/hubspot-call-extension',
+    props: true,
+    component: Dialer
   },
   // Always leave this as last one,
   // but you can also remove it
