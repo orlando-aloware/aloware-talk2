@@ -930,13 +930,14 @@
           </q-card-section>
         </q-card>
       </b-col>
-      <b-col md="8"
+      <b-col :md="isWidget ? 12 : 8"
              class="pr-0 ring-group-snapshot-wrapper"
              data-testid="comm-details-col"
              v-if="communication && communication.type === CommunicationTypes.CALL">
-        <ring-group-snapshot :communication="communication"
+        <ring-group-snapshot data-testid="comm-details-ring-group-snapshot"
+                             :communication="communication"
                              :ring-group="usedRingGroup"
-                             data-testid="comm-details-ring-group-snapshot"/>
+                             v-if="usedRingGroup"/>
       </b-col>
     </b-row>
   </div>
