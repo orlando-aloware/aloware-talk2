@@ -154,7 +154,7 @@
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
-                            :label="tagsFilterLabel">
+                            label="Tabs">
                 <entity-tags ref="tagSelector"
                              data-testid="communication-tags-multi-select"
                              entity="contact"
@@ -513,12 +513,8 @@ export default {
       return smsChannels.includes(this.$route.params.channel)
     },
 
-    tagsFilterLabel () {
-      return this.isInbox ? 'Contact Tags' : 'Tags'
-    },
-
     tagsFilterCategory () {
-      return this.isInboxOrInboxViews ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
+      return TagCategories.CAT_COMMUNICATIONS
     },
 
     isInboxOrInboxViews () {

@@ -382,7 +382,7 @@ export default {
       if (filter && !isEmpty(filter.tags)) {
         this.filters = {
           ...this.filters,
-          'tags': [
+          'communication_tags': [
             { value: filter.tags, operator: OPERATORS.IS_ANY_OF }
           ]
         }
