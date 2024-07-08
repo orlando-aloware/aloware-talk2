@@ -147,7 +147,7 @@
                 <q-item-label>Contact: </q-item-label>
               </b-col>
               <b-col>
-                <router-link :to="{ name: 'Contact', params: { id: communication.contact.id }}"
+                <router-link :to="getContactRouteLink(communication)"
                              data-testid="comm-details-contact-router-link">
                   {{ communication.contact.name | fixContactName }}
                 </router-link>
@@ -1119,6 +1119,13 @@ export default {
   },
 
   methods: {
+    getContactRouteLink (communication) {
+      if (this.isWidget) {
+        return { name: 'Texting Widget (unknown-user)', params: { id: communication.contact.id } }
+      }
+
+      return { name: 'Contact', params: { id: communication.contact.id } }
+    },
     getCampaign (id) {
       if (!id) {
         return null
