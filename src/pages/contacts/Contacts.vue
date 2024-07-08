@@ -8,7 +8,7 @@
     </div>
     <contact-list-sidebar ref="contactListSidebar"
                           :isLoadingMore="isLoadingMore"
-                          v-if="$route.name === 'Contact' && ! isWidget"
+                          v-if="$route.name === 'Contact' && !isWidget"
                           @toggleContactActivities="toggleContactListSidebar"
                           @contactSelected="onContactSelected"/>
     <div class="px-0 mb-0 main flex-1"

@@ -72,7 +72,7 @@
       </div>
     </div>
     <div class="composer-footer d-flex justify-content-between pt-1"
-         :class='isWidget ? "is-widget": ""'>
+         :class="isWidget ? 'is-widget' : ''">
       <div class="phone-lines-left d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
         <contact-phone-number-selector v-if="contact"
