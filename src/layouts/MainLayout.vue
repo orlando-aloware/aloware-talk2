@@ -291,6 +291,7 @@ import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 
 export default {
   name: 'MyLayout',
+
   props: {
     api_key: {
       type: String,
@@ -298,6 +299,7 @@ export default {
       default: null
     }
   },
+
   components: {
     MobileLiveCallBar,
     DialerForm,
