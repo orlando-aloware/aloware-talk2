@@ -366,7 +366,6 @@ import CommunicationInfo from 'components/communication-info'
 import Avatar from 'components/avatar'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import DownloadButton from 'components/download-button'
-import talk2Api from 'src/plugins/api/api'
 import { CREATOR_TYPE_MANUAL } from 'src/constants/creator-types'
 
 export default {
