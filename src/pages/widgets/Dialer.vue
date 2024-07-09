@@ -11,7 +11,7 @@
       <p>Please close this window or click the back button to continue.</p>
     </div>
     <webrtc
-      :carrierName="profile.carrier_name"
+      :carrierName="authProfile.carrier_name"
       :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import CallingExtensions from '@hubspot/calling-extensions-sdk'
 import Webrtc from 'components/webrtc'
@@ -53,7 +53,6 @@ export default {
       needsExtensions: false,
       extensionsInitialized: false,
       extensionsVisibility: false,
-      phoneNumber: null,
       extensions: null,
       timeout: null,
       showAlertAgentOnCall: false,
@@ -75,17 +74,17 @@ export default {
             this.extensions.initialized(payload)
             this.extensionsInitialized = true
           },
-          onDialNumber: event => {
+          onDialNumber: (event) => {
             if (event.phone_number) {
-              this.phoneNumber = event.phone_number
+              this.setPhoneNumber(event.phone_number)
               if (this.timeout) {
                 clearTimeout(this.timeout)
               }
               this.handleDialNumber(event.phone_number)
             }
           },
-          onVisibilityChanged: data => {
-            this.extensionsVisibility = !data.isHidden
+          onVisibilityChanged: (data) => {
+            this.extensionsVisibility = !data?.isHidden
           }
         }
       },
@@ -96,20 +95,24 @@ export default {
       campaignId: null,
       defaultOutboundCampaignId: null,
       previousOutboundCallingMode: null,
-      showAlertCallFinished: false
+      showAlertCallFinished: false,
+      authProfile: null
     }
   },
   computed: {
-    ...mapGetters('auth', ['authenticated', 'profile']),
-    ...mapState('cache', ['currentCompany']),
+    // ...mapGetters('auth', ['authenticated', 'profile']),
+    ...mapState('cache', ['currentCompany', 'phoneNumber']),
+    ...mapState('auth', ['authenticated', 'profile']),
+    ...mapState(['isWidget']),
 
     allowed () {
-      return this.profile && this.initialized
+      return this.authProfile && this.initialized
     }
   },
 
   created () {
     this.$root.$data.is_widget = true
+
     if (this.$route.query.small) {
       this.small = true
     }
@@ -139,8 +142,16 @@ export default {
       check: 'check',
       clear: 'clear'
     }),
-    ...mapActions(['resetVuex']),
-    ...mapActions('cache', ['setCurrentCompany']),
+
+    ...mapActions([
+      'resetVuex',
+      'setIsWidget'
+    ]),
+
+    ...mapActions('cache', [
+      'setCurrentCompany',
+      'setPhoneNumber'
+    ]),
 
     init () {
       if (this.apiKey) {
@@ -153,6 +164,7 @@ export default {
           this.setCurrentCompany(res.data.user.company)
           this.resetVuex(['all'])
         }
+        this.authProfile = res.data.user
         this.loading = false
         this.initialized = true
         this.handleUserLogin()
@@ -193,20 +205,24 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
-      if (this.needsExtensions && this.extensionsInitialized && this.initialized) {
+      if (!this.phoneNumber && phoneNumber) {
+        this.setPhoneNumber(phoneNumber)
+      }
+
+      if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile) {
         this.extensionsVisibility = true
-        this.phoneNumber = phoneNumber
-        const contact = await this.searchContact(phoneNumber)
+        const contact = await this.searchContact(this.phoneNumber)
+
         if (contact) {
           this.setContactDetails(contact)
           this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
           this.handleCall()
         }
-      } else if (this.needsExtensions && this.extensionsInitialized && !this.initialized) {
-        this.timeout = setTimeout(() => {
-          console.log('Retry calling ' + phoneNumber)
+      } else if (!this.authProfile) {
+        this.timeout = setTimeout(async () => {
+          await this.init()
           this.handleDialNumber(phoneNumber)
-        }, 250)
+        }, 3000)
       }
     },
 
@@ -234,13 +250,17 @@ export default {
       this.campaignId = campaignId
     },
 
-    handleCall () {
+    handleCall (shouldHandleDialNumber) {
       const contactData = {
         timezone: this.contactTimezone,
         name: this.contactName
       }
 
       this.checkContactTimezone(contactData, this.makeCall)
+
+      if (shouldHandleDialNumber) {
+        this.handleDialNumber(this.phoneNumber)
+      }
     },
 
     handleAgentStatusUpdate (data) {
@@ -273,36 +293,41 @@ export default {
 
     findDefaultOutboundCampaign () {
       if (this.previousOutboundCallingMode &&
-        this.profile &&
-        this.previousOutboundCallingMode === this.profile.outbound_calling_mode &&
+        this.authProfile &&
+        this.previousOutboundCallingMode === this.authProfile?.outbound_calling_mode &&
         this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
         return
       }
 
-      this.previousOutboundCallingMode = this.profile.outbound_calling_mode
-      this.campaignId = null
-      this.defaultOutboundCampaignId = null
+      this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
 
       // 1. [Account level] force outbound line on all users
       if (this.currentCompany && this.currentCompany.force_outbound_line) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
-        this.campaignId = this.defaultOutboundCampaignId
+        if (this.defaultOutboundCampaignId) {
+          this.campaignId = this.defaultOutboundCampaignId
+        }
 
         return
       }
 
       // 2. [User level] Outbound line is set to follow account default
-      if (this.currentCompany && this.profile && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
+      if (this.currentCompany && this.authProfile && this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.authProfile.default_outbound_campaign_id) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
-        this.campaignId = this.defaultOutboundCampaignId
+        if (this.defaultOutboundCampaignId) {
+          this.campaignId = this.defaultOutboundCampaignId
+        }
 
         return
       }
 
       // 3. [User level] user has a default outbound line
-      if (this.profile && this.profile.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
-        this.defaultOutboundCampaignId = this.profile.default_outbound_campaign_id
-        this.campaignId = this.defaultOutboundCampaignId
+      if (this.authProfile && this.authProfile.default_outbound_campaign_id && this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+        this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
+
+        if (this.defaultOutboundCampaignId) {
+          this.campaignId = this.defaultOutboundCampaignId
+        }
       }
 
       // 4. We couldn't find anything
@@ -312,17 +337,15 @@ export default {
   watch: {
     initialized () {
       if (this.initialized) {
-        if (this.profile.company_id === 119) {
+        if (this.authProfile.company_id === 119) {
           document.domain = 'justpressone.com'
         }
       }
     },
 
     extensionsVisibility () {
-      console.log('Extension visibility: ' + this.extensionsVisibility)
-
       if (this.extensionsVisibility) {
-        this.showAlertAgentOnCall = this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+        this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
         this.findDefaultOutboundCampaign()
       } else {
         this.defaultOutboundCampaignId = null
@@ -331,15 +354,14 @@ export default {
       }
     },
 
-    'profile': {
-      deep: true,
-      handler: function () {
-        if (!this.previousOutboundCallingMode) {
-          this.previousOutboundCallingMode = this.profile.outbound_calling_mode
-        }
-
-        this.findDefaultOutboundCampaign()
+    authProfile () {
+      if (!this.previousOutboundCallingMode) {
+        this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
       }
+
+      this.campaignId = null
+      this.defaultOutboundCampaignId = null
+      this.findDefaultOutboundCampaign()
     }
   }
 }
