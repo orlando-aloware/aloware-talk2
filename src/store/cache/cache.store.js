@@ -1,6 +1,7 @@
 export default function () {
   return {
     currentCompany: null,
-    timezones: []
+    timezones: [],
+    phoneNumber: null
   }
 }
