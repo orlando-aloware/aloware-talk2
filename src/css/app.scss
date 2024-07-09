@@ -9157,7 +9157,7 @@ screen and (max-width: 956px) {
   .inbox {
     .inbox-details {
       .contact-activity-container {
-        .composer-footer {
+        .composer-footer:not(.is-widget) {
           flex-direction: column;
 
           .inline-select.q-select--with-input {
@@ -9190,7 +9190,7 @@ screen and (max-width: 956px) {
 @media (max-width: 1220px) and (min-width: 1085px) {
   .contact-page {
     .contact-activity-container {
-      .composer-footer {
+      .composer-footer:not(.is-widget) {
         flex-direction: column;
 
         .inline-select.q-select--with-input {
@@ -9221,7 +9221,37 @@ screen and (max-width: 956px) {
 
 @media (max-width: 956px) {
   .contact-activity-container {
-    .composer-footer {
+    .composer-footer:not(.is-widget) {
+      flex-direction: column;
+
+      .inline-select.q-select--with-input {
+        min-width: unset;
+      }
+
+      & > div {
+        width: auto !important;
+        height: 24px;
+
+        > div {
+          float: none !important;
+
+          .q-field__append {
+            align-items: center;
+            height: 29px !important;
+          }
+        }
+      }
+
+      .q-field__control {
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+@media (max-width: 650px) {
+  .contact-activity-container {
+    .composer-footer.is-widget {
       flex-direction: column;
 
       .inline-select.q-select--with-input {
@@ -14860,6 +14890,52 @@ thead.conflicted-contact-thead-class tr th {
   background-color: #161922;
   color: #fff;
   font-size: 12px;
+}
+
+.custom-date-time-picker{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+#start-date-time-picker-wrapper, #end-date-time-picker-input{
+  margin-right: 5px;
+}
+
+#start-date-time-picker-input, #end-date-time-picker-input{
+  min-height: 32px;
+  height: 32px;
+  border-radius: 24px;
+}
+
+label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input"] {
+  top: -4px !important;
+}
+
+.btn-custom-date{
+  display: flex;
+}
+
+.btn-custom-date .btn-apply{
+  margin-right: 10px;
+}
+
+.time-picker-column{
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .custom-date-time-picker{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  #start-date-time-picker-input, #end-date-time-picker-input{
+    margin-bottom: 10px;
+  }
 }
 
 .power-dialer-session-toggle-button {
