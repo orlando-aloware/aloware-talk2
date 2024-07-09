@@ -9,5 +9,9 @@ export default {
 
   setTimezones ({ commit }, value) {
     commit('SET_TIMEZONES', value)
+  },
+
+  setPhoneNumber ({ commit }, value) {
+    commit('SET_PHONE_NUMBER', value)
   }
 }
