@@ -1,6 +1,7 @@
 <template>
   <div>
-    <phone :is_widget='isWidget' @callCompleted="handleCallCompleted" />
+    <phone :is_widget='isWidget'
+           @callCompleted="handleCallCompleted" />
     <dialer />
     <select-campaign-dialog :show="showSelectCampaignDialog"
                             :campaignId="campaignId"
@@ -101,7 +102,7 @@ export default {
     },
 
     handleCall (campaignId) {
-      this.$emit('handleCall')
+      this.$emit('handleCall', true)
     },
 
     handleCallCompleted () {
