@@ -901,9 +901,7 @@ export default {
           attachments: this.communication.attachments,
           gif: ''
         }
-      ).then(response => {
-        this.$generalNotification('Message sent')
-      }).catch(error => {
+      ).catch(error => {
         console.log(error)
         this.$handleErrors(error.response)
       }).finally(() => {
