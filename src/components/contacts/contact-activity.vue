@@ -262,15 +262,6 @@
           - {{ communication.creator_type | translateCreatorType }}
         </span>
 
-        <span href="#"
-           class="text-sm text-primary cursor-pointer"
-           v-if="communication.direction === CommunicationDirection.OUTBOUND &&
-              [CommunicationTypes.SMS].includes(communication.type) &&
-              communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW &&
-              isRetryingSendSmsEnabled"
-           @click="retrySendingSms">
-          {{ isRetryingSendSms ? 'Retrying...' : 'Retry?' }}
-        </span>
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND &&
               [CommunicationTypes.SMS].includes(communication.type) &&
@@ -411,8 +402,6 @@ export default {
 
   data () {
     return {
-      isRetryingSendSms: false,
-      isRetryingSendSmsEnabled: false,
       datetimePassed: null,
       relativeDatetime: null,
       excluded_audits: [
@@ -887,26 +876,6 @@ export default {
 
     isAttachmentApplication (mimeType) {
       return mimeType.includes('application/')
-    },
-
-    retrySendingSms (e) {
-      e.preventDefault()
-      this.isRetryingSendSms = true
-      return talk2Api.V1.message.send(
-        {
-          body: this.communication.body,
-          contact_id: this.communication.contact_id,
-          campaign_id: this.communication.campaign_id,
-          phone_number: this.communication.lead_number,
-          attachments: this.communication.attachments,
-          gif: ''
-        }
-      ).catch(error => {
-        console.log(error)
-        this.$handleErrors(error.response)
-      }).finally(() => {
-        this.isRetryingSendSms = false
-      })
     },
 
     getNotesBottomLabel () {

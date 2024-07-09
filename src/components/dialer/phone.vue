@@ -2370,6 +2370,7 @@ export default {
         this.template = null
         this.templateId = null
         this.loadingSendMessage = false
+        this.$generalNotification('Message sent')
       }).catch(err => {
         console.log(err)
       }).finally(_ => {

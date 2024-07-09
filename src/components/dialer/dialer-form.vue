@@ -564,6 +564,7 @@ export default {
       }).then(res => {
         this.isSending = false
         this.hideDialer()
+        this.$generalNotification('Message sent')
 
         if (!this.isMobile) {
           this.$router.push({
