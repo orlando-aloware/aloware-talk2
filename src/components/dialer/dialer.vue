@@ -65,6 +65,8 @@ export default {
 
     ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
 
+    ...mapState(['isWidget']),
+
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
         !['connected', 'open'].includes(this.dialer.call.state)
@@ -80,6 +82,10 @@ export default {
 
     hasCallInProgressNoParkedCall () {
       return !this.dialer.parkedCall && this.dialer.call
+    },
+
+    shouldPushPhoneRoute () {
+      return (this.isMobile && !this.isWidget) && this.$route.name !== 'Phone'
     }
   },
 
@@ -633,7 +639,7 @@ export default {
         return
       }
 
-      if (this.isMobile && this.$route.name !== 'Phone') {
+      if (this.shouldPushPhoneRoute) {
         this.$router.push({
           name: 'Phone'
         })
@@ -789,7 +795,7 @@ export default {
       }
 
       if (this.connection) {
-        if (this.isMobile && this.$route.name !== 'Phone') {
+        if (this.shouldPushPhoneRoute) {
           this.$router.push({
             name: 'Phone'
           })
@@ -1495,7 +1501,7 @@ export default {
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
       this.setShowIncomingCallNotification(false)
 
-      if (this.isMobile && this.$route.name !== 'Phone') {
+      if (this.shouldPushPhoneRoute) {
         this.$router.push({
           name: 'Phone'
         })
