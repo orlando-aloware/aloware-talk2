@@ -71,7 +71,9 @@ export default {
   watch: {
     show (val) {
       console.log('selectCampaignDialog show watch: ', val)
-      this.visible = val
+      if (!this.isAgentOnCall()) {
+        this.visible = val
+      }
 
       this.campaignId = null
     }
