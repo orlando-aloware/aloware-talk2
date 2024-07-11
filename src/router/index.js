@@ -42,7 +42,8 @@ export default function ({ store }) {
     next()
     for (const route of to.matched) {
       // Check if the route is a widget
-      if (route.meta.isWidget) {
+      console.log('beforeEach route -->', route)
+      if (route?.meta?.isWidget) {
         store.commit('SET_IS_WIDGET', true)
         break // Stop the loop if isWidget is found
       }
