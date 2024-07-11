@@ -235,6 +235,8 @@ export default {
     },
 
     handleCall () {
+      console.log('Dialer handleCall this.campaignId ', this.campaignId)
+
       const contactData = {
         timezone: this.contactTimezone,
         name: this.contactName
@@ -258,6 +260,7 @@ export default {
     },
 
     makeCall () {
+      console.log('Dialer makeCall this.campaignId ', this.campaignId)
       if (this.callDisabled || this.campaignId === null) {
         return
       }
