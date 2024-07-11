@@ -10,12 +10,12 @@
       <hr>
       <p>Please close this window or click the back button to continue.</p>
     </div>
+      <!-- v-else-if="allowed" -->
     <webrtc
       :carrierName="authProfile.carrier_name"
       :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
-      v-else-if="allowed"
       @callConnected="handleCallConnectedEvent"
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
