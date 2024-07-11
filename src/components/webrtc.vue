@@ -97,10 +97,17 @@ export default {
     },
 
     handleChangeCampaignId (campaignId) {
+      console.log('webrtc handleChangeCampaignId campaignId: ', campaignId)
+      console.log('webrtc handleChangeCampaignId this.campaignId ', this.campaignId)
+      console.log('webrtc handleChangeCampaignId this.showSelectCampaignDialog ', this.showSelectCampaignDialog)
+      this.campaignId = campaignId
       this.$emit('changeCampaignId', campaignId)
     },
 
     handleCall (campaignId) {
+      console.log('webrtc handleCall campaignId: ', campaignId)
+      console.log('webrtc handleCall this.campaignId ', this.campaignId)
+      console.log('webrtc handleCall this.showSelectCampaignDialog ', this.showSelectCampaignDialog)
       this.$emit('handleCall')
     },
 
