@@ -1700,25 +1700,23 @@ export default {
     },
 
     shouldShow () {
-      // const callFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
+      const callFishingCommunication = _.get(this.dialer, 'callFishing.communication', null)
 
-      // if (callFishingCommunication) {
-      //   return true
-      // }
+      if (callFishingCommunication) {
+        return true
+      }
 
-      // if (this.dialer.call && this.dialer.call.direction === 'INCOMING' &&
-      //   this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' &&
-      //   this.showIncomingCallNotification) {
-      //   return false
-      // }
+      if (this.dialer.call && this.dialer.call.direction === 'INCOMING' &&
+        this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' &&
+        this.showIncomingCallNotification) {
+        return false
+      }
 
-      // if (['menu', 'wrap-up'].includes(this.screen)) {
-      //   return true
-      // }
+      if (['menu', 'wrap-up'].includes(this.screen)) {
+        return true
+      }
 
-      // return this.dialer && !_.isEmpty(this.dialer.communication)
-
-      return true
+      return this.dialer && !_.isEmpty(this.dialer.communication)
     },
 
     iconSizes () {
