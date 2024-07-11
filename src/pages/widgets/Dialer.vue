@@ -111,7 +111,7 @@ export default {
   },
 
   created () {
-    this.$root.$data.is_widget = true
+    this.setIsWidget(true)
 
     if (this.$route.query.small) {
       this.small = true
@@ -240,7 +240,7 @@ export default {
     },
 
     handleCallCompletedEvent () {
-      if (this.needsExtensions && this.extensionsInitialized) {
+      if (this.extensions) {
         this.extensions.callEnded()
         this.showAlertCallFinished = true
       }
