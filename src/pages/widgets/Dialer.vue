@@ -208,6 +208,7 @@ export default {
       if (!this.phoneNumber && phoneNumber) {
         this.setPhoneNumber(phoneNumber)
       }
+      // this.setPhoneNumber('+19403737418')
 
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile) {
         this.extensionsVisibility = true
@@ -221,7 +222,7 @@ export default {
       } else if (!this.authProfile) {
         this.timeout = setTimeout(async () => {
           await this.init()
-          this.handleDialNumber(phoneNumber)
+          this.handleDialNumber(this.phoneNumber)
         }, 3000)
       }
     },
