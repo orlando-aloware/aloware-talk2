@@ -210,9 +210,11 @@ export default {
       if (!this.phoneNumber && phoneNumber) {
         this.setPhoneNumber(phoneNumber)
       }
+
       // this.setPhoneNumber('+19403737418')
       // this.extensionsInitialized = true
       console.log('handleDialNumber', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
+
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady && this.campaignId !== null) {
         this.extensionsVisibility = true
         const contact = await this.searchContact(this.phoneNumber)
@@ -355,6 +357,7 @@ export default {
       if (this.extensionsVisibility) {
         this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
         this.findDefaultOutboundCampaign()
+        this.handleDialNumber(this.phoneNumber)
       } else {
         this.defaultOutboundCampaignId = null
         this.campaignId = null
@@ -369,18 +372,19 @@ export default {
 
       this.campaignId = null
       this.findDefaultOutboundCampaign()
-    },
-
-    defaultOutboundCampaignId: {
-      handler () {
-        console.log('defaultOutboundCampaignId', this.defaultOutboundCampaignId)
-        if (this.defaultOutboundCampaignId) {
-          this.campaignId = this.defaultOutboundCampaignId
-          this.handleDialNumber(this.phoneNumber)
-        }
-      },
-      immediate: true
+      this.handleDialNumber(this.phoneNumber)
     }
+
+    // defaultOutboundCampaignId: {
+    //   handler () {
+    //     console.log('defaultOutboundCampaignId', this.defaultOutboundCampaignId)
+    //     if (this.defaultOutboundCampaignId) {
+    //       this.campaignId = this.defaultOutboundCampaignId
+    //       this.handleDialNumber(this.phoneNumber)
+    //     }
+    //   },
+    //   immediate: true
+    // }
   }
 }
 </script>
