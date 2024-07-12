@@ -75,6 +75,8 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
+            console.log('onDialNumber', event)
+
             if (event.phone_number) {
               this.setPhoneNumber(event.phone_number)
               if (this.timeout) {
@@ -205,11 +207,12 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
-      if (!this.phoneNumber && phoneNumber) {
-        this.setPhoneNumber(phoneNumber)
-      }
-      // this.setPhoneNumber('+19403737418')
+      // if (!this.phoneNumber && phoneNumber) {
+      //   this.setPhoneNumber(phoneNumber)
+      // }
+      this.setPhoneNumber('+19403737418')
 
+      console.log('handleDialNumber', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady)
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady) {
         this.extensionsVisibility = true
         const contact = await this.searchContact(this.phoneNumber)
