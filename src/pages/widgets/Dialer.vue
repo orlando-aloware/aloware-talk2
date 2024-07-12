@@ -212,7 +212,7 @@ export default {
       }
       // this.setPhoneNumber('+19403737418')
       // this.extensionsInitialized = true
-      console.log('handleDialNumber', this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
+      console.log('handleDialNumber', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady && this.campaignId !== null) {
         this.extensionsVisibility = true
         const contact = await this.searchContact(this.phoneNumber)
