@@ -131,11 +131,11 @@ export default {
       this.extensionsVisibility = true
     }
 
+    console.log('Dialer created', this.extensions)
+
     if (!this.extensions) {
       this.extensions = new CallingExtensions(this.callSdkOptions)
     }
-
-    console.log('Dialer created', this.extensions)
   },
 
   async mounted () {
@@ -264,6 +264,11 @@ export default {
       if (this.needsExtensions && this.extensionsInitialized) {
         this.extensions.userLoggedIn()
       }
+
+      if (this.defaultOutboundCampaignId) {
+        this.campaignId = this.defaultOutboundCampaignId
+        this.handleDialNumber(this.phoneNumber)
+      }
     },
 
     handleCallConnectedEvent () {
@@ -335,36 +340,18 @@ export default {
 
       this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
 
-      // 1. [Account level] force outbound line on all users
       if (this.currentCompany && this.currentCompany.force_outbound_line) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
-        if (this.defaultOutboundCampaignId) {
-          this.campaignId = this.defaultOutboundCampaignId
-        }
-
-        return
-      }
-
-      // 2. [User level] Outbound line is set to follow account default
-      if (this.currentCompany && this.authProfile && this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.authProfile.default_outbound_campaign_id) {
+      } else if (this.currentCompany && this.authProfile && this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.authProfile.default_outbound_campaign_id) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
-        if (this.defaultOutboundCampaignId) {
-          this.campaignId = this.defaultOutboundCampaignId
-        }
-
-        return
-      }
-
-      // 3. [User level] user has a default outbound line
-      if (this.authProfile && this.authProfile.default_outbound_campaign_id && this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+      } else if (this.authProfile && this.authProfile.default_outbound_campaign_id && this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
         this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
-
-        if (this.defaultOutboundCampaignId) {
-          this.campaignId = this.defaultOutboundCampaignId
-        }
       }
 
-      // 4. We couldn't find anything
+      if (this.defaultOutboundCampaignId) {
+        this.campaignId = this.defaultOutboundCampaignId
+        this.handleDialNumber(this.phoneNumber)
+      }
     }
   },
 
@@ -389,7 +376,6 @@ export default {
     authProfile () {
       console.log('authProfile', this.authProfile)
       this.findDefaultOutboundCampaign()
-      this.handleDialNumber(this.phoneNumber)
     }
 
     // defaultOutboundCampaignId: {
