@@ -216,7 +216,7 @@ export default {
       console.log('handleDialNumber', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
 
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady && this.campaignId !== null) {
-        // this.extensionsVisibility = true
+        this.extensionsVisibility = true
         const contact = await this.searchContact(this.phoneNumber)
 
         if (contact) {
@@ -356,8 +356,7 @@ export default {
     extensionsVisibility () {
       if (this.extensionsVisibility) {
         this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-        this.findDefaultOutboundCampaign()
-        this.handleDialNumber(this.phoneNumber)
+        // this.findDefaultOutboundCampaign()
       } else {
         this.showAlertCallFinished = false
       }
@@ -368,6 +367,7 @@ export default {
         this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
       }
 
+      console.log('authProfile', this.authProfile)
       this.findDefaultOutboundCampaign()
       this.handleDialNumber(this.phoneNumber)
     }
