@@ -449,6 +449,7 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { inboxRoutesMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import moment from 'moment'
 
 export default {
   name: 'filter-form',
@@ -591,15 +592,13 @@ export default {
       },
       opens: 'right',
       ranges: {
-        'All Time': [null, null],
-        'Today': [window.moment()._d, window.moment()._d],
-        'Yesterday': [window.moment().subtract(1, 'day')._d, window.moment().subtract(1, 'day')._d],
-        'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
-        'This Month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
-        'Last 7 Days': [window.moment().subtract(7, 'day')._d, window.moment()._d],
-        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment()._d],
-        'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
-        'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
+        'Today': [this.parseDatePicker(moment().tz('Australia/Brisbane').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'Yesterday': [this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(1, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(1, 'days').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'Last 7 Days': [this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(7, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'Last 30 Days': [this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(30, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'This Month So Far': [this.parseDatePicker(moment().tz('Australia/Brisbane').startOf('month').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'Last Month': [this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(1, 'months').startOf('month').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(1, 'months').endOf('month').format('MM/DD/YYYY HH:mm:ss'))],
+        'All Time': [null, null]
       },
       rangePicker: null,
       TagCategories,
@@ -647,7 +646,7 @@ export default {
 
   filters: {
     date (date) {
-      return window.moment(date).format('MM/DD/YYYY')
+      return moment(date).format('MM/DD/YYYY')
     }
   },
 
@@ -681,6 +680,13 @@ export default {
 
     onPreliminarChange (tags) {
       this.setTags(tags)
+    },
+
+    parseDatePicker (date) {
+      if (!date) {
+        return null
+      }
+      return moment(date)._d
     }
   },
 
@@ -717,10 +723,10 @@ export default {
       deep: true,
       handler () {
         this.filter.from_date = this.dateRange.startDate
-          ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD')
+          ? moment(this.dateRange.startDate).format('YYYY-MM-DD HH:mm:ss')
           : null
         this.filter.to_date = this.dateRange.endDate
-          ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD')
+          ? moment(this.dateRange.endDate).format('YYYY-MM-DD HH:mm:ss')
           : null
       }
     },
