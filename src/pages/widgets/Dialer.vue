@@ -73,6 +73,7 @@ export default {
             }
             this.extensions.initialized(payload)
             this.extensionsInitialized = true
+            this.extensionsVisibility = true
           },
           onDialNumber: (event) => {
             console.log('onDialNumber', event)
@@ -359,8 +360,6 @@ export default {
         this.findDefaultOutboundCampaign()
         this.handleDialNumber(this.phoneNumber)
       } else {
-        this.defaultOutboundCampaignId = null
-        this.campaignId = null
         this.showAlertCallFinished = false
       }
     },
@@ -370,7 +369,6 @@ export default {
         this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
       }
 
-      this.campaignId = null
       this.findDefaultOutboundCampaign()
       this.handleDialNumber(this.phoneNumber)
     }
