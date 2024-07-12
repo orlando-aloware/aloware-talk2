@@ -70,7 +70,9 @@ export default {
 
   watch: {
     show (val) {
-      this.visible = val
+      if (!this.isAgentOnCall) {
+        this.visible = val
+      }
 
       this.campaignId = null
     }
