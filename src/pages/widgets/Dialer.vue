@@ -103,7 +103,7 @@ export default {
     // ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('cache', ['currentCompany', 'phoneNumber']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget']),
+    ...mapState(['isWidget', 'dialer']),
 
     allowed () {
       return this.authProfile && this.initialized
@@ -210,7 +210,7 @@ export default {
       }
       // this.setPhoneNumber('+19403737418')
 
-      if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile) {
+      if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady) {
         this.extensionsVisibility = true
         const contact = await this.searchContact(this.phoneNumber)
 
@@ -363,6 +363,13 @@ export default {
       this.campaignId = null
       this.defaultOutboundCampaignId = null
       this.findDefaultOutboundCampaign()
+    },
+
+    defaultOutboundCampaignId: {
+      handler () {
+        this.handleDialNumber(this.phoneNumber)
+      },
+      immediate: true
     }
   }
 }
