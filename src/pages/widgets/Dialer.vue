@@ -212,6 +212,7 @@ export default {
       }
       // this.setPhoneNumber('+19403737418')
 
+      console.log('handleDialNumber', this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady)
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady) {
         this.extensionsVisibility = true
         const contact = await this.searchContact(this.phoneNumber)
