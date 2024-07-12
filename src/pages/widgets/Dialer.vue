@@ -211,7 +211,7 @@ export default {
         this.setPhoneNumber(phoneNumber)
       }
       // this.setPhoneNumber('+19403737418')
-
+      // this.extensionsInitialized = true
       console.log('handleDialNumber', this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady && this.campaignId !== null) {
         this.extensionsVisibility = true
@@ -362,10 +362,6 @@ export default {
       }
     },
 
-    extensionsInitialized () {
-      this.handleDialNumber(this.phoneNumber)
-    },
-
     authProfile () {
       if (!this.previousOutboundCallingMode) {
         this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
@@ -374,6 +370,17 @@ export default {
       this.campaignId = null
       this.defaultOutboundCampaignId = null
       this.findDefaultOutboundCampaign()
+    },
+
+    defaultOutboundCampaignId: {
+      handler () {
+        console.log('defaultOutboundCampaignId', this.defaultOutboundCampaignId)
+        if (this.defaultOutboundCampaignId) {
+          this.campaignId = this.defaultOutboundCampaignId
+          this.handleDialNumber(this.phoneNumber)
+        }
+      },
+      immediate: true
     }
   }
 }
