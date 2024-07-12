@@ -86,6 +86,7 @@ export default {
             }
           },
           onVisibilityChanged: (data) => {
+            console.log('onVisibilityChanged', data)
             this.extensionsVisibility = !data?.isHidden
           }
         }
@@ -216,7 +217,6 @@ export default {
       console.log('handleDialNumber', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
 
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady && this.campaignId !== null) {
-        this.extensionsVisibility = true
         const contact = await this.searchContact(this.phoneNumber)
 
         if (contact) {
