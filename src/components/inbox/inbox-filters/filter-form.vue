@@ -154,7 +154,7 @@
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
-                            label="Tabs">
+                            label="Tags">
                 <entity-tags ref="tagSelector"
                              data-testid="communication-tags-multi-select"
                              entity="contact"
