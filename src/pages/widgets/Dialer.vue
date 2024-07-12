@@ -368,7 +368,6 @@ export default {
       }
 
       this.campaignId = null
-      this.defaultOutboundCampaignId = null
       this.findDefaultOutboundCampaign()
     },
 
