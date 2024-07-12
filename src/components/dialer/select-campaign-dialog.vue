@@ -70,8 +70,6 @@ export default {
 
   watch: {
     show (val) {
-      console.log('selectCampaignDialog show watch: ', val)
-      console.log('selectCampaignDialog show watch isAgentOnCall: ', this.isAgentOnCall)
       if (!this.isAgentOnCall) {
         this.visible = val
       }
@@ -81,13 +79,11 @@ export default {
   },
 
   mounted () {
-    console.log('selectCampaignDialog mounted this.show: ', this.show)
     this.visible = this.show
   },
 
   methods: {
     open () {
-      console.log('selectCampaignDialog open this.show: ', this.show)
       this.show = true
     },
 
@@ -96,7 +92,6 @@ export default {
     },
 
     onCallClick () {
-      console.log('selectCampaignDialog onCallClick campaignId: ', this.campaignId)
       this.$emit('change-campaign-id', this.campaignId)
 
       this.$emit('call', this.campaignId)
