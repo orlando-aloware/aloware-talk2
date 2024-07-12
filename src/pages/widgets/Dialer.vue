@@ -73,7 +73,6 @@ export default {
             }
             this.extensions.initialized(payload)
             this.extensionsInitialized = true
-            this.extensionsVisibility = true
           },
           onDialNumber: (event) => {
             console.log('onDialNumber', event)
@@ -217,7 +216,7 @@ export default {
       console.log('handleDialNumber', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
 
       if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady && this.campaignId !== null) {
-        this.extensionsVisibility = true
+        // this.extensionsVisibility = true
         const contact = await this.searchContact(this.phoneNumber)
 
         if (contact) {
