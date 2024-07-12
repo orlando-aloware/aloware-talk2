@@ -68,6 +68,30 @@
                     <span class="data-icon-label">Phone: </span>
                     <span class="data-value">{{ integrationData.phone }}</span>
                 </p>
+                <p class="mb-0"
+                    data-testid="integration-salesforce-phone"
+                    v-if="integrationData.fax">
+                    <span class="data-icon-label">Fax: </span>
+                    <span class="data-value">{{ integrationData.fax }}</span>
+                </p>
+                <p class="mb-0"
+                    data-testid="integration-salesforce-phone"
+                    v-if="integrationData.mobile_phone">
+                    <span class="data-icon-label">Mobile Phone: </span>
+                    <span class="data-value">{{ integrationData.mobile_phone }}</span>
+                </p>
+                <p class="mb-0"
+                    data-testid="integration-salesforce-phone"
+                    v-if="integrationData.home_phone">
+                    <span class="data-icon-label">Home Phone: </span>
+                    <span class="data-value">{{ integrationData.home_phone }}</span>
+                </p>
+                <p class="mb-0"
+                    data-testid="integration-salesforce-phone"
+                    v-if="integrationData.other_phone">
+                    <span class="data-icon-label">Other Phone: </span>
+                    <span class="data-value">{{ integrationData.other_phone }}</span>
+                </p>
             </q-card-section>
         </q-card>
     </div>

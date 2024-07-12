@@ -589,7 +589,6 @@ export default {
       return talk2Api.V1.message.send(message)
         .then(response => {
           this.resetMessageComposerSms()
-          this.$generalNotification('Message sent')
         }).catch(error => {
           console.log(error)
           this.$handleErrors(error.response)

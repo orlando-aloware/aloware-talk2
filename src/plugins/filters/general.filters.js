@@ -510,27 +510,20 @@ const fixPhone = (
     phoneNumber = phoneNumber.substring(0, pos).trim()
   }
 
-  if (phoneNumber.toString().length <= 9) {
-    switch (phoneNumber.toString().length) {
-      case 5:
-      case 6:
-        // Get an instance of ShortNumberInfo
-        const shortInfo = googlePhone.ShortNumberInfo.getInstance()
+  if ([5, 6].includes(phoneNumber.toString().length)) {
+    // Get an instance of ShortNumberInfo
+    const shortInfo = googlePhone.ShortNumberInfo.getInstance()
 
-        try {
-          // Parse number with US country code and keep raw input
-          const number = window.phoneUtil.parseAndKeepRawInput(phoneNumber.toString(), 'US')
+    try {
+      // Parse number with US country code and keep raw input
+      const number = window.phoneUtil.parseAndKeepRawInput(phoneNumber.toString(), 'US')
 
-          if (shortInfo.isValidShortNumberForRegion(number, 'US')) {
-            return phoneNumber.toString()
-          }
-        } catch (err) {
-          return false
-        }
+      if (shortInfo.isValidShortNumberForRegion(number, 'US')) {
+        return phoneNumber.toString()
+      }
+    } catch (err) {
+      // Ignore and move on
     }
-
-    // fallback
-    return false
   }
 
   const locale = window.guessLocale(phoneNumber)
