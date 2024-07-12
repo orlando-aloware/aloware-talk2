@@ -72,6 +72,7 @@ export default {
               }
             }
             this.extensions.initialized(payload)
+            console.log('onReady', this.extensions)
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
@@ -214,9 +215,25 @@ export default {
 
       // this.setPhoneNumber('+19403737418')
       // this.extensionsInitialized = true
-      console.log('handleDialNumber', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
+      console.log('handleDialNumber() --->', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.extensionsVisibility, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
 
-      if (this.needsExtensions && this.extensionsInitialized && this.initialized && this.authProfile && this.dialer?.isReady && this.campaignId !== null) {
+      console.log('phoneNumber -->', this.phoneNumber)
+      console.log('needsExtensions -->', this.needsExtensions)
+      console.log('extensionsInitialized -->', this.extensionsInitialized)
+      console.log('extensionsVisibility -->', this.extensionsVisibility)
+      console.log('initialized -->', this.initialized)
+      console.log('authProfile -->', this.authProfile)
+      console.log('dialer.isReady -->', this.dialer?.isReady)
+      console.log('campaignId -->', this.campaignId)
+
+      if (this.needsExtensions &&
+        this.extensionsInitialized &&
+        this.extensionsVisibility &&
+        this.initialized &&
+        this.authProfile &&
+        this.dialer?.isReady &&
+        this.campaignId !== null
+      ) {
         const contact = await this.searchContact(this.phoneNumber)
 
         if (contact) {
