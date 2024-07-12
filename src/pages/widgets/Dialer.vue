@@ -134,8 +134,13 @@ export default {
     this.extensions = new CallingExtensions(this.callSdkOptions)
   },
 
-  mounted () {
-    this.init()
+  async mounted () {
+    console.log('Dialer mounted')
+    await this.init()
+
+    // this.setPhoneNumber('+19403737418')
+    // this.extensionsInitialized = true
+    // this.extensionsVisibility = true
 
     this.$VueEvent.listen('agent_status_updated', this.handleAgentStatusUpdate)
   },
@@ -213,8 +218,6 @@ export default {
         this.setPhoneNumber(phoneNumber)
       }
 
-      // this.setPhoneNumber('+19403737418')
-      // this.extensionsInitialized = true
       console.log('handleDialNumber() --->', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.extensionsVisibility, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
 
       console.log('phoneNumber -->', this.phoneNumber)
@@ -246,7 +249,7 @@ export default {
           await this.init()
           this.handleDialNumber(this.phoneNumber)
         }, 3000)
-      } else {
+      } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
           this.handleDialNumber(this.phoneNumber)
         }, 3000)
@@ -380,10 +383,6 @@ export default {
     },
 
     authProfile () {
-      if (!this.previousOutboundCallingMode) {
-        this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
-      }
-
       console.log('authProfile', this.authProfile)
       this.findDefaultOutboundCampaign()
       this.handleDialNumber(this.phoneNumber)
