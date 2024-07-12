@@ -504,6 +504,8 @@ export default {
       'profile'
     ]),
 
+    ...mapState(['currentTimezone']),
+
     isInboxOrAllComms () {
       return this.inboxTaskRoutes.includes(this.$route.name) ||
         ['all-communications'].includes(this.$route.params.channel)
@@ -592,12 +594,12 @@ export default {
       },
       opens: 'right',
       ranges: {
-        'Today': [this.parseDatePicker(moment().tz('Australia/Brisbane').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'Yesterday': [this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(1, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(1, 'days').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'Last 7 Days': [this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(7, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'Last 30 Days': [this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(30, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'This Month So Far': [this.parseDatePicker(moment().tz('Australia/Brisbane').startOf('month').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'Last Month': [this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(1, 'months').startOf('month').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz('Australia/Brisbane').subtract(1, 'months').endOf('month').format('MM/DD/YYYY HH:mm:ss'))],
+        'Today': [this.parseDatePicker(moment().tz(this.currentTimezone).startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(this.currentTimezone).endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'Yesterday': [this.parseDatePicker(moment().tz(this.currentTimezone).subtract(1, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(this.currentTimezone).subtract(1, 'days').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'Last 7 Days': [this.parseDatePicker(moment().tz(this.currentTimezone).subtract(7, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(this.currentTimezone).endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'Last 30 Days': [this.parseDatePicker(moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(this.currentTimezone).endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'This Month So Far': [this.parseDatePicker(moment().tz(this.currentTimezone).startOf('month').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(this.currentTimezone).endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
+        'Last Month': [this.parseDatePicker(moment().tz(this.currentTimezone).subtract(1, 'months').startOf('month').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(this.currentTimezone).subtract(1, 'months').endOf('month').format('MM/DD/YYYY HH:mm:ss'))],
         'All Time': [null, null]
       },
       rangePicker: null,
