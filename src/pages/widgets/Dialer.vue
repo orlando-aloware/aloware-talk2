@@ -131,7 +131,11 @@ export default {
       this.extensionsVisibility = true
     }
 
-    this.extensions = new CallingExtensions(this.callSdkOptions)
+    if (!this.extensions) {
+      this.extensions = new CallingExtensions(this.callSdkOptions)
+    }
+
+    console.log('Dialer created', this.extensions)
   },
 
   async mounted () {
