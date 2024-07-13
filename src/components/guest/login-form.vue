@@ -298,13 +298,13 @@ export default {
     },
 
     ...mapActions('cache', [
-      'setCurrentCompany',
-      'setIsRedirectedToHubspotWidget'
+      'setCurrentCompany'
     ]),
 
     ...mapActions([
       'resetVuex',
-      'setUsage'
+      'setUsage',
+      'setIsRedirectedToHubspotWidget'
     ]),
 
     ...mapActions('auth', [

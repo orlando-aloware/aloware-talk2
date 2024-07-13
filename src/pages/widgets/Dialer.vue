@@ -76,7 +76,7 @@ export default {
           },
           onDialNumber: (event) => {
             if (event.phone_number) {
-              this.setPhoneNumber(event.phone_number)
+              this.setHubspotPhoneNumber(event.phone_number)
               if (this.timeout) {
                 clearTimeout(this.timeout)
               }
@@ -101,9 +101,9 @@ export default {
   },
   computed: {
     // ...mapGetters('auth', ['authenticated', 'profile']),
-    ...mapState('cache', ['currentCompany', 'phoneNumber', 'isRedirectedToHubspotWidget']),
+    ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget', 'dialer']),
+    ...mapState(['isWidget', 'dialer', 'hubspotPhoneNumber', 'isRedirectedToHubspotWidget']),
 
     allowed () {
       return this.authProfile && this.initialized
@@ -146,12 +146,12 @@ export default {
 
     ...mapActions([
       'resetVuex',
-      'setIsWidget'
+      'setIsWidget',
+      'setHubspotPhoneNumber'
     ]),
 
     ...mapActions('cache', [
-      'setCurrentCompany',
-      'setPhoneNumber'
+      'setCurrentCompany'
     ]),
 
     init () {
@@ -186,7 +186,7 @@ export default {
 
     getContactEmitPayload () {
       return {
-        currentNumber: this.phoneNumber,
+        currentNumber: this.hubspotPhoneNumber,
         contactName: this.contactName,
         companyName: this.companyName,
         contactId: this.contactId,
@@ -206,12 +206,12 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
-      if (!this.phoneNumber && phoneNumber) {
-        this.setPhoneNumber(phoneNumber)
+      if (!this.hubspotPhoneNumber && phoneNumber) {
+        this.setHubspotPhoneNumber(phoneNumber)
       }
 
       if (this.canHandleDialNumber()) {
-        const contact = await this.searchContact(this.phoneNumber)
+        const contact = await this.searchContact(this.hubspotPhoneNumber)
 
         if (contact) {
           this.setContactDetails(contact)
@@ -221,11 +221,11 @@ export default {
       } else if (!this.authProfile) {
         this.timeout = setTimeout(async () => {
           await this.init()
-          this.handleDialNumber(this.phoneNumber)
+          this.handleDialNumber(this.hubspotPhoneNumber)
         }, 1000)
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
-          this.handleDialNumber(this.phoneNumber)
+          this.handleDialNumber(this.hubspotPhoneNumber)
         }, 1000)
       }
     },
@@ -237,7 +237,7 @@ export default {
 
       if (this.defaultOutboundCampaignId) {
         this.campaignId = this.defaultOutboundCampaignId
-        this.handleDialNumber(this.phoneNumber)
+        this.handleDialNumber(this.hubspotPhoneNumber)
       }
     },
 
@@ -268,7 +268,7 @@ export default {
       this.checkContactTimezone(contactData, this.makeCall)
 
       if (shouldHandleDialNumber) {
-        this.handleDialNumber(this.phoneNumber)
+        this.handleDialNumber(this.hubspotPhoneNumber)
       }
     },
 
@@ -292,7 +292,7 @@ export default {
       }
 
       this.$VueEvent.fire('makeCall', {
-        currentNumber: this.$options.filters.fixPhone(this.phoneNumber),
+        currentNumber: this.$options.filters.fixPhone(this.hubspotPhoneNumber),
         outboundCampaignId: this.campaignId.toString(),
         contactName: this.contactName,
         companyName: this.companyName,
@@ -320,7 +320,7 @@ export default {
 
       if (this.defaultOutboundCampaignId) {
         this.campaignId = this.defaultOutboundCampaignId
-        this.handleDialNumber(this.phoneNumber)
+        this.handleDialNumber(this.hubspotPhoneNumber)
       }
     },
 
