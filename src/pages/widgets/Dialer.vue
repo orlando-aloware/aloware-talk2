@@ -105,12 +105,30 @@ export default {
   },
   computed: {
     // ...mapGetters('auth', ['authenticated', 'profile']),
-    ...mapState('cache', ['currentCompany', 'phoneNumber']),
+    ...mapState('cache', ['currentCompany', 'phoneNumber', 'isRedirectedToHubspotWidget']),
     ...mapState('auth', ['authenticated', 'profile']),
     ...mapState(['isWidget', 'dialer']),
 
     allowed () {
       return this.authProfile && this.initialized
+    },
+
+    canHandleDialNumber () {
+      if (this.isRedirectedToHubspotWidget && this.defaultOutboundCampaignId) {
+        return this.needsExtensions &&
+        this.initialized &&
+        this.authProfile &&
+        this.dialer?.isReady &&
+        this.campaignId !== null
+      }
+
+      return this.needsExtensions &&
+        this.extensionsInitialized &&
+        this.extensionsVisibility &&
+        this.initialized &&
+        this.authProfile &&
+        this.dialer?.isReady &&
+        this.campaignId !== null
     }
   },
 
@@ -224,6 +242,7 @@ export default {
 
       console.log('handleDialNumber() --->', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.extensionsVisibility, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
 
+      console.log('canHandleDialNumber -->', this.canHandleDialNumber)
       console.log('phoneNumber -->', this.phoneNumber)
       console.log('needsExtensions -->', this.needsExtensions)
       console.log('extensionsInitialized -->', this.extensionsInitialized)
@@ -233,14 +252,7 @@ export default {
       console.log('dialer.isReady -->', this.dialer?.isReady)
       console.log('campaignId -->', this.campaignId)
 
-      if (this.needsExtensions &&
-        this.extensionsInitialized &&
-        this.extensionsVisibility &&
-        this.initialized &&
-        this.authProfile &&
-        this.dialer?.isReady &&
-        this.campaignId !== null
-      ) {
+      if (this.canHandleDialNumber) {
         const contact = await this.searchContact(this.phoneNumber)
 
         if (contact) {
@@ -388,6 +400,14 @@ export default {
     //   },
     //   immediate: true
     // }
+  },
+  // check if user is logged in
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (!vm.authenticated) {
+        vm.$router.push({ name: 'Login', query: { redirect: vm.$route.fullPath } })
+      }
+    })
   }
 }
 </script>
