@@ -1,5 +1,7 @@
 @Library('jenkins-shared-libraries')_
 pipeline {
+    agent any
+
     options {
         disableConcurrentBuilds(abortPrevious: true)
     }
