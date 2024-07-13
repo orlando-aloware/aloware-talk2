@@ -142,7 +142,7 @@ export default {
     console.log('Dialer mounted')
     await this.init()
 
-    this.setPhoneNumber('+19403737418')
+    // this.setPhoneNumber('+19403737418')
     // this.extensionsInitialized = true
     // this.extensionsVisibility = true
 
