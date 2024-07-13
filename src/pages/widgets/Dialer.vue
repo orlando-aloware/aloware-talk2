@@ -400,14 +400,6 @@ export default {
     //   },
     //   immediate: true
     // }
-  },
-  // check if user is logged in
-  beforeRouteEnter (to, from, next) {
-    next(vm => {
-      if (!vm.authenticated) {
-        vm.$router.push({ name: 'Login', query: { redirect: vm.$route.fullPath } })
-      }
-    })
   }
 }
 </script>
