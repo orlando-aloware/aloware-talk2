@@ -17,6 +17,10 @@ export default {
     state.phoneNumber = phoneNumber
   },
 
+  SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {
+    state.isRedirectedToHubspotWidget = value
+  },
+
   RESET_VUEX (state) {
     // perform state reset
     state = Object.assign({}, CacheDefault.DEFAULT_STATE)

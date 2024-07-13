@@ -2,6 +2,7 @@ export default function () {
   return {
     currentCompany: null,
     timezones: [],
-    phoneNumber: null
+    phoneNumber: null,
+    isRedirectedToHubspotWidget: false
   }
 }

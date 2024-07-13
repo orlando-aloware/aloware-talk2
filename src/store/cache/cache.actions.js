@@ -13,5 +13,9 @@ export default {
 
   setPhoneNumber ({ commit }, value) {
     commit('SET_PHONE_NUMBER', value)
+  },
+
+  setIsRedirectedToHubspotWidget ({ commit }, value) {
+    commit('SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET', value)
   }
 }

@@ -1,5 +1,6 @@
 export const DEFAULT_STATE = {
   currentCompany: null,
   timezones: [],
-  phoneNumber: null
+  phoneNumber: null,
+  isRedirectedToHubspotWidget: false
 }
