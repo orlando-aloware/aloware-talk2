@@ -1,9 +1,5 @@
 @Library('jenkins-shared-libraries')_
 pipeline {
-    agent {
-        label 'runner2'
-    }
-
     options {
         disableConcurrentBuilds(abortPrevious: true)
     }
