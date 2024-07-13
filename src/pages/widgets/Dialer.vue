@@ -72,12 +72,9 @@ export default {
               }
             }
             this.extensions.initialized(payload)
-            console.log('onReady', this.extensions)
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
-            console.log('onDialNumber', event)
-
             if (event.phone_number) {
               this.setPhoneNumber(event.phone_number)
               if (this.timeout) {
@@ -87,7 +84,6 @@ export default {
             }
           },
           onVisibilityChanged: (data) => {
-            console.log('onVisibilityChanged', data)
             this.extensionsVisibility = !data?.isHidden
           }
         }
@@ -131,21 +127,13 @@ export default {
       this.extensionsVisibility = true
     }
 
-    console.log('Dialer created', this.extensions)
-
     if (!this.extensions) {
       this.extensions = new CallingExtensions(this.callSdkOptions)
     }
   },
 
   async mounted () {
-    console.log('Dialer mounted')
     await this.init()
-
-    // this.setPhoneNumber('+19403737418')
-    // this.extensionsInitialized = true
-    // this.extensionsVisibility = true
-
     this.$VueEvent.listen('agent_status_updated', this.handleAgentStatusUpdate)
   },
 
@@ -221,18 +209,6 @@ export default {
       if (!this.phoneNumber && phoneNumber) {
         this.setPhoneNumber(phoneNumber)
       }
-
-      console.log('handleDialNumber() --->', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.extensionsVisibility, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
-
-      console.log('canHandleDialNumber -->', this.canHandleDialNumber())
-      console.log('phoneNumber -->', this.phoneNumber)
-      console.log('needsExtensions -->', this.needsExtensions)
-      console.log('extensionsInitialized -->', this.extensionsInitialized)
-      console.log('extensionsVisibility -->', this.extensionsVisibility)
-      console.log('initialized -->', this.initialized)
-      console.log('authProfile -->', this.authProfile)
-      console.log('dialer.isReady -->', this.dialer?.isReady)
-      console.log('campaignId -->', this.campaignId)
 
       if (this.canHandleDialNumber()) {
         const contact = await this.searchContact(this.phoneNumber)
@@ -379,27 +355,14 @@ export default {
     extensionsVisibility () {
       if (this.extensionsVisibility) {
         this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-        // this.findDefaultOutboundCampaign()
       } else {
         this.showAlertCallFinished = false
       }
     },
 
     authProfile () {
-      console.log('authProfile', this.authProfile)
       this.findDefaultOutboundCampaign()
     }
-
-    // defaultOutboundCampaignId: {
-    //   handler () {
-    //     console.log('defaultOutboundCampaignId', this.defaultOutboundCampaignId)
-    //     if (this.defaultOutboundCampaignId) {
-    //       this.campaignId = this.defaultOutboundCampaignId
-    //       this.handleDialNumber(this.phoneNumber)
-    //     }
-    //   },
-    //   immediate: true
-    // }
   }
 }
 </script>
