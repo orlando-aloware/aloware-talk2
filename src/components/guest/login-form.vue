@@ -248,6 +248,7 @@ export default {
 
       if (this.hubspotWidget) {
         redirectPath = '/widgets/hubspot-call-extension'
+        this.setIsRedirectedToHubspotWidget(true)
       }
 
       await this.$router.push(String(redirectPath))
@@ -297,7 +298,8 @@ export default {
     },
 
     ...mapActions('cache', [
-      'setCurrentCompany'
+      'setCurrentCompany',
+      'setIsRedirectedToHubspotWidget'
     ]),
 
     ...mapActions([
