@@ -111,24 +111,6 @@ export default {
 
     allowed () {
       return this.authProfile && this.initialized
-    },
-
-    canHandleDialNumber () {
-      if (this.isRedirectedToHubspotWidget && this.defaultOutboundCampaignId) {
-        return this.needsExtensions &&
-        this.initialized &&
-        this.authProfile &&
-        this.dialer?.isReady &&
-        this.campaignId !== null
-      }
-
-      return this.needsExtensions &&
-        this.extensionsInitialized &&
-        this.extensionsVisibility &&
-        this.initialized &&
-        this.authProfile &&
-        this.dialer?.isReady &&
-        this.campaignId !== null
     }
   },
 
@@ -160,7 +142,7 @@ export default {
     console.log('Dialer mounted')
     await this.init()
 
-    // this.setPhoneNumber('+19403737418')
+    this.setPhoneNumber('+19403737418')
     // this.extensionsInitialized = true
     // this.extensionsVisibility = true
 
@@ -242,7 +224,7 @@ export default {
 
       console.log('handleDialNumber() --->', this.phoneNumber, this.needsExtensions, this.extensionsInitialized, this.extensionsVisibility, this.initialized, this.authProfile, this.dialer?.isReady, this.campaignId)
 
-      console.log('canHandleDialNumber -->', this.canHandleDialNumber)
+      console.log('canHandleDialNumber -->', this.canHandleDialNumber())
       console.log('phoneNumber -->', this.phoneNumber)
       console.log('needsExtensions -->', this.needsExtensions)
       console.log('extensionsInitialized -->', this.extensionsInitialized)
@@ -252,7 +234,7 @@ export default {
       console.log('dialer.isReady -->', this.dialer?.isReady)
       console.log('campaignId -->', this.campaignId)
 
-      if (this.canHandleDialNumber) {
+      if (this.canHandleDialNumber()) {
         const contact = await this.searchContact(this.phoneNumber)
 
         if (contact) {
@@ -364,6 +346,24 @@ export default {
         this.campaignId = this.defaultOutboundCampaignId
         this.handleDialNumber(this.phoneNumber)
       }
+    },
+
+    canHandleDialNumber () {
+      if (this.isRedirectedToHubspotWidget && this.defaultOutboundCampaignId) {
+        return this.needsExtensions &&
+          this.initialized &&
+          this.authProfile &&
+          this.dialer?.isReady &&
+          this.campaignId !== null
+      }
+
+      return this.needsExtensions &&
+        this.extensionsInitialized &&
+        this.extensionsVisibility &&
+        this.initialized &&
+        this.authProfile &&
+        this.dialer?.isReady &&
+        this.campaignId !== null
     }
   },
 
