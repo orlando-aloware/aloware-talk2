@@ -67,7 +67,7 @@
                   :breakpoint="0"
                   :width="64"
                   v-model="sidebarVisible"
-                  v-if="authenticated && !suspended">
+                  v-if="authenticated && !suspended && !isWidget">
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
@@ -85,7 +85,7 @@
                   :class="mobilePhoneDrawerClass"
                   :breakpoint="789"
                   v-model="mobilePhoneDrawer"
-                  v-if="authenticated && !suspended"
+                  v-if="authenticated && !suspended && !isWidget"
                   @hide="onCloseMobilePhone">
           <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
                     v-if="!isPhoneVisible && isMobile">
@@ -292,6 +292,14 @@ import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 export default {
   name: 'MyLayout',
 
+  props: {
+    api_key: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
+
   components: {
     MobileLiveCallBar,
     DialerForm,
@@ -345,7 +353,6 @@ export default {
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       loadingLeadSources: false,
-      isWidget: false,
       transitionName: null,
       prevHeight: 0,
       push: null,
@@ -402,7 +409,8 @@ export default {
       'isIntroVideoVisible',
       'showedKycDialog',
       'showedKycReloadDialog',
-      'statics'
+      'statics',
+      'isWidget'
     ]),
 
     ...mapState('auth', [
@@ -578,6 +586,10 @@ export default {
   },
 
   created () {
+    if (this.api_key) {
+      localStorage.setItem('api_token', this.api_key)
+    }
+
     this.showMobileFooter = this.isMobile
     this.checkDebounce = _.debounce(this.check, 1000)
 

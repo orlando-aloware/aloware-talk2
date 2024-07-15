@@ -9151,7 +9151,7 @@ screen and (max-width: 956px) {
   .inbox {
     .inbox-details {
       .contact-activity-container {
-        .composer-footer {
+        .composer-footer:not(.is-widget) {
           flex-direction: column;
 
           .inline-select.q-select--with-input {
@@ -9184,7 +9184,7 @@ screen and (max-width: 956px) {
 @media (max-width: 1220px) and (min-width: 1085px) {
   .contact-page {
     .contact-activity-container {
-      .composer-footer {
+      .composer-footer:not(.is-widget) {
         flex-direction: column;
 
         .inline-select.q-select--with-input {
@@ -9215,7 +9215,37 @@ screen and (max-width: 956px) {
 
 @media (max-width: 956px) {
   .contact-activity-container {
-    .composer-footer {
+    .composer-footer:not(.is-widget) {
+      flex-direction: column;
+
+      .inline-select.q-select--with-input {
+        min-width: unset;
+      }
+
+      & > div {
+        width: auto !important;
+        height: 24px;
+
+        > div {
+          float: none !important;
+
+          .q-field__append {
+            align-items: center;
+            height: 29px !important;
+          }
+        }
+      }
+
+      .q-field__control {
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+@media (max-width: 650px) {
+  .contact-activity-container {
+    .composer-footer.is-widget {
       flex-direction: column;
 
       .inline-select.q-select--with-input {

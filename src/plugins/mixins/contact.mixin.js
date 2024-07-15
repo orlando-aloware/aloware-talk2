@@ -1182,7 +1182,8 @@ export default {
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed'
+      'setIsContactMixinUsed',
+      'selectedContactChanging'
     ]),
 
     ...mapActions('inbox', ['setSelectedContact'])

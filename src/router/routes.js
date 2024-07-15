@@ -36,6 +36,7 @@ const routes = [
   {
     path: '/',
     component: MainLayout,
+    props: true,
     children: [
       {
         path: 'login',
@@ -473,6 +474,24 @@ const routes = [
           isGuest: true
         },
         component: AccountRegistration
+      },
+      {
+        name: 'Texting Widget (known-user)',
+        path: '/widgets/texting/api_key/:api_key/contact/:id',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: Contact
+      },
+      {
+        name: 'Texting Widget (unknown-user)',
+        path: '/widgets/texting/contact/:id',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: Contact
       }
     ]
   },
