@@ -621,6 +621,8 @@ export default {
           'tags'
         ])
 
+        delete params.timezone
+
         return window.axios.get(`/api/v2/contacts`, { params, paramsSerializer: qs.stringify, cancelToken: cancelTokenSource })
       },
 
