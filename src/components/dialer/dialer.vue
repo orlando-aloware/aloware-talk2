@@ -97,6 +97,9 @@ export default {
         const user = this.getUser(this.dialer.communication.added_user_id)
 
         if (user.name && !isGreetingNew) {
+          console.log('Updating AddedParty Object')
+          console.log(this.dialer.communication)
+          console.log(data)
           this.setAddedParty(user)
         }
 

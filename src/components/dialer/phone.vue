@@ -2675,7 +2675,10 @@ export default {
       }
     }
   },
-
+  addedParty (newValue, oldValue) {
+    console.log('addedParty changed:', newValue)
+    console.trace()
+  },
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('showLoadingPhone', this.phoneListeners.showLoadingPhone)
