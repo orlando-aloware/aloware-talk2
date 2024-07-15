@@ -114,11 +114,7 @@ export default {
       this.small = true
     }
 
-    if (this.$route.name === 'Hubspot Call Extension') {
-      this.needsExtensions = true
-    } else {
-      this.needsExtensions = false
-    }
+    this.needsExtensions = this.$route.name === 'Hubspot Call Extension'
 
     if (!this.needsExtensions) {
       this.extensionsVisibility = true
@@ -193,20 +189,22 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
-      if (this.needsExtensions && this.extensionsInitialized && this.initialized) {
-        this.extensionsVisibility = true
-        this.phoneNumber = phoneNumber
-        const contact = await this.searchContact(phoneNumber)
-        if (contact) {
-          this.setContactDetails(contact)
-          this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
-          this.handleCall()
+      if (this.needsExtensions && this.extensionsInitialized)  {
+        if (this.initialized) {
+          this.extensionsVisibility = true
+          this.phoneNumber = phoneNumber
+          const contact = await this.searchContact(phoneNumber)
+          if (contact) {
+            this.setContactDetails(contact)
+            this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
+            this.handleCall()
+          }
+        } else {
+          this.timeout = setTimeout(() => {
+            console.log('Retry calling ' + phoneNumber)
+            this.handleDialNumber(phoneNumber)
+          }, 250)
         }
-      } else if (this.needsExtensions && this.extensionsInitialized && !this.initialized) {
-        this.timeout = setTimeout(() => {
-          console.log('Retry calling ' + phoneNumber)
-          this.handleDialNumber(phoneNumber)
-        }, 250)
       }
     },
 
@@ -272,10 +270,10 @@ export default {
     },
 
     findDefaultOutboundCampaign () {
-      if (this.previousOutboundCallingMode &&
-        this.profile &&
-        this.previousOutboundCallingMode === this.profile.outbound_calling_mode &&
-        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+      if (
+        this.previousOutboundCallingMode === this.profile?.outbound_calling_mode &&
+        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+      ) {
         return
       }
 
@@ -293,8 +291,8 @@ export default {
 
       // 2. [User level] Outbound line is set to follow account default
       if (
-        this.currentCompany && this.profile &&
-        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
+        this.currentCompany && 
+        this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
         !this.profile.default_outbound_campaign_id
       ) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id

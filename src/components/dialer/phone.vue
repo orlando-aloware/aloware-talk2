@@ -22,8 +22,11 @@
         </span>
       </div>
       <div :class="[
-              'd-flex', 'flex-row', 'justify-content-between', 'align-items-center',
-              ((is_widget && isCallCompleted) || (is_widget && loadingPhone)) ? 'width-32' : 'width-65'
+              'd-flex',
+              'flex-row',
+              'justify-content-between',
+              'align-items-center',
+              (is_widget && (isCallCompleted || loadingPhone)) ? 'width-32' : 'width-65'
             ]">
         <pause-record-icon width="14"
                            height="14"
