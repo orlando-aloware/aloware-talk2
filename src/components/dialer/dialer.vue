@@ -93,10 +93,10 @@ export default {
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
         this.setDialerCommunication(data)
-
+        const isGreetingNew = this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
         const user = this.getUser(this.dialer.communication.added_user_id)
 
-        if (user.name) {
+        if (user.name && !isGreetingNew) {
           this.setAddedParty(user)
         }
 
@@ -1209,6 +1209,10 @@ export default {
       }).finally(() => {
         this.loadingAdd = false
       })
+    },
+
+    cleanParticipant () {
+      this.setAddedParty()
     },
 
     dialerCallPrep (call) {

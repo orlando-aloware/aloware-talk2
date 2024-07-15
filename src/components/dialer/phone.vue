@@ -2449,6 +2449,7 @@ export default {
 
     addParticipant ($event) {
       this.loadingAdd = true
+      this.$VueEvent.fire('cleanParticipant')
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
@@ -2461,6 +2462,7 @@ export default {
     introduceParticipant ($event) {
       this.loadingIntroduce = true
       this.add.introduce = true
+      this.$VueEvent.fire('cleanParticipant')
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
