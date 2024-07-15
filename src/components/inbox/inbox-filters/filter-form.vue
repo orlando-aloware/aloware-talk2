@@ -732,12 +732,18 @@ export default {
     dateRange: {
       deep: true,
       handler () {
-        this.filter.from_date = this.dateRange.startDate
-          ? moment(this.dateRange.startDate).format('YYYY-MM-DD HH:mm:ss')
-          : null
-        this.filter.to_date = this.dateRange.endDate
-          ? moment(this.dateRange.endDate).format('YYYY-MM-DD HH:mm:ss')
-          : null
+        let startDate = moment(this.dateRange.startDate)
+        let endDate = moment(this.dateRange.endDate)
+
+        if (startDate.format('HH:mm:ss') === endDate.format('HH:mm:ss')) {
+          startDate.set({ hour: 0, minute: 0, second: 0 })
+          endDate.set({ hour: 23, minute: 59, second: 59 })
+          this.dateRange.startDate = startDate.format('YYYY-MM-DD HH:mm:ss')
+          this.dateRange.endDate = endDate.format('YYYY-MM-DD HH:mm:ss')
+        }
+
+        this.filter.from_date = this.dateRange.startDate ? startDate.format('YYYY-MM-DD HH:mm:ss') : null
+        this.filter.to_date = this.dateRange.endDate ? endDate.format('YYYY-MM-DD HH:mm:ss') : null
       }
     },
 
