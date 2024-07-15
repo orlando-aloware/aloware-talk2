@@ -317,14 +317,6 @@ export default {
   },
 
   watch: {
-    initialized () {
-      if (this.initialized) {
-        if (this.profile.company_id === 119) {
-          document.domain = 'justpressone.com'
-        }
-      }
-    },
-
     extensionsVisibility () {
       console.log('Extension visibility: ' + this.extensionsVisibility)
 
