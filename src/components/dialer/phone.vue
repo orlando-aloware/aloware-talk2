@@ -2673,11 +2673,6 @@ export default {
       if (['add', 'dialpad', 'transfer'].includes(value)) {
         this.openExpansion(value)
       }
-    },
-
-    addedParty (newValue, oldValue) {
-      console.log('addedParty changed:', newValue)
-      console.trace()
     }
   },
   beforeDestroy () {
