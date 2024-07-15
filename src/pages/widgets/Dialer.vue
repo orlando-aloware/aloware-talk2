@@ -292,7 +292,11 @@ export default {
       }
 
       // 2. [User level] Outbound line is set to follow account default
-      if (this.currentCompany && this.profile && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
+      if (
+        this.currentCompany && this.profile &&
+        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
+        !this.profile.default_outbound_campaign_id
+      ) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
 
@@ -300,7 +304,10 @@ export default {
       }
 
       // 3. [User level] user has a default outbound line
-      if (this.profile && this.profile.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+      if (
+        this.profile && this.profile.default_outbound_campaign_id &&
+        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT
+      ) {
         this.defaultOutboundCampaignId = this.profile.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
       }
