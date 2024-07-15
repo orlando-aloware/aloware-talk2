@@ -40,7 +40,7 @@
       </div>
       <div class="contact-details-container"
            :class="{ 'contact-details--opened': detailsOpen }"
-           v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
+           v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
                          v-if="!changingSelectedContact && !isEmptyContact"
@@ -55,7 +55,7 @@
                 :breakpoint="0"
                 :width="300"
                 v-model="drawer"
-                v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users">
+                v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <compact-btn customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
                      variant="outlined-light"
                      borderless
@@ -139,7 +139,8 @@ export default {
       'campaigns',
       'users',
       'tags',
-      'isMobile'
+      'isMobile',
+      'isWidget'
     ]),
 
     isInbox () {

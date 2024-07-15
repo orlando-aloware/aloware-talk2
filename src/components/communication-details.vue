@@ -1,7 +1,7 @@
 <template>
   <div v-if="communication" data-testid="comm-details-wrapper">
     <b-row data-testid="comm-details-row">
-      <b-col md="4"
+      <b-col :md="isWidget ? 12 : 4"
              sm="12"
              data-testid="comm-details-col"
              class="pl-0 pr-0">
@@ -147,7 +147,7 @@
                 <q-item-label>Contact: </q-item-label>
               </b-col>
               <b-col>
-                <router-link :to="{ name: 'Contact', params: { id: communication.contact.id }}"
+                <router-link :to="getContactRouteLink(communication)"
                              data-testid="comm-details-contact-router-link">
                   {{ communication.contact.name | fixContactName }}
                 </router-link>
@@ -930,13 +930,14 @@
           </q-card-section>
         </q-card>
       </b-col>
-      <b-col md="8"
+      <b-col :md="isWidget ? 12 : 8"
              class="pr-0 ring-group-snapshot-wrapper"
              data-testid="comm-details-col"
              v-if="communication && communication.type === CommunicationTypes.CALL">
-        <ring-group-snapshot :communication="communication"
+        <ring-group-snapshot data-testid="comm-details-ring-group-snapshot"
+                             :communication="communication"
                              :ring-group="usedRingGroup"
-                             data-testid="comm-details-ring-group-snapshot"/>
+                             v-if="usedRingGroup"/>
       </b-col>
     </b-row>
   </div>
@@ -1029,7 +1030,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions']),
+    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions', 'isWidget']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     usedCampaign () {
@@ -1118,6 +1119,13 @@ export default {
   },
 
   methods: {
+    getContactRouteLink (communication) {
+      if (this.isWidget) {
+        return { name: 'Texting Widget (unknown-user)', params: { id: communication.contact.id } }
+      }
+
+      return { name: 'Contact', params: { id: communication.contact.id } }
+    },
     getCampaign (id) {
       if (!id) {
         return null
