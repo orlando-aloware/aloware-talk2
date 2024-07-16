@@ -240,7 +240,7 @@ export default {
         return
       }
 
-      const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
+      const redirectPath = this.$route.query.redirect || '/'
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
 
