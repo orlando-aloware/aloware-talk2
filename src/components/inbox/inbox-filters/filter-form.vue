@@ -735,7 +735,7 @@ export default {
         let startDate = moment(this.dateRange.startDate)
         let endDate = moment(this.dateRange.endDate)
 
-        if (startDate.format('HH:mm:ss') === endDate.format('HH:mm:ss')) {
+        if (startDate.isValid() && endDate.isValid() && startDate.format('HH:mm:ss') === endDate.format('HH:mm:ss')) {
           startDate.set({ hour: 0, minute: 0, second: 0 })
           endDate.set({ hour: 23, minute: 59, second: 59 })
           this.dateRange.startDate = startDate.format('YYYY-MM-DD HH:mm:ss')
