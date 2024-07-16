@@ -124,7 +124,7 @@ export const shortDateTimePassed = (dt, replaceAgo = true) => {
  * @param {datetime|string|Moment} dt
  * @returns {string|*}
  */
-export const shortDateTimePassedLessThan = (dt, replaceAgo = true) => {
+export const shortDateTimePassedLessThan = (dt, replaceAgo = true, store = null) => {
   const dateTimePassed = { text: '', num: 0 }
 
   moment.relativeTimeThreshold('s', 60)
@@ -134,11 +134,11 @@ export const shortDateTimePassedLessThan = (dt, replaceAgo = true) => {
   moment.relativeTimeThreshold('w', 4)
   moment.relativeTimeThreshold('M', 12)
 
-  if (dt && window.timezone) {
-    dateTimePassed.text = moment.utc(dt).tz(window.timezone).fromNow(replaceAgo)
+  if (dt && store && store.state.currentTimezone) {
+    dateTimePassed.text = moment.utc(dt).tz(store.state.currentTimezone).fromNow(replaceAgo)
   }
 
-  if (dt && !window.timezone) {
+  if (dt && (!store || !store.state.currentTimezone)) {
     dateTimePassed.text = moment.utc(dt).local().fromNow(replaceAgo)
   }
 
@@ -233,12 +233,12 @@ export const fixScheduleTime = (dt, duration = 0, timezone) => {
  * @param format
  * @returns {string|*}
  */
-export const fixRelativeDatetimeFormat = (dt, format = 'dddd, MMMM D, YYYY h:mm A z') => {
+export const fixRelativeDatetimeFormat = (dt, format = 'dddd, MMMM D, YYYY h:mm A z', store = null) => {
   if (dt) {
-    if (window.timezone) {
-      return window.moment.utc(dt).tz(window.timezone).format(format)
+    if (store && store.state.currentTimezone) {
+      return moment.utc(dt).tz(store.state.currentTimezone).format(format)
     } else {
-      return window.moment.utc(dt).local().format(format)
+      return moment.utc('2024-07-16 05:00:00').local().format(format)
     }
   } else {
     return '-'
