@@ -288,7 +288,7 @@ export default {
     handleAgentStatusUpdate (data) {
       const agentStatus = data.agent_status
 
-      if (!this.showAlertAgentOnCall && !this.showAlertCallFinished && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+      if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.showAlertCallFinished = false
         this.showAlertAgentOnCall = !this.showAlertAgentOnCall
       }
