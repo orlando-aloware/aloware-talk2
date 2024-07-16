@@ -47,6 +47,7 @@ export default {
 
   data () {
     return {
+      isFirstLoading: true,
       loading: false,
       small: false,
       initialized: false,
@@ -135,6 +136,7 @@ export default {
   async mounted () {
     await this.init()
     this.$VueEvent.listen('agent_status_updated', this.handleAgentStatusUpdate)
+    this.isFirstLoading = false
   },
 
   methods: {
@@ -253,6 +255,7 @@ export default {
         this.showAlertCallFinished = true
         this.defaultOutboundCampaignId = null
         this.campaignId = null
+        this.isFirstLoading = true
       }
     },
 
@@ -282,7 +285,7 @@ export default {
         this.showAlertCallFinished = true
       }
 
-      if (!this.showAlertAgentOnCall && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+      if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.showAlertCallFinished = false
         this.showAlertAgentOnCall = !this.showAlertAgentOnCall
       }
