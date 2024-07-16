@@ -135,6 +135,10 @@ export default {
 
   async mounted () {
     await this.init()
+    this.setHubspotPhoneNumber('+19403737418')
+    this.extensionsInitialized = true
+    this.extensionsVisibility = true
+
     this.$VueEvent.listen('agent_status_updated', this.handleAgentStatusUpdate)
     this.isFirstLoading = false
   },
@@ -208,6 +212,13 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
+      if (this.checkAgentHasActiveCallInAnotherDevice()) {
+        this.showAlertAgentOnCall = true
+        return
+      } else {
+        this.showAlertAgentOnCall = false
+      }
+
       if (!this.hubspotPhoneNumber && phoneNumber) {
         this.setHubspotPhoneNumber(phoneNumber)
       }
@@ -255,7 +266,6 @@ export default {
         this.showAlertCallFinished = true
         this.defaultOutboundCampaignId = null
         this.campaignId = null
-        this.isFirstLoading = true
       }
     },
 
@@ -285,7 +295,7 @@ export default {
         this.showAlertCallFinished = true
       }
 
-      if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+      if (!this.showAlertAgentOnCall && this.showAlertCallFinished && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.showAlertCallFinished = false
         this.showAlertAgentOnCall = !this.showAlertAgentOnCall
       }
@@ -368,6 +378,21 @@ export default {
         this.authProfile &&
         this.dialer?.isReady &&
         this.campaignId !== null
+    },
+
+    checkAgentHasActiveCallInAnotherDevice () {
+      const statuses = [
+        'MAKING_CALL',
+        'CALL_CONNECTED',
+        'HANGING_UP_CALL',
+        'CALL_DISCONNECTED',
+        'WRAP_UP'
+      ]
+
+      return this.dialer &&
+        this.profile &&
+        this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
+        !statuses.includes(this.dialer.currentStatus)
     }
   },
 
