@@ -40,12 +40,10 @@ export default function ({ store }) {
 
   Router.beforeEach((to, from, next) => {
     next()
-    for (const route of to.matched) {
-      // Check if the route is a widget
-      if (route?.meta?.isWidget) {
+    const isWidget = to.matched.some(route => route?.meta?.isWidget)
+    
+    if (isWidget) {
         store.commit('SET_IS_WIDGET', true)
-        break // Stop the loop if isWidget is found
-      }
     }
 
     const record = to.matched.find(record => record.meta.title)
