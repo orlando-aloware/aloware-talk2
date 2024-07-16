@@ -288,6 +288,10 @@ export default {
         this.showAlertCallFinished = false
         this.showAlertAgentOnCall = !this.showAlertAgentOnCall
       }
+
+      if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.showAlertAgentOnCall) {
+        this.showAlertAgentOnCall = false
+      }
     },
 
     makeCall () {
