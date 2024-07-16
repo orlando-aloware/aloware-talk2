@@ -251,6 +251,8 @@ export default {
       if (this.extensions) {
         this.extensions.callEnded()
         this.showAlertCallFinished = true
+        this.defaultOutboundCampaignId = null
+        this.campaignId = null
       }
     },
 
