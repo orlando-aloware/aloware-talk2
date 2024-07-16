@@ -280,7 +280,7 @@ export default {
         this.showAlertCallFinished = true
       }
 
-      if (!this.showAlertAgentOnCall && this.showAlertCallFinished && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+      if (!this.showAlertAgentOnCall && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.showAlertCallFinished = false
         this.showAlertAgentOnCall = !this.showAlertAgentOnCall
       }
