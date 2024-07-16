@@ -2462,6 +2462,7 @@ export default {
     introduceParticipant ($event) {
       this.loadingIntroduce = true
       this.add.introduce = true
+      this.$VueEvent.fire('cleanParticipant')
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
@@ -2674,6 +2675,7 @@ export default {
       }
     }
   },
+
   beforeDestroy () {
     window.removeEventListener('resize', this.resizeHandler)
     this.$VueEvent.stop('showLoadingPhone', this.phoneListeners.showLoadingPhone)
