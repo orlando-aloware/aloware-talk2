@@ -238,7 +238,7 @@ export const fixRelativeDatetimeFormat = (dt, format = 'dddd, MMMM D, YYYY h:mm 
     if (store && store.state.currentTimezone) {
       return moment.utc(dt).tz(store.state.currentTimezone).format(format)
     } else {
-      return moment.utc('2024-07-16 05:00:00').local().format(format)
+      return moment.utc(dt).local().format(format)
     }
   } else {
     return '-'
