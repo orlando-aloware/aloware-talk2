@@ -268,11 +268,7 @@ export default {
   mounted () {
     this.timeline = this.resources.date_range_type || 1
     this.metricsList = this.arrangedMetricList ? JSON.parse(JSON.stringify(this.arrangedMetricList)) : []
-    this.customRange = this.DateRanges.DATE_RANGES.find(range => {
-      if (range.label === 'Custom') {
-        return range
-      }
-    })
+    this.customRange = this.DateRanges.DATE_RANGES.find(range => range.label === 'Custom')
 
     if (this.timeline === this.customRange.id) {
       this.show_custom_date_range = true
