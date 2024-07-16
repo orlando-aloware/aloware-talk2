@@ -77,6 +77,7 @@ export default {
           },
           onDialNumber: (event) => {
             if (event.phone_number) {
+              this.findDefaultOutboundCampaign()
               this.setHubspotPhoneNumber(event.phone_number)
               if (this.timeout) {
                 clearTimeout(this.timeout)
@@ -289,11 +290,6 @@ export default {
 
     handleAgentStatusUpdate (data) {
       const agentStatus = data.agent_status
-
-      if (this.showAlertAgentOnCall && agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL) {
-        this.showAlertAgentOnCall = !this.showAlertAgentOnCall
-        this.showAlertCallFinished = true
-      }
 
       if (!this.showAlertAgentOnCall && this.showAlertCallFinished && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.showAlertCallFinished = false
