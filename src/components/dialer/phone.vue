@@ -1,7 +1,7 @@
 <template>
   <div class="phone d-flex flex-column"
        ref="phone"
-       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone }"
+       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center flex-grow-0"
@@ -21,7 +21,13 @@
           {{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}
         </span>
       </div>
-      <div class="d-flex flex-row justify-content-between align-items-center width-65">
+      <div :class="[
+              'd-flex',
+              'flex-row',
+              'justify-content-between',
+              'align-items-center',
+              (is_widget && (isCallCompleted || loadingPhone)) ? 'width-32' : 'width-65'
+            ]">
         <pause-record-icon width="14"
                            height="14"
                            v-show="pauseRecordIconShow">
@@ -92,7 +98,8 @@
           </div>
         </q-btn-dropdown>
 
-        <q-btn class="icon-btn auto-size height-12"
+        <q-btn v-show="!is_widget"
+               class="icon-btn auto-size height-12"
                icon="img:app-icons/dialer/phone_exit.svg"
                size="12px"
                padding="none"
@@ -143,7 +150,8 @@
                 <span class="d-inline-flex">
                   {{ contactName | truncate(15) }}
                 </span>
-                <q-btn class="text-size-rg d-inline-flex ml-1"
+                <q-btn v-if="!is_widget"
+                       class="text-size-rg d-inline-flex ml-1"
                        color="white"
                        icon="o_info"
                        flat
@@ -1447,7 +1455,8 @@ export default {
       CommunicationCurrentStatus,
       CommunicationTypes,
       UploadedFileTypes,
-      TagCategories
+      TagCategories,
+      callbackAction: false
     }
   },
 
@@ -2182,12 +2191,15 @@ export default {
       this.$emit('onPhoneVisible', false)
     },
 
-    endWrapUp () {
+    endWrapUp (type = 'finish') {
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
       }
 
       this.$VueEvent.fire('endWrapUp')
+
+      this.callbackAction = type === 'callback'
+
       this.$emit('onPhoneVisible', false)
     },
 
@@ -2204,7 +2216,7 @@ export default {
         contactId: this.dialer.communication.contact_id
       }
 
-      this.endWrapUp()
+      this.endWrapUp('callback')
 
       this.$VueEvent.fire('makeCall', data)
     },
@@ -2561,6 +2573,12 @@ export default {
 
       if (!this.shouldShow) {
         this.$emit('onPhoneVisible', false)
+
+        // emit the callCompleted event to display a message to close the widget.
+        // only emit the event if is_widget=true and the finish button is clicked.
+        if (this.is_widget && !this.callbackAction) {
+          this.$emit('callCompleted')
+        }
 
         return
       }
