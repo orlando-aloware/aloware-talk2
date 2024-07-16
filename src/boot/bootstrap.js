@@ -356,11 +356,11 @@ Vue.prototype.$handleErrors = function (response, title = null) {
           message.data = `${response.data.error}`
         }
 
-        if (response.data.errors && response.data.errors.length && response.data.error) {
+        if (response.data.errors?.length && response.data.error) {
           message.data = `<p class="pt-1 pb-1">- ${response.data.error}</p>`
         }
 
-        if (response.data.errors && response.data.errors.length) {
+        if (response.data.errors?.length) {
           for (error.data of response.data.errors) {
             message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
           }

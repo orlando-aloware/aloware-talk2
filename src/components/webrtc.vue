@@ -116,8 +116,11 @@ export default {
     this.mainListeners.agentStatusUpdated = (event) => {
       this.updateUserStatus(event)
 
-      if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
-        this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
+      if (
+        this.currentCompany?.id === event.company_id &&
+        this.profile?.id === event.user_id &&
+        this.profile.agent_status !== event.agent_status
+      ) {
         this.setAgentStatus(event.agent_status)
         console.log('Changed agent status [event]: ', event.agent_status)
       }

@@ -119,11 +119,7 @@ export default {
       this.small = true
     }
 
-    if (this.$route.name === 'Hubspot Call Extension') {
-      this.needsExtensions = true
-    } else {
-      this.needsExtensions = false
-    }
+    this.needsExtensions = this.$route.name === 'Hubspot Call Extension'
 
     if (!this.needsExtensions) {
       this.extensionsVisibility = true
@@ -390,14 +386,6 @@ export default {
   },
 
   watch: {
-    initialized () {
-      if (this.initialized) {
-        if (this.authProfile.company_id === 119) {
-          document.domain = 'justpressone.com'
-        }
-      }
-    },
-
     extensionsVisibility () {
       if (this.extensionsVisibility) {
         this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
