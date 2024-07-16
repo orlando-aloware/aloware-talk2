@@ -303,27 +303,50 @@ export default {
     },
 
     findDefaultOutboundCampaign () {
-      if (this.previousOutboundCallingMode &&
-        this.authProfile &&
-        this.previousOutboundCallingMode === this.authProfile?.outbound_calling_mode &&
-        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+      if (this.isAlwaysAskModeEnabled()) {
         return
       }
 
-      this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
+      this.updatePreviousOutboundCallingMode()
 
-      if (this.currentCompany && this.currentCompany.force_outbound_line) {
+      if (this.shouldUseCompanyCampaignId()) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
-      } else if (this.currentCompany && this.authProfile && this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.authProfile.default_outbound_campaign_id) {
-        this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
-      } else if (this.authProfile && this.authProfile.default_outbound_campaign_id && this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+      } else if (this.shouldUseProfileCampaignId()) {
         this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
       }
 
       if (this.defaultOutboundCampaignId) {
-        this.campaignId = this.defaultOutboundCampaignId
-        this.handleDialNumber(this.hubspotPhoneNumber)
+        this.setCampaignIdAndDialNumber()
       }
+    },
+
+    isAlwaysAskModeEnabled () {
+      return this.previousOutboundCallingMode &&
+        this.authProfile &&
+        this.previousOutboundCallingMode === this.authProfile.outbound_calling_mode &&
+        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+    },
+
+    updatePreviousOutboundCallingMode () {
+      this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
+    },
+
+    shouldUseCompanyCampaignId () {
+      return this.currentCompany &&
+        (this.currentCompany.force_outbound_line ||
+        (this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
+        !this.authProfile.default_outbound_campaign_id))
+    },
+
+    shouldUseProfileCampaignId () {
+      return this.authProfile &&
+        this.authProfile.default_outbound_campaign_id &&
+        this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT
+    },
+
+    setCampaignIdAndDialNumber () {
+      this.campaignId = this.defaultOutboundCampaignId
+      this.handleDialNumber(this.hubspotPhoneNumber)
     },
 
     canHandleDialNumber () {
