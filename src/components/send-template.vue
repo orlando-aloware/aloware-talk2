@@ -126,7 +126,6 @@ export default {
       }).then(res => {
         this.message = null
         this.loading_send_message = false
-        this.$generalNotification('Message sent')
         this.$emit('messageSent')
       }).catch(err => {
         this.$handleErrors(err.response)
