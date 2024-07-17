@@ -470,7 +470,6 @@ const routes = [
       {
         path: 'sold-report',
         name: 'Sold Report',
-        props: true,
         component: SoldReport
       },
       {
