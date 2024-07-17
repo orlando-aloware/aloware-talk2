@@ -11,9 +11,11 @@
 
 <script>
 import { mapActions } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
+import { guestMixin } from 'src/boot/mixins'
 
 export default {
+  mixins: [guestMixin],
+
   data () {
     return {
       source: ''
@@ -29,23 +31,14 @@ export default {
   },
 
   created () {
-    this.getStatics()
+    this.setPageInfo()
   },
 
   methods: {
     ...mapActions('auth', ['check']),
 
-    getStatics () {
-      talk2Api.V1.statics.get(this.currentCompany?.id)
-        .then(res => {
-          this.statics = res.data
-          this.setPageTitle('Sold Report - ' + this.statics.name)
-        })
-        .catch(err => {
-          this.setPageTitle('Sold Report - Aloware')
-          console.log(err)
-          this.$root.handleErrors(err.response)
-        })
+    setPageInfo () {
+      this.setPageTitle('Sold Report - ' + this.statics.name)
     }
   },
 
