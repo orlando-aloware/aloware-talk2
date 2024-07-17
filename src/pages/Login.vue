@@ -106,6 +106,7 @@ export default {
 
           if (this.statics.host === 'app.simpsocial.com') {
             this.setPageTitle(`${this.statics?.name} - Login`)
+            this.setDocumentFavicon(this.statics?.favicon)
           }
         })
         .catch(err => {
