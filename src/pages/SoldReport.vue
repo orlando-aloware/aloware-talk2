@@ -11,11 +11,8 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { guestMixin } from 'src/boot/mixins'
 
 export default {
-  mixins: [guestMixin],
-
   data () {
     return {
       source: ''
