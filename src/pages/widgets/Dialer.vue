@@ -133,6 +133,10 @@ export default {
   async mounted () {
     await this.init()
 
+    this.setHubspotPhoneNumber('+19403737418')
+    this.extensionsInitialized = true
+    this.extensionsVisibility = true
+
     this.$VueEvent.listen('agent_status_updated', this.handleAgentStatusUpdate)
     this.isFirstLoading = false
   },
@@ -286,11 +290,12 @@ export default {
 
       if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.showAlertCallFinished = false
-        this.showAlertAgentOnCall = !this.showAlertAgentOnCall
+        this.showAlertAgentOnCall = true
       }
 
       if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.showAlertAgentOnCall) {
         this.showAlertAgentOnCall = false
+        this.showAlertCallFinished = true
       }
     },
 
