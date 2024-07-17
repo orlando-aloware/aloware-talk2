@@ -41,9 +41,9 @@ export default function ({ store }) {
   Router.beforeEach((to, from, next) => {
     next()
     const isWidget = to.matched.some(route => route?.meta?.isWidget)
-    
+
     if (isWidget) {
-        store.commit('SET_IS_WIDGET', true)
+      store.commit('SET_IS_WIDGET', true)
     }
 
     const record = to.matched.find(record => record.meta.title)
