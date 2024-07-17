@@ -17,6 +17,14 @@ export default {
         })
       }
       return ''
+    },
+
+    setPageTitle (title) {
+      document.title = title
+    },
+
+    setPageTitleInfoText (infoText) {
+      this.setPageTitle(`${document.title} ${infoText}`)
     }
   }
 }
