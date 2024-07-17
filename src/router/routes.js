@@ -32,6 +32,7 @@ const EmailBlast = () => import('pages/EmailBlast.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
+const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
 
 const routes = [
   {
@@ -493,6 +494,15 @@ const routes = [
           isWidget: true
         },
         component: Contact
+      },
+      {
+        name: 'HubSpot Widget Error',
+        path: '/errors/hubspot',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: HubSpotMessageWidgetError
       }
     ]
   },
