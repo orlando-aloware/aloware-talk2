@@ -1,10 +1,13 @@
 <template>
     <div class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
         <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-            <img class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0"
-                 :src="appLogo"/>
+            <div class="d-flex w-100 justify-content-center"
+                 v-if="appLogo">
+              <img class="col-6 w-auto login-form-logo pb-4 px-0"
+                   :src="appLogo" />
+            </div>
             <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1"
-                 v-if="!magicLink">
+                 v-if="!appLogo">
                 Login
             </div>
             <form class="login-form w-100 px-2"
