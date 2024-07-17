@@ -133,10 +133,6 @@ export default {
   async mounted () {
     await this.init()
 
-    this.setHubspotPhoneNumber('+19403737418')
-    this.extensionsInitialized = true
-    this.extensionsVisibility = true
-
     this.$VueEvent.listen('agent_status_updated', this.handleAgentStatusUpdate)
     this.isFirstLoading = false
   },
