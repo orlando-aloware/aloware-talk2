@@ -379,30 +379,30 @@
       </q-tooltip>
     </q-btn>
 
-    <q-btn :to="{ name: 'Sold Report' }"
-           :ripple="false"
-           icon="img:app-icons/menu/sold_report_active.svg"
+    <q-btn icon="img:app-icons/menu/sold_report_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
+           flat
+           :to="{ name: 'Sold Report' }"
+           :ripple="false"
            v-show="isActive('Sold Report')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
+           v-if="isSimpSocialIntegrationEnabled">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Sold Report</span>
       </q-tooltip>
     </q-btn>
-    <q-btn :to="{ name: 'Sold Report' }"
-           :ripple="false"
-           icon="img:app-icons/menu/sold_report_gray.svg"
+    <q-btn icon="img:app-icons/menu/sold_report_gray.svg"
            align="center"
            padding="none"
            class="nav-icons w-100"
+           flat
+           :to="{ name: 'Sold Report' }"
+           :ripple="false"
            v-show="!isActive('Sold Report')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
+           v-if="isSimpSocialIntegrationEnabled">
       <q-tooltip anchor="center right"
                  self="center left"
                  :offset="[-5, 0]">
