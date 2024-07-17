@@ -10,6 +10,10 @@ export default {
       }
 
       return 'app-icons/misc/logo.svg'
+    },
+
+    isSimpSocial () {
+      return this.statics?.domain?.includes('simpsocial')
     }
   }
 }
