@@ -48,12 +48,15 @@
 </template>
 
 <script>
-import { guestFormsMixin } from 'src/plugins/mixins'
+import { guestFormsMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'login-large-screens-info',
 
-  mixins: [guestFormsMixin],
+  mixins: [
+    guestFormsMixin,
+    simpsocialMixin
+  ],
 
   props: {
     xmasEnabled: {
