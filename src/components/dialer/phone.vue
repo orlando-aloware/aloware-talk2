@@ -677,7 +677,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="isNotDisposed"
+                  :disabled="isNotDisposed || this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1307,6 +1307,7 @@ import ParkedCallIcon from 'components/icons/parked-call-icon'
 import API from 'src/plugins/api/api'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import * as AgentStatus from '../../constants/agent-status'
 
 export default {
   name: 'phone',
@@ -1456,7 +1457,8 @@ export default {
       CommunicationTypes,
       UploadedFileTypes,
       TagCategories,
-      callbackAction: false
+      callbackAction: false,
+      AgentStatus
     }
   },
 
@@ -1479,6 +1481,8 @@ export default {
     ]),
 
     ...mapState('cache', ['currentCompany']),
+
+    ...mapState('auth', ['profile']),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
