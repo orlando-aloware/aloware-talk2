@@ -11,7 +11,7 @@
         </b-col>
       </b-form-row>
 
-      <div v-if="!statics.whitelabel">
+      <div v-if="!statics.whitelabel && !isSimpSocial">
         <b-form-row class="mt-3 general-settings-app-block">
           <b-col sm="12" md="12">
             <div class="d-inline-flex align-items-center">
@@ -150,11 +150,14 @@ import { mapGetters, mapState } from 'vuex'
 import InputGroupWithCopy from 'components/input-group-with-copy'
 import * as AnswerTypes from 'src/constants/answer-types'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
+import { simpsocialMixin } from 'src/mixins/simpsocial'
 
 export default {
   name: 'general-information',
 
   components: { InputGroupWithCopy },
+
+  mixins: [simpsocialMixin],
 
   props: {
     statics: {
