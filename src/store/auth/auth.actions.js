@@ -36,9 +36,7 @@ const check = async ({ commit }, payload, skipSetAuthenticated) => {
     if (!preventRedirect &&
       response.data.user.enabled &&
       response.data.user.company.enabled &&
-      (window.location.href.indexOf('/suspended') !== -1 ||
-        (window.location.href.indexOf('/login') !== -1 &&
-          window.location.href.indexOf('suspended') !== -1))) {
+      window.location.href.indexOf('/login') !== -1) {
       window.location.href = '/'
     }
 
