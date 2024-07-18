@@ -102,7 +102,6 @@ export default {
     }
   },
   computed: {
-    // ...mapGetters('auth', ['authenticated', 'profile']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
     ...mapState(['isWidget', 'dialer', 'hubspotPhoneNumber', 'isRedirectedToHubspotWidget']),
