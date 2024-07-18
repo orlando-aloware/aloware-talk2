@@ -1,11 +1,9 @@
 <template>
     <div class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
-        <div class="login-container px-3 px-sm-2 pt-sm-0"
-             :class="{'pt-5': !hubspotWidget, 'pt-2': hubspotWidget}">
+        <div class="login-container px-3 px-sm-2 pt-sm-0 pt-5">
             <div class="d-flex w-100 justify-content-center"
                  v-if="appLogo">
-              <img class="col-6 w-auto login-form-logo px-0"
-                   :class="{'pb-4': !hubspotWidget, 'pb-2': hubspotWidget}"
+              <img class="col-6 w-auto login-form-logo px-0 pb-4"
                    :src="appLogo" />
             </div>
             <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1"
