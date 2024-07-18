@@ -14,7 +14,7 @@ export default {
     },
 
     isSimpSocial () {
-      return this.currentCompany && this.currentCompany.reseller_id === 357
+      return (this.currentCompany && this.currentCompany.reseller_id === 357) || this.statics?.domain?.includes('simpsocial')
     },
 
     whiteLabelName () {
