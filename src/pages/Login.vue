@@ -3,8 +3,7 @@
     <login-large-screens-info
       class="col-7 px-0"
       :xmasEnabled="isXmasBannerEnabled" />
-    <login-form class="col-12 col-lg-5 px-0"
-                :static="statics" />
+    <login-form class="col-12 col-lg-5 px-0"/>
     <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </section>
 </template>
