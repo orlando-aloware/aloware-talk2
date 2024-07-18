@@ -972,6 +972,11 @@ export default {
     this.mainListeners.agentStatusUpdated = (event) => {
       this.updateUserStatus(event)
 
+      console.log('MainLayout mainListeners.agentStatusUpdated event', event)
+      console.log('MainLayout mainListeners.agentStatusUpdated currentCompany.id', this.currentCompany.id)
+      console.log('MainLayout mainListeners.agentStatusUpdated profile.id', this.profile.id)
+      console.log('MainLayout mainListeners.agentStatusUpdated profile.agent_status', this.profile.agent_status)
+
       if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
         this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
         this.setAgentStatus(event.agent_status)
