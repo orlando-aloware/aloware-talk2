@@ -6,12 +6,23 @@ export default {
 
     ...mapState('auth', ['profile']),
 
+    ...mapState('statics'),
+
     isSimpSocialIntegrationEnabled () {
-      return this.currentCompany && this.currentCompany.simpsocial_integration_enabled && this.profile
+      // return this.currentCompany && this.currentCompany.simpsocial_integration_enabled && this.profile
+      return true
     },
 
     isSimpSocial () {
       return this.currentCompany && this.currentCompany.reseller_id === 357
+    },
+
+    whiteLabelName () {
+      if (this.statics.whitelabel) {
+        return this.statics?.name ?? 'Aloware'
+      }
+
+      return 'Aloware'
     }
   }
 }
