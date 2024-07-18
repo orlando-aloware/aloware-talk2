@@ -150,7 +150,7 @@ import { mapGetters, mapState } from 'vuex'
 import InputGroupWithCopy from 'components/input-group-with-copy'
 import * as AnswerTypes from 'src/constants/answer-types'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { simpsocialMixin } from 'src/mixins/simpsocial'
+import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'general-information',
