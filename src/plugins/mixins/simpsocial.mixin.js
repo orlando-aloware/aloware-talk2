@@ -9,8 +9,7 @@ export default {
     ...mapState('statics'),
 
     isSimpSocialIntegrationEnabled () {
-      // return this.currentCompany && this.currentCompany.simpsocial_integration_enabled && this.profile
-      return true
+      return this.currentCompany && this.currentCompany.simpsocial_integration_enabled && this.profile
     },
 
     isSimpSocial () {
@@ -23,6 +22,22 @@ export default {
       }
 
       return 'Aloware'
+    },
+
+    whiteLabelText () {
+      return this.statics.whitelabel ? '' : 'Aloware '
+    },
+
+    whiteLabelContactText () {
+      return this.statics.whitelabel ? '' : 'Aloware'
+    },
+
+    whiteLabelUsesText () {
+      return this.statics.whitelabel ? 'Uses' : 'Aloware uses'
+    },
+
+    whiteLabelProfileText () {
+      return this.statics.whitelabel ? '' : ' on Aloware'
     }
   }
 }
