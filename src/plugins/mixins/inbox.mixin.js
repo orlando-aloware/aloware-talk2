@@ -370,7 +370,7 @@ export default {
         }
       }
       if (this.firstTimeLoading && this.profile?.default_report_period) {
-        this.setDateFilter(filter, this.profile.default_report_period)
+        this.setDateFilter(filter, this.profile.default_report_period);
         this.firstTimeLoading = false
       }
 
