@@ -93,7 +93,7 @@ export default {
     },
 
     alowareTalk () {
-      return `${this.statics.name} Talk`
+      return this.isSimpSocial ? 'Talk' : `${this.statics.name} Talk`
     },
 
     classicUrl () {
