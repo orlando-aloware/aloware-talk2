@@ -10,13 +10,20 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import { htmlMixin } from 'src/plugins/mixins'
 
 export default {
   data () {
     return {
       source: ''
     }
+  },
+
+  mixins: [htmlMixin],
+
+  computed: {
+    ...mapState(['statics'])
   },
 
   mounted () {
