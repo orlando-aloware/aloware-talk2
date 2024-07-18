@@ -52,7 +52,7 @@
 import * as HubspotMessageError from 'src/constants/hubspot-message-widget-errors'
 
 export default {
-  name: 'Error',
+  name: 'hubspot-message-widget-error',
   data () {
     return {
       HubspotMessageError
