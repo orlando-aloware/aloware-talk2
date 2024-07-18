@@ -109,7 +109,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, guestFormsMixin, recaptchaMixin } from 'src/plugins/mixins'
+import { aclMixin, guestFormsMixin, simpsocialMixin, recaptchaMixin } from 'src/plugins/mixins'
 import SecurityCode from 'components/guest/security-code'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
@@ -120,7 +120,8 @@ export default {
   mixins: [
     aclMixin,
     guestFormsMixin,
-    recaptchaMixin
+    recaptchaMixin,
+    simpsocialMixin
   ],
 
   name: 'login-form',
