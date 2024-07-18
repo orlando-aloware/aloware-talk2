@@ -77,7 +77,7 @@
                dense
                no-caps
                unelevated
-               v-if="isCompanyKYC && !isKYCFilled"
+               v-if="(isCompanyKYC && !isKYCFilled) || isCompanyBrandApproved"
                @click="onOpenFinishRegistration" />
         <q-btn class="q-mr-lg"
                color="primary"

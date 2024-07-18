@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import * as KycLogs from '../../constants/kyc-logs'
+import * as ComplianceLogs from '../../constants/compliance-status'
 import { mapState } from 'vuex'
 
 export default _.merge({
@@ -33,6 +34,10 @@ export default _.merge({
       }
 
       return this.currentCompany?.is_kyc
+    },
+
+    isCompanyBrandApproved () {
+      return this.currentCompany?.a2p_brand?.status === ComplianceLogs.STATUS_APPROVED
     },
 
     isKYCFilled () {
@@ -93,7 +98,7 @@ export default _.merge({
     enabledToTextNumber () {
       const kycStatus = this.getStatus()
 
-      if (this.skipRestrictions(kycStatus)) {
+      if (this.skipRestrictions(kycStatus) || this.currentCompany?.a2p_brand?.status === ComplianceLogs.STATUS_APPROVED) {
         return true
       }
 
