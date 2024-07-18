@@ -208,9 +208,9 @@ export default {
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
         return
-      } else {
-        this.showAlertAgentOnCall = false
       }
+      
+      this.showAlertAgentOnCall = false
 
       if (!this.hubspotPhoneNumber && phoneNumber) {
         this.setHubspotPhoneNumber(phoneNumber)
