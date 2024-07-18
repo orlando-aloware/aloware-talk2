@@ -60,14 +60,15 @@ import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { cloneDeep } from 'lodash'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   name: 'shared-login-menu',
 
   mixins: [
-    aclMixin
+    aclMixin,
+    simpsocialMixin
   ],
 
   computed: {
@@ -93,10 +94,6 @@ export default {
 
     alowareTalk () {
       return `${this.statics.name} Talk`
-    },
-
-    whiteLabelText () {
-      return this.statics.whitelabel ? '' : 'Aloware '
     },
 
     classicUrl () {
