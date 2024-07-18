@@ -209,7 +209,7 @@ export default {
         this.showAlertAgentOnCall = true
         return
       }
-      
+
       this.showAlertAgentOnCall = false
 
       if (!this.hubspotPhoneNumber && phoneNumber) {
