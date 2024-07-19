@@ -6,7 +6,7 @@ export default {
 
     ...mapState('auth', ['profile']),
 
-    ...mapState('statics'),
+    ...mapState('[statics]'),
 
     isSimpSocialIntegrationEnabled () {
       return this.currentCompany && this.currentCompany.simpsocial_integration_enabled && this.profile
@@ -17,7 +17,7 @@ export default {
     },
 
     whiteLabelName () {
-      if (this.statics.whitelabel) {
+      if (this.statics?.whitelabel) {
         return this.statics?.name ?? 'Aloware'
       }
 
@@ -25,19 +25,19 @@ export default {
     },
 
     whiteLabelText () {
-      return this.statics.whitelabel ? '' : 'Aloware '
+      return this.statics?.whitelabel ? '' : 'Aloware '
     },
 
     whiteLabelContactText () {
-      return this.statics.whitelabel ? '' : 'Aloware'
+      return this.statics?.whitelabel ? '' : 'Aloware'
     },
 
     whiteLabelUsesText () {
-      return this.statics.whitelabel ? 'Uses' : 'Aloware uses'
+      return this.statics?.whitelabel ? 'Uses' : 'Aloware uses'
     },
 
     whiteLabelProfileText () {
-      return this.statics.whitelabel ? '' : ' on Aloware'
+      return this.statics?.whitelabel ? '' : ' on Aloware'
     }
   }
 }
