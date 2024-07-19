@@ -1,6 +1,6 @@
 {
   "name": "aloware-talk2",
-  "version": "1.51.1",
+  "version": "1.51.2",
   "description": "Aloware Agent Interface",
   "productName": "Aloware Talk",
   "author": "Aloware <support@aloware.com>",
@@ -139,5 +139,6 @@
     "node": ">= 18.20.1",
     "npm": ">= 10.5.0",
     "yarn": ">= 1.22.19"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
