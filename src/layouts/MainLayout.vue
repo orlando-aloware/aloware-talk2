@@ -2493,6 +2493,7 @@ export default {
           storage.local.setItem('statics', JSON.stringify(res.data))
           this.setStaticsLoaded(true)
           this.setIsWhiteLabel(res.data.whitelabel)
+          this.setDocumentFavicon(res.data.favicon)
         }).catch(err => {
           console.log(err)
 

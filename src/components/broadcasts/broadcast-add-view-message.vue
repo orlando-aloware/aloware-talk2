@@ -27,7 +27,7 @@
           <information-circle-icon class="cursor-pointer"/>
           <q-tooltip>
             This is the text message you want to send to the selected group of contacts.<br>
-            If the user has no contact name or 'Aloware Contact' as the name, then the variable will be blank.
+            If the user has no contact name or '{{ whiteLabelContactText }} Contact' as the name, then the variable will be blank.
           </q-tooltip>
         </div>
         <div class="d-flex items-center">
@@ -111,7 +111,7 @@ import MessageComposerSms from 'src/components/message-composer/message-composer
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
 import Waveform from 'src/components/waveform.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin, smsMixin } from 'src/plugins/mixins'
+import { aclMixin, smsMixin, simpsocialMixin } from 'src/plugins/mixins'
 import { IS_OPT_OUT_FORCED_TEXT } from '../../constants/compliance-messages'
 
 export default {
@@ -119,7 +119,8 @@ export default {
 
   mixins: [
     aclMixin,
-    smsMixin
+    smsMixin,
+    simpsocialMixin
   ],
 
   components: {
