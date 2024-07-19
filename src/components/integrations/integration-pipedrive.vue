@@ -84,10 +84,10 @@
                        self="center left"
                        data-testid="integration-pipedrive-sync-tooltip"
                        :offset="[-220, 10]">
-              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelText }} and Pipedrive.</p>
+              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and Pipedrive.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>
               <p class="mt-1 mb-0">- The contact was recently merged in Pipedrive with another contact.</p>
-              <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelText }} and Pipedrive data on this contact.</p>
+              <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and Pipedrive data on this contact.</p>
             </q-tooltip>
           </b-button>
         </b-row>
@@ -104,7 +104,8 @@ import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 import {
   pipedriveIntegrationMixin,
-  integrationMixin
+  integrationMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 
 export default {
@@ -114,7 +115,8 @@ export default {
 
   mixins: [
     pipedriveIntegrationMixin,
-    integrationMixin
+    integrationMixin,
+    simpsocialMixin
   ],
 
   props: {
@@ -141,10 +143,6 @@ export default {
       }
 
       return this.pipedriveContactLink(this.contact)
-    },
-
-    whiteLabelText () {
-      return this.statics.whitelabel ? this.statics.name : 'Aloware'
     },
 
     isContactValid () {
