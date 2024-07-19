@@ -103,7 +103,7 @@ export default {
         .then(res => {
           this.setStatics(res.data)
 
-          if (this.statics.host === 'app.simpsocial.com') {
+          if (this.statics.domain === 'app.simpsocial.com') {
             this.setPageTitle(`${this.statics?.name} - Login`)
             this.setDocumentFavicon(this.statics?.favicon)
           }
