@@ -9,7 +9,8 @@
                  custom-class="btn-primary"
                  data-testid="comm-barge-comm-button-popover"
                  delay="100">
-        <span class="text-white">
+        <span class="text-white"
+              v-if="!isSimpSocial">
           The barge option is not included in your current plan, to use it, you have
           to upgrade to one of our plans that offers it!
           <u class="cursor-pointer"
@@ -42,7 +43,7 @@
 
 <script>
 import VolumeHighIcon from 'src/components/icons/volume-high-icon.vue'
-import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'barge-communication-button',
@@ -50,7 +51,8 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin
+    communicationMixin,
+    simpsocialMixin
   ],
 
   components: {
