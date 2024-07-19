@@ -1322,7 +1322,6 @@ export default function (/* { ssrContext } */) {
       },
 
       UPDATE_USER_STATUS (state, event) {
-        console.log('UPDATE_USER_STATUS event', event)
         const found = state.users.find(u => u.id === event.user_id)
         if (found) {
           const index = state.users.indexOf(found)
