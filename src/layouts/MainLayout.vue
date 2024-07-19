@@ -59,7 +59,7 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated && !suspended"/>
+            <dialer v-if="authenticated && !suspended && !isWidget"/>
           </q-page-container>
         </div>
         <q-drawer class="h-100 sidebar-wrapper d-block position-absolute top-0"
