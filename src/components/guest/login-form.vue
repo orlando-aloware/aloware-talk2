@@ -1,10 +1,13 @@
 <template>
     <div class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
-        <div class="login-container px-3 px-sm-2 pt-5 pt-sm-0">
-            <img class="col-6 w-auto login-form-logo d-lg-none pb-5 px-0"
-                 :src="appLogo"/>
+        <div class="login-container px-3 px-sm-2 pt-sm-0 pt-5">
+            <div class="d-flex w-100 justify-content-center"
+                 v-if="appLogo">
+              <img class="col-6 w-auto login-form-logo px-0 pb-4"
+                   :src="appLogo" />
+            </div>
             <div class="title mb-30 w-100 text-left px-2 pb-2 pb-sm-4 mb-4 mb-sm-1"
-                 v-if="!magicLink">
+                 v-if="!appLogo">
                 Login
             </div>
             <form class="login-form w-100 px-2"
@@ -63,14 +66,16 @@
                            :disable="loading || disabledSubmit"
                            :loading="loading"/>
                 </div>
-                <div class="description-sm field text-left pt-3 mt-1">
+                <div class="description-sm field text-left pt-3 mt-1"
+                     v-if="!isSimpSocial">
                     Don’t have an account?
                     <a href="https://meetings.hubspot.com/alwr/aloware-demo"
                        target="_blank">
                         Book a demo now!
                     </a>
                 </div>
-                <div class="field text-left pt-3 mt-1">
+                <div class="field text-left pt-3 mt-1"
+                     v-if="!isSimpSocial">
                     <b-link href="https://support.aloware.com/en/articles/9037819-troubleshooting-aloware-authentication-issues"
                             class="cursor-pointer field text-left text-decoration-none"
                             target="_blank">
@@ -102,7 +107,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, guestFormsMixin, recaptchaMixin } from 'src/plugins/mixins'
+import { aclMixin, guestFormsMixin, simpsocialMixin, recaptchaMixin } from 'src/plugins/mixins'
 import SecurityCode from 'components/guest/security-code'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
@@ -113,7 +118,8 @@ export default {
   mixins: [
     aclMixin,
     guestFormsMixin,
-    recaptchaMixin
+    recaptchaMixin,
+    simpsocialMixin
   ],
 
   name: 'login-form',

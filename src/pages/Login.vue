@@ -2,9 +2,8 @@
   <section class="row w-100 h-100 mx-0">
     <login-large-screens-info
       class="col-7 px-0"
-      :xmasEnabled="isXmasBannerEnabled"
-      />
-    <login-form class="col-12 col-lg-5 px-0" />
+      :xmasEnabled="isXmasBannerEnabled" />
+    <login-form class="col-12 col-lg-5 px-0"/>
     <user-already-have-account-dialog :show="shouldRedirectToLogin" />
   </section>
 </template>
@@ -13,7 +12,8 @@
 import {
   guestMixin,
   aclMixin,
-  settingsMixin
+  settingsMixin,
+  htmlMixin
 } from 'boot/mixins'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
@@ -21,6 +21,7 @@ import { mapActions, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
 import UserAlreadyHaveAccountDialog from 'src/components/account-registration/user-already-have-account-dialog.vue'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'login',
@@ -28,7 +29,8 @@ export default {
   mixins: [
     guestMixin,
     aclMixin,
-    settingsMixin
+    settingsMixin,
+    htmlMixin
   ],
 
   components: { LoginForm, LoginLargeScreensInfo, UserAlreadyHaveAccountDialog },
@@ -51,6 +53,7 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setStatics']),
     ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
     ...mapActions(['resetVuex', 'setUsage']),
     ...mapActions('cache', ['setCurrentCompany']),
@@ -93,11 +96,29 @@ export default {
           resolve()
         }, 2000)
       })
+    },
+
+    getStatics () {
+      talk2Api.V1.statics.get(this.currentCompany?.id)
+        .then(res => {
+          this.setStatics(res.data)
+
+          if (this.statics.host === 'app.simpsocial.com') {
+            this.setPageTitle(`${this.statics?.name} - Login`)
+            this.setDocumentFavicon(this.statics?.favicon)
+          }
+        })
+        .catch(err => {
+          this.setPageTitle('Login - Talk')
+          console.log(err)
+          this.$root.handleErrors(err.response)
+        })
     }
   },
 
   created () {
     this.validateCookieUser()
+    this.getStatics()
   }
 }
 </script>
