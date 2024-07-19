@@ -344,7 +344,7 @@ export default {
       if (filter && filter?.users && filter.users.length) {
         this.filters = {
           ...this.filters,
-          'users': [
+          'communication_users': [
             { value: filter.users, operator: OPERATORS.IS_ANY_OF }
           ]
         }

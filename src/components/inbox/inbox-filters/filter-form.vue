@@ -312,6 +312,7 @@
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"
+                               :with-unassigned="isInboxOrAllCallsChannel"
                                :highlighted="isChanged('users')"
                                data-testid="filter-form-user-selector"
                                v-model="filter.users"
