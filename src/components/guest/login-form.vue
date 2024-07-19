@@ -245,7 +245,16 @@ export default {
         return
       }
 
-      const redirectPath = (this.$route.query.redirect === '/suspended' ? '' : this.$route.query.redirect) || '/'
+      const redirectQuery = this.$route.query.redirect
+      const decodedRedirect = decodeURIComponent(redirectQuery)
+
+      let redirectPath = (decodedRedirect === '/suspended' ? '' : decodedRedirect) || '/'
+
+      if (this.hubspotWidget) {
+        redirectPath = '/widgets/hubspot-call-extension'
+        this.setIsRedirectedToHubspotWidget(true)
+      }
+
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
 
@@ -298,7 +307,8 @@ export default {
 
     ...mapActions([
       'resetVuex',
-      'setUsage'
+      'setUsage',
+      'setIsRedirectedToHubspotWidget'
     ]),
 
     ...mapActions('auth', [

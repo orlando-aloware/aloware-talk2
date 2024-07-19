@@ -1947,6 +1947,7 @@ export default {
   },
 
   mounted () {
+    this.checkIfIsWidget()
     this.setupDraggable()
     this.setupContactLocalTime()
     // Disable phone visibility on power dialer sessions
@@ -2542,9 +2543,16 @@ export default {
       this.hasCommunicationNotesUnsavedChanges = value
     },
 
+    checkIfIsWidget () {
+      if (this.$route.path.includes('/widgets/hubspot-call-extension')) {
+        this.setIsWidget(true)
+      }
+    },
+
     ...mapActions([
       'setDialerContact',
-      'setDialerContactTags'
+      'setDialerContactTags',
+      'setIsWidget'
     ])
   },
 
