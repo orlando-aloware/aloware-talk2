@@ -612,7 +612,7 @@ export default {
       })
     },
 
-    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null) {
+    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null, isCallWaiting = false) {
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
@@ -630,7 +630,7 @@ export default {
       // reject ongoing call if there is one
       this.rejectCall()
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL && !isCallWaiting) {
         console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
         return
       }
@@ -1029,7 +1029,7 @@ export default {
         console.log('Call parked')
 
         if (shouldAnswer) {
-          this.makeCall('call:' + data.id, data.campaignId)
+          this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting)
         } else if (shouldUnpark) {
           this.unparkCall(data, true)
         }
@@ -1074,7 +1074,7 @@ export default {
             if (shouldUnpark) {
               this.unparkCall(data)
             } else if (shouldAnswer) {
-              this.makeCall('call:' + data.id, data.campaignId)
+              this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting)
             }
 
             this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
