@@ -668,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="isNotDisposed"
+                  :disabled="isNotDisposed || isNotOnWrapUp"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -677,7 +677,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="isNotDisposed || this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP"
+                  :disabled="isNotDisposed || isNotOnWrapUp"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1911,6 +1911,10 @@ export default {
     isAccountForcedAlwaysRecordOutbound () {
       return this.dialer.communication.direction === CommunicationDirection.OUTBOUND &&
         this.currentCompany.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS
+    },
+
+    isNotOnWrapUp () {
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP
     }
   },
 
