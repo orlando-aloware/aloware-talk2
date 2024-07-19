@@ -735,7 +735,6 @@ export default {
       window.Echo.private('cache-agent-status-' + this.profile.company_id)
         .listen('.agent_status.updated', (event) => {
           console.log('broadcast mixin event:', event)
-          console.log('broadcast mixin profile:', this.profile)
           if (!this.profile || !event.user_id) {
             return
           }
