@@ -3,7 +3,7 @@
     <div :class="{'login-container px-3 px-sm-2 pt-sm-0': true, 'pt-5': !hubspotWidget, 'pt-2': hubspotWidget}">
       <div class="d-flex w-100 justify-content-center"
            v-if="shouldShowAppLogo">
-        <img :class="{'col-6 w-auto login-form-logo d-lg-none px-0': true, 'pb-5': !hubspotWidget, 'pb-2': hubspotWidget}"
+        <img :class="{'col-6 w-auto login-form-logo px-0': true, 'pb-5': !hubspotWidget, 'pb-2': hubspotWidget}"
              :src="appLogo"/>
       </div>
       <form class="login-form w-100 px-2"
