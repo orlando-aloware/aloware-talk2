@@ -53,7 +53,7 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setStatics']),
+    ...mapActions(['setStatics', 'setStaticsLoaded']),
     ...mapActions('auth', ['getCookieUser', 'getSharedCookie']),
     ...mapActions(['resetVuex', 'setUsage']),
     ...mapActions('cache', ['setCurrentCompany']),
@@ -98,12 +98,13 @@ export default {
       })
     },
 
-    getStatics () {
-      talk2Api.V1.statics.get(this.currentCompany?.id)
+    async getStatics () {
+      this.setStaticsLoaded(false)
+      await talk2Api.V1.statics.get(this.currentCompany?.id)
         .then(res => {
           this.setStatics(res.data)
 
-          if (this.statics.host === 'app.simpsocial.com') {
+          if (this.statics.domain === 'app.simpsocial.com') {
             this.setPageTitle(`${this.statics?.name} - Login`)
             this.setDocumentFavicon(this.statics?.favicon)
           }
@@ -113,12 +114,19 @@ export default {
           console.log(err)
           this.$root.handleErrors(err.response)
         })
+        .finally(() => {
+          this.setStaticsLoaded(true)
+        })
     }
   },
 
   created () {
     this.validateCookieUser()
     this.getStatics()
+  },
+
+  async beforeCreate () {
+    this.$store.commit('SET_STATICS_LOADED', false)
   }
 }
 </script>
