@@ -1,6 +1,6 @@
 {
   "name": "aloware-talk2",
-  "version": "1.50.1",
+  "version": "1.51.0",
   "description": "Aloware Agent Interface",
   "productName": "Aloware Talk",
   "author": "Aloware <support@aloware.com>",
@@ -25,6 +25,7 @@
   "dependencies": {
     "@fullstory/browser": "^1.5.1",
     "@gkt/microphone": "^1.0.3",
+    "@hubspot/calling-extensions-sdk": "^0.5.1",
     "@popperjs/core": "^2.11.8",
     "@quasar/extras": "^1.16.9",
     "@riophae/vue-treeselect": "^0.4.0",
@@ -110,7 +111,7 @@
     "electron-devtools-installer": "^3.1.1",
     "electron-log": "^4.4.8",
     "electron-packager": "^17.1.2",
-    "electron-updater": "^6.1.8",
+    "electron-updater": "^6.3.0",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-loader": "^3.0.3",
@@ -139,5 +140,6 @@
     "node": ">= 18.20.1",
     "npm": ">= 10.5.0",
     "yarn": ">= 1.22.19"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

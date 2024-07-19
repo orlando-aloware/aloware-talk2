@@ -57,41 +57,6 @@ export default {
       canEmail: false,
       type: 0,
       smsOnly: false,
-      replyText: '',
-      sendMediaDialogVisible: false,
-      giphyMediaDialogVisible: false,
-      loadingSendMediaBtn: false,
-      media: {
-        file_name: null,
-        body: null,
-        files: []
-      },
-      uploadPercentage: {
-        import: 0,
-        upload: 0
-      },
-      uploadStatus: {
-        import: 'success',
-        upload: 'success'
-      },
-      uploadFileList: {
-        import: [],
-        upload: []
-      },
-      rulesMedia: {
-        fileName: [
-          {
-            required: true,
-            message: 'Please upload your media file',
-            trigger: 'change'
-          }
-        ]
-      },
-      headers: {
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + storage.local.getItem('api_token'),
-        'X-Socket-Id': window.Echo ? window.Echo.socketId() : ''
-      },
       isLoadingPreviousActivities: false,
       activityTypes: [
         'communication',
@@ -836,12 +801,6 @@ export default {
       })
     },
 
-    changeSelectedPhoneNumber (phoneNumber) {
-      this.selectedPhoneNumber = phoneNumber
-      this.$generalNotification(`Changed selected contact phone number to: ${this.selectedPhoneNumber}`)
-      // this.setFocus()
-    },
-
     resetSelectedContact () {
       if (!this.cancelToken) {
         this.cancelToken = this.$axios.CancelToken
@@ -874,160 +833,6 @@ export default {
           this.loadingMarkAsRead = false
         })
       }
-    },
-
-    sendMessage (event) {
-      if (event && event.shiftKey === true && event.key === 'Enter') {
-        return
-      }
-
-      this.markAllAsRead()
-      this.loadingSendMessage = true
-
-      this.$axios.post('/api/v1/campaign/send-message/' + this.selectedCampaignId + '/' + this.contact.id, {
-        message: this.reply_text,
-        phone_number: this.selectedPhoneNumber
-      }).then(res => {
-        this.reply_text = ''
-        this.loadingSendMessage = false
-        this.$generalNotification('Message sent')
-      }).catch(err => {
-        this.$handleErrors(err.response)
-        this.loadingSendMessage = false
-      })
-    },
-
-    sendGifMessage (url) {
-      this.closeGiphyMediaModal()
-      this.markAllAsRead()
-      this.loadingSendMessage = true
-
-      this.$axios.post(`/api/v1/campaign/send-gif/${this.selectedCampaignId}/${this.contact.id}`, {
-        url: url,
-        phone_number: this.selectedPhoneNumber
-      }).then(res => {
-        this.loadingSendMessage = false
-        this.$generalNotification('Message sent')
-      }).catch(err => {
-        this.$handleErrors(err.response)
-        this.loadingSendMessage = false
-      })
-    },
-
-    openSendMediaModal () {
-      this.sendMediaDialogVisible = true
-      this.resetSendMediaContactsForm('media')
-    },
-
-    closeSendMediaModal () {
-      this.sendMediaDialogVisible = false
-      this.resetSendMediaContactsForm('media')
-    },
-
-    openGiphyMediaModal () {
-      this.giphyMediaDialogVisible = true
-    },
-
-    closeGiphyMediaModal () {
-      this.giphyMediaDialogVisible = false
-    },
-
-    beforeCloseSendMediaModal (done) {
-      this.$bvModal.msgBoxConfirm('Are you sure you want to leave? You have not sent any media yet', {
-        title: 'Warning',
-        size: 'sm',
-        buttonSize: 'sm',
-        okVariant: 'danger',
-        okTitle: 'Yes, Leave',
-        cancelTitle: 'No, Stay',
-        footerClass: 'p-2',
-        hideHeaderClose: false,
-        centered: true
-      })
-        .then(value => {
-          this.boxTwo = value
-          done()
-        })
-        .catch(err => {
-          // An error occurred
-          console.log(err)
-          done()
-        })
-    },
-
-    onChangeFileList (file, fileList) {
-      this.uploadFileList.upload = fileList
-    },
-
-    onSuccessSendMedia (res) {
-      this.$generalNotification('Media file has been uploaded successfully.')
-      this.$set(this.media, 'file_name', res.file_name)
-      this.uploadStatus.upload = 'success'
-      // TODO: validate the form
-    },
-
-    onFailedSendMedia (err) {
-      this.$handleUploadErrors(err.message)
-      this.uploadStatus.upload = 'exception'
-      this.uploadPercentage.upload = 0
-      // TODO: validate the form
-    },
-
-    beforeUploadSendMedia () {
-      this.uploadStatus.upload = 'success'
-      this.uploadPercentage.upload = 0
-    },
-
-    progressUploadSendMedia (event) {
-      this.uploadPercentage.upload = parseInt(event.percent)
-    },
-
-    sendMedia () {
-      // TODO: check if media form is validated
-      // if (this.validateForm('media') == true) {
-      this.loadingSendMediaBtn = true
-      this.media.phone_number = this.selectedPhoneNumber
-      this.media.files = this.uploadFileList.upload.map(item => item.response.file_name)
-
-      this.$axios.post(`/api/v1/campaign/send-mms/${this.selectedCampaignId}/${this.contact.id}`, this.media)
-        .then(res => {
-          this.loadingSendMediaBtn = false
-          this.resetSendMediaContactsForm('media')
-          this.sendMediaDialogVisible = false
-          this.uploadPercentage.upload = 0
-          this.uploadStatus.upload = 'success'
-          this.uploadFileList.upload = []
-          this.$generalNotification('Message sent')
-        })
-        .catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
-          this.loadingSendMediaBtn = false
-        })
-      // }
-    },
-
-    resetSendMediaContactsForm (formName) {
-      this.media.file_name = null
-      this.media.body = null
-      this.media.files = []
-      this.uploadFileList.upload = []
-      this.uploadPercentage.upload = 0
-      this.uploadStatus.upload = 'success'
-      // TODO: reset the form
-    },
-
-    setFocus () {
-      this.$nextTick(() => {
-        if (this.$refs.reply_text) {
-          this.$refs.reply_text.focus()
-        }
-      })
-    },
-
-    addToMessage (event) {
-      this.reply_text += event.target.text.trim()
-      this.setFocus()
     },
 
     scrollMessages () {
@@ -1377,7 +1182,8 @@ export default {
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed'
+      'setIsContactMixinUsed',
+      'selectedContactChanging'
     ]),
 
     ...mapActions('inbox', ['setSelectedContact'])

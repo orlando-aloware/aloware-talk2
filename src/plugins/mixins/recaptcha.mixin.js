@@ -22,6 +22,8 @@ export default {
       script.async = true
       script.defer = true
       document.head.appendChild(script)
+
+      setTimeout(this.resizeRecaptcha, 500)
     },
 
     initRecaptcha () {
@@ -42,6 +44,16 @@ export default {
       }
 
       this.disabledSubmit = false
+    },
+
+    resizeRecaptcha () {
+      const recaptchaElement = document.querySelector('#recaptcha-element')
+      if (recaptchaElement) {
+        const firstDivChild = recaptchaElement.querySelector('div')
+        if (firstDivChild) {
+          window.innerWidth < 768 ? firstDivChild.style.width = '240px' : firstDivChild.style.width = 'auto'
+        }
+      }
     }
   }
 }

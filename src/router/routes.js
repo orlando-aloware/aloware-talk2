@@ -7,6 +7,7 @@ const Contact = () => import('src/pages/contacts/Contact.vue')
 const Contacts = () => import('src/pages/contacts/Contacts.vue')
 const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
 const ContactsAddView = () => import('src/pages/contacts/ContactsAddView.vue')
+const Dialer = () => import('pages/widgets/Dialer.vue')
 const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
 const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
@@ -36,6 +37,7 @@ const routes = [
   {
     path: '/',
     component: MainLayout,
+    props: true,
     children: [
       {
         path: 'login',
@@ -473,10 +475,46 @@ const routes = [
           isGuest: true
         },
         component: AccountRegistration
+      },
+      {
+        name: 'Texting Widget (known-user)',
+        path: '/widgets/texting/api_key/:api_key/contact/:id',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: Contact
+      },
+      {
+        name: 'Texting Widget (unknown-user)',
+        path: '/widgets/texting/contact/:id',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: Contact
       }
     ]
   },
-
+  // Dialer Widget (Browser / Apps)
+  {
+    name: 'Dialer Widget (API)',
+    path: '/widgets/dialer/api_key/:apiKey',
+    props: true,
+    component: Dialer
+  },
+  {
+    name: 'Dialer Widget',
+    path: '/widgets/dialer',
+    props: true,
+    component: Dialer
+  },
+  {
+    name: 'Hubspot Call Extension',
+    path: '/widgets/hubspot-call-extension',
+    props: true,
+    component: Dialer
+  },
   // Always leave this as last one,
   // but you can also remove it
   {

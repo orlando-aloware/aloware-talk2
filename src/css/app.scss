@@ -4606,6 +4606,12 @@ i.option-separator {
   }
 }
 
+.phone-widget {
+  position: relative;
+  top: 0;
+  right: 0;
+}
+
 .phone-settings {
   width: 210px;
   @extend .q-pa-md;
@@ -9151,7 +9157,7 @@ screen and (max-width: 956px) {
   .inbox {
     .inbox-details {
       .contact-activity-container {
-        .composer-footer {
+        .composer-footer:not(.is-widget) {
           flex-direction: column;
 
           .inline-select.q-select--with-input {
@@ -9184,7 +9190,7 @@ screen and (max-width: 956px) {
 @media (max-width: 1220px) and (min-width: 1085px) {
   .contact-page {
     .contact-activity-container {
-      .composer-footer {
+      .composer-footer:not(.is-widget) {
         flex-direction: column;
 
         .inline-select.q-select--with-input {
@@ -9215,7 +9221,37 @@ screen and (max-width: 956px) {
 
 @media (max-width: 956px) {
   .contact-activity-container {
-    .composer-footer {
+    .composer-footer:not(.is-widget) {
+      flex-direction: column;
+
+      .inline-select.q-select--with-input {
+        min-width: unset;
+      }
+
+      & > div {
+        width: auto !important;
+        height: 24px;
+
+        > div {
+          float: none !important;
+
+          .q-field__append {
+            align-items: center;
+            height: 29px !important;
+          }
+        }
+      }
+
+      .q-field__control {
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+@media (max-width: 650px) {
+  .contact-activity-container {
+    .composer-footer.is-widget {
       flex-direction: column;
 
       .inline-select.q-select--with-input {
@@ -10371,7 +10407,7 @@ screen and (max-width: 956px) {
   }
 }
 
-@media (max-width: 300px) {
+@media (max-width: 299px) {
   .unsupported {
     display: flex !important;
     height: 100%;
@@ -14403,10 +14439,6 @@ h1.contact-list-name-label {
   @media (min-height: 720px) {
     .business-information-actions {
       top: calc(100vh - 30vh);
-    }
-  }
-
-  @media (min-height: 900px) {
     .business-information-actions {
       top: calc(100vh - 22vh);
       height: 65vh;
@@ -14442,6 +14474,10 @@ h1.contact-list-name-label {
   .loading-text {
     font-size: 20px;
     font-weight: 500;
+    }
+  }
+
+  @media (min-height: 900px) {
     margin-top: 20px;
   }
 }
@@ -14906,4 +14942,51 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   z-index: 1;
   margin-top: -14px !important;
   margin-bottom:-12px !important;
+}
+
+.select-campaign-dialog {
+
+  .label {
+    font-family: Inter;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 15.73px;
+    text-align: left;
+    margin-bottom: 2px;
+  }
+
+  .q-dialog__backdrop {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .q-dialog__inner > div {
+    border-radius: 8px 8px 0 0;
+  }
+
+  .card {
+    width: 375px;
+    height: 130px;
+    padding: 36px 36px 0 36px;
+  }
+
+  .q-btn {
+    border-radius: 6px;
+    height: 40px;
+    margin-left: 16px;
+  }
+
+  .q-btn__content {
+    padding-right: 14px;
+    padding-left: 14px;
+    text-transform: capitalize;
+  }
+
+  .line-selector {
+    width: 75%;
+  }
+
+  .inline-select.q-select--with-input {
+    min-width: 75% !important;
+  }
 }
