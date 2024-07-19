@@ -97,6 +97,11 @@ export default {
     },
 
     classicUrl () {
+      if (this.isSimpSocial) {
+        const simpsocialUrl = process.env.API_URL?.replace('aloware', 'simpsocial')
+        return simpsocialUrl + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
+      }
+
       return process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
     }
   },
