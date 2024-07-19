@@ -1348,7 +1348,6 @@ export default {
     },
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
-      console.log('dialer backToDial signature:', signature)
       this.resetAgentStatus(forceStatus, signature)
       this.resetCall()
     },
