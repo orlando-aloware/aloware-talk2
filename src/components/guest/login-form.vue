@@ -2,7 +2,7 @@
     <div class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
         <div class="login-container px-3 px-sm-2 pt-sm-0 pt-5">
             <div class="d-flex w-100 justify-content-center"
-                 v-if="appLogo">
+                 v-if="shouldShowAppLogo">
               <img class="col-6 w-auto login-form-logo px-0 pb-4"
                    :src="appLogo" />
             </div>
@@ -126,6 +126,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState(['statics', 'staticsLoaded']),
 
     shouldRedirectToClassic () {
       return this.profile &&
@@ -152,7 +153,8 @@ export default {
       resendingValidation: false,
       verificationMessageType: 'success',
       verificationMessage: '',
-      verificationRequestSent: false
+      verificationRequestSent: false,
+      shouldShowAppLogo: false
     }
   },
 
@@ -313,6 +315,17 @@ export default {
     ...mapActions('contacts', [
       'setDefaultIsShortenedUrlRemembered'
     ])
+  },
+
+  watch: {
+    staticsLoaded: {
+      immediate: true,
+      handler (val) {
+        if (val) {
+          this.shouldShowAppLogo = val
+        }
+      }
+    }
   }
 }
 </script>
