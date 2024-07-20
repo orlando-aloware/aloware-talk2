@@ -6,7 +6,7 @@ export default {
 
     ...mapState('auth', ['profile']),
 
-    ...mapState('[statics]'),
+    ...mapState(['statics']),
 
     isSimpSocialIntegrationEnabled () {
       return this.currentCompany && this.currentCompany.simpsocial_integration_enabled && this.profile
