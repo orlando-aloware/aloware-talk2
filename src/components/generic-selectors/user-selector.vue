@@ -30,7 +30,8 @@
             @blur="onBlur"
             @input="onInput"
             @filter="filterFn">
-    <template v-slot:prepend v-if="prepend">
+    <template v-slot:prepend
+              v-if="prepend">
       {{ prepend }}
     </template>
 
@@ -56,7 +57,8 @@
           </q-item-label>
           <q-item-label caption
                         v-if="!scope.opt.is_destination">
-            <div class="break-all" v-if="scope.opt.email">
+            <div class="break-all"
+                 v-if="scope.opt.email">
               {{ scope.opt.email }} - {{ getLabel(scope.opt) }}
             </div>
           </q-item-label>
