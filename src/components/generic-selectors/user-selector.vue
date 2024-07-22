@@ -37,9 +37,7 @@
 
     <template v-slot:no-option>
       <q-item>
-        <q-item-section class="no-results text-grey"
-                        data-testid="user-selector-select-no-results"
-        >
+        <q-item-section class="no-results text-grey" data-testid="user-selector-select-no-results">
           No results
         </q-item-section>
       </q-item>
@@ -49,8 +47,7 @@
       <q-item v-bind="scope.itemProps"
               v-on="scope.itemEvents"
               v-if="!scope.opt.group"
-              data-testid="user-selector-select-item"
-      >
+              data-testid="user-selector-select-item">
         <q-item-section>
           <q-item-label>
             <div class="break-all">{{ scope.opt.name }}</div>
@@ -70,8 +67,7 @@
       </q-item>
       <q-item v-if="scope.opt.group"
               v-bind="scope.itemProps"
-              v-on="scope.itemEvents"
-      >
+              v-on="scope.itemEvents">
         <q-item-label header class="text-size-xs">{{ scope.opt.group }}</q-item-label>
       </q-item>
     </template>

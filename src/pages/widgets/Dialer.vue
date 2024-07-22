@@ -189,7 +189,7 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
-      if (this.needsExtensions && this.extensionsInitialized)  {
+      if (this.needsExtensions && this.extensionsInitialized) {
         if (this.initialized) {
           this.extensionsVisibility = true
           this.phoneNumber = phoneNumber
@@ -291,7 +291,7 @@ export default {
 
       // 2. [User level] Outbound line is set to follow account default
       if (
-        this.currentCompany && 
+        this.currentCompany &&
         this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
         !this.profile.default_outbound_campaign_id
       ) {
