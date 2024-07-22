@@ -685,14 +685,15 @@ export default {
 
     initializeDateRanges () {
       const timezone = this.currentTimezone
+      const DATE_FORMAT = 'MM/DD/YYYY HH:mm:ss';
 
       this.ranges = {
-        'Today': [this.parseDatePicker(moment().tz(timezone).startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(timezone).endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'Yesterday': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(7, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(timezone).endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'Last 30 Days': [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(timezone).endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'This Month So Far': [this.parseDatePicker(moment().tz(timezone).startOf('month').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(timezone).endOf('day').format('MM/DD/YYYY HH:mm:ss'))],
-        'Last Month': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').startOf('month').format('MM/DD/YYYY HH:mm:ss')), this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').endOf('month').format('MM/DD/YYYY HH:mm:ss'))],
+        'Today': [this.parseDatePicker(moment().tz(timezone).startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Yesterday': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT))],
+        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Last 30 Days': [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'This Month So Far': [this.parseDatePicker(moment().tz(timezone).startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Last Month': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT))],
         'All Time': [null, null]
       }
     }
