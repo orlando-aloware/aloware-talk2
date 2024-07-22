@@ -101,6 +101,13 @@ export const helperMixin = {
       }
 
       return this.isEven(inputNum) ? type[index + 1].open : type[index].close
+    },
+    getContactName (item) {
+      if (!item.first_name || !item.last_name) {
+        return 'No Name'
+      }
+
+      return (item.first_name + ' ' + item.last_name).trim()
     }
   }
 }

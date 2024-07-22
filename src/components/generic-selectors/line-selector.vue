@@ -33,6 +33,7 @@
               :multiple="multiple"
               :use-chips="useChips"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              :behavior="behavior"
               v-else
               v-model="selectedId"
               @popup-show="onShowMenu"
@@ -206,6 +207,11 @@ export default {
     checkBlockedMessaging: {
       type: Boolean,
       default: false
+    },
+
+    behavior: {
+      type: String,
+      default: 'menu' // default, menu or dialog
     }
   },
 
