@@ -1412,6 +1412,31 @@ export default {
       if (this.$route.name === 'Inbox Channel') {
         this.isSearch = false
       }
+    },
+
+    'isContactStatusControlEnabled': function (currentValue, prevValue) {
+      if (this.statusText === InboxTaskStatus.STATUS_ALL) {
+        return
+      }
+
+      const hasToggledStatusControlOff = !currentValue && prevValue
+      if (!hasToggledStatusControlOff) {
+        return
+      }
+
+      this.$nextTick(() => {
+        this.$refs.taskListScroller.scrollTop = 0
+      })
+
+      this.$router.push({
+        name: 'Inbox Channel Task Status',
+        params: {
+          channel: 'inbox',
+          status: InboxTaskStatus.STATUS_ALL
+        }
+      }).catch(err => {
+        console.log(err)
+      })
     }
   }
 }
