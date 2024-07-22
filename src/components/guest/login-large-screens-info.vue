@@ -6,7 +6,7 @@
         <div class="row"
              style="max-width:550px">
           <div class="col-12"
-               v-if="xmasEnabled">
+               v-if="xmasEnabled && !isSimpSocial && staticsLoaded">
             <div>
               <img src="images/xmas-merry.png"
                      style="max-width: 550px;" />
@@ -24,14 +24,16 @@
           </div>
           <div class="col-12"
                v-else>
-            <h1 class="mb-4 text-white text-h4 text-weight-bold banner-font text-banner-title">
+            <h1 class="mb-4 text-white text-h4 text-weight-bold banner-font text-banner-title"
+                v-if="!isSimpSocial && staticsLoaded">
               Our AI-powered <br> call transcription feature <br> is now available
             </h1>
-            <p class="mb-4 text-white banner-font text-banner-subtitle">
+            <p class="mb-4 text-white banner-font text-banner-subtitle"
+               v-if="!isSimpSocial && staticsLoaded">
               <br>
               Get up to 5000 minutes for free
             </p>
-            <div>
+            <div v-if="!isSimpSocial && staticsLoaded">
               <a class="btn btn-primary btn-xl px-5"
                  target="_blank"
                  href="mailto:support@aloware.com?subject=Enable transcription for free">
@@ -46,8 +48,16 @@
 </template>
 
 <script>
+import { guestFormsMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+
 export default {
   name: 'login-large-screens-info',
+
+  mixins: [
+    guestFormsMixin,
+    simpsocialMixin
+  ],
 
   props: {
     xmasEnabled: {
@@ -58,6 +68,8 @@ export default {
   },
 
   computed: {
+    ...mapState(['statics', 'staticsLoaded']),
+
     loginClass () {
       return [
         this.xmasEnabled ? 'xmas-bg' : 'ai-bg'
