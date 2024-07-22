@@ -59,7 +59,7 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated && !suspended"/>
+            <dialer v-if="authenticated && !suspended && !isWidget"/>
           </q-page-container>
         </div>
         <q-drawer class="h-100 sidebar-wrapper d-block position-absolute top-0"
@@ -2493,6 +2493,7 @@ export default {
           storage.local.setItem('statics', JSON.stringify(res.data))
           this.setStaticsLoaded(true)
           this.setIsWhiteLabel(res.data.whitelabel)
+          this.setDocumentFavicon(res.data.favicon)
         }).catch(err => {
           console.log(err)
 

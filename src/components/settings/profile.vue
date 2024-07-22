@@ -227,7 +227,7 @@
           <b-col sm="12" md="12">
             <div>
               <h5 class="form-label">Backup Routing (Beta)</h5>
-              <p class="form-helper-text">Call routing will check if the user is online{{ whiteLabelText }}. If you check this, the backup phone number will ring if you're not available.</p>
+              <p class="form-helper-text">Call routing will check if the user is online{{ whiteLabelProfileText }}. If you check this, the backup phone number will ring if you're not available.</p>
             </div>
 
             <b-form-group label="" >
@@ -455,7 +455,8 @@ import * as Roles from 'src/constants/roles'
 import {
   aclMixin,
   settingsMixin,
-  kycMixin
+  kycMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
@@ -467,7 +468,8 @@ export default {
   mixins: [
     aclMixin,
     settingsMixin,
-    kycMixin
+    kycMixin,
+    simpsocialMixin
   ],
 
   components: { UserCampaignSelector, AnswerTypeSelector },
@@ -503,10 +505,6 @@ export default {
       return this.campaigns.filter((campaign) => {
         return campaign.user_id === this.user.id
       })
-    },
-
-    whiteLabelText () {
-      return this.statics.whitelabel ? '' : ' on Aloware'
     },
 
     isCompanyKYCNotAbleToAddUser () {

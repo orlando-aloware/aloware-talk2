@@ -9,7 +9,7 @@
       </template>
     </b-overlay>
     <header-notification class="flex-grow-0"
-                         v-if="isLoggedIn"/>
+                         v-if="isLoggedIn && !isWidget"/>
     <router-view class="flex-grow-1 overflow-hidden"
                  v-if="cookieValidated"/>
     <portal-target name="app"

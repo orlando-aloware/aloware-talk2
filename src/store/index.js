@@ -291,7 +291,9 @@ export default function (/* { ssrContext } */) {
       isDatatableCountLoading: false,
       showedKycReloadDialog: false,
       isTrialBannerVisible: false,
-      currentTimezone: null
+      currentTimezone: null,
+      hubspotPhoneNumber: null,
+      isRedirectedToHubspotWidget: false
     },
 
     getters: {
@@ -888,6 +890,14 @@ export default function (/* { ssrContext } */) {
 
       setCurrentTimezone ({ commit }, timezone) {
         commit('SET_CURRENT_TIMEZONE', timezone)
+      },
+
+      setHubspotPhoneNumber ({ commit }, value) {
+        commit('SET_HUBSPOT_PHONE_NUMBER', value)
+      },
+
+      setIsRedirectedToHubspotWidget ({ commit }, value) {
+        commit('SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET', value)
       }
     },
 
@@ -1673,6 +1683,14 @@ export default function (/* { ssrContext } */) {
 
       SET_CURRENT_TIMEZONE (state, timezone) {
         state.currentTimezone = timezone
+      },
+
+      SET_HUBSPOT_PHONE_NUMBER (state, value) {
+        state.hubspotPhoneNumber = value
+      },
+
+      SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {
+        state.isRedirectedToHubspotWidget = value
       },
 
       updateField

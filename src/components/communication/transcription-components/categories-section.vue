@@ -32,7 +32,7 @@
     </div>
 
     <!-- If no categories were detected. -->
-    <div v-else>
+    <div v-else-if="!isSimpSocial">
       <span>
         We couldn't find any categories in this call. For more information please check
         <a class="link"
@@ -46,8 +46,12 @@
 </template>
 
 <script>
+import { simpsocialMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'CategoriesSection',
+
+  mixins: [simpsocialMixin],
 
   props: {
     categories: {

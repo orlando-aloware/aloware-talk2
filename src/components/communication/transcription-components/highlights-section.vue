@@ -24,7 +24,7 @@
     </div>
 
     <!-- If no highlights were detected. -->
-    <div v-else>
+    <div v-else-if="!isSimpSocial">
       <span class="mt-3">
         We couldn't find any highlights in this call. For more information please check
         <a style="color: blue"
@@ -38,8 +38,12 @@
 </template>
 
 <script>
+import { simpsocialMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'HighlightsSection',
+
+  mixins: [simpsocialMixin],
 
   props: {
     highlights: {
