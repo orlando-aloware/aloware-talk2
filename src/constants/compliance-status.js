@@ -4,6 +4,3 @@ export const STATUS_PENDING = 3
 export const STATUS_IN_REVIEW = 4
 export const STATUS_REJECTED = 5
 export const STATUS_APPROVED = 6
-export const CNAM_STATUS_IN_REVIEW = 'in-review'
-export const CNAM_STATUS_APPROVED = 'twilio-approved'
-export const CNAM_STATUS_REJECTED = 'twilio-rejected'
