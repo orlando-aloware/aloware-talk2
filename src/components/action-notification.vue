@@ -705,7 +705,7 @@ export default {
 
       console.log('action-notification.vue answerCommunication data:', data)
       console.log('action-notification.vue answerCommunication more data', {
-        isCallringGroupId: this.ringGroupId,
+        ringGroupId: this.ringGroupId,
         ringGroupName: this.ringGroupName,
         isIntroduceToRg: this.isIntroduceToRg,
         isIntroduceToUser: this.isIntroduceToUser,
