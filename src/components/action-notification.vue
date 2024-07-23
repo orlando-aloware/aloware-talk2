@@ -704,6 +704,17 @@ export default {
       }
 
       console.log('action-notification.vue answerCommunication data:', data)
+      console.log('action-notification.vue answerCommunication more data', {
+        isCallringGroupId: this.ringGroupId,
+        ringGroupName: this.ringGroupName,
+        isIntroduceToRg: this.isIntroduceToRg,
+        isIntroduceToUser: this.isIntroduceToUser,
+        isAddToRg: this.isAddToRg,
+        isAddToUser: this.isAddToUser,
+        callIsIntroduced: this.callIsIntroduced,
+        isColdTransferRg: this.isColdTransferRg,
+        isColdTransferUser: this.isColdTransferUser
+      })
 
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
