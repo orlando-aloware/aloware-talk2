@@ -449,6 +449,7 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { inboxRoutesMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import moment from 'moment'
 
 export default {
   name: 'filter-form',
@@ -502,6 +503,8 @@ export default {
     ...mapState('auth', [
       'profile'
     ]),
+
+    ...mapState(['currentTimezone']),
 
     isInboxOrAllComms () {
       return this.inboxTaskRoutes.includes(this.$route.name) ||
@@ -586,21 +589,11 @@ export default {
     return {
       disableContactOwner: false,
       dateRange: {
-        startDate: null, // window.moment('2015-01-01')._d,
-        endDate: null // window.moment()._d
+        startDate: null,
+        endDate: null
       },
       opens: 'right',
-      ranges: {
-        'All Time': [null, null],
-        'Today': [window.moment()._d, window.moment()._d],
-        'Yesterday': [window.moment().subtract(1, 'day')._d, window.moment().subtract(1, 'day')._d],
-        'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
-        'This Month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
-        'Last 7 Days': [window.moment().subtract(7, 'day')._d, window.moment()._d],
-        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment()._d],
-        'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
-        'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
-      },
+      ranges: {},
       rangePicker: null,
       TagCategories,
       relativeRanges: [
@@ -647,7 +640,7 @@ export default {
 
   filters: {
     date (date) {
-      return window.moment(date).format('MM/DD/YYYY')
+      return moment(date).format('MM/DD/YYYY')
     }
   },
 
@@ -681,10 +674,34 @@ export default {
 
     onPreliminarChange (tags) {
       this.setTags(tags)
+    },
+
+    parseDatePicker (date) {
+      if (!date) {
+        return null
+      }
+      return moment(date)._d
+    },
+
+    initializeDateRanges () {
+      const timezone = this.currentTimezone
+      const DATE_FORMAT = 'MM/DD/YYYY HH:mm:ss'
+
+      this.ranges = {
+        'Today': [this.parseDatePicker(moment().tz(timezone).startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Yesterday': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT))],
+        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Last 30 Days': [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'This Month So Far': [this.parseDatePicker(moment().tz(timezone).startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Last Month': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT))],
+        'All Time': [null, null]
+      }
     }
   },
 
   created () {
+    this.initializeDateRanges()
+
     this.$watch(
 
       // Evaluate the value including the two properties
@@ -716,12 +733,18 @@ export default {
     dateRange: {
       deep: true,
       handler () {
-        this.filter.from_date = this.dateRange.startDate
-          ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD')
-          : null
-        this.filter.to_date = this.dateRange.endDate
-          ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD')
-          : null
+        let startDate = moment(this.dateRange.startDate)
+        let endDate = moment(this.dateRange.endDate)
+
+        if (startDate.isValid() && endDate.isValid() && startDate.format('HH:mm:ss') === endDate.format('HH:mm:ss')) {
+          startDate.set({ hour: 0, minute: 0, second: 0 })
+          endDate.set({ hour: 23, minute: 59, second: 59 })
+          this.dateRange.startDate = startDate.format('YYYY-MM-DD HH:mm:ss')
+          this.dateRange.endDate = endDate.format('YYYY-MM-DD HH:mm:ss')
+        }
+
+        this.filter.from_date = this.dateRange.startDate ? startDate.format('YYYY-MM-DD HH:mm:ss') : null
+        this.filter.to_date = this.dateRange.endDate ? endDate.format('YYYY-MM-DD HH:mm:ss') : null
       }
     },
 
