@@ -29,7 +29,7 @@ const check = async ({ commit }, payload, skipSetAuthenticated) => {
     commit('SET_LOADING', false)
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
-    commit('SET_CURRENT_TIMEZONE', response.data.user.timezone, { root: true })
+    commit('SET_CURRENT_TIMEZONE', response.data.user.company.timezone, { root: true })
 
     // auth user in Userpilot
     userpilot.auth(response.data.user)
