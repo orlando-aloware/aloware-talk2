@@ -1414,7 +1414,7 @@ export default {
       }
     },
 
-    'isContactStatusControlEnabled': function (currentValue, prevValue) {
+    isContactStatusControlEnabled: function (currentValue, prevValue) {
       if (this.statusText === InboxTaskStatus.STATUS_ALL) {
         return
       }
