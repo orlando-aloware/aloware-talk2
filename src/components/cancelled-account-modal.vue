@@ -26,7 +26,7 @@
                v-if="true">
             <div class="row">
               <div class="col-12 d-flex align-items-center flex-center text-center pl-0">
-                <p>{{ profile.first_name }}, even though you have canceled your subscription, that doesn't mean this has to be the end of our journey together. If you'd like to renew your subscription and continue enjoying Aloware, we've made the process easy for you.</p>
+                <p>{{ profile.first_name }}, even though you have canceled your subscription, that doesn't mean this has to be the end of our journey together. If you'd like to renew your subscription and continue enjoying {{ whiteLabelName }}, we've made the process easy for you.</p>
               </div>
             </div>
             <div class="row">
@@ -60,13 +60,14 @@
 <script>
 import VueCookies from 'vue-cookies'
 import { mapState } from 'vuex'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'cancelled-account-modal',
 
   mixins: [
-    aclMixin
+    aclMixin,
+    simpsocialMixin
   ],
 
   props: {

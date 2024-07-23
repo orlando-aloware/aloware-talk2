@@ -179,7 +179,7 @@
             2. Decide What happens If duplicates exist
           </div>
           <div>
-            {{ whiteLabelText }} phone numbers as a unique identifier for contacts. If
+            {{ whiteLabelUsesText }} phone numbers as a unique identifier for contacts. If
             contacts share the same primary phone number, how do you wnat to
             handle them?
           </div>
@@ -243,20 +243,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
-  computed: {
-    ...mapState(['statics']),
+  mixins: [simpsocialMixin],
 
-    whiteLabelText () {
-      return this.statics.whitelabel ? 'Uses' : 'Aloware uses'
-    },
-
-    whiteLabelContactText () {
-      return this.statics.whitelabel ? '' : 'Aloware'
-    }
-  },
   methods: {
     open () {
       this.isOpen = true
