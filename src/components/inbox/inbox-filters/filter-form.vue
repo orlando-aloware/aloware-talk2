@@ -685,7 +685,7 @@ export default {
 
     initializeDateRanges () {
       const timezone = this.currentTimezone
-      const DATE_FORMAT = 'MM/DD/YYYY HH:mm:ss';
+      const DATE_FORMAT = 'MM/DD/YYYY HH:mm:ss'
 
       this.ranges = {
         'Today': [this.parseDatePicker(moment().tz(timezone).startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
