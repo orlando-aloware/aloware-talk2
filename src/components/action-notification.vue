@@ -702,6 +702,9 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
+
+      console.log('action-notification.vue answerCommunication data:', data)
+
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
       this.setShowPhone(true)
