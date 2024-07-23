@@ -663,7 +663,7 @@ export default {
       this.setDialerCurrentNumber(params['To'])
 
       // check if connection is completely closed before opening a new one
-      if (this.connection) {
+      if (this.connection && !shouldAnswer) {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
         return
       }
