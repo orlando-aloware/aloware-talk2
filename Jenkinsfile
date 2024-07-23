@@ -83,7 +83,7 @@ pipeline {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'quasar build --debug'
+                                    sh 'quasar build'
                                 }
                             }
                         }
