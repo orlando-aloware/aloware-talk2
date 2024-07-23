@@ -8,7 +8,8 @@
                  custom-class="btn-primary"
                  data-testid="comm-whisper-button-popover"
                  delay="100">
-        <span class="text-white">
+        <span class="text-white"
+              v-if="!isSimpSocial">
           The whisper option is not included in your current plan, to use it, you have
           to upgrade to one of our plans that offers it!
           <u class="cursor-pointer"
@@ -40,7 +41,7 @@
 
 <script>
 import EarIcon from 'src/components/icons/ear-icon.vue'
-import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'whisper-communication-button',
@@ -48,7 +49,8 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin
+    communicationMixin,
+    simpsocialMixin
   ],
 
   components: {

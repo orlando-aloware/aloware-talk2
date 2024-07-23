@@ -1947,6 +1947,7 @@ export default {
   },
 
   mounted () {
+    this.checkIfIsWidget()
     this.setupDraggable()
     this.setupContactLocalTime()
     // Disable phone visibility on power dialer sessions
@@ -2415,6 +2416,7 @@ export default {
     },
 
     resetAdd () {
+      this.$VueEvent.fire('cleanParticipant')
       this.add.introduce = false
       this.add.userId = null
       this.add.ringGroupId = null
@@ -2473,6 +2475,7 @@ export default {
     introduceParticipant ($event) {
       this.loadingIntroduce = true
       this.add.introduce = true
+      this.$VueEvent.fire('cleanParticipant')
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
@@ -2540,9 +2543,16 @@ export default {
       this.hasCommunicationNotesUnsavedChanges = value
     },
 
+    checkIfIsWidget () {
+      if (this.$route.path.includes('/widgets/hubspot-call-extension')) {
+        this.setIsWidget(true)
+      }
+    },
+
     ...mapActions([
       'setDialerContact',
-      'setDialerContactTags'
+      'setDialerContactTags',
+      'setIsWidget'
     ])
   },
 

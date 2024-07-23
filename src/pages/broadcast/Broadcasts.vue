@@ -372,7 +372,7 @@
                       title-text="Broadcast"
                       kb-link="https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast"
                       class="mt-5"
-                      v-if="!shouldShowBroadcast && shouldShowUpgradeNow">
+                      v-if="!shouldShowBroadcast && shouldShowUpgradeNow && !isSimpSocial">
     </upgrade-now-page>
   </div>
 </template>
@@ -393,7 +393,7 @@ import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { COLUMNS } from 'src/constants/broadcast/home-columns'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import { aclMixin, kycMixin } from 'src/plugins/mixins'
+import { aclMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcasts',
@@ -414,7 +414,8 @@ export default {
 
   mixins: [
     aclMixin,
-    kycMixin
+    kycMixin,
+    simpsocialMixin
   ],
 
   data: () => ({
