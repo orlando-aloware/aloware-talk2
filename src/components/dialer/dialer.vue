@@ -663,15 +663,7 @@ export default {
       this.setDialerCurrentNumber(params['To'])
 
       if (shouldAnswer) {
-        console.log('previous awaiting timeout')
-        // Helper function to wait for a specified duration
-        const delay = ms => new Promise(resolve => {
-          console.log('during setTimeout')
-          setTimeout(resolve, ms)
-        })
-        // Wait 3 seconds
-        await delay(1500)
-        console.log('after awaiting timeout')
+        await new Promise(resolve => setTimeout(resolve, 1000))
       }
 
       // check if connection is completely closed before opening a new one

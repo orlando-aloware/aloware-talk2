@@ -1914,27 +1914,12 @@ export default {
     },
 
     isNotOnWrapUp () {
-      console.log('isNotOnWrapUp dialer.parkedCall', this.dialer.parkedCall)
-      console.log('isNotOnWrapUp dialer.call', this.dialer.call)
-
-      console.log('isNotOnWrapUp hasNoParkedAndInprogressCall', this.hasNoParkedAndInprogressCall)
       console.log('isNotOnWrapUp hasParkedAndInprogressCall', this.hasParkedAndInprogressCall)
-      console.log('isNotOnWrapUp hasCallInProgressNoParkedCall', this.hasCallInProgressNoParkedCall)
-
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
-      // return false
-    },
-
-    hasNoParkedAndInprogressCall () {
-      return !this.dialer.parkedCall && !this.dialer.call
     },
 
     hasParkedAndInprogressCall () {
       return this.dialer.parkedCall && this.dialer.call
-    },
-
-    hasCallInProgressNoParkedCall () {
-      return !this.dialer.parkedCall && this.dialer.call
     }
   },
 
