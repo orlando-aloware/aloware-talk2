@@ -340,8 +340,8 @@ export default {
     shouldUseCompanyCampaignId () {
       return this.currentCompany &&
         (this.currentCompany.force_outbound_line ||
-        (this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
-        !this.authProfile.default_outbound_campaign_id))
+          (this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
+            !this.authProfile.default_outbound_campaign_id))
     },
 
     shouldUseProfileCampaignId () {

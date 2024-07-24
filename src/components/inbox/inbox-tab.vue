@@ -612,6 +612,7 @@ export default {
         params: {
           id: contactId.toString(),
           channel: 'inbox',
+          communicationId: contact.communication_id,
           status
         }
       })
