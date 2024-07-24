@@ -663,20 +663,22 @@ export default {
       this.setDialerCurrentNumber(params['To'])
 
       // check if connection is completely closed before opening a new one
-      if (this.connection && !shouldAnswer) {
-        console.log('Dialer is busy', currentNumber, outboundCampaignId)
-        return
-      }
+      setTimeout(async function () {
+        if (this.connection && !shouldAnswer) {
+          console.log('Dialer is busy', currentNumber, outboundCampaignId)
+          return
+        }
 
-      this.connection = await this.device.connect(params, true)
-      this.initConnectionEvents()
+        this.connection = await this.device.connect(params, true)
+        this.initConnectionEvents()
 
-      // Make sure that phone number is string in this part before proceeding
-      currentNumber = currentNumber.toString()
-      // force mute
-      if (currentNumber.includes('barge') || currentNumber.includes('whisper')) {
-        this.forceMute()
-      }
+        // Make sure that phone number is string in this part before proceeding
+        currentNumber = currentNumber.toString()
+        // force mute
+        if (currentNumber.includes('barge') || currentNumber.includes('whisper')) {
+          this.forceMute()
+        }
+      }, 2000)
     },
 
     initConnectionEvents () {

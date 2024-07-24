@@ -1921,8 +1921,8 @@ export default {
       console.log('isNotOnWrapUp hasParkedAndInprogressCall', this.hasParkedAndInprogressCall)
       console.log('isNotOnWrapUp hasCallInProgressNoParkedCall', this.hasCallInProgressNoParkedCall)
 
-      // return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP
-      return false
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
+      // return false
     },
 
     hasNoParkedAndInprogressCall () {
@@ -1935,7 +1935,7 @@ export default {
 
     hasCallInProgressNoParkedCall () {
       return !this.dialer.parkedCall && this.dialer.call
-    },
+    }
   },
 
   created () {
