@@ -1094,7 +1094,7 @@ export default {
             if (shouldUnpark) {
               this.unparkCall(data)
             } else if (shouldAnswer) {
-              this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting)
+              this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
             }
 
             this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
