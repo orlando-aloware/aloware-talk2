@@ -1545,8 +1545,6 @@ export default {
         return
       }
 
-      console.log('Dialer.vue answerCallFishing condition5')
-
       this.makeCall('call:' + communication.id, communication.campaignId)
     },
 
