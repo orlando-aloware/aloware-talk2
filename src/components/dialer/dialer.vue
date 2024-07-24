@@ -662,6 +662,12 @@ export default {
       this.setDialerCurrentStatus('MAKING_CALL')
       this.setDialerCurrentNumber(params['To'])
 
+      console.log('previous awaiting timeout')
+      await setTimeout(() => {
+        console.log('awaiting timeout')
+      }, 3000)
+      console.log('after awaiting timeout')
+
       // check if connection is completely closed before opening a new one
       if (this.connection && !shouldAnswer) {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
