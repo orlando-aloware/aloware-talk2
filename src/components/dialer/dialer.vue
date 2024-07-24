@@ -662,15 +662,17 @@ export default {
       this.setDialerCurrentStatus('MAKING_CALL')
       this.setDialerCurrentNumber(params['To'])
 
-      console.log('previous awaiting timeout', this.hangupInterval)
-      // Helper function to wait for a specified duration
-      const delay = ms => new Promise(resolve => {
-        console.log('during setTimeout')
-        setTimeout(resolve, ms)
-      })
-      // Wait 3 seconds
-      await delay(3000)
-      console.log('after awaiting timeout', this.hangupInterval)
+      if (shouldAnswer) {
+        console.log('previous awaiting timeout')
+        // Helper function to wait for a specified duration
+        const delay = ms => new Promise(resolve => {
+          console.log('during setTimeout')
+          setTimeout(resolve, ms)
+        })
+        // Wait 3 seconds
+        await delay(1500)
+        console.log('after awaiting timeout')
+      }
 
       // check if connection is completely closed before opening a new one
       if (this.connection && !shouldAnswer) {
