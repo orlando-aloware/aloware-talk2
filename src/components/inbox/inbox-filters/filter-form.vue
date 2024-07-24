@@ -72,7 +72,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsOrInboxChannel && !isFilterDialogForView">
+        <div v-if="!isMentionsChannel && !isFilterDialogForView">
           <h5 class="mt-4 section-header">Handling</h5>
           <b-form-row class="mt-2" data-testid="filter-form-handling-form-row">
             <b-col sm="12"
@@ -90,7 +90,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isCallsOnlyChannel">
+                   v-if="isInboxOrCallsChannel">
               <b-form-group class="form-label"
                             label="Answer Status">
                 <answer-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -104,7 +104,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isCallsAndRecordingsChannel">
+                   v-if="isInboxCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Talk Time">
                 <talk-time-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -118,7 +118,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isCallsAndRecordingsChannel">
+                   v-if="isInboxCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Transfer Type">
                 <transfer-type-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -132,7 +132,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isCallsAndRecordingsChannel">
+                   v-if="isInboxCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Callback Status">
                 <callback-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -154,7 +154,7 @@
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
-                            :label="tagsFilterLabel">
+                            label="Tags">
                 <entity-tags ref="tagSelector"
                              data-testid="communication-tags-multi-select"
                              entity="contact"
@@ -170,7 +170,7 @@
             </b-col>
             <b-col md="6"
                    sm="12"
-                   v-if="!isInboxOrInboxViews && isCallsAndRecordingsChannel">
+                   v-if="isInboxCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Call Disposition">
                 <call-disposition-selector :multiple="true"
@@ -181,7 +181,7 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row v-if="!isInboxOrInboxViews" data-testid="filter-form-properties-form-row">
+          <b-form-row data-testid="filter-form-properties-form-row">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -262,59 +262,6 @@
             </b-col>
 
           </b-form-row>
-          <b-form-row v-if="isInboxOrInboxViews" data-testid="filter-form-properties-form-row">
-            <b-col md="6"
-                   sm="12">
-              <b-form-group>
-                <span class="form-label">Show contacts with unread communications only</span>
-                <div>
-                  <b-form-checkbox class="switch-success"
-                                   size="lg"
-                                   switch
-                                   :value="1"
-                                   :unchecked-value="0"
-                                   data-testid="filter-form-properties-form-checkbox"
-                                   v-model="filter.has_unread">
-                  </b-form-checkbox>
-                </div>
-              </b-form-group>
-            </b-col>
-          </b-form-row>
-        </div>
-
-        <div v-if="isInboxOrInboxViews">
-          <h5 class="mt-4 section-header">Has Communicated Within</h5>
-          <b-form-row class="mt-2" data-testid="filter-form-has-communicated-within-form-row">
-            <b-col sm="12"
-                     md="6">
-              <b-form-group class="form-label">
-                <template v-slot:label>
-                  <span>Last Engagement Date Period</span>
-                  <span class="pl-1">
-                    <information-circle-icon color="#2F80ED"/>
-                    <q-tooltip anchor="top middle"
-                               self="center middle"
-                               data-testid="filter-form-has-communicated-within-form-tooltip">
-                      <span class="text-13">Filter based on the last communication date; always  dynamic based on the selected relative period</span>
-                    </q-tooltip>
-                  </span>
-                </template>
-                <q-select class="q-user-selector q-basic-selector"
-                          options-selected-class="text-primary"
-                          color="primary"
-                          option-value="id"
-                          option-label="name"
-                          map-options
-                          use-input
-                          emit-value
-                          dense
-                          outlined
-                          :options="relativeRanges"
-                          data-testid="filter-form-has-communicated-within-form-select"
-                          v-model="filter.dynamic_engagement_date_range" />
-              </b-form-group>
-            </b-col>
-          </b-form-row>
         </div>
 
         <div>
@@ -322,7 +269,7 @@
           <b-form-row class="mt-2" data-testid="filter-form-attributions-form-row">
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsOrInboxChannel">
+                   v-if="!isMentionsChannel">
               <b-form-group class="form-label"
                             label="Line Phone Numbers">
                 <incoming-number-selector :multiple="true"
@@ -336,7 +283,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxOrAllCallsChannel || isMessagesOnlyChannel">
+                   v-if="isInbox || isMessagesOnlyChannel">
               <b-form-group class="form-label">
                 <template v-slot:label>
                   <span data-testid="filter-form-communication-owners-row">Communication Owners</span>
@@ -365,6 +312,7 @@
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"
+                               :with-unassigned="isInboxOrAllCallsChannel"
                                :highlighted="isChanged('users')"
                                data-testid="filter-form-user-selector"
                                v-model="filter.users"
@@ -374,7 +322,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsOrInboxChannel">
+                   v-if="!isMentionsChannel">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector :force-remove-missing-values="true"
@@ -400,6 +348,7 @@
                                :highlighted="isChanged('contact_owner')"
                                :clearable="false"
                                :disable="disableContactOwner"
+                               :with-unassigned="isInboxOrAllCallsChannel"
                                v-model="filter.contact_owner"
                                data-testid="filter-form-user-selector"
                                @change="eventPayload => onFilterChange(eventPayload, 'contact_owner')">
@@ -408,7 +357,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isMessagesOnlyChannel && !isFilterDialogForView">
+                   v-if="(isInbox || isMessagesOnlyChannel) && !isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Broadcasts">
                 <broadcast-selector :multiple="true"
@@ -449,6 +398,7 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { inboxRoutesMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import moment from 'moment'
 
 export default {
   name: 'filter-form',
@@ -503,6 +453,8 @@ export default {
       'profile'
     ]),
 
+    ...mapState(['currentTimezone']),
+
     isInboxOrAllComms () {
       return this.inboxTaskRoutes.includes(this.$route.name) ||
         ['all-communications'].includes(this.$route.params.channel)
@@ -547,30 +499,26 @@ export default {
         nonSmsChannels.includes(this.$route.params.channel)
     },
 
-    isCallsOnlyChannel () {
+    isInboxOrCallsChannel () {
       const callsChannels = ['calls', 'all-communications', 'my-personal-line']
 
-      return callsChannels.includes(this.$route.params.channel)
+      return this.isInboxOrInboxViews || callsChannels.includes(this.$route.params.channel)
     },
 
-    isCallsAndRecordingsChannel () {
+    isInboxCallsAndRecordingsChannel () {
       const allCallsChannels = ['calls', 'recordings', 'all-communications', 'my-personal-line']
 
-      return allCallsChannels.includes(this.$route.params.channel)
+      return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
     },
 
     isMessagesOnlyChannel () {
-      const smsChannels = ['messages', 'all-communications', 'my-personal-line']
+      const smsChannels = ['messages', 'all-communications', 'inbox', 'my-personal-line']
 
       return smsChannels.includes(this.$route.params.channel)
     },
 
-    tagsFilterLabel () {
-      return this.isInbox ? 'Contact Tags' : 'Tags'
-    },
-
     tagsFilterCategory () {
-      return this.isInboxOrInboxViews ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
+      return TagCategories.CAT_COMMUNICATIONS
     },
 
     isInboxOrInboxViews () {
@@ -586,21 +534,11 @@ export default {
     return {
       disableContactOwner: false,
       dateRange: {
-        startDate: null, // window.moment('2015-01-01')._d,
-        endDate: null // window.moment()._d
+        startDate: null,
+        endDate: null
       },
       opens: 'right',
-      ranges: {
-        'All Time': [null, null],
-        'Today': [window.moment()._d, window.moment()._d],
-        'Yesterday': [window.moment().subtract(1, 'day')._d, window.moment().subtract(1, 'day')._d],
-        'This Week': [window.moment().startOf('week')._d, window.moment().endOf('week')._d],
-        'This Month': [window.moment().startOf('month')._d, window.moment().endOf('month')._d],
-        'Last 7 Days': [window.moment().subtract(7, 'day')._d, window.moment()._d],
-        'Last 30 Days': [window.moment().subtract(30, 'day')._d, window.moment()._d],
-        'Last 3 Months': [window.moment().subtract(3, 'month')._d, window.moment()._d],
-        'Custom Range': [window.moment().subtract(1, 'day')._d, window.moment()._d]
-      },
+      ranges: {},
       rangePicker: null,
       TagCategories,
       relativeRanges: [
@@ -647,7 +585,7 @@ export default {
 
   filters: {
     date (date) {
-      return window.moment(date).format('MM/DD/YYYY')
+      return moment(date).format('MM/DD/YYYY')
     }
   },
 
@@ -681,10 +619,34 @@ export default {
 
     onPreliminarChange (tags) {
       this.setTags(tags)
+    },
+
+    parseDatePicker (date) {
+      if (!date) {
+        return null
+      }
+      return moment(date)._d
+    },
+
+    initializeDateRanges () {
+      const timezone = this.currentTimezone
+      const DATE_FORMAT = 'MM/DD/YYYY HH:mm:ss'
+
+      this.ranges = {
+        'Today': [this.parseDatePicker(moment().tz(timezone).startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Yesterday': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT))],
+        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Last 30 Days': [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'This Month So Far': [this.parseDatePicker(moment().tz(timezone).startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Last Month': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT))],
+        'All Time': [null, null]
+      }
     }
   },
 
   created () {
+    this.initializeDateRanges()
+
     this.$watch(
 
       // Evaluate the value including the two properties
@@ -716,12 +678,18 @@ export default {
     dateRange: {
       deep: true,
       handler () {
-        this.filter.from_date = this.dateRange.startDate
-          ? window.moment(this.dateRange.startDate).format('YYYY-MM-DD')
-          : null
-        this.filter.to_date = this.dateRange.endDate
-          ? window.moment(this.dateRange.endDate).format('YYYY-MM-DD')
-          : null
+        let startDate = moment(this.dateRange.startDate)
+        let endDate = moment(this.dateRange.endDate)
+
+        if (startDate.isValid() && endDate.isValid() && startDate.format('HH:mm:ss') === endDate.format('HH:mm:ss')) {
+          startDate.set({ hour: 0, minute: 0, second: 0 })
+          endDate.set({ hour: 23, minute: 59, second: 59 })
+          this.dateRange.startDate = startDate.format('YYYY-MM-DD HH:mm:ss')
+          this.dateRange.endDate = endDate.format('YYYY-MM-DD HH:mm:ss')
+        }
+
+        this.filter.from_date = this.dateRange.startDate ? startDate.format('YYYY-MM-DD HH:mm:ss') : null
+        this.filter.to_date = this.dateRange.endDate ? endDate.format('YYYY-MM-DD HH:mm:ss') : null
       }
     },
 

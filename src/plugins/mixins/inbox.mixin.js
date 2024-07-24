@@ -9,6 +9,7 @@ import { DATE_OPERATORS } from 'src/constants/contacts-date-filter-operators'
 import * as Filters from 'src/constants/filters'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 
 export default {
   computed: {
@@ -326,7 +327,7 @@ export default {
 
       // add the line filter if there is
       if (filter && !isEmpty(filter?.campaigns)) {
-        this.filters.lines = [
+        this.filters.communication_lines = [
           { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
         ]
       }
@@ -334,7 +335,7 @@ export default {
       if (filter && filter?.ring_groups && filter.ring_groups.length) {
         this.filters = {
           ...this.filters,
-          'ring_groups': [
+          'communication_ring_groups': [
             { value: filter.ring_groups, operator: OPERATORS.IS_ANY_OF }
           ]
         }
@@ -343,7 +344,7 @@ export default {
       if (filter && filter?.users && filter.users.length) {
         this.filters = {
           ...this.filters,
-          'users': [
+          'communication_users': [
             { value: filter.users, operator: OPERATORS.IS_ANY_OF }
           ]
         }
@@ -372,7 +373,7 @@ export default {
       if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
         this.filters = {
           ...this.filters,
-          'last_engagement_at': [
+          'communication_created_at': [
             { value: [filter.from_date, filter.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
           ]
         }
@@ -381,12 +382,60 @@ export default {
       if (filter && !isEmpty(filter.tags)) {
         this.filters = {
           ...this.filters,
-          'tags': [
+          'communication_tags': [
             { value: filter.tags, operator: OPERATORS.IS_ANY_OF }
           ]
         }
         relations.push('tags')
       }
+
+      // New filters from all communications
+      if (filter && !isEmpty(filter.direction) && filter.direction !== 'all') {
+        this.filters = {
+          ...this.filters,
+          'direction': [
+            { value: [filter.direction === 'inbound' ? INBOUND : OUTBOUND], operator: OPERATORS.IS_ANY_OF }
+          ]
+        }
+      }
+
+      if (filter && !isEmpty(filter.answer_status) && filter.answer_status !== 'all') {
+        this.filters = {
+          ...this.filters,
+          'answer_status': [
+            { value: [filter.answer_status], operator: OPERATORS.IS_ANY_OF }
+          ]
+        }
+      }
+
+      const otherFiltersList = [
+        'callback_status',
+        'broadcasts',
+        'call_dispositions',
+        'callback_status',
+        'incoming_numbers',
+        'creator_type',
+        'workflows',
+        'transfer_type',
+        'min_talk_time',
+        'untagged_only',
+        'exclude_automated_communications',
+        'first_time_only'
+      ]
+
+      otherFiltersList.forEach(key => {
+        if (filter && (!isEmpty(filter[key]) || filter[key] > 0)) {
+          this.filters = {
+            ...this.filters,
+            [key]: [
+              {
+                value: Array.isArray(filter[key]) ? filter[key] : [filter[key]],
+                operator: OPERATORS.IS_ANY_OF
+              }
+            ]
+          }
+        }
+      })
 
       // apply only if filter is not "All Time"
       if (filter && filter.dynamic_engagement_date_range > 0) {
