@@ -696,7 +696,8 @@ export default {
           contactName: this.title,
           companyName: this.message,
           contactId: this.contactId,
-          phoneNumber: this.phoneNumber
+          phoneNumber: this.phoneNumber,
+          isCallWaiting: this.isCallWaiting
         },
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
