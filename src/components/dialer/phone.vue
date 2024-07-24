@@ -1913,13 +1913,12 @@ export default {
         this.currentCompany.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS
     },
 
-    isNotOnWrapUp () {
-      console.log('isNotOnWrapUp hasParkedAndInprogressCall', this.hasParkedAndInprogressCall)
-      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
-    },
-
     hasParkedAndInprogressCall () {
       return this.dialer.parkedCall && this.dialer.call
+    },
+
+    isNotOnWrapUp () {
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
     }
   },
 

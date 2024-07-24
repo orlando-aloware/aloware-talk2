@@ -662,6 +662,7 @@ export default {
       this.setDialerCurrentStatus('MAKING_CALL')
       this.setDialerCurrentNumber(params['To'])
 
+      // Wait to finish the previous call to avoid conflicts with device.connect()
       if (shouldAnswer) {
         await new Promise(resolve => setTimeout(resolve, 1000))
       }
@@ -1025,9 +1026,7 @@ export default {
     },
 
     parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      console.log('Dialer.vue parkCallCombo', shouldAnswer, shouldUnpark, data)
       if (this.isNotInProgressCall || (!shouldUnpark && this.dialer.parkedCall)) {
-        console.log('Dialer.vue parkCallCombo condition1')
         return
       }
 
@@ -1524,28 +1523,24 @@ export default {
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
-        console.log('Dialer.vue answerCallFishing condition1')
         this.parkCallCombo(true, false, communication)
         return
       }
 
       // park the in-progress call and unpark the parked call
       if (shouldPark && parkedCall) {
-        console.log('Dialer.vue answerCallFishing condition2')
         this.parkCallCombo(false, true, parkedCall)
         return
       }
 
       // hang-up the in-progress call and unpark the parked call
       if (shouldHangup && parkedCall) {
-        console.log('Dialer.vue answerCallFishing condition3')
         this.hangupCallCombo(false, true, parkedCall)
         return
       }
 
       // hangup the in-progress call and answer the incoming call
       if (shouldHangup && !parkedCall) {
-        console.log('Dialer.vue answerCallFishing condition4')
         this.hangupCallCombo(true, false, communication)
         return
       }
