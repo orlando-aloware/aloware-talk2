@@ -90,7 +90,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxOrCallsChannel">
+                   v-if="isCallsOnlyChannel">
               <b-form-group class="form-label"
                             label="Answer Status">
                 <answer-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -104,7 +104,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Talk Time">
                 <talk-time-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -118,7 +118,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Transfer Type">
                 <transfer-type-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -132,7 +132,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Callback Status">
                 <callback-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -170,7 +170,7 @@
             </b-col>
             <b-col md="6"
                    sm="12"
-                   v-if="isInboxCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Call Disposition">
                 <call-disposition-selector :multiple="true"
@@ -269,7 +269,7 @@
           <b-form-row class="mt-2" data-testid="filter-form-attributions-form-row">
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsChannel">
+                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Line Phone Numbers">
                 <incoming-number-selector :multiple="true"
@@ -283,7 +283,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInbox || isMessagesOnlyChannel">
+                   v-if="isInboxOrAllCallsChannel || isMessagesOnlyChannel">
               <b-form-group class="form-label">
                 <template v-slot:label>
                   <span data-testid="filter-form-communication-owners-row">Communication Owners</span>
@@ -322,7 +322,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsChannel">
+                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector :force-remove-missing-values="true"
@@ -357,7 +357,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="(isInbox || isMessagesOnlyChannel) && !isFilterDialogForView">
+                   v-if="((isCompanyPartOfNewInboxFilters(profile.company_id) && isInbox) || isMessagesOnlyChannel) && !isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Broadcasts">
                 <broadcast-selector :multiple="true"
@@ -396,7 +396,7 @@ import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import { inboxRoutesMixin } from 'src/plugins/mixins'
+import { inboxRoutesMixin, userMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import moment from 'moment'
 
@@ -404,7 +404,8 @@ export default {
   name: 'filter-form',
 
   mixins: [
-    inboxRoutesMixin
+    inboxRoutesMixin,
+    userMixin
   ],
 
   components: {
@@ -499,26 +500,46 @@ export default {
         nonSmsChannels.includes(this.$route.params.channel)
     },
 
-    isInboxOrCallsChannel () {
+    isCallsOnlyChannel () {
       const callsChannels = ['calls', 'all-communications', 'my-personal-line']
 
-      return this.isInboxOrInboxViews || callsChannels.includes(this.$route.params.channel)
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        return this.isInboxOrInboxViews || callsChannels.includes(this.$route.params.channel)
+      }
+
+      return callsChannels.includes(this.$route.params.channel)
     },
 
-    isInboxCallsAndRecordingsChannel () {
+    isCallsAndRecordingsChannel () {
       const allCallsChannels = ['calls', 'recordings', 'all-communications', 'my-personal-line']
 
-      return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
+      }
+
+      return allCallsChannels.includes(this.$route.params.channel)
     },
 
     isMessagesOnlyChannel () {
-      const smsChannels = ['messages', 'all-communications', 'inbox', 'my-personal-line']
+      const smsChannels = ['messages', 'all-communications', 'my-personal-line']
+
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        smsChannels.push('inbox')
+      }
 
       return smsChannels.includes(this.$route.params.channel)
     },
 
+    tagsFilterLabel () {
+      return this.isInbox ? 'Contact Tags' : 'Tags'
+    },
+
     tagsFilterCategory () {
-      return TagCategories.CAT_COMMUNICATIONS
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        return TagCategories.CAT_COMMUNICATIONS
+      }
+
+      return this.isInboxOrInboxViews ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
     },
 
     isInboxOrInboxViews () {
