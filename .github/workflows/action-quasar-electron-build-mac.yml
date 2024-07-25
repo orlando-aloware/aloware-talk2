@@ -106,7 +106,6 @@ jobs:
           ENV_XMAS_ENABLED: ${{ secrets.xmas_enabled }}
           ENV_XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
-          ENV_USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
           ENV_CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
           ENV_BETA_FEATURES_COMPANY_IDS: ${{ secrets.beta_features_company_ids }}
           file-name: .env.prod
@@ -183,9 +182,6 @@ jobs:
 
           # Read Reviews
           URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
-
-          # Userpilot
-          USERPILOT_APPTOKEN: ${{ secrets.userpilot_apptoken }}
 
           # Custom Edge Location
           CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
