@@ -56,21 +56,17 @@ module.exports = function (/* ctx */) {
       vueRouterMode: 'history',
       devtool: 'source-map',
       // Webpack bundle optimization
-      extendWebpack (cfg) {
-        cfg.plugins.push(new (require('webpack-bundle-analyzer')).BundleAnalyzerPlugin())
-      },
+      // extendWebpack (cfg) {
+      //   cfg.plugins.push(new (require('webpack-bundle-analyzer')).BundleAnalyzerPlugin())
+      // },
       // Enable gzip compression
       // // Split vendor bundle in multiple small chunks
       chainWebpack (chain) {
-        // chain.optimization.splitChunks({
-        //   chunks: 'all',
-        //   maxSize: 200000
-        // })
         chain.optimization.splitChunks({
           chunks: 'all',
           maxSize: 300000,
+          minSize: 100000,
           maxInitialRequests: Infinity,
-          minSize: 30000,
           cacheGroups: {
             defaultVendors: {
               test: /[\\/]node_modules[\\/]/,
