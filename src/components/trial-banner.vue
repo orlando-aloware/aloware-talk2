@@ -87,7 +87,7 @@
                dense
                no-caps
                unelevated
-               v-else
+               v-if="shouldShowRegistrationInReviewButton"
                @click="onOpenRegistrationInReview" />
       </div>
       <div class="button-index">
@@ -156,6 +156,10 @@ export default {
 
     shouldShowUnlockTrialExperienceButton () {
       return (this.isCompanyKYC && !this.isKYCFilled) || this.isCompanyBrandApproved
+    },
+
+    shouldShowRegistrationInReviewButton () {
+      return (this.isCompanyKYC && !this.isKYCFilled) && !this.isCompanyBrandApproved
     }
   },
 
