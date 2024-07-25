@@ -293,7 +293,8 @@ export default function (/* { ssrContext } */) {
       isTrialBannerVisible: false,
       currentTimezone: null,
       hubspotPhoneNumber: null,
-      isRedirectedToHubspotWidget: false
+      isRedirectedToHubspotWidget: false,
+      isCallBackButtonDisabled: false
     },
 
     getters: {
@@ -898,6 +899,10 @@ export default function (/* { ssrContext } */) {
 
       setIsRedirectedToHubspotWidget ({ commit }, value) {
         commit('SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET', value)
+      },
+
+      setIsCallBackButtonDisabled ({ commit }, value) {
+        commit('SET_IS_CALL_BACK_BUTTON_DISABLED', value)
       }
     },
 
@@ -1691,6 +1696,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {
         state.isRedirectedToHubspotWidget = value
+      },
+
+      SET_IS_CALL_BACK_BUTTON_DISABLED (state, value) {
+        state.isCallBackButtonDisabled = value
       },
 
       updateField
