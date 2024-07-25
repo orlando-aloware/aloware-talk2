@@ -2052,7 +2052,6 @@ export default {
     },
 
     rejectCall () {
-      console.log('here')
       this.$VueEvent.fire('rejectCall')
 
       if (this.dialer.callFishing) {
