@@ -668,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="isNotDisposed"
+                  :disabled="isNotDisposed || isCallBackButtonDisabled"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -1475,7 +1475,8 @@ export default {
       'showIncomingCallNotification',
       'sessionPhoneExpansion',
       'parkedCalls',
-      'callFishingQueue'
+      'callFishingQueue',
+      'isCallBackButtonDisabled'
     ]),
 
     ...mapState('cache', ['currentCompany']),
