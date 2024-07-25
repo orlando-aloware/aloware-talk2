@@ -55,6 +55,36 @@ module.exports = function (/* ctx */) {
     build: {
       vueRouterMode: 'history',
       devtool: 'source-map',
+      // Webpack bundle optimization
+      extendWebpack (cfg) {
+        cfg.plugins.push(new (require('webpack-bundle-analyzer')).BundleAnalyzerPlugin())
+      },
+      // Enable gzip compression
+      // // Split vendor bundle in multiple small chunks
+      chainWebpack (chain) {
+        // chain.optimization.splitChunks({
+        //   chunks: 'all',
+        //   maxSize: 200000
+        // })
+        chain.optimization.splitChunks({
+          chunks: 'all',
+          maxSize: 300000,
+          maxInitialRequests: Infinity,
+          minSize: 30000,
+          cacheGroups: {
+            defaultVendors: {
+              test: /[\\/]node_modules[\\/]/,
+              priority: -10,
+              reuseExistingChunk: true
+            },
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true
+            }
+          }
+        })
+      },
 
       // transpile: false,
 
@@ -67,7 +97,6 @@ module.exports = function (/* ctx */) {
       // preloadChunks: true,
       // showProgress: false,
       // gzip: true,
-      // analyze: true,
 
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
