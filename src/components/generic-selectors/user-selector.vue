@@ -211,6 +211,8 @@ export default {
   computed: {
     ...mapState(['users', 'usersIsLoading']),
 
+    ...mapState('auth', ['profile']),
+
     options () {
       return this.users
     },

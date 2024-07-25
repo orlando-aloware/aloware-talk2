@@ -72,7 +72,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsChannel && !isFilterDialogForView">
+        <div v-if="((isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel) && !isFilterDialogForView">
           <h5 class="mt-4 section-header">Handling</h5>
           <b-form-row class="mt-2" data-testid="filter-form-handling-form-row">
             <b-col sm="12"
@@ -154,7 +154,7 @@
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
-                            label="Tags">
+                            :label="tagsFilterLabel">
                 <entity-tags ref="tagSelector"
                              data-testid="communication-tags-multi-select"
                              entity="contact"
@@ -170,7 +170,7 @@
             </b-col>
             <b-col md="6"
                    sm="12"
-                   v-if="isCallsAndRecordingsChannel">
+                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews) && isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Call Disposition">
                 <call-disposition-selector :multiple="true"
@@ -181,7 +181,7 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row data-testid="filter-form-properties-form-row">
+          <b-form-row v-if="isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews" data-testid="filter-form-properties-form-row">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -261,6 +261,60 @@
               </b-form-group>
             </b-col>
 
+          </b-form-row>
+          <b-form-row v-if="!isCompanyPartOfNewInboxFilters(profile.company_id) && isInboxOrInboxViews"
+                      data-testid="filter-form-properties-form-row">
+            <b-col md="6"
+                   sm="12">
+              <b-form-group>
+                <span class="form-label">Show contacts with unread communications only</span>
+                <div>
+                  <b-form-checkbox class="switch-success"
+                                   size="lg"
+                                   switch
+                                   :value="1"
+                                   :unchecked-value="0"
+                                   data-testid="filter-form-properties-form-checkbox"
+                                   v-model="filter.has_unread">
+                  </b-form-checkbox>
+                </div>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+        </div>
+
+        <div v-if="!isCompanyPartOfNewInboxFilters(profile.company_id) && isInboxOrInboxViews">
+          <h5 class="mt-4 section-header">Has Communicated Within</h5>
+          <b-form-row class="mt-2" data-testid="filter-form-has-communicated-within-form-row">
+            <b-col sm="12"
+                     md="6">
+              <b-form-group class="form-label">
+                <template v-slot:label>
+                  <span>Last Engagement Date Period</span>
+                  <span class="pl-1">
+                    <information-circle-icon color="#2F80ED"/>
+                    <q-tooltip anchor="top middle"
+                               self="center middle"
+                               data-testid="filter-form-has-communicated-within-form-tooltip">
+                      <span class="text-13">Filter based on the last communication date; always  dynamic based on the selected relative period</span>
+                    </q-tooltip>
+                  </span>
+                </template>
+                <q-select class="q-user-selector q-basic-selector"
+                          options-selected-class="text-primary"
+                          color="primary"
+                          option-value="id"
+                          option-label="name"
+                          map-options
+                          use-input
+                          emit-value
+                          dense
+                          outlined
+                          :options="relativeRanges"
+                          data-testid="filter-form-has-communicated-within-form-select"
+                          v-model="filter.dynamic_engagement_date_range" />
+              </b-form-group>
+            </b-col>
           </b-form-row>
         </div>
 
@@ -531,15 +585,11 @@ export default {
     },
 
     tagsFilterLabel () {
-      return this.isInbox ? 'Contact Tags' : 'Tags'
+      return !this.isCompanyPartOfNewInboxFilters(this.profile.company_id) && this.isInbox ? 'Contact Tags' : 'Tags'
     },
 
     tagsFilterCategory () {
-      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
-        return TagCategories.CAT_COMMUNICATIONS
-      }
-
-      return this.isInboxOrInboxViews ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
+      return !this.isCompanyPartOfNewInboxFilters(this.profile.company_id) && this.isInboxOrInboxViews ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
     },
 
     isInboxOrInboxViews () {
