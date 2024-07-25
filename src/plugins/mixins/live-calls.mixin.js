@@ -3,7 +3,8 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import { mapActions, mapState } from 'vuex'
-import _ from 'lodash'
+import _, { isEmpty } from 'lodash'
+import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 
 export default {
   data () {
@@ -326,6 +327,13 @@ export default {
       this.showIncomingCallMenu = false
       this.answerCommunication(false, true)
     },
+    isCallWaiting () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
+      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
+    },
     answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
@@ -334,7 +342,8 @@ export default {
           contactName: this.contact.name,
           companyName: this.contact.company_name,
           contactId: this.contact.id,
-          phoneNumber: this.contact.phone_number
+          phoneNumber: this.contact.phone_number,
+          isCallWaiting: this.isCallWaiting
         },
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
