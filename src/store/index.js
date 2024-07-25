@@ -48,6 +48,7 @@ export default function (/* { ssrContext } */) {
     },
 
     state: {
+      isWidget: false,
       showMenu: false,
       filter: {},
       tags: [],
@@ -285,10 +286,14 @@ export default function (/* { ssrContext } */) {
       isContactDisposed: false,
       isIntroVideoVisible: false,
       showedKycDialog: false,
+      integrationPDImportSummaries: {},
       isDatatableSelectedAll: false,
       isDatatableCountLoading: false,
       showedKycReloadDialog: false,
-      isTrialBannerVisible: false
+      isTrialBannerVisible: false,
+      currentTimezone: null,
+      hubspotPhoneNumber: null,
+      isRedirectedToHubspotWidget: false
     },
 
     getters: {
@@ -299,6 +304,10 @@ export default function (/* { ssrContext } */) {
     },
 
     actions: {
+      setIsWidget ({ commit }, value) {
+        commit('SET_IS_WIDGET', value)
+      },
+
       setDialerToken ({ commit }, token) {
         commit('SET_DIALER_TOKEN', token)
       },
@@ -863,16 +872,40 @@ export default function (/* { ssrContext } */) {
         commit('SET_SHOWED_KYC_DIALOG', value)
       },
 
+      addIntegrationPDImportSummary ({ commit }, payload) {
+        commit('ADD_INTEGRATION_PD_IMPORT_SUMMARY', payload)
+      },
+
+      removeIntegrationPDImportSummary ({ commit }, id) {
+        commit('REMOVE_INTEGRATION_PD_IMPORT_SUMMARY', id)
+      },
+
       setShowedKycReloadDialog ({ commit }, value) {
         commit('SET_SHOWED_KYC_RELOAD_DIALOG', value)
       },
 
       setIsTrialBannerVisible ({ commit }, value) {
         commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
+      },
+
+      setCurrentTimezone ({ commit }, timezone) {
+        commit('SET_CURRENT_TIMEZONE', timezone)
+      },
+
+      setHubspotPhoneNumber ({ commit }, value) {
+        commit('SET_HUBSPOT_PHONE_NUMBER', value)
+      },
+
+      setIsRedirectedToHubspotWidget ({ commit }, value) {
+        commit('SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET', value)
       }
     },
 
     mutations: {
+      SET_IS_WIDGET (state, value) {
+        state.isWidget = value
+      },
+
       SET_DIALER_TOKEN (state, token) {
         state.dialer.token = token
       },
@@ -1629,12 +1662,35 @@ export default function (/* { ssrContext } */) {
         state.showedKycDialog = value
       },
 
+      ADD_INTEGRATION_PD_IMPORT_SUMMARY (state, payload) {
+        state.integrationPDImportSummaries[payload.id] = payload.summary
+      },
+
+      REMOVE_INTEGRATION_PD_IMPORT_SUMMARY (state, id) {
+        if (!state.integrationPDImportSummaries?.[id]) {
+          return
+        }
+        delete state.integrationPDImportSummaries[id]
+      },
+
       SET_SHOWED_KYC_RELOAD_DIALOG (state, value) {
         state.showedKycReloadDialog = value
       },
 
       SET_IS_TRIAL_BANNER_VISIBLE (state, value) {
         state.isTrialBannerVisible = value
+      },
+
+      SET_CURRENT_TIMEZONE (state, timezone) {
+        state.currentTimezone = timezone
+      },
+
+      SET_HUBSPOT_PHONE_NUMBER (state, value) {
+        state.hubspotPhoneNumber = value
+      },
+
+      SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {
+        state.isRedirectedToHubspotWidget = value
       },
 
       updateField

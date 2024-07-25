@@ -35,7 +35,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['profile'])
+    ...mapGetters('auth', ['profile']),
+
+    ...mapGetters('powerDialer', [
+      'bulkAddNotifications'
+    ])
   },
 
   mounted () {
@@ -52,6 +56,10 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'addIntegrationPDImportSummary'
+    ]),
+
     ...mapActions('contacts', ['foldersLoaded']),
 
     onCloseIntegrationImportDialog (data = {}) {
@@ -72,7 +80,10 @@ export default {
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch(() => {
-          this.$generalNotification('Unable to load folders please try again.', 'error')
+          this.$generalNotification(
+            'Unable to load folders please try again.',
+            'error'
+          )
         })
     },
 
@@ -89,7 +100,10 @@ export default {
       }
 
       this.reloadFolders()
-      this.$generalNotification('An error prevented the list from being imported. Please, try again later.', 'error')
+      this.$generalNotification(
+        'An error prevented the list from being imported. Please, try again later.',
+        'error'
+      )
     },
 
     handleImportFinishedEvent (event) {
@@ -105,9 +119,28 @@ export default {
       }
 
       this.reloadFolders()
-      this.$generalNotification('Success! Integration list imported to Power Dialer.', 'redirect', 0, false, {
-        path: `/power-dialer/list/${event.contact_list.id}/in-queue`
+      this.addIntegrationPDImportSummary({
+        id: event.contact_list_id,
+        summary: event?.summary ?? []
       })
+
+      // Look for the the report of items created until it is ready
+      let intervalId = setInterval(() => {
+        const bulkCreatedNotification = this.bulkAddNotifications(event.contact_list_id)
+        const bulkAddStatusReport = bulkCreatedNotification?.status_report ?? null
+
+        if (bulkAddStatusReport) {
+          clearInterval(intervalId)
+          this.$generalNotification(
+            'Success! Your power dialer queue import is ready.',
+            'redirect',
+            0,
+            false,
+            {
+              path: `/power-dialer/list/${event.contact_list_id}/in-queue`
+            })
+        }
+      }, 1000)
     }
   },
 
@@ -118,6 +151,13 @@ export default {
       },
       deep: true
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('contact_list_import_hubspot')
+    this.$VueEvent.stop('contact_list_import_zoho')
+    this.$VueEvent.stop('contact_list_import_pipedrive')
+    this.$VueEvent.stop('contact_list_import_failed')
   }
 }
 </script>

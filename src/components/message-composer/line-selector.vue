@@ -140,6 +140,8 @@ export default {
   },
 
   mounted () {
+    this.showPlaceholder()
+
     if (this.contact && this.contact.id) {
       this.lineOptions = this.formattedLineOptions
       this.setIncomingNumber()

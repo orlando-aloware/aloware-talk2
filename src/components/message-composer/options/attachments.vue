@@ -39,7 +39,7 @@
       </p>
     </form>
     <div class="text-center mt-2 notice" data-testid="attachment-size-messages">
-      <p class="mb-0"><a href="https://support.aloware.com/en/articles/9037680-different-data-types-supported-in-aloware" target="_blank">Click here</a> to see the supported media file list.</p>
+      <p class="mb-0" v-if="!isSimpSocial"><a href="https://support.aloware.com/en/articles/9037680-different-data-types-supported-in-aloware" target="_blank">Click here</a> to see the supported media file list.</p>
       <p class="mb-0">Max. files size for images is 5MB</p>
       <p class="mb-0">Other file types should be below 600KB</p>
     </div>
@@ -50,6 +50,7 @@
 import UploadIcon from 'components/icons/upload-icon'
 import { mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'attachments',
@@ -57,6 +58,8 @@ export default {
   components: {
     UploadIcon
   },
+
+  mixins: [simpsocialMixin],
 
   props: {
     isBroadcast: {

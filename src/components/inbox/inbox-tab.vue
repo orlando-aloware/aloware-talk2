@@ -240,7 +240,8 @@ import {
   inboxMixin,
   visibilityMixin,
   unownedContactTaskMixin,
-  contactV2AttributesMixin
+  contactV2AttributesMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import FilterIcon from 'components/icons/filter-icon'
 import InboxSearcher from 'components/inbox/inbox-searcher'
@@ -261,7 +262,8 @@ export default {
     inboxMixin,
     visibilityMixin,
     unownedContactTaskMixin,
-    contactV2AttributesMixin
+    contactV2AttributesMixin,
+    userMixin
   ],
 
   components: {
@@ -607,13 +609,19 @@ export default {
         return
       }
 
+      const params = {
+        id: contactId.toString(),
+        channel: 'inbox',
+        status
+      }
+
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        params.communicationId = contact.communication_id
+      }
+
       this.$emit('itemSelected', {
         name: 'Inbox Contact Task',
-        params: {
-          id: contactId.toString(),
-          channel: 'inbox',
-          status
-        }
+        params
       })
     },
 

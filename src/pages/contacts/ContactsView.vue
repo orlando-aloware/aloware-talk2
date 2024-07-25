@@ -1888,7 +1888,7 @@ export default {
       }
     },
 
-    checked: function (value) {
+    checked (value) {
       const elem = document.querySelector('.data-table-check-all')
 
       if (elem) {

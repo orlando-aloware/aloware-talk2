@@ -59,7 +59,7 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated && !suspended"/>
+            <dialer v-if="authenticated && !suspended && !isWidget"/>
           </q-page-container>
         </div>
         <q-drawer class="h-100 sidebar-wrapper d-block position-absolute top-0"
@@ -67,7 +67,7 @@
                   :breakpoint="0"
                   :width="64"
                   v-model="sidebarVisible"
-                  v-if="authenticated && !suspended">
+                  v-if="authenticated && !suspended && !isWidget">
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
@@ -85,7 +85,7 @@
                   :class="mobilePhoneDrawerClass"
                   :breakpoint="789"
                   v-model="mobilePhoneDrawer"
-                  v-if="authenticated && !suspended"
+                  v-if="authenticated && !suspended && !isWidget"
                   @hide="onCloseMobilePhone">
           <q-header class="page-header bg-white text-black no-box-shadow dialer-header"
                     v-if="!isPhoneVisible && isMobile">
@@ -292,6 +292,14 @@ import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 export default {
   name: 'MyLayout',
 
+  props: {
+    api_key: {
+      type: String,
+      required: false,
+      default: null
+    }
+  },
+
   components: {
     MobileLiveCallBar,
     DialerForm,
@@ -345,7 +353,6 @@ export default {
       loadingAvailableMetrics: false,
       loadingMetricGroups: false,
       loadingLeadSources: false,
-      isWidget: false,
       transitionName: null,
       prevHeight: 0,
       push: null,
@@ -402,7 +409,8 @@ export default {
       'isIntroVideoVisible',
       'showedKycDialog',
       'showedKycReloadDialog',
-      'statics'
+      'statics',
+      'isWidget'
     ]),
 
     ...mapState('auth', [
@@ -578,6 +586,10 @@ export default {
   },
 
   created () {
+    if (this.api_key) {
+      localStorage.setItem('api_token', this.api_key)
+    }
+
     this.showMobileFooter = this.isMobile
     this.checkDebounce = _.debounce(this.check, 1000)
 
@@ -1015,6 +1027,21 @@ export default {
       this.$generalNotification(event.message)
     }
 
+    this.mainListeners.contactListBulkCreated = (event) => {
+      // Save the event to vuex
+      this.storeBulkActionNotification(event)
+
+      // Verify if we're in the contact list page
+      const isContactsListPage = this.$route.meta?.id === 'power-dialer-list-filter'
+      const isIdMatch = this.$route.params.id === event.contact_list_id
+      if (isContactsListPage && isIdMatch) {
+        // Notify user of finish and push user to power dialer list
+        this.$generalNotification('Contacts were added to your Power Dialer list', null, null, false, {
+          path: `/power-dialer/list/${event.contact_list_id}/in-queue`
+        })
+      }
+    }
+
     // new in-app fax notification
     // this.$VueEvent.listen('new_in_app_fax', (communication) => {
     //   if (this.checkCommunicationMatchesUserAccessibility(communication) && !this.profile.sleep_mode) {
@@ -1279,6 +1306,7 @@ export default {
       this.$VueEvent.listen('export_event_delete', this.mainListeners.exportEventDelete)
       this.$VueEvent.listen('hide_mobile_footer', this.mainListeners.hideMobileFooter)
       this.$VueEvent.listen('bulk_contacts_deleted', this.mainListeners.bulkContactsDeleted)
+      this.$VueEvent.listen('contact_list_bulk_created', this.mainListeners.contactListBulkCreated)
       this.$VueEvent.listen('kyc_status_updated', this.mainListeners.kycStatusUpdated)
     },
 
@@ -2465,6 +2493,7 @@ export default {
           storage.local.setItem('statics', JSON.stringify(res.data))
           this.setStaticsLoaded(true)
           this.setIsWhiteLabel(res.data.whitelabel)
+          this.setDocumentFavicon(res.data.favicon)
         }).catch(err => {
           console.log(err)
 
@@ -2517,7 +2546,8 @@ export default {
     ...mapActions('cache', ['setCurrentCompany', 'setTimezones']),
     ...mapActions('powerDialer', [
       'setFinishedPowerDialerSession',
-      'getMyQueueList'
+      'getMyQueueList',
+      'storeBulkActionNotification'
     ]),
     ...mapActions([
       'resetVuex',

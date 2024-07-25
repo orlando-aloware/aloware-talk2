@@ -2,30 +2,62 @@
   <div class="pt-0 pb-4">
     <div class="row no-wrap report-group-header q-pt-none text-subtitle1 text-bold text-capitalize">
       <div class="cursor-pointer">
-        <TitlePopover
-          v-model="metricGroupName"
-          :id="metricGroupId"
-          :editMetricGroupId="editMetricGroupId"
-          @input="updateGroup"
-          @close="editClosed"/>
+        <TitlePopover :id="metricGroupId"
+                      :editMetricGroupId="editMetricGroupId"
+                      v-model="metricGroupName"
+                      @input="updateGroup"
+                      @close="editClosed"/>
       </div>
-      <q-select
-        class="mini-select"
-        outlined
-        rounded
-        map-options
-        emit-value
-        option-value="id"
-        option-label="label"
-        bg-color="white"
-        :options="dateRange"
-        :dense="dense"
-        :options-dense="denseOpts"
-        :disabled="updateLoading || metricsList.length === 0"
-        :readonly="updateLoading || metricsList.length === 0"
-        v-model="timeline"
-        @input="changedFilter($event)">
+      <q-select class="mini-select"
+                outlined
+                rounded
+                map-options
+                emit-value
+                option-value="id"
+                option-label="label"
+                bg-color="white"
+                :options="dateRange"
+                :dense="dense"
+                :options-dense="denseOpts"
+                :disabled="updateLoading || metricsList.length === 0"
+                :readonly="updateLoading || metricsList.length === 0"
+                v-if="!show_custom_date_range"
+                v-model="timeline"
+                @input="changedFilter($event)">
       </q-select>
+      <div class="custom-date-time-picker"
+           v-if="show_custom_date_range">
+        <vue-ctk-date-time-picker id="start-date-time-picker"
+                                  formatted="lll"
+                                  minuteInterval="5"
+                                  label="Start date and Time"
+                                  :noButtonNow="true"
+                                  :no-header="true"
+                                  v-model="customStartDate"/>
+        <vue-ctk-date-time-picker id="end-date-time-picker"
+                                  formatted="lll"
+                                  minuteInterval="5"
+                                  label="End date and Time"
+                                  :noButtonNow="true"
+                                  :minDate="customStartDate"
+                                  :no-header="true"
+                                  :disabled="isEndDateTimePickerDisabled"
+                                  v-model="customEndDate"/>
+        <div class="btn-custom-date">
+          <b-button class="text-sm btn-apply"
+                    variant="primary"
+                    :disabled="isApplyButtonPickerDisabled"
+                    @click="applyCustomDateFilter">
+            Apply
+          </b-button>
+          <b-button variant="dark-grey"
+                    class="f-btn--cancel btn-cancel"
+                    size="sm"
+                    @click="cancelCustomDateFilter">
+            Cancel
+          </b-button>
+        </div>
+      </div>
     </div>
     <div
       v-if="resources"
@@ -142,6 +174,9 @@ import ConfirmDialog from 'components/confirm-dialog'
 import TrashIcon from 'components/icons/trash-icon'
 import TitlePopover from 'components/popover/text-popover'
 import * as DateRanges from 'src/constants/dates'
+import moment from 'moment'
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
 
 export default {
   name: 'MetricGroup',
@@ -162,7 +197,8 @@ export default {
     MetricLoader,
     ConfirmDialog,
     TrashIcon,
-    TitlePopover
+    TitlePopover,
+    VueCtkDateTimePicker
   },
   data () {
     return {
@@ -182,7 +218,11 @@ export default {
       metricsList: [],
       loaderToggled: false,
       updateLoading: false,
-      DateRanges
+      DateRanges,
+      show_custom_date_range: false,
+      customStartDate: '',
+      customEndDate: '',
+      customRange: {}
     }
   },
   computed: {
@@ -217,11 +257,22 @@ export default {
           .sort((a, b) => (a.order > b.order) ? 1 : -1)
       }
       return agentMetrics
+    },
+    isEndDateTimePickerDisabled () {
+      return !this.customStartDate
+    },
+    isApplyButtonPickerDisabled () {
+      return !this.customEndDate
     }
   },
   mounted () {
     this.timeline = this.resources.date_range_type || 1
     this.metricsList = this.arrangedMetricList ? JSON.parse(JSON.stringify(this.arrangedMetricList)) : []
+    this.customRange = this.DateRanges.DATE_RANGES.find(range => range.label === 'Custom')
+
+    if (this.timeline === this.customRange.id) {
+      this.show_custom_date_range = true
+    }
   },
   methods: {
     ...mapActions('stats', [
@@ -267,10 +318,20 @@ export default {
       }
     },
     async changedFilter (val) {
+      if (this.customRange.id === val) {
+        this.show_custom_date_range = true
+        return
+      }
+
+      this.getMetricGroupsStatistics(val)
+    },
+    getMetricGroupsStatistics (val, start_date = null, end_date = null) {
       this.toggleLoader(true)
       this.$axios.patch(`/api/v2/agents/${this.profile.id}/statistics/metric-groups/${this.resources.id}`, {
         name: this.metricGroupName,
-        date_range_type: val
+        date_range_type: val,
+        custom_start_date: start_date,
+        custom_end_date: end_date
       }).then(res => {
         this.toggleLoader(false)
         this.updateMetricGroup(res.data)
@@ -343,6 +404,26 @@ export default {
     },
     onLoaderToggled (toggle) {
       this.loaderToggled = toggle
+    },
+    cancelCustomDateFilter () {
+      this.show_custom_date_range = false
+      this.customStartDate = ''
+      this.customEndDate = ''
+
+      this.timeline = 1
+
+      if (this.resources.date_range_type && this.resources.date_range_type !== this.customRange.id) {
+        this.timeline = this.resources.date_range_type
+        return
+      }
+
+      this.getMetricGroupsStatistics(this.timeline)
+    },
+    applyCustomDateFilter () {
+      const startDate = moment(this.customStartDate, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm:ss')
+      const endDate = moment(this.customEndDate, 'YYYY-MM-DD hh:mm a').format('YYYY-MM-DD HH:mm:ss')
+
+      this.getMetricGroupsStatistics(this.customRange.id, startDate, endDate)
     }
   },
   watch: {

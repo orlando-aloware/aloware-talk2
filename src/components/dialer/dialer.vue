@@ -65,6 +65,8 @@ export default {
 
     ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
 
+    ...mapState(['isWidget']),
+
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
         !['connected', 'open'].includes(this.dialer.call.state)
@@ -80,6 +82,10 @@ export default {
 
     hasCallInProgressNoParkedCall () {
       return !this.dialer.parkedCall && this.dialer.call
+    },
+
+    shouldPushPhoneRoute () {
+      return (this.isMobile && !this.isWidget) && this.$route.name !== 'Phone'
     }
   },
 
@@ -94,9 +100,11 @@ export default {
         data = _.merge(this.dialer.communication, data)
         this.setDialerCommunication(data)
 
+        const communication = this.dialer?.communication
+        const isGreetingNew = communication?.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
         const user = this.getUser(this.dialer.communication.added_user_id)
 
-        if (user.name) {
+        if (user.name && !isGreetingNew) {
           this.setAddedParty(user)
         }
 
@@ -610,7 +618,7 @@ export default {
       })
     },
 
-    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null) {
+    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null, isCallWaiting = false) {
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
@@ -628,12 +636,12 @@ export default {
       // reject ongoing call if there is one
       this.rejectCall()
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL && !isCallWaiting) {
         console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
         return
       }
 
-      if (this.isMobile && this.$route.name !== 'Phone') {
+      if (this.shouldPushPhoneRoute) {
         this.$router.push({
           name: 'Phone'
         })
@@ -789,7 +797,7 @@ export default {
       }
 
       if (this.connection) {
-        if (this.isMobile && this.$route.name !== 'Phone') {
+        if (this.shouldPushPhoneRoute) {
           this.$router.push({
             name: 'Phone'
           })
@@ -1027,7 +1035,7 @@ export default {
         console.log('Call parked')
 
         if (shouldAnswer) {
-          this.makeCall('call:' + data.id, data.campaignId)
+          this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting)
         } else if (shouldUnpark) {
           this.unparkCall(data, true)
         }
@@ -1072,7 +1080,7 @@ export default {
             if (shouldUnpark) {
               this.unparkCall(data)
             } else if (shouldAnswer) {
-              this.makeCall('call:' + data.id, data.campaignId)
+              this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting)
             }
 
             this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
@@ -1209,6 +1217,10 @@ export default {
       }).finally(() => {
         this.loadingAdd = false
       })
+    },
+
+    cleanParticipant () {
+      this.setAddedParty()
     },
 
     dialerCallPrep (call) {
@@ -1495,7 +1507,7 @@ export default {
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
       this.setShowIncomingCallNotification(false)
 
-      if (this.isMobile && this.$route.name !== 'Phone') {
+      if (this.shouldPushPhoneRoute) {
         this.$router.push({
           name: 'Phone'
         })

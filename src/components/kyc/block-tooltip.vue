@@ -87,7 +87,7 @@ export default {
         case KycLogs.KYC_STATUS_NONE:
           message = ''
           break
-        case KycLogs.KYC_STATUS_DEFINITELY_REJECTED:
+        case KycLogs.KYC_STATUS_REJECTED:
           message = `You need to <a href="${link}"><u class="text-white">submit again the info</u></a> about your business to ${action}`
           break
         default:

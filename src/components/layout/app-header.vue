@@ -46,7 +46,7 @@
 
       <a href="https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast"
          target="_blank"
-         v-if="$route.name === 'Broadcasts'">
+         v-if="$route.name === 'Broadcasts' && !isSimpSocial">
         <information-circle-icon class="ml-2 cursor-pointer"/>
         <q-tooltip>
           Check the article how to use the Broadcast

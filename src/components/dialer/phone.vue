@@ -1,7 +1,7 @@
 <template>
   <div class="phone d-flex flex-column"
        ref="phone"
-       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone }"
+       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center flex-grow-0"
@@ -21,7 +21,13 @@
           {{ getCampaign(dialer.communication.campaign_id).name | truncate(15) }}
         </span>
       </div>
-      <div class="d-flex flex-row justify-content-between align-items-center width-65">
+      <div :class="[
+              'd-flex',
+              'flex-row',
+              'justify-content-between',
+              'align-items-center',
+              (is_widget && (isCallCompleted || loadingPhone)) ? 'width-32' : 'width-65'
+            ]">
         <pause-record-icon width="14"
                            height="14"
                            v-show="pauseRecordIconShow">
@@ -92,7 +98,8 @@
           </div>
         </q-btn-dropdown>
 
-        <q-btn class="icon-btn auto-size height-12"
+        <q-btn v-show="!is_widget"
+               class="icon-btn auto-size height-12"
                icon="img:app-icons/dialer/phone_exit.svg"
                size="12px"
                padding="none"
@@ -143,7 +150,8 @@
                 <span class="d-inline-flex">
                   {{ contactName | truncate(15) }}
                 </span>
-                <q-btn class="text-size-rg d-inline-flex ml-1"
+                <q-btn v-if="!is_widget"
+                       class="text-size-rg d-inline-flex ml-1"
                        color="white"
                        icon="o_info"
                        flat
@@ -660,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="isNotDisposed"
+                  :disabled="isNotDisposed || isNotOnWrapUp"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -669,7 +677,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="isNotDisposed"
+                  :disabled="isNotDisposed || isNotOnWrapUp"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1299,6 +1307,7 @@ import ParkedCallIcon from 'components/icons/parked-call-icon'
 import API from 'src/plugins/api/api'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import * as AgentStatus from '../../constants/agent-status'
 
 export default {
   name: 'phone',
@@ -1447,7 +1456,9 @@ export default {
       CommunicationCurrentStatus,
       CommunicationTypes,
       UploadedFileTypes,
-      TagCategories
+      TagCategories,
+      callbackAction: false,
+      AgentStatus
     }
   },
 
@@ -1470,6 +1481,8 @@ export default {
     ]),
 
     ...mapState('cache', ['currentCompany']),
+
+    ...mapState('auth', ['profile']),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
@@ -1898,6 +1911,10 @@ export default {
     isAccountForcedAlwaysRecordOutbound () {
       return this.dialer.communication.direction === CommunicationDirection.OUTBOUND &&
         this.currentCompany.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS
+    },
+
+    isNotOnWrapUp () {
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP
     }
   },
 
@@ -1938,6 +1955,7 @@ export default {
   },
 
   mounted () {
+    this.checkIfIsWidget()
     this.setupDraggable()
     this.setupContactLocalTime()
     // Disable phone visibility on power dialer sessions
@@ -2182,12 +2200,15 @@ export default {
       this.$emit('onPhoneVisible', false)
     },
 
-    endWrapUp () {
+    endWrapUp (type = 'finish') {
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
       }
 
       this.$VueEvent.fire('endWrapUp')
+
+      this.callbackAction = type === 'callback'
+
       this.$emit('onPhoneVisible', false)
     },
 
@@ -2204,7 +2225,7 @@ export default {
         contactId: this.dialer.communication.contact_id
       }
 
-      this.endWrapUp()
+      this.endWrapUp('callback')
 
       this.$VueEvent.fire('makeCall', data)
     },
@@ -2403,6 +2424,7 @@ export default {
     },
 
     resetAdd () {
+      this.$VueEvent.fire('cleanParticipant')
       this.add.introduce = false
       this.add.userId = null
       this.add.ringGroupId = null
@@ -2461,6 +2483,7 @@ export default {
     introduceParticipant ($event) {
       this.loadingIntroduce = true
       this.add.introduce = true
+      this.$VueEvent.fire('cleanParticipant')
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
@@ -2528,9 +2551,16 @@ export default {
       this.hasCommunicationNotesUnsavedChanges = value
     },
 
+    checkIfIsWidget () {
+      if (this.$route.path.includes('/widgets/hubspot-call-extension')) {
+        this.setIsWidget(true)
+      }
+    },
+
     ...mapActions([
       'setDialerContact',
-      'setDialerContactTags'
+      'setDialerContactTags',
+      'setIsWidget'
     ])
   },
 
@@ -2561,6 +2591,12 @@ export default {
 
       if (!this.shouldShow) {
         this.$emit('onPhoneVisible', false)
+
+        // emit the callCompleted event to display a message to close the widget.
+        // only emit the event if is_widget=true and the finish button is clicked.
+        if (this.is_widget && !this.callbackAction) {
+          this.$emit('callCompleted')
+        }
 
         return
       }

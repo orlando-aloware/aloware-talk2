@@ -31,7 +31,6 @@ import { Vuelidate } from 'vuelidate'
 import { VALID_ENG_COUNTRIES, VALID_NA_COUNTRIES } from 'src/constants/valid-countries'
 import log from 'electron-log'
 import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
-import { Userpilot } from 'userpilot'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 import { AxiosError } from 'axios'
 
@@ -71,11 +70,6 @@ Highcharts.setOptions({
 })
 
 window.Highcharts = Highcharts
-
-// Userpilot
-if (process.env.USERPILOT_APPTOKEN) {
-  Userpilot.initialize(process.env.USERPILOT_APPTOKEN)
-}
 
 // local storage
 storage.local.setItem('api_url', process.env.API_URL)
@@ -352,20 +346,20 @@ Vue.prototype.$handleErrors = function (response, title = null) {
 
     switch (response.status) {
       case 401:
-        if (!response.data.errors.length && response.data.error) {
+        if ((!response.data.errors || !response.data.errors.length) && response.data.error) {
           message.data = `${response.data.error}`
         }
 
-        if (response.data.errors.length && response.data.error) {
+        if (response.data.errors?.length && response.data.error) {
           message.data = `<p class="pt-1 pb-1">- ${response.data.error}</p>`
         }
 
-        if (response.data.errors.length) {
-          response.data.errors = ''
-
+        if (response.data.errors?.length) {
           for (error.data of response.data.errors) {
             message.data += `<p class="pt-1 pb-1">- ${error.data}</p>`
           }
+
+          response.data.errors = ''
         }
 
         break

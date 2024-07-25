@@ -32,7 +32,7 @@
             @filter="filterFn">
     <template v-slot:prepend
               v-if="prepend">
-      {{prepend}}
+      {{ prepend }}
     </template>
 
     <template v-slot:no-option>
@@ -54,7 +54,10 @@
           </q-item-label>
           <q-item-label caption
                         v-if="!scope.opt.is_destination">
-            <div class="break-all">{{ scope.opt.email }} - {{ getLabel(scope.opt) }}</div>
+            <div class="break-all"
+                 v-if="scope.opt.email">
+              {{ scope.opt.email }} - {{ getLabel(scope.opt) }}
+            </div>
           </q-item-label>
           <q-item-label caption
                         v-else>
@@ -95,19 +98,23 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
-import { selectorMixin } from 'src/plugins/mixins'
+import { selectorMixin, userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'user-selector',
 
-  mixins: [
-    selectorMixin
-  ],
+  mixins: [selectorMixin, userMixin],
 
   components: { RemoveTagIcon },
 
   props: {
     value: {
+      required: false
+    },
+
+    withUnassigned: {
+      type: Boolean,
+      default: false,
       required: false
     },
 
@@ -204,6 +211,8 @@ export default {
   computed: {
     ...mapState(['users', 'usersIsLoading']),
 
+    ...mapState('auth', ['profile']),
+
     options () {
       return this.users
     },
@@ -225,6 +234,12 @@ export default {
     },
 
     availableUsers () {
+      if (this.withUnassigned && this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        return [
+          { name: 'Unassiged', id: 'unassigned', email: '' },
+          ...this.options
+        ]
+      }
       return this.options
     },
 
@@ -276,7 +291,7 @@ export default {
         return null
       }
 
-      return this.formattedOptions.find(item => item.id === this.selectedId)
+      return this.formattedOptions.find((item) => item.id === this.selectedId)
     },
 
     userSelectorClass () {
@@ -284,12 +299,7 @@ export default {
       const genericClass = this.genericStyling ? 'generic-selector' : ''
       const highlightedClass = this.highlighted ? this.highlightedClass : ''
 
-      return [
-        prependClass,
-        genericClass,
-        highlightedClass,
-        this.customClass
-      ]
+      return [prependClass, genericClass, highlightedClass, this.customClass]
     }
   },
 

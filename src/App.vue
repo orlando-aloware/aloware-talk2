@@ -9,7 +9,7 @@
       </template>
     </b-overlay>
     <header-notification class="flex-grow-0"
-                         v-if="isLoggedIn"/>
+                         v-if="isLoggedIn && !isWidget"/>
     <router-view class="flex-grow-1 overflow-hidden"
                  v-if="cookieValidated"/>
     <portal-target name="app"
@@ -26,7 +26,7 @@
                          position="b-toaster-top-center"/>
 
     <custom-scripts v-show="isLoggedIn"/>
-    <intercom v-if="isIntercomEnabled"/>
+    <intercom v-if="isIntercomEnabled && !isWidget"/>
   </div>
 </template>
 <script>
@@ -63,7 +63,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
 
-    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel']),
+    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
@@ -183,8 +183,10 @@ export default {
       })
     })
 
-    this.$VueEvent.listen('user_logout', (data) => {
-      if (this.authenticated) {
+    this.$VueEvent.listen('user_logout', async (data) => {
+      const currentAuthToken = storage.local.getItem('shared_cookie')
+
+      if (this.authenticated && currentAuthToken === data.cookie_auth_token) {
         this.clearUser()
         this.$router.push({ name: 'Login' })
           .catch(this.$handleRouteError)

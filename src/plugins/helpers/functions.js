@@ -101,6 +101,35 @@ export const isQueuedCall = (communication) => {
   return true
 }
 
+export const checkIsNumeric = (value) => {
+  let regex = /^-{0,1}\d*\.{0,1}\d+$/
+
+  return regex.test(value)
+}
+
+export const mergeObjectsAndAddValues = (obj1, obj2) => {
+  const result = JSON.parse(JSON.stringify(obj1))
+
+  for (let key in obj2) {
+    if (obj2 && obj2.hasOwnProperty(key)) {
+      if (typeof obj2[key] === 'object' &&
+        obj1 && obj1.hasOwnProperty(key) &&
+        typeof obj1[key] === 'object') {
+        result[key] = mergeObjectsAndAddValues(obj1[key], obj2[key])
+        continue
+      }
+
+      const value = (obj1[key] || 0)
+
+      if (checkIsNumeric(value) && checkIsNumeric(obj2[key])) {
+        result[key] = value + obj2[key]
+      }
+    }
+  }
+
+  return result
+}
+
 /**
  * Deeply clones an object, handling circular references safely.
  * @param {Object} value The object to clone.

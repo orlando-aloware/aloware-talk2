@@ -229,7 +229,10 @@ export const DEFAULT_STATE = {
   staticsLoaded: false,
   isCallDisposed: false,
   isContactDisposed: false,
+  integrationPDImportSummaries: {},
   isWhiteLabel: false,
   isDatatableSelectedAll: false,
-  isDatatableCountLoading: false
+  isDatatableCountLoading: false,
+  hubspotPhoneNumber: null,
+  isRedirectedToHubspotWidget: false
 }

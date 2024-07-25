@@ -257,6 +257,7 @@ export default {
       contactId: null,
       contactTimezone: null,
       currentLocalTime: null,
+      lastContactCampaignId: null,
       loadingContact: false,
       textMessage: '',
       isMakingCall: false,
@@ -416,6 +417,7 @@ export default {
       this.companyName = ''
       this.contactId = null
       this.contactTimezone = null
+      this.lastContactCampaignId = null
 
       if (!this.isMobile) {
         this.defaultOutboundCampaignId = null
@@ -429,6 +431,10 @@ export default {
     phoneNumberChanged (data) {
       this.changePhoneNumber(data).catch(_ => {
       })
+      // check if a line has not yet been selected, select the last used line for the contact
+      if (!this.campaignId) {
+        this.campaignId = this.lastContactCampaignId
+      }
     },
 
     async changePhoneNumber (data) {
@@ -446,6 +452,7 @@ export default {
           this.companyName = data?.company_name
           this.contactId = data?.id
           this.contactTimezone = data?.timezone
+          this.lastContactCampaignId = data?.last_campaign_id
           this.loadingContact = false
         }).catch((err) => {
           console.log(err)

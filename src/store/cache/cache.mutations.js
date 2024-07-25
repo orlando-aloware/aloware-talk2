@@ -13,6 +13,10 @@ export default {
     state.timezones = list
   },
 
+  SET_PHONE_NUMBER (state, phoneNumber) {
+    state.phoneNumber = phoneNumber
+  },
+
   RESET_VUEX (state) {
     // perform state reset
     state = Object.assign({}, CacheDefault.DEFAULT_STATE)
