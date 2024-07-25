@@ -414,6 +414,35 @@ export default {
             ]
           }
         }
+
+        const otherFiltersList = [
+          'callback_status',
+          'broadcasts',
+          'call_dispositions',
+          'callback_status',
+          'incoming_numbers',
+          'creator_type',
+          'workflows',
+          'transfer_type',
+          'min_talk_time',
+          'untagged_only',
+          'exclude_automated_communications',
+          'first_time_only'
+        ]
+
+        otherFiltersList.forEach(key => {
+          if (filter && (!isEmpty(filter[key]) || filter[key] > 0)) {
+            this.filters = {
+              ...this.filters,
+              [key]: [
+                {
+                  value: Array.isArray(filter[key]) ? filter[key] : [filter[key]],
+                  operator: OPERATORS.IS_ANY_OF
+                }
+              ]
+            }
+          }
+        })
       } else {
         // Using old filters for non-beta companies
         if (filter && !isEmpty(filter?.campaigns)) {
@@ -478,37 +507,6 @@ export default {
           }
           relations.push('tags')
         }
-      }
-
-      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
-        const otherFiltersList = [
-          'callback_status',
-          'broadcasts',
-          'call_dispositions',
-          'callback_status',
-          'incoming_numbers',
-          'creator_type',
-          'workflows',
-          'transfer_type',
-          'min_talk_time',
-          'untagged_only',
-          'exclude_automated_communications',
-          'first_time_only'
-        ]
-
-        otherFiltersList.forEach(key => {
-          if (filter && (!isEmpty(filter[key]) || filter[key] > 0)) {
-            this.filters = {
-              ...this.filters,
-              [key]: [
-                {
-                  value: Array.isArray(filter[key]) ? filter[key] : [filter[key]],
-                  operator: OPERATORS.IS_ANY_OF
-                }
-              ]
-            }
-          }
-        })
       }
 
       // apply only if filter is not "All Time"

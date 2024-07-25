@@ -181,7 +181,8 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row v-if="isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews" data-testid="filter-form-properties-form-row">
+          <b-form-row v-if="isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews"
+                      data-testid="filter-form-properties-form-row">
             <b-col md="6"
                    sm="12">
               <b-form-group>
