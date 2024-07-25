@@ -286,9 +286,10 @@
 
         <div v-if="!isCompanyPartOfNewInboxFilters(profile.company_id) && isInboxOrInboxViews">
           <h5 class="mt-4 section-header">Has Communicated Within</h5>
-          <b-form-row class="mt-2" data-testid="filter-form-has-communicated-within-form-row">
+          <b-form-row class="mt-2"
+                      data-testid="filter-form-has-communicated-within-form-row">
             <b-col sm="12"
-                     md="6">
+                   md="6">
               <b-form-group class="form-label">
                 <template v-slot:label>
                   <span>Last Engagement Date Period</span>
