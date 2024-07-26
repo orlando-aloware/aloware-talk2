@@ -64,7 +64,7 @@ module.exports = function (/* ctx */) {
       chainWebpack (chain) {
         chain.optimization.splitChunks({
           chunks: 'all',
-          maxSize: 200000
+          maxSize: 500000
         })
       },
 
