@@ -207,11 +207,8 @@ export default {
       lists: [],
       disableAddView: false,
       searchQuery: '',
-      page: 1,
       offset: 0,
-      hasMore: true,
-      scrollDisabled: true,
-      isLoadingMore: false
+      hasMore: true
     }
   },
 
@@ -245,7 +242,6 @@ export default {
           this.options.push(...result.lists)
         }
         this.hasMore = result.hasMore
-        this.scrollDisabled = !result.hasMore
         this.total = result.total
         this.isLoading = false
       }).catch((err) => {
