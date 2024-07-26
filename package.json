@@ -2,7 +2,7 @@
   "name": "aloware-talk2",
   "version": "1.51.2",
   "description": "Aloware Agent Interface",
-  "productName": "Aloware Talk",
+  "productName": "Talk",
   "author": "Aloware <support@aloware.com>",
   "private": true,
   "repository": {
