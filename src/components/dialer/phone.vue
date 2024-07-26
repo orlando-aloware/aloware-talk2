@@ -1926,9 +1926,6 @@ export default {
     },
 
     isNotOnWrapUp () {
-      console.log('isNotOnWrapUp hasNoParkedAndInprogressCall', this.hasNoParkedAndInprogressCall)
-      console.log('isNotOnWrapUp hasParkedAndInprogressCall', this.hasParkedAndInprogressCall)
-      console.log('isNotOnWrapUp hasCallInProgressNoParkedCall', this.hasCallInProgressNoParkedCall)
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall)
     }
   },
