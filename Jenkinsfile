@@ -83,7 +83,7 @@ pipeline {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'quasar build'
+                                    sh 'NODE_OPTIONS=--openssl-legacy-provider quasar build'
                                 }
                             }
                         }
