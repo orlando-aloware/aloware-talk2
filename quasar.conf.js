@@ -56,13 +56,15 @@ module.exports = function (/* ctx */) {
       vueRouterMode: 'history',
       devtool: 'source-map',
       // Split vendor bundle in multiple small chunks
-      chainWebpack (chain) {
-        chain.optimization.splitChunks({
-          chunks: 'all',
-          maxSize: 500000
-        })
-        chain.optimization.minimize(true)
-      },
+      // chainWebpack (chain) {
+      //   chain.optimization.splitChunks({
+      //     chunks: 'all',
+      //     maxSize: 500000
+      //   })
+      //   chain.optimization.minimize(true)
+      // },
+
+      gzip: true,
 
       // transpile: false,
 
@@ -74,8 +76,6 @@ module.exports = function (/* ctx */) {
       // rtl: false, // https://quasar.dev/options/rtl-support
       // preloadChunks: true,
       // showProgress: false,
-
-      gzip: true,
 
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
