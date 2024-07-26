@@ -17,7 +17,7 @@ export default _.merge({
     },
 
     ssuEnabled () {
-      return this.statics?.xmas_enabled || false
+      return this.statics?.kyc_ssu_enabled || false
     },
 
     isTrialKYC () {
