@@ -1917,7 +1917,18 @@ export default {
       return this.dialer.parkedCall && this.dialer.call
     },
 
+    hasNoParkedAndInprogressCall () {
+      return !this.dialer.parkedCall && !this.dialer.call
+    },
+
+    hasCallInProgressNoParkedCall () {
+      return !this.dialer.parkedCall && this.dialer.call
+    },
+
     isNotOnWrapUp () {
+      console.log('isNotOnWrapUp hasParkedAndInprogressCall', this.hasParkedAndInprogressCall)
+      console.log('isNotOnWrapUp hasNoParkedAndInprogressCall', this.hasNoParkedAndInprogressCall)
+      console.log('isNotOnWrapUp hasCallInProgressNoParkedCall', this.hasCallInProgressNoParkedCall)
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
     }
   },
