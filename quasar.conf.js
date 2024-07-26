@@ -59,8 +59,9 @@ module.exports = function (/* ctx */) {
       chainWebpack (chain) {
         chain.optimization.splitChunks({
           chunks: 'all',
-          maxSize: 200000
+          maxSize: 500000
         })
+        chain.optimization.minimize(true)
       },
 
       // transpile: false,
@@ -73,7 +74,7 @@ module.exports = function (/* ctx */) {
       // rtl: false, // https://quasar.dev/options/rtl-support
       // preloadChunks: true,
       // showProgress: false,
-      // gzip: true,
+      gzip: true,
 
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
