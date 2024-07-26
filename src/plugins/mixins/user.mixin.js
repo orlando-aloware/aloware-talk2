@@ -84,10 +84,10 @@ export default {
     // Temporary function to check if company is part of new inbox filters
     // should be removed once all companies are migrated to new inbox filters
     isCompanyPartOfNewInboxFilters (companyId) {
-      const demoCompanies = storage.local.getItem('aloware_demo_companies') ? storage.local.getItem('aloware_demo_companies').split(',') : []
-      demoCompanies.push('568') // Quill & Arrow account
-
-      return demoCompanies.includes(String(companyId))
+      return false
+      // const demoCompanies = storage.local.getItem('aloware_demo_companies') ? storage.local.getItem('aloware_demo_companies').split(',') : []
+      // demoCompanies.push('568') // Quill & Arrow account
+      // return demoCompanies.includes(String(companyId))
     },
 
     isCompanyPartOfCustomEdgeLocations (companyId) {
