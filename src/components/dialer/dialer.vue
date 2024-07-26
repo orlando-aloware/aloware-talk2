@@ -618,7 +618,7 @@ export default {
       })
     },
 
-    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null, isCallWaiting = false, shouldAnswer = false) {
+    async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null, isCallWaiting = false) {
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
 
       if (!this.dialer.isReady) {
@@ -636,7 +636,7 @@ export default {
       // reject ongoing call if there is one
       this.rejectCall()
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL && !isCallWaiting && !shouldAnswer) {
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL && !isCallWaiting) {
         console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
         return
       }
@@ -662,13 +662,8 @@ export default {
       this.setDialerCurrentStatus('MAKING_CALL')
       this.setDialerCurrentNumber(params['To'])
 
-      // Wait to finish the previous call to avoid conflicts with device.connect()
-      if (shouldAnswer) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
-
       // check if connection is completely closed before opening a new one
-      if (this.connection && !shouldAnswer) {
+      if (this.connection) {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
         return
       }
@@ -1040,7 +1035,7 @@ export default {
         console.log('Call parked')
 
         if (shouldAnswer) {
-          this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
+          this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting)
         } else if (shouldUnpark) {
           this.unparkCall(data, true)
         }
@@ -1085,7 +1080,7 @@ export default {
             if (shouldUnpark) {
               this.unparkCall(data)
             } else if (shouldAnswer) {
-              this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
+              this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting)
             }
 
             this.isMobile && this.$VueEvent.fire('doneHangupAndConnect')
