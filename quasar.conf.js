@@ -61,26 +61,12 @@ module.exports = function (/* ctx */) {
       // },
       // Enable gzip compression
       // // Split vendor bundle in multiple small chunks
-      // chainWebpack (chain) {
-      //   chain.optimization.splitChunks({
-      //     chunks: 'all',
-      //     maxSize: 300000,
-      //     minSize: 100000,
-      //     maxInitialRequests: Infinity,
-      //     cacheGroups: {
-      //       defaultVendors: {
-      //         test: /[\\/]node_modules[\\/]/,
-      //         priority: -10,
-      //         reuseExistingChunk: true
-      //       },
-      //       default: {
-      //         minChunks: 2,
-      //         priority: -20,
-      //         reuseExistingChunk: true
-      //       }
-      //     }
-      //   })
-      // },
+      chainWebpack (chain) {
+        chain.optimization.splitChunks({
+          chunks: 'all',
+          maxSize: 200000
+        })
+      },
 
       // transpile: false,
 
