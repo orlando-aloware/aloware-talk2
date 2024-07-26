@@ -55,23 +55,12 @@ module.exports = function (/* ctx */) {
     build: {
       vueRouterMode: 'history',
       devtool: 'source-map',
-      // Webpack bundle optimization
-      extendWebpack (cfg) {
-        cfg.plugins.push(new (require('webpack-bundle-analyzer')).BundleAnalyzerPlugin())
-      },
-      // Enable gzip compression
       // Split vendor bundle in multiple small chunks
       chainWebpack (chain) {
         chain.optimization.splitChunks({
           chunks: 'all',
           maxSize: 200000
         })
-
-        // chain.plugin('preload').use(require('preload-webpack-plugin'), [{
-        //   rel: 'preload',
-        //   as: 'script',
-        //   include: 'allChunks'
-        // }])
       },
 
       // transpile: false,
