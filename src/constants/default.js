@@ -232,5 +232,7 @@ export const DEFAULT_STATE = {
   integrationPDImportSummaries: {},
   isWhiteLabel: false,
   isDatatableSelectedAll: false,
-  isDatatableCountLoading: false
+  isDatatableCountLoading: false,
+  hubspotPhoneNumber: null,
+  isRedirectedToHubspotWidget: false
 }

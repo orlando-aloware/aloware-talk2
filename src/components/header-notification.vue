@@ -54,7 +54,6 @@
 
       <compact-btn customClass="fs-14 _500 position-relative not-focusable ml-2 text-red-130"
                    borderless
-                   v-if="isClosable"
                    @clicked="close">
         <i class="fa fa-times"/>
       </compact-btn>
@@ -131,10 +130,6 @@ export default {
       return [
         mobileClass
       ]
-    },
-
-    isClosable () {
-      return this.diagnosis?.closable
     },
 
     is10DlcError () {

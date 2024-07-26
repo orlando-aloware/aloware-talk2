@@ -71,7 +71,8 @@
                                v-if="messageComposer.mode === 'note'"/>
       </div>
     </div>
-    <div class="composer-footer d-flex justify-content-between pt-1">
+    <div class="composer-footer d-flex justify-content-between pt-1"
+         :class="isWidget ? 'is-widget' : ''">
       <div class="phone-lines-left d-inline-flex">
         <span class="pr-2 pt-1">To:</span>
         <contact-phone-number-selector v-if="contact"
@@ -159,7 +160,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact', 'selectedLine', 'messageComposer']),
 
-    ...mapState(['templates']),
+    ...mapState(['templates', 'isWidget']),
 
     ...mapState('cache', ['currentCompany']),
 

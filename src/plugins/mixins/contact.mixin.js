@@ -1137,7 +1137,8 @@ export default {
       return this.$axios.get('/api/v1/contact/phone-number', {
         params: {
           phone_number: this.$options.filters.fixPhone(phoneNumber),
-          load_info: 0
+          load_last_campaign: true,
+          load_info: false
         }
       }).then(res => {
         this.loadingContact = false
@@ -1182,7 +1183,8 @@ export default {
       'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
-      'setIsContactMixinUsed'
+      'setIsContactMixinUsed',
+      'selectedContactChanging'
     ]),
 
     ...mapActions('inbox', ['setSelectedContact'])

@@ -5,7 +5,8 @@
 @import 'variables.scss';
 @import 'svg.scss';
 @import 'components/styles.scss';
-@import "dhtmlxscheduler_material.css"; // from ~dhtmlx-scheduler/codebase/dhtmlxscheduler_material.css
+@import "dhtmlxscheduler_material.css";
+// from ~dhtmlx-scheduler/codebase/dhtmlxscheduler_material.css
 @import "animations.scss";
 
 html {
@@ -235,12 +236,15 @@ body,
       }
     }
   }
+
   &.q-field--with-bottom {
     padding-bottom: 15px;
     height: initial !important;
+
     .q-field__bottom {
       min-height: 15px;
       padding-left: 0;
+
       .q-field__messages {
         padding-left: 10px;
       }
@@ -695,6 +699,7 @@ body,
   & > div:first-child {
     min-width: 0;
     flex: 1;
+
     & > h1 {
       display: inline-block;
       white-space: nowrap;
@@ -4606,6 +4611,12 @@ i.option-separator {
   }
 }
 
+.phone-widget {
+  position: relative;
+  top: 0;
+  right: 0;
+}
+
 .phone-settings {
   width: 210px;
   @extend .q-pa-md;
@@ -7875,11 +7886,13 @@ button.grey-90 {
         &:not(.pd-add):not(.contacts) {
           top: 13px;
         }
+
         &.pd-add {
-          top:26px;
+          top: 26px;
         }
+
         &.contacts {
-          top:20px;
+          top: 20px;
         }
       }
 
@@ -9151,7 +9164,7 @@ screen and (max-width: 956px) {
   .inbox {
     .inbox-details {
       .contact-activity-container {
-        .composer-footer {
+        .composer-footer:not(.is-widget) {
           flex-direction: column;
 
           .inline-select.q-select--with-input {
@@ -9184,7 +9197,7 @@ screen and (max-width: 956px) {
 @media (max-width: 1220px) and (min-width: 1085px) {
   .contact-page {
     .contact-activity-container {
-      .composer-footer {
+      .composer-footer:not(.is-widget) {
         flex-direction: column;
 
         .inline-select.q-select--with-input {
@@ -9215,7 +9228,37 @@ screen and (max-width: 956px) {
 
 @media (max-width: 956px) {
   .contact-activity-container {
-    .composer-footer {
+    .composer-footer:not(.is-widget) {
+      flex-direction: column;
+
+      .inline-select.q-select--with-input {
+        min-width: unset;
+      }
+
+      & > div {
+        width: auto !important;
+        height: 24px;
+
+        > div {
+          float: none !important;
+
+          .q-field__append {
+            align-items: center;
+            height: 29px !important;
+          }
+        }
+      }
+
+      .q-field__control {
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+@media (max-width: 650px) {
+  .contact-activity-container {
+    .composer-footer.is-widget {
       flex-direction: column;
 
       .inline-select.q-select--with-input {
@@ -9424,6 +9467,7 @@ screen and (max-width: 956px) {
   .contact-details-container {
     width: 0;
     margin: 0;
+
     &:not(.contact-details--opened) {
       .mobile-header {
         margin: 0;
@@ -9682,7 +9726,9 @@ screen and (max-width: 956px) {
       &:first-child {
         flex: 1;
       }
+
       min-width: 0;
+
       & > h1 {
         font-size: 18px;
         font-family: $font-family-body;
@@ -10371,7 +10417,7 @@ screen and (max-width: 956px) {
   }
 }
 
-@media (max-width: 300px) {
+@media (max-width: 299px) {
   .unsupported {
     display: flex !important;
     height: 100%;
@@ -12526,6 +12572,7 @@ h1.contact-list-name-label {
     width: 0 !important;
     height: 0 !important;
   }
+
   pointer-events: none;
   height: 49px;
   overflow: hidden;
@@ -12793,7 +12840,7 @@ h1.contact-list-name-label {
             }
           }
 
-          &:hover  {
+          &:hover {
             text-decoration: none;
           }
         }
@@ -13017,9 +13064,11 @@ h1.contact-list-name-label {
 
 .text-decoration-underline {
   text-decoration: underline;
+
   &:hover {
     text-decoration: none;
   }
+
   &.text-red-130 {
     &:hover {
       color: $red-130;
@@ -13288,6 +13337,7 @@ h1.contact-list-name-label {
         &.sending {
           border-color: $indigo;
         }
+
         &.paused {
           border-color: $warning;
         }
@@ -14144,6 +14194,7 @@ h1.contact-list-name-label {
   ::-webkit-scrollbar-thumb {
     background-color: #256EFF !important;
     border-radius: 6px !important;
+
     &:hover {
       background-color: #256EFF !important;
     }
@@ -14362,6 +14413,7 @@ h1.contact-list-name-label {
     color: #040404;
     border-radius: 20px;
   }
+
   .q-field--outlined.q-field--with-bottom.disabled {
     > div {
       background: #D8D8D8;
@@ -14403,45 +14455,46 @@ h1.contact-list-name-label {
   @media (min-height: 720px) {
     .business-information-actions {
       top: calc(100vh - 30vh);
+
+      .business-information-actions {
+        top: calc(100vh - 22vh);
+        height: 65vh;
+      }
+    }
+
+    @media (min-height: 1024px) {
+      .business-information-actions {
+        top: calc(100vh - 16vh);
+        height: 68vh;
+      }
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .loading-icon {
+      width: 250px;
+      height: 250px;
+    }
+
+    .loading-text {
+      font-size: 20px;
+      font-weight: 500;
     }
   }
 
   @media (min-height: 900px) {
-    .business-information-actions {
-      top: calc(100vh - 22vh);
-      height: 65vh;
-    }
-  }
-
-  @media (min-height: 1024px) {
-    .business-information-actions {
-      top: calc(100vh - 16vh);
-      height: 68vh;
-    }
-  }
-
-  .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .loading-icon {
-    width: 250px;
-    height: 250px;
-  }
-
-  .loading-text {
-    font-size: 20px;
-    font-weight: 500;
     margin-top: 20px;
   }
 }
@@ -14856,18 +14909,18 @@ thead.conflicted-contact-thead-class tr th {
   font-size: 12px;
 }
 
-.custom-date-time-picker{
+.custom-date-time-picker {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   margin-bottom: 10px;
 }
 
-#start-date-time-picker-wrapper, #end-date-time-picker-input{
+#start-date-time-picker-wrapper, #end-date-time-picker-input {
   margin-right: 5px;
 }
 
-#start-date-time-picker-input, #end-date-time-picker-input{
+#start-date-time-picker-input, #end-date-time-picker-input {
   min-height: 32px;
   height: 32px;
   border-radius: 24px;
@@ -14877,27 +14930,27 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   top: -4px !important;
 }
 
-.btn-custom-date{
+.btn-custom-date {
   display: flex;
 }
 
-.btn-custom-date .btn-apply{
+.btn-custom-date .btn-apply {
   margin-right: 10px;
 }
 
-.time-picker-column{
+.time-picker-column {
   height: 100%;
 }
 
 @media (max-width: 768px) {
-  .custom-date-time-picker{
+  .custom-date-time-picker {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
   }
 
-  #start-date-time-picker-input, #end-date-time-picker-input{
+  #start-date-time-picker-input, #end-date-time-picker-input {
     margin-bottom: 10px;
   }
 }
@@ -14905,10 +14958,70 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 .power-dialer-session-toggle-button {
   z-index: 1;
   margin-top: -14px !important;
-  margin-bottom:-12px !important;
+  margin-bottom: -12px !important;
+}
+
+.select-campaign-dialog {
+
+  .label {
+    font-family: Inter;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 15.73px;
+    text-align: left;
+    margin-bottom: 2px;
+  }
+
+  .q-dialog__backdrop {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .q-dialog__inner > div {
+    border-radius: 8px 8px 0 0;
+  }
+
+  .card {
+    width: 375px;
+    height: 130px;
+    padding: 36px 36px 0 36px;
+  }
+
+  .q-btn {
+    border-radius: 6px;
+    height: 40px;
+    margin-left: 16px;
+  }
+
+  .q-btn__content {
+    padding-right: 14px;
+    padding-left: 14px;
+    text-transform: capitalize;
+  }
+
+  .line-selector {
+    width: 75%;
+  }
+
+  .inline-select.q-select--with-input {
+    min-width: 75% !important;
+  }
 }
 
 .login-form-logo {
   max-width: 200px;
   height: auto;
+}
+
+.hubspot-widget-error-details {
+  color: #000;
+  padding: 0 12px;
+  h4 {
+    font-size: 1.5rem;
+    margin-bottom: .5rem;
+  }
+  p {
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+  }
 }

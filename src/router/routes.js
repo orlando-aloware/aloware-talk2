@@ -8,6 +8,7 @@ const Contact = () => import('src/pages/contacts/Contact.vue')
 const Contacts = () => import('src/pages/contacts/Contacts.vue')
 const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
 const ContactsAddView = () => import('src/pages/contacts/ContactsAddView.vue')
+const Dialer = () => import('pages/widgets/Dialer.vue')
 const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
 const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
@@ -24,7 +25,6 @@ const Account = () => import('pages/Account.vue')
 const Communication = () => import('pages/Communication.vue')
 const Phone = () => import('pages/Phone.vue')
 const Error404 = () => import('pages/Error404.vue')
-const Suspended = () => import('pages/Suspended.vue')
 const Messenger = () => import('pages/Messenger.vue')
 const DMSEquity = () => import('pages/DMSEquity.vue')
 const DigitalLeadWar = () => import('pages/DigitalLeadWar.vue')
@@ -33,11 +33,13 @@ const SoldReport = () => import('pages/SoldReport.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
+const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
 
 const routes = [
   {
     path: '/',
     component: MainLayout,
+    props: true,
     children: [
       {
         path: 'login',
@@ -431,11 +433,6 @@ const routes = [
         component: Phone
       },
       {
-        path: 'suspended',
-        name: 'Suspended',
-        component: Suspended
-      },
-      {
         path: 'messenger',
         name: 'Messenger',
         meta: {
@@ -480,10 +477,55 @@ const routes = [
           isGuest: true
         },
         component: AccountRegistration
+      },
+      {
+        name: 'Texting Widget (known-user)',
+        path: '/widgets/texting/api_key/:api_key/contact/:id',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: Contact
+      },
+      {
+        name: 'Texting Widget (unknown-user)',
+        path: '/widgets/texting/contact/:id',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: Contact
+      },
+      {
+        name: 'HubSpot Widget Error',
+        path: '/errors/hubspot',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: HubSpotMessageWidgetError
       }
     ]
   },
-
+  // Dialer Widget (Browser / Apps)
+  {
+    name: 'Dialer Widget (API)',
+    path: '/widgets/dialer/api_key/:apiKey',
+    props: true,
+    component: Dialer
+  },
+  {
+    name: 'Dialer Widget',
+    path: '/widgets/dialer',
+    props: true,
+    component: Dialer
+  },
+  {
+    name: 'Hubspot Call Extension',
+    path: '/widgets/hubspot-call-extension',
+    props: true,
+    component: Dialer
+  },
   // Always leave this as last one,
   // but you can also remove it
   {
