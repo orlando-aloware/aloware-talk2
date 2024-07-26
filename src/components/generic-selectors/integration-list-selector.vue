@@ -22,12 +22,13 @@
               :use-chips="useChips"
               :clearable="clearable"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
-              :loading="isLoading"
+              :loading="isLoading || isScrolling"
               @popup-show="onShowMenu"
               @focus="onFocus"
               @blur="onBlur"
               @input="onInput"
-              @filter="filterFn">
+              @filter="filterFn"
+              @virtual-scroll="onScroll">
       <template v-slot:prepend
                 v-if="prepend">
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
@@ -198,21 +199,119 @@ export default {
     return {
       selectedId: this.value,
       isLoading: false,
+      isScrolling: false,
       options: [],
+      total: 0,
       reference: 'hubspotListSelector',
       fullOptionsProperty: 'sorted',
       lists: [],
-      disableAddView: false
+      disableAddView: false,
+      searchQuery: '',
+      page: 1,
+      offset: 0,
+      hasMore: true,
+      scrollDisabled: true,
+      isLoadingMore: false
     }
   },
 
   methods: {
+    isHubSpotIntegration () {
+      return this.integration?.toLowerCase() === 'hubspot'
+    },
+
+    fetchOptions (search = null, offset = 0) {
+      if (this.searchQuery !== search) {
+        offset = 0
+      }
+
+      this.offset = offset
+
+      if (!offset) {
+        // do not block the UI if we are loading more
+        this.isLoading = true
+      }
+
+      return talk2Api.V1.integrations.hubspot.getList({
+        params: {
+          search,
+          offset
+        }
+      }).then(response => {
+        const result = response.data
+        if (offset === 0) {
+          this.options = result.lists
+        } else {
+          this.options.push(...result.lists)
+        }
+        this.hasMore = result.hasMore
+        this.scrollDisabled = !result.hasMore
+        this.total = result.total
+        this.isLoading = false
+      }).catch((err) => {
+        this.isLoading = false
+        this.$handleErrors(err.response)
+        console.log(err)
+      })
+    },
+
+    filterFn (val, update) {
+      if (this.isHubSpotIntegration()) {
+        if (val === this.searchQuery) {
+          update()
+
+          return
+        }
+
+        this.searchQuery = val
+
+        update(() => {
+          this.fetchOptions(val, 0)
+        })
+      } else {
+        if (val === '') {
+          update(() => {
+            this.options = this.sorted
+          })
+
+          return
+        }
+
+        update(() => {
+          const needle = val.toLowerCase()
+          this.options = this.sorted.filter((item) => item.name && item.name.toLowerCase().indexOf(needle) > -1)
+        })
+      }
+    },
+
+    onScroll ({ to, ref }) {
+      if (!this.isHubSpotIntegration()) {
+        return
+      }
+
+      const lastIndex = this.options.length - 1
+      if (this.isScrolling !== true && this.hasMore && to === lastIndex) {
+        this.isScrolling = true
+
+        this.fetchOptions(this.searchQuery, this.offset + 20)
+          .then(() => {
+            this.$nextTick(() => {
+              ref.refresh()
+              this.isScrolling = false
+            })
+          })
+          .catch(() => {
+            this.isScrolling = false
+          })
+      }
+    },
+
     getListsOfEnabledIntegration: debounce(function () {
       this.lists = []
 
       switch (this.integration?.toLowerCase()) {
         case 'hubspot':
-          return this.getHubspotLists()
+          return this.fetchOptions()
 
         case 'zoho':
           return this.getZohoViews()
@@ -221,28 +320,6 @@ export default {
           return this.getPipedriveFilters()
       }
     }, 500),
-
-    getHubspotLists (offset = 0) {
-      this.isLoading = true
-
-      talk2Api.V1.integrations.hubspot.getList({
-        params: {
-          offset: offset
-        }
-      }).then(response => {
-        const result = response.data
-        this.lists.push(...result.lists)
-        if (result.has_more) {
-          return this.getHubspotLists(result.offset)
-        }
-
-        this.isLoading = false
-      }).catch((err) => {
-        this.isLoading = false
-        this.$handleErrors(err.response)
-        console.log(err)
-      })
-    },
 
     getZohoViews () {
       this.isLoading = true
@@ -267,21 +344,6 @@ export default {
         this.isLoading = false
         this.$handleErrors(err.response)
         console.log(err)
-      })
-    },
-
-    filterFn (val, update) {
-      if (val === '') {
-        update(() => {
-          this.options = this.sorted
-        })
-
-        return
-      }
-
-      update(() => {
-        const needle = val.toLowerCase()
-        this.options = this.sorted.filter((item) => item.name && item.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
