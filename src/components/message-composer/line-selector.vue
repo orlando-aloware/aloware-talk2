@@ -29,11 +29,11 @@
             <q-item-label v-html="scope.opt.name"></q-item-label>
           </q-item-section>
           <q-item-section v-if="isMessagingBlocked(scope.opt, checkBlockedMessaging, false, true)" side>
-            <q-tooltip :disabled="!isMessagingBlocked(scope.opt, checkBlockedMessaging, false, true)"
-                       anchor="top middle"
+            <q-tooltip anchor="top middle"
                        self="center middle">
-              <q-badge color="blue">i</q-badge>
+                To send messages to the US, A2P 10DLC Brand and Campaign are required.
             </q-tooltip>
+            <q-badge color="blue">i</q-badge>
           </q-item-section>
         </q-item>
         <q-item v-if="scope.opt.group"
