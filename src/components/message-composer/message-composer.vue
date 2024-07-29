@@ -189,7 +189,8 @@ export default {
     },
 
     shouldShowComplianceMessage () {
-      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedLine, true) && this.selectedLine && this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason']
+      let a2pBlock = this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason'] && !this.selectedLine.blocked_messaging_information?.bypassed
+      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedLine, true) && this.selectedLine && a2pBlock
     },
 
     canTextToNumber () {

@@ -53,7 +53,7 @@
           <q-item-section>
             <q-item-label>{{ opt.name }}</q-item-label>
           </q-item-section>
-          <q-item-section v-if="isMessagingBlocked(opt, checkBlockedMessaging)" side>
+          <q-item-section v-if="isMessagingBlocked(opt, checkBlockedMessaging, false, true)" side>
             <q-badge color="red">!</q-badge>
           </q-item-section>
         </q-item>
