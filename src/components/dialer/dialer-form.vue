@@ -369,7 +369,7 @@ export default {
     },
 
     shouldShowComplianceMessage () {
-      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedCampaign, true) && this.selectedCampaign && this.selectedCampaign.blocked_messaging_information && !selectedCampaign.blocked_messaging_information?.bypassed && this.selectedCampaign.blocked_messaging_information['reason']
+      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedCampaign, true) && this.selectedCampaign && this.selectedCampaign.blocked_messaging_information && !this.selectedCampaign.blocked_messaging_information?.bypassed && this.selectedCampaign.blocked_messaging_information['reason']
     }
   },
 
