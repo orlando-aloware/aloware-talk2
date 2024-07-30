@@ -185,12 +185,12 @@ export default {
     },
 
     disabledComplianceMessage () {
-      return this.isMessagingBlocked(this.selectedLine, true) ? this.selectedLine?.blocked_messaging_information?.['reason'] : ''
+      return this.selectedLine && this.isMessagingBlocked(this.selectedLine, true) ? this.selectedLine?.blocked_messaging_information?.['reason'] : ''
     },
 
     shouldShowComplianceMessage () {
-      let a2pBlock = this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason'] && !this.selectedLine.blocked_messaging_information['bypassed']
-      return !this.isTrialKYC && this.selectedLine && this.isMessagingBlocked(this.selectedLine, true) && a2pBlock
+      let a2pBlock = this.selectedLine && this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason'] && !this.selectedLine.blocked_messaging_information['bypassed']
+      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedLine, true) && a2pBlock
     },
 
     canTextToNumber () {
