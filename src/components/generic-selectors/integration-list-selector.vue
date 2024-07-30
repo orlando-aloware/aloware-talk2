@@ -208,7 +208,8 @@ export default {
       disableAddView: false,
       searchQuery: '',
       offset: 0,
-      hasMore: true
+      hasMore: true,
+      limit: 20
     }
   },
 
@@ -289,7 +290,7 @@ export default {
       if (this.isScrolling !== true && this.hasMore && to === lastIndex) {
         this.isScrolling = true
 
-        this.fetchOptions(this.searchQuery, this.offset + 20)
+        this.fetchOptions(this.searchQuery, this.offset + this.limit)
           .then(() => {
             this.$nextTick(() => {
               ref.refresh()
