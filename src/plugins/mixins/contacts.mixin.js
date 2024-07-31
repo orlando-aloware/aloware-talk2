@@ -39,12 +39,10 @@ export default {
       listDataSource: null,
       listContactsCancelToken: null,
       listContactsSource: null,
+      myContacts: false,
       previousSearch: null,
       listeners: {},
-      addListMetaIds: [
-        'power-dialer-add-queue-list',
-        'power-dialer-add-list'
-      ],
+      addListMetaIds: ['power-dialer-add-queue-list', 'power-dialer-add-list'],
       appliedFiltersPreviousFilters: null,
       ALL_COLUMNS
     }
@@ -126,6 +124,7 @@ export default {
       this.sorts = sorts
 
       const params = {
+        my_contacts: this.myContacts,
         search: this.search,
         page: 1
       }
@@ -221,6 +220,7 @@ export default {
 
     onFetchMyContacts (checked) {
       this.isLoading = true
+      this.myContacts = checked
 
       this.fetch({
         my_contacts: checked,
