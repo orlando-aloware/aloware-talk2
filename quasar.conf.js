@@ -56,14 +56,6 @@ module.exports = function (/* ctx */) {
       vueRouterMode: 'history',
       devtool: 'source-map',
       // Split vendor bundle in multiple small chunks
-      // chainWebpack (chain) {
-      //   chain.optimization.splitChunks({
-      //     chunks: 'all',
-      //     maxSize: 500000
-      //   })
-      //   chain.optimization.minimize(true)
-      // },
-
       gzip: true,
 
       // transpile: false,
