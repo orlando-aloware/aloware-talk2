@@ -77,11 +77,11 @@ module.exports = function (/* ctx */) {
       // https://quasar.dev/quasar-cli/handling-webpack
       extendWebpack (cfg) {
         cfg.plugins.push(new CompressionWebpackPlugin({
-          filename: '[path][base].gz', // Use the original name, without .gz
+          filename: '[path][base]', // Use the original name, without .gz
           algorithm: 'gzip',
           test: /\.(js|css|html|svg)$/,
-          threshold: 1024,
-          minRatio: 0.9,
+          threshold: 0, // Compress all files, no size threshold
+          minRatio: Infinity, // Ensure all files are compressed, regardless of compression ratio
           deleteOriginalAssets: false
         }))
 
