@@ -124,16 +124,7 @@ pipeline {
                                     sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                 }
 
-                                sh """
-                                aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
-                                  --delete \
-                                  --exclude "*.gz" \
-                                  && aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
-                                  --delete \
-                                  --include "*.gz" \
-                                  --content-encoding gzip \
-                                  --metadata-directive REPLACE
-                                """
+                                sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} --content-encoding gzip"
                                 }
                             }
                         }

@@ -11,6 +11,8 @@ module.exports = function (/* ctx */) {
   const DotEnv = require('dotenv')
   const parsedEnv = DotEnv.config().parsed
 
+  const CompressionWebpackPlugin = require('compression-webpack-plugin')
+
   if (typeof parsedEnv === 'object' &&
     !Array.isArray(parsedEnv) &&
     parsedEnv !== undefined &&
@@ -74,6 +76,15 @@ module.exports = function (/* ctx */) {
 
       // https://quasar.dev/quasar-cli/handling-webpack
       extendWebpack (cfg) {
+        cfg.plugins.push(new CompressionWebpackPlugin({
+          filename: '[path][base]', // Use the original name, without .gz
+          algorithm: 'gzip',
+          test: /\.(js|css|html|svg)$/,
+          threshold: 1024,
+          minRatio: 0.9,
+          deleteOriginalAssets: true
+        }))
+
         cfg.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
