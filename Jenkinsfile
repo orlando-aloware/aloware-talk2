@@ -129,14 +129,15 @@ pipeline {
                                   --delete \
                                   --exclude "*.js" \
                                   --exclude "*.gz"
-                                  && aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
+                                  """
+                                sh """
+                                aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
                                   --delete \
                                   --include "*.js" \
                                   --include "*.gz" \
                                   --content-encoding gzip \
                                   --metadata-directive REPLACE
                                 """
-
                                 }
                             }
                         }
