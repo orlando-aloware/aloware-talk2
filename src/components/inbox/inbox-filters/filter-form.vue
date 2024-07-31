@@ -72,7 +72,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsChannel && !isFilterDialogForView">
+        <div v-if="((isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel) && !isFilterDialogForView">
           <h5 class="mt-4 section-header">Handling</h5>
           <b-form-row class="mt-2" data-testid="filter-form-handling-form-row">
             <b-col sm="12"
@@ -90,7 +90,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxOrCallsChannel">
+                   v-if="isCallsOnlyChannel">
               <b-form-group class="form-label"
                             label="Answer Status">
                 <answer-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -104,7 +104,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Talk Time">
                 <talk-time-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -118,7 +118,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Transfer Type">
                 <transfer-type-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -132,7 +132,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxCallsAndRecordingsChannel">
+                   v-if="isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Callback Status">
                 <callback-status-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -154,7 +154,7 @@
             <b-col md="6"
                    sm="12">
               <b-form-group class="form-label"
-                            label="Tags">
+                            :label="tagsFilterLabel">
                 <entity-tags ref="tagSelector"
                              data-testid="communication-tags-multi-select"
                              entity="contact"
@@ -170,7 +170,7 @@
             </b-col>
             <b-col md="6"
                    sm="12"
-                   v-if="isInboxCallsAndRecordingsChannel">
+                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews) && isCallsAndRecordingsChannel">
               <b-form-group class="form-label"
                             label="Call Disposition">
                 <call-disposition-selector :multiple="true"
@@ -181,7 +181,8 @@
               </b-form-group>
             </b-col>
           </b-form-row>
-          <b-form-row data-testid="filter-form-properties-form-row">
+          <b-form-row v-if="isCompanyPartOfNewInboxFilters(profile.company_id) || !isInboxOrInboxViews"
+                      data-testid="filter-form-properties-form-row">
             <b-col md="6"
                    sm="12">
               <b-form-group>
@@ -262,6 +263,61 @@
             </b-col>
 
           </b-form-row>
+          <b-form-row v-if="!isCompanyPartOfNewInboxFilters(profile.company_id) && isInboxOrInboxViews"
+                      data-testid="filter-form-properties-form-row">
+            <b-col md="6"
+                   sm="12">
+              <b-form-group>
+                <span class="form-label">Show contacts with unread communications only</span>
+                <div>
+                  <b-form-checkbox class="switch-success"
+                                   size="lg"
+                                   switch
+                                   :value="1"
+                                   :unchecked-value="0"
+                                   data-testid="filter-form-properties-form-checkbox"
+                                   v-model="filter.has_unread">
+                  </b-form-checkbox>
+                </div>
+              </b-form-group>
+            </b-col>
+          </b-form-row>
+        </div>
+
+        <div v-if="!isCompanyPartOfNewInboxFilters(profile.company_id) && isInboxOrInboxViews">
+          <h5 class="mt-4 section-header">Has Communicated Within</h5>
+          <b-form-row class="mt-2"
+                      data-testid="filter-form-has-communicated-within-form-row">
+            <b-col sm="12"
+                   md="6">
+              <b-form-group class="form-label">
+                <template v-slot:label>
+                  <span>Last Engagement Date Period</span>
+                  <span class="pl-1">
+                    <information-circle-icon color="#2F80ED"/>
+                    <q-tooltip anchor="top middle"
+                               self="center middle"
+                               data-testid="filter-form-has-communicated-within-form-tooltip">
+                      <span class="text-13">Filter based on the last communication date; always  dynamic based on the selected relative period</span>
+                    </q-tooltip>
+                  </span>
+                </template>
+                <q-select class="q-user-selector q-basic-selector"
+                          options-selected-class="text-primary"
+                          color="primary"
+                          option-value="id"
+                          option-label="name"
+                          map-options
+                          use-input
+                          emit-value
+                          dense
+                          outlined
+                          :options="relativeRanges"
+                          data-testid="filter-form-has-communicated-within-form-select"
+                          v-model="filter.dynamic_engagement_date_range" />
+              </b-form-group>
+            </b-col>
+          </b-form-row>
         </div>
 
         <div>
@@ -269,7 +325,7 @@
           <b-form-row class="mt-2" data-testid="filter-form-attributions-form-row">
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsChannel">
+                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Line Phone Numbers">
                 <incoming-number-selector :multiple="true"
@@ -283,7 +339,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInbox || isMessagesOnlyChannel">
+                   v-if="isInboxOrAllCallsChannel || isMessagesOnlyChannel">
               <b-form-group class="form-label">
                 <template v-slot:label>
                   <span data-testid="filter-form-communication-owners-row">Communication Owners</span>
@@ -322,7 +378,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="!isMentionsChannel">
+                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector :force-remove-missing-values="true"
@@ -357,7 +413,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="(isInbox || isMessagesOnlyChannel) && !isFilterDialogForView">
+                   v-if="((isCompanyPartOfNewInboxFilters(profile.company_id) && isInbox) || isMessagesOnlyChannel) && !isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Broadcasts">
                 <broadcast-selector :multiple="true"
@@ -396,7 +452,7 @@ import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import { inboxRoutesMixin } from 'src/plugins/mixins'
+import { inboxRoutesMixin, userMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import moment from 'moment'
 
@@ -404,7 +460,8 @@ export default {
   name: 'filter-form',
 
   mixins: [
-    inboxRoutesMixin
+    inboxRoutesMixin,
+    userMixin
   ],
 
   components: {
@@ -499,26 +556,42 @@ export default {
         nonSmsChannels.includes(this.$route.params.channel)
     },
 
-    isInboxOrCallsChannel () {
+    isCallsOnlyChannel () {
       const callsChannels = ['calls', 'all-communications', 'my-personal-line']
 
-      return this.isInboxOrInboxViews || callsChannels.includes(this.$route.params.channel)
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        return this.isInboxOrInboxViews || callsChannels.includes(this.$route.params.channel)
+      }
+
+      return callsChannels.includes(this.$route.params.channel)
     },
 
-    isInboxCallsAndRecordingsChannel () {
+    isCallsAndRecordingsChannel () {
       const allCallsChannels = ['calls', 'recordings', 'all-communications', 'my-personal-line']
 
-      return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
+      }
+
+      return allCallsChannels.includes(this.$route.params.channel)
     },
 
     isMessagesOnlyChannel () {
-      const smsChannels = ['messages', 'all-communications', 'inbox', 'my-personal-line']
+      const smsChannels = ['messages', 'all-communications', 'my-personal-line']
+
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        smsChannels.push('inbox')
+      }
 
       return smsChannels.includes(this.$route.params.channel)
     },
 
+    tagsFilterLabel () {
+      return !this.isCompanyPartOfNewInboxFilters(this.profile.company_id) && this.isInbox ? 'Contact Tags' : 'Tags'
+    },
+
     tagsFilterCategory () {
-      return TagCategories.CAT_COMMUNICATIONS
+      return !this.isCompanyPartOfNewInboxFilters(this.profile.company_id) && this.isInboxOrInboxViews ? TagCategories.CAT_CONTACTS : TagCategories.CAT_COMMUNICATIONS
     },
 
     isInboxOrInboxViews () {

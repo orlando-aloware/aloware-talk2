@@ -98,12 +98,12 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
-import { selectorMixin } from 'src/plugins/mixins'
+import { selectorMixin, userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'user-selector',
 
-  mixins: [selectorMixin],
+  mixins: [selectorMixin, userMixin],
 
   components: { RemoveTagIcon },
 
@@ -211,6 +211,8 @@ export default {
   computed: {
     ...mapState(['users', 'usersIsLoading']),
 
+    ...mapState('auth', ['profile']),
+
     options () {
       return this.users
     },
@@ -232,7 +234,7 @@ export default {
     },
 
     availableUsers () {
-      if (this.withUnassigned) {
+      if (this.withUnassigned && this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
         return [
           { name: 'Unassiged', id: 'unassigned', email: '' },
           ...this.options

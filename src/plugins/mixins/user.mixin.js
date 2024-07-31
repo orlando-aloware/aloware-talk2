@@ -81,6 +81,17 @@ export default {
       return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
     },
 
+    // Temporary function to check if company is part of new inbox filters
+    // should be removed once all companies are migrated to new inbox filters
+    isCompanyPartOfNewInboxFilters (companyId) {
+      // Disabled because query is too slow in production
+      return false
+
+      // const demoCompanies = storage.local.getItem('aloware_demo_companies') ? storage.local.getItem('aloware_demo_companies').split(',') : []
+      // demoCompanies.push('568') // Quill & Arrow account
+      // return demoCompanies.includes(String(companyId))
+    },
+
     isCompanyPartOfCustomEdgeLocations (companyId) {
       return storage.local.getItem('custom_edge_location_companies') && storage.local.getItem('custom_edge_location_companies').split(',').includes(String(companyId))
     }
