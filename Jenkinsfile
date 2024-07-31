@@ -124,20 +124,12 @@ pipeline {
                                     sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                 }
 
-                              // Sync all files excluding js, css, html, and svg
                               sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
-                                  --exclude '*.js' \
-                                  --exclude '*.css' \
-                                  --exclude '*.html' \
-                                  --exclude '*.svg'"
+                                  --exclude '*.gz'"
 
-                              // Sync only js, css, html, and svg files with content-encoding gzip
                               sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
                                   --exclude '*' \
-                                  --include '*.js' \
-                                  --include '*.css' \
-                                  --include '*.html' \
-                                  --include '*.svg' \
+                                  --include '*.gz' \
                                   --metadata-directive REPLACE --content-encoding gzip"
                                 }
                             }
