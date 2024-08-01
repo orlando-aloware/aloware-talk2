@@ -64,7 +64,7 @@
              class="text-danger"
              data-testid="bulk-action-menu-delete-link"
              :disabled="disabledDelete"
-             v-if="hasDeletePermission && canDelete"
+             v-if="(hasDeletePermission && canDelete) || isPowerDialer"
              @click="onDelete">
             <i class="fa fa-trash text-danger"/>
             Delete
