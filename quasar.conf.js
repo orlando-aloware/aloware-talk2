@@ -79,9 +79,9 @@ module.exports = function (/* ctx */) {
         cfg.plugins.push(new CompressionWebpackPlugin({
           filename: '[path][base]',
           algorithm: 'gzip',
-          test: /\.(js|css|svg)$/,
+          test: /\.(js|svg)$/,
           threshold: 0,
-          minRatio: 0.8,
+          minRatio: 1,
           deleteOriginalAssets: true
         }))
 
