@@ -36,8 +36,7 @@
     const faviconElements = ['favicon128', 'favicon96', 'favicon32', 'favicon16', 'faviconIco']
 
     // Check if current hostname is one of the resellers
-    // const isReseller = resellerHostnames.some(hostname => window?.location?.hostname?.includes(hostname));
-    const isReseller = true
+    const isReseller = resellerHostnames.some(hostname => window?.location?.hostname?.includes(hostname));
 
     function updateFavicon(elementId, filename) {
       document.getElementById(elementId).href = filename
