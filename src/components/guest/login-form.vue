@@ -161,7 +161,14 @@ export default {
         storage.local.setItem('shared_cookie', res.data.meta.hashed_token)
         storage.local.setItem('api_token', res.data.meta.token)
         this.clearError()
-        window.location.reload()
+        this.onLoginSuccess({
+          data: {
+            data: {
+              usage: res.data?.data?.usage ?? null,
+              company: res.data?.data?.company ?? null
+            }
+          }
+        })
       }).catch(err => {
         console.log(err)
         this.verificationMessage = err.response.data.message

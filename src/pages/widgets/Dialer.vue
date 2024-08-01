@@ -224,11 +224,6 @@ export default {
           this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
           this.handleCall()
         }
-      } else if (!this.authProfile) {
-        this.timeout = setTimeout(async () => {
-          await this.init()
-          this.handleDialNumber(this.hubspotPhoneNumber)
-        }, 1000)
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
           this.handleDialNumber(this.hubspotPhoneNumber)
