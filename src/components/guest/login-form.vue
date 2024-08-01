@@ -248,7 +248,7 @@ export default {
       const redirectQuery = this.$route.query.redirect
       const decodedRedirect = decodeURIComponent(redirectQuery)
 
-      let redirectPath = (decodedRedirect === '/suspended' ? '' : decodedRedirect) || '/'
+      let redirectPath = decodedRedirect || '/'
 
       if (this.hubspotWidget) {
         redirectPath = '/widgets/hubspot-call-extension'

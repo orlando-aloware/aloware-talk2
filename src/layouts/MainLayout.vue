@@ -59,7 +59,7 @@
                 </div>
               </div>
             </section>
-            <dialer v-if="authenticated && !suspended"/>
+            <dialer v-if="authenticated && !suspended && !isWidget"/>
           </q-page-container>
         </div>
         <q-drawer class="h-100 sidebar-wrapper d-block position-absolute top-0"
@@ -2428,7 +2428,10 @@ export default {
       // don't close the phone yet!
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.isPhoneVisible = true
-        this.mobilePhoneDrawer = false
+
+        if (this.isMobile && !this.mobilePhoneDrawer && this.$route.name === 'Phone') {
+          this.mobilePhoneDrawer = true
+        }
       }
 
       if (typeof this.$refs.appFooter !== 'undefined') {

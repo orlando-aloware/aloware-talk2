@@ -223,8 +223,21 @@ export default {
       }
     },
 
-    isMessagingBlocked (campaign, checkBlockedMessaging, isAutomated = false) {
-      return checkBlockedMessaging && campaign && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
+    isMessagingBlocked (campaign, checkBlockedMessaging, isAutomated = false, isLineSelector = false) {
+      if (!campaign) {
+        return false
+      }
+
+      let a2pBlock = false
+
+      // Do not bypass the Line Selector Option to keep showing the (i) blue icon
+      if (isLineSelector) {
+        a2pBlock = campaign.blocked_messaging_information && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
+      } else {
+        a2pBlock = campaign.blocked_messaging_information && !campaign.blocked_messaging_information['bypassed'] && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
+      }
+
+      return checkBlockedMessaging && a2pBlock
     }
   },
   watch: {

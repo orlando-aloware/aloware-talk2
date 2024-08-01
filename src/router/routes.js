@@ -25,7 +25,6 @@ const Account = () => import('pages/Account.vue')
 const Communication = () => import('pages/Communication.vue')
 const Phone = () => import('pages/Phone.vue')
 const Error404 = () => import('pages/Error404.vue')
-const Suspended = () => import('pages/Suspended.vue')
 const Messenger = () => import('pages/Messenger.vue')
 const DMSEquity = () => import('pages/DMSEquity.vue')
 const DigitalLeadWar = () => import('pages/DigitalLeadWar.vue')
@@ -34,6 +33,7 @@ const SoldReport = () => import('pages/SoldReport.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
+const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
 
 const routes = [
   {
@@ -433,11 +433,6 @@ const routes = [
         component: Phone
       },
       {
-        path: 'suspended',
-        name: 'Suspended',
-        component: Suspended
-      },
-      {
         path: 'messenger',
         name: 'Messenger',
         meta: {
@@ -500,6 +495,15 @@ const routes = [
           isWidget: true
         },
         component: Contact
+      },
+      {
+        name: 'HubSpot Widget Error',
+        path: '/errors/hubspot',
+        props: true,
+        meta: {
+          isWidget: true
+        },
+        component: HubSpotMessageWidgetError
       }
     ]
   },

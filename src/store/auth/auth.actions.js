@@ -1,5 +1,4 @@
 import * as storage from 'src/plugins/helpers/storage'
-import userpilot from 'src/plugins/vendor/userpilot'
 import { get } from 'lodash'
 
 const check = async ({ commit, state }, payload, skipSetAuthenticated) => {
@@ -30,23 +29,13 @@ const check = async ({ commit, state }, payload, skipSetAuthenticated) => {
     commit('SET_LOADING', false)
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
-
-    // auth user in Userpilot
-    userpilot.auth(response.data.user)
-
-    const isUserOrCompanySuspended = !response.data.user.enabled || !response.data.user.company.enabled
-    const isCompanyCancelled = response.data.user.company?.subscription?.status === 'cancelled'
-    if (!preventRedirect && isUserOrCompanySuspended && !isCompanyCancelled && window.location.href.indexOf('/suspended') === -1) {
-      window.location.href = '/suspended'
-    }
+    commit('SET_CURRENT_TIMEZONE', response.data.user.company.timezone, { root: true })
 
     if (!preventRedirect &&
       !isHubspotWidget &&
       response.data.user.enabled &&
       response.data.user.company.enabled &&
-      (window.location.href.indexOf('/suspended') !== -1 ||
-        (window.location.href.indexOf('/login') !== -1 &&
-          window.location.href.indexOf('suspended') !== -1))) {
+      window.location.href.indexOf('/login') !== -1) {
       window.location.href = '/'
     }
 

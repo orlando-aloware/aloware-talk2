@@ -9,8 +9,12 @@ import { DATE_OPERATORS } from 'src/constants/contacts-date-filter-operators'
 import * as Filters from 'src/constants/filters'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
+  mixins: [userMixin],
+
   computed: {
     ...mapState('inbox', [
       'isFetchingContacts',
@@ -324,68 +328,185 @@ export default {
 
       const filter = filters ?? this.appliedFilter?.filter ?? this.channelClonedFilter ?? null
 
-      // add the line filter if there is
-      if (filter && !isEmpty(filter?.campaigns)) {
-        this.filters.lines = [
-          { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
+      // Using new communication filters for beta companies
+      // @TODO: There are a lot of code duplication here,
+      // but this will be removed once the old filters are removed
+      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
+        // add the line filter if there is
+        if (filter && !isEmpty(filter?.campaigns)) {
+          this.filters.communication_lines = [
+            { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
+          ]
+        }
+
+        if (filter && filter?.ring_groups && filter.ring_groups.length) {
+          this.filters = {
+            ...this.filters,
+            'communication_ring_groups': [
+              { value: filter.ring_groups, operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
+        }
+
+        if (filter && filter?.users && filter.users.length) {
+          this.filters = {
+            ...this.filters,
+            'communication_users': [
+              { value: filter.users, operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
+        }
+
+        if (filter && filter?.contact_owner && filter.contact_owner.length && !this.inboxShowMyContacts) {
+          this.filters = {
+            ...this.filters,
+            'inbox_contact_owner': [
+              { value: filter.contact_owner, operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
+        }
+
+        query.my_contact = this.inboxShowMyContacts
+
+        if (query.my_contact) {
+          this.filters = {
+            ...this.filters,
+            'inbox_contact_owner': [
+              { value: [this.profile.id], operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
+        }
+
+        if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
+          this.filters = {
+            ...this.filters,
+            'communication_created_at': [
+              { value: [filter.from_date, filter.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
+            ]
+          }
+        }
+
+        if (filter && !isEmpty(filter.tags)) {
+          this.filters = {
+            ...this.filters,
+            'communication_tags': [
+              { value: filter.tags, operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
+          relations.push('tags')
+        }
+
+        // New filters from all communications
+        if (filter && !isEmpty(filter.direction) && filter.direction !== 'all') {
+          this.filters = {
+            ...this.filters,
+            'direction': [
+              { value: [filter.direction === 'inbound' ? INBOUND : OUTBOUND], operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
+        }
+
+        if (filter && !isEmpty(filter.answer_status) && filter.answer_status !== 'all') {
+          this.filters = {
+            ...this.filters,
+            'answer_status': [
+              { value: [filter.answer_status], operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
+        }
+
+        const otherFiltersList = [
+          'callback_status',
+          'broadcasts',
+          'call_dispositions',
+          'callback_status',
+          'incoming_numbers',
+          'creator_type',
+          'workflows',
+          'transfer_type',
+          'min_talk_time',
+          'untagged_only',
+          'exclude_automated_communications',
+          'first_time_only'
         ]
-      }
 
-      if (filter && filter?.ring_groups && filter.ring_groups.length) {
-        this.filters = {
-          ...this.filters,
-          'ring_groups': [
-            { value: filter.ring_groups, operator: OPERATORS.IS_ANY_OF }
+        otherFiltersList.forEach(key => {
+          if (filter && (!isEmpty(filter[key]) || filter[key] > 0)) {
+            this.filters = {
+              ...this.filters,
+              [key]: [
+                {
+                  value: Array.isArray(filter[key]) ? filter[key] : [filter[key]],
+                  operator: OPERATORS.IS_ANY_OF
+                }
+              ]
+            }
+          }
+        })
+      } else {
+        // Using old filters for non-beta companies
+        if (filter && !isEmpty(filter?.campaigns)) {
+          this.filters.lines = [
+            { value: filter.campaigns, operator: OPERATORS.IS_ANY_OF }
           ]
         }
-      }
 
-      if (filter && filter?.users && filter.users.length) {
-        this.filters = {
-          ...this.filters,
-          'users': [
-            { value: filter.users, operator: OPERATORS.IS_ANY_OF }
-          ]
+        if (filter && filter?.ring_groups && filter.ring_groups.length) {
+          this.filters = {
+            ...this.filters,
+            'ring_groups': [
+              { value: filter.ring_groups, operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
         }
-      }
 
-      if (filter && filter?.contact_owner && filter.contact_owner.length && !this.inboxShowMyContacts) {
-        this.filters = {
-          ...this.filters,
-          'contact_owner': [
-            { value: filter.contact_owner, operator: OPERATORS.IS_ANY_OF }
-          ]
+        if (filter && filter?.users && filter.users.length) {
+          this.filters = {
+            ...this.filters,
+            'users': [
+              { value: filter.users, operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
         }
-      }
 
-      query.my_contact = this.inboxShowMyContacts
-
-      if (query.my_contact) {
-        this.filters = {
-          ...this.filters,
-          'contact_owner': [
-            { value: [this.profile.id], operator: OPERATORS.IS_ANY_OF }
-          ]
+        if (filter && filter?.contact_owner && filter.contact_owner.length && !this.inboxShowMyContacts) {
+          this.filters = {
+            ...this.filters,
+            'contact_owner': [
+              { value: filter.contact_owner, operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
         }
-      }
 
-      if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
-        this.filters = {
-          ...this.filters,
-          'last_engagement_at': [
-            { value: [filter.from_date, filter.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
-          ]
-        }
-      }
+        query.my_contact = this.inboxShowMyContacts
 
-      if (filter && !isEmpty(filter.tags)) {
-        this.filters = {
-          ...this.filters,
-          'tags': [
-            { value: filter.tags, operator: OPERATORS.IS_ANY_OF }
-          ]
+        if (query.my_contact) {
+          this.filters = {
+            ...this.filters,
+            'contact_owner': [
+              { value: [this.profile.id], operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
         }
-        relations.push('tags')
+
+        if (filter && filter?.from_date && filter?.to_date && filter.from_date && filter.to_date) {
+          this.filters = {
+            ...this.filters,
+            'last_engagement_at': [
+              { value: [filter.from_date, filter.to_date], operator: DATE_OPERATORS.IS_BETWEEN }
+            ]
+          }
+        }
+
+        if (filter && !isEmpty(filter.tags)) {
+          this.filters = {
+            ...this.filters,
+            'tags': [
+              { value: filter.tags, operator: OPERATORS.IS_ANY_OF }
+            ]
+          }
+          relations.push('tags')
+        }
       }
 
       // apply only if filter is not "All Time"
