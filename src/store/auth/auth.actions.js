@@ -1,7 +1,7 @@
 import * as storage from 'src/plugins/helpers/storage'
 import { get } from 'lodash'
 
-const check = async ({ commit, state }, payload, skipSetAuthenticated) => {
+const check = async ({ commit }, payload, skipSetAuthenticated) => {
   const preventLogout = get(payload, 'preventLogout', false)
   const preventRedirect = get(payload, 'preventRedirect', false)
   const isHubspotWidget = window.location?.href?.includes('hubspot-call-extension') || false
