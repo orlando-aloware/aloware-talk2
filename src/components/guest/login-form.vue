@@ -252,10 +252,12 @@ export default {
         return
       }
 
-      const redirectQuery = this.$route.query.redirect
-      const decodedRedirect = decodeURIComponent(redirectQuery)
+      let redirectPath = '/'
+      const redirectQuery = this.$route.query?.redirect
 
-      let redirectPath = decodedRedirect || '/'
+      if (redirectQuery) {
+        redirectPath = decodeURIComponent(redirectQuery)
+      }
 
       if (this.hubspotWidget) {
         redirectPath = '/widgets/hubspot-call-extension'
