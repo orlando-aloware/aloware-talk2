@@ -128,6 +128,7 @@ pipeline {
                                 aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
                                   --delete \
                                   --exclude "*.js" \
+                                  --exclude "*.css" \
                                   --exclude "*.svg" \
                                   --exclude "*.gz"
                                   """
@@ -137,6 +138,14 @@ pipeline {
                                   --include "*.js" \
                                   --include "*.svg" \
                                   --include "*.gz" \
+                                  --content-encoding gzip \
+                                  --metadata-directive REPLACE
+                                """
+                                sh """
+                                aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
+                                  --delete \
+                                  --include "*.css" \
+                                  --content-type "text/css" \
                                   --content-encoding gzip \
                                   --metadata-directive REPLACE
                                 """
