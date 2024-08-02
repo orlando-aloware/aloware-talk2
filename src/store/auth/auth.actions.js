@@ -1,5 +1,6 @@
 import * as storage from 'src/plugins/helpers/storage'
 import { get } from 'lodash'
+import VueCookies from 'vue-cookies'
 
 const check = async ({ commit }, payload, skipSetAuthenticated) => {
   const preventLogout = get(payload, 'preventLogout', false)
@@ -167,6 +168,8 @@ const logout = async ({ commit }) => {
     commit('SET_LOADING', true)
 
     const response = await window.axios.post('/logout')
+
+    VueCookies.set('simpsocial-migration', null, 3650)
 
     clear({ commit })
 

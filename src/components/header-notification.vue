@@ -92,8 +92,11 @@ export default {
       'profile'
     ]),
 
+    ...mapState(['isSimpsocialMigrationBannerVisible']),
+
     isShow () {
-      return this.showNotification && this.diagnosis.length > 0
+      console.log('*** isShow this.isSimpsocialMigrationBannerVisible', this.isSimpsocialMigrationBannerVisible)
+      return this.showNotification && this.diagnosis.length > 0 && !this.isSimpsocialMigrationBannerVisible
     },
 
     firstDiagnosis () {

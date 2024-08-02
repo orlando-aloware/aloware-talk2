@@ -14554,6 +14554,50 @@ h1.contact-list-name-label {
 //   }
 // }
 
+.simpsocial-migration-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #256EFF1F;
+
+  /*.left-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }*/
+
+  .trial--text {
+    margin: 0;
+    font-weight: 700 !important;
+    margin-right: 2rem;
+  }
+
+  /*.button-index {
+    z-index: 1 !important;
+    margin-right: 1rem;
+
+    .q-btn__wrapper {
+      margin-bottom: 3px;
+    }
+
+    .block {
+      padding-right: 20px;
+      padding-left: 20px;
+      min-width: 200px;
+    }
+
+    & > a {
+      color: #256EFF;
+      font-size: 0.875rem;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }*/
+  }
+
 .trial-banner {
   display: flex;
   justify-content: space-between;
