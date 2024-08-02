@@ -172,7 +172,9 @@ export default {
         console.log('Error: api key is not valid', err)
         this.$handleErrors(err.response)
         this.loading = false
-        this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
+        if (this.$route.name !== 'Login') {
+          this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
+        }
       })
     },
 
@@ -224,11 +226,6 @@ export default {
           this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
           this.handleCall()
         }
-      } else if (!this.authProfile) {
-        this.timeout = setTimeout(async () => {
-          await this.init()
-          this.handleDialNumber(this.hubspotPhoneNumber)
-        }, 1000)
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
           this.handleDialNumber(this.hubspotPhoneNumber)
