@@ -83,7 +83,7 @@ pipeline {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'quasar build --debug'
+                                    sh 'NODE_OPTIONS=--openssl-legacy-provider quasar build --debug'
                                 }
                             }
                         }
@@ -124,7 +124,22 @@ pipeline {
                                     sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                 }
 
-                                sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
+                                sh """
+                                  aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
+                                    --delete \
+                                    --exclude "*.js" \
+                                    --exclude "*.svg" \
+                                    --exclude "*.gz"
+                                  """
+                                sh """
+                                  aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl} \
+                                    --delete \
+                                    --include "*.js" \
+                                    --include "*.svg" \
+                                    --include "*.gz" \
+                                    --content-encoding gzip \
+                                    --metadata-directive REPLACE
+                                  """
                                 }
                             }
                         }
