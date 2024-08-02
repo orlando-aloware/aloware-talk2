@@ -76,15 +76,6 @@ module.exports = function (/* ctx */) {
 
       // https://quasar.dev/quasar-cli/handling-webpack
       extendWebpack (cfg) {
-        cfg.plugins.push(new CompressionWebpackPlugin({
-          filename: '[path][base].gz',
-          algorithm: 'gzip',
-          test: /\.(js|svg)$/,
-          threshold: 0,
-          minRatio: 1,
-          deleteOriginalAssets: false
-        }))
-
         cfg.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
@@ -96,6 +87,16 @@ module.exports = function (/* ctx */) {
         })
 
         if (process.env.APP_ENV !== 'local') {
+          // Compress js and svg files using the original name
+          cfg.plugins.push(new CompressionWebpackPlugin({
+            filename: '[path][base]',
+            algorithm: 'gzip',
+            test: /\.(js|svg)$/,
+            threshold: 0,
+            minRatio: 1,
+            deleteOriginalAssets: true
+          }))
+
           const SentryWebpackPlugin = require('@sentry/webpack-plugin')
           const sentryPluginInstance = new SentryWebpackPlugin({
             authToken: process.env.SENTRY_AUTH_TOKEN,
