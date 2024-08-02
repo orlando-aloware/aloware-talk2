@@ -95,7 +95,6 @@ export default {
     ...mapState(['isSimpsocialMigrationBannerVisible']),
 
     isShow () {
-      console.log('*** isShow this.isSimpsocialMigrationBannerVisible', this.isSimpsocialMigrationBannerVisible)
       return this.showNotification && this.diagnosis.length > 0 && !this.isSimpsocialMigrationBannerVisible
     },
 

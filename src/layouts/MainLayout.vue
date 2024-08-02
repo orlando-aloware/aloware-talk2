@@ -1679,7 +1679,7 @@ export default {
             return Promise.resolve()
           })
           .catch((err) => {
-            /* eslint-disable */console.log(...oo_oo(`925746293_1684_12_1684_28_4`,err))
+            console.log(err)
             this.loadingUsers = false
 
             return Promise.reject()
@@ -1714,7 +1714,7 @@ export default {
           return Promise.resolve()
         }).catch(err => {
           this.loadingWorkflows = false
-          /* eslint-disable */console.log(...oo_oo(`925746293_1719_10_1719_26_4`,err))
+          console.log(err)
 
           return Promise.reject()
         })
@@ -1734,7 +1734,7 @@ export default {
             return Promise.resolve()
           })
           .catch((err) => {
-            /* eslint-disable */console.log(...oo_oo(`925746293_1739_12_1739_28_4`,err))
+            console.log(err)
             this.loadingDispositionStatuses = false
 
             return Promise.reject()
@@ -1755,7 +1755,7 @@ export default {
             return Promise.resolve()
           })
           .catch((err) => {
-            /* eslint-disable */console.log(...oo_oo(`925746293_1760_12_1760_28_4`,err))
+            console.log(err)
             this.loadingCallDispositionStatuses = false
 
             return Promise.reject()
@@ -1772,7 +1772,7 @@ export default {
 
           return Promise.resolve()
         }).catch(err => {
-          /* eslint-disable */console.log(...oo_oo(`925746293_1777_10_1777_26_4`,err))
+          console.log(err)
           this.loadingActivityTypes = false
 
           return Promise.reject()
@@ -1791,7 +1791,7 @@ export default {
 
           return Promise.resolve()
         }).catch(err => {
-          /* eslint-disable */console.log(...oo_oo(`925746293_1796_10_1796_26_4`,err))
+          console.log(err)
           this.loadingTemplates = false
 
           return Promise.reject()
@@ -1810,7 +1810,7 @@ export default {
 
           return Promise.resolve()
         }).catch(err => {
-          /* eslint-disable */console.log(...oo_oo(`925746293_1815_10_1815_26_4`,err))
+          console.log(err)
           this.loadingBroadcasts = false
 
           return Promise.reject()
@@ -1935,7 +1935,7 @@ export default {
           return Promise.resolve()
         }).catch(err => {
           this.loadingLeadSources = false
-          /* eslint-disable */console.log(...oo_oo(`925746293_1940_10_1940_26_4`,err))
+          console.log(err)
 
           return Promise.reject()
         })
@@ -1980,13 +1980,13 @@ export default {
       }
 
       if (this.authenticated) {
-        /* eslint-disable */console.log(...oo_oo(`925746293_1985_8_1985_59_4`,'Calling phone number: ' + phoneNumber))
+        console.log('Calling phone number: ' + phoneNumber)
         this.call(phoneNumber)
 
         return
       }
 
-      /* eslint-disable */console.log(...oo_oo(`925746293_1991_6_1991_70_4`,'Rescheduling call to phone number: ' + phoneNumber))
+      console.log('Rescheduling call to phone number: ' + phoneNumber)
       // reschedule for 1 second from now
       setTimeout(() => {
         this.call(phoneNumber)
@@ -2074,7 +2074,7 @@ export default {
                 }
               })
               .catch((err) => {
-                /* eslint-disable */console.log(...oo_oo(`925746293_2079_16_2079_32_4`,err))
+                console.log(err)
               })
           }
 
@@ -2087,7 +2087,7 @@ export default {
                 }
               })
               .catch((err) => {
-                /* eslint-disable */console.log(...oo_oo(`925746293_2092_16_2092_32_4`,err))
+                console.log(err)
               })
           }
 
@@ -2100,7 +2100,7 @@ export default {
                 }
               })
               .catch((err) => {
-                /* eslint-disable */console.log(...oo_oo(`925746293_2105_16_2105_32_4`,err))
+                console.log(err)
               })
           }
         }
@@ -2121,7 +2121,7 @@ export default {
           onClick: onClickFunction,
           onError: (err) => {
             self.removeCommunicationNotifiedDesktop(communication.id)
-            /* eslint-disable */console.log(...oo_oo(`925746293_2126_12_2126_28_4`,err))
+            console.log(err)
           },
           onClose: () => {
             self.removeCommunicationNotifiedDesktop(communication.id)
@@ -2165,7 +2165,7 @@ export default {
               }
             })
             .catch((err) => {
-              /* eslint-disable */console.log(...oo_oo(`925746293_2170_14_2170_30_4`,err))
+              console.log(err)
             })
         }
 
@@ -2184,7 +2184,7 @@ export default {
           onClick: onClickFunction,
           onError: (err) => {
             self.removeVoicemailNotifiedDesktop(communication.id)
-            /* eslint-disable */console.log(...oo_oo(`925746293_2189_12_2189_28_4`,err))
+            console.log(err)
           },
           onClose: () => {
             self.removeVoicemailNotifiedDesktop(communication.id)
@@ -2225,7 +2225,7 @@ export default {
               }
             })
             .catch((err) => {
-              /* eslint-disable */console.log(...oo_oo(`925746293_2230_14_2230_30_4`,err))
+              console.log(err)
             })
         }
 
@@ -2242,7 +2242,7 @@ export default {
           onClick: onClickFunction,
           onError: (err) => {
             self.removeContactNotifiedDesktop(contact.id)
-            /* eslint-disable */console.log(...oo_oo(`925746293_2247_12_2247_28_4`,err))
+            console.log(err)
           },
           onClose: () => {
             self.removeContactNotifiedDesktop(contact.id)
@@ -2300,7 +2300,7 @@ export default {
               }
             })
             .catch((err) => {
-              /* eslint-disable */console.log(...oo_oo(`925746293_2305_14_2305_30_4`,err))
+              console.log(err)
             })
         }
 
@@ -2320,7 +2320,7 @@ export default {
           onClick: onClickFunction,
           onError: (err) => {
             self.removeContactNotifiedDesktop(engagement.id)
-            /* eslint-disable */console.log(...oo_oo(`925746293_2325_12_2325_28_4`,err))
+            console.log(err)
           },
           onClose: () => {
             self.removeContactNotifiedDesktop(engagement.id)
@@ -2368,7 +2368,7 @@ export default {
               }
             })
             .catch((err) => {
-              /* eslint-disable */console.log(...oo_oo(`925746293_2373_14_2373_30_4`,err))
+              console.log(err)
             })
         }
 
@@ -2388,7 +2388,7 @@ export default {
           onClick: onClickFunction,
           onError: (err) => {
             self.removeContactNotifiedDesktop(engagement.id)
-            /* eslint-disable */console.log(...oo_oo(`925746293_2393_12_2393_28_4`,err))
+            console.log(err)
           },
           onClose: () => {
             self.removeContactNotifiedDesktop(engagement.id)
@@ -2440,11 +2440,10 @@ export default {
       this.logoutUser().then((res) => {
         this.response = res.data
         this.$router.push({ name: 'Login' }).catch((err) => {
-          /* eslint-disable */console.log(...oo_oo(`925746293_2445_10_2445_26_4`,err))
+          console.log(err)
         })
       }).catch((err) => {
-        /* eslint-disable */console.log(...oo_oo(`925746293_2448_8_2448_24_4`,err))
-      })
+        console.log(err)      })
     },
 
     resizeHandler () {
@@ -2495,7 +2494,7 @@ export default {
           this.setIsWhiteLabel(res.data.whitelabel)
           this.setDocumentFavicon(res.data.favicon)
         }).catch(err => {
-          /* eslint-disable */console.log(...oo_oo(`925746293_2500_10_2500_26_4`,err))
+          console.log(err)
 
           if (repeatTimes >= 3) {
             this.$handleErrors(err.response)
