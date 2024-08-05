@@ -5,12 +5,12 @@
       <p class="trial--text">
         Over the coming weeks, PowerDialer, Calendar, Contacts, Broadcast, and the Phone will move to the new 'Talk' page. For questions, contact <a class="link-only" href="mailto:training@simpsocial.com">training@simpsocial.com</a>
       </p>
-      <compact-btn customClass="fs-14 _500 position-relative not-focusable ml-2 text-red-130"
-                   borderless
-                   @clicked="closeBanner">
-        <i class="fa fa-times"/>
-      </compact-btn>
     </div>
+    <compact-btn customClass="fs-14 _500 position-relative not-focusable ml-2 text-red-130"
+                 borderless
+                 @clicked="closeBanner">
+      <i class="fa fa-times"/>
+    </compact-btn>
   </div>
 </template>
 
