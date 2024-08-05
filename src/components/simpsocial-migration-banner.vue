@@ -73,10 +73,17 @@ export default {
   created () {
     this.$cookies = VueCookies
 
-    if (!this.isSimpSocial || (this.isSimpSocial && this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null' && this.shouldShowInFirstVisit)) {
+    console.log('this.profile', this.profile)
+    console.log('this.isSimpSocial', this.isSimpSocial)
+    console.log('this.parsedCookieName', this.parsedCookieName)
+    console.log("this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null'", this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null')
+
+    if (this.profile && (!this.isSimpSocial || (this.isSimpSocial && this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null' && this.shouldShowInFirstVisit))) {
       this.shouldShow = false
       this.setIsSimpsocialMigrationBannerVisible(false)
     }
+
+    console.log('this.shouldShow', this.shouldShow)
   }
 }
 </script>
