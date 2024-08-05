@@ -2428,7 +2428,10 @@ export default {
       // don't close the phone yet!
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.isPhoneVisible = true
-        this.mobilePhoneDrawer = false
+
+        if (this.isMobile && !this.mobilePhoneDrawer && this.$route.name === 'Phone') {
+          this.mobilePhoneDrawer = true
+        }
       }
 
       if (typeof this.$refs.appFooter !== 'undefined') {
