@@ -10,6 +10,7 @@
     </b-overlay>
     <header-notification class="flex-grow-0"
                          v-if="isLoggedIn && !isWidget"/>
+    <simpsocial-migration-banner cookieName="simpsocial-migration"/>
     <router-view class="flex-grow-1 overflow-hidden"
                  v-if="cookieValidated"/>
     <portal-target name="app"
@@ -37,6 +38,7 @@ import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import CustomScripts from 'components/custom-scripts'
 import HeaderNotification from 'components/header-notification'
+import SimpsocialMigrationBanner from 'components/simpsocial-migration-banner.vue'
 
 export default {
   name: 'App',
@@ -47,7 +49,8 @@ export default {
     HeaderNotification,
     Intercom,
     CustomScripts,
-    ActionNotification
+    ActionNotification,
+    SimpsocialMigrationBanner
   },
 
   data () {
