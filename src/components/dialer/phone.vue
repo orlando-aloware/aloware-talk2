@@ -329,7 +329,13 @@
                               @click="openExpansion('members')">
                   <div class="d-flex align-items-center">
                     <ready-icon />
-                    <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty.name | truncate(15) }}</span>
+                    <span class="ml-2 text-size-xxl _600 text-grey-100" v-if="addedParty.name">
+                      {{ addedParty.name | truncate(15) }}
+                    </span>
+                    <span class="ml-2 text-size-xxl _600 text-grey-100"
+                          v-else>
+                      {{ addedParty }}
+                    </span>
                   </div>
                   <div class="mt-1">
                     <span class="add-status"
