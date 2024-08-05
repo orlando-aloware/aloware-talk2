@@ -78,7 +78,7 @@ export default {
     console.log('this.parsedCookieName', this.parsedCookieName)
     console.log("this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null'", this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null')
 
-    if (this.profile && (!this.isSimpSocial || (this.isSimpSocial && this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null' && this.shouldShowInFirstVisit))) {
+    if (!this.profile || !this.isSimpSocial || (this.isSimpSocial && this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null' && this.shouldShowInFirstVisit)) {
       this.shouldShow = false
       this.setIsSimpsocialMigrationBannerVisible(false)
     }
