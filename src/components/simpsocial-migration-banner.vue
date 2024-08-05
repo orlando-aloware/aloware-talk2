@@ -73,7 +73,7 @@ export default {
   created () {
     this.$cookies = VueCookies
 
-    if (!this.isSimpSocial || (this.isSimpSocial && this.$cookies.get(this.parsedCookieName) && this.shouldShowInFirstVisit)) {
+    if (!this.isSimpSocial || (this.isSimpSocial && this.$cookies.get(this.parsedCookieName) !== null && this.$cookies.get(this.parsedCookieName) !== 'null' && this.shouldShowInFirstVisit)) {
       this.shouldShow = false
       this.setIsSimpsocialMigrationBannerVisible(false)
     }
