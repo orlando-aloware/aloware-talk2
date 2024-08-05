@@ -1,5 +1,46 @@
 <template>
   <div class="broadcast-add broadcast-add__message">
+    <div class="broadcast-add__schedule__row"
+         v-if="campaign">
+      <div class="broadcast-add__schedule__row__label">
+        From
+        <span>
+          <information-circle-icon class="cursor-pointer"/>
+          <q-tooltip>
+            The line you want to send the bulck messages campaign from.
+          </q-tooltip>
+        </span>
+      </div>
+      <div class="broadcast-add__schedule__row__fields">
+        <contact-line-selector :value="campaign?.id"
+                               @select="onCampaignSelected"
+                               v-if="campaign"/>
+        <warning-note :campaign="campaign"
+                      :useMmsRate="useMmsRate"/>
+      </div>
+    </div>
+
+    <div class="broadcast-add__schedule__row">
+      <div class="broadcast-add__schedule__row__label">
+        Throttling
+        <a target="_blank"
+           :href="campaign?.max_mps <= mpsLimit ? getComplianceURL() : '#'">
+          <information-circle-icon class="ml-2 cursor-pointer"/>
+          <q-tooltip>
+            This is an hourly throttling limit on your bulk message campaign.<br>
+            Throttling comes directly from the carrier based on brand trust score.<br>
+            <span v-if="campaign?.max_mps <= mpsLimit">
+              To increase your MPS rate, please register your line cliking on this button.
+            </span>
+          </q-tooltip>
+        </a>
+      </div>
+      <div class="broadcast-add__schedule__row__fields">
+        <throttle-selector :campaign="campaign"
+                           v-model="throttle"/>
+      </div>
+    </div>
+
     <b-form-radio-group stacked
                         value-field="id"
                         text-field="label"
@@ -110,8 +151,11 @@ import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import MessageComposerSms from 'src/components/message-composer/message-composer-sms.vue'
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
 import Waveform from 'src/components/waveform.vue'
+import ContactLineSelector from 'src/components/contact-line-selector.vue'
+import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
+import WarningNote from 'src/components/warning-note.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin, smsMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, classicMixin, smsMixin, simpsocialMixin } from 'src/plugins/mixins'
 import { IS_OPT_OUT_FORCED_TEXT } from '../../constants/compliance-messages'
 
 export default {
@@ -119,6 +163,7 @@ export default {
 
   mixins: [
     aclMixin,
+    classicMixin,
     smsMixin,
     simpsocialMixin
   ],
@@ -130,7 +175,10 @@ export default {
     InformationCircleIcon,
     MessageComposerSms,
     MessageComposerSmsPreview,
-    Waveform
+    Waveform,
+    ContactLineSelector,
+    ThrottleSelector,
+    WarningNote
   },
 
   props: {
@@ -142,12 +190,27 @@ export default {
     rvm: {
       type: Object,
       default: null
+    },
+
+    propCampaign: {
+      type: Object,
+      required: false,
+      default: null
+    },
+
+    propThrottle: {
+      type: Object,
+      required: false,
+      default: null
     }
   },
 
   data: () => ({
     type: 'sms',
-    maxSmsBodyLength: 1600
+    maxSmsBodyLength: 1600,
+    campaign: {},
+    throttle: null,
+    mpsLimit: 0.25
   }),
 
   computed: {
@@ -276,15 +339,30 @@ export default {
 
     optoutTooltipText () {
       return IS_OPT_OUT_FORCED_TEXT
+    },
+
+    showMessageSentAsMmsWarning () {
+      // Only MMS
+      return this.shouldApplyMmsRate() && !this.shouldApplyTollFreeRate()
+    },
+
+    showMessageSentFromTollFreeNumberWarning () {
+      // Only TFN
+      return !this.shouldApplyMmsRate() && this.shouldApplyTollFreeRate()
+    },
+
+    showMessageSentFromTollFreeNumberAsMmsWarning () {
+      // MMS + TFN
+      return this.shouldApplyMmsRate() && this.shouldApplyTollFreeRate()
     }
   },
 
   created () {
-    const campaign = this.profile.campaign_id
-      ? this.campaigns.find(camp => camp.id === this.profile.campaign_id)
-      : this.campaigns[0]
-
-    this.setSelectedLine(campaign)
+    console.log('broadcast-add-view-message created', this.propCampaign?.name)
+    this.setCampaign()
+    console.log('broadcast-add-view-message created', this.campaign?.name)
+    this.setSelectedLine(this.campaign)
+    this.throttle = this.propThrottle
 
     // type setup
     this.type = this.rvm ? 'rvm' : 'sms'
@@ -308,6 +386,23 @@ export default {
 
     onRemoveRVM () {
       this.$emit('rvm-updated', null)
+    },
+
+    onCampaignSelected (campaign) {
+      this.campaign = campaign
+
+      this.$emit('campaign', this.campaign)
+    },
+
+    setCampaign () {
+      if (this.propCampaign) {
+        this.campaign = this.propCampaign
+        return
+      }
+
+      this.campaign = this.propCampaign ?? this.profile.campaign_id
+        ? this.campaigns.find(camp => camp.id === this.profile.campaign_id)
+        : this.campaigns[0]
     }
   },
 
@@ -348,6 +443,14 @@ export default {
       handler (price) {
         this.$emit('price-updated', price)
       }
+    },
+
+    campaign (campaign) {
+      this.$emit('campaign', campaign)
+    },
+
+    throttle (value) {
+      this.$emit('throttle', value)
     }
   }
 }
