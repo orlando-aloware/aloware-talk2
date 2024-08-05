@@ -263,7 +263,6 @@ export default {
     },
 
     isStepValid () {
-      console.log('isStepValid', this.footerComponent, this.isFooterComponentValid)
       switch (this.currentStep.id) {
         case 1:
           return this.isMainComponentValid && (this.footerComponent ? this.isFooterComponentValid : true)
@@ -322,12 +321,10 @@ export default {
     ]),
 
     mainComponentChanged (state) {
-      console.log('mainComponentChanged', state)
       this.isMainComponentValid = state
     },
 
     footerComponentChanged (state) {
-      console.log('footerComponentChanged', state)
       this.isFooterComponentValid = state
     },
 
@@ -356,7 +353,6 @@ export default {
     },
 
     onCampaignUpdated (campaign) {
-      console.log('onCampaignUpdated', campaign)
       this.campaign = campaign
     },
 
