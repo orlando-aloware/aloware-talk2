@@ -668,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="isNotDisposed || isNotOnWrapUp"
+                  :disabled="shouldDisableCallBackButton"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -1477,7 +1477,9 @@ export default {
       'showIncomingCallNotification',
       'sessionPhoneExpansion',
       'parkedCalls',
-      'callFishingQueue'
+      'callFishingQueue',
+      'isCallBackButtonDisabled',
+      'isWidget'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -1919,6 +1921,10 @@ export default {
 
     isNotOnWrapUp () {
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
+    },
+
+    shouldDisableCallBackButton () {
+      return this.isNotDisposed || this.isNotOnWrapUp || this.isCallBackButtonDisabled
     }
   },
 
@@ -2005,16 +2011,20 @@ export default {
     },
 
     goToContact () {
-      if (this.contact) {
-        this.$router.push({
-          name: 'Contact',
-          params: {
-            id: this.contact.id
-          }
-        }).catch(err => {
-          console.log(err)
-        })
+      if (!this.contact) {
+        return
       }
+
+      const contactRouter = {
+        name: 'Contact',
+        params: {
+          id: this.contact.id
+        }
+      }
+
+      this.isWidget
+        ? window.open(this.$router.resolve(contactRouter).href, '_blank')
+        : this.$router.push(contactRouter).catch(err => console.log(err))
     },
 
     copyPhoneNumber (phoneNumber) {

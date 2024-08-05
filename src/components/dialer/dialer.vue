@@ -767,6 +767,11 @@ export default {
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
       this.connection.hangup()
+
+      this.setIsCallBackButtonDisabled(true)
+      setTimeout(() => {
+        this.setIsCallBackButtonDisabled(false)
+      }, 3500)
     },
 
     sendDigit (digit) {
@@ -1579,7 +1584,8 @@ export default {
       'setDialerFormStatus',
       'setDialerError',
       'setDialerErrorDefault',
-      'removeParkedCall'
+      'removeParkedCall',
+      'setIsCallBackButtonDisabled'
     ])
   },
 
