@@ -3,10 +3,19 @@
     <phone :is_widget='isWidget'
            @callCompleted="handleCallCompleted" />
     <dialer />
-    <select-campaign-dialog :show="showSelectCampaignDialog"
-                            :campaignId="campaignId"
-                            @call="handleCall"
-                            @change-campaign-id="handleChangeCampaignId" />
+    <div
+      class="p-3"
+      v-if="dialer.parkedCall"
+    >
+      <parked-call />
+    </div>
+    <select-campaign-dialog
+      v-else
+      :show="showSelectCampaignDialog"
+      :campaignId="campaignId"
+      @call="handleCall"
+      @change-campaign-id="handleChangeCampaignId"
+    />
   </div>
 </template>
 
@@ -21,9 +30,10 @@ import {
   broadcastMixin,
   dialerDataMixin
 } from 'src/boot/mixins'
+import ParkedCall from 'components/dialer/parked-call.vue'
 
 export default {
-  components: { Dialer, Phone, SelectCampaignDialog },
+  components: { ParkedCall, Dialer, Phone, SelectCampaignDialog },
 
   mixins: [
     aclMixin,
@@ -62,6 +72,8 @@ export default {
       'currentCompany',
       'timezones'
     ]),
+
+    ...mapState(['dialer']),
 
     showSelectCampaignDialog () {
       return this.campaignId === null
