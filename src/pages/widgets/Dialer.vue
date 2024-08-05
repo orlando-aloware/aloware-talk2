@@ -132,6 +132,7 @@ export default {
   async mounted () {
     await this.init()
 
+    this.$VueEvent.listen('userLoggedIn', this.handleUserLogin)
     this.$VueEvent.listen('agent_status_updated', this.handleAgentStatusUpdate)
     this.isFirstLoading = false
   },
@@ -196,6 +197,10 @@ export default {
     },
 
     async searchContact (phoneNumber) {
+      if (!phoneNumber) {
+        return null
+      }
+
       const url = '/api/v2/contacts/quick-search'
       const response = await this.$axios.get(url, {
         params: {
