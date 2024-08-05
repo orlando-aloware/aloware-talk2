@@ -15025,3 +15025,25 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
     font-size: 0.95rem;
   }
 }
+
+.note {
+  font-size: 12px;
+  border-radius: 4px;
+  margin: 16px 0;
+  padding: 12px;
+  border-width: 1px;
+  border-style: solid;
+  color: black;
+  flex: 1 1 100%;
+
+  &--warning {
+    border-color: #f2c037;
+    background-color: #ffecbc;
+  }
+
+  &__title {
+    color:#a17d1c;
+    font-weight: bold;
+    margin-bottom: 6px
+  }
+}
