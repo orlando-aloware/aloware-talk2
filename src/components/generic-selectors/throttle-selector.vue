@@ -99,7 +99,7 @@ export default {
 
       let mpsList = [0.05, 0.1, 0.25, 0.5, 1, 2, 3, 4, 6, 8, 10]
 
-      for (let index = 0; mpsList[index] <= this.campaign.max_mps; index++) {
+      for (let index = 0; mpsList[index] <= this.campaign?.max_mps; index++) {
         options.push({
           id: index + 1,
           name: mpsList[index] * 60 * 60 + ' per hour',
