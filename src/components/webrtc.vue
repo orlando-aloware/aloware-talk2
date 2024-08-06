@@ -10,7 +10,7 @@
       <parked-call />
     </div>
     <select-campaign-dialog
-      v-else-if="!isAgentOnCallOrOnWrapUp"
+      v-else
       :show="showSelectCampaignDialog"
       :campaignId="campaignId"
       @call="handleCall"
@@ -79,17 +79,21 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     showSelectCampaignDialog () {
-      console.log('===========================================')
+      console.log('=================showSelectCampaignDialog==========================')
       console.log(this.campaignId)
+      console.log('agent_status', this.profile.agent_status)
+      console.log(this.dialer)
+      console.log('currentStatus', this.dialer.currentStatus)
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
       console.log('===========================================')
-      return this.campaignId === null
+      return this.campaignId === null && !isCallInProgress.includes(this.dialer.currentStatus)
     },
 
     isAgentOnCallOrOnWrapUp () {
-      console.log('==================================')
+      console.log('===============isAgentOnCallOrOnWrapUp===================')
       console.log('agent_status', this.profile.agent_status)
       console.log('==================================')
-      return [AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_WRAP_UP].includes(this.profile.agent_status)
+      return [AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_ON_WRAP_UP].includes(this.profile.agent_status)
     }
   },
 
