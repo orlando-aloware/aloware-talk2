@@ -262,7 +262,7 @@ export default {
       if (this.extensions) {
         console.log('here')
         this.extensions.callEnded()
-        this.showAlertCallFinished = !!this.dialer.parkedCall
+        this.showAlertCallFinished = !this.dialer.parkedCall
         this.defaultOutboundCampaignId = null
         this.campaignId = null
       }
