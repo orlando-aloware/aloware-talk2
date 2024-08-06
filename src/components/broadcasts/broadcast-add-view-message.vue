@@ -11,7 +11,7 @@
           </q-tooltip>
         </span>
       </div>
-      <div class="broadcast-add__schedule__row__fields">
+      <div class="broadcast-add__schedule__row__fields mx-w-70">
         <contact-line-selector :value="campaign?.id"
                                @select="onCampaignSelected"
                                v-if="campaign"/>
@@ -35,7 +35,7 @@
           </q-tooltip>
         </a>
       </div>
-      <div class="broadcast-add__schedule__row__fields">
+      <div class="broadcast-add__schedule__row__fields mx-w-70">
         <throttle-selector :campaign="campaign"
                            v-model="throttle"/>
       </div>
@@ -358,9 +358,7 @@ export default {
   },
 
   created () {
-    console.log('broadcast-add-view-message created', this.propCampaign?.name)
     this.setCampaign()
-    console.log('broadcast-add-view-message created', this.campaign?.name)
     this.setSelectedLine(this.campaign)
     this.throttle = this.propThrottle
 
