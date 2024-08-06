@@ -79,11 +79,17 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     showSelectCampaignDialog () {
+      console.log('===========================================')
+      console.log(this.campaignId)
+      console.log(this.isAgentOnCall)
+      console.log('===========================================')
       return this.campaignId === null && !this.isAgentOnCall
     },
 
     isAgentOnCall () {
-      console.log(this.profile)
+      console.log('==================================')
+      console.log(this.profile.agent_status)
+      console.log('==================================')
       return this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
     }
   },
