@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Dialer from 'components/dialer/dialer'
 import Phone from 'components/dialer/phone'
 import SelectCampaignDialog from 'components/dialer/select-campaign-dialog.vue'
@@ -76,11 +76,14 @@ export default {
 
     ...mapState(['dialer']),
 
+    ...mapGetters('auth', ['profile']),
+
     showSelectCampaignDialog () {
       return this.campaignId === null && !this.isAgentOnCall
     },
 
     isAgentOnCall () {
+      console.log(this.profile)
       return this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
     }
   },
