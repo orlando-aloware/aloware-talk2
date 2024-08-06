@@ -256,12 +256,17 @@ export default {
     },
 
     handleCallCompletedEvent () {
+      console.log('================================ handleCallCompletedEvent ================================')
+      console.log(this.dialer)
+      console.log(this.extensions)
       if (this.extensions) {
+        console.log('here')
         this.extensions.callEnded()
         this.showAlertCallFinished = true
         this.defaultOutboundCampaignId = null
         this.campaignId = null
       }
+      console.log('================================ END - handleCallCompletedEvent ================================')
     },
 
     handleChangeCampaignEvent (campaignId) {
