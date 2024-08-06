@@ -1,7 +1,10 @@
 <template>
   <div class="note note--warning"
        v-if="showWarning">
-    <p class="note__title">WARNING</p>
+    <p class="note__title"
+       v-if="!isCalculatorMessage">
+       WARNING
+    </p>
     <div>{{ message }}</div>
   </div>
 </template>
@@ -17,6 +20,11 @@ export default {
     },
 
     useMmsRate: {
+      type: Boolean,
+      required: false
+    },
+
+    isCalculatorMessage: {
       type: Boolean,
       required: false
     }
@@ -40,10 +48,17 @@ export default {
     },
 
     showWarning () {
-      return this.showMessageSentAsMmsWarning || this.showMessageSentFromTollFreeNumberWarning || this.showMessageSentFromTollFreeNumberAsMmsWarning
+      return this.showMessageSentAsMmsWarning ||
+        this.showMessageSentFromTollFreeNumberWarning ||
+        this.showMessageSentFromTollFreeNumberAsMmsWarning ||
+        this.isCalculatorMessage
     },
 
     message () {
+      if (this.isCalculatorMessage) {
+        return 'This calculator is meant to provide the best estimate for the cost of the broadcast. Actual charges from carriers may vary.'
+      }
+
       if (this.showMessageSentAsMmsWarning) {
         return 'The selected line is configured to send long messages via MMS, which may lead to higher-than-expected charges for this broadcast.'
       }
