@@ -807,7 +807,6 @@ export default function (/* { ssrContext } */) {
       },
 
       removeParkedCall ({ commit }, communicationId) {
-        console.log('removing parked call')
         commit('REMOVE_PARKED_CALL', communicationId)
       },
 
