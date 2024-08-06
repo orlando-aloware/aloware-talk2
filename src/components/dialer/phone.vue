@@ -1920,10 +1920,6 @@ export default {
     },
 
     isNotOnWrapUp () {
-      console.log('=======================isNotOnWrapUp==================================')
-      console.log(this.profile.agent_status)
-      console.log(this.dialer)
-      console.log('=========================================================')
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
     },
 

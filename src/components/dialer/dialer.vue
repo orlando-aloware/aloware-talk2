@@ -619,10 +619,7 @@ export default {
     },
 
     async makeCall (currentNumber, outboundCampaignId, contactName = '', companyName = '', contactId = null, isCallWaiting = false) {
-      console.log('making call')
       console.log(currentNumber, outboundCampaignId, contactName, companyName, contactId, this.dialer.isReady, this.dialer.call)
-
-      console.log(this.dialer)
 
       if (!this.dialer.isReady) {
         console.log('Dialer is not ready', currentNumber, outboundCampaignId)
@@ -645,7 +642,6 @@ export default {
       }
 
       if (this.shouldPushPhoneRoute) {
-        console.log('Pushing phone route')
         this.$router.push({
           name: 'Phone'
         })
@@ -742,19 +738,13 @@ export default {
         }
 
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-        console.log(this.dialer)
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-        console.log('hasNoParkedAndInprogressCall', this.hasNoParkedAndInprogressCall)
-        console.log('hasParkedAndInprogressCall', this.hasParkedAndInprogressCall)
-        console.log('hasCallInProgressNoParkedCall', this.hasCallInProgressNoParkedCall)
-
         if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
           this.startWrapUpTimer()
-          console.log('here')
           return
         }
 
@@ -1003,8 +993,6 @@ export default {
     },
 
     unparkCall (parkedCallData = null, preventClear = false) {
-      console.log('=========================================================')
-      console.log(this.dialer)
       if (!parkedCallData && !this.dialer.parkedCall) {
         return
       }
@@ -1035,7 +1023,6 @@ export default {
       if (this.isMobile) {
         this.$VueEvent.fire('doneUnparkCall')
       }
-      console.log('=========================================================')
     },
 
     parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {

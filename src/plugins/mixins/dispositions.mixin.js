@@ -20,9 +20,6 @@ export default {
       const isForceCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition && !this.isCallDisposed
       const isForceContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition && !this.isContactDisposed
 
-      console.log(`isForceCallDisposition: ${isForceCallDisposition}`)
-      console.log(`isForceContactDisposition: ${isForceContactDisposition}`)
-
       return isForceCallDisposition || isForceContactDisposition
     },
 

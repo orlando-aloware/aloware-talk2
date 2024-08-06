@@ -64,7 +64,6 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     isAgentOnCall () {
-      console.log('isAgentOnCall', this.profile.agent_status)
       return this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
     }
   },

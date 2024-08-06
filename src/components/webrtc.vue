@@ -2,13 +2,16 @@
   <div>
     <phone :is_widget='isWidget'
            @callCompleted="handleCallCompleted" />
+
     <dialer />
+
     <div
       class="p-3"
       v-if="dialer.parkedCall"
     >
       <parked-call />
     </div>
+
     <select-campaign-dialog
       v-else
       :show="showSelectCampaignDialog"
@@ -31,7 +34,6 @@ import {
   dialerDataMixin
 } from 'src/boot/mixins'
 import ParkedCall from 'components/dialer/parked-call.vue'
-import * as AgentStatus from 'src/constants/agent-status'
 
 export default {
   components: { ParkedCall, Dialer, Phone, SelectCampaignDialog },
@@ -79,21 +81,8 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     showSelectCampaignDialog () {
-      console.log('=================showSelectCampaignDialog==========================')
-      console.log(this.campaignId)
-      console.log('agent_status', this.profile.agent_status)
-      console.log(this.dialer)
-      console.log('currentStatus', this.dialer.currentStatus)
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
-      console.log('===========================================')
       return this.campaignId === null && !isCallInProgress.includes(this.dialer.currentStatus)
-    },
-
-    isAgentOnCallOrOnWrapUp () {
-      console.log('===============isAgentOnCallOrOnWrapUp===================')
-      console.log('agent_status', this.profile.agent_status)
-      console.log('==================================')
-      return [AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_ON_WRAP_UP].includes(this.profile.agent_status)
     }
   },
 
@@ -142,8 +131,6 @@ export default {
   },
 
   created () {
-    console.log(this.dialer)
-
     this.initAuth()
 
     this.mainListeners.agentStatusUpdated = (event) => {
