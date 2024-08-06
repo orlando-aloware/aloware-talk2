@@ -748,8 +748,13 @@ export default {
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
+        console.log('hasNoParkedAndInprogressCall', this.hasNoParkedAndInprogressCall)
+        console.log('hasParkedAndInprogressCall', this.hasParkedAndInprogressCall)
+        console.log('hasCallInProgressNoParkedCall', this.hasCallInProgressNoParkedCall)
+
         if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
           this.startWrapUpTimer()
+          console.log('here')
           return
         }
 

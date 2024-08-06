@@ -1920,7 +1920,7 @@ export default {
     },
 
     isNotOnWrapUp () {
-      console.log('=========================================================')
+      console.log('=======================isNotOnWrapUp==================================')
       console.log(this.profile.agent_status)
       console.log(this.dialer)
       console.log('=========================================================')
