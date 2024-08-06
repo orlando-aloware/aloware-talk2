@@ -24,7 +24,6 @@ export default {
       const users = _.get(this, 'users', null)
 
       if (!id || !users || users.length === 0) {
-        console.log('Users not loaded')
         return {
           id: id,
           name: ''
@@ -34,11 +33,8 @@ export default {
       const found = users.find(user => user.id === id)
 
       if (found) {
-        console.log('Founded user', found)
         return found
       }
-
-      console.log('Users loaded, but user id not found', id)
 
       return {
         id: id,
