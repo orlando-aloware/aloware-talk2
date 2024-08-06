@@ -20,16 +20,23 @@
         <span class="cards__body__card__text">
           {{ card.text }}
         </span>
+        <warning-note :isCalculatorMessage="true"
+                      v-if="card.showWarning"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import WarningNote from 'src/components/warning-note.vue'
 import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-add-cards',
+
+  components: {
+    WarningNote
+  },
 
   mixins: [
     simpsocialMixin
@@ -54,12 +61,14 @@ export default {
         {
           title: this.contactsLength,
           text: (this.contactsLength === 1 ? 'Contact' : 'Contacts'),
-          enabled: true
+          enabled: true,
+          showWarning: false
         },
         {
           title: this.$options.filters.toCurrency(this.$options.filters.fixRounding(this.estimatedCost)),
           text: 'Estimated Cost',
-          enabled: !this.isSimpSocial
+          enabled: !this.isSimpSocial,
+          showWarning: true
         }
       ].filter(card => card.enabled)
     },
