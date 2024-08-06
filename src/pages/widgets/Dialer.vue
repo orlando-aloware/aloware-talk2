@@ -142,9 +142,6 @@ export default {
 
   async mounted () {
     await this.init()
-    this.setHubspotPhoneNumber('+19403737418')
-    this.extensionsInitialized = true
-    this.extensionsVisibility = true
     this.isFirstLoading = false
   },
 
@@ -223,8 +220,8 @@ export default {
       return response.data.data.length > 0 ? response.data.data[0] : null
     },
 
-    async handleDialNumber (phoneNumber, skipCheckAgentActiveCall = false) {
-      if (this.checkAgentHasActiveCallInAnotherDevice() && !skipCheckAgentActiveCall) {
+    async handleDialNumber (phoneNumber) {
+      if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
         return
       }
@@ -306,7 +303,7 @@ export default {
 
       if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.showAlertAgentOnCall) {
         this.showAlertAgentOnCall = false
-        this.handleDialNumber(this.hubspotPhoneNumber, true)
+        this.handleDialNumber(this.hubspotPhoneNumber)
       }
     },
 
