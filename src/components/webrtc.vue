@@ -31,6 +31,7 @@ import {
   dialerDataMixin
 } from 'src/boot/mixins'
 import ParkedCall from 'components/dialer/parked-call.vue'
+import * as AgentStatus from 'src/constants/agent-status'
 
 export default {
   components: { ParkedCall, Dialer, Phone, SelectCampaignDialog },
@@ -76,7 +77,11 @@ export default {
     ...mapState(['dialer']),
 
     showSelectCampaignDialog () {
-      return this.campaignId === null
+      return this.campaignId === null && !this.isAgentOnCall
+    },
+
+    isAgentOnCall () {
+      return this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
     }
   },
 
@@ -123,6 +128,8 @@ export default {
   },
 
   created () {
+    console.log(this.dialer)
+
     this.initAuth()
 
     this.mainListeners.agentStatusUpdated = (event) => {
