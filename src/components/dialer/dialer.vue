@@ -742,6 +742,7 @@ export default {
         }
 
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+        console.log(this.dialer)
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
