@@ -24,7 +24,6 @@ export default {
       'setCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
-      'setCampaignsIsLoading',
       'setUsers',
       'setUsersIsLoading'
     ]),
