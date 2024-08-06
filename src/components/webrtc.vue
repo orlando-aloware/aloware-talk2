@@ -93,6 +93,8 @@ export default {
       'updateUserStatus'
     ]),
 
+    ...mapActions('auth', ['setAgentStatus']),
+
     initAuth () {
       this.broadcastInit()
 
