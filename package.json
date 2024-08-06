@@ -23,8 +23,8 @@
     "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-common-types": "6.5.2",
-    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/fontawesome-common-types": "6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fullstory/browser": "^1.5.1",
     "@gkt/microphone": "^1.0.3",
     "@hubspot/calling-extensions-sdk": "^0.5.1",
