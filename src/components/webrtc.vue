@@ -10,7 +10,7 @@
       <parked-call />
     </div>
     <select-campaign-dialog
-      v-else-if="!isAgentOnCall"
+      v-else-if="!isAgentOnCallOrOnWrapUp"
       :show="showSelectCampaignDialog"
       :campaignId="campaignId"
       @call="handleCall"
@@ -85,11 +85,11 @@ export default {
       return this.campaignId === null
     },
 
-    isAgentOnCall () {
+    isAgentOnCallOrOnWrapUp () {
       console.log('==================================')
       console.log('agent_status', this.profile.agent_status)
       console.log('==================================')
-      return this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+      return [AgentStatus.AGENT_STATUS_ON_CALL, AgentStatus.AGENT_STATUS_WRAP_UP].includes(this.profile.agent_status)
     }
   },
 
