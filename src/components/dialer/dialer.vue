@@ -1023,13 +1023,6 @@ export default {
       if (this.isMobile) {
         this.$VueEvent.fire('doneUnparkCall')
       }
-
-      console.log(this.$route.name)
-
-      if (this.$route.name !== 'Phone' && this.isWidget) {
-        this.$router.push({ name: 'Phone' })
-        this.setShowPhone(true)
-      }
     },
 
     parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
@@ -1587,8 +1580,7 @@ export default {
       'setDialerError',
       'setDialerErrorDefault',
       'removeParkedCall',
-      'setIsCallBackButtonDisabled',
-      'setShowPhone'
+      'setIsCallBackButtonDisabled'
     ])
   },
 
