@@ -2617,6 +2617,10 @@ i.option-separator {
   max-width: 100% !important;
 }
 
+.mx-w-70 {
+  max-width: 70% !important;
+}
+
 .contact-activity-container {
   display: table;
   table-layout: fixed;
@@ -15029,16 +15033,16 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 .note {
   font-size: 12px;
   border-radius: 4px;
-  margin: 16px 0;
+  margin-top: 16px;
   padding: 12px;
   border-width: 1px;
   border-style: solid;
-  color: black;
   flex: 1 1 100%;
 
   &--warning {
-    border-color: #f2c037;
-    background-color: #ffecbc;
+    color: #7e641d;
+    background-color: #fcf2d7;
+    border-color: #fbedc7;
   }
 
   &__title {
