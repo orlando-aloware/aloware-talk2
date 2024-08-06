@@ -292,6 +292,7 @@ export default function (/* { ssrContext } */) {
       isDatatableCountLoading: false,
       showedKycReloadDialog: false,
       isTrialBannerVisible: false,
+      isSimpsocialMigrationBannerVisible: true,
       currentTimezone: null,
       hubspotPhoneNumber: null,
       isRedirectedToHubspotWidget: false,
@@ -888,6 +889,10 @@ export default function (/* { ssrContext } */) {
 
       setIsTrialBannerVisible ({ commit }, value) {
         commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
+      },
+
+      setIsSimpsocialMigrationBannerVisible ({ commit }, value) {
+        commit('SET_IS_SIMPSOCIAL_MIGRATION_BANNER_VISIBLE', value)
       },
 
       setCurrentTimezone ({ commit }, timezone) {
@@ -1685,6 +1690,10 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_TRIAL_BANNER_VISIBLE (state, value) {
         state.isTrialBannerVisible = value
+      },
+
+      SET_IS_SIMPSOCIAL_MIGRATION_BANNER_VISIBLE (state, value) {
+        state.isSimpsocialMigrationBannerVisible = value
       },
 
       SET_CURRENT_TIMEZONE (state, timezone) {
