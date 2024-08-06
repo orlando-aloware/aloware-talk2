@@ -356,13 +356,10 @@ export default {
       })
     },
 
-    proceedToLogout() {
-      console.log('proceedToLogout')
+    proceedToLogout () {
       this.$cookies = VueCookies
       const parsedCookieName = `simpsocial-migration-${this.profile.id}`
-      console.log('parsedCookieName', parsedCookieName)
       this.$cookies.set(parsedCookieName, null, 3650)
-      console.log('this.$cookies.get(parsedCookieName)', this.$cookies.get(parsedCookieName))
       this.logoutAction()
     }
   }
