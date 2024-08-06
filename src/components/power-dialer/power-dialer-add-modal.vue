@@ -283,6 +283,7 @@ import * as CompanyTiers from 'src/constants/company-international-tier'
 import { integrationMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import { get, isEmpty } from 'lodash'
+import moment from 'moment'
 
 export default {
   name: 'power-dialer-add-modal',
@@ -360,7 +361,7 @@ export default {
 
     ...mapGetters('powerDialer', ['myQueueId']),
 
-    ...mapState(['isDatatableSelectedAll']),
+    ...mapState(['isDatatableSelectedAll', 'currentTimezone']),
 
     isOpen: {
       get () {
@@ -394,7 +395,7 @@ export default {
       }
 
       if (this.where === 'scheduled') {
-        params.future_scheduled_time = this.schedule.toISOString().slice(0, 19).replace('T', ' ')
+        params.future_scheduled_time = moment(this.schedule).utc().tz(this.currentTimezone).format('YYYY-MM-DD HH:mm:ss')
       }
 
       return params

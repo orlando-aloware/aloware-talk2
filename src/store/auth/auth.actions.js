@@ -3,8 +3,6 @@ import { get } from 'lodash'
 
 const check = async ({ commit }, payload, skipSetAuthenticated) => {
   const preventLogout = get(payload, 'preventLogout', false)
-  const preventRedirect = get(payload, 'preventRedirect', false)
-  const isHubspotWidget = window.location?.href?.includes('hubspot-call-extension') || false
 
   try {
     if (storage.local.getItem('api_token') === null) {
@@ -30,14 +28,6 @@ const check = async ({ commit }, payload, skipSetAuthenticated) => {
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
     commit('SET_CURRENT_TIMEZONE', response.data.user.company.timezone, { root: true })
-
-    if (!preventRedirect &&
-      !isHubspotWidget &&
-      response.data.user.enabled &&
-      response.data.user.company.enabled &&
-      window.location.href.indexOf('/login') !== -1) {
-      window.location.href = '/'
-    }
 
     return response
   } catch (err) {
