@@ -3,7 +3,6 @@ import * as Roles from '../../constants/roles'
 import goBackMixin from './goback.mixin'
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import VueCookies from 'vue-cookies'
 
 export default _.merge({
   methods: {
@@ -220,8 +219,6 @@ export default _.merge({
         this.logout()
           .then(() => {
             this.resetVuex(['all'])
-
-            VueCookies.set(`simpsocial-migration-${this.profile?.id}`, null, 3650)
 
             if (isImpersonating) {
               window.location.href = this.classicLogOutUrl

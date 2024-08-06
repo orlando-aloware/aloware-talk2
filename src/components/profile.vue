@@ -220,7 +220,7 @@
                   clickable
                   v-close-popup
                   data-testid="profile-logout-item"
-                  @click="logoutAction">
+                  @click="proceedToLogout">
             <q-item-section>
               <div class="text-red-80">
                 <logout-icon width="15"
@@ -246,6 +246,7 @@ import * as AgentStatus from 'src/constants/agent-status'
 import LogoutIcon from 'components/icons/logout-icon'
 import HalfMoonIcon from 'components/icons/half-moon-icon'
 import talk2Api from 'src/plugins/api/api'
+import VueCookies from 'vue-cookies'
 
 export default {
   name: 'profile',
@@ -353,6 +354,16 @@ export default {
         this.togglingSleepMode = false
         this.$handleErrors(err.response)
       })
+    },
+
+    proceedToLogout() {
+      console.log('proceedToLogout')
+      this.$cookies = VueCookies
+      const parsedCookieName = `simpsocial-migration-${this.profile.id}`
+      console.log('parsedCookieName', parsedCookieName)
+      this.$cookies.set(parsedCookieName, null, 3650)
+      console.log('this.$cookies.get(parsedCookieName)', this.$cookies.get(parsedCookieName))
+      this.logoutAction()
     }
   }
 }
