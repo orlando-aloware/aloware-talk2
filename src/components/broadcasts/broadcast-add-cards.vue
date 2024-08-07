@@ -20,22 +20,22 @@
         <span class="cards__body__card__text">
           {{ card.text }}
         </span>
-        <warning-note :isCalculatorMessage="true"
-                      v-if="card.showWarning"/>
+        <broadcast-warning-note :isCalculatorMessage="true"
+                                v-if="card.showWarning"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import WarningNote from 'src/components/warning-note.vue'
+import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
 import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-add-cards',
 
   components: {
-    WarningNote
+    BroadcastWarningNote
   },
 
   mixins: [
