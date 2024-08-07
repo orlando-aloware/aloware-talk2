@@ -106,6 +106,12 @@
         </div>
       </template>
     </confirm-dialog>
+
+    <broadcast-send-warning-dialog :is-open="sendWarningDialog.open"
+                                   :campaign="campaign"
+                                   :use-mms-rate="useMmsRate"
+                                   @submit="onSendWarningDialogConfirmed"
+                                   @close="onSendWarningDialogClosed"/>
   </div>
 </template>
 
@@ -116,17 +122,19 @@ import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
 import BroadcastAddViewPreview from './broadcast-add-view-preview.vue'
 import BroadcastAddViewSchedule from './broadcast-add-view-schedule.vue'
 import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
+import BroadcastSendWarningDialog from './broadcast-send-warning-dialog.vue'
 import CompactBtn from 'components/compact-btn.vue'
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import API from 'src/plugins/api/api'
 import { mapGetters, mapState, mapActions } from 'vuex'
-import { companyTimezone } from 'src/plugins/mixins'
+import { broadcastsMixin, companyTimezone } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view',
 
   mixins: [
+    broadcastsMixin,
     companyTimezone
   ],
 
@@ -137,6 +145,7 @@ export default {
     BroadcastAddViewPreview,
     BroadcastAddViewSchedule,
     BroadcastContactsPreview,
+    BroadcastSendWarningDialog,
     CompactBtn,
     ConfirmDialog
   },
@@ -308,6 +317,9 @@ export default {
     },
     optoutMissingDialog: {
       open: false
+    },
+    sendWarningDialog: {
+      open: false
     }
   }),
 
@@ -391,6 +403,15 @@ export default {
       this.setIsOptoutActive(false)
     },
 
+    onSendWarningDialogClosed () {
+      this.sendWarningDialog.open = false
+    },
+
+    onSendWarningDialogConfirmed () {
+      this.sendWarningDialog.open = false
+      this.goToNextStep()
+    },
+
     goToNextStep () {
       this.isMainComponentValid = false
       this.isFooterComponentValid = false
@@ -403,6 +424,12 @@ export default {
       // send outside business hours confirmation
       if (this.currentStep.id === 3 && this.isRestrictedTime && !this.acceptedOutsideBusinessHours) {
         this.outsideBusinessHoursDialog.open = true
+
+        return
+      }
+
+      if (this.currentStep.id === 3 && this.shouldShowWarning) {
+        this.sendWarningDialog.open = true
 
         return
       }
