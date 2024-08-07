@@ -117,7 +117,7 @@ export default {
         this.$generalNotification('Contact has been successfully synced.')
         setTimeout(() => {
           this.$router.push({
-            name: 'Contact',
+            name: 'Texting Widget (unknown-user)',
             params: {
               id: this.contactId
             }
