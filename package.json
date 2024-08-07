@@ -20,7 +20,8 @@
     "deploy-mac": "quasar build -d -m electron -T mac -b builder -P always",
     "deploy-linux": "quasar build -d -m electron -T linux -b builder -P always",
     "deploy-win": "quasar build -d -m electron -T win -b builder -P always",
-    "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always"
+    "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always",
+    "prepare": "husky"
   },
   "dependencies": {
     "@fullstory/browser": "^1.5.1",
@@ -94,6 +95,8 @@
     "@babel/core": "^7.24.0",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
     "@babel/plugin-proposal-optional-chaining": "^7.20.7",
+    "@commitlint/cli": "^19.4.0",
+    "@commitlint/config-conventional": "^19.2.2",
     "@electron/notarize": "^2.3.0",
     "@quasar/app": "^2.4.3",
     "@quasar/quasar-app-extension-dotenv": "^1.0.5",
@@ -120,6 +123,7 @@
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^6.1.2",
+    "husky": "^9.1.4",
     "laravel-echo": "^1.16.0",
     "pusher-js": "^8.3.0",
     "vue-loader": "^15.9.6",
