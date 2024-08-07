@@ -253,7 +253,7 @@ export default {
     async setIntegrationHubspot () {
       this.loading = true
 
-      this.contactsLength = this.integration.list.metaData.size
+      this.contactsLength = parseInt(this.integration.list.additionalProperties.hs_list_size)
 
       // run this to get a preview contact
       await this.getContacts()

@@ -219,6 +219,7 @@ export default _.merge({
         this.logout()
           .then(() => {
             this.resetVuex(['all'])
+
             if (isImpersonating) {
               window.location.href = this.classicLogOutUrl
             }

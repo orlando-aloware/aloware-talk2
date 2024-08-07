@@ -33,6 +33,30 @@
         <p>1. Merging these contacts in HubSpot</p>
         <p>- OR -</p>
         <p>2. Removing the duplicated phone number from either one of these contacts in HubSpot.</p>
+        <b-row v-if='contactId'>
+          <b-button class="text-white"
+                    size="sm"
+                    variant="primary"
+                    tabindex="0"
+                    data-testid="integration-hubspot-sync-button"
+                    @click="syncHubspot">
+            <i class="fa fa-sync-alt" v-if="!isSyncing"></i>
+            <q-spinner-bars v-if="isSyncing"
+                            data-testid="integration-hubspot-sync-spinner"
+                            color="white">
+            </q-spinner-bars>
+            {{ isSyncing ? 'Syncing...' : 'Sync with Hubspot' }}
+            <q-tooltip anchor="center start"
+                       self="center left"
+                       data-testid="integration-hubspot-sync-tooltip"
+                       :offset="[-220, 10]">
+              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and HubSpot.</p>
+              <p class="font-weight-bold">You'll want to click on this button if:</p>
+              <p class="mt-1 mb-0">- The contact was recently merged in HubSpot with another contact.</p>
+              <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and HubSpot data on this contact.</p>
+            </q-tooltip>
+          </b-button>
+        </b-row>
       </div>
       <div v-else-if="errorCode === HubspotMessageError.ERROR_NO_ASSOCIATED_WITH_DEAL_CONTACT">
         <p>Fix by adding a contact with a valid phone number to this deal record on HubSpot.</p>
@@ -50,12 +74,22 @@
 </template>
 <script>
 import * as HubspotMessageError from 'src/constants/hubspot-message-widget-errors'
+import talk2Api from 'src/plugins/api/api'
+import {
+  simpsocialMixin
+} from 'src/plugins/mixins'
 
 export default {
   name: 'hubspot-message-widget-error',
+  mixins: [
+    simpsocialMixin
+  ],
   data () {
     return {
-      HubspotMessageError
+      HubspotMessageError,
+      isSyncing: false,
+      integrationData: null,
+      contactIntegrationDataLoaded: false
     }
   },
   computed: {
@@ -70,6 +104,21 @@ export default {
     },
     integrationSettingsUrl () {
       return window.axios.defaults.baseURL + '/integrations?tab=integrations&name=hubspot'
+    },
+    contactId () {
+      return this.$route.query.contact_id ?? null
+    }
+  },
+  methods: {
+    syncHubspot () {
+      this.isSyncing = true
+      talk2Api.V1.contact.syncHubspot(this.contactId).then(response => {
+        this.isSyncing = false
+        this.$generalNotification('Contact has been successfully synced.')
+        setTimeout(() => {
+          window.location.href = window.axios.defaults.baseURL + '/widgets/texting/contact/' + this.contactId
+        }, 500)
+      })
     }
   }
 }

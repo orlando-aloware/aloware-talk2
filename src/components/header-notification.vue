@@ -92,8 +92,10 @@ export default {
       'profile'
     ]),
 
+    ...mapState(['isSimpsocialMigrationBannerVisible']),
+
     isShow () {
-      return this.showNotification && this.diagnosis.length > 0
+      return this.showNotification && this.diagnosis.length > 0 && !this.isSimpsocialMigrationBannerVisible
     },
 
     firstDiagnosis () {

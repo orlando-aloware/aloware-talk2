@@ -1,8 +1,8 @@
 {
   "name": "aloware-talk2",
-  "version": "1.51.2",
+  "version": "1.52.2",
   "description": "Aloware Agent Interface",
-  "productName": "Aloware Talk",
+  "productName": "Talk",
   "author": "Aloware <support@aloware.com>",
   "private": true,
   "repository": {
@@ -101,6 +101,7 @@
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.2.2",
     "babel-preset-vue": "^2.0.2",
+    "compression-webpack-plugin": "^6.0.0",
     "cors": "^2.8.5",
     "devtron": "^1.4.0",
     "electron": "^25.9.8",
