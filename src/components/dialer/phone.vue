@@ -1919,16 +1919,8 @@ export default {
       return this.dialer.parkedCall && this.dialer.call
     },
 
-    hasNoParkedAndInprogressCall () {
-      return !this.dialer.parkedCall && !this.dialer.call
-    },
-
-    hasCallInProgressNoParkedCall () {
-      return !this.dialer.parkedCall && this.dialer.call
-    },
-
     isNotOnWrapUp () {
-      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall)
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
     },
 
     shouldDisableCallBackButton () {

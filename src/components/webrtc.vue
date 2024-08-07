@@ -58,10 +58,6 @@ export default {
   },
 
   computed: {
-    ...mapState([
-      'ringGroups'
-    ]),
-
     ...mapState('cache', [
       'currentCompany',
       'timezones'
@@ -85,7 +81,6 @@ export default {
       this.getActivityTypes()
       this.getTemplates()
       this.getCampaigns()
-      this.getRingGroups()
     },
 
     startMainEvents () {
