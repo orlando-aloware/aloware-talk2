@@ -264,7 +264,6 @@ export default {
         this.setIsRedirectedToHubspotWidget(true)
       }
 
-      this.$emit('userLoggedIn')
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
 
