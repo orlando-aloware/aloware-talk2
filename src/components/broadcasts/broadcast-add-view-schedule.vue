@@ -76,8 +76,7 @@
       <div class="broadcast-add__schedule__row__fields mx-w-70">
         <contact-line-selector :value="propCampaign?.id"
                                @select="onCampaignSelected"/>
-        <warning-note :campaign="propCampaign"
-                      :useMmsRate="useMmsRate"/>
+        <broadcast-warning-note :campaign="propCampaign"/>
       </div>
     </div>
 
@@ -110,7 +109,7 @@ import ContactLineSelector from 'src/components/contact-line-selector.vue'
 import DateSelector from 'src/components/date-selector.vue'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
-import WarningNote from 'src/components/warning-note.vue'
+import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
 import { classicMixin, companyTimezone } from 'src/plugins/mixins'
 import { mapState, mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
@@ -129,7 +128,7 @@ export default {
     InformationCircleIcon,
     DateSelector,
     ThrottleSelector,
-    WarningNote
+    BroadcastWarningNote
   },
 
   props: {
