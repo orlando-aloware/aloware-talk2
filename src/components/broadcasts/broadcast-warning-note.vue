@@ -10,17 +10,18 @@
 </template>
 
 <script>
+import { broadcastsMixin } from 'src/plugins/mixins'
+
 export default {
-  name: 'WarningNote',
+  name: 'BroadcastWarningNote',
+
+  mixins: [
+    broadcastsMixin
+  ],
 
   props: {
     campaign: {
       type: Object,
-      required: false
-    },
-
-    useMmsRate: {
-      type: Boolean,
       required: false
     },
 
@@ -31,22 +32,6 @@ export default {
   },
 
   computed: {
-    hasTollFreePhoneNumber () {
-      return this.campaign?.has_tollfree_pn
-    },
-
-    showMessageSentAsMmsWarning () {
-      return this.useMmsRate && !this.hasTollFreePhoneNumber
-    },
-
-    showMessageSentFromTollFreeNumberWarning () {
-      return !this.useMmsRate && this.hasTollFreePhoneNumber
-    },
-
-    showMessageSentFromTollFreeNumberAsMmsWarning () {
-      return this.useMmsRate && this.hasTollFreePhoneNumber
-    },
-
     showWarning () {
       return this.showMessageSentAsMmsWarning ||
         this.showMessageSentFromTollFreeNumberWarning ||
