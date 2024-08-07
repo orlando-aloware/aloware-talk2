@@ -5,11 +5,14 @@
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
     </div>
-    <div class="p-3" v-else-if="showAlertCallFinished && dialer && !dialer.parkedCall">
+
+    <div class="p-3"
+         v-else-if="showAlertCallFinished && dialer && !dialer.parkedCall">
       <p><strong>Call Finished</strong></p>
       <hr>
       <p>Please close this window or click the back button to continue.</p>
     </div>
+
     <webrtc
       :carrierName="authProfile.carrier_name"
       :isWidget="true"

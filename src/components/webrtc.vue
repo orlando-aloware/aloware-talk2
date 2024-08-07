@@ -12,13 +12,11 @@
       <parked-call />
     </div>
 
-    <select-campaign-dialog
-      v-else
-      :show="showSelectCampaignDialog"
-      :campaignId="campaignId"
-      @call="handleCall"
-      @change-campaign-id="handleChangeCampaignId"
-    />
+    <select-campaign-dialog :show="showSelectCampaignDialog"
+                            :campaignId="campaignId"
+                            v-else
+                            @call="handleCall"
+                            @change-campaign-id="handleChangeCampaignId"/>
   </div>
 </template>
 
