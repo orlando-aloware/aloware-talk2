@@ -17,9 +17,9 @@ pipeline {
         NODE_VERSION = '20'
         NODE_MODULES_PATH = '/cached_modules/npm/${NODE_VERSION}/talk2/node_modules'
 
-        // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
+        // Fill this with the URL of the MDE instance, for example https://pr-10101.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
-        API_URL_OVERWRITE = ''
+        API_URL_OVERWRITE = 'https://pr-10101.mde.alodev.org'
     }
 
     stages {
