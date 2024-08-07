@@ -1,0 +1,21 @@
+#This script checks if the branch name is valid before allowing the commit to go through.
+local_branch_name=$(git rev-parse --abbrev-ref HEAD)
+
+types='(feature|fix|hotfix|chore|docs|refactor|revert|build|test|style|ci|perf|conflict|cleanup)'
+jiraTicket='[A-Z]+-[0-9]+'
+description='[a-z]+(-[a-z]+)*'
+
+valid_branch_regex="^($jiraTicket\/)?$types\/$description$"
+
+message='\nError: '
+message+='Your branch name is invalid. \n\n'
+message+='Branch names must be: [JIRA-TICKET]/type/description or type/description e.g.: ALO-123/feature/add-pre-commit-hook  \n\n'
+message+='Your commit will be rejected. Please rename your branch to a valid name and try again.\n\n'
+message+='Types allowed: '$types'\n'
+
+if [[ ! "$local_branch_name" =~ $valid_branch_regex ]]; then
+    echo "$message"
+    exit 1
+fi
+
+exit 0
