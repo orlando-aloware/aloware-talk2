@@ -1477,9 +1477,8 @@ export default {
       'showIncomingCallNotification',
       'sessionPhoneExpansion',
       'parkedCalls',
-      'callFishingQueue',
       'isCallBackButtonDisabled',
-      'isWidget'
+      'callFishingQueue'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -2011,20 +2010,16 @@ export default {
     },
 
     goToContact () {
-      if (!this.contact) {
-        return
+      if (this.contact) {
+        this.$router.push({
+          name: 'Contact',
+          params: {
+            id: this.contact.id
+          }
+        }).catch(err => {
+          console.log(err)
+        })
       }
-
-      const contactRouter = {
-        name: 'Contact',
-        params: {
-          id: this.contact.id
-        }
-      }
-
-      this.isWidget
-        ? window.open(this.$router.resolve(contactRouter).href, '_blank')
-        : this.$router.push(contactRouter).catch(err => console.log(err))
     },
 
     copyPhoneNumber (phoneNumber) {
