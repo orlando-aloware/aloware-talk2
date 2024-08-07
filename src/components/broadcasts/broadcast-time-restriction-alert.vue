@@ -14,7 +14,7 @@
 
       <a target="_blank"
          :href="getBroadcastSettingURL()"
-         v-if="hasRole('Company Admin')">
+         v-if="hasRole('Company Admin') && !isSimpSocial">
         <pencil-o-icon />
         <q-tooltip>
           Edit Broadcast time restriction
@@ -26,7 +26,7 @@
 
 <script>
 import PencilOIcon from 'src/components/icons/pencil-o-icon.vue'
-import { aclMixin, classicMixin, companyTimezone } from 'src/plugins/mixins'
+import { aclMixin, classicMixin, companyTimezone, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-time-restriction-alert',
@@ -34,7 +34,8 @@ export default {
   mixins: [
     aclMixin,
     classicMixin,
-    companyTimezone
+    companyTimezone,
+    simpsocialMixin
   ],
 
   components: {
