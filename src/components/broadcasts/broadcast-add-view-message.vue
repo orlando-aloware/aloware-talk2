@@ -15,8 +15,7 @@
         <contact-line-selector :value="campaign?.id"
                                @select="onCampaignSelected"
                                v-if="campaign"/>
-        <warning-note :campaign="campaign"
-                      :useMmsRate="useMmsRate"/>
+        <broadcast-warning-note :campaign="campaign" />
       </div>
     </div>
 
@@ -153,7 +152,7 @@ import MessageComposerSmsPreview from 'src/components/message-composer/message-c
 import Waveform from 'src/components/waveform.vue'
 import ContactLineSelector from 'src/components/contact-line-selector.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
-import WarningNote from 'src/components/warning-note.vue'
+import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { aclMixin, classicMixin, smsMixin, simpsocialMixin } from 'src/plugins/mixins'
 import { IS_OPT_OUT_FORCED_TEXT } from '../../constants/compliance-messages'
@@ -178,7 +177,7 @@ export default {
     Waveform,
     ContactLineSelector,
     ThrottleSelector,
-    WarningNote
+    BroadcastWarningNote
   },
 
   props: {
@@ -309,10 +308,6 @@ export default {
     messageCount () {
       // Return the number of segments
       return this.segments
-    },
-
-    useMmsRate () {
-      return this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
     },
 
     price () {
