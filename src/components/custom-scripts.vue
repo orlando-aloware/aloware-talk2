@@ -33,16 +33,8 @@ export default {
       }
 
       if (this.isModGen) {
-        if (!process.env.HS_CUSTOM_JS_MOD_GENIUS) {
-          return
-        }
-
         this.loadScript(process.env.HS_CUSTOM_JS_MOD_GENIUS)
       } else if (!this.isSimpsocial) {
-        if (!process.env.HS_CUSTOM_JS) {
-          return
-        }
-
         this.loadScript(process.env.HS_CUSTOM_JS)
       }
 
