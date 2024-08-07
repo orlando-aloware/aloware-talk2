@@ -5,10 +5,8 @@
 
     <dialer />
 
-    <div
-      class="p-3"
-      v-if="dialer.parkedCall"
-    >
+    <div class="p-3"
+         v-if="dialer.parkedCall">
       <parked-call />
     </div>
 
