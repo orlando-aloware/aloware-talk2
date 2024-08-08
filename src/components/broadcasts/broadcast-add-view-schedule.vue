@@ -110,7 +110,7 @@ import DateSelector from 'src/components/date-selector.vue'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
 import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
-import { classicMixin, companyTimezone } from 'src/plugins/mixins'
+import { broadcastsMixin, classicMixin, companyTimezone } from 'src/plugins/mixins'
 import { mapState, mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
 
@@ -118,6 +118,7 @@ export default {
   name: 'broadcast-add-view-schedule',
 
   mixins: [
+    broadcastsMixin,
     classicMixin,
     companyTimezone
   ],
@@ -294,6 +295,10 @@ export default {
 
     throttle (value) {
       this.$emit('throttle', value)
+    },
+
+    propCampaign () {
+      this.$emit('price-updated', this.getEstimatedPrice())
     }
   }
 }
