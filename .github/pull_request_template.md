@@ -3,7 +3,7 @@
 
 ## :heavy_equals_sign: Counterpart
 
-[Talk PR](url)
+[api-core PR](url)
 
 ## :package: Packages
 - Updated package A
