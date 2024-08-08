@@ -11,8 +11,6 @@ module.exports = function (/* ctx */) {
   const DotEnv = require('dotenv')
   const parsedEnv = DotEnv.config().parsed
 
-  const CompressionWebpackPlugin = require('compression-webpack-plugin')
-
   if (typeof parsedEnv === 'object' &&
     !Array.isArray(parsedEnv) &&
     parsedEnv !== undefined &&
@@ -57,8 +55,6 @@ module.exports = function (/* ctx */) {
     build: {
       vueRouterMode: 'history',
       devtool: 'source-map',
-      // Split vendor bundle in multiple small chunks
-      gzip: true,
 
       // transpile: false,
 
@@ -70,21 +66,14 @@ module.exports = function (/* ctx */) {
       // rtl: false, // https://quasar.dev/options/rtl-support
       // preloadChunks: true,
       // showProgress: false,
+      // gzip: true,
+      // analyze: true,
 
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
 
       // https://quasar.dev/quasar-cli/handling-webpack
       extendWebpack (cfg) {
-        cfg.plugins.push(new CompressionWebpackPlugin({
-          filename: '[path][base]',
-          algorithm: 'gzip',
-          test: /\.(js|svg)$/,
-          threshold: 0,
-          minRatio: 1,
-          deleteOriginalAssets: true
-        }))
-
         cfg.module.rules.push({
           enforce: 'pre',
           test: /\.(js|vue)$/,
