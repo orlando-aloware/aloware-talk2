@@ -5,7 +5,7 @@
 
 [Talk PR](url)
 
-## Packages
+## :package: Packages
 - Updated package A
 - Added package B
 
