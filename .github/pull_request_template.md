@@ -1,3 +1,10 @@
+## :ticket: Jira Ticket
+[ticket | (description)](url)
+
+## :heavy_equals_sign: Counterpart
+
+[Talk PR](url)
+
 ## Packages
 - Updated package A
 - Added package B
