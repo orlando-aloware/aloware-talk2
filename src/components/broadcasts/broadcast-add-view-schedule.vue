@@ -204,10 +204,6 @@ export default {
         : this.schedule.time
 
       return time >= this.currentCompany.broadcast_open && time <= this.currentCompany.broadcast_close
-    },
-
-    useMmsRate () {
-      return this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
     }
   },
 
