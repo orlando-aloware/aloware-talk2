@@ -1477,8 +1477,9 @@ export default {
       'showIncomingCallNotification',
       'sessionPhoneExpansion',
       'parkedCalls',
+      'callFishingQueue',
       'isCallBackButtonDisabled',
-      'callFishingQueue'
+      'isWidget'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -1918,8 +1919,16 @@ export default {
       return this.dialer.parkedCall && this.dialer.call
     },
 
+    hasNoParkedAndInprogressCall () {
+      return !this.dialer.parkedCall && !this.dialer.call
+    },
+
+    hasCallInProgressNoParkedCall () {
+      return !this.dialer.parkedCall && this.dialer.call
+    },
+
     isNotOnWrapUp () {
-      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall)
     },
 
     shouldDisableCallBackButton () {
@@ -2010,16 +2019,20 @@ export default {
     },
 
     goToContact () {
-      if (this.contact) {
-        this.$router.push({
-          name: 'Contact',
-          params: {
-            id: this.contact.id
-          }
-        }).catch(err => {
-          console.log(err)
-        })
+      if (!this.contact) {
+        return
       }
+
+      const contactRouter = {
+        name: 'Contact',
+        params: {
+          id: this.contact.id
+        }
+      }
+
+      this.isWidget
+        ? window.open(this.$router.resolve(contactRouter).href, '_blank')
+        : this.$router.push(contactRouter).catch(err => console.log(err))
     },
 
     copyPhoneNumber (phoneNumber) {
