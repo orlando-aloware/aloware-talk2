@@ -58,5 +58,17 @@ export default {
       console.log(err)
       this._vm.$handleErrors(err.response)
     }
+  },
+
+  setSmartEncodedMessageLength ({ commit }, messageLength) {
+    commit('SET_SMART_ENCODED_MESSAGE_LENGTH', messageLength)
+  },
+
+  setSelectedCampaign ({ commit }, campaign) {
+    commit('SET_SELECTED_CAMPAIGN', campaign)
+  },
+
+  setContactsLength ({ commit }, length) {
+    commit('SET_CONTACTS_LENGTH', length)
   }
 }
