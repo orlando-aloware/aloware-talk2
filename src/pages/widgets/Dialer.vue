@@ -1,5 +1,7 @@
 <template>
   <div>
+    <dialer-listeners @user-logged-in="handleUserLogin"
+                      @agent-status-updated="handleAgentStatusUpdate"/>
     <div class="p-3" v-if="showAlertAgentOnCall">
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
@@ -32,10 +34,14 @@ import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { timezoneCheckMixin, helperMixin } from 'src/plugins/mixins'
+import DialerListeners from 'components/dialer-listeners.vue'
 
 export default {
   name: 'Dialer',
-  components: { Webrtc },
+  components: {
+    Webrtc,
+    DialerListeners
+  },
 
   mixins: [ timezoneCheckMixin, helperMixin ],
 
@@ -48,6 +54,7 @@ export default {
   data () {
     return {
       isFirstLoading: true,
+      isDialed: false,
       loading: false,
       small: false,
       initialized: false,
@@ -98,7 +105,11 @@ export default {
       defaultOutboundCampaignId: null,
       previousOutboundCallingMode: null,
       showAlertCallFinished: false,
-      authProfile: null
+      authProfile: null,
+      listeners: {
+        userLoggedIn: null,
+        agentStatusUpdated: null
+      }
     }
   },
   computed: {
@@ -131,9 +142,6 @@ export default {
 
   async mounted () {
     await this.init()
-
-    this.$VueEvent.listen('userLoggedIn', this.handleUserLogin)
-    this.$VueEvent.listen('agent_status_updated', this.handleAgentStatusUpdate)
     this.isFirstLoading = false
   },
 
@@ -141,7 +149,8 @@ export default {
     ...mapActions('auth', {
       logoutUser: 'logout',
       check: 'check',
-      clear: 'clear'
+      clear: 'clear',
+      setAgentStatus: 'setAgentStatus'
     }),
 
     ...mapActions([
@@ -165,7 +174,7 @@ export default {
           this.setCurrentCompany(res.data.user.company)
           this.resetVuex(['all'])
         }
-        this.authProfile = res.data.user
+        this.authProfile = res.data?.user
         this.loading = false
         this.initialized = true
         this.handleUserLogin()
@@ -276,6 +285,7 @@ export default {
       }
 
       this.checkContactTimezone(contactData, this.makeCall)
+      this.isDialed = true
 
       if (shouldHandleDialNumber) {
         this.handleDialNumber(this.hubspotPhoneNumber)
@@ -284,15 +294,16 @@ export default {
 
     handleAgentStatusUpdate (data) {
       const agentStatus = data.agent_status
+      this.setAgentStatus(agentStatus)
 
-      if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-        this.showAlertCallFinished = false
+      if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.isDialed) {
         this.showAlertAgentOnCall = true
+        this.showAlertCallFinished = false
       }
 
       if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.showAlertAgentOnCall) {
         this.showAlertAgentOnCall = false
-        this.showAlertCallFinished = true
+        this.handleDialNumber(this.hubspotPhoneNumber)
       }
     },
 
