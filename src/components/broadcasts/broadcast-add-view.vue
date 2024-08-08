@@ -108,7 +108,7 @@
     </confirm-dialog>
 
     <broadcast-send-warning-dialog :is-open="sendWarningDialog.open"
-                                   :campaign="campaign"
+                                   :campaign="selectedCampaign"
                                    :use-mms-rate="useMmsRate"
                                    @submit="onSendWarningDialogConfirmed"
                                    @close="onSendWarningDialogClosed"/>
@@ -183,6 +183,11 @@ export default {
       'isOptoutActive'
     ]),
 
+    ...mapState('broadcast', [
+      'selectedCampaign',
+      'contactsLength'
+    ]),
+
     mainComponent () {
       switch (this.currentStep.id) {
         case 1:
@@ -204,21 +209,19 @@ export default {
           return { defaultSource: this.source }
         case 2:
           return {
-            propCampaign: this.campaign,
+            propCampaign: this.selectedCampaign,
             propThrottle: this.throttle,
-            contactsLength: this.contactsLength,
             rvm: this.rvm
           }
         case 3:
           return {
-            propCampaign: this.campaign,
+            propCampaign: this.selectedCampaign,
             propThrottle: this.throttle,
             propTime: this.time
           }
         case 4:
           return {
-            campaign: this.campaign,
-            contactsLength: this.contactsLength,
+            propCampaign: this.selectedCampaign,
             date: this.date,
             isScheduled: this.time.time === 'scheduled',
             source: this.source,
@@ -301,11 +304,9 @@ export default {
     isMainComponentValid: false,
     isFooterComponentValid: false,
     source: {},
-    contactsLength: 0,
     type: 'sms', // sms, voicemail
     rvm: null,
     price: 0,
-    campaign: null,
     throttle: null,
     time: null, // holds the schedule's time options
     date: null, // holds the send datetime
@@ -329,7 +330,13 @@ export default {
       'setMessageComposerSmsBody',
       'setMessageComposerSmsGif',
       'setMessageComposerAttachments',
-      'setIsOptoutActive'
+      'setIsOptoutActive',
+      'setSelectedLine'
+    ]),
+
+    ...mapActions('broadcast', [
+      'setSelectedCampaign',
+      'setContactsLength'
     ]),
 
     mainComponentChanged (state) {
@@ -365,7 +372,8 @@ export default {
     },
 
     onCampaignUpdated (campaign) {
-      this.campaign = campaign
+      this.setSelectedCampaign(campaign)
+      this.setSelectedLine(campaign)
     },
 
     onThrottleUpdated (throttle) {
@@ -457,7 +465,7 @@ export default {
     },
 
     onContactsLength (count) {
-      this.contactsLength = count
+      this.setContactsLength(count)
     },
 
     send () {
@@ -467,7 +475,7 @@ export default {
       const bulkMessage = {
         name: '',
         count: this.contactsLength,
-        campaign_id: this.campaign.id,
+        campaign_id: this.selectedCampaign.id,
         run_at_date: this.date.substr(0, 10),
         run_at_time: this.date.substr(11, 10),
         message_body: this.messageBodyWithOptout,
