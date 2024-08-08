@@ -1,4 +1,4 @@
-## :ticket: Jira Ticket <ALO-123>
+## :ticket: Jira Ticket ALO-123
 
 ## :heavy_equals_sign: Counterpart
 
