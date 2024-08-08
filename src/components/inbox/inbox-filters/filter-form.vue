@@ -447,7 +447,7 @@ import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapMutations } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
@@ -664,6 +664,7 @@ export default {
 
   methods: {
     ...mapActions(['setTags']),
+    ...mapMutations(['SET_IS_FIRST_LOAD']),
 
     onFilterChange (value, prop) {
       this.filter[prop] = value
@@ -681,6 +682,10 @@ export default {
     getDateRangeInputLabel () {
       if (this.dateRange.startDate && this.dateRange.endDate) {
         return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
+      }
+
+      if (!this.dateRange.startDate && !this.dateRange.endDate && this.$store.state.isFirstLoad) {
+        return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
       }
 
       return 'All Time'
@@ -735,8 +740,16 @@ export default {
   },
 
   mounted () {
-    this.dateRange.startDate = this.filter.from_date
-    this.dateRange.endDate = this.filter.to_date
+    if (this.$store.state.isFirstLoad) {
+      this.SET_IS_FIRST_LOAD(false)
+
+      this.dateRange.startDate = this.ranges['Last 30 Days'][0]
+      this.dateRange.endDate = this.ranges['Last 30 Days'][1]
+    } else {
+      this.dateRange.startDate = this.filter.from_date
+      this.dateRange.endDate = this.filter.to_date
+    }
+
     this.rangePicker = this.$refs.picker
     this.selectedTags = this.getTagsObjectsByIds(this.filter?.tags)
 
