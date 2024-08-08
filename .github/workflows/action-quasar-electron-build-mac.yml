@@ -103,6 +103,7 @@ jobs:
           ENV_KYC_SSU_ENABLED: ${{ secrets.kyc_ssu_enabled }}
           ENV_HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
           ENV_HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
+          ENV_HS_DISABLE_TRACKER: ${{ secrets.hs_disable_tracker }}
           ENV_XMAS_ENABLED: ${{ secrets.xmas_enabled }}
           ENV_XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
@@ -175,6 +176,8 @@ jobs:
           HS_CUSTOM_JS_MOD_GENIUS: ${{ secrets.hs_custom_js_mod_genius }}
           # All others
           HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
+          # Disable HubSpot tracker
+          HS_DISABLE_TRACKER: ${{ secrets.hs_disable_tracker }}
 
           # Xmas
           XMAS_ENABLED: ${{ secrets.xmas_enabled }}
