@@ -51,6 +51,13 @@ export default {
         loadImmediately: false
       }
 
+      if (this.isTrackerDisabled()) {
+        window._hsq = window._hsq || []
+        window._hsq.push(['doNotTrack', true])
+      } else {
+        document.cookie = '__hs_do_not_track=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+      }
+
       this.initiateHubspotConversationsWithUserDetails()
     },
 
@@ -139,6 +146,10 @@ export default {
       }
 
       this.remove()
+    },
+
+    isTrackerDisabled () {
+      return process.env.HS_DISABLE_TRACKER || false
     }
   },
 
