@@ -1718,7 +1718,6 @@ export default function (/* { ssrContext } */) {
       },
 
       SET_IS_FIRST_LOAD (state, value) {
-        console.log('es falos? ', value)
         state.isFirstLoad = value
       },
       updateField
