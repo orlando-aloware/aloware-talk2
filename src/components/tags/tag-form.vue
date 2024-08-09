@@ -44,12 +44,14 @@
                         class="color-picker">
               <template #button-content>
                 <i class="fa fa-square fa-2x"
+                   data-testid="tags-edit-modal-color-button-content"
                    :style="{ color: tag.color }">
                 </i>
               </template>
 
               <b-dropdown-item :key="`color-${option}`"
                                v-for="option in colorOptions"
+                               data-testid="tags-edit-modal-color-option"
                                @click="selectTagColor(option)">
                   <span class="color-pick"
                         :class="[tag.color === option ? 'selected' : '']">
