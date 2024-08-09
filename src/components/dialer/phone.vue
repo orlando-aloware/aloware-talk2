@@ -668,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="isNotDisposed || isNotOnWrapUp"
+                  :disabled="shouldDisableCallBackButton"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -1477,6 +1477,7 @@ export default {
       'showIncomingCallNotification',
       'sessionPhoneExpansion',
       'parkedCalls',
+      'isCallBackButtonDisabled',
       'callFishingQueue'
     ]),
 
@@ -1919,6 +1920,10 @@ export default {
 
     isNotOnWrapUp () {
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.hasParkedAndInprogressCall
+    },
+
+    shouldDisableCallBackButton () {
+      return this.isNotDisposed || this.isNotOnWrapUp || this.isCallBackButtonDisabled
     }
   },
 
