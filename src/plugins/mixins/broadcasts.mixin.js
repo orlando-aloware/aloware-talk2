@@ -2,6 +2,12 @@ import { mapGetters, mapState } from 'vuex'
 import { aclMixin, smsMixin } from 'src/plugins/mixins'
 
 export default {
+  data () {
+    return {
+      charactersPerPage: 160
+    }
+  },
+
   mixins: [
     aclMixin,
     smsMixin
