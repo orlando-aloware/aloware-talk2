@@ -161,14 +161,7 @@ export default {
         storage.local.setItem('shared_cookie', res.data.meta.hashed_token)
         storage.local.setItem('api_token', res.data.meta.token)
         this.clearError()
-        this.onLoginSuccess({
-          data: {
-            data: {
-              usage: res.data?.data?.usage ?? null,
-              company: res.data?.data?.company ?? null
-            }
-          }
-        })
+        window.location.reload()
       }).catch(err => {
         console.log(err)
         this.verificationMessage = err.response.data.message
@@ -252,19 +245,16 @@ export default {
         return
       }
 
-      let redirectPath = '/'
-      const redirectQuery = this.$route.query?.redirect
+      const redirectQuery = this.$route.query.redirect
+      const decodedRedirect = decodeURIComponent(redirectQuery)
 
-      if (redirectQuery) {
-        redirectPath = decodeURIComponent(redirectQuery)
-      }
+      let redirectPath = decodedRedirect || '/'
 
       if (this.hubspotWidget) {
         redirectPath = '/widgets/hubspot-call-extension'
         this.setIsRedirectedToHubspotWidget(true)
       }
 
-      this.$emit('userLoggedIn')
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
 

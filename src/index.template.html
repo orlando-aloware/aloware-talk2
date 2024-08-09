@@ -47,12 +47,12 @@
       faviconElements.forEach(element => updateFavicon(element, 'company-357-favicon.ico'))
     } else {
       // If not a reseller, determine favicon path based on the environment
-      const env = process.env.APP_ENV
+      const env = '<%= process.env.APP_ENV %>';
       faviconElements.forEach(element => {
         const size = element.replace('favicon', '')
         const isIco = size === 'Ico'
-        const suffix = isIco ? 'ico' : `${size}x${size}.png`
-        const filename = env !== "production" ? `favicon-dev-${suffix}` : `favicon-${suffix}`
+        const suffix = isIco ? '.ico' : `-${size}x${size}.png`
+        const filename = env !== "production" ? `favicon-dev${suffix}` : `favicon${suffix}`
         updateFavicon(element, filename)
       })
     }
