@@ -76,15 +76,15 @@ export default {
     },
 
     showMessageSentAsMmsWarning () {
-      return this.useMmsRate && !this.hasTollFreePhoneNumber
+      return this.shouldApplyMmsRate && !this.hasTollFreePhoneNumber
     },
 
     showMessageSentFromTollFreeNumberWarning () {
-      return !this.useMmsRate && this.hasTollFreePhoneNumber
+      return !this.shouldApplyMmsRate && this.hasTollFreePhoneNumber
     },
 
     showMessageSentFromTollFreeNumberAsMmsWarning () {
-      return this.useMmsRate && this.hasTollFreePhoneNumber
+      return this.shouldApplyMmsRate && this.hasTollFreePhoneNumber
     },
 
     shouldShowWarning () {
