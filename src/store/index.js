@@ -68,7 +68,6 @@ export default function (/* { ssrContext } */) {
       firstLogin: false,
       userStatus: false,
       oldAgentStatus: false,
-      usage: null,
       dialer: {
         token: null,
         call: null,
