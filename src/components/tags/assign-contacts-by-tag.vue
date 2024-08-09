@@ -45,7 +45,9 @@
                        data-testid="tags-assign-contacts-by-tag-distribute-contacts"
                        v-model="distributeContacts">
         <span class="font-weight-bold"
-              data-testid="tags-assign-contacts-by-tag-distribute-contacts-label">Also distribute assigned contacts</span>
+              data-testid="tags-assign-contacts-by-tag-distribute-contacts-label">
+              Also distribute assigned contacts
+        </span>
       </b-form-checkbox>
     </div>
 

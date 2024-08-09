@@ -169,7 +169,7 @@ export default {
 
     openModal: {
       get () {
-        // Add data-testid to the puch contacts to toggle buttons
+        // Add data-testid to the push contacts to toggle buttons
         if (this.isShow) {
           this.$nextTick(() => {
             const toggleButtons = document.querySelectorAll('[data-testid="tags-add-to-power-dialer-modal-push-contacts-toggle"] button')

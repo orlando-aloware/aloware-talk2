@@ -645,8 +645,8 @@ export default {
   },
 
   watch: {
-    paginationPage: function (newPage) {
-      this.$emit('paginated', { page: newPage, per_page: this.perPage })
+    paginationPage: function () {
+      this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
     },
 
     perPage: function () {
