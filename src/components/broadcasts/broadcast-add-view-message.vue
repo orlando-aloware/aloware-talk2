@@ -80,7 +80,7 @@
               </q-tooltip>
             </q-checkbox>
           <span class="mr-4">
-            Message parts: {{ messagePartCount }} / {{ baseLine }}
+            Message parts: {{ messagePartCount }} / {{ charactersPerPage }}
           </span>
           <span>
             Message(s): {{ messageCount() }}
@@ -290,14 +290,10 @@ export default {
       return false
     },
 
-    baseLine () {
-      return this.segmentMaxChars
-    },
-
     messagePartCount () {
       if (this.smsBodyLength > 0) {
-        const count = this.smartEncodedMessageLength % this.segmentUsedChars
-        return (count === 0 ? this.segmentMaxChars : count) || this.smartEncodedMessageLength
+        const count = this.smartEncodedMessageLength % this.charactersPerPage
+        return (count === 0 ? this.charactersPerPage : count) || this.smartEncodedMessageLength
       }
 
       return 0
@@ -385,7 +381,6 @@ export default {
         const newBody = this.messageComposer.sms.body.substring(0, this.maxSmsBodyWithOptoutLength)
         this.setMessageComposerSmsBody(newBody)
         this.messageLength(newBody)
-        this.getMessageInfo(newBody)
       }
     },
 
