@@ -13,6 +13,7 @@
                :current-page="pagination.currentPage"
                :last-page="pagination.lastPage"
                :is-selected-all="isSelectedAll"
+               data-testid="tags-datatable"
                @paginated="paginated"
                @sort="sort"
                @checked="selectAllCheckboxChange">
@@ -20,11 +21,13 @@
       <template #tbody>
         <tr class="datatable-row"
             :key="`${index}`"
+            data-testid="tags-table-row"
             v-for="(tag, index) in tags">
 
           <template v-for="(column, colIndex) in columns">
             <td v-if="column.name === 'checkbox' && hasRole('Company Admin')"
                 :key="`col-${colIndex}`"
+                data-testid="tags-table-row-checkbox"
                 class="text-left pull-left datatable-row__checkbox">
 
                 <label class="custom-checkbox-container">
@@ -195,6 +198,7 @@
     <!-- contacts tag actions -->
     <tag-contacts-splitter :is-show="isOpenTagContactsSplitterDialog"
                            :tag="selectedTag"
+                           data-testid="tags-contacts-splitter"
                            @closeAssignContactsTagModal="closeContactTagsActionsModals" />
 
     <assign-contacts-by-tag :is-show="isOpenAssignContactsTagDialog"

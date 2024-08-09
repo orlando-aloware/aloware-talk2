@@ -3,6 +3,7 @@
            modal-class="tags__modal"
            size="md"
            centered
+           data-testid="tags-add-to-power-dialer-modal"
            v-model="openModal"
            @hide="closeModalPrompt">
     <b-overlay no-wrap
@@ -16,7 +17,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>{{ formName }}</h6>
+      <h6 data-testid="tags-add-to-power-dialer-modal-title">{{ formName }}</h6>
     </template>
 
     <p class="text-13 text-amber-10">
@@ -28,6 +29,7 @@
       <b-row class="no-gutters">
         <b-col class="mr-1">
           <b-form-group class="font-weight-light text-13 mb-0"
+                        data-testid="tags-add-to-power-dialer-modal-user-box"
                         label="User">
             <user-selector :generic-styling="false"
                            v-model="userId"
@@ -37,6 +39,7 @@
 
         <b-col class="ml-1">
           <b-form-group class="font-weight-light text-13 mb-0"
+                        data-testid="tags-add-to-power-dialer-modal-pd-list-box"
                         label="Power Dialer List">
             <power-dialer-list-selector v-model="powerDialerListId"
                                         :user-id="userId"
@@ -48,7 +51,8 @@
     </div>
 
     <div class="py-3">
-      <label class="label mt-2 mb-1 font-weight-bold">
+      <label class="label mt-2 mb-1 font-weight-bold"
+             data-testid="tags-add-to-power-modal-push-contacts-label">
         Push Contacts To
       </label>
       <q-btn-toggle class="custom-toggle-button"
@@ -60,12 +64,13 @@
                     spread
                     unelevated
                     :options="directionOptions"
+                    data-testid="tags-add-to-power-dialer-modal-push-contacts-toggle"
                     v-model="direction" />
-
       <b-form-checkbox class="mx-2 mt-2"
                        :value="option.value"
                        :key="option.value"
                        v-model="conversion"
+                       data-testid="tags-add-to-power-dialer-modal-checkbox"
                        v-for="option in conversionOptions">
           {{ option.text }}
         <information-circle-icon color="#2F80ED"
@@ -79,6 +84,7 @@
     </div>
 
     <p class="text-13 mt-2 mb-0"
+       data-testid="tags-add-to-power-dialer-modal-tag-name"
        v-if="!isBulk"
        v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
 
@@ -86,11 +92,13 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
           <button class="btn btn-sm btn-outline-dark mr-2"
+                  data-testid="tags-add-to-power-dialer-modal-cancel-button"
                   @click.prevent="closeModalPrompt">
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
                   :disabled="!userId"
+                  data-testid="tags-add-to-power-dialer-modal-add-button"
                   @click.prevent="addTasksToPowerDialer">
             Add Tasks
           </button>
@@ -161,6 +169,17 @@ export default {
 
     openModal: {
       get () {
+        // Add data-testid to the puch contacts to toggle buttons
+        if (this.isShow) {
+          this.$nextTick(() => {
+            const toggleButtons = document.querySelectorAll('[data-testid="tags-add-to-power-dialer-modal-push-contacts-toggle"] button')
+            if (toggleButtons.length) {
+              toggleButtons[0].setAttribute('data-testid', 'tags-add-to-power-dialer-modal-push-to-bottom')
+              toggleButtons[1].setAttribute('data-testid', 'tags-add-to-power-dialer-modal-push-to-top')
+            }
+          })
+        }
+
         return this.isShow
       },
 

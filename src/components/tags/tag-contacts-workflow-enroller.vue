@@ -3,6 +3,7 @@
            modal-class="tags__modal"
            size="md"
            centered
+           data-testid="tags-contacts-wokflow-enroller-modal"
            v-model="openModal"
            @hide="closeModalPrompt">
     <b-overlay rounded="sm"
@@ -16,7 +17,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>{{ formName }}</h6>
+      <h6 data-testid="tags-contacts-wokflow-enroller-modal-title">{{ formName }}</h6>
     </template>
 
     <div>
