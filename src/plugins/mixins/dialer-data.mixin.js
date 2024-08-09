@@ -10,8 +10,7 @@ export default {
       loadingCallDispositionStatuses: false,
       loadingActivityTypes: false,
       loadingTemplates: false,
-      loadingCampaigns: false,
-      loadingRingGroups: false
+      loadingCampaigns: false
     }
   },
 
@@ -23,7 +22,6 @@ export default {
       'setTemplates',
       'setCampaigns',
       'setCampaignsIsLoading',
-      'setRingGroups',
       'setUsers',
       'setUsersIsLoading'
     ]),
@@ -127,29 +125,6 @@ export default {
           .catch((err) => {
             console.log(err)
             this.loadingCampaigns = false
-
-            return Promise.reject()
-          })
-      }
-    },
-
-    getRingGroups () {
-      if (this.hasPermissionTo('list ring group')) {
-        this.loadingRingGroups = true
-
-        return this.$axios
-          .get('/api/v1/ring-group', {
-            mode: 'no-cors'
-          })
-          .then((res) => {
-            this.setRingGroups(res.data)
-            this.loadingRingGroups = false
-
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingRingGroups = false
 
             return Promise.reject()
           })

@@ -116,7 +116,14 @@ export default {
         this.isSyncing = false
         this.$generalNotification('Contact has been successfully synced.')
         setTimeout(() => {
-          window.location.href = window.axios.defaults.baseURL + '/widgets/texting/contact/' + this.contactId
+          this.$router.push({
+            name: 'Texting Widget (unknown-user)',
+            params: {
+              id: this.contactId
+            }
+          }).catch(err => {
+            console.log(err)
+          })
         }, 500)
       })
     }
