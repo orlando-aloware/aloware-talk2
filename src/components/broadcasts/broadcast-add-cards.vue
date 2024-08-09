@@ -21,6 +21,7 @@
           {{ card.text }}
         </span>
         <broadcast-warning-note :isCalculatorMessage="true"
+                                :campaign="campaign"
                                 v-if="card.showWarning"/>
       </div>
     </div>
@@ -52,6 +53,11 @@ export default {
       type: Number,
       required: false,
       default: 0
+    },
+
+    campaign: {
+      type: Object,
+      required: false
     }
   },
 

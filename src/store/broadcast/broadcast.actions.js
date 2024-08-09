@@ -60,6 +60,10 @@ export default {
     }
   },
 
+  fetchCarrierFees () {
+    return API.V1.carrierFees.get()
+  },
+
   setSmartEncodedMessageLength ({ commit }, messageLength) {
     commit('SET_SMART_ENCODED_MESSAGE_LENGTH', messageLength)
   },
