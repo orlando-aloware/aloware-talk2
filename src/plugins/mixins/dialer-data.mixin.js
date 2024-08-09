@@ -23,6 +23,8 @@ export default {
       'setTemplates',
       'setCampaigns',
       'setCampaignsIsLoading',
+      'setUsers',
+      'setUsersIsLoading',
       'setRingGroups'
     ]),
 
@@ -127,6 +129,28 @@ export default {
             this.loadingCampaigns = false
 
             return Promise.reject()
+          })
+      }
+    },
+
+    getUsers () {
+      // This function is equal to the one on the MainLayout
+      if (this.hasPermissionTo('list user')) {
+        this.loadingUsers = true
+        this.setUsersIsLoading(true)
+
+        return this.$axios
+          .get('/api/v2/users', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setUsers(res.data)
+            this.loadingUsers = false
+            this.setUsersIsLoading(false)
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingUsers = false
           })
       }
     },

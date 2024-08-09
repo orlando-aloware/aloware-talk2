@@ -96,6 +96,7 @@ export default {
     initAuth () {
       this.broadcastInit()
 
+      this.getUsers()
       this.getDispositionStatuses()
       this.getCallDispositions()
       this.getActivityTypes()
