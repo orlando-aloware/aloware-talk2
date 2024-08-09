@@ -72,7 +72,7 @@ jobs:
         run: yarn install && yarn global add @quasar/cli
 
       - name: Make dotenv file
-        uses: ozaytsev86/create-env-file@v1
+        uses: ozaytsev86/create-env-file-action@v1
         with:
           ENV_APP_NAME: ${{ secrets.app_name }}
           ENV_APP_ENV: ${{ secrets.app_env }}
