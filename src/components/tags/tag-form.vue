@@ -26,6 +26,7 @@
                     invalid-feedback="Please provide a tag name"
                     :state="validateState('name')">
         <b-form-input placeholder="Enter tag name"
+                      data-testid="tags-edit-modal-input-name"
                       v-model="$v.tag.name.$model"
                       required />
       </b-form-group>
@@ -39,6 +40,7 @@
                         :state="validateState('color')">
             <b-dropdown variant="light"
                         size="sm"
+                        data-testid="tags-edit-modal-color"
                         class="color-picker">
               <template #button-content>
                 <i class="fa fa-square fa-2x"
@@ -76,6 +78,7 @@
                              :show-labels="false"
                              :allow-empty="false"
                              :disabled="disabled"
+                             data-testid="tags-edit-modal-category"
                              v-model="category"
                              @select="selectTagCategory" />
           </b-form-group>
@@ -97,6 +100,7 @@
         <b-form-textarea id="textarea"
                          rows="3"
                          placeholder="Enter tag description"
+                         data-testid="tags-edit-modal-description"
                          v-model="$v.tag.description.$model"/>
       </b-form-group>
     </b-form>
@@ -105,11 +109,13 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
+                    data-testid="tags-edit-modal-cancel-button"
                     @click.prevent="closeModalPrompt">
               Cancel
             </button>
             <button class="btn btn-sm bg-primary text-white"
                     :disabled="$v.$invalid"
+                    data-testid="tags-edit-modal-update-button"
                     @click.prevent="saveTag">
               {{ submitButtonLabel }}
             </button>
@@ -277,6 +283,12 @@ export default {
     },
 
     openTagForm () {
+      // Add data-testid to elements that can't be accessed inside template code
+      this.$nextTick(() => {
+        document.querySelector('.modal-header > .close').setAttribute('data-testid', 'tags-edit-modal-close-button')
+        document.querySelector('[data-testid="tags-edit-modal-category"] input').setAttribute('data-testid', 'tags-edit-modal-category-input')
+      })
+
       this.setTag()
       this.setTagCategory(this.presetCategory)
     },
@@ -303,13 +315,20 @@ export default {
         cancelTitle: 'No, I\'m not',
         size: 'sm',
         buttonSize: 'sm',
-        centered: true
+        centered: true,
+        footerClass: 'close-edit-modal-footer-class'
       })
         .then(confirm => {
           if (confirm) {
             this.closeTagForm()
           }
         })
+
+      this.$nextTick(() => {
+        document.querySelector('.close-edit-modal-footer-class > .btn-primary').setAttribute('data-testid', 'tags-close-edit-modal-confirm-button')
+        document.querySelector('.close-edit-modal-footer-class > .btn-secondary').setAttribute('data-testid', 'tags-close-edit-modal-cancel-button')
+        console.log('Button', document.querySelector('.close-edit-modal-footer-class > .btn-primary'))
+      })
     },
 
     closeTagForm () {

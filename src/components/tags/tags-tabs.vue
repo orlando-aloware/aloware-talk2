@@ -11,7 +11,8 @@
                   :options="options"
                   v-model="currentTab">
       <template v-slot:one>
-        <div class="options" data-testid="tags-toggle-buttons-communication-tag">
+        <div class="options"
+             data-testid="tags-toggle-buttons-communication-tag">
           <span class="toggle-button-name">Communication Tags</span>
           <span class="ml-1 align-bottom badge-active-count">
             {{ categoriesCount.communications | numFormat }}
@@ -19,9 +20,9 @@
         </div>
       </template>
 
-      <template v-slot:two
-                data-testid="tags-toggle-buttons-contact-tag">
-        <div class="options">
+      <template v-slot:two>
+        <div class="options"
+             data-testid="tags-toggle-buttons-contact-tag">
           <span class="toggle-button-name">Contact Tags</span>
           <span class="ml-1 align-bottom badge-active-count">
             {{ categoriesCount.contacts | numFormat }}

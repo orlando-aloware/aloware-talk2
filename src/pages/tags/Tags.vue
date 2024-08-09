@@ -27,7 +27,7 @@
                     size="sm"
                     variant="primary"
                     :title="`Add ${ tagCategoryName } Tag`"
-                    data-testid="tags-button-add-contact-tag"
+                    data-testid="tags-button-add-tag"
                     v-if="isAdmin || isSupervisor"
                     @click="openTagForm">
             <i class="fa fa-plus"></i>
