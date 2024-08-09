@@ -279,7 +279,8 @@ export default function (/* { ssrContext } */) {
         path: null,
         referer: null,
         whitelabel: false,
-        xmas_enabled: false
+        xmas_enabled: false,
+        kyc_ssu_enabled: false
       },
       staticsLoaded: false,
       isWhiteLabel: false,
