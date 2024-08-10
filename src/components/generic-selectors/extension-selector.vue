@@ -6,7 +6,7 @@
               color="primary"
               option-value="value"
               option-label="label"
-              input-debounce="0"
+              input-debounce="300"
               style="word-break: break-all;"
               emit-value
               map-options
@@ -101,18 +101,11 @@ export default {
     },
 
     availableExtensions () {
-      const availableExtensions = []
-      const item = { i: 100 }
-      // fill the extensions array
-      for (item.i = 100; item.i < 1000; item.i++) {
-        availableExtensions.push(item.i.toString())
-      }
-
       // find used extensions
       const usedExtensions = this.users ? this.users.map(user => (user.extension) ? user.extension : null).filter(o => o !== null) : []
 
       // remove used extensions from available extensions
-      return availableExtensions.filter((extension) => !usedExtensions.includes(extension))
+      return this.available_extensions.filter((extension) => !usedExtensions.includes(extension))
     }
   },
 
@@ -120,6 +113,7 @@ export default {
     return {
       selectedId: this.value,
       options: [],
+      available_extensions: [],
       reference: 'wrapUpSelector',
       compareProperty: null,
       fullOptionsProperty: 'availableExtensions'
@@ -130,19 +124,27 @@ export default {
     filterFn (val, update) {
       if (val === '') {
         update(() => {
-          this.options = this.availableExtensions
+          this.options = this.availableExtensions.slice(0, 100)
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.availableExtensions.filter(item => item.toLowerCase().indexOf(needle) > -1)
+        this.options = this.availableExtensions.filter(item => item.toLowerCase().indexOf(needle) > -1).slice(0, 100)
       })
+    },
+
+    initializeExtensions () {
+      // fill the extensions array
+      for (let i = 100; i < 100000; i++) {
+        this.available_extensions.push(i.toString())
+      }
     }
   },
   mounted () {
-    this.options = this.availableExtensions
+    this.initializeExtensions()
+    this.options = this.availableExtensions.slice(0, 100)
   },
   watch: {
     value () {
