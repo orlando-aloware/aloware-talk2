@@ -54,7 +54,7 @@ export default {
 
         if (this.campaign) {
           const carrierFee = this.getCarrierFee()
-          carrierSurchargesMessage = `Estimated carrier surcharcharges of $${carrierFee} will also apply.`
+          carrierSurchargesMessage = ` Estimated carrier surcharges of $${carrierFee} will also apply.`
         }
 
         return `This calculator is meant to provide the best estimate for the cost of the broadcast. Actual charges from carriers may vary.${carrierSurchargesMessage}`
@@ -93,9 +93,6 @@ export default {
       // matches the constants from CarrierFee.php
       const carrierFeeName = `${prefix}_${suffix}`
       const carrierFeePerSegment = this.carrierFees.find(fee => fee.name === carrierFeeName)?.price ?? 0
-
-      console.log('segments: ', this.segments)
-      console.log('messageCount: ', this.messageCount())
 
       return (carrierFeePerSegment * this.segments).toFixed(3)
     }
