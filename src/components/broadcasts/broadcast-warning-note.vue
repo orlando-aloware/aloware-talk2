@@ -99,8 +99,11 @@ export default {
   },
 
   watch: {
-    'messageComposer.sms.body': function (value) {
-      this.messageLength(value)
+    'messageComposer.sms.body': {
+      immediate: true,
+      handler (value) {
+        this.messageLength(value)
+      }
     }
   }
 }
