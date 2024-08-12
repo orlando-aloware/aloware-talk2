@@ -669,7 +669,7 @@ export default {
 
     pickerToggle (isOpen) {
       if (isOpen) {
-        setTimeout(() => {
+        this.$nextTick(() => {
           const pickerElement = this.$refs.picker.$el
           const listItems = pickerElement.querySelectorAll('li')
 
@@ -684,7 +684,7 @@ export default {
               li.classList.add('active')
             }
           })
-        }, 10)
+        })
       }
     },
 
