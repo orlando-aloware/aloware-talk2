@@ -94,7 +94,7 @@ export default {
       const carrierFeeName = `${prefix}_${suffix}`
       const carrierFeePerSegment = this.carrierFees.find(fee => fee.name === carrierFeeName)?.price ?? 0
 
-      return (carrierFeePerSegment * this.segments).toFixed(3)
+      return (carrierFeePerSegment * this.messageCount()).toFixed(3)
     }
   },
 
