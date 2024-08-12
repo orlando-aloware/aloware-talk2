@@ -37,6 +37,10 @@ export default {
       carrierFees: 'getCarrierFees'
     }),
 
+    ...mapGetters('contacts', [
+      'messageComposer'
+    ]),
+
     showWarning () {
       return this.showMessageSentAsMmsWarning ||
         this.showMessageSentFromTollFreeNumberWarning ||
@@ -94,6 +98,12 @@ export default {
       console.log('messageCount: ', this.messageCount())
 
       return (carrierFeePerSegment * this.segments).toFixed(3)
+    }
+  },
+
+  watch: {
+    'messageComposer.sms.body': function (value) {
+      this.messageLength(value)
     }
   }
 }
