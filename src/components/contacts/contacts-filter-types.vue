@@ -643,7 +643,6 @@ export default {
 
       // update the results with new query
       if (!isEqual(this.initialListFilters, currentListFilters)) {
-        this.setShowMyContacts(false)
         this.$VueEvent.fire('filteredFetchContacts', {
           clear: true,
           // added the previous filter so that if the fetch fails,
