@@ -448,7 +448,7 @@ import SequenceSelector from 'components/generic-selectors/sequence-selector'
 import CallbackStatusSelector from 'components/generic-selectors/callback-status-selector'
 import BroadcastSelector from 'components/generic-selectors/broadcast-selector'
 import CreatorTypeSelector from 'components/generic-selectors/creator-type-selector.vue'
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import DateRangePicker from 'vue2-daterange-picker'
 import 'vue2-daterange-picker/dist/vue2-daterange-picker.css'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
@@ -670,7 +670,7 @@ export default {
 
   methods: {
     ...mapActions(['setTags']),
-    ...mapMutations(['SET_IS_FIRST_LOAD']),
+    ...mapActions(['setIsFirstLoad']),
 
     pickerToggle (isOpen) {
       if (isOpen) {
@@ -770,7 +770,7 @@ export default {
   mounted () {
     console.log('mounted ', this.$store.state.isFirstLoad)
     if (this.$store.state.isFirstLoad) {
-      this.SET_IS_FIRST_LOAD(false)
+      this.setIsFirstLoad(false)
       sessionStorage.setItem('date-selected', 'Last 30 Days')
 
       this.dateRange.startDate = this.ranges['Last 30 Days'][0]
