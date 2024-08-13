@@ -308,8 +308,6 @@ export default {
       'isContactMixinUsed'
     ]),
 
-    ...mapActions(['setIsFirstLoad']),
-
     statusToggleColor () {
       return (this.$route.params.id && this.$route.params.status !== this.statusText ? 'bg-grey-80' : 'primary') + ' active'
     },
@@ -460,7 +458,8 @@ export default {
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
       'setFilterDialogForView',
-      'setIsEditingView'
+      'setIsEditingView',
+      'setIsFirstLoad'
     ]),
 
     initInboxTaskRoute () {
