@@ -742,7 +742,7 @@ export default {
       this.ranges = {
         'Today': [this.parseDatePicker(moment().tz(timezone).startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Yesterday': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT))],
-        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(11, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(12, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Last 30 Days': [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'This Month So Far': [this.parseDatePicker(moment().tz(timezone).startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Last Month': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT))],
@@ -763,23 +763,19 @@ export default {
       // The type of value or oldValue is the array returned above
 
       (value, oldValue) => {
-        console.log('$watch')
         this.dateRange.startDate = value[0]
         this.dateRange.endDate = value[1]
       })
   },
 
   mounted () {
-    console.log('IS FIRST LOAD ', this.isFirstLoad)
     if (this.isFirstLoad) {
-      console.log('is first load')
       this.setIsFirstLoad(false)
       sessionStorage.setItem('date-selected', 'Last 30 Days')
 
       this.dateRange.startDate = this.ranges['Last 30 Days'][0]
       this.dateRange.endDate = this.ranges['Last 30 Days'][1]
     } else {
-      console.log('is not first load')
       this.dateRange.startDate = this.filter.from_date
       this.dateRange.endDate = this.filter.to_date
     }
@@ -800,9 +796,8 @@ export default {
       handler () {
         let startDate = moment(this.dateRange.startDate)
         let endDate = moment(this.dateRange.endDate)
-        console.log('HEREE CHANGE')
+
         if (startDate.isValid() && endDate.isValid() && startDate.format('HH:mm:ss') === endDate.format('HH:mm:ss')) {
-          console.log('HEREE CHANGE 2')
           startDate.set({ hour: 0, minute: 0, second: 0 })
           endDate.set({ hour: 23, minute: 59, second: 59 })
           this.dateRange.startDate = startDate.format('YYYY-MM-DD HH:mm:ss')
@@ -854,7 +849,6 @@ export default {
     },
 
     reset (newVal) {
-      console.log('reset ', newVal)
       if (newVal) {
         this.dateRange.startDate = this.ranges['Last 30 Days'][0]
         this.dateRange.endDate = this.ranges['Last 30 Days'][1]

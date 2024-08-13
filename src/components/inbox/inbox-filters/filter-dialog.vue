@@ -162,7 +162,7 @@
 
 <script>
 import FilterForm from 'components/inbox/inbox-filters/filter-form'
-import { mapActions, mapState, mapMutations } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import CompactBtn from 'components/compact-btn'
 import talk2Api from 'src/plugins/api/api'
 import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
@@ -449,8 +449,7 @@ export default {
     ]),
 
     ...mapActions(['setTags']),
-
-    ...mapMutations(['SET_IS_FIRST_LOAD']),
+    ...mapActions(['setIsFirstLoad']),
 
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
@@ -523,7 +522,7 @@ export default {
 
       this.reset = true
       sessionStorage.removeItem('date-selected')
-      this.SET_IS_FIRST_LOAD(true)
+      this.setIsFirstLoad(true)
 
       for (const item in useFilter) {
         if (this.booleanFields.includes(item)) {
