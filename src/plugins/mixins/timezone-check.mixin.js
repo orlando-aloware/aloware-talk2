@@ -1,9 +1,19 @@
 import moment from 'moment'
 
 export default {
+  data () {
+    return {
+      isModalOpen: false
+    }
+  },
   methods: {
     // Checks if it's within contact daytime. If not, promps alert to user.
     checkContactTimezone (contact, makeCall) {
+      // if the modal is already open, we skip the next steps
+      if (this.isModalOpen) {
+        return
+      }
+
       let { timezone, name } = contact
 
       // check contact has timezone or not
@@ -22,6 +32,7 @@ export default {
         const contactLocalTime = moment().tz(contact.timezone)
 
         if (!contactLocalTime.isBetween(startDay, endDay)) {
+          this.isModalOpen = true
           return this.$bvModal.msgBoxConfirm(
             `This is outside the contact's day time. Do you want to make a call? It's ${contactLocalTime.format(
               'hh:mm A'
@@ -35,8 +46,11 @@ export default {
             }
           ).then(confirm => {
             if (confirm) {
+              this.isModalOpen = false
               makeCall()
             }
+          }).catch(() => {
+            this.isModalOpen = false
           })
         }
       }
