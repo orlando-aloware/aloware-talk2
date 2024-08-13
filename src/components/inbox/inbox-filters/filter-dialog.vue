@@ -584,8 +584,21 @@ export default {
           // for non-boolean fields change tracking
           const filterItem = JSON.stringify(this.filter[item])
           const loadedFilterItem = JSON.stringify(this.loadedDefaultFilterModel.filter[item])
+
+          let toDateUpdated = false
+
+          if (item === 'to_date') {
+            if (filterItem && loadedFilterItem && filterItem === loadedFilterItem) {
+              toDateUpdated = true
+              this.updateChannelChangedFilterFields({
+                name: item,
+                value: this.filter[item]
+              })
+            }
+          }
+
           if (!this.booleanFields.includes(item) && filterItem !== loadedFilterItem &&
-            hasField && !excludeProps.includes(item)) {
+            hasField && !excludeProps.includes(item) && !toDateUpdated) {
             this.updateChannelChangedFilterFields({
               name: item,
               value: this.filter[item]
