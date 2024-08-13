@@ -493,6 +493,11 @@ export default {
     defaultFilterModel: {
       type: Object,
       required: true
+    },
+
+    reset: {
+      type: Boolean,
+      required: false
     }
   },
 
@@ -706,7 +711,7 @@ export default {
         return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
       }
 
-      if (!this.dateRange.startDate && !this.dateRange.endDate && this.$store.state.isFirstLoad) {
+      if ((!this.dateRange.startDate && !this.dateRange.endDate && this.$store.state.isFirstLoad) || this.reset) {
         return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
       }
 
@@ -838,6 +843,15 @@ export default {
       if (value && this.dateRange.startDate && this.dateRange.endDate) {
         this.rangePicker.$data.start = window.moment(this.dateRange.startDate)._d
         this.rangePicker.$data.end = window.moment(this.dateRange.endDate)._d
+      }
+    },
+
+    reset (newVal) {
+      if (newVal) {
+        this.dateRange.startDate = this.ranges['Last 30 Days'][0]
+        this.dateRange.endDate = this.ranges['Last 30 Days'][1]
+        this.filter.from_date = this.dateRange.startDate
+        this.filter.to_date = this.dateRange.endDate
       }
     }
   }
