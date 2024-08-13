@@ -109,6 +109,7 @@
         <filter-form ref="inboxChannelFilterForm"
                      :default-filter-model="loadedDefaultFilterModel"
                      :filter="filter"
+                     :reset="reset"
                      data-testid="filter-dialog-filter-form">
         </filter-form>
         <div class="d-flex justify-content-end mt-sm-3 px-3">
@@ -240,7 +241,8 @@ export default {
         'has_unread'
       ],
       ChannelType,
-      viewName: null
+      viewName: null,
+      reset: false
     }
   },
 
@@ -343,6 +345,10 @@ export default {
 
     filterHasChanges () {
       const filterIdentifier = this.isFilterUpdateMode ? this.selectedFilter.filter : this.loadedDefaultFilterModel.filter
+
+      if (this.reset) {
+        return false
+      }
 
       for (const field of this.filterFields) {
         if (JSON.stringify(this.filter[field]) !== JSON.stringify(filterIdentifier[field])) {
@@ -522,9 +528,12 @@ export default {
 
         this.filter[item] = useFilter[item]
       }
+
+      this.reset = true
     },
 
     onApply (skipChangedFields = false) {
+      this.reset = false
       this.resetChannelChangedFilterFields()
 
       const myContactsFilter = _.get(this.filter, 'my_contact', null)
@@ -635,6 +644,7 @@ export default {
     },
 
     onSaveNewFilter () {
+      this.reset = false
       this.$emit('createNewFilter', _.pick(this.filter, this.filterFields))
     },
 
