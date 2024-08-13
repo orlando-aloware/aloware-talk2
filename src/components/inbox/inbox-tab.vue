@@ -458,9 +458,10 @@ export default {
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
       'setFilterDialogForView',
-      'setIsEditingView',
-      'setIsFirstLoad'
+      'setIsEditingView'
     ]),
+
+    ...mapActions(['setIsFirstLoad']),
 
     initInboxTaskRoute () {
       // if currently in inbox routes which works with contact's
@@ -690,6 +691,9 @@ export default {
       this.firstTimeLoading = true
       this.resetFilter()
 
+      sessionStorage.removeItem('date-selected')
+      this.setIsFirstLoad(true)
+
       // redirect
       if (this.$route.params?.viewId) {
         this.$router.push({
@@ -704,8 +708,7 @@ export default {
 
         return
       }
-      sessionStorage.removeItem('date-selected')
-      this.setIsFirstLoad(true)
+
       this.loadContactTasks()
       this.fetchInboxTaskCounts()
     },
