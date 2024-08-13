@@ -97,6 +97,12 @@ export default {
           },
           onVisibilityChanged: (data) => {
             this.extensionsVisibility = !data?.isHidden
+
+            if (!this.extensionsVisibility) {
+              this.showAlertAgentOnCall = false
+              this.showAlertCallFinished = false
+              this.isDialed = false
+            }
           }
         }
       },
@@ -145,6 +151,10 @@ export default {
 
   async mounted () {
     await this.init()
+    // console.log('this.dialer.currentStatus -->', this.dialer.currentStatus)
+    // this.setHubspotPhoneNumber('+19403737418')
+    // this.extensionsInitialized = true
+    // this.extensionsVisibility = true
     this.isFirstLoading = false
   },
 
@@ -398,6 +408,7 @@ export default {
         'WRAP_UP'
       ]
 
+      console.log('this.dialer.currentStatus -->', this.dialer.currentStatus)
       return this.dialer &&
         this.profile &&
         this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
@@ -416,6 +427,23 @@ export default {
 
     authProfile () {
       this.findDefaultOutboundCampaign()
+    },
+
+    'dialer.currentStatus' () {
+      console.log('watch.dialer.currentStatus -->', this.dialer?.currentStatus)
+
+      const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
+      if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
+        return
+      }
+
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+      if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
+        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) &&
+        !this.isDialed) {
+        this.showAlertAgentOnCall = true
+        this.showAlertCallFinished = false
+      }
     }
   }
 }
