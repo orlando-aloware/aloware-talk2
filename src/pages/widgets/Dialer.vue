@@ -102,6 +102,10 @@ export default {
               this.showAlertAgentOnCall = false
               this.showAlertCallFinished = false
               this.isDialed = false
+
+              if (this.dialer.communication) {
+                this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+              }
             }
           }
         }
