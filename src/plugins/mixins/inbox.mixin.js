@@ -122,7 +122,7 @@ export default {
       ],
       inboxViewsRoutes: inboxViewsRoutes,
       defaultFilterModel: {
-        name: 'test jeff',
+        name: '',
         type: ChannelType.CHANNEL_INBOX,
         filter: Filters.EXCERPT,
         scope: 'user'
@@ -199,7 +199,7 @@ export default {
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
           this.taskListHasError = false
-          console.log('yyyyyyy')
+
           if (!response) {
             return
           }
