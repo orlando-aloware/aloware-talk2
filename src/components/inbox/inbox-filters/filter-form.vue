@@ -518,6 +518,8 @@ export default {
 
     ...mapState(['currentTimezone']),
 
+    ...mapState(['isFirstLoad']),
+
     isInboxOrAllComms () {
       return this.inboxTaskRoutes.includes(this.$route.name) ||
         ['all-communications'].includes(this.$route.params.channel)
@@ -673,7 +675,7 @@ export default {
     ...mapActions(['setIsFirstLoad']),
 
     pickerToggle (isOpen) {
-      if (isOpen) {
+      if (isOpen && !this.isFirstLoad) {
         this.$nextTick(() => {
           const pickerElement = this.$refs.picker.$el
           const listItems = pickerElement.querySelectorAll('li')
@@ -710,9 +712,8 @@ export default {
       if (this.dateRange.startDate && this.dateRange.endDate) {
         return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
       }
-      console.log('this reset---', this.reset)
 
-      if (this.$store.state.isFirstLoad || this.reset) {
+      if (this.isFirstLoad || this.reset) {
         return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
       }
 
@@ -762,20 +763,23 @@ export default {
       // The type of value or oldValue is the array returned above
 
       (value, oldValue) => {
+        console.log('$watch')
         this.dateRange.startDate = value[0]
         this.dateRange.endDate = value[1]
       })
   },
 
   mounted () {
-    console.log('mounted ', this.$store.state.isFirstLoad)
-    if (this.$store.state.isFirstLoad) {
+    console.log('IS FIRST LOAD ', this.isFirstLoad)
+    if (this.isFirstLoad) {
+      console.log('is first load')
       this.setIsFirstLoad(false)
       sessionStorage.setItem('date-selected', 'Last 30 Days')
 
       this.dateRange.startDate = this.ranges['Last 30 Days'][0]
       this.dateRange.endDate = this.ranges['Last 30 Days'][1]
     } else {
+      console.log('is not first load')
       this.dateRange.startDate = this.filter.from_date
       this.dateRange.endDate = this.filter.to_date
     }
@@ -796,8 +800,9 @@ export default {
       handler () {
         let startDate = moment(this.dateRange.startDate)
         let endDate = moment(this.dateRange.endDate)
-
+        console.log('HEREE CHANGE')
         if (startDate.isValid() && endDate.isValid() && startDate.format('HH:mm:ss') === endDate.format('HH:mm:ss')) {
+          console.log('HEREE CHANGE 2')
           startDate.set({ hour: 0, minute: 0, second: 0 })
           endDate.set({ hour: 23, minute: 59, second: 59 })
           this.dateRange.startDate = startDate.format('YYYY-MM-DD HH:mm:ss')
@@ -855,6 +860,7 @@ export default {
         this.dateRange.endDate = this.ranges['Last 30 Days'][1]
         this.filter.from_date = this.dateRange.startDate
         this.filter.to_date = this.dateRange.endDate
+        this.getDateRangeInputLabel()
       }
     }
   }

@@ -267,7 +267,6 @@ export default {
     },
 
     getContactsByTaskStatus (taskId) {
-      console.log('ppppppp')
       this.source.cancel('Loading of contact task operation is canceled by the user.')
       this.source = this.cancelToken.source()
 
@@ -276,7 +275,7 @@ export default {
 
     getContactsCountByTaskStatus (taskId, forInbox = false, params = null) {
       params = forInbox && !isEmpty(params) ? params : this.getParameters(taskId, true)
-      console.log('TEST XXXX')
+
       return talk2Api.V2.contacts.counts(params)
         .then(response => {
           switch (taskId) {
