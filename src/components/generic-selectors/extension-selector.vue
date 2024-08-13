@@ -105,7 +105,7 @@ export default {
       const usedExtensions = this.users ? this.users.map(user => (user.extension) ? user.extension : null).filter(o => o !== null) : []
 
       // remove used extensions from available extensions
-      return this.available_extensions.filter((extension) => !usedExtensions.includes(extension))
+      return this.allExtensions.filter((extension) => !usedExtensions.includes(extension))
     }
   },
 
@@ -113,7 +113,7 @@ export default {
     return {
       selectedId: this.value,
       options: [],
-      available_extensions: [],
+      allExtensions: [],
       reference: 'wrapUpSelector',
       compareProperty: null,
       fullOptionsProperty: 'availableExtensions'
@@ -138,7 +138,7 @@ export default {
     initializeExtensions () {
       // fill the extensions array
       for (let i = 100; i < 100000; i++) {
-        this.available_extensions.push(i.toString())
+        this.allExtensions.push(i.toString())
       }
     }
   },
