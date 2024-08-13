@@ -11,6 +11,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
+import moment from 'moment'
 
 export default {
   mixins: [userMixin],
@@ -30,6 +31,8 @@ export default {
     ]),
 
     ...mapState('auth', ['profile']),
+
+    ...mapState(['currentTimezone']),
 
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
@@ -119,7 +122,7 @@ export default {
       ],
       inboxViewsRoutes: inboxViewsRoutes,
       defaultFilterModel: {
-        name: '',
+        name: 'test jeff',
         type: ChannelType.CHANNEL_INBOX,
         filter: Filters.EXCERPT,
         scope: 'user'
@@ -196,7 +199,7 @@ export default {
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
           this.taskListHasError = false
-
+          console.log('yyyyyyy')
           if (!response) {
             return
           }
@@ -264,6 +267,7 @@ export default {
     },
 
     getContactsByTaskStatus (taskId) {
+      console.log('ppppppp')
       this.source.cancel('Loading of contact task operation is canceled by the user.')
       this.source = this.cancelToken.source()
 
@@ -272,7 +276,7 @@ export default {
 
     getContactsCountByTaskStatus (taskId, forInbox = false, params = null) {
       params = forInbox && !isEmpty(params) ? params : this.getParameters(taskId, true)
-
+      console.log('TEST XXXX')
       return talk2Api.V2.contacts.counts(params)
         .then(response => {
           switch (taskId) {
@@ -694,5 +698,7 @@ export default {
     this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
+    this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('MM/DD/YYYY HH:mm:ss')
+    this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('MM/DD/YYYY HH:mm:ss')
   }
 }
