@@ -81,8 +81,13 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     showSelectCampaignDialog () {
+      const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
+      if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
+        return false
+      }
+
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
-      return this.campaignId === null && !isCallInProgress.includes(this.dialer.currentStatus)
+      return this.campaignId === null && !isCallInProgress.includes(this.dialer?.currentStatus)
     }
   },
 
