@@ -261,13 +261,15 @@ export default {
         case this.currentStep.id === 2 || this.currentStep.id === 3:
           return {
             contactsLength: this.contactsLength,
-            estimatedCost: this.price
+            estimatedCost: this.price,
+            campaign: this.selectedCampaign
           }
         case this.currentStep.id === 4:
           return {
             contactsLength: this.contactsLength,
             estimatedCost: this.price,
-            messagesLength: this.messagesLength
+            messagesLength: this.messagesLength,
+            campaign: this.selectedCampaign
           }
         default:
           return null

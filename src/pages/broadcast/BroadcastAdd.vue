@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import BroadcastAddView from 'src/components/broadcasts/broadcast-add-view.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
 import StepsWrapper from 'src/components/generic-wrappers/steps-wrapper.vue'
@@ -78,9 +79,15 @@ export default {
     this.$VueEvent.listen('toggle-contact-filters', (state) => {
       this.filters = state
     })
+
+    this.fetchCarrierFees()
   },
 
   methods: {
+    ...mapActions('carrierFee', [
+      'fetchCarrierFees'
+    ]),
+
     onBack () {
       this.step--
     },
