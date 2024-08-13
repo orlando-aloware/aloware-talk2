@@ -162,7 +162,7 @@
 
 <script>
 import FilterForm from 'components/inbox/inbox-filters/filter-form'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapMutations } from 'vuex'
 import CompactBtn from 'components/compact-btn'
 import talk2Api from 'src/plugins/api/api'
 import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
@@ -450,6 +450,8 @@ export default {
 
     ...mapActions(['setTags']),
 
+    ...mapMutations(['SET_IS_FIRST_LOAD']),
+
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
     },
@@ -519,6 +521,10 @@ export default {
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
       const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
+      this.reset = true
+      sessionStorage.removeItem('date-selected')
+      this.SET_IS_FIRST_LOAD(true)
+
       for (const item in useFilter) {
         if (this.booleanFields.includes(item)) {
           // convert boolean to numeric
@@ -528,8 +534,6 @@ export default {
 
         this.filter[item] = useFilter[item]
       }
-
-      this.reset = true
     },
 
     onApply (skipChangedFields = false) {

@@ -710,8 +710,9 @@ export default {
       if (this.dateRange.startDate && this.dateRange.endDate) {
         return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
       }
+      console.log('this reset---', this.reset)
 
-      if ((!this.dateRange.startDate && !this.dateRange.endDate && this.$store.state.isFirstLoad) || this.reset) {
+      if (this.$store.state.isFirstLoad || this.reset) {
         return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
       }
 
@@ -740,7 +741,7 @@ export default {
       this.ranges = {
         'Today': [this.parseDatePicker(moment().tz(timezone).startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Yesterday': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT))],
-        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(11, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Last 30 Days': [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'This Month So Far': [this.parseDatePicker(moment().tz(timezone).startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Last Month': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT))],
@@ -767,6 +768,7 @@ export default {
   },
 
   mounted () {
+    console.log('mounted ', this.$store.state.isFirstLoad)
     if (this.$store.state.isFirstLoad) {
       this.SET_IS_FIRST_LOAD(false)
       sessionStorage.setItem('date-selected', 'Last 30 Days')
@@ -847,6 +849,7 @@ export default {
     },
 
     reset (newVal) {
+      console.log('reset ', newVal)
       if (newVal) {
         this.dateRange.startDate = this.ranges['Last 30 Days'][0]
         this.dateRange.endDate = this.ranges['Last 30 Days'][1]

@@ -233,7 +233,7 @@ import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapMutations } from 'vuex'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import {
   aclMixin,
@@ -307,6 +307,8 @@ export default {
       'contact',
       'isContactMixinUsed'
     ]),
+
+    ...mapMutations(['SET_IS_FIRST_LOAD']),
 
     statusToggleColor () {
       return (this.$route.params.id && this.$route.params.status !== this.statusText ? 'bg-grey-80' : 'primary') + ' active'
@@ -703,7 +705,8 @@ export default {
 
         return
       }
-
+      sessionStorage.removeItem('date-selected')
+      this.SET_IS_FIRST_LOAD(true)
       this.loadContactTasks()
       this.fetchInboxTaskCounts()
     },
