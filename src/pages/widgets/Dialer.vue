@@ -114,6 +114,8 @@ export default {
               if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
                 this.$VueEvent.fire('hangupCall')
               }
+
+              this.handleCallCompletedEvent()
             }
           }
         }
