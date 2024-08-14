@@ -1,5 +1,13 @@
 <template>
   <div>
+    <b-overlay class="h-100 w-100 position-absolute"
+               :show="isLoadingDialer">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="40px" />
+      </template>
+    </b-overlay>
+
     <dialer-listeners @user-logged-in="handleUserLogin"
                       @agent-status-updated="handleAgentStatusUpdate"/>
     <div class="p-3" v-if="showAlertAgentOnCall">
@@ -136,7 +144,8 @@ export default {
       listeners: {
         userLoggedIn: null,
         agentStatusUpdated: null
-      }
+      },
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED']
     }
   },
   computed: {
@@ -146,6 +155,10 @@ export default {
 
     allowed () {
       return this.authProfile && this.initialized
+    },
+
+    isLoadingDialer () {
+      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus)
     }
   },
 
@@ -450,8 +463,7 @@ export default {
     'dialer.currentStatus' () {
       console.log('watch.dialer.currentStatus -->', this.dialer?.currentStatus)
 
-      const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
-      if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
+      if (this.isLoadingDialer) {
         return
       }
 
