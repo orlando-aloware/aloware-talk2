@@ -1,4 +1,10 @@
-## Packages
+## :ticket: Jira Ticket ALO-123
+
+## :heavy_equals_sign: Counterpart
+
+[api-core PR](url)
+
+## :package: Packages
 - Updated package A
 - Added package B
 
