@@ -3,7 +3,7 @@ local_branch_name=$(git rev-parse --abbrev-ref HEAD)
 
 types='(feature|fix|hotfix|chore|docs|refactor|revert|build|test|style|ci|perf|conflict|cleanup)'
 jiraTicket='[A-Za-z]+-[0-9]+'
-description='[a-z]+(-[a-z0-9]+)*'
+description='[a-z0-9]+(-[a-z0-9]+)*'
 
 valid_branch_regex="^($jiraTicket\/)?(master|develop|($types))\/$description$"
 
