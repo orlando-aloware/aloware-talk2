@@ -103,6 +103,7 @@ export default {
               this.showAlertCallFinished = false
               this.isDialed = false
 
+              console.log('onVisibilityChanged -->', this.extensionsVisibility, this.dialer?.communication)
               if (this.dialer.communication) {
                 this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
               }
