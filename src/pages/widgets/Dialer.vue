@@ -4,16 +4,24 @@
                :show="isLoadingDialer">
       <template #overlay>
         <q-spinner-bars color="primary"
-                        size="40px" />
+                        size="2em" />
       </template>
     </b-overlay>
 
     <dialer-listeners @user-logged-in="handleUserLogin"
                       @agent-status-updated="handleAgentStatusUpdate"/>
-    <div class="p-3" v-if="showAlertAgentOnCall">
+    <div class="p-3"
+         v-if="true">
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
+      <q-btn color="primary"
+             text-color="white"
+             variant="primary"
+             no-caps
+             @click="endActiveCall">
+        <span class="pl-3 pr-3">Finish active call</span>
+      </q-btn>
     </div>
 
     <div class="p-3"
@@ -50,6 +58,7 @@ import DialerListeners from 'components/dialer-listeners.vue'
 
 export default {
   name: 'Dialer',
+
   components: {
     Webrtc,
     DialerListeners
@@ -113,21 +122,7 @@ export default {
             this.extensionsVisibility = !data?.isHidden
 
             if (!this.extensionsVisibility) {
-              this.showAlertAgentOnCall = false
-              this.showAlertCallFinished = false
-              this.isDialed = false
-
-              console.log('onVisibilityChanged -->', this.extensionsVisibility, this.dialer?.communication)
-              if (this.dialer.currentStatus === 'WRAP_UP') {
-                this.$VueEvent.fire('endWrapUp')
-              }
-
-              if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
-                this.$VueEvent.fire('hangupCall')
-              }
-
-              this.$VueEvent.fire('resetCall')
-              this.handleCallCompletedEvent(true)
+              this.endActiveCall()
             }
           }
         }
@@ -182,10 +177,10 @@ export default {
 
   async mounted () {
     await this.init()
-    // console.log('this.dialer.currentStatus -->', this.dialer.currentStatus)
-    // this.setHubspotPhoneNumber('+19403737418')
-    // this.extensionsInitialized = true
-    // this.extensionsVisibility = true
+    console.log('this.dialer.currentStatus -->', this.dialer.currentStatus)
+    this.setHubspotPhoneNumber('+19403737418')
+    this.extensionsInitialized = true
+    this.extensionsVisibility = true
     this.isFirstLoading = false
   },
 
@@ -444,6 +439,24 @@ export default {
         this.profile &&
         this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
         !statuses.includes(this.dialer.currentStatus)
+    },
+
+    endActiveCall () {
+      this.showAlertAgentOnCall = false
+      this.showAlertCallFinished = false
+      this.isDialed = false
+
+      console.log('onVisibilityChanged -->', this.extensionsVisibility, this.dialer?.communication)
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+        this.$VueEvent.fire('hangupCall')
+      }
+
+      this.$VueEvent.fire('resetCall')
+      this.handleCallCompletedEvent(true)
     }
   },
 
