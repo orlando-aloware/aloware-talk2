@@ -1083,7 +1083,7 @@ export default {
       const counter = { data: 0 }
 
       this.$options.hangupInterval = setInterval(() => {
-        // Added the status 'READY' to handle the case when the dialer has the 'no-wrap' option
+        // Added 'READY' status to handle the case when the agent has set Wrap Time to 'No Wrap up'
         if (['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)) {
           this.backToDial('Talk-hangupInterval')
           this.setDialerCurrentStatus('HANGING_UP_CALL')
