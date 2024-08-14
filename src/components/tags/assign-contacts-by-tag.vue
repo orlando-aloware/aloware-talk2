@@ -23,14 +23,16 @@
 
     <b-tabs content-class="mt-3"
             v-model="selectedTabIndex">
-      <b-tab title="User" title-item-class="user-tab-link">
+      <b-tab title="User"
+             title-item-class="user-tab-link">
         <p>Assign the leads to this user</p>
         <user-selector :generic-styling="false"
                        v-model="userId"
                        @change="setUserId" />
       </b-tab>
 
-      <b-tab title="Ring Group" title-item-class="ring-group-tab-link">
+      <b-tab title="Ring Group"
+             title-item-class="ring-group-tab-link">
         <p>Assign the leads evenly and randomly between the users on this ring group</p>
         <ring-group-selector class="text-13"
                              :generic-multiselect="false"
