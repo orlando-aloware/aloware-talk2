@@ -12,11 +12,16 @@
                 data-testid="comm-details-card">
           <q-card-section class="pb-0" data-testid="comm-details-archive-card-section">
             <div class="d-flex justify-content-between header">
-              <b-link class="communication-back-button"
-                      v-if='isWidget'
-                      @click="$router.go(-1)">
-                back
-              </b-link>
+              <b-button size="sm"
+                        variant="light"
+                        class="btn-white communication-back-button"
+                        title="Go Back"
+                        v-if='isWidget'
+                        data-testid="contact-details-navigation-btn-prev"
+                        v-b-tooltip.hover
+                        @click.prevent="$router.go(-1)">
+                <i class="material-icons">keyboard_arrow_left</i>
+              </b-button>
               <div class="fs-14 mt-1 header-title">Communication Info</div>
 
               <div class="d-flex header-btn-wrapper">
@@ -1269,8 +1274,11 @@ export default {
 <style scoped>
 .communication-back-button {
   position: absolute;
-  top: -1px;
-  left: 5px;
-  font-size: 12px;
+  top: 2px;
+  left: 3px;
+  width: 19px;
+  height: 18px;
+  padding: 0;
+  line-height: 11px;
 }
 </style>
