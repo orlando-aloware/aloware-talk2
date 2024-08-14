@@ -2,7 +2,7 @@
     <div class="security-code clearfix">
         <div class="security-code-wrapper">
             <div class="security-code-field"
-                 :class="{ 'hubspot-widget': hubspotWidget }"
+                 :class="{ 'security-code-hs-widget-mode': hubspotWidget }"
                  v-for="n in securityCodeLength"
                  :key="n">
                 <input maxlength="1"
