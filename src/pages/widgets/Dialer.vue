@@ -90,6 +90,8 @@ export default {
           },
           onDialNumber: (event) => {
             this.$VueEvent.fire('resetCall')
+            this.showAlertCallFinished = false
+
             if (event.phone_number) {
               this.findDefaultOutboundCampaign()
               this.setHubspotPhoneNumber(event.phone_number)
