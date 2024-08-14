@@ -12,17 +12,19 @@
                 data-testid="comm-details-card">
           <q-card-section class="pb-0" data-testid="comm-details-archive-card-section">
             <div class="d-flex justify-content-between header">
-              <b-button size="sm"
-                        variant="light"
-                        class="btn-white communication-back-button"
-                        title="Go Back"
-                        v-if='isWidget'
-                        data-testid="contact-details-navigation-btn-prev"
-                        v-b-tooltip.hover
-                        @click.prevent="$router.go(-1)">
-                <i class="material-icons">keyboard_arrow_left</i>
-              </b-button>
-              <div class="fs-14 mt-1 header-title">Communication Info</div>
+              <div class="fs-14 mt-1 header-title">
+                <b-button size="sm"
+                          variant="light"
+                          class="btn-white communication-back-button"
+                          title="Go Back"
+                          v-if='isWidget'
+                          data-testid="contact-details-navigation-btn-prev"
+                          v-b-tooltip.hover
+                          @click.prevent="$router.go(-1)">
+                  <i class="material-icons">keyboard_arrow_left</i>
+                </b-button>
+                Communication Info
+              </div>
 
               <div class="d-flex header-btn-wrapper">
                 <transcription-modal class="mr-2"
@@ -1273,12 +1275,10 @@ export default {
 
 <style scoped>
 .communication-back-button {
-  position: absolute;
-  top: 2px;
-  left: 3px;
   width: 19px;
   height: 18px;
   padding: 0;
   line-height: 11px;
+  margin-top: -2px;
 }
 </style>
