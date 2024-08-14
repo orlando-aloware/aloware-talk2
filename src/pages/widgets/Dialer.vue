@@ -172,11 +172,9 @@ export default {
       }
       this.loading = true
       this.check().then((res) => {
-        if (!this.needsExtensions) {
-          storage.local.setItem('company_id', res.data.user.company.id)
-          this.setCurrentCompany(res.data.user.company)
-          this.resetVuex(['all'])
-        }
+        storage.local.setItem('company_id', res.data.user.company.id)
+        this.setCurrentCompany(res.data.user.company)
+        this.resetVuex(['all'])
         this.authProfile = res.data?.user
         this.loading = false
         this.initialized = true
