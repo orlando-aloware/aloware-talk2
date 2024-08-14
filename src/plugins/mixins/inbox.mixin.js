@@ -11,6 +11,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
+import moment from 'moment'
 
 export default {
   mixins: [userMixin],
@@ -30,6 +31,8 @@ export default {
     ]),
 
     ...mapState('auth', ['profile']),
+
+    ...mapState(['currentTimezone']),
 
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
@@ -694,5 +697,7 @@ export default {
     this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
+    this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
+    this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
   }
 }
