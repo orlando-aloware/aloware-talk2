@@ -26,6 +26,11 @@ export default {
       required: false
     },
 
+    contactsLength: {
+      type: Number,
+      required: false
+    },
+
     isCalculatorMessage: {
       type: Boolean,
       required: false
@@ -52,7 +57,7 @@ export default {
       if (this.isCalculatorMessage) {
         let carrierSurchargesMessage = ''
 
-        if (this.campaign) {
+        if (this.campaign && this.contactsLength) {
           const carrierFee = this.getCarrierFee()
           carrierSurchargesMessage = ` Estimated carrier surcharges of $${carrierFee} will also apply.`
         }
@@ -94,7 +99,7 @@ export default {
       const carrierFeeName = `${prefix}_${suffix}`
       const carrierFeePerSegment = this.carrierFees.find(fee => fee.name === carrierFeeName)?.price ?? 0
 
-      return (carrierFeePerSegment * this.messageCount()).toFixed(4)
+      return (carrierFeePerSegment * this.contactsLength * this.messageCount()).toFixed(4)
     }
   },
 
