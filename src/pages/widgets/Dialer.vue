@@ -11,7 +11,7 @@
     <dialer-listeners @user-logged-in="handleUserLogin"
                       @agent-status-updated="handleAgentStatusUpdate"/>
     <div class="p-3"
-         v-if="true">
+         v-if="showAlertAgentOnCall">
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
@@ -177,10 +177,10 @@ export default {
 
   async mounted () {
     await this.init()
-    console.log('this.dialer.currentStatus -->', this.dialer.currentStatus)
-    this.setHubspotPhoneNumber('+19403737418')
-    this.extensionsInitialized = true
-    this.extensionsVisibility = true
+    // console.log('this.dialer.currentStatus -->', this.dialer.currentStatus)
+    // this.setHubspotPhoneNumber('+19403737418')
+    // this.extensionsInitialized = true
+    // this.extensionsVisibility = true
     this.isFirstLoading = false
   },
 
