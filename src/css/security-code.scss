@@ -21,6 +21,10 @@
       margin-right: 10px;
       float: left;
 
+      &.hubspot-widget {
+        margin-right: 6px;
+      }
+
       @media only screen and (max-device-width: 736px) {
         margin-right: 4px;
       }

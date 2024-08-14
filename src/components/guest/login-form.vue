@@ -79,7 +79,7 @@
           </b-link>
         </div>
       </form>
-      <div class="login-form w-100 px-5 text-center"
+      <div :class="['login-form', 'w-100', 'text-center', hubspotWidget ? 'px-3' : 'px-5']"
            v-else>
         <h2 class="text-black mb-3">2FA Email Sent</h2>
         <p v-html="error"></p>
@@ -87,6 +87,7 @@
           <security-code v-model="token"
                          ref="securityCode"
                          class="mb-2"
+                         :hubspot-widget="hubspotWidget"
                          @input="clearError"
                          @completed="verifyToken">
           </security-code>
