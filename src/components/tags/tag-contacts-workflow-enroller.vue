@@ -3,6 +3,7 @@
            modal-class="tags__modal"
            size="md"
            centered
+           data-testid="tags-contacts-workflow-enroller-modal"
            v-model="openModal"
            @hide="closeModalPrompt">
     <b-overlay rounded="sm"
@@ -16,12 +17,13 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>{{ formName }}</h6>
+      <h6 data-testid="tags-contacts-workflow-enroller-modal-title">{{ formName }}</h6>
     </template>
 
     <div>
       <label class="label mt-2 mb-1">Choose the sequence you want this tagged contacts to enroll</label>
       <sequence-selector :generic-styling="false"
+                         data-testid="tags-contacts-workflow-enroller-sequence-selector"
                          @change="setWorkflowId" />
     </div>
 
@@ -66,17 +68,20 @@
 
     <p class="text-13 mt-2 mb-0"
        v-if="!isBulk"
+       data-testid="tags-contacts-workflow-enroller-tag-name"
        v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
 
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
           <button class="btn btn-sm btn-outline-dark mr-2"
+                  data-testid="tags-contacts-workflow-enroller-cancel-button"
                   @click.prevent="closeModalPrompt">
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
                   :disabled="!selectedWorkflowId"
+                  data-testid="tags-contacts-workflow-enroller-enroll-button"
                   @click.prevent="enrollContacts">
             Enroll Contacts
           </button>

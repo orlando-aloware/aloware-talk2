@@ -2,11 +2,12 @@
   <div class="bulk-action-menu bulk-action-menu__tags">
     <div class="menu-actions d-flex flex-row">
       <div class="items">
-        <span>{{ getSelectedCount }} selected</span>
+        <span data-testid="tags-selected-count">{{ getSelectedCount }} selected</span>
       </div>
 
       <div class="items">
         <a href="#"
+           data-testid="tags-clear-all-selected-tags-button"
            @click.prevent="clearAllSelectedTags">
           <i class="fa fa-minus-square"></i>
           Clear All
@@ -21,6 +22,7 @@
           <a id="btn-assign-contacts"
              href="#"
              :disabled="!selectedTagsHasContactsCount"
+             data-testid="tags-assign-contacts-button"
              @click.prevent="isOpenAssignContactsTagDialog = true">
             <i class="fa fa-sign-in-alt"></i>
             Assign Contacts
@@ -35,6 +37,7 @@
               :title="disabledBulkActionTitle">
           <a href="#"
              :disabled="!selectedTagsHasContactsCount"
+             data-testid="tags-add-to-power-dialer-button"
              @click.prevent="isOpenAddTagContactsToPowerDialerDialog = true">
             <i class="fa fa-phone"></i>
             Add to Power Dialer
@@ -49,6 +52,7 @@
               :title="disabledBulkActionTitle">
           <a href="#"
              :disabled="!selectedTagsHasContactsCount"
+             data-testid="tags-enroll-contacts-button"
              @click.prevent="isOpenEnrollTagContactsToSequenceDialog = true">
             <i class="fa fa-user-plus"></i>
             Enroll Contacts
@@ -59,6 +63,7 @@
       <div class="items">
         <a href="#"
            class="text-danger"
+           data-testid="tags-delete-selected-tags-button"
            @click.prevent="isOpenDeleteTagDialog = true">
           <i class="fa fa-trash text-danger"></i>
           Delete
