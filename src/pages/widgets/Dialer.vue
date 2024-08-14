@@ -89,6 +89,7 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
+            this.$VueEvent.fire('resetCall')
             if (event.phone_number) {
               this.findDefaultOutboundCampaign()
               this.setHubspotPhoneNumber(event.phone_number)
@@ -115,6 +116,7 @@ export default {
                 this.$VueEvent.fire('hangupCall')
               }
 
+              this.$VueEvent.fire('resetCall')
               this.handleCallCompletedEvent()
             }
           }
