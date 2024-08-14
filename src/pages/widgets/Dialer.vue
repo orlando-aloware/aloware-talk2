@@ -74,6 +74,8 @@ export default {
         // eventHandlers handle inbound messages
         eventHandlers: {
           onReady: () => {
+            this.$VueEvent.fire('resetCall')
+
             const payload = {
               // Whether a user is logged-in
               isLoggedIn: this.authenticated,
@@ -105,6 +107,10 @@ export default {
               this.isDialed = false
 
               console.log('onVisibilityChanged -->', this.extensionsVisibility, this.dialer?.communication)
+              if (this.dialer.currentStatus === 'WRAP_UP') {
+                this.$VueEvent.fire('endWrapUp')
+              }
+
               if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
                 this.$VueEvent.fire('hangupCall')
               }
