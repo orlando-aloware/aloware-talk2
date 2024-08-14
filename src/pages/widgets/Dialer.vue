@@ -36,6 +36,7 @@ import CallingExtensions from '@hubspot/calling-extensions-sdk'
 import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { timezoneCheckMixin, helperMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 
@@ -104,7 +105,9 @@ export default {
               this.isDialed = false
 
               console.log('onVisibilityChanged -->', this.extensionsVisibility, this.dialer?.communication)
-              this.$VueEvent.fire('hangupCall')
+              if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+                this.$VueEvent.fire('hangupCall')
+              }
             }
           }
         }
