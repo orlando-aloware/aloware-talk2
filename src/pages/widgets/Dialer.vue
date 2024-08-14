@@ -117,7 +117,7 @@ export default {
               }
 
               this.$VueEvent.fire('resetCall')
-              this.handleCallCompletedEvent()
+              this.handleCallCompletedEvent(true)
             }
           }
         }
@@ -293,10 +293,10 @@ export default {
       }
     },
 
-    handleCallCompletedEvent () {
+    handleCallCompletedEvent (skipCallFinished = false) {
       if (this.extensions) {
         this.extensions.callEnded()
-        this.showAlertCallFinished = !this.dialer.parkedCall
+        this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
         this.defaultOutboundCampaignId = null
         this.campaignId = null
       }
