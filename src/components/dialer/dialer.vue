@@ -1083,7 +1083,7 @@ export default {
       const counter = { data: 0 }
 
       this.$options.hangupInterval = setInterval(() => {
-        if (this.dialer.currentStatus === 'WRAP_UP' || this.dialer.currentStatus === 'READY') {
+        if (['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)) {
           this.backToDial('Talk-hangupInterval')
           this.setDialerCurrentStatus('HANGING_UP_CALL')
 
