@@ -73,7 +73,7 @@
           </q-tooltip>
         </span>
       </div>
-      <div class="broadcast-add__schedule__row__fields mx-w-70">
+      <div class="broadcast-add__schedule__row__fields">
         <contact-line-selector :value="propCampaign?.id"
                                @select="onCampaignSelected"/>
         <broadcast-warning-note :campaign="propCampaign"/>
@@ -95,7 +95,7 @@
           </q-tooltip>
         </a>
       </div>
-      <div class="broadcast-add__schedule__row__fields mx-w-70">
+      <div class="broadcast-add__schedule__row__fields">
         <throttle-selector :campaign="propCampaign"
                            v-model="throttle"/>
       </div>
