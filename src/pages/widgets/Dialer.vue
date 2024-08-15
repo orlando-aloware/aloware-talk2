@@ -15,13 +15,6 @@
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
-      <q-btn color="primary"
-             text-color="white"
-             variant="primary"
-             no-caps
-             @click="endActiveCall">
-        <span class="pl-3 pr-3">Finish active call</span>
-      </q-btn>
     </div>
 
     <div class="p-3"
