@@ -2617,10 +2617,6 @@ i.option-separator {
   max-width: 100% !important;
 }
 
-.mx-w-70 {
-  max-width: 70% !important;
-}
-
 .contact-activity-container {
   display: table;
   table-layout: fixed;
@@ -13653,6 +13649,7 @@ h1.contact-list-name-label {
                   flex-grow: 1;
                   display: flex;
                   flex-direction: column;
+                  max-width: 70% !important;
 
                   .time-schedule {
                     display: flex;
@@ -15030,7 +15027,7 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   }
 }
 
-.note {
+.broadcast-warning-note {
   font-size: 12px;
   border-radius: 4px;
   margin-top: 16px;
