@@ -1,7 +1,7 @@
 <template>
-  <div class="note note--warning"
+  <div class="broadcast-warning-note broadcast-warning-note--warning"
        v-if="showWarning">
-    <p class="note__title"
+    <p class="broadcast-warning-note__title"
        v-if="!isCalculatorMessage">
        WARNING
     </p>
@@ -14,7 +14,7 @@ import { mapGetters } from 'vuex'
 import { broadcastsMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'BroadcastWarningNote',
+  name: 'broadcast-warning-note',
 
   mixins: [
     broadcastsMixin
