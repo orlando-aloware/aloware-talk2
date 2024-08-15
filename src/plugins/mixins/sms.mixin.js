@@ -1,5 +1,5 @@
 import * as SMS from 'src/constants/sms'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapMutations, mapGetters, mapState } from 'vuex'
 
 export default {
   data () {
@@ -29,8 +29,8 @@ export default {
   },
 
   methods: {
-    ...mapActions('broadcast', [
-      'setSmartEncodedMessageLength'
+    ...mapMutations('broadcast', [
+      'SET_SMART_ENCODED_MESSAGE_LENGTH'
     ]),
 
     messageLength (message) {
@@ -70,7 +70,7 @@ export default {
         }
       })
 
-      this.setSmartEncodedMessageLength(message.length + this.optoutTextLength + this.smartEncodingExtraChars)
+      this.SET_SMART_ENCODED_MESSAGE_LENGTH(message.length + this.optoutTextLength + this.smartEncodingExtraChars)
 
       this.getMessageInfo(message)
 
