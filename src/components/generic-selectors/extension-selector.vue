@@ -137,7 +137,7 @@ export default {
 
     initializeExtensions () {
       const initialExtension = 100
-      const extensionsLimit = 100000
+      const extensionsLimit  = 100000
 
       // fill the extensions array
       for (let i = initialExtension; i < extensionsLimit; i++) {
