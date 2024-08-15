@@ -20,7 +20,7 @@
         <span class="cards__body__card__text">
           {{ card.text }}
         </span>
-        <broadcast-warning-note :isCalculatorMessage="true"
+        <broadcast-warning-note :is-calculator-message="true"
                                 :campaign="campaign"
                                 :contactsLength="contactsLength"
                                 v-if="card.showWarning"/>
