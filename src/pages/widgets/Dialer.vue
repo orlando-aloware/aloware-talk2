@@ -170,10 +170,6 @@ export default {
 
   async mounted () {
     await this.init()
-    // console.log('this.dialer.currentStatus -->', this.dialer.currentStatus)
-    // this.setHubspotPhoneNumber('+19403737418')
-    // this.extensionsInitialized = true
-    // this.extensionsVisibility = true
     this.isFirstLoading = false
   },
 
