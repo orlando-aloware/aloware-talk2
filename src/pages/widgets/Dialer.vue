@@ -427,7 +427,6 @@ export default {
         'WRAP_UP'
       ]
 
-      console.log('this.dialer.currentStatus -->', this.dialer.currentStatus)
       return this.dialer &&
         this.profile &&
         this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
@@ -439,7 +438,6 @@ export default {
       this.showAlertCallFinished = false
       this.isDialed = false
 
-      console.log('onVisibilityChanged -->', this.extensionsVisibility, this.dialer?.communication)
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
       }
@@ -467,8 +465,6 @@ export default {
     },
 
     'dialer.currentStatus' () {
-      console.log('watch.dialer.currentStatus -->', this.dialer?.currentStatus)
-
       if (this.isLoadingDialer) {
         return
       }
