@@ -11,7 +11,7 @@
           </q-tooltip>
         </span>
       </div>
-      <div class="broadcast-add__schedule__row__fields mx-w-70">
+      <div class="broadcast-add__schedule__row__fields">
         <contact-line-selector :value="propCampaign?.id"
                                @select="onCampaignSelected"/>
         <broadcast-warning-note :campaign="propCampaign" />
@@ -33,7 +33,7 @@
           </q-tooltip>
         </a>
       </div>
-      <div class="broadcast-add__schedule__row__fields mx-w-70">
+      <div class="broadcast-add__schedule__row__fields">
         <throttle-selector :campaign="propCampaign"
                            v-model="throttle"/>
       </div>
@@ -201,9 +201,9 @@ export default {
 
   data: () => ({
     type: 'sms',
-    maxSmsBodyLength: 1600,
-    throttle: null,
-    mpsLimit: 0.25
+    maxSmsBodyLength: 1600, // Maximum length of a single SMS message body.
+    throttle: null, // Throttling settings for the campaign, controls the rate of message sending.
+    mpsLimit: 0.25 // Maximum messages per second (MPS) that the campaign is allowed to send.
   }),
 
   computed: {
