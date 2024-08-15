@@ -136,11 +136,11 @@ export default {
     },
 
     initializeExtensions () {
-      const initialExtension = 100
-      const extensionsLimit  = 100000
+      const extensionInitial = 100
+      const extensionLimit = 100000
 
       // fill the extensions array
-      for (let i = initialExtension; i < extensionsLimit; i++) {
+      for (let i = extensionInitial; i < extensionLimit; i++) {
         this.allExtensions.push(i.toString())
       }
     }
