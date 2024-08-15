@@ -307,13 +307,13 @@ export default {
       if (this.extensions) {
         this.extensions.callEnded()
         this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
-        this.defaultOutboundCampaignId = null
-        this.campaignId = null
+        if (!this.defaultOutboundCampaignId) {
+          this.campaignId = null
+        }
       }
     },
 
     handleChangeCampaignEvent (campaignId) {
-      this.defaultOutboundCampaignId = campaignId
       this.campaignId = campaignId
     },
 
