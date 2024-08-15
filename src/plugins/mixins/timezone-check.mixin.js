@@ -45,8 +45,8 @@ export default {
               centered: true
             }
           ).then(confirm => {
+            this.isModalOpen = false
             if (confirm) {
-              this.isModalOpen = false
               makeCall()
             }
           }).catch(() => {
