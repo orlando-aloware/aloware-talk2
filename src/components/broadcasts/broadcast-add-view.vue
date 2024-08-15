@@ -126,7 +126,7 @@ import BroadcastSendWarningDialog from './broadcast-send-warning-dialog.vue'
 import CompactBtn from 'components/compact-btn.vue'
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import API from 'src/plugins/api/api'
-import { mapGetters, mapState, mapActions } from 'vuex'
+import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
 import { broadcastsMixin, companyTimezone } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
 
@@ -336,9 +336,9 @@ export default {
       'setSelectedLine'
     ]),
 
-    ...mapActions('broadcast', [
-      'setSelectedCampaign',
-      'setContactsLength'
+    ...mapMutations('broadcast', [
+      'SET_SELECTED_CAMPAIGN',
+      'SET_CONTACTS_LENGTH'
     ]),
 
     mainComponentChanged (state) {
@@ -374,7 +374,7 @@ export default {
     },
 
     onCampaignUpdated (campaign) {
-      this.setSelectedCampaign(campaign)
+      this.SET_SELECTED_CAMPAIGN(campaign)
       this.setSelectedLine(campaign)
     },
 
@@ -467,7 +467,7 @@ export default {
     },
 
     onContactsLength (count) {
-      this.setContactsLength(count)
+      this.SET_CONTACTS_LENGTH(count)
     },
 
     send () {
