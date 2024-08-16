@@ -1560,14 +1560,7 @@ export default {
     },
 
     isCallAdded () {
-      return (
-        this.dialer.communication &&
-        this.dialer.communication.legc_uuid &&
-        this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW &&
-        !this.dialer.communication.in_cold_transfer &&
-        this.dialer.call.call_sid !== this.dialer.communication.legc_uuid &&
-        (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid)
-      )
+      return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
     },
 
     isCallAdding () {
