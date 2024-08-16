@@ -8,7 +8,7 @@ export default {
   },
   methods: {
     // Checks if it's within contact daytime. If not, promps alert to user.
-    checkContactTimezone (contact, makeCall) {
+    checkContactTimezone (contact, makeCall, onCancelCall = null) {
       // if the modal is already open, we skip the next steps
       if (this.isModalOpen) {
         return
@@ -48,9 +48,18 @@ export default {
             this.isModalOpen = false
             if (confirm) {
               makeCall()
+              return
+            }
+
+            // if the user clicks on cancel and there's a callback, we call it to execute an action
+            if (onCancelCall) {
+              onCancelCall()
             }
           }).catch(() => {
             this.isModalOpen = false
+            if (onCancelCall) {
+              onCancelCall()
+            }
           })
         }
       }

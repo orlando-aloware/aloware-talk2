@@ -305,17 +305,31 @@ export default {
     },
 
     handleCall (shouldHandleDialNumber) {
+      const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+
+      // if there's a call in progress or in wrap up, we omit the call
+      if (isCallInProgressOrWrapUp.includes(this.dialer.currentStatus)) {
+        return
+      }
+
+      // if shouldHandleDialNumber is true, then handleDialNumber will set the contact name and timezone
+      // to proceed to execute checkContactTimezone and makeCall
+      if (shouldHandleDialNumber) {
+        this.handleDialNumber(this.hubspotPhoneNumber)
+        return
+      }
+
       const contactData = {
         timezone: this.contactTimezone,
         name: this.contactName
       }
 
-      this.checkContactTimezone(contactData, this.makeCall)
+      this.checkContactTimezone(contactData, this.makeCall, this.onCancelCall)
       this.isDialed = true
+    },
 
-      if (shouldHandleDialNumber) {
-        this.handleDialNumber(this.hubspotPhoneNumber)
-      }
+    onCancelCall () {
+      this.campaignId = null
     },
 
     handleAgentStatusUpdate (data) {
