@@ -135,6 +135,16 @@ export default {
       })
     },
 
+    loadExtensions () {
+      const storedExtensions = localStorage.getItem('extensions')
+      if (storedExtensions) {
+        this.allExtensions = JSON.parse(storedExtensions)
+      } else {
+        this.initializeExtensions()
+        localStorage.setItem('extensions', JSON.stringify(this.allExtensions))
+      }
+    },
+
     initializeExtensions () {
       const extensionInitial = 100
       const extensionLimit = 100000
@@ -145,10 +155,12 @@ export default {
       }
     }
   },
+
   mounted () {
-    this.initializeExtensions()
+    this.loadExtensions()
     this.options = this.availableExtensions.slice(0, 100)
   },
+
   watch: {
     value () {
       this.selectedId = this.value
