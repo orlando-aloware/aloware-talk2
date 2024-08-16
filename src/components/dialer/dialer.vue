@@ -98,7 +98,6 @@ export default {
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
-        console.log('here 2')
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
@@ -403,7 +402,6 @@ export default {
       }
     },
     forceStartOnWrapUp () {
-      console.log('here 3')
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
       this.startWrapUpTimer()
@@ -517,7 +515,6 @@ export default {
           return Promise.resolve()
         }
 
-        console.log('here 4')
         this.setDialerCommunication(res.data)
 
         // if in power dialer session, we must match the active task (contact)'s id
@@ -540,7 +537,6 @@ export default {
       }).catch(err => {
         // Fail if the API returned a 4xx error
         if (err.response && err.response.status >= 400 && err.response.status < 500) {
-          console.log('here 5')
           this.setDialerCommunication()
           this.setDialerContact()
           this.setDialerDeal()
@@ -555,7 +551,6 @@ export default {
         console.log('An error occurred while getting the communication', err)
         // check if we have found the communication after 3 retries
         if (getCommunicationTry > 4) {
-          console.log('here 6')
           this.setDialerCommunication()
           this.setDialerContact()
           this.setDialerDeal()
@@ -1187,8 +1182,6 @@ export default {
         return
       }
 
-      console.log(add)
-
       this.loadingAdd = true
       const params = {
         communication_id: this.dialer.communication.id,
@@ -1226,10 +1219,7 @@ export default {
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
         this.setShouldIntroduce(params.introduce)
-        console.log('======================conferencing-transfer======================')
-        console.log(res.data)
         console.log((params.introduce) ? 'Introduce is in progress.' : 'Add is in progress.')
-        console.log('===================================================================')
       }).catch(err => {
         this.setAddedParty()
         console.log(err)
@@ -1263,7 +1253,6 @@ export default {
     },
 
     resetCall () {
-      console.log('here 7')
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()

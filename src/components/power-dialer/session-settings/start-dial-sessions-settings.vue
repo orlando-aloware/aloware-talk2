@@ -807,7 +807,6 @@ export default {
 
     cleanupDialer () {
       if (this.dialer.isReady && this.dialer.currentStatus === 'READY') {
-        console.log('here 8')
         this.setDialerCommunication()
       }
     },

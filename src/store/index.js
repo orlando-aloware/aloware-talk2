@@ -1374,16 +1374,10 @@ export default function (/* { ssrContext } */) {
       },
 
       SET_SHOULD_INTRODUCE (state, status) {
-        console.log('=================================================')
-        console.log('SET_SHOULD_INTRODUCE', status)
-        console.log('=================================================')
         state.shouldIntroduce = status
       },
 
       SET_ADDED_PARTY (state, addedParty) {
-        console.log('=================================================')
-        console.log('added party', addedParty)
-        console.log('=================================================')
         state.addedParty = addedParty
       },
 
