@@ -2499,6 +2499,10 @@ export default {
 
       setTimeout(() => {
         this.loadingAdd = false
+        // if these 2 attributes are null, then the communication object has not been updated, so we force a refresh
+        if (this.dialer.communication?.legc_uuid === null && this.dialer.communication?.legc_status === null) {
+          this.forceRefreshCommunication($event)
+        }
       }, 1000)
     },
 
