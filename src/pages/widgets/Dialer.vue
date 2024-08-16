@@ -1,8 +1,17 @@
 <template>
   <div>
+    <b-overlay class="h-100 w-100 position-absolute"
+               :show="isLoadingDialer">
+      <template #overlay>
+        <q-spinner-bars color="primary"
+                        size="2em" />
+      </template>
+    </b-overlay>
+
     <dialer-listeners @user-logged-in="handleUserLogin"
                       @agent-status-updated="handleAgentStatusUpdate"/>
-    <div class="p-3" v-if="showAlertAgentOnCall">
+    <div class="p-3"
+         v-if="showAlertAgentOnCall">
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
@@ -36,11 +45,13 @@ import CallingExtensions from '@hubspot/calling-extensions-sdk'
 import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { timezoneCheckMixin, helperMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 
 export default {
   name: 'Dialer',
+
   components: {
     Webrtc,
     DialerListeners
@@ -73,6 +84,8 @@ export default {
         // eventHandlers handle inbound messages
         eventHandlers: {
           onReady: () => {
+            this.$VueEvent.fire('resetCall')
+
             const payload = {
               // Whether a user is logged-in
               isLoggedIn: this.authenticated,
@@ -86,6 +99,9 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
+            this.$VueEvent.fire('resetCall')
+            this.showAlertCallFinished = false
+
             if (event.phone_number) {
               this.findDefaultOutboundCampaign()
               this.setHubspotPhoneNumber(event.phone_number)
@@ -97,6 +113,10 @@ export default {
           },
           onVisibilityChanged: (data) => {
             this.extensionsVisibility = !data?.isHidden
+
+            if (!this.extensionsVisibility) {
+              this.endActiveCall()
+            }
           }
         }
       },
@@ -112,7 +132,8 @@ export default {
       listeners: {
         userLoggedIn: null,
         agentStatusUpdated: null
-      }
+      },
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED']
     }
   },
   computed: {
@@ -122,6 +143,10 @@ export default {
 
     allowed () {
       return this.authProfile && this.initialized
+    },
+
+    isLoadingDialer () {
+      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus)
     }
   },
 
@@ -265,17 +290,17 @@ export default {
       }
     },
 
-    handleCallCompletedEvent () {
+    handleCallCompletedEvent (skipCallFinished = false) {
       if (this.extensions) {
         this.extensions.callEnded()
-        this.showAlertCallFinished = !this.dialer.parkedCall
-        this.defaultOutboundCampaignId = null
-        this.campaignId = null
+        this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
+        if (!this.defaultOutboundCampaignId) {
+          this.campaignId = null
+        }
       }
     },
 
     handleChangeCampaignEvent (campaignId) {
-      this.defaultOutboundCampaignId = campaignId
       this.campaignId = campaignId
     },
 
@@ -400,6 +425,23 @@ export default {
         this.profile &&
         this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
         !statuses.includes(this.dialer.currentStatus)
+    },
+
+    endActiveCall () {
+      this.showAlertAgentOnCall = false
+      this.showAlertCallFinished = false
+      this.isDialed = false
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('endWrapUp')
+      }
+
+      if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+        this.$VueEvent.fire('hangupCall')
+      }
+
+      this.$VueEvent.fire('resetCall')
+      this.handleCallCompletedEvent(true)
     }
   },
 
@@ -414,6 +456,20 @@ export default {
 
     authProfile () {
       this.findDefaultOutboundCampaign()
+    },
+
+    'dialer.currentStatus' () {
+      if (this.isLoadingDialer) {
+        return
+      }
+
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+      if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
+        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP) &&
+        !this.isDialed) {
+        this.showAlertAgentOnCall = true
+        this.showAlertCallFinished = false
+      }
     }
   }
 }
