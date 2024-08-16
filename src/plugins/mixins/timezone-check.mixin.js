@@ -51,6 +51,7 @@ export default {
               return
             }
 
+            // if the user clicks on cancel and there's a callback, we call it to execute an action
             if (onCancelCall) {
               onCancelCall()
             }
