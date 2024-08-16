@@ -167,6 +167,7 @@ export default {
 
         if (dialerCommunication) {
           dialerCommunication.call_disposition_id = data.id
+          console.log('here 1')
           this.setDialerCommunication(dialerCommunication)
         }
 

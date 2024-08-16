@@ -1560,10 +1560,30 @@ export default {
     },
 
     isCallAdded () {
-      return (this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW && !this.dialer.communication.in_cold_transfer && this.dialer.call.call_sid !== this.dialer.communication.legc_uuid && (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid))
+      console.log('===========================IS_CALL_ADDED=========================================')
+      console.log(this.dialer.communication)
+      console.log(this.dialer.communication.legc_uuid)
+      console.log(this.dialer.communication.legz_uuid)
+      console.log(this.dialer.communication.legc_status)
+      console.log(this.dialer.communication.in_cold_transfer)
+      console.log(this.dialer.call.call_sid)
+      console.log('====================================================================')
+      return (
+        this.dialer.communication &&
+        this.dialer.communication.legc_uuid &&
+        this.dialer.communication.legc_status === CommunicationStatus.STATUS_INPROGRESS_NEW &&
+        !this.dialer.communication.in_cold_transfer &&
+        this.dialer.call.call_sid !== this.dialer.communication.legc_uuid &&
+        (!this.dialer.communication.legz_uuid || this.dialer.call.call_sid !== this.dialer.communication.legz_uuid)
+      )
     },
 
     isCallAdding () {
+      console.log('===========================IS_CALL_ADDING=========================================')
+      console.log(this.dialer.communication)
+      console.log(this.dialer.communication.legc_uuid)
+      console.log(this.dialer.communication.legc_status)
+      console.log('====================================================================')
       return this.dialer.communication && this.dialer.communication.legc_uuid && this.dialer.communication.legc_status === CommunicationStatus.STATUS_RINGING_NEW
     },
 
@@ -2461,9 +2481,13 @@ export default {
     },
 
     changeAddRingGroup (ringGroupId) {
+      console.log('=======================changeAddRingGroup====================================')
+      console.log('ringGroupId', ringGroupId)
       this.add.phoneNumber = ''
       this.add.userId = null
       this.add.ringGroupId = ringGroupId
+      console.log(this.add)
+      console.log('===========================================================')
     },
 
     changeAddPhoneNumber () {
@@ -2493,12 +2517,21 @@ export default {
 
     addParticipant ($event) {
       this.loadingAdd = true
+      console.log('===========================addParticipant================================')
+      console.log(this.add)
+      console.log('===============================================================================')
       this.$VueEvent.fire('addParticipant', this.add)
       this.resetAdd()
       this.saveAndResetExpansion($event)
 
       setTimeout(() => {
         this.loadingAdd = false
+        console.log('====================TIMEOUT==========================')
+        // if these 2 attributes are null, then the communication object has not been updated, so we force a refresh
+        if (this.dialer.communication?.legc_uuid === null && this.dialer.communication?.legc_status === null) {
+          this.forceRefreshCommunication($event)
+        }
+        console.log('================================================')
       }, 1000)
     },
 

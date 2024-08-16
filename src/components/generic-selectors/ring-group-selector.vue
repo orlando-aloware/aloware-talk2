@@ -261,6 +261,9 @@ export default {
       })
     },
     updateRingGroups (val) {
+      console.log('===========================updateRingGroup==========================')
+      console.log(val)
+      console.log('======================================================================')
       this.$emit('change', val)
     }
   },
