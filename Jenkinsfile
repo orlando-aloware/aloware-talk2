@@ -19,7 +19,7 @@ pipeline {
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
-        API_URL_OVERWRITE = ''
+        API_URL_OVERWRITE = 'https://pr-10194.mde.alodev.org'
     }
 
     stages {
@@ -49,16 +49,16 @@ pipeline {
                                 script {
                                     //String text
                                     withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
-                                    // text = readFile(dev_env)
-                                    sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
+                                        // text = readFile(dev_env)
+                                        sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                                     }
 
                                     // If the API_URL_OVERWRITE is set, we will replace the API_URL in the .env file
                                     if (env.API_URL_OVERWRITE) {
-                                    sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
+                                        sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
                                     }
 
-                                    // println "${text}"
+                                // println "${text}"
                                 }
                             }
                         }
@@ -92,39 +92,39 @@ pipeline {
                             when { not { branch 'master' } }
                             steps {
                                 sshagent(credentials: ['jenkins-github-creds']) {
-                                echo '==> Clone GitOps Repo';
-                                sh ("""
+                                    echo '==> Clone GitOps Repo'
+                                    sh("""
                                     [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                                     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
                                     git clone git@github.com:${GITHUB_ORG}/${TERRAFORM_REPO}.git
-                                """);
+                                """)
                                 }
 
                                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                                 script {
-                                def branchName = env.GIT_BRANCH.toLowerCase()
-                                def subDomain = branchName.contains('pr') ? "${branchName}.talk" : "talk"
-                                def envUrl = "${subDomain}.${DEV_DOMAIN}"
+                                    def branchName = env.GIT_BRANCH.toLowerCase()
+                                    def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
+                                    def envUrl = "${subDomain}.${DEV_DOMAIN}"
 
-                                dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
-                                    sh """
+                                    dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
+                                        sh '''
                                         terraform init; \
                                         terraform validate; \
                                         terraform fmt
-                                    """
+                                    '''
 
-                                    try {
-                                        sh "terraform workspace new ${branchName}"
+                                        try {
+                                            sh "terraform workspace new ${branchName}"
                                     } catch (Exception e) {
-                                        echo "The workspace already exists, running TF Commands..."
-                                        sh "terraform workspace select ${branchName}"
+                                            echo 'The workspace already exists, running TF Commands...'
+                                            sh "terraform workspace select ${branchName}"
+                                        }
+
+                                        sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
-                                    sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
-                                }
-
-                                sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
+                                    sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
                                 }
                             }
                         }
@@ -135,7 +135,7 @@ pipeline {
                     steps {
                         script {
                             sh 'git rev-parse --abbrev-ref HEAD'
-                            def scannerHome = tool 'SonarQube Tool';
+                            def scannerHome = tool 'SonarQube Tool'
                             withSonarQubeEnv('Sonar') {
                                 sh "${scannerHome}/bin/sonar-scanner"
                             }
@@ -149,18 +149,18 @@ pipeline {
         success {
             script {
                 def branchName = env.GIT_BRANCH.toLowerCase()
-                def subDomain = branchName.contains('pr') ? "${branchName}.talk" : "talk"
+                def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
                 def envUrl = "${subDomain}.${DEV_DOMAIN}"
 
                 notificationSender.sendSlackSuccess()
                 try {
-                  if (env.CHANGE_BRANCH) {
-                    sh "echo ${GIT_AUTH_PSW} > tmp_token.txt"
-                    sh "gh auth login --with-token < tmp_token.txt"
-                    sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${envUrl}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
-                  }
+                    if (env.CHANGE_BRANCH) {
+                        sh "echo ${GIT_AUTH_PSW} > tmp_token.txt"
+                        sh 'gh auth login --with-token < tmp_token.txt'
+                        sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${envUrl}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                    }
                 } catch (Exception e) {
-                    echo "We could not add the comment in Github PR. Error: " + e.toString() + ". Please check #dev-deployments channel in Slack for the environment URL."
+                    echo 'We could not add the comment in Github PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
                 }
             }
         }

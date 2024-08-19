@@ -1,7 +1,7 @@
 #This script checks if the branch name is valid before allowing the commit to go through.
 local_branch_name=$(git rev-parse --abbrev-ref HEAD)
 
-types='(feature|fix|hotfix|chore|docs|refactor|revert|build|test|style|ci|perf|conflict|cleanup)'
+types='(feature|fix|hotfix|chore|docs|refactor|revert|build|test|style|ci|perf|conflict|cleanup|epic)'
 jiraTicket='[A-Za-z]+-[0-9]+'
 description='[a-z]+(-[a-z0-9]+)*'
 
