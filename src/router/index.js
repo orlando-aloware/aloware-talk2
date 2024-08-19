@@ -72,7 +72,7 @@ export default function ({ store }) {
     })
   })
 
-  if (process.env.APP_ENV === 'production') {
+  if (process.env.APP_ENV === 'production' && process.env.GA_TRACKING_ID) {
     Vue.use(VueGtagEsm, {
       config: {
         id: process.env.GA_TRACKING_ID

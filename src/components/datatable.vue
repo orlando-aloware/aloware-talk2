@@ -38,6 +38,7 @@
                        :class="checkAllClass"
                        :disabled="isDisabledCheckAll"
                        :checked="isSelectedAll"
+                       data-testid="datatable-header-check-all"
                        @change="onCheckboxClicked" />
                 <span class="checkmark"
                       :class="checkAllClass">
@@ -113,6 +114,7 @@
                     padding="0 5px"
                     boundary-links
                     direction-links
+                    @input="updatePaginationButtons"
                     dense
                     data-testid="datatable-pagination"
                     :max="lastPage"
@@ -600,6 +602,17 @@ export default {
     onCheckboxClicked (evt) {
       this.$emit('checked', evt.target.checked)
       this.setAllContactsSelected(evt.target.checked)
+    },
+
+    updatePaginationButtons () {
+      this.$nextTick(() => {
+        const allButtons = this.$el.querySelectorAll('.q-pagination button')
+
+        allButtons.forEach(button => {
+          const pageNumber = button.innerText
+          button.setAttribute('data-testid', 'datatable-pagination-page-' + pageNumber)
+        })
+      })
     }
   },
 

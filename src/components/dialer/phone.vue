@@ -1477,9 +1477,8 @@ export default {
       'showIncomingCallNotification',
       'sessionPhoneExpansion',
       'parkedCalls',
-      'callFishingQueue',
       'isCallBackButtonDisabled',
-      'isWidget'
+      'callFishingQueue'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -1915,18 +1914,24 @@ export default {
         this.currentCompany.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS
     },
 
+    // there is a parked call, and another call is in-progress.
     hasParkedAndInprogressCall () {
       return this.dialer.parkedCall && this.dialer.call
     },
 
+    // there is no parked call, nor is there a call in-progress.
     hasNoParkedAndInprogressCall () {
       return !this.dialer.parkedCall && !this.dialer.call
     },
 
+    // there is no parked call, but there is a call in-progress.
     hasCallInProgressNoParkedCall () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
+    // to ensure that the "Finish Call" button in the Wrap-up Form is disabled until the changeAgentStatus job event, executed from the backend,
+    // arrives via Pusher at the frontend and changes the agent's status to wrap-up, at which point the button becomes enabled.
+    // it includes "ParkingCalls" conditionals.
     isNotOnWrapUp () {
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall)
     },
@@ -2019,20 +2024,16 @@ export default {
     },
 
     goToContact () {
-      if (!this.contact) {
-        return
+      if (this.contact) {
+        this.$router.push({
+          name: 'Contact',
+          params: {
+            id: this.contact.id
+          }
+        }).catch(err => {
+          console.log(err)
+        })
       }
-
-      const contactRouter = {
-        name: 'Contact',
-        params: {
-          id: this.contact.id
-        }
-      }
-
-      this.isWidget
-        ? window.open(this.$router.resolve(contactRouter).href, '_blank')
-        : this.$router.push(contactRouter).catch(err => console.log(err))
     },
 
     copyPhoneNumber (phoneNumber) {

@@ -16,8 +16,7 @@ export default _.merge({
     },
 
     ssuEnabled () {
-      // return !!(process.env.KYC_SSU_ENABLED || false)
-      return true
+      return this.statics?.kyc_ssu_enabled || false
     },
 
     isTrialKYC () {

@@ -14,6 +14,7 @@
                            is-simple
                            :communication-id="communication.id"
                            :filename="filename"
+                           :file-mime-type="this.mimeType"
                            :file-uuid="fileUuid"/>
           <transcription-modal button-text="Show Smart Transcription"
                                data-testid="communication-audio-transcription-modal"
@@ -76,6 +77,7 @@ export default {
       fileUuid: null,
       filename: '',
       loading: false,
+      mimeType: '',
       UploadedFileTypes
     }
   },
@@ -119,6 +121,7 @@ export default {
             this.filename = this.getFilenameFromURL(response.data.download_url)
             this.remoteUrl = response.data.url
             this.downloadUrl = response.data.download_url
+            this.mimeType = response.data.mimetype || ''
           }).catch(err => {
             console.log(err)
             this.loading = false

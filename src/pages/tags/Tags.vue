@@ -8,6 +8,7 @@
           <search placeholder="Search ID or name"
                   class="width-300"
                   :search="search"
+                  data-testid="tags-input-search-id-or-name"
                   @search="onSearch">
           </search>
         </b-col>
@@ -15,6 +16,7 @@
         <!-- category tabs -->
         <b-col class="d-flex align-self-center justify-around">
           <tags-tabs :categories-count="tagCategoriesCount"
+                     data-testid="tags-toggle-buttons"
                      @loadTags="loadTags">
           </tags-tabs>
         </b-col>
@@ -26,6 +28,7 @@
                     size="sm"
                     variant="primary"
                     :title="`Add ${ tagCategoryName } Tag`"
+                    data-testid="tags-button-add-tag"
                     v-if="isAdmin || isSupervisor"
                     @click="openTagForm">
             <i class="fa fa-plus"></i>
@@ -37,7 +40,8 @@
                     class="btn-light align-items-center"
                     size="sm"
                     title="Help"
-                    variant="light">
+                    variant="light"
+                    data-testid="tags-button-help">
             <i class="large material-icons mr-1">help_outline</i>
             <span v-show="!$q.screen.sm && !$q.screen.md"> Help</span>
           </b-button>
@@ -58,6 +62,7 @@
        <!-- loading spinner -->
       <b-overlay class="h-100 w-100 d-flex flex-column overflow-hidden"
                  rounded="sm"
+                 data-testid="tags-loading-spinner"
                  :show="isLoading">
         <template #overlay>
           <q-spinner-bars color="primary"
@@ -66,6 +71,7 @@
 
         <!-- bulk actions -->
         <div class="row mx-0 relative-position"
+             data-testid="tags-bulk-actions"
              v-if="hasRole('Company Admin')">
           <tags-bulk-action-menu v-if="hasSelectedTagIds && this.tags.length"
                                  @reloadTags="getTags" />
@@ -76,6 +82,7 @@
                     :is-loading="isLoading"
                     :is-loading-refresh-count="isLoadingRefreshCount"
                     :pagination="pagination"
+                    data-testid="tags-table"
                     @paginated="paginate"
                     @sort="sort"
                     @editTag="editTag"
@@ -84,6 +91,7 @@
         <tag-form :is-show="isOpenTagForm"
                   :tag-category="selectedTagCategory"
                   :editable-tag="tag"
+                  data-testid="tags-form"
                   @closeTagForm="closeTagForm" />
       </b-overlay>
     </div>

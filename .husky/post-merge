@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+# Post-merge script to check if yarn.lock changed and run yarn install if necessary
+
+# Checks if yarn.lock changed in the last pull operation
+if git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | grep -q "yarn.lock"; then
+  echo "yarn.lock has changed, running yarn install..."
+  yarn install
+else
+  echo "yarn.lock has not changed, no need to run yarn install."
+fi

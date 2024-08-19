@@ -13,6 +13,7 @@
                :current-page="pagination.currentPage"
                :last-page="pagination.lastPage"
                :is-selected-all="isSelectedAll"
+               data-testid="tags-datatable"
                @paginated="paginated"
                @sort="sort"
                @checked="selectAllCheckboxChange">
@@ -20,11 +21,13 @@
       <template #tbody>
         <tr class="datatable-row"
             :key="`${index}`"
+            data-testid="tags-table-row"
             v-for="(tag, index) in tags">
 
           <template v-for="(column, colIndex) in columns">
             <td v-if="column.name === 'checkbox' && hasRole('Company Admin')"
                 :key="`col-${colIndex}`"
+                data-testid="tags-table-row-checkbox"
                 class="text-left pull-left datatable-row__checkbox">
 
                 <label class="custom-checkbox-container">
@@ -32,12 +35,14 @@
                          class="checker"
                          :value="tag.id"
                          :checked="isSelected(tag.id)"
+                         data-testid="tags-table-tag-checker-input"
                          @change="rowCheckboxChange($event, tag)" />
                   <span class="checkmark"></span>
                 </label>
               </td>
 
             <td :key="`col-${colIndex}`"
+                data-testid="tags-table-id"
                 v-if="column.name === 'id'">
               {{ tag.id }}
             </td>
@@ -45,6 +50,7 @@
             <td class="cursor-pointer"
                 :key="`col-${colIndex}`"
                 :title="tag.name"
+                data-testid="tags-table-name"
                 v-if="column.name === 'name'">
               <i class="fa fa-square mr-1"
                  :style="{ color: tag.color }">
@@ -53,6 +59,7 @@
 
             <td class="cursor-pointer"
                 :key="`col-${colIndex}`"
+                data-testid="tags-table-updated-at"
                 v-if="column.name === 'updated_at'">
               {{ tag.updated_at | fixDate }}
             </td>
@@ -60,6 +67,7 @@
             <td class="cursor-pointer"
                 :key="`col-${colIndex}`"
                 :title="tag.description"
+                data-testid="tags-table-description"
                 v-if="column.name === 'description'">
               <span>{{ tag.description }}</span>
             </td>
@@ -72,6 +80,7 @@
               <b-button class="badge bg-grey-12 text-size-xs"
                         v-show="refreshedTagId !== tag.id"
                         v-b-tooltip.hover.right="'Click to Refresh'"
+                        data-testid="tags-table-communications-count"
                         @click="refreshCount(tag.id)">
                 {{ tag.communications_count }}
               </b-button>
@@ -85,6 +94,7 @@
               <b-button class="badge bg-grey-12 text-size-xs"
                         v-show="refreshedTagId !== tag.id"
                         v-b-tooltip.hover.right="'Click to Refresh'"
+                        data-testid="tags-table-contacts-count"
                         @click="refreshCount(tag.id)">
                 {{ tag.contacts_count }}
               </b-button>
@@ -100,6 +110,7 @@
                           variant="transparent"
                           size="sm"
                           v-if="hasPermissionTo('update tag') && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
+                          data-testid="tags-table-button-communications"
                           @click="openTagCommunications(tag.id)">
                   <q-icon :name="ionOpenOutline"></q-icon>
                 </b-button>
@@ -107,12 +118,14 @@
                           variant="transparent"
                           size="sm"
                           v-if="hasPermissionTo('update tag') && selectedTagCategory === ContactTags && tag.contacts_count > 0"
+                          data-testid="tags-table-button-contacts"
                           @click="openTagContacts(tag.id)">
                   <q-icon :name="ionOpenOutline" />
                 </b-button>
                 <b-button title="Edit"
                           variant="transparent"
                           size="sm"
+                          data-testid="tags-table-button-edit"
                           @click="editTag(tag)">
                   <edit-pen-icon />
                 </b-button>
@@ -120,30 +133,36 @@
                             size="sm"
                             variant="light"
                             right
-                            no-caret>
+                            no-caret
+                            data-testid="tags-table-button-more-options">
                   <template #button-content>
                     <ellipse-icon />
                   </template>
                   <div v-if="selectedTagCategory === ContactTags && tag.contacts_count > 0">
                     <b-dropdown-item v-if="tag.contacts_count > 50"
+                                     data-testid="tags-table-dropdown-item-split"
                                      @click="openTagContactsSplitterDialog(tag)">
                       <i class="fas fa-columns"></i> Split
                     </b-dropdown-item>
 
-                    <b-dropdown-item @click="openAssignContactsTagDialog(tag)">
+                    <b-dropdown-item data-testid="tags-table-dropdown-item-assign-contacts"
+                                     @click="openAssignContactsTagDialog(tag)">
                       <i class="fas fa-sign-in-alt"></i> Assign Contacts
                     </b-dropdown-item>
 
-                    <b-dropdown-item @click="openAddTagContactsToPowerDialerDialog(tag)">
+                    <b-dropdown-item data-testid="tags-table-dropdown-item-add-to-power-dialer"
+                                     @click="openAddTagContactsToPowerDialerDialog(tag)">
                       <i class="fas fa-phone"></i> Add to PowerDialer
                     </b-dropdown-item>
 
-                    <b-dropdown-item @click="openEnrollTagContactsToSequenceDialog(tag)">
+                    <b-dropdown-item data-testid="tags-table-dropdown-item-enroll-contacts"
+                                     @click="openEnrollTagContactsToSequenceDialog(tag)">
                       <i class="fas fa-user-plus"></i> Enroll Contacts
                     </b-dropdown-item>
                   </div>
 
                   <b-dropdown-item v-if="hasPermissionTo('delete tag')"
+                                   data-testid="tags-table-dropdown-item-delete"
                                    @click="openDeleteTagDialog(tag)">
                     <span class="text-danger"><delete-red-icon /> Delete</span>
                   </b-dropdown-item>
@@ -155,6 +174,7 @@
                         variant="light"
                         size="sm"
                         v-if="isAgent && selectedTagCategory === CommunicationTags && tag.communications_count > 0"
+                        data-testid="tags-table-redirect-to-communications"
                         @click="openTagCommunications(tag.id)">
                 <span v-if="isAgent"><q-icon :name="ionOpenOutline" /> Communications</span>
               </b-button>
@@ -164,6 +184,7 @@
                         variant="light"
                         size="sm"
                         v-if="isAgent && selectedTagCategory === ContactTags && tag.contacts_count > 0"
+                        data-testid="tags-table-redirect-to-contacts"
                         @click="openTagContacts(tag.id)">
                 <span v-if="isAgent"><q-icon :name="ionOpenOutline" /> Contacts</span>
               </b-button>
@@ -177,6 +198,7 @@
     <!-- contacts tag actions -->
     <tag-contacts-splitter :is-show="isOpenTagContactsSplitterDialog"
                            :tag="selectedTag"
+                           data-testid="tags-contacts-splitter"
                            @closeAssignContactsTagModal="closeContactTagsActionsModals" />
 
     <assign-contacts-by-tag :is-show="isOpenAssignContactsTagDialog"
