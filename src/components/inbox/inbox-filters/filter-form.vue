@@ -28,6 +28,7 @@
                                    :always-show-calendars="true"
                                    :auto-apply="true"
                                    data-testid="filter-form-date-range-picker"
+                                   @toggle="pickerToggle"
                                    v-model="dateRange">
                   <template v-slot:input="picker" style="min-width: 350px;">
                     {{ getDateRangeInputLabel(picker) }}
@@ -492,6 +493,11 @@ export default {
     defaultFilterModel: {
       type: Object,
       required: true
+    },
+
+    reset: {
+      type: Boolean,
+      required: false
     }
   },
 
@@ -511,6 +517,8 @@ export default {
     ]),
 
     ...mapState(['currentTimezone']),
+
+    ...mapState(['isFirstLoad']),
 
     isInboxOrAllComms () {
       return this.inboxTaskRoutes.includes(this.$route.name) ||
@@ -664,6 +672,28 @@ export default {
 
   methods: {
     ...mapActions(['setTags']),
+    ...mapActions(['setIsFirstLoad']),
+
+    pickerToggle (isOpen) {
+      if (isOpen && !this.isFirstLoad) {
+        this.$nextTick(() => {
+          const pickerElement = this.$refs.picker.$el
+          const listItems = pickerElement.querySelectorAll('li')
+
+          listItems.forEach(li => {
+            li.addEventListener('click', () => {
+              sessionStorage.setItem('date-selected', li.getAttribute('data-range-key'))
+            })
+
+            li.classList.remove('active')
+
+            if (li.getAttribute('data-range-key') === sessionStorage.getItem('date-selected')) {
+              li.classList.add('active')
+            }
+          })
+        })
+      }
+    },
 
     onFilterChange (value, prop) {
       this.filter[prop] = value
@@ -681,6 +711,10 @@ export default {
     getDateRangeInputLabel () {
       if (this.dateRange.startDate && this.dateRange.endDate) {
         return `${this.$options.filters.date(this.dateRange.startDate)} - ${this.$options.filters.date(this.dateRange.endDate)}`
+      }
+
+      if (this.isFirstLoad || this.reset) {
+        return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
       }
 
       return 'All Time'
@@ -735,8 +769,17 @@ export default {
   },
 
   mounted () {
-    this.dateRange.startDate = this.filter.from_date
-    this.dateRange.endDate = this.filter.to_date
+    if (this.isFirstLoad) {
+      this.setIsFirstLoad(false)
+      sessionStorage.setItem('date-selected', 'Last 30 Days')
+
+      this.dateRange.startDate = this.ranges['Last 30 Days'][0]
+      this.dateRange.endDate = this.ranges['Last 30 Days'][1]
+    } else {
+      this.dateRange.startDate = this.filter.from_date
+      this.dateRange.endDate = this.filter.to_date
+    }
+
     this.rangePicker = this.$refs.picker
     this.selectedTags = this.getTagsObjectsByIds(this.filter?.tags)
 
@@ -802,6 +845,16 @@ export default {
       if (value && this.dateRange.startDate && this.dateRange.endDate) {
         this.rangePicker.$data.start = window.moment(this.dateRange.startDate)._d
         this.rangePicker.$data.end = window.moment(this.dateRange.endDate)._d
+      }
+    },
+
+    reset (newVal) {
+      if (newVal) {
+        this.dateRange.startDate = this.ranges['Last 30 Days'][0]
+        this.dateRange.endDate = this.ranges['Last 30 Days'][1]
+        this.filter.from_date = this.dateRange.startDate
+        this.filter.to_date = this.dateRange.endDate
+        this.getDateRangeInputLabel()
       }
     }
   }

@@ -1915,18 +1915,24 @@ export default {
         this.currentCompany.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_ALWAYS
     },
 
+    // there is a parked call, and another call is in-progress.
     hasParkedAndInprogressCall () {
       return this.dialer.parkedCall && this.dialer.call
     },
 
+    // there is no parked call, nor is there a call in-progress.
     hasNoParkedAndInprogressCall () {
       return !this.dialer.parkedCall && !this.dialer.call
     },
 
+    // there is no parked call, but there is a call in-progress.
     hasCallInProgressNoParkedCall () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
+    // to ensure that the "Finish Call" button in the Wrap-up Form is disabled until the changeAgentStatus job event, executed from the backend,
+    // arrives via Pusher at the frontend and changes the agent's status to wrap-up, at which point the button becomes enabled.
+    // it includes "ParkingCalls" conditionals.
     isNotOnWrapUp () {
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall)
     },

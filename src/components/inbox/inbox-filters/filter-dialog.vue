@@ -109,6 +109,7 @@
         <filter-form ref="inboxChannelFilterForm"
                      :default-filter-model="loadedDefaultFilterModel"
                      :filter="filter"
+                     :reset="reset"
                      data-testid="filter-dialog-filter-form">
         </filter-form>
         <div class="d-flex justify-content-end mt-sm-3 px-3">
@@ -240,7 +241,8 @@ export default {
         'has_unread'
       ],
       ChannelType,
-      viewName: null
+      viewName: null,
+      reset: false
     }
   },
 
@@ -344,6 +346,10 @@ export default {
     filterHasChanges () {
       const filterIdentifier = this.isFilterUpdateMode ? this.selectedFilter.filter : this.loadedDefaultFilterModel.filter
 
+      if (this.reset) {
+        return false
+      }
+
       for (const field of this.filterFields) {
         if (JSON.stringify(this.filter[field]) !== JSON.stringify(filterIdentifier[field])) {
           return true
@@ -443,6 +449,7 @@ export default {
     ]),
 
     ...mapActions(['setTags']),
+    ...mapActions(['setIsFirstLoad']),
 
     hideModal () {
       this.$refs.inboxChannelFilterModal.hide()
@@ -513,6 +520,10 @@ export default {
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
       const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.defaultFilterModel.filter
 
+      this.reset = true
+      sessionStorage.removeItem('date-selected')
+      this.setIsFirstLoad(true)
+
       for (const item in useFilter) {
         if (this.booleanFields.includes(item)) {
           // convert boolean to numeric
@@ -525,6 +536,7 @@ export default {
     },
 
     onApply (skipChangedFields = false) {
+      this.reset = false
       this.resetChannelChangedFilterFields()
 
       const myContactsFilter = _.get(this.filter, 'my_contact', null)
@@ -572,8 +584,21 @@ export default {
           // for non-boolean fields change tracking
           const filterItem = JSON.stringify(this.filter[item])
           const loadedFilterItem = JSON.stringify(this.loadedDefaultFilterModel.filter[item])
+
+          let toDateUpdated = false
+
+          if (item === 'to_date') {
+            if (filterItem && loadedFilterItem && filterItem === loadedFilterItem) {
+              toDateUpdated = true
+              this.updateChannelChangedFilterFields({
+                name: item,
+                value: this.filter[item]
+              })
+            }
+          }
+
           if (!this.booleanFields.includes(item) && filterItem !== loadedFilterItem &&
-            hasField && !excludeProps.includes(item)) {
+            hasField && !excludeProps.includes(item) && !toDateUpdated) {
             this.updateChannelChangedFilterFields({
               name: item,
               value: this.filter[item]
@@ -635,6 +660,7 @@ export default {
     },
 
     onSaveNewFilter () {
+      this.reset = false
       this.$emit('createNewFilter', _.pick(this.filter, this.filterFields))
     },
 
