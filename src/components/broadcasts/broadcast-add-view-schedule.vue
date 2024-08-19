@@ -84,12 +84,12 @@
       <div class="broadcast-add__schedule__row__label">
         Throttling
         <a target="_blank"
-           :href="propCampaign?.max_mps <= mpsLimit ? getComplianceURL() : '#'">
+           :href="complianceURL">
           <information-circle-icon class="ml-2 cursor-pointer"/>
           <q-tooltip>
             This is an hourly throttling limit on your bulk message campaign.<br>
             Throttling comes directly from the carrier based on brand trust score.<br>
-            <span v-if="propCampaign?.max_mps <= mpsLimit">
+            <span v-if="isWithinMpsLimit">
               To increase your MPS rate, please register your line cliking on this button.
             </span>
           </q-tooltip>
@@ -204,6 +204,14 @@ export default {
         : this.schedule.time
 
       return time >= this.currentCompany.broadcast_open && time <= this.currentCompany.broadcast_close
+    },
+
+    complianceURL () {
+      return this.propCampaign?.max_mps <= this.mpsLimit ? this.getComplianceURL() : '#'
+    },
+
+    isWithinMpsLimit () {
+      return this.propCampaign?.max_mps <= this.mpsLimit
     }
   },
 
