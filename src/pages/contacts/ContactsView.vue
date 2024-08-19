@@ -587,7 +587,7 @@
                   <span v-else>
                     <button class='btn btn-sm datatable-row__actions__action--trash'
                             data-testid='contact-remove-option'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')"
+                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact') && !isSimpSocial"
                             @click='onRemove(contact, id)'>
                       <span class='aloicons action-icons'>B</span>
                     </button>
