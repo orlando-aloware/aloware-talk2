@@ -1976,6 +1976,7 @@ export default {
     this.checkIfIsWidget()
     this.setupDraggable()
     this.setupContactLocalTime()
+    this.widgetShouldOpen()
     // Disable phone visibility on power dialer sessions
     this.isVisible = this.$route.meta.id !== 'power-dialer-session'
     this.showLocalTime = true
@@ -2003,6 +2004,12 @@ export default {
       if (contact) {
         this.getContactLocalTime()
         this.$options.localTimeInterval = setInterval(this.getContactLocalTime, 60 * 1000)
+      }
+    },
+
+    widgetShouldOpen () {
+      if (this.is_widget && this.shouldShow) {
+        this.openPhone()
       }
     },
 
@@ -2603,6 +2610,7 @@ export default {
       this.loadingAdd = false
       this.loadingIntroduce = false
       this.setupDraggable()
+      this.widgetShouldOpen()
       this.setupContactLocalTime()
       this.resetBottomExpansion()
 
