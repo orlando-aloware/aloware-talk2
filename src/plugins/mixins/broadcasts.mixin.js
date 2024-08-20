@@ -140,9 +140,6 @@ export default {
       }
 
       return this.contactsLength * this.messageCount() * messageRate
-
-      // wait Tayllan to confirm this calculation
-      // return this.contactsLength * this.messageCount() * messageRate + (this.segments * rate_by_type_of_numbers)
     }
   }
 }
