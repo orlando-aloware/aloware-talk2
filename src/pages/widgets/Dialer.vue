@@ -169,7 +169,6 @@ export default {
   },
 
   async mounted () {
-    console.log('Dialer mounted')
     await this.init()
     this.isFirstLoading = false
   },
@@ -204,7 +203,6 @@ export default {
         this.authProfile = res.data?.user
         this.loading = false
         this.initialized = true
-        console.log('User is authenticated')
         this.handleUserLogin()
       }).catch((err) => {
         console.log('Error: api key is not valid', err)
@@ -249,8 +247,6 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
-      console.log('handleDialNumber --> phoneNumber', phoneNumber)
-
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
         return
@@ -262,7 +258,6 @@ export default {
         this.setHubspotPhoneNumber(phoneNumber)
       }
 
-      console.log('handleDialNumber --> canHandleDialNumber', this.canHandleDialNumber())
       if (this.canHandleDialNumber()) {
         const contact = await this.searchContact(this.hubspotPhoneNumber)
 
@@ -310,12 +305,10 @@ export default {
     },
 
     handleCall (shouldHandleDialNumber) {
-      console.log('handleCall --> shouldHandleDialNumber', shouldHandleDialNumber)
       const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       // if there's a call in progress or in wrap up, we omit the call
       if (isCallInProgressOrWrapUp.includes(this.dialer.currentStatus)) {
-        console.log('Call in progress or wrap up')
         return
       }
 
@@ -416,17 +409,6 @@ export default {
     },
 
     canHandleDialNumber () {
-      console.log('canHandleDialNumber --> dialer', this.dialer)
-      console.log('canHandleDialNumber --> isRedirectedToHubspotWidget', this.isRedirectedToHubspotWidget)
-      console.log('canHandleDialNumber --> defaultOutboundCampaignId', this.defaultOutboundCampaignId)
-      console.log('canHandleDialNumber --> needsExtensions', this.needsExtensions)
-      console.log('canHandleDialNumber --> extensionsInitialized', this.extensionsInitialized)
-      console.log('canHandleDialNumber --> extensionsVisibility', this.extensionsVisibility)
-      console.log('canHandleDialNumber --> initialized', this.initialized)
-      console.log('canHandleDialNumber --> authProfile', this.authProfile)
-      console.log('canHandleDialNumber --> dialer.isReady', this.dialer?.isReady)
-      console.log('canHandleDialNumber --> campaignId', this.campaignId)
-
       if (this.isRedirectedToHubspotWidget && this.campaignId) {
         return this.needsExtensions &&
           this.initialized &&
