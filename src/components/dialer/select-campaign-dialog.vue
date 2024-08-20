@@ -7,7 +7,6 @@
       <div class="label">Select a Line</div>
       <div class="d-flex">
         <line-selector class="line-selector"
-                       specificClass="inline-select"
                        label="Select a Line"
                        custom-placeholder="Choose an available line"
                        rounded
