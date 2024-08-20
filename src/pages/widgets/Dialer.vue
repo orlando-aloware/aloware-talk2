@@ -262,6 +262,7 @@ export default {
         this.setHubspotPhoneNumber(phoneNumber)
       }
 
+      console.log('handleDialNumber --> canHandleDialNumber', this.canHandleDialNumber())
       if (this.canHandleDialNumber()) {
         const contact = await this.searchContact(this.hubspotPhoneNumber)
 
@@ -415,6 +416,15 @@ export default {
     },
 
     canHandleDialNumber () {
+      console.log('canHandleDialNumber --> dialer', this.dialer)
+      console.log('canHandleDialNumber --> isRedirectedToHubspotWidget', this.isRedirectedToHubspotWidget)
+      console.log('canHandleDialNumber --> defaultOutboundCampaignId', this.defaultOutboundCampaignId)
+      console.log('canHandleDialNumber --> needsExtensions', this.needsExtensions)
+      console.log('canHandleDialNumber --> initialized', this.initialized)
+      console.log('canHandleDialNumber --> authProfile', this.authProfile)
+      console.log('canHandleDialNumber --> dialer.isReady', this.dialer?.isReady)
+      console.log('canHandleDialNumber --> campaignId', this.campaignId)
+
       if (this.isRedirectedToHubspotWidget && this.defaultOutboundCampaignId) {
         return this.needsExtensions &&
           this.initialized &&
