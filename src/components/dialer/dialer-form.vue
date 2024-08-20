@@ -327,7 +327,7 @@ export default {
     },
 
     isBlockTooltipPopoverEnabled () {
-      if (!this.isTrialKYC || this.isCompanyA2pCampaignApproved) {
+      if (!this.isTrialKYC && this.isCompanyA2pCampaignApproved) {
         return false
       }
 

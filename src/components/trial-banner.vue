@@ -159,7 +159,7 @@ export default {
     },
 
     shouldShowRegistrationInReviewButton () {
-      return (this.isCompanyKYC && !this.isKYCFilled) && !this.isCompanyA2pCampaignApproved
+      return (this.isCompanyKYC && !this.isKYCFilled) || !this.isCompanyA2pCampaignApproved
     }
   },
 
