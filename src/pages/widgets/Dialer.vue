@@ -420,12 +420,14 @@ export default {
       console.log('canHandleDialNumber --> isRedirectedToHubspotWidget', this.isRedirectedToHubspotWidget)
       console.log('canHandleDialNumber --> defaultOutboundCampaignId', this.defaultOutboundCampaignId)
       console.log('canHandleDialNumber --> needsExtensions', this.needsExtensions)
+      console.log('canHandleDialNumber --> extensionsInitialized', this.extensionsInitialized)
+      console.log('canHandleDialNumber --> extensionsVisibility', this.extensionsVisibility)
       console.log('canHandleDialNumber --> initialized', this.initialized)
       console.log('canHandleDialNumber --> authProfile', this.authProfile)
       console.log('canHandleDialNumber --> dialer.isReady', this.dialer?.isReady)
       console.log('canHandleDialNumber --> campaignId', this.campaignId)
 
-      if (this.isRedirectedToHubspotWidget && this.defaultOutboundCampaignId) {
+      if (this.isRedirectedToHubspotWidget && this.campaignId) {
         return this.needsExtensions &&
           this.initialized &&
           this.authProfile &&
