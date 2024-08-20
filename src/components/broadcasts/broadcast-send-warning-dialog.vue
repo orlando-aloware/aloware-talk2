@@ -29,7 +29,7 @@ import { broadcastsMixin } from 'src/plugins/mixins'
 import ConfirmDialog from 'components/confirm-dialog.vue'
 
 export default {
-  name: 'BroadcastSendWarningDialog',
+  name: 'broadcast-send-warning-dialog',
 
   components: {
     ConfirmDialog
