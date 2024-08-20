@@ -308,7 +308,7 @@ export default {
       const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       // if there's a call in progress or in wrap up, we omit the call
-      if (isCallInProgressOrWrapUp.includes(this.dialer.currentStatus)) {
+      if (isCallInProgressOrWrapUp.includes(this.dialer?.currentStatus)) {
         return
       }
 
