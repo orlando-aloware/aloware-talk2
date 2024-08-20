@@ -325,8 +325,7 @@ export default {
       'messageComposer',
       'selectedLine',
       'isOptoutActive',
-      'optoutText',
-      'selectedLine'
+      'optoutText'
     ]),
 
     ...mapState('contacts', [

@@ -74,8 +74,9 @@
         </span>
       </div>
       <div class="broadcast-add__schedule__row__fields">
-        <contact-line-selector v-model="campaign.id"
+        <contact-line-selector :value="propCampaign?.id"
                                @select="onCampaignSelected"/>
+        <broadcast-warning-note :campaign="propCampaign"/>
       </div>
     </div>
 
@@ -83,19 +84,19 @@
       <div class="broadcast-add__schedule__row__label">
         Throttling
         <a target="_blank"
-           :href="campaign.max_mps <= mpsLimit ? getComplianceURL() : '#'">
+           :href="complianceURL">
           <information-circle-icon class="ml-2 cursor-pointer"/>
           <q-tooltip>
             This is an hourly throttling limit on your bulk message campaign.<br>
             Throttling comes directly from the carrier based on brand trust score.<br>
-            <span v-if="campaign.max_mps <= mpsLimit">
+            <span v-if="isWithinMpsLimit">
               To increase your MPS rate, please register your line cliking on this button.
             </span>
           </q-tooltip>
         </a>
       </div>
       <div class="broadcast-add__schedule__row__fields">
-        <throttle-selector :campaign="campaign"
+        <throttle-selector :campaign="propCampaign"
                            v-model="throttle"/>
       </div>
     </div>
@@ -108,14 +109,16 @@ import ContactLineSelector from 'src/components/contact-line-selector.vue'
 import DateSelector from 'src/components/date-selector.vue'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
-import { classicMixin, companyTimezone } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
+import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
+import { broadcastsMixin, classicMixin, companyTimezone } from 'src/plugins/mixins'
+import { mapState, mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view-schedule',
 
   mixins: [
+    broadcastsMixin,
     classicMixin,
     companyTimezone
   ],
@@ -125,7 +128,8 @@ export default {
     ContactLineSelector,
     InformationCircleIcon,
     DateSelector,
-    ThrottleSelector
+    ThrottleSelector,
+    BroadcastWarningNote
   },
 
   props: {
@@ -153,13 +157,15 @@ export default {
       'currentCompany'
     ]),
 
+    ...mapGetters('contacts', ['messageComposer']),
+
     isValid () {
       const time = this.time === 'scheduled'
         ? this.schedule.date && this.schedule.time
         : true
 
       return time &&
-        !isEmpty(this.campaign) &&
+        !isEmpty(this.propCampaign) &&
         !isEmpty(this.throttle) &&
         !this.scheduleIsPast
     },
@@ -198,6 +204,14 @@ export default {
         : this.schedule.time
 
       return time >= this.currentCompany.broadcast_open && time <= this.currentCompany.broadcast_close
+    },
+
+    complianceURL () {
+      return this.propCampaign?.max_mps <= this.mpsLimit ? this.getComplianceURL() : '#'
+    },
+
+    isWithinMpsLimit () {
+      return this.propCampaign?.max_mps <= this.mpsLimit
     }
   },
 
@@ -207,13 +221,12 @@ export default {
       date: null,
       time: null
     },
-    campaign: {},
     throttle: null,
     mpsLimit: 0.25
   }),
 
   created () {
-    this.campaign = this.propCampaign || {}
+    this.onCampaignSelected(this.propCampaign || {})
     this.throttle = this.propThrottle
 
     if (this.propTime) {
@@ -238,9 +251,7 @@ export default {
     },
 
     onCampaignSelected (campaign) {
-      this.campaign = campaign
-
-      this.$emit('campaign', this.campaign)
+      this.$emit('campaign', campaign)
     },
 
     emitValues () {
@@ -288,6 +299,10 @@ export default {
 
     throttle (value) {
       this.$emit('throttle', value)
+    },
+
+    propCampaign () {
+      this.$emit('price-updated', this.getEstimatedPrice())
     }
   }
 }
