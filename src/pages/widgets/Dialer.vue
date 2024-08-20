@@ -444,7 +444,7 @@ export default {
       return this.dialer &&
         this.profile &&
         this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
-        !statuses.includes(this.dialer.currentStatus)
+        !statuses.includes(this.dialer?.currentStatus)
     },
 
     endActiveCall () {
@@ -452,7 +452,7 @@ export default {
       this.showAlertCallFinished = false
       this.isDialed = false
 
-      if (this.dialer.currentStatus === 'WRAP_UP') {
+      if (this.dialer?.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
       }
 
