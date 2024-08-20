@@ -329,7 +329,22 @@ export default {
     },
 
     onCancelCall () {
-      this.campaignId = null
+      if (this.shouldUseCompanyCampaignId()) {
+        this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
+      } else if (this.shouldUseProfileCampaignId()) {
+        this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
+      } else { // if there's no a line by default, we remove the selected line
+        this.defaultOutboundCampaignId = null
+      }
+
+      this.campaignId = this.defaultOutboundCampaignId
+
+      // if the call is canceled, we close the widget in HS
+      setTimeout(() => {
+        this.extensions.callCompleted({
+          hideWidget: true
+        })
+      }, 50)
     },
 
     handleAgentStatusUpdate (data) {
