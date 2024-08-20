@@ -308,7 +308,7 @@ export default {
       const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       // if there's a call in progress or in wrap up, we omit the call
-      if (isCallInProgressOrWrapUp.includes(this.dialer.currentStatus)) {
+      if (isCallInProgressOrWrapUp.includes(this.dialer?.currentStatus)) {
         return
       }
 
@@ -438,7 +438,7 @@ export default {
       return this.dialer &&
         this.profile &&
         this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
-        !statuses.includes(this.dialer.currentStatus)
+        !statuses.includes(this.dialer?.currentStatus)
     },
 
     endActiveCall () {
@@ -446,7 +446,7 @@ export default {
       this.showAlertCallFinished = false
       this.isDialed = false
 
-      if (this.dialer.currentStatus === 'WRAP_UP') {
+      if (this.dialer?.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
       }
 

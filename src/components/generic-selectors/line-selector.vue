@@ -216,6 +216,11 @@ export default {
     behavior: {
       type: String,
       default: 'menu' // default, menu or dialog
+    },
+
+    customPlaceholder: {
+      type: String,
+      default: ''
     }
   },
 
@@ -235,6 +240,10 @@ export default {
     ...mapState('auth', ['profile']),
 
     placeholder () {
+      if (this.customPlaceholder) {
+        return this.customPlaceholder
+      }
+
       switch (true) {
         case this.multiple && this.selectedId && this.selectedId.length < 1:
           return 'Select Lines'
@@ -309,6 +318,10 @@ export default {
     }
   },
 
+  mounted () {
+    this.loadPlaceholder()
+  },
+
   methods: {
     selectOption (option) {
       this.selectedId = option.id
@@ -341,6 +354,14 @@ export default {
       }
 
       this.$emit('change', val)
+    },
+
+    loadPlaceholder () {
+      const input = this.$refs.lineSelect.$el.querySelector('.q-placeholder')
+
+      if (input) {
+        input.style.display = 'block'
+      }
     }
   },
 
