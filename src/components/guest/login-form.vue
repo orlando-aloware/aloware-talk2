@@ -266,6 +266,7 @@ export default {
       }
 
       this.$emit('userLoggedIn')
+      console.log('Redirecting to: ', redirectPath)
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
 
