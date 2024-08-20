@@ -97,19 +97,16 @@ export default {
         return options
       }
 
-      let mpsList = [0.05, 0.1, 0.25, 0.5, 1, 2, 3, 4, 6, 8, 10]
+      const mpsList = [0.05, 0.1, 0.25, 0.5, 1, 2, 3, 4, 6, 8, 10]
+      const maxMps = this.campaign.max_mps || 0
 
-      // Sanity check to avoid out-of-bounds index access
-      let maxMps = this.campaign?.max_mps || 0
-      let validMpsList = mpsList.filter(mps => mps <= maxMps)
-
-      validMpsList.forEach((mps, index) => {
+      for (let index = 0; mpsList[index] <= maxMps; index++) {
         options.push({
           id: index + 1,
-          name: mps * 60 * 60 + ' per hour',
-          value: mps * 60
+          name: mpsList[index] * 60 * 60 + ' per hour',
+          value: mpsList[index] * 60
         })
-      })
+      }
 
       return options
     }
