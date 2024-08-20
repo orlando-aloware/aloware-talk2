@@ -1477,8 +1477,9 @@ export default {
       'showIncomingCallNotification',
       'sessionPhoneExpansion',
       'parkedCalls',
+      'callFishingQueue',
       'isCallBackButtonDisabled',
-      'callFishingQueue'
+      'isWidget'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -1981,6 +1982,7 @@ export default {
     this.checkIfIsWidget()
     this.setupDraggable()
     this.setupContactLocalTime()
+    this.widgetShouldOpen()
     // Disable phone visibility on power dialer sessions
     this.isVisible = this.$route.meta.id !== 'power-dialer-session'
     this.showLocalTime = true
@@ -2011,6 +2013,12 @@ export default {
       }
     },
 
+    widgetShouldOpen () {
+      if (this.is_widget && this.shouldShow) {
+        this.openPhone()
+      }
+    },
+
     hideLocalTime () {
       this.showLocalTime = false
     },
@@ -2024,16 +2032,20 @@ export default {
     },
 
     goToContact () {
-      if (this.contact) {
-        this.$router.push({
-          name: 'Contact',
-          params: {
-            id: this.contact.id
-          }
-        }).catch(err => {
-          console.log(err)
-        })
+      if (!this.contact) {
+        return
       }
+
+      const contactRouter = {
+        name: 'Contact',
+        params: {
+          id: this.contact.id
+        }
+      }
+
+      this.isWidget
+        ? window.open(this.$router.resolve(contactRouter).href, '_blank')
+        : this.$router.push(contactRouter).catch(err => console.log(err))
     },
 
     copyPhoneNumber (phoneNumber) {
@@ -2500,6 +2512,10 @@ export default {
 
       setTimeout(() => {
         this.loadingAdd = false
+        // if these 2 attributes are null, then the communication object has not been updated, so we force a refresh
+        if (this.dialer.communication?.legc_uuid === null && this.dialer.communication?.legc_status === null) {
+          this.forceRefreshCommunication($event)
+        }
       }, 1000)
     },
 
@@ -2600,6 +2616,7 @@ export default {
       this.loadingAdd = false
       this.loadingIntroduce = false
       this.setupDraggable()
+      this.widgetShouldOpen()
       this.setupContactLocalTime()
       this.resetBottomExpansion()
 

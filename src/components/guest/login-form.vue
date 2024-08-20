@@ -79,7 +79,7 @@
           </b-link>
         </div>
       </form>
-      <div class="login-form w-100 px-5 text-center"
+      <div :class="['login-form', 'w-100', 'text-center', hubspotWidget ? 'px-3' : 'px-5']"
            v-else>
         <h2 class="text-black mb-3">2FA Email Sent</h2>
         <p v-html="error"></p>
@@ -87,6 +87,7 @@
           <security-code v-model="token"
                          ref="securityCode"
                          class="mb-2"
+                         :hubspot-widget="hubspotWidget"
                          @input="clearError"
                          @completed="verifyToken">
           </security-code>
@@ -161,7 +162,14 @@ export default {
         storage.local.setItem('shared_cookie', res.data.meta.hashed_token)
         storage.local.setItem('api_token', res.data.meta.token)
         this.clearError()
-        window.location.reload()
+        this.onLoginSuccess({
+          data: {
+            data: {
+              usage: res.data?.data?.usage ?? null,
+              company: res.data?.data?.company ?? null
+            }
+          }
+        })
       }).catch(err => {
         console.log(err)
         this.verificationMessage = err.response.data.message
@@ -245,16 +253,19 @@ export default {
         return
       }
 
-      const redirectQuery = this.$route.query.redirect
-      const decodedRedirect = decodeURIComponent(redirectQuery)
+      let redirectPath = '/'
+      const redirectQuery = this.$route.query?.redirect
 
-      let redirectPath = decodedRedirect || '/'
+      if (redirectQuery) {
+        redirectPath = decodeURIComponent(redirectQuery)
+      }
 
       if (this.hubspotWidget) {
         redirectPath = '/widgets/hubspot-call-extension'
         this.setIsRedirectedToHubspotWidget(true)
       }
 
+      this.$emit('userLoggedIn')
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
 

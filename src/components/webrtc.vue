@@ -2,16 +2,24 @@
   <div>
     <phone :is_widget='isWidget'
            @callCompleted="handleCallCompleted" />
+
     <dialer />
+
+    <div class="p-3"
+         v-if="dialer.parkedCall">
+      <parked-call />
+    </div>
+
     <select-campaign-dialog :show="showSelectCampaignDialog"
                             :campaignId="campaignId"
+                            v-else
                             @call="handleCall"
-                            @change-campaign-id="handleChangeCampaignId" />
+                            @change-campaign-id="handleChangeCampaignId"/>
   </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Dialer from 'components/dialer/dialer'
 import Phone from 'components/dialer/phone'
 import SelectCampaignDialog from 'components/dialer/select-campaign-dialog.vue'
@@ -21,9 +29,10 @@ import {
   broadcastMixin,
   dialerDataMixin
 } from 'src/boot/mixins'
+import ParkedCall from 'components/dialer/parked-call.vue'
 
 export default {
-  components: { Dialer, Phone, SelectCampaignDialog },
+  components: { ParkedCall, Dialer, Phone, SelectCampaignDialog },
 
   mixins: [
     aclMixin,
@@ -58,13 +67,27 @@ export default {
   },
 
   computed: {
+    ...mapState([
+      'ringGroups'
+    ]),
+
     ...mapState('cache', [
       'currentCompany',
       'timezones'
     ]),
 
+    ...mapState(['dialer']),
+
+    ...mapGetters('auth', ['profile']),
+
     showSelectCampaignDialog () {
-      return this.campaignId === null
+      const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
+      if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
+        return false
+      }
+
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+      return this.campaignId === null && !isCallInProgress.includes(this.dialer?.currentStatus)
     }
   },
 
@@ -73,14 +96,18 @@ export default {
       'updateUserStatus'
     ]),
 
+    ...mapActions('auth', ['setAgentStatus']),
+
     initAuth () {
       this.broadcastInit()
 
+      this.getUsers()
       this.getDispositionStatuses()
       this.getCallDispositions()
       this.getActivityTypes()
       this.getTemplates()
       this.getCampaigns()
+      this.getRingGroups()
     },
 
     startMainEvents () {
