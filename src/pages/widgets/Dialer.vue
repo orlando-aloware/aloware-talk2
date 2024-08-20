@@ -424,7 +424,7 @@ export default {
     },
 
     canHandleDialNumber () {
-      if (this.isRedirectedToHubspotWidget && this.defaultOutboundCampaignId) {
+      if (this.isRedirectedToHubspotWidget && this.campaignId) {
         return this.needsExtensions &&
           this.initialized &&
           this.authProfile &&

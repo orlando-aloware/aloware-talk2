@@ -8,7 +8,7 @@
       <div class="d-flex">
         <line-selector class="line-selector"
                        label="Select a Line"
-                       custom-placeholder="Choose an available line"
+                       custom-placeholder="Pick a line"
                        rounded
                        behavior="menu"
                        :generic-multiselect="false"
