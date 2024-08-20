@@ -97,7 +97,7 @@ export default {
 
       // matches the constants from CarrierFee.php
       const carrierFeeName = `${prefix}_${suffix}`
-      const carrierFeePerSegment = this.carrierFees.find(fee => fee.name === carrierFeeName)?.price ?? 0
+      const carrierFeePerSegment = this.carrierFees?.find(fee => fee.name === carrierFeeName)?.price ?? 0
 
       return (carrierFeePerSegment * this.contactsLength * this.messageCount()).toFixed(2)
     }
