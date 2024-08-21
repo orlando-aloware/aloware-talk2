@@ -99,7 +99,15 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
-            this.$VueEvent.fire('resetCall')
+            const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
+              !this.profile.last_call?.contact?.disposition_status_id
+            const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
+              !this.profile.last_call?.call_disposition_id
+
+            if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
+              this.$VueEvent.fire('resetCall')
+            }
+
             this.showAlertCallFinished = false
 
             if (event.phone_number) {
