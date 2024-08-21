@@ -99,7 +99,7 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
-            this.checkDispositionWhenFinishCall()
+            this.checkAndResetCallDisposition()
 
             this.showAlertCallFinished = false
 
@@ -215,7 +215,7 @@ export default {
       })
     },
 
-    checkDispositionWhenFinishCall () {
+    checkAndResetCallDisposition () {
       const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
         !this.profile.last_call?.contact?.disposition_status_id
       const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
