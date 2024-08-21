@@ -99,7 +99,8 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
-            this.$VueEvent.fire('resetCall')
+            this.checkAndResetCallDisposition()
+
             this.showAlertCallFinished = false
 
             if (event.phone_number) {
@@ -212,6 +213,17 @@ export default {
           this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
         }
       })
+    },
+
+    checkAndResetCallDisposition () {
+      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
+        !this.profile.last_call?.contact?.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
+        !this.profile.last_call?.call_disposition_id
+
+      if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
+        this.$VueEvent.fire('resetCall')
+      }
     },
 
     setContactDetails (contact) {
@@ -493,9 +505,9 @@ export default {
       }
 
       const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.last_call.contact.disposition_status_id
+        !this.profile.last_call?.contact?.disposition_status_id
       const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.last_call.call_disposition_id
+        !this.profile.last_call?.call_disposition_id
 
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
       if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
