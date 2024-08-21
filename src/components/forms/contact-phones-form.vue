@@ -200,7 +200,9 @@ export default {
         const message = alreadyExisted ? 'The phone number already existed' : 'Phone number added'
         const kind = alreadyExisted ? 'warning' : 'success'
 
-        if (!alreadyExisted) { this.addContactPhoneNumber(data) }
+        if (!alreadyExisted) {
+          this.addContactPhoneNumber(data)
+        }
 
         this.$generalNotification(message, kind)
 
