@@ -99,14 +99,7 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: (event) => {
-            const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-              !this.profile.last_call?.contact?.disposition_status_id
-            const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-              !this.profile.last_call?.call_disposition_id
-
-            if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
-              this.$VueEvent.fire('resetCall')
-            }
+            this.checkDispositionWhenFinishCall()
 
             this.showAlertCallFinished = false
 
@@ -220,6 +213,17 @@ export default {
           this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
         }
       })
+    },
+
+    checkDispositionWhenFinishCall () {
+      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
+        !this.profile.last_call?.contact?.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
+        !this.profile.last_call?.call_disposition_id
+
+      if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
+        this.$VueEvent.fire('resetCall')
+      }
     },
 
     setContactDetails (contact) {
