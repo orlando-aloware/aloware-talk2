@@ -27,7 +27,7 @@
         <b-badge variant="danger"
                  class="badge-phone-info"
                  data-testid="contact-phones-list-items-has-conflict"
-                 v-if="phone.conflicted_contacts.length !== 0">
+                 v-if="hasConflictedContacts(phone)">
           Has conflicts
         </b-badge>
 
@@ -106,7 +106,7 @@
         </div>
         <div class="phone-number-duplicates-icon">
           <contact-phone-number-duplicates :phone_number="phone"
-                                           v-if="phone.conflicted_contacts.length !== 0" />
+                                           v-if="hasConflictedContacts(phone)" />
         </div>
       </div>
     </div>
@@ -169,7 +169,11 @@ export default {
 
     onCall (phone) {
       this.$emit('call', phone)
+    },
+    hasConflictedContacts (phone) {
+      return Array.isArray(phone.conflicted_contacts) && phone.conflicted_contacts.length !== 0
     }
+
   }
 }
 </script>
