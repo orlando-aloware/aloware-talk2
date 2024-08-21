@@ -33,7 +33,8 @@
                   data-testid="contact-phones-form-menu"
                   v-model="showPhonesForm">
             <div class="row no-wrap q-pa-md">
-              <contact-phones-form :phone="phone"
+              <contact-phones-form :phones="sortedPhones"
+                                   :phone="phone"
                                    data-testid="contact-phones-form"
                                    @close="onClosePhoneForm">
               </contact-phones-form>
@@ -83,15 +84,11 @@ export default {
     ]),
 
     sortedPhones () {
-      // Create a copy of the array before sorting
-      const phoneNumbersCopy = [...this.contactPhoneNumbers]
-
-      // move primary phone to the top
-      return phoneNumbersCopy.sort((a, b) => {
-        if (a.phone_number === this.contact.phone_number) return -1
-        if (b.phone_number === this.contact.phone_number) return 1
-        return 0
-      })
+      const primaryPhone = this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
+      return [
+        primaryPhone,
+        ...this.contactPhoneNumbers.filter(phone => phone.phone_number !== this.contact.phone_number)
+      ]
     },
 
     bodyClass () {
