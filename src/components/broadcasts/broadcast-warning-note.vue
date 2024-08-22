@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import { broadcastsMixin } from 'src/plugins/mixins'
 
 export default {
@@ -23,6 +23,11 @@ export default {
   props: {
     campaign: {
       type: Object,
+      required: false
+    },
+
+    contactsLength: {
+      type: Number,
       required: false
     },
 
@@ -39,10 +44,6 @@ export default {
 
     ...mapGetters('contacts', [
       'messageComposer'
-    ]),
-
-    ...mapState('broadcast', [
-      'contactsLength'
     ]),
 
     showWarning () {

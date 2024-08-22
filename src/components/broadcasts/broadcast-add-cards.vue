@@ -22,6 +22,7 @@
         </span>
         <broadcast-warning-note :is-calculator-message="true"
                                 :campaign="campaign"
+                                :contactsLength="contactsLength"
                                 v-if="card.showWarning"/>
       </div>
     </div>
