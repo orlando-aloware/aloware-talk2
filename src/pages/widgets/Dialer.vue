@@ -46,7 +46,7 @@ import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import { timezoneCheckMixin, helperMixin } from 'src/plugins/mixins'
+import { timezoneCheckMixin, helperMixin, agentMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 
 export default {
@@ -57,7 +57,7 @@ export default {
     DialerListeners
   },
 
-  mixins: [ timezoneCheckMixin, helperMixin ],
+  mixins: [ timezoneCheckMixin, helperMixin, agentMixin ],
 
   props: {
     apiKey: {
@@ -216,10 +216,10 @@ export default {
     },
 
     checkAndResetCallDisposition () {
-      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.last_call?.contact?.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.last_call?.call_disposition_id
+      const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
+        !this.profile?.last_call?.contact?.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
+        !this.profile?.last_call?.call_disposition_id
 
       if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
         this.$VueEvent.fire('resetCall')
@@ -288,6 +288,10 @@ export default {
     handleUserLogin () {
       if (this.needsExtensions && this.extensionsInitialized) {
         this.extensions.userLoggedIn()
+
+        if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call) {
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-2')
+        }
       }
 
       if (this.defaultOutboundCampaignId) {
