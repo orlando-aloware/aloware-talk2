@@ -357,7 +357,13 @@ export default {
     },
 
     loadPlaceholder () {
-      const input = this.$refs.lineSelect.$el.querySelector('.q-placeholder')
+      const ref = this.$refs.lineSelect
+
+      if (!ref) {
+        return
+      }
+
+      const input = ref.$el.querySelector('.q-placeholder')
 
       if (input) {
         input.style.display = 'block'
