@@ -676,62 +676,6 @@ export default {
           }
         })
 
-      window.Echo.join('online-users-company-' + this.profile.company_id)
-        // as long as this broadcast will fire, everyone on the presence channel will receive this event
-        .listen('.app.newversion', (event) => {
-          this.$VueEvent.fire('new_version', event.data.message)
-        })
-        .listen('.communication.created', (event) => {
-          if (event.tags) {
-            event.communication.tags = event.tags
-            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            event.communication.contact = event.contact
-          }
-          if (event.owner) {
-            event.communication.owner = event.owner
-          }
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-          }
-          this.$VueEvent.fire('new_communication', event.communication)
-        })
-        .listen('.communication.updated', (event) => {
-          if (event.tags) {
-            event.communication.tags = event.tags
-            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
-          }
-          if (event.contact) {
-            event.communication.contact = event.contact
-          }
-          if (event.owner) {
-            event.communication.owner = event.owner
-          }
-          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
-          if (campaign) {
-            event.communication.campaign = campaign
-          }
-          this.$VueEvent.fire('update_communication', event.communication)
-        })
-        .listen('.communication.deleted', (event) => {
-          this.$VueEvent.fire('delete_communication', event.communication)
-        })
-        .listen('.user.created', (event) => {
-          if (this.currentCompany && event.user.company_id && event.user.company_id === this.currentCompany.id) {
-            this.$VueEvent.fire('user_created', event.user)
-          }
-        })
-        .listen('.user.updated', (event) => {
-          this.$VueEvent.fire('user_updated', event.user)
-        })
-        .listen('.user.deleted', (event) => {
-          if (this.currentCompany && event.user.company_id && event.user.company_id === this.currentCompany.id) {
-            this.$VueEvent.fire('user_deleted', event.user)
-          }
-        })
-
       window.Echo.private('cache-agent-status-' + this.profile.company_id)
         .listen('.agent_status.updated', (event) => {
           if (!this.profile || !event.user_id) {
@@ -748,7 +692,6 @@ export default {
       if (this.profile) {
         window.Echo.leave('user-' + this.profile.id)
         window.Echo.leave('company-' + this.profile.company_id)
-        window.Echo.leave('online-users-company-' + this.profile.company_id)
         return
       }
 
