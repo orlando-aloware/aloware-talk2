@@ -57,7 +57,11 @@
                               :reset-on-load="false"
                               :use-send-button="false"
                               :is-broadcast="true"
-                              @messageChanged="onMessageChanged"/>
+                              @messageChanged="onMessageChanged"
+                              @attachments-uploaded="onAttachmentsUploaded"
+                              @attachment-removed="onAttachmentRemoved"
+                              @gif-selected="onGifSelected"
+                              @gif-removed="onGifRemoved" />
       </div>
 
       <div class="broadcast-add__message__sms__composer-footer">
@@ -371,6 +375,22 @@ export default {
 
     onMessageChanged (message) {
       this.messageLength(message)
+      this.updatePrice()
+    },
+
+    onAttachmentsUploaded () {
+      this.updatePrice()
+    },
+
+    onAttachmentRemoved () {
+      this.updatePrice()
+    },
+
+    onGifSelected () {
+      this.updatePrice()
+    },
+
+    onGifRemoved () {
       this.updatePrice()
     }
   },
