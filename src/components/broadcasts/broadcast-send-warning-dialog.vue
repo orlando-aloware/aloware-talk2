@@ -57,10 +57,6 @@ export default {
     },
 
     message () {
-      if (this.showMessageSentAsMmsDueToAssets) {
-        return 'The message will be sent via MMS because it has an attachment or GIF attached to it, which may lead to higher-than-expected charges for this broadcast. Would you like to proceed?'
-      }
-
       if (this.showMessageSentAsMmsWarning) {
         return 'The selected line is configured to send long messages via MMS, which may lead to higher-than-expected charges for this broadcast. Would you like to proceed?'
       }

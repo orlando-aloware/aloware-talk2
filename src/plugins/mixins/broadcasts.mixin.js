@@ -75,10 +75,6 @@ export default {
       return this.useMmsRate || this.sendLongMessagesAsMms
     },
 
-    showMessageSentAsMmsDueToAssets () {
-      return this.useMmsRate && !this.sendLongMessagesAsMms
-    },
-
     showMessageSentAsMmsWarning () {
       return this.shouldApplyMmsRate && !this.hasTollFreePhoneNumber
     },
