@@ -1,11 +1,12 @@
 import * as SMS from 'src/constants/sms'
-import { mapMutations, mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   data () {
     return {
       hasReplaceableBySmartEncoding: false,
       smartEncodingExtraChars: 0,
+      smartEncodedMessageLength: 0,
       segmentMaxChars: SMS.DEFAULT_SEGMENT_MAX_CHAR,
       segments: 0,
       segmentUsedChars: 0,
@@ -14,10 +15,6 @@ export default {
   },
 
   computed: {
-    ...mapState('broadcast', [
-      'smartEncodedMessageLength'
-    ]),
-
     ...mapGetters('contacts', [
       'isOptoutActive',
       'optoutText'
@@ -29,10 +26,6 @@ export default {
   },
 
   methods: {
-    ...mapMutations('broadcast', [
-      'SET_SMART_ENCODED_MESSAGE_LENGTH'
-    ]),
-
     messageLength (message) {
       this.hasUnicode = false
       this.smartEncodingExtraChars = 0
@@ -70,7 +63,8 @@ export default {
         }
       })
 
-      this.SET_SMART_ENCODED_MESSAGE_LENGTH(message.length + this.optoutTextLength + this.smartEncodingExtraChars)
+      this.smartEncodedMessageLength =
+        message.length + this.optoutTextLength + this.smartEncodingExtraChars
 
       this.getMessageInfo(message)
 

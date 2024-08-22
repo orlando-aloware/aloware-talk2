@@ -20,25 +20,16 @@
         <span class="cards__body__card__text">
           {{ card.text }}
         </span>
-        <broadcast-warning-note :is-calculator-message="true"
-                                :campaign="campaign"
-                                :contactsLength="contactsLength"
-                                v-if="card.showWarning"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
 import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-add-cards',
-
-  components: {
-    BroadcastWarningNote
-  },
 
   mixins: [
     simpsocialMixin
@@ -54,11 +45,6 @@ export default {
       type: Number,
       required: false,
       default: 0
-    },
-
-    campaign: {
-      type: Object,
-      required: false
     }
   },
 
@@ -68,14 +54,12 @@ export default {
         {
           title: this.contactsLength,
           text: (this.contactsLength === 1 ? 'Contact' : 'Contacts'),
-          enabled: true,
-          showWarning: false
+          enabled: true
         },
         {
           title: this.$options.filters.toCurrency(this.$options.filters.fixRounding(this.estimatedCost)),
           text: 'Estimated Cost',
-          enabled: !this.isSimpSocial,
-          showWarning: true
+          enabled: !this.isSimpSocial
         }
       ].filter(card => card.enabled)
     },
