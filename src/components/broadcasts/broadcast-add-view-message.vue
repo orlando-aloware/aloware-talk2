@@ -13,6 +13,7 @@
       </div>
       <div class="broadcast-add__schedule__row__fields">
         <contact-line-selector :value="propCampaign?.id"
+                               :use-groups="false"
                                @select="onCampaignSelected"/>
         <broadcast-warning-note :campaign="propCampaign" />
       </div>
