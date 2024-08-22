@@ -560,6 +560,7 @@ export default {
     this.setMessageComposerSmsGif('')
     this.setMessageComposerAttachments([])
     this.setCurrentListFilters({})
+    this.SET_SELECTED_CAMPAIGN(null)
     this.rmv = null
   }
 }
