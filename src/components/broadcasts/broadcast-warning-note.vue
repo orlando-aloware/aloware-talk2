@@ -65,6 +65,10 @@ export default {
         return `This calculator is meant to provide the best estimate for the cost of the broadcast. Actual charges from carriers may vary.${carrierSurchargesMessage}`
       }
 
+      if (this.showMessageSentAsMmsDueToAssets) {
+        return 'The message will be sent via MMS because it has an attachment or GIF attached to it, which may lead to higher-than-expected charges for this broadcast.'
+      }
+
       if (this.showMessageSentAsMmsWarning) {
         return 'The selected line is configured to send long messages via MMS, which may lead to higher-than-expected charges for this broadcast.'
       }
