@@ -599,14 +599,25 @@ export default {
 
     gifSelected (gif) {
       this.setMessageComposerSmsGif(gif)
+      this.$emit('gif-selected', gif)
     },
 
     removeMessageGif () {
       this.setMessageComposerSmsGif('')
+      this.$emit('gif-removed', '')
+    },
+
+    attachmentUploaded (files) {
+      files.forEach((file) => {
+        this.appendMessageComposerSmsAttachments(file)
+      })
+
+      this.$emit('attachments-uploaded', files)
     },
 
     removeAttachment (attachment) {
       this.removeMessageComposerSmsAttachment(attachment)
+      this.$emit('attachment-removed', attachment)
     },
 
     getPreviewLink (uuid) {
@@ -619,12 +630,6 @@ export default {
 
     variableSelected (variable) {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ? this.messageComposer.sms.body + ' ' : '') + variable)
-    },
-
-    attachmentUploaded (files) {
-      files.forEach((file) => {
-        this.appendMessageComposerSmsAttachments(file)
-      })
     },
 
     showScheduleMessage () {
