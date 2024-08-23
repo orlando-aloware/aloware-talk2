@@ -461,6 +461,8 @@ export default {
       'setIsEditingView'
     ]),
 
+    ...mapActions(['setIsFirstLoad']),
+
     initInboxTaskRoute () {
       // if currently in inbox routes which works with contact's
       // task status, compare if current task is in the correct
@@ -688,6 +690,9 @@ export default {
     onResetFilter () {
       this.firstTimeLoading = true
       this.resetFilter()
+
+      sessionStorage.removeItem('date-selected')
+      this.setIsFirstLoad(true)
 
       // redirect
       if (this.$route.params?.viewId) {

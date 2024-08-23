@@ -23,7 +23,7 @@ export default {
     getUser (id) {
       const users = _.get(this, 'users', null)
 
-      if (!id || !users) {
+      if (!id || !users || users.length === 0) {
         return {
           id: id,
           name: ''

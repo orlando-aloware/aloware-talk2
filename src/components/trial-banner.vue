@@ -77,7 +77,7 @@
                dense
                no-caps
                unelevated
-               v-if="isCompanyKYC && !isKYCFilled"
+               v-if="shouldShowUnlockTrialExperienceButton"
                @click="onOpenFinishRegistration" />
         <q-btn class="q-mr-lg"
                color="primary"
@@ -87,7 +87,7 @@
                dense
                no-caps
                unelevated
-               v-else
+               v-if="shouldShowRegistrationInReviewButton"
                @click="onOpenRegistrationInReview" />
       </div>
       <div class="button-index">
@@ -152,6 +152,14 @@ export default {
 
     classicUrlCompliancePage () {
       return process.env.API_URL + '/account?tab=compliance'
+    },
+
+    shouldShowUnlockTrialExperienceButton () {
+      return (this.isCompanyKYC && !this.isKYCFilled) || this.isCompanyA2pCampaignApproved
+    },
+
+    shouldShowRegistrationInReviewButton () {
+      return (this.isCompanyKYC && !this.isKYCFilled) || !this.isCompanyA2pCampaignApproved
     }
   },
 

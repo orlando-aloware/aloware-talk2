@@ -354,7 +354,8 @@ export default {
   computed: {
     ...mapState('contacts', [
       'isAddPowerDialerOpen',
-      'currentListFilters'
+      'currentListFilters',
+      'showAddViewMyContacts'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -378,7 +379,7 @@ export default {
         'prevent_duplicates': this.conversion.includes('prevent_duplicates'),
         'multiple_phone_numbers': this.conversion.includes('multiple_phone_numbers'),
         'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers'),
-        'own_contacts_only': this.conversion.includes('own_contacts_only'),
+        'own_contacts_only': this.conversion.includes('own_contacts_only') || this.showAddViewMyContacts,
         'direction': this.direction
       }
 

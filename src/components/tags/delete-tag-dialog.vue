@@ -4,6 +4,7 @@
            size="md"
            centered
            v-model="openModal"
+           data-testid="tags-delete-dialog"
            @hide="closeModalPrompt">
     <b-overlay rounded="sm"
                no-wrap
@@ -16,7 +17,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>{{ formName }}</h6>
+      <h6 data-testid="tags-delete-dialog-title">{{ formName }}</h6>
     </template>
 
     <span v-html="promptMessage" />
@@ -24,6 +25,7 @@
     <b-form-checkbox value="yes"
                      unchecked-value="no"
                      class="mt-4"
+                     data-testid="tags-delete-dialog-confirm-checkbox"
                      v-if="!isBulk"
                      v-show="!isBulk && showDeleteContactsQuestion"
                      v-model="isDeleteContacts">
@@ -40,6 +42,7 @@
      <b-form-group invalid-feedback="Number of contacts does not match"
                    :state="validateState('confirmDeleteContactsCount')">
         <b-form-input :placeholder="`${tag?.contacts_count}`"
+                      data-testid="tags-delete-dialog-confirm-contacts-count"
                       v-model.trim="$v.confirmDeleteContactsCount.$model" />
        </b-form-group>
     </div>
@@ -48,11 +51,13 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
+                    data-testid="tags-delete-dialog-cancel-button"
                     @click.prevent="closeModalPrompt">
               Cancel
             </button>
             <button class="btn btn-sm btn-danger text-white"
                     :disabled="disabled"
+                    data-testid="tags-delete-dialog-delete-button"
                     @click.prevent="deleteTag">
               Delete
             </button>

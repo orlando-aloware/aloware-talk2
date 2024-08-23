@@ -20,6 +20,8 @@
         <span class="cards__body__card__text">
           {{ card.text }}
         </span>
+        <broadcast-warning-note :isCalculatorMessage="true"
+                                v-if="card.showWarning"/>
       </div>
     </div>
   </div>

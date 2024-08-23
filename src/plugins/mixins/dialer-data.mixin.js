@@ -10,7 +10,8 @@ export default {
       loadingCallDispositionStatuses: false,
       loadingActivityTypes: false,
       loadingTemplates: false,
-      loadingCampaigns: false
+      loadingCampaigns: false,
+      loadingRingGroups: false
     }
   },
 
@@ -21,7 +22,10 @@ export default {
       'setActivityTypes',
       'setTemplates',
       'setCampaigns',
-      'setCampaignsIsLoading'
+      'setCampaignsIsLoading',
+      'setUsers',
+      'setUsersIsLoading',
+      'setRingGroups'
     ]),
 
     getDispositionStatuses () {
@@ -123,6 +127,51 @@ export default {
           .catch((err) => {
             console.log(err)
             this.loadingCampaigns = false
+
+            return Promise.reject()
+          })
+      }
+    },
+
+    getUsers () {
+      // This function is equal to the one on the MainLayout
+      if (this.hasPermissionTo('list user')) {
+        this.loadingUsers = true
+        this.setUsersIsLoading(true)
+
+        return this.$axios
+          .get('/api/v2/users', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setUsers(res.data)
+            this.loadingUsers = false
+            this.setUsersIsLoading(false)
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingUsers = false
+          })
+      }
+    },
+
+    getRingGroups () {
+      if (this.hasPermissionTo('list ring group')) {
+        this.loadingRingGroups = true
+
+        return this.$axios
+          .get('/api/v1/ring-group', {
+            mode: 'no-cors'
+          })
+          .then((res) => {
+            this.setRingGroups(res.data)
+            this.loadingRingGroups = false
+
+            return Promise.resolve()
+          })
+          .catch((err) => {
+            console.log(err)
+            this.loadingRingGroups = false
 
             return Promise.reject()
           })

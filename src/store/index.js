@@ -68,6 +68,7 @@ export default function (/* { ssrContext } */) {
       firstLogin: false,
       userStatus: false,
       oldAgentStatus: false,
+      usage: null,
       dialer: {
         token: null,
         call: null,
@@ -278,7 +279,8 @@ export default function (/* { ssrContext } */) {
         path: null,
         referer: null,
         whitelabel: false,
-        xmas_enabled: false
+        xmas_enabled: false,
+        kyc_ssu_enabled: false
       },
       staticsLoaded: false,
       isWhiteLabel: false,
@@ -295,7 +297,8 @@ export default function (/* { ssrContext } */) {
       currentTimezone: null,
       hubspotPhoneNumber: null,
       isRedirectedToHubspotWidget: false,
-      isCallBackButtonDisabled: false
+      isCallBackButtonDisabled: false,
+      isFirstLoad: true
     },
 
     getters: {
@@ -908,6 +911,10 @@ export default function (/* { ssrContext } */) {
 
       setIsCallBackButtonDisabled ({ commit }, value) {
         commit('SET_IS_CALL_BACK_BUTTON_DISABLED', value)
+      },
+
+      setIsFirstLoad ({ commit }, value) {
+        commit('SET_IS_FIRST_LOAD', value)
       }
     },
 
@@ -1711,6 +1718,9 @@ export default function (/* { ssrContext } */) {
         state.isCallBackButtonDisabled = value
       },
 
+      SET_IS_FIRST_LOAD (state, value) {
+        state.isFirstLoad = value
+      },
       updateField
     },
 

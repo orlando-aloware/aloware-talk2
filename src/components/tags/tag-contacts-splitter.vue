@@ -3,6 +3,7 @@
            modal-class="tags__modal"
            size="sm"
            centered
+           data-testid="tags-contact-splitter-modal"
            v-model="openModal"
            @hide="closeModalPrompt">
     <b-overlay rounded="sm"
@@ -16,7 +17,7 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6>{{ formName }}</h6>
+      <h6 data-testid="tags-contact-splitter-modal-title">{{ formName }}</h6>
     </template>
 
     <p v-html="`Split <span class='font-italic font-weight-bold'>${ tagName }</span> tag into smaller tags.`">
@@ -31,6 +32,7 @@
                        :options="options"
                        :show-labels="false"
                        :allow-empty="false"
+                       data-testid="tags-contact-splitter-modal-page-size"
                        v-model="selectedPageSize"
                        @select="setSplitPageSize" />
     </div>
@@ -43,11 +45,13 @@
       <div class="mt-2 d-flex w-100">
         <div class="ml-auto">
           <button class="btn btn-sm btn-outline-dark mr-2"
+                  data-testid="tags-contact-splitter-modal-cancel-button"
                   @click.prevent="closeModalPrompt">
             Cancel
           </button>
           <button class="btn btn-sm btn-primary text-white"
                   :disabled="!splitPageSize || !selectedPageSize || !allowSplit"
+                  data-testid="tags-contact-splitter-modal-split-button"
                   @click.prevent="split">
             Split
           </button>

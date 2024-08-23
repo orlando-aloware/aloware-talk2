@@ -8,6 +8,7 @@
               :show-count="isShowCount"
               :disable-branch-nodes="disableBranchNodes"
               v-model="selectedListId"
+              data-testid="power-dialer-selector"
               @input="updateValue">
 
       <label slot="option-label"
@@ -79,6 +80,16 @@ export default {
     if (this.userId) {
       this.getUserPowerDialerLists()
     }
+  },
+
+  mounted () {
+    this.$nextTick(() => {
+      // Set data-testid attribute to the input element
+      const input = document.querySelector('[data-testid="power-dialer-selector"] input')
+      if (input) {
+        input.setAttribute('data-testid', 'power-dialer-selector-input')
+      }
+    })
   },
 
   methods: {

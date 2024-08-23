@@ -16,7 +16,7 @@ export default _.merge({
     },
 
     ssuEnabled () {
-      return !!(process.env.KYC_SSU_ENABLED || false)
+      return this.statics?.kyc_ssu_enabled || false
     },
 
     isTrialKYC () {
@@ -33,6 +33,10 @@ export default _.merge({
       }
 
       return this.currentCompany?.is_kyc
+    },
+
+    isCompanyA2pCampaignApproved () {
+      return this.currentCompany?.is_a2p_campaign_approved
     },
 
     isKYCFilled () {
@@ -93,7 +97,7 @@ export default _.merge({
     enabledToTextNumber () {
       const kycStatus = this.getStatus()
 
-      if (this.skipRestrictions(kycStatus)) {
+      if (this.skipRestrictions(kycStatus) && this.isCompanyA2pCampaignApproved) {
         return true
       }
 
