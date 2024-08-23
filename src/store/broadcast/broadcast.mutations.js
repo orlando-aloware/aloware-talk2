@@ -50,18 +50,6 @@ export default {
     }
   },
 
-  SET_SMART_ENCODED_MESSAGE_LENGTH (state, messageLength) {
-    state.smartEncodedMessageLength = messageLength
-  },
-
-  SET_SELECTED_CAMPAIGN (state, campaign) {
-    state.selectedCampaign = campaign
-  },
-
-  SET_CONTACTS_LENGTH (state, length) {
-    state.contactsLength = length
-  },
-
   RESET_VUEX (state) {
     state = Object.assign({}, BroadcastDefault.DEFAULT_STATE)
   }

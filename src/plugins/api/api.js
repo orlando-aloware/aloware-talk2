@@ -543,11 +543,6 @@ export default {
         return window.axios.post(`${suffixV1}broadcasts/${id}/toggle-active`)
       }
     },
-    carrierFees: {
-      get () {
-        return window.axios.get(`${suffixV1}carrier-fees`)
-      }
-    },
     contactCenter: {
       summary: {
         get (params) {

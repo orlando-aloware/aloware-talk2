@@ -325,7 +325,8 @@ export default {
       'messageComposer',
       'selectedLine',
       'isOptoutActive',
-      'optoutText'
+      'optoutText',
+      'selectedLine'
     ]),
 
     ...mapState('contacts', [
@@ -367,11 +368,11 @@ export default {
     },
 
     isSendTextDisabled () {
-      return !this.validSms || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber || this.isSending
+      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber || this.isSending
     },
 
     isSendTextInputDisabled () {
-      return this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+      return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
     },
 
     canTextToNumber () {
@@ -599,25 +600,14 @@ export default {
 
     gifSelected (gif) {
       this.setMessageComposerSmsGif(gif)
-      this.$emit('gif-selected', gif)
     },
 
     removeMessageGif () {
       this.setMessageComposerSmsGif('')
-      this.$emit('gif-removed', '')
-    },
-
-    attachmentUploaded (files) {
-      files.forEach((file) => {
-        this.appendMessageComposerSmsAttachments(file)
-      })
-
-      this.$emit('attachments-uploaded', files)
     },
 
     removeAttachment (attachment) {
       this.removeMessageComposerSmsAttachment(attachment)
-      this.$emit('attachment-removed', attachment)
     },
 
     getPreviewLink (uuid) {
@@ -630,6 +620,12 @@ export default {
 
     variableSelected (variable) {
       this.setMessageComposerSmsBody((this.messageComposer.sms.body ? this.messageComposer.sms.body + ' ' : '') + variable)
+    },
+
+    attachmentUploaded (files) {
+      files.forEach((file) => {
+        this.appendMessageComposerSmsAttachments(file)
+      })
     },
 
     showScheduleMessage () {
