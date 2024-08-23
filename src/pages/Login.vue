@@ -12,7 +12,9 @@
 import {
   guestMixin,
   aclMixin,
+  classicMixin,
   settingsMixin,
+  simpsocialMixin,
   htmlMixin
 } from 'boot/mixins'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
@@ -29,7 +31,9 @@ export default {
   mixins: [
     guestMixin,
     aclMixin,
+    classicMixin,
     settingsMixin,
+    simpsocialMixin,
     htmlMixin
   ],
 
@@ -84,7 +88,7 @@ export default {
       storage.local.setItem('company_id', company.id)
 
       if (this.shouldRedirectToClassic) {
-        location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
+        location.href = `${this.getClassicURL(this.isSimpSocial)}?from_talk_2=1&token=${storage.local.getItem('shared_cookie')}`
       } else {
         window.location.reload()
       }
