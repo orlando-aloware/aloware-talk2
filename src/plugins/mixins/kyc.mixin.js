@@ -97,7 +97,7 @@ export default _.merge({
     enabledToTextNumber () {
       const kycStatus = this.getStatus()
 
-      if (this.skipRestrictions(kycStatus) && this.isCompanyA2pCampaignApproved) {
+      if (this.skipRestrictions(kycStatus)) {
         return true
       }
 
