@@ -26,6 +26,17 @@ export default {
 
     getComplianceURL () {
       return process.env.API_URL + '/account?tab=compliance'
+    },
+
+    getClassicURL (isSimpSocial = false) {
+      const url = process.env.API_URL
+      const isProduction = process.env.APP_ENV === 'production'
+
+      if (isSimpSocial) {
+        return isProduction ? url?.replace('aloware', 'simpsocial') : url?.replace('alodev', 'simpsocial')
+      }
+
+      return url
     }
   }
 }
