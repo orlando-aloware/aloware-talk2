@@ -827,7 +827,8 @@ import {
   userMixin,
   notificationMixin,
   liveCallsMixin,
-  mentionsMixin
+  mentionsMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import SmsReminders from './sms-reminders'
@@ -869,7 +870,8 @@ export default {
     userMixin,
     notificationMixin,
     liveCallsMixin,
-    mentionsMixin
+    mentionsMixin,
+    simpsocialMixin
   ],
 
   components: {
@@ -1126,7 +1128,7 @@ export default {
     },
 
     getClassicUrlUserActivity (userId) {
-      return process.env.API_URL + `/users/${userId}/activity`
+      return `${this.getClassicURL(this.isSimpSocial)}/users/${userId}/activity`
     },
 
     dispose (dispositionStatus) {
