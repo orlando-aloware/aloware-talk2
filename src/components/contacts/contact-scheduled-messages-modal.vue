@@ -138,10 +138,15 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import TrashOIcon from 'components/icons/trash-o-icon'
 import VueMultiselect from 'vue-multiselect'
+import { classicMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-scheduled-messages-modal',
   components: { TrashOIcon, VueMultiselect },
+  mixins: [
+    classicMixin,
+    simpsocialMixin
+  ],
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', ['isScheduledMessageListOpen']),
@@ -216,7 +221,7 @@ export default {
     },
     ...mapActions('contacts', ['scheduledMessageListOpen']),
     getPreviewLink (uuid) {
-      return process.env.API_URL + '/static/uploaded_file/' + uuid
+      return `${this.getClassicURL(this.isSimpSocial)}/static/uploaded_file/${uuid}`
     },
     isAttachmentImage (mimeType) {
       return mimeType.includes('image/')
