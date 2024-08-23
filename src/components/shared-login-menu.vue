@@ -60,7 +60,7 @@ import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { cloneDeep } from 'lodash'
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, classicMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
@@ -68,6 +68,7 @@ export default {
 
   mixins: [
     aclMixin,
+    classicMixin,
     simpsocialMixin
   ],
 
@@ -97,12 +98,7 @@ export default {
     },
 
     classicUrl () {
-      if (this.isSimpSocial) {
-        const simpsocialUrl = process.env.API_URL?.replace('aloware', 'simpsocial')
-        return simpsocialUrl + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
-      }
-
-      return process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
+      return `${this.getClassicURL(this.isSimpSocial)}?from_talk_2=1&token=${storage.local.getItem('shared_cookie')}`
     }
   },
 
