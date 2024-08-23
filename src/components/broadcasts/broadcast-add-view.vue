@@ -106,6 +106,12 @@
         </div>
       </template>
     </confirm-dialog>
+
+    <broadcast-send-warning-dialog :is-open="sendWarningDialog.open"
+                                   :campaign="selectedCampaign"
+                                   :use-mms-rate="useMmsRate"
+                                   @submit="onSendWarningDialogConfirmed"
+                                   @close="onSendWarningDialogClosed"/>
   </div>
 </template>
 
@@ -116,17 +122,19 @@ import BroadcastAddViewMessage from './broadcast-add-view-message.vue'
 import BroadcastAddViewPreview from './broadcast-add-view-preview.vue'
 import BroadcastAddViewSchedule from './broadcast-add-view-schedule.vue'
 import BroadcastContactsPreview from './broadcast-contacts-preview.vue'
+import BroadcastSendWarningDialog from './broadcast-send-warning-dialog.vue'
 import CompactBtn from 'components/compact-btn.vue'
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import API from 'src/plugins/api/api'
-import { mapGetters, mapState, mapActions } from 'vuex'
-import { companyTimezone } from 'src/plugins/mixins'
+import { mapGetters, mapState, mapActions, mapMutations } from 'vuex'
+import { broadcastsMixin, companyTimezone } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'broadcast-add-view',
 
   mixins: [
+    broadcastsMixin,
     companyTimezone
   ],
 
@@ -137,6 +145,7 @@ export default {
     BroadcastAddViewPreview,
     BroadcastAddViewSchedule,
     BroadcastContactsPreview,
+    BroadcastSendWarningDialog,
     CompactBtn,
     ConfirmDialog
   },
@@ -174,6 +183,11 @@ export default {
       'isOptoutActive'
     ]),
 
+    ...mapState('broadcast', [
+      'selectedCampaign',
+      'contactsLength'
+    ]),
+
     mainComponent () {
       switch (this.currentStep.id) {
         case 1:
@@ -195,19 +209,19 @@ export default {
           return { defaultSource: this.source }
         case 2:
           return {
-            contactsLength: this.contactsLength,
+            propCampaign: this.selectedCampaign,
+            propThrottle: this.throttle,
             rvm: this.rvm
           }
         case 3:
           return {
-            propCampaign: this.campaign,
+            propCampaign: this.selectedCampaign,
             propThrottle: this.throttle,
             propTime: this.time
           }
         case 4:
           return {
-            campaign: this.campaign,
-            contactsLength: this.contactsLength,
+            propCampaign: this.selectedCampaign,
             date: this.date,
             isScheduled: this.time.time === 'scheduled',
             source: this.source,
@@ -247,13 +261,15 @@ export default {
         case this.currentStep.id === 2 || this.currentStep.id === 3:
           return {
             contactsLength: this.contactsLength,
-            estimatedCost: this.price
+            estimatedCost: this.price,
+            campaign: this.selectedCampaign
           }
         case this.currentStep.id === 4:
           return {
             contactsLength: this.contactsLength,
             estimatedCost: this.price,
-            messagesLength: this.messagesLength
+            messagesLength: this.messagesLength,
+            campaign: this.selectedCampaign
           }
         default:
           return null
@@ -290,11 +306,9 @@ export default {
     isMainComponentValid: false,
     isFooterComponentValid: false,
     source: {},
-    contactsLength: 0,
     type: 'sms', // sms, voicemail
     rvm: null,
     price: 0,
-    campaign: null,
     throttle: null,
     time: null, // holds the schedule's time options
     date: null, // holds the send datetime
@@ -306,6 +320,9 @@ export default {
     },
     optoutMissingDialog: {
       open: false
+    },
+    sendWarningDialog: {
+      open: false
     }
   }),
 
@@ -315,7 +332,13 @@ export default {
       'setMessageComposerSmsBody',
       'setMessageComposerSmsGif',
       'setMessageComposerAttachments',
-      'setIsOptoutActive'
+      'setIsOptoutActive',
+      'setSelectedLine'
+    ]),
+
+    ...mapMutations('broadcast', [
+      'SET_SELECTED_CAMPAIGN',
+      'SET_CONTACTS_LENGTH'
     ]),
 
     mainComponentChanged (state) {
@@ -351,7 +374,8 @@ export default {
     },
 
     onCampaignUpdated (campaign) {
-      this.campaign = campaign
+      this.SET_SELECTED_CAMPAIGN(campaign)
+      this.setSelectedLine(campaign)
     },
 
     onThrottleUpdated (throttle) {
@@ -389,6 +413,15 @@ export default {
       this.setIsOptoutActive(false)
     },
 
+    onSendWarningDialogClosed () {
+      this.sendWarningDialog.open = false
+    },
+
+    onSendWarningDialogConfirmed () {
+      this.sendWarningDialog.open = false
+      this.goToNextStep()
+    },
+
     goToNextStep () {
       this.isMainComponentValid = false
       this.isFooterComponentValid = false
@@ -401,6 +434,12 @@ export default {
       // send outside business hours confirmation
       if (this.currentStep.id === 3 && this.isRestrictedTime && !this.acceptedOutsideBusinessHours) {
         this.outsideBusinessHoursDialog.open = true
+
+        return
+      }
+
+      if (this.currentStep.id === 3 && this.shouldShowWarning) {
+        this.sendWarningDialog.open = true
 
         return
       }
@@ -428,7 +467,7 @@ export default {
     },
 
     onContactsLength (count) {
-      this.contactsLength = count
+      this.SET_CONTACTS_LENGTH(count)
     },
 
     send () {
@@ -438,7 +477,7 @@ export default {
       const bulkMessage = {
         name: '',
         count: this.contactsLength,
-        campaign_id: this.campaign.id,
+        campaign_id: this.selectedCampaign.id,
         run_at_date: this.date.substr(0, 10),
         run_at_time: this.date.substr(11, 10),
         message_body: this.messageBodyWithOptout,
