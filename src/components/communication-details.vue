@@ -940,6 +940,23 @@
               </b-col>
             </b-form-row>
           </q-card-section>
+
+          <hr/>
+          <!-- COMMUNICATION CUSTOM FIELDS -->
+          <q-card-section class="pt-0 pb-0"
+                          v-if="communication.metadata?.custom_fields && Object.keys(communication.metadata.custom_fields).length > 0"
+                          data-testid="comm-details-call-disposition-card">
+            <b-form-row v-for="(custom_field, key) in communication.metadata?.custom_fields" data-testid="comm-details-call-disposition-row" :key="key">
+              <b-col class="pl-0 pr-0">
+                <q-item-label> {{ convertToTitleCase(key) }}: </q-item-label>
+              </b-col>
+              <b-col>
+                <span>
+                  {{ custom_field }}
+                </span>
+              </b-col>
+            </b-form-row>
+          </q-card-section>
         </q-card>
       </b-col>
       <b-col :md="isWidget ? 12 : 8"
@@ -1268,6 +1285,13 @@ export default {
 
     isAttachmentApplication (mimeType) {
       return mimeType.includes('application/')
+    },
+
+    convertToTitleCase (key) {
+      return key
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
     }
   }
 }
