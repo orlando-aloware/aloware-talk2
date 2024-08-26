@@ -4,6 +4,9 @@ export default function () {
     broadcastsCount: 0,
     isBroadcastsLoading: false,
     search: null,
-    status: 'all'
+    status: 'all',
+    smartEncodedMessageLength: 0,
+    selectedCampaign: null,
+    contactsLength: 0
   }
 }

@@ -7,6 +7,7 @@ import createPersistedState from 'vuex-persistedstate'
 import { getField, updateField } from 'vuex-map-fields'
 import auth from './auth'
 import cache from './cache'
+import carrierFee from './carrier-fee'
 import contacts from './contacts'
 import inbox from './inbox'
 import stats from './stats'
@@ -35,6 +36,7 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       auth,
+      carrierFee,
       contacts,
       inbox,
       stats,
