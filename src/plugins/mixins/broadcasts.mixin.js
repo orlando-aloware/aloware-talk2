@@ -76,7 +76,7 @@ export default {
     },
 
     showMessageSentAsMmsDueToAssets () {
-      return this.useMmsRate && !this.sendLongMessagesAsMms
+      return this.useMmsRate && !this.sendLongMessagesAsMms && !this.hasTollFreePhoneNumber
     },
 
     showMessageSentAsMmsWarning () {
@@ -104,7 +104,7 @@ export default {
         this.segments = 0
         this.charactersPerPage = 160
         return this.segments
-      } else if (this.sendLongMessagesAsMms) {
+      } else if (this.shouldApplyMmsRate) {
         this.segments = 1
         this.charactersPerPage = 1600
         return this.segments
