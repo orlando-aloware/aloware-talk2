@@ -96,13 +96,15 @@ import WallboardAgentStatus from 'src/components/wallboard/wallboard-agent-statu
 import * as AgentStatus from 'src/constants/agent-status'
 import { COLUMNS } from 'src/constants/wallboard/agents-columns'
 import { mapActions, mapGetters } from 'vuex'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, classicMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'wallboard-agents-table',
 
   mixins: [
-    aclMixin
+    aclMixin,
+    classicMixin,
+    simpsocialMixin
   ],
 
   components: {
@@ -196,7 +198,7 @@ export default {
     },
 
     apiUrl () {
-      return process.env.API_URL
+      return this.getClassicURL(this.isSimpSocial)
     },
 
     customStatusOrder () {

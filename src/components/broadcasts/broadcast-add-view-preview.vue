@@ -70,8 +70,13 @@ export default {
   },
 
   props: {
-    propCampaign: {
+    campaign: {
       type: Object,
+      required: true
+    },
+
+    contactsLength: {
+      type: Number,
       required: true
     },
 
@@ -112,10 +117,6 @@ export default {
       'currentCompany'
     ]),
 
-    ...mapState('broadcast', [
-      'contactsLength'
-    ]),
-
     isValid () {
       return true
     },
@@ -134,7 +135,7 @@ export default {
     },
 
     campaignText () {
-      return `${this.propCampaign.name} (${this.propCampaign.incoming_number})`
+      return `${this.campaign.name} (${this.campaign.incoming_number})`
     },
 
     contactsText () {

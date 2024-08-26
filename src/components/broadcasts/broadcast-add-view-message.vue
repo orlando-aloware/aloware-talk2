@@ -1,44 +1,5 @@
 <template>
   <div class="broadcast-add broadcast-add__message">
-    <div class="broadcast-add__schedule__row"
-         v-if="propCampaign">
-      <div class="broadcast-add__schedule__row__label">
-        From
-        <span>
-          <information-circle-icon class="cursor-pointer"/>
-          <q-tooltip>
-            The line you want to send the bulck messages campaign from.
-          </q-tooltip>
-        </span>
-      </div>
-      <div class="broadcast-add__schedule__row__fields">
-        <contact-line-selector :value="propCampaign?.id"
-                               @select="onCampaignSelected"/>
-        <broadcast-warning-note :campaign="propCampaign" />
-      </div>
-    </div>
-
-    <div class="broadcast-add__schedule__row">
-      <div class="broadcast-add__schedule__row__label">
-        Throttling
-        <a target="_blank"
-           :href="complianceURL">
-          <information-circle-icon class="ml-2 cursor-pointer"/>
-          <q-tooltip>
-            This is an hourly throttling limit on your bulk message campaign.<br>
-            Throttling comes directly from the carrier based on brand trust score.<br>
-            <span v-if="isWithinMpsLimit">
-              To increase your MPS rate, please register your line cliking on this button.
-            </span>
-          </q-tooltip>
-        </a>
-      </div>
-      <div class="broadcast-add__schedule__row__fields">
-        <throttle-selector :campaign="propCampaign"
-                           v-model="throttle"/>
-      </div>
-    </div>
-
     <b-form-radio-group stacked
                         value-field="id"
                         text-field="label"
@@ -57,7 +18,7 @@
                               :reset-on-load="false"
                               :use-send-button="false"
                               :is-broadcast="true"
-                              @messageChanged="onMessageChanged"/>
+                              @messageChanged="messageLength"/>
       </div>
 
       <div class="broadcast-add__message__sms__composer-footer">
@@ -80,10 +41,10 @@
               </q-tooltip>
             </q-checkbox>
           <span class="mr-4">
-            Message parts: {{ messagePartCount }} / {{ charactersPerPage }}
+            Message parts: {{ messagePartCount }} / {{ baseLine }}
           </span>
           <span>
-            Message(s): {{ messageCount() }}
+            Message(s): {{ messageCount }}
           </span>
 
         </div>
@@ -149,11 +110,8 @@ import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import MessageComposerSms from 'src/components/message-composer/message-composer-sms.vue'
 import MessageComposerSmsPreview from 'src/components/message-composer/message-composer-sms-preview.vue'
 import Waveform from 'src/components/waveform.vue'
-import ContactLineSelector from 'src/components/contact-line-selector.vue'
-import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
-import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin, broadcastsMixin, classicMixin, smsMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, smsMixin, simpsocialMixin } from 'src/plugins/mixins'
 import { IS_OPT_OUT_FORCED_TEXT } from '../../constants/compliance-messages'
 
 export default {
@@ -161,8 +119,6 @@ export default {
 
   mixins: [
     aclMixin,
-    broadcastsMixin,
-    classicMixin,
     smsMixin,
     simpsocialMixin
   ],
@@ -174,36 +130,24 @@ export default {
     InformationCircleIcon,
     MessageComposerSms,
     MessageComposerSmsPreview,
-    Waveform,
-    ContactLineSelector,
-    ThrottleSelector,
-    BroadcastWarningNote
+    Waveform
   },
 
   props: {
+    contactsLength: {
+      type: Number,
+      default: 0
+    },
+
     rvm: {
       type: Object,
-      default: null
-    },
-
-    propCampaign: {
-      type: Object,
-      required: false,
-      default: null
-    },
-
-    propThrottle: {
-      type: Object,
-      required: false,
       default: null
     }
   },
 
   data: () => ({
     type: 'sms',
-    maxSmsBodyLength: 1600, // Maximum length of a single SMS message body.
-    throttle: null, // Throttling settings for the campaign, controls the rate of message sending.
-    mpsLimit: 0.25 // Maximum messages per second (MPS) that the campaign is allowed to send.
+    maxSmsBodyLength: 1600
   }),
 
   computed: {
@@ -217,10 +161,6 @@ export default {
 
     ...mapState('auth', [
       'profile'
-    ]),
-
-    ...mapState('broadcast', [
-      'contactsLength'
     ]),
 
     ...mapGetters('contacts', [
@@ -290,13 +230,40 @@ export default {
       return false
     },
 
+    baseLine () {
+      return this.segmentMaxChars
+    },
+
     messagePartCount () {
       if (this.smsBodyLength > 0) {
-        const count = this.smartEncodedMessageLength % this.charactersPerPage
-        return (count === 0 ? this.charactersPerPage : count) || this.smartEncodedMessageLength
+        const count = this.smartEncodedMessageLength % this.segmentUsedChars
+        return (count === 0 ? this.segmentMaxChars : count) || this.smartEncodedMessageLength
       }
 
       return 0
+    },
+
+    messageCount () {
+      // Return the number of segments
+      return this.segments
+    },
+
+    useMmsRate () {
+      return this.messageComposer.sms.attachments.length > 0 || this.messageComposer.sms.gif_url.length > 0
+    },
+
+    price () {
+      // get the rate based on the type
+      const rate = this.type === 'rvm'
+        ? this.profile.rate.rvm
+        : this.useMmsRate ? this.profile.rate.local_mms : this.profile.rate.local_sms
+
+      // get the messages count based on the type
+      const messages = this.type === 'sms'
+        ? this.messageCount
+        : this.rvm ? 1 : 0
+
+      return this.contactsLength * messages * rate
     },
 
     vmDropUploadUrl () {
@@ -309,20 +276,15 @@ export default {
 
     optoutTooltipText () {
       return IS_OPT_OUT_FORCED_TEXT
-    },
-
-    complianceURL () {
-      return this.propCampaign?.max_mps <= this.mpsLimit ? this.getComplianceURL() : '#'
-    },
-
-    isWithinMpsLimit () {
-      return this.propCampaign?.max_mps <= this.mpsLimit
     }
   },
 
   created () {
-    this.setCampaign()
-    this.throttle = this.propThrottle
+    const campaign = this.profile.campaign_id
+      ? this.campaigns.find(camp => camp.id === this.profile.campaign_id)
+      : this.campaigns[0]
+
+    this.setSelectedLine(campaign)
 
     // type setup
     this.type = this.rvm ? 'rvm' : 'sms'
@@ -332,46 +294,20 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'setMessageComposerSmsBody',
+      'setSelectedLine',
       'setIsOptoutActive'
     ]),
 
     applyVMDropAudioFile (data) {
       this.$emit('rvm-updated', data)
-      this.updatePrice()
     },
 
     vmFileUploaded (file) {
       this.$emit('rvm-updated', file)
-      this.updatePrice()
     },
 
     onRemoveRVM () {
       this.$emit('rvm-updated', null)
-      this.updatePrice()
-    },
-
-    onCampaignSelected (campaign) {
-      this.$emit('campaign', campaign)
-    },
-
-    setCampaign () {
-      if (this.propCampaign) {
-        this.onCampaignSelected(this.propCampaign)
-        return
-      }
-
-      this.onCampaignSelected(this.propCampaign ?? this.profile.campaign_id
-        ? this.campaigns.find(camp => camp.id === this.profile.campaign_id)
-        : this.campaigns[0])
-    },
-
-    updatePrice () {
-      this.$emit('price-updated', this.getEstimatedPrice())
-    },
-
-    onMessageChanged (message) {
-      this.messageLength(message)
-      this.updatePrice()
     }
   },
 
@@ -389,6 +325,7 @@ export default {
         const newBody = this.messageComposer.sms.body.substring(0, this.maxSmsBodyWithOptoutLength)
         this.setMessageComposerSmsBody(newBody)
         this.messageLength(newBody)
+        this.getMessageInfo(newBody)
       }
     },
 
@@ -406,12 +343,11 @@ export default {
       this.$emit('type-updated', type)
     },
 
-    propCampaign (campaign) {
-      this.updatePrice()
-    },
-
-    throttle (value) {
-      this.$emit('throttle', value)
+    price: {
+      immediate: true,
+      handler (price) {
+        this.$emit('price-updated', price)
+      }
     }
   }
 }
