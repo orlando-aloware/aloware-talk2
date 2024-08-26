@@ -919,3 +919,19 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.activity-bottom-info {
+  min-height: 30px;
+  height: auto;
+  max-height: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.img-fluid {
+  min-width: 250px;
+  width: auto;
+  max-width: 322px;
+}
+</style>

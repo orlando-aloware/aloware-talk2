@@ -215,3 +215,31 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.contact-activity-container {
+  display: flex;
+  flex-direction: column;
+
+  .contact-activities {
+    min-height: 100px;
+    flex-grow: 1;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 600px) and (min-width: 501px), (max-height: 400px) {
+    zoom: 80%;
+  }
+
+  @media (max-width: 500px) {
+    zoom: 70%;
+  }
+
+  .composer-container-wrapper {
+    @media (max-height: 370px) {
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+  }
+}
+</style>
