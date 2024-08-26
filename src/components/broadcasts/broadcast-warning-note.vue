@@ -26,11 +26,6 @@ export default {
       required: false
     },
 
-    contactsLength: {
-      type: Number,
-      required: false
-    },
-
     isCalculatorMessage: {
       type: Boolean,
       required: false
