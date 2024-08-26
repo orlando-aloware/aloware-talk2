@@ -58,7 +58,7 @@
                               :reset-on-load="false"
                               :use-send-button="false"
                               :is-broadcast="true"
-                              @messageChanged="onMessageChanged"
+                              @message-changed="onMessageChanged"
                               @attachments-uploaded="onAttachmentsUploaded"
                               @attachment-removed="onAttachmentRemoved"
                               @gif-selected="onGifSelected"
