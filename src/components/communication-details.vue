@@ -944,9 +944,11 @@
           <hr/>
           <!-- COMMUNICATION CUSTOM FIELDS -->
           <q-card-section class="pt-0 pb-0"
-                          v-if="communication.metadata?.custom_fields && Object.keys(communication.metadata.custom_fields).length > 0"
-                          data-testid="comm-details-custom-fields">
-            <b-form-row v-for="(custom_field, key) in communication.metadata?.custom_fields" data-testid="comm-details-custom-field-row" :key="key">
+              data-testid="comm-details-custom-fields"
+              v-if="communication.metadata?.custom_fields && Object.keys(communication.metadata.custom_fields).length > 0">
+            <b-form-row data-testid="comm-details-custom-field-row"
+              v-for="(custom_field, key) in communication.metadata?.custom_fields"
+              :key="key">
               <b-col class="pl-0 pr-0">
                 <q-item-label> {{ convertToTitleCase(key) }}: </q-item-label>
               </b-col>
