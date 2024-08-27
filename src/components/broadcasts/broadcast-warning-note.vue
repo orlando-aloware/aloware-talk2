@@ -56,7 +56,6 @@ export default {
       if (this.isCalculatorMessage) {
         let carrierSurchargesMessage = ''
 
-        console.log(this.campaign, this.contactsLength)
         if (this.campaign && this.contactsLength) {
           const carrierFee = this.getCarrierFee()
           carrierSurchargesMessage = ` Estimated carrier surcharges of $${carrierFee} will also apply.`
