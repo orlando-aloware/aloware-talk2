@@ -927,11 +927,11 @@ export default {
   max-height: 100%;
   overflow-x: auto;
   overflow-y: auto;
-}
 
-.img-fluid {
-  min-width: 250px;
-  width: auto;
-  max-width: 322px;
+  span {
+    @media (max-width: 500px) {
+      white-space: normal;
+    }
+  }
 }
 </style>

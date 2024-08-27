@@ -218,27 +218,11 @@ export default {
 
 <style scoped lang="scss">
 .contact-activity-container {
-  display: flex;
-  flex-direction: column;
-
   .contact-activities {
-    min-height: 100px;
-    flex-grow: 1;
-    box-sizing: border-box;
-  }
+    min-height: 250px;
 
-  @media (max-width: 600px) and (min-width: 501px), (max-height: 400px) {
-    zoom: 80%;
-  }
-
-  @media (max-width: 500px) {
-    zoom: 70%;
-  }
-
-  .composer-container-wrapper {
-    @media (max-height: 370px) {
-      overflow-y: scroll;
-      overflow-x: hidden;
+    @media (max-height: 500px) {
+      height: 250px !important;
     }
   }
 }
