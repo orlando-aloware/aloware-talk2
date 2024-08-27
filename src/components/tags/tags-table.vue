@@ -161,7 +161,7 @@
                     </b-dropdown-item>
                   </div>
 
-                  <b-dropdown-item v-if="hasPermissionTo('delete tag') && !isSimpSocial"
+                  <b-dropdown-item v-if="hasPermissionTo('delete tag')"
                                    data-testid="tags-table-dropdown-item-delete"
                                    @click="openDeleteTagDialog(tag)">
                     <span class="text-danger"><delete-red-icon /> Delete</span>
@@ -223,8 +223,7 @@
 import Datatable from 'components/datatable.vue'
 import {
   aclMixin,
-  tagsMixin,
-  simpsocialMixin
+  tagsMixin
 } from 'src/plugins/mixins'
 import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
@@ -262,8 +261,7 @@ export default {
 
   mixins: [
     aclMixin,
-    tagsMixin,
-    simpsocialMixin
+    tagsMixin
   ],
 
   props: {

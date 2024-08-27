@@ -64,7 +64,6 @@
         <a href="#"
            class="text-danger"
            data-testid="tags-delete-selected-tags-button"
-           v-if="!isSimpSocial"
            @click.prevent="isOpenDeleteTagDialog = true">
           <i class="fa fa-trash text-danger"></i>
           Delete
@@ -100,10 +99,7 @@
 </template>
 
 <script>
-import {
-  tagsMixin,
-  simpsocialMixin
-} from 'src/plugins/mixins'
+import { tagsMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
 import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
@@ -121,8 +117,7 @@ export default {
   },
 
   mixins: [
-    tagsMixin,
-    simpsocialMixin
+    tagsMixin
   ],
 
   data () {
