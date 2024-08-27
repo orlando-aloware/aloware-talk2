@@ -355,7 +355,7 @@ export default {
       console.log('Call invite canceled 1', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       if (call !== undefined) {
-        console.log('Call undefined 2')
+        console.log('Call undefined 1')
         this.backToDial('Talk-Device.OnCancel')
       }
       this.connection = null
@@ -739,9 +739,8 @@ export default {
         console.log('Call invite canceled 2', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
-        // this.backToDial('Talk-Connection.OnCancel')
         if (call !== undefined) {
-          console.log('Call undefined 1')
+          console.log('Call undefined 2')
           this.backToDial('Talk-Device.OnCancel')
         }
         this.$closeActionNotification('incomingCall')
