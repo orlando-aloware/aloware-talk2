@@ -350,12 +350,13 @@ export default {
     })
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
-      this.removeUnownedLiveContactTask()
-      console.log('Call invite canceled', call)
-      this.setDialerCurrentStatus('INVITE_CANCELLED')
-      this.backToDial('Talk-Device.OnCancel')
-      this.connection = null
-      this.$closeActionNotification('incomingCall')
+      // TEL-527
+      // this.removeUnownedLiveContactTask()
+      // console.log('Call invite canceled', call)
+      // this.setDialerCurrentStatus('INVITE_CANCELLED')
+      // this.backToDial('Talk-Device.OnCancel')
+      // this.connection = null
+      // this.$closeActionNotification('incomingCall')
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
@@ -473,6 +474,7 @@ export default {
     },
 
     getCommunication (sid, from, getCommunicationTry = 1, force = false) {
+      // TEL-527
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {
