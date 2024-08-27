@@ -48,7 +48,7 @@ pipeline {
                             steps {
                                 script {
                                     //String text
-                                    withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
+                                    withCredentials([file(credentialsId: 'talk2-dev-env2', variable: 'dev_env')]) {
                                         // text = readFile(dev_env)
                                         sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                                     }
