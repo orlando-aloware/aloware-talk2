@@ -369,14 +369,10 @@ export default {
         this.setAgentStatus(agentStatus)
 
         if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.isDialed) {
-          this.showAlertAgentOnCall = true
           this.showAlertCallFinished = false
         }
 
-        if (this.showAlertAgentOnCall) {
-          this.showAlertAgentOnCall = false
-          this.handleDialNumber(this.hubspotPhoneNumber)
-        }
+        this.handleDialNumber(this.hubspotPhoneNumber)
       }
     },
 
