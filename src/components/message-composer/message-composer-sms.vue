@@ -367,11 +367,11 @@ export default {
     },
 
     isSendTextDisabled () {
-      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber || this.isSending
+      return !this.validSms || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber || this.isSending
     },
 
     isSendTextInputDisabled () {
-      return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
+      return this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
     },
 
     canTextToNumber () {

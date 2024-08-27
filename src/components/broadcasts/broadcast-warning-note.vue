@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { broadcastsMixin } from 'src/plugins/mixins'
 
 export default {
@@ -41,6 +41,10 @@ export default {
       'messageComposer'
     ]),
 
+    ...mapState('broadcast', [
+      'contactsLength'
+    ]),
+
     showWarning () {
       return this.showMessageSentAsMmsWarning ||
         this.showMessageSentFromTollFreeNumberWarning ||
@@ -52,6 +56,7 @@ export default {
       if (this.isCalculatorMessage) {
         let carrierSurchargesMessage = ''
 
+        console.log(this.campaign, this.contactsLength)
         if (this.campaign && this.contactsLength) {
           const carrierFee = this.getCarrierFee()
           carrierSurchargesMessage = ` Estimated carrier surcharges of $${carrierFee} will also apply.`
