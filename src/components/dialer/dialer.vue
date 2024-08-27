@@ -731,12 +731,13 @@ export default {
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
-        this.removeUnownedLiveContactTask()
-        console.log('Call invite canceled', call)
-        this.connection = null
-        this.setDialerCurrentStatus('INVITE_CANCELLED')
-        this.backToDial('Talk-Connection.OnCancel')
-        this.$closeActionNotification('incomingCall')
+        // TEL-527
+        // this.removeUnownedLiveContactTask()
+        // console.log('Call invite canceled', call)
+        // this.connection = null
+        // this.setDialerCurrentStatus('INVITE_CANCELLED')
+        // this.backToDial('Talk-Connection.OnCancel')
+        // this.$closeActionNotification('incomingCall')
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
