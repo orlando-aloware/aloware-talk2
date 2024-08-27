@@ -373,7 +373,7 @@ export default {
           this.showAlertCallFinished = false
         }
 
-        if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.showAlertAgentOnCall) {
+        if (this.showAlertAgentOnCall) {
           this.showAlertAgentOnCall = false
           this.handleDialNumber(this.hubspotPhoneNumber)
         }
