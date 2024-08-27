@@ -365,9 +365,7 @@ export default {
         return
       }
 
-      this.onCampaignSelected(this.propCampaign ?? this.profile.campaign_id
-        ? this.campaigns.find(camp => camp.id === this.profile.campaign_id)
-        : this.campaigns[0])
+      this.onCampaignSelected({})
     },
 
     updatePrice () {

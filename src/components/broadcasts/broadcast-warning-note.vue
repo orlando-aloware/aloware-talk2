@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { broadcastsMixin } from 'src/plugins/mixins'
 
 export default {
@@ -39,6 +39,10 @@ export default {
 
     ...mapGetters('contacts', [
       'messageComposer'
+    ]),
+
+    ...mapState('broadcast', [
+      'contactsLength'
     ]),
 
     showWarning () {
