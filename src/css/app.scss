@@ -4340,6 +4340,8 @@ i.option-separator {
     }
 
     .merge-btn {
+      min-width: 82px;
+
       & .q-btn__content {
         padding: 0 9px;
         font-size: $f-size-body;
