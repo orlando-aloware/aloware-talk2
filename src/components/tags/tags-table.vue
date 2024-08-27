@@ -221,10 +221,7 @@
 
 <script>
 import Datatable from 'components/datatable.vue'
-import {
-  aclMixin,
-  tagsMixin
-} from 'src/plugins/mixins'
+import { aclMixin, tagsMixin } from 'src/plugins/mixins'
 import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
