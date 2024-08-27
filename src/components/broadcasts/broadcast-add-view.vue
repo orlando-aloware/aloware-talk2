@@ -336,8 +336,11 @@ export default {
       'setSelectedLine'
     ]),
 
+    ...mapActions('broadcast', [
+      'setSelectedCampaign'
+    ]),
+
     ...mapMutations('broadcast', [
-      'SET_SELECTED_CAMPAIGN',
       'SET_CONTACTS_LENGTH'
     ]),
 
@@ -374,7 +377,7 @@ export default {
     },
 
     onCampaignUpdated (campaign) {
-      this.SET_SELECTED_CAMPAIGN(campaign)
+      this.setSelectedCampaign(campaign)
       this.setSelectedLine(campaign)
     },
 
@@ -560,7 +563,7 @@ export default {
     this.setMessageComposerSmsGif('')
     this.setMessageComposerAttachments([])
     this.setCurrentListFilters({})
-    this.SET_SELECTED_CAMPAIGN({})
+    this.setSelectedCampaign({})
     this.rmv = null
   }
 }
