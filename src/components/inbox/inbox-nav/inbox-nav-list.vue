@@ -138,16 +138,23 @@ export default {
     },
 
     inboxChannels () {
+      console.log('============================================================================')
+      console.log(this.profile)
       if (this.profile?.campaign_id) {
         return this.navListItems
       }
 
       // hard-coded disabling my-personal-line channel
       const channels = this.navListItems
+      console.log(channels)
       let index = channels.findIndex(channel => channel.value === 'my-personal-line')
+      console.log(index)
       channels[index].disabled = true
       channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
 
+      console.log(channels[index])
+
+      console.log('============================================================================')
       return channels
     }
   },
