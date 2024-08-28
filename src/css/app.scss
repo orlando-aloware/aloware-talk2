@@ -15048,3 +15048,39 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
     margin-bottom: 6px
   }
 }
+
+.contact-activity-container {
+  .contact-activities-hs-widget {
+    min-height: 250px;
+
+    @media (max-height: 500px) {
+      height: 250px !important;
+    }
+  }
+}
+
+.activity-bottom-info-hs-widget {
+  min-height: 30px;
+  height: auto;
+  max-height: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+
+  span {
+    @media (max-width: 500px) {
+      white-space: normal;
+    }
+  }
+}
+
+.contact-view-wrapper-hs-widget {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-y: auto;
+
+  @media (max-width: 400px) {
+    width: 400px !important;
+    overflow-x: auto;
+  }
+}
