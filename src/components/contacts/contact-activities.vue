@@ -11,7 +11,7 @@
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
 
-      <div :class="['contact-activities', { 'contact-activities-hs-widget':  isWidget} ]">
+      <div :class="['contact-activities', { 'contact-activities-hs-widget':  isWidget }]">
         <b-overlay class="h-100 w-100"
                    variant="white"
                    rounded="sm"
