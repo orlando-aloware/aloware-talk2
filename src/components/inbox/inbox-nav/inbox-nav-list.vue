@@ -140,13 +140,13 @@ export default {
     inboxChannels () {
       console.log('============================================================================')
       console.log(this.profile)
+      console.log(this.navListItems)
       if (this.profile?.campaign_id) {
         return this.navListItems
       }
 
       // hard-coded disabling my-personal-line channel
       const channels = this.navListItems
-      console.log(channels)
       let index = channels.findIndex(channel => channel.value === 'my-personal-line')
       console.log(index)
       channels[index].disabled = true
