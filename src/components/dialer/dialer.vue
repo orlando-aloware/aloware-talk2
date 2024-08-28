@@ -351,14 +351,14 @@ export default {
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       // TEL-527
-      if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
-        this.removeUnownedLiveContactTask()
-        console.log('Call invite canceled 1', call)
-        this.setDialerCurrentStatus('INVITE_CANCELLED')
-        this.backToDial('Talk-Device.OnCancel')
-        this.connection = null
-        this.$closeActionNotification('incomingCall')
-      }
+      console.log('Call invite canceled 1 this.dialer.call.callSid', this.dialer.call.callSid)
+      this.removeUnownedLiveContactTask()
+      console.log('Call invite canceled 1', call)
+      console.log('Call invite canceled 1 callSid', call.callSid)
+      this.setDialerCurrentStatus('INVITE_CANCELLED')
+      this.backToDial('Talk-Device.OnCancel')
+      this.connection = null
+      this.$closeActionNotification('incomingCall')
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
@@ -734,14 +734,14 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
         // TEL-527
-        if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
-          this.removeUnownedLiveContactTask()
-          console.log('Call invite canceled 2', call)
-          this.connection = null
-          this.setDialerCurrentStatus('INVITE_CANCELLED')
-          this.backToDial('Talk-Device.OnCancel')
-          this.$closeActionNotification('incomingCall')
-        }
+        console.log('Call invite canceled 2 this.dialer.call.callSid', this.dialer.call.callSid)
+        this.removeUnownedLiveContactTask()
+        console.log('Call invite canceled 2', call)
+        console.log('Call invite canceled 2 call.callSid', call.callSid)
+        this.connection = null
+        this.setDialerCurrentStatus('INVITE_CANCELLED')
+        this.backToDial('Talk-Device.OnCancel')
+        this.$closeActionNotification('incomingCall')
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
