@@ -362,17 +362,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.contact-view-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  overflow-y: auto;
-
-  @media (max-width: 400px) {
-    width: 400px !important;
-    overflow-x: auto;
-  }
-}
-</style>
