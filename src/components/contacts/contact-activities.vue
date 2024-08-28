@@ -215,3 +215,15 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="scss">
+.contact-activity-container {
+  .contact-activities {
+    min-height: 250px;
+
+    @media (max-height: 500px) {
+      height: 250px !important;
+    }
+  }
+}
+</style>
