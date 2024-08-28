@@ -324,6 +324,10 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+
+      console.log('this.device.on call.callSid', call.callSid)
+      console.log('this.dialer.call.callSid', this.dialer.call.callSid)
+
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
@@ -354,7 +358,7 @@ export default {
       console.log('Call invite canceled 1 this.dialer.call.callSid', this.dialer.call.callSid)
       this.removeUnownedLiveContactTask()
       console.log('Call invite canceled 1', call)
-      console.log('Call invite canceled 1 callSid', call.callSid)
+      // console.log('Call invite canceled 1 callSid', call.callSid)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
       this.connection = null
@@ -362,6 +366,8 @@ export default {
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
+      console.log('this.device.on DISCONNECT call', call)
+      console.log('this.device.on DISCONNECT this.dialer.call.callSid', this.dialer.call.callSid)
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
 
       if (this.dialer.communication) {
@@ -737,7 +743,7 @@ export default {
         console.log('Call invite canceled 2 this.dialer.call.callSid', this.dialer.call.callSid)
         this.removeUnownedLiveContactTask()
         console.log('Call invite canceled 2', call)
-        console.log('Call invite canceled 2 call.callSid', call.callSid)
+        // console.log('Call invite canceled 2 call.callSid', call.callSid)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial('Talk-Device.OnCancel')
