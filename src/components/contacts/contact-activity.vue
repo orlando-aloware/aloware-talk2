@@ -922,19 +922,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.activity-bottom-info-hs-widget {
-  min-height: 30px;
-  height: auto;
-  max-height: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-
-  span {
-    @media (max-width: 500px) {
-      white-space: normal;
-    }
-  }
-}
-</style>
