@@ -351,15 +351,14 @@ export default {
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       // TEL-527
-      this.removeUnownedLiveContactTask()
-      console.log('Call invite canceled 1', call)
-      this.setDialerCurrentStatus('INVITE_CANCELLED')
-      if (call !== undefined) {
-        console.log('Call undefined 1')
+      if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
+        this.removeUnownedLiveContactTask()
+        console.log('Call invite canceled 1', call)
+        this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial('Talk-Device.OnCancel')
+        this.connection = null
+        this.$closeActionNotification('incomingCall')
       }
-      this.connection = null
-      this.$closeActionNotification('incomingCall')
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
@@ -735,15 +734,14 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
         // TEL-527
-        this.removeUnownedLiveContactTask()
-        console.log('Call invite canceled 2', call)
-        this.connection = null
-        this.setDialerCurrentStatus('INVITE_CANCELLED')
-        if (call !== undefined) {
-          console.log('Call undefined 2')
+        if (this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL) {
+          this.removeUnownedLiveContactTask()
+          console.log('Call invite canceled 2', call)
+          this.connection = null
+          this.setDialerCurrentStatus('INVITE_CANCELLED')
           this.backToDial('Talk-Device.OnCancel')
+          this.$closeActionNotification('incomingCall')
         }
-        this.$closeActionNotification('incomingCall')
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
