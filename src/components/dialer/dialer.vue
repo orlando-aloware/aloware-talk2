@@ -480,7 +480,6 @@ export default {
     },
 
     getCommunication (sid, from, getCommunicationTry = 1, force = false) {
-      // TEL-527
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {
