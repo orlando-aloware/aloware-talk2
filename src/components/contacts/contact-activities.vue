@@ -11,7 +11,8 @@
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
 
-      <div :class="['contact-activities', { 'contact-activities-hs-widget':  isWidget }]">
+      <div class="contact-activities"
+           :class="{ 'contact-activities-hs-widget': isWidget }">
         <b-overlay class="h-100 w-100"
                    variant="white"
                    rounded="sm"
@@ -215,15 +216,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.contact-activity-container {
-  .contact-activities-hs-widget {
-    min-height: 250px;
-
-    @media (max-height: 500px) {
-      height: 250px !important;
-    }
-  }
-}
-</style>
