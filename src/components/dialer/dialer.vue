@@ -350,8 +350,8 @@ export default {
     })
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
-      // TEL-527
       if (call?.parameters?.CallSid === this.dialer?.call?.callSid) {
+        console.log('Talk-Device: The SIDs match, prevent the calls from being hung up.')
         return
       }
 
@@ -364,8 +364,6 @@ export default {
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      console.log('TEL-527 this.device.on DISCONNECT call.parameters.CallSid', call.parameters.CallSid)
-      console.log('TEL-527 this.device.on DISCONNECT this.dialer.call.callSid', this.dialer.call.callSid)
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
 
       if (this.dialer.communication) {
@@ -736,8 +734,8 @@ export default {
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
-        // TEL-527
         if (call?.parameters?.CallSid === this.dialer?.call?.callSid) {
+          console.log('Talk-Connection: The SIDs match, prevent the calls from being hung up.')
           return
         }
 
@@ -753,9 +751,6 @@ export default {
         if (this.dialer.communication) {
           this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
         }
-
-        console.log('TEL-527 this.connection.on CONNECTION_DISCONNECT call.parameters.CallSid', call.parameters.CallSid)
-        console.log('TEL-527 this.connection.on CONNECTION_DISCONNECT this.dialer.call.callSid', this.dialer.call.callSid)
 
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
         this.removeUnownedLiveContactTask()
