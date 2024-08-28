@@ -5,7 +5,8 @@
              :show="isShowContact"
              :opacity="0.85"
              v-if="authenticated">
-    <div :class="['mx-0', 'content-row', 'contact-view-wrapper', 'd-flex', 'justify-content-between', { 'contact-view-wrapper-hs-widget': isWidget }]"
+    <div class="mx-0 content-row contact-view-wrapper d-flex justify-content-between"
+         :class="{ 'contact-view-wrapper-hs-widget': isWidget }"
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
@@ -362,17 +363,3 @@ export default {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.contact-view-wrapper-hs-widget {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  overflow-y: auto;
-
-  @media (max-width: 400px) {
-    width: 400px !important;
-    overflow-x: auto;
-  }
-}
-</style>
