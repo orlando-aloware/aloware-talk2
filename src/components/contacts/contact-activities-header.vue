@@ -165,7 +165,7 @@
         </q-btn>
       </div>
     </div>
-    <profile v-if="isMobile && $q.screen.lt.md && !isWidget"
+    <profile v-if="isMobile && $q.screen.lt.md"
       :hideProfileInfo="true"></profile>
   </div>
 </template>
