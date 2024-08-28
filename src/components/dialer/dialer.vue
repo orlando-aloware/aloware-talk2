@@ -356,7 +356,7 @@ export default {
       }
 
       this.removeUnownedLiveContactTask()
-      console.log('Call invite canceled 1', call)
+      console.log('Talk-Device: Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
       this.connection = null
@@ -740,7 +740,7 @@ export default {
         }
 
         this.removeUnownedLiveContactTask()
-        console.log('Call invite canceled 2', call)
+        console.log('Talk-Connection: Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial('Talk-Connection.OnCancel')
