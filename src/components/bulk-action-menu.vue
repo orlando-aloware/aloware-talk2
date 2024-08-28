@@ -64,7 +64,7 @@
              class="text-danger"
              data-testid="bulk-action-menu-delete-link"
              :disabled="disabledDelete"
-             v-if="(hasDeletePermission && canDelete) || isPowerDialer"
+             v-if="(hasDeletePermission && canDelete && !isSimpSocial) || isPowerDialer"
              @click="onDelete">
             <i class="fa fa-trash text-danger"/>
             Delete
@@ -100,7 +100,10 @@
 import { chunk } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
-import { aclMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  simpsocialMixin
+} from 'src/plugins/mixins'
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 
 export default {
@@ -110,7 +113,10 @@ export default {
     'selectedContacts'
   ],
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    simpsocialMixin
+  ],
 
   props: {
     id: {
