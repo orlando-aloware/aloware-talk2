@@ -326,7 +326,9 @@ export default {
     this.device.on(WebrtcEvents.INCOMING, (call) => {
 
       console.log('this.device.on call.callSid', call.callSid)
-      console.log('this.dialer.call.callSid', this.dialer.call.callSid)
+      if (this.dialer?.call?.callSid) {
+        console.log('1 this.dialer.call.callSid', this.dialer.call.callSid)
+      }
 
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
@@ -340,6 +342,10 @@ export default {
       // restore app when a call comes
       if (this.$q.platform.is.electron) {
         this.$q.electron.ipcRenderer.send('restore_app')
+      }
+
+      if (this.dialer?.call?.callSid) {
+        console.log('2 this.dialer.call.callSid', this.dialer.call.callSid)
       }
 
       this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
