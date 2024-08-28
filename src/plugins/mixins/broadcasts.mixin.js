@@ -76,7 +76,7 @@ export default {
     },
 
     showMessageSentAsMmsDueToAssets () {
-      return this.useMmsRate
+      return this.useMmsRate && !this.sendLongMessagesAsMms
     },
 
     showMessageSentAsMmsWarning () {
@@ -147,16 +147,16 @@ export default {
     },
 
     generateWarningMessage () {
+      if (this.showMessageSentFromTollFreeNumberWarning) {
+        return 'The selected line is configured with a Toll-free Number, which may lead to higher-than-expected charges for this broadcast.'
+      }
+
       if (this.showMessageSentAsMmsDueToAssets) {
         return 'The message will be sent via MMS because it has an attachment or GIF attached to it, which may lead to higher-than-expected charges for this broadcast.'
       }
 
       if (this.showMessageSentAsMmsWarning) {
         return 'The selected line is configured to send long messages via MMS, which may lead to higher-than-expected charges for this broadcast.'
-      }
-
-      if (this.showMessageSentFromTollFreeNumberWarning) {
-        return 'The selected line is configured with a Toll-free Number, which may lead to higher-than-expected charges for this broadcast.'
       }
 
       if (this.showMessageSentFromTollFreeNumberAsMmsWarning) {
