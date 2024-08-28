@@ -761,6 +761,9 @@ export default {
           this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
         }
 
+        console.log('TEL-527 this.connection.on CONNECTION_DISCONNECT call.callSid', call.callSid)
+        console.log('TEL-527 this.connection.on CONNECTION_DISCONNECT this.dialer.call.callSid', this.dialer.call.callSid)
+
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
