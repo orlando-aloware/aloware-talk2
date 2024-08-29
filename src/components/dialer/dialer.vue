@@ -324,14 +324,14 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      // if (this.connection && this.connection.callSid === call.callSid) {
-      //   console.log('Connection already exists, skipping creation.')
-      //   return
-      // }
+      if (this.connection && this.connection.callSid === call.callSid) {
+        console.log('Connection already exists, skipping creation.')
+        return
+      }
 
-      // if (this.connection) {
-      //   this.connection._connection.off();
-      // }
+      if (this.connection) {
+        this.connection._connection.off()
+      }
 
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)

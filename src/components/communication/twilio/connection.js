@@ -4,10 +4,6 @@ export default class TwilioConnection {
   static instance = null;
 
   constructor (device, connection, initEvents = false) {
-    if (TwilioConnection.instance) {
-      return TwilioConnection.instance
-    }
-
     this._device = device
     this._connection = connection
     this.callSid = connection.parameters.CallSid
@@ -35,12 +31,6 @@ export default class TwilioConnection {
     if (initEvents) {
       this._initEvents()
     }
-
-    TwilioConnection.instance = this
-  }
-
-  static resetInstance () {
-    TwilioConnection.instance = null
   }
 
   _executeCallback (cbName, args = []) {
@@ -114,12 +104,10 @@ export default class TwilioConnection {
 
   hangup () {
     this._connection.disconnect()
-    // TwilioConnection.resetInstance()
   }
 
   reject () {
     this._connection.reject()
-    // TwilioConnection.resetInstance()
   }
 
   sendDigits (digit) {
