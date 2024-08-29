@@ -1416,6 +1416,7 @@ export default {
     },
 
     updateOnlineStatus (event) {
+      console.log('TEL-527 navigator onLine status', navigator.onLine)
       this.onlineStatus = navigator.onLine
       this.loading = !this.onlineStatus
     },
