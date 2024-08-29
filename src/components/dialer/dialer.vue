@@ -324,16 +324,17 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
-      if (sessionStorage.getItem('processed') === 'true') {
-        console.log('TEL-527 this.device.on INCOMING already processed')
-        return
-      }
+      // if (this.connection && this.connection.callSid === call.callSid) {
+      //   console.log('Connection already exists, skipping creation.')
+      //   return
+      // }
+
+      // if (this.connection) {
+      //   this.connection._connection.off();
+      // }
 
       this.stopAudio()
-      console.log('TEL-527 this.device.on INCOMING this.connection current', this.connection)// TEL-527 for testing
       this.connection = this.device._createConnection(call._connection, true)
-      console.log('TEL-527 this.device.on INCOMING this.connection new', this.connection)// TEL-527 for testing
-      // this.connection = call._connection // TEL-527 for testing
       this.initConnectionEvents()
       console.log('Received call invite', call)
       this.dialerCallPrep(call._connection)
