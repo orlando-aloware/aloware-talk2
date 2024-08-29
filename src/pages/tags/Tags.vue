@@ -59,6 +59,22 @@
         </b-col>
       </b-row>
 
+      <b-row class="d-flex"
+             v-if="shouldShowTagsDeprecationBanner">
+        <b-col class="d-flex align-self-center"
+               md="8"
+               offset-md="2"
+               sm="12">
+          <div class="tags-deprecation-banner px-2 w-100 py-2 px-3">
+            <div class="left-content">
+              <p class="trial--text">
+                <strong>Contact Tags</strong> are being moved to <strong>Lists</strong> in the next 60 days. Please consider moving to the <strong>lists page</strong>.
+              </p>
+            </div>
+          </div>
+        </b-col>
+      </b-row>
+
        <!-- loading spinner -->
       <b-overlay class="h-100 w-100 d-flex flex-column overflow-hidden"
                  rounded="sm"
@@ -233,6 +249,10 @@ export default {
 
     oldCategoryName () {
       return this.getTagCategoryName(this.oldTagCategory)
+    },
+
+    shouldShowTagsDeprecationBanner () {
+      return this.selectedTagCategory === this.ContactTags
     }
   },
 
