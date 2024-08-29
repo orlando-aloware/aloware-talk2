@@ -324,6 +324,11 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      if (sessionStorage.getItem('processed') === 'true') {
+        console.log('TEL-527 this.device.on INCOMING already processed')
+        return
+      }
+
       this.stopAudio()
       console.log('TEL-527 this.device.on INCOMING this.connection current', this.connection)// TEL-527 for testing
       this.connection = this.device._createConnection(call._connection, true)
