@@ -98,7 +98,6 @@ export default class TwilioConnection {
       this._executeCallback(Events.CONNECTION_WARNING_CLEARED, [warningName])
     })
     console.log('init connection events')
-    sessionStorage.setItem('processed', 'true')
   }
 
   isMuted () {
