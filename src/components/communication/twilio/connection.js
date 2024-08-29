@@ -114,12 +114,12 @@ export default class TwilioConnection {
 
   hangup () {
     this._connection.disconnect()
-    TwilioConnection.resetInstance()
+    // TwilioConnection.resetInstance()
   }
 
   reject () {
     this._connection.reject()
-    TwilioConnection.resetInstance()
+    // TwilioConnection.resetInstance()
   }
 
   sendDigits (digit) {
