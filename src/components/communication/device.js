@@ -51,6 +51,18 @@ export default class Device {
     this._device = this.carrier === Carriers.TWILIO ? new TwilioClientDevice(token, options) : null
     this._device.isEventsStarted = false
     this._is_initialized = true
+
+    // this._callbacks = {
+    //   registered: [],
+    //   unregistered: [],
+    //   incoming: [],
+    //   error: [],
+    //   disconnect: [],
+    //   connect: [],
+    //   cancel: [],
+    //   tokenWillExpire: []
+    // } // for testing
+
     this._initEvents()
   }
 
@@ -72,7 +84,8 @@ export default class Device {
     })
 
     this._device.on(Events.INCOMING, (connection) => {
-      this._executeCallback(Events.INCOMING, [this._createConnection(connection)])
+      // this._executeCallback(Events.INCOMING, [this._createConnection(connection)])
+      this._executeCallback(Events.INCOMING, [connection]) // TEL-527 for testing
     })
 
     this._device.on(Events.ERROR, (error) => {
