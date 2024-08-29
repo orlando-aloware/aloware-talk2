@@ -1,8 +1,6 @@
 import * as Events from '../../../constants/webrtc-events'
 
 export default class TwilioConnection {
-  static instance = null;
-
   constructor (device, connection, initEvents = false) {
     this._device = device
     this._connection = connection
