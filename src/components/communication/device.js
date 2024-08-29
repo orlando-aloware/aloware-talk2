@@ -52,16 +52,16 @@ export default class Device {
     this._device.isEventsStarted = false
     this._is_initialized = true
 
-    this._callbacks = {
-      registered: [],
-      unregistered: [],
-      incoming: [],
-      error: [],
-      disconnect: [],
-      connect: [],
-      cancel: [],
-      tokenWillExpire: []
-    } // TEL-527 for testing
+    // this._callbacks = {
+    //   registered: [],
+    //   unregistered: [],
+    //   incoming: [],
+    //   error: [],
+    //   disconnect: [],
+    //   connect: [],
+    //   cancel: [],
+    //   tokenWillExpire: []
+    // } // TEL-527 for testing
 
     this._initEvents()
   }
