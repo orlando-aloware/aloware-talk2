@@ -290,7 +290,7 @@ export default {
         this.extensions.userLoggedIn()
 
         if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call) {
-          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-2')
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
         }
       }
 
