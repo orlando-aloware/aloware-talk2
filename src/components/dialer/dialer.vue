@@ -325,7 +325,8 @@ export default {
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       this.stopAudio()
-      this.connection = this.device._createConnection(call._connection, true)
+      // this.connection = this.device._createConnection(call._connection, true)
+      this.connection = call._connection // TEL-527 for testing
       this.initConnectionEvents()
       console.log('Received call invite', call)
       this.dialerCallPrep(call._connection)
