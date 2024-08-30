@@ -61,11 +61,11 @@
 
       <b-row class="d-flex"
              v-if="shouldShowTagsDeprecationBanner">
-        <b-col class="d-flex align-self-center"
+        <b-col class="d-flex justify-content-center"
                md="8"
                offset-md="2"
                sm="12">
-          <div class="tags-deprecation-banner px-2 w-100 py-2 px-3">
+          <div class="tags-deprecation-banner px-2 py-2 px-3">
             <div class="left-content">
               <p class="trial--text">
                 <strong>Contact Tags</strong> are being moved to <strong>Lists</strong> in the next 60 days. Please consider moving to the <strong>lists page</strong>.
