@@ -215,13 +215,17 @@ export default {
       })
     },
 
-    checkAndResetCallDisposition () {
+    shouldForceDisposition () {
       const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
         !this.profile.last_call?.contact?.disposition_status_id
       const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
         !this.profile.last_call?.call_disposition_id
 
-      if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
+      return shouldForceContactDisposition || shouldForceCallDisposition
+    },
+
+    checkAndResetCallDisposition () {
+      if (!this.shouldForceDisposition()) {
         this.$VueEvent.fire('resetCall')
       }
     },
@@ -485,6 +489,10 @@ export default {
 
       this.$VueEvent.fire('resetCall')
       this.handleCallCompletedEvent(true)
+
+      if (this.dialer?.currentStatus === 'READY' && (this.currentCompany?.force_contact_disposition && this.currentCompany?.force_call_disposition)) {
+        window.location.reload()
+      }
     }
   },
 
@@ -506,14 +514,9 @@ export default {
         return
       }
 
-      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.last_call?.contact?.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.last_call?.call_disposition_id
-
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
       if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
-        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(shouldForceContactDisposition || shouldForceCallDisposition))) &&
+        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.shouldForceDisposition())) &&
         !this.isDialed) {
         this.showAlertAgentOnCall = true
         this.showAlertCallFinished = false
