@@ -58,5 +58,9 @@ export default {
       console.log(err)
       this._vm.$handleErrors(err.response)
     }
+  },
+
+  setSelectedCampaign ({ commit }, campaign) {
+    commit('SET_SELECTED_CAMPAIGN', campaign)
   }
 }

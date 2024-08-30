@@ -81,6 +81,16 @@ export default {
       return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
     },
 
+    // Unassigned filters should be available for beta and 568, 3459 companies
+    isCompanyPartOfNewUnassignedInboxFilters (companyId) {
+      const demoCompanies = storage.local.getItem('aloware_demo_companies') ? storage.local.getItem('aloware_demo_companies').split(',') : []
+      demoCompanies.push('2287')
+      demoCompanies.push('568')
+      demoCompanies.push('3459')
+      demoCompanies.push('2403')
+      return demoCompanies.includes(String(companyId))
+    },
+
     // Temporary function to check if company is part of new inbox filters
     // should be removed once all companies are migrated to new inbox filters
     isCompanyPartOfNewInboxFilters (companyId) {
