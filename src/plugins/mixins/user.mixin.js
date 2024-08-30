@@ -87,6 +87,7 @@ export default {
       demoCompanies.push('2287')
       demoCompanies.push('568')
       demoCompanies.push('3459')
+      demoCompanies.push('2403')
       return demoCompanies.includes(String(companyId))
     },
 
