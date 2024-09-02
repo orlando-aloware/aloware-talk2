@@ -1609,7 +1609,7 @@ export default {
     clearInterval(this.$options.hangupInterval)
     clearInterval(this.unownedContact.interval)
 
-    console.log('Destroy the Twilio device to avoid having multiple Twilio device instances.')
+    // Destroy the Twilio device to avoid having multiple Twilio device instances.
     this.device.destroy()
   }
 }
