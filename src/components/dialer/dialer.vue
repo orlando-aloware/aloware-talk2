@@ -1610,7 +1610,6 @@ export default {
   },
 
   beforeDestroy () {
-    console.log('TEL-527 dialer.vue beforeDestroy')
     this.stopDialerWrapUpEvents()
     this.stopDialerEvents()
     clearInterval(this.$options.callDurationInterval)
@@ -1620,15 +1619,8 @@ export default {
     clearInterval(this.$options.hangupInterval)
     clearInterval(this.unownedContact.interval)
 
-    console.log('TEL-527 dialer.vue beforeDestroy destroying twilio device')
-    // this.device.disconnectAll()
+    console.log('Destroy the Twilio device to avoid having multiple Twilio device instances.')
     this.device.destroy()
-    // this.device._is_initialized = false
-    // this.device = null
-  },
-
-  destroy () {
-    console.log('TEL-527 dialer.vue destroy')
   }
 }
 </script>
