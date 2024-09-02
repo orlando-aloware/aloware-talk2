@@ -1610,6 +1610,7 @@ export default {
     clearInterval(this.unownedContact.interval)
 
     // Destroy the Twilio device to avoid having multiple Twilio device instances.
+    console.log('Destroying Twilio device')
     this.device.destroy()
   }
 }
