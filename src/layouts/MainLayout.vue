@@ -1417,15 +1417,15 @@ export default {
 
     updateOnlineStatus (event) {
       console.log('TEL-527 navigator onLine status', navigator.onLine)
-      const wasOffline = !this.onlineStatus
+      // const wasOffline = !this.onlineStatus
 
       this.onlineStatus = navigator.onLine
       this.loading = !this.onlineStatus
 
-      if (wasOffline && this.onlineStatus) {
-        console.log('TEL-527 reloading page')
-        window.location.reload()
-      }
+      // if (wasOffline && this.onlineStatus) {
+      //   console.log('TEL-527 reloading page')
+      //   window.location.reload()
+      // }
     },
 
     call (phoneNumber) {
