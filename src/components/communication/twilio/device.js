@@ -98,7 +98,6 @@ export default class TwilioDevice extends MainDevice {
   }
 
   destroy () {
-    console.log('TEL-527 device.js destroy')
     this._device.disconnectAll()
     this._device.destroy()
     this._device._is_initialized = false

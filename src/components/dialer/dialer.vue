@@ -350,11 +350,6 @@ export default {
     })
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
-      if (call?.parameters?.CallSid === this.dialer?.call?.callSid) {
-        console.log('Talk-Device: The SIDs match, prevent the calls from being hung up.')
-        return
-      }
-
       this.removeUnownedLiveContactTask()
       console.log('Talk-Device: Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
@@ -734,11 +729,6 @@ export default {
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
-        if (call?.parameters?.CallSid === this.dialer?.call?.callSid) {
-          console.log('Talk-Connection: The SIDs match, prevent the calls from being hung up.')
-          return
-        }
-
         this.removeUnownedLiveContactTask()
         console.log('Talk-Connection: Call invite canceled', call)
         this.connection = null
