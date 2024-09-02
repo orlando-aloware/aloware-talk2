@@ -1621,7 +1621,6 @@ export default {
     clearInterval(this.unownedContact.interval)
 
     console.log('TEL-527 dialer.vue beforeDestroy destroying twilio device')
-    this.device.destroy()
     this.device.disconnectAll()
     this.device.destroy()
     this.device._is_initialized = false
