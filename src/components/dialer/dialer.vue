@@ -1610,6 +1610,7 @@ export default {
   },
 
   beforeDestroy () {
+    console.log('TEL-527 dialer.vue beforeDestroy')
     this.stopDialerWrapUpEvents()
     this.stopDialerEvents()
     clearInterval(this.$options.callDurationInterval)
@@ -1618,6 +1619,10 @@ export default {
     clearInterval(this.$options.webrtcTokenRegenerateInterval)
     clearInterval(this.$options.hangupInterval)
     clearInterval(this.unownedContact.interval)
+  },
+
+  destroy () {
+    console.log('TEL-527 dialer.vue destroy')
   }
 }
 </script>

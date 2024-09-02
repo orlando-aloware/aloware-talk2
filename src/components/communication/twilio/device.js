@@ -97,12 +97,8 @@ export default class TwilioDevice extends MainDevice {
     return this._createConnection(await this._device.connect({ params }), initEvents)
   }
 
-  beforeDestroy () {
-    console.log('TEL-527 beforeDestroy')
-  }
-
   destroy () {
-    console.log('TEL-527 destroy')
+    console.log('TEL-527 device.js destroy')
     this._device.disconnectAll()
     this._device.destroy()
     this._device._is_initialized = false
