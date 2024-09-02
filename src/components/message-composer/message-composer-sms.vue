@@ -777,7 +777,7 @@ export default {
     },
 
     onInput (input) {
-      this.$emit('messageChanged', input)
+      this.$emit('message-changed', input)
     },
 
     async imposeCharactersLimit (value) {
@@ -811,7 +811,7 @@ export default {
 
   watch: {
     'messageComposer.sms.body': function (value) {
-      this.$emit('messageChanged', value)
+      this.$emit('message-changed', value)
       this.setMessageComposerSmsBody(value)
     }
   },

@@ -148,6 +148,7 @@ export default {
       per_page: 25,
       sort: 'last_engagement_at',
       order: 'desc',
+      force_slave: 1,
       filters: {
         dnc_option: {
           value: 5, // only contacts without dnc

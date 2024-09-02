@@ -193,7 +193,10 @@
       </div>
 
       <div class="activity-bottom-info text-xs width-500 m-b d-flex align-items-center flex-wrap"
-           :class="[ communication.direction === CommunicationDirection.INBOUND ? 'justify-content-start' : 'justify-content-end' ]"
+           :class="[
+             communication.direction === CommunicationDirection.INBOUND ? 'justify-content-start' : 'justify-content-end',
+             { 'activity-bottom-info-hs-widget': isWidget },
+           ]"
            v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <span class="text-muted"
               v-if="communication.direction === CommunicationDirection.OUTBOUND &&
@@ -462,7 +465,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources']),
+    ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     ...mapState('inbox', [
