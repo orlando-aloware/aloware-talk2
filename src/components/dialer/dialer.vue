@@ -1621,10 +1621,10 @@ export default {
     clearInterval(this.unownedContact.interval)
 
     console.log('TEL-527 dialer.vue beforeDestroy destroying twilio device')
-    this.device.disconnectAll()
+    // this.device.disconnectAll()
     this.device.destroy()
-    this.device._is_initialized = false
-    this.device = null
+    // this.device._is_initialized = false
+    // this.device = null
   },
 
   destroy () {
