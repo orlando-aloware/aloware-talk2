@@ -92,8 +92,6 @@ jobs:
           ENV_SENTRY_PROJECT: ${{ secrets.sentry_project }}
           ENV_RECAPTCHA_SITE_KEY: ${{ secrets.recaptcha_site_key }}
           ENV_DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
-          ENV_HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
-          ENV_HS_DISABLE_TRACKER: ${{ secrets.hs_disable_tracker }}
           ENV_XMAS_ENABLED: ${{ secrets.xmas_enabled }}
           ENV_XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
@@ -152,11 +150,6 @@ jobs:
 
           # Demo Company Ids
           DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
-
-          # All others
-          HS_CUSTOM_JS: ${{ secrets.hs_custom_js }}
-          # Disable HubSpot tracker
-          HS_DISABLE_TRACKER: ${{ secrets.hs_disable_tracker }}
 
           # Xmas
           XMAS_ENABLED: ${{ secrets.xmas_enabled }}

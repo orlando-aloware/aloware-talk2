@@ -25,8 +25,6 @@
                          position="b-toaster-top-center"/>
     <action-notification id="callFishing"
                          position="b-toaster-top-center"/>
-
-    <custom-scripts v-show="isLoggedIn"/>
     <intercom v-if="isIntercomEnabled && !isWidget"/>
   </div>
 </template>
@@ -36,7 +34,6 @@ import { customScriptsMixin } from 'src/plugins/mixins'
 import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
-import CustomScripts from 'components/custom-scripts'
 import HeaderNotification from 'components/header-notification'
 import SimpsocialMigrationBanner from 'components/simpsocial-migration-banner.vue'
 
@@ -48,7 +45,6 @@ export default {
   components: {
     HeaderNotification,
     Intercom,
-    CustomScripts,
     ActionNotification,
     SimpsocialMigrationBanner
   },
