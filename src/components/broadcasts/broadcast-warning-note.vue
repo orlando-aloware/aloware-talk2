@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { broadcastsMixin } from 'src/plugins/mixins'
 
 export default {
@@ -23,11 +23,6 @@ export default {
   props: {
     campaign: {
       type: Object,
-      required: false
-    },
-
-    contactsLength: {
-      type: Number,
       required: false
     },
 
@@ -44,6 +39,10 @@ export default {
 
     ...mapGetters('contacts', [
       'messageComposer'
+    ]),
+
+    ...mapState('broadcast', [
+      'contactsLength'
     ]),
 
     showWarning () {
@@ -65,19 +64,7 @@ export default {
         return `This calculator is meant to provide the best estimate for the cost of the broadcast. Actual charges from carriers may vary.${carrierSurchargesMessage}`
       }
 
-      if (this.showMessageSentAsMmsWarning) {
-        return 'The selected line is configured to send long messages via MMS, which may lead to higher-than-expected charges for this broadcast.'
-      }
-
-      if (this.showMessageSentFromTollFreeNumberWarning) {
-        return 'The selected line is configured with a Toll-free Number, which may lead to higher-than-expected charges for this broadcast.'
-      }
-
-      if (this.showMessageSentFromTollFreeNumberAsMmsWarning) {
-        return 'The selected line is configured with a Toll-free Number and to send long messages via MMS which may lead to higher-than-expected charges for this broadcast.'
-      }
-
-      return ''
+      return this.generateWarningMessage()
     }
   },
 

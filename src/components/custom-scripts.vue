@@ -18,7 +18,8 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
-    ...mapState('auth', ['profile', 'authenticated'])
+    ...mapState('auth', ['profile', 'authenticated']),
+    ...mapState(['isWidget'])
   },
 
   mounted () {
@@ -33,7 +34,7 @@ export default {
       }
 
       if (this.isModGen) {
-        if (!process.env.HS_CUSTOM_JS_MOD_GENIUS) {
+        if (!process.env.HS_CUSTOM_JS_MOD_GENIUS || this.isWidget) {
           return
         }
 

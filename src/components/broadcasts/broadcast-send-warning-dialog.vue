@@ -57,19 +57,8 @@ export default {
     },
 
     message () {
-      if (this.showMessageSentAsMmsWarning) {
-        return 'The selected line is configured to send long messages via MMS, which may lead to higher-than-expected charges for this broadcast. Would you like to proceed?'
-      }
-
-      if (this.showMessageSentFromTollFreeNumberWarning) {
-        return 'The selected line is configured with a Toll-free Number, which may lead to higher-than-expected charges for this broadcast. Would you like to proceed?'
-      }
-
-      if (this.showMessageSentFromTollFreeNumberAsMmsWarning) {
-        return 'The selected line is configured with a Toll-free Number and to send long messages via MMS which may lead to higher-than-expected charges for this broadcast. Would you like to proceed?'
-      }
-
-      return ''
+      const baseMessage = this.generateWarningMessage()
+      return baseMessage ? `${baseMessage} Would you like to proceed?` : ''
     }
   },
 

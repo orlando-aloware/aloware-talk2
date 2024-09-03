@@ -26,6 +26,7 @@
 <script>
 import CalendarIconOutlined from 'components/icons/calendar-icon-outlined'
 import { mapState } from 'vuex'
+import { classicMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'open-calendar-button',
@@ -33,6 +34,11 @@ export default {
   components: {
     CalendarIconOutlined
   },
+
+  mixins: [
+    classicMixin,
+    simpsocialMixin
+  ],
 
   props: {
     communicationId: {
@@ -53,7 +59,7 @@ export default {
   methods: {
     openCalendar () {
       // redirect to Classic only if talk isn't enabled
-      const url = this.currentCompany.talk_enabled ? '' : process.env.API_URL
+      const url = this.currentCompany.talk_enabled ? '' : this.getClassicURL(this.isSimpSocial)
 
       window.open(`${url}/calendar?communication_id=${this.communicationId}&view=month`)
     }

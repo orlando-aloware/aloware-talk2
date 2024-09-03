@@ -758,7 +758,7 @@
                   <div class="mt-2 w-100"
                        v-if="currentCompany.hubspot_integration_enabled">
                     <div class="d-flex align-items-center co-12">
-                      <label class="form-control-label mb-1">HubSpot Type:</label>
+                      <label class="form-control-label mb-1">HubSpot Call Type:</label>
                     </div>
                     <div class="d-flex align-items-center pt-2 w-100">
                       <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>
@@ -827,7 +827,8 @@ import {
   userMixin,
   notificationMixin,
   liveCallsMixin,
-  mentionsMixin
+  mentionsMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import SmsReminders from './sms-reminders'
@@ -869,7 +870,8 @@ export default {
     userMixin,
     notificationMixin,
     liveCallsMixin,
-    mentionsMixin
+    mentionsMixin,
+    simpsocialMixin
   ],
 
   components: {
@@ -1126,7 +1128,7 @@ export default {
     },
 
     getClassicUrlUserActivity (userId) {
-      return process.env.API_URL + `/users/${userId}/activity`
+      return `${this.getClassicURL(this.isSimpSocial)}/users/${userId}/activity`
     },
 
     dispose (dispositionStatus) {

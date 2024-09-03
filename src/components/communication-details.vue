@@ -931,7 +931,7 @@
             </b-form-row>
             <b-form-row v-if="currentCompany.hubspot_integration_enabled" data-testid="comm-details-call-disposition-row">
               <b-col class="pl-0 pr-0">
-                <q-item-label class="mt-3 custom-item-label">HubSpot Type: </q-item-label>
+                <q-item-label class="mt-3 custom-item-label">HubSpot Call Type: </q-item-label>
               </b-col>
               <b-col>
                 <div class="d-flex align-items-center">
@@ -960,8 +960,10 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import {
   aclMixin,
+  classicMixin,
   userMixin,
-  communicationInfoMixin
+  communicationInfoMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 
 import * as CommunicationTypes from '../constants/communication-types'
@@ -1005,8 +1007,10 @@ export default {
 
   mixins: [
     communicationInfoMixin,
+    classicMixin,
     userMixin,
-    aclMixin
+    aclMixin,
+    simpsocialMixin
   ],
 
   data () {
@@ -1170,23 +1174,23 @@ export default {
     },
 
     getClassicUrlUserActivity (userId) {
-      return process.env.API_URL + `/users/${userId}/activity`
+      return `${this.getClassicURL(this.isSimpSocial)}/users/${userId}/activity`
     },
 
     getClassicUrlSequenceActivity (sequenceId) {
-      return process.env.API_URL + `/sequences2/manager/${sequenceId}`
+      return `${this.getClassicURL(this.isSimpSocial)}/sequences2/manager/${sequenceId}`
     },
 
     getClassicUrlRingGroupActivity (ringGroupId) {
-      return process.env.API_URL + `/ring-groups/${ringGroupId}/activity`
+      return `${this.getClassicURL(this.isSimpSocial)}/ring-groups/${ringGroupId}/activity`
     },
 
     getClassicUrlBroadcastActivity (broadcastId) {
-      return process.env.API_URL + `/broadcast/${broadcastId}/activity`
+      return `${this.getClassicURL(this.isSimpSocial)}/broadcast/${broadcastId}/activity`
     },
 
     getClassicUrlLineActivity (campaignId) {
-      return process.env.API_URL + `/lines/${campaignId}/activity`
+      return `${this.getClassicURL(this.isSimpSocial)}/lines/${campaignId}/activity`
     },
 
     onArchive () {

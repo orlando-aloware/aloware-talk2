@@ -58,7 +58,7 @@
                               :reset-on-load="false"
                               :use-send-button="false"
                               :is-broadcast="true"
-                              @messageChanged="onMessageChanged"
+                              @message-changed="onMessageChanged"
                               @attachments-uploaded="onAttachmentsUploaded"
                               @attachment-removed="onAttachmentRemoved"
                               @gif-selected="onGifSelected"
@@ -365,9 +365,7 @@ export default {
         return
       }
 
-      this.onCampaignSelected(this.propCampaign ?? this.profile.campaign_id
-        ? this.campaigns.find(camp => camp.id === this.profile.campaign_id)
-        : this.campaigns[0])
+      this.onCampaignSelected({})
     },
 
     updatePrice () {

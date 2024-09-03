@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { simpsocialMixin, kycMixin } from 'src/plugins/mixins'
+import { classicMixin, simpsocialMixin, kycMixin } from 'src/plugins/mixins'
 import { mapActions, mapState, mapGetters } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
 import CompactBtn from 'components/compact-btn'
@@ -117,6 +117,7 @@ export default {
   },
 
   mixins: [
+    classicMixin,
     simpsocialMixin,
     kycMixin
   ],
@@ -151,7 +152,7 @@ export default {
     },
 
     classicUrlCompliancePage () {
-      return process.env.API_URL + '/account?tab=compliance'
+      return `${this.getClassicURL(this.isSimpSocial)}/account?tab=compliance`
     },
 
     shouldShowUnlockTrialExperienceButton () {

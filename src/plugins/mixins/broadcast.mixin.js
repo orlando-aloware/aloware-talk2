@@ -337,6 +337,48 @@ export default {
         .listen('.user.logout', (event) => {
           this.$VueEvent.fire('user_logout', event)
         })
+        .listen('.communication.created', (event) => {
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          if (campaign) {
+            event.communication.campaign = campaign
+          }
+          this.$VueEvent.fire('new_communication', event.communication)
+        })
+        .listen('.communication.updated', (event) => {
+          if (event.tags) {
+            event.communication.tags = event.tags
+            event.communication.tag_ids = event.communication.tags.map((a) => a.id)
+          }
+          if (event.contact) {
+            event.communication.contact = event.contact
+
+            if (event.contact_tags) {
+              event.communication.contact.tags = event.contact_tags
+            }
+          }
+          if (event.owner) {
+            event.communication.owner = event.owner
+          }
+          const campaign = this.campaigns.find(campaign => campaign.id === event.communication.campaign_id)
+          if (campaign) {
+            event.communication.campaign = campaign
+          }
+          this.$VueEvent.fire('update_communication', event.communication)
+        })
 
         /**
          * ------------------------------------

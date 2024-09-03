@@ -364,16 +364,18 @@ export default {
     },
 
     handleAgentStatusUpdate (data) {
-      const agentStatus = data.agent_status
-      this.setAgentStatus(agentStatus)
+      if (
+        this.currentCompany?.id === data.company_id &&
+        this.profile?.id === data.user_id &&
+        this.profile.agent_status !== data.agent_status
+      ) {
+        const agentStatus = data.agent_status
+        this.setAgentStatus(agentStatus)
 
-      if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.isDialed) {
-        this.showAlertAgentOnCall = true
-        this.showAlertCallFinished = false
-      }
+        if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.isDialed) {
+          this.showAlertCallFinished = false
+        }
 
-      if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.showAlertAgentOnCall) {
-        this.showAlertAgentOnCall = false
         this.handleDialNumber(this.hubspotPhoneNumber)
       }
     },
