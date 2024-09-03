@@ -787,6 +787,18 @@ export default {
       get (params) {
         return window.axios.get(`${suffixV2}users`, { params })
       }
+    },
+
+    aloAiBot: {
+      getBots () {
+        return window.axios.get(`${suffixV1}aloai/bots`)
+      },
+      getContactDisengagedBots (contactId) {
+        return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
+      },
+      updateContactEngagements (contactId, engagements) {
+        return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-control`, { engagements })
+      }
     }
   }
 }
