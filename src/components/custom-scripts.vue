@@ -33,13 +33,7 @@ export default {
         return
       }
 
-      if (this.isModGen) {
-        if (!process.env.HS_CUSTOM_JS_MOD_GENIUS || this.isWidget) {
-          return
-        }
-
-        this.loadScript(process.env.HS_CUSTOM_JS_MOD_GENIUS)
-      } else if (!this.isSimpsocial) {
+      if (!this.isSimpsocial) {
         if (!process.env.HS_CUSTOM_JS) {
           return
         }
