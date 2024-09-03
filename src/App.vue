@@ -57,9 +57,10 @@ export default {
   },
 
   computed: {
-    ...mapState('auth', ['profile', 'authenticated', 'loading']),
-
-    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget']),
+    ...mapState('cache', ['currentCompany']),
+    ...mapState('auth', ['profile', 'authenticated, loading']),
+    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget'])
+  },
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
