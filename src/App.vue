@@ -57,7 +57,6 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile', 'authenticated, loading']),
     ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget'])
   },
