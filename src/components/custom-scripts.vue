@@ -80,7 +80,7 @@ export default {
       }
 
       // Disable Hubspot chat for Aloware and local environments
-      if (!this.isModGen || this.isLocal) {
+      if (this.isLocal) {
         return
       }
 
