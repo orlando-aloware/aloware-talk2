@@ -14,7 +14,7 @@
                            is-simple
                            :communication-id="communication.id"
                            :filename="filename"
-                           :file-mime-type="this.mimeType"
+                           :file-mime-type="mimeType"
                            :file-uuid="fileUuid"/>
           <transcription-modal button-text="Show Smart Transcription"
                                data-testid="communication-audio-transcription-modal"
@@ -83,10 +83,6 @@ export default {
   },
 
   computed: {
-    isMigrated () {
-      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.recorded_file_is_migrated : this.communication.voicemail_is_migrated
-    },
-
     hasAudio () {
       return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.has_recording : this.communication.has_voicemail
     },
