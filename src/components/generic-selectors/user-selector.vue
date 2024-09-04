@@ -236,7 +236,7 @@ export default {
     availableUsers () {
       if (this.withUnassigned) {
         return [
-          { name: 'Unassiged', id: 'unassigned', email: '' },
+          { name: 'Unassigned', id: 'unassigned', email: '' },
           ...this.options
         ]
       }
