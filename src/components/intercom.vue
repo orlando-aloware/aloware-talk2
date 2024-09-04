@@ -35,6 +35,11 @@ export default {
 
   methods: {
     setup (newRoute = false) {
+      // @custom for The Moderate Genius Reseller & SimpSocial
+      if (this.currentCompany && [357].includes(this.currentCompany.reseller_id)) {
+        return
+      }
+
       if (!this.authenticated || !this.profile?.enabled || this.isWhiteLabel) {
         return
       }
