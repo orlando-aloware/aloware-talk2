@@ -234,10 +234,7 @@ export default {
     },
 
     availableUsers () {
-      if (this.withUnassigned &&
-          (this.isCompanyPartOfNewInboxFilters(this.profile.company_id) ||
-           this.isCompanyPartOfNewUnassignedInboxFilters(this.profile.company_id))
-      ) {
+      if (this.withUnassigned) {
         return [
           { name: 'Unassiged', id: 'unassigned', email: '' },
           ...this.options
