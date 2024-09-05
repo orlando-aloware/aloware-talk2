@@ -247,9 +247,12 @@ export default {
       'setShowViewsList'
     ]),
 
+    ...mapActions(['setIsFirstLoad']),
+
     onItemClicked (nextActive) {
       this.onCloseViewsList()
       this.resetFilter()
+      this.setIsFirstLoad(true)
 
       this.active = nextActive
       const isView = nextActive.indexOf('view') !== -1
