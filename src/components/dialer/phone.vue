@@ -2260,9 +2260,15 @@ export default {
         contactId: this.dialer.communication.contact_id
       }
 
-      this.endWrapUp('callback')
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.endWrapUp('callback')
 
-      this.$VueEvent.fire('makeCall', data)
+        setTimeout(() => {
+          this.$VueEvent.fire('makeCall', data)
+        }, 500)
+      } else {
+        this.$VueEvent.fire('makeCall', data)
+      }
     },
 
     resizeHandler (e) {
