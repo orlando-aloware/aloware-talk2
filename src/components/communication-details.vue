@@ -189,7 +189,7 @@
             <hr/>
             <b-form-row data-testid="comm-details-disposition-row">
               <b-col class="pl-0 pr-0" data-testid="comm-details-disposition-col">
-                <q-item-label>From 01: </q-item-label>
+                <q-item-label>From: </q-item-label>
               </b-col>
               <b-col data-testid="comm-details-disposition-col">
                 <div class="d-flex align-items-center"

@@ -331,12 +331,7 @@ export default {
 
       let selectedCampaign = this.campaigns.find(campaign => campaign.id === this.selectedCampaignId)
 
-      console.log('dialer-form.vue selectedCampaign: ', selectedCampaign)
-
       if (!this.shouldAllowSmsTraffic(selectedCampaign)) {
-        console.log('dialer-form.vue: isBlockTooltipPopoverEnabled: shouldAllowSmsTraffic is false')
-        // if this.shouldAllowSmsTraffic = true -> allow
-        // if this.shouldAllowSmsTraffic = false -> block sms
         return true
       }
 
@@ -374,11 +369,11 @@ export default {
     },
 
     disabledComplianceMessage () {
-      return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
+      return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' && !this.selectedCampaign.blocked_messaging_information['bypassed'] ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
     },
 
     shouldShowComplianceMessage () {
-      return !this.isTrialKYC && this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.selectedCampaign?.blocked_messaging_information && this.selectedCampaign.blocked_messaging_information['reason']
+      return !this.isTrialKYC && this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.selectedCampaign?.blocked_messaging_information && !this.selectedCampaign.blocked_messaging_information['bypassed'] && this.selectedCampaign.blocked_messaging_information['reason']
     }
   },
 

@@ -185,7 +185,6 @@ export default {
     },
 
     disabledComplianceMessage () {
-      console.log('disabledComplianceMessage', this.selectedLine && this.isMessagingBlocked(this.selectedLine, true) ? this.selectedLine?.blocked_messaging_information?.['reason'] : '')
       return this.selectedLine && this.isMessagingBlocked(this.selectedLine, true) ? this.selectedLine?.blocked_messaging_information?.['reason'] : ''
     },
 
@@ -195,9 +194,7 @@ export default {
     },
 
     canTextToNumber () {
-      console.log('canTextToNumber', !this.disabledComplianceMessage)
       const phoneNumber = this.messageComposer.sms.phone_number
-      console.log('canTextToNumber', this.enabledToTextNumber(phoneNumber))
       return this.enabledToTextNumber(phoneNumber) && !this.disabledComplianceMessage
     }
   },
@@ -235,7 +232,6 @@ export default {
     },
 
     onLineChange (line) {
-      console.log('onLineChange', line)
       this.setSelectedLine(line)
     },
 

@@ -6,7 +6,6 @@ export default _.merge({
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
-    // check this line if is it necessary or not
     ...mapState('contacts', ['selectedLine']),
 
     viewOnly () {
@@ -61,10 +60,6 @@ export default _.merge({
     },
 
     shouldAllowSmsTraffic (selectedLine) {
-      console.log('shouldAllowSmsTraffic MIXIN param', selectedLine)
-      console.log('shouldAllowSmsTraffic MIXIN is_10_dlc', selectedLine?.is_10_dlc)
-      console.log('shouldAllowSmsTraffic MIXIN has_approved_a2p_use_case', selectedLine?.has_approved_a2p_use_case)
-
       /**
        *
        *   1 - no a2p campaign + no 10dlc line -> enable
@@ -127,13 +122,6 @@ export default _.merge({
 
     enabledToTextNumber () {
       const kycStatus = this.getStatus()
-
-      /**
-       * Original code that was reverted
-          if (this.skipRestrictions(kycStatus) && this.isCompanyA2pCampaignApproved) {
-            return true
-          }
-       */
 
       if (this.skipRestrictions(kycStatus)) {
         return true

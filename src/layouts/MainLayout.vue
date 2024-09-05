@@ -1626,7 +1626,6 @@ export default {
             }
           })
           .then((res) => {
-            console.log('Main layout Campaigns: ', res.data)
             this.setCampaigns(res.data)
             this.loadingCampaigns = false
             this.setCampaignsIsLoading(false)
