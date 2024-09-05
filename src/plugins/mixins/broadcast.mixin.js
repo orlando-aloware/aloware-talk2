@@ -12,15 +12,7 @@ export default {
     ...mapState('inbox', [
       'communications',
       'channelChangedFilterFields'
-    ]),
-
-    hasRvmEnabled () {
-      return this.currentCompany.bulk_rvm_enabled
-    },
-
-    hasSmsEnabled () {
-      return this.currentCompany.bulk_sms_enabled
-    }
+    ])
   },
   methods: {
     ...mapActions([
