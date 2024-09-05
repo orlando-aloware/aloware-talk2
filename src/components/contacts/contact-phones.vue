@@ -84,11 +84,15 @@ export default {
     ]),
 
     sortedPhones () {
-      const primaryPhone = this.contactPhoneNumbers.find(phone => phone.phone_number === this.contact.phone_number)
-      return [
-        primaryPhone,
-        ...this.contactPhoneNumbers.filter(phone => phone.phone_number !== this.contact.phone_number)
-      ]
+      // Create a copy of the array before sorting
+      const phoneNumbersCopy = [...this.contactPhoneNumbers]
+
+      // move primary phone to the top
+      return phoneNumbersCopy.sort((a, b) => {
+        if (a.phone_number === this.contact.phone_number) return -1
+        if (b.phone_number === this.contact.phone_number) return 1
+        return 0
+      })
     },
 
     bodyClass () {
