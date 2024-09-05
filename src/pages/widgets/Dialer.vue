@@ -109,7 +109,6 @@ export default {
               if (this.timeout) {
                 clearTimeout(this.timeout)
               }
-
               this.handleDialNumber(event.phone_number)
             }
           },
