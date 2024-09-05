@@ -6,6 +6,8 @@ export default _.merge({
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
+    // check this line if is it necessary or not
+    ...mapState('contacts', ['selectedLine']),
 
     viewOnly () {
       return this.isViewOnlyAccess()
@@ -58,6 +60,35 @@ export default _.merge({
       return this.currentCompany?.is_trial ? this.currentCompany.kyc_status : KycLogs.KYC_STATUS_NONE
     },
 
+    shouldAllowSmsTraffic (selectedLine) {
+      console.log('shouldAllowSmsTraffic MIXIN param', selectedLine)
+      console.log('shouldAllowSmsTraffic MIXIN is_10_dlc', selectedLine?.is_10_dlc)
+      console.log('shouldAllowSmsTraffic MIXIN has_approved_a2p_use_case', selectedLine?.has_approved_a2p_use_case)
+
+      /**
+       *
+       *   1 - no a2p campaign + no 10dlc line -> enable
+       *
+       *   2 - a2p campaign  + no 10dlc (TF) ->  enable messagin
+       *
+       */
+      if (!selectedLine?.is_10_dlc) {
+        console.log('shouldAllowSmsTraffic MIXIN returning TRUE -> allowed')
+        // true -> allow
+        // false -> block sms
+        return true
+      }
+      console.log('shouldAllowSmsTraffic MIXIN returning ', selectedLine?.is_10_dlc && selectedLine?.has_approved_a2p_use_case)
+
+      /**
+       *   3 - a2p campaign + 10dlc line. -> enable messaging
+       *
+       *   4 - no a2p campaign + 10dlc -> disable
+       */
+
+      return selectedLine?.is_10_dlc && selectedLine?.has_approved_a2p_use_case
+    },
+
     enabledToCreateContacts () {
       const kycStatus = this.getStatus()
 
@@ -96,6 +127,13 @@ export default _.merge({
 
     enabledToTextNumber () {
       const kycStatus = this.getStatus()
+
+      /**
+       * Original code that was reverted
+          if (this.skipRestrictions(kycStatus) && this.isCompanyA2pCampaignApproved) {
+            return true
+          }
+       */
 
       if (this.skipRestrictions(kycStatus)) {
         return true

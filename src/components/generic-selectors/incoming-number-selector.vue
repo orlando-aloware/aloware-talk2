@@ -225,6 +225,7 @@ export default {
       })
     },
     getCampaigns () {
+      console.log('getCampaigns')
       if (this.hasPermissionTo('list campaign')) {
         this.loadingCampaigns = true
         return this.$axios
@@ -232,6 +233,7 @@ export default {
             mode: 'no-cors'
           })
           .then((res) => {
+            console.log('getCampaigns Data', res.data)
             this.campaigns = res.data
             this.phoneNumberOptions = this.incomingNumbers
             this.loadingCampaigns = false
@@ -245,6 +247,7 @@ export default {
   },
 
   created () {
+    console.log('created')
     this.phoneNumberOptions = this.incomingNumbers
     this.getCampaigns()
   },

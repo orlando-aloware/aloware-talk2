@@ -371,6 +371,14 @@ export default {
     },
 
     isSendTextInputDisabled () {
+      console.log('dialer-form.vue: this.selectedLine')
+
+      if (!this.shouldAllowSmsTraffic(this.selectedLine)) {
+        console.log('dialer-form.vue: isBlockTooltipPopoverEnabled: shouldAllowSmsTraffic is false')
+        // if this.shouldAllowSmsTraffic = true -> allow
+        // if this.shouldAllowSmsTraffic = false -> block sms
+        return true
+      }
       return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
     },
 
