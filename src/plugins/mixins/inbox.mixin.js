@@ -472,15 +472,10 @@ export default {
           }
         }
 
-        // Use a different key for contact owner filter with unassigned options
-        const contactOwnerFilterKey = this.isCompanyPartOfNewUnassignedInboxFilters(this.profile.company_id)
-          ? 'inbox_contact_owner'
-          : 'contact_owner'
-
         if (filter && filter?.contact_owner && filter.contact_owner.length && !this.inboxShowMyContacts) {
           this.filters = {
             ...this.filters,
-            [contactOwnerFilterKey]: [
+            'inbox_contact_owner': [
               { value: filter.contact_owner, operator: OPERATORS.IS_ANY_OF }
             ]
           }
@@ -491,7 +486,7 @@ export default {
         if (query.my_contact) {
           this.filters = {
             ...this.filters,
-            [contactOwnerFilterKey]: [
+            'inbox_contact_owner': [
               { value: [this.profile.id], operator: OPERATORS.IS_ANY_OF }
             ]
           }

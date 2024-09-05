@@ -636,11 +636,6 @@ export default {
       // reject ongoing call if there is one
       this.rejectCall()
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL && !isCallWaiting && !shouldAnswer) {
-        console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
-        return
-      }
-
       if (this.shouldPushPhoneRoute) {
         this.$router.push({
           name: 'Phone'
@@ -1254,7 +1249,8 @@ export default {
       })
     },
 
-    resetCall () {
+    resetCall (signature) {
+      console.log('Resetting call', signature)
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()
@@ -1367,7 +1363,7 @@ export default {
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
       this.resetAgentStatus(forceStatus, signature)
-      this.resetCall()
+      this.resetCall(signature)
     },
 
     playDispositionNotification () {
