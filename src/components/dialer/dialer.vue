@@ -1254,7 +1254,8 @@ export default {
       })
     },
 
-    resetCall () {
+    resetCall (signature) {
+      console.log('Resetting call', signature)
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()
@@ -1367,7 +1368,7 @@ export default {
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
       this.resetAgentStatus(forceStatus, signature)
-      this.resetCall()
+      this.resetCall(signature)
     },
 
     playDispositionNotification () {
