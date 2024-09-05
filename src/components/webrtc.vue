@@ -149,7 +149,7 @@ export default {
         this.profile.agent_status !== event.agent_status
       ) {
         this.setAgentStatus(event.agent_status)
-        console.log('Changed agent status [event]: ', event.agent_status)
+        console.log('Changed agent status from webrtc::agentStatusUpdated [event]: ', event.agent_status)
       }
     }
 
