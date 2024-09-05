@@ -264,14 +264,6 @@ export default {
       }
     },
 
-    hasRvmEnabled () {
-      return this.currentCompany.bulk_rvm_enabled
-    },
-
-    hasSmsEnabled () {
-      return this.currentCompany.bulk_sms_enabled
-    },
-
     types () {
       return [
         {
