@@ -327,8 +327,6 @@ export default {
     },
 
     isBlockTooltipPopoverEnabled () {
-      console.log('dialer-form.vue: isBlockTooltipPopoverEnabled')
-
       let selectedCampaign = this.campaigns.find(campaign => campaign.id === this.selectedCampaignId)
 
       if (!this.shouldAllowSmsTraffic(selectedCampaign)) {

@@ -371,8 +371,6 @@ export default {
     },
 
     isSendTextInputDisabled () {
-      console.log('dialer-form.vue: this.selectedLine')
-
       if (!this.shouldAllowSmsTraffic(this.selectedLine)) {
         return true
       }
