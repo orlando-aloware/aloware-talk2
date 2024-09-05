@@ -527,7 +527,7 @@ export default {
 
     processDetectLongUrl (detected) {
       // WAT-779: disable shortening url for simpsocial
-      if (this.isSimpsocial) {
+      if (this.isSimpSocial) {
         return
       }
 
