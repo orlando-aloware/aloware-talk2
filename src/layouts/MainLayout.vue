@@ -957,7 +957,7 @@ export default {
       if (this.profile && user.id === this.profile.id) {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
-        console.log('Changed agent status [event]: ', user.agent_status)
+        console.log('Changed agent status from userUpdated [event]: ', user.agent_status)
       }
     }
 
@@ -977,7 +977,7 @@ export default {
       if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
         this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
         this.setAgentStatus(event.agent_status)
-        console.log('Changed agent status [event]: ', event.agent_status)
+        console.log('Changed agent status from main::agentStatusUpdated [event]: ', event.agent_status)
       }
     }
 
