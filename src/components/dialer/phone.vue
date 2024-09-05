@@ -677,7 +677,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="isNotDisposed || isNotOnWrapUp"
+                  :disabled="isNotDisposed || isNotOnWrapUp || temporaryDisableFinishButton"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1458,6 +1458,7 @@ export default {
       UploadedFileTypes,
       TagCategories,
       callbackAction: false,
+      temporaryDisableFinishButton: false,
       AgentStatus
     }
   },
@@ -2745,6 +2746,12 @@ export default {
     },
 
     isCallCompleted () {
+      if (this.isCallCompleted) {
+        this.temporaryDisableFinishButton = true
+        setTimeout(() => {
+          this.temporaryDisableFinishButton = false
+        }, 1000)
+      }
       this.resetBottomExpansion()
       this.expansionEnabled = false
     },
