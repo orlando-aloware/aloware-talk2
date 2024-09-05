@@ -1449,6 +1449,8 @@ export default {
       loadingPhone: false,
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
+      callbackAction: false,
+      temporaryDisableFinishButton: false,
       phoneListeners: {},
       CommunicationDirection,
       CommunicationDispositionStatus,
@@ -1457,8 +1459,6 @@ export default {
       CommunicationTypes,
       UploadedFileTypes,
       TagCategories,
-      callbackAction: false,
-      temporaryDisableFinishButton: false,
       AgentStatus
     }
   },
@@ -2237,6 +2237,8 @@ export default {
     },
 
     endWrapUp (type = 'finish') {
+      this.temporaryDisableFinishButton = false
+
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
       }

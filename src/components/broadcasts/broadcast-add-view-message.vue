@@ -269,12 +269,12 @@ export default {
         {
           id: 'sms',
           label: 'SMS',
-          enabled: this.hasPermissionTo('create broadcast message')
+          enabled: this.hasSmsEnabled && this.hasPermissionTo('create broadcast message')
         },
         {
           id: 'rvm',
           label: 'Ringless Voicemail',
-          enabled: this.hasPermissionTo('create broadcast rvm')
+          enabled: this.hasRvmEnabled && this.hasPermissionTo('create broadcast rvm')
         }
       ].filter(type => type.enabled)
     },
