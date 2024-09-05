@@ -1332,6 +1332,8 @@ export default {
         return
       }
 
+      this.changeAgentStatus(AgentStatus.AGENT_STATUS_ON_WRAP_UP, false, 1, 'Talk-WrapUp')
+
       if (wrapUpTimer === 0) {
         this.stopWrapUpTimer()
         return
