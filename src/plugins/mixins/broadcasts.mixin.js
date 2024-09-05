@@ -93,6 +93,14 @@ export default {
 
     shouldShowWarning () {
       return this.showMessageSentAsMmsWarning || this.showMessageSentFromTollFreeNumberWarning || this.showMessageSentFromTollFreeNumberAsMmsWarning
+    },
+
+    hasRvmEnabled () {
+      return this.currentCompany.bulk_rvm_enabled
+    },
+
+    hasSmsEnabled () {
+      return this.currentCompany.bulk_sms_enabled
     }
   },
 
