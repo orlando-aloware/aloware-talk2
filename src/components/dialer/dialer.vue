@@ -398,6 +398,10 @@ export default {
       const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
         !this.profile.last_call.call_disposition_id
       if (shouldForceContactDisposition || shouldForceCallDisposition) {
+        if (this.isWidget && this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          return
+        }
+
         this.forceStartOnWrapUp()
       }
     },
