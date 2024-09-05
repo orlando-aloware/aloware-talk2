@@ -259,14 +259,13 @@ import ApplicationPlaceholder from 'components/message-composer/file-placeholder
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { kycMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { kycMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'message-composer-sms',
 
   mixins: [
-    kycMixin,
-    simpsocialMixin
+    kycMixin
   ],
 
   components: {
@@ -526,11 +525,6 @@ export default {
     },
 
     processDetectLongUrl (detected) {
-      // WAT-779: disable shortening url for simpsocial
-      if (this.isSimpSocial) {
-        return
-      }
-
       if (detected &&
                 !this.urlShortenerDontAsk && !this.isShortenedUrlRemembered) {
         this.urlShortenerDialog = true
