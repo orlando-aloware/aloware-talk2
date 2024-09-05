@@ -109,6 +109,7 @@ export default {
               if (this.timeout) {
                 clearTimeout(this.timeout)
               }
+
               this.handleDialNumber(event.phone_number)
             }
           },
@@ -376,7 +377,9 @@ export default {
           this.showAlertCallFinished = false
         }
 
-        this.handleDialNumber(this.hubspotPhoneNumber)
+        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          this.handleDialNumber(this.hubspotPhoneNumber)
+        }
       }
     },
 
@@ -438,7 +441,8 @@ export default {
 
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
-      this.handleDialNumber(this.hubspotPhoneNumber)
+      // Wait to finish the generate token to avoid conflicts with device
+      setTimeout(() => { this.handleDialNumber(this.hubspotPhoneNumber) }, 580)
     },
 
     canHandleDialNumber () {
@@ -489,6 +493,11 @@ export default {
 
       this.$VueEvent.fire('resetCall')
       this.handleCallCompletedEvent(true)
+
+      if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+        // force if agent status is on call and dialer is ready
+        this.changeAgentStatus(AgentStatus.AGENT_STATUS_ON_WRAP_UP, false, 1, 'HS-Update-AgentStatus')
+      }
     }
   },
 
