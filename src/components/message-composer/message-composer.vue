@@ -92,11 +92,6 @@
         </div>
       </div>
     </div>
-    <div v-if="shouldShowComplianceMessage" class="composer-footer">
-      <div class="compliance-badge mb-2">
-        {{ disabledComplianceMessage }}
-      </div>
-    </div>
     <block-tooltip placement="top"
                    triggers="hover"
                    target="composer-wrapper"

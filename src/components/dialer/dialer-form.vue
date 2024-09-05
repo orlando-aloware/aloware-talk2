@@ -104,10 +104,7 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div class="compliance-badge mb-2"
-                 v-if="shouldShowComplianceMessage">
-              {{ disabledComplianceMessage }}
-            </div>
+
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
