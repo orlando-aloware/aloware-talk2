@@ -677,7 +677,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="isNotDisposed || isNotOnWrapUp"
+                  :disabled="isNotDisposed || isNotOnWrapUp || temporaryDisableFinishButton"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1449,6 +1449,8 @@ export default {
       loadingPhone: false,
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
+      callbackAction: false,
+      temporaryDisableFinishButton: false,
       phoneListeners: {},
       CommunicationDirection,
       CommunicationDispositionStatus,
@@ -1457,7 +1459,6 @@ export default {
       CommunicationTypes,
       UploadedFileTypes,
       TagCategories,
-      callbackAction: false,
       AgentStatus
     }
   },
@@ -2236,6 +2237,8 @@ export default {
     },
 
     endWrapUp (type = 'finish') {
+      this.temporaryDisableFinishButton = false
+
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
       }
@@ -2745,6 +2748,12 @@ export default {
     },
 
     isCallCompleted () {
+      if (this.isCallCompleted) {
+        this.temporaryDisableFinishButton = true
+        setTimeout(() => {
+          this.temporaryDisableFinishButton = false
+        }, 1000)
+      }
       this.resetBottomExpansion()
       this.expansionEnabled = false
     },
