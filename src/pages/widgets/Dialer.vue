@@ -98,7 +98,11 @@ export default {
             this.extensions.initialized(payload)
             this.extensionsInitialized = true
           },
-          onDialNumber: (event) => {
+          onDialNumber: async (event) => {
+            if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+
             this.checkAndResetCallDisposition()
 
             this.showAlertCallFinished = false
@@ -109,7 +113,10 @@ export default {
               if (this.timeout) {
                 clearTimeout(this.timeout)
               }
-              this.handleDialNumber(event.phone_number)
+
+              if (this.isAlwaysAskModeEnabled()) {
+                this.handleDialNumber(event.phone_number)
+              }
             }
           },
           onVisibilityChanged: (data) => {
