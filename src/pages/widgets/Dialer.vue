@@ -109,7 +109,9 @@ export default {
               if (this.timeout) {
                 clearTimeout(this.timeout)
               }
-              this.handleDialNumber(event.phone_number)
+              if (this.isAlwaysAskModeEnabled()) {
+                this.handleDialNumber(event.phone_number)
+              }
             }
           },
           onVisibilityChanged: (data) => {
