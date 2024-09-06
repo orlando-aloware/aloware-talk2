@@ -668,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="shouldDisableCallBackButton"
+                  :disabled="shouldDisableCallBackButton || temporaryDisableFinishButton"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -2237,8 +2237,6 @@ export default {
     },
 
     endWrapUp (type = 'finish') {
-      this.temporaryDisableFinishButton = false
-
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
       }
@@ -2752,7 +2750,7 @@ export default {
         this.temporaryDisableFinishButton = true
         setTimeout(() => {
           this.temporaryDisableFinishButton = false
-        }, 1000)
+        }, 2000)
       }
       this.resetBottomExpansion()
       this.expansionEnabled = false
