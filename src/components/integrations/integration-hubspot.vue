@@ -27,14 +27,14 @@
       <q-card-section v-if="integrationData && integrationData.properties" data-testid="integration-hubspot-card-section-1">
         <p class="mb-0"
            data-testid="integration-hubspot-name"
-           v-if="integrationData.properties.firstname !== undefined && integrationData.properties.lastname !== undefined">
+           v-if="isNameAvailable">
           <span class="data-icon-label">Name: </span>
           <span class="data-value">
              <q-tooltip anchor="top middle"
                         self="center middle">
-              {{ integrationData.properties.firstname.value + ' ' + integrationData.properties.lastname.value }}
+              {{ fullName }}
             </q-tooltip>
-            {{ integrationData.properties.firstname.value + ' ' + integrationData.properties.lastname.value }}
+            {{ fullName }}
           </span>
         </p>
         <p class="mb-0"
@@ -223,6 +223,16 @@ export default {
 
     isWorkflowValid () {
       return this.workflow.id
+    },
+
+    isNameAvailable () {
+      return this.integrationData.properties.firstname !== undefined || this.integrationData.properties.lastname !== undefined
+    },
+
+    fullName () {
+      const firstname = this.integrationData.properties.firstname ? this.integrationData.properties.firstname.value : ''
+      const lastname = this.integrationData.properties.lastname ? this.integrationData.properties.lastname.value : ''
+      return `${firstname} ${lastname}`.trim()
     },
 
     companyDomain () {
