@@ -61,24 +61,19 @@ export default _.merge({
 
     shouldAllowSmsTraffic (selectedLine) {
       /**
-       *
-       *   1 - no a2p campaign + no 10dlc line -> enable
-       *
-       *   2 - a2p campaign  + no 10dlc (TF) ->  enable messagin
-       *
+       * Allow sms traffic on Dialer and Contact text Composer component
        */
       if (!selectedLine?.is_10_dlc) {
-        console.log('shouldAllowSmsTraffic MIXIN returning TRUE -> allowed')
-        // true -> allow
-        // false -> block sms
+        /**
+         *  1 - No A2P Campaign + No 10DLC Line -> Allow messaging
+         *  2 - A2P Campaign  + No 10DLC (TF) ->  Allow messaging
+         */
         return true
       }
-      console.log('shouldAllowSmsTraffic MIXIN returning ', selectedLine?.is_10_dlc && selectedLine?.has_approved_a2p_use_case)
 
       /**
-       *   3 - a2p campaign + 10dlc line. -> enable messaging
-       *
-       *   4 - no a2p campaign + 10dlc -> disable
+       *   3 - A2P Campaign + 10DLC Line. -> Allow messaging
+       *   4 - No A2P Campaign + 10DLC -> Not allowed
        */
 
       return selectedLine?.is_10_dlc && selectedLine?.has_approved_a2p_use_case

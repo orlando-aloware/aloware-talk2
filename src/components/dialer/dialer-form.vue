@@ -104,7 +104,6 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
