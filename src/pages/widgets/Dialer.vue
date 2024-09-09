@@ -509,6 +509,7 @@ export default {
       if (this.isLoadingDialer) {
         return
       }
+
       const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
         !this.profile.last_call?.contact?.disposition_status_id
       const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
