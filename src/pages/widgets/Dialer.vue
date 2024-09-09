@@ -290,7 +290,14 @@ export default {
         this.extensions.userLoggedIn()
 
         if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call) {
-          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
+          const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
+            !this.profile.last_call?.contact?.disposition_status_id
+          const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
+            !this.profile.last_call?.call_disposition_id
+
+          if (!(shouldForceContactDisposition || shouldForceCallDisposition)) {
+            this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
+          }
         }
       }
 
