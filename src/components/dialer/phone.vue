@@ -668,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="shouldDisableCallBackButton"
+                  :disabled="shouldDisableCallBackButton || temporaryDisableFinishButton"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -677,7 +677,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="isNotDisposed || isNotOnWrapUp"
+                  :disabled="isNotDisposed || isNotOnWrapUp || temporaryDisableFinishButton"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1449,6 +1449,8 @@ export default {
       loadingPhone: false,
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
+      callbackAction: false,
+      temporaryDisableFinishButton: false,
       phoneListeners: {},
       CommunicationDirection,
       CommunicationDispositionStatus,
@@ -1457,7 +1459,6 @@ export default {
       CommunicationTypes,
       UploadedFileTypes,
       TagCategories,
-      callbackAction: false,
       AgentStatus
     }
   },
@@ -2745,6 +2746,12 @@ export default {
     },
 
     isCallCompleted () {
+      if (this.isCallCompleted) {
+        this.temporaryDisableFinishButton = true
+        setTimeout(() => {
+          this.temporaryDisableFinishButton = false
+        }, 2000)
+      }
       this.resetBottomExpansion()
       this.expansionEnabled = false
     },

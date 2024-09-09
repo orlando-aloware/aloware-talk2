@@ -24,7 +24,7 @@
             Call
           </q-btn>
           <q-tooltip v-if="isAgentOnCall">
-            There is a call in progress on another device.
+            There is a call in progress on another device. If you think this is an error, please refresh your screen.
           </q-tooltip>
         </div>
       </div>
