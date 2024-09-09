@@ -215,17 +215,13 @@ export default {
       })
     },
 
-    shouldForceDisposition () {
+    checkAndResetCallDisposition () {
       const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
         !this.profile.last_call?.contact?.disposition_status_id
       const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
         !this.profile.last_call?.call_disposition_id
 
-      return shouldForceContactDisposition || shouldForceCallDisposition
-    },
-
-    checkAndResetCallDisposition () {
-      if (!this.shouldForceDisposition()) {
+      if (!shouldForceContactDisposition || !shouldForceCallDisposition) {
         this.$VueEvent.fire('resetCall')
       }
     },
@@ -513,10 +509,14 @@ export default {
       if (this.isLoadingDialer) {
         return
       }
+      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
+        !this.profile.last_call?.contact?.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
+        !this.profile.last_call?.call_disposition_id
 
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
       if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
-        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.shouldForceDisposition())) &&
+        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(shouldForceContactDisposition || shouldForceCallDisposition))) &&
         !this.isDialed) {
         this.showAlertAgentOnCall = true
         this.showAlertCallFinished = false
