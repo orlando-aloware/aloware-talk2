@@ -14629,6 +14629,45 @@ h1.contact-list-name-label {
   }
 }
 
+.tags-deprecation-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #FFFFE7;
+  border: #F2C94D 1px solid;
+  border-radius: 5px;
+
+  .left-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .trial--text {
+    margin: 0;
+    font-size: 0.8rem;
+    margin-right: 2rem;
+  }
+
+  @media only screen and (max-width: 1280px) {
+    .trial-banner {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .left-content {
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .left-content > .trial--text {
+      flex: 1 0 100%;
+    }
+  }
+}
+
 .video-modal-section {
   .activator {
     &-button {

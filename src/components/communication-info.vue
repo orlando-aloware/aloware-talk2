@@ -758,7 +758,7 @@
                   <div class="mt-2 w-100"
                        v-if="currentCompany.hubspot_integration_enabled">
                     <div class="d-flex align-items-center co-12">
-                      <label class="form-control-label mb-1">HubSpot Type:</label>
+                      <label class="form-control-label mb-1">HubSpot Call Type:</label>
                     </div>
                     <div class="d-flex align-items-center pt-2 w-100">
                       <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>

@@ -717,7 +717,7 @@ export default {
         return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
       }
 
-      return 'All Time'
+      return 'Last 30 Days'
     },
 
     getTagsObjectsByIds (tagsIds = []) {

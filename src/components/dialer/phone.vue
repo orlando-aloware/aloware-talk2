@@ -535,7 +535,7 @@
             <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
                  v-if="dialer.communication && currentCompany.hubspot_integration_enabled">
               <label class="form-control-label text-grey-90">
-                HubSpot Type
+                HubSpot Call Type
               </label>
               <div class="d-flex flex-row align-items-center w-100">
                 <hubspot-activity-type-selector :communication="dialer.communication"></hubspot-activity-type-selector>
@@ -677,7 +677,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="isNotDisposed || isNotOnWrapUp"
+                  :disabled="isNotDisposed || isNotOnWrapUp || temporaryDisableFinishButton"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1458,6 +1458,7 @@ export default {
       UploadedFileTypes,
       TagCategories,
       callbackAction: false,
+      temporaryDisableFinishButton: false,
       AgentStatus
     }
   },
@@ -2260,9 +2261,15 @@ export default {
         contactId: this.dialer.communication.contact_id
       }
 
-      this.endWrapUp('callback')
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.endWrapUp('callback')
 
-      this.$VueEvent.fire('makeCall', data)
+        setTimeout(() => {
+          this.$VueEvent.fire('makeCall', data)
+        }, 500)
+      } else {
+        this.$VueEvent.fire('makeCall', data)
+      }
     },
 
     resizeHandler (e) {
@@ -2739,6 +2746,12 @@ export default {
     },
 
     isCallCompleted () {
+      if (this.isCallCompleted) {
+        this.temporaryDisableFinishButton = true
+        setTimeout(() => {
+          this.temporaryDisableFinishButton = false
+        }, 1000)
+      }
       this.resetBottomExpansion()
       this.expansionEnabled = false
     },

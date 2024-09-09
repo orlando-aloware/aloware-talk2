@@ -215,6 +215,7 @@ import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import UserSelector from 'components/generic-selectors/user-selector'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import moment from 'moment'
 
 export default {
   name: 'inbox-channels',
@@ -338,7 +339,8 @@ export default {
       scrollTimeout: null,
       cancelToken: null,
       source: null,
-      listeners: {}
+      listeners: {},
+      firstTimeLoading: true
     }
   },
 
@@ -879,6 +881,7 @@ export default {
     },
 
     onResetFilters () {
+      this.firstTimeLoading = true
       this.resetFilters()
       this.getCommunications(this.filter)
     },
@@ -1027,6 +1030,19 @@ export default {
       this.setIsInboxFiltersLoaded(true)
       this.gettingTasksList(true)
       this.communicationsListHasError = false
+
+      if (this.firstTimeLoading) {
+        const timezone = this.currentTimezone
+        const dateFormat = 'YYYY-MM-DD HH:mm:ss'
+        const fromDate = moment().tz(timezone).subtract(30, 'days').startOf('day').format(dateFormat)
+        const toDate = moment().tz(timezone).endOf('day').format(dateFormat)
+
+        params.from_date = fromDate
+        params.to_date = toDate
+        this.filter.from_date = fromDate
+        this.filter.to_date = toDate
+        this.firstTimeLoading = false
+      }
 
       // payload specific for Mentions
       if (this.$route.params.channel === 'mentions') {
@@ -1422,6 +1438,8 @@ export default {
       if (inboxRoutes.includes(this.$route.name)) {
         this.isLoaded = false
       }
+
+      this.firstTimeLoading = true
     },
 
     activeChannel (newValue, oldValue) {
