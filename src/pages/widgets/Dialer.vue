@@ -295,7 +295,7 @@ export default {
           const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
             !this.profile.last_call?.call_disposition_id
 
-          if (!(shouldForceContactDisposition || shouldForceCallDisposition)) {
+          if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
             this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
           }
         }
