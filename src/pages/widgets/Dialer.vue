@@ -380,7 +380,9 @@ export default {
           this.showAlertCallFinished = false
         }
 
-        this.handleDialNumber(this.hubspotPhoneNumber)
+        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          this.handleDialNumber(this.hubspotPhoneNumber)
+        }
       }
     },
 
@@ -442,7 +444,8 @@ export default {
 
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
-      this.handleDialNumber(this.hubspotPhoneNumber)
+      // Wait to finish the generate token to avoid conflicts with device
+      setTimeout(() => { this.handleDialNumber(this.hubspotPhoneNumber) }, 500)
     },
 
     canHandleDialNumber () {
