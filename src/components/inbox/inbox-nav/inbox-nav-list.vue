@@ -148,9 +148,10 @@ export default {
       // hard-coded disabling my-personal-line channel
       const channels = this.navListItems
       let index = channels.findIndex(channel => channel.value === 'my-personal-line')
-      channels[index].disabled = true
-      channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
-
+      if (channels[index]) {
+        channels[index].disabled = true
+        channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
+      }
       return channels
     }
   },
@@ -253,9 +254,12 @@ export default {
       'setShowViewsList'
     ]),
 
+    ...mapActions(['setIsFirstLoad']),
+
     onItemClicked (nextActive) {
       this.onCloseViewsList()
       this.resetFilter()
+      this.setIsFirstLoad(true)
 
       this.active = nextActive
       const isView = nextActive.indexOf('view') !== -1
