@@ -441,7 +441,7 @@ export default {
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
       // Wait to finish the generate token to avoid conflicts with device
-      setTimeout(() => { this.handleDialNumber(this.hubspotPhoneNumber) }, 580)
+      setTimeout(() => { this.handleDialNumber(this.hubspotPhoneNumber) }, 500)
     },
 
     canHandleDialNumber () {
@@ -492,11 +492,6 @@ export default {
 
       this.$VueEvent.fire('resetCall')
       this.handleCallCompletedEvent(true)
-
-      if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-        // force if agent status is on call and dialer is ready
-        this.changeAgentStatus(AgentStatus.AGENT_STATUS_ON_WRAP_UP, false, 1, 'HS-Update-AgentStatus')
-      }
     }
   },
 
