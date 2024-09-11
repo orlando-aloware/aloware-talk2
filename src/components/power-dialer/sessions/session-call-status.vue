@@ -450,7 +450,6 @@ import { mapFields } from 'vuex-map-fields'
 import DialPadIcon from 'components/icons/dialpad-icon'
 import TransferIcon from 'components/icons/transfer-icon-2'
 import AddUserIcon from 'components/icons/add-user-icon-2'
-import CalendarIcon from 'components/icons/calendar-icon'
 import DropIcon from 'components/icons/drop-location-icon'
 import HeadphoneIcon from 'components/icons/headphone-icon'
 import PauseIcon from 'components/icons/pause-icon-2'
@@ -480,7 +479,6 @@ export default {
   components: {
     PlayBarIcon,
     HangupIcon,
-    CalendarIcon,
     TransferIcon,
     DialPadIcon,
     AddUserIcon,
