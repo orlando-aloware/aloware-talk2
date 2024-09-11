@@ -78,14 +78,7 @@ export default {
     },
 
     isCompanyPartOfAlowareDemoCompanies (companyId) {
-      const demoCompanies = storage.local.getItem('aloware_demo_companies')
-      if (demoCompanies) {
-        // Parse the string to get the actual array
-        const companiesArray = JSON.parse(demoCompanies)
-        return companiesArray.includes(companyId)
-      }
-
-      return false
+      return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
     },
 
     // Temporary function to check if company is part of new inbox filters
