@@ -10,6 +10,7 @@
 
       <q-card-section class="text-center" data-testid="ring-group-rounting-table-card-section">
         <q-table
+          :pagination="{ rowsPerPage: 0 }"
           hide-pagination
           class="ring-group-snapshot-table"
           separator="none"
@@ -59,7 +60,7 @@
 
               </q-td>
             </q-tr>
-            <q-tr v-show="props.expand" :props="props" data-testid="ring-group-rounting-table-tr">
+            <q-tr v-show="props.expand" :props="props" data-testid="ring-group-rounting-table-tr-expanded">
               <q-td data-testid="ring-group-rounting-table-td"></q-td>
               <q-td data-testid="ring-group-rounting-table-td"></q-td>
               <q-td data-testid="ring-group-rounting-table-td" colspan="100%" class="text-left">
