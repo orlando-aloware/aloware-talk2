@@ -125,8 +125,10 @@ export default {
     rows () {
       const rows = []
       const seenUsers = new Set()
+      const userResults = this.layer.user_results || []
+      const teamUsersResults = this.layer.team_users_results || []
 
-      this.layer.user_results.forEach(userResult => {
+      userResults.forEach(userResult => {
         if (!seenUsers.has(userResult.model.id)) {
           if (userResult.model.teams_name) {
             delete userResult.model.teams_name
@@ -142,7 +144,7 @@ export default {
       }
 
       // eslint-disable-next-line no-unused-expressions
-      this.layer.team_users_results?.forEach(team => {
+      teamUsersResults?.forEach(team => {
         team.users.forEach(userResult => {
           if (!seenUsers.has(userResult.model.id)) {
             userResult.model.teams_name = this.adjustTeamsNames(userResult.model.id, userResult.model.teams_name)
