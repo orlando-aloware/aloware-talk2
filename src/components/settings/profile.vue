@@ -552,7 +552,7 @@ export default {
   },
 
   validations () {
-    const passwordCases = (pass) => !helpers.req(pass) || /[a-z]/.test(pass) && /[A-Z]/.test(pass)
+    const passwordCases = (pass) => !helpers.req(pass) || (/[a-z]/.test(pass) && /[A-Z]/.test(pass))
     const passwordDigit = (pass) => !helpers.req(pass) || /\d/.test(pass)
 
     return {
