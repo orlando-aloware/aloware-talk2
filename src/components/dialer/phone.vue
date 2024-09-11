@@ -668,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="shouldDisableCallBackButton"
+                  :disabled="shouldDisableCallBackButton || temporaryDisableFinishButton"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -1449,6 +1449,8 @@ export default {
       loadingPhone: false,
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
+      callbackAction: false,
+      temporaryDisableFinishButton: false,
       phoneListeners: {},
       CommunicationDirection,
       CommunicationDispositionStatus,
@@ -1457,8 +1459,6 @@ export default {
       CommunicationTypes,
       UploadedFileTypes,
       TagCategories,
-      callbackAction: false,
-      temporaryDisableFinishButton: false,
       AgentStatus
     }
   },
@@ -2750,7 +2750,7 @@ export default {
         this.temporaryDisableFinishButton = true
         setTimeout(() => {
           this.temporaryDisableFinishButton = false
-        }, 1000)
+        }, 2000)
       }
       this.resetBottomExpansion()
       this.expansionEnabled = false

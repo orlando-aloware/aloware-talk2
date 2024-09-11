@@ -7,7 +7,7 @@
         <span>
           <information-circle-icon class="cursor-pointer"/>
           <q-tooltip>
-            The line you want to send the bulck messages campaign from.
+            The line you want to send the bulk messages campaign from.
           </q-tooltip>
         </span>
       </div>
@@ -269,12 +269,12 @@ export default {
         {
           id: 'sms',
           label: 'SMS',
-          enabled: this.hasPermissionTo('create broadcast message')
+          enabled: this.hasSmsEnabled && this.hasPermissionTo('create broadcast message')
         },
         {
           id: 'rvm',
           label: 'Ringless Voicemail',
-          enabled: this.hasPermissionTo('create broadcast rvm')
+          enabled: this.hasRvmEnabled && this.hasPermissionTo('create broadcast rvm')
         }
       ].filter(type => type.enabled)
     },

@@ -98,7 +98,11 @@ export default {
             this.extensions.initialized(payload)
             this.extensionsInitialized = true
           },
-          onDialNumber: (event) => {
+          onDialNumber: async (event) => {
+            if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+
             this.checkAndResetCallDisposition()
 
             this.showAlertCallFinished = false
@@ -109,7 +113,9 @@ export default {
               if (this.timeout) {
                 clearTimeout(this.timeout)
               }
-              this.handleDialNumber(event.phone_number)
+              if (this.isAlwaysAskModeEnabled()) {
+                this.handleDialNumber(event.phone_number)
+              }
             }
           },
           onVisibilityChanged: (data) => {
@@ -215,13 +221,17 @@ export default {
       })
     },
 
-    checkAndResetCallDisposition () {
-      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.last_call?.contact?.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.last_call?.call_disposition_id
+    checkForceDisposition () {
+      const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
+        !this.profile?.last_call?.contact?.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
+        !this.profile?.last_call?.call_disposition_id
 
-      if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
+      return shouldForceContactDisposition || shouldForceCallDisposition
+    },
+
+    checkAndResetCallDisposition () {
+      if (!this.checkForceDisposition()) {
         this.$VueEvent.fire('resetCall')
       }
     },
@@ -383,7 +393,9 @@ export default {
           this.showAlertCallFinished = false
         }
 
-        this.handleDialNumber(this.hubspotPhoneNumber)
+        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          this.handleDialNumber(this.hubspotPhoneNumber)
+        }
       }
     },
 
@@ -445,7 +457,8 @@ export default {
 
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
-      this.handleDialNumber(this.hubspotPhoneNumber)
+      // Wait to finish the generate token to avoid conflicts with device
+      setTimeout(() => { this.handleDialNumber(this.hubspotPhoneNumber) }, 500)
     },
 
     canHandleDialNumber () {
@@ -463,7 +476,8 @@ export default {
         this.initialized &&
         this.authProfile &&
         this.dialer?.isReady &&
-        this.campaignId !== null
+        this.campaignId !== null &&
+        (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition()))
     },
 
     checkAgentHasActiveCallInAnotherDevice () {
