@@ -198,18 +198,7 @@ export default {
   },
 
   created () {
-    const timezone = this.currentTimezone
-    const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
-
-    this.ranges = {
-      'Today': [moment().tz(timezone).startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
-      'Yesterday': [moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT)],
-      'Last 7 Days': [moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
-      'Last 30 Days': [moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
-      'This Month So Far': [moment().tz(timezone).startOf('month').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
-      'Last Month': [moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
-      'All Time': [null, null]
-    }
+    this.initializeDateRanges()
 
     if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
       this.getFilters()
@@ -425,6 +414,21 @@ export default {
       this.resetChannelChangedFilterFields()
       this.setSelectedFilter(null)
       this.setAppliedFilter(null)
+    },
+
+    initializeDateRanges () {
+      const timezone = this.currentTimezone
+      const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
+      this.ranges = {
+        'Today': [moment().tz(timezone).startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Yesterday': [moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT)],
+        'Last 7 Days': [moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last 30 Days': [moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'This Month So Far': [moment().tz(timezone).startOf('month').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last Month': [moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
+        'All Time': [null, null]
+      }
     }
   },
 
