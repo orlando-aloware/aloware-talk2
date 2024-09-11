@@ -769,7 +769,7 @@ export default {
   },
 
   mounted () {
-    const viewId = sessionStorage.getItem('view-selected') ?? null
+    const viewId = sessionStorage.getItem('view-selected')
     if (this.isFirstLoad && !viewId) {
       this.setIsFirstLoad(false)
       sessionStorage.setItem('date-selected', 'Last 30 Days')
