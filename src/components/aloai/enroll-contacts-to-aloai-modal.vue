@@ -157,7 +157,7 @@ export default {
         })
         .then(() => {
           this.$generalNotification(
-            'Contacts enrolled successfully to AloAi Bot.'
+            'Contacts successfully enrolled to the selected AloAi Bot.'
           )
           this.onHidden()
         })
