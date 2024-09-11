@@ -130,7 +130,29 @@
               v-model.trim="$v.user.password.$model"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password')">
             </b-form-input>
-            <b-form-invalid-feedback v-if="!$v.user.password.minLength">Password must be at least 6 character length.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.password.minLength">
+              <b-icon
+                class="mr-xs text-red"
+                icon="x">
+              </b-icon>
+              Password must be at least 6 character length.
+            </b-form-invalid-feedback>
+
+            <b-form-invalid-feedback v-if="!$v.user.password.passwordCases">
+              <b-icon
+                class="mr-xs text-red"
+                icon="x">
+              </b-icon>
+              Must contain upper and lower case letters
+            </b-form-invalid-feedback>
+
+            <b-form-invalid-feedback v-if="!$v.user.password.passwordDigit">
+              <b-icon
+                class="mr-xs text-red"
+                icon="x">
+              </b-icon>
+              Include at least one numerical digit
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
         <b-col
@@ -148,7 +170,13 @@
               v-model.trim="$v.user.password_confirmation.$model"
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
             </b-form-input>
-            <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAsPassword">Password did not match.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAsPassword">
+              <b-icon
+                class="mr-xs text-red"
+                icon="x">
+              </b-icon>
+              The passwords don't match
+            </b-form-invalid-feedback>
           </b-form-group>
         </b-col>
       </b-form-row>
@@ -460,7 +488,7 @@ import {
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
-import { required, maxLength, minLength, email, sameAs } from 'vuelidate/lib/validators'
+import { required, maxLength, minLength, email, sameAs, helpers } from 'vuelidate/lib/validators'
 
 export default {
   name: 'profile',
@@ -524,6 +552,9 @@ export default {
   },
 
   validations () {
+    const passwordCases = (pass) => !helpers.req(pass) || /[a-z]/.test(pass) && /[A-Z]/.test(pass)
+    const passwordDigit = (pass) => !helpers.req(pass) || /\d/.test(pass)
+
     return {
       user: {
         first_name: {
@@ -542,7 +573,9 @@ export default {
           validPhone: (value) => this.$options.filters.fixPhone(value) !== false
         },
         password: {
-          minLength: minLength(6)
+          minLength: minLength(6),
+          passwordCases,
+          passwordDigit
         },
         password_confirmation: {
           sameAsPassword: sameAs('password')
