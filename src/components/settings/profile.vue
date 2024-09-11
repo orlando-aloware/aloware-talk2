@@ -131,25 +131,22 @@
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.password.minLength">
-              <b-icon
-                class="mr-xs text-red"
-                icon="x">
+              <b-icon class="mr-xs text-red"
+                      icon="x">
               </b-icon>
               Password must be at least 6 character length.
             </b-form-invalid-feedback>
 
             <b-form-invalid-feedback v-if="!$v.user.password.passwordCases">
-              <b-icon
-                class="mr-xs text-red"
-                icon="x">
+              <b-icon class="mr-xs text-red"
+                      icon="x">
               </b-icon>
               Must contain upper and lower case letters
             </b-form-invalid-feedback>
 
             <b-form-invalid-feedback v-if="!$v.user.password.passwordDigit">
-              <b-icon
-                class="mr-xs text-red"
-                icon="x">
+              <b-icon class="mr-xs text-red"
+                      icon="x">
               </b-icon>
               Include at least one numerical digit
             </b-form-invalid-feedback>
@@ -171,9 +168,8 @@
               @input="(eventPayload) => onUpdateFields(eventPayload, 'password_confirmation')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.password_confirmation.sameAsPassword">
-              <b-icon
-                class="mr-xs text-red"
-                icon="x">
+              <b-icon class="mr-xs text-red"
+                      icon="x">
               </b-icon>
               The passwords don't match
             </b-form-invalid-feedback>
