@@ -78,7 +78,14 @@ export default {
     },
 
     isCompanyPartOfAlowareDemoCompanies (companyId) {
-      return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
+      const demoCompanies = storage.local.getItem('aloware_demo_companies')
+      if (demoCompanies) {
+        // Parse the string to get the actual array
+        const companiesArray = JSON.parse(demoCompanies)
+        return companiesArray.includes(companyId)
+      }
+
+      return false
     },
 
     // Temporary function to check if company is part of new inbox filters
@@ -94,6 +101,12 @@ export default {
 
     isCompanyPartOfCustomEdgeLocations (companyId) {
       return storage.local.getItem('custom_edge_location_companies') && storage.local.getItem('custom_edge_location_companies').split(',').includes(String(companyId))
+    },
+
+    isCompanyPartOfTeamsBeta () {
+      if (this.currentCompany?.id === 1659) return false
+
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   }
 }
