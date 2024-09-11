@@ -289,11 +289,9 @@ export default {
     handleUserLogin () {
       if (this.needsExtensions && this.extensionsInitialized) {
         this.extensions.userLoggedIn()
-
-        if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call) {
-          if (!this.checkForceDisposition) {
-            this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
-          }
+        // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
+        if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
+          this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
         }
       }
 
