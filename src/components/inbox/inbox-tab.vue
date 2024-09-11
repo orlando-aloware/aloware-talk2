@@ -691,7 +691,8 @@ export default {
       this.firstTimeLoading = true
       this.resetFilter()
 
-      sessionStorage.removeItem('date-selected')
+      sessionStorage.setItem('date-selected', 'Last 30 Days')
+      sessionStorage.setItem('view-selected', null)
       this.setIsFirstLoad(true)
 
       // redirect
