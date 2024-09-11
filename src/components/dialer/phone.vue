@@ -2079,6 +2079,7 @@ export default {
         this.processRemoveFromNotification(this.dialer.callFishing.communication)
       }
 
+      console.log('phone > answerCall', this.dialer?.communication?.current_status2, this.dialer?.currentStatus)
       this.changeScreen('menu')
     },
 
@@ -2662,6 +2663,7 @@ export default {
         }
 
         if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
+          console.log('phone > dialer > handler', this.dialer?.communication?.current_status2, this.dialer?.currentStatus)
           this.changeScreen('menu')
         }
       },
@@ -2710,11 +2712,13 @@ export default {
           break
         case 'CALL_CONNECTED':
           if (this.dialer.call && this.dialer.call.direction === 'INCOMING') {
+            console.log('phone > dialer.currentStatus watcher', this.dialer?.communication?.current_status2, this.dialer?.currentStatus)
             this.changeScreen('menu')
             this.loadingPhone = false
           } else if (this.dialer.call && this.dialer.call.direction === 'OUTGOING') {
             setTimeout(() => {
               if (this.screen !== 'wrap-up') {
+                console.log('phone > dialer.currentStatus watcher', this.dialer?.communication?.current_status2, this.dialer?.currentStatus)
                 this.changeScreen('menu')
                 this.loadingPhone = false
               }
