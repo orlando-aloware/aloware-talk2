@@ -113,7 +113,9 @@ export default {
               if (this.timeout) {
                 clearTimeout(this.timeout)
               }
-              this.handleDialNumber(event.phone_number)
+              if (this.isAlwaysAskModeEnabled()) {
+                this.handleDialNumber(event.phone_number)
+              }
             }
           },
           onVisibilityChanged: (data) => {
@@ -219,13 +221,17 @@ export default {
       })
     },
 
-    checkAndResetCallDisposition () {
+    checkForceDisposition () {
       const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
         !this.profile?.last_call?.contact?.disposition_status_id
       const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
         !this.profile?.last_call?.call_disposition_id
 
-      if (!shouldForceContactDisposition && !shouldForceCallDisposition) {
+      return shouldForceContactDisposition || shouldForceCallDisposition
+    },
+
+    checkAndResetCallDisposition () {
+      if (!this.checkForceDisposition()) {
         this.$VueEvent.fire('resetCall')
       }
     },
@@ -463,7 +469,8 @@ export default {
         this.initialized &&
         this.authProfile &&
         this.dialer?.isReady &&
-        this.campaignId !== null
+        this.campaignId !== null &&
+        (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition()))
     },
 
     checkAgentHasActiveCallInAnotherDevice () {
