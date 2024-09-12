@@ -227,10 +227,7 @@ export default {
       if (!campaign) {
         return false
       }
-
-      let a2pBlock = false
-
-      a2pBlock = campaign.blocked_messaging_information && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
+      const a2pBlock = campaign.blocked_messaging_information && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
 
       return checkBlockedMessaging && a2pBlock
     }
