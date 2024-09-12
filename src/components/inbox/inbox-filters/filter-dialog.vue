@@ -673,7 +673,6 @@ export default {
 
     onSelectFilter (personalFilter) {
       this.setSelectedFilter(personalFilter)
-      console.log('onSelectFilter personalFilter', personalFilter)
       if (!personalFilter) {
         this.filter = { ...this.defaultFilterModel.filter }
       } else {
@@ -689,11 +688,6 @@ export default {
 
         personalFilterObject.from_date = formattedDates.from_date
         personalFilterObject.to_date = formattedDates.to_date
-
-        console.log('onSelectFilter formattedDates', formattedDates)
-        console.log('onSelectFilter this.ranges', this.ranges)
-        console.log('onSelectFilter personalFilterObject.from_date', personalFilterObject.from_date)
-        console.log('onSelectFilter personalFilterObject.to_date', personalFilterObject.to_date)
 
         // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
         // set the range to the key of the range
