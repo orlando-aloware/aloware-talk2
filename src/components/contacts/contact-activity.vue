@@ -226,10 +226,7 @@
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-          {{ mustDisplayHubspotContactOwner(communication)
-              ? getHubspotContactOwnerName(communication)
-              : (currentCompany ? currentCompany.name : 'No Name')
-          }}
+          {{ getHubspotOwnerOrCompanyName(communication) }}
         </span>
 
         <span class="text-muted"
@@ -808,6 +805,14 @@ export default {
 
     getHubspotContactOwnerName (communication) {
       return `${communication?.metadata?.hs_owner_first_name} ${communication?.metadata?.hs_owner_last_name}`
+    },
+
+    getHubspotOwnerOrCompanyName (communication) {
+      if (this.mustDisplayHubspotContactOwner(communication)) {
+        return this.getHubspotContactOwnerName(communication)
+      }
+
+      return this.currentCompany ? this.currentCompany.name : 'No Name'
     },
 
     getUser (id) {
