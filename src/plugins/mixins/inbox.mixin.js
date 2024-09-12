@@ -712,12 +712,12 @@ export default {
       const hasTimeRegex = /\d{2}:\d{2}:\d{2}$/
 
       // If fromDate has no time, add ' 00:00:00'
-      if (!hasTimeRegex.test(fromDate)) {
+      if (fromDate && !hasTimeRegex.test(fromDate)) {
         fromDate += ' 00:00:00'
       }
 
       // If toDate has no time, add ' 23:59:59'
-      if (!hasTimeRegex.test(toDate)) {
+      if (toDate && !hasTimeRegex.test(toDate)) {
         toDate += ' 23:59:59'
       }
 
