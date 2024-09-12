@@ -226,7 +226,10 @@
         <span class="text-muted"
               v-else-if="communication.direction === CommunicationDirection.OUTBOUND &&
               communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW">
-          {{ currentCompany ? currentCompany.name : 'No Name' }}
+          {{ mustDisplayHubspotContactOwner(communication)
+              ? getHubspotContactOwnerName(communication)
+              : (currentCompany ? currentCompany.name : 'No Name')
+          }}
         </span>
 
         <span class="text-muted"
@@ -503,6 +506,9 @@ export default {
         }
         if (this.communication.user_id) {
           return this.getUser(this.communication.user_id).name
+        }
+        if (this.mustDisplayHubspotContactOwner(this.communication)) {
+          return this.getHubspotContactOwnerName(this.communication)
         }
         return this.currentCompany ? this.currentCompany.name : 'No Name'
       }
@@ -794,6 +800,14 @@ export default {
       } else if (state === CommunicationDispositionStatus.DISPOSITION_STATUS_PLACED_NEW) {
         return 'b-lime-500'
       }
+    },
+
+    mustDisplayHubspotContactOwner (communication) {
+      return communication.creator_type === 8 && !communication.user_id && communication?.metadata?.hs_owner_first_name
+    },
+
+    getHubspotContactOwnerName (communication) {
+      return `${communication?.metadata?.hs_owner_first_name} ${communication?.metadata?.hs_owner_last_name}`
     },
 
     getUser (id) {
