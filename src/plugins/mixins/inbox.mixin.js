@@ -705,6 +705,23 @@ export default {
         'Last Month': [moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
         'All Time': [null, null]
       }
+    },
+
+    formatDates (fromDate, toDate) {
+      // Regular expression to check if they already have time (hour)
+      const hasTimeRegex = /\d{2}:\d{2}:\d{2}$/
+
+      // If fromDate has no time, add ' 00:00:00'
+      if (!hasTimeRegex.test(fromDate)) {
+        fromDate += ' 00:00:00'
+      }
+
+      // If toDate has no time, add ' 23:59:59'
+      if (!hasTimeRegex.test(toDate)) {
+        toDate += ' 23:59:59'
+      }
+
+      return { from_date: fromDate, to_date: toDate }
     }
   },
 
