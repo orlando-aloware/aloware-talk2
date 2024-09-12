@@ -73,6 +73,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
 import { inboxRoutesMixin, inboxMixin, userMixin } from 'src/plugins/mixins'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import moment from 'moment'
 
 export default {
   name: 'inbox-nav-list',
@@ -130,6 +131,8 @@ export default {
     ...mapGetters('auth', [
       'profile'
     ]),
+
+    ...mapState(['currentTimezone']),
 
     isShowActive () {
       const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxTaskAndCommRoutes.includes(this.$route.name)
@@ -189,7 +192,8 @@ export default {
         pinnedViewsEvents: null,
         openInboxViewPopup: null,
         deletedFilter: null
-      }
+      },
+      ranges: {}
     }
   },
 
@@ -255,6 +259,7 @@ export default {
     onItemClicked (nextActive) {
       this.onCloseViewsList()
       this.resetFilter()
+      this.setIsFirstLoad(true)
 
       this.active = nextActive
       const isView = nextActive.indexOf('view') !== -1
@@ -411,6 +416,21 @@ export default {
       this.resetChannelChangedFilterFields()
       this.setSelectedFilter(null)
       this.setAppliedFilter(null)
+    },
+
+    initializeDateRanges () {
+      const timezone = this.currentTimezone
+      const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
+      this.ranges = {
+        'Today': [moment().tz(timezone).startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Yesterday': [moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT)],
+        'Last 7 Days': [moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last 30 Days': [moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'This Month So Far': [moment().tz(timezone).startOf('month').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last Month': [moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
+        'All Time': [null, null]
+      }
     }
   },
 
