@@ -72,10 +72,9 @@ export default _.merge({
       }
 
       /**
-       *   3 - A2P Campaign + 10DLC Line. -> Allow messaging
+       *   3 - A2P Campaign + 10DLC Line -> Allow messaging
        *   4 - No A2P Campaign + 10DLC -> Not allowed
        */
-
       return selectedLine?.is_10_dlc && selectedLine?.has_approved_a2p_use_case
     },
 
