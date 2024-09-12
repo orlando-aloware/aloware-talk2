@@ -73,6 +73,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
 import { inboxRoutesMixin, inboxMixin, userMixin } from 'src/plugins/mixins'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import moment from 'moment'
 
 export default {
   name: 'inbox-nav-list',
@@ -131,6 +132,8 @@ export default {
       'profile'
     ]),
 
+    ...mapState(['currentTimezone']),
+
     isShowActive () {
       const isMobileInboxRoutes = this.$q.screen.lt.md && this.inboxTaskAndCommRoutes.includes(this.$route.name)
 
@@ -145,9 +148,10 @@ export default {
       // hard-coded disabling my-personal-line channel
       const channels = this.navListItems
       let index = channels.findIndex(channel => channel.value === 'my-personal-line')
-      channels[index].disabled = true
-      channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
-
+      if (channels[index]) {
+        channels[index].disabled = true
+        channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
+      }
       return channels
     }
   },
@@ -188,11 +192,14 @@ export default {
         pinnedViewsEvents: null,
         openInboxViewPopup: null,
         deletedFilter: null
-      }
+      },
+      ranges: {}
     }
   },
 
   created () {
+    this.initializeDateRanges()
+
     if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
       this.getFilters()
         .then(() => {
@@ -247,9 +254,12 @@ export default {
       'setShowViewsList'
     ]),
 
+    ...mapActions(['setIsFirstLoad']),
+
     onItemClicked (nextActive) {
       this.onCloseViewsList()
       this.resetFilter()
+      this.setIsFirstLoad(true)
 
       this.active = nextActive
       const isView = nextActive.indexOf('view') !== -1
@@ -259,10 +269,24 @@ export default {
         const viewId = nextActive.split('-')[1]
         const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
 
+        // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+        // set the range to the key of the range
+        for (const range in this.ranges) {
+          const hasDatesValues = view.filter.filter && view.filter.filter.from_date && view.filter.filter.to_date
+          if (hasDatesValues && view.filter.filter.from_date === this.ranges[range][0] && view.filter.filter.to_date === this.ranges[range][1]) {
+            sessionStorage.setItem('date-selected', range)
+            sessionStorage.setItem('view-selected', viewId)
+            break
+          }
+        }
+
         this.currentTask = InboxTaskStatus.DEFAULT_STATUS
+        this.setIsFirstLoad(false)
         this.onSelectView(view.filter)
         return
       }
+
+      this.setIsFirstLoad(true)
 
       if (!this.activeChannel) {
         return
@@ -392,6 +416,21 @@ export default {
       this.resetChannelChangedFilterFields()
       this.setSelectedFilter(null)
       this.setAppliedFilter(null)
+    },
+
+    initializeDateRanges () {
+      const timezone = this.currentTimezone
+      const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
+      this.ranges = {
+        'Today': [moment().tz(timezone).startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Yesterday': [moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT)],
+        'Last 7 Days': [moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last 30 Days': [moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'This Month So Far': [moment().tz(timezone).startOf('month').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last Month': [moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
+        'All Time': [null, null]
+      }
     }
   },
 

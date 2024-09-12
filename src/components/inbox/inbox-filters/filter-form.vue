@@ -717,7 +717,7 @@ export default {
         return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
       }
 
-      return 'Last 30 Days'
+      return 'All Time'
     },
 
     getTagsObjectsByIds (tagsIds = []) {
@@ -769,7 +769,8 @@ export default {
   },
 
   mounted () {
-    if (this.isFirstLoad) {
+    const viewId = sessionStorage.getItem('view-selected')
+    if (this.isFirstLoad && !viewId) {
       this.setIsFirstLoad(false)
       sessionStorage.setItem('date-selected', 'Last 30 Days')
 

@@ -402,6 +402,14 @@ export default {
       }
     },
     forceStartOnWrapUp () {
+      const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
+        ? this.currentCompany.wrap_up_seconds
+        : this.profile.wrap_up_seconds
+
+      if (wrapUpTimer < 0) {
+        return
+      }
+
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
       this.startWrapUpTimer()
@@ -635,6 +643,11 @@ export default {
 
       // reject ongoing call if there is one
       this.rejectCall()
+
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL && !isCallWaiting && !shouldAnswer) {
+        console.log('Agent has a call in progress on another device', { agentStatus: this.profile.agent_status })
+        return
+      }
 
       if (this.shouldPushPhoneRoute) {
         this.$router.push({

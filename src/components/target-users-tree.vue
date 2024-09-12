@@ -147,18 +147,16 @@ export default {
       }
 
       const data = []
-      const order = { data: 0 }
       const userId = { id: null }
       const user = { data: null }
       for (userId.id of attemptingUsers) {
-        order.data++
         user.data = this.getUser(userId.id)
         if (!user.data) {
           continue
         }
 
         data.push({
-          label: (attemptingUsers.length > 1 ? `(${order.data}) ` : '') + `${this.getUserName(user.data)}`
+          label: this.getUserName(user.data)
         })
       }
 
