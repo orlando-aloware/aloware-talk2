@@ -240,7 +240,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users', 'isWidget']),
+    ...mapState(['notifications', 'dialer', 'callFishingQueue', 'users']),
     ...mapState('cache', ['currentCompany']),
 
     isCall () {
@@ -322,7 +322,7 @@ export default {
     },
 
     link () {
-      if (['system', 'incomingCall', 'callFishing'].includes(this.id) || this.isWidget) {
+      if (['system', 'incomingCall', 'callFishing'].includes(this.id)) {
         return null
       }
 
@@ -770,7 +770,7 @@ export default {
     },
 
     toInbox (event) {
-      if (this.isWidget || this.isValidPhoneShowInfo) {
+      if (this.isValidPhoneShowInfo) {
         return
       }
 
