@@ -155,6 +155,36 @@
           <hr>
 
           <label class="label mb-1 text-weight-bold"
+                 data-testid="power-dialer-add-modal-conversion-options"
+                 v-if="mode == 'add'">
+            Select Power Dialer List
+          </label>
+          <b-row class="no-gutters mb-2"
+                 v-if="mode == 'add'">
+
+            <b-col class="mr-1"
+                  v-if="!isAgent">
+              <b-form-group class="font-weight-light text-13 mb-0"
+                            data-testid="add-to-power-dialer-modal-user-box"
+                            label="User">
+                <user-selector :generic-styling="false"
+                              v-model="userId"
+                              @change="setUserId"/>
+              </b-form-group>
+            </b-col>
+
+            <b-col class="ml-1">
+              <b-form-group class="font-weight-light text-13 mb-0"
+                            data-testid="add-to-power-dialer-modal-pd-list-box"
+                            label="Power Dialer List">
+                <power-dialer-list-selector v-model="powerDialerListId"
+                                            :user-id="userId"
+                                            @change="setPowerDialerListId" />
+              </b-form-group>
+            </b-col>
+          </b-row>
+
+          <label class="label mb-1 text-weight-bold"
                  data-testid="power-dialer-add-modal-conversion-options">
             Conversion Options
           </label>
@@ -280,20 +310,24 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
-import { integrationMixin } from 'src/plugins/mixins'
+import { integrationMixin, aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import { get, isEmpty } from 'lodash'
 import moment from 'moment'
+import UserSelector from 'components/generic-selectors/user-selector.vue'
+import PowerDialerListSelector from 'components/power-dialer/power-dialer-list-selector.vue'
 
 export default {
   name: 'power-dialer-add-modal',
 
   components: {
     DatePicker,
-    InformationCircleIcon
+    InformationCircleIcon,
+    UserSelector,
+    PowerDialerListSelector
   },
 
-  mixins: [integrationMixin],
+  mixins: [integrationMixin, aclMixin],
 
   props: {
     integration: {
@@ -327,29 +361,33 @@ export default {
     }
   },
 
-  data: () => ({
-    loading: 0,
-    confirm: false,
-    confirm_message: '',
-    conversion: [
-      'prevent_duplicates'
-    ],
-    where: 'queue',
-    schedule: new Date(),
-    direction: ImportConstants.BOTTOM,
-    masks: {
-      input: 'MM/DD/YYYY HH:mm'
-    },
-    popover_config: {
-      placement: 'right'
-    },
-    count: 0,
-    stay: false,
-    showContactModals: {
-      add: false,
-      confirmation: false
+  data () {
+    return {
+      loading: 0,
+      confirm: false,
+      confirm_message: '',
+      conversion: [
+        'prevent_duplicates'
+      ],
+      where: 'queue',
+      schedule: new Date(),
+      direction: ImportConstants.BOTTOM,
+      masks: {
+        input: 'MM/DD/YYYY HH:mm'
+      },
+      popover_config: {
+        placement: 'right'
+      },
+      count: 0,
+      stay: false,
+      showContactModals: {
+        add: false,
+        confirmation: false
+      },
+      userId: null,
+      powerDialerListId: this.myQueueId
     }
-  }),
+  },
 
   computed: {
     ...mapState('contacts', [
@@ -363,6 +401,8 @@ export default {
     ...mapGetters('powerDialer', ['myQueueId']),
 
     ...mapState(['isDatatableSelectedAll', 'currentTimezone']),
+
+    ...mapState('auth', ['profile']),
 
     isOpen: {
       get () {
@@ -476,6 +516,10 @@ export default {
   mounted () {
     this.loading++
 
+    if (this.isAgent) {
+      this.setUserId(this.profile.id)
+    }
+
     if (this.mode === 'integration') {
       // check if a list from integration already exists
       this.checkIntegrationImport()
@@ -496,6 +540,14 @@ export default {
       'addPowerDialerOpen',
       'createPdListClose'
     ]),
+
+    setUserId (userId) {
+      this.userId = userId
+    },
+
+    setPowerDialerListId (listId) {
+      this.powerDialerListId = listId
+    },
 
     setCount () {
       if (this.checkedCount) {

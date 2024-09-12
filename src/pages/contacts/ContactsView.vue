@@ -296,7 +296,7 @@
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
-            Add to My Power Dialer
+            Add to Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
@@ -1136,13 +1136,18 @@ export default {
 
       return ids
     },
+    isContactListSelected () {
+      const blockedIds = ['all', 'unanswered', 'unassigned', 'my-contacts', 'new-leads']
 
+      return !blockedIds.includes(this.selectedList.id)
+    },
     isAddToPowerDialerDisabled () {
-      return !this.checked.length
+      return !this.checked.length && !this.isContactListSelected
     }
   },
 
   mounted () {
+    console.log('PROFILE: ', this.profile)
     // clear the selected contacts
     this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
 
@@ -1354,6 +1359,17 @@ export default {
     },
 
     attachedParams () {
+      console.log('Selected list', this.selectedList)
+      // If there are no selected contacts and a contact list is selected
+      // then add all contacts in the list should be added to the power dialer
+      if (this.checkedItemIds.length === 0 && this.selectedList.id !== 'all') {
+        return {
+          list_id: this.selectedList.id,
+          selected_all: true,
+          contact_ids: []
+        }
+      }
+
       return {
         contact_ids: this.checkedItemIds
       }
