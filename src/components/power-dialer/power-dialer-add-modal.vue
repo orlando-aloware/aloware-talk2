@@ -154,35 +154,34 @@
 
           <hr>
 
-          <label class="label mb-1 text-weight-bold"
-                 data-testid="power-dialer-add-modal-conversion-options"
-                 v-if="mode == 'add'">
-            Select Power Dialer List
-          </label>
-          <b-row class="no-gutters mb-2"
-                 v-if="mode == 'add'">
+          <div v-if="mode == 'add-contact-list'">
+            <label class="label mb-1 text-weight-bold"
+                  data-testid="power-dialer-add-modal-conversion-options">
+              Select Power Dialer List
+            </label>
+            <b-row class="no-gutters mb-2">
+              <b-col class="mr-1"
+                    v-if="!isAgent">
+                <b-form-group class="font-weight-light text-13 mb-0"
+                              data-testid="add-to-power-dialer-modal-user-box"
+                              label="User">
+                  <user-selector :generic-styling="false"
+                                v-model="userId"
+                                @change="setUserId"/>
+                </b-form-group>
+              </b-col>
 
-            <b-col class="mr-1"
-                  v-if="!isAgent">
-              <b-form-group class="font-weight-light text-13 mb-0"
-                            data-testid="add-to-power-dialer-modal-user-box"
-                            label="User">
-                <user-selector :generic-styling="false"
-                              v-model="userId"
-                              @change="setUserId"/>
-              </b-form-group>
-            </b-col>
-
-            <b-col class="ml-1">
-              <b-form-group class="font-weight-light text-13 mb-0"
-                            data-testid="add-to-power-dialer-modal-pd-list-box"
-                            label="Power Dialer List">
-                <power-dialer-list-selector v-model="powerDialerListId"
-                                            :user-id="userId"
-                                            @change="setPowerDialerListId" />
-              </b-form-group>
-            </b-col>
-          </b-row>
+              <b-col class="ml-1">
+                <b-form-group class="font-weight-light text-13 mb-0"
+                              data-testid="add-to-power-dialer-modal-pd-list-box"
+                              label="Power Dialer List">
+                  <power-dialer-list-selector v-model="powerDialerListId"
+                                              :user-id="userId"
+                                              @change="setPowerDialerListId" />
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </div>
 
           <label class="label mb-1 text-weight-bold"
                  data-testid="power-dialer-add-modal-conversion-options">
@@ -310,6 +309,7 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { integrationMixin, aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import { get, isEmpty } from 'lodash'
@@ -347,7 +347,7 @@ export default {
 
     mode: {
       type: String,
-      default: 'add' // add, duplicate, hubspot
+      default: 'add' // add, duplicate, hubspot, add-contact-list
     },
 
     showInContactsPage: {
@@ -358,6 +358,11 @@ export default {
     checkedCount: {
       type: Number,
       default: 0
+    },
+
+    contactList: {
+      type: Object,
+      default: null
     }
   },
 
@@ -385,7 +390,8 @@ export default {
         confirmation: false
       },
       userId: null,
-      powerDialerListId: this.myQueueId
+      powerDialerListId: this.myQueueId,
+      ContactListTypes
     }
   },
 
@@ -445,7 +451,9 @@ export default {
     contactsDescription () {
       let description = ''
 
-      if (this.count !== null) {
+      if (this.mode === 'add-contact-list' && this.contactList && this.requestParams.selected_all) {
+        description += this.contactList.contactCount
+      } else if (this.count !== null) {
         description += this.$options.filters.numFormat(this.count)
       }
 
@@ -516,7 +524,8 @@ export default {
   mounted () {
     this.loading++
 
-    if (this.isAgent) {
+    // Select current user by default
+    if (this.profile.id && this.mode === 'add-contact-list') {
       this.setUserId(this.profile.id)
     }
 
@@ -626,6 +635,8 @@ export default {
     getRequest () {
       // In case of new types of requests, you just need to setup a new mode and its own import method, like above
       switch (this.mode) {
+        case 'add-contact-list':
+          return this.addContacts()
         case 'add':
           return this.addContacts()
         case 'duplicate':
@@ -638,7 +649,28 @@ export default {
     },
 
     addContacts () {
-      const listId = get(this.requestParams, 'contact_list_id', this.myQueueId)
+      const listId = get(this.requestParams, 'contact_list_id', this.powerDialerListId)
+
+      // User selected a different list, set is as the list to add contacts
+      if (this.powerDialerListId !== this.myQueueId) {
+        this.requestParams.contact_list_id = this.powerDialerListId
+      }
+
+      // Verify filters to avoid adding all company contacts
+      if (this.requestParams.selected_all && !this.requestParams.filter_groups && this.contactList.id !== 'all') {
+        // Add to requests params the list_id to adding all contacts from current list
+        this.requestParams.list_id = this.contactList.id
+      }
+
+      // Don't send list_id for dynamic lists, it should use only the filters
+      if (this.contactList.type === this.ContactListTypes.DYNAMIC) {
+        delete this.requestParams.list_id
+      }
+
+      // Remove contact_ids param if it's empty
+      if (this.requestParams.contact_ids !== undefined && this.requestParams.contact_ids.length === 0) {
+        delete this.requestParams.contact_ids
+      }
 
       this.$VueEvent.fire('addContactsProgress', {
         id: listId,

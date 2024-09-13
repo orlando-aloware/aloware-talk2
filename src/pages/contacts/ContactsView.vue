@@ -292,7 +292,7 @@
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
                            :disabled="isAddToPowerDialerDisabled"
                            v-if="shouldShowPowerDialer"
-                           @click="addSelectedContacts">
+                           @click="addToPowerDialerList">
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
@@ -739,6 +739,8 @@
               v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
       <power-dialer-add-modal :params="attachedParams()"
+                              :contactList="selectedList"
+                              :mode="addToPowerDialerMode"
                               :show-in-contacts-page="true"
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
@@ -905,7 +907,8 @@ export default {
       viewListeners: {},
       ContactListTypes,
       openPDModal: false,
-      isContactModule: false
+      isContactModule: false,
+      addToPowerDialerMode: 'add'
     }
   },
 
@@ -1356,13 +1359,22 @@ export default {
     addSelectedContacts () {
       this.openPDModal = true
       this.addPowerDialerOpen(true)
+      this.addToPowerDialerMode = 'add'
+    },
+
+    addToPowerDialerList () {
+      this.openPDModal = true
+      this.addPowerDialerOpen(true)
+      this.addToPowerDialerMode = 'add-contact-list'
     },
 
     attachedParams () {
-      console.log('Selected list', this.selectedList)
       // If there are no selected contacts and a contact list is selected
-      // then add all contacts in the list should be added to the power dialer
-      if (this.checkedItemIds.length === 0 && this.selectedList.id !== 'all') {
+      // all contacts in the list should be added to the power dialer
+      if (
+        this.checkedItemIds.length === 0 &&
+        this.isContactListSelected
+      ) {
         return {
           list_id: this.selectedList.id,
           selected_all: true,
