@@ -28,40 +28,46 @@
         />
       </div>
       <b-form
-        @submit.prevent="onSubmit"
         data-testid="enroll-contacts-to-aloai-modal-form"
         class="my-4"
+        @submit.prevent="onSubmit"
       >
-        <div v-if="isLoading" class="p-1">
+        <div
+          class="p-1"
+          v-if="isLoading"
+        >
           <template v-for="n in 5">
             <q-skeleton
-              :key="`${n}-skeleton`"
               type="text"
               animation="fade"
               height="40px"
+              :key="`${n}-skeleton`"
             />
           </template>
         </div>
         <template v-else>
-          <div v-if="!this.filteredBots.length" class="text-center py-2">
+          <div
+            class="text-center py-2"
+            v-if="!this.filteredBots.length"
+          >
             No records to show.
           </div>
           <b-overlay
-            v-else
             data-testid="enroll-to-aloai-modal-overlay"
             :show="isBusy"
+            v-else
           >
             <ul class="list-group list-group-flush scrollable-list">
               <li
-                v-for="(bot, key) in this.filteredBots"
-                :key="`enroll-bot-${key}`"
                 class="list-group-item list-group-item-action p-0"
+                :key="`enroll-bot-${key}`"
+                v-for="(bot, key) in this.filteredBots"
               >
                 <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
                   <b-form-radio
                     name="selected-bot"
-                    v-model="selectedBotId"
                     :value="bot.id"
+                    v-model="selectedBotId"
                   >
                     {{ bot.name }}
                   </b-form-radio>
@@ -71,13 +77,19 @@
 
             <template #overlay>
               <div class="text-center">
-                <q-spinner-bars color="primary" size="2em" />
+                <q-spinner-bars
+                  color="primary"
+                  size="2em"
+                />
               </div>
             </template>
           </b-overlay>
         </template>
       </b-form>
-      <div class="d-flex items-center justify-center" style="gap: 15px">
+      <div
+        class="d-flex items-center justify-center"
+        style="gap: 15px"
+      >
         <b-button
           variant="outline"
           size="sm"
@@ -95,7 +107,10 @@
           data-testid="enroll-contacts-to-aloai-modal-enroll-contact-button"
           @click="onSubmit"
         >
-          <q-spinner-bars v-if="isBusy" color="white" />
+          <q-spinner-bars
+            color="white"
+            v-if="isBusy"
+          />
           Enroll
         </b-button>
       </div>
