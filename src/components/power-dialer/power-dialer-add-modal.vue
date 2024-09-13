@@ -264,10 +264,11 @@
                         size="sm"
                         data-testid="power-dialer-add-modal-stay-in-contacts"
                         @click="saveAndStay">
-                Stay in Contacts
+                {{isMyOwnList ? 'Stay in Contacts' : 'Add to Power Dialer'}}
               </b-button>
             </div>
-            <div class="col-6 text-center">
+            <div class="col-6 text-center"
+                 v-if="isMyOwnList">
               <b-button class="btn-block mt-4"
                         variant="primary"
                         size="sm"
@@ -417,6 +418,10 @@ export default {
       set (isOpen) {
         return isOpen
       }
+    },
+
+    isMyOwnList () {
+      return this.userId === this.profile.id
     },
 
     requestParams () {
