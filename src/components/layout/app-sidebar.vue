@@ -28,24 +28,36 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Communications</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Communications
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
            :ripple="false"
            icon="img:app-icons/menu/inbox_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
            v-show="!isActive('Inbox')"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Communications</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Communications
+      </span>
     </q-btn>
 
     <q-btn :to="{ name: 'Contacts' }"
@@ -59,25 +71,37 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  data-testid="contacts-sidebar-tooltip"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Contacts</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Contacts
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'Contacts' }"
            :ripple="false"
            icon="img:app-icons/menu/contacts_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            data-testid="contacts-no-active-sidebar-btn"
            v-show="!isActive('Contacts')"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Contacts</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Contacts
+      </span>
     </q-btn>
 
     <q-btn :to="{ path: '/power-dialer' }"
@@ -90,23 +114,35 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Power Dialer</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Power Dialer
+      </span>
     </q-btn>
     <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="(!isActive('Power Dialer') && profile.auto_dialer_enabled) || !profile.auto_dialer_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Power Dialer</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Power Dialer
+      </span>
     </q-btn>
 
     <q-btn icon="img:app-icons/menu/wallboard_active.svg"
@@ -119,13 +155,19 @@
            v-show="isActive('Wallboard')">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Wallboard</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Wallboard
+      </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/wallboard_grey.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            flat
            :to="{ name: 'Wallboard' }"
@@ -133,9 +175,15 @@
            v-show="!isActive('Wallboard')">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Wallboard</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Wallboard
+      </span>
     </q-btn>
 
     <q-btn :to="{ path: '/calendar' }"
@@ -148,23 +196,35 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Calendar</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Calendar
+      </span>
     </q-btn>
     <q-btn :to="{ path: '/calendar' }"
            :ripple="false"
            icon="img:app-icons/menu/calendar_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="(!isActive('Calendar') && profile.calendar_enabled) || !profile.calendar_enabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Calendar</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Calendar
+      </span>
     </q-btn>
 
     <q-btn class="nav-icons w-100"
@@ -177,13 +237,19 @@
            v-show="isActive('Tags')">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Tags</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Tags
+      </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/tags_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            :to="{ name: 'Tags' }"
            :ripple="false"
@@ -191,9 +257,15 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Tags</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Tags
+      </span>
     </q-btn>
 
     <q-btn :to="{ name: 'Stats' }"
@@ -206,23 +278,35 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Stats</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Stats
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'Stats' }"
            :ripple="false"
            icon="img:app-icons/menu/stats_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('Stats')"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Stats</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Stats
+      </span>
     </q-btn>
 
     <q-btn :to="{ name: 'Messenger' }"
@@ -236,24 +320,36 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Messenger</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Messenger
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'Messenger' }"
            :ripple="false"
            icon="img:app-icons/menu/messenger_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('Messenger')"
            v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Messenger</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Messenger
+      </span>
     </q-btn>
 
     <q-btn :to="{ name: 'DMS Equity' }"
@@ -267,24 +363,36 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">DMS Equity</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        DMS Equity
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'DMS Equity' }"
            :ripple="false"
            icon="img:app-icons/menu/dms_equity_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('DMS Equity')"
            v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">DMS Equity</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        DMS Equity
+      </span>
     </q-btn>
 
     <q-btn :to="{ name: 'Digital Lead War' }"
@@ -298,24 +406,36 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Digital Lead War</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Digital Lead War
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'Digital Lead War' }"
            :ripple="false"
            icon="img:app-icons/menu/digital_lead_war_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('Digital Lead War')"
            v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Digital Lead War</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Digital Lead War
+      </span>
     </q-btn>
 
     <q-btn :to="{ name: 'Email Blast' }"
@@ -329,24 +449,36 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Email Blast</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Email Blast
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'Email Blast' }"
            :ripple="false"
            icon="img:app-icons/menu/email_blast_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('Email Blast')"
            v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Email Blast</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Email Blast
+      </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/training_active.svg"
            align="left"
@@ -359,13 +491,19 @@
            @click="openTrainingPage">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Training</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Training
+      </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/training_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            flat
            :ripple="false"
@@ -374,9 +512,15 @@
            @click="openTrainingPage">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Training</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Training
+      </span>
     </q-btn>
 
     <q-btn icon="img:app-icons/menu/sold_report_active.svg"
@@ -390,13 +534,19 @@
            v-if="isSimpSocialIntegrationEnabled">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Sold Report</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Sold Report
+      </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/sold_report_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            flat
            :to="{ name: 'Sold Report' }"
@@ -405,9 +555,15 @@
            v-if="isSimpSocialIntegrationEnabled">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Sold Report</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Sold Report
+      </span>
     </q-btn>
 
     <!--q-btn :to="{ name: 'Dealer Profile' }"
@@ -421,29 +577,41 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Dealer Profile</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Dealer Profile
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'Dealer Profile' }"
            :ripple="false"
            icon="img:app-icons/menu/dealer_profile_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('Dealer Profile')"
            v-if="isSimpSocialIntegrationEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Dealer Profile</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Dealer Profile
+      </span>
     </q-btn-->
 
     <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100 disabled"
            flat
            :ripple="false"
@@ -455,9 +623,15 @@
       </q-badge>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Broadcasts
+      </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/broadcast_active.svg"
            align="left"
@@ -469,13 +643,19 @@
            v-show="isActive('Broadcasts') && canUseBroadcast">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Broadcasts
+      </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            flat
            :to="{ path: '/broadcasts' }"
@@ -483,9 +663,15 @@
            v-show="!isActive('Broadcasts') && canUseBroadcast">
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Broadcasts</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Broadcasts
+      </span>
     </q-btn>
 
     <q-btn :to="{ name: 'Settings' }"
@@ -498,26 +684,37 @@
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Settings</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Settings
+      </span>
     </q-btn>
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
            icon="img:app-icons/menu/settings_gray.svg"
-           align="center"
-           padding="none"
+           align="left"
+           padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('Settings')"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
+                 v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">Settings</span>
       </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Settings
+      </span>
     </q-btn>
-    <div class="mt-auto w-100"
-         v-show="false">
+    <div class="mt-auto w-100">
       <div class="width-40 margin-auto position-relative">
         <q-separator class="separator-blur mt-1"
                      color="white"/>
@@ -528,7 +725,22 @@
              size="0.75rem"
              align="center"
              class="nav-icons w-100"
+             v-if="false"
              @click="$emit('toggleMode')"/>
+
+      <q-btn :icon="sidebarIcon"
+             :ripple="false"
+             :padding="isSidebarExpanded ? '10px 20px' : 'none'"
+             size="0.75rem"
+             :align="isSidebarExpanded ? 'right' : 'center'"
+             class="nav-icons w-100 text-menu-purple custom-rotate-90 bordered-menu-icon"
+             @click="toggleSidebar">
+        <q-tooltip anchor="center right"
+                   self="center left"
+                   :offset="[-5, 0]">
+          <span class="font-weight-bold text-sm">{{ isSidebarExpanded ? 'Collapse the navigation' : 'Expand the navigation' }}</span>
+        </q-tooltip>
+      </q-btn>
     </div>
   </div>
 </template>
@@ -536,7 +748,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import { simpsocialMixin, kycMixin, broadcastsMixin } from 'src/plugins/mixins'
+import { broadcastsMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as KycLogs from 'src/constants/kyc-logs'
 
 export default {
@@ -583,6 +795,9 @@ export default {
         case this.xmasEnabled:
           return 'img:app-icons/menu/xmas/logo_white.svg'
         default:
+          if (this.isSidebarExpanded) {
+            return 'img:app-icons/menu/aloware-logo-original-inverse.svg'
+          }
           return 'img:app-icons/menu/logo_white.svg'
       }
     },
@@ -599,7 +814,9 @@ export default {
 
   data () {
     return {
-      modeIcon: 'img:app-icons/menu/mode_gray.svg'
+      modeIcon: 'img:app-icons/menu/mode_gray.svg',
+      sidebarIcon: 'unfold_more',
+      isSidebarExpanded: false
     }
   },
 
@@ -634,6 +851,12 @@ export default {
       } catch (err) {
         console.error(err)
       }
+    },
+
+    toggleSidebar () {
+      this.isSidebarExpanded = !this.isSidebarExpanded
+      this.sidebarIcon = this.isSidebarExpanded ? 'unfold_less' : 'unfold_more'
+      this.$emit('toggleSidebarExpansion', this.isSidebarExpanded)
     },
 
     openTrainingPage () {

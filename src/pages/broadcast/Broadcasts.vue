@@ -2,16 +2,6 @@
   <div class="h-100">
     <div v-if="shouldShowBroadcast"
          class="broadcasts__home position-relative d-flex flex-column h-100">
-      <b-overlay class="broadcasts__home__loading-overlay"
-                 rounded="sm"
-                 :style="`margin-top: ${notificationHeight}px`"
-                 :show="true"
-                 v-show="loading || isBroadcastsLoading">
-        <template #overlay>
-          <q-spinner-bars color="primary"
-                          size="40px" />
-        </template>
-      </b-overlay>
       <div class="broadcasts__home__header px-3 my-2">
         <div class="broadcasts__home__header__search">
           <search placeholder="Search name"

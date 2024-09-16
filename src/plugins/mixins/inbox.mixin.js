@@ -126,7 +126,8 @@ export default {
         type: ChannelType.CHANNEL_INBOX,
         filter: Filters.EXCERPT,
         scope: 'user'
-      }
+      },
+      ranges: {}
     }
   },
 
@@ -689,6 +690,38 @@ export default {
           label: 'Closed'
         }
       ]
+    },
+
+    initializeDateRanges () {
+      const timezone = this.currentTimezone
+      const DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss'
+
+      this.ranges = {
+        'Today': [moment().tz(timezone).startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Yesterday': [moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT)],
+        'Last 7 Days': [moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last 30 Days': [moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'This Month So Far': [moment().tz(timezone).startOf('month').format(DATE_FORMAT), moment().tz(timezone).endOf('day').format(DATE_FORMAT)],
+        'Last Month': [moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT), moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT)],
+        'All Time': [null, null]
+      }
+    },
+
+    formatDates (fromDate, toDate) {
+      // Regular expression to check if they already have time (hour)
+      const hasTimeRegex = /\d{2}:\d{2}:\d{2}$/
+
+      // If fromDate has no time, add ' 00:00:00'
+      if (fromDate && !hasTimeRegex.test(fromDate)) {
+        fromDate += ' 00:00:00'
+      }
+
+      // If toDate has no time, add ' 23:59:59'
+      if (toDate && !hasTimeRegex.test(toDate)) {
+        toDate += ' 23:59:59'
+      }
+
+      return { from_date: fromDate, to_date: toDate }
     }
   },
 

@@ -13,7 +13,8 @@ import {
   notificationMixin,
   visibilityMixin,
   unownedContactTaskMixin,
-  dialerWrapUpMixin
+  dialerWrapUpMixin,
+  dispositionsMixin
 } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -30,7 +31,8 @@ export default {
     notificationMixin,
     visibilityMixin,
     unownedContactTaskMixin,
-    dialerWrapUpMixin
+    dialerWrapUpMixin,
+    dispositionsMixin
   ],
 
   data () {
@@ -393,15 +395,24 @@ export default {
       if (!this.profile.last_call) {
         return
       }
-      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.last_call.contact.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.last_call.call_disposition_id
-      if (shouldForceContactDisposition || shouldForceCallDisposition) {
+
+      if (this.checkForceDisposition) {
+        if (this.isWidget && this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          return
+        }
+
         this.forceStartOnWrapUp()
       }
     },
     forceStartOnWrapUp () {
+      const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
+        ? this.currentCompany.wrap_up_seconds
+        : this.profile.wrap_up_seconds
+
+      if (wrapUpTimer < 0) {
+        return
+      }
+
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
       this.startWrapUpTimer()

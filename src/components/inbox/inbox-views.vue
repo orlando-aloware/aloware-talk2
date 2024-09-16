@@ -138,6 +138,8 @@ export default {
       'setSelectedFilter'
     ]),
 
+    ...mapActions(['setIsFirstLoad']),
+
     onSearch (search) {
       this.search = search
     },
@@ -145,6 +147,7 @@ export default {
     onCreateView () {
       this.$emit('closed')
 
+      this.setIsFirstLoad(true)
       this.setIsEditingView(false)
       this.setFilterDialogForView(true)
       this.toggleFilterDialog(true)
