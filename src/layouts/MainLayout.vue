@@ -67,14 +67,15 @@
         <q-drawer class="h-100 sidebar-wrapper d-block position-absolute top-0"
                   content-class="sidebar"
                   :breakpoint="0"
-                  :width="64"
+                  :width="sidebarWidth"
                   v-model="sidebarVisible"
                   v-if="authenticated && !suspended && !isWidget">
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
                          :xmasEnabled="isXmasEnabled"
-                         @toggleMode="toggleMode">
+                         @toggleMode="toggleMode"
+                         @toggleSidebarExpansion="toggleSidebarExpansion">
             </app-sidebar>
           </q-list>
         </q-drawer>
@@ -388,7 +389,9 @@ export default {
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin,
-      isFirstLoading: true
+      isFirstLoading: true,
+      isSidebarExpanded: false,
+      sidebarWidth: 64
     }
   },
 
@@ -519,10 +522,12 @@ export default {
     mainLayoutClass () {
       const pageClass = this.authenticated && !this.suspended ? `dashboard ${this.pageClass}` : 'guest'
       const modeClass = this.lightMode ? 'light-mode' : 'night-mode'
+      const sidebarClass = this.isSidebarExpanded ? 'sidebar-expanded' : ''
 
       return [
         pageClass,
-        modeClass
+        modeClass,
+        sidebarClass
       ]
     },
 
@@ -1402,6 +1407,16 @@ export default {
 
     toggleMode () {
       this.lightMode = !this.lightMode
+    },
+
+    toggleSidebarExpansion () {
+      this.isSidebarExpanded = !this.isSidebarExpanded
+
+      if (this.isSidebarExpanded) {
+        this.sidebarWidth = 230
+      } else {
+        this.sidebarWidth = 64
+      }
     },
 
     toggleSidebar () {

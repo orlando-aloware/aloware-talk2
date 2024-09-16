@@ -23,7 +23,7 @@
       <div class="d-flex align-items-center chart-types">
         <strong>Chart type:</strong>
         <q-btn-toggle class="custom-toggle-button mx-2 mt-2 mb-1"
-                      toggle-color="green"
+                      toggle-color="primary"
                       no-caps
                       spread
                       unelevated
