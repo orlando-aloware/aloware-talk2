@@ -299,6 +299,15 @@
             Add to My Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
+                           data-testid="contacts-view-add-to-sequence-option-dropdown"
+                           :disabled="isAddToSequenceDisabled"
+                           @click="openAddToSequence">
+            <power-dialer-mobile-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
+            Add to Sequence
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
                            v-if="isAdmin"
                            data-testid="contacts-view-export-as-csv-option-dropdown"
                            @click="exportAsCsv">
@@ -743,6 +752,9 @@
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
+      <tag-contacts-workflow-enroller :is-show="showAddToSequence"
+                                      :list="selectedList"
+                                      @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
     </template>
   </contacts-screen>
 </template>
@@ -789,6 +801,7 @@ import {
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 
 export default {
   name: 'contacts-view',
@@ -826,7 +839,8 @@ export default {
     Datatable,
     ImportContactsModal,
     BlockTooltip,
-    PowerDialerAddModal
+    PowerDialerAddModal,
+    TagContactsWorkflowEnroller
   },
 
   props: {
@@ -905,7 +919,9 @@ export default {
       viewListeners: {},
       ContactListTypes,
       openPDModal: false,
-      isContactModule: false
+      isContactModule: false,
+      showAddToSequence: false,
+      workflowId: null
     }
   },
 
@@ -1137,8 +1153,17 @@ export default {
       return ids
     },
 
+    isContactListSelected () {
+      const blockedIds = ['all', 'unanswered', 'unassigned', 'my-contacts', 'new-leads']
+      return !blockedIds.includes(this.selectedList.id)
+    },
+
     isAddToPowerDialerDisabled () {
       return !this.checked.length
+    },
+
+    isAddToSequenceDisabled () {
+      return !this.isContactListSelected
     }
   },
 
@@ -1236,6 +1261,18 @@ export default {
       'setPreviousListFilters',
       'addPowerDialerOpen'
     ]),
+
+    setWorkflowId (id) {
+      this.workflowId = id
+    },
+
+    openAddToSequence () {
+      this.showAddToSequence = true
+    },
+
+    closeAddToSequence () {
+      this.showAddToSequence = false
+    },
 
     hasIntegration (contact) {
       // activate only for multi-entity allowed company
