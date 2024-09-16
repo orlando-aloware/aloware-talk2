@@ -172,6 +172,7 @@ import _ from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as Filters from 'src/constants/filters'
+import { inboxMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'filter-dialog',
@@ -183,6 +184,10 @@ export default {
     FilterListItems,
     CheckOIcon
   },
+
+  mixins: [
+    inboxMixin
+  ],
 
   props: {
     value: {
@@ -247,6 +252,8 @@ export default {
   },
 
   created () {
+    this.initializeDateRanges()
+
     if (!this.appliedFilter) {
       this.setSelectedFilter(null)
     }
@@ -465,7 +472,7 @@ export default {
         this.setSelectedFilter(this.appliedFilter)
       }
 
-      if (!this.isFilterDialogForView && !this.appliedFilter && this.channelChangedFilterFields.length) {
+      if (!this.isFilterDialogForView && !this.appliedFilter) {
         this.setSelectedFilter(null)
       }
 
@@ -666,15 +673,36 @@ export default {
 
     onSelectFilter (personalFilter) {
       this.setSelectedFilter(personalFilter)
-
       if (!personalFilter) {
         this.filter = { ...this.defaultFilterModel.filter }
       } else {
         // combine default filter values with the selected one
-        const personalFilterObject = personalFilter.filter
+        let personalFilterObject = personalFilter.filter
         this.filter = {
           ...this.defaultFilterModel.filter,
           ..._.pick(personalFilterObject, this.filterFields)
+        }
+        this.setIsFirstLoad(false)
+
+        const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
+
+        personalFilterObject.from_date = formattedDates.from_date
+        personalFilterObject.to_date = formattedDates.to_date
+
+        // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+        // set the range to the key of the range
+        let inRange = false
+        for (const range in this.ranges) {
+          const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
+          if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
+            sessionStorage.setItem('date-selected', range)
+            inRange = true
+            break
+          }
+        }
+
+        if (!inRange) {
+          sessionStorage.setItem('date-selected', 'custom')
         }
       }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="phone d-flex flex-column"
        ref="phone"
-       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
+       :class="{ 'phone-with-banner': banner, 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center flex-grow-0"
@@ -1242,6 +1242,13 @@
     </template>
   </div>
 </template>
+
+<style scoped>
+.phone-with-banner {
+  top: 150px;
+}
+</style>
+
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
@@ -1406,6 +1413,7 @@ export default {
         right: 0,
         top: 0
       },
+      banner: false,
       isVisible: true,
       currentLocalTime: null,
       showLocalTime: true,
@@ -1991,9 +1999,17 @@ export default {
     if (this.dialer.currentStatus === 'WRAP_UP') {
       this.changeScreen('wrap-up')
     }
+
+    setTimeout(() => { this.checkNotification() }, 3000)
   },
 
   methods: {
+
+    checkNotification () {
+      const notification = document.querySelector('#notification-container')
+      this.banner = !!notification
+    },
+
     setupDraggable () {
       if (!this.is_widget && this.shouldShow) {
         this.openPhone()
@@ -2661,7 +2677,7 @@ export default {
           return
         }
 
-        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
+        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP', 'READY'].includes(this.dialer.currentStatus)) {
           this.changeScreen('menu')
         }
       },

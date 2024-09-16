@@ -71,10 +71,6 @@ export default {
           if (this.localUser.operating_hours[day.data][item.data].isOpen && this.localUser.operating_hours[day.data][item.data].close === '') {
             this.localUser.operating_hours[day.data][item.data].close = '24hrs'
           }
-
-          if (this.localUser.operating_hours[day.data][item.data].isOpen && this.localUser.operating_hours[day.data][item.data].open !== '24hrs' && this.localUser.operating_hours[day.data][item.data].close === '24hrs') {
-            this.localUser.operating_hours[day.data][item.data].open = '24hrs'
-          }
         }
       }
 
