@@ -79,6 +79,7 @@ export default {
         return
       }
 
+      console.log('Communication when event closeCallNotifications : ', communication)
       this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
     },
 
