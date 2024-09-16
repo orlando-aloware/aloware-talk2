@@ -139,10 +139,6 @@ export default {
         }
       })
 
-      if (!this.isCompanyPartOfTeamsBeta()) {
-        return rows
-      }
-
       // eslint-disable-next-line no-unused-expressions
       teamUsersResults?.forEach(team => {
         team.users.forEach(userResult => {
