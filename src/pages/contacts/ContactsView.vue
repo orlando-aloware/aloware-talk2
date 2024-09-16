@@ -753,9 +753,8 @@
       </power-dialer-add-modal>
       <enroll-contacts-to-aloai-modal
         ref="enrollContactsToAloAiModal"
-        :params="{
-          contact_ids: this.checkedItemIds
-        }"
+        :params="attachedParams()"
+        :contactList="selectedList"
       />
     </template>
   </contacts-screen>
@@ -1156,6 +1155,11 @@ export default {
       return ids
     },
 
+    isContactListSelected () {
+      const blockedIds = ['all', 'unanswered', 'unassigned', 'my-contacts', 'new-leads']
+      return !blockedIds.includes(this.selectedList.id)
+    },
+
     isAddToPowerDialerDisabled () {
       return !this.checked.length
     }
@@ -1380,7 +1384,8 @@ export default {
 
     attachedParams () {
       return {
-        contact_ids: this.checkedItemIds
+        contact_ids: this.checkedItemIds,
+        ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})
       }
     },
 

@@ -123,6 +123,8 @@ import talk2Api from 'src/plugins/api/api'
 import { mapGetters, mapState } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
+
 export default {
   name: 'enroll-contacts-to-aloai-modal',
   components: { Search },
@@ -130,11 +132,19 @@ export default {
     params: {
       type: Object,
       required: true
+    },
+    contactList: {
+      type: Object,
+      default: null
     }
   },
   computed: {
     ...mapGetters('contacts', ['contact']),
-    ...mapState('contacts'),
+    ...mapState('contacts', [
+      'currentListFilters',
+      'showAddViewMyContacts'
+    ]),
+    ...mapState(['isDatatableSelectedAll']),
     filteredBots () {
       let bots = this.bots
       if (!isEmpty(this.searchText)) {
@@ -154,7 +164,8 @@ export default {
       bots: [],
       searchText: '',
       isLoading: true,
-      selectedBotId: undefined
+      selectedBotId: undefined,
+      ContactListTypes
     }
   },
   methods: {
@@ -164,12 +175,34 @@ export default {
     onSubmit (event) {
       event.preventDefault()
 
+      const params = {
+        ...this.params,
+        'prevent_duplicates': true,
+        'multiple_phone_numbers': false,
+        'allow_international_phone_numbers': false,
+        'own_contacts_only': this.showAddViewMyContacts
+      }
+
+      if (this.isDatatableSelectedAll) {
+        params.selected_all = true
+        if (params?.contact_ids) {
+          delete params.contact_ids
+        }
+      }
+
+      // Don't send list_id for dynamic lists, it should use only the filters
+      if (this.contactList?.type === this.ContactListTypes.DYNAMIC) {
+        delete params.list_id
+      }
+
+      if (!isEmpty(this.currentListFilters)) {
+        params.filter_groups = this.$jsonClone(this.currentListFilters)
+      }
+
       // add confirm dialog here
       this.isBusy = true
       talk2Api.V2.aloAiBot
-        .enrollContacts(this.selectedBotId, {
-          contact_ids: this.params.contact_ids
-        })
+        .enrollContacts(this.selectedBotId, params)
         .then(() => {
           this.$generalNotification(
             'Contacts successfully enrolled to the selected AloAi Bot.'
