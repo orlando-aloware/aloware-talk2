@@ -688,6 +688,7 @@ export default {
 
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
+      console.log('Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
@@ -717,6 +718,7 @@ export default {
             (this.queue && !this.queue.length))
         )
       ) {
+        console.log('Communication when event closeCallNotifications : ', this.communication)
         this.closeCallNotifications(this.id, this.communicationId, true)
       }
 
