@@ -14,7 +14,8 @@ export const COLUMNS = [
     name: 'name',
     label: 'Name',
     field: 'name',
-    sortable: true
+    sortable: true,
+    minWidth: 390
   },
   {
     name: 'status',
