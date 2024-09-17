@@ -790,14 +790,17 @@ export default {
     },
 
     aloAiBot: {
-      getBots () {
-        return window.axios.get(`${suffixV1}aloai/bots`)
+      getBots (params = {}) {
+        return window.axios.get(`${suffixV1}aloai/bots`, { params })
       },
       getContactDisengagedBots (contactId) {
         return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
       },
       updateContactEngagements (contactId, engagements) {
         return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-status`, { engagements })
+      },
+      enrollContacts (botId, params) {
+        return window.axios.post(`${suffixV1}aloai/${botId}/enroll-contacts`, params)
       }
     }
   }
