@@ -29,6 +29,7 @@
                                    :auto-apply="true"
                                    data-testid="filter-form-date-range-picker"
                                    @toggle="pickerToggle"
+                                   @finish-selection="onFinishSelection"
                                    v-model="dateRange">
                   <template v-slot:input="picker" style="min-width: 350px;">
                     {{ getDateRangeInputLabel(picker) }}
@@ -695,6 +696,10 @@ export default {
       }
     },
 
+    onFinishSelection (dateRange) {
+      sessionStorage.setItem('date-selected', 'custom')
+    },
+
     onFilterChange (value, prop) {
       this.filter[prop] = value
     },
@@ -769,7 +774,8 @@ export default {
   },
 
   mounted () {
-    if (this.isFirstLoad) {
+    const viewId = sessionStorage.getItem('view-selected')
+    if (this.isFirstLoad && !viewId) {
       this.setIsFirstLoad(false)
       sessionStorage.setItem('date-selected', 'Last 30 Days')
 

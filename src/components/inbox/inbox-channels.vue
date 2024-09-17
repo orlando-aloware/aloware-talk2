@@ -881,8 +881,10 @@ export default {
     },
 
     onResetFilters () {
+      sessionStorage.setItem('date-selected', 'Last 30 Days')
       this.firstTimeLoading = true
       this.resetFilters()
+      this.setSelectedFilter(null)
       this.getCommunications(this.filter)
     },
 

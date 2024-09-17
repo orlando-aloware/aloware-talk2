@@ -194,6 +194,8 @@ export default {
   },
 
   created () {
+    this.initializeDateRanges()
+
     if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
       this.getFilters()
         .then(() => {
@@ -263,10 +265,24 @@ export default {
         const viewId = nextActive.split('-')[1]
         const view = this.pinnedViews.find(view => +view.filter_id === +viewId)
 
+        // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+        // set the range to the key of the range
+        for (const range in this.ranges) {
+          const hasDatesValues = view.filter.filter && view.filter.filter.from_date && view.filter.filter.to_date
+          if (hasDatesValues && view.filter.filter.from_date === this.ranges[range][0] && view.filter.filter.to_date === this.ranges[range][1]) {
+            sessionStorage.setItem('date-selected', range)
+            sessionStorage.setItem('view-selected', viewId)
+            break
+          }
+        }
+
         this.currentTask = InboxTaskStatus.DEFAULT_STATUS
+        this.setIsFirstLoad(false)
         this.onSelectView(view.filter)
         return
       }
+
+      this.setIsFirstLoad(true)
 
       if (!this.activeChannel) {
         return

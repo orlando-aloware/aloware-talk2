@@ -10,6 +10,7 @@
 
       <q-card-section class="text-center" data-testid="ring-group-rounting-table-card-section">
         <q-table
+          :pagination="{ rowsPerPage: 0 }"
           hide-pagination
           class="ring-group-snapshot-table"
           separator="none"
@@ -59,7 +60,7 @@
 
               </q-td>
             </q-tr>
-            <q-tr v-show="props.expand" :props="props" data-testid="ring-group-rounting-table-tr">
+            <q-tr v-show="props.expand" :props="props" data-testid="ring-group-rounting-table-tr-expanded">
               <q-td data-testid="ring-group-rounting-table-td"></q-td>
               <q-td data-testid="ring-group-rounting-table-td"></q-td>
               <q-td data-testid="ring-group-rounting-table-td" colspan="100%" class="text-left">
@@ -100,9 +101,11 @@
 import * as RingGroupDialMode from 'src/constants/ring-group-dial-modes'
 import * as AgentStatusLabels from 'src/constants/agent-status-labels'
 import ArrowDownIcon from 'components/icons/arrow-down-icon'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'ring-group-routing-table',
+  mixins: [userMixin],
   components: { ArrowDownIcon },
   props: {
     columns: {
@@ -121,15 +124,32 @@ export default {
   computed: {
     rows () {
       const rows = []
-      this.layer.user_results.forEach((value) => {
-        rows.push({
-          order: value.agent_is_eligible_to_take_call ? (this.ringGroup.dial_mode === RingGroupDialMode.DIAL_MODE_SIMUL ? 1 : this.layer.order++) : '-',
-          status: value.model.is_destination ? 'Available' : AgentStatusLabels.LABELS.find(label => label.value === value.model.agent_status).label,
-          user: value.model.full_name,
-          take_calls: value.agent_is_eligible_to_take_call ? 'Yes' : 'No',
-          results: value.results
+      const seenUsers = new Set()
+      const userResults = this.layer.user_results || []
+      const teamUsersResults = this.layer.team_users_results || []
+
+      userResults.forEach(userResult => {
+        if (!seenUsers.has(userResult.model.id)) {
+          if (userResult.model.teams_name) {
+            delete userResult.model.teams_name
+          }
+
+          rows.push(this.createRow(userResult))
+          seenUsers.add(userResult.model.id)
+        }
+      })
+
+      // eslint-disable-next-line no-unused-expressions
+      teamUsersResults?.forEach(team => {
+        team.users.forEach(userResult => {
+          if (!seenUsers.has(userResult.model.id)) {
+            userResult.model.teams_name = this.adjustTeamsNames(userResult.model.id, userResult.model.teams_name)
+            rows.push(this.createRow(userResult))
+            seenUsers.add(userResult.model.id)
+          }
         })
       })
+
       return rows
     }
   },
@@ -143,6 +163,34 @@ export default {
         return
       }
       props.expand = !props.expand
+    },
+
+    adjustTeamsNames (userId, teamsNames) {
+      const modifiedTeamsName = []
+      if (this.ringGroup && this.ringGroup.ordered_team_ids && this.ringGroup.ordered_team_ids[this.layer.layer]) {
+        this.ringGroup.ordered_team_ids[this.layer.layer].forEach(teamId => {
+          if (this.ringGroup.teams) {
+            this.ringGroup.teams.forEach(team => {
+              if (teamId === team.id && teamsNames.includes(team.name) && !modifiedTeamsName.includes(team.name)) {
+                modifiedTeamsName.push(team.name)
+              }
+            })
+          }
+        })
+      }
+
+      return modifiedTeamsName
+    },
+
+    createRow (userResult) {
+      return {
+        order: userResult.agent_is_eligible_to_take_call ? (this.ringGroup.dial_mode === RingGroupDialMode.DIAL_MODE_SIMUL ? 1 : this.layer.order++) : '-',
+        teams: userResult.model?.teams_name?.join('; ') || '-',
+        status: userResult.model.is_destination ? 'Available' : AgentStatusLabels.LABELS.find(label => label.value === userResult.model.agent_status).label,
+        user: userResult.model.full_name,
+        take_calls: userResult.agent_is_eligible_to_take_call ? 'Yes' : 'No',
+        results: userResult.results
+      }
     }
   }
 }

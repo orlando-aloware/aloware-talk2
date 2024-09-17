@@ -46,7 +46,7 @@ import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import { timezoneCheckMixin, helperMixin, agentMixin } from 'src/plugins/mixins'
+import { timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 
 export default {
@@ -57,7 +57,7 @@ export default {
     DialerListeners
   },
 
-  mixins: [ timezoneCheckMixin, helperMixin, agentMixin ],
+  mixins: [ timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin ],
 
   props: {
     apiKey: {
@@ -221,17 +221,8 @@ export default {
       })
     },
 
-    checkForceDisposition () {
-      const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
-        !this.profile?.last_call?.contact?.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
-        !this.profile?.last_call?.call_disposition_id
-
-      return shouldForceContactDisposition || shouldForceCallDisposition
-    },
-
     checkAndResetCallDisposition () {
-      if (!this.checkForceDisposition()) {
+      if (!this.checkForceDisposition) {
         this.$VueEvent.fire('resetCall')
       }
     },
@@ -298,8 +289,8 @@ export default {
     handleUserLogin () {
       if (this.needsExtensions && this.extensionsInitialized) {
         this.extensions.userLoggedIn()
-
-        if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call) {
+        // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
+        if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
           this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
         }
       }
@@ -470,7 +461,7 @@ export default {
         this.authProfile &&
         this.dialer?.isReady &&
         this.campaignId !== null &&
-        (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition()))
+        (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition))
     },
 
     checkAgentHasActiveCallInAnotherDevice () {
@@ -524,14 +515,9 @@ export default {
         return
       }
 
-      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.last_call?.contact?.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.last_call?.call_disposition_id
-
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
       if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
-        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(shouldForceContactDisposition || shouldForceCallDisposition))) &&
+        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) &&
         !this.isDialed) {
         this.showAlertAgentOnCall = true
         this.showAlertCallFinished = false

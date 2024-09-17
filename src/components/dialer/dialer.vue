@@ -13,7 +13,8 @@ import {
   notificationMixin,
   visibilityMixin,
   unownedContactTaskMixin,
-  dialerWrapUpMixin
+  dialerWrapUpMixin,
+  dispositionsMixin
 } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -30,7 +31,8 @@ export default {
     notificationMixin,
     visibilityMixin,
     unownedContactTaskMixin,
-    dialerWrapUpMixin
+    dialerWrapUpMixin,
+    dispositionsMixin
   ],
 
   data () {
@@ -351,7 +353,7 @@ export default {
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       this.removeUnownedLiveContactTask()
-      console.log('Call invite canceled', call)
+      console.log('Talk-Device: Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
       this.connection = null
@@ -393,15 +395,24 @@ export default {
       if (!this.profile.last_call) {
         return
       }
-      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.last_call.contact.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.last_call.call_disposition_id
-      if (shouldForceContactDisposition || shouldForceCallDisposition) {
+
+      if (this.checkForceDisposition) {
+        if (this.isWidget && this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          return
+        }
+
         this.forceStartOnWrapUp()
       }
     },
     forceStartOnWrapUp () {
+      const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
+        ? this.currentCompany.wrap_up_seconds
+        : this.profile.wrap_up_seconds
+
+      if (wrapUpTimer < 0) {
+        return
+      }
+
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
       this.startWrapUpTimer()
@@ -730,7 +741,7 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
         this.removeUnownedLiveContactTask()
-        console.log('Call invite canceled', call)
+        console.log('Talk-Connection: Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial('Talk-Connection.OnCancel')
@@ -1609,6 +1620,10 @@ export default {
     clearInterval(this.$options.webrtcTokenRegenerateInterval)
     clearInterval(this.$options.hangupInterval)
     clearInterval(this.unownedContact.interval)
+
+    // Destroy the Twilio device to avoid having multiple Twilio device instances.
+    console.log('Destroying Twilio device')
+    this.device.destroy()
   }
 }
 </script>
