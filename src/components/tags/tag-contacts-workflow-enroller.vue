@@ -69,7 +69,7 @@
     <p class="text-13 mt-2 mb-0"
        v-if="list"
        data-testid="tags-contacts-workflow-enroller-tag-name"
-       v-html="`<span class='font-weight-bold'>List:</span> ${ list.name }`" />
+       v-html="`<span class='font-weight-bold'>All contacts from List:</span> ${ list.name }`" />
 
     <p class="text-13 mt-2 mb-0"
        v-if="!isBulk && tag"

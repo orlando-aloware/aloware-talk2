@@ -302,7 +302,7 @@
                            data-testid="contacts-view-add-to-sequence-option-dropdown"
                            :disabled="isAddToSequenceDisabled"
                            @click="openAddToSequence">
-            <power-dialer-mobile-icon width="14"
+            <add-sequence-icon width="14"
                                       height="14"
                                       color="#62666E" />
             Add to Sequence
@@ -802,6 +802,7 @@ import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
+import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 
 export default {
   name: 'contacts-view',
@@ -822,6 +823,7 @@ export default {
     DeleteRedIcon,
     ExportIcon,
     PowerDialerMobileIcon,
+    AddSequenceIcon,
     EditHamburgerIcon,
     Search,
     PlusIcon,
