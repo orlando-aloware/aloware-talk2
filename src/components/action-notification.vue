@@ -563,12 +563,14 @@ export default {
     },
 
     onShow () {
+      console.log('Communication when event Show notification triggers: ', this.communication)
       this.isValidNotification = false
       this.stopNotificationListeners()
       this.startNotificationListeners()
     },
 
     autoClose () {
+      console.log('Communication when event Auto close notification triggers: ', this.communication)
       this.runDateTimeInterval()
 
       if ((this.id === 'callFishing' && document.getElementById('callFishing') &&
@@ -620,6 +622,7 @@ export default {
     },
 
     onHidden () {
+      console.log('Communication when event Hidden notification triggers: ', this.communication)
       if (this.id === 'call') {
         return
       }
@@ -685,6 +688,7 @@ export default {
 
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
+      console.log('Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
@@ -714,6 +718,7 @@ export default {
             (this.queue && !this.queue.length))
         )
       ) {
+        console.log('Communication when event closeCallNotifications : ', this.communication)
         this.closeCallNotifications(this.id, this.communicationId, true)
       }
 
