@@ -134,7 +134,7 @@
               <b-icon class="mr-xs text-red"
                       icon="x">
               </b-icon>
-              Password must be at least 6 character length.
+              Password must be at least 8 character length.
             </b-form-invalid-feedback>
 
             <b-form-invalid-feedback v-if="!$v.user.password.passwordCases">
@@ -569,7 +569,7 @@ export default {
           validPhone: (value) => this.$options.filters.fixPhone(value) !== false
         },
         password: {
-          minLength: minLength(6),
+          minLength: minLength(8),
           passwordCases,
           passwordDigit
         },
