@@ -96,7 +96,8 @@
                                       :default-date-range="7"/>
       </div>
       <q-separator/>
-      <div class="d-flex align-items-center justify-content-end">
+      <div class="d-flex align-items-center justify-content-end"
+           v-if="false">
         <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                     id="bulk-action-dropdown"
                     text="..."
@@ -152,7 +153,7 @@
                    ref="broadcastsTable"
                    use-empty-slot
                    :sticky-headers="true"
-                   :columns="COLUMNS"
+                   :columns="fixedColumns"
                    :is-empty="isBroadcastsTableEmpty"
                    :show-select-all="false"
                    :paginated="true"
@@ -167,10 +168,10 @@
           <template slot="tbody">
             <tr :key="rowIndex"
                 v-for="(row, rowIndex) in broadcasts">
-              <template v-for="(col, colIndex) in COLUMNS">
+              <template v-for="(col, colIndex) in fixedColumns">
                 <td class="datatable-row__checkbox"
                     :key="`c-${colIndex}`"
-                    v-if="col.name == 'checkbox'">
+                    v-if="col.name === 'checkbox'">
                   <label class="custom-checkbox-container">
                     <input type="checkbox"
                            class="checker"
@@ -180,9 +181,21 @@
                     <span class="checkmark"/>
                   </label>
                 </td>
+                <td :key="`c-${colIndex}`"
+                    v-else-if="col.name === 'name'">
+                  <span>
+                    {{ row['name'] }}
+                    <q-tooltip anchor="top middle"
+                               self="top end"
+                               :offset="[0, 40]"
+                               v-if="row['name'].length > 54">
+                      {{ row['name'] }}
+                    </q-tooltip>
+                  </span>
+                </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
-                    v-else-if="col.name == 'status'">
+                    v-else-if="col.name === 'status'">
                   <broadcast-status-pill :status="row[col.field]"
                                          :text="row['status_name']" />
                 </td>
@@ -194,12 +207,12 @@
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
-                    v-else-if="col.name == 'throttle_limit'">
+                    v-else-if="col.name === 'throttle_limit'">
                   {{ getThrottling(row[col.field]) }}
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
-                    v-else-if="col.name == 'campaign_id'">
+                    v-else-if="col.name === 'campaign_id'">
                   <span v-if="getCampaign(row[col.field])">
                     {{ getCampaign(row[col.field]).name }}
                   </span>
@@ -215,7 +228,7 @@
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
-                    v-else-if="col.name == 'target_group'">
+                    v-else-if="col.name === 'target_group'">
                   <template v-if="row['tag']">
                     <i class="fa fa-circle"
                        :style="`color: ${row['tag']?.color}; font-size:36%; position: relative; top: -3px;`" />
@@ -228,11 +241,13 @@
                   </template>
                 </td>
                 <td :key="`c-${colIndex}`"
-                    v-else-if="col.field == 'actions'">
+                    :class="col.stickyRight ? 'sticky-right' : ''"
+                    v-else-if="col.field === 'actions'">
                   <div class="context-menu"
                        :class="[isSelectedRow(row) ? 'keep-visible' : '']">
                     <b-dropdown class="position-absolute"
                                 size="sm"
+                                container="body"
                                 right
                                 :style="{ 'margin-top': '-0.9rem', right: '0.5rem' }"
                                 :id="getContextMenuTargetElementId(row)"
@@ -383,7 +398,7 @@ import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { COLUMNS } from 'src/constants/broadcast/home-columns'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import { aclMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, kycMixin, simpsocialMixin, dataTableMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcasts',
@@ -405,7 +420,8 @@ export default {
   mixins: [
     aclMixin,
     kycMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    dataTableMixin
   ],
 
   data: () => ({
@@ -552,17 +568,86 @@ export default {
           name: 'rename',
           label: 'Rename',
           icon: 'context-menu-rename.svg'
-        },
-        {
-          name: 'delete',
-          label: 'Delete',
-          icon: 'context-menu-delete.svg'
         }
       ]
     },
 
     canAddBroadcasts () {
       return this.enabledToAddBroadcasts()
+    },
+
+    columnsByViewport () {
+      return {
+        mobile: [
+          'id',
+          'name',
+          'actions'
+        ],
+        tablet: [
+          'id',
+          'name',
+          'status',
+          'actions'
+        ],
+        smallDesktop: [
+          'id',
+          'name',
+          'status',
+          'total_failed',
+          'total_enrolled',
+          'actions'
+        ],
+        mediumDesktop: [
+          'id',
+          'name',
+          'status',
+          'total_enrolled',
+          'total_failed',
+          'scheduled_time',
+          'pending_tasks',
+          'engagement_rate',
+          'total_unsubscribed',
+          'target_group',
+          'actions'
+        ],
+        largeDesktop: [
+          'id',
+          'name',
+          'status',
+          'total_enrolled',
+          'total_failed',
+          'scheduled_time',
+          'pending_tasks',
+          'engagement_rate',
+          'total_unsubscribed',
+          'target_group',
+          'campaign_id',
+          'throttle_limit',
+          'date_created',
+          'actions'
+        ],
+        extraLargeDesktop: [
+          'id',
+          'name',
+          'status',
+          'total_failed',
+          'total_enrolled',
+          'scheduled_time',
+          'pending_tasks',
+          'engagement_rate',
+          'total_unsubscribed',
+          'target_group',
+          'campaign_id',
+          'throttle_limit',
+          'date_created',
+          'actions'
+        ]
+      }
+    },
+
+    fixedColumns () {
+      const allColumns = this.$jsonClone(this.COLUMNS)
+      return this.getResponsiveColumns(allColumns, this.columnsByViewport)
     }
   },
 

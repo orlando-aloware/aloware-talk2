@@ -14,7 +14,8 @@ export const COLUMNS = [
     name: 'name',
     label: 'Name',
     field: 'name',
-    sortable: true
+    sortable: true,
+    minWidth: 390
   },
   {
     name: 'status',
@@ -31,43 +32,43 @@ export const COLUMNS = [
     draggable: true
   },
   {
+    name: 'total_enrolled',
+    label: 'Total Messages',
+    field: 'total_enrolled',
+    sortable: true,
+    draggable: true
+  },
+  {
     name: 'pending_tasks',
-    label: 'Pending Tasks',
+    label: 'Pending Messages',
     field: 'pending_tasks',
     sortable: true,
     draggable: true
   },
   {
     name: 'total_failed',
-    label: 'Failed Tasks',
+    label: 'Failed Messages',
     field: 'total_failed',
     sortable: true,
     draggable: true
   },
   {
-    name: 'total_enrolled',
-    label: 'Total Tasks',
-    field: 'total_enrolled',
-    sortable: true,
-    draggable: true
-  },
-  {
     name: 'engagement_rate',
-    label: 'Engagement',
+    label: 'Replies',
     field: 'engagement_rate',
     sortable: true,
     draggable: true
   },
   {
     name: 'total_unsubscribed',
-    label: 'Unsubscribed',
+    label: 'Opt-Out',
     field: 'total_unsubscribed',
     sortable: true,
     draggable: true
   },
   {
     name: 'target_group',
-    label: 'Target Group',
+    label: 'Contacts',
     field: 'target_group',
     draggable: true
   },
@@ -96,6 +97,8 @@ export const COLUMNS = [
     name: '',
     label: '',
     field: 'actions',
-    maxWidth: 50
+    maxWidth: 50,
+    sticky: true,
+    stickyRight: true
   }
 ]
