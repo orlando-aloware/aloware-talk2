@@ -210,7 +210,7 @@
         </div>
       </div>
 
-      <filter-dialog :default-filter-model="defaultFilterModel"
+      <filter-dialog :filter-model="defaultFilterModel"
                      data-testid="inbox-tab-filter-dialog"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
