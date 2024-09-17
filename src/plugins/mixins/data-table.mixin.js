@@ -21,7 +21,7 @@ export default {
     },
 
     filterColumns (allColumns, columnNames) {
-      return allColumns.filter((column) => columnNames.includes(column.name))
+      return allColumns.filter((column) => columnNames.includes(column.name || column.field))
     }
   }
 }

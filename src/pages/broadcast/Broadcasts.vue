@@ -171,7 +171,7 @@
               <template v-for="(col, colIndex) in fixedColumns">
                 <td class="datatable-row__checkbox"
                     :key="`c-${colIndex}`"
-                    v-if="col.name == 'checkbox'">
+                    v-if="col.name === 'checkbox'">
                   <label class="custom-checkbox-container">
                     <input type="checkbox"
                            class="checker"
@@ -192,11 +192,10 @@
                       {{ row['name'] }}
                     </q-tooltip>
                   </span>
-
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
-                    v-else-if="col.name == 'status'">
+                    v-else-if="col.name === 'status'">
                   <broadcast-status-pill :status="row[col.field]"
                                          :text="row['status_name']" />
                 </td>
@@ -208,12 +207,12 @@
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
-                    v-else-if="col.name == 'throttle_limit'">
+                    v-else-if="col.name === 'throttle_limit'">
                   {{ getThrottling(row[col.field]) }}
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
-                    v-else-if="col.name == 'campaign_id'">
+                    v-else-if="col.name === 'campaign_id'">
                   <span v-if="getCampaign(row[col.field])">
                     {{ getCampaign(row[col.field]).name }}
                   </span>
@@ -229,7 +228,7 @@
                 </td>
                 <td class="sorted-column"
                     :key="`c-${colIndex}`"
-                    v-else-if="col.name == 'target_group'">
+                    v-else-if="col.name === 'target_group'">
                   <template v-if="row['tag']">
                     <i class="fa fa-circle"
                        :style="`color: ${row['tag']?.color}; font-size:36%; position: relative; top: -3px;`" />
@@ -242,11 +241,13 @@
                   </template>
                 </td>
                 <td :key="`c-${colIndex}`"
-                    v-else-if="col.field == 'actions'">
+                    :class="col.stickyRight ? 'sticky-right' : ''"
+                    v-else-if="col.field === 'actions'">
                   <div class="context-menu"
                        :class="[isSelectedRow(row) ? 'keep-visible' : '']">
                     <b-dropdown class="position-absolute"
                                 size="sm"
+                                container="body"
                                 right
                                 :style="{ 'margin-top': '-0.9rem', right: '0.5rem' }"
                                 :id="getContextMenuTargetElementId(row)"
@@ -567,11 +568,6 @@ export default {
           name: 'rename',
           label: 'Rename',
           icon: 'context-menu-rename.svg'
-        },
-        {
-          name: 'delete',
-          label: 'Delete',
-          icon: 'context-menu-delete.svg'
         }
       ]
     },
@@ -584,38 +580,42 @@ export default {
       return {
         mobile: [
           'id',
-          'name'
+          'name',
+          'actions'
         ],
         tablet: [
           'id',
           'name',
-          'status'
+          'status',
+          'actions'
         ],
         smallDesktop: [
           'id',
           'name',
           'status',
           'total_failed',
-          'total_enrolled'
+          'total_enrolled',
+          'actions'
         ],
         mediumDesktop: [
           'id',
           'name',
           'status',
-          'total_failed',
           'total_enrolled',
+          'total_failed',
           'scheduled_time',
           'pending_tasks',
           'engagement_rate',
           'total_unsubscribed',
-          'target_group'
+          'target_group',
+          'actions'
         ],
         largeDesktop: [
           'id',
           'name',
           'status',
-          'total_failed',
           'total_enrolled',
+          'total_failed',
           'scheduled_time',
           'pending_tasks',
           'engagement_rate',
@@ -623,7 +623,8 @@ export default {
           'target_group',
           'campaign_id',
           'throttle_limit',
-          'date_created'
+          'date_created',
+          'actions'
         ],
         extraLargeDesktop: [
           'id',
