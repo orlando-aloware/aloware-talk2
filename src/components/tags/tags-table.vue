@@ -150,6 +150,11 @@
                       <i class="fas fa-sign-in-alt"></i> Assign Contacts
                     </b-dropdown-item>
 
+                    <b-dropdown-item data-testid="tags-table-dropdown-item-convert-to-list"
+                                     @click="openConvertToListDialog(tag)">
+                      <i class="fas fa-address-book"></i> Convert to List
+                    </b-dropdown-item>
+
                     <b-dropdown-item data-testid="tags-table-dropdown-item-add-to-power-dialer"
                                      @click="openAddTagContactsToPowerDialerDialog(tag)">
                       <i class="fas fa-phone"></i> Add to PowerDialer
@@ -205,6 +210,10 @@
                             :tag="selectedTag"
                             @closeAssignContactsTagModal="closeContactTagsActionsModals" />
 
+    <convert-to-list :is-show="isOpenConvertToListDialog"
+                     :tag="selectedTag"
+                     @closeConvertToListModal="closeContactTagsActionsModals" />
+
     <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
                                       :tag="selectedTag"
                                       @closeAddTagContactsToPowerDialer="closeContactTagsActionsModals" />
@@ -227,6 +236,7 @@ import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
 import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
+import ConvertToList from 'components/tags/convert-to-list.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
@@ -249,6 +259,7 @@ export default {
     TagContactsWorkflowEnroller,
     TagContactsAddToPowerDialer,
     AssignContactsByTag,
+    ConvertToList,
     TagContactsSplitter,
     Datatable,
     EditPenIcon,
@@ -291,6 +302,7 @@ export default {
       selectedTag: null,
       isOpenTagContactsSplitterDialog: false,
       isOpenAssignContactsTagDialog: false,
+      isOpenConvertToListDialog: false,
       isOpenAddTagContactsToPowerDialerDialog: false,
       isOpenEnrollTagContactsToSequenceDialog: false,
       isOpenDeleteTagDialog: false
@@ -391,6 +403,11 @@ export default {
       this.isOpenAssignContactsTagDialog = true
     },
 
+    openConvertToListDialog (tag) {
+      this.selectedTag = tag
+      this.isOpenConvertToListDialog = true
+    },
+
     openAddTagContactsToPowerDialerDialog (tag) {
       this.selectedTag = tag
       this.isOpenAddTagContactsToPowerDialerDialog = true
@@ -404,6 +421,7 @@ export default {
     closeContactTagsActionsModals () {
       this.isOpenTagContactsSplitterDialog = false
       this.isOpenAssignContactsTagDialog = false
+      this.isOpenConvertToListDialog = false
       this.isOpenAddTagContactsToPowerDialerDialog = false
       this.isOpenEnrollTagContactsToSequenceDialog = false
 
