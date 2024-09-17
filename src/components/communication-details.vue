@@ -945,7 +945,7 @@
           <!-- COMMUNICATION CUSTOM FIELDS -->
           <q-card-section class="pt-0 pb-0"
               data-testid="comm-details-custom-fields"
-              v-if="communication.metadata?.custom_fields && Object.keys(communication.metadata.custom_fields).length > 0">
+              v-if="hasCustomFields">
             <b-form-row data-testid="comm-details-custom-field-row"
               v-for="(custom_field, key) in communication.metadata?.custom_fields"
               :key="key">
@@ -1150,6 +1150,10 @@ export default {
         this.callDispositions &&
         this.callDispositions.length > 0 &&
         !this.dialerMode
+    },
+
+    hasCustomFields () {
+      return this.communication.metadata?.custom_fields && Object.keys(this.communication.metadata.custom_fields).length > 0
     }
   },
 
