@@ -511,7 +511,7 @@ export default {
     },
 
     contextMenuTarget () {
-      return this.contextMenuTargetId ? '#' + this.getContextMenuTargetElementId({ id: this.contextMenuTargetId }) : '#bulk-action-dropdown'
+      return this.contextMenuTargetId ? '#' + this.getContextMenuTargetElementId({ id: this.contextMenuTargetId }) : ''
     },
 
     bulkActionsDisabled () {
