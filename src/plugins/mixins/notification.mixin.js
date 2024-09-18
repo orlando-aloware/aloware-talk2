@@ -23,7 +23,8 @@ export default {
       'reminderNotifiedDesktop',
       'notificationAudio'
     ]),
-    ...mapState('cache', ['currentCompany'])
+    ...mapState('cache', ['currentCompany']),
+    ...mapState(['isWidget'])
   },
 
   methods: {
@@ -201,6 +202,10 @@ export default {
     },
 
     processActionNotification (communication, type) {
+      console.log('PROCESSING ACTION NOTIFICATION')
+      if (this.isWidget) {
+        return
+      }
       const name = { data: '' }
       const companyName = { data: '' }
       const firstAttachment = { data: null }
