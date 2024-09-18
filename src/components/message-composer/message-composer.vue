@@ -183,11 +183,6 @@ export default {
       return this.selectedLine && this.isMessagingBlocked(this.selectedLine, true) ? this.selectedLine?.blocked_messaging_information?.['reason'] : ''
     },
 
-    shouldShowComplianceMessage () {
-      let a2pBlock = this.selectedLine && this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason'] && !this.selectedLine.blocked_messaging_information['bypassed']
-      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedLine, true) && a2pBlock
-    },
-
     canTextToNumber () {
       const phoneNumber = this.messageComposer.sms.phone_number
       return this.enabledToTextNumber(phoneNumber) && !this.disabledComplianceMessage

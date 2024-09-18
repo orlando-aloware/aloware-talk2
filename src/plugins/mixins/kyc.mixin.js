@@ -71,6 +71,13 @@ export default _.merge({
         return true
       }
 
+      if (this.isCanadaLine(selectedLine) && selectedLine?.blocked_messaging_information?.['bypassed']) {
+        /**
+         * 3 - 10DLC Bypassed lines -> Allow messaging
+         */
+        return true
+      }
+
       /**
        *   3 - A2P Campaign + 10DLC Line -> Allow messaging
        *   4 - No A2P Campaign + 10DLC -> Not allowed
@@ -197,6 +204,10 @@ export default _.merge({
     onOpenFinishRegistration () {
       const link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
       return window.open(link, '_self')
+    },
+
+    isCanadaLine (selectedLine) {
+      return selectedLine?.incoming_numbers?.filter(number => number.country === 'CA').length > 0
     }
   }
 })
