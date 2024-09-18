@@ -44,7 +44,7 @@ body,
 }
 
 .text-black,
-// .general-notification has to have always be black, override system class .text-white which also has !important
+// .general-notification has to always be black, override system class .text-white which also has !important
 .general-notification.text-black {
   color: $grey-100 !important;
 }
