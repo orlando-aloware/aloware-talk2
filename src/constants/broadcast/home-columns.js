@@ -53,9 +53,9 @@ export const COLUMNS = [
     draggable: true
   },
   {
-    name: 'engagement_rate',
+    name: 'total_replied',
     label: 'Replies',
-    field: 'engagement_rate',
+    field: 'total_replied',
     sortable: true,
     draggable: true
   },
