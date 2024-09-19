@@ -132,6 +132,10 @@ pipeline {
                 }
 
                 stage('Sonar Analysis') {
+                    when {
+                        branch 'master'
+                        branch 'develop'
+                    }
                     steps {
                         script {
                             sh 'git rev-parse --abbrev-ref HEAD'
