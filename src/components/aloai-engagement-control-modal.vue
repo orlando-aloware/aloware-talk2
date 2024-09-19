@@ -1,18 +1,15 @@
 <template>
-  <b-modal
-    size="md"
-    hide-header
-    hide-footer
-    centered
-    data-testid="aloai-engagement-control-modal"
-    v-model="isOpen"
-    @hidden="onHidden"
-    @shown="onShown"
-  >
+  <b-modal size="md"
+           hide-header
+           hide-footer
+           centered
+           data-testid="aloai-engagement-control-modal"
+           v-model="isOpen"
+           @hidden="onHidden"
+           @shown="onShown">
     <div class="p-2">
-      <h1
-        data-testid="aloai-engagement-control-modal-title"
-        class="text-center mb-2">
+      <h1 data-testid="aloai-engagement-control-modal-title"
+          class="text-center mb-2">
         Engagement Control
       </h1>
       <div class="text-center">
@@ -20,18 +17,17 @@
         contact.
       </div>
       <div class="w-75 my-2 mx-auto">
-        <search
-          placeholder="Search bot"
-          data-testid="aloai-engagement-control-modal-search"
-          @search="onSearch"/>
+        <search placeholder="Search bot"
+                data-testid="aloai-engagement-control-modal-search"
+                @search="onSearch"/>
       </div>
-      <q-tabs  no-caps
-        inline-label
-        dense
-        class="bg-white text-black border-bottom"
-        content-class="flex-nowrap"
-        :mobile-arrows="false"
-        v-model="selectedTab">
+      <q-tabs no-caps
+              inline-label
+              dense
+              class="bg-white text-black border-bottom"
+              content-class="flex-nowrap"
+              :mobile-arrows="false"
+              v-model="selectedTab">
         <q-tab :name="TABS.ENGAGEMENT">
           Chatbots Engagement
           <span class="ml-1">
@@ -51,76 +47,73 @@
           </span>
         </q-tab>
       </q-tabs>
-      <q-tab-panels
-        class="h-100"
-        v-model="selectedTab">
+      <q-tab-panels class="h-100"
+                    v-model="selectedTab">
         <q-tab-panel :name="TABS.ENGAGEMENT">
           <b-form data-testid="aloai-engagement-control-modal-form"
-            class="mb-4"
-            @submit.prevent="onSubmit">
-            <div class="p-1" v-if="isLoading">
+                  class="mb-4"
+                  @submit.prevent="onSubmit">
+            <div class="p-1"
+                 v-if="isLoading">
               <template v-for="n in 5">
                 <q-skeleton type="text"
-                  animation="fade"
-                  height="40px"
-                  :key="`${n}-skeleton`"/>
+                            animation="fade"
+                            height="40px"
+                            :key="`${n}-skeleton`"/>
               </template>
             </div>
-            <ul
-              class="list-group list-group-flush aloai-engagement-control-bots-list"
-              v-else>
+            <ul class="list-group list-group-flush aloai-engagement-control-bots-list"
+                v-else>
               <div class="text-center py-2"
-                v-if="!this.filteredBots.length">
+                   v-if="!this.filteredBots.length">
                 No records to show.
               </div>
               <template v-else>
-                <li
-                  class="list-group-item list-group-item-action p-2 d-flex items-center justify-between"
-                  :key="`ec-bot-${key}`"
-                  v-for="(bot, key) in this.filteredBots">
+                <li class="list-group-item list-group-item-action p-2 d-flex items-center justify-between"
+                    :key="`ec-bot-${key}`"
+                    v-for="(bot, key) in this.filteredBots">
                   <label class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
-                    :for="`engage-control-bot-${bot.id}`">
+                         :for="`engage-control-bot-${bot.id}`">
                     {{ bot.name }}
                   </label>
                   <b-form-checkbox switch
-                    :id="`engage-control-bot-${bot.id}`"
-                    :value="true"
-                    :unchecked-value="false"
-                    v-model="bot_engagements[bot.id]"/>
+                                  :id="`engage-control-bot-${bot.id}`"
+                                  :value="true"
+                                  :unchecked-value="false"
+                                  v-model="bot_engagements[bot.id]"/>
                 </li>
               </template>
             </ul>
           </b-form>
           <div class="d-flex items-center justify-center" style="gap: 15px">
             <b-button variant="outline"
-              size="sm"
-              class="custom-btn"
-              data-testid="aloai-engagement-control-modal-close-button"
-              @click="onHidden">
+                      size="sm"
+                      class="custom-btn"
+                      data-testid="aloai-engagement-control-modal-close-button"
+                      @click="onHidden">
               Cancel
             </b-button>
             <b-button variant="success"
-              size="sm"
-              class="custom-btn"
-              data-testid="aloai-engagement-control-modal-enroll-contact-button"
-              :disabled="isBusy"
-              @click="onSubmit">
+                      size="sm"
+                      class="custom-btn"
+                      data-testid="aloai-engagement-control-modal-enroll-contact-button"
+                      :disabled="isBusy"
+                      @click="onSubmit">
               <q-spinner-bars color="white"
-                v-if="isBusy"/>
+                              v-if="isBusy"/>
               Save changes
             </b-button>
           </div>
         </q-tab-panel>
         <q-tab-panel :name="TABS.ENROLLMENT">
           <ul class="list-group list-group-flush scrollable-list mb-4">
-            <li
-              class="list-group-item list-group-item-action p-0"
-              :key="`enroll-bot-${key}`"
-              v-for="(bot, key) in this.filteredSalesBots">
+            <li class="list-group-item list-group-item-action p-0"
+                :key="`enroll-bot-${key}`"
+                v-for="(bot, key) in this.filteredSalesBots">
               <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
                 <b-form-radio name="selected-bot"
-                  :value="bot.id"
-                  v-model="selectedBotId">
+                              :value="bot.id"
+                              v-model="selectedBotId">
                   {{ bot.name }}
                 </b-form-radio>
               </label>
@@ -128,20 +121,20 @@
           </ul>
           <div class="d-flex items-center justify-center" style="gap: 15px">
             <b-button variant="outline"
-              size="sm"
-              class="custom-btn"
-              data-testid="enroll-contacts-to-aloai-modal-close-button"
-              @click="onHidden">
+                      size="sm"
+                      class="custom-btn"
+                      data-testid="enroll-contacts-to-aloai-modal-close-button"
+                      @click="onHidden">
               Cancel
             </b-button>
             <b-button variant="success"
-              size="sm"
-              class="custom-btn"
-              data-testid="enroll-contacts-to-aloai-modal-enroll-contact-button"
-              :disabled="!selectedBotId || isBusy"
-              @click="onSubmitEnrollment">
+                      size="sm"
+                      class="custom-btn"
+                      data-testid="enroll-contacts-to-aloai-modal-enroll-contact-button"
+                      :disabled="!selectedBotId || isBusy"
+                      @click="onSubmitEnrollment">
               <q-spinner-bars color="white"
-                v-if="isBusy"/>
+                              v-if="isBusy"/>
               Enroll
             </b-button>
           </div>
