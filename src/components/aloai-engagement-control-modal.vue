@@ -12,8 +12,7 @@
     <div class="p-2">
       <h1
         data-testid="aloai-engagement-control-modal-title"
-        class="text-center mb-2"
-      >
+        class="text-center mb-2">
         Engagement Control
       </h1>
       <div class="text-center">
@@ -28,14 +27,13 @@
         />
       </div>
       <q-tabs
-        v-model="selectedTab"
         no-caps
         inline-label
         dense
-        :mobile-arrows="false"
         class="bg-white text-black border-bottom"
         content-class="flex-nowrap"
-      >
+        :mobile-arrows="false"
+        v-model="selectedTab">
         <q-tab :name="TABS.ENGAGEMENT">
           Chatbots Engagement
           <span class="ml-1">
@@ -55,36 +53,37 @@
           </span>
         </q-tab>
       </q-tabs>
-      <q-tab-panels v-model="selectedTab" class="h-100">
+      <q-tab-panels
+        class="h-100"
+        v-model="selectedTab"
+      >
         <q-tab-panel :name="TABS.ENGAGEMENT">
           <b-form
-            @submit.prevent="onSubmit"
             data-testid="aloai-engagement-control-modal-form"
             class="mb-4"
-          >
+            @submit.prevent="onSubmit">
             <div class="p-1" v-if="isLoading">
               <template v-for="n in 5">
                 <q-skeleton
-                  :key="`${n}-skeleton`"
                   type="text"
                   animation="fade"
                   height="40px"
-                />
+                  :key="`${n}-skeleton`"/>
               </template>
             </div>
             <ul
               class="list-group list-group-flush aloai-engagement-control-bots-list"
-              v-else
-            >
-              <div v-if="!this.filteredBots.length" class="text-center py-2">
+              v-else>
+              <div
+                class="text-center py-2"
+                v-if="!this.filteredBots.length">
                 No records to show.
               </div>
               <template v-else>
                 <li
                   v-for="(bot, key) in this.filteredBots"
                   class="list-group-item list-group-item-action p-2 d-flex items-center justify-between"
-                  :key="`ec-bot-${key}`"
-                >
+                  :key="`ec-bot-${key}`">
                   <label
                     class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
                     :for="`engage-control-bot-${bot.id}`"
@@ -95,8 +94,7 @@
                     :id="`engage-control-bot-${bot.id}`"
                     :value="true"
                     :unchecked-value="false"
-                    v-model="bot_engagements[bot.id]"
-                  />
+                    v-model="bot_engagements[bot.id]"/>
                 </li>
               </template>
             </ul>
@@ -107,8 +105,7 @@
               size="sm"
               class="custom-btn"
               data-testid="aloai-engagement-control-modal-close-button"
-              @click="onHidden"
-            >
+              @click="onHidden">
               Cancel
             </b-button>
             <b-button
@@ -117,9 +114,10 @@
               class="custom-btn"
               data-testid="aloai-engagement-control-modal-enroll-contact-button"
               :disabled="isBusy"
-              @click="onSubmit"
-            >
-              <q-spinner-bars v-if="isBusy" color="white" />
+              @click="onSubmit">
+              <q-spinner-bars
+                color="white"
+                v-if="isBusy"/>
               Save changes
             </b-button>
           </div>
@@ -127,16 +125,14 @@
         <q-tab-panel :name="TABS.ENROLLMENT">
           <ul class="list-group list-group-flush scrollable-list mb-4">
             <li
-              v-for="(bot, key) in this.filteredSalesBots"
-              :key="`enroll-bot-${key}`"
               class="list-group-item list-group-item-action p-0"
-            >
+              :key="`enroll-bot-${key}`"
+              v-for="(bot, key) in this.filteredSalesBots">
               <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
                 <b-form-radio
                   name="selected-bot"
                   :value="bot.id"
-                  v-model="selectedBotId"
-                >
+                  v-model="selectedBotId">
                   {{ bot.name }}
                 </b-form-radio>
               </label>
@@ -148,8 +144,7 @@
               size="sm"
               class="custom-btn"
               data-testid="enroll-contacts-to-aloai-modal-close-button"
-              @click="onHidden"
-            >
+              @click="onHidden">
               Cancel
             </b-button>
             <b-button
@@ -158,9 +153,10 @@
               class="custom-btn"
               data-testid="enroll-contacts-to-aloai-modal-enroll-contact-button"
               :disabled="!selectedBotId || isBusy"
-              @click="onSubmitEnrollment"
-            >
-              <q-spinner-bars v-if="isBusy" color="white" />
+              @click="onSubmitEnrollment">
+              <q-spinner-bars
+                color="white"
+                v-if="isBusy"/>
               Enroll
             </b-button>
           </div>
@@ -182,6 +178,12 @@ const TABS = {
   ENROLLMENT: 'enrollment'
 }
 
+const ALOAI_USE_CASES = {
+  SALES: 1,
+  QUESTION_AND_ANSWER: 2,
+  SUPPORT: 3
+}
+
 export default {
   name: 'aloai-engagement-control-modal',
 
@@ -201,8 +203,9 @@ export default {
         a.name?.toUpperCase() > b.name?.toUpperCase() ? 1 : -1
       )
     },
+    // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
     filteredSalesBots () {
-      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === 1)
+      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === ALOAI_USE_CASES.SALES)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -224,7 +227,8 @@ export default {
       isLoading: true,
       TABS,
       selectedTab: TABS.ENGAGEMENT,
-      selectedBotId: null
+      selectedBotId: null,
+      ALOAI_USE_CASES
     }
   },
 
