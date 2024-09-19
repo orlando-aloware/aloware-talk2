@@ -327,6 +327,7 @@ export default {
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       if (this.isWidget) {
+        call._connection.ignore()
         return
       }
       this.stopAudio()
