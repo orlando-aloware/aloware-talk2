@@ -326,6 +326,8 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      // Avoid continuing with the incoming call if it's a widget,
+      // and ignore the call. Otherwise, Twilio will play the default incoming sound.
       if (this.isWidget) {
         call._connection.ignore()
         return
