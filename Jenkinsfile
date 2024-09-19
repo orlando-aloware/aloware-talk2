@@ -133,8 +133,10 @@ pipeline {
 
                 stage('Sonar Analysis') {
                     when {
-                        branch 'master'
-                        branch 'develop'
+                        anyOf {
+                            branch 'master';
+                            branch 'develop'
+                        }
                     }
                     steps {
                         script {
