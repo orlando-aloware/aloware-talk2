@@ -25,8 +25,7 @@
           data-testid="aloai-engagement-control-modal-search"
           @search="onSearch"/>
       </div>
-      <q-tabs
-        no-caps
+      <q-tabs  no-caps
         inline-label
         dense
         class="bg-white text-black border-bottom"
@@ -56,14 +55,12 @@
         class="h-100"
         v-model="selectedTab">
         <q-tab-panel :name="TABS.ENGAGEMENT">
-          <b-form
-            data-testid="aloai-engagement-control-modal-form"
+          <b-form data-testid="aloai-engagement-control-modal-form"
             class="mb-4"
             @submit.prevent="onSubmit">
             <div class="p-1" v-if="isLoading">
               <template v-for="n in 5">
-                <q-skeleton
-                  type="text"
+                <q-skeleton type="text"
                   animation="fade"
                   height="40px"
                   :key="`${n}-skeleton`"/>
@@ -72,8 +69,7 @@
             <ul
               class="list-group list-group-flush aloai-engagement-control-bots-list"
               v-else>
-              <div
-                class="text-center py-2"
+              <div class="text-center py-2"
                 v-if="!this.filteredBots.length">
                 No records to show.
               </div>
@@ -82,13 +78,11 @@
                   v-for="(bot, key) in this.filteredBots"
                   class="list-group-item list-group-item-action p-2 d-flex items-center justify-between"
                   :key="`ec-bot-${key}`">
-                  <label
-                    class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
+                  <label class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
                     :for="`engage-control-bot-${bot.id}`">
                     {{ bot.name }}
                   </label>
-                  <b-form-checkbox
-                    switch
+                  <b-form-checkbox switch
                     :id="`engage-control-bot-${bot.id}`"
                     :value="true"
                     :unchecked-value="false"
@@ -98,23 +92,20 @@
             </ul>
           </b-form>
           <div class="d-flex items-center justify-center" style="gap: 15px">
-            <b-button
-              variant="outline"
+            <b-button variant="outline"
               size="sm"
               class="custom-btn"
               data-testid="aloai-engagement-control-modal-close-button"
               @click="onHidden">
               Cancel
             </b-button>
-            <b-button
-              variant="success"
+            <b-button variant="success"
               size="sm"
               class="custom-btn"
               data-testid="aloai-engagement-control-modal-enroll-contact-button"
               :disabled="isBusy"
               @click="onSubmit">
-              <q-spinner-bars
-                color="white"
+              <q-spinner-bars color="white"
                 v-if="isBusy"/>
               Save changes
             </b-button>
@@ -127,8 +118,7 @@
               :key="`enroll-bot-${key}`"
               v-for="(bot, key) in this.filteredSalesBots">
               <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
-                <b-form-radio
-                  name="selected-bot"
+                <b-form-radio name="selected-bot"
                   :value="bot.id"
                   v-model="selectedBotId">
                   {{ bot.name }}
@@ -137,23 +127,20 @@
             </li>
           </ul>
           <div class="d-flex items-center justify-center" style="gap: 15px">
-            <b-button
-              variant="outline"
+            <b-button variant="outline"
               size="sm"
               class="custom-btn"
               data-testid="enroll-contacts-to-aloai-modal-close-button"
               @click="onHidden">
               Cancel
             </b-button>
-            <b-button
-              variant="success"
+            <b-button variant="success"
               size="sm"
               class="custom-btn"
               data-testid="enroll-contacts-to-aloai-modal-enroll-contact-button"
               :disabled="!selectedBotId || isBusy"
               @click="onSubmitEnrollment">
-              <q-spinner-bars
-                color="white"
+              <q-spinner-bars color="white"
                 v-if="isBusy"/>
               Enroll
             </b-button>
