@@ -134,7 +134,7 @@ pipeline {
                 stage('Sonar Analysis') {
                     when {
                         anyOf {
-                            branch 'master'
+                            branch 'master';
                             branch 'develop'
                         }
                     }
