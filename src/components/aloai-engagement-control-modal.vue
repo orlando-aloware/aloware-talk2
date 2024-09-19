@@ -23,8 +23,7 @@
         <search
           placeholder="Search bot"
           data-testid="aloai-engagement-control-modal-search"
-          @search="onSearch"
-        />
+          @search="onSearch"/>
       </div>
       <q-tabs
         no-caps
@@ -55,8 +54,7 @@
       </q-tabs>
       <q-tab-panels
         class="h-100"
-        v-model="selectedTab"
-      >
+        v-model="selectedTab">
         <q-tab-panel :name="TABS.ENGAGEMENT">
           <b-form
             data-testid="aloai-engagement-control-modal-form"
@@ -86,9 +84,9 @@
                   :key="`ec-bot-${key}`">
                   <label
                     class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
-                    :for="`engage-control-bot-${bot.id}`"
-                    >{{ bot.name }}</label
-                  >
+                    :for="`engage-control-bot-${bot.id}`">
+                    {{ bot.name }}
+                  </label>
                   <b-form-checkbox
                     switch
                     :id="`engage-control-bot-${bot.id}`"
