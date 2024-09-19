@@ -14,7 +14,8 @@ import {
   visibilityMixin,
   unownedContactTaskMixin,
   dialerWrapUpMixin,
-  dispositionsMixin
+  dispositionsMixin,
+  sessionCallStatusMixin
 } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -32,7 +33,8 @@ export default {
     visibilityMixin,
     unownedContactTaskMixin,
     dialerWrapUpMixin,
-    dispositionsMixin
+    dispositionsMixin,
+    sessionCallStatusMixin
   ],
 
   data () {
