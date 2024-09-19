@@ -759,6 +759,9 @@ export default {
     },
 
     canRedialNow () {
+      console.log('***////***//// canRedialNow this.dialer.currentStatus', this.dialer.currentStatus)
+      console.log('***////***//// canRedialNow this.redialed.includes(this.activeTask.id)', this.redialed.includes(this.activeTask.id))
+      console.log('***////***//// canRedialNow this.isRedialClicked', this.isRedialClicked)
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
         !this.redialed.includes(this.activeTask.id) &&
         !this.isRedialClicked
