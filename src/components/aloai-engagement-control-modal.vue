@@ -75,9 +75,9 @@
               </div>
               <template v-else>
                 <li
-                  v-for="(bot, key) in this.filteredBots"
                   class="list-group-item list-group-item-action p-2 d-flex items-center justify-between"
-                  :key="`ec-bot-${key}`">
+                  :key="`ec-bot-${key}`"
+                  v-for="(bot, key) in this.filteredBots">
                   <label class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
                     :for="`engage-control-bot-${bot.id}`">
                     {{ bot.name }}
