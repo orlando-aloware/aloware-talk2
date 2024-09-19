@@ -202,7 +202,6 @@ export default {
     },
 
     processActionNotification (communication, type) {
-      console.log('PROCESSING ACTION NOTIFICATION')
       if (this.isWidget) {
         return
       }
