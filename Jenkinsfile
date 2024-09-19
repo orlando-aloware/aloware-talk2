@@ -64,7 +64,7 @@ pipeline {
                         }
 
                         stage('Load Cached Modules') {
-                            when { not { branch 'master' || branch 'WAT-838/feature/bussiness-hours' } }
+                            when { not { branch 'WAT-838/feature/bussiness-hours' } }
                             steps {
                                 sh "cp -r ${env.NODE_MODULES_PATH} ."
                             }
