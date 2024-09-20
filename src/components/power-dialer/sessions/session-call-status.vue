@@ -765,6 +765,7 @@ export default {
         !this.redialed.includes(this.activeTask.id) &&
         !this.isRedialClicked */
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
+        !this.activeTask?.redial_status &&
         !this.isRedialClicked
     },
 
