@@ -196,21 +196,31 @@ export default {
       } else if (!isEmpty(allFilters)) {
         // just pass the filters when not empty, if list is STATIC
         params.filter_groups = allFilters
-      } else if (this.selectedList.id !== 'all') {
-        // else, just pass the contacts list id filter
-        params.filter_groups = [
+      }
+
+      if (this.ContactListTypes.CONTACTS_STRING_KEYS.indexOf(this.selectedList.id) === -1) {
+        // else, list is of type STATIC. Just pass the contacts list id filter
+        const contactListFilter = [
           {
-            'filters': {
-              'contact_lists': [
-                {
-                  value: [this.selectedList.id],
-                  operator: 1
-                }
-              ]
-            },
-            is_conjunction: true
+            value: [this.selectedList.id],
+            operator: 1
           }
         ]
+
+        // Verify if filter_groups is already set and merge it with the contact_lists filter
+        if (Array.isArray(params.filter_groups)) {
+          params.filter_groups[0].filters.contact_lists = contactListFilter
+        } else {
+          params.filter_groups = [
+            {
+              filters: {
+                contact_lists: contactListFilter
+              }
+            }
+          ]
+        }
+
+        params.filter_groups.is_conjunction = true
       }
 
       // only show list's loading view if all contacts were selected
