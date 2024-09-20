@@ -67,14 +67,15 @@
         <q-drawer class="h-100 sidebar-wrapper d-block position-absolute top-0"
                   content-class="sidebar"
                   :breakpoint="0"
-                  :width="64"
+                  :width="sidebarWidth"
                   v-model="sidebarVisible"
                   v-if="authenticated && !suspended && !isWidget">
           <q-list>
             <app-sidebar class="page-sidebar"
                          :lightMode="lightMode"
                          :xmasEnabled="isXmasEnabled"
-                         @toggleMode="toggleMode">
+                         @toggleMode="toggleMode"
+                         @toggleSidebarExpansion="toggleSidebarExpansion">
             </app-sidebar>
           </q-list>
         </q-drawer>
@@ -388,7 +389,9 @@ export default {
       CommunicationTypes,
       MetricOptionGroups,
       AppDefaultLogin,
-      isFirstLoading: true
+      isFirstLoading: true,
+      isSidebarExpanded: false,
+      sidebarWidth: 64
     }
   },
 
@@ -519,10 +522,12 @@ export default {
     mainLayoutClass () {
       const pageClass = this.authenticated && !this.suspended ? `dashboard ${this.pageClass}` : 'guest'
       const modeClass = this.lightMode ? 'light-mode' : 'night-mode'
+      const sidebarClass = this.isSidebarExpanded ? 'sidebar-expanded' : ''
 
       return [
         pageClass,
-        modeClass
+        modeClass,
+        sidebarClass
       ]
     },
 
@@ -824,15 +829,16 @@ export default {
         this.removeParkedCall(communication.id)
       }
 
-      if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {
-        return
-      }
-
       // if disposition status is not in-progress
       // or current status is not queued / ring all, close call notification
       if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
         !INCOMING_STATUSES.includes(communication.current_status2)) {
+        console.log('Communication when event closeCallNotifications : ', communication)
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
+      }
+
+      if (!this.checkCommunicationMatchesUserAccessibility(communication) && !isCommunicationHasUnownedContact) {
+        return
       }
 
       if (!this.isNotInInbox || !communication.contact_id) {
@@ -957,7 +963,7 @@ export default {
       if (this.profile && user.id === this.profile.id) {
         // this.setAgentStatus(user.agent_status)
         this.setProfile(user)
-        console.log('Changed agent status [event]: ', user.agent_status)
+        console.log('Changed agent status from userUpdated [event]: ', user.agent_status)
       }
     }
 
@@ -977,7 +983,7 @@ export default {
       if (this.currentCompany && event.company_id && event.company_id === this.currentCompany.id &&
         this.profile && event.user_id === this.profile.id && this.profile.agent_status !== event.agent_status) {
         this.setAgentStatus(event.agent_status)
-        console.log('Changed agent status [event]: ', event.agent_status)
+        console.log('Changed agent status from main::agentStatusUpdated [event]: ', event.agent_status)
       }
     }
 
@@ -1402,6 +1408,16 @@ export default {
 
     toggleMode () {
       this.lightMode = !this.lightMode
+    },
+
+    toggleSidebarExpansion () {
+      this.isSidebarExpanded = !this.isSidebarExpanded
+
+      if (this.isSidebarExpanded) {
+        this.sidebarWidth = 230
+      } else {
+        this.sidebarWidth = 64
+      }
     },
 
     toggleSidebar () {

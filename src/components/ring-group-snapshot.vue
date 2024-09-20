@@ -41,9 +41,11 @@ import * as RingGroupDialMode from '../constants/ring-group-dial-modes'
 import * as AgentStatusLabels from '../constants/agent-status-labels'
 import RingGroupRoutingTable from 'components/ring-group-routing-table'
 import { DISPOSITION_STATUS_ABANDONED_NEW } from 'src/constants/communication-disposition-status'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'ring-group-snapshot',
+  mixins: [userMixin],
   components: { RingGroupRoutingTable },
   props: {
     ringGroup: {
@@ -66,18 +68,25 @@ export default {
           style: 'width: 10%'
         },
         {
+          name: 'teams',
+          field: 'teams',
+          label: 'Teams',
+          align: 'left',
+          style: 'width: 20%'
+        },
+        {
           name: 'status',
           field: 'status',
           label: 'Status',
           align: 'left',
-          style: 'width: 20%'
+          style: 'width: 10%'
         },
         {
           name: 'user',
           field: 'user',
           label: 'User',
           align: 'left',
-          style: 'width: 50%'
+          style: 'width: 40%'
         },
         {
           name: 'take_calls',

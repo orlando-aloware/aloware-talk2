@@ -24,7 +24,7 @@
             To start dialing, a minimum of one (1) contact item in the list is required.
           </q-tooltip>
           <q-tooltip v-if="isAgentOnCall">
-            It is not possible to start a dialer if there is a call in progress on another device.
+            It is not possible to start a dialer if there is a call in progress on another device. If you think this is an error, please refresh your screen.
           </q-tooltip>
         </div>
       </q-btn>
@@ -209,7 +209,7 @@
                                {{ defaultTrigger ? 'Begin Dialing' : 'Apply' }}
                         </q-btn>
                         <q-tooltip v-if="isAgentOnCall">
-                          There is a call in progress on another device.
+                          There is a call in progress on another device. If you think this is an error, please refresh your screen.
                         </q-tooltip>
                       </div>
                     </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="phone d-flex flex-column"
        ref="phone"
-       :class="{ 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
+       :class="{ 'phone-with-banner': banner, 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center flex-grow-0"
@@ -668,7 +668,7 @@
       <div class="phone-footer-buttons p-2"
            v-if="isCallCompleted && !devMode">
         <b-button variant="outline-dark"
-                  :disabled="shouldDisableCallBackButton"
+                  :disabled="shouldDisableCallBackButton || temporaryDisableFinishButton"
                   @click="makeCall">
           <b-icon icon="telephone-fill"
                   aria-hidden="true">
@@ -677,7 +677,7 @@
         </b-button>
 
         <b-button variant="primary"
-                  :disabled="isNotDisposed || isNotOnWrapUp"
+                  :disabled="isNotDisposed || isNotOnWrapUp || temporaryDisableFinishButton"
                   @click="endWrapUp">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
@@ -1242,6 +1242,13 @@
     </template>
   </div>
 </template>
+
+<style scoped>
+.phone-with-banner {
+  top: 150px;
+}
+</style>
+
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
@@ -1406,6 +1413,7 @@ export default {
         right: 0,
         top: 0
       },
+      banner: false,
       isVisible: true,
       currentLocalTime: null,
       showLocalTime: true,
@@ -1449,6 +1457,8 @@ export default {
       loadingPhone: false,
       communicationNotes: '',
       hasCommunicationNotesUnsavedChanges: false,
+      callbackAction: false,
+      temporaryDisableFinishButton: false,
       phoneListeners: {},
       CommunicationDirection,
       CommunicationDispositionStatus,
@@ -1457,7 +1467,6 @@ export default {
       CommunicationTypes,
       UploadedFileTypes,
       TagCategories,
-      callbackAction: false,
       AgentStatus
     }
   },
@@ -1990,9 +1999,17 @@ export default {
     if (this.dialer.currentStatus === 'WRAP_UP') {
       this.changeScreen('wrap-up')
     }
+
+    setTimeout(() => { this.checkNotification() }, 3000)
   },
 
   methods: {
+
+    checkNotification () {
+      const notification = document.querySelector('#notification-container')
+      this.banner = !!notification
+    },
+
     setupDraggable () {
       if (!this.is_widget && this.shouldShow) {
         this.openPhone()
@@ -2660,7 +2677,7 @@ export default {
           return
         }
 
-        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus)) {
+        if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW && !['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP', 'READY'].includes(this.dialer.currentStatus)) {
           this.changeScreen('menu')
         }
       },
@@ -2745,6 +2762,12 @@ export default {
     },
 
     isCallCompleted () {
+      if (this.isCallCompleted) {
+        this.temporaryDisableFinishButton = true
+        setTimeout(() => {
+          this.temporaryDisableFinishButton = false
+        }, 2000)
+      }
       this.resetBottomExpansion()
       this.expansionEnabled = false
     },

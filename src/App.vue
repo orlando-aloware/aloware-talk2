@@ -16,15 +16,22 @@
     <portal-target name="app"
                    multiple>
     </portal-target>
-    <action-notification id="system"/>
-    <action-notification id="sms"/>
-    <action-notification id="call"/>
-    <action-notification id="voicemail"/>
-    <action-notification id="mention"/>
+    <action-notification id="system"
+                         v-if='!isWidget'/>
+    <action-notification id="sms"
+                         v-if='!isWidget'/>
+    <action-notification id="call"
+                         v-if='!isWidget'/>
+    <action-notification id="voicemail"
+                         v-if='!isWidget'/>
+    <action-notification id="mention"
+                         v-if='!isWidget'/>
     <action-notification id="incomingCall"
+                         v-if='!isWidget'
                          position="b-toaster-top-center"/>
     <action-notification id="callFishing"
-                         position="b-toaster-top-center"/>
+                         position="b-toaster-top-center"
+                         v-if='!isWidget'/>
     <intercom v-if="isIntercomEnabled && !isWidget"/>
   </div>
 </template>

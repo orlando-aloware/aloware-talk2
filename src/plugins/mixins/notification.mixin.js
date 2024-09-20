@@ -23,7 +23,8 @@ export default {
       'reminderNotifiedDesktop',
       'notificationAudio'
     ]),
-    ...mapState('cache', ['currentCompany'])
+    ...mapState('cache', ['currentCompany']),
+    ...mapState(['isWidget'])
   },
 
   methods: {
@@ -79,6 +80,7 @@ export default {
         return
       }
 
+      console.log('Communication when event closeCallNotifications : ', communication)
       this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
     },
 
@@ -200,6 +202,9 @@ export default {
     },
 
     processActionNotification (communication, type) {
+      if (this.isWidget) {
+        return
+      }
       const name = { data: '' }
       const companyName = { data: '' }
       const firstAttachment = { data: null }

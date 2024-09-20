@@ -180,7 +180,7 @@
                  @click="getCommunications(filter)">Retry</b-btn>
         </div>
       </div>
-      <filter-dialog :default-filter-model="channelDefaultFilterModel"
+      <filter-dialog :filter-model="channelDefaultFilterModel"
                      v-model="filter"
                      data-testid="inbox-channels-filter-dialog"
                      @createNewFilter="onCreateNewFilter"
@@ -881,8 +881,10 @@ export default {
     },
 
     onResetFilters () {
+      sessionStorage.setItem('date-selected', 'Last 30 Days')
       this.firstTimeLoading = true
       this.resetFilters()
+      this.setSelectedFilter(null)
       this.getCommunications(this.filter)
     },
 

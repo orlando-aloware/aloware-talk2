@@ -210,7 +210,7 @@
         </div>
       </div>
 
-      <filter-dialog :default-filter-model="defaultFilterModel"
+      <filter-dialog :filter-model="defaultFilterModel"
                      data-testid="inbox-tab-filter-dialog"
                      @createNewFilter="onCreateNewFilter"
                      @applyFilter="onApplyFilter"
@@ -691,7 +691,8 @@ export default {
       this.firstTimeLoading = true
       this.resetFilter()
 
-      sessionStorage.removeItem('date-selected')
+      sessionStorage.setItem('date-selected', 'Last 30 Days')
+      sessionStorage.removeItem('view-selected')
       this.setIsFirstLoad(true)
 
       // redirect

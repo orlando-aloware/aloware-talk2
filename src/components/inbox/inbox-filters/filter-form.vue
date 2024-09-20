@@ -29,6 +29,7 @@
                                    :auto-apply="true"
                                    data-testid="filter-form-date-range-picker"
                                    @toggle="pickerToggle"
+                                   @finish-selection="onFinishSelection"
                                    v-model="dateRange">
                   <template v-slot:input="picker" style="min-width: 350px;">
                     {{ getDateRangeInputLabel(picker) }}
@@ -695,6 +696,10 @@ export default {
       }
     },
 
+    onFinishSelection (dateRange) {
+      sessionStorage.setItem('date-selected', 'custom')
+    },
+
     onFilterChange (value, prop) {
       this.filter[prop] = value
     },
@@ -717,7 +722,7 @@ export default {
         return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
       }
 
-      return 'Last 30 Days'
+      return 'All Time'
     },
 
     getTagsObjectsByIds (tagsIds = []) {
@@ -769,7 +774,8 @@ export default {
   },
 
   mounted () {
-    if (this.isFirstLoad) {
+    const viewId = sessionStorage.getItem('view-selected')
+    if (this.isFirstLoad && !viewId) {
       this.setIsFirstLoad(false)
       sessionStorage.setItem('date-selected', 'Last 30 Days')
 
