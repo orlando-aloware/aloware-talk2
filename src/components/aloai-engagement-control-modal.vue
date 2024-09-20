@@ -93,7 +93,7 @@
                       @click="onHidden">
               Cancel
             </b-button>
-            <b-button variant="success"
+            <b-button variant="primary"
                       size="sm"
                       class="custom-btn"
                       data-testid="aloai-engagement-control-modal-enroll-contact-button"
@@ -127,7 +127,7 @@
                       @click="onHidden">
               Cancel
             </b-button>
-            <b-button variant="success"
+            <b-button variant="primary"
                       size="sm"
                       class="custom-btn"
                       data-testid="enroll-contacts-to-aloai-modal-enroll-contact-button"
