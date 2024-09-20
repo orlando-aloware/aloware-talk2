@@ -178,16 +178,6 @@ export default {
     state.ongoingSession = merge(state.ongoingSession, data)
   },
 
-  ADD_REDIALED_TASK: (state, taskId) => {
-    if (!state.redialed.includes(taskId)) {
-      state.redialed.push(taskId)
-    }
-  },
-
-  CLEAR_REDIALED_TASKS: (state) => {
-    state.redialed = []
-  },
-
   RESET_VUEX (state, value) {
     if (!isArray(value) || isEmpty(value)) {
       return
