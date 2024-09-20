@@ -249,7 +249,7 @@ export default {
           // include the filter groups
           params.filter_groups = allFilters
         }
-      } else {
+      } else if (this.selectedList.id !== 'all') {
         // else, list is of type STATIC. Just pass the contacts list id filter
         params.filter_groups = [
           {
