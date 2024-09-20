@@ -43,7 +43,9 @@ body,
   background-color: $green;
 }
 
-.text-black {
+.text-black,
+// .general-notification has to always be black, override system class .text-white which also has !important
+.general-notification.text-black {
   color: $grey-100 !important;
 }
 
@@ -353,6 +355,10 @@ body,
 
     .sidebar-wrapper {
       width: 64px;
+    }
+
+    &.sidebar-expanded .sidebar-wrapper {
+      width: 250px;
     }
 
     .sidebar-wrapper > aside {
@@ -726,11 +732,24 @@ body,
     height: 52px;
     -webkit-appearance: none;
 
+    &:hover {
+      text-decoration: none;
+    }
+
     @extend .no-q-btn-focus;
 
     .q-icon {
       width: auto;
       height: auto;
+    }
+
+    &.custom-rotate-90 .q-icon {
+      transform: rotate(90deg);
+    }
+
+    &.bordered-menu-icon .q-icon {
+      border: 1px solid #9797AE;
+      border-radius: 6px;
     }
 
     .q-btn__wrapper:before {
@@ -742,6 +761,16 @@ body,
     top: 8px;
     right: 15px;
   }
+}
+
+.sidebar-expanded .page-sidebar .app-logo {
+  .q-icon {
+    width: auto !important;
+  }
+}
+
+.sidebar-expanded .app-logo {
+  padding-left: 17px !important;
 }
 
 .page-footer {
@@ -809,6 +838,11 @@ body,
   max-width: 64px;
   position: absolute !important;
   top: 0;
+}
+
+.sidebar-expanded .sidebar-wrapper,
+.sidebar-expanded .sidebar-wrapper > aside {
+  max-width: 250px;
 }
 
 .separator-blur {
@@ -4340,6 +4374,8 @@ i.option-separator {
     }
 
     .merge-btn {
+      min-width: 82px;
+
       & .q-btn__content {
         padding: 0 9px;
         font-size: $f-size-body;
@@ -13284,12 +13320,6 @@ h1.contact-list-name-label {
     &__graph {
       padding: 0px 10px;
 
-      .custom-toggle-button {
-        button[aria-pressed="true"]:hover {
-          background: lighten(#4caf50, 10%) !important;
-        }
-      }
-
       .highcharts-scrollbar {
         display: none;
       }
@@ -15122,4 +15152,8 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
     width: 400px !important;
     overflow-x: auto;
   }
+}
+
+.text-menu-purple {
+  color: #9797AE;
 }

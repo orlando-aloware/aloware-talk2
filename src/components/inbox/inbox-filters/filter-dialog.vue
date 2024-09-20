@@ -196,7 +196,7 @@ export default {
       }
     },
 
-    defaultFilterModel: {
+    filterModel: {
       type: Object,
       required: true
     }
@@ -269,7 +269,7 @@ export default {
       }
 
       // add to personal filters of currently selected channel
-      if (filter.type === this.defaultFilterModel.type) {
+      if (filter.type === this.filterModel.type) {
         this.personalFilters.push(filter)
       }
 
@@ -402,7 +402,7 @@ export default {
     isSaveAsNewDisabled () {
       return this.isNonViewCreateModeUnchanged ||
         this.isViewCreateModeUnchanged ||
-        (!this.isFilterDialogForView && this.defaultFilterModel.type === ChannelType.CHANNEL_MENTIONS)
+        (!this.isFilterDialogForView && this.filterModel.type === ChannelType.CHANNEL_MENTIONS)
     },
 
     filterFormDisplayName () {
@@ -432,7 +432,7 @@ export default {
         }
       }
 
-      return this.defaultFilterModel
+      return this.filterModel
     }
   },
 
@@ -525,7 +525,7 @@ export default {
 
     onResetFilter () {
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
-      const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.defaultFilterModel.filter
+      const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.filterModel.filter
 
       this.reset = true
       sessionStorage.removeItem('date-selected')
@@ -657,7 +657,7 @@ export default {
         finalFilters.type = communicationType
       }
 
-      if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.defaultFilterModel.type) &&
+      if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.filterModel.type) &&
         communicationAnswerStatus) {
         finalFilters.answer_status = communicationAnswerStatus
       }
@@ -674,12 +674,12 @@ export default {
     onSelectFilter (personalFilter) {
       this.setSelectedFilter(personalFilter)
       if (!personalFilter) {
-        this.filter = { ...this.defaultFilterModel.filter }
+        this.filter = { ...this.filterModel.filter }
       } else {
         // combine default filter values with the selected one
         let personalFilterObject = personalFilter.filter
         this.filter = {
-          ...this.defaultFilterModel.filter,
+          ...this.filterModel.filter,
           ..._.pick(personalFilterObject, this.filterFields)
         }
         this.setIsFirstLoad(false)
@@ -710,14 +710,14 @@ export default {
     },
 
     getFilters () {
-      if (this.defaultFilterModel.type === ChannelType.CHANNEL_MENTIONS) {
+      if (this.filterModel.type === ChannelType.CHANNEL_MENTIONS) {
         return
       }
 
       this.isGettingFilters = true
-      const type = this.defaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS
+      const type = this.filterModel.type === ChannelType.CHANNEL_RECORDINGS
         ? ChannelType.CHANNEL_CALLS
-        : (this.isFilterDialogForView ? ChannelType.CHANNEL_INBOX : this.defaultFilterModel.type)
+        : (this.isFilterDialogForView ? ChannelType.CHANNEL_INBOX : this.filterModel.type)
 
       return talk2Api.V2.inbox.filters.get({ type: type })
         .then(response => {
@@ -775,7 +775,7 @@ export default {
 
           this.setSelectedFilter(filter)
 
-          if (this.defaultFilterModel.filter.type === params.type) {
+          if (this.filterModel.filter.type === params.type) {
             this.setAppliedFilter(filter)
             this.setChannelClonedFilter(filter.filter)
           }
@@ -822,7 +822,7 @@ export default {
 
         if (!filter.is_on_company) {
           // update the personal filters of currently selected channel
-          if (filter.type === this.defaultFilterModel.type) {
+          if (filter.type === this.filterModel.type) {
             this.personalFilters = this.personalFilters.filter(item => item.id !== filter.id)
           }
 

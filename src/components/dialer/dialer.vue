@@ -13,7 +13,8 @@ import {
   notificationMixin,
   visibilityMixin,
   unownedContactTaskMixin,
-  dialerWrapUpMixin
+  dialerWrapUpMixin,
+  dispositionsMixin
 } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -30,7 +31,8 @@ export default {
     notificationMixin,
     visibilityMixin,
     unownedContactTaskMixin,
-    dialerWrapUpMixin
+    dialerWrapUpMixin,
+    dispositionsMixin
   ],
 
   data () {
@@ -304,7 +306,7 @@ export default {
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
       this.removeUnownedLiveContactTask()
 
-      if (this.dialer.isReady) {
+      if (this.dialer.isReady && !this.isWidget) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         console.warn('[UNREGISTERED] Twilio token', this.dialer.token)
         this.setDialerIsReady(false)
@@ -324,6 +326,12 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      // Avoid continuing with the incoming call if it's a widget,
+      // and ignore the call. Otherwise, Twilio will play the default incoming sound.
+      if (this.isWidget) {
+        call._connection.ignore()
+        return
+      }
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
@@ -393,11 +401,12 @@ export default {
       if (!this.profile.last_call) {
         return
       }
-      const shouldForceContactDisposition = this.currentCompany.force_contact_disposition &&
-        !this.profile.last_call.contact.disposition_status_id
-      const shouldForceCallDisposition = this.currentCompany.force_call_disposition &&
-        !this.profile.last_call.call_disposition_id
-      if (shouldForceContactDisposition || shouldForceCallDisposition) {
+
+      if (this.checkForceDisposition) {
+        if (this.isWidget && this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          return
+        }
+
         this.forceStartOnWrapUp()
       }
     },

@@ -79,14 +79,14 @@ export default {
           field: 'status',
           label: 'Status',
           align: 'left',
-          style: `width: ${this.isCompanyPartOfTeamsBeta ? '10' : '20'}%`
+          style: 'width: 10%'
         },
         {
           name: 'user',
           field: 'user',
           label: 'User',
           align: 'left',
-          style: `width: ${this.isCompanyPartOfTeamsBeta ? '40' : '50'}%`
+          style: 'width: 40%'
         },
         {
           name: 'take_calls',
@@ -118,18 +118,11 @@ export default {
           layer.order = 1
         })
       }
-    },
-
-    setTeamsColumns () {
-      if (!this.isCompanyPartOfTeamsBeta()) {
-        this.columns.splice(1, 1)
-      }
     }
   },
 
   created () {
     this.setLayers()
-    this.setTeamsColumns()
   },
 
   watch: {

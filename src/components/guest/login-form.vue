@@ -41,7 +41,8 @@
         </div>
         <div class="field text-left"
              v-if="!$q.platform.is.electron">
-          <router-link :to="{ name: 'Forgot Password' }">
+          <router-link :to="{ name: 'Forgot Password' }"
+                       v-if='!isWidget'>
             <label class="link mb-3 w-100 pb-2 cursor-pointer">
               Forgot Password?
             </label>
@@ -63,7 +64,7 @@
                  :loading="loading"/>
         </div>
         <div class="description-sm field text-left pt-3 mt-1"
-             v-if="!isSimpSocial">
+             v-if="!isSimpSocial && !isWidget">
           Don’t have an account?
           <a href="https://meetings.hubspot.com/alwr/aloware-demo"
              target="_blank">
@@ -71,7 +72,7 @@
           </a>
         </div>
         <div class="field text-left pt-3 mt-1"
-             v-if="!isSimpSocial">
+             v-if="!isSimpSocial && !isWidget">
           <b-link href="https://support.aloware.com/en/articles/9037819-troubleshooting-aloware-authentication-issues"
                   class="cursor-pointer field text-left text-decoration-none"
                   target="_blank">
@@ -123,7 +124,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState(['statics', 'staticsLoaded']),
+    ...mapState(['statics', 'staticsLoaded', 'isWidget']),
 
     shouldRedirectToClassic () {
       return this.profile &&

@@ -7,7 +7,7 @@
         <span>
           <information-circle-icon class="cursor-pointer"/>
           <q-tooltip>
-            The line you want to send the bulck messages campaign from.
+            The line you want to send the bulk messages campaign from.
           </q-tooltip>
         </span>
       </div>

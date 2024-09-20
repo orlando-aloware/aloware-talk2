@@ -301,11 +301,6 @@
               <transfer-icon color="#62666E"/>
               Transfer
             </b-dropdown-item>
-            <b-dropdown-item href="#"
-                             disabled>
-              <calendar-icon/>
-              Schedule Callback
-            </b-dropdown-item>
           </b-dropdown>
         </div>
       </div>
