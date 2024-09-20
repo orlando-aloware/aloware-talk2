@@ -254,7 +254,7 @@ export default {
           // include the filter groups
           params.filter_groups = allFilters
         }
-      } else if (!isEmpty(allFilters)) {
+      } else if (!isEmpty(allFilters) && this.selectedList.type === this.ContactListTypes.STATIC) {
         // just pass the filters when not empty, if list is STATIC
         params.filter_groups = allFilters
       }
