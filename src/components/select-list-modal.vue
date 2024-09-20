@@ -196,7 +196,7 @@ export default {
       } else if (!isEmpty(allFilters)) {
         // just pass the filters when not empty, if list is STATIC
         params.filter_groups = allFilters
-      } else {
+      } else if (this.selectedList.id !== 'all') {
         // else, just pass the contacts list id filter
         params.filter_groups = [
           {
