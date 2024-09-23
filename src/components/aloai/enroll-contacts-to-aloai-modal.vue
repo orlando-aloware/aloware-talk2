@@ -100,7 +100,7 @@
           Cancel
         </b-button>
         <b-button
-          variant="success"
+          variant="primary"
           size="sm"
           class="custom-btn"
           :disabled="!selectedBotId || isBusy"

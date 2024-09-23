@@ -306,7 +306,7 @@ export default {
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
       this.removeUnownedLiveContactTask()
 
-      if (this.dialer.isReady) {
+      if (this.dialer.isReady && !this.isWidget) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         console.warn('[UNREGISTERED] Twilio token', this.dialer.token)
         this.setDialerIsReady(false)
@@ -326,6 +326,12 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      // Avoid continuing with the incoming call if it's a widget,
+      // and ignore the call. Otherwise, Twilio will play the default incoming sound.
+      if (this.isWidget) {
+        call._connection.ignore()
+        return
+      }
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
@@ -353,7 +359,7 @@ export default {
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       this.removeUnownedLiveContactTask()
-      console.log('Talk-Device: Call invite canceled', call)
+      console.log('Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
       this.connection = null
@@ -741,7 +747,7 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
         this.removeUnownedLiveContactTask()
-        console.log('Talk-Connection: Call invite canceled', call)
+        console.log('Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial('Talk-Connection.OnCancel')
@@ -1620,10 +1626,6 @@ export default {
     clearInterval(this.$options.webrtcTokenRegenerateInterval)
     clearInterval(this.$options.hangupInterval)
     clearInterval(this.unownedContact.interval)
-
-    // Destroy the Twilio device to avoid having multiple Twilio device instances.
-    console.log('Destroying Twilio device')
-    this.device.destroy()
   }
 }
 </script>
