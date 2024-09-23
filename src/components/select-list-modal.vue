@@ -81,7 +81,8 @@ export default {
       'currentListFilters',
       'selectedStaticList',
       'selectedList',
-      'folders'
+      'folders',
+      'search'
     ]),
 
     ...mapState(['isDatatableSelectedAll']),
@@ -229,6 +230,10 @@ export default {
           id: this.selectedStaticList.id,
           loading: true
         })
+      }
+
+      if (this.search) {
+        params.search = this.search
       }
 
       const isChunked = !params?.selected_all && ids.length > 0

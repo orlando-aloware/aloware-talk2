@@ -121,7 +121,8 @@ export default {
       'currentListFilters',
       'selectedList',
       'unsavedList',
-      'isAllContactsSelected'
+      'isAllContactsSelected',
+      'search'
     ]),
 
     ...mapState(['isDatatableSelectedAll']),
@@ -232,6 +233,7 @@ export default {
       }
 
       const allFilters = this.$jsonClone(this.currentListFilters)
+
       // delete attributes that wont be considered as filter
       delete allFilters.order
       delete allFilters.relations
@@ -282,6 +284,10 @@ export default {
         }
 
         params.filter_groups.is_conjunction = true
+      }
+
+      if (this.search) {
+        params.search = this.search
       }
 
       return params
