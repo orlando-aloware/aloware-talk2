@@ -925,11 +925,8 @@ export default {
       ContactListTypes,
       openPDModal: false,
       isContactModule: false,
-<<<<<<< HEAD
-      addToPowerDialerMode: 'add'
-=======
+      addToPowerDialerMode: 'add',
       openAloAiEnrollmentModal: false
->>>>>>> develop
     }
   },
 
