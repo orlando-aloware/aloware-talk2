@@ -11,9 +11,6 @@
                v-model="searchValue"
                @clear="onInput"
                @keyup.enter="onInput">
-        <template v-slot:prepend>
-          <search-icon/>
-        </template>
         <template v-slot:default
                   v-if="limitSearchCharacters">
           <q-tooltip anchor="bottom middle"
@@ -34,11 +31,8 @@
 </template>
 
 <script>
-import SearchIcon from 'components/icons/search-icon'
 
 export default {
-  components: { SearchIcon },
-
   props: {
     placeholder: {
       type: String,
@@ -87,10 +81,6 @@ export default {
       this.searchValue = this.searchValue.trim()
       this.$refs.searchInput.focus()
       this.$emit('search', this.searchValue)
-    },
-
-    clearSearch () {
-      this.searchValue = ''
     }
   }
 }
