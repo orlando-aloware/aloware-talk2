@@ -833,6 +833,7 @@ export default {
       // or current status is not queued / ring all, close call notification
       if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
         !INCOMING_STATUSES.includes(communication.current_status2)) {
+        console.log('Communication when event closeCallNotifications : ', communication)
         this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
       }
 

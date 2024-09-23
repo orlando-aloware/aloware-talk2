@@ -21,7 +21,7 @@
                      :move="onCheckMove"
                      @change="onOrderChanged">
 
-            <th :class="getHeaderCheckboxClass(key, column.sticky, column.name)"
+            <th :class="getHeaderClasses(key, column.sticky, column.name, column.stickyRight)"
                 :data-testid="`datatable-header-${column.name.replace('_', '-')}`"
                 :key="column.name"
                 :data-column-id="column.name"
@@ -425,16 +425,18 @@ export default {
       }
     },
 
-    getHeaderCheckboxClass (key, sticky, name) {
+    getHeaderClasses (key, sticky, name, stickyRight) {
       const checkboxClass = name === 'checkbox' ? `${name} cursor-default` : ''
       const stickyClass = sticky ? 'sticky' : ''
       const hoveringClass = this.hoverKey === key && this.isHovering
         ? 'hovering' : ''
+      const stickyRightClass = stickyRight ? 'sticky-right' : ''
 
       return [
         checkboxClass,
         stickyClass,
-        hoveringClass
+        hoveringClass,
+        stickyRightClass
       ]
     },
 

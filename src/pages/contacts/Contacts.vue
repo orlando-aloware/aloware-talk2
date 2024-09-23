@@ -263,6 +263,7 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('fetchContactsLists')
+    this.stopMainViewEvents()
   },
 
   beforeRouteLeave (to, from, next) {
@@ -310,8 +311,6 @@ export default {
     if (to.name !== 'Contact') {
       this.stopEvents()
     }
-
-    this.stopMainViewEvents()
 
     setTimeout(() => {
       this.setAllContactsSelected(false)

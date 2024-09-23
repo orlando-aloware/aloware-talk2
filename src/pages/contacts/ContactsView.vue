@@ -308,6 +308,14 @@
             Add to Sequence
           </b-dropdown-item>
           <b-dropdown-item href="#"
+                           data-testid="contacts-view-enroll-aloai-option-dropdown"
+                           :disabled="!this.checked.length"
+                           v-if="currentCompany.aloai_enabled"
+                           @click="openAloAiBotContactsEnrollmentModal">
+            <add-user-icon width="14" height="14" color="#62666E" />
+            Enroll to AloAI Bot
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
                            v-if="isAdmin"
                            data-testid="contacts-view-export-as-csv-option-dropdown"
                            @click="exportAsCsv">
@@ -755,6 +763,11 @@
       <tag-contacts-workflow-enroller :is-show="showAddToSequence"
                                       :list="selectedList"
                                       @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
+      <enroll-contacts-to-aloai-modal
+        ref="enrollContactsToAloAiModal"
+        :params="attachedParams()"
+        :contactList="selectedList"
+      />
     </template>
   </contacts-screen>
 </template>
@@ -783,6 +796,7 @@ import PlusIcon from 'components/icons/plus-icon'
 import Search from 'components/search'
 import EditHamburgerIcon from 'components/icons/edit-hamburger-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
+import AddUserIcon from 'components/icons/add-user-icon'
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
@@ -803,6 +817,7 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
+import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 
 export default {
   name: 'contacts-view',
@@ -824,6 +839,7 @@ export default {
     ExportIcon,
     PowerDialerMobileIcon,
     AddSequenceIcon,
+    AddUserIcon,
     EditHamburgerIcon,
     Search,
     PlusIcon,
@@ -842,7 +858,8 @@ export default {
     ImportContactsModal,
     BlockTooltip,
     PowerDialerAddModal,
-    TagContactsWorkflowEnroller
+    TagContactsWorkflowEnroller,
+    EnrollContactsToAloaiModal
   },
 
   props: {
@@ -923,7 +940,8 @@ export default {
       openPDModal: false,
       isContactModule: false,
       showAddToSequence: false,
-      workflowId: null
+      workflowId: null,
+      openAloAiEnrollmentModal: false
     }
   },
 
@@ -1392,9 +1410,16 @@ export default {
       this.addPowerDialerOpen(true)
     },
 
+    openAloAiBotContactsEnrollmentModal () {
+      if (this.$refs.enrollContactsToAloAiModal) {
+        this.$refs.enrollContactsToAloAiModal.isOpen = true
+      }
+    },
+
     attachedParams () {
       return {
-        contact_ids: this.checkedItemIds
+        contact_ids: this.checkedItemIds,
+        ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})
       }
     },
 
