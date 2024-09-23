@@ -78,7 +78,7 @@ export default {
         this.searchValue = ''
       }
 
-      this.searchValue = this.searchValue.trim()
+      // this.searchValue = this.searchValue.trim()
       this.$refs.searchInput.focus()
       this.$emit('search', this.searchValue)
     }
