@@ -12,7 +12,7 @@
           <div class="t-badge-name">
             {{ filter.name }}
           </div>
-          <q-tooltip v-if="filter.name === 'CRM View' && !hasHubspotEnabled && !isReferrizer"
+          <q-tooltip v-if="filter.name === 'CRM View' && !hasHubspotEnabled"
                      content-class="bg-grey-light11"
                      anchor="bottom start"
                      self="center start"
@@ -44,15 +44,6 @@ export default {
       return this.currentCompany?.hubspot_integration_enabled
     },
 
-    isReferrizer () {
-      // dev testing
-      if (process.env.APP_ENV !== 'production') {
-        return this.currentCompany.id === 2139
-      }
-
-      return this.currentCompany.id === 2140
-    },
-
     tabs () {
       return [
         {
@@ -68,7 +59,7 @@ export default {
         {
           id: 3,
           name: 'CRM View',
-          enabled: this.hasHubspotEnabled || this.isReferrizer
+          enabled: this.hasHubspotEnabled
         }
       ]
     }

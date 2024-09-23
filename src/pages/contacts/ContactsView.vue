@@ -299,6 +299,14 @@
             Add to Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
+                           data-testid="contacts-view-enroll-aloai-option-dropdown"
+                           :disabled="!this.checked.length"
+                           v-if="currentCompany.aloai_enabled"
+                           @click="openAloAiBotContactsEnrollmentModal">
+            <add-user-icon width="14" height="14" color="#62666E" />
+            Enroll to AloAI Bot
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
                            v-if="isAdmin"
                            data-testid="contacts-view-export-as-csv-option-dropdown"
                            @click="exportAsCsv">
@@ -745,6 +753,11 @@
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
+      <enroll-contacts-to-aloai-modal
+        ref="enrollContactsToAloAiModal"
+        :params="attachedParams()"
+        :contactList="selectedList"
+      />
     </template>
   </contacts-screen>
 </template>
@@ -773,6 +786,7 @@ import PlusIcon from 'components/icons/plus-icon'
 import Search from 'components/search'
 import EditHamburgerIcon from 'components/icons/edit-hamburger-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
+import AddUserIcon from 'components/icons/add-user-icon'
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
@@ -791,6 +805,7 @@ import {
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 
 export default {
   name: 'contacts-view',
@@ -811,6 +826,7 @@ export default {
     DeleteRedIcon,
     ExportIcon,
     PowerDialerMobileIcon,
+    AddUserIcon,
     EditHamburgerIcon,
     Search,
     PlusIcon,
@@ -828,7 +844,8 @@ export default {
     Datatable,
     ImportContactsModal,
     BlockTooltip,
-    PowerDialerAddModal
+    PowerDialerAddModal,
+    EnrollContactsToAloaiModal
   },
 
   props: {
@@ -908,7 +925,11 @@ export default {
       ContactListTypes,
       openPDModal: false,
       isContactModule: false,
+<<<<<<< HEAD
       addToPowerDialerMode: 'add'
+=======
+      openAloAiEnrollmentModal: false
+>>>>>>> develop
     }
   },
 
@@ -1144,6 +1165,7 @@ export default {
 
       return !blockedIds.includes(this.selectedList.id)
     },
+
     isAddToPowerDialerDisabled () {
       return !this.checked.length && !this.isContactListSelected
     }
@@ -1368,6 +1390,12 @@ export default {
       this.addToPowerDialerMode = 'add-contact-list'
     },
 
+    openAloAiBotContactsEnrollmentModal () {
+      if (this.$refs.enrollContactsToAloAiModal) {
+        this.$refs.enrollContactsToAloAiModal.isOpen = true
+      }
+    },
+
     attachedParams () {
       // If there are no selected contacts and a contact list is selected
       // all contacts in the list should be added to the power dialer
@@ -1383,7 +1411,8 @@ export default {
       }
 
       return {
-        contact_ids: this.checkedItemIds
+        contact_ids: this.checkedItemIds,
+        ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})
       }
     },
 
