@@ -102,6 +102,7 @@ import {
   FROM_BULK_MENU
 } from 'src/constants/contacts-list-create-mode'
 import { chunk, isEmpty } from 'lodash'
+import { DEFAULT_STATE } from 'src/constants/contacts-default'
 
 export default {
   inject: [
@@ -261,7 +262,7 @@ export default {
         params.filter_groups = allFilters
       }
 
-      if (this.ContactListTypes.CONTACTS_STRING_KEYS.indexOf(this.selectedList.id) === -1) {
+      if (Object.keys(DEFAULT_STATE.listItems).indexOf(this.selectedList.id) === -1) {
         // else, list is of type STATIC. Just pass the contacts list id filter
         const contactListFilter = [
           {
