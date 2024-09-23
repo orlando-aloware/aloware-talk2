@@ -99,6 +99,7 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: async (event) => {
+            // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
             if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
               await new Promise(resolve => setTimeout(resolve, 1000))
             }
@@ -140,7 +141,7 @@ export default {
         userLoggedIn: null,
         agentStatusUpdated: null
       },
-      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED']
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY']
     }
   },
   computed: {
@@ -153,7 +154,7 @@ export default {
     },
 
     isLoadingDialer () {
-      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus)
+      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) && !this.showAlertAgentOnCall && !this.showAlertCallFinished
     }
   },
 
@@ -260,6 +261,8 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
+      console.log('Handle')
+      console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
         return
@@ -322,6 +325,7 @@ export default {
     },
 
     handleCall (shouldHandleDialNumber) {
+      this.loading = true
       const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       // if there's a call in progress or in wrap up, we omit the call
