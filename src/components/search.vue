@@ -1,35 +1,39 @@
 <template>
-  <div class="position-relative">
-    <q-input :class="[border ? 'form-control' : 'border-0']"
-             :placeholder="placeholder"
-             :disabled="disabled"
-             class="form-control-search"
-             v-model="searchValue"
-             borderless
-             clearable
-             data-testid="search-input"
-             @blur="onBlur"
-             @focus="onFocus"
-             @clear="onInput"
-             @input="onInput">
-      <template v-slot:prepend>
-        <search-icon/>
-      </template>
-      <template v-slot:default
-                v-if="limitSearchCharacters">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle"
-                   data-testid="search-tooltip"
-                   v-if="!searchValue || (searchValue && searchValue.length < 3)">
-          Search requires at least 3 characters
-        </q-tooltip>
-      </template>
-    </q-input>
+  <div class="position-relative d-flex">
+      <q-input class="form-control-search"
+               borderless
+               clearable
+               data-testid="search-input"
+               ref="searchInput"
+               :class="[border ? 'form-control' : 'border-0']"
+               :placeholder="placeholder"
+               :disabled="disabled"
+               v-model="searchValue"
+               @clear="onInput"
+               @keyup.enter="onInput">
+        <template v-slot:prepend>
+          <search-icon/>
+        </template>
+        <template v-slot:default
+                  v-if="limitSearchCharacters">
+          <q-tooltip anchor="bottom middle"
+                    self="center middle"
+                    data-testid="search-tooltip"
+                    v-if="!searchValue || (searchValue && searchValue.length < 3)">
+            Search requires at least 3 characters
+          </q-tooltip>
+        </template>
+      </q-input>
+    <b-button variant="primary"
+              size="sm"
+              class="ml-1"
+              @click="onInput">
+      <i class="fa fa-magnifying-glass"></i>
+    </b-button>
   </div>
 </template>
 
 <script>
-import _ from 'lodash'
 import SearchIcon from 'components/icons/search-icon'
 
 export default {
@@ -38,7 +42,7 @@ export default {
   props: {
     placeholder: {
       type: String,
-      default: 'Search name, phone, email, etc.'
+      default: 'Press ENTER to search...'
     },
 
     disabled: {
@@ -73,7 +77,7 @@ export default {
   },
 
   methods: {
-    onInput: _.debounce(function () {
+    onInput: function () {
       // send an empty string on null value
       // (happens when page is from contact page - clicked from result)
       if (!this.searchValue) {
@@ -81,25 +85,12 @@ export default {
       }
 
       this.searchValue = this.searchValue.trim()
+      this.$refs.searchInput.focus()
       this.$emit('search', this.searchValue)
-    }, 500),
-
-    onFocus: function () {
-      this.$emit('focus', this.searchValue)
-    },
-
-    onBlur: function () {
-      this.$emit('blur', this.searchValue)
     },
 
     clearSearch () {
       this.searchValue = ''
-    }
-  },
-
-  watch: {
-    search () {
-      this.searchValue = this.search
     }
   }
 }
