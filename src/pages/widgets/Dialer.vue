@@ -99,7 +99,6 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: async (event) => {
-            // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
             if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
               await new Promise(resolve => setTimeout(resolve, 1000))
             }
@@ -141,6 +140,7 @@ export default {
         userLoggedIn: null,
         agentStatusUpdated: null
       },
+      // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
       isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY']
     }
   },
