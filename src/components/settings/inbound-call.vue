@@ -558,13 +558,9 @@ export default {
       if (prop === 'operating_hours') {
         const key = Object.keys(value)[0]
 
-        value[key].forEach((day) => {
-          if ((day.isOpen && day.open !== '' && day.close !== '') || !day.isOpen) {
-            this.updateChangedUserProperties({
-              name: 'operating_hours.' + key,
-              value: value[key]
-            })
-          }
+        this.updateChangedUserProperties({
+          name: 'operating_hours.' + key,
+          value: value[key]
         })
       }
 
