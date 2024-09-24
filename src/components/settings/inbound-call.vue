@@ -338,7 +338,7 @@
             label=""
             class="form-label"
           >
-            <b-form-textarea placeholder="Enter missed call message here..."
+            <b-form-textarea placeholder="Enter completed call message here..."
                              rows="3"
                              max-rows="6"
                              id="ta-user-completed-call-message"
