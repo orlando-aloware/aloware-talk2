@@ -4,7 +4,6 @@
                borderless
                clearable
                data-testid="search-input"
-               ref="searchInput"
                :class="[border ? 'form-control' : 'border-0']"
                :placeholder="placeholder"
                :disabled="disabled"
