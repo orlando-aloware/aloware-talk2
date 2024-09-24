@@ -15161,3 +15161,25 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 .text-menu-purple {
   color: #9797AE;
 }
+
+.search-icon-component {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  cursor: pointer;
+}
+
+.limit-characters-error {
+  color: black;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.limit-characters-error .fa-x {
+  color: #FA003F;
+}
+
+.form-control-search-component.is-invalid {
+  padding-right: 0 !important;
+}

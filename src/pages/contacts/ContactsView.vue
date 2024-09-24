@@ -65,10 +65,11 @@
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <search class="width-260"
-                  limitSearchCharacters
+                  data-testid="contacts-view-search-input"
+                  :limitSearchCharacters="false"
                   :search="search"
                   :disabled="isLoadingDisabled"
-                  data-testid="contacts-view-search-input"
+                  @show-error-message="handleLimitCharactersError"
                   @search="onSearch">
           </search>
           <div class="contacts-total mobile">
@@ -324,6 +325,11 @@
             </span>
           </b-dropdown-item>
         </b-dropdown>
+      </div>
+      <div class="limit-characters-error"
+           v-if="showLimitCharactersError">
+        <i class="fa fa-x"></i>
+        Search requires at least 3 characters
       </div>
     </template>
     <template slot="actions"
@@ -923,7 +929,8 @@ export default {
       ContactListTypes,
       openPDModal: false,
       isContactModule: false,
-      openAloAiEnrollmentModal: false
+      openAloAiEnrollmentModal: false,
+      showLimitCharactersError: false
     }
   },
 
@@ -1266,7 +1273,7 @@ export default {
     },
 
     onSearch (searchText) {
-      this.$emit('search', searchText.trim())
+      this.$emit('search', searchText)
     },
 
     onFetchMyContacts (checked) {
@@ -1864,6 +1871,10 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
+    },
+
+    handleLimitCharactersError (value) {
+      this.showLimitCharactersError = value
     }
   },
 
