@@ -15167,9 +15167,13 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 }
 
 .limit-characters-error {
-  color: #ff0000;
-  font-size: 12px;
+  color: black;
+  font-size: 13px;
   margin-bottom: 10px;
+}
+
+.limit-characters-error .fa-x {
+  color: red;
 }
 
 .form-control-search-component.is-invalid {
