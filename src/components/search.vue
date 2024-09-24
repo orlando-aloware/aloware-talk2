@@ -11,7 +11,8 @@
              @clear="onInput"
              @keyup.enter="onInput">
        <template v-slot:prepend>
-        <span @click="onInput" class="search-icon-component">
+        <span class="search-icon-component"
+              @click="onInput">
           <search-icon />
         </span>
       </template>
