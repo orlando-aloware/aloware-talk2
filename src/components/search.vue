@@ -1,30 +1,30 @@
 <template>
   <div class="position-relative d-flex">
-      <q-input class="form-control-search"
-               borderless
-               clearable
-               data-testid="search-input"
-               :class="[border ? 'form-control' : 'border-0']"
-               :placeholder="placeholder"
-               :disabled="disabled"
-               v-model="searchValue"
-               @clear="onInput"
-               @keyup.enter="onInput">
-        <template v-slot:prepend>
-          <span @click="onInput" class="search-icon-component">
-            <search-icon />
-          </span>
-        </template>
-        <template v-slot:default
-                  v-if="limitSearchCharacters">
-          <q-tooltip anchor="bottom middle"
-                    self="center middle"
-                    data-testid="search-tooltip"
-                    v-if="!searchValue || (searchValue && searchValue.length < 3)">
-            Search requires at least 3 characters
-          </q-tooltip>
-        </template>
-      </q-input>
+    <q-input class="form-control-search"
+             borderless
+             clearable
+             data-testid="search-input"
+             :class="[border ? 'form-control' : 'border-0']"
+             :placeholder="placeholder"
+             :disabled="disabled"
+             v-model="searchValue"
+             @clear="onInput"
+             @keyup.enter="onInput">
+       <template v-slot:prepend>
+        <span @click="onInput" class="search-icon-component">
+          <search-icon />
+        </span>
+      </template>
+      <template v-slot:default
+                v-if="limitSearchCharacters">
+        <q-tooltip anchor="bottom middle"
+                   self="center middle"
+                   data-testid="search-tooltip"
+                   v-if="!searchValue || (searchValue && searchValue.length < 3)">
+          Search requires at least 3 characters
+        </q-tooltip>
+      </template>
+    </q-input>
   </div>
 </template>
 
