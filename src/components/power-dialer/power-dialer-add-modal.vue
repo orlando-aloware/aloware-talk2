@@ -355,7 +355,8 @@ export default {
     ...mapState('contacts', [
       'isAddPowerDialerOpen',
       'currentListFilters',
-      'showAddViewMyContacts'
+      'showAddViewMyContacts',
+      'search'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -381,6 +382,10 @@ export default {
         'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers'),
         'own_contacts_only': this.conversion.includes('own_contacts_only') || this.showAddViewMyContacts,
         'direction': this.direction
+      }
+
+      if (this.search) {
+        params.search = this.search
       }
 
       if (this.isDatatableSelectedAll) {
@@ -731,7 +736,8 @@ export default {
 
     getListCount (id) {
       return this.$axios
-        .get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${id}/count`)
+        // .get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${id}/count`)
+        .get(`https://pr-10510.mde.alodev.org/api/v2/contacts-list/${id}/count`)
     },
 
     checkIntegrationImport () {
