@@ -11,6 +11,11 @@
                v-model="searchValue"
                @clear="onInput"
                @keyup.enter="onInput">
+        <template v-slot:prepend>
+          <span @click="onInput" class="search-icon-component">
+            <search-icon />
+          </span>
+        </template>
         <template v-slot:default
                   v-if="limitSearchCharacters">
           <q-tooltip anchor="bottom middle"
@@ -21,18 +26,15 @@
           </q-tooltip>
         </template>
       </q-input>
-    <b-button variant="primary"
-              size="sm"
-              class="ml-1"
-              @click="onInput">
-      <i class="fa fa-magnifying-glass"></i>
-    </b-button>
   </div>
 </template>
 
 <script>
+import SearchIcon from 'components/icons/search-icon'
 
 export default {
+  components: { SearchIcon },
+
   props: {
     placeholder: {
       type: String,
@@ -78,8 +80,6 @@ export default {
         this.searchValue = ''
       }
 
-      // this.searchValue = this.searchValue.trim()
-      this.$refs.searchInput.focus()
       this.$emit('search', this.searchValue)
     }
   }

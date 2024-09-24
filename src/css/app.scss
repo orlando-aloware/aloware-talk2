@@ -15157,3 +15157,11 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 .text-menu-purple {
   color: #9797AE;
 }
+
+.search-icon-component {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  cursor: pointer;
+}
