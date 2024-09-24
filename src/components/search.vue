@@ -76,18 +76,13 @@ export default {
 
   methods: {
     onInput: function () {
-      let showErrorMessage = false
       // send an empty string on null value
       // (happens when page is from contact page - clicked from result)
       if (!this.searchValue) {
         this.searchValue = ''
       }
 
-      if (!this.limitSearchCharacters && this.searchValue.length > 0 && this.searchValue.length < 3) {
-        showErrorMessage = true
-      }
-
-      this.$emit('show-error-message', showErrorMessage)
+      this.$emit('show-error-message', this.showErrorMessage)
       this.$emit('search', this.searchValue)
     },
 
@@ -107,6 +102,12 @@ export default {
   watch: {
     search () {
       this.searchValue = this.search
+    }
+  },
+
+  computed: {
+    showErrorMessage () {
+      return !this.limitSearchCharacters && this.searchValue.length > 0 && this.searchValue.length < 3
     }
   }
 }
