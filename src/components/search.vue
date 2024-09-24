@@ -81,6 +81,23 @@ export default {
       }
 
       this.$emit('search', this.searchValue)
+    },
+
+    onFocus: function () {
+      this.$emit('focus', this.searchValue)
+    },
+    onBlur: function () {
+      this.$emit('blur', this.searchValue)
+    },
+
+    clearSearch () {
+      this.searchValue = ''
+    }
+  },
+
+  watch: {
+    search () {
+      this.searchValue = this.search
     }
   }
 }
