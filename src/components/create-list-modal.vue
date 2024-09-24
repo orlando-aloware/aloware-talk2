@@ -121,7 +121,8 @@ export default {
       'currentListFilters',
       'selectedList',
       'unsavedList',
-      'isAllContactsSelected'
+      'isAllContactsSelected',
+      'search'
     ]),
 
     ...mapState(['isDatatableSelectedAll']),
@@ -231,12 +232,18 @@ export default {
         params.selected_all = true
       }
 
+      const allFilters = this.$jsonClone(this.currentListFilters)
+
+      // delete attributes that wont be considered as filter
+      delete allFilters.order
+      delete allFilters.relations
+      delete allFilters.sort
+      delete allFilters.search
+
       // we have to use the dynamic list's filters if the source list
       // is of type DYNAMIC
       if (this.isDefault && this.selectedList.type === this.ContactListTypes.DYNAMIC &&
         !isEmpty(this.currentListFilters)) {
-        const allFilters = this.$jsonClone(this.currentListFilters)
-
         Object.keys(allFilters).forEach(index => {
           // include all other filters
           if (!this.$isNumeric(index)) {
@@ -249,21 +256,38 @@ export default {
           // include the filter groups
           params.filter_groups = allFilters
         }
-      } else {
+      } else if (!isEmpty(allFilters) && this.selectedList.type === this.ContactListTypes.STATIC) {
+        // just pass the filters when not empty, if list is STATIC
+        params.filter_groups = allFilters
+      }
+
+      if (ContactListTypes.CONTACTS_STRING_KEYS.indexOf(this.selectedList.id) === -1) {
         // else, list is of type STATIC. Just pass the contacts list id filter
-        params.filter_groups = [
+        const contactListFilter = [
           {
-            'filters': {
-              'contact_lists': [
-                {
-                  value: [this.selectedList.id],
-                  operator: 1
-                }
-              ]
-            },
-            is_conjunction: true
+            value: [this.selectedList.id],
+            operator: 1
           }
         ]
+
+        // Verify if filter_groups is already set and merge it with the contact_lists filter
+        if (Array.isArray(params.filter_groups)) {
+          params.filter_groups[0].filters.contact_lists = contactListFilter
+        } else {
+          params.filter_groups = [
+            {
+              filters: {
+                contact_lists: contactListFilter
+              }
+            }
+          ]
+        }
+
+        params.filter_groups[0].is_conjunction = true
+      }
+
+      if (this.search) {
+        params.search = this.search
       }
 
       return params

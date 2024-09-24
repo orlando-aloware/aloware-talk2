@@ -111,11 +111,6 @@ export default {
           description: 'Forward all calls to this user to the provided phone number (usually a cell phone or off-site landline). Mostly used for call tracking.'
         },
         {
-          value: AnswerTypes.BY_IP_PHONE,
-          label: 'Using IP phone',
-          description: 'Used for desk-phone replacement. Note: You need to have SIP phones configured before selecting this option.'
-        },
-        {
           value: AnswerTypes.BY_NONE,
           label: 'Will not answer',
           description: 'This user does not answer the phone at all. Calls can\'t be routed to this person. Suitable for managers, controllers, etc.'
