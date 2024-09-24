@@ -15171,3 +15171,7 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   font-size: 12px;
   margin-bottom: 10px;
 }
+
+.form-control-search-component.is-invalid {
+  padding-right: 0 !important;
+}

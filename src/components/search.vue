@@ -1,10 +1,10 @@
 <template>
   <div class="position-relative d-flex">
-    <q-input class="form-control-search"
+    <q-input class="form-control-search form-control-search-component"
              borderless
              clearable
              data-testid="search-input"
-             :class="[border ? 'form-control' : 'border-0']"
+             :class="[border ? 'form-control' : 'border-0', isInvalid ? 'is-invalid' : '']"
              :placeholder="placeholder"
              :disabled="disabled"
              v-model="searchValue"
@@ -66,7 +66,8 @@ export default {
 
   data () {
     return {
-      searchValue: ''
+      searchValue: '',
+      isInvalid: false
     }
   },
 
@@ -82,7 +83,10 @@ export default {
         this.searchValue = ''
       }
 
-      this.$emit('show-error-message', this.showErrorMessage)
+      const hasError = this.showErrorMessage
+
+      this.isInvalid = hasError
+      this.$emit('show-error-message', hasError)
       this.$emit('search', this.searchValue)
     },
 
