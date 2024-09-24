@@ -86,6 +86,7 @@ export default {
     onFocus: function () {
       this.$emit('focus', this.searchValue)
     },
+
     onBlur: function () {
       this.$emit('blur', this.searchValue)
     },
