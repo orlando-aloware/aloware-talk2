@@ -273,8 +273,10 @@ export default {
 
         // Verify if filter_groups is already set and merge it with the contact_lists filter
         if (Array.isArray(params.filter_groups)) {
+          console.log('Option 1')
           params.filter_groups[0].filters.contact_lists = contactListFilter
         } else {
+          console.log('Option 2')
           params.filter_groups = [
             {
               filters: {
@@ -284,7 +286,7 @@ export default {
           ]
         }
 
-        params.filter_groups.is_conjunction = true
+        params.filter_groups[0].is_conjunction = true
       }
 
       if (this.search) {

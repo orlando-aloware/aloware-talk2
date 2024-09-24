@@ -222,7 +222,7 @@ export default {
           ]
         }
 
-        params.filter_groups.is_conjunction = true
+        params.filter_groups[0].is_conjunction = true
       }
 
       // only show list's loading view if all contacts were selected
