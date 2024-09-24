@@ -8,6 +8,8 @@
              :placeholder="placeholder"
              :disabled="disabled"
              v-model="searchValue"
+             @blur="onBlur"
+             @focus="onFocus"
              @clear="onInput"
              @keyup.enter="onInput">
        <template v-slot:prepend>
