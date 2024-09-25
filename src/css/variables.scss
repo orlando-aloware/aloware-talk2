@@ -462,13 +462,21 @@ $f-size-14: 14px;
 
 // Calendar events colors
 $upcoming-appointment: #256EFF;
-$past-appointment: rgba($upcoming-appointment, 0.6);
+$past-appointment: #98baff;
 $canceled-appointment: $upcoming-appointment;
 $missed-appointment: #DC3545;
 $upcoming-reminder: #8956F8;
-$past-reminder: rgba($upcoming-reminder, 0.6);
+$past-reminder: #c4adfc;
 $canceled-reminder: $upcoming-reminder;
 $completed-event: #00BF4A;
+
+// Past events colors
+$upcoming-appointment-is-past: #a8c2ff;
+$canceled-appointment-is-past: #a8c2ff;
+$missed-appointment-is-past: #fc8b96;
+$upcoming-reminder-is-past: #c4adfc;
+$canceled-reminder-is-past: #c4adfc;
+$completed-event-is-past: #7fdfa5;
 
 // Wallboard colors
 $agent-status-offline: $grey-80;
