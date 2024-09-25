@@ -267,7 +267,9 @@ export default {
     }
   },
 
-  created () {
+  mounted () {
+    this.timeFormat = this.profile.time_format
+
     const { view, date } = this.$route.query
     if (view && ['day', 'week', 'month'].includes(view)) {
       this.view = view
@@ -275,12 +277,7 @@ export default {
 
     if (date) {
       this.gotoDate = moment(date).toDate()
-      console.log('gotoDate created', this.gotoDate)
     }
-  },
-
-  mounted () {
-    this.timeFormat = this.profile.time_format
 
     if ('communication_id' in this.$route.query) {
       this.$axios.get('/api/v1/calendar/events/show/' + this.$route.query.communication_id + '/communication').then(res => {
@@ -460,25 +457,6 @@ export default {
 
     viewChange (mode, newDate) {
       this.view = mode
-      this.reloadFromCurrentFilter()
-
-      if (mode !== 'day') {
-        return this.$router.push({
-          query: {
-            ...this.$route.query,
-            date: null,
-            view: mode
-          }
-        })
-      }
-
-      return this.$router.push({
-        query: {
-          ...this.$route.query,
-          date: moment(newDate).format('YYYY-MM-DD'),
-          view: mode
-        }
-      })
     },
 
     updateTimeFormat () {
