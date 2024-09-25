@@ -308,20 +308,14 @@ export default {
     },
 
     redialTask (autoDialTask, redial) {
-      console.log('///***/// redialTask autoDialTask', autoDialTask)
-      console.log('///***/// redialTask redial', redial)
       const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
-      console.log('///***/// redialTask contactListItemId', contactListItemId)
       if (!contactListItemId) {
         return
       }
 
       return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`, { redial })
         .then(res => {
-          console.log('///***/// redialTask skip API response res', res)
-          // this.addRedialedTask(autoDialTask.id)
-
           const position = redial ? 'top' : 'bottom'
           this.$generalNotification(`Success: contact is at the ${position} of the current list`)
           return Promise.resolve(res)

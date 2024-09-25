@@ -759,11 +759,9 @@ export default {
     },
 
     canRedialNow () {
-      console.log('***////***//// canRedialNow this.dialer.currentStatus', this.dialer.currentStatus)
-      console.log('***////***//// canRedialNow this.isRedialClicked', this.isRedialClicked)
-      /* return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.redialed.includes(this.activeTask.id) &&
-        !this.isRedialClicked */
+      if (this.dialer.currentStatus === 'CALL_CONNECTED' && !this.isRedialClicked) {
+        console.log('***////***//// canRedialNow this.activeTask?.redial_status', this.activeTask?.redial_status)
+      }
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
         !this.activeTask?.redial_status &&
         !this.isRedialClicked
@@ -1365,6 +1363,8 @@ export default {
       }
 
       this.activeTask = this.taskToCall
+      console.log('/////// processSession this.isSessionRunning', this.isSessionRunning)
+      console.log('/////// processSession this.activeTask', this.activeTask)
       this.hasActiveTask = true
       this.setContact(this.taskToCall)
 
@@ -1524,6 +1524,7 @@ export default {
         task = get(this.powerDialerTasks.in_queue, '0', null)
       }
       this.taskToCall = cloneDeep(task)
+      this.taskToCall.redial_status = redial
 
       // end session if no more tasks
       if (isEmpty(task)) {
