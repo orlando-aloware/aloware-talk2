@@ -4,7 +4,7 @@
          class="calendar d-flex h-100 flex-column">
       <b-overlay class="h-100 w-100 position-absolute"
                  rounded="sm"
-                 :show="true"
+                 :show="loading"
                  v-show="loading">
         <template #overlay>
           <q-spinner-bars color="primary"
@@ -120,7 +120,6 @@
                      @add-schedule="addSchedule"
                      @render-events="renderFromEvent"
                      @update-current-date="updateCurrentDate"
-                     @view-change="viewChange"
                      @toggle-goto-date="onToggleGotoDate">
           </scheduler>
         </div>
@@ -205,7 +204,10 @@ export default {
         { id: 2, format: '24-hour' }
       ],
       cancel_token: this.$axios.CancelToken,
-      source: null
+      source: null,
+      loadingStates: {},
+      requestQueue: [],
+      currentRequestId: null
     }
   },
 
@@ -304,10 +306,8 @@ export default {
         ? new Date()
         : moment(this.gotoDate)[direction](1, this.stepMap[this.view]).toDate()
 
-      if (this.view === 'day') {
-        this.gotoDate = date
-        this.onToggleGotoDate(date)
-      }
+      this.gotoDate = date
+      this.onToggleGotoDate(date)
 
       this.$refs.scheduler.setCurrentView(date, this.view)
     },
@@ -326,17 +326,27 @@ export default {
     },
 
     loadCalendarData (state) {
-      this.loading = true
+      const requestId = Date.now().toString()
+      this.requestQueue.push(requestId)
+
+      // Set loading state for this specific request
+      this.$set(this.loadingStates, requestId, true)
+
+      // Update the overall loading state
+      this.updateOverallLoadingState()
+
+      // Cancel the previous request if it exists
+      if (this.source) {
+        this.source.cancel('Calendar: Previous request cancelled.')
+      }
+
       this.source = this.cancel_token.source()
 
       this.filters.calendar_mode = state.mode
       this.filters.calendar_min_date = state.min_date
       this.filters.calendar_max_date = state.max_date
-      this.filters.limit = state.limit
+      this.filters.limit = this.getLimitFilterValue()
 
-      // reset only if the page is set back to one
-      // it basically means that it will reload the data
-      // from the beginning
       if (this.filters.page === 1) {
         this.events = []
         this.$refs.scheduler.clearAll()
@@ -347,20 +357,50 @@ export default {
         cancelToken: this.source.token
       }).then(res => {
         this.events.push(...res.data)
-
         this.$refs.scheduler.customParse(this.events)
 
         if (res.data && res.data.length) {
           this.filters.page++
           this.reloadFromCurrentFilter()
-        } else {
-          this.loading = false
         }
       }).catch(err => {
-        console.log(err)
+        if (!this.$axios.isCancel(err)) {
+          console.log(err)
+        }
+      }).finally(() => {
+        // Remove the request from the queue
+        const index = this.requestQueue.indexOf(requestId)
+        if (index > -1) {
+          this.requestQueue.splice(index, 1)
+        }
 
-        this.loading = false
+        // Set loading state for this specific request to false
+        this.$set(this.loadingStates, requestId, false)
+
+        // Update the overall loading state
+        this.updateOverallLoadingState()
       })
+    },
+
+    updateOverallLoadingState () {
+      // If any request is still loading, keep the overall loading state true
+      this.loading = Object.values(this.loadingStates).some(state => state === true)
+    },
+
+    getLimitFilterValue () {
+      if (this.view === 'month') {
+        return 2500
+      }
+
+      if (this.view === 'week') {
+        return 1000
+      }
+
+      if (this.view === 'day') {
+        return 500
+      }
+
+      return 2500
     },
 
     reloadFromCurrentFilter () {
@@ -375,7 +415,6 @@ export default {
         const endOfMonth = moment(this.gotoDate).endOf('month')
         state.min_date = startOfMonth.toDate()
         state.max_date = endOfMonth.toDate()
-        state.limit = 2500
       }
 
       if (this.view === 'week') {
@@ -383,19 +422,18 @@ export default {
         const endOfWeek = moment(this.gotoDate).endOf('isoWeek')
         state.min_date = startOfWeek.toDate()
         state.max_date = endOfWeek.toDate()
-        state.limit = 1000
       }
 
       if (this.view === 'day') {
         state.min_date = moment(this.gotoDate).startOf('day').toDate()
         state.max_date = moment(this.gotoDate).endOf('day').toDate()
-        state.limit = 250
       }
 
       this.loadCalendarData(state)
     },
 
     renderFromEvent (state) {
+      console.log('renderFromEvent loadCalendarData -->', state)
       this.cancelRequestToken()
       this.resetPage()
       this.loadCalendarData(state)
@@ -470,8 +508,7 @@ export default {
 
     onToggleGotoDate (date) {
       const formattedDate = moment(date).format('YYYY-MM-DD')
-      console.log('formattedDate', formattedDate)
-      this.$router.push({
+      this.$router.replace({
         query: {
           ...this.$route.query,
           date: formattedDate
@@ -482,8 +519,14 @@ export default {
 
   watch: {
     view () {
+      this.$router.replace({
+        query: {
+          ...this.$route.query,
+          view: this.view
+        }
+      })
+
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
-      this.reloadFromCurrentFilter()
     },
     '$route.query': {
       handler (newQuery) {
