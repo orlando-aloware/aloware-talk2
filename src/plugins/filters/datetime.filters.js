@@ -599,7 +599,7 @@ export default ({ Vue }) => {
     fixCommunicationDateTime,
     formatTime,
     utcToLocalizedMoment,
-    fixBirthdate
+    displayBirthdate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }
