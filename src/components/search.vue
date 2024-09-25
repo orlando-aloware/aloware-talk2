@@ -11,7 +11,8 @@
              @blur="onBlur"
              @focus="onFocus"
              @clear="onInput"
-             @keyup.enter="onInput">
+             @keyup.enter="onInput"
+             @keyup="onLiveSearch">
        <template v-slot:prepend>
         <span class="search-icon-component"
               @click="onInput">
@@ -88,6 +89,12 @@ export default {
       this.isInvalid = hasError
       this.$emit('show-error-message', hasError)
       this.$emit('search', this.searchValue)
+    },
+
+    onLiveSearch: function () {
+      if (!this.searchValue) {
+        this.onInput()
+      }
     },
 
     onFocus: function () {
