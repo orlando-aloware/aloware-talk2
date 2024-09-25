@@ -164,7 +164,6 @@ export default {
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter',
-      // 'addRedialedTask',
       'clearRedialedTasks'
     ]),
 
