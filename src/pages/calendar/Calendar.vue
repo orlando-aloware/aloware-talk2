@@ -120,7 +120,8 @@
                      @add-schedule="addSchedule"
                      @render-events="renderFromEvent"
                      @update-current-date="updateCurrentDate"
-                     @view-change="viewChange">
+                     @view-change="viewChange"
+                     @toggle-goto-date="onToggleGotoDate">
           </scheduler>
         </div>
       </div>
@@ -182,7 +183,7 @@ export default {
         calendar_min_date: new Date(),
         calendar_max_date: new Date(),
         calendar_status: [],
-        limit: 25,
+        limit: 2500,
         page: 1
       },
       loading: true,
@@ -266,6 +267,18 @@ export default {
     }
   },
 
+  created () {
+    const { view, date } = this.$route.query
+    if (view && ['day', 'week', 'month'].includes(view)) {
+      this.view = view
+    }
+
+    if (date) {
+      this.gotoDate = moment(date).toDate()
+      console.log('gotoDate created', this.gotoDate)
+    }
+  },
+
   mounted () {
     this.timeFormat = this.profile.time_format
 
@@ -274,6 +287,10 @@ export default {
         this.editSchedule(res.data)
       })
     }
+
+    this.$nextTick(() => {
+      this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+    })
   },
 
   methods: {
@@ -281,6 +298,7 @@ export default {
 
     onDateSelected (date) {
       this.gotoDate = date
+      this.onToggleGotoDate(date)
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
     },
 
@@ -291,6 +309,7 @@ export default {
 
       if (this.view === 'day') {
         this.gotoDate = date
+        this.onToggleGotoDate(date)
       }
 
       this.$refs.scheduler.setCurrentView(date, this.view)
@@ -316,6 +335,7 @@ export default {
       this.filters.calendar_mode = state.mode
       this.filters.calendar_min_date = state.min_date
       this.filters.calendar_max_date = state.max_date
+      this.filters.limit = state.limit
 
       // reset only if the page is set back to one
       // it basically means that it will reload the data
@@ -347,11 +367,35 @@ export default {
     },
 
     reloadFromCurrentFilter () {
-      this.loadCalendarData({
+      let state = {
         mode: this.filters.calendar_mode,
         min_date: this.filters.calendar_min_date,
         max_date: this.filters.calendar_max_date
-      })
+      }
+
+      if (this.view === 'month') {
+        const startOfMonth = moment(this.gotoDate).startOf('month')
+        const endOfMonth = moment(this.gotoDate).endOf('month')
+        state.min_date = startOfMonth.toDate()
+        state.max_date = endOfMonth.toDate()
+        state.limit = 2500
+      }
+
+      if (this.view === 'week') {
+        const startOfWeek = moment(this.gotoDate).startOf('isoWeek')
+        const endOfWeek = moment(this.gotoDate).endOf('isoWeek')
+        state.min_date = startOfWeek.toDate()
+        state.max_date = endOfWeek.toDate()
+        state.limit = 1000
+      }
+
+      if (this.view === 'day') {
+        state.min_date = moment(this.gotoDate).startOf('day').toDate()
+        state.max_date = moment(this.gotoDate).endOf('day').toDate()
+        state.limit = 250
+      }
+
+      this.loadCalendarData(state)
     },
 
     renderFromEvent (state) {
@@ -414,8 +458,27 @@ export default {
       this.$refs.scheduler.customParse(this.events)
     },
 
-    viewChange (mode) {
+    viewChange (mode, newDate) {
       this.view = mode
+      this.reloadFromCurrentFilter()
+
+      if (mode !== 'day') {
+        return this.$router.push({
+          query: {
+            ...this.$route.query,
+            date: null,
+            view: mode
+          }
+        })
+      }
+
+      return this.$router.push({
+        query: {
+          ...this.$route.query,
+          date: moment(newDate).format('YYYY-MM-DD'),
+          view: mode
+        }
+      })
     },
 
     updateTimeFormat () {
@@ -425,12 +488,39 @@ export default {
           this.setProfile(res.data)
           this.$refs.scheduler.reInit(this.gotoDate, this.view)
         })
+    },
+
+    onToggleGotoDate (date) {
+      const formattedDate = moment(date).format('YYYY-MM-DD')
+      console.log('formattedDate', formattedDate)
+      this.$router.push({
+        query: {
+          ...this.$route.query,
+          date: formattedDate
+        }
+      })
     }
   },
 
   watch: {
     view () {
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+      this.reloadFromCurrentFilter()
+    },
+    '$route.query': {
+      handler (newQuery) {
+        const { view, date } = newQuery
+
+        if (view && ['day', 'week', 'month'].includes(view)) {
+          this.view = view
+        }
+
+        if (date) {
+          this.gotoDate = moment(date).toDate()
+          this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+        }
+      },
+      deep: true
     }
   }
 }
