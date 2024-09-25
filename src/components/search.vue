@@ -91,8 +91,8 @@ export default {
       this.$emit('search', this.searchValue)
     },
 
-    onLiveSearch: function () {
-      if (!this.searchValue) {
+    onLiveSearch: function (e) {
+      if (!this.searchValue && e && e.key === 'Backspace') {
         this.onInput()
       }
     },
