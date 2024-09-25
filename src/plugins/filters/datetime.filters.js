@@ -566,7 +566,7 @@ export const utcToLocalizedMoment = (dt) => {
  * @param {date|string|Moment} dt
  * @returns {string|*}
  */
-export const fixBirthdate = (dt) => {
+export const displayBirthdate = (dt) => {
   if (dt) {
     return dt
   } else {
