@@ -55,6 +55,9 @@ export default {
     Scheduler.config.drag_move = false
     Scheduler.config.drag_resize = false
     Scheduler.config.max_month_events = 4
+    Scheduler.config.min_event_width = 60
+    Scheduler.config.min_event_height = 20
+    Scheduler.config.event_min_dy = 20
     Scheduler.xy.nav_height = 0
 
     Scheduler.templates.week_date = function (start, end) {
@@ -94,7 +97,7 @@ export default {
     }
 
     Scheduler.templates.month_events_link = function (date, count) {
-      return `<a>${count} more</a>`
+      return `<div class="custom-more-link" data-date="${date.toISOString()}" data-count="${count}">${count} more</div>`
     }
 
     Scheduler.templates.event_date = function (date) {
@@ -112,8 +115,15 @@ export default {
 
     Scheduler.templates.event_text = Scheduler.templates.event_bar_text
 
+    Scheduler.templates.event_bar_text = () => ''
+    Scheduler.templates.event_text = () => ''
+
+    Scheduler.attachEvent('onEventRendered', this.customEventRender)
+
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
-      this.addSchedule(date)
+      if (!e.target.classList.contains('custom-more-link')) {
+        this.addSchedule(date)
+      }
     })
 
     Scheduler.attachEvent('onClick', (id, e) => {
@@ -123,12 +133,18 @@ export default {
     Scheduler.attachEvent('onViewChange', (newMode, newDate) => {
       let state = Scheduler.getState()
       this.renderEvents(state)
-      this.updateCurrentDate(newDate)
-      this.$emit('view-change', newMode)
+      // this.updateCurrentDate(newDate)
+      this.$emit('view-change', newMode, newDate)
     })
 
     Scheduler.init(this.$refs.scheduler, new Date(), 'month')
     Scheduler.parse(this.$props.events)
+    this.$refs.scheduler.addEventListener('click', this.handleMoreLink)
+    this.$nextTick(() => Scheduler.updateView())
+  },
+
+  beforeUnmount () {
+    this.$refs.scheduler.removeEventListener('click', this.handleMoreLink)
   },
 
   methods: {
@@ -162,7 +178,8 @@ export default {
     },
 
     toggleGotoDate () {
-      this.$emit('toggle-goto-date')
+      const currentDate = Scheduler.getState().date
+      this.$emit('toggle-goto-date', currentDate)
     },
 
     setCurrentView (date, view) {
@@ -181,6 +198,41 @@ export default {
 
       Scheduler.init(this.$refs.scheduler, date, view)
       Scheduler.parse(this.$props.events)
+    },
+
+    handleMoreLink (e) {
+      if (e.target.classList.contains('custom-more-link')) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+    },
+
+    customEventRender (event, ev, container) {
+      const minWidth = Scheduler.config.min_event_width || 60
+      const width = Math.max(ev.width, minWidth)
+
+      const durationInMinutes = moment(event.end_date).diff(moment(event.start_date), 'minutes')
+      const baseHeight = 20
+
+      // Calculate the height based on duration, with a minimum height
+      const calculatedHeight = Math.max(baseHeight * (durationInMinutes / 30), 20)
+
+      // Use the calculated height, but don't exceed the original height
+      const height = Math.min(calculatedHeight, ev.height)
+
+      container.style.width = `${width}px`
+      container.style.height = `${height}px`
+
+      console.log('width', width)
+      console.log('height', height)
+
+      container.innerHTML = `
+        <div class="event-content">
+          <div class="event-title">${event.text}</div>
+          <div class="event-time">${Scheduler.templates.event_date(event.start_date)} - ${Scheduler.templates.event_date(event.end_date)}</div>
+        </div>
+      `
+      return true
     }
   }
 }
