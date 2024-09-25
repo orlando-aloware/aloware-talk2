@@ -561,6 +561,19 @@ export const utcToLocalizedMoment = (dt) => {
   }
 }
 
+/**
+ * Fix date time
+ * @param {date|string|Moment} dt
+ * @returns {string|*}
+ */
+export const fixBirthdate = (dt) => {
+  if (dt) {
+    return dt
+  } else {
+    return '-'
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     dateTimePassed,
@@ -585,7 +598,8 @@ export default ({ Vue }) => {
     fixFullDateUTCRelative,
     fixCommunicationDateTime,
     formatTime,
-    utcToLocalizedMoment
+    utcToLocalizedMoment,
+    fixBirthdate
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }
