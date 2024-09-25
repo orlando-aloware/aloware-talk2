@@ -12420,6 +12420,16 @@ h1.contact-list-name-label {
           -webkit-box-sizing: border-box;
           -moz-box-sizing: border-box;
           box-sizing: border-box;
+
+          .dhx_scale_holder {
+            overflow-x: auto;
+            overflow-y: hidden;
+
+            > div {
+              display: flex;
+              min-width: fit-content;
+            }
+          }
         }
 
         .dhx_month_link {
@@ -12427,6 +12437,12 @@ h1.contact-list-name-label {
           color: #62666E;
           font-size: 11px;
           margin-top: 5px;
+
+          .custom-more-link {
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+          }
         }
 
         .dhx_cal_event,
@@ -12464,6 +12480,23 @@ h1.contact-list-name-label {
   .b-overlay-wrap {
     z-index: 1005;
   }
+
+  .event {
+    &-content {
+      padding: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &-title {
+      font-weight: bold;
+    }
+
+    &-time {
+      font-size: 0.8em;
+    }
+  }
 }
 
 #calendar-manager-modal {
@@ -12490,48 +12523,62 @@ h1.contact-list-name-label {
 
 /* Event Colors */
 .event-color-type-12 {
-  // color: #C6DAFC;
-
   &.status-11 {
     color: $upcoming-appointment;
+    &.is_past {
+      color: $upcoming-appointment-is-past;
+    }
   }
 
   &.status-9 {
     color: $completed-event;
+    &.is_past {
+      color: $completed-event-is-past;
+    }
   }
 
   &.status-10 {
     color: $canceled-appointment;
+    &.is_past {
+      color: $canceled-appointment-is-past;
+    }
   }
 
   &.status-14 {
     color: $missed-appointment;
-  }
-
-  &.is_past {
-    color: $past-appointment;
+    &.is_past {
+      color: $missed-appointment-is-past;
+    }
   }
 }
 
 .event-color-type-13 {
   &.status-8 {
     color: $upcoming-reminder;
+    &.is_past {
+      color: $upcoming-reminder-is-past;
+    }
   }
 
   &.status-4 {
     color: $completed-event;
+    &.is_past {
+      color: $completed-event-is-past;
+    }
   }
 
   &.status-5 {
     color: $canceled-reminder;
+    &.is_past {
+      color: $canceled-reminder-is-past;
+    }
   }
 
   &.status-3 {
     color: $missed-appointment;
-  }
-
-  &.is_past {
-    color: $past-reminder;
+    &.is_past {
+      color: $missed-appointment-is-past;
+    }
   }
 }
 
@@ -12540,23 +12587,31 @@ h1.contact-list-name-label {
 
   &.status-11 {
     background-color: $upcoming-appointment;
+    &.is_past {
+      background-color: $upcoming-appointment-is-past;
+    }
   }
 
   &.status-9 {
     background-color: $completed-event;
+    &.is_past {
+      background-color: $completed-event-is-past;
+    }
   }
 
   &.status-10 {
     background-color: $canceled-appointment;
     text-decoration: line-through;
+    &.is_past {
+      background-color: $canceled-appointment-is-past;
+    }
   }
 
   &.status-14 {
     background-color: $missed-appointment;
-  }
-
-  &.is_past {
-    background-color: $past-appointment;
+    &.is_past {
+      background-color: $missed-appointment-is-past;
+    }
   }
 }
 
@@ -12565,23 +12620,31 @@ h1.contact-list-name-label {
 
   &.status-8 {
     background-color: $upcoming-reminder;
+    &.is_past {
+      background-color: $upcoming-reminder-is-past;
+    }
   }
 
   &.status-4 {
-    background-color: $completed-event
+    background-color: $completed-event;
+    &.is_past {
+      background-color: $completed-event-is-past;
+    }
   }
 
   &.status-5 {
     background-color: $canceled-reminder;
     text-decoration: line-through;
+    &.is_past {
+      background-color: $canceled-reminder-is-past;
+    }
   }
 
   &.status-3 {
     background-color: $missed-appointment;
-  }
-
-  &.is_past {
-    background-color: $past-reminder;
+    &.is_past {
+      background-color: $missed-appointment-is-past;
+    }
   }
 }
 
