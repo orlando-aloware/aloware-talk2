@@ -130,11 +130,9 @@ export default {
       this.editSchedule(Scheduler.getEvent(id))
     })
 
-    Scheduler.attachEvent('onViewChange', (newMode, newDate) => {
+    Scheduler.attachEvent('onViewChange', () => {
       let state = Scheduler.getState()
       this.renderEvents(state)
-      // this.updateCurrentDate(newDate)
-      this.$emit('view-change', newMode, newDate)
     })
 
     Scheduler.init(this.$refs.scheduler, new Date(), 'month')
