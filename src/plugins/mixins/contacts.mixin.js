@@ -1288,6 +1288,11 @@ export default {
         if (this.$route.name === 'Contacts') {
           setTimeout(() => {
             this.startEvents()
+
+            if (backToContacts) {
+              this.$VueEvent.fire('shouldUpdateListCount')
+              this.setCurrentListFilters({})
+            }
           }, 500)
         }
 
