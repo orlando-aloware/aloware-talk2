@@ -320,6 +320,11 @@
           </div>
         </div>
         <div
+          v-else-if="column.name.includes('date_of_birth')"
+          class="text-left ellipse">
+          {{ contact[column.name] | displayBirthdate }}
+        </div>
+        <div
           v-else-if="column.name.includes('_at') || column.name.includes('date')"
           class="text-left ellipse">
           {{ contact[column.name] | fixFullDateTime }}
