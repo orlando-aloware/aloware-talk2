@@ -328,7 +328,6 @@
       </div>
       <div class="limit-characters-error"
            v-if="showLimitCharactersError">
-        <i class="fa fa-x"></i>
         Search requires at least 3 characters
       </div>
     </template>
