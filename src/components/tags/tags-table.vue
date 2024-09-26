@@ -1,5 +1,27 @@
 <template>
   <div class="tags-table position-relative overflow-hidden">
+    <q-dialog persistent
+              v-model="convertedListDialog">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">
+            New List Created
+          </div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          The tag has been successfully converted to a contact list.
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat
+                 label="Go to list"
+                 color="primary"
+                 @click="retirectToConvertedList"/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <datatable custom-class="pr-3"
                paginated
                show-pagination
@@ -212,7 +234,8 @@
 
     <convert-to-list :is-show="isOpenConvertToListDialog"
                      :tag="selectedTag"
-                     @closeConvertToListModal="closeContactTagsActionsModals" />
+                     @closeConvertToListModal="closeContactTagsActionsModals"
+                     @listConverted="onListConverted" />
 
     <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
                                       :tag="selectedTag"
@@ -305,7 +328,9 @@ export default {
       isOpenConvertToListDialog: false,
       isOpenAddTagContactsToPowerDialerDialog: false,
       isOpenEnrollTagContactsToSequenceDialog: false,
-      isOpenDeleteTagDialog: false
+      isOpenDeleteTagDialog: false,
+      convertedListDialog: false,
+      convertedList: {}
     }
   },
 
@@ -505,6 +530,23 @@ export default {
       if (this.selectedTagCategory === this.CommunicationTags) {
         this.setSelectedTagsContactsCount(0)
       }
+    },
+
+    onListConverted (list) {
+      this.convertedListDialog = true
+      this.convertedList = list
+    },
+
+    retirectToConvertedList () {
+      if (this.convertedList.show_in_public_folder) {
+        this.$router.push({ path: '/contacts/list/' + this.convertedList.id,
+          query: { type: 'public' },
+          meta: { type: 'public' }
+        })
+        return
+      }
+
+      this.$router.push({ path: '/contacts/list/' + this.convertedList.id })
     }
   },
 

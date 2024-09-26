@@ -205,15 +205,15 @@ export default {
         show_in_public_folder: showInPublicFolder
       }
 
-      console.log('**** convert payload', payload)
-
       const xhr = API.V1.tags.convertTagToList(payload)
-
       xhr
         .then(res => {
           this.loading = false
-          this.$generalNotification(res.data.message)
           this.closeModal()
+
+          const list = res.data.data
+          list.show_in_public_folder = showInPublicFolder
+          this.$emit('listConverted', list)
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loading = false
