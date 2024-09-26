@@ -21,7 +21,7 @@
             switch
             @change="onFetchMyContacts"
           >
-            <span class="small text-muted text-uppercase">My Contacts</span>
+            <span class="small text-muted text-uppercase">My Contacts PINNED</span>
           </b-form-checkbox>
         </div>
       </div>
@@ -40,7 +40,7 @@
           customClass="mr-2"
           @clicked="onEditColumnsClicked"
         >
-          <i class="fa fa-chevron-down text-success mr-1"></i> Edit Columns
+          <i class="fa fa-chevron-down text-success mr-1"></i> EditTT Columns
         </compact-btn>
         <compact-btn variant="success">
           Save
