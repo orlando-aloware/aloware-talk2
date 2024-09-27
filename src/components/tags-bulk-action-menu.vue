@@ -23,7 +23,7 @@
              href="#"
              :disabled="!selectedTagsHasContactsCount"
              data-testid="tags-assign-contacts-button"
-             @click.prevent="isOpenAssignContactsTagDialog = true">
+             @click.prevent="openAssignContactsTagDialog">
             <i class="fa fa-sign-in-alt"></i>
             Assign Contacts
           </a>
@@ -75,7 +75,7 @@
                            :is-bulk="true"
                            :tag="{}"
                            v-if="selectedTagsHasContactsCount"
-                           @closeAssignContactsModal="isOpenAssignContactsTagDialog = false"/>
+                           @closeAssignContactsModal="closeAssignContactsTagDialog"/>
 
     <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
                                       :is-bulk="true"
@@ -150,6 +150,14 @@ export default {
   },
 
   methods: {
+    openAssignContactsTagDialog () {
+      this.isOpenAssignContactsTagDialog = true
+    },
+
+    closeAssignContactsTagDialog () {
+      this.isOpenAssignContactsTagDialog = false
+    },
+
     reloadTags () {
       this.$emit('reloadTags')
     }
