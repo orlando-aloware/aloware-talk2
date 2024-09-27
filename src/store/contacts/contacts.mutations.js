@@ -339,18 +339,32 @@ export default {
     state.search = ''
   },
   UPDATE_CHANGED_CONTACT_PROPERTIES: (state, { name, value }) => {
+    console.log('state', state.contactClone[name])
+    console.log('name ', name)
+    console.log('value ', value)
+
     const found = { data: null }
     if (state.contactClone[name] !== value) {
-      found.data = state.changedContactProperties.find(item => item.property === name)
-      found.data = found.data ? state.changedContactProperties.indexOf(found.data) : null
+      console.log('STATE PROPERTIES:  ', state.changedContactProperties)
+      // console.log('STATE PROPERTIES:  ', state.changedContactProperties.__ob__.value[0])
 
+      // console.log('STATE PROPERTIES:  ', JSON.parse(JSON.stringify(state.changedContactProperties)))
+      // console.log('STATE PROPERTIES:  ', state.changedContactProperties[0])
+      found.data = Object.keys(state.changedContactProperties).find(item => {
+        return item.property === name
+      })
+      console.log('FOUND DATA ', found.data)
+      found.data = found.data ? state.changedContactProperties.indexOf(found.data) : null
+      console.log('FOUND DATA ', found.data)
       if (found.data !== -1 && found.data !== null) {
+        console.log('CCCCCC')
         Vue.set(state.changedContactProperties[found.data], 'value', value)
         return
       }
-
+      console.log('DDDDD')
       state.changedContactProperties.push({ property: name, value: value })
     } else {
+      console.log('EEEEEEEE')
       found.data = [...state.changedContactProperties]
       state.changedContactProperties = found.data.filter(item => item.property !== name)
     }
