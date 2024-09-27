@@ -275,6 +275,11 @@ export default {
             this.user &&
             this.user.profile &&
             this.user.profile.id !== communication.contact.user_id) {
+            console.log('processActionNotification - dont show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected', {
+              'ringGroup': ringGroup,
+              'user.profile.id': this.user.profile.id,
+              'communication.contact.user_id': communication.contact.user_id
+            })
             break
           }
 
@@ -301,6 +306,7 @@ export default {
 
       if (!_.isEmpty(params.data)) {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
+          console.log('processActionNotification - params.data', params.data)
           this.setShowIncomingCallNotification(true)
         }
 
