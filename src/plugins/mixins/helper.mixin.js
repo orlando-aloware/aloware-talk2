@@ -108,6 +108,36 @@ export const helperMixin = {
       }
 
       return (item.first_name + ' ' + item.last_name).trim()
+    },
+    setCookie (name, value, days) {
+      const date = new Date()
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000))
+      const expires = '; expires=' + date?.toUTCString()
+      const domain = this.getTopLevelDomain()
+      document.cookie = `${name}=${value || ''}${expires}; path=/; domain=${domain}`
+    },
+    getCookie (name) {
+      const nameEQ = name + '='
+
+      const ca = document?.cookie?.split(';')
+      if (!ca) {
+        return null
+      }
+
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i]
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length)
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length)
+      }
+      return null
+    },
+    getTopLevelDomain () {
+      const hostParts = window?.location?.hostname?.split('.')
+      if (!hostParts || hostParts.length <= 1) {
+        return null
+      }
+
+      return '.' + hostParts.slice(1).join('.')
     }
   }
 }
