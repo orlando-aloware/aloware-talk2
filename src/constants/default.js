@@ -234,5 +234,9 @@ export const DEFAULT_STATE = {
   isDatatableSelectedAll: false,
   isDatatableCountLoading: false,
   hubspotPhoneNumber: null,
-  isRedirectedToHubspotWidget: false
+  isRedirectedToHubspotWidget: false,
+  showAccountSelector: false,
+  showAccountSelectorFullscreen: false,
+  showAccountSelectorFirstLoad: false,
+  accesses: []
 }
