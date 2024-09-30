@@ -1,10 +1,8 @@
 import { mapActions, mapState, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import { helperMixin } from 'src/plugins/mixins'
+import { getCookie, setCookie } from 'src/plugins/helpers/functions'
 
 export default {
-  mixins: [helperMixin],
-
   data () {
     return {
       isLoadingAccesses: false
@@ -53,7 +51,7 @@ export default {
     },
 
     loginWithSavedCompany (firstLoad = false) {
-      const selectedCompanyId = parseInt(this.getCookie('selected_company_id'))
+      const selectedCompanyId = parseInt(getCookie('selected_company_id'))
 
       if (!selectedCompanyId) {
         this.setShowAccountSelector(true)
@@ -82,7 +80,7 @@ export default {
       talk2Api.V1.auth.impersonate(access.id, true, this.profile)
         .then(() => {
           if (this.accesses.length > 1) {
-            this.setCookie('selected_company_id', access.company_id, 30)
+            setCookie('selected_company_id', access.company_id, 30)
           }
 
           window.location.reload()
