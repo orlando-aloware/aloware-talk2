@@ -119,6 +119,7 @@ export default {
             if (event.owner) {
               event.communication.owner = event.owner
             }
+            console.log('.user.in-app.communication.new_call - event.communication', event.communication)
             this.$VueEvent.fire('new_in_app_call', event.communication)
           }
         })
@@ -251,6 +252,7 @@ export default {
             if (event.owner) {
               event.communication.owner = event.owner
             }
+            console.log('.user.desktop.communication.new_call - event.communication', event.communication)
             this.$VueEvent.fire('new_desktop_call', event.communication)
           }
         })

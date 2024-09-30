@@ -607,6 +607,10 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     const found = queue.find(item => item.contactId === settings.contactId && item.communicationId === settings.communicationId)
 
     if (found) {
+      console.log('Vue.prototype.$actionNotification - notification already queued', {
+        'contactId': settings.contactId,
+        'communicationId': settings.communicationId
+      })
       return
     }
 
@@ -617,6 +621,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     this.$store.commit('SET_NOTIFICATIONS', data)
 
     if (settings.type === 'callFishing') {
+      console.log('Vue.prototype.$actionNotification - ADD_TO_CALL_FISHING_QUEUE', {
+        'settings': settings
+      })
       this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
     }
 
@@ -646,6 +653,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
         this.$store.commit('SET_NOTIFICATIONS', data)
 
         if (settings.type === 'callFishing') {
+          console.log('Vue.prototype.$actionNotification actionNotificationUnqueuedIntervals - ADD_TO_CALL_FISHING_QUEUE', {
+            'settings': settings
+          })
           this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
         }
 
@@ -673,6 +683,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     // if call is not queued in our call fishing notification queue,
     // then we no longer need to continue to wait for notification availability
     if (!queue) {
+      console.log('Vue.prototype.$actionNotification actionNotificationQueuedIntervals - notification not queued', {
+        'settings': settings
+      })
       clearInterval(window.actionNotificationQueuedIntervals[settings.type])
 
       return
@@ -682,6 +695,9 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
       this.$store.commit('SET_NOTIFICATIONS', data)
 
       if (settings.type === 'callFishing') {
+        console.log('Vue.prototype.$actionNotification actionNotificationQueuedIntervals - ADD_TO_CALL_FISHING_QUEUE', {
+          'settings': settings
+        })
         this.$store.commit('ADD_TO_CALL_FISHING_QUEUE', settings)
       }
 
