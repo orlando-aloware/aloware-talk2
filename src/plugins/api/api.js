@@ -631,6 +631,12 @@ export default {
       }
     },
 
+    scriptCommunication: {
+      store (params) {
+        return window.axios.post(`${suffixV1}script-communication`, params)
+      }
+    },
+
     auth: {
       impersonate (userId, userAccess = false, user = null) {
         let isImpersonating = true
