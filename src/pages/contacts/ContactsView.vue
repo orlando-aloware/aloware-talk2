@@ -1169,7 +1169,6 @@ export default {
   },
 
   mounted () {
-    console.log('PROFILE: ', this.profile)
     // clear the selected contacts
     this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
 

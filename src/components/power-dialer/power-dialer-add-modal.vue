@@ -156,18 +156,18 @@
 
           <div v-if="mode == 'add-contact-list'">
             <label class="label mb-1 text-weight-bold"
-                  data-testid="power-dialer-add-modal-conversion-options">
+                   data-testid="power-dialer-add-modal-conversion-options">
               Select Power Dialer List
             </label>
             <b-row class="no-gutters mb-2">
               <b-col class="mr-1"
-                    v-if="!isAgent">
+                     v-if="!isAgent">
                 <b-form-group class="font-weight-light text-13 mb-0"
                               data-testid="add-to-power-dialer-modal-user-box"
                               label="User">
                   <user-selector :generic-styling="false"
-                                v-model="userId"
-                                @change="setUserId"/>
+                                 v-model="userId"
+                                 @change="setUserId"/>
                 </b-form-group>
               </b-col>
 
@@ -820,8 +820,7 @@ export default {
 
     getListCount (id) {
       return this.$axios
-        // .get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${id}/count`)
-        .get(`https://pr-10466.mde.alodev.org/api/v2/contacts-list/${id}/count`)
+        .get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${id}/count`)
     },
 
     checkIntegrationImport () {

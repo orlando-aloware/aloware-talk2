@@ -634,8 +634,7 @@ export default {
       counts (params, cancelTokenSource) {
         delete params.timezone
 
-        // return window.axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
-        return window.axios.get(`https://pr-10466.mde.alodev.org/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
+        return window.axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, { params, paramsSerializer: qs.stringify })
       },
 
       inboxCounts (params) {
