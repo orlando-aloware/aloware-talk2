@@ -300,6 +300,15 @@
             Add to My Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
+                           data-testid="contacts-view-add-to-sequence-option-dropdown"
+                           :disabled="isAddToSequenceDisabled"
+                           @click="openAddToSequence">
+            <add-sequence-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
+            Add to Sequence
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
                            data-testid="contacts-view-assign-contacts-option-dropdown"
                            :disabled="!isContactListSelected"
                            @click="openAssignContacts">
@@ -765,6 +774,9 @@
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
+      <tag-contacts-workflow-enroller :is-show="showAddToSequence"
+                                      :list="selectedList"
+                                      @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
       <enroll-contacts-to-aloai-modal
         ref="enrollContactsToAloAiModal"
         :params="attachedParams()"
@@ -820,6 +832,8 @@ import {
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
+import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 
@@ -842,6 +856,7 @@ export default {
     DeleteRedIcon,
     ExportIcon,
     PowerDialerMobileIcon,
+    AddSequenceIcon,
     AddUserIcon,
     EditHamburgerIcon,
     Search,
@@ -861,6 +876,7 @@ export default {
     ImportContactsModal,
     BlockTooltip,
     PowerDialerAddModal,
+    TagContactsWorkflowEnroller,
     EnrollContactsToAloaiModal,
     AssignContactsModal
   },
@@ -942,6 +958,8 @@ export default {
       ContactListTypes,
       openPDModal: false,
       isContactModule: false,
+      showAddToSequence: false,
+      workflowId: null,
       openAloAiEnrollmentModal: false,
       showAssignContacts: false,
       showLimitCharactersError: false
@@ -1183,6 +1201,10 @@ export default {
 
     isAddToPowerDialerDisabled () {
       return !this.checked.length
+    },
+
+    isAddToSequenceDisabled () {
+      return !this.isContactListSelected
     }
   },
 
@@ -1280,6 +1302,18 @@ export default {
       'setPreviousListFilters',
       'addPowerDialerOpen'
     ]),
+
+    setWorkflowId (id) {
+      this.workflowId = id
+    },
+
+    openAddToSequence () {
+      this.showAddToSequence = true
+    },
+
+    closeAddToSequence () {
+      this.showAddToSequence = false
+    },
 
     openAssignContacts () {
       this.showAssignContacts = true
