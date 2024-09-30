@@ -43,7 +43,9 @@ body,
   background-color: $green;
 }
 
-.text-black {
+.text-black,
+// .general-notification has to always be black, override system class .text-white which also has !important
+.general-notification.text-black {
   color: $grey-100 !important;
 }
 
@@ -15158,4 +15160,26 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 
 .text-menu-purple {
   color: #9797AE;
+}
+
+#working-hours-container .business-hours-container .flex-row.hours.close{
+  opacity: 1 !important;
+}
+
+.search-icon-component {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  cursor: pointer;
+}
+
+.limit-characters-error {
+  color: black;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.form-control-search-component.is-invalid {
+  padding-right: 0 !important;
 }

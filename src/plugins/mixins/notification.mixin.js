@@ -23,7 +23,8 @@ export default {
       'reminderNotifiedDesktop',
       'notificationAudio'
     ]),
-    ...mapState('cache', ['currentCompany'])
+    ...mapState('cache', ['currentCompany']),
+    ...mapState(['isWidget'])
   },
 
   methods: {
@@ -79,6 +80,7 @@ export default {
         return
       }
 
+      console.log('Communication when event closeCallNotifications : ', communication)
       this.closeCallNotifications(this.getNotificationType(communication.ring_group_id), communication.id)
     },
 
@@ -200,6 +202,9 @@ export default {
     },
 
     processActionNotification (communication, type) {
+      if (this.isWidget) {
+        return
+      }
       const name = { data: '' }
       const companyName = { data: '' }
       const firstAttachment = { data: null }
@@ -270,6 +275,13 @@ export default {
             this.user &&
             this.user.profile &&
             this.user.profile.id !== communication.contact.user_id) {
+            console.log('processActionNotification - dont show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected', {
+              'ringGroup': ringGroup,
+              'user.profile.id': this.user?.profile?.id,
+              'communication.id': communication?.id,
+              'communication.contact.user_id': communication?.contact?.user_id,
+              'communication.is_call_waiting': communication?.is_call_waiting
+            })
             break
           }
 
@@ -296,6 +308,7 @@ export default {
 
       if (!_.isEmpty(params.data)) {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
+          console.log('processActionNotification - params.data', params.data)
           this.setShowIncomingCallNotification(true)
         }
 

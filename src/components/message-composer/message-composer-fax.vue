@@ -33,7 +33,7 @@
                          class="pb-1">
             </upload-icon>
             <p class="text-xs mb-0" data-testid="fax-form-drop-pdf-files">Drop PDF files here, or <span class="text-primary">Browse</span></p>
-            <p class="text-xxs file-info" data-testid="fax-form-maximun-pdf-size">Maximum PDF file size is 8MB</p>
+            <p class="text-xxs file-info" data-testid="fax-form-maximum-pdf-size">Maximum PDF file size is 8MB</p>
           </div>
           <div v-if="isUploading" class="text-center uploading-label pl-2 pr-2">
             <b-progress :max="100"

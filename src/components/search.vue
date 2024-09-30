@@ -1,19 +1,23 @@
 <template>
-  <div class="position-relative">
-    <q-input :class="[border ? 'form-control' : 'border-0']"
-             :placeholder="placeholder"
-             :disabled="disabled"
-             class="form-control-search"
-             v-model="searchValue"
+  <div class="position-relative d-flex">
+    <q-input class="form-control-search form-control-search-component"
              borderless
              clearable
              data-testid="search-input"
+             :class="[border ? 'form-control' : 'border-0', isInvalid ? 'is-invalid' : '']"
+             :placeholder="placeholder"
+             :disabled="disabled"
+             v-model="searchValue"
              @blur="onBlur"
              @focus="onFocus"
              @clear="onInput"
-             @input="onInput">
-      <template v-slot:prepend>
-        <search-icon/>
+             @keyup.enter="onInput"
+             @keyup="onLiveSearch">
+       <template v-slot:prepend>
+        <span class="search-icon-component"
+              @click="onInput">
+          <search-icon />
+        </span>
       </template>
       <template v-slot:default
                 v-if="limitSearchCharacters">
@@ -29,7 +33,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import SearchIcon from 'components/icons/search-icon'
 
 export default {
@@ -38,7 +41,7 @@ export default {
   props: {
     placeholder: {
       type: String,
-      default: 'Search name, phone, email, etc.'
+      default: 'Press ENTER to search...'
     },
 
     disabled: {
@@ -64,7 +67,8 @@ export default {
 
   data () {
     return {
-      searchValue: ''
+      searchValue: '',
+      isInvalid: false
     }
   },
 
@@ -73,16 +77,25 @@ export default {
   },
 
   methods: {
-    onInput: _.debounce(function () {
+    onInput: function () {
       // send an empty string on null value
       // (happens when page is from contact page - clicked from result)
       if (!this.searchValue) {
         this.searchValue = ''
       }
 
-      this.searchValue = this.searchValue.trim()
+      const hasError = this.showErrorMessage
+
+      this.isInvalid = hasError
+      this.$emit('show-error-message', hasError)
       this.$emit('search', this.searchValue)
-    }, 500),
+    },
+
+    onLiveSearch: function (e) {
+      if (!this.searchValue && e && e.key === 'Backspace') {
+        this.onInput()
+      }
+    },
 
     onFocus: function () {
       this.$emit('focus', this.searchValue)
@@ -100,6 +113,12 @@ export default {
   watch: {
     search () {
       this.searchValue = this.search
+    }
+  },
+
+  computed: {
+    showErrorMessage () {
+      return !this.limitSearchCharacters && this.searchValue.length > 0 && this.searchValue.length < 3
     }
   }
 }

@@ -1,24 +1,12 @@
 <template>
   <div class="row full-height">
     <div class="col-12 p-0">
-      <div v-if="!isReferrizer"
-           class="hubspot-iframe-container">
+      <div class="hubspot-iframe-container">
         <iframe class="hubspot-crm-iframe"
                 :src="hubspotLink"
                 frameborder="0"
                 id="hubspot-crm"
                 v-if="hubspotLink">
-        </iframe>
-      </div>
-
-      <div v-if="isReferrizer"
-           class="referrizer-iframe-container">
-        <iframe class="referrizer-crm-iframe"
-                :src="referrizerLink"
-                :key="contact.id"
-                frameborder="0"
-                id="referrizer-crm"
-                v-if="referrizerLink">
         </iframe>
       </div>
     </div>
@@ -44,33 +32,6 @@ export default {
 
     hubspotLink () {
       return this.getHubspotContactLink(this.contact)
-    },
-
-    referrizerLink () {
-      if (!this.isReferrizer) {
-        return null
-      }
-
-      const customUrl = this.currentCompany?.crm_view_custom_url
-
-      if (!customUrl) {
-        return null
-      }
-
-      const url = new URL(customUrl)
-      const params = new URLSearchParams(url.search)
-      const mappedParams = this.getMappedUrlParams(params)
-
-      return `${url.origin}?` + mappedParams.join('&')
-    },
-
-    isReferrizer () {
-      // dev testing
-      if (process.env.APP_ENV !== 'production') {
-        return this.profile.company.id === 2139
-      }
-
-      return this.profile.company.id === 2140
     },
 
     test () {

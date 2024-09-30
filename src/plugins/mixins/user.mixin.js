@@ -94,12 +94,6 @@ export default {
 
     isCompanyPartOfCustomEdgeLocations (companyId) {
       return storage.local.getItem('custom_edge_location_companies') && storage.local.getItem('custom_edge_location_companies').split(',').includes(String(companyId))
-    },
-
-    isCompanyPartOfTeamsBeta () {
-      if (this.currentCompany?.id === 1659) return false
-
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   }
 }
