@@ -2399,10 +2399,11 @@ export default {
       if (script) {
         this.scriptId = script.id
 
-        if (this.dialer.communication) {
+        if (this.dialer?.communication) {
           API.V1.scriptCommunication.store({
             script_id: script.id,
-            communication_id: this.dialer.communication.id
+            communication_id: this.dialer.communication.id,
+            text: script.text
           }).then(() => {
             this.$generalNotification('Script added')
           }).catch(err => {
