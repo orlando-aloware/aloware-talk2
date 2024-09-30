@@ -5245,6 +5245,15 @@ i.option-separator {
   align-items: center;
 }
 
+.medium-button {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 14px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+}
+
 .btn-outlined-light {
   border-color: $grey-light11;
   color: $black;

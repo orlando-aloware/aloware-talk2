@@ -53,6 +53,7 @@
              v-else>
           <div class="column items-center">
             <compact-btn class="mb-3"
+                         customClass="medium-button"
                          variant="primary"
                          :key="access.company_id"
                          v-for="access in accessesWithoutCurrent"
