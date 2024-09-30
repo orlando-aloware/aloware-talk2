@@ -2399,7 +2399,7 @@ export default {
       if (script) {
         this.scriptId = script.id
 
-        if (!empty(this.dialer.communication)) {
+        if (this.dialer.communication) {
           API.V1.scriptCommunication.store({
             script_id: script.id,
             communication_id: this.dialer.communication.id
