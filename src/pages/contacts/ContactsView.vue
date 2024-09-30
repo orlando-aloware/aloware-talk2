@@ -309,6 +309,15 @@
             Add to Sequence
           </b-dropdown-item>
           <b-dropdown-item href="#"
+                           data-testid="contacts-view-assign-contacts-option-dropdown"
+                           :disabled="!isContactListSelected"
+                           @click="openAssignContacts">
+            <power-dialer-mobile-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
+            Assign Contacts
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
                            data-testid="contacts-view-enroll-aloai-option-dropdown"
                            :disabled="!this.checked.length"
                            v-if="currentCompany.aloai_enabled"
@@ -337,7 +346,6 @@
       </div>
       <div class="limit-characters-error"
            v-if="showLimitCharactersError">
-        <i class="fa fa-x"></i>
         Search requires at least 3 characters
       </div>
     </template>
@@ -774,6 +782,9 @@
         :params="attachedParams()"
         :contactList="selectedList"
       />
+    <assign-contacts-modal :is-show="showAssignContacts"
+                           :list="selectedList"
+                           @closeAssignContactsModal="closeAssignContacts" />
     </template>
   </contacts-screen>
 </template>
@@ -824,6 +835,7 @@ import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-mo
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
+import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 
 export default {
   name: 'contacts-view',
@@ -865,7 +877,8 @@ export default {
     BlockTooltip,
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
-    EnrollContactsToAloaiModal
+    EnrollContactsToAloaiModal,
+    AssignContactsModal
   },
 
   props: {
@@ -948,6 +961,7 @@ export default {
       showAddToSequence: false,
       workflowId: null,
       openAloAiEnrollmentModal: false,
+      showAssignContacts: false,
       showLimitCharactersError: false
     }
   },
@@ -1299,6 +1313,14 @@ export default {
 
     closeAddToSequence () {
       this.showAddToSequence = false
+    },
+
+    openAssignContacts () {
+      this.showAssignContacts = true
+    },
+
+    closeAssignContacts () {
+      this.showAssignContacts = false
     },
 
     hasIntegration (contact) {
