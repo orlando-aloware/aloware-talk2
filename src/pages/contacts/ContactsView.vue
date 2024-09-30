@@ -300,6 +300,15 @@
             Add to My Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
+                           data-testid="contacts-view-assign-contacts-option-dropdown"
+                           :disabled="!isContactListSelected"
+                           @click="openAssignContacts">
+            <power-dialer-mobile-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
+            Assign Contacts
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
                            data-testid="contacts-view-enroll-aloai-option-dropdown"
                            :disabled="!this.checked.length"
                            v-if="currentCompany.aloai_enabled"
@@ -761,6 +770,9 @@
         :params="attachedParams()"
         :contactList="selectedList"
       />
+    <assign-contacts-modal :is-show="showAssignContacts"
+                           :list="selectedList"
+                           @closeAssignContactsModal="closeAssignContacts" />
     </template>
   </contacts-screen>
 </template>
@@ -809,6 +821,7 @@ import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
+import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 
 export default {
   name: 'contacts-view',
@@ -848,7 +861,8 @@ export default {
     ImportContactsModal,
     BlockTooltip,
     PowerDialerAddModal,
-    EnrollContactsToAloaiModal
+    EnrollContactsToAloaiModal,
+    AssignContactsModal
   },
 
   props: {
@@ -929,6 +943,7 @@ export default {
       openPDModal: false,
       isContactModule: false,
       openAloAiEnrollmentModal: false,
+      showAssignContacts: false,
       showLimitCharactersError: false
     }
   },
@@ -1265,6 +1280,14 @@ export default {
       'setPreviousListFilters',
       'addPowerDialerOpen'
     ]),
+
+    openAssignContacts () {
+      this.showAssignContacts = true
+    },
+
+    closeAssignContacts () {
+      this.showAssignContacts = false
+    },
 
     hasIntegration (contact) {
       // activate only for multi-entity allowed company
