@@ -761,7 +761,7 @@
             </b-form-row>
 
             <!--RECEIVED/SENT BY-->
-            <b-form-row v-if="getUser(communication.user_id) && communication.type === CommunicationTypes.SMS"
+            <b-form-row v-if="communication?.user_id && communication?.type === CommunicationTypes.SMS"
                         data-testid="comm-details-sent-by-row">
               <b-col class="pl-0 pr-0" data-testid="comm-details-sent-by-col">
                 <q-item-label v-if="communication.direction === CommunicationDirections.INBOUND">
@@ -774,6 +774,19 @@
               <b-col data-testid="comm-details-sent-by-col">
                 <div class="d-flex align-items-center">
                   {{ getUser(communication.user_id).name }}
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!-- SENT AS MMS -->
+            <b-form-row data-testid="comm-details-sent-as-mms-row"
+                        v-if="isCommunicationSentAsMms">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-sent-as-mms-col">
+                <q-item-label>Sent as MMS: </q-item-label>
+              </b-col>
+              <b-col data-testid="comm-details-sent-as-mms-col">
+                <div class="d-flex align-items-center">
+                  {{ sentAsMmsLabel }}
                 </div>
               </b-col>
             </b-form-row>
@@ -1154,6 +1167,16 @@ export default {
 
     hasCustomFields () {
       return this.communication.metadata?.custom_fields && Object.keys(this.communication.metadata.custom_fields).length > 0
+    },
+
+    isCommunicationSentAsMms () {
+      return this.communication.type === CommunicationTypes.SMS && this.communication.direction === CommunicationDirections.OUTBOUND && this.sentAsMmsLabel
+    },
+
+    sentAsMmsLabel () {
+      const sendAsMms = this.communication.metadata?.send_as_mms
+
+      return sendAsMms ? 'Yes' : 'No'
     }
   },
 
