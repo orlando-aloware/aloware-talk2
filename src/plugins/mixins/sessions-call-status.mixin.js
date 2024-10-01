@@ -319,7 +319,7 @@ export default {
           if (redial) {
             position = 'top'
             this.taskToCall.contact_list_item_id = res.data.data.id
-            this.taskToCall.redial_status = res.data.data.redialed
+            this.taskToCall.redial = res.data.data.redialed
           }
 
           this.$generalNotification(`Success: contact is at the ${position} of the current list`)
