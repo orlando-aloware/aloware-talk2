@@ -255,6 +255,9 @@ export default {
         const hasSkippedTasks = this.powerDialerTasks[TaskType.SKIPPED]?.length > 0
         const remainingInQueueTasks = this.powerDialerTaskFilters[TaskType.IN_QUEUE] ? this.powerDialerTaskFilters[TaskType.IN_QUEUE].total_queued > this.inQueueFetchTasks.fetchedTasks : false
 
+        console.log('**** fetchTasks **** lastItemsInCurrentQueue', lastItemsInCurrentQueue)
+        console.log('**** fetchTasks **** hasSkippedTasks', hasSkippedTasks)
+        console.log('**** fetchTasks **** remainingInQueueTasks', remainingInQueueTasks)
         // Increment the pagination when the last items in the current list of IN QUEUE taks are reached
         // AND we have skipped tasks, so we need to fetch the next page of IN QUEUE tasks.
         // Otherwise we don't increment the page since the API response will change after a call is completed.
@@ -264,15 +267,19 @@ export default {
 
         this.getTaskByFilter(params)
           .then(res => {
+            console.log('**** fetchTasks **** getTaskByFilter response', res)
             this.powerDialerTaskFilters[taskType] = this.$jsonClone(res.data)
             delete this.powerDialerTaskFilters[taskType].data
 
             if (status === AutoDialTaskStatus.STATUS_QUEUED && !refreshData) {
+              console.log('**** fetchTasks **** getTaskByFilter STATUS_QUEUED')
+              console.log('**** fetchTasks **** getTaskByFilter this.powerDialerTasks[taskType]', this.powerDialerTasks[taskType])
               const newInQueueList = this.filterNewInQueueTasks(res.data.data, taskType, true, true)
 
               if (newInQueueList?.length) {
                 this.powerDialerTasks[taskType] = newInQueueList
               }
+              console.log('**** fetchTasks **** getTaskByFilter this.powerDialerTasks[taskType]', this.powerDialerTasks[taskType])
             } else {
               const retrievedTasks = res.data.data
               const newTasks = retrievedTasks.filter(element => !this.powerDialerTasks[taskType].some(item => item.id === element.id))
