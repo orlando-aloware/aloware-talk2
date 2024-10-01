@@ -18,6 +18,14 @@ const toUpperCase = (text) => {
   return ''
 }
 
+const toLowerCase = (text) => {
+  if (text) {
+    return text.toLowerCase()
+  }
+
+  return ''
+}
+
 /**
  * Capitalize text
  * @param {string} text
@@ -688,6 +696,7 @@ export default ({ Vue }) => {
   const filters = {
     fixPhone,
     toUpperCase,
+    toLowerCase,
     capitalize,
     initials,
     humanReadableBool,
