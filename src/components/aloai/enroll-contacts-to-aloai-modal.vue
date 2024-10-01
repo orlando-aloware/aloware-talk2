@@ -100,7 +100,7 @@
           Cancel
         </b-button>
         <b-button
-          variant="success"
+          variant="primary"
           size="sm"
           class="custom-btn"
           :disabled="!selectedBotId || isBusy"
@@ -142,7 +142,8 @@ export default {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', [
       'currentListFilters',
-      'showAddViewMyContacts'
+      'showAddViewMyContacts',
+      'search'
     ]),
     ...mapState(['isDatatableSelectedAll']),
     filteredBots () {
@@ -181,6 +182,10 @@ export default {
         'multiple_phone_numbers': false,
         'allow_international_phone_numbers': false,
         'own_contacts_only': this.showAddViewMyContacts
+      }
+
+      if (this.search) {
+        params.search = this.search
       }
 
       if (this.isDatatableSelectedAll) {

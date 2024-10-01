@@ -77,7 +77,6 @@
 </template>
 
 <script>
-import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
@@ -124,7 +123,7 @@ export default {
     powerDialerParams () {
       return {
         target: this.list.listId || this.list.id,
-        size: _.get(this.list, 'metaData.size', null)
+        size: this.list?.additionalProperties?.hs_list_size || null
       }
     },
 

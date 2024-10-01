@@ -712,6 +712,18 @@ export default {
       }
     },
 
+    contactsList: {
+      assignContactsTo (contactListId, payload = {}) {
+        const params = {
+          assign_to: payload.assign_contacts_to,
+          id: payload.assign_contacts_to === 'ring_group' ? payload.ring_group_id : payload.user_id,
+          force: payload.force,
+          from_talk: true
+        }
+        return window.axios.post(`${suffixV2}contacts-list/${contactListId}/assign`, params)
+      }
+    },
+
     contactListItem: {
       addContact (contactListId, contacts = []) {
         return window.axios.post(`${suffixV2}contact-list-items`, {

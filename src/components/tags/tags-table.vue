@@ -226,11 +226,11 @@
     <tag-contacts-splitter :is-show="isOpenTagContactsSplitterDialog"
                            :tag="selectedTag"
                            data-testid="tags-contacts-splitter"
-                           @closeAssignContactsTagModal="closeContactTagsActionsModals" />
+                           @closeAssignContactsModal="closeContactTagsActionsModals" />
 
-    <assign-contacts-by-tag :is-show="isOpenAssignContactsTagDialog"
-                            :tag="selectedTag"
-                            @closeAssignContactsTagModal="closeContactTagsActionsModals" />
+    <assign-contacts-modal :is-show="isOpenAssignContactsTagDialog"
+                           :tag="selectedTag"
+                           @closeAssignContactsModal="closeContactTagsActionsModals" />
 
     <convert-to-list :is-show="isOpenConvertToListDialog"
                      :tag="selectedTag"
@@ -258,8 +258,8 @@ import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
-import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 import ConvertToList from 'components/tags/convert-to-list.vue'
+import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
@@ -281,8 +281,8 @@ export default {
     DeleteTagDialog,
     TagContactsWorkflowEnroller,
     TagContactsAddToPowerDialer,
-    AssignContactsByTag,
     ConvertToList,
+    AssignContactsModal,
     TagContactsSplitter,
     Datatable,
     EditPenIcon,
