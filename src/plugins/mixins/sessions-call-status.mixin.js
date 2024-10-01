@@ -315,15 +315,11 @@ export default {
 
       return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`, { redial })
         .then(res => {
-          console.log('******* redialTask after skip response', res)
-          console.log('******* redialTask after skip redial', redial)
-
           let position = 'bottom'
           if (redial) {
             position = 'top'
             this.taskToCall.contact_list_item_id = res.data.data.id
             this.taskToCall.redial_status = res.data.data.redialed
-            console.log('||| redialTask ||| this.taskToCall', this.taskToCall)
           }
 
           this.$generalNotification(`Success: contact is at the ${position} of the current list`)

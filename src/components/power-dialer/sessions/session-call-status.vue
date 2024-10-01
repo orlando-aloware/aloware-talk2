@@ -1519,7 +1519,7 @@ export default {
         task = get(this.powerDialerTasks.in_queue, '0', null)
       }
       this.taskToCall = cloneDeep(task)
-      console.log('||| onRedial ||| this.taskToCall', this.taskToCall)
+
       // end session if no more tasks
       if (isEmpty(task)) {
         this.hasActiveTask = false
@@ -1568,8 +1568,7 @@ export default {
     },
 
     requeueTask () {
-      console.log('/*/*/*/*/ requeueTask this.redialedTask', this.redialedTask)
-      /* if (isEmpty(this.redialedTask)) {
+      if (isEmpty(this.redialedTask)) {
         return
       }
 
@@ -1582,7 +1581,7 @@ export default {
         })
       }
 
-      this.redialedTask = {} */
+      this.redialedTask = {}
     },
 
     onHoldFailed () {
