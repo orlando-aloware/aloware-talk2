@@ -59,23 +59,13 @@
         </b-col>
       </b-row>
 
-      <b-row class="d-flex"
-             v-if="shouldShowTagsDeprecationBanner">
-        <b-col class="d-flex justify-content-center"
-               md="8"
-               offset-md="2"
-               sm="12">
-          <div class="tags-deprecation-banner px-2 py-2 px-3">
-            <div class="left-content">
-              <p class="trial--text">
-                <strong>Contact Tags</strong> are being moved to <strong>Lists</strong> in the next 60 days. Please consider moving to the <strong>lists page</strong>.
-              </p>
-            </div>
-          </div>
-        </b-col>
-      </b-row>
+      <!-- deprecation banner -->
+      <al-alert>
+        <span class="text-dark"
+              v-html="TAGS_DEPRECATION_MESSAGE" />
+      </al-alert>
 
-       <!-- loading spinner -->
+      <!-- loading spinner -->
       <b-overlay class="h-100 w-100 d-flex flex-column overflow-hidden"
                  rounded="sm"
                  data-testid="tags-loading-spinner"
@@ -124,6 +114,9 @@ import TagForm from 'components/tags/tag-form.vue'
 import { aclMixin, tagsMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import TagsBulkActionMenu from 'components/tags-bulk-action-menu.vue'
+import AlAlert from 'components/alert/index.vue'
+
+import { TAGS_DEPRECATION_MESSAGE } from 'src/constants/deprecation-messages'
 
 export default {
   name: 'Tags',
@@ -133,7 +126,8 @@ export default {
     TagForm,
     TagsTable,
     TagsTabs,
-    Search
+    Search,
+    AlAlert
   },
 
   mixins: [
@@ -147,6 +141,7 @@ export default {
       isLoading: false,
       isLoadingRefreshCount: false,
       tags: [],
+      TAGS_DEPRECATION_MESSAGE,
       pagination: {
         currentPage: 1,
         perPage: 25,
