@@ -205,8 +205,7 @@ export default {
         show_in_public_folder: showInPublicFolder
       }
 
-      const xhr = API.V1.tags.convertTagToList(payload)
-      xhr
+      API.V1.tags.convertTagToList(payload)
         .then(res => {
           this.loading = false
           this.closeModal()
