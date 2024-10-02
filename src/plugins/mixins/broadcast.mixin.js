@@ -379,7 +379,6 @@ export default {
           if (campaign) {
             event.communication.campaign = campaign
           }
-          console.log('event user- .communication.updated update_communication', event.communication)
           this.$VueEvent.fire('update_communication', event.communication)
         })
 
@@ -494,7 +493,6 @@ export default {
           if (campaign) {
             event.communication.campaign = campaign
           }
-          console.log('event company- .communication.updated update_communication', event.communication)
           this.$VueEvent.fire('update_communication', event.communication)
         })
         .listen('.communication.deleted', (event) => {
@@ -623,7 +621,6 @@ export default {
         .listen('.contact_audit.created', (event) => {
           let contactAudit = event.audit
           if (contactAudit) {
-            console.log('event contact_audit_created ', contactAudit)
             this.$VueEvent.fire('contact_audit_created', contactAudit)
           }
         })

@@ -339,7 +339,7 @@ export default {
         this.communicationsAndAudits.push(data)
         this.removeDuplicateCommunicationsAndAudits()
         this.scrollMessages()
-        this.sortByCreatedAt()
+        this.sortCommunicationsAndAudits()
       }
     },
 
@@ -398,7 +398,6 @@ export default {
           // update communication
           console.log('WAT-612 communicationsAndAudits 1', data)
           Object.assign(this.communicationsAndAudits[index], data)
-          this.sortByCreatedAt()
         }
       }
     },
@@ -681,7 +680,6 @@ export default {
       if (!found) {
         console.log('WAT-612 communicationsAndAudits 2', audit)
         this.communicationsAndAudits.push(audit)
-        this.sortByCreatedAt()
       }
     },
 
@@ -1176,7 +1174,7 @@ export default {
       })
     },
 
-    sortByCreatedAt () {
+    sortCommunicationsAndAudits () {
       console.log('this.communicationsAndAudits before', this.communicationsAndAudits)
       this.communicationsAndAudits = _.orderBy(
         this.communicationsAndAudits,
@@ -1221,15 +1219,6 @@ export default {
     contactId: function () {
       this.communicationsPage = 1
     }
-
-    // communicationsAndAudits: {
-    //   handler () {
-    //     console.log('WAT-612 communicationsAndAudits before', this.communicationsAndAudits)
-    //     this.sortByCreatedAt()
-    //     console.log('WAT-612 communicationsAndAudits after', this.communicationsAndAudits)
-    //   },
-    //   deep: true
-    // }
   },
 
   beforeDestroy () {
