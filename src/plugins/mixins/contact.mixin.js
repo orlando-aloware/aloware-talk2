@@ -1177,7 +1177,9 @@ export default {
     },
 
     sortByCreatedAt () {
+      console.log('this.communicationsAndAudits before', this.communicationsAndAudits)
       this.communicationsAndAudits = _.orderBy(this.communicationsAndAudits, ['created_at'], ['asc'])
+      console.log('this.communicationsAndAudits after', this.communicationsAndAudits)
     },
 
     ...mapActions('contacts', [
