@@ -1205,14 +1205,14 @@ export default {
 
     contactId: function () {
       this.communicationsPage = 1
-    }//,
+    },
 
-    // communicationsAndAudits: {
-    //   handler () {
-    //     this.sortByCreatedAt()
-    //   },
-    //   deep: true
-    // }
+    communicationsAndAudits: {
+      handler () {
+        this.sortByCreatedAt()
+      },
+      deep: true
+    }
   },
 
   beforeDestroy () {
