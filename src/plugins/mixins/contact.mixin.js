@@ -1209,7 +1209,9 @@ export default {
 
     communicationsAndAudits: {
       handler () {
+        console.log('WAT-612 communicationsAndAudits before', this.communicationsAndAudits)
         this.sortByCreatedAt()
+        console.log('WAT-612 communicationsAndAudits after', this.communicationsAndAudits)
       },
       deep: true
     }
