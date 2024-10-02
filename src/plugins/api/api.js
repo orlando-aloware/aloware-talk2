@@ -237,6 +237,10 @@ export default {
         return window.axios.post(`${suffixV1}tags/bulk-assign-contacts-to`, params)
       },
 
+      convertTagToList (params) {
+        return window.axios.post(`${suffixV2}contacts-list/convert`, params)
+      },
+
       addTasksToUserPowerDialer (id, params) {
         return window.axios.post(`${suffixV1}tags/${id}/add-to-user-power-dialer`, params)
       },

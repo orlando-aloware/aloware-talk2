@@ -1,5 +1,27 @@
 <template>
   <div class="tags-table position-relative overflow-hidden">
+    <q-dialog persistent
+              v-model="convertedListDialog">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">
+            New List Created
+          </div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          The tag has been successfully converted to a contact list.
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat
+                 label="Go to list"
+                 color="primary"
+                 @click="retirectToConvertedList"/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <datatable custom-class="pr-3"
                paginated
                show-pagination
@@ -150,6 +172,11 @@
                       <i class="fas fa-sign-in-alt"></i> Assign Contacts
                     </b-dropdown-item>
 
+                    <b-dropdown-item data-testid="tags-table-dropdown-item-convert-to-list"
+                                     @click="openConvertToListDialog(tag)">
+                      <i class="fas fa-address-book"></i> Convert to List
+                    </b-dropdown-item>
+
                     <b-dropdown-item data-testid="tags-table-dropdown-item-add-to-power-dialer"
                                      @click="openAddTagContactsToPowerDialerDialog(tag)">
                       <i class="fas fa-phone"></i> Add to PowerDialer
@@ -205,6 +232,11 @@
                            :tag="selectedTag"
                            @closeAssignContactsModal="closeContactTagsActionsModals" />
 
+    <convert-to-list :is-show="isOpenConvertToListDialog"
+                     :tag="selectedTag"
+                     @closeConvertToListModal="closeContactTagsActionsModals"
+                     @listConverted="onListConverted" />
+
     <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
                                       :tag="selectedTag"
                                       @closeAddTagContactsToPowerDialer="closeContactTagsActionsModals" />
@@ -226,6 +258,7 @@ import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import EllipseIcon from 'components/icons/ellipse-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
 import TagContactsSplitter from 'components/tags/tag-contacts-splitter.vue'
+import ConvertToList from 'components/tags/convert-to-list.vue'
 import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
@@ -248,6 +281,7 @@ export default {
     DeleteTagDialog,
     TagContactsWorkflowEnroller,
     TagContactsAddToPowerDialer,
+    ConvertToList,
     AssignContactsModal,
     TagContactsSplitter,
     Datatable,
@@ -291,9 +325,12 @@ export default {
       selectedTag: null,
       isOpenTagContactsSplitterDialog: false,
       isOpenAssignContactsTagDialog: false,
+      isOpenConvertToListDialog: false,
       isOpenAddTagContactsToPowerDialerDialog: false,
       isOpenEnrollTagContactsToSequenceDialog: false,
-      isOpenDeleteTagDialog: false
+      isOpenDeleteTagDialog: false,
+      convertedListDialog: false,
+      convertedList: {}
     }
   },
 
@@ -391,6 +428,11 @@ export default {
       this.isOpenAssignContactsTagDialog = true
     },
 
+    openConvertToListDialog (tag) {
+      this.selectedTag = tag
+      this.isOpenConvertToListDialog = true
+    },
+
     openAddTagContactsToPowerDialerDialog (tag) {
       this.selectedTag = tag
       this.isOpenAddTagContactsToPowerDialerDialog = true
@@ -404,6 +446,7 @@ export default {
     closeContactTagsActionsModals () {
       this.isOpenTagContactsSplitterDialog = false
       this.isOpenAssignContactsTagDialog = false
+      this.isOpenConvertToListDialog = false
       this.isOpenAddTagContactsToPowerDialerDialog = false
       this.isOpenEnrollTagContactsToSequenceDialog = false
 
@@ -487,6 +530,23 @@ export default {
       if (this.selectedTagCategory === this.CommunicationTags) {
         this.setSelectedTagsContactsCount(0)
       }
+    },
+
+    onListConverted (list) {
+      this.convertedListDialog = true
+      this.convertedList = list
+    },
+
+    retirectToConvertedList () {
+      if (this.convertedList.show_in_public_folder) {
+        this.$router.push({ path: '/contacts/list/' + this.convertedList.id,
+          query: { type: 'public' },
+          meta: { type: 'public' }
+        })
+        return
+      }
+
+      this.$router.push({ path: '/contacts/list/' + this.convertedList.id })
     }
   },
 
