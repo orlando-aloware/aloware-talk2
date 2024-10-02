@@ -2,14 +2,13 @@
   <b-modal id="tag-convert-to-list-modal"
            modal-class="tags__modal"
            size="md"
-           centered
            data-testid="tags-convert-to-list-modal"
+           centered
            v-model="openModal"
            @hide="closeModalPrompt">
-    <b-overlay no-wrap
+    <b-overlay data-testid="tags-convert-to-list-loading"
                rounded="sm"
-               data-testid="tags-convert-to-list-loading"
-               :show="true"
+               no-wrap
                v-show="loading">
       <template #overlay>
         <q-spinner-bars color="primary"
@@ -18,7 +17,9 @@
     </b-overlay>
 
     <template #modal-title>
-      <h6 data-testid="tags-convert-to-list-modal-title">{{ formName }}</h6>
+      <h6 data-testid="tags-convert-to-list-modal-title">
+        {{ formName }}
+      </h6>
     </template>
 
     <b-tabs content-class="mt-3"
