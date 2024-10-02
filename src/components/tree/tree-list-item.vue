@@ -79,6 +79,7 @@
           <list-actions
             :list-id="id"
             :type="type"
+            :showInPublicFolder="showInPublicFolder"
             :hasEdit="hasEdit"
             :hasDelete="hasDelete"
             :isPinned="isPinned"
@@ -87,6 +88,7 @@
             @pin="onPin"
             @move="onMove"
             @duplicate="onDuplicate"
+            @split="onSplit"
             @clonestatic="onCloneStatic"/>
         </b-popover>
       </div>
@@ -141,6 +143,11 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    showInPublicFolder: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
@@ -245,6 +252,10 @@ export default {
         id: this.id,
         type: this.type
       })
+    },
+    onSplit () {
+      this.$root.$emit('bv::hide::popover')
+      console.log('split!!!!')
     },
     onCloneStatic () {
       this.$root.$emit('bv::hide::popover')

@@ -7,6 +7,7 @@
         class="flex-grow-1 w-100"
         v-for="list in lists"
         :name="list.name"
+        :showInPublicFolder="list.show_in_public_folder"
         :key="list.id"
         :id="list.id"
         :layer="layer"
