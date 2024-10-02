@@ -335,6 +335,7 @@ export default {
 
       if (!found) {
         // push new data to top of array
+        console.log('WAT-612 communicationsAndAudits 3', data)
         this.communicationsAndAudits.push(data)
         this.removeDuplicateCommunicationsAndAudits()
         this.scrollMessages()
@@ -394,6 +395,7 @@ export default {
 
         if (index > -1) {
           // update communication
+          console.log('WAT-612 communicationsAndAudits 1', data)
           Object.assign(this.communicationsAndAudits[index], data)
         }
       }
@@ -675,6 +677,7 @@ export default {
         .find(communication => this.isCommOrAuditExists(communication, audit))
 
       if (!found) {
+        console.log('WAT-612 communicationsAndAudits 2', audit)
         this.communicationsAndAudits.push(audit)
       }
     },
@@ -1170,6 +1173,10 @@ export default {
       })
     },
 
+    sortByCreatedAt () {
+      this.communicationsAndAudits = _.orderBy(this.communicationsAndAudits, ['created_at'], ['asc'])
+    },
+
     ...mapActions('contacts', [
       'setContact',
       'setContactClone',
@@ -1198,6 +1205,13 @@ export default {
 
     contactId: function () {
       this.communicationsPage = 1
+    },
+
+    communicationsAndAudits: {
+      handler () {
+        this.sortByCreatedAt()
+      },
+      deep: true
     }
   },
 
