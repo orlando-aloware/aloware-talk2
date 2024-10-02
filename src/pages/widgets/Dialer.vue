@@ -381,6 +381,11 @@ export default {
           this.showAlertCallFinished = false
         }
 
+        // if we finished - don't need to handle dial number
+        if (this.showAlertCallFinished) {
+          return
+        }
+
         if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
           this.handleDialNumber(this.hubspotPhoneNumber)
         }
