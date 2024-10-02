@@ -120,6 +120,11 @@ export default {
     },
     isPinned: {
       type: Boolean
+    },
+    showInPublicFolder: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
@@ -136,7 +141,7 @@ export default {
         return false
       } */
       /* const isAgent = this.profile.role_names.includes('Company Agent')
-      if (this.show_in_public_folder && isAgent) {
+      if (this.showInPublicFolder && isAgent) {
         return false
       }
       return this.type === ContactListTypes.STATIC_LIST && this.no_of_contacts > 50 */
