@@ -79,14 +79,23 @@
                        v-if="!this.canAddBroadcasts">
         </block-tooltip>
         <div id="broadcast-popover"
-            class="broadcasts__home__header__new-button">
-          <compact-btn variant="primary"
+             class="broadcasts__home__header__new-button">
+          <compact-btn variant="success"
+                       class="mr-2"
                        :disabled="!this.canAddBroadcasts"
-                       v-if="hasPermissionTo(['create broadcast message', 'create broadcast rvm', 'update broadcast'])"
+                       v-if="hasPermissionTo(['create broadcast message', 'update broadcast'])"
                        @clicked="$router.push({ path: '/broadcasts/new' })">
             <plus-icon class="mr-1"
                        color="white"/>
             New Bulk Message
+          </compact-btn>
+          <compact-btn variant="primary"
+                       :disabled="!this.canAddBroadcasts"
+                       v-if="hasPermissionTo(['create broadcast rvm', 'update broadcast'])"
+                       @clicked="$router.push({ path: '/broadcasts/new?type=rvm' })">
+            <plus-icon class="mr-1"
+                       color="white"/>
+            New Bulk RVM
           </compact-btn>
         </div>
       </div>

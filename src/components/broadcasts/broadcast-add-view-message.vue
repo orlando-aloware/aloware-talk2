@@ -40,11 +40,6 @@
       </div>
     </div>
 
-    <b-form-radio-group stacked
-                        value-field="id"
-                        text-field="label"
-                        :options="types"
-                        v-model="type"/>
     <!-- sms -->
     <div class="broadcast-add__message__sms"
          v-if="type === 'sms'">
@@ -186,6 +181,11 @@ export default {
   },
 
   props: {
+    type: {
+      type: String,
+      required: true
+    },
+
     rvm: {
       type: Object,
       default: null
@@ -205,7 +205,6 @@ export default {
   },
 
   data: () => ({
-    type: 'sms',
     maxSmsBodyLength: 1600, // Maximum length of a single SMS message body.
     throttle: null, // Throttling settings for the campaign, controls the rate of message sending.
     mpsLimit: 0.25 // Maximum messages per second (MPS) that the campaign is allowed to send.
@@ -264,21 +263,6 @@ export default {
       }
     },
 
-    types () {
-      return [
-        {
-          id: 'sms',
-          label: 'SMS',
-          enabled: this.hasSmsEnabled && this.hasPermissionTo('create broadcast message')
-        },
-        {
-          id: 'rvm',
-          label: 'Ringless Voicemail',
-          enabled: this.hasRvmEnabled && this.hasPermissionTo('create broadcast rvm')
-        }
-      ].filter(type => type.enabled)
-    },
-
     optoutTextLength () {
       return this.isOptoutActive ? this.optoutText.length : 0
     },
@@ -329,8 +313,6 @@ export default {
     this.setCampaign()
     this.throttle = this.propThrottle
 
-    // type setup
-    this.type = this.rvm ? 'rvm' : 'sms'
     this.setIsOptoutActive(true)
   },
 
@@ -409,20 +391,6 @@ export default {
         this.setMessageComposerSmsBody(newBody)
         this.messageLength(newBody)
       }
-    },
-
-    type (type) {
-      // clean content of non-selected types
-      switch (type) {
-        case 'sms':
-          this.$emit('rvm-updated', null)
-          break
-        case 'rvm':
-          this.setMessageComposerSmsBody('')
-          break
-      }
-
-      this.$emit('type-updated', type)
     },
 
     propCampaign (campaign) {
