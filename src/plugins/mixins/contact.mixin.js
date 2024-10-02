@@ -1178,7 +1178,17 @@ export default {
 
     sortByCreatedAt () {
       console.log('this.communicationsAndAudits before', this.communicationsAndAudits)
-      this.communicationsAndAudits = _.orderBy(this.communicationsAndAudits, ['created_at'], ['asc'])
+      this.communicationsAndAudits = _.orderBy(
+        this.communicationsAndAudits,
+        [
+          'created_at',
+          item => item.type ? 0 : 1
+        ],
+        [
+          'asc',
+          'asc'
+        ]
+      )
       console.log('this.communicationsAndAudits after', this.communicationsAndAudits)
     },
 
