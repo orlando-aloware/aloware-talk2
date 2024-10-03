@@ -154,7 +154,7 @@
 
           <hr>
 
-          <div v-if="mode == 'add-contact-list'">
+          <div v-if="mode === 'add-contact-list'">
             <label class="label mb-1 text-weight-bold"
                    data-testid="power-dialer-add-modal-conversion-options">
               Select Power Dialer List
@@ -400,7 +400,8 @@ export default {
     ...mapState('contacts', [
       'isAddPowerDialerOpen',
       'currentListFilters',
-      'showAddViewMyContacts'
+      'showAddViewMyContacts',
+      'search'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -432,6 +433,10 @@ export default {
         'allow_international_phone_numbers': this.conversion.includes('allow_international_phone_numbers'),
         'own_contacts_only': this.conversion.includes('own_contacts_only') || this.showAddViewMyContacts,
         'direction': this.direction
+      }
+
+      if (this.search) {
+        params.search = this.search
       }
 
       if (this.isDatatableSelectedAll) {

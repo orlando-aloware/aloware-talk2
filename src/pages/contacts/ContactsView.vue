@@ -65,10 +65,11 @@
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <search class="width-260"
-                  limitSearchCharacters
+                  data-testid="contacts-view-search-input"
+                  :limitSearchCharacters="false"
                   :search="search"
                   :disabled="isLoadingDisabled"
-                  data-testid="contacts-view-search-input"
+                  @show-error-message="handleLimitCharactersError"
                   @search="onSearch">
           </search>
           <div class="contacts-total mobile">
@@ -299,6 +300,24 @@
             Add to Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
+                           data-testid="contacts-view-add-to-sequence-option-dropdown"
+                           :disabled="isAddToSequenceDisabled"
+                           @click="openAddToSequence">
+            <add-sequence-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
+            Add to Sequence
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
+                           data-testid="contacts-view-assign-contacts-option-dropdown"
+                           :disabled="!isContactListSelected"
+                           @click="openAssignContacts">
+            <power-dialer-mobile-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
+            Assign Contacts
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
                            data-testid="contacts-view-enroll-aloai-option-dropdown"
                            :disabled="!this.checked.length"
                            v-if="currentCompany.aloai_enabled"
@@ -324,6 +343,10 @@
             </span>
           </b-dropdown-item>
         </b-dropdown>
+      </div>
+      <div class="limit-characters-error"
+           v-if="showLimitCharactersError">
+        Search requires at least 3 characters
       </div>
     </template>
     <template slot="actions"
@@ -753,11 +776,17 @@
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
+      <tag-contacts-workflow-enroller :is-show="showAddToSequence"
+                                      :list="selectedList"
+                                      @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
       <enroll-contacts-to-aloai-modal
         ref="enrollContactsToAloAiModal"
         :params="attachedParams()"
         :contactList="selectedList"
       />
+    <assign-contacts-modal :is-show="showAssignContacts"
+                           :list="selectedList"
+                           @closeAssignContactsModal="closeAssignContacts" />
     </template>
   </contacts-screen>
 </template>
@@ -805,7 +834,10 @@ import {
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
+import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
+import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 
 export default {
   name: 'contacts-view',
@@ -826,6 +858,7 @@ export default {
     DeleteRedIcon,
     ExportIcon,
     PowerDialerMobileIcon,
+    AddSequenceIcon,
     AddUserIcon,
     EditHamburgerIcon,
     Search,
@@ -845,7 +878,9 @@ export default {
     ImportContactsModal,
     BlockTooltip,
     PowerDialerAddModal,
-    EnrollContactsToAloaiModal
+    TagContactsWorkflowEnroller,
+    EnrollContactsToAloaiModal,
+    AssignContactsModal
   },
 
   props: {
@@ -926,7 +961,11 @@ export default {
       openPDModal: false,
       isContactModule: false,
       addToPowerDialerMode: 'add',
-      openAloAiEnrollmentModal: false
+      showAddToSequence: false,
+      workflowId: null,
+      openAloAiEnrollmentModal: false,
+      showAssignContacts: false,
+      showLimitCharactersError: false
     }
   },
 
@@ -1165,6 +1204,10 @@ export default {
 
     isAddToPowerDialerDisabled () {
       return !this.checked.length && !this.isContactListSelected
+    },
+
+    isAddToSequenceDisabled () {
+      return !this.isContactListSelected
     }
   },
 
@@ -1263,13 +1306,33 @@ export default {
       'addPowerDialerOpen'
     ]),
 
+    setWorkflowId (id) {
+      this.workflowId = id
+    },
+
+    openAddToSequence () {
+      this.showAddToSequence = true
+    },
+
+    closeAddToSequence () {
+      this.showAddToSequence = false
+    },
+
+    openAssignContacts () {
+      this.showAssignContacts = true
+    },
+
+    closeAssignContacts () {
+      this.showAssignContacts = false
+    },
+
     hasIntegration (contact) {
       // activate only for multi-entity allowed company
       return Boolean(this.currentCompany.activate_multi_entity ? contact.external_integration_data && contact.external_integration_data.length > 0 : false)
     },
 
     onSearch (searchText) {
-      this.$emit('search', searchText.trim())
+      this.$emit('search', searchText)
     },
 
     onFetchMyContacts (checked) {
@@ -1887,6 +1950,10 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
+    },
+
+    handleLimitCharactersError (value) {
+      this.showLimitCharactersError = value
     }
   },
 
