@@ -353,7 +353,11 @@ export default {
           this.addNonOwnedLiveContact(res.data)
         }
       }).catch((err) => {
-        console.log(err)
+        console.log('getCommunication error', {
+          'callSid': this.dialer.call.callSid,
+          'from': this.dialer.call.from,
+          'err': err
+        })
       })
     })
 

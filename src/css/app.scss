@@ -15171,6 +15171,10 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   color: #9797AE;
 }
 
+#working-hours-container .business-hours-container .flex-row.hours.close{
+  opacity: 1 !important;
+}
+
 .search-icon-component {
   display: flex;
   align-items: center;
