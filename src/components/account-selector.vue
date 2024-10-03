@@ -29,7 +29,7 @@
       <q-card-section class="mb-4">
         <div class="text-body2 text-center mb-4">
           <h6 class="q-mb-md"
-             v-if="welcomeAccountSelectorFirstLoad">
+              v-if="welcomeAccountSelectorFirstLoad">
             Welcome <strong>{{ profile.first_name }}</strong>! You have access to multiple accounts.
           </h6>
           <p class="q-mb-md"
