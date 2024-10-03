@@ -1170,7 +1170,7 @@ export default {
     },
 
     isCommunicationSentAsMms () {
-      return this.communication.type === CommunicationTypes.SMS && this.communication.direction === CommunicationDirections.OUTBOUND && this.sentAsMmsLabel
+      return this.communication.type === CommunicationTypes.SMS && this.communication.direction === CommunicationDirections.OUTBOUND && this.communication.metadata?.send_as_mms
     },
 
     sentAsMmsLabel () {
