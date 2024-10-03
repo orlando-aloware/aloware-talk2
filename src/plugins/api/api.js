@@ -721,6 +721,10 @@ export default {
           from_talk: true
         }
         return window.axios.post(`${suffixV2}contacts-list/${contactListId}/assign`, params)
+      },
+
+      splitListIntoSmallerLists (contactListId, params) {
+        return window.axios.post(`${suffixV2}contacts-list/${contactListId}/split`, params)
       }
     },
 

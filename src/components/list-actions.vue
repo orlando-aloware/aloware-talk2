@@ -125,6 +125,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    contactsCount: {
+      type: Number,
+      required: false,
+      default: 0
     }
   },
   computed: {
@@ -135,16 +140,16 @@ export default {
     },
 
     shouldShowSplitOption () {
-      console.log('***** this.profile', this.profile)
-      return false
-      /* if(!this.hasEdit) {
+      if (!this.hasEdit) {
         return false
-      } */
-      /* const isAgent = this.profile.role_names.includes('Company Agent')
+      }
+
+      const isAgent = this.profile.role_names.includes('Company Agent')
       if (this.showInPublicFolder && isAgent) {
         return false
       }
-      return this.type === ContactListTypes.STATIC_LIST && this.no_of_contacts > 50 */
+
+      return this.type === ContactListTypes.STATIC && this.contactsCount > 50
     }
   }
 }

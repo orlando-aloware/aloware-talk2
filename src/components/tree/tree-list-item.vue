@@ -80,6 +80,7 @@
             :list-id="id"
             :type="type"
             :showInPublicFolder="showInPublicFolder"
+            :contactsCount="contactsCount"
             :hasEdit="hasEdit"
             :hasDelete="hasDelete"
             :isPinned="isPinned"
@@ -148,6 +149,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    contactsCount: {
+      type: Number,
+      required: false,
+      default: 0
     }
   },
 
@@ -255,7 +261,8 @@ export default {
     },
     onSplit () {
       this.$root.$emit('bv::hide::popover')
-      console.log('split!!!!')
+      this.$emit('split', this.id, this.name, this.contactsCount)
+      console.log('split!!!! this.id', this.id)
     },
     onCloneStatic () {
       this.$root.$emit('bv::hide::popover')
