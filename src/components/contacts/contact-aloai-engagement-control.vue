@@ -35,7 +35,7 @@
 <script>
 import AddUserIcon from 'components/icons/add-user-icon-2'
 import AloaiEngagementControlModal from 'components/aloai-engagement-control-modal.vue'
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import BlockTooltip from 'components/kyc/block-tooltip'
 
 export default {
@@ -51,8 +51,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['profile']),
-    ...mapState('contacts')
+    ...mapGetters('auth', ['profile'])
   },
 
   methods: {

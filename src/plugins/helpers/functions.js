@@ -164,3 +164,51 @@ export const cloneDeep = (value, map = new WeakMap()) => {
   // with circular references safely handled.
   return clone
 }
+
+/**
+ * Sets a cookie with the given name, value, and expiration days.
+ * @param {string} name - The name of the cookie.
+ * @param {string} value - The value of the cookie.
+ * @param {number} days - The number of days until the cookie expires.
+ */
+export function setCookie (name, value, days) {
+  const date = new Date()
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000))
+  const expires = '; expires=' + date?.toUTCString()
+  const domain = getTopLevelDomain()
+  document.cookie = `${name}=${value || ''}${expires}; path=/; domain=${domain}`
+}
+
+/**
+ * Retrieves the value of a cookie by its name.
+ * @param {string} name - The name of the cookie to retrieve.
+ * @returns {string|null} The value of the cookie, or null if not found.
+ */
+export function getCookie (name) {
+  const nameEQ = name + '='
+
+  const ca = document?.cookie?.split(';')
+  if (!ca) {
+    return null
+  }
+
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i]
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length)
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length)
+  }
+  return null
+}
+
+/**
+ * Gets the top-level domain of the current page.
+ * @returns {string|null} The top-level domain, or null if it can't be determined.
+ */
+export function getTopLevelDomain () {
+  const hostParts = window?.location?.hostname?.split('.')
+  if (!hostParts || hostParts.length <= 1) {
+    return null
+  }
+
+  return '.' + hostParts.slice(1).join('.')
+}

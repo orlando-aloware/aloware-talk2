@@ -224,6 +224,7 @@
       <kyc-fill-dialog :show="shouldShowKycFillDialog"
                        v-if="shouldShowKycFillDialog"/>
       <kyc-reload-dialog :show="shouldShowKycReloadDialog" />
+      <account-selector v-if="shouldShowAccountSelector" />
     </div>
   </div>
 </template>
@@ -247,7 +248,8 @@ import {
   simpsocialMixin,
   userMixin,
   settingsMixin,
-  broadcastsMixin
+  broadcastsMixin,
+  accessMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -291,6 +293,7 @@ import TrialBanner from 'components/trial-banner.vue'
 import * as TrialStatus from 'src/constants/trial-account-status'
 import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
+import AccountSelector from 'src/components/account-selector.vue'
 
 export default {
   name: 'MyLayout',
@@ -317,7 +320,8 @@ export default {
     Modal,
     TrialBanner,
     TrialExpiredModal,
-    CancelledAccountModal
+    CancelledAccountModal,
+    AccountSelector
   },
 
   mixins: [
@@ -336,7 +340,8 @@ export default {
     simpsocialMixin,
     userMixin,
     settingsMixin,
-    broadcastsMixin
+    broadcastsMixin,
+    accessMixin
   ],
 
   data () {
@@ -588,6 +593,10 @@ export default {
 
     isAuthenticated () {
       return !this.isGuest && this.authenticated
+    },
+
+    shouldShowAccountSelector () {
+      return this.isAuthenticated && this.showAccountSelector && this.profile.has_multiple_access
     },
 
     sidebarWidth () {

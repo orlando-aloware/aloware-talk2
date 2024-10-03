@@ -5245,6 +5245,15 @@ i.option-separator {
   align-items: center;
 }
 
+.medium-button {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 14px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+}
+
 .btn-outlined-light {
   border-color: $grey-light11;
   color: $black;
@@ -15182,4 +15191,25 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 
 .form-control-search-component.is-invalid {
   padding-right: 0 !important;
+}
+
+.select-account {
+  &--dialog {
+    min-height: 200px;
+
+    &.fullscreen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo-image {
+      max-width: 200px;
+      height: auto;
+    }
+  }
+
+  &--icon {
+    margin-right: 6px !important;
+  }
 }

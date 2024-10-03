@@ -42,9 +42,13 @@ import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import HeaderNotification from 'components/header-notification'
 import SimpsocialMigrationBanner from 'components/simpsocial-migration-banner.vue'
-
+import { accessMixin } from 'src/plugins/mixins'
 export default {
   name: 'App',
+
+  mixins: [
+    accessMixin
+  ],
 
   components: {
     HeaderNotification,
@@ -107,6 +111,7 @@ export default {
       // proceed to cookie validation if account is talk allowed access
       this.getSharedCookie().then(sharedCookie => {
         this.sharedCookie = sharedCookie
+        this.checkAccesses()
 
         if (storage.local.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
           this.validateCookieUser()
@@ -302,6 +307,12 @@ export default {
           company_name: this.profile.company_name
         })
       })
+    },
+
+    checkAccesses () {
+      if (this.profile?.has_multiple_access) {
+        this.getAccesses(true)
+      }
     },
 
     ...mapActions('auth', {
