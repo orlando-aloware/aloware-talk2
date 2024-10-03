@@ -12,12 +12,27 @@
             </div>
           </q-card-section>
 
-          <q-card-section class="q-pt-none">
+          <q-card-section class="q-pt-none"
+                          v-if="splitErrorMessage">
+            {{ splitErrorMessage }}
+          </q-card-section>
+
+          <q-card-actions class="text-primary"
+                          align="right"
+                          v-show="splitErrorMessage">
+            <q-btn label="Ok"
+                   flat
+                   @click="prompt = false">
+            </q-btn>
+          </q-card-actions>
+
+          <q-card-section class="q-pt-none"
+                          v-if="!splitErrorMessage">
             Split <strong>{{ listName }}</strong> list into smaller lists
           </q-card-section>
 
           <q-card-section class="q-pt-none"
-                          v-show="!loading">
+                          v-show="!loading && !splitErrorMessage">
             <q-select label="Page Size"
                       :options="options"
                       :option-disable="item => (item === null ? true : item.disabled)"
@@ -26,7 +41,7 @@
 
           <q-card-actions class="text-primary"
                           align="right"
-                          v-show="!loading">
+                          v-show="!loading && !splitErrorMessage">
             <q-btn label="Cancel"
                    flat
                    v-close-popup>
@@ -39,7 +54,7 @@
 
           <q-card-actions class="q-pt-none"
                           align="center"
-                          v-show="loading">
+                          v-show="loading && !splitErrorMessage">
             <q-spinner-bars color="primary"
                             size="30px"/>
           </q-card-actions>
@@ -58,6 +73,7 @@
                       :hasDelete="hasDelete"
                       v-for="list in lists"
                       @split="onSplit"
+                      @noSplit="onNoSplit"
       />
     </template>
     <tree-list-item
@@ -153,7 +169,8 @@ export default {
         disabled: false
       },
       listName: '',
-      listId: null
+      listId: null,
+      splitErrorMessage: ''
     }
   },
 
@@ -182,7 +199,12 @@ export default {
       this.listId = listId
       this.listName = listName
       this.prompt = true
-      console.log('voy a partir a ', listId, listName, this.optionSelected)
+    },
+
+    onNoSplit (listName, splitErrorMessage) {
+      this.listName = listName
+      this.splitErrorMessage = splitErrorMessage
+      this.prompt = true
     },
 
     disableSizeOptions (contactsCount) {

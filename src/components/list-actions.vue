@@ -31,7 +31,7 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item v-if="listId"
+    <contact-menu-item v-if="hasDuplicate && listId"
                        @click="$emit('duplicate')">
       <template slot="icon">
         <duplicate-icon></duplicate-icon>
@@ -52,7 +52,7 @@
     </contact-menu-item>
 
     <contact-menu-item
-      v-if="isContactsRoute && listId"
+      v-if="hasPin && isContactsRoute && listId"
       @click="$emit('pin')">
       <template slot="icon">
         <pin-icon></pin-icon>
@@ -85,7 +85,6 @@ import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import MoveIcon from 'components/icons/move-icon.vue'
-import { mapState } from 'vuex'
 
 export default {
   components: {
@@ -118,13 +117,23 @@ export default {
     hasDelete: {
       type: Number
     },
+    hasSplit: {
+      type: Number,
+      required: false,
+      default: 0
+    },
+    hasPin: {
+      type: Number,
+      required: false,
+      default: 1
+    },
+    hasDuplicate: {
+      type: Number,
+      required: false,
+      default: 1
+    },
     isPinned: {
       type: Boolean
-    },
-    showInPublicFolder: {
-      type: Boolean,
-      required: false,
-      default: false
     },
     contactsCount: {
       type: Number,
@@ -133,23 +142,12 @@ export default {
     }
   },
   computed: {
-    ...mapState('auth', ['profile']),
-
     isContactsRoute () {
       return this.$route.meta.title === 'Contacts'
     },
 
     shouldShowSplitOption () {
-      if (!this.hasEdit) {
-        return false
-      }
-
-      const isAgent = this.profile.role_names.includes('Company Agent')
-      if (this.showInPublicFolder && isAgent) {
-        return false
-      }
-
-      return this.type === ContactListTypes.STATIC && this.contactsCount > 50
+      return (this.type === ContactListTypes.STATIC && this.contactsCount > 50) || this.hasSplit
     }
   }
 }

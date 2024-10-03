@@ -76,21 +76,19 @@
           custom-class="contact-popover"
           :target="folderId"
           v-if="folderExists">
-          <list-actions
-            :list-id="id"
-            :type="type"
-            :showInPublicFolder="showInPublicFolder"
-            :contactsCount="contactsCount"
-            :hasEdit="hasEdit"
-            :hasDelete="hasDelete"
-            :isPinned="isPinned"
-            @remove="onRemoveList"
-            @rename="onRenameList"
-            @pin="onPin"
-            @move="onMove"
-            @duplicate="onDuplicate"
-            @split="onSplit"
-            @clonestatic="onCloneStatic"/>
+          <list-actions :list-id="id"
+                        :type="type"
+                        :contactsCount="contactsCount"
+                        :hasEdit="hasEdit"
+                        :hasDelete="hasDelete"
+                        :isPinned="isPinned"
+                        @remove="onRemoveList"
+                        @rename="onRenameList"
+                        @pin="onPin"
+                        @move="onMove"
+                        @duplicate="onDuplicate"
+                        @split="onSplit"
+                        @clonestatic="onCloneStatic"/>
         </b-popover>
       </div>
     </router-link>
@@ -176,6 +174,7 @@ export default {
       'unsavedList'
     ]),
     ...mapState(['isMobile']),
+    ...mapState('auth', ['profile']),
     indentStyle () {
       return {
         flex: `0 0 ${this.layer * 10}px`
@@ -261,8 +260,19 @@ export default {
     },
     onSplit () {
       this.$root.$emit('bv::hide::popover')
+
+      const isAgent = this.profile.role_names.includes('Company Agent')
+      if (this.type === ContactListTypes.DYNAMIC || (this.showInPublicFolder && isAgent)) {
+        this.$emit('noSplit', this.name, 'You are not allowed to split this list.')
+        return
+      }
+
+      if (this.type === ContactListTypes.STATIC && this.contactsCount <= 50) {
+        this.$emit('noSplit', this.name, 'The list must have more than 50 contacts to be split')
+        return
+      }
+
       this.$emit('split', this.id, this.name, this.contactsCount)
-      console.log('split!!!! this.id', this.id)
     },
     onCloneStatic () {
       this.$root.$emit('bv::hide::popover')
