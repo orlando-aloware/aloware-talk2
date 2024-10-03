@@ -190,7 +190,6 @@ export default function () {
       currentTime: null,
       listId: null
     },
-    redialed: [],
     pdViewSource: null,
     pdViewCancelToken: null,
     bulkAddContactsNotification: {}
