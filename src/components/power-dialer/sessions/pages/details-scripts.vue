@@ -17,6 +17,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ScriptSelector from 'components/generic-selectors/session-scripts-selector'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'DetailsScripts',
@@ -108,6 +109,16 @@ export default {
 
       this.script = lastCommunicationData.data.find(script => {
         return script.id === this.selectedScript
+      })
+
+      API.V1.scriptCommunication.store({
+        script_id: this.script.id,
+        communication_id: lastCommunicationId,
+        text: this.script.text
+      }).then(() => {
+        this.$generalNotification('Script added')
+      }).catch(err => {
+        console.log(err)
       })
     }
   },
