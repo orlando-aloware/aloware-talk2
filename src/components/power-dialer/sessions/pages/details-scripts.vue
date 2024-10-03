@@ -111,15 +111,15 @@ export default {
         return script.id === this.selectedScript
       })
 
-      API.V1.scriptCommunication.store({
-        script_id: this.script.id,
-        communication_id: lastCommunicationId,
-        text: this.script.text
-      }).then(() => {
-        this.$generalNotification('Script added')
-      }).catch(err => {
+      try {
+        await API.V1.scriptCommunication.store({
+          script_id: this.selectedScript,
+          communication_id: lastCommunicationId,
+          text: this.script.text
+        })
+      } catch (err) {
         console.log(err)
-      })
+      }
     }
   },
 
