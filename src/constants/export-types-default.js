@@ -29,3 +29,4 @@ export const TYPE_IMPORT_LOGS_REPORTING = 'import_logs'
 // contact list items
 export const TYPE_EXPORT_CONTACT_LIST_ITEMS = 'contact_list_items'
 export const TYPE_EXPORT_POWER_DIALER_LIST_ITEMS = 'power_dialer_list_items'
+export const TYPE_EXPORT_CONTACT_COMMUNICATIONS = 'contact_communications_export'

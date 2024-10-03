@@ -280,7 +280,8 @@ import KycReloadDialog from 'components/kyc-reload-dialog.vue'
 import store from 'src/store'
 import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
-  TYPE_EXPORT_CONTACT_LIST_ITEMS
+  TYPE_EXPORT_CONTACT_LIST_ITEMS,
+  TYPE_EXPORT_CONTACT_COMMUNICATIONS
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
 import talk2Api from 'src/plugins/api/api'
@@ -378,7 +379,8 @@ export default {
       accountSuspended: false,
       allowedExports: [
         TYPE_EXPORT_CONTACT_LIST_ITEMS,
-        TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
+        TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
+        TYPE_EXPORT_CONTACT_COMMUNICATIONS
       ],
       mainListeners: {},
       isElectronEventsStarted: false,
@@ -1003,7 +1005,16 @@ export default {
         return
       }
 
-      const type = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer' : 'Contacts'
+      let type = 'Contacts'
+
+      if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        type = 'Power Dialer'
+      }
+
+      if (task.export.type === TYPE_EXPORT_CONTACT_COMMUNICATIONS) {
+        type = 'Communications'
+      }
+
       this.$generalNotification(`${type} list is being exported. Please wait for a while.`, 'success')
     }
 
@@ -1012,7 +1023,16 @@ export default {
         return
       }
 
-      const listText = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer list' : 'Contacts list'
+      let listText = 'Contacts list'
+
+      if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        listText = 'Power Dialer list'
+      }
+
+      if (task.export.type === TYPE_EXPORT_CONTACT_COMMUNICATIONS) {
+        listText = 'Communications list'
+      }
+
       this.$generalNotification(
         `Your ${listText} export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
         'export-csv',
