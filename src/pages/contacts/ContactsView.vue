@@ -770,7 +770,7 @@
               v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
       <power-dialer-add-modal :params="attachedParams()"
-                              :contactList="selectedList"
+                              :contact-list="selectedList"
                               :mode="addToPowerDialerMode"
                               :show-in-contacts-page="true"
                               v-if="openPDModal"
