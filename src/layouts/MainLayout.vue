@@ -72,11 +72,11 @@
                   v-if="authenticated && !suspended && !isWidget">
           <q-list>
             <app-sidebar class="page-sidebar"
-                         :lightMode="lightMode"
-                         :xmasEnabled="isXmasEnabled"
+                         :is-sidebar-expanded="isSidebarExpanded"
+                         :light-mode="lightMode"
+                         :xmas-enabled="isXmasEnabled"
                          @toggleMode="toggleMode"
-                         @toggleSidebarExpansion="toggleSidebarExpansion">
-            </app-sidebar>
+                         @toggleSidebarExpansion="toggleSidebarExpansion" />
           </q-list>
         </q-drawer>
         <q-drawer class="mobile-phone-drawer position-relative h-100 overflow-hidden"
@@ -395,8 +395,7 @@ export default {
       MetricOptionGroups,
       AppDefaultLogin,
       isFirstLoading: true,
-      isSidebarExpanded: false,
-      sidebarWidth: 64
+      isSidebarExpanded: true
     }
   },
 
@@ -598,6 +597,14 @@ export default {
 
     shouldShowAccountSelector () {
       return this.isAuthenticated && this.showAccountSelector && this.profile.has_multiple_access
+    },
+
+    sidebarWidth () {
+      if (this.isSidebarExpanded) {
+        return 230
+      } else {
+        return 64
+      }
     }
   },
 
@@ -1158,6 +1165,13 @@ export default {
       this.sidebarVisible = true
     }
 
+    // using the negative because the default should be expanded, so whenever the value is falsy means expanded
+    const isSidebarCollapsed = localStorage.getItem('isSidebarCollapsed')
+
+    if (isSidebarCollapsed === 'true') {
+      this.isSidebarExpanded = false
+    }
+
     // check auth every 5 minutes
     const checkInterval = 5 * 60 * 1000
 
@@ -1422,11 +1436,7 @@ export default {
     toggleSidebarExpansion () {
       this.isSidebarExpanded = !this.isSidebarExpanded
 
-      if (this.isSidebarExpanded) {
-        this.sidebarWidth = 230
-      } else {
-        this.sidebarWidth = 64
-      }
+      localStorage.setItem('isSidebarCollapsed', !this.isSidebarExpanded)
     },
 
     toggleSidebar () {

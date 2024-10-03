@@ -22,7 +22,13 @@
                         <i class="fa fa-times"></i>
                     </button>
                 </div>
-                <div class="pt-3">
+
+                <al-alert class="my-1">
+                  <span class="text-dark"
+                        v-html="TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE" />
+                </al-alert>
+
+                <div>
                     <div class="mb-3"
                          v-if="integrationsEnabled.length > 1">
                         <div class="row">
@@ -81,13 +87,16 @@ import { mapActions, mapState } from 'vuex'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import { integrationMixin } from 'src/plugins/mixins'
+import AlAlert from 'components/alert/index.vue'
+import { TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE } from 'src/constants/deprecation-messages'
 
 export default {
   name: 'integration-list-import-modal',
 
   components: {
     IntegrationListSelector,
-    PowerDialerAddModal
+    PowerDialerAddModal,
+    AlAlert
   },
 
   mixins: [integrationMixin],
@@ -109,7 +118,8 @@ export default {
       isLoading: false,
       list: null,
       integration: null,
-      selectedIntegration: null
+      selectedIntegration: null,
+      TAGS_DEPRECATION_IMPORT_CONTACTS_MESSAGE
     }
   },
 
