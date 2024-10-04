@@ -293,11 +293,11 @@
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
                            :disabled="isAddToPowerDialerDisabled"
                            v-if="shouldShowPowerDialer"
-                           @click="addSelectedContacts">
+                           @click="addToPowerDialerList">
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
-            Add to My Power Dialer
+            Add to Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-sequence-option-dropdown"
@@ -770,6 +770,8 @@
               v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
       <power-dialer-add-modal :params="attachedParams()"
+                              :contact-list="selectedList"
+                              :mode="addToPowerDialerMode"
                               :show-in-contacts-page="true"
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
@@ -958,6 +960,7 @@ export default {
       ContactListTypes,
       openPDModal: false,
       isContactModule: false,
+      addToPowerDialerMode: 'add',
       showAddToSequence: false,
       workflowId: null,
       openAloAiEnrollmentModal: false,
@@ -1193,14 +1196,14 @@ export default {
 
       return ids
     },
-
     isContactListSelected () {
       const blockedIds = ['all', 'unanswered', 'unassigned', 'my-contacts', 'new-leads']
+
       return !blockedIds.includes(this.selectedList.id)
     },
 
     isAddToPowerDialerDisabled () {
-      return !this.checked.length
+      return !this.checked.length && !this.isContactListSelected
     },
 
     isAddToSequenceDisabled () {
@@ -1437,6 +1440,13 @@ export default {
     addSelectedContacts () {
       this.openPDModal = true
       this.addPowerDialerOpen(true)
+      this.addToPowerDialerMode = 'add'
+    },
+
+    addToPowerDialerList () {
+      this.openPDModal = true
+      this.addPowerDialerOpen(true)
+      this.addToPowerDialerMode = 'add-contact-list'
     },
 
     openAloAiBotContactsEnrollmentModal () {
@@ -1446,6 +1456,19 @@ export default {
     },
 
     attachedParams () {
+      // If there are no selected contacts and a contact list is selected
+      // all contacts in the list should be added to the power dialer
+      if (
+        this.checkedItemIds.length === 0 &&
+        this.isContactListSelected
+      ) {
+        return {
+          list_id: this.selectedList.id,
+          selected_all: true,
+          contact_ids: []
+        }
+      }
+
       return {
         contact_ids: this.checkedItemIds,
         ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})
