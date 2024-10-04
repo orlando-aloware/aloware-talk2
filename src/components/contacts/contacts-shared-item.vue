@@ -18,8 +18,8 @@
                         align="right"
                         v-show="splitErrorMessage">
           <q-btn label="Ok"
-                  flat
-                  @click="prompt = false">
+                 flat
+                 @click="prompt = false">
           </q-btn>
         </q-card-actions>
 
@@ -40,12 +40,12 @@
                         align="right"
                         v-show="!loading && !splitErrorMessage">
           <q-btn label="Cancel"
-                  flat
-                  v-close-popup>
+                 flat
+                 v-close-popup>
           </q-btn>
           <q-btn label="Split"
-                  flat
-                  @click="splitList">
+                 flat
+                 @click="splitList">
           </q-btn>
         </q-card-actions>
 
@@ -103,12 +103,12 @@
           <list-actions :list-id="item.id"
                         :type="item.type"
                         :contactsCount="item.no_of_contacts"
-                        :hasSplit="1"
-                        :hasEdit="0"
-                        :hasDelete="0"
-                        :hasPin="0"
-                        :hasDuplicate="0"
-                        :isPinned="true"
+                        :has-split="1"
+                        :has-edit="0"
+                        :has-delete="0"
+                        :has-pin="0"
+                        :has-duplicate="0"
+                        :is-pinned="true"
                         @split="onSplit(item)"/>
         </b-popover>
       </b-col>
@@ -191,8 +191,8 @@ export default {
         this.splitErrorMessage = 'You are not allowed to split this list.'
       }
 
-      if (list.type === ContactListTypes.STATIC && list.no_of_contacts <= 50) {
-        this.splitErrorMessage = 'The list must have more than 50 contacts to be split.'
+      if (list.type === ContactListTypes.STATIC && list.no_of_contacts <= this.minimunContactsToSplit) {
+        this.splitErrorMessage = `The list must have more than ${this.minimunContactsToSplit} contacts to be split.`
       }
 
       this.listName = list.name

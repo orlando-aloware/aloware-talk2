@@ -63,17 +63,17 @@
       </q-dialog>
       <tree-list-item class="flex-grow-1 w-100"
                       :name="list.name"
-                      :showInPublicFolder="list.show_in_public_folder"
-                      :contactsCount="list.no_of_contacts ?? 0"
+                      :show-in-public-folder="list.show_in_public_folder"
+                      :contacts-count="list.no_of_contacts ?? 0"
                       :key="list.id"
                       :id="list.id"
                       :layer="layer"
                       :type="list.type"
-                      :hasEdit="hasEdit"
-                      :hasDelete="hasDelete"
+                      :has-edit="hasEdit"
+                      :has-delete="hasDelete"
                       v-for="list in lists"
                       @split="onSplit"
-                      @noSplit="onNoSplit"
+                      @no-split="onNoSplit"
       />
     </template>
     <tree-list-item

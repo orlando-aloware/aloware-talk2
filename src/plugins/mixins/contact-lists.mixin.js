@@ -3,6 +3,7 @@ import API from 'src/plugins/api/api'
 export default {
   data () {
     return {
+      minimunContactsToSplit: 50,
       listId: null,
       listName: '',
       splitErrorMessage: '',
@@ -41,7 +42,7 @@ export default {
     }
   },
   computed: {
-    
+
   },
   methods: {
     disableSizeOptions (contactsCount) {
