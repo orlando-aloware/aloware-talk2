@@ -13,21 +13,7 @@ export default {
   },
   UPDATE_CHANGED_USER_PROPERTIES: (state, { name, value }) => {
     const hasChanges = { data: !1 }
-
     switch (true) {
-      case name.startsWith('operating_hours.'):
-
-        if (typeof value === 'object' && value !== null && Object.keys(value).length !== 0) {
-          value.forEach((item) => {
-            if (item.isOpen && item.open === '' && item.close === '') {
-              hasChanges.data = false
-            } else {
-              hasChanges.data = JSON.stringify(state.userClone[name]) !== JSON.stringify(value)
-            }
-          })
-        }
-
-        break
       case [ typeof value, typeof state.userClone[name] ].includes('object'):
         if (name === 'reminders_options') {
           hasChanges.data = JSON.stringify(state.userClone[name].sort()) !== JSON.stringify(value.sort())

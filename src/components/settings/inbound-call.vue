@@ -558,6 +558,29 @@ export default {
       if (prop === 'operating_hours') {
         const key = Object.keys(value)[0]
 
+        value[key].forEach((day, index) => {
+          if (day.isOpen && day.open !== '24hrs') {
+            const minutesPerHour = 60
+            const additionalHours = 9
+            const maxHours = 23
+            const [hours, minutes] = [parseInt(day.open.substring(0, 2), 10), parseInt(day.open.substring(2, 4), 10)]
+
+            let totalMinutes = hours * minutesPerHour + minutes + (additionalHours * minutesPerHour)
+            const maxMinutes = maxHours * minutesPerHour + 30
+
+            if (totalMinutes > maxMinutes) {
+              totalMinutes = maxMinutes
+            }
+
+            let newHours = Math.floor(totalMinutes / 60)
+            let newMinutes = totalMinutes % 60
+
+            let closeTime = String(newHours).padStart(2, '0') + String(newMinutes).padStart(2, '0')
+
+            value[key][index].close = closeTime
+          }
+        })
+
         this.updateChangedUserProperties({
           name: 'operating_hours.' + key,
           value: value[key]
