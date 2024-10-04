@@ -31,7 +31,7 @@
         <q-card-section class="q-pt-none"
                         v-show="!loading && !splitErrorMessage">
           <q-select label="Page Size"
-                    :options="options"
+                    :options="splitOptions"
                     :option-disable="item => (item === null ? true : item.disabled)"
                     v-model="optionSelected"/>
         </q-card-section>
@@ -137,42 +137,7 @@ export default {
     return {
       loading: false,
       ContactListTypes,
-      listToSplit: {},
-      listName: '',
-      splitErrorMessage: '',
-      prompt: false,
-      options: [
-        {
-          value: 50,
-          label: '50',
-          disabled: false
-        },
-        {
-          value: 100,
-          label: '100',
-          disabled: false
-        },
-        {
-          value: 200,
-          label: '200',
-          disabled: false
-        },
-        {
-          value: 500,
-          label: '500',
-          disabled: false
-        },
-        {
-          value: 1000,
-          label: '1000',
-          disabled: false
-        }
-      ],
-      optionSelected: {
-        value: 50,
-        label: '50',
-        disabled: false
-      }
+      prompt: false
     }
   },
   props: {
@@ -214,24 +179,9 @@ export default {
       })
     },
 
-    disableSizeOptions (contactsCount) {
-      // Set option as disabled if value >= contactsCount
-      this.options.forEach(option => {
-        if (option.value >= contactsCount) {
-          option.disabled = true
-        }
-      })
-    },
-
-    enableAllSizeOptions () {
-      this.options.forEach(option => {
-        option.disabled = false
-      })
-    },
-
     onSplit (list) {
       this.splitErrorMessage = ''
-      this.listToSplit = {}
+      this.listId = null
 
       const isAgent = this.profile.role_names.includes('Company Agent')
       if (list.type === ContactListTypes.DYNAMIC || (list.show_in_public_folder && isAgent)) {
@@ -244,44 +194,8 @@ export default {
 
       this.listName = list.name
       this.disableSizeOptions(list.no_of_contacts)
-      this.listToSplit = this.$jsonClone(list)
+      this.listId = list.id
       this.prompt = true
-    },
-
-    splitList () {
-      this.loading = true
-
-      const data = {
-        page_size: this.optionSelected.value
-      }
-
-      API.V2.contactsList.splitListIntoSmallerLists(this.listToSplit.id, data)
-        .then(res => {
-          this.loading = false
-          this.closeDialog()
-        }).catch(err => {
-          this.$handleErrors(err.response)
-          this.loading = false
-          console.log(err)
-        })
-    },
-
-    closeDialog () {
-      this.enableAllSizeOptions()
-      this.listId = null
-      this.listToSplit = {}
-      this.optionSelected = {
-        value: 50,
-        label: '50',
-        disabled: false
-      }
-      this.prompt = false
-      this.loading = false
-
-      // reload the page
-      setTimeout(() => {
-        window.location.reload()
-      }, 2000)
     }
   }
 }
