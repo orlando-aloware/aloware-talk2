@@ -108,6 +108,7 @@ import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { contactLists } from 'src/plugins/mixins'
 
 export default {
   components: {
@@ -119,6 +120,8 @@ export default {
     UnsavedIcon,
     ListActions
   },
+
+  mixins: [contactLists],
 
   props: {
     id: {
@@ -267,8 +270,8 @@ export default {
         return
       }
 
-      if (this.type === ContactListTypes.STATIC && this.contactsCount <= 50) {
-        this.$emit('noSplit', this.name, 'The list must have more than 50 contacts to be split')
+      if (this.type === ContactListTypes.STATIC && this.contactsCount <= this.minimunContactsToSplit) {
+        this.$emit('noSplit', this.name, `The list must have more than ${this.minimunContactsToSplit} contacts to be split`)
         return
       }
 

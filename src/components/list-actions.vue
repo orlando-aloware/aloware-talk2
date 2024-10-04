@@ -85,6 +85,7 @@ import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import MoveIcon from 'components/icons/move-icon.vue'
+import { contactLists } from 'src/plugins/mixins'
 
 export default {
   components: {
@@ -98,6 +99,7 @@ export default {
     PinIcon,
     MoveIcon
   },
+  mixins: [contactLists],
   data () {
     return {
       ContactListTypes
@@ -147,7 +149,7 @@ export default {
     },
 
     shouldShowSplitOption () {
-      return (this.type === ContactListTypes.STATIC && this.contactsCount > 50) || this.hasSplit
+      return (this.type === ContactListTypes.STATIC && this.contactsCount > this.minimunContactsToSplit) || this.hasSplit
     }
   }
 }
