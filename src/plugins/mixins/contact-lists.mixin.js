@@ -1,5 +1,3 @@
-import { get } from 'lodash'
-import { mapActions, mapGetters, mapState } from 'vuex'
 import API from 'src/plugins/api/api'
 
 export default {
