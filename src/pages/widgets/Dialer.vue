@@ -154,7 +154,7 @@ export default {
     },
 
     isLoadingDialer () {
-      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) && !this.showAlertAgentOnCall && !this.showAlertCallFinished
+      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) && !this.showAlertAgentOnCall && !this.showAlertCallFinished && !this.dialer?.parkedCall
     }
   },
 
