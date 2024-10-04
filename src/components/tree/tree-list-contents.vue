@@ -101,8 +101,11 @@
 
 import { mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
+import { contactLists } from 'src/plugins/mixins'
 
 export default {
+  mixins: [contactLists],
+
   components: {
     treeListItem: () => import('./tree-list-item.vue')
   },

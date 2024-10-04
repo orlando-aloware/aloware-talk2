@@ -123,10 +123,13 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapState } from 'vuex'
 import ListActions from 'components/list-actions.vue'
 import FolderOption from 'components/icons/folder-option.vue'
-import API from 'src/plugins/api/api'
+import { contactLists } from 'src/plugins/mixins'
 
 export default {
   name: 'contacts-shared-item',
+
+  mixins: [contactLists],
+
   components: {
     FolderDynamicIcon,
     FolderStaticIcon,
