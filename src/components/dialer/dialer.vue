@@ -1023,7 +1023,7 @@ export default {
 
         this.$axios.post('/api/v1/dialer/new-hold', params).then(() => {
           this.setDialerIsHeld(true)
-          console.log('Call parked')
+          console.log('Call held')
         }).catch(err => {
           console.log(err)
           this.$VueEvent.fire('holdFailed')
