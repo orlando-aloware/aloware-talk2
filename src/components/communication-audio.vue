@@ -9,7 +9,10 @@
                     data-testid="communication-audio-waveform"
                     @ready="loading = false">
           </waveform>
-          <download-button v-if="fileUuid"
+          <p class="text-black _600">
+            We are processing the {{ typeString | toLowerCase }}. It will be shortly available for download.
+          </p>
+          <download-button v-if="fileUuid && isMigrate"
                            data-testid="communication-audio-download-button"
                            is-simple
                            :communication-id="communication.id"
@@ -78,6 +81,7 @@ export default {
       filename: '',
       loading: false,
       mimeType: '',
+      isMigrate: false,
       UploadedFileTypes
     }
   },
@@ -91,8 +95,12 @@ export default {
       return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.recording_is_deleted : false
     },
 
+    typeString () {
+      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? 'Recording' : 'Voicemail'
+    },
+
     title () {
-      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? 'Play Recording' : 'Play Voicemail'
+      return 'Play ' + this.typeString
     }
   },
 
@@ -118,6 +126,7 @@ export default {
             this.remoteUrl = response.data.url
             this.downloadUrl = response.data.download_url
             this.mimeType = response.data.mimetype || ''
+            this.isMigrate = response.data.is_migrate
           }).catch(err => {
             console.log(err)
             this.loading = false
