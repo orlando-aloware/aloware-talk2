@@ -268,6 +268,11 @@ export default {
         return
       }
 
+      // don't allow to make a call if there's a parked call
+      if (this.dialer?.parkedCall) {
+        return
+      }
+
       this.showAlertAgentOnCall = false
 
       if (!this.hubspotPhoneNumber && phoneNumber) {
