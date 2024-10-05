@@ -351,7 +351,18 @@ export default {
       this.loading = true
 
       try {
-        await talk2Api.V2.contacts.exportCommunications(this.contact.id)
+        /* const { data } = */ await talk2Api.V2.contacts.exportCommunications(this.contact.id)
+
+        /*  this.$generalNotification(
+          `Your export is now available.<a id="${data.export.uuid}" href="${data.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
+          'export-csv',
+          0,
+          true,
+          {
+            uuid: data.export.uuid,
+            filename: `${data.export.uuid}.csv`
+          }
+        ) */
       } catch (error) {
         console.log(error)
         this.$generalNotification('Unable to process export request! Please try again later.', 'error')

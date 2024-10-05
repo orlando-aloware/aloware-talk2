@@ -5,7 +5,7 @@ import _ from 'lodash'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 const exportCommunications = async (contactId) => {
-  return window.axios.get(`${suffixV2}contacts/${contactId}/communications-export`)
+  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
 }
 
 export default {

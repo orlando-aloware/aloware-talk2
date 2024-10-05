@@ -281,7 +281,7 @@ import store from 'src/store'
 import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
   TYPE_EXPORT_CONTACT_LIST_ITEMS,
-  TYPE_EXPORT_CONTACT_COMMUNICATIONS
+  TYPE_COMMUNICATION
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
 import talk2Api from 'src/plugins/api/api'
@@ -380,7 +380,7 @@ export default {
       allowedExports: [
         TYPE_EXPORT_CONTACT_LIST_ITEMS,
         TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
-        TYPE_EXPORT_CONTACT_COMMUNICATIONS
+        TYPE_COMMUNICATION
       ],
       mainListeners: {},
       isElectronEventsStarted: false,
@@ -1011,7 +1011,7 @@ export default {
         type = 'Power Dialer'
       }
 
-      if (task.export.type === TYPE_EXPORT_CONTACT_COMMUNICATIONS) {
+      if (task.export.type === TYPE_COMMUNICATION) {
         type = 'Communications'
       }
 
@@ -1029,7 +1029,7 @@ export default {
         listText = 'Power Dialer list'
       }
 
-      if (task.export.type === TYPE_EXPORT_CONTACT_COMMUNICATIONS) {
+      if (task.export.type === TYPE_COMMUNICATION) {
         listText = 'Communications list'
       }
 
