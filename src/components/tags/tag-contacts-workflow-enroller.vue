@@ -21,7 +21,7 @@
     </template>
 
     <div>
-      <label class="label mt-2 mb-1">Choose the sequence you want this tagged contacts to enroll</label>
+      <label class="label mt-2 mb-1">Choose the sequence you want this contacts to enroll</label>
       <sequence-selector :generic-styling="false"
                          data-testid="tags-contacts-workflow-enroller-sequence-selector"
                          @change="setWorkflowId" />
@@ -67,7 +67,12 @@
     </ul>
 
     <p class="text-13 mt-2 mb-0"
-       v-if="!isBulk"
+       v-if="list"
+       data-testid="tags-contacts-workflow-enroller-tag-name"
+       v-html="`<span class='font-weight-bold'>All contacts from List:</span> ${ list.name }`" />
+
+    <p class="text-13 mt-2 mb-0"
+       v-if="!isBulk && tag"
        data-testid="tags-contacts-workflow-enroller-tag-name"
        v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
 
@@ -114,6 +119,11 @@ export default {
       required: false
     },
 
+    list: {
+      type: Object,
+      required: false
+    },
+
     isShow: {
       type: Boolean,
       required: true
@@ -145,6 +155,10 @@ export default {
 
     formName () {
       return `Enroll to Sequence`
+    },
+
+    modelName () {
+      return this.list ? 'contact_list' : 'tag'
     }
   },
 
@@ -189,7 +203,7 @@ export default {
       this.loading = true
 
       const payload = {
-        model: 'tag'
+        model: this.modelName
       }
       let xhr = null
 
@@ -197,7 +211,7 @@ export default {
         payload.tag_ids = this.getSelectedTagIds
         xhr = API.V1.automations.workflows.bulkEnroll(this.selectedWorkflowId, payload)
       } else {
-        payload.id = this.tag.id
+        payload.id = payload.model === 'contact_list' ? this.list.id : this.tag.id
         xhr = API.V1.automations.workflows.enroll(this.selectedWorkflowId, payload)
       }
 
