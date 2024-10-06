@@ -4,6 +4,10 @@ import qs from 'qs'
 import _ from 'lodash'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
+const exportCommunications = async (contactId) => {
+  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
+}
+
 export default {
   V1: {
     contact: {
@@ -698,7 +702,9 @@ export default {
         return window.axios.get(`api/v2/contacts-list/export-csv`, {
           params: params
         })
-      }
+      },
+
+      exportCommunications
     },
 
     contactFolders: {

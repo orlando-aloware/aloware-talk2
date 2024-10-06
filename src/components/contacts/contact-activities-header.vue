@@ -22,7 +22,7 @@
                     data-testid="contact-activities-actions-dropdown"
                     class="m-2 b-compact-dropdown-button text-bold contact-activities-actions-dropdown d-flex align-items-center">
           <template #button-content>
-            <ellipsis-icon/>
+            <ellipsis-icon />
           </template>
           <b-dropdown-item href=""
                            :disabled="!hasUnreads"
@@ -31,6 +31,16 @@
             <mail-open-icon class="mark-all-as-read-icon dropdown-icon"/>
             Mark All as Read ({{ unreadCount }})
           </b-dropdown-item>
+
+          <b-dropdown-item href=""
+                           data-testid="contact-activities-export-communications-item"
+                           class="d-flex"
+                           v-if="isAdmin"
+                           @click="handleExportCommunications">
+            <export-icon class="mark-all-as-read-icon dropdown-icon" />
+            Export Communications
+          </b-dropdown-item>
+
           <b-dropdown-item href="#"
                            :disable="isUpdatingStatus"
                            v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
@@ -89,6 +99,31 @@
             Mark All as Read ({{ unreadCount }})
           </span>
         </q-btn>
+
+        <q-btn borderless
+               flat
+               no-caps
+               type="a"
+               color="primary"
+               class="text-decoration-none"
+               data-testid="contact-activities-export-communications-btn"
+               v-if="isAdmin"
+               @click="handleExportCommunications">
+          <q-tooltip anchor="top middle"
+                     self="center middle">
+            Export Communications
+          </q-tooltip>
+          <span v-if="!loading"
+                class="mx-2">
+            <export-icon />
+          </span>
+          <q-spinner-bars v-if="loading"
+                          class="pl-1 pr-1"
+                          color="primary"
+                          size="20px"
+          />
+        </q-btn>
+
         <q-btn
           v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
           borderless
@@ -179,12 +214,17 @@ import talk2Api from 'src/plugins/api/api'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import MailOpenIcon from 'components/icons/mail-open-icon'
 import EllipsisIcon from 'components/icons/ellipsis-icon'
+import ExportIcon from '../icons/export-icon.vue'
 import BackButton from 'components/back-button'
 import Profile from 'components/profile'
 import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
+import { aclMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'contact-activities-header',
+
+  mixins: [aclMixin],
 
   components: {
     Profile,
@@ -194,7 +234,8 @@ export default {
     InformationCircleIcon,
     MailOpenIcon,
     EllipsisIcon,
-    BackButton
+    BackButton,
+    ExportIcon
   },
 
   props: {
@@ -252,7 +293,8 @@ export default {
     return {
       ContactTaskStatus,
       isUpdatingStatus: false,
-      nextStat: null
+      nextStat: null,
+      loading: false
     }
   },
 
@@ -292,6 +334,41 @@ export default {
       }
 
       this.$router.push(path.join('/'))
+    },
+
+    async handleExportCommunications () {
+      const confirm = await this.$bvModal.msgBoxConfirm('Do you want to proceed with the export?', {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'Cancel',
+        centered: true
+      })
+
+      if (!confirm) {
+        return
+      }
+
+      this.loading = true
+
+      try {
+        /* const { data } = */ await talk2Api.V2.contacts.exportCommunications(this.contact.id)
+
+        /*  this.$generalNotification(
+          `Your export is now available.<a id="${data.export.uuid}" href="${data.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
+          'export-csv',
+          0,
+          true,
+          {
+            uuid: data.export.uuid,
+            filename: `${data.export.uuid}.csv`
+          }
+        ) */
+      } catch (error) {
+        console.log(error)
+        this.$generalNotification('Unable to process export request! Please try again later.', 'error')
+      } finally {
+        this.loading = false
+      }
     }
   },
   watch: {
