@@ -73,7 +73,8 @@ export default {
     companyLogin (access) {
       const currentCompanyId = parseInt(localStorage.getItem('company_id'))
       if (currentCompanyId === access.company_id) {
-        return
+        setCookie('selected_company_id', access.company_id, 30)
+        return this.closeDialog()
       }
 
       this.isLoadingAccesses = true
@@ -90,6 +91,11 @@ export default {
           this.$root.handleErrors(err.response)
           this.isLoadingAccesses = false
         })
+    },
+
+    closeDialog () {
+      this.setShowAccountSelector(false)
+      this.setShowAccountSelectorFullscreen(false)
     },
 
     setWelcomeAccountSelectorDialog () {
