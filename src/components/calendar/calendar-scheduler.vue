@@ -199,9 +199,15 @@ export default {
     },
 
     handleMoreLink (e) {
+      const date = e.target.getAttribute('data-date')
+
       if (e.target.classList.contains('custom-more-link')) {
         e.preventDefault()
         e.stopPropagation()
+
+        if (date) {
+          this.$emit('toggle-goto-date', new Date(date), 'day')
+        }
       }
     },
 
