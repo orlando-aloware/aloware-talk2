@@ -374,7 +374,7 @@
                     </div>
                     <div v-else>
                       <div :class="`${column.draggable ? 'col-indented' : ''}`">
-                        No Name
+                        &nbsp;
                       </div>
                     </div>
                   </div>
