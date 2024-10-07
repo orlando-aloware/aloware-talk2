@@ -506,8 +506,13 @@ export default {
         })
     },
 
-    onToggleGotoDate (date) {
+    onToggleGotoDate (date, view) {
       const formattedDate = moment(date).format('YYYY-MM-DD')
+
+      if (view) {
+        this.view = view
+      }
+
       this.$router.replace({
         query: {
           ...this.$route.query,
