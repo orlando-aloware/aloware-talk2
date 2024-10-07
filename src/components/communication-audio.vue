@@ -12,7 +12,7 @@
           <p class="text-black _600">
             We are processing the {{ typeString | toLowerCase }}. It will be shortly available for download.
           </p>
-          <download-button v-if="fileUuid && isMigrate"
+          <download-button v-if="fileUuid && isMigrated"
                            data-testid="communication-audio-download-button"
                            is-simple
                            :communication-id="communication.id"
@@ -81,7 +81,7 @@ export default {
       filename: '',
       loading: false,
       mimeType: '',
-      isMigrate: false,
+      isMigrated: false,
       UploadedFileTypes
     }
   },
@@ -126,7 +126,7 @@ export default {
             this.remoteUrl = response.data.url
             this.downloadUrl = response.data.download_url
             this.mimeType = response.data.mimetype || ''
-            this.isMigrate = response.data.is_migrate
+            this.isMigrated = response.data.is_migrated
           }).catch(err => {
             console.log(err)
             this.loading = false
