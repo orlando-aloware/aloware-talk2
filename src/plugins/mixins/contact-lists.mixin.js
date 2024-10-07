@@ -5,6 +5,7 @@ export default {
     return {
       minimunContactsToSplit: 50,
       listId: null,
+      keepList: true,
       listName: '',
       splitErrorMessage: '',
       splitOptions: [
@@ -64,7 +65,8 @@ export default {
       this.loading = true
 
       const data = {
-        page_size: this.optionSelected.value
+        page_size: this.optionSelected.value,
+        keep_original: this.keepList
       }
 
       API.V2.contactsList.splitListIntoSmallerLists(this.listId, data)

@@ -36,6 +36,23 @@
                     v-model="optionSelected"/>
         </q-card-section>
 
+        <q-card-section class="q-pt-none"
+                        v-show="!loading && !splitErrorMessage">
+          <span>
+            Do you want to keep the original List?
+          </span>
+          <div>
+            <q-radio label="Keep"
+                     dark
+                     :val="true"
+                     v-model="keepList"/>
+            <q-radio label="Delete"
+                     dark
+                     :val="false"
+                     v-model="keepList"/>
+          </div>
+        </q-card-section>
+
         <q-card-actions class="text-primary"
                         align="right"
                         v-show="!loading && !splitErrorMessage">
@@ -90,10 +107,10 @@
       <folder-option></folder-option>
     </button>
     <b-popover triggers="click blur"
-                placement="bottomright"
-                boundary="window"
-                custom-class="contact-popover"
-                :target="`contacts-shared-item-option-${item.id}`">
+               placement="bottomright"
+               boundary="window"
+               custom-class="contact-popover"
+               :target="`contacts-shared-item-option-${item.id}`">
       <list-actions :list-id="item.id"
                     :type="item.type"
                     :contactsCount="item.no_of_contacts"
