@@ -311,6 +311,7 @@ export default function (/* { ssrContext } */) {
       notifications: (state) => state.notifications,
       breadcrumbs: (state) => state.breadcrumbs,
       contactsLists: (state) => state.contactsLists,
+      getAttributeDictionaries: (state) => state.attributeDictionaries,
       getField
     },
 
@@ -828,6 +829,10 @@ export default function (/* { ssrContext } */) {
 
       setLeadSources ({ commit }, leadSources) {
         commit('SET_LEAD_SOURCES', leadSources)
+      },
+
+      setAttributeDictionaries ({ commit }, attributeDictionaries) {
+        commit('SET_ATTRIBUTE_DICTIONARIES', attributeDictionaries)
       },
 
       setStatics ({ commit }, statics) {
@@ -1659,6 +1664,10 @@ export default function (/* { ssrContext } */) {
 
       SET_LEAD_SOURCES (state, leadSources) {
         state.leadSources = leadSources
+      },
+
+      SET_ATTRIBUTE_DICTIONARIES (state, attributeDictionaries) {
+        state.attributeDictionaries = attributeDictionaries
       },
 
       SET_STATICS (state, statics) {
