@@ -164,7 +164,6 @@ export default {
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter',
-      'addRedialedTask',
       'clearRedialedTasks'
     ]),
 
@@ -316,9 +315,13 @@ export default {
 
       return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`, { redial })
         .then(res => {
-          this.addRedialedTask(autoDialTask.id)
+          let position = 'bottom'
+          if (redial) {
+            position = 'top'
+            this.taskToCall.contact_list_item_id = res.data.data.id
+            this.taskToCall.redial = res.data.data.redialed
+          }
 
-          const position = redial ? 'top' : 'bottom'
           this.$generalNotification(`Success: contact is at the ${position} of the current list`)
           return Promise.resolve(res)
         }).catch(err => {

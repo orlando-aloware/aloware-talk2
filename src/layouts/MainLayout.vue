@@ -72,11 +72,11 @@
                   v-if="authenticated && !suspended && !isWidget">
           <q-list>
             <app-sidebar class="page-sidebar"
-                         :lightMode="lightMode"
-                         :xmasEnabled="isXmasEnabled"
+                         :is-sidebar-expanded="isSidebarExpanded"
+                         :light-mode="lightMode"
+                         :xmas-enabled="isXmasEnabled"
                          @toggleMode="toggleMode"
-                         @toggleSidebarExpansion="toggleSidebarExpansion">
-            </app-sidebar>
+                         @toggleSidebarExpansion="toggleSidebarExpansion" />
           </q-list>
         </q-drawer>
         <q-drawer class="mobile-phone-drawer position-relative h-100 overflow-hidden"
@@ -224,6 +224,7 @@
       <kyc-fill-dialog :show="shouldShowKycFillDialog"
                        v-if="shouldShowKycFillDialog"/>
       <kyc-reload-dialog :show="shouldShowKycReloadDialog" />
+      <account-selector v-if="shouldShowAccountSelector" />
     </div>
   </div>
 </template>
@@ -247,7 +248,8 @@ import {
   simpsocialMixin,
   userMixin,
   settingsMixin,
-  broadcastsMixin
+  broadcastsMixin,
+  accessMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -280,7 +282,8 @@ import KycReloadDialog from 'components/kyc-reload-dialog.vue'
 import store from 'src/store'
 import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
-  TYPE_EXPORT_CONTACT_LIST_ITEMS
+  TYPE_EXPORT_CONTACT_LIST_ITEMS,
+  TYPE_COMMUNICATION
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
 import talk2Api from 'src/plugins/api/api'
@@ -291,6 +294,7 @@ import TrialBanner from 'components/trial-banner.vue'
 import * as TrialStatus from 'src/constants/trial-account-status'
 import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
+import AccountSelector from 'src/components/account-selector.vue'
 
 export default {
   name: 'MyLayout',
@@ -317,7 +321,8 @@ export default {
     Modal,
     TrialBanner,
     TrialExpiredModal,
-    CancelledAccountModal
+    CancelledAccountModal,
+    AccountSelector
   },
 
   mixins: [
@@ -336,7 +341,8 @@ export default {
     simpsocialMixin,
     userMixin,
     settingsMixin,
-    broadcastsMixin
+    broadcastsMixin,
+    accessMixin
   ],
 
   data () {
@@ -378,7 +384,8 @@ export default {
       accountSuspended: false,
       allowedExports: [
         TYPE_EXPORT_CONTACT_LIST_ITEMS,
-        TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
+        TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
+        TYPE_COMMUNICATION
       ],
       mainListeners: {},
       isElectronEventsStarted: false,
@@ -390,8 +397,7 @@ export default {
       MetricOptionGroups,
       AppDefaultLogin,
       isFirstLoading: true,
-      isSidebarExpanded: false,
-      sidebarWidth: 64
+      isSidebarExpanded: true
     }
   },
 
@@ -589,6 +595,18 @@ export default {
 
     isAuthenticated () {
       return !this.isGuest && this.authenticated
+    },
+
+    shouldShowAccountSelector () {
+      return this.isAuthenticated && this.showAccountSelector && this.profile.has_multiple_access
+    },
+
+    sidebarWidth () {
+      if (this.isSidebarExpanded) {
+        return 230
+      } else {
+        return 64
+      }
     }
   },
 
@@ -996,7 +1014,16 @@ export default {
         return
       }
 
-      const type = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer' : 'Contacts'
+      let type = 'Contacts'
+
+      if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        type = 'Power Dialer'
+      }
+
+      if (task.export.type === TYPE_COMMUNICATION) {
+        type = 'Communications'
+      }
+
       this.$generalNotification(`${type} list is being exported. Please wait for a while.`, 'success')
     }
 
@@ -1005,7 +1032,16 @@ export default {
         return
       }
 
-      const listText = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer list' : 'Contacts list'
+      let listText = 'Contacts list'
+
+      if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        listText = 'Power Dialer list'
+      }
+
+      if (task.export.type === TYPE_COMMUNICATION) {
+        listText = 'Communications list'
+      }
+
       this.$generalNotification(
         `Your ${listText} export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
         'export-csv',
@@ -1147,6 +1183,13 @@ export default {
   mounted () {
     if (this.authenticated) {
       this.sidebarVisible = true
+    }
+
+    // using the negative because the default should be expanded, so whenever the value is falsy means expanded
+    const isSidebarCollapsed = localStorage.getItem('isSidebarCollapsed')
+
+    if (isSidebarCollapsed === 'true') {
+      this.isSidebarExpanded = false
     }
 
     // check auth every 5 minutes
@@ -1413,11 +1456,7 @@ export default {
     toggleSidebarExpansion () {
       this.isSidebarExpanded = !this.isSidebarExpanded
 
-      if (this.isSidebarExpanded) {
-        this.sidebarWidth = 230
-      } else {
-        this.sidebarWidth = 64
-      }
+      localStorage.setItem('isSidebarCollapsed', !this.isSidebarExpanded)
     },
 
     toggleSidebar () {

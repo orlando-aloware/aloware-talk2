@@ -4,6 +4,10 @@ import qs from 'qs'
 import _ from 'lodash'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
+const exportCommunications = async (contactId) => {
+  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
+}
+
 export default {
   V1: {
     contact: {
@@ -237,6 +241,10 @@ export default {
         return window.axios.post(`${suffixV1}tags/bulk-assign-contacts-to`, params)
       },
 
+      convertTagToList (params) {
+        return window.axios.post(`${suffixV2}contacts-list/convert`, params)
+      },
+
       addTasksToUserPowerDialer (id, params) {
         return window.axios.post(`${suffixV1}tags/${id}/add-to-user-power-dialer`, params)
       },
@@ -410,6 +418,10 @@ export default {
         return window.axios.post(`${suffixV1}user/${userId}/agent-status`, {
           agent_status: status
         })
+      },
+
+      getCompanyAccesses () {
+        return window.axios.get('/api/v1/user/company/accesses')
       }
     },
 
@@ -494,10 +506,6 @@ export default {
     profile: {
       store (params) {
         return window.axios.post(`${suffixV1}profile`, params)
-      },
-
-      getHubspotConversationsVisitorToken () {
-        return window.axios.get(`${suffixV1}profile/hubspot-visitor-token`)
       }
     },
 
@@ -602,6 +610,38 @@ export default {
       get (params) {
         return window.axios.get(`${suffixV1}company/${params.id}`)
       }
+    },
+
+    auth: {
+      impersonate (userId, userAccess = false, user = null) {
+        let isImpersonating = true
+        let previousUserId = user?.id
+        localStorage.removeItem('previous_user_id')
+        localStorage.removeItem('impersonate')
+        localStorage.removeItem('company_id')
+        localStorage.removeItem('current_user_id')
+
+        if (userAccess) {
+          isImpersonating = false
+        }
+
+        return window.axios.post(`${suffixV1}user/${userId}/impersonate`, {
+          is_impersonated: isImpersonating
+        }).then((res) => {
+          localStorage.setItem('api_token', res.data.api_token)
+          window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('api_token')
+
+          if (isImpersonating) {
+            localStorage.setItem('impersonate', true)
+            localStorage.setItem('previous_user_id', previousUserId)
+          }
+
+          localStorage.setItem('company_id', res.data.company_id)
+          localStorage.setItem('current_user_id', res.data.user_id)
+        }).catch((err) => {
+          return Promise.reject(err)
+        })
+      }
     }
   },
 
@@ -662,7 +702,9 @@ export default {
         return window.axios.get(`api/v2/contacts-list/export-csv`, {
           params: params
         })
-      }
+      },
+
+      exportCommunications
     },
 
     contactFolders: {
@@ -705,6 +747,22 @@ export default {
         return window.axios.get(`api/v2/power-dialer-lists/my-queue`, {
           params: params
         })
+      }
+    },
+
+    contactsList: {
+      assignContactsTo (contactListId, payload = {}) {
+        const params = {
+          assign_to: payload.assign_contacts_to,
+          id: payload.assign_contacts_to === 'ring_group' ? payload.ring_group_id : payload.user_id,
+          force: payload.force,
+          from_talk: true
+        }
+        return window.axios.post(`${suffixV2}contacts-list/${contactListId}/assign`, params)
+      },
+
+      splitListIntoSmallerLists (contactListId, params) {
+        return window.axios.post(`${suffixV2}contacts-list/${contactListId}/split`, params)
       }
     },
 

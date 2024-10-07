@@ -337,6 +337,7 @@ export default {
         // push new data to top of array
         this.communicationsAndAudits.push(data)
         this.removeDuplicateCommunicationsAndAudits()
+        this.sortCommunicationsAndAudits()
         this.scrollMessages()
       }
     },
@@ -1169,6 +1170,20 @@ export default {
         return Promise.resolve(res.data)
       })
     },
+
+    sortCommunicationsAndAudits: _.debounce(function () {
+      this.communicationsAndAudits = _.orderBy(
+        this.communicationsAndAudits,
+        [
+          'created_at',
+          item => item.type ? 0 : 1
+        ],
+        [
+          'asc',
+          'asc'
+        ]
+      )
+    }, 500),
 
     ...mapActions('contacts', [
       'setContact',

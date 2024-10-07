@@ -81,7 +81,8 @@ export default {
       'currentListFilters',
       'selectedStaticList',
       'selectedList',
-      'folders'
+      'folders',
+      'search'
     ]),
 
     ...mapState(['isDatatableSelectedAll']),
@@ -194,23 +195,33 @@ export default {
         // include the filter groups
         params.filter_groups = allFilters
       } else if (!isEmpty(allFilters)) {
-        // just pass the filters when not empty, if list is STATIC
+        // just pass the filters when not empty
         params.filter_groups = allFilters
-      } else {
-        // else, just pass the contacts list id filter
-        params.filter_groups = [
+      }
+
+      if (ContactListTypes.CONTACTS_STRING_KEYS.indexOf(this.selectedList.id) === -1) {
+        // else, list is of type STATIC. Just pass the contacts list id filter
+        const contactListFilter = [
           {
-            'filters': {
-              'contact_lists': [
-                {
-                  value: [this.selectedList.id],
-                  operator: 1
-                }
-              ]
-            },
-            is_conjunction: true
+            value: [this.selectedList.id],
+            operator: 1
           }
         ]
+
+        // Verify if filter_groups is already set and merge it with the contact_lists filter
+        if (Array.isArray(params.filter_groups)) {
+          params.filter_groups[0].filters.contact_lists = contactListFilter
+        } else {
+          params.filter_groups = [
+            {
+              filters: {
+                contact_lists: contactListFilter
+              }
+            }
+          ]
+        }
+
+        params.filter_groups[0].is_conjunction = true
       }
 
       // only show list's loading view if all contacts were selected
@@ -219,6 +230,10 @@ export default {
           id: this.selectedStaticList.id,
           loading: true
         })
+      }
+
+      if (this.search) {
+        params.search = this.search
       }
 
       const isChunked = !params?.selected_all && ids.length > 0

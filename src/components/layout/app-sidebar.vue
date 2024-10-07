@@ -755,6 +755,11 @@ export default {
   name: 'app-sidebar',
 
   props: {
+    isSidebarExpanded: {
+      type: Boolean,
+      default: true
+    },
+
     lightMode: {
       required: false,
       type: Boolean
@@ -809,14 +814,17 @@ export default {
     isKycAccount () {
       const status = this.profile?.company?.kyc_status
       return status !== KycLogs.KYC_STATUS_NONE
+    },
+
+    sidebarIcon () {
+      return this.isSidebarExpanded ? 'unfold_less' : 'unfold_more'
     }
+
   },
 
   data () {
     return {
-      modeIcon: 'img:app-icons/menu/mode_gray.svg',
-      sidebarIcon: 'unfold_more',
-      isSidebarExpanded: false
+      modeIcon: 'img:app-icons/menu/mode_gray.svg'
     }
   },
 
@@ -854,8 +862,6 @@ export default {
     },
 
     toggleSidebar () {
-      this.isSidebarExpanded = !this.isSidebarExpanded
-      this.sidebarIcon = this.isSidebarExpanded ? 'unfold_less' : 'unfold_more'
       this.$emit('toggleSidebarExpansion', this.isSidebarExpanded)
     },
 

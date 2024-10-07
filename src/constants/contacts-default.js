@@ -5,15 +5,13 @@ import {
 import { DEFAULT_CONTACT_LIST_ITEMS } from 'src/constants/contacts-list-item-default'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import { BOOLEAN_OPERATORS } from 'src/constants/contacts-boolean-filter-operators'
+import { CONTACTS_STRING_KEYS } from './contacts-list-types'
 
 export const DEFAULT_STATE = {
-  listItems: {
-    all: DEFAULT_CONTACT_LIST_ITEMS,
-    'my-contacts': DEFAULT_CONTACT_LIST_ITEMS,
-    unassigned: DEFAULT_CONTACT_LIST_ITEMS,
-    unanswered: DEFAULT_CONTACT_LIST_ITEMS,
-    'new-leads': DEFAULT_CONTACT_LIST_ITEMS
-  },
+  listItems: CONTACTS_STRING_KEYS.reduce((list, key) => {
+    list[key] = DEFAULT_CONTACT_LIST_ITEMS
+    return list
+  }, {}),
   lists: {
     all: {
       id: 'all',

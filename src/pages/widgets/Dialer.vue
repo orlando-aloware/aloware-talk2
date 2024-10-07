@@ -154,7 +154,7 @@ export default {
     },
 
     isLoadingDialer () {
-      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) && !this.showAlertAgentOnCall && !this.showAlertCallFinished
+      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) && !this.showAlertAgentOnCall && !this.showAlertCallFinished && !this.dialer?.parkedCall
     }
   },
 
@@ -265,6 +265,11 @@ export default {
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
+        return
+      }
+
+      // don't allow to make a call if there's a parked call
+      if (this.dialer?.parkedCall) {
         return
       }
 

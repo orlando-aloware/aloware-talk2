@@ -760,7 +760,7 @@ export default {
 
     canRedialNow () {
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.redialed.includes(this.activeTask.id) &&
+        !this.activeTask?.redial &&
         !this.isRedialClicked
     },
 

@@ -300,7 +300,11 @@ export default function (/* { ssrContext } */) {
       hubspotPhoneNumber: null,
       isRedirectedToHubspotWidget: false,
       isCallBackButtonDisabled: false,
-      isFirstLoad: true
+      isFirstLoad: true,
+      showAccountSelector: false,
+      showAccountSelectorFullscreen: false,
+      showAccountSelectorFirstLoad: false,
+      accesses: []
     },
 
     getters: {
@@ -917,6 +921,22 @@ export default function (/* { ssrContext } */) {
 
       setIsFirstLoad ({ commit }, value) {
         commit('SET_IS_FIRST_LOAD', value)
+      },
+
+      setShowAccountSelector ({ commit }, value) {
+        commit('SET_SHOW_ACCOUNT_SELECTOR', value)
+      },
+
+      setShowAccountSelectorFullscreen ({ commit }, value) {
+        commit('SET_SHOW_ACCOUNT_SELECTOR_FULLSCREEN', value)
+      },
+
+      setShowAccountSelectorFirstLoad ({ commit }, value) {
+        commit('SET_SHOW_ACCOUNT_SELECTOR_FIRST_LOAD', value)
+      },
+
+      setAccesses ({ commit }, accesses) {
+        commit('SET_ACCESSES', accesses)
       }
     },
 
@@ -1723,6 +1743,23 @@ export default function (/* { ssrContext } */) {
       SET_IS_FIRST_LOAD (state, value) {
         state.isFirstLoad = value
       },
+
+      SET_SHOW_ACCOUNT_SELECTOR (state, value) {
+        state.showAccountSelector = value
+      },
+
+      SET_SHOW_ACCOUNT_SELECTOR_FULLSCREEN (state, value) {
+        state.showAccountSelectorFullscreen = value
+      },
+
+      SET_SHOW_ACCOUNT_SELECTOR_FIRST_LOAD (state, value) {
+        state.showAccountSelectorFirstLoad = value
+      },
+
+      SET_ACCESSES (state, accesses) {
+        state.accesses = accesses
+      },
+
       updateField
     },
 

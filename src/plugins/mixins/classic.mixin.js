@@ -33,7 +33,7 @@ export default {
       const isProduction = process.env.APP_ENV === 'production'
 
       if (isSimpSocial) {
-        return isProduction ? url?.replace('aloware', 'simpsocial') : url?.replace('alodev', 'aloreseller')
+        return isProduction ? url?.replace('aloware', 'simpsocial') : url?.replace('alodev', 'aloreseller')?.replace('org', 'com')
       }
 
       return url

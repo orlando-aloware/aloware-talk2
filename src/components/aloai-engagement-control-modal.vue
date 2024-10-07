@@ -146,7 +146,7 @@
 
 <script>
 import talk2Api from 'src/plugins/api/api'
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
@@ -169,7 +169,6 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact']),
-    ...mapState('contacts'),
     filteredBots () {
       let bots = this.bots
       if (!isEmpty(this.searchText)) {
