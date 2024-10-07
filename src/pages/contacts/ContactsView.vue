@@ -459,7 +459,7 @@
                     </div>
                     <div v-else>
                       <div :class="`${column.draggable ? 'col-indented' : ''}`" data-testid="contacts-view-contact-no-owner-name">
-                        No Name
+                        &nbsp;
                       </div>
                     </div>
                   </div>
