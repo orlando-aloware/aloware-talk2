@@ -673,7 +673,7 @@ export default {
       }
 
       // Don't send list_id for dynamic lists, it should use only the filters
-      if (this.contactList.type === this.ContactListTypes.DYNAMIC) {
+      if (this.contactList?.type === this.ContactListTypes.DYNAMIC) {
         delete this.requestParams.list_id
       }
 
