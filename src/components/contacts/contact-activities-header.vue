@@ -35,6 +35,7 @@
           <b-dropdown-item href=""
                            data-testid="contact-activities-export-communications-item"
                            class="d-flex"
+                           :disabled="loading"
                            v-if="isAdmin"
                            @click="handleExportCommunications">
             <export-icon class="mark-all-as-read-icon dropdown-icon" />
@@ -107,6 +108,7 @@
                color="primary"
                class="text-decoration-none"
                data-testid="contact-activities-export-communications-btn"
+               :disabled="loading"
                v-if="isAdmin"
                @click="handleExportCommunications">
           <q-tooltip anchor="top middle"
@@ -337,32 +339,10 @@ export default {
     },
 
     async handleExportCommunications () {
-      const confirm = await this.$bvModal.msgBoxConfirm('Do you want to proceed with the export?', {
-        buttonSize: 'sm',
-        okTitle: 'Yes',
-        cancelTitle: 'Cancel',
-        centered: true
-      })
-
-      if (!confirm) {
-        return
-      }
-
       this.loading = true
 
       try {
-        /* const { data } = */ await talk2Api.V2.contacts.exportCommunications(this.contact.id)
-
-        /*  this.$generalNotification(
-          `Your export is now available.<a id="${data.export.uuid}" href="${data.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
-          'export-csv',
-          0,
-          true,
-          {
-            uuid: data.export.uuid,
-            filename: `${data.export.uuid}.csv`
-          }
-        ) */
+        await talk2Api.V2.contacts.exportCommunications(this.contact.id)
       } catch (error) {
         console.log(error)
         this.$generalNotification('Unable to process export request! Please try again later.', 'error')
