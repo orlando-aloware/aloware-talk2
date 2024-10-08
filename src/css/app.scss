@@ -12436,11 +12436,6 @@ h1.contact-list-name-label {
           .dhx_scale_holder {
             overflow-x: auto;
             overflow-y: hidden;
-
-            > div {
-              display: flex;
-              min-width: fit-content;
-            }
           }
         }
 
@@ -12473,6 +12468,17 @@ h1.contact-list-name-label {
           display: flex !important;
           align-items: flex-start;
           justify-content: center;
+        }
+      }
+
+      .dhx_scheduler_week {
+        .dhx_cal_data {
+          .dhx_scale_holder {
+            > div {
+              display: flex;
+              min-width: fit-content;
+            }
+          }
         }
       }
 
