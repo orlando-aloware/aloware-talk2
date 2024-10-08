@@ -137,12 +137,16 @@ export default {
 
     Scheduler.init(this.$refs.scheduler, new Date(), 'month')
     Scheduler.parse(this.$props.events)
+
     this.$refs.scheduler.addEventListener('click', this.handleMoreLink)
+    this.$refs.scheduler.addEventListener('click', this.handleDayLabelClick)
+
     this.$nextTick(() => Scheduler.updateView())
   },
 
   beforeUnmount () {
     this.$refs.scheduler.removeEventListener('click', this.handleMoreLink)
+    this.$refs.scheduler.removeEventListener('click', this.handleDayLabelClick)
   },
 
   methods: {
@@ -237,6 +241,15 @@ export default {
         </div>
       `
       return true
+    },
+
+    handleDayLabelClick (e) {
+      if (e.target.classList.contains('day-label')) {
+        e.preventDefault()
+        const dateStr = e.target.getAttribute('data-date')
+        const date = new Date(dateStr)
+        Scheduler.setCurrentView(date, 'day')
+      }
     }
   }
 }
