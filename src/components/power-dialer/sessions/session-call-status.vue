@@ -1386,10 +1386,10 @@ export default {
       }, 1000)
 
       // store script communication
-      if (this.script?.id && this.taskToCall?.communication?.id) {
+      if (this.script?.id && this.dialer?.communication?.id) {
         talk2Api.V1.scriptCommunication.store({
           script_id: this.script.id,
-          communication_id: this.taskToCall.communication.id,
+          communication_id: this.dialer.communication.id,
           text: this.script.text || ''
         }).catch(err => {
           console.log('Error storing script communication:', err);
