@@ -97,8 +97,14 @@
               <td :class="d.today ? 'today': ''"
                   :key="d.dayOfWeek"
                   v-for="d in formattedWeekDays">
+                <a
+                  href="#"
+                  class="day-label"
+                  @click.prevent="goToDayView(d.date)"
+                >
                   <span class="day-of-week">{{ d.dayOfWeek }}</span>
                   <span class="day">{{ d.day }}</span>
+                </a>
               </td>
               <td style="width: 20px"></td>
             </tr>
@@ -242,15 +248,15 @@ export default {
     formattedWeekDays () {
       const start = moment(this.gotoDate).startOf('isoWeek')
 
-      let cd = start
+      let cd = start.clone()
       let dates = []
 
       for (let i = 0; i < 7; i++) {
         dates.push({
-          date: cd,
+          date: cd.clone(),
           dayOfWeek: cd.format('ddd'),
           day: cd.format('D'),
-          today: cd.format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')
+          today: cd.isSame(moment(), 'day')
         })
 
         cd.add(1, 'd')
@@ -504,6 +510,23 @@ export default {
           this.setProfile(res.data)
           this.$refs.scheduler.reInit(this.gotoDate, this.view)
         })
+    },
+
+    goToDayView (date) {
+      this.view = 'day'
+      this.gotoDate = date.toDate()
+      this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+
+      const newQuery = {
+        ...this.$route.query,
+        view: this.view,
+        date: moment(this.gotoDate).format('YYYY-MM-DD')
+      }
+
+      // Compare the new query with the current route's query to prevent unnecessary navigation which causes errors
+      if (JSON.stringify(newQuery) !== JSON.stringify(this.$route.query)) {
+        this.$router.replace({ query: newQuery })
+      }
     },
 
     onToggleGotoDate (date, view) {
