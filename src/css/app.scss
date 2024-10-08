@@ -12468,6 +12468,12 @@ h1.contact-list-name-label {
           text-align: right;
           font-weight: normal;
         }
+
+        .dhx_scale_hour {
+          display: flex !important;
+          align-items: flex-start;
+          justify-content: center;
+        }
       }
 
       .dhx_cal_event, .dhx_cal_event_clear {
