@@ -115,11 +115,6 @@ export default {
 
     Scheduler.templates.event_text = Scheduler.templates.event_bar_text
 
-    Scheduler.templates.event_bar_text = () => ''
-    Scheduler.templates.event_text = () => ''
-
-    Scheduler.attachEvent('onEventRendered', this.customEventRender)
-
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
       if (!e.target.classList.contains('custom-more-link')) {
         this.addSchedule(date)
@@ -213,34 +208,6 @@ export default {
           this.$emit('toggle-goto-date', new Date(date), 'day')
         }
       }
-    },
-
-    customEventRender (event, ev, container) {
-      const minWidth = Scheduler.config.min_event_width || 60
-      const width = Math.max(ev.width, minWidth)
-
-      const durationInMinutes = moment(event.end_date).diff(moment(event.start_date), 'minutes')
-      const baseHeight = 20
-
-      // Calculate the height based on duration, with a minimum height
-      const calculatedHeight = Math.max(baseHeight * (durationInMinutes / 30), 20)
-
-      // Use the calculated height, but don't exceed the original height
-      const height = Math.min(calculatedHeight, ev.height)
-
-      container.style.width = `${width}px`
-      container.style.height = `${height}px`
-
-      console.log('width', width)
-      console.log('height', height)
-
-      container.innerHTML = `
-        <div class="event-content">
-          <div class="event-title">${event.text}</div>
-          <div class="event-time">${Scheduler.templates.event_date(event.start_date)} - ${Scheduler.templates.event_date(event.end_date)}</div>
-        </div>
-      `
-      return true
     },
 
     handleDayLabelClick (e) {
