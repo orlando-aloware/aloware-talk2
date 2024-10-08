@@ -439,7 +439,6 @@ export default {
     },
 
     renderFromEvent (state) {
-      console.log('renderFromEvent loadCalendarData -->', state)
       this.cancelRequestToken()
       this.resetPage()
       this.loadCalendarData(state)
