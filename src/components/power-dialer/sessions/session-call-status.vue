@@ -1379,12 +1379,6 @@ export default {
         this.isSessionRunning = true
       }
 
-      this.resetTimer()
-
-      setTimeout(() => {
-        this.startWarmUpCountDown()
-      }, 1000)
-
       // store script communication
       if (this.script?.id && this.dialer?.communication?.id) {
         talk2Api.V1.scriptCommunication.store({
@@ -1394,7 +1388,13 @@ export default {
         }).catch(err => {
           console.log('Error storing script communication:', err);
         });
-      }
+      } 
+
+      this.resetTimer()
+
+      setTimeout(() => {
+        this.startWarmUpCountDown()
+      }, 1000)
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
