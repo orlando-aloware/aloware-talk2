@@ -173,6 +173,10 @@ export default function () {
     activeTask: {},
     hasActiveTask: false,
     taskToCall: {},
+    script: {
+      id: null,
+      script: ''
+    },
     selectedDialerSessionId: null,
     sessionPaused: false,
     selectedPdList: {},

@@ -530,7 +530,8 @@ export default {
       'countdownTimer',
       'sessionPaused',
       'activeTask',
-      'hubspot'
+      'hubspot',
+      'script',
     ]),
 
     ...mapState([
@@ -1383,6 +1384,17 @@ export default {
       setTimeout(() => {
         this.startWarmUpCountDown()
       }, 1000)
+
+      // store script communication
+      if (this.script?.id && this.taskToCall?.communication?.id) {
+        talk2Api.V1.scriptCommunication.store({
+          script_id: this.script.id,
+          communication_id: this.taskToCall.communication.id,
+          text: this.script.text || ''
+        }).catch(err => {
+          console.log('Error storing script communication:', err);
+        });
+      }
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {

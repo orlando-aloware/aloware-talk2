@@ -93,6 +93,11 @@ export default {
     state.activeTask = payload
   },
 
+  SET_SCRIPT: (state, payload) => {
+    state.script.id = payload.id;
+    state.script.text = payload.text;
+  },
+
   SET_CONTACTS: (state, payload) => {
     state.listItems[state.selectedPdList.id].data = payload
   },
