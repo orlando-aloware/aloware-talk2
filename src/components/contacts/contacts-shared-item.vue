@@ -76,22 +76,22 @@
       </q-card>
     </q-dialog>
     <router-link :to="{ path: '/contacts/list/' + item.id, query : { type: 'public' }, meta : { type: 'public' }}"
-                  :key="item.id"
-                  v-slot="{ href, route, navigate, isActive, isExactActive }">
+                 :key="item.id"
+                 v-slot="{ href, route, navigate, isActive, isExactActive }">
       <a class="d-flex align-items-center item"
-          data-testid="contacts-shared-list-link"
-          :href="href"
-          :class="[
-            isActive && 'router-link-active',
-            isExactActive && 'router-link-exact-active'
-          ]"
-          @click="toggleSidebar($event, route)">
+         data-testid="contacts-shared-list-link"
+         :href="href"
+         :class="[
+           isActive && 'router-link-active',
+           isExactActive && 'router-link-exact-active'
+         ]"
+         @click="toggleSidebar($event, route)">
         <div class="icon d-flex align-items-center">
           <folder-static-icon data-testid="contacts-shared-static-icon"
                               v-if="item.type === ContactListTypes.STATIC">
           </folder-static-icon>
           <folder-dynamic-icon data-testid="contacts-shared-dynamic-icon"
-                                v-if="item.type === ContactListTypes.DYNAMIC || !item.type" >
+                               v-if="item.type === ContactListTypes.DYNAMIC || !item.type" >
           </folder-dynamic-icon>
         </div>
         <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
