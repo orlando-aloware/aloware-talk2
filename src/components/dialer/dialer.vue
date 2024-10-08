@@ -521,6 +521,10 @@ export default {
           const skipedAndActive = this.getSkippedAndActiveTasks()
           const tempSet = new Set(skipedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
           this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+          const rejectionReason = 14
+          if (res.data.rejected_by_app === rejectionReason) {
+            this.$generalNotification('Calls to this country are not allowed', 'error')
+          }
         }
 
         // we need to prevent proceeding to the next steps if current task's contact id
