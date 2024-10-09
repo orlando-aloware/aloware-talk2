@@ -13,6 +13,10 @@
          v-if="extraText">
           {{ extraText }}
       </p>
+      <p class="info-text"
+         v-if="extraText2">
+          {{ extraText2 }}
+      </p>
       <div class="flex-row mb-4 mt-3">
           <span size="large"
                 type="text"
@@ -46,6 +50,11 @@ export default {
 
   props: {
     extraText: {
+      type: String,
+      required: false
+    },
+
+    extraText2: {
       type: String,
       required: false
     },

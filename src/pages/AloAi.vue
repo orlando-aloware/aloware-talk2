@@ -2,10 +2,11 @@
   <div>
     <upgrade-now-page
       class="mt-5"
-      title-text="AloAi"
+      title-text="AloAi Tools"
       image-link="/assets/images/Broadcast.svg"
-      text="The leading conversational AI supercharging your path to explosive sales growth. Upgrade today to unlock these features"
-      extra-text="Enhance your team’s efficiency and lower operational expenses by automating conversations throughout the entire customer journey.Our AI bot replaces most BDRs and SDRs and will escalate automatically to humans."
+      text="Boost your productivity with Aloware’s powerful AI tools!"
+      extra-text="Automate calls with Voice AI, handle more conversations through Text Bot AI, and gain valuable insights with Voice AI Analytics. These tools free up your time by managing routine tasks and providing real-time data to improve your performance."
+      extra-text2="Want to deliver faster responses and see how you’re doing? Ask your admin to unlock the AloAi tools today and take your work to the next level!"
       :show-button="false"
     />
   </div>
