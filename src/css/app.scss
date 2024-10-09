@@ -8797,9 +8797,13 @@ span.mention {
         margin-right: 14px !important;
       }
 
-      .focus-mode-icon,
-      .logout-icon {
+      .focus-mode-icon {
         margin-right: 8px;
+        margin-top: -2px;
+      }
+
+      .logout-icon {
+        margin-right: 5px;
         margin-top: -2px;
       }
     }
