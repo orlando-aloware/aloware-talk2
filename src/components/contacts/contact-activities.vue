@@ -6,6 +6,7 @@
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
       :contact="contact"
+      :enable-export="enableExport"
       data-testid="contact-activities-header"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
@@ -92,6 +93,10 @@ export default {
     loadingCommunications: {
       type: Boolean,
       default: false
+    },
+    enableExport: {
+      type: Boolean,
+      default: true
     }
   },
   data () {

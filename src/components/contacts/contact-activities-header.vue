@@ -36,7 +36,7 @@
                            data-testid="contact-activities-export-communications-item"
                            class="d-flex"
                            :disabled="loading"
-                           v-if="isAdmin"
+                           v-if="isAdmin && !isWidget && enableExport && !isSimpSocial && !inPowerDialerPage"
                            @click="handleExportCommunications">
             <export-icon class="mark-all-as-read-icon dropdown-icon" />
             Export Communications
@@ -109,7 +109,7 @@
                class="text-decoration-none"
                data-testid="contact-activities-export-communications-btn"
                :disabled="loading"
-               v-if="isAdmin"
+               v-if="isAdmin && !isWidget && enableExport && !isSimpSocial && !inPowerDialerPage"
                @click="handleExportCommunications">
           <q-tooltip anchor="top middle"
                      self="center middle">
@@ -221,12 +221,12 @@ import BackButton from 'components/back-button'
 import Profile from 'components/profile'
 import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-activities-header',
 
-  mixins: [aclMixin],
+  mixins: [aclMixin, simpsocialMixin],
 
   components: {
     Profile,
@@ -258,6 +258,10 @@ export default {
       type: Number,
       required: false,
       default: 0
+    },
+    enableExport: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -289,6 +293,11 @@ export default {
 
     shouldDisplayClosedOrPendingContact () {
       return [ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(this.contact?.task_status) && this.isContactStatusControlEnabled
+    },
+
+    inPowerDialerPage () {
+      const previousPage = this.$route?.query?.previousPage
+      return previousPage === 'Power Dialer'
     }
   },
   data () {
