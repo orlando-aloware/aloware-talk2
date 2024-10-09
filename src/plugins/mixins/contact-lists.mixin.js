@@ -38,7 +38,7 @@ export default {
         value: 50,
         label: '50',
         disabled: false
-      }
+      },
     }
   },
   computed: {
