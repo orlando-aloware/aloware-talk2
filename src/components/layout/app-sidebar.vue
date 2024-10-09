@@ -682,7 +682,8 @@
            class="nav-icons w-100"
            data-testid="contacts-sidebar-btn"
            v-show="isActive('AloAi')"
-           flat>
+           flat
+           v-if="!isSimpSocial">
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
@@ -704,7 +705,8 @@
            class="nav-icons w-100"
            data-testid="contacts-no-active-sidebar-btn"
            v-show="!isActive('AloAi')"
-           flat>
+           flat
+           v-if="!isSimpSocial">
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
@@ -794,6 +796,7 @@ import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 import { broadcastsMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as KycLogs from 'src/constants/kyc-logs'
+import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'app-sidebar',
