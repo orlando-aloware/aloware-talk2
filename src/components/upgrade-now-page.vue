@@ -24,6 +24,7 @@
           <b-button pill
                     variant="primary"
                     class="cursor-pointer el-button ml-2"
+                    v-if="showButton"
                     :disabled="disabled"
                     @click="checkClick">
             {{ buttonText }}
@@ -58,6 +59,12 @@ export default {
     buttonText: {
       type: String,
       default: 'Request a Plan Upgrade',
+      required: false
+    },
+
+    showButton: {
+      type: Boolean,
+      default: true,
       required: false
     },
 

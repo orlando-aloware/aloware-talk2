@@ -1,11 +1,12 @@
 <template>
   <div>
     <upgrade-now-page
-      image-link="/assets/images/Broadcast.svg"
-      text="Scale your outreach with the click of a button. Send captivating SMS campaigns to many contacts at once via Broadcast."
-      extra-text="Upgrade today to unlock this feature"
-      title-text="Broadcast"
       class="mt-5"
+      title-text="AloAi"
+      image-link="/assets/images/Broadcast.svg"
+      text="The leading conversational AI supercharging your path to explosive sales growth. Upgrade today to unlock these features"
+      extra-text="Enhance your team’s efficiency and lower operational expenses by automating conversations throughout the entire customer journey.Our AI bot replaces most BDRs and SDRs and will escalate automatically to humans."
+      :show-button="false"
     />
   </div>
 </template>
