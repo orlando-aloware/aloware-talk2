@@ -328,6 +328,12 @@ export default {
     })
 
     this.device.on(WebrtcEvents.INCOMING, (call) => {
+      // Avoid continuing with the incoming call if it's a widget,
+      // and ignore the call. Otherwise, Twilio will play the default incoming sound.
+      if (this.isWidget) {
+        call._connection.ignore()
+        return
+      }
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
@@ -349,7 +355,11 @@ export default {
           this.addNonOwnedLiveContact(res.data)
         }
       }).catch((err) => {
-        console.log(err)
+        console.log('getCommunication error', {
+          'callSid': this.dialer.call.callSid,
+          'from': this.dialer.call.from,
+          'err': err
+        })
       })
     })
 
@@ -654,6 +664,39 @@ export default {
         return
       }
 
+      const to = this.$options.filters.fixPhone(currentNumber, 'E164')
+      // check if the user has enabled two-legged outbound calls,
+      // and the requested call is does not include ":" in the phone number
+      // ":" is used to dial into an existing call,
+      // and also used for calling from HubSpot
+      if (!!contactId && !to.includes(':') && this.profile.enabled_two_legged_outbound) {
+        const contact = {
+          id: contactId,
+          name: contactName
+        }
+        let message = 'We will call your secondary phone'
+        message += ' on ' + this.profile.secondary_phone_number
+        message += ' and connect you with '
+        if (contactName) {
+          message += contact.name
+        } else {
+          message += 'the contact'
+        }
+        message += '. Proceed?'
+        this.$bvModal.msgBoxConfirm(message, {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.makeTwoLeggedCall(contact, to)
+          }
+        })
+
+        return
+      }
+
       if (this.shouldPushPhoneRoute) {
         this.$router.push({
           name: 'Phone'
@@ -695,6 +738,28 @@ export default {
       if (currentNumber.includes('barge') || currentNumber.includes('whisper')) {
         this.forceMute()
       }
+    },
+
+    makeTwoLeggedCall (contact, phoneNumber) {
+      let prefix = ' the contact'
+      if (contact.name) {
+        prefix = ' ' + contact.name
+      }
+      this.$axios.post(`/api/v1/contact/${contact.id}/make-two-legged-call`, {
+        phone_number: phoneNumber
+      }).then(() => {
+        this.$generalNotification(`We are calling your phone to connect you to ${prefix}`)
+      }).catch(err => {
+        const message = err.response.data.message
+        if (message) {
+          this.$generalNotification(err.response.data.message, 'error')
+          return
+        }
+        const error = err.response.data.error
+        if (error) {
+          this.$generalNotification(err.response.data.error, 'error')
+        }
+      })
     },
 
     initConnectionEvents () {
@@ -959,7 +1024,7 @@ export default {
 
         this.$axios.post('/api/v1/dialer/new-hold', params).then(() => {
           this.setDialerIsHeld(true)
-          console.log('Call parked')
+          console.log('Call held')
         }).catch(err => {
           console.log(err)
           this.$VueEvent.fire('holdFailed')

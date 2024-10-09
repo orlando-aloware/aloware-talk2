@@ -147,11 +147,6 @@
         </q-item>
       </div>
     </div>
-    <div class="ml-auto d-block d-sm-none">
-      <div class="d-flex h-100 align-items-center">
-
-      </div>
-    </div>
   </q-toolbar>
 </template>
 

@@ -761,7 +761,7 @@
             </b-form-row>
 
             <!--RECEIVED/SENT BY-->
-            <b-form-row v-if="getUser(communication.user_id) && communication.type === CommunicationTypes.SMS"
+            <b-form-row v-if="communication?.user_id && communication?.type === CommunicationTypes.SMS"
                         data-testid="comm-details-sent-by-row">
               <b-col class="pl-0 pr-0" data-testid="comm-details-sent-by-col">
                 <q-item-label v-if="communication.direction === CommunicationDirections.INBOUND">
@@ -774,6 +774,19 @@
               <b-col data-testid="comm-details-sent-by-col">
                 <div class="d-flex align-items-center">
                   {{ getUser(communication.user_id).name }}
+                </div>
+              </b-col>
+            </b-form-row>
+
+            <!-- SENT AS MMS -->
+            <b-form-row data-testid="comm-details-sent-as-mms-row"
+                        v-if="isCommunicationSentAsMms">
+              <b-col class="pl-0 pr-0" data-testid="comm-details-sent-as-mms-col">
+                <q-item-label>Sent as MMS: </q-item-label>
+              </b-col>
+              <b-col data-testid="comm-details-sent-as-mms-col">
+                <div class="d-flex align-items-center">
+                  {{ sentAsMmsLabel }}
                 </div>
               </b-col>
             </b-form-row>
@@ -937,6 +950,25 @@
                 <div class="d-flex align-items-center">
                   <hubspot-activity-type-selector data-testid="comm-details-call-disposition-hubspot" :communication="communication"></hubspot-activity-type-selector>
                 </div>
+              </b-col>
+            </b-form-row>
+          </q-card-section>
+
+          <hr/>
+          <!-- COMMUNICATION CUSTOM FIELDS -->
+          <q-card-section class="pt-0 pb-0"
+              data-testid="comm-details-custom-fields"
+              v-if="hasCustomFields">
+            <b-form-row data-testid="comm-details-custom-field-row"
+              v-for="(custom_field, key) in communication.metadata?.custom_fields"
+              :key="key">
+              <b-col class="pl-0 pr-0">
+                <q-item-label> {{ convertToTitleCase(key) }}: </q-item-label>
+              </b-col>
+              <b-col>
+                <span>
+                  {{ custom_field }}
+                </span>
               </b-col>
             </b-form-row>
           </q-card-section>
@@ -1131,6 +1163,20 @@ export default {
         this.callDispositions &&
         this.callDispositions.length > 0 &&
         !this.dialerMode
+    },
+
+    hasCustomFields () {
+      return this.communication.metadata?.custom_fields && Object.keys(this.communication.metadata.custom_fields).length > 0
+    },
+
+    isCommunicationSentAsMms () {
+      return this.communication.type === CommunicationTypes.SMS && this.communication.direction === CommunicationDirections.OUTBOUND && this.communication.metadata?.send_as_mms
+    },
+
+    sentAsMmsLabel () {
+      const sendAsMms = this.communication.metadata?.send_as_mms
+
+      return sendAsMms ? 'Yes' : 'No'
     }
   },
 
@@ -1272,6 +1318,13 @@ export default {
 
     isAttachmentApplication (mimeType) {
       return mimeType.includes('application/')
+    },
+
+    convertToTitleCase (key) {
+      return key
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
     }
   }
 }

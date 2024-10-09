@@ -211,6 +211,7 @@ export default {
           return {
             propCampaign: this.selectedCampaign,
             propThrottle: this.throttle,
+            type: this.type,
             rvm: this.rvm
           }
         case 3:
@@ -301,30 +302,32 @@ export default {
     }
   },
 
-  data: () => ({
-    direction: 'left',
-    isMainComponentValid: false,
-    isFooterComponentValid: false,
-    source: {},
-    type: 'sms', // sms, voicemail
-    rvm: null,
-    price: 0,
-    throttle: null,
-    time: null, // holds the schedule's time options
-    date: null, // holds the send datetime
-    messagesLength: 0,
-    isRestrictedTime: false,
-    acceptedOutsideBusinessHours: false,
-    outsideBusinessHoursDialog: {
-      open: false
-    },
-    optoutMissingDialog: {
-      open: false
-    },
-    sendWarningDialog: {
-      open: false
+  data: function () {
+    return {
+      direction: 'left',
+      isMainComponentValid: false,
+      isFooterComponentValid: false,
+      source: {},
+      type: ['sms', 'rvm'].includes(this.$route.query.type) ? this.$route.query.type : 'sms', // sms, rvm
+      rvm: null,
+      price: 0,
+      throttle: null,
+      time: null, // holds the schedule's time options
+      date: null, // holds the send datetime
+      messagesLength: 0,
+      isRestrictedTime: false,
+      acceptedOutsideBusinessHours: false,
+      outsideBusinessHoursDialog: {
+        open: false
+      },
+      optoutMissingDialog: {
+        open: false
+      },
+      sendWarningDialog: {
+        open: false
+      }
     }
-  }),
+  },
 
   methods: {
     ...mapActions('contacts', [
@@ -357,7 +360,7 @@ export default {
     },
 
     onTypeUpdated (type) {
-      this.type = type
+      //
     },
 
     onRvmUpdated (file) {

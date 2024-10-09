@@ -65,10 +65,11 @@
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <search class="width-260"
-                  limitSearchCharacters
+                  data-testid="contacts-view-search-input"
+                  :limitSearchCharacters="false"
                   :search="search"
                   :disabled="isLoadingDisabled"
-                  data-testid="contacts-view-search-input"
+                  @show-error-message="handleLimitCharactersError"
                   @search="onSearch">
           </search>
           <div class="contacts-total mobile">
@@ -325,6 +326,10 @@
           </b-dropdown-item>
         </b-dropdown>
       </div>
+      <div class="limit-characters-error"
+           v-if="showLimitCharactersError">
+        Search requires at least 3 characters
+      </div>
     </template>
     <template slot="actions"
               v-if="!simpleTable">
@@ -436,7 +441,7 @@
                     </div>
                     <div v-else>
                       <div :class="`${column.draggable ? 'col-indented' : ''}`" data-testid="contacts-view-contact-no-owner-name">
-                        No Name
+                        &nbsp;
                       </div>
                     </div>
                   </div>
@@ -669,7 +674,7 @@
                 </div>
                 <div class="text-left ellipse col-indented"
                      v-else-if="column.name.includes('date_of_birth')">
-                  {{ contact[column.name] | fixFullDate }}
+                  {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div class="ellipse"
                      :class="getColumnClass(column.name, column.draggable)"
@@ -923,7 +928,8 @@ export default {
       ContactListTypes,
       openPDModal: false,
       isContactModule: false,
-      openAloAiEnrollmentModal: false
+      openAloAiEnrollmentModal: false,
+      showLimitCharactersError: false
     }
   },
 
@@ -1266,7 +1272,7 @@ export default {
     },
 
     onSearch (searchText) {
-      this.$emit('search', searchText.trim())
+      this.$emit('search', searchText)
     },
 
     onFetchMyContacts (checked) {
@@ -1864,6 +1870,10 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
+    },
+
+    handleLimitCharactersError (value) {
+      this.showLimitCharactersError = value
     }
   },
 

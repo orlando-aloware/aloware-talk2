@@ -140,7 +140,8 @@ export default {
         userLoggedIn: null,
         agentStatusUpdated: null
       },
-      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED']
+      // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY']
     }
   },
   computed: {
@@ -153,7 +154,7 @@ export default {
     },
 
     isLoadingDialer () {
-      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus)
+      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) && !this.showAlertAgentOnCall && !this.showAlertCallFinished && !this.dialer?.parkedCall
     }
   },
 
@@ -260,8 +261,15 @@ export default {
     },
 
     async handleDialNumber (phoneNumber) {
+      console.log('Handle')
+      console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
+        return
+      }
+
+      // don't allow to make a call if there's a parked call
+      if (this.dialer?.parkedCall) {
         return
       }
 
@@ -322,6 +330,7 @@ export default {
     },
 
     handleCall (shouldHandleDialNumber) {
+      this.loading = true
       const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       // if there's a call in progress or in wrap up, we omit the call
@@ -375,6 +384,11 @@ export default {
 
         if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.isDialed) {
           this.showAlertCallFinished = false
+        }
+
+        // if we finished - don't need to handle dial number
+        if (this.showAlertCallFinished) {
+          return
         }
 
         if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {

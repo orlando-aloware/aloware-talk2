@@ -371,6 +371,9 @@ export default {
     },
 
     isSendTextInputDisabled () {
+      if (!this.shouldAllowSmsTraffic(this.selectedLine)) {
+        return true
+      }
       return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
     },
 
