@@ -54,14 +54,9 @@
     </div>
 
      <p class="text-13 mt-2 mb-0"
-        v-if="!isBulk && !list"
+        v-if="!isBulk"
         data-testid="tags-assign-contacts-by-tag-p-tag-name"
         v-html="`<span class='font-weight-bold'>Tag:</span> ${ tagName }`" />
-
-      <p class="text-13 mt-2 mb-0"
-        v-if="list"
-        data-testid="tags-assign-contacts-by-tag-p-tag-name"
-        v-html="`<span class='font-weight-bold'>All contacts from this list:</span> ${ list.name }`" />
 
     <template #modal-footer>
       <div class="mt-2 d-flex w-100">
@@ -90,7 +85,7 @@ import { tagsMixin } from 'src/plugins/mixins'
 import API from 'src/plugins/api/api'
 
 export default {
-  name: 'assign-contacts-modal',
+  name: 'assign-contacts-by-tag',
 
   mixins: [
     tagsMixin
@@ -103,11 +98,6 @@ export default {
 
   props: {
     tag: {
-      type: Object,
-      required: false
-    },
-
-    list: {
       type: Object,
       required: false
     },
@@ -193,7 +183,7 @@ export default {
     },
 
     closeModal () {
-      this.$emit('closeAssignContactsModal')
+      this.$emit('closeAssignContactsTagModal')
       this.reset()
     },
 
@@ -217,8 +207,7 @@ export default {
     assignContacts () {
       this.loading = true
 
-      const msg = this.list ? `Are you sure you want the contacts in this list to be assigned to this ${this.tabNameLabel}?`
-        : `Are you sure you want the contacts under ` + (this.isBulk ? `these tags` : 'this tag') + ` to be assigned to this ${this.tabNameLabel}?`
+      const msg = `Are you sure you want the contacts under ` + (this.isBulk ? `these tags` : 'this tag') + ` to be assigned to this ${this.tabNameLabel}?`
 
       this.$bvModal.msgBoxConfirm(msg, {
         title: 'Event Confirmation',
@@ -247,9 +236,7 @@ export default {
       }
       let xhr = null
 
-      if (this.list) {
-        xhr = API.V2.contactsList.assignContactsTo(this.list.id, payload)
-      } else if (this.isBulk) {
+      if (this.isBulk) {
         payload.tag_ids = this.getSelectedTagIds
         xhr = API.V1.tags.bulkAssignContactsTo(payload)
       } else {

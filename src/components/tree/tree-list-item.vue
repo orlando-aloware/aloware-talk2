@@ -76,19 +76,18 @@
           custom-class="contact-popover"
           :target="folderId"
           v-if="folderExists">
-          <list-actions :list-id="id"
-                        :type="type"
-                        :contacts-count="contactsCount"
-                        :has-edit="hasEdit"
-                        :has-delete="hasDelete"
-                        :is-pinned="isPinned"
-                        @remove="onRemoveList"
-                        @rename="onRenameList"
-                        @pin="onPin"
-                        @move="onMove"
-                        @duplicate="onDuplicate"
-                        @split="onSplit"
-                        @clonestatic="onCloneStatic"/>
+          <list-actions
+            :list-id="id"
+            :type="type"
+            :hasEdit="hasEdit"
+            :hasDelete="hasDelete"
+            :isPinned="isPinned"
+            @remove="onRemoveList"
+            @rename="onRenameList"
+            @pin="onPin"
+            @move="onMove"
+            @duplicate="onDuplicate"
+            @clonestatic="onCloneStatic"/>
         </b-popover>
       </div>
     </router-link>
@@ -108,7 +107,6 @@ import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { contactLists } from 'src/plugins/mixins'
 
 export default {
   components: {
@@ -120,8 +118,6 @@ export default {
     UnsavedIcon,
     ListActions
   },
-
-  mixins: [contactLists],
 
   props: {
     id: {
@@ -145,16 +141,6 @@ export default {
     },
     hasDelete: {
       type: Number
-    },
-    showInPublicFolder: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    contactsCount: {
-      type: Number,
-      required: false,
-      default: 0
     }
   },
 
@@ -177,7 +163,6 @@ export default {
       'unsavedList'
     ]),
     ...mapState(['isMobile']),
-    ...mapState('auth', ['profile']),
     indentStyle () {
       return {
         flex: `0 0 ${this.layer * 10}px`
@@ -260,22 +245,6 @@ export default {
         id: this.id,
         type: this.type
       })
-    },
-    onSplit () {
-      this.$root.$emit('bv::hide::popover')
-
-      const isAgent = this.profile.role_names.includes('Company Agent')
-      if (this.type === ContactListTypes.DYNAMIC || (this.showInPublicFolder && isAgent)) {
-        this.$emit('noSplit', this.name, 'You are not allowed to split this list.')
-        return
-      }
-
-      if (this.type === ContactListTypes.STATIC && this.contactsCount <= this.minimunContactsToSplit) {
-        this.$emit('noSplit', this.name, `The list must have more than ${this.minimunContactsToSplit} contacts to be split`)
-        return
-      }
-
-      this.$emit('split', this.id, this.name, this.contactsCount)
     },
     onCloneStatic () {
       this.$root.$emit('bv::hide::popover')
