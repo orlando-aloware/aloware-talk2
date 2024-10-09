@@ -23,7 +23,7 @@
              href="#"
              :disabled="!selectedTagsHasContactsCount"
              data-testid="tags-assign-contacts-button"
-             @click.prevent="openAssignContactsTagDialog">
+             @click.prevent="isOpenAssignContactsTagDialog = true">
             <i class="fa fa-sign-in-alt"></i>
             Assign Contacts
           </a>
@@ -71,11 +71,11 @@
       </div>
     </div>
 
-    <assign-contacts-modal :is-show="isOpenAssignContactsTagDialog"
-                           :is-bulk="true"
-                           :tag="{}"
-                           v-if="selectedTagsHasContactsCount"
-                           @closeAssignContactsModal="closeAssignContactsTagDialog"/>
+    <assign-contacts-by-tag :is-show="isOpenAssignContactsTagDialog"
+                            :is-bulk="true"
+                            :tag="{}"
+                            v-if="selectedTagsHasContactsCount"
+                            @closeAssignContactsTagModal="isOpenAssignContactsTagDialog = false"/>
 
     <tag-contacts-add-to-power-dialer :is-show="isOpenAddTagContactsToPowerDialerDialog"
                                       :is-bulk="true"
@@ -102,7 +102,7 @@
 import { tagsMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import DeleteTagDialog from 'components/tags/delete-tag-dialog.vue'
-import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
+import AssignContactsByTag from 'components/tags/assign-contacts-by-tag.vue'
 import TagContactsAddToPowerDialer from 'components/tags/tag-contacts-add-to-power-dialer.vue'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 
@@ -112,7 +112,7 @@ export default {
   components: {
     TagContactsWorkflowEnroller,
     TagContactsAddToPowerDialer,
-    AssignContactsModal,
+    AssignContactsByTag,
     DeleteTagDialog
   },
 
@@ -150,14 +150,6 @@ export default {
   },
 
   methods: {
-    openAssignContactsTagDialog () {
-      this.isOpenAssignContactsTagDialog = true
-    },
-
-    closeAssignContactsTagDialog () {
-      this.isOpenAssignContactsTagDialog = false
-    },
-
     reloadTags () {
       this.$emit('reloadTags')
     }
