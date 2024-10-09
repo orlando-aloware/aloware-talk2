@@ -695,6 +695,9 @@ export default {
         .listen('.contact-list.import-failed', (event) => {
           window.VueEvent.fire('contact_list_import_failed', event)
         })
+        .listen('.contact-list.created', (event) => {
+          window.VueEvent.fire('contact_list_created', event)
+        })
         .listen('.broadcasts.created', (event) => {
           window.VueEvent.fire('broadcasts_created', event.broadcaster)
         })

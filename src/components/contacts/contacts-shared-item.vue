@@ -111,7 +111,7 @@
                boundary="window"
                custom-class="contact-popover"
                :target="`contacts-shared-item-option-${item.id}`">
-      <list-actions :list-id="item.id"
+      <list-actions :id="item.id"
                     :type="item.type"
                     :contactsCount="item.no_of_contacts"
                     :has-split="1"
@@ -159,7 +159,15 @@ export default {
   },
   computed: {
     ...mapState('contacts', ['unsavedList']),
-    ...mapState('auth', ['profile'])
+    ...mapState('auth', ['profile']),
+    isContactsRoute () {
+      return this.$route.meta.title === 'Contacts'
+    }
+  },
+  mounted () {
+    this.$VueEvent.stop('contact_list_created')
+
+    this.$VueEvent.listen('contact_list_created', event => this.handleListCreated(event))
   },
   methods: {
     ...mapActions('contacts', ['setShowContactsListSidebar', 'setUnsavedList']),
@@ -208,6 +216,18 @@ export default {
       this.disableSizeOptions(list.no_of_contacts)
       this.listId = list.id
       this.prompt = true
+    },
+
+    handleListCreated (event) {
+      if (!event.contact_list) {
+        return
+      }
+
+      if (this.isContactsRoute) {
+        this.$router.push(`/contacts/list/${event.contact_list.id}`)
+      } else {
+        this.$router.push(`/power-dialer/list/${event.contact_list.id}`)
+      }
     }
   }
 }

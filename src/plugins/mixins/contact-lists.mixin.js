@@ -91,11 +91,6 @@ export default {
       }
       this.prompt = false
       this.loading = false
-
-      // reload the page
-      setTimeout(() => {
-        window.location.reload()
-      }, 2000)
     }
   }
 }

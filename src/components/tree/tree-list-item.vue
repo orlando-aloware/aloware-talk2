@@ -76,7 +76,7 @@
           custom-class="contact-popover"
           :target="folderId"
           v-if="folderExists">
-          <list-actions :list-id="id"
+          <list-actions :id="id"
                         :type="type"
                         :contacts-count="contactsCount"
                         :has-edit="hasEdit"
@@ -240,6 +240,10 @@ export default {
         }
       }, 500)
     }
+
+    this.$VueEvent.stop('contact_list_created')
+
+    this.$VueEvent.listen('contact_list_created', event => this.handleListCreated(event))
   },
 
   methods: {
@@ -509,6 +513,18 @@ export default {
       }
       if (this.$route.path !== '/contacts/list/unsaved') {
         this.$router.push('/contacts/list/unsaved')
+      }
+    },
+
+    handleListCreated (event) {
+      if (!event.contact_list) {
+        return
+      }
+
+      if (this.isContactsRoute) {
+        this.$router.push(`/contacts/list/${event.contact_list.id}`)
+      } else {
+        this.$router.push(`/power-dialer/list/${event.contact_list.id}`)
       }
     }
   },
