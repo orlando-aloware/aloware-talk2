@@ -234,7 +234,7 @@ export default {
       if (isLineSelector) {
         a2pBlock = campaign.blocked_messaging_information && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
       } else {
-        a2pBlock = campaign.blocked_messaging_information && !campaign.blocked_messaging_information['bypassed'] && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
+        a2pBlock = campaign.blocked_messaging_information && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
       }
 
       return checkBlockedMessaging && a2pBlock
