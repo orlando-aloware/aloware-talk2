@@ -36,7 +36,7 @@
                            data-testid="contact-activities-export-communications-item"
                            class="d-flex"
                            :disabled="loading"
-                           v-if="isAdmin"
+                           v-if="isAdmin && !isWidget && enableExport"
                            @click="handleExportCommunications">
             <export-icon class="mark-all-as-read-icon dropdown-icon" />
             Export Communications
@@ -109,7 +109,7 @@
                class="text-decoration-none"
                data-testid="contact-activities-export-communications-btn"
                :disabled="loading"
-               v-if="isAdmin"
+               v-if="isAdmin && !isWidget && enableExport"
                @click="handleExportCommunications">
           <q-tooltip anchor="top middle"
                      self="center middle">
@@ -258,6 +258,10 @@ export default {
       type: Number,
       required: false,
       default: 0
+    },
+    enableExport: {
+      type: Boolean,
+      default: true
     }
   },
 
