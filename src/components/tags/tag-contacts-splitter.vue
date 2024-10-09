@@ -168,7 +168,7 @@ export default {
     },
 
     closeModal () {
-      this.$emit('closeAssignContactsModal')
+      this.$emit('closeAssignContactsTagModal')
       this.reset()
     },
 

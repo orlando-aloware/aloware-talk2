@@ -47,7 +47,6 @@ export { default as dispositionsOptionsMixin } from './dispositions-options.mixi
 export { default as inboxRoutesMixin } from './inbox-routes.mixin'
 export { default as callDispositionMixin } from './call-disposition.mixin'
 export { default as contactDispositionMixin } from './contact-disposition.mixin'
-export { default as contactLists } from './contact-lists.mixin'
 export { default as communicationMixin } from './communication.mixin'
 export { default as classicMixin } from './classic.mixin'
 export { default as settingsLayoutMixin } from './settings-layout.mixin'
