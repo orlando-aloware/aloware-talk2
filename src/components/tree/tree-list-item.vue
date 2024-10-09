@@ -201,18 +201,18 @@ export default {
     itemName () {
       return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
     },
-    isContactsRoute () {
+    /* isContactsRoute () {
       return this.$route.meta.title === 'Contacts'
-    },
+    }, */
     viewListPath () {
       return this.isContactsRoute ? `/contacts/list/${this.id}` : `/power-dialer/list/${this.id}`
     },
     listPath () {
       return this.isContactsRoute ? '/api/v2/contacts-list/' : '/api/v2/power-dialer-lists/'
     },
-    foldersPath () {
+    /* foldersPath () {
       return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
-    },
+    }, */
     folderId () {
       const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-item-option-${module}-${this.id}`
@@ -250,7 +250,7 @@ export default {
     ...mapActions('contacts', [
       'removeListOpen',
       'removeListClose',
-      'foldersLoaded',
+      // 'foldersLoaded',
       'listLoaded',
       'listPinToggled',
       'openMoveDialog',
@@ -454,7 +454,7 @@ export default {
       return this.$axios
         .get(`api/v2/contacts-list/${id}/items?per_page=1`)
     },
-    reloadFolders () {
+    /* reloadFolders () {
       return this.$axios
         .get(this.foldersPath)
         .then((response) => response.data)
@@ -462,7 +462,7 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
-    },
+    }, */
     onClickItem () {
       this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
     },
@@ -526,6 +526,8 @@ export default {
       } else {
         this.$router.push(`/power-dialer/list/${event.contact_list.id}`)
       }
+
+      this.reloadFolders()
     }
   },
 

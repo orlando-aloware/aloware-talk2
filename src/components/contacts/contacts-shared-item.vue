@@ -224,10 +224,10 @@ export default {
       }
 
       if (this.isContactsRoute) {
-        this.$router.push(`/contacts/list/${event.contact_list.id}`)
-      } else {
-        this.$router.push(`/power-dialer/list/${event.contact_list.id}`)
+        this.$router.push(`/contacts/list/${event.contact_list.id}?type=public`)
       }
+
+      this.reloadFolders()
     }
   }
 }
