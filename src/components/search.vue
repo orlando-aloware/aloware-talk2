@@ -1,22 +1,19 @@
 <template>
-  <div class="position-relative d-flex">
-    <q-input class="form-control-search form-control-search-component"
+  <div class="position-relative">
+    <q-input :class="[border ? 'form-control' : 'border-0']"
+             :placeholder="placeholder"
+             :disabled="disabled"
+             class="form-control-search"
+             v-model="searchValue"
              borderless
              clearable
              data-testid="search-input"
-             :class="[border ? 'form-control' : 'border-0', isInvalid ? 'is-invalid' : '']"
-             :placeholder="placeholder"
-             :disabled="disabled"
-             v-model="searchValue"
              @blur="onBlur"
              @focus="onFocus"
              @clear="onInput"
-             @keyup.enter="onInput">
-       <template v-slot:prepend>
-        <span class="search-icon-component"
-              @click="onInput">
-          <search-icon />
-        </span>
+             @input="onInput">
+      <template v-slot:prepend>
+        <search-icon/>
       </template>
       <template v-slot:default
                 v-if="limitSearchCharacters">
@@ -32,6 +29,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import SearchIcon from 'components/icons/search-icon'
 
 export default {
@@ -40,7 +38,7 @@ export default {
   props: {
     placeholder: {
       type: String,
-      default: 'Press ENTER to search...'
+      default: 'Search name, phone, email, etc.'
     },
 
     disabled: {
@@ -66,8 +64,7 @@ export default {
 
   data () {
     return {
-      searchValue: '',
-      isInvalid: false
+      searchValue: ''
     }
   },
 
@@ -76,19 +73,16 @@ export default {
   },
 
   methods: {
-    onInput: function () {
+    onInput: _.debounce(function () {
       // send an empty string on null value
       // (happens when page is from contact page - clicked from result)
       if (!this.searchValue) {
         this.searchValue = ''
       }
 
-      const hasError = this.showErrorMessage
-
-      this.isInvalid = hasError
-      this.$emit('show-error-message', hasError)
+      this.searchValue = this.searchValue.trim()
       this.$emit('search', this.searchValue)
-    },
+    }, 500),
 
     onFocus: function () {
       this.$emit('focus', this.searchValue)
@@ -106,12 +100,6 @@ export default {
   watch: {
     search () {
       this.searchValue = this.search
-    }
-  },
-
-  computed: {
-    showErrorMessage () {
-      return !this.limitSearchCharacters && this.searchValue.length > 0 && this.searchValue.length < 3
     }
   }
 }
