@@ -31,11 +31,6 @@ export default {
   props: {
     contact: {
       required: true
-    },
-    noPadding: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
 
