@@ -15,15 +15,18 @@
       <div class="details-component-container h-100"
            ref="detailsComponentContainer">
         <template v-if="!saveBarOnly">
-          <contact-info data-testid="contact-details-info" :campaign-id="campaignId"/>
+          <contact-info data-testid="contact-details-info" :campaign-id="campaignId" />
           <contact-sequence class="w-100"
                             data-testid="contact-details-sequence"
                             :contact="contact"
-                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
+                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+          <contact-push-to-crm data-testid="contact-details-push-to-crm"
+                               :contact="contact"
+                               v-if="isSimpSocial" />
           <contact-aloai-engagement-control ss="w-100"
-                            data-testid="contact-aloai-engagement-control"
-                            :contact="contact"
-                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
+                                            data-testid="contact-aloai-engagement-control"
+                                            :contact="contact"
+                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
           <contact-aloha-bot class="w-100"
                              data-testid="contact-details-aloha-bot"
                              :contact="contact"
@@ -72,6 +75,7 @@ import ContactBroadcast from 'src/components/contacts/contact-broadcast'
 import ContactInformation from 'src/components/contacts/contact-information'
 import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
+import ContactPushToCrm from 'src/components/contacts/contact-push-to-crm'
 import BackButton from 'components/back-button'
 import { mapGetters, mapActions, mapState } from 'vuex'
 import { CALL, SMS } from 'src/constants/communication-types'
@@ -90,7 +94,8 @@ import {
   aclMixin,
   contactMixin,
   contactV2AttributesMixin,
-  visibilityMixin
+  visibilityMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 
 export default {
@@ -118,7 +123,8 @@ export default {
     contactMixin,
     contactV2AttributesMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    simpsocialMixin
   ],
 
   components: {
@@ -127,6 +133,7 @@ export default {
     Profile,
     ContactSaveBar,
     ContactScheduledMessages,
+    ContactPushToCrm,
     ContactIntegrations,
     ContactInformation,
     ContactBroadcast,
