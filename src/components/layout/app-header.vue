@@ -169,7 +169,6 @@ import DialerIcon from 'components/icons/dialer-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
-import * as storage from 'src/plugins/helpers/storage'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 
