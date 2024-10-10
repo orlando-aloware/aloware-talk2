@@ -50,6 +50,9 @@
                                 data-testid="contact-details-reservations-messages"
                                 :contact="contact"/>
           <contact-scheduled-messages data-testid="contact-details-scheduled-messages"/>
+          <contact-push-to-crm data-testid="contact-details-push-to-crm"
+                               :contact="contact"
+                               v-if="isSimpSocial"/>
           <contact-activity-counts data-testid="contact-details-activity-counts" :summary="communicationsSummary.summaries"/>
           <contact-lines data-testid="contact-details-lines"/>
           <contact-ring-groups data-testid="contact-details-ring-groups"/>
@@ -72,6 +75,7 @@ import ContactBroadcast from 'src/components/contacts/contact-broadcast'
 import ContactInformation from 'src/components/contacts/contact-information'
 import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
+import ContactPushToCrm from 'src/components/contacts/contact-push-to-crm'
 import BackButton from 'components/back-button'
 import { mapGetters, mapActions, mapState } from 'vuex'
 import { CALL, SMS } from 'src/constants/communication-types'
@@ -90,7 +94,8 @@ import {
   aclMixin,
   contactMixin,
   contactV2AttributesMixin,
-  visibilityMixin
+  visibilityMixin,
+  simpsocialMixin
 } from 'src/plugins/mixins'
 
 export default {
@@ -118,7 +123,8 @@ export default {
     contactMixin,
     contactV2AttributesMixin,
     aclMixin,
-    visibilityMixin
+    visibilityMixin,
+    simpsocialMixin
   ],
 
   components: {
@@ -127,6 +133,7 @@ export default {
     Profile,
     ContactSaveBar,
     ContactScheduledMessages,
+    ContactPushToCrm,
     ContactIntegrations,
     ContactInformation,
     ContactBroadcast,
