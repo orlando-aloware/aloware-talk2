@@ -241,6 +241,10 @@ export default {
         return window.axios.post(`${suffixV1}tags/bulk-assign-contacts-to`, params)
       },
 
+      convertTagToList (params) {
+        return window.axios.post(`${suffixV2}contacts-list/convert`, params)
+      },
+
       addTasksToUserPowerDialer (id, params) {
         return window.axios.post(`${suffixV1}tags/${id}/add-to-user-power-dialer`, params)
       },
@@ -743,6 +747,22 @@ export default {
         return window.axios.get(`api/v2/power-dialer-lists/my-queue`, {
           params: params
         })
+      }
+    },
+
+    contactsList: {
+      assignContactsTo (contactListId, payload = {}) {
+        const params = {
+          assign_to: payload.assign_contacts_to,
+          id: payload.assign_contacts_to === 'ring_group' ? payload.ring_group_id : payload.user_id,
+          force: payload.force,
+          from_talk: true
+        }
+        return window.axios.post(`${suffixV2}contacts-list/${contactListId}/assign`, params)
+      },
+
+      splitListIntoSmallerLists (contactListId, params) {
+        return window.axios.post(`${suffixV2}contacts-list/${contactListId}/split`, params)
       }
     },
 
