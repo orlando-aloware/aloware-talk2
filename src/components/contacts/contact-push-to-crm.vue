@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
@@ -39,10 +38,6 @@ export default {
       pushed: false,
       isLoading: false
     }
-  },
-
-  computed: {
-    ...mapState('auth', ['profile'])
   },
 
   methods: {
