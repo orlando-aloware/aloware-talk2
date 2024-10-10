@@ -41,13 +41,13 @@
            data-testid="integration-hubspot-email"
            v-if="integrationData.properties.email">
           <span class="data-icon-label">Email: </span>
-          <span class="data-value">{{ integrationData.properties.email.value }}</span>
+          <span class="data-value">{{ integrationData.properties.email }}</span>
         </p>
         <p class="mb-0"
            data-testid="integration-hubspot-company"
            v-if="integrationData.properties.company">
           <span class="data-icon-label">Company: </span>
-          <span class="data-value">{{ integrationData.properties.company.value }}</span>
+          <span class="data-value">{{ integrationData.properties.company }}</span>
         </p>
         <p class="mb-0"
            data-testid="integration-hubspot-owner"
@@ -61,17 +61,17 @@
                       data-testid="integration-hubspot-card-section-2"
                       v-if="integrationData && integrationData.properties">
         <q-card class="deals mb-1"
-                v-for="(deal, index) in integrationData.properties.deals"
+                v-for="(deal, index) in integrationData.deals"
                 :key="index"
                 flat bordered>
           <q-card-section>
             <q-card-section class="p-0">
               <h6 class="mb-2">
                 <b-link class="deals-title ml-0"
-                        :href="hubspotContactBaseLink + 'deal/' + deal.dealId"
+                        :href="hubspotContactBaseLink + 'deal/' + deal.id"
                         data-testid="integration-hubspot-deal-link"
                         target="_blank">
-                  {{ deal.properties.dealname.value }}
+                  {{ deal.properties.dealname }}
                 </b-link>
               </h6>
               <p class="mb-1 d-flex"  data-testid="integration-hubspot-amount">
@@ -80,9 +80,9 @@
                       v-if="deal.properties && deal.properties.amount">
                   <q-tooltip anchor="top middle"
                              self="center middle">
-                    {{ deal.properties.amount.value | toCurrency }}
+                    {{ deal.properties.amount | toCurrency }}
                   </q-tooltip>
-                  {{ deal.properties.amount.value | toCurrency }}
+                  {{ deal.properties.amount | toCurrency }}
                 </span>
               </p>
               <p class="mb-1 d-flex"  data-testid="integration-hubspot-pipeline">
@@ -90,9 +90,9 @@
                 <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
                              self="center middle">
-                    {{ deal.properties.pipeline.label }}
+                    {{ deal.pipeline_label }}
                   </q-tooltip>
-                  {{ deal.properties.pipeline.label }}
+                  {{ deal.pipeline_label }}
                 </span>
               </p>
               <p class="mb-1 d-flex"  data-testid="integration-hubspot-stage">
@@ -100,9 +100,9 @@
                 <span class="data-value ml-1">
                   <q-tooltip anchor="top middle"
                              self="center middle">
-                    {{ deal.properties.dealstage.label }}
+                    {{ deal.properties.dealstage_label }}
                   </q-tooltip>
-                  {{ deal.properties.dealstage.label }}
+                  {{ deal.properties.dealstage_label }}
                 </span>
               </p>
             </q-card-section>
@@ -140,7 +140,7 @@
 
       <q-card-section
         data-testid="integration-hubspot-card-section-4"
-        v-if="integrationData && integrationData.properties && integrationData.properties.email && integrationData.properties.email.value && false">
+        v-if="integrationData && integrationData.properties && integrationData.properties.email && false">
         <b-row>
           <b-button class="text-white btn-block"
                     size="sm"
@@ -230,8 +230,8 @@ export default {
     },
 
     fullName () {
-      const firstname = this.integrationData.properties.firstname ? this.integrationData.properties.firstname.value : ''
-      const lastname = this.integrationData.properties.lastname ? this.integrationData.properties.lastname.value : ''
+      const firstname = this.integrationData.properties.firstname ? this.integrationData.properties.firstname : ''
+      const lastname = this.integrationData.properties.lastname ? this.integrationData.properties.lastname : ''
       return `${firstname} ${lastname}`.trim()
     },
 
@@ -309,7 +309,7 @@ export default {
 
     enrollToWorkflow () {
       this.isEnrolling = true
-      this.workflow.email = this.integrationData.properties.email ? this.integrationData.properties.email.value : ''
+      this.workflow.email = this.integrationData.properties.email ? this.integrationData.properties.email : ''
       return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow).then(response => {
         this.resetWorkflowEnrollment()
         // emit on parent if there's a need to do after workflow enrollment

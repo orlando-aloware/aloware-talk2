@@ -600,29 +600,12 @@
                     <span class="aloicons action-icons">A</span>
                   </button>
 
-                  <span class='d-inline-block'
-                        tabindex='0'
-                        :id='`contact-remove-option-disabled-wrapper-${index}`'
-                        v-if='hasIntegration(contact)'>
-                    <button class='btn btn-sm datatable-row__actions__action--trash'
-                            data-testid='contact-remove-option-disabled'
-                            :disabled='true'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')">
-                      <span class='aloicons action-icons'>B</span>
-                    </button>
-                    <b-tooltip :target='`contact-remove-option-disabled-wrapper-${index}`'>
-                      This contact is from integration and can't be deleted.
-                    </b-tooltip>
-                  </span>
-
-                  <span v-else>
-                    <button class='btn btn-sm datatable-row__actions__action--trash'
-                            data-testid='contact-remove-option'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact') && !isSimpSocial"
-                            @click='onRemove(contact, id)'>
-                      <span class='aloicons action-icons'>B</span>
-                    </button>
-                  </span>
+                  <button class='btn btn-sm datatable-row__actions__action--trash'
+                          data-testid='contact-remove-option'
+                          v-if="!list.show_in_public_folder && hasPermissionTo('archive contact') && !isSimpSocial"
+                          @click='onRemove(contact, id)'>
+                    <span class='aloicons action-icons'>B</span>
+                  </button>
                 </div>
               </td>
 
@@ -1324,11 +1307,6 @@ export default {
 
     closeAssignContacts () {
       this.showAssignContacts = false
-    },
-
-    hasIntegration (contact) {
-      // activate only for multi-entity allowed company
-      return Boolean(this.currentCompany.activate_multi_entity ? contact.external_integration_data && contact.external_integration_data.length > 0 : false)
     },
 
     onSearch (searchText) {
