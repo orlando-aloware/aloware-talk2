@@ -736,6 +736,7 @@ export default {
       if (this.profile) {
         window.Echo.leave('user-' + this.profile.id)
         window.Echo.leave('company-' + this.profile.company_id)
+        window.Echo.leave('cache-agent-status-' + this.profile.company_id)
         return
       }
 

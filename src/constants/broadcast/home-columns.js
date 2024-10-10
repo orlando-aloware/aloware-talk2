@@ -8,14 +8,16 @@ export const COLUMNS = [
     name: 'id',
     label: 'Id',
     field: 'id',
-    sortable: true
+    sortable: true,
+    resizable: true
   },
   {
     name: 'name',
     label: 'Name',
     field: 'name',
     sortable: true,
-    minWidth: 390
+    minWidth: 390,
+    resizable: true
   },
   {
     name: 'status',

@@ -6,6 +6,7 @@ export default _.merge({
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
+    ...mapState('contacts', ['selectedLine']),
 
     viewOnly () {
       return this.isViewOnlyAccess()
@@ -56,6 +57,36 @@ export default _.merge({
     getStatus () {
       // Gets the KYC status from the company
       return this.currentCompany?.is_trial ? this.currentCompany.kyc_status : KycLogs.KYC_STATUS_NONE
+    },
+
+    shouldAllowSmsTraffic (selectedLine) {
+      if (!selectedLine) {
+        return true
+      }
+
+      /**
+       * Allow sms traffic on Dialer and Contact text Composer component
+       */
+      if (!selectedLine.is_10_dlc) {
+        /**
+         *  1 - No A2P Campaign + No 10DLC Line -> Allow messaging
+         *  2 - A2P Campaign  + No 10DLC (TF) ->  Allow messaging
+         */
+        return true
+      }
+
+      if (this.isCanadaLine(selectedLine)) {
+        /**
+         * 3 - 10DLC Canada lines -> Allow messaging
+         */
+        return true
+      }
+
+      /**
+       *   3 - A2P Campaign + 10DLC Line -> Allow messaging
+       *   4 - No A2P Campaign + 10DLC -> Not allowed
+       */
+      return selectedLine.is_10_dlc && selectedLine.has_approved_a2p_use_case
     },
 
     enabledToCreateContacts () {
@@ -177,6 +208,11 @@ export default _.merge({
     onOpenFinishRegistration () {
       const link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
       return window.open(link, '_self')
+    },
+
+    isCanadaLine (selectedLine) {
+      console.log(Array.isArray(selectedLine?.incoming_numbers))
+      return selectedLine?.incoming_numbers?.filter(number => number.country === 'CA').length > 0
     }
   }
 })

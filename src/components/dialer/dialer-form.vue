@@ -104,10 +104,6 @@
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
-            <div class="compliance-badge mb-2"
-                 v-if="shouldShowComplianceMessage">
-              {{ disabledComplianceMessage }}
-            </div>
           </b-form-group>
           <div class="d-inline-flex align-items-end justify-content-between dialer w-100"
                v-if="mode === 'text'">
@@ -327,8 +323,10 @@ export default {
     },
 
     isBlockTooltipPopoverEnabled () {
-      if (!this.isTrialKYC && this.isCompanyA2pCampaignApproved) {
-        return false
+      let selectedCampaign = this.campaigns.find(campaign => campaign.id === this.selectedCampaignId)
+
+      if (!this.shouldAllowSmsTraffic(selectedCampaign)) {
+        return true
       }
 
       if (this.mode === 'text' && this.disabledComplianceMessage) {
@@ -365,11 +363,7 @@ export default {
     },
 
     disabledComplianceMessage () {
-      return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' && !this.selectedCampaign.blocked_messaging_information['bypassed'] ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
-    },
-
-    shouldShowComplianceMessage () {
-      return !this.isTrialKYC && this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.selectedCampaign?.blocked_messaging_information && !this.selectedCampaign.blocked_messaging_information['bypassed'] && this.selectedCampaign.blocked_messaging_information['reason']
+      return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
     }
   },
 

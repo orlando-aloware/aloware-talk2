@@ -745,6 +745,8 @@ body,
 
     &.custom-rotate-90 .q-icon {
       transform: rotate(90deg);
+      width: 24px !important;
+      height: 24px !important;
     }
 
     &.bordered-menu-icon .q-icon {
@@ -5245,6 +5247,15 @@ i.option-separator {
   align-items: center;
 }
 
+.medium-button {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 14px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+}
+
 .btn-outlined-light {
   border-color: $grey-light11;
   color: $black;
@@ -8786,15 +8797,20 @@ span.mention {
         margin-right: 14px !important;
       }
 
-      .focus-mode-icon,
-      .logout-icon {
+      .focus-mode-icon {
         margin-right: 8px;
+        margin-top: -2px;
+      }
+
+      .logout-icon {
+        margin-right: 5px;
         margin-top: -2px;
       }
     }
 
     .q-item:not(:first-child) {
-      margin-top: 8px;
+      margin-top: 4px;
+      margin-bottom: 4px;
     }
 
     .q-item:nth-child(6) {
@@ -15160,4 +15176,44 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 
 .text-menu-purple {
   color: #9797AE;
+}
+
+.search-icon-component {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  cursor: pointer;
+}
+
+.limit-characters-error {
+  color: black;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.form-control-search-component.is-invalid {
+  padding-right: 0 !important;
+}
+
+.select-account {
+  &--dialog {
+    min-height: 200px;
+
+    &.fullscreen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo-image {
+      max-width: 200px;
+      max-height: 50px;
+      height: auto;
+    }
+  }
+
+  &--icon {
+    margin-right: 6px !important;
+  }
 }

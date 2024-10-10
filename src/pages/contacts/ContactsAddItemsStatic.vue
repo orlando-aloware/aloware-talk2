@@ -303,7 +303,7 @@
                     </div>
                     <div v-else>
                       <div :class="`${column.draggable ? 'col-indented' : ''}`">
-                        No Name
+                        &nbsp;
                       </div>
                     </div>
                   </div>
@@ -419,7 +419,7 @@
                 <div
                   v-else-if="column.name.includes('date_of_birth')"
                   class="text-left ellipse col-indented" >
-                  {{ contact[column.name] | fixFullDate }}
+                  {{ contact[column.name] | displayBirthdate }}
                 </div>
                 <div
                   v-else

@@ -216,6 +216,26 @@
               </div>
             </q-item-section>
           </q-item>
+          <!-- Select account -->
+          <q-item dense
+                  clickable
+                  v-close-popup
+                  data-testid="profile-select-account-item"
+                  v-if="profile?.has_multiple_access"
+                  @click="showAccountSelector">
+            <q-item-section>
+              <div>
+                <q-icon class="select-account--icon"
+                        name="fa fa-list"
+                        size="12px"
+                        data-testid="profile-select-account-icon" />
+                <span>
+                  Select Account
+                </span>
+              </div>
+            </q-item-section>
+          </q-item>
+          <!-- End select account -->
           <q-item dense
                   clickable
                   v-close-popup
@@ -334,6 +354,7 @@ export default {
   },
 
   methods: {
+    ...mapActions(['setShowAccountSelector']),
     ...mapActions('auth', ['setProfile']),
 
     changeStatus (status) {
@@ -361,6 +382,10 @@ export default {
       const parsedCookieName = `simpsocial-migration-${this.profile.id}`
       this.$cookies.set(parsedCookieName, null, 3650)
       this.logoutAction()
+    },
+
+    showAccountSelector () {
+      this.setShowAccountSelector(true)
     }
   }
 }

@@ -14,7 +14,8 @@ import {
   visibilityMixin,
   unownedContactTaskMixin,
   dialerWrapUpMixin,
-  dispositionsMixin
+  dispositionsMixin,
+  sessionCallStatusMixin
 } from '../../boot/mixins'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
@@ -32,7 +33,8 @@ export default {
     visibilityMixin,
     unownedContactTaskMixin,
     dialerWrapUpMixin,
-    dispositionsMixin
+    dispositionsMixin,
+    sessionCallStatusMixin
   ],
 
   data () {
@@ -358,13 +360,12 @@ export default {
           'from': this.dialer.call.from,
           'err': err
         })
-        console.log(err)
       })
     })
 
     this.device.on(WebrtcEvents.CANCEL, (call) => { // When originator cancels a call
       this.removeUnownedLiveContactTask()
-      console.log('Call invite canceled', call)
+      console.log('Talk-Device: Call invite canceled', call)
       this.setDialerCurrentStatus('INVITE_CANCELLED')
       this.backToDial('Talk-Device.OnCancel')
       this.connection = null
@@ -807,7 +808,7 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_CANCEL, (call) => { // When originator cancels a call
         this.removeUnownedLiveContactTask()
-        console.log('Call invite canceled', call)
+        console.log('Talk-Connection: Call invite canceled', call)
         this.connection = null
         this.setDialerCurrentStatus('INVITE_CANCELLED')
         this.backToDial('Talk-Connection.OnCancel')
@@ -1686,6 +1687,10 @@ export default {
     clearInterval(this.$options.webrtcTokenRegenerateInterval)
     clearInterval(this.$options.hangupInterval)
     clearInterval(this.unownedContact.interval)
+
+    // Destroy the Twilio device to avoid having multiple Twilio device instances.
+    console.log('Destroying Twilio device')
+    this.device.destroy()
   }
 }
 </script>
