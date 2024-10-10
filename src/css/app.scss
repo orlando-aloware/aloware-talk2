@@ -8797,9 +8797,13 @@ span.mention {
         margin-right: 14px !important;
       }
 
-      .focus-mode-icon,
-      .logout-icon {
+      .focus-mode-icon {
         margin-right: 8px;
+        margin-top: -2px;
+      }
+
+      .logout-icon {
+        margin-right: 5px;
         margin-top: -2px;
       }
     }
@@ -15204,6 +15208,7 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 
     .logo-image {
       max-width: 200px;
+      max-height: 50px;
       height: auto;
     }
   }

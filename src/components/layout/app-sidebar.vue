@@ -674,6 +674,52 @@
       </span>
     </q-btn>
 
+    <q-btn :to="{ name: 'AloAi' }"
+           :ripple="false"
+           icon="img:app-icons/menu/aloai_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           data-testid="contacts-sidebar-btn"
+           v-show="isActive('AloAi')"
+           flat
+           v-if="!isSimpSocial">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 data-testid="contacts-sidebar-tooltip"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">AloAi</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        AloAi
+      </span>
+    </q-btn>
+    <q-btn :to="{ name: 'AloAi' }"
+           :ripple="false"
+           icon="img:app-icons/menu/aloai_gray.svg"
+           align="left"
+           padding="10px 20px"
+           class="nav-icons w-100"
+           data-testid="contacts-no-active-sidebar-btn"
+           v-show="!isActive('AloAi')"
+           flat
+           v-if="!isSimpSocial">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">AloAi</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        AloAi
+      </span>
+    </q-btn>
+
     <q-btn :to="{ name: 'Settings' }"
            :ripple="false"
            icon="img:app-icons/menu/settings_active.svg"
@@ -843,6 +889,10 @@ export default {
       }
 
       if (['Wallboard Agents', 'Wallboard Calls'].includes(this.$route.name) && name === 'Wallboard') {
+        return true
+      }
+
+      if (this.$route.name === 'AloAi' && name === 'AloAi') {
         return true
       }
 
