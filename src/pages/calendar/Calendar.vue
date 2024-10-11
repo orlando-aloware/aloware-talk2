@@ -364,6 +364,7 @@ export default {
       }).then(res => {
         this.events.push(...res.data)
         this.$refs.scheduler.customParse(this.events)
+        this.$refs.scheduler.setNavHeightForMultiDayEvents()
 
         if (res.data && res.data.length) {
           this.filters.page++
