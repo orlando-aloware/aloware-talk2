@@ -20,7 +20,7 @@
     </contact-menu-item>
 
     <contact-menu-item
-      v-if="type === ContactListTypes.DYNAMIC && listId && false"
+      v-if="type === ContactListTypes.DYNAMIC && id && false"
       @click="$emit('clonestatic')"
     >
       <template slot="icon">
@@ -31,7 +31,7 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item v-if="hasDuplicate && listId"
+    <contact-menu-item v-if="hasDuplicate && id"
                        @click="$emit('duplicate')">
       <template slot="icon">
         <duplicate-icon></duplicate-icon>
@@ -41,7 +41,7 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item v-if="hasEdit && listId"
+    <contact-menu-item v-if="hasEdit && id"
                        @click="$emit('move')">
       <template slot="icon">
         <move-icon></move-icon>
@@ -52,7 +52,7 @@
     </contact-menu-item>
 
     <contact-menu-item
-      v-if="hasPin && isContactsRoute && listId"
+      v-if="hasPin && isContactsRoute && id"
       @click="$emit('pin')">
       <template slot="icon">
         <pin-icon></pin-icon>
@@ -68,7 +68,7 @@
         <trash-icon></trash-icon>
       </template>
       <template slot="title">
-        <span>{{ listId === undefined ? 'Discard' : 'Delete'}}</span>
+        <span>{{ id === undefined ? 'Discard' : 'Delete'}}</span>
       </template>
     </contact-menu-item>
   </contact-menu>
@@ -106,7 +106,7 @@ export default {
     }
   },
   props: {
-    listId: {
+    id: {
       required: true
     },
     type: {

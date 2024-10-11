@@ -1,10 +1,13 @@
 import API from 'src/plugins/api/api'
+import { mapActions } from 'vuex'
 
 export default {
   data () {
     return {
       minimunContactsToSplit: 50,
       listId: null,
+      keepList: true,
+      isConvertedListPublic: false,
       listName: '',
       splitErrorMessage: '',
       splitOptions: [
@@ -42,9 +45,28 @@ export default {
     }
   },
   computed: {
-
+    isContactsRoute () {
+      return this.$route.meta.title === 'Contacts'
+    },
+    foldersPath () {
+      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
+    }
   },
   methods: {
+    ...mapActions('contacts', [
+      'foldersLoaded'
+    ]),
+
+    reloadFolders () {
+      return this.$axios
+        .get(this.foldersPath)
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((_err) => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+    },
+
     disableSizeOptions (contactsCount) {
       // Set option as disabled if value >= contactsCount
       this.splitOptions.forEach(option => {
@@ -64,7 +86,8 @@ export default {
       this.loading = true
 
       const data = {
-        page_size: this.optionSelected.value
+        page_size: this.optionSelected.value,
+        keep_original: this.keepList
       }
 
       API.V2.contactsList.splitListIntoSmallerLists(this.listId, data)
@@ -89,11 +112,6 @@ export default {
       }
       this.prompt = false
       this.loading = false
-
-      // reload the page
-      setTimeout(() => {
-        window.location.reload()
-      }, 2000)
     }
   }
 }

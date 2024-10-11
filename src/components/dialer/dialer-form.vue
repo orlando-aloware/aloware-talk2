@@ -363,7 +363,7 @@ export default {
     },
 
     disabledComplianceMessage () {
-      return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' && !this.selectedCampaign.blocked_messaging_information['bypassed'] ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
+      return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
     }
   },
 
