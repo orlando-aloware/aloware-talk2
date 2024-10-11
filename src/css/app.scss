@@ -12458,7 +12458,6 @@ h1.contact-list-name-label {
 
         .dhx_cal_event,
         .dhx_cal_event_clear {
-          margin-left: 1px;
           font-size: 13px;
           border-radius: 6px;
         }
@@ -12491,7 +12490,6 @@ h1.contact-list-name-label {
         .dhx_cal_data {
           .dhx_scale_holder {
             > div {
-              display: flex;
               min-width: fit-content;
             }
           }
