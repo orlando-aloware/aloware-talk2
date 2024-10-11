@@ -12473,6 +12473,18 @@ h1.contact-list-name-label {
           align-items: flex-start;
           justify-content: center;
         }
+
+        .dhx_cal_today_button.dhx_cal_nav_button,
+        .dhx_cal_nav_button.dhx_cal_nav_button_custom.dhx_cal_tab.btn-goto-date,
+        .dhx_cal_prev_button.dhx_cal_nav_button,
+        .dhx_cal_next_button.dhx_cal_nav_button,
+        .dhx_cal_date,
+        .dhx_cal_tab.dhx_cal_tab_first,
+        .dhx_cal_tab.dhx_cal_tab_first.active,
+        .dhx_cal_tab,
+        .dhx_cal_tab.dhx_cal_tab_last {
+          display: none !important;
+        }
       }
 
       .dhx_scheduler_week {
