@@ -35,7 +35,8 @@
           <b-dropdown-item href=""
                            data-testid="contact-activities-export-communications-item"
                            class="d-flex"
-                           v-if="isAdmin"
+                           :disabled="loading"
+                           v-if="isAdmin && !isWidget && enableExport && !isSimpSocial && !inPowerDialerPage"
                            @click="handleExportCommunications">
             <export-icon class="mark-all-as-read-icon dropdown-icon" />
             Export Communications
@@ -107,7 +108,8 @@
                color="primary"
                class="text-decoration-none"
                data-testid="contact-activities-export-communications-btn"
-               v-if="isAdmin"
+               :disabled="loading"
+               v-if="isAdmin && !isWidget && enableExport && !isSimpSocial && !inPowerDialerPage"
                @click="handleExportCommunications">
           <q-tooltip anchor="top middle"
                      self="center middle">
@@ -219,12 +221,12 @@ import BackButton from 'components/back-button'
 import Profile from 'components/profile'
 import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-activities-header',
 
-  mixins: [aclMixin],
+  mixins: [aclMixin, simpsocialMixin],
 
   components: {
     Profile,
@@ -256,6 +258,10 @@ export default {
       type: Number,
       required: false,
       default: 0
+    },
+    enableExport: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -287,6 +293,11 @@ export default {
 
     shouldDisplayClosedOrPendingContact () {
       return [ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(this.contact?.task_status) && this.isContactStatusControlEnabled
+    },
+
+    inPowerDialerPage () {
+      const previousPage = this.$route?.query?.previousPage
+      return previousPage === 'Power Dialer'
     }
   },
   data () {
@@ -337,32 +348,10 @@ export default {
     },
 
     async handleExportCommunications () {
-      const confirm = await this.$bvModal.msgBoxConfirm('Do you want to proceed with the export?', {
-        buttonSize: 'sm',
-        okTitle: 'Yes',
-        cancelTitle: 'Cancel',
-        centered: true
-      })
-
-      if (!confirm) {
-        return
-      }
-
       this.loading = true
 
       try {
-        /* const { data } = */ await talk2Api.V2.contacts.exportCommunications(this.contact.id)
-
-        /*  this.$generalNotification(
-          `Your export is now available.<a id="${data.export.uuid}" href="${data.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
-          'export-csv',
-          0,
-          true,
-          {
-            uuid: data.export.uuid,
-            filename: `${data.export.uuid}.csv`
-          }
-        ) */
+        await talk2Api.V2.contacts.exportCommunications(this.contact.id)
       } catch (error) {
         console.log(error)
         this.$generalNotification('Unable to process export request! Please try again later.', 'error')

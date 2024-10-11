@@ -1014,17 +1014,17 @@ export default {
         return
       }
 
-      let type = 'Contacts'
+      let message = 'Contacts list is being exported. Please wait for a while.'
 
       if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
-        type = 'Power Dialer'
+        message = 'Power Dialer list is being exported. Please wait for a while.'
       }
 
       if (task.export.type === TYPE_COMMUNICATION) {
-        type = 'Communications'
+        message = 'Contact communications are being exported.'
       }
 
-      this.$generalNotification(`${type} list is being exported. Please wait for a while.`, 'success')
+      this.$generalNotification(message, 'success')
     }
 
     this.mainListeners.exportEventUpdate = (task) => {
@@ -1032,18 +1032,18 @@ export default {
         return
       }
 
-      let listText = 'Contacts list'
+      let message = `Your Contacts list export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
 
       if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
-        listText = 'Power Dialer list'
+        message = `Your Power Dialer list export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
       }
 
       if (task.export.type === TYPE_COMMUNICATION) {
-        listText = 'Communications list'
+        message = `Your Contact communications export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
       }
 
       this.$generalNotification(
-        `Your ${listText} export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
+        message,
         'export-csv',
         0,
         true,

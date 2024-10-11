@@ -193,6 +193,14 @@ export default {
         }
 
         return window.axios.get(`${suffixV1}contact/${contactId}/communications-summary`)
+      },
+
+      pushToCrm (contactId) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.post(`${suffixV1}contact/${contactId}/push-to-crm`)
       }
     },
 

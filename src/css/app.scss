@@ -745,6 +745,8 @@ body,
 
     &.custom-rotate-90 .q-icon {
       transform: rotate(90deg);
+      width: 24px !important;
+      height: 24px !important;
     }
 
     &.bordered-menu-icon .q-icon {
@@ -8811,15 +8813,20 @@ span.mention {
         margin-right: 14px !important;
       }
 
-      .focus-mode-icon,
-      .logout-icon {
+      .focus-mode-icon {
         margin-right: 8px;
+        margin-top: -2px;
+      }
+
+      .logout-icon {
+        margin-right: 5px;
         margin-top: -2px;
       }
     }
 
     .q-item:not(:first-child) {
-      margin-top: 8px;
+      margin-top: 4px;
+      margin-bottom: 4px;
     }
 
     .q-item:nth-child(6) {
@@ -15217,6 +15224,7 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 
     .logo-image {
       max-width: 200px;
+      max-height: 50px;
       height: auto;
     }
   }

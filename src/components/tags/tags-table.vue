@@ -173,6 +173,7 @@
                     </b-dropdown-item>
 
                     <b-dropdown-item data-testid="tags-table-dropdown-item-convert-to-list"
+                                     v-if="isAllowedToConvertToList"
                                      @click="openConvertToListDialog(tag)">
                       <i class="fas fa-address-book"></i> Convert to List
                     </b-dropdown-item>
@@ -369,6 +370,11 @@ export default {
       const inSelectedTags = tagIds.filter(tagId => [...this.selectedTagIds].includes(tagId))
 
       return tagIds.length === inSelectedTags.length
+    },
+
+    isAllowedToConvertToList () {
+      const isAgent = this.profile.role_names.includes('Company Agent')
+      return !isAgent && this.selectedTagCategory === this.ContactTags
     }
   },
 

@@ -662,7 +662,7 @@ export default {
       const listId = get(this.requestParams, 'contact_list_id', this.powerDialerListId)
 
       // User selected a different list, set is as the list to add contacts
-      if (this.powerDialerListId !== this.myQueueId) {
+      if (this.mode === 'add-contact-list' && this.powerDialerListId !== this.myQueueId) {
         this.requestParams.contact_list_id = this.powerDialerListId
       }
 
@@ -673,7 +673,7 @@ export default {
       }
 
       // Don't send list_id for dynamic lists, it should use only the filters
-      if (this.contactList.type === this.ContactListTypes.DYNAMIC) {
+      if (this.contactList?.type === this.ContactListTypes.DYNAMIC) {
         delete this.requestParams.list_id
       }
 

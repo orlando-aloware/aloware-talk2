@@ -78,7 +78,6 @@ jobs:
           ENV_GIPHY_API_KEY: ${{ secrets.giphy_api_key }}
           ENV_INTERCOM_APP_ID: ${{ secrets.intercom_app_id }}
           ENV_GITHUB_TOKEN: ${{ secrets.github_token }}
-          ENV_AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
           ENV_API_KEY_ID: ${{ secrets.api_key_id }}
           ENV_API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
           ENV_AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
@@ -122,9 +121,6 @@ jobs:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
           GITHUB_TOKEN: ${{ secrets.github_token }}
-
-          # AnnounceKit
-          AK_WIDGET_URL: ${{ secrets.ak_widget_url }}
 
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.api_key_id }}

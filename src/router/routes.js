@@ -34,6 +34,7 @@ const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
 const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
+const AloAi = () => import('pages/AloAi.vue')
 
 const routes = [
   {
@@ -362,6 +363,14 @@ const routes = [
         },
         path: 'broadcasts/new',
         component: BroadcastAdd
+      },
+      {
+        path: 'aloai',
+        name: 'AloAi',
+        component: AloAi,
+        meta: {
+          title: 'AloAi'
+        }
       },
       {
         path: 'settings',
