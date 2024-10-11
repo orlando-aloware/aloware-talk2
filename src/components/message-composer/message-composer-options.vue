@@ -77,6 +77,61 @@
       </q-tooltip>
     </b-link>
 
+    <b-link v-if="messageComposer.mode === 'sms'"
+            href="#"
+            data-testid="add-contact-card-link"
+            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments">
+      <q-menu content-class="mx-height-500 width-300"
+              ref="contactCardMenu"
+              data-testid="add-contact-card-menu"
+              :offset="[0,5]">
+        <div class="row no-wrap q-pa-md text-center">
+          <b-col sm="12" md="12">
+            <div class="mt-2 notice" data-testid="add-contact-card-message">
+              <p class="mb-0">
+                <router-link
+                  :to="{ path: '/settings/profile' }"
+                  :click="onContactCardLinkClicked"
+                >
+                  Click here
+                </router-link>
+                to change the name/phone number of your contact card.
+              </p>
+            </div>
+          </b-col>
+          <b-col sm="12" md="12">
+            <button class="btn btn-sm btn-primary mt-2"
+                    data-testid="add-contact-card-button"
+                    @click="onContactCardSelected">
+              Send my contact card
+            </button>
+          </b-col>
+
+          <b-col sm="12" md="12">
+            <b-progress v-if="isUploading && !hasError"
+                    class="add-contact-card-progress mt-2"
+                    variant="success"
+                    data-testid="add-contact-card-progress"
+                    :max="100">
+              <b-progress-bar :value="uploadPercentage"
+                              data-testid="add-contact-card-progress-bar"
+                              :label="`${uploadPercentage}%`"/>
+            </b-progress>
+            <p v-if="hasError && !isUploading"
+              data-testid="add-contact-card-error"
+              class="error-notice mt-2">
+              Error while generating contact card...
+            </p>
+          </b-col>
+        </div>
+      </q-menu>
+
+      <contact-card-icon></contact-card-icon>
+      <q-tooltip data-testid="add-contact-card-tooltip">
+        {{  !selectedLine ? 'Please select line before send contact card' : 'Send my contact card' }}
+      </q-tooltip>
+    </b-link>
+
     <b-link v-if="isSimpSocialIntegrationEnabled"
             href="#">
       <q-menu content-class="inventory-menu mx-height-600 overflow-x-hidden"
@@ -118,6 +173,7 @@
 <script>
 import SearchGiphy from 'components/message-composer/options/search-giphy'
 import GifIcon from 'components/icons/gif-icon'
+import ContactCardIcon from 'components/icons/contact-card-icon.vue'
 import Attachments from 'components/message-composer/options/attachments'
 import AttachmentIcon from 'components/icons/attachment-icon'
 import MessageTemplates from 'components/message-composer/options/message-templates'
@@ -161,7 +217,8 @@ export default {
     Attachments,
     GifIcon,
     SearchGiphy,
-    NewCar
+    NewCar,
+    ContactCardIcon
   },
 
   mixins: [
@@ -174,7 +231,11 @@ export default {
       creditApplicationSending: false,
       newCarCounter: 0,
       newCarMenu: false,
-      isCarMenuClosing: false
+      isCarMenuClosing: false,
+
+      isUploading: false,
+      uploadPercentage: 0,
+      hasError: false
     }
   },
 
@@ -186,6 +247,8 @@ export default {
       'messageComposer',
       'contact'
     ]),
+
+    ...mapGetters('auth', ['user']),
 
     isTextingDisabled () {
       return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
@@ -262,6 +325,21 @@ export default {
 
     onPreventNewCarMenuClose () {
       this.newCarMenu = true
+    },
+
+    onContactCardSelected () {
+      const vCardData = `
+      BEGIN:VCARD
+      VERSION:3.0
+      FN:${this.user?.profile?.contact_card_name}
+      TEL:${this.user?.profile?.contact_card_phone_number || ''}
+      END:VCARD
+      `
+      console.log(vCardData)
+    },
+
+    onContactCardLinkClicked () {
+      this.$refs.contactCardMenu.hide()
     }
   }
 }
