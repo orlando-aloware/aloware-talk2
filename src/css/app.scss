@@ -2572,6 +2572,22 @@ i.option-separator {
     font-size: 20px;
   }
 
+  .hubspot-card {
+    .hubspot-icon {
+      font-size: 24px;
+      border-radius: 7px;
+      background: #FF7A59;
+      color: #FFFFFF;
+      border: 5px solid #FF7A59;
+      margin-right: 10px;
+    }
+    .integration-title {
+      font-size: 18px;
+      position: relative;
+      top: -3px;
+    }
+  }
+
   .pipedrive-btn {
     content: url(/integrations/pipedrive-icon.svg);
     margin-right: 20px;
@@ -15208,4 +15224,14 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   &--icon {
     margin-right: 6px !important;
   }
+}
+
+.external-contact-hubspot-link-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.duplicateContactPhoneNumberMessage {
+  color: $grey-90;
 }

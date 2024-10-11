@@ -46,7 +46,8 @@ export default {
         params: {
           integration_name: integrationName,
           dialer_mode: dialerMode ? 1 : 0,
-          force: true
+          force: true,
+          with_duplicates: true
         }
       })
     }
