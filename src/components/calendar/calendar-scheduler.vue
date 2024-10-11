@@ -58,7 +58,6 @@ export default {
     Scheduler.config.min_event_width = 60
     Scheduler.config.min_event_height = 20
     Scheduler.config.event_min_dy = 20
-    Scheduler.xy.nav_height = 0
 
     Scheduler.templates.week_date = function (start, end) {
       const startDate = moment(start)
@@ -125,7 +124,9 @@ export default {
       this.editSchedule(Scheduler.getEvent(id))
     })
 
-    Scheduler.attachEvent('onViewChange', () => {
+    Scheduler.attachEvent('onViewChange', (newView) => {
+      this.setNavHeight(newView)
+
       let state = Scheduler.getState()
       this.renderEvents(state)
     })
@@ -217,6 +218,24 @@ export default {
         const date = new Date(dateStr)
         Scheduler.setCurrentView(date, 'day')
       }
+    },
+
+    setNavHeight (newView) {
+      if (newView === 'week' || newView === 'day') {
+        return this.setNavHeightForMultiDayEvents()
+      }
+
+      Scheduler.xy.nav_height = 0
+    },
+
+    setNavHeightForMultiDayEvents () {
+      const multiDayEvents = document.querySelector('.dhx_multi_day')
+      if (multiDayEvents && multiDayEvents.children.length > 1) {
+        Scheduler.xy.nav_height = 20
+        return
+      }
+
+      Scheduler.xy.nav_height = 0
     }
   }
 }
