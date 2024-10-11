@@ -278,14 +278,12 @@ export default {
   mounted () {
     this.timeFormat = this.profile.time_format
 
-    const { view, date } = this.$route.query
+    const { view } = this.$route.query
     if (view && ['day', 'week', 'month'].includes(view)) {
       this.view = view
     }
 
-    if (date) {
-      this.gotoDate = moment(date).toDate()
-    }
+    this.setValidDate()
 
     if ('communication_id' in this.$route.query) {
       this.$axios.get('/api/v1/calendar/events/show/' + this.$route.query.communication_id + '/communication').then(res => {
@@ -523,10 +521,7 @@ export default {
         date: moment(this.gotoDate).format('YYYY-MM-DD')
       }
 
-      // Compare the new query with the current route's query to prevent unnecessary navigation which causes errors
-      if (JSON.stringify(newQuery) !== JSON.stringify(this.$route.query)) {
-        this.$router.replace({ query: newQuery })
-      }
+      this.updateRouteQuery(newQuery)
     },
 
     onToggleGotoDate (date, view) {
@@ -536,38 +531,67 @@ export default {
         this.view = view
       }
 
-      this.$router.replace({
-        query: {
-          ...this.$route.query,
-          date: formattedDate
+      const newQuery = {
+        ...this.$route.query,
+        date: formattedDate
+      }
+
+      this.updateRouteQuery(newQuery)
+    },
+
+    updateRouteQuery (newQuery) {
+      // Compare the new query with the current route's query to prevent unnecessary navigation which causes errors
+      if (JSON.stringify(newQuery) !== JSON.stringify(this.$route.query)) {
+        this.$router.replace({ query: newQuery })
+      }
+    },
+
+    setValidDate (shouldSetCurrentView = false) {
+      const { date } = this.$route.query
+      if (date) {
+        const parsedDate = moment(date)
+        if (parsedDate.isValid()) {
+          this.gotoDate = parsedDate.toDate()
+          return shouldSetCurrentView ? this.$refs.scheduler.setCurrentView(this.gotoDate, this.view) : null
         }
-      })
+
+        // If date is invalid, set gotoDate to today
+        this.gotoDate = moment().toDate()
+        const newQuery = {
+          ...this.$route.query,
+          date: moment(this.gotoDate).format('YYYY-MM-DD')
+        }
+
+        this.updateRouteQuery(newQuery)
+        return shouldSetCurrentView ? this.$refs.scheduler.setCurrentView(this.gotoDate, this.view) : null
+      }
+
+      // If no date provided, default to today
+      this.gotoDate = moment().toDate()
+      return shouldSetCurrentView ? this.$refs.scheduler.setCurrentView(this.gotoDate, this.view) : null
     }
   },
 
   watch: {
     view () {
-      this.$router.replace({
-        query: {
-          ...this.$route.query,
-          view: this.view
-        }
-      })
+      const newQuery = {
+        ...this.$route.query,
+        view: this.view
+      }
+
+      this.updateRouteQuery(newQuery)
 
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
     },
     '$route.query': {
       handler (newQuery) {
-        const { view, date } = newQuery
+        const { view } = newQuery
 
         if (view && ['day', 'week', 'month'].includes(view)) {
           this.view = view
         }
 
-        if (date) {
-          this.gotoDate = moment(date).toDate()
-          this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
-        }
+        this.setValidDate(true)
       },
       deep: true
     }
