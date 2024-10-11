@@ -67,20 +67,6 @@
 
         <header-help v-if="!isTrialKYC" />
 
-        <q-item v-if="!statics.whitelabel">
-          <q-item-section class="nav-item dropdown">
-            <div class="hyperlink-color nav-link ak-trigger pl-0 cursor-pointer">
-              <span class="fa fa-bullhorn changelog-trigger pointer"
-                    style="font-size: 1.2rem">
-              </span>
-              <AnnounceKit style="position: fixed;"
-                           catchClick=".ak-trigger"
-                           :user="currentUser"
-                           :widget="akWidgetUrl" />
-            </div>
-          </q-item-section>
-        </q-item>
-
         <profile :hideProfileInfo="isMobileTransitionWidth" />
 
         <phone v-if="!titleOnly" />
@@ -183,8 +169,6 @@ import DialerIcon from 'components/icons/dialer-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
-import * as storage from 'src/plugins/helpers/storage'
-import AnnounceKit from 'announcekit-vue'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
 
@@ -219,7 +203,6 @@ export default {
     RefreshIcon,
     HeaderHelp,
     InboxToggleFilters,
-    AnnounceKit,
     InformationCircleIcon,
     TutorialVideoButton
   },
@@ -311,10 +294,6 @@ export default {
 
     dialerIconTextColor () {
       return this.dialerStatus ? '#FFFFFF' : '#95989E'
-    },
-
-    akWidgetUrl () {
-      return storage.local.getItem('ak_widget_url')
     },
 
     currentUser () {
