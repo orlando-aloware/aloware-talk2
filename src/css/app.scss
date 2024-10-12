@@ -1461,11 +1461,11 @@ i.option-separator {
   }
 }
 
-.waveform {
-  wave {
-    height: 25px !important;
-    overflow: hidden !important;
-  }
+.waveform-selector {
+  font-size: $f-size-body-xxs;
+  line-height: 13px;
+  letter-spacing: 0.004em;
+  color: $grey-90;
 }
 
 .waveform-timeline {
@@ -1473,6 +1473,11 @@ i.option-separator {
   line-height: 13px;
   letter-spacing: 0.004em;
   color: $grey-90;
+}
+
+.waveform-controls {
+  height: 24px;
+  overflow: hidden;
 }
 
 .audio-player {

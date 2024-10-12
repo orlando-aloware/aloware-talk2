@@ -7,7 +7,6 @@
            dense
            data-testid="comm-transcription-modal-single-btn"
            :size="buttonSize"
-           v-if="singleButton"
            @click="fetchSmartTranscriptionData">
       <q-tooltip>
         <span>
@@ -15,23 +14,36 @@
         </span>
       </q-tooltip>
     </q-btn>
-    <div class="flex items-center mr-1 h-100"
-         v-else
-         data-testid="comm-transcription-modal-btn"
-         @click="fetchSmartTranscriptionData">
-      <span class="text-blue cursor-pointer">
-        {{ buttonText }}
-      </span>
-    </div>
 
     <!-- Smart Transcription modal. -->
     <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
-          <div class="text-h6 pl-3" data-testid="comm-transcription-modal-smart-title">Smart Transcription</div>
+          <!--COMM TYPE-->
+          <q-card-section class="comm-type-container" data-testid="comm-details-comm-type-card-section">
+            <div class="text-h6 d-inline-flex align-items-center"
+                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
+                         v-if="communication.disposition_status2">
+              </component>
+              <div class="comm-type-wrapper pl-3">
+                <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                  {{ communication.direction | fixCommDirection }}
+                </span>
+                {{ communication.type | fixCommType }}
+
+                <span v-if="communication?.contact">
+                  {{ communication.direction | getCommPrepositions }} {{ communication.contact.name | fixContactName }}
+                </span>
+                <span v-else-if="contact">
+                  {{ communication.direction | getCommPrepositions }} {{ contact.name | fixContactName }}
+                </span>
+              </div>
+            </div>
+          </q-card-section>
+
           <q-space></q-space>
-          <q-btn class="pr-1"
-                 icon="close"
+          <q-btn icon="close"
                  flat
                  round
                  data-testid="comm-transcription-modal-close-dialog-btn"
@@ -40,23 +52,45 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none px-4">
-          <div class="q-pa-md mx-3 py-0 border border-rounded"
-               v-if="remote_url && !isLoading">
-            <waveform :remote-url="remote_url"
-                      :unique-id="communication.id"
-                      data-testid="comm-transcription-modal-waveform"/>
+          <div class="mx-3 py-2"
+               v-if="remoteUrl && !isLoading">
+            <div class="d-flex flex-row align-items-center">
+              <waveform :remote-url="remoteUrl"
+                        :unique-id="communication.id"
+                        :height="40"
+                        :split-channels="splitChannels"
+                        :communication="communication"
+                        :messages="messages"
+                        data-testid="comm-transcription-modal-waveform"
+                        @time-update="updateCurrentTime">
+              </waveform>
+              <download-button v-if="fileUuid"
+                               data-testid="communication-audio-download-button"
+                               is-simple
+                               :communication-id="communication.id"
+                               :filename="filename"
+                               :file-mime-type="mimeType"
+                               :file-uuid="fileUuid"/>
+            </div>
+            <div class="d-flex flex-row align-items-center mt-2">
+              <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
+                                          :speakers="speakers"
+                                          :is-empty="isEmpty"
+                                          data-testid="comm-transcription-modal-talk-time-analysis-section"/>
+
+              <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
+                                          :sentiment-chip-colors="sentimentChipColors"
+                                          :is-empty="isEmpty"
+                                          :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
+                                          class="ml-2"
+                                          data-testid="comm-transcription-modal-sentiment-analysis-section"/>
+            </div>
           </div>
 
-          <div class="h-100 w-100 flex items-center justify-center"
-               v-if="isLoading">
-            <q-spinner-bars color="primary"
-                            size="40px"
-                            data-testid="comm-transcription-modal-spinner-bars"/>
-          </div>
-
-          <div class="flex row py-4"
-               v-else>
-            <div class="col-6">
+          <div class="row py-4"
+               v-if="!isLoading">
+            <div id="reference-column"
+                 class="col-6 pt-12">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
                                   data-testid="comm-transcription-modal-category-section"/>
@@ -114,12 +148,14 @@
                       <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
+                        style="cursor: pointer;"
                         :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
                         @click="submitFeedback('upvote')"
                       />
                       <span class="mx-1"></span>
                       <img
                         class="clickable-icon"
+                        style="cursor: pointer;"
                         :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
                         @click="submitFeedback('downvote')"
                       />
@@ -137,7 +173,7 @@
 
 <script>
 import Waveform from 'components/waveform'
-import marked from 'marked'
+import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import { isEmpty } from 'lodash'
@@ -159,7 +195,12 @@ import * as CommunicationDirection from 'src/constants/communication-direction'
 export default {
   name: 'TranscriptionModal',
 
+  mixins: [
+    communicationInfoMixin
+  ],
+
   components: {
+    DownloadButton,
     Waveform,
     CategoriesSection,
     HighlightsSection,
@@ -174,6 +215,9 @@ export default {
     communication: {
       required: true
     },
+    contact: {
+      required: false
+    },
     buttonText: {
       type: String,
       default: 'Show Transcription'
@@ -181,18 +225,15 @@ export default {
     buttonSize: {
       type: String,
       default: 'sm'
-    },
-    singleButton: {
-      type: Boolean,
-      default: false
     }
   },
 
   data () {
     return {
+      tabName: 'transcription',
       isLoading: true,
       show_form: false,
-      remote_url: null,
+      remoteUrl: null,
       iab_categories: [],
       highlights: [],
       entities: [],
@@ -228,6 +269,40 @@ export default {
   },
 
   computed: {
+    splitChannels () {
+      if (this.communication.direction === CommunicationDirection.INBOUND) {
+        return [
+          {
+            waveColor: 'rgb(0, 200, 200)',
+            progressColor: 'rgb(0, 100, 100)',
+            barAlign: 'bottom'
+          },
+          {
+            waveColor: 'rgb(200, 0, 200)',
+            progressColor: 'rgb(100, 0, 100)',
+            barAlign: 'top'
+          }
+        ]
+      } else {
+        return [
+          {
+            waveColor: 'rgb(200, 0, 200)',
+            progressColor: 'rgb(100, 0, 100)',
+            barAlign: 'bottom'
+          },
+          {
+            waveColor: 'rgb(0, 200, 200)',
+            progressColor: 'rgb(0, 100, 100)',
+            barAlign: 'top'
+          }
+        ]
+      }
+    },
+    CommunicationTypes () {
+      return CommunicationTypes
+    },
+    ...mapState('cache', ['currentCompany']),
+
     formattedMessages () {
       return this.messages.map(message => ({
         ...message,
@@ -245,13 +320,21 @@ export default {
 
   mounted () {
     this.checkAndShowTranscriptionModal()
+
+    this.$VueEvent.listen('fetchSmartTranscriptionData', communicationId => this.handleFetchSmartTranscriptionData(communicationId))
   },
 
   methods: {
+    handleFetchSmartTranscriptionData (communicationId) {
+      if (this.communication.id === communicationId) {
+        this.fetchSmartTranscriptionData()
+      }
+    },
+
     fetchSmartTranscriptionData () {
       this.isLoading = true
       this.show_form = true
-      this.remote_url = null
+      this.remoteUrl = null
 
       // Fetch communication transcription.
       window.axios.get(`/api/v1/transcription/communication/${this.communication.id}`)
@@ -259,7 +342,7 @@ export default {
           this.setSmartTranscriptionData(res.data)
           this.isLoading = false
         }).catch(err => {
-          console.log("Couldn't fetch transcription information.", err)
+          console.log('Couldn\'t fetch transcription information.', err)
           this.isLoading = false
         })
 
@@ -272,18 +355,22 @@ export default {
 
       window.axios.get(`/api/v1/communication/${this.communication.id}/file-url`, options)
         .then(res => {
-          this.remote_url = res.data.url
+          this.fileUuid = this.getUuidFromURL(res.data.download_url)
+          this.filename = this.getFilenameFromURL(res.data.download_url)
+          this.remoteUrl = res.data.url
+          this.downloadUrl = res.data.download_url
+          this.mimeType = res.data.mimetype || ''
         }).catch(err => {
-          console.log("Couldn't fetch call recording.", err)
+          console.log('Couldn\'t fetch call recording.', err)
         })
     },
 
     /**
-    * Sets Smart Transcription panel data.
-    * @public
-    *
-    * @param {Object} data
-    */
+     * Sets Smart Transcription panel data.
+     * @public
+     *
+     * @param {Object} data
+     */
     setSmartTranscriptionData (data) {
       // Sort the speakers to always get AGENT first.
       this.speakers = data.speakers?.sort()
@@ -305,13 +392,13 @@ export default {
     },
 
     /**
-    * Adds border to highlights in a message text.
-    * @public
-    *
-    * @param {string} messageText
-    *
-    * @returns {string}
-    */
+     * Adds border to highlights in a message text.
+     * @public
+     *
+     * @param {string} messageText
+     *
+     * @returns {string}
+     */
     circleText (speaker, messageText) {
       this.highlights_summary.forEach(function (highlightSummary) {
         if (speaker === highlightSummary.speaker) {
@@ -324,14 +411,14 @@ export default {
           )
 
           /**
-          * Imagine we have 2 highlights: 'call' and 'outbound call'.
-          * At this point 'call' will be highlighted twice.
-          *
-          * If we find a span tag directly connected to another one,
-          * it means a word has already been highlighted twice.
-          *
-          * Check for existing tag before and after a span.
-          */
+           * Imagine we have 2 highlights: 'call' and 'outbound call'.
+           * At this point 'call' will be highlighted twice.
+           *
+           * If we find a span tag directly connected to another one,
+           * it means a word has already been highlighted twice.
+           *
+           * Check for existing tag before and after a span.
+           */
           if (messageText.includes('><span') || messageText.includes('</span><')) {
             // Revert last highlighted word to prevent double highlighting.
             messageText = backupMessageText
@@ -362,13 +449,13 @@ export default {
     },
 
     /**
-    * Create a string with each speaker sentiments' percentages.
-    * @public
-    *
-    * @param {Object} sentimentSummary
-    *
-    * @returns {string} Ex: POSITIVE: 0%; NEUTRAL: 100%; NEGATIVE: 0%;
-    */
+     * Create a string with each speaker sentiments' percentages.
+     * @public
+     *
+     * @param {Object} sentimentSummary
+     *
+     * @returns {string} Ex: POSITIVE: 0%; NEUTRAL: 100%; NEGATIVE: 0%;
+     */
     calculateOverAllSentimentBySpeaker (sentimentSummary) {
       const positiveSum = sentimentSummary.positive
       const neutralSum = sentimentSummary.neutral
@@ -426,7 +513,13 @@ export default {
 
       return {
         messageBoxClass: isAgent ? 'message-box-out' : 'message-box-in',
-        sentimentClass: isAgent ? 'sentiment-out' : 'sentiment-in'
+        sentimentClass: isAgent ? 'justify-start' : 'justify-end'
+      }
+    },
+
+    updateCurrentTime (time) {
+      if (this.tabName === 'transcription') {
+        this.$refs.conversationSection.syncScroll(time)
       }
     },
 
@@ -439,14 +532,15 @@ export default {
     submitFeedback (type) {
       const feedbackValue = type === 'upvote' ? FeedbackConstants.FEEDBACK_UPVOTE : FeedbackConstants.FEEDBACK_DOWNVOTE
 
-      this.feedback = feedbackValue
-
       talk2Api.V1.transcription.submitSummaryFeedback(this.communication.id, feedbackValue)
         .then(() => {
+          this.feedback = feedbackValue
           this.upvoteActive = type === 'upvote'
           this.downvoteActive = type === 'downvote'
+          this.$generalNotification('Feedback received. Thank you!')
         })
         .catch(err => {
+          this.$generalNotification('Failed to submit feedback.', 'error')
           console.log('Error submitting summary feedback:', err)
         })
     }
@@ -467,3 +561,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.pt-12 {
+  padding-top: 12px;
+}
+</style>

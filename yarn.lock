@@ -13958,12 +13958,11 @@ vue-template-es2015-compiler@^1.9.0:
   resolved "https://registry.yarnpkg.com/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha512-4gDntzrifFnCEvyoO8PqyJDmguXgVPxKiIxrBKjIowvL9l+N66196+72XVYR8BBf1Uv1Fgt3bGevJ+sEmxfZzw==
 
-vue-wave-surfer@^1.0.1:
+"vue-wave-surfer@git+https://github.com/aloware/vue-wave-sufver.git":
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/vue-wave-surfer/-/vue-wave-surfer-1.0.1.tgz#2ef93267afe73ff609db9c6ca1f5002f366e62a4"
-  integrity sha512-4Y/M2JHqfrtwwIA+w95ClvVBibXKwq8/d3lvrFiktbsEbgxPKlgV1R07Nw78H6L9KTki5V2o3iy76fexO0fA8Q==
+  resolved "git+https://github.com/aloware/vue-wave-sufver.git#11603abab9544cd89d63959da9f33acf27bb787e"
   dependencies:
-    wavesurfer.js "^3.2.0"
+    wavesurfer.js "^7.8.6"
 
 vue2-daterange-picker@^0.6.8:
   version "0.6.8"
@@ -14033,10 +14032,10 @@ watchpack@^1.7.4:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"
 
-wavesurfer.js@^3.2.0:
-  version "3.3.3"
-  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-3.3.3.tgz#9b16a62335c6bd13a3d55deb895a336d027ccb51"
-  integrity sha512-meko20S9in+V5xBLSVV/9uYVBSbx5AsJNkAslZ+a5yYIeFGYwcCo4Yd1sUpSGaiNnyflzrJwC7x7TdJFYrdT8w==
+wavesurfer.js@^7.8.6:
+  version "7.8.6"
+  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-7.8.6.tgz#753eb22c93c27225a1c878f13d1a1bee073365dd"
+  integrity sha512-EDexkMwkkQBTWruhfWQRkTtvRggtKFTPuJX/oZ5wbIZEfyww9EBeLr2mtkxzA1S8TlWPx6adY5WyjOlNYNyHSg==
 
 wbuf@^1.1.0, wbuf@^1.7.3:
   version "1.7.3"
