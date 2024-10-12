@@ -30,8 +30,7 @@
         <q-card-section class="row items-center no-wrap px-4">
           <div class="text-h6 pl-3" data-testid="comm-transcription-modal-smart-title">Smart Transcription</div>
           <q-space></q-space>
-          <q-btn class="pr-1"
-                 icon="close"
+          <q-btn icon="close"
                  flat
                  round
                  data-testid="comm-transcription-modal-close-dialog-btn"
@@ -40,23 +39,25 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none px-4">
-          <div class="q-pa-md mx-3 py-0 border border-rounded"
-               v-if="remote_url && !isLoading">
-            <waveform :remote-url="remote_url"
+          <div class="q-pa-md mx-3 py-2 border border-rounded d-flex flex-row align-items-center"
+               v-if="remoteUrl && !isLoading">
+            <waveform :remote-url="remoteUrl"
                       :unique-id="communication.id"
+                      :height="40"
+                      :split-channels="splitChannels"
                       data-testid="comm-transcription-modal-waveform"/>
+            <download-button v-if="fileUuid"
+                             data-testid="communication-audio-download-button"
+                             is-simple
+                             :communication-id="communication.id"
+                             :filename="filename"
+                             :file-mime-type="mimeType"
+                             :file-uuid="fileUuid"/>
           </div>
 
-          <div class="h-100 w-100 flex items-center justify-center"
-               v-if="isLoading">
-            <q-spinner-bars color="primary"
-                            size="40px"
-                            data-testid="comm-transcription-modal-spinner-bars"/>
-          </div>
-
-          <div class="flex row py-4"
-               v-else>
-            <div class="col-6">
+          <div class="row py-4"
+               v-if="!isLoading">
+            <div class="col-6" id="reference-column">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
                                   data-testid="comm-transcription-modal-category-section"/>
@@ -79,7 +80,7 @@
             </div>
 
             <div class="col-6">
-              <div class="mb-2">
+              <div class="d-flex mb-2">
                 <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
                                             :sentiment-chip-colors="sentimentChipColors"
                                             :is-empty="isEmpty"
@@ -92,10 +93,12 @@
                                             data-testid="comm-transcription-modal-talk-time-analysis-section"/>
               </div>
 
-              <conversation-section :messages="messages"
-                                    :formatted-messages="formattedMessages"
-                                    :is-empty="isEmpty"
-                                    data-testid="comm-transcription-modal-conversation-section"/>
+              <div class="d-flex">
+                <conversation-section :messages="messages"
+                                      :formatted-messages="formattedMessages"
+                                      :is-empty="isEmpty"
+                                      data-testid="comm-transcription-modal-conversation-section"/>
+              </div>
             </div>
           </div>
         </q-card-section>
@@ -115,11 +118,18 @@ import CustomKeywordsSection from './transcription-components/custom-keywords-se
 import SentimentAnalysisSection from './transcription-components/sentiment-analysis-section'
 import TalkTimeAnalysisSection from './transcription-components/talk-time-analysis-section'
 import ConversationSection from './transcription-components/conversation-section'
+import DownloadButton from 'components/download-button.vue'
+import { communicationInfoMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'TranscriptionModal',
 
+  mixins: [
+    communicationInfoMixin
+  ],
+
   components: {
+    DownloadButton,
     Waveform,
     CategoriesSection,
     HighlightsSection,
@@ -152,7 +162,7 @@ export default {
     return {
       isLoading: true,
       show_form: false,
-      remote_url: null,
+      remoteUrl: null,
       iab_categories: [],
       highlights: [],
       entities: [],
@@ -176,6 +186,16 @@ export default {
         'NEUTRAL': '#d0d8dc',
         'NEGATIVE': '#ff7d74'
       },
+      splitChannels: [
+        {
+          waveColor: 'rgb(200, 0, 200)',
+          progressColor: 'rgb(100, 0, 100)'
+        },
+        {
+          waveColor: 'rgb(0, 200, 200)',
+          progressColor: 'rgb(0, 100, 100)'
+        }
+      ],
       UploadedFileTypes,
       isEmpty
     }
@@ -201,7 +221,7 @@ export default {
     fetchSmartTranscriptionData () {
       this.isLoading = true
       this.show_form = true
-      this.remote_url = null
+      this.remoteUrl = null
 
       // Fetch communication transcription.
       window.axios.get(`/api/v1/transcription/communication/${this.communication.id}`)
@@ -222,7 +242,11 @@ export default {
 
       window.axios.get(`/api/v1/communication/${this.communication.id}/file-url`, options)
         .then(res => {
-          this.remote_url = res.data.url
+          this.fileUuid = this.getUuidFromURL(res.data.download_url)
+          this.filename = this.getFilenameFromURL(res.data.download_url)
+          this.remoteUrl = res.data.url
+          this.downloadUrl = res.data.download_url
+          this.mimeType = res.data.mimetype || ''
         }).catch(err => {
           console.log("Couldn't fetch call recording.", err)
         })

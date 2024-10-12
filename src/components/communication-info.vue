@@ -933,12 +933,6 @@ export default {
       type: Boolean
     },
 
-    isWidget: {
-      required: false,
-      default: false,
-      type: Boolean
-    },
-
     campaignId: {
       required: false
     }
