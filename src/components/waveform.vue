@@ -151,6 +151,12 @@ export default {
         this.player.playPause()
       }
     }
+  },
+
+  watch: {
+    currentTime (newTime) {
+      this.$emit('time-update', newTime)
+    }
   }
 }
 </script>

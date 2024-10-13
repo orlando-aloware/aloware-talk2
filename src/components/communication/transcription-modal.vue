@@ -45,7 +45,9 @@
                       :unique-id="communication.id"
                       :height="40"
                       :split-channels="splitChannels"
-                      data-testid="comm-transcription-modal-waveform"/>
+                      data-testid="comm-transcription-modal-waveform"
+                      @time-update="updateCurrentTime">
+            </waveform>
             <download-button v-if="fileUuid"
                              data-testid="communication-audio-download-button"
                              is-simple
@@ -97,6 +99,7 @@
                 <conversation-section :messages="messages"
                                       :formatted-messages="formattedMessages"
                                       :is-empty="isEmpty"
+                                      ref="conversationSection"
                                       data-testid="comm-transcription-modal-conversation-section"/>
               </div>
             </div>
@@ -370,6 +373,10 @@ export default {
         messageBoxClass: isAgent ? 'message-box-out' : 'message-box-in',
         sentimentClass: isAgent ? 'sentiment-out' : 'sentiment-in'
       }
+    },
+
+    updateCurrentTime (time) {
+      this.$refs.conversationSection.syncScroll(time)
     }
   }
 }
