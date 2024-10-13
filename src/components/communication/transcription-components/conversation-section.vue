@@ -46,6 +46,8 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
   name: 'ConversationSection',
 
@@ -71,7 +73,7 @@ export default {
   },
 
   methods: {
-    syncScroll (currentTime) {
+    syncScroll: _.throttle(function (currentTime) {
       // Find the current message
       const msgIndex = this.formattedMessages.findIndex(msg => currentTime * 1000 >= msg.start && currentTime * 1000 <= msg.end)
 
@@ -103,7 +105,7 @@ export default {
         // Update current message index
         this.currentMessageIndex = msgIndex
       }
-    },
+    }, 200),
 
     /**
      * Scrolls the transcript container to the specified message element smoothly.
