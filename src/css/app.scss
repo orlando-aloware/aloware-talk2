@@ -14883,16 +14883,6 @@ h1.contact-list-name-label {
     flex-grow: 1;
 
     .sentiment {
-      width: 45%;
-
-      &-out {
-        margin-left: 0% !important;
-      }
-
-      &-in {
-        margin-left: 53% !important;
-      }
-
       &-circle {
         width: 20px;
         height: 20px;
@@ -14908,7 +14898,7 @@ h1.contact-list-name-label {
     }
 
     .message-box {
-      width: 45%;
+      width: 75%;
       border-radius: 10px;
       padding: .5em;
       font-size: 14px;
@@ -14922,7 +14912,7 @@ h1.contact-list-name-label {
 
       &-in {
         color: black;
-        margin-left: 53% !important;
+        margin-left: 26% !important;
       }
     }
   }

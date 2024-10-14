@@ -415,7 +415,7 @@ export default {
 
       return {
         messageBoxClass: isAgent ? 'message-box-out' : 'message-box-in',
-        sentimentClass: isAgent ? 'sentiment-out' : 'sentiment-in'
+        sentimentClass: isAgent ? 'justify-start' : 'justify-end'
       }
     },
 

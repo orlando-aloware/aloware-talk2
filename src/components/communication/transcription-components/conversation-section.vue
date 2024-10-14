@@ -27,7 +27,7 @@
         </p>
 
         <!-- Show the speaker's sentiment below each message. -->
-        <span class="sentiment flex items-center justify-start"
+        <span class="sentiment flex items-center"
               data-testid="comm-conversation-section-speaker-sentiment"
               :class="message.classes.sentimentClass">
           <span class="sentiment-circle"
