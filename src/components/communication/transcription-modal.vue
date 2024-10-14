@@ -39,27 +39,43 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none px-4">
-          <div class="q-pa-md mx-3 py-2 border border-rounded d-flex flex-row align-items-center"
+          <div class="mx-3 py-2"
                v-if="remoteUrl && !isLoading">
-            <waveform :remote-url="remoteUrl"
-                      :unique-id="communication.id"
-                      :height="40"
-                      :split-channels="splitChannels"
-                      data-testid="comm-transcription-modal-waveform"
-                      @time-update="updateCurrentTime">
-            </waveform>
-            <download-button v-if="fileUuid"
-                             data-testid="communication-audio-download-button"
-                             is-simple
-                             :communication-id="communication.id"
-                             :filename="filename"
-                             :file-mime-type="mimeType"
-                             :file-uuid="fileUuid"/>
+            <div class="d-flex flex-row align-items-center">
+              <waveform :remote-url="remoteUrl"
+                        :unique-id="communication.id"
+                        :height="40"
+                        :split-channels="splitChannels"
+                        data-testid="comm-transcription-modal-waveform"
+                        @time-update="updateCurrentTime">
+              </waveform>
+              <download-button v-if="fileUuid"
+                               data-testid="communication-audio-download-button"
+                               is-simple
+                               :communication-id="communication.id"
+                               :filename="filename"
+                               :file-mime-type="mimeType"
+                               :file-uuid="fileUuid"/>
+            </div>
+            <div class="d-flex flex-row align-items-center mt-2">
+              <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
+                                          :speakers="speakers"
+                                          :is-empty="isEmpty"
+                                          data-testid="comm-transcription-modal-talk-time-analysis-section"/>
+
+              <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
+                                          :sentiment-chip-colors="sentimentChipColors"
+                                          :is-empty="isEmpty"
+                                          :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
+                                          class="ml-2"
+                                          data-testid="comm-transcription-modal-sentiment-analysis-section"/>
+            </div>
           </div>
 
           <div class="row py-4"
                v-if="!isLoading">
-            <div class="col-6" id="reference-column">
+            <div id="reference-column"
+                 class="col-6 pt-12">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
                                   data-testid="comm-transcription-modal-category-section"/>
@@ -82,26 +98,37 @@
             </div>
 
             <div class="col-6">
-              <div class="d-flex mb-2">
-                <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
-                                            :sentiment-chip-colors="sentimentChipColors"
-                                            :is-empty="isEmpty"
-                                            :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
-                                            data-testid="comm-transcription-modal-sentiment-analysis-section"/>
+              <q-tabs v-model="tabName"
+                      no-caps
+                      inline-label
+                      dense
+                      :mobile-arrows="false"
+                      align="left"
+                      class="bg-white text-black border-bottom"
+                      content-class="flex-nowrap">
+                <q-tab name="transcription" label="Transcription"/>
+<!--                <q-tab name="summary" label="Summary"/>-->
+              </q-tabs>
+              <q-tab-panels v-model="tabName">
+                <q-tab-panel class="p-0"
+                             name="transcription">
+                  <conversation-section :messages="messages"
+                                        :formatted-messages="formattedMessages"
+                                        :is-empty="isEmpty"
+                                        ref="conversationSection"
+                                        data-testid="comm-transcription-modal-conversation-section"/>
+                </q-tab-panel>
 
-                <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
-                                            :speakers="speakers"
-                                            :is-empty="isEmpty"
-                                            data-testid="comm-transcription-modal-talk-time-analysis-section"/>
-              </div>
-
-              <div class="d-flex">
-                <conversation-section :messages="messages"
-                                      :formatted-messages="formattedMessages"
-                                      :is-empty="isEmpty"
-                                      ref="conversationSection"
-                                      data-testid="comm-transcription-modal-conversation-section"/>
-              </div>
+<!--                <q-tab-panel class="p-0"-->
+<!--                             name="summary">-->
+<!--                  <section class="transcription chat-area"-->
+<!--                           id="summary"-->
+<!--                           data-testid="comm-summary-section"-->
+<!--                           ref="summaryArea">-->
+<!--                    {{ customSummary }}-->
+<!--                  </section>-->
+<!--                </q-tab-panel>-->
+              </q-tab-panels>
             </div>
           </div>
         </q-card-section>
@@ -163,6 +190,7 @@ export default {
 
   data () {
     return {
+      tabName: 'transcription',
       isLoading: true,
       show_form: false,
       remoteUrl: null,
@@ -174,6 +202,10 @@ export default {
       sentiment_analysis: [],
       talk_time_analysis: [],
       messages: [],
+      summaryEngine: null,
+      customSummary: null,
+      summaryPrompt: null,
+      summaryFeedback: null,
       sentiments: [
         'POSITIVE',
         'NEUTRAL',
@@ -192,11 +224,13 @@ export default {
       splitChannels: [
         {
           waveColor: 'rgb(200, 0, 200)',
-          progressColor: 'rgb(100, 0, 100)'
+          progressColor: 'rgb(100, 0, 100)',
+          barAlign: 'bottom'
         },
         {
           waveColor: 'rgb(0, 200, 200)',
-          progressColor: 'rgb(0, 100, 100)'
+          progressColor: 'rgb(0, 100, 100)',
+          barAlign: 'top'
         }
       ],
       UploadedFileTypes,
@@ -232,7 +266,7 @@ export default {
           this.setSmartTranscriptionData(res.data)
           this.isLoading = false
         }).catch(err => {
-          console.log("Couldn't fetch transcription information.", err)
+          console.log('Couldn\'t fetch transcription information.', err)
           this.isLoading = false
         })
 
@@ -251,16 +285,16 @@ export default {
           this.downloadUrl = res.data.download_url
           this.mimeType = res.data.mimetype || ''
         }).catch(err => {
-          console.log("Couldn't fetch call recording.", err)
+          console.log('Couldn\'t fetch call recording.', err)
         })
     },
 
     /**
-    * Sets Smart Transcription panel data.
-    * @public
-    *
-    * @param {Object} data
-    */
+     * Sets Smart Transcription panel data.
+     * @public
+     *
+     * @param {Object} data
+     */
     setSmartTranscriptionData (data) {
       // Sort the speakers to always get AGENT first.
       this.speakers = data.speakers?.sort()
@@ -273,16 +307,20 @@ export default {
       this.messages = data.messages
       this.sentiment_analysis = data.sentiment_analysis_summary
       this.talk_time_analysis = data.talk_time_analysis
+      this.summaryEngine = data.summary_engine
+      this.customSummary = data.custom_summary
+      this.summaryPrompt = data.summary_prompt
+      this.summaryFeedback = data.summary_feedback
     },
 
     /**
-    * Adds border to highlights in a message text.
-    * @public
-    *
-    * @param {string} messageText
-    *
-    * @returns {string}
-    */
+     * Adds border to highlights in a message text.
+     * @public
+     *
+     * @param {string} messageText
+     *
+     * @returns {string}
+     */
     circleText (speaker, messageText) {
       this.highlights_summary.forEach(function (highlightSummary) {
         if (speaker === highlightSummary.speaker) {
@@ -295,14 +333,14 @@ export default {
           )
 
           /**
-          * Imagine we have 2 highlights: 'call' and 'outbound call'.
-          * At this point 'call' will be highlighted twice.
-          *
-          * If we find a span tag directly connected to another one,
-          * it means a word has already been highlighted twice.
-          *
-          * Check for existing tag before and after a span.
-          */
+           * Imagine we have 2 highlights: 'call' and 'outbound call'.
+           * At this point 'call' will be highlighted twice.
+           *
+           * If we find a span tag directly connected to another one,
+           * it means a word has already been highlighted twice.
+           *
+           * Check for existing tag before and after a span.
+           */
           if (messageText.includes('><span') || messageText.includes('</span><')) {
             // Revert last highlighted word to prevent double highlighting.
             messageText = backupMessageText
@@ -318,13 +356,13 @@ export default {
     },
 
     /**
-    * Create a string with each speaker sentiments' percentages.
-    * @public
-    *
-    * @param {Object} sentimentSummary
-    *
-    * @returns {string} Ex: POSITIVE: 0%; NEUTRAL: 100%; NEGATIVE: 0%;
-    */
+     * Create a string with each speaker sentiments' percentages.
+     * @public
+     *
+     * @param {Object} sentimentSummary
+     *
+     * @returns {string} Ex: POSITIVE: 0%; NEUTRAL: 100%; NEGATIVE: 0%;
+     */
     calculateOverAllSentimentBySpeaker (sentimentSummary) {
       const positiveSum = sentimentSummary.positive
       const neutralSum = sentimentSummary.neutral
@@ -376,8 +414,16 @@ export default {
     },
 
     updateCurrentTime (time) {
-      this.$refs.conversationSection.syncScroll(time)
+      if (this.tabName === 'transcription') {
+        this.$refs.conversationSection.syncScroll(time)
+      }
     }
   }
 }
 </script>
+
+<style scoped>
+.pt-12 {
+  padding-top: 12px;
+}
+</style>

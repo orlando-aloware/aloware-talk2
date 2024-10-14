@@ -55,6 +55,12 @@
 <script>
 import { aclMixin } from 'src/plugins/mixins'
 import * as WaveformPlaybackSpeedOptions from 'src/constants/waveform-playback-speed-options'
+import Hover from 'wavesurfer.js/dist/plugins/hover.esm.js'
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
+
+const regions = RegionsPlugin.create({
+  regions: []
+})
 
 export default {
   name: 'waveform',
@@ -94,7 +100,17 @@ export default {
         responsive: true,
         waveColor: '#C9C9C9',
         cursorColor: '#2D5BFF',
-        splitChannels: this.splitChannels
+        splitChannels: this.splitChannels,
+        plugins: [
+          Hover.create({
+            lineColor: '#ff0000',
+            lineWidth: 2,
+            labelBackground: '#555',
+            labelColor: '#fff',
+            labelSize: '11px'
+          }),
+          regions
+        ]
       },
       playing: false,
       loading: true,

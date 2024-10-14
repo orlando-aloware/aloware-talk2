@@ -5,7 +5,7 @@ import * as storage from 'src/plugins/helpers/storage'
 
 export default {
   computed: {
-    ...mapState(['users']),
+    ...mapState(['users', 'usersIsLoading']),
 
     ...mapState('cache', ['currentCompany']),
 

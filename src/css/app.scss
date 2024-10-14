@@ -3551,16 +3551,8 @@ i.option-separator {
   }
 }
 
-.max-w-75 {
-  max-width: 75% !important;
-}
-
-.max-w-85 {
-  max-width: 85% !important;
-}
-
-.max-width-266 {
-  max-width: 266px;
+.width-200 {
+  width: 200px;
 }
 
 .width-250 {
@@ -3590,6 +3582,18 @@ i.option-separator {
 .max-width-380 {
   max-width: 380px;
   width: 100%;
+}
+
+.max-w-75 {
+  max-width: 75% !important;
+}
+
+.max-w-85 {
+  max-width: 85% !important;
+}
+
+.max-width-266 {
+  max-width: 266px;
 }
 
 .width-0 {
@@ -14875,7 +14879,6 @@ h1.contact-list-name-label {
     max-height: 64vh;
     padding: 1em;
     margin: 0 auto 2em auto;
-    border-radius: 14px;
     overflow: auto;
     flex-grow: 1;
 
