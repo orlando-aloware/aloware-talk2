@@ -117,6 +117,8 @@
                                        :speakers="speakers"
                                        :is-empty="isEmpty"
                                        data-testid="comm-transcription-modal-custom-keywords-section"/>
+
+              <div v-if="custom_summary" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
             </div>
 
             <div class="col-6">
@@ -164,6 +166,8 @@
 
 <script>
 import Waveform from 'components/waveform'
+import marked from 'marked'
+import DOMPurify from 'dompurify'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import { isEmpty } from 'lodash'
 import CategoriesSection from './transcription-components/categories-section'
@@ -229,6 +233,7 @@ export default {
       entities: [],
       entity_types: [],
       custom_keywords: [],
+      custom_summary: null,
       sentiment_analysis: [],
       talk_time_analysis: [],
       messages: [],
@@ -289,6 +294,10 @@ export default {
     }
   },
 
+  mounted () {
+    this.checkAndShowTranscriptionModal()
+  },
+
   methods: {
     fetchSmartTranscriptionData () {
       this.isLoading = true
@@ -339,6 +348,7 @@ export default {
       this.entities = data.entities
       this.entity_types = data.entity_types
       this.custom_keywords = data.custom_keywords
+      this.custom_summary = data.custom_summary
       this.messages = data.messages
       this.sentiment_analysis = data.sentiment_analysis_summary
       this.talk_time_analysis = data.talk_time_analysis
@@ -384,6 +394,21 @@ export default {
       })
 
       return messageText
+    },
+
+    /**
+     * Check if the URL has a query parameter to show the transcription modal.
+     * @public
+     *
+     * @returns {void}
+     */
+    checkAndShowTranscriptionModal () {
+      const urlParams = new URLSearchParams(window.location.search)
+      const showTranscription = urlParams.get('showTranscription')
+
+      if (showTranscription === 'true') {
+        this.fetchSmartTranscriptionData()
+      }
     },
 
     handleClose () {
@@ -439,6 +464,17 @@ export default {
       return sentimentPercentages
     },
 
+    /**
+     * Parse markdown text to HTML.
+     * @param {string} summaryText
+     *
+     * @returns {string}
+     */
+    parseMarkdown (summaryText) {
+      const rawHtml = marked(summaryText)
+      return DOMPurify.sanitize(rawHtml)
+    },
+
     getMessageClasses (speaker) {
       const isAgent = ['AGENT', 'A'].includes(speaker)
 
@@ -451,6 +487,14 @@ export default {
     updateCurrentTime (time) {
       if (this.tabName === 'transcription') {
         this.$refs.conversationSection.syncScroll(time)
+      }
+    }
+  },
+
+  watch: {
+    communication (newVal) {
+      if (newVal) {
+        this.checkAndShowTranscriptionModal()
       }
     }
   }
