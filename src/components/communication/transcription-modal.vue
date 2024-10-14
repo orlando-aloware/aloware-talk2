@@ -28,7 +28,26 @@
     <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
-          <div class="text-h6 pl-3" data-testid="comm-transcription-modal-smart-title">Smart Transcription</div>
+          <!--COMM TYPE-->
+          <q-card-section class="comm-type-container" data-testid="comm-details-comm-type-card-section">
+            <div class="text-h6 d-inline-flex align-items-center"
+                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
+                         v-if="communication.disposition_status2">
+              </component>
+              <div class="comm-type-wrapper pl-3">
+                <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                  {{ communication.direction | fixCommDirection }}
+                </span>
+                {{ communication.type | fixCommType }}
+
+                <span v-if="communication?.contact">
+                  {{ communication.direction | getCommPrepositions }} {{ communication.contact.name | fixContactName }}
+                </span>
+              </div>
+            </div>
+          </q-card-section>
+
           <q-space></q-space>
           <q-btn icon="close"
                  flat
@@ -154,6 +173,7 @@ import ConversationSection from './transcription-components/conversation-section
 import DownloadButton from 'components/download-button.vue'
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'TranscriptionModal',
@@ -243,6 +263,9 @@ export default {
   },
 
   computed: {
+    CommunicationTypes () {
+      return CommunicationTypes
+    },
     ...mapState('cache', ['currentCompany']),
 
     formattedMessages () {
