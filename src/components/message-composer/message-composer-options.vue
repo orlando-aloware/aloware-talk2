@@ -336,23 +336,23 @@ export default {
       // END:VCARD
       // `
 
-      const vCardData = `
-      BEGIN:VCARD
-      VERSION:3.0
-      FN;CHARSET=UTF-8:${this.user?.profile?.contact_card_name}
-      N:${this.user?.profile?.last_name};${this.user?.profile?.first_name};;;
-      TEL:${this.user?.profile?.contact_card_phone_number || ''}
-      EMAIL:${this.user?.profile?.email || ''}
-      END:VCARD
-      `.trim()
+      const vCardData = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        `N:${this.user?.profile?.first_name || ''};${this.user?.profile?.last_name || ''};;;`,
+        `FN:${this.user?.profile?.contact_card_name || ''}`,
+        `TEL;TYPE=CELL:${this.user?.profile?.contact_card_phone_number || ''}`,
+        `EMAIL:${this.user?.profile?.email || ''}`,
+        'END:VCARD'
+      ].join('\r\n')
 
       console.log(vCardData)
 
       const contactCardName = this.user?.profile?.contact_card_name || 'contact-card'
-      const fileName = contactCardName.toLowerCase().replace(/\s+/g, '-')
+      const fileName = `${contactCardName.toLowerCase().replace(/\s+/g, '-')}.vcf`
 
-      const blob = new Blob([vCardData], { type: 'text/vcard' })
-      const file = new File([blob], `${fileName}.vcf`, { type: 'text/vcard' })
+      const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' })
+      const file = new File([blob], fileName, { type: 'text/vcard;charset=utf-8' })
       // console.log(file)
 
       this.uploadVCard(file)
