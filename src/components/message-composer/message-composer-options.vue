@@ -339,10 +339,8 @@ export default {
       const vCardData = [
         'BEGIN:VCARD',
         'VERSION:3.0',
-        `N:${this.user?.profile?.first_name || ''};${this.user?.profile?.last_name || ''};;;`,
         `FN:${this.user?.profile?.contact_card_name || ''}`,
-        `TEL;TYPE=CELL:${this.user?.profile?.contact_card_phone_number || ''}`,
-        `EMAIL:${this.user?.profile?.email || ''}`,
+        `TEL:${this.user?.profile?.contact_card_phone_number || ''}`,
         'END:VCARD'
       ].join('\r\n')
 
