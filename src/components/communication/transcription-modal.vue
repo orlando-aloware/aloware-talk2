@@ -106,8 +106,11 @@
                       align="left"
                       class="bg-white text-black border-bottom"
                       content-class="flex-nowrap">
-                <q-tab name="transcription" label="Transcription"/>
-<!--                <q-tab name="summary" label="Summary"/>-->
+                <q-tab name="transcription"
+                       label="Transcription"/>
+                <q-tab name="summary"
+                       label="Summary"
+                       :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
               </q-tabs>
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
@@ -119,15 +122,15 @@
                                         data-testid="comm-transcription-modal-conversation-section"/>
                 </q-tab-panel>
 
-<!--                <q-tab-panel class="p-0"-->
-<!--                             name="summary">-->
-<!--                  <section class="transcription chat-area"-->
-<!--                           id="summary"-->
-<!--                           data-testid="comm-summary-section"-->
-<!--                           ref="summaryArea">-->
-<!--                    {{ customSummary }}-->
-<!--                  </section>-->
-<!--                </q-tab-panel>-->
+                <q-tab-panel class="p-0"
+                             name="summary">
+                  <section class="transcription chat-area"
+                           id="summary"
+                           data-testid="comm-summary-section"
+                           ref="summaryArea">
+                    {{ customSummary }}
+                  </section>
+                </q-tab-panel>
               </q-tab-panels>
             </div>
           </div>
@@ -150,6 +153,7 @@ import TalkTimeAnalysisSection from './transcription-components/talk-time-analys
 import ConversationSection from './transcription-components/conversation-section'
 import DownloadButton from 'components/download-button.vue'
 import { communicationInfoMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
 
 export default {
   name: 'TranscriptionModal',
@@ -239,6 +243,8 @@ export default {
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
+
     formattedMessages () {
       return this.messages.map(message => ({
         ...message,
