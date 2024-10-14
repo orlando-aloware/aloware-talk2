@@ -328,13 +328,24 @@ export default {
     },
 
     onContactCardSelected () {
+      // const vCardData = `
+      // BEGIN:VCARD
+      // VERSION:3.0
+      // FN:${this.user?.profile?.contact_card_name}
+      // TEL:${this.user?.profile?.contact_card_phone_number || ''}
+      // END:VCARD
+      // `
+
       const vCardData = `
       BEGIN:VCARD
       VERSION:3.0
-      FN:${this.user?.profile?.contact_card_name}
+      FN;CHARSET=UTF-8:${this.user?.profile?.contact_card_name}
+      N:${this.user?.profile?.last_name};${this.user?.profile?.first_name};;;
       TEL:${this.user?.profile?.contact_card_phone_number || ''}
+      EMAIL:${this.user?.profile?.email || ''}
       END:VCARD
-      `
+      `.trim()
+
       console.log(vCardData)
 
       const contactCardName = this.user?.profile?.contact_card_name || 'contact-card'
