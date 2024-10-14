@@ -336,6 +336,41 @@ export default {
       END:VCARD
       `
       console.log(vCardData)
+
+      const contactCardName = this.user?.profile?.contact_card_name || 'contact-card'
+      const fileName = contactCardName.toLowerCase().replace(/\s+/g, '-')
+
+      const blob = new Blob([vCardData], { type: 'text/vcard' })
+      const file = new File([blob], `${fileName}.vcf`, { type: 'text/vcard' })
+      // console.log(file)
+
+      this.uploadVCard(file)
+    },
+
+    uploadVCard (file) {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      this.isUploading = true
+      this.uploadPercentage = 0
+
+      talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, {
+        onUploadProgress: function (progressEvent) {
+          this.uploadPercentage = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100))
+        }.bind(this)
+      }).then(response => {
+        this.isUploading = false
+        this.hasError = false
+        this.uploadPercentage = 100
+
+        const files = [response.data.uploaded_file]
+        this.$emit('attachmentUploaded', files)
+        this.$refs.contactCardMenu.hide()
+      }).catch(error => {
+        console.error('Error al subir el archivo vCard:', error)
+        this.isUploading = false
+        this.hasError = true
+      })
     },
 
     onContactCardLinkClicked () {

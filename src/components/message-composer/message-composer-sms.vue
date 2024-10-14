@@ -127,6 +127,20 @@
                             <i class="fa fa-times"></i>
                         </b-button>
                     </div>
+
+                    <div v-if="attachment.mimetype.includes('vcard')" class="vcard-thumbnail-wrapper">
+                      <div class="text-center media-icon-wrapper mt-2">
+                        <i class="far fa-address-card media-icon"></i>
+                      </div>
+                      <p class="ellipsis mt-1 text-center">{{ attachment.original_file }}</p>
+                      <b-button size="sm"
+                                class="btn-remove-attachments"
+                                data-testid="sms-remove-vcard-button"
+                                @click="removeAttachment(attachment)"
+                                pill>
+                        <i class="fa fa-times"></i>
+                      </b-button>
+                    </div>
                 </div>
 
             </div>
