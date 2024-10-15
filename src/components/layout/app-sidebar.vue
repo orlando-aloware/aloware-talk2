@@ -186,7 +186,7 @@
       </span>
     </q-btn>
 
-    <q-btn :to="{ path: '/calendar' }"
+    <q-btn :to="{ path: '/calendar', query: { view: 'month' } }"
            :ripple="false"
            icon="img:app-icons/menu/calendar_active.svg"
            align="left"
@@ -206,7 +206,7 @@
         Calendar
       </span>
     </q-btn>
-    <q-btn :to="{ path: '/calendar' }"
+    <q-btn :to="{ path: '/calendar', query: { view: 'month' } }"
            :ripple="false"
            icon="img:app-icons/menu/calendar_gray.svg"
            align="left"
