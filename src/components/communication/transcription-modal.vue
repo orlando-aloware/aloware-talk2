@@ -194,6 +194,7 @@ import { communicationInfoMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import * as FeedbackConstants from 'src/constants/feedback-types'
 
 export default {
   name: 'TranscriptionModal',
@@ -252,7 +253,7 @@ export default {
       summaryEngine: null,
       customSummary: null,
       summaryPrompt: null,
-      summaryFeedback: null,
+      feedback: null,
       upvoteActive: false,
       downvoteActive: false,
       sentiments: [
@@ -369,9 +370,9 @@ export default {
       this.summaryEngine = data.summary_engine
       this.customSummary = data.custom_summary
       this.summaryPrompt = data.summary_prompt
-      this.summaryFeedback = data.summary_feedback
-      this.upvoteActive = this.summaryFeedback === 1
-      this.downvoteActive = this.summaryFeedback === 2
+      this.feedback = data.feedback
+      this.upvoteActive = this.feedback === FeedbackConstants.UPVOTE
+      this.downvoteActive = this.feedback === FeedbackConstants.DOWNVOTE
     },
 
     /**
@@ -513,14 +514,12 @@ export default {
      * @returns {void}
      */
     submitFeedback (type) {
-      const feedbackValue = type === 'upvote' ? 1 : 2
+      const feedbackValue = type === 'upvote' ? FeedbackConstants.UPVOTE : FeedbackConstants.DOWNVOTE
 
-      this.summaryFeedback = feedbackValue
+      this.feedback = feedbackValue
 
       talk2Api.V1.transcription.submitSummaryFeedback(this.transcriptionId, feedbackValue)
         .then(() => {
-
-          // Update the button states based on the feedback type
           this.upvoteActive = type === 'upvote'
           this.downvoteActive = type === 'downvote'
         })
@@ -539,8 +538,8 @@ export default {
     },
 
     summaryFeedback (newFeedback) {
-      this.upvoteActive = newFeedback === 1
-      this.downvoteActive = newFeedback === 2
+      this.upvoteActive = newFeedback === FeedbackConstants.UPVOTE
+      this.downvoteActive = newFeedback === FeedbackConstants.DOWNVOTE
     }
   }
 }
