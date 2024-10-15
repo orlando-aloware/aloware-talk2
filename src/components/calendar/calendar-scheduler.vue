@@ -8,6 +8,9 @@ import Scheduler from 'dhtmlx-scheduler'
 import moment from 'moment'
 import { mapState } from 'vuex'
 
+const MAX_EVENTS_MONTH = 4
+const MAX_EVENTS_MOBILE = 2
+
 export default {
   name: 'scheduler',
 
@@ -23,7 +26,8 @@ export default {
   },
 
   computed: {
-    ...mapState('auth', ['profile'])
+    ...mapState('auth', ['profile']),
+    ...mapState(['isMobile'])
   },
 
   mounted () {
@@ -54,7 +58,7 @@ export default {
     Scheduler.config.drag_highlight = false
     Scheduler.config.drag_move = false
     Scheduler.config.drag_resize = false
-    Scheduler.config.max_month_events = 4
+    Scheduler.config.max_month_events = this.isMobile ? MAX_EVENTS_MOBILE : MAX_EVENTS_MONTH
     Scheduler.config.min_event_width = 60
     Scheduler.config.min_event_height = 20
     Scheduler.config.event_min_dy = 20
@@ -98,11 +102,11 @@ export default {
     Scheduler.templates.month_events_link = function (date, count) {
       return `
         <div class="dhx_more">
-          <div class="custom-more-link" data-date="${date.toISOString()}" data-count="${count}">${count} more</div>
+          <div class="custom-more-link" data-date="${date.toISOString()}" data-count="${count}" style="display: ${this.isMobile ? 'none' : 'block'};">${this.getMoreCount(count)} more</div>
           <div class="custom-expand-link" data-date="${date.toISOString()}" onclick="window.handleExpandLink(event);">See all events</div>
         </div>
       `
-    }
+    }.bind(this)
 
     Scheduler.templates.hour_scale = function (date) {
       const hour = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
@@ -282,6 +286,10 @@ export default {
       }
 
       Scheduler.xy.nav_height = 0
+    },
+
+    getMoreCount (count) {
+      return this.isMobile ? count - MAX_EVENTS_MOBILE : count - MAX_EVENTS_MONTH
     }
   }
 }
