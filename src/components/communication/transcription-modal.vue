@@ -537,9 +537,9 @@ export default {
       }
     },
 
-    summaryFeedback (newFeedback) {
-      this.upvoteActive = newFeedback === FeedbackConstants.UPVOTE
-      this.downvoteActive = newFeedback === FeedbackConstants.DOWNVOTE
+    feedback (newValue) {
+      this.upvoteActive = newValue === FeedbackConstants.UPVOTE
+      this.downvoteActive = newValue === FeedbackConstants.DOWNVOTE
     }
   }
 }
