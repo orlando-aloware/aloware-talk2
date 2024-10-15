@@ -7,10 +7,10 @@
       <q-card-section class="d-flex align-items-center justify-between">
         <div class="text-h6">{{ modalTitle }}</div>
         <q-btn icon="close"
+               size="12px"
                flat
                round
                dense
-               size="12px"
                v-close-popup />
       </q-card-section>
       <q-separator />
@@ -44,12 +44,14 @@
                     {{ formatEventTime(event) }} - {{ getEventStatusLabel(event?.status) }} {{ getEventTypeLabel(event?.type) }}
                   </span>
                 </div>
-                <div class="text-bold" :class="getCancelledEventTextDecoration(event)">
+                <div class="text-bold"
+                     :class="getCancelledEventTextDecoration(event)">
                   {{ event.text }}
                 </div>
               </div>
             </div>
-            <q-separator spaced v-if="index !== displayedEvents.length - 1" />
+            <q-separator spaced
+                         v-if="index !== displayedEvents.length - 1" />
           </div>
         </div>
         <div v-else>
