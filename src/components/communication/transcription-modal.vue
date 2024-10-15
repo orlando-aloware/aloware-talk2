@@ -151,14 +151,14 @@
                            data-testid="comm-summary-section"
                            ref="summaryArea">
                     <div v-if="customSummary" class="custom-summary" v-html="parseMarkdown(customSummary)" />
-                    <div v-if="customSummary" class="summary-feedback-section mt-4 d-flex justify-end align-items-center">
-                      <span class="evaluation-text pr-3">Please evaluate the accuracy of this summary.</span>
+                    <div v-if="customSummary" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                      <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
                         :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
                         @click="submitFeedback('upvote')"
                       />
-                      <span class="mx-2"></span>
+                      <span class="mx-1"></span>
                       <img
                         class="clickable-icon"
                         :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
@@ -515,9 +515,10 @@ export default {
     submitFeedback (type) {
       const feedbackValue = type === 'upvote' ? 1 : 2
 
+      this.summaryFeedback = feedbackValue
+
       talk2Api.V1.transcription.submitSummaryFeedback(this.transcriptionId, feedbackValue)
         .then(() => {
-          this.summaryFeedback = feedbackValue
 
           // Update the button states based on the feedback type
           this.upvoteActive = type === 'upvote'
