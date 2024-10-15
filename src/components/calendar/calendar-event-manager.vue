@@ -2,13 +2,13 @@
   <b-modal id="calendar-manager-modal"
            size="lg"
            body-class="p-0"
-           no-close-on-esc
            no-close-on-backdrop
            :scrollable="!loading"
            :hide-footer="loading"
            :visible="showManager"
            @cancel="closeFiltersMenu"
-           @close="closeFiltersMenu">
+           @close="closeFiltersMenu"
+           @hidden="closeFiltersMenu">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
