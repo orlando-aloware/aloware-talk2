@@ -477,7 +477,6 @@ export default {
     },
 
     updateCurrentDate (date) {
-      console.log('updateCurrentDate', date)
       this.gotoDate = date
     },
 
@@ -563,7 +562,6 @@ export default {
     },
 
     onToggleGotoDate (date, view) {
-      console.log('onToggleGotoDate', date)
       const formattedDate = moment(date).format('YYYY-MM-DD')
 
       if (view) {
