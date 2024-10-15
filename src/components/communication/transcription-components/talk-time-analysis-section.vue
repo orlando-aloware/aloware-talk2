@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import * as CommunicationDirection from 'src/constants/communication-direction'
 
 export default {
   name: 'TalkTimeAnalysisSection',
@@ -36,10 +35,6 @@ export default {
       type: Array,
       required: true
     },
-    direction: {
-      type: Number,
-      required: true
-    },
     isEmpty: {
       type: Function,
       required: true
@@ -48,26 +43,12 @@ export default {
 
   methods: {
     getSpeakerClass (speakerIndex) {
-      let style = {}
-
-      if (this.direction === CommunicationDirection.INBOUND) {
-        style = {
-          color: 'rgb(0, 200, 200)'
-        }
-
-        if (speakerIndex === 1) {
-          style.color = 'rgb(200, 0, 200)'
-        }
+      let style = {
+        color: 'rgb(200, 0, 200)'
       }
 
-      if (this.direction === CommunicationDirection.OUTBOUND) {
-        style = {
-          color: 'rgb(200, 0, 200)'
-        }
-
-        if (speakerIndex === 1) {
-          style.color = 'rgb(0, 200, 200)'
-        }
+      if (speakerIndex === 1) {
+        style.color = 'rgb(0, 200, 200)'
       }
 
       return style
