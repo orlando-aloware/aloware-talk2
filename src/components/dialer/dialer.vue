@@ -126,7 +126,8 @@ export default {
           this.setDialerContact(this.dialer.communication.contact)
         }
 
-        if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) {
+        if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ||
+          communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
           this.setDialerCallSuccessfullyAnswered(true)
         }
       }
