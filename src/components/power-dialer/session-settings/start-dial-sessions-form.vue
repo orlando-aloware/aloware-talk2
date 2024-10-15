@@ -9,8 +9,8 @@
       </label>
       <div class="row pb-4 dial-sessions__form">
         <div :key="cform.name"
-             v-for="cform in form.children"
-             :class="cform.containerClass ?? 'col-6 pl-3'">
+             :class="cform.containerClass ?? 'col-6 pl-3'"
+             v-for="cform in form.children">
           <div :class="cform.name === 'force_redial' && currentCompany?.pd_force_redial ? 'opacity-05' : ''">
             <label :class="`label mb-1 ${cform.labelClass}`">
               {{ cform.label }}
