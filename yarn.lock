@@ -13795,8 +13795,8 @@ vue-at@^2.5.0-beta:
   integrity sha512-c17Rn8vVTXp/rvWV76jNB2PVx534eqIAP5/Tv1twCt0ebtRPIgNaJJwSaoRVISQ6vM6m3+owmtpAG1qr5g9fyQ==
 
 "vue-business-hours@github:aloware/vue-business-hours#WAT-912/fix/working-hours-are-not-being-recorded":
-  version "1.4.1"
-  resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/8bae1b8d6a49f690bfca98032d69f056362f002a"
+  version "1.5.0"
+  resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/5f30eb237f6daf69e7c41bfb1897e2ce9d98ed87"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.26"
     "@fortawesome/free-solid-svg-icons" "^6.5.2"
