@@ -82,7 +82,7 @@ export default {
       type: String,
       default: 'hour'
     },
-    selectedDateTime: {
+    selectedDate: {
       type: [Date, String, Object],
       required: true
     },
@@ -137,7 +137,7 @@ export default {
     },
 
     eventsForSelectedDate () {
-      const selectedDay = moment(this.selectedDateTime).startOf('day')
+      const selectedDay = moment(this.selectedDate).startOf('day')
 
       return this.events.filter(event => {
         const eventDate = moment(event.start_date)
@@ -156,7 +156,7 @@ export default {
     modalTitle () {
       return this.eventsModalMode === 'hour'
         ? `Events for ${moment(this.selectedHour).format(this.timeFormat === 1 ? 'D MMM YYYY, h A' : 'D MMM YYYY, H:mm')}`
-        : `Events for ${moment(this.selectedDateTime).format('LL')}`
+        : `Events for ${moment(this.selectedDate).format('LL')}`
     },
 
     emptyEventsMessage () {
