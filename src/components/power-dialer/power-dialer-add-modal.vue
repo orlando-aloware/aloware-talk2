@@ -262,6 +262,7 @@
               <b-button class="btn-block mt-4"
                         variant="secondary"
                         size="sm"
+                        :disabled="userId == null"
                         data-testid="power-dialer-add-modal-stay-in-contacts"
                         @click="saveAndStay">
                 {{isMyOwnList ? 'Stay in Contacts' : 'Add to Power Dialer'}}
@@ -533,11 +534,6 @@ export default {
 
   mounted () {
     this.loading++
-
-    // Select current user by default
-    if (this.profile.id && this.mode === 'add-contact-list') {
-      this.setUserId(this.profile.id)
-    }
 
     if (this.mode === 'integration') {
       // check if a list from integration already exists
