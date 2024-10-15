@@ -15,7 +15,7 @@
       </q-card-section>
       <q-separator />
       <q-card-section class="pb-0"
-                      v-if="displayedEvents.length && !searchQuery">
+                      v-if="displayedEvents.length || searchQuery">
         <search class="w-100"
                 placeholder="Search by name"
                 data-testid="calendar-event-list-search-input"
@@ -222,6 +222,14 @@ export default {
 
     onSearch (searchQuery) {
       this.searchQuery = searchQuery
+    }
+  },
+
+  watch: {
+    dialogOpen (newVal) {
+      if (newVal) {
+        this.searchQuery = ''
+      }
     }
   }
 }
