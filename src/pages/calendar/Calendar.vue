@@ -61,7 +61,7 @@
                     class="btn-white btn-rounded px-3 btn-calendar-today"
                     v-if="view === 'day'"
                     @click.prevent="showAllEvents(gotoDate)">
-            List all events
+            {{ isMobile ? 'Events' : 'List all events' }}
             <q-tooltip anchor="top middle">
               Show all events
             </q-tooltip>
