@@ -366,13 +366,12 @@ export default {
       this.messages = data.messages
       this.sentiment_analysis = data.sentiment_analysis_summary
       this.talk_time_analysis = data.talk_time_analysis
-      this.transcriptionId = data.transcription_id
       this.summaryEngine = data.summary_engine
       this.customSummary = data.custom_summary
       this.summaryPrompt = data.summary_prompt
       this.feedback = data.feedback
-      this.upvoteActive = this.feedback === FeedbackConstants.UPVOTE
-      this.downvoteActive = this.feedback === FeedbackConstants.DOWNVOTE
+      this.upvoteActive = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvoteActive = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
     },
 
     /**
@@ -514,11 +513,11 @@ export default {
      * @returns {void}
      */
     submitFeedback (type) {
-      const feedbackValue = type === 'upvote' ? FeedbackConstants.UPVOTE : FeedbackConstants.DOWNVOTE
+      const feedbackValue = type === 'upvote' ? FeedbackConstants.FEEDBACK_UPVOTE : FeedbackConstants.FEEDBACK_DOWNVOTE
 
       this.feedback = feedbackValue
 
-      talk2Api.V1.transcription.submitSummaryFeedback(this.transcriptionId, feedbackValue)
+      talk2Api.V1.transcription.submitSummaryFeedback(this.communication.id, feedbackValue)
         .then(() => {
           this.upvoteActive = type === 'upvote'
           this.downvoteActive = type === 'downvote'
@@ -538,8 +537,8 @@ export default {
     },
 
     feedback (newValue) {
-      this.upvoteActive = newValue === FeedbackConstants.UPVOTE
-      this.downvoteActive = newValue === FeedbackConstants.DOWNVOTE
+      this.upvoteActive = newValue === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvoteActive = newValue === FeedbackConstants.FEEDBACK_DOWNVOTE
     }
   }
 }

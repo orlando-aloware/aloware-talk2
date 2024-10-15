@@ -486,8 +486,8 @@ export default {
     },
 
     transcription: {
-      submitSummaryFeedback (transcriptionId, feedbackType) {
-        return window.axios.post(`${suffixV1}transcription/${transcriptionId}/summary-feedback`, { feedback: feedbackType })
+      submitSummaryFeedback (communicationId, feedbackType) {
+        return window.axios.post(`${suffixV1}transcription/${communicationId}/summary-feedback`, { feedback: feedbackType })
       },
 
       fetchSmartTranscriptionData (communicationId, options) {
