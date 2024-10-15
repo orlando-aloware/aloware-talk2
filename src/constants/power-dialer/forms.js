@@ -21,7 +21,7 @@ export const SESSION_SETTINGS_ALL_FORMS = [
       {
         name: 'force_redial',
         label: 'Require Agent Redial',
-        description: 'You can require that the agents redial a contact when they doesn\'t pick the call up.',
+        description: 'Redial a contact when it doesn\'t pick up the call.',
         type: 'toggle',
         items: [],
         containerClass: 'col-12 mb-3 d-flex items-center justify-between',
