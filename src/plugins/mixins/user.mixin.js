@@ -1,6 +1,6 @@
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../../constants/answer-types'
-import _ from 'lodash'
+import { get, isEmpty } from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
@@ -21,7 +21,7 @@ export default {
 
   methods: {
     getUser (id) {
-      const users = _.get(this, 'users', null)
+      const users = get(this, 'users', null)
 
       if (!id || !users || users.length === 0) {
         return {
@@ -97,14 +97,13 @@ export default {
     },
 
     filterUsers (users) {
-      if (!_.isEmpty(users)) {
-        return users.filter((user) =>
-          !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access) &&
-          user.answer_by !== AnswerTypes.BY_NONE
-        )
-      }
+      if (isEmpty(users)) return []
 
-      return []
+      return users.filter((user) => {
+        const hasSingleOrUndefinedRole = typeof user.role_names === 'undefined' || user.role_names.length === 1
+
+        return !(hasSingleOrUndefinedRole && user.read_only_access) && user.answer_by !== AnswerTypes.BY_NONE
+      })
     }
   }
 }
