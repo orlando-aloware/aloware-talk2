@@ -538,7 +538,7 @@ export default {
     this.loading++
 
     // Select current user by default, if is a valid user
-    if (this.profile.id && this.mode === 'add-contact-list' && this.userMixin.filterUsers(this.users).find(user => user.id === this.profile.id)) {
+    if (this.profile.id && this.mode === 'add-contact-list' && this.filterUsers(this.users).find(user => user.id === this.profile.id)) {
       this.setUserId(this.profile.id)
     }
 
