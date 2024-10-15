@@ -1704,6 +1704,10 @@ i.option-separator {
   font-size: 6px !important;
 }
 
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
 .multiselect.border-blue {
   .multiselect__tags {
     border: 1px solid $blue
@@ -12462,6 +12466,21 @@ h1.contact-list-name-label {
             color: inherit;
             text-decoration: none;
             width: 100%;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+
+          .custom-expand-link {
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+            cursor: pointer;
+
+            &:hover {
+              text-decoration: underline;
+            }
           }
         }
 
@@ -12515,6 +12534,16 @@ h1.contact-list-name-label {
 
         .actual-scheduler {
           height: calc(100vh - 90px);
+        }
+      }
+
+      .hour-label {
+        text-decoration: none;
+        width: 100%;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
         }
       }
     }
@@ -15299,4 +15328,10 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
   &--icon {
     margin-right: 6px !important;
   }
+}
+
+.rounded-circle-dot {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 100px !important;
 }
