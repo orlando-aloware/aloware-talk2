@@ -312,7 +312,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { integrationMixin, aclMixin } from 'src/plugins/mixins'
+import { integrationMixin, aclMixin, userMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import { get, isEmpty } from 'lodash'
 import moment from 'moment'
@@ -329,7 +329,7 @@ export default {
     PowerDialerListSelector
   },
 
-  mixins: [integrationMixin, aclMixin],
+  mixins: [integrationMixin, aclMixin, userMixin],
 
   props: {
     integration: {
@@ -404,6 +404,8 @@ export default {
       'showAddViewMyContacts',
       'search'
     ]),
+
+    ...mapState(['users']),
 
     ...mapState('cache', ['currentCompany']),
 
@@ -534,6 +536,11 @@ export default {
 
   mounted () {
     this.loading++
+
+    // Select current user by default, if is a valid user
+    if (this.profile.id && this.mode === 'add-contact-list' && this.userMixin.filterUsers(this.users).find(user => user.id === this.profile.id)) {
+      this.setUserId(this.profile.id)
+    }
 
     if (this.mode === 'integration') {
       // check if a list from integration already exists

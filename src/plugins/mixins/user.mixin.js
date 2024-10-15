@@ -94,6 +94,17 @@ export default {
 
     isCompanyPartOfCustomEdgeLocations (companyId) {
       return storage.local.getItem('custom_edge_location_companies') && storage.local.getItem('custom_edge_location_companies').split(',').includes(String(companyId))
+    },
+
+    filterUsers (users) {
+      if (!_.isEmpty(users)) {
+        return users.filter((user) =>
+          !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access) &&
+          user.answer_by !== AnswerTypes.BY_NONE
+        )
+      }
+
+      return []
     }
   }
 }
