@@ -227,8 +227,8 @@ export default {
       },
       views: [
         { 'id': 'day', name: 'Day' },
-        { 'id': 'month', name: 'Month' },
-        { 'id': 'week', name: 'Week' }
+        { 'id': 'week', name: 'Week' },
+        { 'id': 'month', name: 'Month' }
       ],
       timeFormat: 1,
       timeFormats: [
