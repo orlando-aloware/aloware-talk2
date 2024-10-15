@@ -11,7 +11,7 @@
         <div :key="cform.name"
              v-for="cform in form.children"
              :class="cform.containerClass ?? 'col-6 pl-3'">
-          <div :class="cform.name === 'force_redial' && currentCompany.pd_force_redial ? 'opacity-05' : ''">
+          <div :class="cform.name === 'force_redial' && currentCompany?.pd_force_redial ? 'opacity-05' : ''">
             <label :class="`label mb-1 ${cform.labelClass}`">
               {{ cform.label }}
             </label>
@@ -115,7 +115,7 @@
                       val="md"
                       :true-value="1"
                       :false-value="0"
-                      :disable="disabled || currentCompany.pd_force_redial"
+                      :disable="disabled || currentCompany?.pd_force_redial"
                       v-model="resources[cform.name]" />
           </p>
 
