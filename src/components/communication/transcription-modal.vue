@@ -166,7 +166,7 @@
 
 <script>
 import Waveform from 'components/waveform'
-import { marked } from 'marked'
+import marked from 'marked'
 import DOMPurify from 'dompurify'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import { isEmpty } from 'lodash'
