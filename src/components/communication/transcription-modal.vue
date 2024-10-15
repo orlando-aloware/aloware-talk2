@@ -192,11 +192,8 @@ import ConversationSection from './transcription-components/conversation-section
 import DownloadButton from 'components/download-button.vue'
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-<<<<<<< HEAD
-import * as CommunicationTypes from 'src/constants/communication-types'
-=======
 import talk2Api from 'src/plugins/api/api'
->>>>>>> bd52569fc (feature(pla-381): update transcription section)
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'TranscriptionModal',
