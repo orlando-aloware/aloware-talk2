@@ -559,7 +559,7 @@ export default {
         const key = Object.keys(value)[0]
 
         value[key].forEach((day, index) => {
-          if (day.isOpen && day.open !== '24hrs') {
+          if (day.isOpen && day.open !== '24hrs' && day.open !== '' && (day.close === '24hrs' || day.close === '')) {
             const minutesPerHour = 60
             const additionalHours = 9
             const maxHours = 23
