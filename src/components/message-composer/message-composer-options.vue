@@ -85,45 +85,11 @@
               ref="contactCardMenu"
               data-testid="add-contact-card-menu"
               :offset="[0,5]">
-        <div class="row no-wrap q-pa-md text-center">
-          <b-col sm="12" md="12">
-            <div class="mt-2 notice" data-testid="add-contact-card-message">
-              <p class="mb-0">
-                <router-link
-                  :to="{ path: '/settings/profile' }"
-                  :click="onContactCardLinkClicked"
-                >
-                  Click here
-                </router-link>
-                to change the name/phone number of your contact card.
-              </p>
-            </div>
-          </b-col>
-          <b-col sm="12" md="12">
-            <button class="btn btn-sm btn-primary mt-2"
-                    data-testid="add-contact-card-button"
-                    @click="onContactCardSelected">
-              Send my contact card
-            </button>
-          </b-col>
-
-          <b-col sm="12" md="12">
-            <b-progress v-if="isUploading && !hasError"
-                    class="add-contact-card-progress mt-2"
-                    variant="success"
-                    data-testid="add-contact-card-progress"
-                    :max="100">
-              <b-progress-bar :value="uploadPercentage"
-                              data-testid="add-contact-card-progress-bar"
-                              :label="`${uploadPercentage}%`"/>
-            </b-progress>
-            <p v-if="hasError && !isUploading"
-              data-testid="add-contact-card-error"
-              class="error-notice mt-2">
-              Error while generating contact card...
-            </p>
-          </b-col>
-        </div>
+        <contact-card
+          :selectedLine="selectedLine"
+          @contactCardUploaded="onContactCardUploaded"
+          @closeMenu="onContactCardLinkClicked"
+        />
       </q-menu>
 
       <contact-card-icon></contact-card-icon>
@@ -180,6 +146,7 @@ import MessageTemplates from 'components/message-composer/options/message-templa
 import NewCar from 'components/new-car'
 import CalendarTodayIcon from 'components/icons/calendar-today-icon'
 import Variables from 'components/message-composer/options/variables'
+import ContactCard from 'components/message-composer/options/contact-card.vue'
 import VariableIcon from 'components/icons/variable-icon'
 import { mapGetters, mapState } from 'vuex'
 import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
@@ -218,6 +185,7 @@ export default {
     GifIcon,
     SearchGiphy,
     NewCar,
+    ContactCard,
     ContactCardIcon
   },
 
@@ -231,11 +199,7 @@ export default {
       creditApplicationSending: false,
       newCarCounter: 0,
       newCarMenu: false,
-      isCarMenuClosing: false,
-
-      isUploading: false,
-      uploadPercentage: 0,
-      hasError: false
+      isCarMenuClosing: false
     }
   },
 
@@ -247,8 +211,6 @@ export default {
       'messageComposer',
       'contact'
     ]),
-
-    ...mapGetters('auth', ['user']),
 
     isTextingDisabled () {
       return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
@@ -327,59 +289,9 @@ export default {
       this.newCarMenu = true
     },
 
-    onContactCardSelected () {
-      // const vCardData = `
-      // BEGIN:VCARD
-      // VERSION:3.0
-      // FN:${this.user?.profile?.contact_card_name}
-      // TEL:${this.user?.profile?.contact_card_phone_number || ''}
-      // END:VCARD
-      // `
-
-      const vCardData = [
-        'BEGIN:VCARD',
-        'VERSION:3.0',
-        `FN:${this.user?.profile?.contact_card_name || ''}`,
-        `TEL:${this.user?.profile?.contact_card_phone_number || ''}`,
-        'END:VCARD'
-      ].join('\r\n')
-
-      console.log(vCardData)
-
-      const contactCardName = this.user?.profile?.contact_card_name || 'contact-card'
-      const fileName = `${contactCardName.toLowerCase().replace(/\s+/g, '-')}.vcf`
-
-      const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' })
-      const file = new File([blob], fileName, { type: 'text/vcard;charset=utf-8' })
-      // console.log(file)
-
-      this.uploadVCard(file)
-    },
-
-    uploadVCard (file) {
-      const formData = new FormData()
-      formData.append('file', file)
-
-      this.isUploading = true
-      this.uploadPercentage = 0
-
-      talk2Api.V1.lines.fileUpload(this.selectedLine.id, formData, {
-        onUploadProgress: function (progressEvent) {
-          this.uploadPercentage = parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100))
-        }.bind(this)
-      }).then(response => {
-        this.isUploading = false
-        this.hasError = false
-        this.uploadPercentage = 100
-
-        const files = [response.data.uploaded_file]
-        this.$emit('attachmentUploaded', files)
-        this.$refs.contactCardMenu.hide()
-      }).catch(error => {
-        console.error('Error al subir el archivo vCard:', error)
-        this.isUploading = false
-        this.hasError = true
-      })
+    onContactCardUploaded (files) {
+      this.$emit('attachmentUploaded', files)
+      this.$refs.contactCardMenu.hide()
     },
 
     onContactCardLinkClicked () {
