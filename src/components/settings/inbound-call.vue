@@ -577,10 +577,10 @@ export default {
 
             let closeTime = String(newHours).padStart(2, '0') + String(newMinutes).padStart(2, '0')
 
-            if (day.open !== closeTime) {
-              value[key][index].close = closeTime
-            } else {
+            if (day.open === closeTime) {
               value[key][index].close = '2400'
+            } else {
+              value[key][index].close = closeTime
             }
           }
         })
