@@ -56,6 +56,16 @@
               Go to today
             </q-tooltip>
           </b-button>
+          <b-button size="sm"
+                    variant="light"
+                    class="btn-white btn-rounded px-3 btn-calendar-today"
+                    v-if="view === 'day'"
+                    @click.prevent="showAllEvents(gotoDate)">
+            List all events
+            <q-tooltip anchor="top middle">
+              Show all events
+            </q-tooltip>
+          </b-button>
         </div>
         <div class="calendar__header__action-right">
           <filters :filters="convertedFilters"
@@ -126,14 +136,27 @@
                      @add-schedule="addSchedule"
                      @render-events="renderFromEvent"
                      @update-current-date="updateCurrentDate"
-                     @toggle-goto-date="onToggleGotoDate">
+                     @toggle-goto-date="onToggleGotoDate"
+                     @expand-day-events="showAllEvents"
+                     @expand-hour-events="showEventsForHour">
           </scheduler>
         </div>
       </div>
       <manager ref="manager"
-               @render-schedule="renderSchedule">
+               @render-schedule="renderSchedule"
+               @close-filters-menu="closeEventModal">
       </manager>
     </div>
+
+    <calendar-event-list :is-mobile="isMobile"
+                         :events-modal-mode="eventsModalMode"
+                         :selected-date-time="gotoDate"
+                         :selected-hour="selectedHour"
+                         :events="events"
+                         :time-format="timeFormat"
+                         v-model="isEventsModalOpen"
+                         @open-event-modal="openEventModal" />
+
     <upgrade-now-page image-link="/assets/images/Calendar.svg"
                       text="Simplify your appointment scheduling and receive timely reminders with Calendar"
                       extra-text="Upgrade today to unlock this feature"
@@ -154,10 +177,12 @@ import Helper from '../../components/calendar/calendar-helper.vue'
 import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
 import UpgradeNowPage from 'components/upgrade-now-page.vue'
+import CalendarEventList from 'components/calendar/calendar-event-list.vue'
 import moment from 'moment'
 import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
 import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'Calendar',
@@ -174,7 +199,8 @@ export default {
     Helper,
     Manager,
     Scheduler,
-    UpgradeNowPage
+    UpgradeNowPage,
+    CalendarEventList
   },
 
   data () {
@@ -213,12 +239,19 @@ export default {
       source: null,
       loadingStates: {},
       requestQueue: [],
-      currentRequestId: null
+      currentRequestId: null,
+      selectedDate: '',
+      selectedHour: '',
+      isShowingEventEditModal: false,
+      CommunicationDispositionStatus,
+      isEventsModalOpen: false,
+      eventsModalMode: null // 'hour' or 'list'
     }
   },
 
   computed: {
     ...mapState('auth', ['profile']),
+    ...mapState(['isMobile']),
 
     currentDate () {
       let d = ''
@@ -444,6 +477,7 @@ export default {
     },
 
     updateCurrentDate (date) {
+      console.log('updateCurrentDate', date)
       this.gotoDate = date
     },
 
@@ -494,6 +528,10 @@ export default {
         }
       }
 
+      if (this.isShowingEventEditModal) {
+        this.isShowingEventEditModal = false
+      }
+
       this.$refs.scheduler.customParse(this.events)
     },
 
@@ -525,6 +563,7 @@ export default {
     },
 
     onToggleGotoDate (date, view) {
+      console.log('onToggleGotoDate', date)
       const formattedDate = moment(date).format('YYYY-MM-DD')
 
       if (view) {
@@ -542,7 +581,7 @@ export default {
     updateRouteQuery (newQuery) {
       // Compare the new query with the current route's query to prevent unnecessary navigation which causes errors
       if (JSON.stringify(newQuery) !== JSON.stringify(this.$route.query)) {
-        this.$router.replace({ query: newQuery })
+        this.$router.push({ query: newQuery })
       }
     },
 
@@ -568,7 +607,37 @@ export default {
 
       // If no date provided, default to today
       this.gotoDate = moment().toDate()
+      const newQuery = {
+        ...this.$route.query,
+        date: moment(this.gotoDate).format('YYYY-MM-DD')
+      }
+
+      this.updateRouteQuery(newQuery)
       return shouldSetCurrentView ? this.$refs.scheduler.setCurrentView(this.gotoDate, this.view) : null
+    },
+
+    showAllEvents () {
+      this.eventsModalMode = 'list'
+      this.isEventsModalOpen = true
+    },
+
+    showEventsForHour (selectedDate) {
+      this.selectedHour = selectedDate
+      this.eventsModalMode = 'hour'
+      this.isEventsModalOpen = true
+    },
+
+    openEventModal (event) {
+      this.editSchedule(event)
+      this.isEventsModalOpen = false
+      this.isShowingEventEditModal = true
+    },
+
+    closeEventModal () {
+      if (this.isShowingEventEditModal) {
+        this.isShowingEventEditModal = false
+        this.isEventsModalOpen = true
+      }
     }
   },
 
