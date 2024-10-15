@@ -733,6 +733,7 @@ export default {
       if (_.isEqual(this.schedule, this.originalSchedule)) {
         this.resetForm()
         this.showManager = false
+        this.$emit('close-filters-menu')
       } else {
         // prevent closing
         bvModalEvent.preventDefault()
@@ -749,6 +750,7 @@ export default {
 
               this.$nextTick(() => {
                 this.showManager = false
+                this.$emit('close-filters-menu')
                 this.$bvModal.hide('calendar-manager-modal')
               })
             }
