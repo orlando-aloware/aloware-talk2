@@ -81,6 +81,7 @@
             </div>
             <div class="d-flex flex-row align-items-center mt-2">
               <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
+                                          :direction="communication.direction"
                                           :speakers="speakers"
                                           :is-empty="isEmpty"
                                           data-testid="comm-transcription-modal-talk-time-analysis-section"/>
