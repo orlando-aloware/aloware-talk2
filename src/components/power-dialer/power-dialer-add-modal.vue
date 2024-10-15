@@ -661,15 +661,11 @@ export default {
     addContacts () {
       const listId = get(this.requestParams, 'contact_list_id', this.powerDialerListId)
 
-      console.log('addContacts this.powerDialerListId', this.powerDialerListId)
-      console.log('addContacts this.myQueueId', this.myQueueId)
-
       // User selected a different list, set is as the list to add contacts
       if (this.mode === 'add-contact-list' && this.powerDialerListId !== this.myQueueId) {
         this.requestParams.contact_list_id = this.powerDialerListId
       }
 
-      console.log('addContacts this.contactList', this.contactList)
       // Verify filters to avoid adding all company contacts
       if (this.requestParams.selected_all && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
         // Add to requests params the list_id to adding all contacts from current list
