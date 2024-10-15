@@ -8,12 +8,15 @@
         {{ form.label }}
       </label>
       <div class="row pb-4 dial-sessions__form">
-        <div class="col-6 pl-3"
-             :key="cform.name"
-             v-for="cform in form.children">
-          <label class="label mb-1">
-            {{ cform.label }}
-          </label>
+        <div :key="cform.name"
+             v-for="cform in form.children"
+             :class="cform.containerClass ?? 'col-6 pl-3'">
+          <div :class="cform.name === 'force_redial' && currentCompany.pd_force_redial ? 'opacity-05' : ''">
+            <label :class="`label mb-1 ${cform.labelClass}`">
+              {{ cform.label }}
+            </label>
+            <div v-if="cform.description">{{ cform.description }}</div>
+          </div>
 
           <q-select class="generic-selector-2 dial-sessions__form__metric-options"
                     option-value="value"
@@ -107,6 +110,15 @@
                       v-model="resources[cform.name]" />
           </p>
 
+          <p v-else-if="cform.name === 'force_redial'">
+            <q-toggle size="md"
+                      val="md"
+                      :true-value="1"
+                      :false-value="0"
+                      :disable="disabled || currentCompany.pd_force_redial"
+                      v-model="resources[cform.name]" />
+          </p>
+
           <warmup-period-selector class="dial-sessions__form__warmup-period-selector"
                                   :disable="disabled"
                                   v-else-if="cform.name === 'warmup_period_in_seconds'"
@@ -196,6 +208,10 @@ export default {
       'sessionSettings'
     ]),
 
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     warmUpPeriods () {
       let values = []
       values = [WARM_UP_PERIOD_LIST]
@@ -265,6 +281,9 @@ export default {
     },
 
     settings (value) {
+      if (this.currentCompany?.pd_force_redial) {
+        value.force_redial = 1
+      }
       this.resources = value
     },
 

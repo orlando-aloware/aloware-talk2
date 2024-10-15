@@ -547,12 +547,12 @@ export default {
       'getTemporarySessionSetting',
       'updateContactsList',
       'getSessionSetting',
-      'getPowerDialerList',
-      'clearRedialedTasks'
+      'getPowerDialerList'
     ]),
 
     ...mapActions([
-      'setDialerCommunication'
+      'setDialerCommunication',
+      'clearDialerRedialedTaskIds'
     ]),
 
     ...mapMutations('powerDialer', [
@@ -565,7 +565,6 @@ export default {
     },
 
     async beginDial () {
-      this.clearRedialedTasks()
       this.cleanupDialer()
       const requests = {
         res: null,
@@ -809,6 +808,8 @@ export default {
       if (this.dialer.isReady && this.dialer.currentStatus === 'READY') {
         this.setDialerCommunication()
       }
+
+      this.clearDialerRedialedTaskIds()
     },
 
     getSettingsItemClass (setting) {

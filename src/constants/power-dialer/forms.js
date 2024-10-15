@@ -12,8 +12,20 @@ export const SESSION_SETTINGS_ALL_FORMS = [
       {
         name: 'skip_outside_daytime_hours',
         label: 'Skip Outside Daytime Hours',
+        description: 'You can skip contacts that are in a timezone outside the daytime hours.',
         type: 'toggle',
-        items: []
+        items: [],
+        containerClass: 'col-12 mb-3 d-flex items-center justify-between',
+        labelClass: 'font-weight-bold'
+      },
+      {
+        name: 'force_redial',
+        label: 'Require Agent Redial',
+        description: 'You can require that the agents redial a contact when they doesn\'t pick the call up.',
+        type: 'toggle',
+        items: [],
+        containerClass: 'col-12 mb-3 d-flex items-center justify-between',
+        labelClass: 'font-weight-bold'
       },
       {
         name: 'warmup_period_in_seconds',
@@ -77,6 +89,7 @@ export const DEFAULT_SETTING_VALUES = {
   name: null,
   script_id: null,
   skip_outside_daytime_hours: 1,
+  force_redial: 0,
   user_id: null,
   warmup_period_in_seconds: 0,
   order: 1,
