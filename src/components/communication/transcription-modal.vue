@@ -28,10 +28,31 @@
     <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
-          <div class="text-h6 pl-3" data-testid="comm-transcription-modal-smart-title">Smart Transcription</div>
+          <!--COMM TYPE-->
+          <q-card-section class="comm-type-container" data-testid="comm-details-comm-type-card-section">
+            <div class="text-h6 d-inline-flex align-items-center"
+                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
+                         v-if="communication.disposition_status2">
+              </component>
+              <div class="comm-type-wrapper pl-3">
+                <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                  {{ communication.direction | fixCommDirection }}
+                </span>
+                {{ communication.type | fixCommType }}
+
+                <span v-if="communication?.contact">
+                  {{ communication.direction | getCommPrepositions }} {{ communication.contact.name | fixContactName }}
+                </span>
+                <span v-else-if="contact">
+                  {{ communication.direction | getCommPrepositions }} {{ contact.name | fixContactName }}
+                </span>
+              </div>
+            </div>
+          </q-card-section>
+
           <q-space></q-space>
-          <q-btn class="pr-1"
-                 icon="close"
+          <q-btn icon="close"
                  flat
                  round
                  data-testid="comm-transcription-modal-close-dialog-btn"
@@ -40,23 +61,43 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none px-4">
-          <div class="q-pa-md mx-3 py-0 border border-rounded"
-               v-if="remote_url && !isLoading">
-            <waveform :remote-url="remote_url"
-                      :unique-id="communication.id"
-                      data-testid="comm-transcription-modal-waveform"/>
+          <div class="mx-3 py-2"
+               v-if="remoteUrl && !isLoading">
+            <div class="d-flex flex-row align-items-center">
+              <waveform :remote-url="remoteUrl"
+                        :unique-id="communication.id"
+                        :height="40"
+                        :split-channels="splitChannels"
+                        data-testid="comm-transcription-modal-waveform"
+                        @time-update="updateCurrentTime">
+              </waveform>
+              <download-button v-if="fileUuid"
+                               data-testid="communication-audio-download-button"
+                               is-simple
+                               :communication-id="communication.id"
+                               :filename="filename"
+                               :file-mime-type="mimeType"
+                               :file-uuid="fileUuid"/>
+            </div>
+            <div class="d-flex flex-row align-items-center mt-2">
+              <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
+                                          :speakers="speakers"
+                                          :is-empty="isEmpty"
+                                          data-testid="comm-transcription-modal-talk-time-analysis-section"/>
+
+              <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
+                                          :sentiment-chip-colors="sentimentChipColors"
+                                          :is-empty="isEmpty"
+                                          :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
+                                          class="ml-2"
+                                          data-testid="comm-transcription-modal-sentiment-analysis-section"/>
+            </div>
           </div>
 
-          <div class="h-100 w-100 flex items-center justify-center"
-               v-if="isLoading">
-            <q-spinner-bars color="primary"
-                            size="40px"
-                            data-testid="comm-transcription-modal-spinner-bars"/>
-          </div>
-
-          <div class="flex row py-4"
-               v-else>
-            <div class="col-6">
+          <div class="row py-4"
+               v-if="!isLoading">
+            <div id="reference-column"
+                 class="col-6 pt-12">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
                                   data-testid="comm-transcription-modal-category-section"/>
@@ -79,23 +120,40 @@
             </div>
 
             <div class="col-6">
-              <div class="mb-2">
-                <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
-                                            :sentiment-chip-colors="sentimentChipColors"
-                                            :is-empty="isEmpty"
-                                            :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
-                                            data-testid="comm-transcription-modal-sentiment-analysis-section"/>
+              <q-tabs v-model="tabName"
+                      no-caps
+                      inline-label
+                      dense
+                      :mobile-arrows="false"
+                      align="left"
+                      class="bg-white text-black border-bottom"
+                      content-class="flex-nowrap">
+                <q-tab name="transcription"
+                       label="Transcription"/>
+                <q-tab name="summary"
+                       label="Summary"
+                       :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
+              </q-tabs>
+              <q-tab-panels v-model="tabName">
+                <q-tab-panel class="p-0"
+                             name="transcription">
+                  <conversation-section :messages="messages"
+                                        :formatted-messages="formattedMessages"
+                                        :is-empty="isEmpty"
+                                        ref="conversationSection"
+                                        data-testid="comm-transcription-modal-conversation-section"/>
+                </q-tab-panel>
 
-                <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
-                                            :speakers="speakers"
-                                            :is-empty="isEmpty"
-                                            data-testid="comm-transcription-modal-talk-time-analysis-section"/>
-              </div>
-
-              <conversation-section :messages="messages"
-                                    :formatted-messages="formattedMessages"
-                                    :is-empty="isEmpty"
-                                    data-testid="comm-transcription-modal-conversation-section"/>
+                <q-tab-panel class="p-0"
+                             name="summary">
+                  <section class="transcription chat-area"
+                           id="summary"
+                           data-testid="comm-summary-section"
+                           ref="summaryArea">
+                    {{ customSummary }}
+                  </section>
+                </q-tab-panel>
+              </q-tab-panels>
             </div>
           </div>
         </q-card-section>
@@ -115,11 +173,20 @@ import CustomKeywordsSection from './transcription-components/custom-keywords-se
 import SentimentAnalysisSection from './transcription-components/sentiment-analysis-section'
 import TalkTimeAnalysisSection from './transcription-components/talk-time-analysis-section'
 import ConversationSection from './transcription-components/conversation-section'
+import DownloadButton from 'components/download-button.vue'
+import { communicationInfoMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'TranscriptionModal',
 
+  mixins: [
+    communicationInfoMixin
+  ],
+
   components: {
+    DownloadButton,
     Waveform,
     CategoriesSection,
     HighlightsSection,
@@ -133,6 +200,9 @@ export default {
   props: {
     communication: {
       required: true
+    },
+    contact: {
+      required: false
     },
     buttonText: {
       type: String,
@@ -150,9 +220,10 @@ export default {
 
   data () {
     return {
+      tabName: 'transcription',
       isLoading: true,
       show_form: false,
-      remote_url: null,
+      remoteUrl: null,
       iab_categories: [],
       highlights: [],
       entities: [],
@@ -161,6 +232,10 @@ export default {
       sentiment_analysis: [],
       talk_time_analysis: [],
       messages: [],
+      summaryEngine: null,
+      customSummary: null,
+      summaryPrompt: null,
+      summaryFeedback: null,
       sentiments: [
         'POSITIVE',
         'NEUTRAL',
@@ -176,12 +251,29 @@ export default {
         'NEUTRAL': '#d0d8dc',
         'NEGATIVE': '#ff7d74'
       },
+      splitChannels: [
+        {
+          waveColor: 'rgb(200, 0, 200)',
+          progressColor: 'rgb(100, 0, 100)',
+          barAlign: 'bottom'
+        },
+        {
+          waveColor: 'rgb(0, 200, 200)',
+          progressColor: 'rgb(0, 100, 100)',
+          barAlign: 'top'
+        }
+      ],
       UploadedFileTypes,
       isEmpty
     }
   },
 
   computed: {
+    CommunicationTypes () {
+      return CommunicationTypes
+    },
+    ...mapState('cache', ['currentCompany']),
+
     formattedMessages () {
       return this.messages.map(message => ({
         ...message,
@@ -201,7 +293,7 @@ export default {
     fetchSmartTranscriptionData () {
       this.isLoading = true
       this.show_form = true
-      this.remote_url = null
+      this.remoteUrl = null
 
       // Fetch communication transcription.
       window.axios.get(`/api/v1/transcription/communication/${this.communication.id}`)
@@ -209,7 +301,7 @@ export default {
           this.setSmartTranscriptionData(res.data)
           this.isLoading = false
         }).catch(err => {
-          console.log("Couldn't fetch transcription information.", err)
+          console.log('Couldn\'t fetch transcription information.', err)
           this.isLoading = false
         })
 
@@ -222,18 +314,22 @@ export default {
 
       window.axios.get(`/api/v1/communication/${this.communication.id}/file-url`, options)
         .then(res => {
-          this.remote_url = res.data.url
+          this.fileUuid = this.getUuidFromURL(res.data.download_url)
+          this.filename = this.getFilenameFromURL(res.data.download_url)
+          this.remoteUrl = res.data.url
+          this.downloadUrl = res.data.download_url
+          this.mimeType = res.data.mimetype || ''
         }).catch(err => {
-          console.log("Couldn't fetch call recording.", err)
+          console.log('Couldn\'t fetch call recording.', err)
         })
     },
 
     /**
-    * Sets Smart Transcription panel data.
-    * @public
-    *
-    * @param {Object} data
-    */
+     * Sets Smart Transcription panel data.
+     * @public
+     *
+     * @param {Object} data
+     */
     setSmartTranscriptionData (data) {
       // Sort the speakers to always get AGENT first.
       this.speakers = data.speakers?.sort()
@@ -246,16 +342,20 @@ export default {
       this.messages = data.messages
       this.sentiment_analysis = data.sentiment_analysis_summary
       this.talk_time_analysis = data.talk_time_analysis
+      this.summaryEngine = data.summary_engine
+      this.customSummary = data.custom_summary
+      this.summaryPrompt = data.summary_prompt
+      this.summaryFeedback = data.summary_feedback
     },
 
     /**
-    * Adds border to highlights in a message text.
-    * @public
-    *
-    * @param {string} messageText
-    *
-    * @returns {string}
-    */
+     * Adds border to highlights in a message text.
+     * @public
+     *
+     * @param {string} messageText
+     *
+     * @returns {string}
+     */
     circleText (speaker, messageText) {
       this.highlights_summary.forEach(function (highlightSummary) {
         if (speaker === highlightSummary.speaker) {
@@ -268,14 +368,14 @@ export default {
           )
 
           /**
-          * Imagine we have 2 highlights: 'call' and 'outbound call'.
-          * At this point 'call' will be highlighted twice.
-          *
-          * If we find a span tag directly connected to another one,
-          * it means a word has already been highlighted twice.
-          *
-          * Check for existing tag before and after a span.
-          */
+           * Imagine we have 2 highlights: 'call' and 'outbound call'.
+           * At this point 'call' will be highlighted twice.
+           *
+           * If we find a span tag directly connected to another one,
+           * it means a word has already been highlighted twice.
+           *
+           * Check for existing tag before and after a span.
+           */
           if (messageText.includes('><span') || messageText.includes('</span><')) {
             // Revert last highlighted word to prevent double highlighting.
             messageText = backupMessageText
@@ -291,13 +391,13 @@ export default {
     },
 
     /**
-    * Create a string with each speaker sentiments' percentages.
-    * @public
-    *
-    * @param {Object} sentimentSummary
-    *
-    * @returns {string} Ex: POSITIVE: 0%; NEUTRAL: 100%; NEGATIVE: 0%;
-    */
+     * Create a string with each speaker sentiments' percentages.
+     * @public
+     *
+     * @param {Object} sentimentSummary
+     *
+     * @returns {string} Ex: POSITIVE: 0%; NEUTRAL: 100%; NEGATIVE: 0%;
+     */
     calculateOverAllSentimentBySpeaker (sentimentSummary) {
       const positiveSum = sentimentSummary.positive
       const neutralSum = sentimentSummary.neutral
@@ -344,9 +444,21 @@ export default {
 
       return {
         messageBoxClass: isAgent ? 'message-box-out' : 'message-box-in',
-        sentimentClass: isAgent ? 'sentiment-out' : 'sentiment-in'
+        sentimentClass: isAgent ? 'justify-start' : 'justify-end'
+      }
+    },
+
+    updateCurrentTime (time) {
+      if (this.tabName === 'transcription') {
+        this.$refs.conversationSection.syncScroll(time)
       }
     }
   }
 }
 </script>
+
+<style scoped>
+.pt-12 {
+  padding-top: 12px;
+}
+</style>

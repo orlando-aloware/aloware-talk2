@@ -1461,11 +1461,11 @@ i.option-separator {
   }
 }
 
-.waveform {
-  wave {
-    height: 25px !important;
-    overflow: hidden !important;
-  }
+.waveform-selector {
+  font-size: $f-size-body-xxs;
+  line-height: 13px;
+  letter-spacing: 0.004em;
+  color: $grey-90;
 }
 
 .waveform-timeline {
@@ -1473,6 +1473,11 @@ i.option-separator {
   line-height: 13px;
   letter-spacing: 0.004em;
   color: $grey-90;
+}
+
+.waveform-controls {
+  height: 24px;
+  overflow: hidden;
 }
 
 .audio-player {
@@ -3546,16 +3551,8 @@ i.option-separator {
   }
 }
 
-.max-w-75 {
-  max-width: 75% !important;
-}
-
-.max-w-85 {
-  max-width: 85% !important;
-}
-
-.max-width-266 {
-  max-width: 266px;
+.width-200 {
+  width: 200px;
 }
 
 .width-250 {
@@ -3585,6 +3582,18 @@ i.option-separator {
 .max-width-380 {
   max-width: 380px;
   width: 100%;
+}
+
+.max-w-75 {
+  max-width: 75% !important;
+}
+
+.max-w-85 {
+  max-width: 85% !important;
+}
+
+.max-width-266 {
+  max-width: 266px;
 }
 
 .width-0 {
@@ -14955,21 +14964,10 @@ h1.contact-list-name-label {
     max-height: 64vh;
     padding: 1em;
     margin: 0 auto 2em auto;
-    border-radius: 14px;
     overflow: auto;
     flex-grow: 1;
 
     .sentiment {
-      width: 45%;
-
-      &-out {
-        margin-left: 0% !important;
-      }
-
-      &-in {
-        margin-left: 53% !important;
-      }
-
       &-circle {
         width: 20px;
         height: 20px;
@@ -14985,7 +14983,7 @@ h1.contact-list-name-label {
     }
 
     .message-box {
-      width: 45%;
+      width: 75%;
       border-radius: 10px;
       padding: .5em;
       font-size: 14px;
@@ -14999,7 +14997,7 @@ h1.contact-list-name-label {
 
       &-in {
         color: black;
-        margin-left: 53% !important;
+        margin-left: 26% !important;
       }
     }
   }

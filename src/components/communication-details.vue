@@ -163,7 +163,6 @@
                              data-testid="comm-details-contact-router-link">
                   {{ communication.contact.name | fixContactName }}
                 </router-link>
-
               </b-col>
             </b-form-row>
             <hr/>
