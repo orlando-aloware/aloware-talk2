@@ -44,6 +44,9 @@
                 <span v-if="communication?.contact">
                   {{ communication.direction | getCommPrepositions }} {{ communication.contact.name | fixContactName }}
                 </span>
+                <span v-else-if="contact">
+                  {{ communication.direction | getCommPrepositions }} {{ contact.name | fixContactName }}
+                </span>
               </div>
             </div>
           </q-card-section>
@@ -197,6 +200,9 @@ export default {
   props: {
     communication: {
       required: true
+    },
+    contact: {
+      required: false
     },
     buttonText: {
       type: String,
