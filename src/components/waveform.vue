@@ -15,7 +15,8 @@
         <div class="d-flex justify-center position-relative"
              v-if="loading">
           <q-spinner-bars color="primary"
-                          size="14px"
+                          size="28px"
+                          class="position-absolute"
                           data-testid="waveform-spinner-bars">
           </q-spinner-bars>
         </div>

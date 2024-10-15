@@ -78,8 +78,6 @@ export default {
       const msgIndex = this.formattedMessages.findIndex(msg => currentTime * 1000 >= msg.start && currentTime * 1000 <= msg.end)
 
       if (msgIndex !== -1 && msgIndex !== this.currentMessageIndex) {
-        console.log(msgIndex)
-
         // Remove highlight from previous message
         if (this.currentMessageIndex !== -1) {
           const prevMsg = document.getElementById(`msg-${this.currentMessageIndex}`)
