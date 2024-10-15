@@ -127,12 +127,15 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapState } from 'vuex'
 import ListActions from 'components/list-actions.vue'
 import FolderOption from 'components/icons/folder-option.vue'
-import { contactLists } from 'src/plugins/mixins'
+import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contacts-shared-item',
 
-  mixins: [contactLists],
+  mixins: [
+    contactLists,
+    contactsListFiltersMixin
+  ],
 
   components: {
     FolderDynamicIcon,
@@ -227,6 +230,14 @@ export default {
       if (this.isContactsRoute) {
         this.$router.push(`/contacts/list/${event.contact_list.id}?type=public`)
       }
+
+      this.initiateUpdateContactsListFilter()
+      this.$VueEvent.fire('fetchContacts', {
+        fromRefresh: true,
+        clear: true,
+        skipCache: true
+      })
+      this.$VueEvent.fire('fetchContactsLists')
 
       this.reloadFolders()
     }
