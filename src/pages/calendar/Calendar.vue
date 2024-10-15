@@ -150,7 +150,7 @@
 
     <calendar-event-list :is-mobile="isMobile"
                          :events-modal-mode="eventsModalMode"
-                         :selected-date-time="gotoDate"
+                         :selected-date="selectedDate"
                          :selected-hour="selectedHour"
                          :events="events"
                          :time-format="timeFormat"
@@ -616,7 +616,8 @@ export default {
       return shouldSetCurrentView ? this.$refs.scheduler.setCurrentView(this.gotoDate, this.view) : null
     },
 
-    showAllEvents () {
+    showAllEvents (date) {
+      this.selectedDate = moment(date).format('YYYY-MM-DD')
       this.eventsModalMode = 'list'
       this.isEventsModalOpen = true
     },
