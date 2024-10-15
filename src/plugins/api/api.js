@@ -485,6 +485,16 @@ export default {
       }
     },
 
+    transcription: {
+      submitSummaryFeedback (transcriptionId, feedbackType) {
+        return window.axios.post(`${suffixV1}transcription/${transcriptionId}/summary-feedback`, { feedback: feedbackType })
+      },
+
+      fetchSmartTranscriptionData (communicationId, options) {
+        return window.axios.get(`${suffixV1}transcription/communication/${communicationId}`, options)
+      }
+    },
+
     statics: {
       get (companyId) {
         return window.axios.get('/get-statics', {

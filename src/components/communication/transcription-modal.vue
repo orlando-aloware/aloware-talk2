@@ -117,8 +117,6 @@
                                        :speakers="speakers"
                                        :is-empty="isEmpty"
                                        data-testid="comm-transcription-modal-custom-keywords-section"/>
-
-              <div v-if="custom_summary" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
             </div>
 
             <div class="col-6">
@@ -152,7 +150,21 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    {{ customSummary }}
+                    <div v-if="customSummary" class="custom-summary" v-html="parseMarkdown(customSummary)" />
+                    <div v-if="customSummary" class="summary-feedback-section mt-4 d-flex justify-end align-items-center">
+                      <span class="evaluation-text pr-3">Please evaluate the accuracy of this summary.</span>
+                      <img
+                        class="clickable-icon"
+                        :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
+                        @click="submitFeedback('upvote')"
+                      />
+                      <span class="mx-2"></span>
+                      <img
+                        class="clickable-icon"
+                        :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
+                        @click="submitFeedback('downvote')"
+                      />
+                    </div>
                   </section>
                 </q-tab-panel>
               </q-tab-panels>
@@ -180,7 +192,11 @@ import ConversationSection from './transcription-components/conversation-section
 import DownloadButton from 'components/download-button.vue'
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+<<<<<<< HEAD
 import * as CommunicationTypes from 'src/constants/communication-types'
+=======
+import talk2Api from 'src/plugins/api/api'
+>>>>>>> bd52569fc (feature(pla-381): update transcription section)
 
 export default {
   name: 'TranscriptionModal',
@@ -233,7 +249,6 @@ export default {
       entities: [],
       entity_types: [],
       custom_keywords: [],
-      custom_summary: null,
       sentiment_analysis: [],
       talk_time_analysis: [],
       messages: [],
@@ -241,6 +256,8 @@ export default {
       customSummary: null,
       summaryPrompt: null,
       summaryFeedback: null,
+      upvoteActive: false,
+      downvoteActive: false,
       sentiments: [
         'POSITIVE',
         'NEUTRAL',
@@ -348,14 +365,16 @@ export default {
       this.entities = data.entities
       this.entity_types = data.entity_types
       this.custom_keywords = data.custom_keywords
-      this.custom_summary = data.custom_summary
       this.messages = data.messages
       this.sentiment_analysis = data.sentiment_analysis_summary
       this.talk_time_analysis = data.talk_time_analysis
+      this.transcriptionId = data.transcription_id
       this.summaryEngine = data.summary_engine
       this.customSummary = data.custom_summary
       this.summaryPrompt = data.summary_prompt
       this.summaryFeedback = data.summary_feedback
+      this.upvoteActive = this.summaryFeedback === 1
+      this.downvoteActive = this.summaryFeedback === 2
     },
 
     /**
@@ -488,7 +507,30 @@ export default {
       if (this.tabName === 'transcription') {
         this.$refs.conversationSection.syncScroll(time)
       }
+    },
+
+    /**
+     * Update the summary feedback.
+     * @param type
+     *
+     * @returns {void}
+     */
+    submitFeedback (type) {
+      const feedbackValue = type === 'upvote' ? 1 : 2
+
+      talk2Api.V1.transcription.submitSummaryFeedback(this.transcriptionId, feedbackValue)
+        .then(() => {
+          this.summaryFeedback = feedbackValue
+
+          // Update the button states based on the feedback type
+          this.upvoteActive = type === 'upvote'
+          this.downvoteActive = type === 'downvote'
+        })
+        .catch(err => {
+          console.log('Error submitting summary feedback:', err)
+        })
     }
+
   },
 
   watch: {
@@ -496,6 +538,11 @@ export default {
       if (newVal) {
         this.checkAndShowTranscriptionModal()
       }
+    },
+
+    summaryFeedback (newFeedback) {
+      this.upvoteActive = newFeedback === 1
+      this.downvoteActive = newFeedback === 2
     }
   }
 }
