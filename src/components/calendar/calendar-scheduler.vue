@@ -96,8 +96,18 @@ export default {
     }
 
     Scheduler.templates.month_events_link = function (date, count) {
-      return `<div class="custom-more-link" data-date="${date.toISOString()}" data-count="${count}">${count} more</div>`
+      return `
+        <div class="dhx_more">
+          <div class="custom-more-link" data-date="${date.toISOString()}" data-count="${count}">${count} more</div>
+          <div class="custom-expand-link" data-date="${date.toISOString()}" onclick="window.handleExpandLink(event);">See all events</div>
+        </div>
+      `
     }
+
+    Scheduler.templates.hour_scale = function (date) {
+      const hour = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+      return `<div class="hour-label" data-hour="${moment(date).hour()}">${hour}</div>`
+    }.bind(this)
 
     Scheduler.templates.event_date = function (date) {
       const formatFunc = Scheduler.date.date_to_str(Scheduler.config.hour_date)
@@ -115,9 +125,14 @@ export default {
     Scheduler.templates.event_text = Scheduler.templates.event_bar_text
 
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
-      if (!e.target.classList.contains('custom-more-link')) {
-        this.addSchedule(date)
+      if (e.target.classList.contains('custom-more-link') ||
+        e.target.classList.contains('custom-expand-link') ||
+        e.target.classList.contains('day-label') ||
+        e.target.classList.contains('hour-label')) {
+        return
       }
+
+      this.addSchedule(date)
     })
 
     Scheduler.attachEvent('onClick', (id, e) => {
@@ -136,6 +151,11 @@ export default {
 
     this.$refs.scheduler.addEventListener('click', this.handleMoreLink)
     this.$refs.scheduler.addEventListener('click', this.handleDayLabelClick)
+    this.$refs.scheduler.addEventListener('click', this.handleExpandLink)
+    this.$refs.scheduler.addEventListener('click', this.handleHourLabelClick)
+
+    // bind handleExpandLink to the window object to be able to call it from the expand link
+    window.handleExpandLink = this.handleExpandLink.bind(this)
 
     this.$nextTick(() => Scheduler.updateView())
   },
@@ -143,6 +163,8 @@ export default {
   beforeUnmount () {
     this.$refs.scheduler.removeEventListener('click', this.handleMoreLink)
     this.$refs.scheduler.removeEventListener('click', this.handleDayLabelClick)
+    this.$refs.scheduler.removeEventListener('click', this.handleExpandLink)
+    this.$refs.scheduler.removeEventListener('click', this.handleHourLabelClick)
   },
 
   methods: {
@@ -200,7 +222,6 @@ export default {
 
     handleMoreLink (e) {
       const date = e.target.getAttribute('data-date')
-
       if (e.target.classList.contains('custom-more-link')) {
         e.preventDefault()
         e.stopPropagation()
@@ -217,6 +238,31 @@ export default {
         const dateStr = e.target.getAttribute('data-date')
         const date = new Date(dateStr)
         Scheduler.setCurrentView(date, 'day')
+      }
+    },
+
+    handleExpandLink (e) {
+      if (e.target.classList.contains('custom-expand-link')) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        const dateStr = e.target.getAttribute('data-date')
+        const date = new Date(dateStr)
+
+        this.$emit('expand-day-events', date)
+      }
+    },
+
+    handleHourLabelClick (e) {
+      if (e.target.classList.contains('hour-label')) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        const hour = parseInt(e.target.getAttribute('data-hour'))
+        const date = Scheduler.getState().date
+        const selectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour)
+
+        this.$emit('expand-hour-events', selectedDate)
       }
     },
 
