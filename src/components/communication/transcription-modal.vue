@@ -132,7 +132,7 @@
                        label="Transcription"/>
                 <q-tab name="summary"
                        label="Summary"
-                       :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
+                       :disable="!currentCompany?.transcription_settings?.summarization_enabled || !customSummary"/>
               </q-tabs>
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
