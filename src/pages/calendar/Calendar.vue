@@ -529,6 +529,7 @@ export default {
 
       if (this.isShowingEventEditModal) {
         this.isShowingEventEditModal = false
+        this.isEventsModalOpen = true
       }
 
       this.$refs.scheduler.customParse(this.events)
