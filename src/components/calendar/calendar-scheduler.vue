@@ -25,9 +25,19 @@ export default {
     }
   },
 
+  data () {
+    return {
+      browserTimeZone: moment.tz.guess()
+    }
+  },
+
   computed: {
     ...mapState('auth', ['profile']),
-    ...mapState(['isMobile'])
+    ...mapState(['isMobile']),
+
+    isPST () {
+      return this.browserTimeZone === 'America/Los_Angeles'
+    }
   },
 
   mounted () {
@@ -62,6 +72,7 @@ export default {
     Scheduler.config.min_event_width = 60
     Scheduler.config.min_event_height = 20
     Scheduler.config.event_min_dy = 20
+    Scheduler.xy.scale_width = this.isPST ? 70 : 130
 
     Scheduler.templates.week_date = function (start, end) {
       const startDate = moment(start)
@@ -109,8 +120,24 @@ export default {
     }.bind(this)
 
     Scheduler.templates.hour_scale = function (date) {
-      const hour = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
-      return `<div class="hour-label" data-hour="${moment(date).hour()}">${hour}</div>`
+      const localTime = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+
+      if (!this.isPST) {
+        const pstTime = moment(date).tz('America/Los_Angeles').format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+        return `
+          <div class="hour-label" data-hour="${moment(date).hour()}">
+            <div class="time-column pst-time" data-hour="${moment(date).hour()}">${pstTime} PST</div>
+            <div class="time-column local-time" data-hour="${moment(date).hour()}">${localTime}</div>
+          </div>
+        `
+      } else {
+        // User is in PST, only show local time
+        return `
+          <div class="hour-label" data-hour="${moment(date).hour()}">
+            <div class="time-column local-time" data-hour="${moment(date).hour()}">${localTime}</div>
+          </div>
+        `
+      }
     }.bind(this)
 
     Scheduler.templates.event_date = function (date) {
@@ -132,7 +159,8 @@ export default {
       if (e.target.classList.contains('custom-more-link') ||
         e.target.classList.contains('custom-expand-link') ||
         e.target.classList.contains('day-label') ||
-        e.target.classList.contains('hour-label')) {
+        e.target.classList.contains('hour-label') ||
+        e.target.classList.contains('time-column')) {
         return
       }
 
@@ -258,7 +286,7 @@ export default {
     },
 
     handleHourLabelClick (e) {
-      if (e.target.classList.contains('hour-label')) {
+      if (e.target.classList.contains('time-column')) {
         e.preventDefault()
         e.stopPropagation()
 
