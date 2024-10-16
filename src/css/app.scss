@@ -10603,7 +10603,8 @@ screen and (max-width: 956px) {
         }
 
         svg {
-          margin-right: 10px;
+          width: 16px;
+          margin-right: 8px;
         }
       }
     }
@@ -15219,4 +15220,18 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 hr {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+.bulk-action-menu-dropdown {
+  font-size: .75rem;
+
+  svg {
+    margin-top: 0 !important;
+  }
+}
+
+.bulk-action-menu-dropdown-btn {
+  outline: none;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
 }
