@@ -213,12 +213,6 @@ export default {
         }
       }
 
-      // // Verify filters to avoid adding all company contacts
-      // if (params.selected_all && !params.filter_groups && this.contactList && this.contactList.id !== 'all') {
-      //   // Add to requests params the list_id to adding all contacts from current list
-      //   params.contact_list_id = this.contactList.id
-      // }
-
       // Don't send list_id for dynamic lists, it should use only the filters
       if (this.contactList?.type === this.ContactListTypes.DYNAMIC) {
         delete params.list_id
