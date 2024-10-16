@@ -138,7 +138,7 @@
         <h2>Power Dialer Task Options</h2>
         <slot name="header-close-content">
           <b-button variant="transparent"
-                    @click="openPDModalInContacts('confirmation')">
+                    @click="hidePDModalsInContacts">
             <i class="fas fa-times"></i>
           </b-button>
         </slot>
@@ -154,7 +154,7 @@
 
           <hr>
 
-          <div v-if="mode === 'add-contact-list'">
+          <div v-if="enablePdListSelection">
             <label class="label mb-1 text-weight-bold"
                    data-testid="power-dialer-add-modal-conversion-options">
               Select Power Dialer List
@@ -365,6 +365,11 @@ export default {
     contactList: {
       type: Object,
       default: null
+    },
+
+    selectedAllCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -464,8 +469,10 @@ export default {
     contactsDescription () {
       let description = ''
 
-      if (this.mode === 'add-contact-list' && this.contactList && this.requestParams.selected_all) {
+      if (this.mode === 'add-contact-list' && this.contactList) {
         description += this.contactList.contactCount
+      } else if (this.requestParams.selected_all) {
+        description += this.selectedAllCount
       } else if (this.count !== null) {
         description += this.$options.filters.numFormat(this.count)
       }
@@ -531,6 +538,10 @@ export default {
           label: 'Top'
         }
       ]
+    },
+
+    enablePdListSelection () {
+      return this.mode === 'add' || this.mode === 'add-contact-list'
     }
   },
 
@@ -538,7 +549,7 @@ export default {
     this.loading++
 
     // Select current user by default, if is a valid user
-    if (this.profile.id && this.mode === 'add-contact-list' && this.filterUsers(this.users).find(user => user.id === this.profile.id)) {
+    if (this.profile.id && this.enablePdListSelection && this.filterUsers(this.users).find(user => user.id === this.profile.id)) {
       this.setUserId(this.profile.id)
     }
 
@@ -665,8 +676,13 @@ export default {
       const listId = get(this.requestParams, 'contact_list_id', this.powerDialerListId)
 
       // User selected a different list, set is as the list to add contacts
-      if (this.mode === 'add-contact-list' && this.powerDialerListId !== this.myQueueId) {
+      if (this.enablePdListSelection && this.powerDialerListId !== this.myQueueId) {
         this.requestParams.contact_list_id = this.powerDialerListId
+      }
+
+      // For List mode we should always be adding the whole list
+      if (this.mode === 'add-contact-list') {
+        this.requestParams.selected_all = true
       }
 
       // Verify filters to avoid adding all company contacts
