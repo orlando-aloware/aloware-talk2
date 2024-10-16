@@ -118,6 +118,12 @@ export default {
       required: false
     },
 
+    allAnswerTypes: {
+      type: Boolean,
+      default: false,
+      required: false
+    },
+
     multiple: {
       type: Boolean,
       default: false,
@@ -245,6 +251,12 @@ export default {
 
     filteredUsers () {
       if (!_.isEmpty(this.availableUsers)) {
+        if (this.allAnswerTypes) {
+          return this.availableUsers.filter((user) =>
+            !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access)
+          )
+        }
+
         return this.availableUsers.filter((user) =>
           !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access) &&
           user.answer_by !== AnswerTypes.BY_NONE

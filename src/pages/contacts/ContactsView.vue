@@ -218,7 +218,7 @@
                      :disabled="isDisabledSaveFilter"
                      :customClass="saveFilterButtonCustomClass"
                      data-testid="contacts-view-update-contact-list-compact-button"
-                     v-if="selectedList.type !== ContactListTypes.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
+                     v-if="selectedList.type !== ContactListTypes.STATIC && !CONTACTS_STRING_KEYS.includes(selectedList.id)"
                      @clicked="onUpdateContactList">
           <q-spinner-bars color="white"
                           class="mr-1"
@@ -833,6 +833,7 @@ import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-e
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
+import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 
 export default {
   name: 'contacts-view',
@@ -960,7 +961,8 @@ export default {
       workflowId: null,
       openAloAiEnrollmentModal: false,
       showAssignContacts: false,
-      showLimitCharactersError: false
+      showLimitCharactersError: false,
+      CONTACTS_STRING_KEYS
     }
   },
 
@@ -1192,7 +1194,7 @@ export default {
       return ids
     },
     isContactListSelected () {
-      const blockedIds = ['all', 'unanswered', 'unassigned', 'my-contacts', 'new-leads']
+      const blockedIds = this.CONTACTS_STRING_KEYS
 
       return !blockedIds.includes(this.selectedList.id)
     },

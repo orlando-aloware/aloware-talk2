@@ -22,6 +22,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'TalkTimeAnalysisSection',
 
@@ -42,12 +43,12 @@ export default {
 
   methods: {
     getSpeakerClass (speakerIndex) {
-      const style = {
-        color: 'rgb(0, 200, 200)'
+      let style = {
+        color: 'rgb(200, 0, 200)'
       }
 
       if (speakerIndex === 1) {
-        style.color = 'rgb(200, 0, 200)'
+        style.color = 'rgb(0, 200, 200)'
       }
 
       return style

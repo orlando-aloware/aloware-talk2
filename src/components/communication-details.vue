@@ -1,5 +1,6 @@
 <template>
-  <div v-if="communication" data-testid="comm-details-wrapper">
+  <div v-if="communication"
+       data-testid="comm-details-wrapper">
     <b-row data-testid="comm-details-row">
       <b-col :md="isWidget ? 12 : 4"
              sm="12"
@@ -27,10 +28,15 @@
               </div>
 
               <div class="d-flex header-btn-wrapper">
-                <transcription-modal class="mr-2"
-                                     :communication="communication"
-                                     data-testid="comm-details-transcription-modal"
-                                     v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
+                <div class="flex items-center mr-1 h-100"
+                     data-testid="comm-transcription-modal-btn"
+                     v-if="!communication.transcription_is_deleted && communication.metadata?.transcription_info"
+                     @click="fetchSmartTranscriptionData(communication)">
+                  <span class="text-blue cursor-pointer">
+                    Show Transcription
+                  </span>
+                </div>
+
                 <b-button variant="danger"
                           size="sm"
                           v-if="hasPermissionTo('archive communication')"
@@ -1180,6 +1186,9 @@ export default {
   },
 
   methods: {
+    fetchSmartTranscriptionData (communication) {
+      this.$VueEvent.fire('fetchSmartTranscriptionData', communication.id)
+    },
     getContactRouteLink (communication) {
       if (this.isWidget) {
         return { name: 'Texting Widget (unknown-user)', params: { id: communication.contact.id } }

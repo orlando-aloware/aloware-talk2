@@ -50,6 +50,26 @@
         </q-select>
       </div>
     </div>
+
+    <q-dialog ref="popupProxy"
+              transition-show="scale"
+              transition-hide="scale"
+              anchor="bottom middle"
+              self="top start"
+              v-if="popupTarget"
+              :target="popupTarget"
+              no-parent-event>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-overline">Keywords Spotted - {{ selectedMessage.speaker }}</div>
+          <div class="text-h5 q-mt-sm q-mb-xs">"{{ selectedAutoHighlight.text }}"</div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Close" @click="closePopup"/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -58,6 +78,7 @@ import { aclMixin } from 'src/plugins/mixins'
 import * as WaveformPlaybackSpeedOptions from 'src/constants/waveform-playback-speed-options'
 import Hover from 'wavesurfer.js/dist/plugins/hover.esm.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 
 const regions = RegionsPlugin.create({
   regions: []
@@ -84,11 +105,24 @@ export default {
 
     splitChannels: {
       default: false
+    },
+
+    communication: {
+      type: Object,
+      required: false
+    },
+
+    messages: {
+      type: Array,
+      required: false
     }
   },
 
   data () {
     return {
+      selectedAutoHighlight: null,
+      selectedMessage: null,
+      popupTarget: null,
       options: {
         barRadius: 2,
         barWidth: 2,
@@ -97,6 +131,7 @@ export default {
         container: '#waveform-' + this.uniqueId,
         backend: 'MediaElement',
         height: this.height,
+        barHeight: 0.8,
         progressColor: '#2D5BFF',
         responsive: true,
         waveColor: '#C9C9C9',
@@ -142,6 +177,8 @@ export default {
         this.loading = false
         this.$emit('ready')
         this.duration = this.player.getDuration()
+
+        this.addRegions()
       })
 
       this.player.on('finish', () => {
@@ -159,6 +196,77 @@ export default {
   },
 
   methods: {
+    showPopup (triggerElement) {
+      console.log(triggerElement)
+      this.popupTarget = triggerElement
+      this.$nextTick(() => {
+        this.$refs.popupProxy.show(triggerElement) // Show popup relative to the element
+      })
+    },
+    closePopup () {
+      if (this.$refs.popupProxy) {
+        this.$refs.popupProxy.hide() // Close the popup
+      }
+    },
+    addRegions () {
+      if (!this.messages) {
+        return
+      }
+
+      for (let message of this.messages) {
+        if (!message.auto_highlights) {
+          continue
+        }
+
+        for (let autoHighlight of message.auto_highlights) {
+          if (autoHighlight.start === undefined || autoHighlight.end === undefined) {
+            continue
+          }
+
+          let channelIdx = 2
+          let color = message.speaker === 'AGENT' ? 'rgb(200, 0, 200)' : 'rgb(0, 200, 200)'
+
+          if (this.communication?.direction === CommunicationDirection.INBOUND && message.speaker === 'CONTACT') {
+            channelIdx = 0
+          }
+
+          if (this.communication?.direction === CommunicationDirection.INBOUND && message.speaker === 'AGENT') {
+            channelIdx = 1
+          }
+
+          if (this.communication?.direction === CommunicationDirection.OUTBOUND && message.speaker === 'AGENT') {
+            channelIdx = 0
+          }
+
+          if (this.communication?.direction === CommunicationDirection.OUTBOUND && message.speaker === 'CONTACT') {
+            channelIdx = 1
+          }
+
+          const region = regions.addRegion({
+            start: autoHighlight.start / 1000,
+            drag: false,
+            resize: false,
+            color: 'rgba(255, 255, 255, 0)',
+            channelIdx: channelIdx
+          })
+
+          // HTML content
+          const div = document.createElement('div')
+          div.classList.add('region-' + message.speaker + '-' + this.communication?.direction)
+          div.style.backgroundColor = color
+          div.style.top = channelIdx === 0 ? '0px' : 'auto'
+          div.style.bottom = channelIdx === 1 ? '0px' : 'auto'
+          div.onclick = () => {
+            this.selectedMessage = message
+            this.selectedAutoHighlight = autoHighlight
+            this.closePopup()
+            this.showPopup(div)
+          }
+
+          region.setContent(div)
+        }
+      }
+    },
     changePlaybackSpeed (speed) {
       this.player.setPlaybackRate(speed)
     },
@@ -177,3 +285,18 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.waveform ::part(region-content) {
+  position: absolute;
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  -moz-border-radius: 2.5px;
+  -webkit-border-radius: 2.5px;
+  border-radius: 2.5px;
+  transform: translateX(-75%);
+  cursor: pointer;
+}
+</style>
