@@ -164,7 +164,6 @@ export default {
       )
     },
     contactsCount () {
-      console.log('this.mode', this.mode)
       if (this.mode === 'add-contact-list' && this.contactList) {
         return this.contactList.contactCount
       }

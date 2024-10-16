@@ -466,7 +466,7 @@ export default {
     contactsDescription () {
       let description = ''
 
-      if (this.mode === 'add-contact-list' && this.contactList && this.requestParams.selected_all) {
+      if (this.mode === 'add-contact-list' && this.contactList) {
         description += this.contactList.contactCount
       } else if (this.requestParams.selected_all) {
         description += this.selectedAllCount
@@ -671,6 +671,11 @@ export default {
       // User selected a different list, set is as the list to add contacts
       if (this.mode === 'add-contact-list' && this.powerDialerListId !== this.myQueueId) {
         this.requestParams.contact_list_id = this.powerDialerListId
+      }
+
+      // For List mode we should always be adding the whole list
+      if (this.mode === 'add-contact-list') {
+        this.requestParams.selected_all = true
       }
 
       // Verify filters to avoid adding all company contacts
