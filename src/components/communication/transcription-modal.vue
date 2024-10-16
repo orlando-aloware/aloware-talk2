@@ -79,23 +79,54 @@
             </div>
 
             <div class="col-6">
-              <div class="mb-2">
-                <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
-                                            :sentiment-chip-colors="sentimentChipColors"
-                                            :is-empty="isEmpty"
-                                            :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
-                                            data-testid="comm-transcription-modal-sentiment-analysis-section"/>
+              <q-tabs v-model="tabName"
+                      no-caps
+                      inline-label
+                      dense
+                      :mobile-arrows="false"
+                      align="left"
+                      class="bg-white text-black border-bottom"
+                      content-class="flex-nowrap">
+                <q-tab name="transcription"
+                       label="Transcription"/>
+                <q-tab name="summary"
+                       label="Summary"
+                       :disable="!currentCompany?.transcription_settings?.summarization_enabled || !customSummary"/>
+              </q-tabs>
+              <q-tab-panels v-model="tabName">
+                <q-tab-panel class="p-0"
+                             name="transcription">
+                  <conversation-section :messages="messages"
+                                        :formatted-messages="formattedMessages"
+                                        :is-empty="isEmpty"
+                                        ref="conversationSection"
+                                        data-testid="comm-transcription-modal-conversation-section"/>
+                </q-tab-panel>
 
-                <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
-                                            :speakers="speakers"
-                                            :is-empty="isEmpty"
-                                            data-testid="comm-transcription-modal-talk-time-analysis-section"/>
-              </div>
-
-              <conversation-section :messages="messages"
-                                    :formatted-messages="formattedMessages"
-                                    :is-empty="isEmpty"
-                                    data-testid="comm-transcription-modal-conversation-section"/>
+                <q-tab-panel class="p-0"
+                             name="summary">
+                  <section class="transcription chat-area"
+                           id="summary"
+                           data-testid="comm-summary-section"
+                           ref="summaryArea">
+                    <div v-if="customSummary" class="custom-summary" v-html="parseMarkdown(customSummary)" />
+                    <div v-if="customSummary" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                      <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
+                      <img
+                        class="clickable-icon"
+                        :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
+                        @click="submitFeedback('upvote')"
+                      />
+                      <span class="mx-1"></span>
+                      <img
+                        class="clickable-icon"
+                        :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
+                        @click="submitFeedback('downvote')"
+                      />
+                    </div>
+                  </section>
+                </q-tab-panel>
+              </q-tab-panels>
             </div>
           </div>
         </q-card-section>
@@ -106,6 +137,8 @@
 
 <script>
 import Waveform from 'components/waveform'
+import marked from 'marked'
+import DOMPurify from 'dompurify'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import { isEmpty } from 'lodash'
 import CategoriesSection from './transcription-components/categories-section'
@@ -115,6 +148,13 @@ import CustomKeywordsSection from './transcription-components/custom-keywords-se
 import SentimentAnalysisSection from './transcription-components/sentiment-analysis-section'
 import TalkTimeAnalysisSection from './transcription-components/talk-time-analysis-section'
 import ConversationSection from './transcription-components/conversation-section'
+import DownloadButton from 'components/download-button.vue'
+import { communicationInfoMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import * as FeedbackConstants from 'src/constants/feedback-types'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 
 export default {
   name: 'TranscriptionModal',
@@ -161,6 +201,12 @@ export default {
       sentiment_analysis: [],
       talk_time_analysis: [],
       messages: [],
+      summaryEngine: null,
+      customSummary: null,
+      summaryPrompt: null,
+      feedback: null,
+      upvoteActive: false,
+      downvoteActive: false,
       sentiments: [
         'POSITIVE',
         'NEUTRAL',
@@ -195,6 +241,10 @@ export default {
     sentimentSummaryText () {
       return this.sentiment_analysis.map(sentiment => this.calculateOverAllSentimentBySpeaker(sentiment))
     }
+  },
+
+  mounted () {
+    this.checkAndShowTranscriptionModal()
   },
 
   methods: {
@@ -246,6 +296,12 @@ export default {
       this.messages = data.messages
       this.sentiment_analysis = data.sentiment_analysis_summary
       this.talk_time_analysis = data.talk_time_analysis
+      this.summaryEngine = data.summary_engine
+      this.customSummary = data.custom_summary
+      this.summaryPrompt = data.summary_prompt
+      this.feedback = data.feedback
+      this.upvoteActive = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvoteActive = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
     },
 
     /**
@@ -284,6 +340,21 @@ export default {
       })
 
       return messageText
+    },
+
+    /**
+     * Check if the URL has a query parameter to show the transcription modal.
+     * @public
+     *
+     * @returns {void}
+     */
+    checkAndShowTranscriptionModal () {
+      const urlParams = new URLSearchParams(window.location.search)
+      const showTranscription = urlParams.get('showTranscription')
+
+      if (showTranscription === 'true') {
+        this.fetchSmartTranscriptionData()
+      }
     },
 
     handleClose () {
@@ -339,6 +410,17 @@ export default {
       return sentimentPercentages
     },
 
+    /**
+     * Parse markdown text to HTML.
+     * @param {string} summaryText
+     *
+     * @returns {string}
+     */
+    parseMarkdown (summaryText) {
+      const rawHtml = marked(summaryText)
+      return DOMPurify.sanitize(rawHtml)
+    },
+
     getMessageClasses (speaker) {
       const isAgent = ['AGENT', 'A'].includes(speaker)
 
@@ -346,6 +428,41 @@ export default {
         messageBoxClass: isAgent ? 'message-box-out' : 'message-box-in',
         sentimentClass: isAgent ? 'sentiment-out' : 'sentiment-in'
       }
+    },
+
+    /**
+     * Update the summary feedback.
+     * @param type
+     *
+     * @returns {void}
+     */
+    submitFeedback (type) {
+      const feedbackValue = type === 'upvote' ? FeedbackConstants.FEEDBACK_UPVOTE : FeedbackConstants.FEEDBACK_DOWNVOTE
+
+      this.feedback = feedbackValue
+
+      talk2Api.V1.transcription.submitSummaryFeedback(this.communication.id, feedbackValue)
+        .then(() => {
+          this.upvoteActive = type === 'upvote'
+          this.downvoteActive = type === 'downvote'
+        })
+        .catch(err => {
+          console.log('Error submitting summary feedback:', err)
+        })
+    }
+
+  },
+
+  watch: {
+    communication (newVal) {
+      if (newVal) {
+        this.checkAndShowTranscriptionModal()
+      }
+    },
+
+    feedback (newValue) {
+      this.upvoteActive = newValue === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvoteActive = newValue === FeedbackConstants.FEEDBACK_DOWNVOTE
     }
   }
 }
