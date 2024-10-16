@@ -46,11 +46,11 @@
           </span>
           <div>
             <q-radio label="Keep"
-                     dark
+                     color="green"
                      :val="true"
                      v-model="keepList"/>
             <q-radio label="Delete"
-                     dark
+                     color="red"
                      :val="false"
                      v-model="keepList"/>
           </div>

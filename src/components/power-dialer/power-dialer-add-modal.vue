@@ -667,7 +667,7 @@ export default {
       }
 
       // Verify filters to avoid adding all company contacts
-      if (this.requestParams.selected_all && !this.requestParams.filter_groups && this.contactList.id !== 'all') {
+      if (this.requestParams.selected_all && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
         // Add to requests params the list_id to adding all contacts from current list
         this.requestParams.list_id = this.contactList.id
       }
