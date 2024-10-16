@@ -195,6 +195,7 @@ import { mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as FeedbackConstants from 'src/constants/feedback-types'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 
 export default {
   name: 'TranscriptionModal',
@@ -271,24 +272,41 @@ export default {
         'NEUTRAL': '#d0d8dc',
         'NEGATIVE': '#ff7d74'
       },
-      splitChannels: [
-        {
-          waveColor: 'rgb(200, 0, 200)',
-          progressColor: 'rgb(100, 0, 100)',
-          barAlign: 'bottom'
-        },
-        {
-          waveColor: 'rgb(0, 200, 200)',
-          progressColor: 'rgb(0, 100, 100)',
-          barAlign: 'top'
-        }
-      ],
       UploadedFileTypes,
       isEmpty
     }
   },
 
   computed: {
+    splitChannels () {
+      if (this.communication.direction === CommunicationDirection.INBOUND) {
+        return [
+          {
+            waveColor: 'rgb(0, 200, 200)',
+            progressColor: 'rgb(0, 100, 100)',
+            barAlign: 'bottom'
+          },
+          {
+            waveColor: 'rgb(200, 0, 200)',
+            progressColor: 'rgb(100, 0, 100)',
+            barAlign: 'top'
+          }
+        ]
+      } else {
+        return [
+          {
+            waveColor: 'rgb(200, 0, 200)',
+            progressColor: 'rgb(100, 0, 100)',
+            barAlign: 'bottom'
+          },
+          {
+            waveColor: 'rgb(0, 200, 200)',
+            progressColor: 'rgb(0, 100, 100)',
+            barAlign: 'top'
+          }
+        ]
+      }
+    },
     CommunicationTypes () {
       return CommunicationTypes
     },
