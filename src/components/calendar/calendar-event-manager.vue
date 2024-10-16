@@ -6,8 +6,6 @@
            :scrollable="!loading"
            :hide-footer="loading"
            :visible="showManager"
-           @cancel="closeFiltersMenu"
-           @close="closeFiltersMenu"
            @hidden="closeFiltersMenu">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
@@ -288,7 +286,7 @@
         </button>
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
-                    @click.prevent="closeFiltersMenu">
+                    @click.prevent="onCancelClicked">
               Cancel
             </button>
             <button class="btn btn-sm bg-primary text-white"
@@ -671,8 +669,6 @@ export default {
             })
             this.showManager = false
 
-            this.resetForm()
-
             this.$generalNotification('Event added.')
           }).catch(err => {
             this.loading = false
@@ -700,8 +696,6 @@ export default {
               action: 'update'
             })
             this.showManager = false
-
-            this.resetForm()
 
             this.$generalNotification('Event updated.')
           }).catch(err => {
@@ -756,6 +750,10 @@ export default {
             }
           })
       }
+    },
+
+    onCancelClicked () {
+      this.showManager = false
     },
 
     updateSmsReminderVariables () {
