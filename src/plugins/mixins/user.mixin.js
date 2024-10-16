@@ -96,6 +96,8 @@ export default {
       return storage.local.getItem('custom_edge_location_companies') && storage.local.getItem('custom_edge_location_companies').split(',').includes(String(companyId))
     },
 
+    // Filters users by excluding those with read-only access and a single/undefined role,
+    // or those with `answer_by` set to `BY_NONE`.
     filterUsers (users) {
       if (isEmpty(users)) return []
 
