@@ -148,12 +148,14 @@
                       <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
+                        style="cursor: pointer;"
                         :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
                         @click="submitFeedback('upvote')"
                       />
                       <span class="mx-1"></span>
                       <img
                         class="clickable-icon"
+                        style="cursor: pointer;"
                         :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
                         @click="submitFeedback('downvote')"
                       />
@@ -530,14 +532,15 @@ export default {
     submitFeedback (type) {
       const feedbackValue = type === 'upvote' ? FeedbackConstants.FEEDBACK_UPVOTE : FeedbackConstants.FEEDBACK_DOWNVOTE
 
-      this.feedback = feedbackValue
-
       talk2Api.V1.transcription.submitSummaryFeedback(this.communication.id, feedbackValue)
         .then(() => {
+          this.feedback = feedbackValue
           this.upvoteActive = type === 'upvote'
           this.downvoteActive = type === 'downvote'
+          this.$generalNotification('Feedback received. Thank you!')
         })
         .catch(err => {
+          this.$generalNotification('Failed to submit feedback.', 'error')
           console.log('Error submitting summary feedback:', err)
         })
     }
