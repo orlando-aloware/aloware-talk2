@@ -9,7 +9,7 @@ export default {
       if (this.canGoBack) {
         this.$router.go(-1)
       } else {
-        this.$router.push('/')
+        this.$router.push({ name: 'Inbox' })
       }
     }
   }
