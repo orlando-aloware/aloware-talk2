@@ -462,22 +462,35 @@ $f-size-14: 14px;
 
 // Calendar events colors
 $upcoming-appointment: #256EFF;
+$upcoming-appointment-hover: #054CDB;
 $past-appointment: #98baff;
+$past-appointment-hover: #799bdf;
 $canceled-appointment: $upcoming-appointment;
+$canceled-appointment-hover: $upcoming-appointment-hover;
 $missed-appointment: #DC3545;
+$missed-appointment-hover: #c22534;
 $upcoming-reminder: #8956F8;
+$upcoming-reminder-hover: #6a41c0;
 $past-reminder: #c4adfc;
+$past-reminder-hover: #b39bfe;
 $canceled-reminder: $upcoming-reminder;
+$canceled-reminder-hover: $upcoming-reminder-hover;
 $completed-event: #00BF4A;
+$completed-event-hover: #00a33e;
 
 // Past events colors
 $upcoming-appointment-is-past: #a8c2ff;
+$upcoming-appointment-is-past-hover: #98baff;
 $canceled-appointment-is-past: #a8c2ff;
+$canceled-appointment-is-past-hover: #98baff;
 $missed-appointment-is-past: #fc8b96;
+$missed-appointment-is-past-hover: #f9707a;
 $upcoming-reminder-is-past: #c4adfc;
+$upcoming-reminder-is-past-hover: #b39bfe;
 $canceled-reminder-is-past: #c4adfc;
+$canceled-reminder-is-past-hover: #b39bfe;
 $completed-event-is-past: #7fdfa5;
-
+$completed-event-is-past-hover: #6fdba0;
 // Wallboard colors
 $agent-status-offline: $grey-80;
 $agent-status-available: $success;

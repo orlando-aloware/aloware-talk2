@@ -12626,6 +12626,14 @@ h1.contact-list-name-label {
     color: $upcoming-appointment;
     &.is_past {
       color: $upcoming-appointment-is-past;
+
+      &:hover {
+        color: $upcoming-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $upcoming-appointment-hover;
     }
   }
 
@@ -12633,6 +12641,14 @@ h1.contact-list-name-label {
     color: $completed-event;
     &.is_past {
       color: $completed-event-is-past;
+
+      &:hover {
+        color: $completed-event-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $completed-event-hover;
     }
   }
 
@@ -12640,6 +12656,14 @@ h1.contact-list-name-label {
     color: $canceled-appointment;
     &.is_past {
       color: $canceled-appointment-is-past;
+
+      &:hover {
+        color: $canceled-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $canceled-appointment-hover;
     }
   }
 
@@ -12647,6 +12671,14 @@ h1.contact-list-name-label {
     color: $missed-appointment;
     &.is_past {
       color: $missed-appointment-is-past;
+
+      &:hover {
+        color: $missed-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $missed-appointment-hover;
     }
   }
 }
@@ -12656,6 +12688,14 @@ h1.contact-list-name-label {
     color: $upcoming-reminder;
     &.is_past {
       color: $upcoming-reminder-is-past;
+
+      &:hover {
+        color: $upcoming-reminder-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $upcoming-reminder-hover;
     }
   }
 
@@ -12663,6 +12703,14 @@ h1.contact-list-name-label {
     color: $completed-event;
     &.is_past {
       color: $completed-event-is-past;
+
+      &:hover {
+        color: $completed-event-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $completed-event-hover;
     }
   }
 
@@ -12670,6 +12718,14 @@ h1.contact-list-name-label {
     color: $canceled-reminder;
     &.is_past {
       color: $canceled-reminder-is-past;
+
+      &:hover {
+        color: $canceled-reminder-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $canceled-reminder-hover;
     }
   }
 
@@ -12677,6 +12733,14 @@ h1.contact-list-name-label {
     color: $missed-appointment;
     &.is_past {
       color: $missed-appointment-is-past;
+
+      &:hover {
+        color: $missed-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $missed-appointment-hover;
     }
   }
 }
@@ -12688,6 +12752,14 @@ h1.contact-list-name-label {
     background-color: $upcoming-appointment;
     &.is_past {
       background-color: $upcoming-appointment-is-past;
+
+      &:hover {
+        background-color: $upcoming-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $upcoming-appointment-hover;
     }
   }
 
@@ -12695,6 +12767,14 @@ h1.contact-list-name-label {
     background-color: $completed-event;
     &.is_past {
       background-color: $completed-event-is-past;
+
+      &:hover {
+        background-color: $completed-event-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $completed-event-hover;
     }
   }
 
@@ -12703,6 +12783,14 @@ h1.contact-list-name-label {
     text-decoration: line-through;
     &.is_past {
       background-color: $canceled-appointment-is-past;
+
+      &:hover {
+        background-color: $canceled-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $canceled-appointment-hover;
     }
   }
 
@@ -12710,6 +12798,14 @@ h1.contact-list-name-label {
     background-color: $missed-appointment;
     &.is_past {
       background-color: $missed-appointment-is-past;
+
+      &:hover {
+        background-color: $missed-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $missed-appointment-hover;
     }
   }
 }
@@ -12721,6 +12817,14 @@ h1.contact-list-name-label {
     background-color: $upcoming-reminder;
     &.is_past {
       background-color: $upcoming-reminder-is-past;
+
+      &:hover {
+        background-color: $upcoming-reminder-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $upcoming-reminder-hover;
     }
   }
 
@@ -12728,6 +12832,14 @@ h1.contact-list-name-label {
     background-color: $completed-event;
     &.is_past {
       background-color: $completed-event-is-past;
+
+      &:hover {
+        background-color: $completed-event-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $completed-event-hover;
     }
   }
 
@@ -12736,6 +12848,14 @@ h1.contact-list-name-label {
     text-decoration: line-through;
     &.is_past {
       background-color: $canceled-reminder-is-past;
+
+      &:hover {
+        background-color: $canceled-reminder-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $canceled-reminder-hover;
     }
   }
 
@@ -12743,6 +12863,14 @@ h1.contact-list-name-label {
     background-color: $missed-appointment;
     &.is_past {
       background-color: $missed-appointment-is-past;
+
+      &:hover {
+        background-color: $missed-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $missed-appointment-hover;
     }
   }
 }
