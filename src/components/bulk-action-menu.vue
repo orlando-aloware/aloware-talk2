@@ -253,7 +253,7 @@ export default {
     },
 
     showDeleteButton () {
-      return !isAddView && ((hasDeletePermission && canDelete && !isSimpSocial) || isPowerDialer)
+      return !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) || this.isPowerDialer)
     }
   },
 
