@@ -251,7 +251,6 @@ export default {
 
     filteredUsers () {
       if (!_.isEmpty(this.availableUsers)) {
-
         if (this.allAnswerTypes) {
           return this.availableUsers.filter((user) =>
             !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access)

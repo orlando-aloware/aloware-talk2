@@ -138,7 +138,7 @@
         <h2>Power Dialer Task Options</h2>
         <slot name="header-close-content">
           <b-button variant="transparent"
-                    @click="openPDModalInContacts('confirmation')">
+                    @click="hidePDModalsInContacts">
             <i class="fas fa-times"></i>
           </b-button>
         </slot>
@@ -154,7 +154,7 @@
 
           <hr>
 
-          <div v-if="mode === 'add-contact-list'">
+          <div v-if="enablePdListSelection">
             <label class="label mb-1 text-weight-bold"
                    data-testid="power-dialer-add-modal-conversion-options">
               Select Power Dialer List
@@ -476,6 +476,8 @@ export default {
 
       if (this.mode === 'add-contact-list' && this.contactList && !this.isManualSelection) {
         description += this.contactList.contactCount
+      } else if (this.requestParams.selected_all) {
+        description += this.selectedAllCount
       } else if (this.count !== null) {
         description += this.$options.filters.numFormat(this.count)
       }
@@ -541,6 +543,10 @@ export default {
           label: 'Top'
         }
       ]
+    },
+
+    enablePdListSelection () {
+      return this.mode === 'add' || this.mode === 'add-contact-list'
     }
   },
 
