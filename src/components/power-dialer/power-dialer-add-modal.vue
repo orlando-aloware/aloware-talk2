@@ -154,7 +154,7 @@
 
           <hr>
 
-          <div v-if="mode === 'add-contact-list'">
+          <div v-if="enablePdListSelection">
             <label class="label mb-1 text-weight-bold"
                    data-testid="power-dialer-add-modal-conversion-options">
               Select Power Dialer List
@@ -535,6 +535,10 @@ export default {
           label: 'Top'
         }
       ]
+    },
+
+    enablePdListSelection () {
+      return this.mode === 'add' || this.mode === 'add-contact-list'
     }
   },
 
@@ -542,7 +546,7 @@ export default {
     this.loading++
 
     // Select current user by default
-    if (this.profile.id && this.mode === 'add-contact-list') {
+    if (this.profile.id && this.enablePdListSelection) {
       this.setUserId(this.profile.id)
     }
 
@@ -669,7 +673,7 @@ export default {
       const listId = get(this.requestParams, 'contact_list_id', this.powerDialerListId)
 
       // User selected a different list, set is as the list to add contacts
-      if (this.mode === 'add-contact-list' && this.powerDialerListId !== this.myQueueId) {
+      if (this.enablePdListSelection && this.powerDialerListId !== this.myQueueId) {
         this.requestParams.contact_list_id = this.powerDialerListId
       }
 
