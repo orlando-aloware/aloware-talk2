@@ -211,14 +211,14 @@ export default {
         reminders: true,
         calendar_users: [],
         calendar_mode: null,
-        calendar_min_date: new Date(),
-        calendar_max_date: new Date(),
+        calendar_min_date: moment.utc().startOf('day').toISOString(),
+        calendar_max_date: moment.utc().endOf('day').toISOString(),
         calendar_status: [],
         limit: 2500,
         page: 1
       },
       loading: true,
-      gotoDate: new Date(),
+      gotoDate: moment.utc().toDate(),
       view: 'month',
       stepMap: {
         'day': 'd',
@@ -380,8 +380,8 @@ export default {
       this.source = this.cancel_token.source()
 
       this.filters.calendar_mode = state.mode
-      this.filters.calendar_min_date = state.min_date
-      this.filters.calendar_max_date = state.max_date
+      this.filters.calendar_min_date = moment.utc(state.min_date).startOf('day').toISOString()
+      this.filters.calendar_max_date = moment.utc(state.max_date).endOf('day').toISOString()
       this.filters.limit = this.getLimitFilterValue()
 
       if (this.filters.page === 1) {
@@ -449,22 +449,22 @@ export default {
       }
 
       if (this.view === 'month') {
-        const startOfMonth = moment(this.gotoDate).startOf('month')
-        const endOfMonth = moment(this.gotoDate).endOf('month')
-        state.min_date = startOfMonth.toDate()
-        state.max_date = endOfMonth.toDate()
+        const startOfMonth = moment.utc(this.gotoDate).startOf('month')
+        const endOfMonth = moment.utc(this.gotoDate).endOf('month')
+        state.min_date = startOfMonth.toISOString()
+        state.max_date = endOfMonth.toISOString()
       }
 
       if (this.view === 'week') {
-        const startOfWeek = moment(this.gotoDate).startOf('isoWeek')
-        const endOfWeek = moment(this.gotoDate).endOf('isoWeek')
-        state.min_date = startOfWeek.toDate()
-        state.max_date = endOfWeek.toDate()
+        const startOfWeek = moment.utc(this.gotoDate).startOf('isoWeek')
+        const endOfWeek = moment.utc(this.gotoDate).endOf('isoWeek')
+        state.min_date = startOfWeek.toISOString()
+        state.max_date = endOfWeek.toISOString()
       }
 
       if (this.view === 'day') {
-        state.min_date = moment(this.gotoDate).startOf('day').toDate()
-        state.max_date = moment(this.gotoDate).endOf('day').toDate()
+        state.min_date = moment.utc(this.gotoDate).startOf('day').toISOString()
+        state.max_date = moment.utc(this.gotoDate).endOf('day').toISOString()
       }
 
       this.loadCalendarData(state)
