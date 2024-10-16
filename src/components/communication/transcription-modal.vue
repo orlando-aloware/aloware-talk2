@@ -7,7 +7,6 @@
            dense
            data-testid="comm-transcription-modal-single-btn"
            :size="buttonSize"
-           v-if="singleButton"
            @click="fetchSmartTranscriptionData">
       <q-tooltip>
         <span>
@@ -15,14 +14,6 @@
         </span>
       </q-tooltip>
     </q-btn>
-    <div class="flex items-center mr-1 h-100"
-         v-else
-         data-testid="comm-transcription-modal-btn"
-         @click="fetchSmartTranscriptionData">
-      <span class="text-blue cursor-pointer">
-        {{ buttonText }}
-      </span>
-    </div>
 
     <!-- Smart Transcription modal. -->
     <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
@@ -230,10 +221,6 @@ export default {
     buttonSize: {
       type: String,
       default: 'sm'
-    },
-    singleButton: {
-      type: Boolean,
-      default: false
     }
   },
 
@@ -329,9 +316,17 @@ export default {
 
   mounted () {
     this.checkAndShowTranscriptionModal()
+
+    this.$VueEvent.listen('fetchSmartTranscriptionData', communicationId => this.handleFetchSmartTranscriptionData(communicationId))
   },
 
   methods: {
+    handleFetchSmartTranscriptionData (communicationId) {
+      if (this.communication.id === communicationId) {
+        this.fetchSmartTranscriptionData()
+      }
+    },
+
     fetchSmartTranscriptionData () {
       this.isLoading = true
       this.show_form = true

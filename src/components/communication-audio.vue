@@ -16,7 +16,7 @@
                            :filename="filename"
                            :file-mime-type="mimeType"
                            :file-uuid="fileUuid"/>
-          <transcription-modal button-text="Show Smart Transcription"
+          <transcription-modal button-text="Show Transcription"
                                data-testid="communication-audio-transcription-modal"
                                :communication="communication"
                                :contact="contact"
