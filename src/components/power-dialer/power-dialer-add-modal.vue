@@ -262,6 +262,7 @@
               <b-button class="btn-block mt-4"
                         variant="secondary"
                         size="sm"
+                        :disabled="userId == null"
                         data-testid="power-dialer-add-modal-stay-in-contacts"
                         @click="saveAndStay">
                 {{isMyOwnList ? 'Stay in Contacts' : 'Add to Power Dialer'}}
@@ -311,7 +312,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { integrationMixin, aclMixin } from 'src/plugins/mixins'
+import { integrationMixin, aclMixin, userMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import { get, isEmpty } from 'lodash'
 import moment from 'moment'
@@ -328,7 +329,7 @@ export default {
     PowerDialerListSelector
   },
 
-  mixins: [integrationMixin, aclMixin],
+  mixins: [integrationMixin, aclMixin, userMixin],
 
   props: {
     integration: {
@@ -403,6 +404,8 @@ export default {
       'showAddViewMyContacts',
       'search'
     ]),
+
+    ...mapState(['users']),
 
     ...mapState('cache', ['currentCompany']),
 
@@ -534,8 +537,9 @@ export default {
   mounted () {
     this.loading++
 
-    // Select current user by default
-    if (this.profile.id && this.mode === 'add-contact-list') {
+    // When open PD modal, verify if the authenticated user is in the list of users to select, and set it
+    // as the default user if exists. This should happen only for 'add' and 'add-contact-list' modes
+    if (this.profile.id && this.mode === 'add-contact-list' && this.filterUsers(this.users).find(user => user.id === this.profile.id)) {
       this.setUserId(this.profile.id)
     }
 
