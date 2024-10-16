@@ -290,7 +290,7 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
-                           :disabled="!isContactListSelected"
+                           :disabled="isListActionDisabled"
                            v-if="shouldShowPowerDialer"
                            @click="addToPowerDialerList">
             <power-dialer-mobile-icon width="14"
@@ -300,7 +300,7 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-sequence-option-dropdown"
-                           :disabled="!isContactListSelected"
+                           :disabled="isListActionDisabled"
                            @click="openAddToSequence">
             <add-sequence-icon width="14"
                                       height="14"
@@ -309,7 +309,7 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-assign-contacts-option-dropdown"
-                           :disabled="!isContactListSelected"
+                           :disabled="isListActionDisabled"
                            @click="openAssignContacts">
             <power-dialer-mobile-icon width="14"
                                       height="14"
@@ -318,7 +318,7 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-enroll-aloai-option-dropdown"
-                           :disabled="!isContactListSelected"
+                           :disabled="isListActionDisabled"
                            v-if="currentCompany.aloai_enabled"
                            @click="openAloAiBotContactsEnrollmentModal('add-contact-list')">
             <add-user-icon width="14" height="14" color="#62666E" />
@@ -326,6 +326,7 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
+                           :disabled="!totalRows"
                            data-testid="contacts-view-export-as-csv-option-dropdown"
                            @click="exportAsCsv">
             <export-icon />
@@ -1199,6 +1200,11 @@ export default {
       const blockedIds = this.CONTACTS_STRING_KEYS
 
       return !blockedIds.includes(this.selectedList.id)
+    },
+
+    // Disable List actions if no list is selected or if there no records
+    isListActionDisabled () {
+      return !this.isContactListSelected || !this.totalRows
     }
   },
 
