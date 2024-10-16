@@ -8,6 +8,8 @@ export default {
     goBack: function () {
       if (this.canGoBack) {
         this.$router.go(-1)
+      } else {
+        this.$router.push('/')
       }
     }
   }

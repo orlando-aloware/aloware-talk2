@@ -21,7 +21,7 @@
                           v-if='isWidget'
                           data-testid="contact-details-navigation-btn-prev"
                           v-b-tooltip.hover
-                          @click.prevent="$router.go(-1)">
+                          @click.prevent="goBack">
                   <i class="material-icons">keyboard_arrow_left</i>
                 </b-button>
                 Communication Info
@@ -1000,7 +1000,8 @@ import {
   classicMixin,
   userMixin,
   communicationInfoMixin,
-  simpsocialMixin
+  simpsocialMixin,
+  goBackMixin
 } from 'src/plugins/mixins'
 
 import * as CommunicationTypes from '../constants/communication-types'
@@ -1047,7 +1048,8 @@ export default {
     classicMixin,
     userMixin,
     aclMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    goBackMixin
   ],
 
   data () {
