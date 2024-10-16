@@ -94,6 +94,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
@@ -249,9 +250,6 @@ export default {
     },
 
     filteredUsers () {
-<<<<<<< HEAD
-      return this.filterUsers(this.availableUsers)
-=======
       if (!_.isEmpty(this.availableUsers)) {
         if (this.allAnswerTypes) {
           return this.availableUsers.filter((user) =>
@@ -259,14 +257,10 @@ export default {
           )
         }
 
-        return this.availableUsers.filter((user) =>
-          !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access) &&
-          user.answer_by !== AnswerTypes.BY_NONE
-        )
+        return this.filterUsers(this.availableUsers)
       }
 
       return []
->>>>>>> develop
     },
 
     normalUsers () {
