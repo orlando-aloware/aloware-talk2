@@ -59,6 +59,8 @@
                         :unique-id="communication.id"
                         :height="40"
                         :split-channels="splitChannels"
+                        :communication="communication"
+                        :messages="messages"
                         data-testid="comm-transcription-modal-waveform"
                         @time-update="updateCurrentTime">
               </waveform>
