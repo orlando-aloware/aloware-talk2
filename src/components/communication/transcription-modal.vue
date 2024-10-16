@@ -132,7 +132,7 @@
                        label="Transcription"/>
                 <q-tab name="summary"
                        label="Summary"
-                       :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
+                       :disable="!currentCompany?.transcription_settings?.summarization_enabled || !customSummary"/>
               </q-tabs>
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
@@ -150,7 +150,21 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    {{ customSummary }}
+                    <div v-if="customSummary" class="custom-summary" v-html="parseMarkdown(customSummary)" />
+                    <div v-if="customSummary" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                      <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
+                      <img
+                        class="clickable-icon"
+                        :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
+                        @click="submitFeedback('upvote')"
+                      />
+                      <span class="mx-1"></span>
+                      <img
+                        class="clickable-icon"
+                        :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
+                        @click="submitFeedback('downvote')"
+                      />
+                    </div>
                   </section>
                 </q-tab-panel>
               </q-tab-panels>
@@ -164,6 +178,8 @@
 
 <script>
 import Waveform from 'components/waveform'
+import marked from 'marked'
+import DOMPurify from 'dompurify'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import { isEmpty } from 'lodash'
 import CategoriesSection from './transcription-components/categories-section'
@@ -176,7 +192,9 @@ import ConversationSection from './transcription-components/conversation-section
 import DownloadButton from 'components/download-button.vue'
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import * as FeedbackConstants from 'src/constants/feedback-types'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 
 export default {
@@ -236,7 +254,9 @@ export default {
       summaryEngine: null,
       customSummary: null,
       summaryPrompt: null,
-      summaryFeedback: null,
+      feedback: null,
+      upvoteActive: false,
+      downvoteActive: false,
       sentiments: [
         'POSITIVE',
         'NEUTRAL',
@@ -307,6 +327,10 @@ export default {
     }
   },
 
+  mounted () {
+    this.checkAndShowTranscriptionModal()
+  },
+
   methods: {
     fetchSmartTranscriptionData () {
       this.isLoading = true
@@ -363,7 +387,9 @@ export default {
       this.summaryEngine = data.summary_engine
       this.customSummary = data.custom_summary
       this.summaryPrompt = data.summary_prompt
-      this.summaryFeedback = data.summary_feedback
+      this.feedback = data.feedback
+      this.upvoteActive = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvoteActive = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
     },
 
     /**
@@ -402,6 +428,21 @@ export default {
       })
 
       return messageText
+    },
+
+    /**
+     * Check if the URL has a query parameter to show the transcription modal.
+     * @public
+     *
+     * @returns {void}
+     */
+    checkAndShowTranscriptionModal () {
+      const urlParams = new URLSearchParams(window.location.search)
+      const showTranscription = urlParams.get('showTranscription')
+
+      if (showTranscription === 'true') {
+        this.fetchSmartTranscriptionData()
+      }
     },
 
     handleClose () {
@@ -457,6 +498,17 @@ export default {
       return sentimentPercentages
     },
 
+    /**
+     * Parse markdown text to HTML.
+     * @param {string} summaryText
+     *
+     * @returns {string}
+     */
+    parseMarkdown (summaryText) {
+      const rawHtml = marked(summaryText)
+      return DOMPurify.sanitize(rawHtml)
+    },
+
     getMessageClasses (speaker) {
       const isAgent = ['AGENT', 'A'].includes(speaker)
 
@@ -470,6 +522,41 @@ export default {
       if (this.tabName === 'transcription') {
         this.$refs.conversationSection.syncScroll(time)
       }
+    },
+
+    /**
+     * Update the summary feedback.
+     * @param type
+     *
+     * @returns {void}
+     */
+    submitFeedback (type) {
+      const feedbackValue = type === 'upvote' ? FeedbackConstants.FEEDBACK_UPVOTE : FeedbackConstants.FEEDBACK_DOWNVOTE
+
+      this.feedback = feedbackValue
+
+      talk2Api.V1.transcription.submitSummaryFeedback(this.communication.id, feedbackValue)
+        .then(() => {
+          this.upvoteActive = type === 'upvote'
+          this.downvoteActive = type === 'downvote'
+        })
+        .catch(err => {
+          console.log('Error submitting summary feedback:', err)
+        })
+    }
+
+  },
+
+  watch: {
+    communication (newVal) {
+      if (newVal) {
+        this.checkAndShowTranscriptionModal()
+      }
+    },
+
+    feedback (newValue) {
+      this.upvoteActive = newValue === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvoteActive = newValue === FeedbackConstants.FEEDBACK_DOWNVOTE
     }
   }
 }
