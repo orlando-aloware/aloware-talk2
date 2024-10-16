@@ -18,7 +18,7 @@
                           variant="light"
                           class="btn-white communication-back-button"
                           title="Go Back"
-                          v-if='isWidget'
+                          v-if="isWidget && canGoBack"
                           data-testid="contact-details-navigation-btn-prev"
                           v-b-tooltip.hover
                           @click.prevent="goBack(false)">
