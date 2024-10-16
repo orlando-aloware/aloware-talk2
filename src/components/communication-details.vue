@@ -21,7 +21,7 @@
                           v-if='isWidget'
                           data-testid="contact-details-navigation-btn-prev"
                           v-b-tooltip.hover
-                          @click.prevent="goBack">
+                          @click.prevent="goBack(false)">
                   <i class="material-icons">keyboard_arrow_left</i>
                 </b-button>
                 Communication Info
