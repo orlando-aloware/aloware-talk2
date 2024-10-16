@@ -206,11 +206,9 @@ export default {
         params.search = this.search
       }
 
-      if (this.isDatatableSelectedAll) {
+      if (this.mode === 'add-contact-list' || this.isDatatableSelectedAll) {
         params.selected_all = true
-        if (params?.contact_ids) {
-          delete params.contact_ids
-        }
+        delete params.contact_ids
       }
 
       // Don't send list_id for dynamic lists, it should use only the filters
