@@ -429,6 +429,7 @@ export default {
         footerClass: 'p-2 border-top-0',
         centered: true
       },
+      isSubmitted: false,
       CommunicationDispositionStatus,
       CommunicationTypes
     }
@@ -535,6 +536,7 @@ export default {
 
     editSchedule (sched) {
       this.loading = true
+      this.isSubmitted = false
       let date = moment(sched.start_date)
 
       this.originalSchedule = {
@@ -668,6 +670,7 @@ export default {
               action: 'add'
             })
             this.showManager = false
+            this.isSubmitted = true
 
             this.$generalNotification('Event added.')
           }).catch(err => {
@@ -696,6 +699,7 @@ export default {
               action: 'update'
             })
             this.showManager = false
+            this.isSubmitted = true
 
             this.$generalNotification('Event updated.')
           }).catch(err => {
@@ -724,32 +728,39 @@ export default {
     },
 
     closeFiltersMenu (bvModalEvent) {
-      if (_.isEqual(this.schedule, this.originalSchedule)) {
+      console.log('closeFiltersMenu', this.schedule, this.originalSchedule)
+
+      if (_.isEqual(this.schedule, this.originalSchedule) || this.isSubmitted) {
         this.resetForm()
+        this.resetSchedule()
         this.showManager = false
         this.$emit('close-filters-menu')
-      } else {
-        // prevent closing
-        bvModalEvent.preventDefault()
-
-        this.$bvModal.msgBoxConfirm('Are you sure you want to close this form?', {
-          ...this.confirmDialogParams,
-          title: 'Confirmation',
-          okTitle: 'Yes, I\'m sure',
-          cancelTitle: 'No, I\'m not'
-        })
-          .then(value => {
-            if (value) {
-              this.resetForm()
-
-              this.$nextTick(() => {
-                this.showManager = false
-                this.$emit('close-filters-menu')
-                this.$bvModal.hide('calendar-manager-modal')
-              })
-            }
-          })
+        return
       }
+
+      // prevent closing
+      bvModalEvent.preventDefault()
+
+      this.$bvModal.msgBoxConfirm('Are you sure you want to close this form?', {
+        ...this.confirmDialogParams,
+        title: 'Confirmation',
+        okTitle: 'Yes, I\'m sure',
+        cancelTitle: 'No, I\'m not'
+      })
+        .then(value => {
+          if (value) {
+            this.resetForm()
+            this.resetSchedule()
+
+            return this.$nextTick(() => {
+              this.showManager = false
+              this.$emit('close-filters-menu')
+              this.$bvModal.hide('calendar-manager-modal')
+            })
+          }
+
+          this.showManager = true
+        })
     },
 
     onCancelClicked () {
@@ -853,6 +864,15 @@ export default {
 
     appendSmsReminderTemplateVariable (variable) {
       this.sms_reminder_fields.body = `${(this.sms_reminder_fields.body ?? '')} ${variable}`
+    },
+
+    resetSchedule () {
+      this.schedule = {
+        contact: {},
+        user: this.user.profile,
+        calendar_response: 1
+      }
+      this.originalSchedule = {}
     },
 
     onContactsLoaded () {
