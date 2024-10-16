@@ -124,7 +124,6 @@ import { mapGetters, mapState } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { viewMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'enroll-contacts-to-aloai-modal',
@@ -143,7 +142,6 @@ export default {
       default: 0
     }
   },
-  mixins: [viewMixin],
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', [
