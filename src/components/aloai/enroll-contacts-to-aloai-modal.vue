@@ -206,6 +206,7 @@ export default {
         params.search = this.search
       }
 
+      // If it is a List action, we need to send the full list
       if (this.mode === 'add-contact-list' || this.isDatatableSelectedAll) {
         params.selected_all = true
         delete params.contact_ids

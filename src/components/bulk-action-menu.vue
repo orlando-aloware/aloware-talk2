@@ -41,7 +41,7 @@
           </div>
         </template>
         <div class="items"
-             v-if="!isAddView && ((hasDeletePermission && canDelete && !isSimpSocial) || isPowerDialer)">
+             v-if="showDeleteButton">
           <a href=""
              class="text-danger"
              data-testid="bulk-action-menu-delete-link"
@@ -250,6 +250,10 @@ export default {
 
     canSelectAll () {
       return !this.isAllSelected && this.checkedCount < this.totalRows && !this.isDatatableCountLoading
+    },
+
+    showDeleteButton () {
+      return !isAddView && ((hasDeletePermission && canDelete && !isSimpSocial) || isPowerDialer)
     }
   },
 
