@@ -71,7 +71,7 @@
     "v-calendar": "2.4.1",
     "vue": "^2.7.16",
     "vue-at": "^2.5.0-beta",
-    "vue-business-hours": "github:aloware/vue-business-hours#WAT-912/fix/working-hours-are-not-being-recorded",
+    "vue-business-hours": "github:aloware/vue-business-hours#WAT-912-feature-branch",
     "vue-cookies": "^1.8.3",
     "vue-countup-v2": "^4.0.0",
     "vue-ctk-date-time-picker": "^2.5.0",
