@@ -299,24 +299,4 @@ export default {
   transform: translateX(-75%);
   cursor: pointer;
 }
-
-.region-AGENT-1:after {
-  position: absolute;
-  bottom: 0px !important;
-}
-
-.region-AGENT-2:after {
-  position: absolute;
-  top: 0px !important;
-}
-
-.region-CONTACT-1:after {
-  position: absolute;
-  top: 0px !important;
-}
-
-.region-CONTACT-2:after {
-  position: absolute;
-  bottom: 0px !important;
-}
 </style>
