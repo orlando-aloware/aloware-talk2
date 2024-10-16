@@ -728,8 +728,6 @@ export default {
     },
 
     closeFiltersMenu (bvModalEvent) {
-      console.log('closeFiltersMenu', this.schedule, this.originalSchedule)
-
       if (_.isEqual(this.schedule, this.originalSchedule) || this.isSubmitted) {
         this.resetForm()
         this.resetSchedule()
