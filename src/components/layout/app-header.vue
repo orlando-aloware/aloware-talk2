@@ -310,11 +310,17 @@ export default {
 
     backRoute () {
       if (this.$route.name === 'Communication') {
-        return {
-          name: 'Contact',
-          params: {
-            id: this.$route.params.contactId
+        if (this.$route.params.contactId) {
+          return {
+            name: 'Contact',
+            params: {
+              id: this.$route.params.contactId
+            }
           }
+        }
+
+        return {
+          name: 'Inbox'
         }
       }
 
