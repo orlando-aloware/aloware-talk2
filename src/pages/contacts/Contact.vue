@@ -219,10 +219,6 @@ export default {
   },
 
   mounted () {
-    if (!this.$route.params.id || this.$route.params.id === 'null') {
-      this.$router.push({ path: '/contacts/' })
-    }
-
     if (this.authenticated) {
       this.fetchContact()
     }
@@ -347,21 +343,8 @@ export default {
     }
   },
 
-  beforeRouteUpdate (to, from, next) {
-    if (!to.params.id || to.params.id === 'null') {
-      next({ path: '/contacts/' })
-    } else {
-      this.leaving = false
-      next()
-    }
-  },
-
-  beforeRouteEnter (to, from, next) {
-    if (!to.params.id || to.params.id === 'null') {
-      next({ path: '/contacts/' })
-    } else {
-      next()
-    }
+  beforeRouteUpdate () {
+    this.leaving = false
   },
 
   beforeDestroy () {
