@@ -138,7 +138,7 @@
         <h2>Power Dialer Task Options</h2>
         <slot name="header-close-content">
           <b-button variant="transparent"
-                    @click="openPDModalInContacts('confirmation')">
+                    @click="hidePDModalsInContacts">
             <i class="fas fa-times"></i>
           </b-button>
         </slot>
@@ -364,6 +364,11 @@ export default {
     contactList: {
       type: Object,
       default: null
+    },
+
+    selectedAllCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -463,6 +468,8 @@ export default {
 
       if (this.mode === 'add-contact-list' && this.contactList && this.requestParams.selected_all) {
         description += this.contactList.contactCount
+      } else if (this.requestParams.selected_all) {
+        description += this.selectedAllCount
       } else if (this.count !== null) {
         description += this.$options.filters.numFormat(this.count)
       }

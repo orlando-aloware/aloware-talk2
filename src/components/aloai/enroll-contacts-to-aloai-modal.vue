@@ -18,7 +18,7 @@
       </h1>
       <div class="text-center">
         Select the bot that you want to enroll at your
-        {{ this.params.contact_ids.length }} selected<br />contacts.
+        <strong>~{{this.contactsCount}} contacts</strong>.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search
@@ -124,6 +124,7 @@ import { mapGetters, mapState } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { viewMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'enroll-contacts-to-aloai-modal',
@@ -136,8 +137,13 @@ export default {
     contactList: {
       type: Object,
       default: null
+    },
+    checkedCount: {
+      type: Number,
+      default: 0
     }
   },
+  mixins: [viewMixin],
   computed: {
     ...mapGetters('contacts', ['contact']),
     ...mapState('contacts', [
@@ -156,12 +162,25 @@ export default {
       return bots.sort((a, b) =>
         a.name?.toUpperCase() > b.name?.toUpperCase() ? 1 : -1
       )
+    },
+    contactsCount () {
+      console.log('this.mode', this.mode)
+      if (this.mode === 'add-contact-list' && this.contactList) {
+        return this.contactList.contactCount
+      }
+
+      if (this.isDatatableSelectedAll) {
+        return this.checkedCount
+      }
+
+      return this.params?.contact_ids?.length ?? 0
     }
   },
   data () {
     return {
       isBusy: false,
       isOpen: false,
+      mode: 'add-contact-list',
       bots: [],
       searchText: '',
       isLoading: true,
@@ -194,6 +213,12 @@ export default {
           delete params.contact_ids
         }
       }
+
+      // // Verify filters to avoid adding all company contacts
+      // if (params.selected_all && !params.filter_groups && this.contactList && this.contactList.id !== 'all') {
+      //   // Add to requests params the list_id to adding all contacts from current list
+      //   params.contact_list_id = this.contactList.id
+      // }
 
       // Don't send list_id for dynamic lists, it should use only the filters
       if (this.contactList?.type === this.ContactListTypes.DYNAMIC) {

@@ -23,24 +23,6 @@
           </div>
         </template>
         <template v-if="isContacts && !isAddView">
-          <div class="items"
-               v-if="false">
-            <a href="#"
-               disabled
-               data-testid="bulk-action-menu-enroll-in-sequence-link">
-              <i class="fa fa-layer-group"></i>
-              Enroll in Sequence
-            </a>
-          </div>
-          <div class="items"
-               v-if="false">
-            <a href="#"
-               disabled
-               data-testid="bulk-action-menu-power-dialer-link">
-              <i class="fa fa-crosshairs"></i>
-              Power Dialer
-            </a>
-          </div>
           <div class="items">
             <a href=""
                data-testid="bulk-action-menu-add-to-static-list-link"
@@ -59,16 +41,54 @@
           </div>
         </template>
         <div class="items"
-             v-if="!isAddView">
+             v-if="!isAddView && ((hasDeletePermission && canDelete && !isSimpSocial) || isPowerDialer)">
           <a href=""
              class="text-danger"
              data-testid="bulk-action-menu-delete-link"
              :disabled="disabledDelete"
-             v-if="(hasDeletePermission && canDelete && !isSimpSocial) || isPowerDialer"
              @click="onDelete">
             <i class="fa fa-trash text-danger"/>
             Delete
           </a>
+        </div>
+        <div class="items"
+             v-if="isContacts && !isAddView">
+          <b-dropdown size="sm"
+                      text="More"
+                      variant="link"
+                      class="bulk-action-menu-dropdown contacts-options-dropdown p-0 contacts-options-dropdown"
+                      toggle-class="bulk-action-menu-dropdown-btn text-decoration-none"
+                      right
+                      no-caret>
+            <template #button-content>
+              <a href="#"
+                 class="d-flex align-items-center">
+                More
+                <i class="fa fa-chevron-down fs-12 d-flex align-items-center ml-1 text-grey-90" />
+              </a>
+
+            </template>
+
+            <b-dropdown-item href="#"
+                             data-testid="bulk-action-menu-add-to-power-dialer-option"
+                             v-if="shouldShowPowerDialer"
+                             @click="addToPowerDialer">
+              <power-dialer-mobile-icon width="14"
+                                        height="14"
+                                        color="#62666E"/>
+              Add to Power Dialer
+            </b-dropdown-item>
+
+            <b-dropdown-item href="#"
+                             data-testid="bulk-action-menu-enroll-aloai-option"
+                             v-if="currentCompany?.aloai_enabled"
+                             @click="addToAloAi">
+              <add-user-icon width="14"
+                             height="14"
+                             color="#62666E"/>
+              Enroll to AloAI Bot
+            </b-dropdown-item>
+          </b-dropdown>
         </div>
       </template>
     </div>
@@ -102,9 +122,12 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
 import {
   aclMixin,
-  simpsocialMixin
+  simpsocialMixin,
+  viewMixin
 } from 'src/plugins/mixins'
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
+import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
+import AddUserIcon from 'components/icons/add-user-icon'
 
 export default {
   name: 'bulk-action-menu',
@@ -115,23 +138,16 @@ export default {
 
   mixins: [
     aclMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    viewMixin
   ],
 
-  props: {
-    id: {
-      type: [Number, String],
-      required: true
-    },
+  components: { PowerDialerMobileIcon, AddUserIcon },
 
+  props: {
     disabledDelete: {
       type: Boolean,
       default: false
-    },
-
-    totalRows: {
-      type: Number,
-      default: 0
     },
 
     isLoading: {
@@ -156,6 +172,8 @@ export default {
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
+
     ...mapGetters('contacts', [
       'selectedList'
     ]),
@@ -370,6 +388,13 @@ export default {
       })
       this.setSelectedStaticList({ id: null, name: '', type: null })
       e.preventDefault()
+    },
+
+    addToPowerDialer () {
+      this.$VueEvent.fire('addToPowerDialer')
+    },
+    addToAloAi () {
+      this.$VueEvent.fire('addToAloAi', 'add')
     }
   },
 

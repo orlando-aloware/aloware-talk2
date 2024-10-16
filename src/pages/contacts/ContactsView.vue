@@ -290,22 +290,22 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
-                           :disabled="isAddToPowerDialerDisabled"
+                           :disabled="!isContactListSelected"
                            v-if="shouldShowPowerDialer"
                            @click="addToPowerDialerList">
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
-            Add to Power Dialer
+            Add List to Power Dialer
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-sequence-option-dropdown"
-                           :disabled="isAddToSequenceDisabled"
+                           :disabled="!isContactListSelected"
                            @click="openAddToSequence">
             <add-sequence-icon width="14"
                                       height="14"
                                       color="#62666E" />
-            Add to Sequence
+            Add List to Sequence
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-assign-contacts-option-dropdown"
@@ -314,22 +314,22 @@
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
-            Assign Contacts
+            Assign Contact List
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-enroll-aloai-option-dropdown"
-                           :disabled="!this.checked.length"
+                           :disabled="!isContactListSelected"
                            v-if="currentCompany.aloai_enabled"
-                           @click="openAloAiBotContactsEnrollmentModal">
+                           @click="openAloAiBotContactsEnrollmentModal('add-contact-list')">
             <add-user-icon width="14" height="14" color="#62666E" />
-            Enroll to AloAI Bot
+            Enroll List in AloAI Text Bot
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
                            data-testid="contacts-view-export-as-csv-option-dropdown"
                            @click="exportAsCsv">
             <export-icon />
-            Export as CSV
+            Export List as CSV
           </b-dropdown-item>
           <b-dropdown-item href=""
                            :disabled="isListDeletable"
@@ -768,6 +768,7 @@
                               :contact-list="selectedList"
                               :mode="addToPowerDialerMode"
                               :show-in-contacts-page="true"
+                              :selected-all-count="selectedAllCount"
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
@@ -778,6 +779,7 @@
         ref="enrollContactsToAloAiModal"
         :params="attachedParams()"
         :contactList="selectedList"
+        :checked-count="selectedAllCount"
       />
     <assign-contacts-modal :is-show="showAssignContacts"
                            :list="selectedList"
@@ -1197,14 +1199,6 @@ export default {
       const blockedIds = this.CONTACTS_STRING_KEYS
 
       return !blockedIds.includes(this.selectedList.id)
-    },
-
-    isAddToPowerDialerDisabled () {
-      return !this.checked.length && !this.isContactListSelected
-    },
-
-    isAddToSequenceDisabled () {
-      return !this.isContactListSelected
     }
   },
 
@@ -1268,8 +1262,20 @@ export default {
       this.filterHasChanges = false
     }
 
+    this.viewListeners.addToPowerDialer = () => {
+      this.addSelectedContacts()
+    }
+
+    this.viewListeners.addToAloAi = (mode) => {
+      this.openAloAiBotContactsEnrollmentModal(mode)
+    }
+
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
     this.$VueEvent.listen('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
+
+    // Listeners for "more" options on contact selection
+    this.$VueEvent.listen('addToPowerDialer', this.viewListeners.addToPowerDialer)
+    this.$VueEvent.listen('addToAloAi', this.viewListeners.addToAloAi)
   },
 
   methods: {
@@ -1446,9 +1452,10 @@ export default {
       this.addToPowerDialerMode = 'add-contact-list'
     },
 
-    openAloAiBotContactsEnrollmentModal () {
+    openAloAiBotContactsEnrollmentModal (mode = 'add-contact-list') {
       if (this.$refs.enrollContactsToAloAiModal) {
         this.$refs.enrollContactsToAloAiModal.isOpen = true
+        this.$refs.enrollContactsToAloAiModal.mode = mode
       }
     },
 
@@ -2033,6 +2040,8 @@ export default {
     this.$VueEvent.stop('shouldUpdateListCount')
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
     this.$VueEvent.stop('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
+    this.$VueEvent.stop('addToPowerDialer', this.viewListeners.addToPowerDialer)
+    this.$VueEvent.stop('addToAloAi', this.viewListeners.addToAloAi)
   }
 }
 </script>
