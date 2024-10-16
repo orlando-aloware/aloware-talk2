@@ -12426,6 +12426,14 @@ h1.contact-list-name-label {
           display: none;
         }
 
+        .is_past {
+          cursor: pointer;
+        }
+
+        .dhx_cal_event {
+          cursor: pointer !important;
+        }
+
         .dhx_cal_data table tr {
           border-left: 0;
           border-right: 0;
