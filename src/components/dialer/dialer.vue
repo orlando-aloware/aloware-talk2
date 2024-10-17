@@ -775,6 +775,7 @@ export default {
         }
 
         this.setWarnings(this.warnings)
+        this.saveCallIssue(warningName, warningData)
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
@@ -1632,6 +1633,24 @@ export default {
       }
 
       this.makeCall('call:' + communication.id, communication.campaignId)
+    },
+
+    saveCallIssue (warningName, warningData) {
+      if (this.dialer.communication) {
+        const params = {
+          user_id: this.profile.id,
+          event_name: warningName,
+          communication_id: this.dialer.communication.id,
+          data: JSON.stringify(warningData)
+        }
+
+        console.log(params)
+        this.$axios.post('/api/v2/call-quality-events', params)
+          .catch(err => {
+            console.log(err)
+            this.$handleErrors(err.response)
+          })
+      }
     },
 
     ...mapActions([
