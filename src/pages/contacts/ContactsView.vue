@@ -301,6 +301,7 @@
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-sequence-option-dropdown"
                            :disabled="isListActionDisabled"
+                           v-if="shouldShowSequences"
                            @click="openAddToSequence">
             <add-sequence-icon width="14"
                                       height="14"
@@ -319,7 +320,7 @@
           <b-dropdown-item href="#"
                            data-testid="contacts-view-enroll-aloai-option-dropdown"
                            :disabled="isListActionDisabled"
-                           v-if="currentCompany.aloai_enabled"
+                           v-if="shouldShowAloAi"
                            @click="openAloAiBotContactsEnrollmentModal('add-contact-list')">
             <add-user-icon width="14" height="14" color="#62666E" />
             Enroll List in AloAI Text Bot
