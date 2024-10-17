@@ -676,8 +676,9 @@ export default {
     addContacts () {
       const listId = get(this.requestParams, 'contact_list_id', this.powerDialerListId)
 
-      // User selected a different list, set is as the list to add contacts
-      if (this.enablePdListSelection && this.powerDialerListId !== this.myQueueId) {
+      // If mode is 'add-contact-list', user should select the PD list to add contacts
+      // if user selected a list that is not myQueueId, set the new PD list id to receive the contacts
+      if (this.mode === 'add-contact-list' && this.powerDialerListId !== this.myQueueId) {
         this.requestParams.contact_list_id = this.powerDialerListId
       }
 
