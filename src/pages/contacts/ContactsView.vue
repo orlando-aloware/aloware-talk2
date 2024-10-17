@@ -292,7 +292,7 @@
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
                            :disabled="isListActionDisabled"
                            v-if="shouldShowPowerDialer"
-                           @click="addToPowerDialerList">
+                           @click="addToPowerDialerList(false)">
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
@@ -771,6 +771,7 @@
                               :mode="addToPowerDialerMode"
                               :show-in-contacts-page="true"
                               :selected-all-count="selectedAllCount"
+                              :is-manual-selection="addToPowerDialerIsManualSelection"
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
@@ -961,6 +962,7 @@ export default {
       openPDModal: false,
       isContactModule: false,
       addToPowerDialerMode: 'add',
+      addToPowerDialerIsManualSelection: false,
       showAddToSequence: false,
       workflowId: null,
       openAloAiEnrollmentModal: false,
@@ -1270,7 +1272,7 @@ export default {
     }
 
     this.viewListeners.addToPowerDialer = () => {
-      this.addSelectedContacts()
+      this.addToPowerDialerList(true)
     }
 
     this.viewListeners.addToAloAi = (mode) => {
@@ -1453,10 +1455,11 @@ export default {
       this.addToPowerDialerMode = 'add'
     },
 
-    addToPowerDialerList () {
+    addToPowerDialerList (isManualSelection = false) {
       this.openPDModal = true
       this.addPowerDialerOpen(true)
       this.addToPowerDialerMode = 'add-contact-list'
+      this.addToPowerDialerIsManualSelection = isManualSelection
     },
 
     openAloAiBotContactsEnrollmentModal (mode = 'add-contact-list') {
