@@ -52,7 +52,7 @@
           </a>
         </div>
         <div class="items"
-             v-if="isContacts && !isAddView">
+             v-if="showMoreDropdownButton">
           <b-dropdown size="sm"
                       text="More"
                       variant="link"
@@ -81,7 +81,7 @@
 
             <b-dropdown-item href="#"
                              data-testid="bulk-action-menu-enroll-aloai-option"
-                             v-if="currentCompany?.aloai_enabled"
+                             v-if="shouldShowAloAi"
                              @click="addToAloAi">
               <add-user-icon width="14"
                              height="14"
@@ -172,8 +172,6 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
-
     ...mapGetters('contacts', [
       'selectedList'
     ]),
@@ -254,6 +252,19 @@ export default {
 
     showDeleteButton () {
       return !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) || this.isPowerDialer)
+    },
+
+    showMoreDropdownButton () {
+      if (!this.isContacts || this.isAddView) {
+        return false
+      }
+
+      // AloAI and Power Dialer disabled
+      if (!this.shouldShowAloAi && !this.shouldShowPowerDialer) {
+        return false
+      }
+
+      return true
     }
   },
 
