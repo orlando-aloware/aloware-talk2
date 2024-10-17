@@ -682,15 +682,11 @@ export default {
         this.requestParams.contact_list_id = this.powerDialerListId
       }
 
-      // For List mode we should always be adding the whole list
-      if (this.mode === 'add-contact-list') {
-        this.requestParams.selected_all = true
-      }
-
       // Verify filters to avoid adding all company contacts
       if (this.requestParams.selected_all && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
         // Add to requests params the list_id to adding all contacts from current list
         this.requestParams.list_id = this.contactList.id
+        this.requestParams.selected_all = true
       }
 
       // Don't send list_id for dynamic lists, it should use only the filters

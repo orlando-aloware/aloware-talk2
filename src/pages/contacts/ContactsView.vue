@@ -290,7 +290,7 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
-                           :disabled="isListActionDisabled"
+                           :disabled="isAddToPowerDialerDisabled"
                            v-if="shouldShowPowerDialer"
                            @click="addToPowerDialerList">
             <power-dialer-mobile-icon width="14"
@@ -1206,6 +1206,11 @@ export default {
     // Disable List actions if no list is selected or if there no records
     isListActionDisabled () {
       return !this.isContactListSelected || !this.totalRows
+    },
+
+    // Disable Add to Power Dialer button if no list is selected and no contact is checked, or if there are no records
+    isAddToPowerDialerDisabled () {
+      return !(this.isContactListSelected || this.checkedItemIds.length) || !this.totalRows
     }
   },
 
