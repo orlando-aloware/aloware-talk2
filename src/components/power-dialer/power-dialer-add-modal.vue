@@ -365,6 +365,16 @@ export default {
     contactList: {
       type: Object,
       default: null
+    },
+
+    selectedAllCount: {
+      type: Number,
+      default: 0
+    },
+
+    isManualSelection: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -464,7 +474,7 @@ export default {
     contactsDescription () {
       let description = ''
 
-      if (this.mode === 'add-contact-list' && this.contactList && this.requestParams.selected_all) {
+      if (this.mode === 'add-contact-list' && this.contactList && !this.isManualSelection) {
         description += this.contactList.contactCount
       } else if (this.count !== null) {
         description += this.$options.filters.numFormat(this.count)
@@ -665,15 +675,20 @@ export default {
     addContacts () {
       const listId = get(this.requestParams, 'contact_list_id', this.powerDialerListId)
 
-      // User selected a different list, set is as the list to add contacts
+      // If mode is 'add-contact-list', user should select the PD list to add contacts
+      // if user selected a list that is not myQueueId, set the new PD list id to receive the contacts
       if (this.mode === 'add-contact-list' && this.powerDialerListId !== this.myQueueId) {
         this.requestParams.contact_list_id = this.powerDialerListId
       }
 
+      // If selectedAll OR is List action
+      const shouldSelectAll = this.requestParams.selected_all || (this.mode === 'add-contact-list' && !this.isManualSelection)
+
       // Verify filters to avoid adding all company contacts
-      if (this.requestParams.selected_all && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
+      if (shouldSelectAll && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
         // Add to requests params the list_id to adding all contacts from current list
         this.requestParams.list_id = this.contactList.id
+        this.requestParams.selected_all = true
       }
 
       // Don't send list_id for dynamic lists, it should use only the filters

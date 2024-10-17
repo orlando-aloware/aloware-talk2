@@ -292,7 +292,7 @@
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
                            :disabled="isAddToPowerDialerDisabled"
                            v-if="shouldShowPowerDialer"
-                           @click="addToPowerDialerList">
+                           @click="addToPowerDialerList(false)">
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
@@ -768,6 +768,8 @@
                               :contact-list="selectedList"
                               :mode="addToPowerDialerMode"
                               :show-in-contacts-page="true"
+                              :selected-all-count="selectedAllCount"
+                              :is-manual-selection="addToPowerDialerIsManualSelection"
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
@@ -956,6 +958,7 @@ export default {
       openPDModal: false,
       isContactModule: false,
       addToPowerDialerMode: 'add',
+      addToPowerDialerIsManualSelection: false,
       showAddToSequence: false,
       workflowId: null,
       openAloAiEnrollmentModal: false,
@@ -1266,6 +1269,14 @@ export default {
       this.filterHasChanges = false
     }
 
+    this.viewListeners.addToPowerDialer = () => {
+      this.addToPowerDialerList(true)
+    }
+
+    this.viewListeners.addToAloAi = (mode) => {
+      this.openAloAiBotContactsEnrollmentModal(mode)
+    }
+
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
     this.$VueEvent.listen('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
   },
@@ -1438,10 +1449,11 @@ export default {
       this.addToPowerDialerMode = 'add'
     },
 
-    addToPowerDialerList () {
+    addToPowerDialerList (isManualSelection = false) {
       this.openPDModal = true
       this.addPowerDialerOpen(true)
       this.addToPowerDialerMode = 'add-contact-list'
+      this.addToPowerDialerIsManualSelection = isManualSelection
     },
 
     openAloAiBotContactsEnrollmentModal () {
