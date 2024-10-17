@@ -154,7 +154,7 @@
 
           <hr>
 
-          <div v-if="enablePdListSelection">
+          <div v-if="mode === 'add-contact-list'">
             <label class="label mb-1 text-weight-bold"
                    data-testid="power-dialer-add-modal-conversion-options">
               Select Power Dialer List
@@ -538,10 +538,6 @@ export default {
           label: 'Top'
         }
       ]
-    },
-
-    enablePdListSelection () {
-      return this.mode === 'add' || this.mode === 'add-contact-list'
     }
   },
 
@@ -550,7 +546,7 @@ export default {
 
     // When open PD modal, verify if the authenticated user is in the list of users to select, and set it
     // as the default user if exists. This should happen only for 'add' and 'add-contact-list' modes
-    if (this.profile.id && this.enablePdListSelection && this.filterUsers(this.users).find(user => user.id === this.profile.id)) {
+    if (this.profile.id && this.mode === 'add-contact-list' && this.filterUsers(this.users).find(user => user.id === this.profile.id)) {
       this.setUserId(this.profile.id)
     }
 

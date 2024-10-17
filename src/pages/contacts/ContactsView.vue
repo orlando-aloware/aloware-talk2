@@ -1270,7 +1270,7 @@ export default {
     }
 
     this.viewListeners.addToPowerDialer = () => {
-      this.addSelectedContacts()
+      this.addToPowerDialerList()
     }
 
     this.viewListeners.addToAloAi = (mode) => {
