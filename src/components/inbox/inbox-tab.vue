@@ -284,6 +284,8 @@ export default {
       'isMobile'
     ]),
 
+    ...mapState('cache', ['currentCompany']),
+
     ...mapState('inbox', [
       'taskCounts',
       'liveContacts',
@@ -571,8 +573,9 @@ export default {
         this.fetchTaskCounts()
       }
 
-      const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
-      await this.setContacts(filteredContacts)
+      if (this.currentCompany?.contact_status_control_enabled && this.currentTask !== InboxTaskStatus.STATUS_ALL) {
+        await this.setContacts(this.contacts.filter(item => item.id !== contact.id))
+      }
 
       if (typeof callback !== 'undefined') {
         callback()
