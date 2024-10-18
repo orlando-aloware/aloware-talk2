@@ -336,8 +336,8 @@ export default {
     isInInboxPage () {
       const path = this.$route.path
       return this.$route.name === 'Inbox' ||
-          path.includes('inbox') ||
-          path.includes('channels')
+        path.includes('inbox') ||
+        path.includes('channels')
     },
 
     shouldShowUnreadsToggle () {
