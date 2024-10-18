@@ -946,13 +946,10 @@ export default {
     }
 
     this.pdViewListeners.contactListBulkCreated = (event) => {
-      this.pdViewEvents.push(event)
       const eventListId = this.getCleanedListId(event.contact_list_id)
-      console.log('LISTENING EVENT', eventListId, event)
 
       if (this.isInPowerDialerList && this.cleanedListId && eventListId &&
         this.cleanedListId === eventListId) {
-        console.log('EVENT LIST SUMMARY', event)
         this.$VueEvent.fire('add_contacts_progress', {
           id: null,
           loading: false
