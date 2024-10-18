@@ -228,6 +228,15 @@ export default {
   },
 
   STORE_BULK_ACTION_NOTIFICATION (state, value) {
+    if (value?.status_report?.batch_size > 1) {
+      if (state.bulkAddContactsNotification[value.contact_list_id]) {
+        state.bulkAddContactsNotification[value.contact_list_id].unshift(value)
+        return
+      }
+      state.bulkAddContactsNotification[value.contact_list_id] = [value]
+      return
+    }
+
     state.bulkAddContactsNotification[value.contact_list_id] = value
   },
 
