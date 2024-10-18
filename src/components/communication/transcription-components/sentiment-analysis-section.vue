@@ -1,27 +1,24 @@
 <template>
-  <div class="flex items-center">
-    <strong class="mr-2" data-testid="comm-sentiment-analysis-section">Overall Sentiment:</strong>
-    <div v-if="!isEmpty(sentiment_analysis)">
-      <!--
-          Sentiment analysis object contains:
-              1. speaker.
-              2. overall: speaker's overall sentiment.
-      -->
-      <div class="flex inline items-center mr-3"
-          :key="sentiment_index"
-          v-for="(sentimentSummary, sentiment_index) in sentiment_analysis">
-        <div class="mr-2">{{ sentimentSummary.speaker }}:</div>
-        <q-chip text-color="black"
-                dense
-                data-testid="comm-sentiment-analysis-section-chip"
-                :color="sentimentChipColors[sentimentSummary.overall]">
-          <strong>{{ sentimentSummary.overall }}</strong>
-          <q-tooltip data-testid="comm-sentiment-analysis-section-tooltip">
-            {{ calculateOverAllSentimentBySpeaker(sentimentSummary) }}
-          </q-tooltip>
-        </q-chip>
-
-      </div>
+  <div v-if="!isEmpty(sentiment_analysis)"
+       data-testid="comm-sentiment-analysis-wrapper">
+    <!--
+        Sentiment analysis object contains:
+            1. speaker.
+            2. overall: speaker's overall sentiment.
+    -->
+    <div class="d-flex flex-row align-items-center"
+         :key="sentiment_index"
+         v-for="(sentimentSummary, sentiment_index) in sentiment_analysis">
+      <q-chip text-color="black"
+              dense
+              data-testid="comm-sentiment-analysis-section-chip"
+              :color="sentimentChipColors[sentimentSummary.overall]">
+        <strong>{{ sentimentSummary.overall }}</strong>
+        <q-tooltip data-testid="comm-sentiment-analysis-section-tooltip">
+          {{ calculateOverAllSentimentBySpeaker(sentimentSummary) }}
+        </q-tooltip>
+      </q-chip>
+      sentiment
     </div>
   </div>
 </template>

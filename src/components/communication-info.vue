@@ -653,6 +653,7 @@
                   <div class="d-flex align-items-center w-100 mb-2 border-bottom"
                        v-if="showAudio(communication)">
                     <communication-audio :communication="communication"
+                                         :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                          :uniqueId="communication.id + '1'"
                                          class="mb-2"
@@ -675,6 +676,7 @@
                   <div class="d-flex flex-row align-items-center w-100 mb-2 border-bottom"
                        v-if="communication.has_voicemail">
                     <communication-audio :communication="communication"
+                                         :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                          :uniqueId="communication.id + '2'"
                                          class="mb-2"
