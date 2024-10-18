@@ -310,11 +310,17 @@ export default {
 
     backRoute () {
       if (this.$route.name === 'Communication') {
-        return {
-          name: 'Contact',
-          params: {
-            id: this.$route.params.contactId
+        if (this.$route.params.contactId) {
+          return {
+            name: 'Contact',
+            params: {
+              id: this.$route.params.contactId
+            }
           }
+        }
+
+        return {
+          name: 'Inbox'
         }
       }
 
@@ -330,8 +336,8 @@ export default {
     isInInboxPage () {
       const path = this.$route.path
       return this.$route.name === 'Inbox' ||
-          path.includes('inbox') ||
-          path.includes('channels')
+        path.includes('inbox') ||
+        path.includes('channels')
     },
 
     shouldShowUnreadsToggle () {
