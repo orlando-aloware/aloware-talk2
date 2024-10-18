@@ -1,6 +1,8 @@
 <template>
   <div data-testid="network-logs-wrapper">
-    <q-card flat bordered class="ring-group-snapshot-card"
+    <q-card flat
+            bordered
+            class="ring-group-snapshot-card"
             data-testid="network-logs-card">
       <q-card-section data-testid="network-logs-card-section">
         <div class="text-h6">Call Quality</div>
@@ -10,7 +12,7 @@
                       data-testid="network-logs-card-section"
                       v-if="showNetworkLogs">
         <div :key="callIssueIndex"
-            v-for="(callIssue,callIssueIndex) in mapCallIssues">
+             v-for="(callIssue,callIssueIndex) in mapCallIssues">
           <q-card flat
                   bordered
                   class="ring-group-snapshot-card mb-2 text-15"
@@ -29,7 +31,7 @@
               <div v-else-if="callIssue.data.name === 'mos'">
                 <network-signal-strength :value-issue="callIssue.data.avg"
                                          :issue="networkIssues[callIssue.data.name]" />
-                <h5 class="mr-1">Outbound MOS: </h5>
+                <h5 class="mr-1">Outbound MOS:</h5>
                 {{ callIssue.data.avg }}
               </div>
               <div v-else-if="callIssue.data.name === 'jitter'">
