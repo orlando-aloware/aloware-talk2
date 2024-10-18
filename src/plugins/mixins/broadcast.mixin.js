@@ -53,14 +53,19 @@ export default {
       window.Echo = new Echo({
         authEndpoint: `${process.env.API_URL}/broadcasting/auth`,
         broadcaster: 'pusher',
-        key: storage.local.getItem('pusher_app_key'),
-        cluster: storage.local.getItem('pusher_cluster'),
+        key: storage.local.getItem('ws_app_key'),
+        cluster: storage.local.getItem('ws_cluster'),
+        wsHost: storage.local.getItem('ws_host'),
+        wssHost: storage.local.getItem('ws_host'),
+        encrypted: true,
         forceTLS: true,
         auth: {
           headers: {
             Authorization: `Bearer ${storage.local.getItem('api_token')}`
           }
-        }
+        },
+        enabledTransports: ['ws', 'wss'],
+        disableStats: true
       })
       console.log('broadcast initiated')
       this.broadcastListen()
