@@ -22,6 +22,22 @@ const fixCommDirection = (direction) => {
 }
 
 /**
+ * Fix comm prepositions
+ * @param {string} direction
+ * @returns {string}
+ */
+const getCommPrepositions = (direction) => {
+  switch (direction) {
+    case 1:
+      return 'From'
+    case 2:
+      return 'To'
+    default:
+      return 'N/A'
+  }
+}
+
+/**
  * Fix comm type
  * @param {string} type
  * @returns {string}
@@ -249,6 +265,7 @@ const translateCallbackStatusText = (callbackStatus) => {
 export default ({ Vue }) => {
   const filters = {
     fixCommDirection,
+    getCommPrepositions,
     fixCommType,
     areaCode: areaCode({ Vue }),
     translateCurrentStatusText,
