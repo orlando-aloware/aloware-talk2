@@ -1637,14 +1637,15 @@ export default {
 
     saveCallIssue (warningName, warningData) {
       if (this.dialer.communication) {
+        const { samples, ...dataCallIssue } = warningData
+
         const params = {
           user_id: this.profile.id,
           event_name: warningName,
           communication_id: this.dialer.communication.id,
-          data: JSON.stringify(warningData)
+          data: JSON.stringify(dataCallIssue)
         }
 
-        console.log(params)
         this.$axios.post('/api/v2/call-quality-events', params)
           .catch(err => {
             console.log(err)
