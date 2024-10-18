@@ -931,8 +931,7 @@ export default {
       selectedItem: null,
       hasFilters: false,
       pdViewListeners: {},
-      bulkAddStatusReport: {},
-      pdViewEvents: []
+      bulkAddStatusReport: {}
     }
   },
 
