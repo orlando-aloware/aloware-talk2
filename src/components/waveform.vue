@@ -1,49 +1,54 @@
 <template>
-  <div class="waveform-container d-flex align-items-center flex-row flex-grow-1" data-testid="waveform-wrapper">
-    <button class="play-button mr-2 px-0"
-            :disabled="!ready"
-            data-testid="waveform-button"
-            @click.prevent="handlePlay">
-      <i class="fa fa-pause"
-         v-if="playing"></i>
-      <i class="fa fa-play"
-         v-if="!playing"></i>
-    </button>
-    <div class="waveform flex-grow-1 mr-2"
-         :id="'waveform-' + uniqueId">
+  <div class="d-flex flex-column flex-grow-1">
+    <div class="waveform-container d-flex align-items-center flex-row flex-grow-1" data-testid="waveform-wrapper">
+      <button class="play-button mr-2 px-0"
+              :disabled="!ready"
+              data-testid="waveform-button"
+              @click.prevent="handlePlay">
+        <i class="fa fa-pause"
+           v-if="playing"></i>
+        <i class="fa fa-play"
+           v-if="!playing"></i>
+      </button>
+      <div class="waveform flex-grow-1 mr-2"
+           :id="'waveform-' + uniqueId">
         <div class="d-flex justify-center position-relative"
              v-if="loading">
-          <q-spinner-bars color="success"
-                        size="28px"
-                        class="position-absolute"
-                        data-testid="waveform-spinner-bars">
+          <q-spinner-bars color="primary"
+                          size="14px"
+                          data-testid="waveform-spinner-bars">
           </q-spinner-bars>
         </div>
       </div>
-    <div class="waveform-timeline mr-1">
-      <q-select
-        dense
-        emit-value
-        borderless
-        class="mt-2 q-select-pager"
-        option-value="value"
-        option-label="label"
-        data-testid="waveform-select-payback-speed"
-        @input="changePlaybackSpeed"
-        v-model="playbackSpeed"
-        :options="playbackOptions"
-        :display-value="`${playbackSpeed}x`">
-      </q-select>
+      <vue-wave-surfer :src="remoteUrl"
+                       :options="options"
+                       ref="surf"
+                       v-if="remoteUrl"
+                       data-testid="waveform-wave-surfer">
+      </vue-wave-surfer>
     </div>
-    <div class="waveform-timeline mr-2">
-      <span class="text-xxs">{{ currentTime | fixDuration(true) }}/{{ duration | fixDuration(true) }}</span>
+    <div class="d-flex flex-row align-items-center justify-content-between waveform-controls">
+      <div class="waveform-timeline">
+        <span class="text-xxs">{{ currentTime | fixDuration(true) }}/{{ duration | fixDuration(true) }}</span>
+      </div>
+
+      <div class="waveform-selector d-flex flex-row align-items-center">
+        <span>Speed:</span>
+        <q-select
+          dense
+          emit-value
+          borderless
+          class="mt-2 q-select-pager"
+          option-value="value"
+          option-label="label"
+          data-testid="waveform-select-payback-speed"
+          @input="changePlaybackSpeed"
+          v-model="playbackSpeed"
+          :options="playbackOptions"
+          :display-value="`${playbackSpeed}x`">
+        </q-select>
+      </div>
     </div>
-    <vue-wave-surfer :src="remoteUrl"
-                     :options="options"
-                     ref="surf"
-                     v-if="remoteUrl"
-                     data-testid="waveform-wave-surfer">
-    </vue-wave-surfer>
   </div>
 </template>
 
@@ -63,6 +68,15 @@ export default {
 
     uniqueId: {
       required: true
+    },
+
+    height: {
+      type: Number,
+      default: 40
+    },
+
+    splitChannels: {
+      default: false
     }
   },
 
@@ -75,11 +89,12 @@ export default {
         cursorWidth: 1,
         container: '#waveform-' + this.uniqueId,
         backend: 'MediaElement',
-        height: 40,
+        height: this.height,
         progressColor: '#2D5BFF',
         responsive: true,
         waveColor: '#C9C9C9',
-        cursorColor: '#2D5BFF'
+        cursorColor: '#2D5BFF',
+        splitChannels: this.splitChannels
       },
       playing: false,
       loading: true,
@@ -118,6 +133,10 @@ export default {
 
       this.player.on('audioprocess', () => {
         this.currentTime = this.player.getCurrentTime()
+      })
+
+      this.player.on('seeking', (currentTime) => {
+        this.currentTime = currentTime
       })
     }
   },
