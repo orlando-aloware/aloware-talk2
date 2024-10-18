@@ -123,7 +123,8 @@
                 </q-img>
               </template>
 
-              <div v-if="isAttachmentAudio(attachment.mime_type)" class="flex mb-1">
+              <div class="flex mb-1"
+                   v-if="isAttachmentAudio(attachment.mime_type)">
                 <div :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse', 'd-flex', 'align-items-center']"
                      v-if="attachment.mime_type === 'audio/amr'">
                   <download-button
