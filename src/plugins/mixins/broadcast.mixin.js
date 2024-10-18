@@ -388,7 +388,6 @@ export default {
          * ------------------------------------
          */
         .listen('.user.contact_list_item.created', (event) => {
-          console.log('########### EVENT 1', event)
           window.VueEvent.fire('contact_list_item_created', event.contact_list_item)
         })
         .listen('.user.contact_list_item.updated', (event) => {
