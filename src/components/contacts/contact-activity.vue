@@ -123,10 +123,24 @@
                 </q-img>
               </template>
 
-              <div v-if="isAttachmentAudio(attachment.mime_type)">
+              <div v-if="isAttachmentAudio(attachment.mime_type)" class="flex mb-1">
+                <div :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse', 'd-flex', 'align-items-center']"
+                     v-if="attachment.mime_type === 'audio/amr'">
+                  <download-button
+                    show-file-name
+                    buttonStyle="position: relative !important;"
+                    :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2']"
+                    :communication-id="communication.id"
+                    :filename="attachment.name"
+                    :file-mime-type="attachment.mime_type"
+                    :attachment-url="attachment.url">
+                  </download-button>
+                  File .amr
+                </div>
                 <audio style="height: 25px;width: 300px;margin-top: 10px;"
                        data-testid="contact-activity-audio"
-                       controls>
+                       controls
+                       v-else>
                   <source :src="attachment.url"
                           :type="attachment.mime_type">
                   Your browser does not support the audio element.
