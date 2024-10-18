@@ -1636,7 +1636,7 @@ export default {
     },
 
     saveCallIssue (warningName, warningData) {
-      if (this.dialer.communication) {
+      if (this.dialer.communication && warningData) {
         const { samples, ...dataCallIssue } = warningData
 
         const params = {
