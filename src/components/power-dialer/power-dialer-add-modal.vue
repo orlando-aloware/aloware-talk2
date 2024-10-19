@@ -370,11 +370,6 @@ export default {
     selectedAllCount: {
       type: Number,
       default: 0
-    },
-
-    isManualSelection: {
-      type: Boolean,
-      default: false
     }
   },
 
@@ -474,7 +469,7 @@ export default {
     contactsDescription () {
       let description = ''
 
-      if (this.mode === 'add-contact-list' && this.contactList && !this.isManualSelection) {
+      if (this.mode === 'add-contact-list' && this.contactList) {
         description += this.contactList.contactCount
       } else if (this.requestParams.selected_all) {
         description += this.selectedAllCount
@@ -683,11 +678,8 @@ export default {
         this.requestParams.contact_list_id = this.powerDialerListId
       }
 
-      // If selectedAll OR is List action
-      const shouldSelectAll = this.requestParams.selected_all || (this.mode === 'add-contact-list' && !this.isManualSelection)
-
       // Verify filters to avoid adding all company contacts
-      if (shouldSelectAll && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
+      if (this.mode === 'add-contact-list' && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
         // Add to requests params the list_id to adding all contacts from current list
         this.requestParams.list_id = this.contactList.id
         this.requestParams.selected_all = true
@@ -846,8 +838,7 @@ export default {
 
     getListCount (id) {
       return this.$axios
-        // .get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${id}/count`)
-        .get(`https://pr-10767.mde.alodev.org/api/v2/contacts-list/${id}/count`)
+        .get(`${process.env.API_REPORTING_URL}/api/v2/contacts-list/${id}/count`)
     },
 
     checkIntegrationImport () {
