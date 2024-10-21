@@ -370,6 +370,11 @@ export default {
     selectedAllCount: {
       type: Number,
       default: 0
+    },
+
+    isManualSelection: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -469,7 +474,7 @@ export default {
     contactsDescription () {
       let description = ''
 
-      if (this.mode === 'add-contact-list' && this.contactList) {
+      if (this.mode === 'add-contact-list' && this.contactList && !this.isManualSelection) {
         description += this.contactList.contactCount
       } else if (this.requestParams.selected_all) {
         description += this.selectedAllCount
@@ -678,8 +683,11 @@ export default {
         this.requestParams.contact_list_id = this.powerDialerListId
       }
 
+      // If selectedAll OR is List action
+      const shouldSelectAll = this.requestParams.selected_all || (this.mode === 'add-contact-list' && !this.isManualSelection)
+
       // Verify filters to avoid adding all company contacts
-      if (this.mode === 'add-contact-list' && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
+      if (shouldSelectAll && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
         // Add to requests params the list_id to adding all contacts from current list
         this.requestParams.list_id = this.contactList.id
         this.requestParams.selected_all = true
