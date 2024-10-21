@@ -64,7 +64,9 @@
         </div>
 
         <template v-if="userCanAddPublicList">
-          <hr class="w-100 my-2" v-if="!isCreateListModeFromBulkMenuOrFilters" />
+          <hr class="w-100 my-2"
+              v-if="!isCreateListModeFromBulkMenuOrFilters"
+          />
           <div :class="['flex-grow-1', isCreateListModeFromBulkMenuOrFilters ? 'py-4' : 'pt-2 pb-4']">
             <div class="form-check mb-2"
                  @click="createList.show_in_public_folder = false">
@@ -136,7 +138,10 @@ import {
   FROM_BULK_MENU
 } from 'src/constants/contacts-list-create-mode'
 import { chunk, isEmpty } from 'lodash'
-import { aclMixin, contactLists } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  contactLists
+} from 'src/plugins/mixins'
 
 export default {
   mixins: [

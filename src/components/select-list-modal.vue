@@ -41,30 +41,30 @@
             </b-col>
           </b-form-row>
         </div>
-        <div class="tree-container" v-if="filteredPublicLists.length">
-          <select-list-tree-folder
-            class="select-list-tree-folder"
-            name="Public Lists"
-            :layer="0"
-            :order="0"
-            key="publicLists"
-            :lists="filteredPublicLists"
-            :folders="null"
-            :has-edit="1"
-            :has-delete="0"
+        <div class="tree-container"
+             v-if="filteredPublicLists.length">
+          <select-list-tree-folder class="select-list-tree-folder"
+                                   name="Public Lists"
+                                   key="publicLists"
+                                   :layer="0"
+                                   :order="0"
+                                   :has-edit="1"
+                                   :has-delete="0"
+                                   :folders="null"
+                                   :lists="filteredPublicLists"
           />
         </div>
         <div class="tree-container">
           <select-list-tree-folder class="select-list-tree-folder"
                                    name="My Lists"
-                                   :key="folder.id"
+                                   :layer="0"
                                    :id="folder.id"
+                                   :key="folder.id"
                                    :order="folder.order"
                                    :hasEdit="folder.has_edit"
                                    :hasDelete="folder.has_delete"
                                    :folders="folder.child_folders"
                                    :lists="folder.lists.filter(list => list.type === ContactListTypes.STATIC && list.id !== selectedList.id)"
-                                   :layer="0"
                                    v-for="folder in folders"/>
         </div>
       </div>
