@@ -31,7 +31,7 @@
                  v-model="createList.name"/>
         </div>
 
-        <div class="flex-grow-1 py-4"
+        <div :class="['flex-grow-1', isCreateListModeFromBulkMenuOrFilters ? 'py-4' : 'pt-4 pb-2']"
              v-if="![CreateListMode.FROM_FILTERS, CreateListMode.FROM_BULK_MENU].includes(createList.mode) && isDefault">
           <div class="form-check mb-2"
                @click="createList.type = ContactListTypes.DYNAMIC">
@@ -62,6 +62,40 @@
             </label>
           </div>
         </div>
+
+        <template v-if="userCanAddPublicList">
+          <hr class="w-100 my-2" v-if="!isCreateListModeFromBulkMenuOrFilters" />
+          <div :class="['flex-grow-1', isCreateListModeFromBulkMenuOrFilters ? 'py-4' : 'pt-2 pb-4']">
+            <div class="form-check mb-2"
+                 @click="createList.show_in_public_folder = false">
+              <input class="form-check-input"
+                     type="radio"
+                     id="isPublicListFalse"
+                     name="isPublicList"
+                     :checked="createList.show_in_public_folder === false" />
+              <label for="isPublicListFalse">
+                <div class="create-list-modal__list-title">Private List</div>
+                <div class="create-list-modal__list-desc">
+                  Designed for individual use. It is only accessible to the user who created it.
+                </div>
+              </label>
+            </div>
+            <div class="form-check"
+                 @click="createList.show_in_public_folder = true">
+              <input class="form-check-input"
+                     type="radio"
+                     id="isPublicListTrue"
+                     :checked="createList.show_in_public_folder === true" />
+              <label for="isPublicListTrue">
+                <div class="create-list-modal__list-title">Public List</div>
+                <div class="create-list-modal__list-desc">
+                  Designed for broader access. It can be seen by all agents in the organization. Supervisors and Admins
+                  can also add contacts to the list.
+                </div>
+              </label>
+            </div>
+          </div>
+        </template>
 
         <div class="text-red">
           {{ errorMsg }}
@@ -102,8 +136,12 @@ import {
   FROM_BULK_MENU
 } from 'src/constants/contacts-list-create-mode'
 import { chunk, isEmpty } from 'lodash'
+import { aclMixin, contactLists } from 'src/plugins/mixins'
 
 export default {
+  mixins: [
+    aclMixin, contactLists
+  ],
   inject: [
     'selectedContacts'
   ],
@@ -134,6 +172,14 @@ export default {
       }
 
       return 'New List'
+    },
+
+    isCreateListModeFromBulkMenuOrFilters () {
+      return [this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)
+    },
+
+    userCanAddPublicList () {
+      return this.isBillingAdminOrAdminOrSupervisor
     },
 
     isNameValid () {
@@ -193,6 +239,7 @@ export default {
         headers: headers,
         mode: this.createList.mode,
         order: 0,
+        show_in_public_folder: this.createList.show_in_public_folder,
         include_all_contacts: this.isAllContactsSelected
       }
 
@@ -351,6 +398,7 @@ export default {
           this.$generalNotification(message)
 
           this.loadFolders()
+          this.loadPublicLists()
         })
         .catch((error) => {
           if (!isChunked) {

@@ -21,7 +21,6 @@
             <i class="fa fa-times"/>
           </button>
         </div>
-
         <div class="pt-3">
           <b-form-row>
             <b-col md="10">
@@ -42,9 +41,22 @@
             </b-col>
           </b-form-row>
         </div>
+        <div class="tree-container" v-if="filteredPublicLists.length">
+          <select-list-tree-folder
+            class="select-list-tree-folder"
+            name="Public Lists"
+            :layer="0"
+            :order="0"
+            key="publicLists"
+            :lists="filteredPublicLists"
+            :folders="null"
+            :has-edit="1"
+            :has-delete="0"
+          />
+        </div>
         <div class="tree-container">
           <select-list-tree-folder class="select-list-tree-folder"
-                                   :name="folder.name"
+                                   name="My Lists"
                                    :key="folder.id"
                                    :id="folder.id"
                                    :order="folder.order"
@@ -82,11 +94,13 @@ export default {
       'selectedStaticList',
       'selectedList',
       'folders',
+      'publicLists',
       'search'
     ]),
-
     ...mapState(['isDatatableSelectedAll']),
-
+    filteredPublicLists () {
+      return this.publicLists.filter(list => list.type === ContactListTypes.STATIC && list.id !== this.selectedList.id)
+    },
     getTitle () {
       return 'Add to Static Lists'
     }
@@ -153,6 +167,9 @@ export default {
             const { message, html } = extractErrorMessage(error)
             console.log(html)
             this.$generalNotification(message, 'error')
+          } else {
+            this.$generalNotification('Unable to add Contact to Static List. Please check if You are authorized to edit this list.', 'error')
+            this.isLoading = false
           }
         })
         .finally(() => {
