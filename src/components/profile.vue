@@ -345,10 +345,6 @@ export default {
       return this.isDisabled && !localStorage.getItem('impersonate')
     },
 
-    userPersonalLine () {
-      return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
-    },
-
     isDisabled () {
       const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
       const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
@@ -358,6 +354,10 @@ export default {
       return this.loadingAgentStatus ||
         ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus) ||
         this.isAgentOnCall || isForcedDispositionOnWrapUp
+    },
+
+    userPersonalLine () {
+      return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
     }
   },
 
