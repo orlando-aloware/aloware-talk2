@@ -93,6 +93,7 @@
                   v-close-popup
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'cursor-inherit' : '']"
                   data-testid="profile-offline-time"
+                  :disable="isDisabled"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
@@ -115,6 +116,7 @@
                   v-close-popup
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'cursor-inherit' : '']"
                   data-testid="profile-available-calls"
+                  :disable="isDisabled"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
@@ -134,7 +136,7 @@
           <q-item dense
                   clickable
                   v-close-popup
-                  :disable="profile.company.force_users_always_available && !hasRole('Company Admin')"
+                  :disable="(profile.company.force_users_always_available && !hasRole('Company Admin')) || isDisabled"
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'cursor-inherit' : '']"
                   data-testid="profile-busy-calls"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)">
@@ -168,7 +170,7 @@
                   clickable
                   v-close-popup
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'cursor-inherit' : '']"
-                  :disable="profile.company.force_users_always_available && !hasRole('Company Admin')"
+                  :disable="(profile.company.force_users_always_available && !hasRole('Company Admin')) || isDisabled"
                   data-testid="profile-on-break"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)">
             <div class="d-flex align-items-center justify-content-between w-100">
@@ -199,6 +201,7 @@
           <q-item dense
                   clickable
                   data-testid="profile-turn-notifications-item"
+                  :disable="isDisabled"
                   @click="toggleSleepMode">
             <q-item-section>
               <q-skeleton type="rect"
@@ -221,6 +224,7 @@
                   clickable
                   v-close-popup
                   data-testid="profile-select-account-item"
+                  :disable="isDisabled"
                   v-if="profile?.has_multiple_access"
                   @click="showAccountSelector">
             <q-item-section>
@@ -338,6 +342,14 @@ export default {
     },
 
     isProfileDropdownDisabled () {
+      return this.isDisabled && !localStorage.getItem('impersonate')
+    },
+
+    userPersonalLine () {
+      return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
+    },
+
+    isDisabled () {
       const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
       const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
       const isForcedDispositionOnWrapUp = (isForcedCallDisposition || isForcedContactDisposition) &&
@@ -346,10 +358,6 @@ export default {
       return this.loadingAgentStatus ||
         ['RECEIVED_CALL_INVITE', 'MAKING_CALL', 'CALL_CONNECTED'].includes(this.dialer.currentStatus) ||
         this.isAgentOnCall || isForcedDispositionOnWrapUp
-    },
-
-    userPersonalLine () {
-      return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
     }
   },
 
