@@ -359,7 +359,7 @@
                  data-testid="contacts-view-datatable"
                  :stickyHeaders="true"
                  :columns="columns"
-                 :isEmpty="isEmpty || isStartState"
+                 :isEmpty="isEmpty"
                  :isLoadingMore="isLoadingMore"
                  :is-loading="isLoading"
                  :contact-list-id="id"
