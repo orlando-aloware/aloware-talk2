@@ -166,6 +166,7 @@ export default {
       return this.$axios.get(`https://pr-10767.mde.alodev.org/api/v2/contacts/count`, {
         params: {
           skip_cache: skipCache,
+          force_slave: 1, // TODO: Remove this, use only for MDE
           ...params
         },
         paramsSerializer: qs.stringify,
