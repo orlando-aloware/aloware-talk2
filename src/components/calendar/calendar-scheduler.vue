@@ -25,6 +25,12 @@ export default {
     }
   },
 
+  data () {
+    return {
+      browserTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+    }
+  },
+
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState(['isMobile']),
@@ -67,7 +73,7 @@ export default {
     Scheduler.config.min_event_width = 60
     Scheduler.config.min_event_height = 20
     Scheduler.config.event_min_dy = 20
-    Scheduler.xy.scale_width = !this.timezoneIsDifferentThanBrowser ? 70 : 130
+    Scheduler.xy.scale_width = this.getScaleWidth()
 
     Scheduler.templates.week_date = function (start, end) {
       const startDate = moment(start)
@@ -115,10 +121,10 @@ export default {
     }.bind(this)
 
     Scheduler.templates.hour_scale = function (date) {
-      const localTime = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
-      const localTimeAcronym = moment(date).format('z')
+      const localTime = moment(date).tz(this.browserTimeZone).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+      const localTimeAcronym = moment(date).tz(this.browserTimeZone).format('z')
 
-      if (this.timezoneIsDifferentThanBrowser) {
+      if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
         const currentTimezoneTime = moment(date).tz(this.currentTimezone).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
         const currentTimezoneAcronym = moment(date).tz(this.currentTimezone).format('z')
         return `
@@ -155,7 +161,8 @@ export default {
       if (e.target.classList.contains('custom-more-link') ||
         e.target.classList.contains('custom-expand-link') ||
         e.target.classList.contains('day-label') ||
-        e.target.classList.contains('hour-label')) {
+        e.target.classList.contains('hour-label') ||
+        e.target.classList.contains('time-column')) {
         return
       }
 
@@ -168,6 +175,7 @@ export default {
 
     Scheduler.attachEvent('onViewChange', (newView) => {
       this.setNavHeight(newView)
+      this.setSchedulerHeaderTableWidth(newView)
 
       let state = Scheduler.getState()
       this.renderEvents(state)
@@ -281,7 +289,8 @@ export default {
     },
 
     handleHourLabelClick (e) {
-      if (e.target.classList.contains('hour-label')) {
+      if (e.target.classList.contains('hour-label') ||
+        e.target.classList.contains('time-column')) {
         e.preventDefault()
         e.stopPropagation()
 
@@ -309,6 +318,32 @@ export default {
       }
 
       Scheduler.xy.nav_height = 0
+    },
+
+    setSchedulerHeaderTableWidth (currentView) {
+      if (!currentView || currentView !== 'week') {
+        return
+      }
+
+      const headerTableWeek = document.querySelector('.scheduler__header__table--week')
+      if (this.isMobile) {
+        headerTableWeek.style.width = `calc(100% - ${this.getScaleWidth()}px)`
+        return
+      }
+
+      headerTableWeek.style.width = !this.timezoneIsDifferentThanBrowser ? `calc(100% - ${this.getScaleWidth()}px)` : `calc(100% - ${this.getScaleWidth()}px)`
+    },
+
+    getScaleWidth () {
+      if (this.isMobile) {
+        return 50
+      }
+
+      if (!this.timezoneIsDifferentThanBrowser) {
+        return 70
+      }
+
+      return 130
     },
 
     getMoreCount (count) {
