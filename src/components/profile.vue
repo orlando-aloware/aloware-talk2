@@ -342,7 +342,8 @@ export default {
     },
 
     isProfileDropdownDisabled () {
-      return this.isDisabled && !localStorage.getItem('impersonate')
+      const isImpersonate = localStorage.getItem('impersonate')
+      return this.isDisabled && (!isImpersonate || (isImpersonate && this.dialer?.call?.state === 'open'))
     },
 
     isDisabled () {
