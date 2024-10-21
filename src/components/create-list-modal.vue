@@ -65,8 +65,7 @@
 
         <template v-if="userCanAddPublicList">
           <hr class="w-100 my-2"
-              v-if="!isCreateListModeFromBulkMenuOrFilters"
-          />
+              v-if="!isCreateListModeFromBulkMenuOrFilters"/>
           <div :class="['flex-grow-1', isCreateListModeFromBulkMenuOrFilters ? 'py-4' : 'pt-2 pb-4']">
             <div class="form-check mb-2"
                  @click="createList.show_in_public_folder = false">
