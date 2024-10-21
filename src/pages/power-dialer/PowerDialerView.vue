@@ -1245,6 +1245,7 @@ export default {
         elem.checked = this.listItemsDataCount > 0 && value.length === this.listItemsDataCount
       }
     },
+
     /**
      * Notifies summary of contacts added to PD list
      */
