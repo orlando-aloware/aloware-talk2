@@ -145,7 +145,8 @@ import {
 
 export default {
   mixins: [
-    aclMixin, contactLists
+    aclMixin,
+    contactLists
   ],
   inject: [
     'selectedContacts'
