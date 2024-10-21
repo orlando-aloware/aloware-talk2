@@ -1,19 +1,19 @@
 <template>
   <confirm-dialog id="remove-contact-confirmation-dialog"
-                  :title="title"
+                  :title="'Are you sure you want to ' + title"
                   :is-busy="isBusy"
-                  @close="removeContactClose"
+                  @close="removeContactClose; confirmationInputString=''; typedConfirmationInputString=''"
                   @hide="onHide"
                   @shown="onShown">
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          Type the number of contacts below to delete
+          Type "{{confirmationInputString}}" here to confirm
           <input ref="contactsToDeleteInput"
-                 class="form-control form-control-search"
+                 class="form-control form-control-search my-2"
                  type="text"
-                 :placeholder="contactToDeleteCount"
-                 v-model="contactsToDelete"/>
+                 :placeholder="confirmationInputString"
+                 v-model="typedConfirmationInputString" />
         </div>
       </div>
     </div>
@@ -27,7 +27,7 @@
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
-                :disabled="(contactsToDelete !== contactToDeleteCount.toString()) || isBusy"
+                :disabled="(confirmationInputString !== typedConfirmationInputString) || isBusy"
                 @click="onConfirm">
           <b-spinner variant="warning"
                      type="grow"
@@ -35,7 +35,7 @@
                      small
                      v-if="isBusy">
           </b-spinner>
-          Delete
+          {{ confirmationInputString  }}
         </button>
       </div>
     </div>
@@ -87,7 +87,21 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     title () {
-      return `Delete ${this.$options.filters.numFormat(this.contactToDeleteCount)} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
+      let formattedContactToDeleteCount = this.$options.filters.numFormat(this.contactToDeleteCount)
+      let formattedContactWord = ` contact` + ((this.contactToDeleteCount > 1) ? `s` : ``)
+      let title = null
+      switch (this.removeContactActionType) {
+        case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
+          title = `remove ${formattedContactToDeleteCount}` + formattedContactWord + ` from the list?`
+          break
+        case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
+          title = `delete ${formattedContactToDeleteCount}` + formattedContactWord + `?`
+      }
+      return title
+    },
+
+    confirmationInputString () {
+      return this.removeContactActionType === ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY ? 'Remove' : 'Delete'
     },
 
     contactToDeleteCount () {
@@ -138,6 +152,7 @@ export default {
       isBusy: false,
       contactsToDelete: null,
       ContactsListRemoveFromTypes,
+      typedConfirmationInputString: '',
       STATIC
     }
   },

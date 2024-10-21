@@ -41,6 +41,17 @@
           </div>
         </template>
         <div class="items"
+             v-if="showRemoveFromListButton">
+          <a href=""
+             class="text-danger"
+             data-testid="bulk-action-menu-remove-from-list-link"
+             :disabled="disabledRemoveOnList"
+             @click="onRemoveFromList">
+            <i class="fa fa-ban text-danger" />
+            Remove {{ contactsWord }} From List
+          </a>
+        </div>
+        <div class="items"
              v-if="showDeleteButton">
           <a href=""
              class="text-danger"
@@ -48,7 +59,7 @@
              :disabled="disabledDelete"
              @click="onDelete">
             <i class="fa fa-trash text-danger"/>
-            Delete
+            Delete {{ contactsWord }}
           </a>
         </div>
         <div class="items"
@@ -128,6 +139,7 @@ import {
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
+import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 
 export default {
   name: 'bulk-action-menu',
@@ -146,6 +158,11 @@ export default {
 
   props: {
     disabledDelete: {
+      type: Boolean,
+      default: false
+    },
+
+    disabledRemoveOnList: {
       type: Boolean,
       default: false
     },
@@ -186,6 +203,10 @@ export default {
       'isDatatableCountLoading',
       'isDatatableSelectedAll'
     ]),
+
+    contactsWord () {
+      return this.checkedCount > 1 ? 'Contacts' : 'Contact'
+    },
 
     selectedContactIds () {
       return this.selectedContacts[this.id].map(contact => contact.contact_list_item_id)
@@ -254,6 +275,10 @@ export default {
       return !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) || this.isPowerDialer)
     },
 
+    showRemoveFromListButton () {
+      return !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) || this.isPowerDialer)
+    },
+
     showMoreDropdownButton () {
       if (!this.isContacts || this.isAddView) {
         return false
@@ -283,7 +308,8 @@ export default {
       'removeContactOpen',
       'createListOpen',
       'selectListOpen',
-      'setSelectedStaticList'
+      'setSelectedStaticList',
+      'setContactRemoveActionType'
     ]),
 
     ...mapActions('powerDialer', [
@@ -299,8 +325,22 @@ export default {
       }
 
       this.setBulkDelete(true)
-      this.$bvModal.show('remove-contact-dialog')
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_CONTACTS)
       this.$emit('on-delete')
+      e.preventDefault()
+    },
+
+    onRemoveFromList (e) {
+      if (this.disabledDelete) {
+        e.preventDefault()
+        return
+      }
+
+      this.setBulkDelete(true)
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.$emit('on-remove-from-list')
       e.preventDefault()
     },
 
