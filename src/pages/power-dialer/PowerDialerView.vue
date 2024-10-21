@@ -1249,7 +1249,7 @@ export default {
      * Notifies summary of contacts added to PD list
      */
     checkTaskAddedNotification () {
-      const notifications = this.bulkAddNotifications(this.$route.params.id)
+      const notifications = this.bulkAddNotifications(this.selectedListId)
       // Verify if notifications is not an array and set the status report
       if (!Array.isArray(notifications)) {
         this.bulkAddStatusReport = notifications?.status_report
@@ -1301,7 +1301,7 @@ export default {
     },
 
     onTaskAddedNotificationClose () {
-      this.clearBulkActionNotification(this.$route.params.id)
+      this.clearBulkActionNotification(this.selectedListId)
       this.bulkAddStatusReport = {}
     }
   },
