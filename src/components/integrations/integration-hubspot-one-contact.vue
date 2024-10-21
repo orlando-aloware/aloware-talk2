@@ -7,7 +7,7 @@
          :href="getHubspotContactBaseLink() + 'contact/' + integrationData.id">
         <i class="fa fa-external-link" aria-hidden="true"/>
       </a>
-      <p class='mb-0 text-bold' v-if='isPrimary'>
+      <p class='mb-0 text-bold' v-if='isPrimary && hasDuplicates'>
         Primary
       </p>
       <p class='mb-0'
@@ -120,6 +120,10 @@ export default {
     }
   },
   computed: {
+    hasDuplicates () {
+      return this.integrationData && this.integrationData.duplicates && this.integrationData.duplicates.length > 0
+    },
+
     isNameAvailable () {
       return this.integrationData.properties.firstname !== undefined || this.integrationData.properties.lastname !== undefined
     },

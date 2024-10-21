@@ -4,27 +4,15 @@
             data-testid="integration-hubspot-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="contactLink">
-          <b-link target="_blank"
-                  data-testid="integration-hubspot-hubspot-link"
-                  :href="contactLink">
-            <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Hubspot</span>
-          </b-link>
-        </q-item-section>
-        <q-item-section v-else>
-          <a href="#"
-             data-testid="integration-hubspot-hubspot-a-tag"
-             onclick="return false;">
-            <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Hubspot</span>
-          </a>
-        </q-item-section>
+        <span class='hubspot-jit-card-header'>
+          <i class="fab fa-hubspot hubspot-icon"></i>
+          <span class="integration-title">Hubspot</span>
+        </span>
       </q-item>
       <q-separator data-testid="integration-hubspot-separator" />
       <q-card-section class='duplicateContactPhoneNumberMessage'
                       v-if='hasDuplicates'>
-        This contact has other matches with the same number{{ duplicatePhoneNumbers }}
+        {{ duplicatePhoneNumbersDescription }}
       </q-card-section>
       <q-separator v-if='hasDuplicates' />
       <integration-hubspot-one-contact v-if='integrationData'
@@ -162,14 +150,6 @@ export default {
       return this.workflow.id
     },
 
-    contactLink () {
-      if (!this.contactIntegrationDataLoaded) {
-        return
-      }
-
-      return this.getHubspotContactLink(this.contact)
-    },
-
     isContactValid () {
       return this.contact && this.contact.id
     },
@@ -186,7 +166,7 @@ export default {
       return this.integrationData && this.integrationData.duplicates && this.integrationData.duplicates.length > 0
     },
 
-    duplicatePhoneNumbers () {
+    duplicatePhoneNumbersDescription () {
       if (!this.integrationData || !this.integrationData.duplicates) {
         return ''
       }
@@ -194,7 +174,9 @@ export default {
       const values = [...new Set(this.integrationData.duplicates
         .flatMap(item => [...new Set(item.duplicated_by.map(item => item.value))]))]
 
-      return values.length ? `: ${values.join(', ')}` : ''
+      return 'This contact has other matches with the same number' +
+        (values.length > 1 ? 's' : '') +
+        (values.length ? `: ${values.join(', ')}` : '')
     }
   },
 
