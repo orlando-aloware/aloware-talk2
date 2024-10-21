@@ -228,6 +228,17 @@ export default {
   },
 
   STORE_BULK_ACTION_NOTIFICATION (state, value) {
+    // verify if the bulk action is a batch action and store it in an array if it is
+    if (value?.status_report?.batch_size > 1) {
+      if (state.bulkAddContactsNotification[value.contact_list_id]) {
+        state.bulkAddContactsNotification[value.contact_list_id].unshift(value)
+        return
+      }
+      state.bulkAddContactsNotification[value.contact_list_id] = [value]
+      return
+    }
+
+    // if not a batch action, store it as a single object
     state.bulkAddContactsNotification[value.contact_list_id] = value
   },
 
