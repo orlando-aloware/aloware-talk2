@@ -165,7 +165,8 @@ export default {
       // return this.$axios.get(`${process.env.API_REPORTING_URL}/api/v2/contacts/count`, {
       return this.$axios.get(`https://pr-10767.mde.alodev.org/api/v2/contacts/count`, {
         params: {
-          skip_cache: skipCache,
+          skip_cache: true, // TODO: Rollback this skip cache
+          // skip_cache: skipCache,
           ...params
         },
         paramsSerializer: qs.stringify,
