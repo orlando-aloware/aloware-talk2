@@ -27,7 +27,12 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile']),
-    ...mapState(['isMobile'])
+    ...mapState(['isMobile']),
+    ...mapState(['currentTimezone']),
+
+    timezoneIsDifferentThanBrowser () {
+      return this.browserTimeZone !== this.currentTimezone
+    }
   },
 
   mounted () {
@@ -62,6 +67,7 @@ export default {
     Scheduler.config.min_event_width = 60
     Scheduler.config.min_event_height = 20
     Scheduler.config.event_min_dy = 20
+    Scheduler.xy.scale_width = !this.timezoneIsDifferentThanBrowser ? 70 : 130
 
     Scheduler.templates.week_date = function (start, end) {
       const startDate = moment(start)
@@ -109,8 +115,25 @@ export default {
     }.bind(this)
 
     Scheduler.templates.hour_scale = function (date) {
-      const hour = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
-      return `<div class="hour-label" data-hour="${moment(date).hour()}">${hour}</div>`
+      const localTime = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+      const localTimeAcronym = moment(date).format('z')
+
+      if (this.timezoneIsDifferentThanBrowser) {
+        const currentTimezoneTime = moment(date).tz(this.currentTimezone).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+        const currentTimezoneAcronym = moment(date).tz(this.currentTimezone).format('z')
+        return `
+          <div class="hour-label" data-hour="${moment(date).hour()}">
+            <div class="time-column current-time" data-hour="${moment(date).hour()}">${currentTimezoneTime} ${currentTimezoneAcronym}</div>
+            <div class="time-column local-time" data-hour="${moment(date).hour()}">${localTime} ${localTimeAcronym}</div>
+          </div>
+        `
+      } else {
+        return `
+          <div class="hour-label" data-hour="${moment(date).hour()}">
+            <div class="time-column local-time" data-hour="${moment(date).hour()}">${localTime}</div>
+          </div>
+        `
+      }
     }.bind(this)
 
     Scheduler.templates.event_date = function (date) {
