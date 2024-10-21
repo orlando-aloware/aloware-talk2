@@ -361,7 +361,7 @@
                  data-testid="contacts-view-datatable"
                  :stickyHeaders="true"
                  :columns="columns"
-                 :isEmpty="isEmpty || isStartState"
+                 :isEmpty="isEmpty"
                  :isLoadingMore="isLoadingMore"
                  :is-loading="isLoading"
                  :contact-list-id="id"
@@ -1059,6 +1059,8 @@ export default {
     },
 
     listItemsHasData () {
+      console.log('***listItemsHasData this.listItemsDataCount', this.listItemsDataCount)
+      console.log('***listItemsHasData this.fixedContactsData', this.fixedContactsData)
       return !_.isEmpty(this.fixedContactsData)
     },
 
