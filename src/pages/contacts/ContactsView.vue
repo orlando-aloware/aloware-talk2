@@ -1059,8 +1059,6 @@ export default {
     },
 
     listItemsHasData () {
-      console.log('***listItemsHasData this.listItemsDataCount', this.listItemsDataCount)
-      console.log('***listItemsHasData this.fixedContactsData', this.fixedContactsData)
       return !_.isEmpty(this.fixedContactsData)
     },
 
