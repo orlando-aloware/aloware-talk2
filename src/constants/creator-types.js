@@ -20,6 +20,7 @@ export const CREATOR_TYPE_ZAPIER = 9
 export const CREATOR_TYPE_ALOHABOT = 10 // Deprecated
 // Communication that initiated from GoHighLevel
 export const CREATOR_TYPE_GOHIGHLEVEL = 11
+// Communication that initiated from AloAi
 export const CREATOR_TYPE_ALOAI = 12
 
 export const ALL_CREATOR_TYPES = [
