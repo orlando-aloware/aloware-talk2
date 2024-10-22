@@ -326,6 +326,10 @@ export default {
       }
 
       const headerTableWeek = document.querySelector('.scheduler__header__table--week')
+      if (!headerTableWeek) {
+        return
+      }
+
       if (this.isMobile) {
         headerTableWeek.style.width = `calc(100% - ${this.getScaleWidth()}px)`
         return
