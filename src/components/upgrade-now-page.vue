@@ -13,6 +13,10 @@
          v-if="extraText">
           {{ extraText }}
       </p>
+      <p class="info-text"
+         v-if="extraText2">
+          {{ extraText2 }}
+      </p>
       <div class="flex-row mb-4 mt-3">
           <span size="large"
                 type="text"
@@ -24,6 +28,7 @@
           <b-button pill
                     variant="primary"
                     class="cursor-pointer el-button ml-2"
+                    v-if="showButton"
                     :disabled="disabled"
                     @click="checkClick">
             {{ buttonText }}
@@ -49,6 +54,11 @@ export default {
       required: false
     },
 
+    extraText2: {
+      type: String,
+      required: false
+    },
+
     text: {
       type: String,
       default: 'This is not included in your current plan. To use it, please contact us to upgrade today!',
@@ -58,6 +68,12 @@ export default {
     buttonText: {
       type: String,
       default: 'Request a Plan Upgrade',
+      required: false
+    },
+
+    showButton: {
+      type: Boolean,
+      default: true,
       required: false
     },
 

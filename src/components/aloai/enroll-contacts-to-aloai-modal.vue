@@ -18,7 +18,7 @@
       </h1>
       <div class="text-center">
         Select the bot that you want to enroll at your
-        {{ this.params.contact_ids.length }} selected<br />contacts.
+        <strong>~{{this.contactsCount}} contacts</strong>.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search
@@ -136,6 +136,10 @@ export default {
     contactList: {
       type: Object,
       default: null
+    },
+    checkedCount: {
+      type: Number,
+      default: 0
     }
   },
   computed: {
@@ -156,12 +160,24 @@ export default {
       return bots.sort((a, b) =>
         a.name?.toUpperCase() > b.name?.toUpperCase() ? 1 : -1
       )
+    },
+    contactsCount () {
+      if (this.mode === 'add-contact-list' && this.contactList) {
+        return this.contactList.contactCount
+      }
+
+      if (this.isDatatableSelectedAll) {
+        return this.checkedCount
+      }
+
+      return this.params?.contact_ids?.length ?? 0
     }
   },
   data () {
     return {
       isBusy: false,
       isOpen: false,
+      mode: 'add-contact-list',
       bots: [],
       searchText: '',
       isLoading: true,
@@ -188,11 +204,10 @@ export default {
         params.search = this.search
       }
 
-      if (this.isDatatableSelectedAll) {
+      // If it is a List action, we need to send the full list
+      if (this.mode === 'add-contact-list' || this.isDatatableSelectedAll) {
         params.selected_all = true
-        if (params?.contact_ids) {
-          delete params.contact_ids
-        }
+        delete params.contact_ids
       }
 
       // Don't send list_id for dynamic lists, it should use only the filters

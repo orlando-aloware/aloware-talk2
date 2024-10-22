@@ -319,7 +319,7 @@ export default {
           if (redial) {
             position = 'top'
             this.taskToCall.contact_list_item_id = res.data.data.id
-            this.taskToCall.redial = res.data.data.redialed
+            this.taskToCall.redialed = res.data.data.redialed
           }
 
           this.$generalNotification(`Success: contact is at the ${position} of the current list`)
@@ -397,7 +397,7 @@ export default {
 
       // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
       // but discarding the ones have been skipped so we don't list them again
-      const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+      const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.contact_list_item_id === element.contact_list_item_id))
 
       return newInQueueList
     }

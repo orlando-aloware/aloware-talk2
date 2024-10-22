@@ -1,5 +1,6 @@
 <template>
-  <div v-if="communication" data-testid="comm-details-wrapper">
+  <div v-if="communication"
+       data-testid="comm-details-wrapper">
     <b-row data-testid="comm-details-row">
       <b-col :md="isWidget ? 12 : 4"
              sm="12"
@@ -17,20 +18,25 @@
                           variant="light"
                           class="btn-white communication-back-button"
                           title="Go Back"
-                          v-if='isWidget'
+                          v-if="isWidget && canGoBack"
                           data-testid="contact-details-navigation-btn-prev"
                           v-b-tooltip.hover
-                          @click.prevent="$router.go(-1)">
+                          @click.prevent="goBack(false)">
                   <i class="material-icons">keyboard_arrow_left</i>
                 </b-button>
                 Communication Info
               </div>
 
               <div class="d-flex header-btn-wrapper">
-                <transcription-modal class="mr-2"
-                                     :communication="communication"
-                                     data-testid="comm-details-transcription-modal"
-                                     v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
+                <div class="flex items-center mr-1 h-100"
+                     data-testid="comm-transcription-modal-btn"
+                     v-if="!communication.transcription_is_deleted && communication.metadata?.transcription_info"
+                     @click="fetchSmartTranscriptionData(communication)">
+                  <span class="text-blue cursor-pointer">
+                    Show Transcription
+                  </span>
+                </div>
+
                 <b-button variant="danger"
                           size="sm"
                           v-if="hasPermissionTo('archive communication')"
@@ -163,7 +169,6 @@
                              data-testid="comm-details-contact-router-link">
                   {{ communication.contact.name | fixContactName }}
                 </router-link>
-
               </b-col>
             </b-form-row>
             <hr/>
@@ -995,7 +1000,8 @@ import {
   classicMixin,
   userMixin,
   communicationInfoMixin,
-  simpsocialMixin
+  simpsocialMixin,
+  goBackMixin
 } from 'src/plugins/mixins'
 
 import * as CommunicationTypes from '../constants/communication-types'
@@ -1042,7 +1048,8 @@ export default {
     classicMixin,
     userMixin,
     aclMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    goBackMixin
   ],
 
   data () {
@@ -1181,6 +1188,9 @@ export default {
   },
 
   methods: {
+    fetchSmartTranscriptionData (communication) {
+      this.$VueEvent.fire('fetchSmartTranscriptionData', communication.id)
+    },
     getContactRouteLink (communication) {
       if (this.isWidget) {
         return { name: 'Texting Widget (unknown-user)', params: { id: communication.contact.id } }

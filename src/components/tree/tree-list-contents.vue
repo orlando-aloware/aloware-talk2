@@ -39,6 +39,23 @@
                       v-model="optionSelected"/>
           </q-card-section>
 
+          <q-card-section class="q-pt-none"
+                          v-show="!loading && !splitErrorMessage">
+          <span>
+            Do you want to keep the original List?
+          </span>
+          <div>
+            <q-radio label="Keep"
+                     color="green"
+                     :val="true"
+                     v-model="keepList"/>
+            <q-radio label="Delete"
+                     color="red"
+                     :val="false"
+                     v-model="keepList"/>
+          </div>
+        </q-card-section>
+
           <q-card-actions class="text-primary"
                           align="right"
                           v-show="!loading && !splitErrorMessage">
@@ -85,15 +102,6 @@
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
     />
-    <!-- <tree-list-item
-      class="flex-grow-1 w-100"
-      :name="unsavedList.name"
-      :layer="layer"
-      :type="unsavedList.type"
-      :hasEdit="hasEdit"
-      :hasDelete="hasDelete"
-      v-else-if="hasUnsavedList"
-    /> -->
   </div>
 </template>
 

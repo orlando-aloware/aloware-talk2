@@ -58,10 +58,15 @@ export default {
 
   methods: {
     openCalendar () {
-      // redirect to Classic only if talk isn't enabled
-      const url = this.currentCompany.talk_enabled ? '' : this.getClassicURL(this.isSimpSocial)
+      const query = {
+        communication_id: this.communicationId,
+        view: 'month'
+      }
 
-      window.open(`${url}/calendar?communication_id=${this.communicationId}&view=month`)
+      this.$router.push({
+        path: '/calendar',
+        query
+      })
     }
   }
 }

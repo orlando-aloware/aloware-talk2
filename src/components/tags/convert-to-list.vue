@@ -28,6 +28,7 @@
              title-item-class="user-list-tab-link">
         <p>Convert into a list of contacts for this user</p>
         <user-selector :generic-styling="false"
+                       :all-answer-types="true"
                        v-model="userId"
                        @change="setUserId" />
       </b-tab>
