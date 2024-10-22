@@ -12408,6 +12408,7 @@ h1.contact-list-name-label {
 
         .dhx_event_move.dhx_title {
           padding: 0;
+          display: none;
         }
 
         .dhx_cal_event .dhx_body,
@@ -12538,6 +12539,17 @@ h1.contact-list-name-label {
 
         .current-time {
           border-right: 1px solid #dcdfe6;
+        }
+
+        .event-content {
+          .event-time {
+            font-size: 10px;
+          }
+
+          .event-text {
+            font-size: 14px;
+            font-weight: bold;
+          }
         }
       }
 
