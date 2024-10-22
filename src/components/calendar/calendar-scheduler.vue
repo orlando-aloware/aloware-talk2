@@ -168,9 +168,6 @@ export default {
     }.bind(this)
 
     Scheduler.templates.event_text = function (start, end, event) {
-      console.log('start', start)
-      console.log('end', end)
-      console.log('event', event)
       const timeFormat = this.profile.time_format === 1 ? 'h:mm A' : 'HH:mm'
 
       // Current Timezone
