@@ -121,41 +121,84 @@ export default {
     }.bind(this)
 
     Scheduler.templates.hour_scale = function (date) {
-      const localTime = moment(date).tz(this.browserTimeZone).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
-      const localTimeAcronym = moment(date).tz(this.browserTimeZone).format('z')
+      // Get the current date being displayed in the scheduler
+      const schedulerStateDate = Scheduler.getState().date // This is the date currently displayed in the scheduler
+
+      // Create a new date using the scheduler's date but with the hour from the date parameter.
+      // This is necessary because the date parameter comes with date 1980-01-01 by default and make inconsistent the timezones when needs to differ PDT and PST for example.
+      const adjustedDate = new Date(
+        schedulerStateDate.getFullYear(),
+        schedulerStateDate.getMonth(),
+        schedulerStateDate.getDate(),
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds()
+      )
+
+      const dateInBrowserTimeZone = moment(adjustedDate).tz(this.browserTimeZone)
+      const localTime = dateInBrowserTimeZone.format(
+        this.profile.time_format === 1 ? 'h A' : 'H:00'
+      )
+      const localTimeAcronym = dateInBrowserTimeZone.format('z')
 
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
-        const currentTimezoneTime = moment(date).tz(this.currentTimezone).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
-        const currentTimezoneAcronym = moment(date).tz(this.currentTimezone).format('z')
+        const dateInCurrentTimezone = moment(adjustedDate).tz(this.currentTimezone)
+        const currentTimezoneTime = dateInCurrentTimezone.format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+        const currentTimezoneAcronym = dateInCurrentTimezone.format('z')
+
         return `
-          <div class="hour-label" data-hour="${moment(date).hour()}">
-            <div class="time-column current-time" data-hour="${moment(date).hour()}">${currentTimezoneTime} ${currentTimezoneAcronym}</div>
-            <div class="time-column local-time" data-hour="${moment(date).hour()}">${localTime} ${localTimeAcronym}</div>
-          </div>
-        `
-      } else {
-        return `
-          <div class="hour-label" data-hour="${moment(date).hour()}">
-            <div class="time-column local-time" data-hour="${moment(date).hour()}">${localTime}</div>
+          <div class="hour-label" data-hour="${dateInCurrentTimezone.hour()}">
+            <div class="time-column current-time" data-hour="${dateInCurrentTimezone.hour()}">
+              ${currentTimezoneTime} ${currentTimezoneAcronym}
+            </div>
+            <div class="time-column local-time" data-hour="${dateInBrowserTimeZone.hour()}">
+              ${localTime} ${localTimeAcronym}
+            </div>
           </div>
         `
       }
+
+      return `
+        <div class="hour-label" data-hour="${dateInBrowserTimeZone.hour()}">
+          <div class="time-column local-time" data-hour="${dateInBrowserTimeZone.hour()}">
+            ${localTime}
+          </div>
+        </div>
+      `
     }.bind(this)
 
-    Scheduler.templates.event_date = function (date) {
-      const formatFunc = Scheduler.date.date_to_str(Scheduler.config.hour_date)
-      return formatFunc(date)
-    }
+    Scheduler.templates.event_text = function (start, end, event) {
+      console.log('start', start)
+      console.log('end', end)
+      console.log('event', event)
+      const timeFormat = this.profile.time_format === 1 ? 'h:mm A' : 'HH:mm'
 
-    Scheduler.templates.event_bar_text = function (start, end, event) {
-      return event.text
-        ? event.text
-        : (event.contact.first_name || event.contact.last_name
-          ? `${event.contact.first_name || ''} ${event.contact.last_name || ''}`
-          : event.contact.phone_number)
-    }
+      // Current Timezone
+      const currentStartTime = moment(start).tz(this.currentTimezone).format(timeFormat)
+      const currentEndTime = moment(end).tz(this.currentTimezone).format(timeFormat)
 
-    Scheduler.templates.event_text = Scheduler.templates.event_bar_text
+      // Local Timezone
+      const localStartTime = moment(start).tz(this.browserTimeZone).format(timeFormat)
+      const localEndTime = moment(end).tz(this.browserTimeZone).format(timeFormat)
+
+      const localTimeAcronym = moment(start).tz(this.browserTimeZone).format('z')
+      const currentTimeAcronym = moment(start).tz(this.currentTimezone).format('z')
+
+      let timeString
+
+      if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
+        timeString = `${currentStartTime} - ${currentEndTime} ${currentTimeAcronym} / ${localStartTime} - ${localEndTime} ${localTimeAcronym}`
+      } else {
+        timeString = `${localStartTime} - ${localEndTime} ${localTimeAcronym}`
+      }
+
+      return `
+        <div class="event-content">
+          <div class="event-time">${timeString}</div>
+          <div class="event-text">${event.text}</div>
+        </div>
+      `
+    }.bind(this)
 
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
       if (e.target.classList.contains('custom-more-link') ||
