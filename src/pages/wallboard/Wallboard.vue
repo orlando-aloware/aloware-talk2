@@ -49,7 +49,6 @@ export default {
   }),
 
   created () {
-    this.fetchAgents()
     this.fetchLiveCalls()
     this.fetchParkedCalls()
     this.fetchQueuedCalls()
@@ -99,7 +98,6 @@ export default {
 
   methods: {
     ...mapActions('wallboard', [
-      'fetchAgents',
       'fetchLiveCalls',
       'fetchParkedCalls',
       'fetchQueuedCalls',
