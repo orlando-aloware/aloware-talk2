@@ -44,7 +44,7 @@ export default {
     ]),
     ...mapActions('cache', ['setCurrentCompany']),
     broadcastInit () {
-      console.log('initiating broadcast', storage.local.getItem('ws_app_key'))
+      console.log('initiating broadcast', storage.local.getItem('ws_app_key'), `${process.env.API_URL}/broadcasting/auth`)
       /**
        * Echo exposes an expressive API for subscribing to channels and listening
        * for events that are broadcast by Laravel. Echo and event broadcasting
