@@ -52,6 +52,17 @@
           </a>
         </div>
         <div class="items"
+             v-if="showRemoveFromPdListButton">
+          <a href=""
+             class="text-danger"
+             data-testid="bulk-action-menu-remove-from-pd-list-link"
+             :disabled="disabledRemoveOnPdList"
+             @click="onRemoveFromPdList">
+            <i class="fa fa-ban text-danger" />
+            Remove {{ contactsWord }} From List
+          </a>
+        </div>
+        <div class="items"
              v-if="showDeleteButton">
           <a href=""
              class="text-danger"
@@ -167,6 +178,11 @@ export default {
       default: false
     },
 
+    disabledRemoveOnPdList: {
+      type: Boolean,
+      default: false
+    },
+
     isLoading: {
       type: Boolean,
       default: false
@@ -272,11 +288,15 @@ export default {
     },
 
     showDeleteButton () {
-      return !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) || this.isPowerDialer)
+      return this.hasDeletePermission && !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) && !this.isPowerDialer)
     },
 
     showRemoveFromListButton () {
-      return !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) || this.isPowerDialer)
+      return !this.isAddView && !this.isPowerDialer && ((this.canDelete && !this.isSimpSocial))
+    },
+
+    showRemoveFromPdListButton () {
+      return this.isPowerDialer && !this.isAddView && ((this.canDelete && !this.isSimpSocial))
     },
 
     showMoreDropdownButton () {
@@ -341,6 +361,19 @@ export default {
       this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
       this.$bvModal.show('remove-contact-confirmation-dialog')
       this.$emit('on-remove-from-list')
+      e.preventDefault()
+    },
+
+    onRemoveFromPdList (e) {
+      if (this.disabledRemoveOnPdList) {
+        e.preventDefault()
+        return
+      }
+
+      this.setBulkDelete(true)
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.$emit('on-remove')
       e.preventDefault()
     },
 

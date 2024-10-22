@@ -6,6 +6,8 @@
                   @hide="onHide"
                   @shown="onShown">
     <div slot="content">
+      <div class="text-left"
+           v-html="message"/>
       <div class="text-left">
         <div class="text-dark">
           Type "{{confirmationInputString}}" here to confirm
@@ -109,8 +111,8 @@ export default {
         return 1
       }
 
-      if (this.selectedContacts[this.listId]) {
-        let list = this.selectedContacts[this.listId]
+      if (this.selectedContacts[this.selectedList.id]) {
+        let list = this.selectedContacts[this.selectedList.id]
         if (this.currentCompany.activate_multi_entity) {
           // do not include contacts with integrations
           list = list.filter(contact => !contact.hasExternalData)
@@ -144,6 +146,23 @@ export default {
 
     currentList () {
       return this.listItems[this.selectedList.id]
+    },
+
+    message () {
+      if (this.selectedContacts[this.listId]) {
+        const hasIntegrationsCount = this.integrationsCount()
+        const text = []
+
+        if (hasIntegrationsCount > 1) {
+          text.push(`There are ${hasIntegrationsCount} contacts from integrations and can't be deleted.`)
+        } else if (hasIntegrationsCount > 0) {
+          text.push(`There is a contact from integrations and can't be deleted.`)
+        }
+
+        return text.join('<br /><br />')
+      }
+
+      return ''
     }
   },
 
@@ -360,6 +379,18 @@ export default {
       if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
         this.handleBulkDeletion()
       }
+    },
+
+    integrationsCount () {
+      if (!this.contactToRemove && this.selectedContacts[this.listId]) {
+        // disable integrations count if multi entity is not activated
+        if (!this.currentCompany.activate_multi_entity) {
+          return 0
+        }
+        return this.selectedContacts[this.listId].filter(contact => contact.has_integration).length
+      }
+
+      return 0
     }
   }
 }
