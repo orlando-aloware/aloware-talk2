@@ -29,14 +29,6 @@ export default {
     state.agents.push(agent)
   },
 
-  SET_AGENTS: (state, data) => {
-    state.agents = data
-  },
-
-  SET_AGENTS_LOADING: (state, data) => {
-    state.isAgentsLoading = data
-  },
-
   SET_AGENT_STATUS: (state, data) => {
     const agentIndex = state.agents.findIndex(agent => agent.id === data.user_id)
 

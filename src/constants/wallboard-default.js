@@ -1,5 +1,4 @@
 export const DEFAULT_STATE = {
-  agents: [],
   calls: {
     live: [],
     parked: [],
@@ -51,7 +50,6 @@ export const DEFAULT_STATE = {
     agent: null,
     agentStatus: 'all'
   },
-  isAgentsLoading: false,
   isLiveCallsLoading: false,
   isOverviewDetailed: false,
   isParkedCallsLoading: false,
