@@ -537,15 +537,6 @@ export default {
       }
     },
 
-    alohabot: {
-      getContactSession (id) {
-        return window.axios.get(`${suffixV1}bots/contact/${id}/session`)
-      },
-
-      disengageContact (id, params) {
-        return window.axios.post(`${suffixV1}bots/contact/${id}/disengage`, params)
-      }
-    },
     broadcasts: {
       delete (id) {
         return window.axios.delete(`${suffixV1}broadcasts/${id}`)
