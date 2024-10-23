@@ -2,7 +2,7 @@
   <confirm-dialog id="remove-contact-confirmation-dialog"
                   :title="'Are you sure you want to ' + title"
                   :is-busy="isBusy"
-                  @close="removeContactClose; confirmationInputString=''; typedConfirmationInputString=''"
+                  @close="removeContactClose; typedConfirmationInputString=''"
                   @hide="onHide"
                   @shown="onShown">
     <div slot="content">
