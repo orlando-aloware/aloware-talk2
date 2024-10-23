@@ -636,7 +636,7 @@ export default {
        * @return Promise
        */
       getAgentsStatus () {
-        return window.axios.get(`${suffixV1}agents-status/get`)
+        return window.axios.get(`${suffixV1}company/agents-status/get`)
       }
     },
 
