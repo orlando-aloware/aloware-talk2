@@ -106,11 +106,14 @@ export default {
 
     ...mapMutations('wallboard', {
       deleteCall: 'DELETE_CALL',
-      setAgent: 'SET_AGENT',
-      setAgentStatus: 'SET_AGENT_STATUS',
       setLiveCall: 'SET_LIVE_CALL',
       setParkedCall: 'SET_PARKED_CALL',
       setQueuedCall: 'SET_QUEUED_CALL'
+    }),
+
+    ...mapMutations({
+      setAgent: 'UPDATE_USER',
+      setAgentStatus: 'UPDATE_USER_STATUS'
     })
   },
 

@@ -124,7 +124,7 @@ export default {
     try {
       const response = await API.V1.users.setAgentStatus(params.userId, params.status)
 
-      commit('SET_AGENT_STATUS', response.data)
+      commit('UPDATE_USER_STATUS', response.data, { root: true })
     } catch (err) {
       console.log(err.response || err)
       this._vm.$handleErrors(err.response)
