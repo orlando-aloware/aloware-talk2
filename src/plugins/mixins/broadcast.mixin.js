@@ -696,9 +696,7 @@ export default {
           window.VueEvent.fire('contact_list_import_failed', event)
         })
         .listen('.contact-list.created', (event) => {
-          const isTargetCompany = this.currentCompany && event.contact_list.company_id && event.contact_list.company_id === this.currentCompany.id
-          const isTargetUser = this.profile && event.user_id && event.user_id === this.profile.id
-          if (isTargetCompany && isTargetUser) {
+          if (this.profile && event.user_id && event.user_id === this.profile.id) {
             window.VueEvent.fire('contact_list_created', event)
           }
         })
