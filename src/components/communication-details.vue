@@ -982,8 +982,7 @@
                              :ring-group="usedRingGroup"
                              v-if="usedRingGroup"/>
         <network-logs-display :call-issues="communication.call_quality_events"
-                              :user="communication.user"
-                              v-if="currentCompany.network_logs_enabled"/>
+                              :user="communication.user"/>
       </b-col>
     </b-row>
   </div>
