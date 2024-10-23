@@ -108,7 +108,7 @@ import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { contactLists } from 'src/plugins/mixins'
+import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
 
 export default {
   components: {
@@ -121,7 +121,10 @@ export default {
     ListActions
   },
 
-  mixins: [contactLists],
+  mixins: [
+    contactLists,
+    contactsListFiltersMixin
+  ],
 
   props: {
     id: {
@@ -526,6 +529,14 @@ export default {
       } else {
         this.$router.push(`/power-dialer/list/${event.contact_list.id}`)
       }
+
+      this.initiateUpdateContactsListFilter()
+      this.$VueEvent.fire('fetchContacts', {
+        fromRefresh: true,
+        clear: true,
+        skipCache: true
+      })
+      this.$VueEvent.fire('fetchContactsLists')
 
       this.reloadFolders()
     }

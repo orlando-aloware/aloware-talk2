@@ -7,7 +7,6 @@
            dense
            data-testid="comm-transcription-modal-single-btn"
            :size="buttonSize"
-           v-if="singleButton"
            @click="fetchSmartTranscriptionData">
       <q-tooltip>
         <span>
@@ -15,14 +14,6 @@
         </span>
       </q-tooltip>
     </q-btn>
-    <div class="flex items-center mr-1 h-100"
-         v-else
-         data-testid="comm-transcription-modal-btn"
-         @click="fetchSmartTranscriptionData">
-      <span class="text-blue cursor-pointer">
-        {{ buttonText }}
-      </span>
-    </div>
 
     <!-- Smart Transcription modal. -->
     <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
@@ -68,6 +59,8 @@
                         :unique-id="communication.id"
                         :height="40"
                         :split-channels="splitChannels"
+                        :communication="communication"
+                        :messages="messages"
                         data-testid="comm-transcription-modal-waveform"
                         @time-update="updateCurrentTime">
               </waveform>
@@ -132,7 +125,7 @@
                        label="Transcription"/>
                 <q-tab name="summary"
                        label="Summary"
-                       :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
+                       :disable="!currentCompany?.transcription_settings?.summarization_enabled || !customSummary"/>
               </q-tabs>
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
@@ -150,7 +143,23 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    {{ customSummary }}
+                    <div v-if="customSummary" class="custom-summary" v-html="parseMarkdown(customSummary)" />
+                    <div v-if="customSummary" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                      <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
+                      <img
+                        class="clickable-icon"
+                        style="cursor: pointer;"
+                        :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
+                        @click="submitFeedback('upvote')"
+                      />
+                      <span class="mx-1"></span>
+                      <img
+                        class="clickable-icon"
+                        style="cursor: pointer;"
+                        :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
+                        @click="submitFeedback('downvote')"
+                      />
+                    </div>
                   </section>
                 </q-tab-panel>
               </q-tab-panels>
@@ -164,6 +173,8 @@
 
 <script>
 import Waveform from 'components/waveform'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import { isEmpty } from 'lodash'
 import CategoriesSection from './transcription-components/categories-section'
@@ -176,7 +187,10 @@ import ConversationSection from './transcription-components/conversation-section
 import DownloadButton from 'components/download-button.vue'
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import * as FeedbackConstants from 'src/constants/feedback-types'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 
 export default {
   name: 'TranscriptionModal',
@@ -211,10 +225,6 @@ export default {
     buttonSize: {
       type: String,
       default: 'sm'
-    },
-    singleButton: {
-      type: Boolean,
-      default: false
     }
   },
 
@@ -235,7 +245,9 @@ export default {
       summaryEngine: null,
       customSummary: null,
       summaryPrompt: null,
-      summaryFeedback: null,
+      feedback: null,
+      upvoteActive: false,
+      downvoteActive: false,
       sentiments: [
         'POSITIVE',
         'NEUTRAL',
@@ -251,24 +263,41 @@ export default {
         'NEUTRAL': '#d0d8dc',
         'NEGATIVE': '#ff7d74'
       },
-      splitChannels: [
-        {
-          waveColor: 'rgb(200, 0, 200)',
-          progressColor: 'rgb(100, 0, 100)',
-          barAlign: 'bottom'
-        },
-        {
-          waveColor: 'rgb(0, 200, 200)',
-          progressColor: 'rgb(0, 100, 100)',
-          barAlign: 'top'
-        }
-      ],
       UploadedFileTypes,
       isEmpty
     }
   },
 
   computed: {
+    splitChannels () {
+      if (this.communication.direction === CommunicationDirection.INBOUND) {
+        return [
+          {
+            waveColor: 'rgb(0, 200, 200)',
+            progressColor: 'rgb(0, 100, 100)',
+            barAlign: 'bottom'
+          },
+          {
+            waveColor: 'rgb(200, 0, 200)',
+            progressColor: 'rgb(100, 0, 100)',
+            barAlign: 'top'
+          }
+        ]
+      } else {
+        return [
+          {
+            waveColor: 'rgb(200, 0, 200)',
+            progressColor: 'rgb(100, 0, 100)',
+            barAlign: 'bottom'
+          },
+          {
+            waveColor: 'rgb(0, 200, 200)',
+            progressColor: 'rgb(0, 100, 100)',
+            barAlign: 'top'
+          }
+        ]
+      }
+    },
     CommunicationTypes () {
       return CommunicationTypes
     },
@@ -289,7 +318,19 @@ export default {
     }
   },
 
+  mounted () {
+    this.checkAndShowTranscriptionModal()
+
+    this.$VueEvent.listen('fetchSmartTranscriptionData', communicationId => this.handleFetchSmartTranscriptionData(communicationId))
+  },
+
   methods: {
+    handleFetchSmartTranscriptionData (communicationId) {
+      if (this.communication.id === communicationId) {
+        this.fetchSmartTranscriptionData()
+      }
+    },
+
     fetchSmartTranscriptionData () {
       this.isLoading = true
       this.show_form = true
@@ -345,7 +386,9 @@ export default {
       this.summaryEngine = data.summary_engine
       this.customSummary = data.custom_summary
       this.summaryPrompt = data.summary_prompt
-      this.summaryFeedback = data.summary_feedback
+      this.feedback = data.feedback
+      this.upvoteActive = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvoteActive = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
     },
 
     /**
@@ -384,6 +427,21 @@ export default {
       })
 
       return messageText
+    },
+
+    /**
+     * Check if the URL has a query parameter to show the transcription modal.
+     * @public
+     *
+     * @returns {void}
+     */
+    checkAndShowTranscriptionModal () {
+      const urlParams = new URLSearchParams(window.location.search)
+      const showTranscription = urlParams.get('showTranscription')
+
+      if (showTranscription === 'true') {
+        this.fetchSmartTranscriptionData()
+      }
     },
 
     handleClose () {
@@ -439,6 +497,17 @@ export default {
       return sentimentPercentages
     },
 
+    /**
+     * Parse markdown text to HTML.
+     * @param {string} summaryText
+     *
+     * @returns {string}
+     */
+    parseMarkdown (summaryText) {
+      const rawHtml = marked(summaryText)
+      return DOMPurify.sanitize(rawHtml)
+    },
+
     getMessageClasses (speaker) {
       const isAgent = ['AGENT', 'A'].includes(speaker)
 
@@ -452,6 +521,42 @@ export default {
       if (this.tabName === 'transcription') {
         this.$refs.conversationSection.syncScroll(time)
       }
+    },
+
+    /**
+     * Update the summary feedback.
+     * @param type
+     *
+     * @returns {void}
+     */
+    submitFeedback (type) {
+      const feedbackValue = type === 'upvote' ? FeedbackConstants.FEEDBACK_UPVOTE : FeedbackConstants.FEEDBACK_DOWNVOTE
+
+      talk2Api.V1.transcription.submitSummaryFeedback(this.communication.id, feedbackValue)
+        .then(() => {
+          this.feedback = feedbackValue
+          this.upvoteActive = type === 'upvote'
+          this.downvoteActive = type === 'downvote'
+          this.$generalNotification('Feedback received. Thank you!')
+        })
+        .catch(err => {
+          this.$generalNotification('Failed to submit feedback.', 'error')
+          console.log('Error submitting summary feedback:', err)
+        })
+    }
+
+  },
+
+  watch: {
+    communication (newVal) {
+      if (newVal) {
+        this.checkAndShowTranscriptionModal()
+      }
+    },
+
+    feedback (newValue) {
+      this.upvoteActive = newValue === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvoteActive = newValue === FeedbackConstants.FEEDBACK_DOWNVOTE
     }
   }
 }

@@ -98,7 +98,9 @@ export default function (/* { ssrContext } */) {
         error: {
           message: '',
           code: null
-        }
+        },
+        redialedTaskIds: [],
+        callSuccessfullyAnswered: false
       },
       warnings: [],
       shouldIntroduce: false,
@@ -311,6 +313,7 @@ export default function (/* { ssrContext } */) {
       notifications: (state) => state.notifications,
       breadcrumbs: (state) => state.breadcrumbs,
       contactsLists: (state) => state.contactsLists,
+      getAttributeDictionaries: (state) => state.attributeDictionaries,
       getField
     },
 
@@ -401,6 +404,18 @@ export default function (/* { ssrContext } */) {
 
       setDialerError ({ commit }, error) {
         commit('SET_DIALER_ERROR', error)
+      },
+
+      addDialerRedialedTaskId ({ commit }, taskId) {
+        commit('ADD_DIALER_REDIALED_TASK_ID', taskId)
+      },
+
+      clearDialerRedialedTaskIds ({ commit }) {
+        commit('CLEAR_DIALER_REDIALED_TASK_IDS')
+      },
+
+      setDialerCallSuccessfullyAnswered ({ commit }, status) {
+        commit('SET_DIALER_CALL_SUCCESSFULLY_ANSWERED', status)
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -830,6 +845,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_LEAD_SOURCES', leadSources)
       },
 
+      setAttributeDictionaries ({ commit }, attributeDictionaries) {
+        commit('SET_ATTRIBUTE_DICTIONARIES', attributeDictionaries)
+      },
+
       setStatics ({ commit }, statics) {
         commit('SET_STATICS', statics)
       },
@@ -1053,6 +1072,18 @@ export default function (/* { ssrContext } */) {
       SET_DIALER_ERROR (state, error) {
         state.dialer.error.message = error.message
         state.dialer.error.code = error.code
+      },
+
+      ADD_DIALER_REDIALED_TASK_ID (state, taskId) {
+        state.dialer.redialedTaskIds.push(taskId)
+      },
+
+      CLEAR_DIALER_REDIALED_TASK_IDS (state) {
+        state.dialer.redialedTaskIds = []
+      },
+
+      SET_DIALER_CALL_SUCCESSFULLY_ANSWERED (state, status) {
+        state.dialer.callSuccessfullyAnswered = status
       },
 
       SET_OLD_AGENT_STATUS (state, status) {
@@ -1659,6 +1690,10 @@ export default function (/* { ssrContext } */) {
 
       SET_LEAD_SOURCES (state, leadSources) {
         state.leadSources = leadSources
+      },
+
+      SET_ATTRIBUTE_DICTIONARIES (state, attributeDictionaries) {
+        state.attributeDictionaries = attributeDictionaries
       },
 
       SET_STATICS (state, statics) {

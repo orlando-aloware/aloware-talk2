@@ -1504,6 +1504,7 @@ export default {
       this.setDialerCurrentNumber('')
       this.setDialerIsMuted(false)
       this.setDialerCallFishing()
+      this.setDialerCallSuccessfullyAnswered(false)
     },
 
     nl2br (str, isXhtml) {
@@ -1592,6 +1593,7 @@ export default {
         this.getCallDispositions()
         this.getActivityTypes()
         this.getLeadSources()
+        this.getAttributeDictionaries()
         this.getMyQueueList()
       })
     },
@@ -1996,6 +1998,16 @@ export default {
 
           return Promise.reject()
         })
+    },
+
+    getAttributeDictionaries () {
+      if (this.is_widget) {
+        return
+      }
+
+      return this.$axios.get('/api/v1/attribute-dictionary').then(res => {
+        this.setAttributeDictionaries(res.data.data)
+      })
     },
 
     async initAccount () {
@@ -2632,6 +2644,7 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted',
       'setDialerParkedCall',
+      'setDialerCallSuccessfullyAnswered',
       'setFilters',
       'setNotifications',
       'resetNotifications',
@@ -2646,6 +2659,7 @@ export default {
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
+      'setAttributeDictionaries',
       'updateUserStatus',
       'setStatics',
       'setStaticsLoaded',

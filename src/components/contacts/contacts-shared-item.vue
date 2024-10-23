@@ -1,5 +1,5 @@
 <template>
-  <div class="folder d-flex align-items-center p-0">
+  <div class="folder align-items-center p-0">
     <q-dialog persistent
               v-model="prompt">
       <q-card style="min-width: 350px">
@@ -43,11 +43,11 @@
           </span>
           <div>
             <q-radio label="Keep"
-                     dark
+                     color="green"
                      :val="true"
                      v-model="keepList"/>
             <q-radio label="Delete"
-                     dark
+                     color="red"
                      :val="false"
                      v-model="keepList"/>
           </div>
@@ -75,53 +75,48 @@
 
       </q-card>
     </q-dialog>
-    <router-link :to="{ path: '/contacts/list/' + item.id, query : { type: 'public' }, meta : { type: 'public' }}"
-                 :key="item.id"
-                 v-slot="{ href, route, navigate, isActive, isExactActive }">
-      <a class="d-flex align-items-center item"
+    <div class="d-flex align-items-center item"
          data-testid="contacts-shared-list-link"
-         :href="href"
          :class="[
            isActive && 'router-link-active',
            isExactActive && 'router-link-exact-active'
          ]"
-         @click="toggleSidebar($event, route)">
-        <div class="icon d-flex align-items-center">
-          <folder-static-icon data-testid="contacts-shared-static-icon"
-                              v-if="item.type === ContactListTypes.STATIC">
-          </folder-static-icon>
-          <folder-dynamic-icon data-testid="contacts-shared-dynamic-icon"
-                               v-if="item.type === ContactListTypes.DYNAMIC || !item.type" >
-          </folder-dynamic-icon>
-        </div>
-        <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
-          <span>{{ item.name }}</span>
-        </div>
-      </a>
-    </router-link>
-    <button class="folder__option btn btn-link p-0 shadow-0"
-            :data-popper-target="'list-' + item.id"
-            :id="`contacts-shared-item-option-${item.id}`"
-            :ref="`contacts-shared-item-option-${item.id}`"
-            v-if="item.type === ContactListTypes.STATIC">
-      <folder-option></folder-option>
-    </button>
-    <b-popover triggers="click blur"
-               placement="bottomright"
-               boundary="window"
-               custom-class="contact-popover"
-               :target="`contacts-shared-item-option-${item.id}`">
-      <list-actions :id="item.id"
-                    :type="item.type"
-                    :contactsCount="item.no_of_contacts"
-                    :has-split="1"
-                    :has-edit="0"
-                    :has-delete="0"
-                    :has-pin="0"
-                    :has-duplicate="0"
-                    :is-pinned="true"
-                    @split="onSplit(item)"/>
-    </b-popover>
+         @click="toggleSidebar($event)">
+      <div class="icon d-flex align-items-center">
+        <folder-static-icon data-testid="contacts-shared-static-icon"
+                            v-if="item.type === ContactListTypes.STATIC">
+        </folder-static-icon>
+        <folder-dynamic-icon data-testid="contacts-shared-dynamic-icon"
+                             v-if="item.type === ContactListTypes.DYNAMIC || !item.type" >
+        </folder-dynamic-icon>
+      </div>
+      <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
+        <span>{{ item.name }}</span>
+      </div>
+      <button class="folder__option btn btn-link p-0 shadow-0"
+              :data-popper-target="'list-' + item.id"
+              :id="`contacts-shared-item-option-${item.id}`"
+              :ref="`contacts-shared-item-option-${item.id}`"
+              v-if="item.type === ContactListTypes.STATIC">
+        <folder-option></folder-option>
+      </button>
+      <b-popover triggers="click blur"
+                 placement="bottomright"
+                 boundary="window"
+                 custom-class="contact-popover"
+                 :target="`contacts-shared-item-option-${item.id}`">
+        <list-actions :id="item.id"
+                      :type="item.type"
+                      :contactsCount="item.no_of_contacts"
+                      :has-split="1"
+                      :has-edit="0"
+                      :has-delete="0"
+                      :has-pin="0"
+                      :has-duplicate="0"
+                      :is-pinned="true"
+                      @split="onSplit(item)"/>
+      </b-popover>
+    </div>
   </div>
 </template>
 
@@ -132,12 +127,15 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapState } from 'vuex'
 import ListActions from 'components/list-actions.vue'
 import FolderOption from 'components/icons/folder-option.vue'
-import { contactLists } from 'src/plugins/mixins'
+import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contacts-shared-item',
 
-  mixins: [contactLists],
+  mixins: [
+    contactLists,
+    contactsListFiltersMixin
+  ],
 
   components: {
     FolderDynamicIcon,
@@ -162,6 +160,12 @@ export default {
     ...mapState('auth', ['profile']),
     isContactsRoute () {
       return this.$route.meta.title === 'Contacts'
+    },
+    isActive () {
+      return this.$route.path.includes(`/contacts/list/${this.item.id}`)
+    },
+    isExactActive () {
+      return this.$route.path === `/contacts/list/${this.item.id}`
     }
   },
   mounted () {
@@ -226,6 +230,14 @@ export default {
       if (this.isContactsRoute) {
         this.$router.push(`/contacts/list/${event.contact_list.id}?type=public`)
       }
+
+      this.initiateUpdateContactsListFilter()
+      this.$VueEvent.fire('fetchContacts', {
+        fromRefresh: true,
+        clear: true,
+        skipCache: true
+      })
+      this.$VueEvent.fire('fetchContactsLists')
 
       this.reloadFolders()
     }
