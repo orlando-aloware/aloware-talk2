@@ -424,7 +424,7 @@ export default {
 
     findDefaultOutboundCampaign () {
       if (this.isAlwaysAskModeEnabled()) {
-        setTimeout(() => this.setTheLastUsedCallLine(), 2000)
+        setTimeout(() => this.setTheLastUsedCallLine(), 1000)
         return
       }
 
@@ -442,10 +442,14 @@ export default {
     },
 
     isAlwaysAskModeEnabled () {
+      const isPreviousCallingModeInAlwaysAsk = this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+      const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
+      const isCompanyOrUserAlwaysAsk = isCompanyAlwaysAsk || !this.shouldUseProfileCampaignId()
+
       return this.previousOutboundCallingMode &&
         this.authProfile &&
         this.previousOutboundCallingMode === this.authProfile.outbound_calling_mode &&
-        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+        (isCompanyOrUserAlwaysAsk || isPreviousCallingModeInAlwaysAsk)
     },
 
     updatePreviousOutboundCallingMode () {
