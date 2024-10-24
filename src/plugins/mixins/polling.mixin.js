@@ -4,7 +4,7 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   data () {
     return {
-      pollingInterval: 30 // in seconds
+      pollingInterval: 5 // in seconds
     }
   },
 
