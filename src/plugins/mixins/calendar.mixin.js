@@ -92,10 +92,14 @@ export default {
     getStartEndTime ({ currentStart, currentEnd, browserStart, browserEnd }) {
       return {
         currentStartTime: currentStart ? moment(currentStart).tz(this.currentTimezone).format(this.timeFormat) : null,
+        currentStartDate: currentStart ? moment(currentStart).tz(this.currentTimezone).format('MM-DD') : null,
         currentEndTime: currentEnd ? moment(currentEnd).tz(this.currentTimezone).format(this.timeFormat) : null,
+        currentEndDate: currentEnd ? moment(currentEnd).tz(this.currentTimezone).format('MM-DD') : null,
         currentTimeAcronym: currentStart ? moment(currentStart).tz(this.currentTimezone).format('z') : null,
         localStartTime: browserStart ? moment(browserStart).tz(this.browserTimeZone).format(this.timeFormat) : null,
+        localStartDate: browserStart ? moment(browserStart).tz(this.browserTimeZone).format('MM-DD') : null,
         localEndTime: browserEnd ? moment(browserEnd).tz(this.browserTimeZone).format(this.timeFormat) : null,
+        localEndDate: browserEnd ? moment(browserEnd).tz(this.browserTimeZone).format('MM-DD') : null,
         localTimeAcronym: browserStart ? moment(browserStart).tz(this.browserTimeZone).format('z') : null
       }
     },
