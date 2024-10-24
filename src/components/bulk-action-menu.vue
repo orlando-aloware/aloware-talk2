@@ -175,6 +175,8 @@ export default {
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
+
     ...mapGetters('contacts', [
       'selectedList'
     ]),
