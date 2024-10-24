@@ -292,6 +292,10 @@ export default {
     },
 
     showRemoveFromListButton () {
+      // if is only agent and not billing admin or admin or supervisor and list is public
+      if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
+        return false
+      }
       return !this.isAddView && !this.isPowerDialer && ((this.canDelete && !this.isSimpSocial))
     },
 
