@@ -1,81 +1,74 @@
 <template>
   <div>
-    <b-modal
-      dialog-class="modal-mc-add"
-      data-testid="merge-contact-modal"
-      centered
+    <b-modal centered
       hide-footer
       no-close-on-backdrop
       no-close-on-esc
+             dialog-class="modal-mc-add"
+             data-testid="merge-contact-modal"
       v-model="isOpen"
-      @hide="onCloseAttempt"
-    >
+             @hide="onCloseAttempt">
       <template #modal-title>
         <h5 v-if="!active_step">
-          Which contact do you want to merge {{ fromContact }} with?
+          Which contact do you want to merge <strong>{{ fromContact }}</strong> with?
         </h5>
         <h5 v-else>
-          Merge {{ fromContact }} with {{ toContact }}
+          Merge <strong>{{ fromContact }}</strong> with <strong>{{ toContact }}</strong>
         </h5>
       </template>
 
-      <div class="merge-contact__sidebar" style="margin-bottom: 2em;">
+      <div class="merge-contact__sidebar"
+           style="margin-bottom: 2em;">
         <steps-wrapper-horizontal :current-step="currentStep" :steps="steps" />
       </div>
 
       <div style="margin-bottom: 2em;">
         <template v-if="active_step === 0">
-          <q-input
+          <q-input borderless
+                   clearable
+                   ref="searchInput"
             class="form-control form-control-search"
             placeholder="Search Contact..."
-            :disabled="disabled"
+                   data-testid="search-input"
             :loading="contact_searching"
-            ref="searchInput"
             v-model="searchQuery"
-            borderless
-            clearable
-            data-testid="search-input"
             @input="onInput"
             @click="toggleSearchFocus"
-            @clear="onClear"
-          >
+                   @clear="onClear">
             <template v-slot:prepend>
               <search-icon />
             </template>
-            <template v-slot:default v-show="isInputFocused">
-              <q-tooltip
-                anchor="bottom middle"
+            <template v-slot:default
+                      v-show="isInputFocused">
+              <q-tooltip anchor="bottom middle"
                 self="center middle"
                 data-testid="search-tooltip"
-                v-if="!searchQuery || (searchQuery && searchQuery.length < 3)"
-              >
+                         v-if="!searchQuery || (searchQuery && searchQuery.length < 3)">
                 Search requires at least 3 characters
               </q-tooltip>
             </template>
           </q-input>
 
-          <q-menu
-            v-if="showMenu"
+          <q-menu fit
+                  ref="contactsList"
             anchor="bottom left"
             self="top left"
-            fit
             :max-height="300"
-            ref="contactsList"
-          >
-            <q-list style="min-width: 100%">
-              <q-item
+                  v-show="showMenu">
+            <q-list style="min-width: 100%" v-show="showMenu">
+              <q-item clickable
+                      style="padding: 10px;"
+                      :key="contact.id"
                 v-for="contact in filteredContacts"
-                :key="contact.id"
-                clickable
-                @click="selectContact(contact)"
-                style="padding: 10px;"
-              >
+                      @click="selectContact(contact)">
                 <q-item-section>
-                  <q-item-label>{{ contact.name | fixContactName }}</q-item-label>
-                  <q-item-label caption>{{ contact.phone_number | fixPhone }}</q-item-label>
+                  <q-item-label><strong>{{ contact.name | fixContactName }}</strong></q-item-label>
+                  <q-item-label caption>{{ contact.phone_number | fixPhone('NATIONAL', true, false, true) }}</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item v-if="filteredContacts.length === 0" class="text-grey" style="padding: 10px;">
+              <q-item class="text-grey"
+                      style="padding: 10px;"
+                      v-if="filteredContacts.length === 0">
                 <q-item-section>
                   <q-item-label>{{ no_data_text }}</q-item-label>
                 </q-item-section>
@@ -90,7 +83,7 @@
               The following <strong>{{ fromContact }}</strong> info will be added to the <strong>{{ toContact }}</strong> if applicable:
             </h5>
             <ul>
-              <li v-for="(item, index) in addedInfo" :key="index">{{ item }}</li>
+              <li v-for="(item, index) in listAddInfo" :key="index">{{ item }}</li>
             </ul>
 
             <hr />
@@ -99,7 +92,7 @@
               The <strong>{{ fromContact }}</strong> contact will be deleted and the following info will be lost:
             </h5>
             <ul>
-              <li v-for="(item, index) in lostInfo" :key="index">{{ item }}</li>
+              <li v-for="(item, index) in listDeleteInfo" :key="index">{{ item }}</li>
             </ul>
 
             <hr />
@@ -110,21 +103,19 @@
       </div>
 
       <div class="dialog-footer d-flex q-gutter-md">
-        <q-btn
-          @click="active_step ? backToSearch() : closeDialog()"
+        <q-btn class="flex-grow-1"
           data-testid="merge-cancel-button"
+               :disabled="isMerging"
+               :label="active_step ? 'Back' : 'Cancel'"
+               @click="active_step ? backToSearch() : closeDialog()"/>
+        <q-btn color="primary"
           class="flex-grow-1"
-          :label="active_step ? 'Back' : 'Cancel'"
-          :disable="isMerging"
-        />
-        <q-btn
-          @click="active_step ? mergeContact() : reviewMerge()"
+               data-testid="merge-review-button"
           :disabled="!selectedContact || isMerging"
-          color="primary"
-          data-testid="merge-review-button"
-          class="flex-grow-1"
-        >
-          {{ !active_step ? 'Review' : 'Merge' }}
+               @click="active_step ? mergeContact() : reviewMerge()">
+          <q-spinner-bars color="white"
+                          v-if="isMerging"/>
+          {{ !active_step ? 'Review' : (isMerging ? '&nbsp;Merging' : 'Merge') }}
         </q-btn>
       </div>
     </b-modal>
@@ -132,34 +123,38 @@
 </template>
 
 <script>
+import debounce from 'lodash/debounce'
 import { mapActions, mapState } from 'vuex'
-import StepsWrapperHorizontal from '../generic-wrappers/steps-wrapper-horizontal.vue'
 import SearchIcon from 'components/icons/search-icon'
-import _ from 'lodash'
+import StepsWrapperHorizontal from '../generic-wrappers/steps-wrapper-horizontal.vue'
 
 export default {
   name: 'merge-contact-modal',
-  components: { StepsWrapperHorizontal, SearchIcon },
+
+  components: { SearchIcon, StepsWrapperHorizontal },
+
   props: { contact: {} },
   data () {
     return {
-      isMerging: false,
-      searchQuery: '',
-      selectedContact: null,
-      showMenu: false,
+      active_step: 0,
+      cancelToken: null,
       contact_searching: false,
       contacts: [],
       filteredContacts: [],
-      active_step: 0,
-      cancelToken: null,
-      source: null,
-      no_data_text: '',
       isInputFocused: false,
+      isMerging: false,
+      no_data_text: '',
+      searchQuery: '',
+      selectedContact: null,
+      showMenu: false,
+      source: null,
+
       steps: [
         { id: 1, name: 'Select Contact' },
         { id: 2, name: 'Merge Contact' }
       ],
-      addedInfo: [
+
+      listAddInfo: [
         'Phone Number',
         'Power Dialer Tasks',
         'Communications',
@@ -171,7 +166,8 @@ export default {
         'Contact Disposition',
         'Owner'
       ],
-      lostInfo: [
+
+      listDeleteInfo: [
         'Contact Information (e.g. First Name, Last Name, etc.)',
         'Contact Audits',
         'Active Broadcast or Sequence'
@@ -192,22 +188,11 @@ export default {
       }
     },
     fromContact () {
-      if (this.contact) {
-        const filters = this.$options.filters
-        return this.contact.name
-          ? filters.fixContactName(this.contact.name)
-          : filters.fixPhone(this.contact.phone_number)
-      }
-      return ''
+      return this.getFormattedContactName(this.contact)
     },
+
     toContact () {
-      if (this.selectedContact) {
-        const filters = this.$options.filters
-        return this.selectedContact.name
-          ? filters.fixContactName(this.selectedContact.name)
-          : filters.fixPhone(this.selectedContact.phone_number)
-      }
-      return ''
+      return this.getFormattedContactName(this.selectedContact)
     }
   },
   created () {
@@ -256,7 +241,21 @@ export default {
     },
 
     closeDialog () {
-      // Pending
+      if (this.selectedContact) {
+        this.$q.dialog({
+          title: 'Merge Contact',
+          message: `Are you sure you want to close this form?`,
+          ok: "Yes, I'm sure",
+          cancel: "No, I'm not",
+          persistent: true
+        }).onOk(() => {
+          this.resetAll()
+          this.addMergeContactOpen(false)
+        })
+      } else {
+        this.resetAll()
+        this.addMergeContactOpen(false)
+      }
     },
 
     fetchContact (query) {
