@@ -219,7 +219,7 @@
                 </q-tooltip>
                 <video-conference-icon data-testid="contact-info-video-conference-icon" width="16"/>
             </b-button>
-            <b-button v-if="!hasCompanyIntegrationsEnabled"
+            <b-button v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled"
                       variant="light"
                       size="sm"
                       class="custom-action-button my-1"
