@@ -33,6 +33,7 @@ import log from 'electron-log'
 import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 import { AxiosError } from 'axios'
+import { getWebSocketCredentials } from './helpers'
 
 Screen.setSizes({
   sm: 300,
@@ -71,12 +72,14 @@ Highcharts.setOptions({
 
 window.Highcharts = Highcharts
 
+const wsCredentials = getWebSocketCredentials()
+
 // local storage
 storage.local.setItem('api_url', process.env.API_URL)
 storage.local.setItem('api_reporting_url', process.env.API_REPORTING_URL)
-storage.local.setItem('ws_app_key', process.env.WS_APP_KEY)
-storage.local.setItem('ws_cluster', process.env.WS_CLUSTER)
-storage.local.setItem('ws_host', process.env.WS_HOST)
+storage.local.setItem('ws_app_key', wsCredentials.WS_APP_KEY)
+storage.local.setItem('ws_cluster', wsCredentials.WS_CLUSTER)
+storage.local.setItem('ws_host', wsCredentials.WS_HOST)
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 storage.local.setItem('aloware_demo_companies', Object.values(process.env.DEMO_COMPANY_IDS).join(','))
 storage.local.setItem('custom_edge_location_companies', Object.values(process.env.CUSTOM_EDGE_LOCATION_COMPANY_IDS).join(','))
