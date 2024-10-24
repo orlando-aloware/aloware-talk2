@@ -3,7 +3,7 @@
             :full-width="isMobile"
             :full-height="isMobile"
             :maximized="isMobile"
-            :style="isMobile ? 'width: 100%' : 'width: 1000px'"
+            :style="isMobile ? 'width: 100%' : 'width: 660px'"
             v-model="dialogOpen">
     <q-card style="border-radius: 10px">
       <q-card-section class="d-flex align-items-center justify-between">
