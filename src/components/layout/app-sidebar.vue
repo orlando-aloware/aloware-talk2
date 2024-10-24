@@ -634,9 +634,8 @@
             v-if="isSidebarExpanded">
         Broadcasts
         <q-badge rounded
-                 floating
+                 class="mb-2"
                  color="orange"
-                 style="top:-5px; right: -5px"
         />
       </span>
     </q-btn>
