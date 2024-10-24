@@ -458,7 +458,9 @@ import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-m
 import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
 import {
   sessionCallStatusMixin,
-  dialerWrapUpMixin, aclMixin
+  dialerWrapUpMixin,
+  aclMixin,
+  dispositionsOptionsMixin
 } from 'src/plugins/mixins'
 import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
@@ -490,7 +492,8 @@ export default {
   mixins: [
     aclMixin,
     sessionCallStatusMixin,
-    dialerWrapUpMixin
+    dialerWrapUpMixin,
+    dispositionsOptionsMixin
   ],
 
   props: {
@@ -864,7 +867,15 @@ export default {
     },
 
     shouldRedial () {
-      return this.sessionSettings.force_redial && !this.dialer.callSuccessfullyAnswered && !this.dialer.redialedTaskIds.includes(this.activeTask?.id)
+      console.log('shouldRedial', {
+        'this.callDisposition': this.callDisposition,
+        'this.sessionSettings.force_redial': this.sessionSettings.force_redial,
+        'this.dialer.redialedTaskIds.includes(this.activeTask?.id)': this.dialer.redialedTaskIds.includes(this.activeTask?.id)
+      })
+
+      const callDispositionRequiresRedial = this.callDisposition === 963
+
+      return this.sessionSettings.force_redial && callDispositionRequiresRedial && !this.dialer.redialedTaskIds.includes(this.activeTask?.id)
     }
   },
 
@@ -896,8 +907,7 @@ export default {
     ...mapActions([
       'setShowPhone',
       'addDialerRedialedTaskId',
-      'clearDialerRedialedTaskIds',
-      'setDialerCallSuccessfullyAnswered'
+      'clearDialerRedialedTaskIds'
     ]),
 
     ...mapActions('contacts', [
@@ -1263,7 +1273,6 @@ export default {
       }
 
       this.clearDialerRedialedTaskIds()
-      this.setDialerCallSuccessfullyAnswered(false)
 
       clearInterval(this.countdownInterval)
 
@@ -1387,6 +1396,8 @@ export default {
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
       if (this.shouldRedial) {
+        console.log(' %c Double dial required, pushing to bottom', 'background: yellow; color: #000;')
+
         this.addDialerRedialedTaskId(this.activeTask.id)
         this.onRedial(false)
         return
