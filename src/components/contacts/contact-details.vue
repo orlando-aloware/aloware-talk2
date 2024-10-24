@@ -27,10 +27,6 @@
                                             data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
                                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
-          <contact-aloha-bot class="w-100"
-                             data-testid="contact-details-aloha-bot"
-                             :contact="contact"
-                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>
@@ -85,7 +81,6 @@ import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
 import ContactAloaiEngagementControl from 'components/contacts/contact-aloai-engagement-control'
-import ContactAlohaBot from 'components/contacts/contact-aloha-bot'
 import ContactReservations from 'components/contacts/contact-reservations.vue'
 import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
 import EntityTags from 'components/generic-selectors/entity-tags'
@@ -144,7 +139,6 @@ export default {
     ContactInfo,
     ContactPhones,
     BackButton,
-    ContactAlohaBot,
     ContactReservations,
     ContactReservationsMessages,
     EntityTags

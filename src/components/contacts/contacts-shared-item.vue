@@ -223,7 +223,7 @@ export default {
     },
 
     handleListCreated (event) {
-      if (!event.contact_list) {
+      if (!event.contact_list || (event.contact_list && !event.contact_list.show_in_public_folder)) {
         return
       }
 
