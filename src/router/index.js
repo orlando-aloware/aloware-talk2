@@ -2,9 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './routes'
 import VueGtagEsm from 'vue-gtag'
-Vue.use(VueRouter)
 import * as storage from 'src/plugins/helpers/storage'
 import { get } from 'lodash'
+
+Vue.use(VueRouter)
 
 // This listener will execute before router.beforeEach only if registered
 // before vue-router is registered with Vue.use(VueRouter)
@@ -57,6 +58,17 @@ export default function ({ store }) {
     staticName = !staticName ? '' : staticName
 
     document.title = `${documentTitle.data} - ${staticName} Talk`
+  })
+
+  Router.onError(error => {
+    console.error(error)
+    if (/ChunkLoadError:.*failed./i.test(error.message)) {
+      console.error('Reloading Window 1')
+      window.location.reload()
+    } else if (/Loading.*chunk.*failed./i.test(error.message)) {
+      console.error('Reloading Window 2')
+      window.location.reload()
+    }
   })
 
   Router.afterEach((to, from) => {
