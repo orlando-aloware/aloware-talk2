@@ -47,6 +47,7 @@ export default {
         }
       })
   },
+  publicLists: (state) => state.publicLists,
   currentListFilters: (state) => state.currentListFilters,
   contact: (state) => state.contact,
   contactClone: (state) => state.contactClone,

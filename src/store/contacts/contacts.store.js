@@ -113,6 +113,7 @@ export default function () {
         name: ''
       }
     },
+    publicLists: [],
     columns: null,
     folders: [],
     isFiltersOpen: false,
@@ -161,6 +162,7 @@ export default function () {
       name: '',
       mode: '', // from_filters, from_bulk_menu, from_folders
       type: 1,
+      show_in_public_folder: false,
       open: false,
       contact_folder_id: null,
       filters: []

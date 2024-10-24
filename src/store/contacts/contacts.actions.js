@@ -372,5 +372,8 @@ export default {
   },
   removeAxiosUniqueId ({ commit }, value) {
     commit('REMOVE_AXIOS_UNIQUE_ID', value)
+  },
+  setPublicLists ({ commit }, value) {
+    commit('SET_PUBLIC_LISTS', value)
   }
 }

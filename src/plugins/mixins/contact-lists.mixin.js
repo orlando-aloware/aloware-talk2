@@ -54,7 +54,9 @@ export default {
   },
   methods: {
     ...mapActions('contacts', [
-      'foldersLoaded'
+      'foldersLoaded',
+      'setPublicLists',
+      'setPublicListsLoaded'
     ]),
 
     reloadFolders () {
@@ -112,6 +114,35 @@ export default {
       }
       this.prompt = false
       this.loading = false
+    },
+
+    loadPublicLists () {
+      this.isLoading = true
+      this.setPublicListsLoaded(false)
+      this.publicLists = []
+      API.V2.contactList.public({
+        page: this.paginationPage,
+        size: this.perPage
+      }).then(response => {
+        const total = response.data.total
+        this.lastPage = Math.ceil(total > this.perPage ? Math.ceil(total / this.perPage) : 1)
+
+        if (total > this.perPage) {
+          this.paginated = true
+        }
+
+        this.publicLists = response.data.data
+        this.setPublicLists(response.data.data)
+      }).catch((err) => {
+        console.error(err)
+        this.$generalNotification('Unable to load folders please try again.', 'error')
+        this.setPublicListsLoaded(true)
+        this.setPublicLists([])
+        this.isLoading = false
+      }).finally(() => {
+        this.isLoading = false
+        this.setPublicListsLoaded(true)
+      })
     }
   }
 }
