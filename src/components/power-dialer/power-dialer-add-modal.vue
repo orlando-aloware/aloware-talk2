@@ -138,7 +138,7 @@
         <h2>Power Dialer Task Options</h2>
         <slot name="header-close-content">
           <b-button variant="transparent"
-                    @click="openPDModalInContacts('confirmation')">
+                    @click="hidePDModalsInContacts">
             <i class="fas fa-times"></i>
           </b-button>
         </slot>
@@ -153,6 +153,35 @@
           </div>
 
           <hr>
+
+          <div v-if="enablePdListSelection">
+            <label class="label mb-1 text-weight-bold"
+                   data-testid="power-dialer-add-modal-conversion-options">
+              Select Power Dialer List
+            </label>
+            <b-row class="no-gutters mb-2">
+              <b-col class="mr-1"
+                     v-if="!isAgent">
+                <b-form-group class="font-weight-light text-13 mb-0"
+                              data-testid="add-to-power-dialer-modal-user-box"
+                              label="User">
+                  <user-selector :generic-styling="false"
+                                 v-model="userId"
+                                 @change="setUserId"/>
+                </b-form-group>
+              </b-col>
+
+              <b-col class="ml-1">
+                <b-form-group class="font-weight-light text-13 mb-0"
+                              data-testid="add-to-power-dialer-modal-pd-list-box"
+                              label="Power Dialer List">
+                  <power-dialer-list-selector v-model="powerDialerListId"
+                                              :user-id="userId"
+                                              @change="setPowerDialerListId" />
+                </b-form-group>
+              </b-col>
+            </b-row>
+          </div>
 
           <label class="label mb-1 text-weight-bold"
                  data-testid="power-dialer-add-modal-conversion-options">
@@ -233,12 +262,14 @@
               <b-button class="btn-block mt-4"
                         variant="secondary"
                         size="sm"
+                        :disabled="userId == null"
                         data-testid="power-dialer-add-modal-stay-in-contacts"
                         @click="saveAndStay">
-                Stay in Contacts
+                {{isMyOwnList ? 'Stay in Contacts' : 'Add to Power Dialer'}}
               </b-button>
             </div>
-            <div class="col-6 text-center">
+            <div class="col-6 text-center"
+                 v-if="isMyOwnList">
               <b-button class="btn-block mt-4"
                         variant="primary"
                         size="sm"
@@ -280,20 +311,25 @@ import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ImportConstants from 'src/constants/power-dialer-import'
 import * as CompanyTiers from 'src/constants/company-international-tier'
-import { integrationMixin } from 'src/plugins/mixins'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { integrationMixin, aclMixin, userMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import { get, isEmpty } from 'lodash'
 import moment from 'moment'
+import UserSelector from 'components/generic-selectors/user-selector.vue'
+import PowerDialerListSelector from 'components/power-dialer/power-dialer-list-selector.vue'
 
 export default {
   name: 'power-dialer-add-modal',
 
   components: {
     DatePicker,
-    InformationCircleIcon
+    InformationCircleIcon,
+    UserSelector,
+    PowerDialerListSelector
   },
 
-  mixins: [integrationMixin],
+  mixins: [integrationMixin, aclMixin, userMixin],
 
   props: {
     integration: {
@@ -313,7 +349,7 @@ export default {
 
     mode: {
       type: String,
-      default: 'add' // add, duplicate, hubspot
+      default: 'add' // add, duplicate, hubspot, add-contact-list
     },
 
     showInContactsPage: {
@@ -324,32 +360,52 @@ export default {
     checkedCount: {
       type: Number,
       default: 0
+    },
+
+    contactList: {
+      type: Object,
+      default: null
+    },
+
+    selectedAllCount: {
+      type: Number,
+      default: 0
+    },
+
+    isManualSelection: {
+      type: Boolean,
+      default: false
     }
   },
 
-  data: () => ({
-    loading: 0,
-    confirm: false,
-    confirm_message: '',
-    conversion: [
-      'prevent_duplicates'
-    ],
-    where: 'queue',
-    schedule: new Date(),
-    direction: ImportConstants.BOTTOM,
-    masks: {
-      input: 'MM/DD/YYYY HH:mm'
-    },
-    popover_config: {
-      placement: 'right'
-    },
-    count: 0,
-    stay: false,
-    showContactModals: {
-      add: false,
-      confirmation: false
+  data () {
+    return {
+      loading: 0,
+      confirm: false,
+      confirm_message: '',
+      conversion: [
+        'prevent_duplicates'
+      ],
+      where: 'queue',
+      schedule: new Date(),
+      direction: ImportConstants.BOTTOM,
+      masks: {
+        input: 'MM/DD/YYYY HH:mm'
+      },
+      popover_config: {
+        placement: 'right'
+      },
+      count: 0,
+      stay: false,
+      showContactModals: {
+        add: false,
+        confirmation: false
+      },
+      userId: null,
+      powerDialerListId: this.myQueueId,
+      ContactListTypes
     }
-  }),
+  },
 
   computed: {
     ...mapState('contacts', [
@@ -359,11 +415,15 @@ export default {
       'search'
     ]),
 
+    ...mapState(['users']),
+
     ...mapState('cache', ['currentCompany']),
 
     ...mapGetters('powerDialer', ['myQueueId']),
 
     ...mapState(['isDatatableSelectedAll', 'currentTimezone']),
+
+    ...mapState('auth', ['profile']),
 
     isOpen: {
       get () {
@@ -372,6 +432,10 @@ export default {
       set (isOpen) {
         return isOpen
       }
+    },
+
+    isMyOwnList () {
+      return this.userId === this.profile.id
     },
 
     requestParams () {
@@ -410,7 +474,11 @@ export default {
     contactsDescription () {
       let description = ''
 
-      if (this.count !== null) {
+      if (this.mode === 'add-contact-list' && this.contactList && !this.isManualSelection) {
+        description += this.contactList.contactCount
+      } else if (this.requestParams.selected_all) {
+        description += this.selectedAllCount
+      } else if (this.count !== null) {
         description += this.$options.filters.numFormat(this.count)
       }
 
@@ -475,11 +543,21 @@ export default {
           label: 'Top'
         }
       ]
+    },
+
+    enablePdListSelection () {
+      return this.mode === 'add' || this.mode === 'add-contact-list'
     }
   },
 
   mounted () {
     this.loading++
+
+    // When open PD modal, verify if the authenticated user is in the list of users to select, and set it
+    // as the default user if exists. This should happen only for 'add' and 'add-contact-list' modes
+    if (this.profile.id && this.mode === 'add-contact-list' && this.filterUsers(this.users).find(user => user.id === this.profile.id)) {
+      this.setUserId(this.profile.id)
+    }
 
     if (this.mode === 'integration') {
       // check if a list from integration already exists
@@ -501,6 +579,14 @@ export default {
       'addPowerDialerOpen',
       'createPdListClose'
     ]),
+
+    setUserId (userId) {
+      this.userId = userId
+    },
+
+    setPowerDialerListId (listId) {
+      this.powerDialerListId = listId
+    },
 
     setCount () {
       if (this.checkedCount) {
@@ -579,6 +665,8 @@ export default {
     getRequest () {
       // In case of new types of requests, you just need to setup a new mode and its own import method, like above
       switch (this.mode) {
+        case 'add-contact-list':
+          return this.addContacts()
         case 'add':
           return this.addContacts()
         case 'duplicate':
@@ -591,7 +679,33 @@ export default {
     },
 
     addContacts () {
-      const listId = get(this.requestParams, 'contact_list_id', this.myQueueId)
+      const listId = get(this.requestParams, 'contact_list_id', this.powerDialerListId)
+
+      // If mode is 'add-contact-list', user should select the PD list to add contacts
+      // if user selected a list that is not myQueueId, set the new PD list id to receive the contacts
+      if (this.mode === 'add-contact-list' && this.powerDialerListId !== this.myQueueId) {
+        this.requestParams.contact_list_id = this.powerDialerListId
+      }
+
+      // If selectedAll OR is List action
+      const shouldSelectAll = this.requestParams.selected_all || (this.mode === 'add-contact-list' && !this.isManualSelection)
+
+      // Verify filters to avoid adding all company contacts
+      if (shouldSelectAll && !this.requestParams.filter_groups && this.contactList && this.contactList.id !== 'all') {
+        // Add to requests params the list_id to adding all contacts from current list
+        this.requestParams.list_id = this.contactList.id
+        this.requestParams.selected_all = true
+      }
+
+      // Don't send list_id for dynamic lists, it should use only the filters
+      if (this.contactList?.type === this.ContactListTypes.DYNAMIC) {
+        delete this.requestParams.list_id
+      }
+
+      // Remove contact_ids param if it's empty
+      if (this.requestParams.contact_ids !== undefined && this.requestParams.contact_ids.length === 0) {
+        delete this.requestParams.contact_ids
+      }
 
       this.$VueEvent.fire('addContactsProgress', {
         id: listId,

@@ -76,18 +76,19 @@
           custom-class="contact-popover"
           :target="folderId"
           v-if="folderExists">
-          <list-actions
-            :list-id="id"
-            :type="type"
-            :hasEdit="hasEdit"
-            :hasDelete="hasDelete"
-            :isPinned="isPinned"
-            @remove="onRemoveList"
-            @rename="onRenameList"
-            @pin="onPin"
-            @move="onMove"
-            @duplicate="onDuplicate"
-            @clonestatic="onCloneStatic"/>
+          <list-actions :id="id"
+                        :type="type"
+                        :contacts-count="contactsCount"
+                        :has-edit="hasEdit"
+                        :has-delete="hasDelete"
+                        :is-pinned="isPinned"
+                        @remove="onRemoveList"
+                        @rename="onRenameList"
+                        @pin="onPin"
+                        @move="onMove"
+                        @duplicate="onDuplicate"
+                        @split="onSplit"
+                        @clonestatic="onCloneStatic"/>
         </b-popover>
       </div>
     </router-link>
@@ -107,6 +108,7 @@ import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
 
 export default {
   components: {
@@ -118,6 +120,11 @@ export default {
     UnsavedIcon,
     ListActions
   },
+
+  mixins: [
+    contactLists,
+    contactsListFiltersMixin
+  ],
 
   props: {
     id: {
@@ -141,6 +148,16 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    showInPublicFolder: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    contactsCount: {
+      type: Number,
+      required: false,
+      default: 0
     }
   },
 
@@ -163,6 +180,7 @@ export default {
       'unsavedList'
     ]),
     ...mapState(['isMobile']),
+    ...mapState('auth', ['profile']),
     indentStyle () {
       return {
         flex: `0 0 ${this.layer * 10}px`
@@ -186,17 +204,11 @@ export default {
     itemName () {
       return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
     },
-    isContactsRoute () {
-      return this.$route.meta.title === 'Contacts'
-    },
     viewListPath () {
       return this.isContactsRoute ? `/contacts/list/${this.id}` : `/power-dialer/list/${this.id}`
     },
     listPath () {
       return this.isContactsRoute ? '/api/v2/contacts-list/' : '/api/v2/power-dialer-lists/'
-    },
-    foldersPath () {
-      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     },
     folderId () {
       const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
@@ -225,13 +237,16 @@ export default {
         }
       }, 500)
     }
+
+    this.$VueEvent.stop('contact_list_created')
+
+    this.$VueEvent.listen('contact_list_created', event => this.handleListCreated(event))
   },
 
   methods: {
     ...mapActions('contacts', [
       'removeListOpen',
       'removeListClose',
-      'foldersLoaded',
       'listLoaded',
       'listPinToggled',
       'openMoveDialog',
@@ -245,6 +260,22 @@ export default {
         id: this.id,
         type: this.type
       })
+    },
+    onSplit () {
+      this.$root.$emit('bv::hide::popover')
+
+      const isAgent = this.profile.role_names.includes('Company Agent')
+      if (this.type === ContactListTypes.DYNAMIC || (this.showInPublicFolder && isAgent)) {
+        this.$emit('noSplit', this.name, 'You are not allowed to split this list.')
+        return
+      }
+
+      if (this.type === ContactListTypes.STATIC && this.contactsCount <= this.minimunContactsToSplit) {
+        this.$emit('noSplit', this.name, `The list must have more than ${this.minimunContactsToSplit} contacts to be split`)
+        return
+      }
+
+      this.$emit('split', this.id, this.name, this.contactsCount)
     },
     onCloneStatic () {
       this.$root.$emit('bv::hide::popover')
@@ -419,15 +450,6 @@ export default {
       return this.$axios
         .get(`api/v2/contacts-list/${id}/items?per_page=1`)
     },
-    reloadFolders () {
-      return this.$axios
-        .get(this.foldersPath)
-        .then((response) => response.data)
-        .then(this.foldersLoaded)
-        .catch((_err) => {
-          this.$generalNotification('Unable to load folders please try again.', 'error')
-        })
-    },
     onClickItem () {
       this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
     },
@@ -479,6 +501,28 @@ export default {
       if (this.$route.path !== '/contacts/list/unsaved') {
         this.$router.push('/contacts/list/unsaved')
       }
+    },
+
+    handleListCreated (event) {
+      if (!event.contact_list) {
+        return
+      }
+
+      if (this.isContactsRoute) {
+        this.$router.push(`/contacts/list/${event.contact_list.id}`)
+      } else {
+        this.$router.push(`/power-dialer/list/${event.contact_list.id}`)
+      }
+
+      this.initiateUpdateContactsListFilter()
+      this.$VueEvent.fire('fetchContacts', {
+        fromRefresh: true,
+        clear: true,
+        skipCache: true
+      })
+      this.$VueEvent.fire('fetchContactsLists')
+
+      this.reloadFolders()
     }
   },
 
