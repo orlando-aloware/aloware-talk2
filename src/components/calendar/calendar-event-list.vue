@@ -1,11 +1,13 @@
 <template>
-  <q-dialog :full-width="isMobile"
+  <q-dialog content-class="calendar-event-list-modal"
+            :full-width="isMobile"
             :full-height="isMobile"
             :maximized="isMobile"
+            :style="isMobile ? 'width: 100%' : 'width: 1000px'"
             v-model="dialogOpen">
-    <q-card style="width: 635px; border-radius: 10px">
+    <q-card style="border-radius: 10px">
       <q-card-section class="d-flex align-items-center justify-between">
-        <div class="text-h6">{{ modalTitle }}</div>
+        <div class="calendar-event-list-modal-title">{{ modalTitle }}</div>
         <q-btn icon="close"
                size="12px"
                flat
@@ -39,10 +41,14 @@
                 </div>
               </div>
               <div class="col">
-                <div>
-                  <span :class="getCancelledEventTextDecoration(event)">
-                    {{ formatEventTime(event) }} - {{ getEventStatusLabel(event?.status) }} {{ getEventTypeLabel(event?.type) }}
-                  </span>
+                <div :class="getCancelledEventTextDecoration(event)"
+                     v-if="timezoneIsDifferentThanBrowser && !isMobile">
+                  <div v-html="formatEventTime(event)"></div>
+                  <div>{{ getEventStatusLabel(event?.status) }} {{ getEventTypeLabel(event?.type) }}</div>
+                </div>
+                <div :class="getCancelledEventTextDecoration(event)"
+                     v-else>
+                  {{ formatEventTime(event) }} - {{ getEventStatusLabel(event?.status) }} {{ getEventTypeLabel(event?.type) }}
                 </div>
                 <div class="text-bold"
                      :class="getCancelledEventTextDecoration(event)">
@@ -65,11 +71,14 @@
 <script>
 import moment from 'moment'
 import Search from 'src/components/search.vue'
+import { calendarMixin } from 'src/plugins/mixins'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'calendar-event-list',
+
+  mixins: [calendarMixin],
 
   components: {
     Search
@@ -84,6 +93,14 @@ export default {
       type: String,
       default: 'hour'
     },
+    viewMode: {
+      type: String,
+      default: 'day'
+    },
+    currentDate: {
+      type: [Date, String, Object],
+      default: () => moment()
+    },
     selectedDate: {
       type: [Date, String, Object],
       required: true
@@ -95,10 +112,6 @@ export default {
     events: {
       type: Array,
       default: () => []
-    },
-    timeFormat: {
-      type: Number,
-      default: 1
     },
     value: { // For v-model binding
       type: Boolean,
@@ -125,6 +138,22 @@ export default {
     },
 
     eventsForSelectedHour () {
+      if (this.viewMode === 'week') {
+        const startOfWeek = moment(this.currentDate.split(' - ')[0], 'D MMM YYYY')
+        const endOfWeek = moment(this.currentDate.split(' - ')[1], 'D MMM YYYY')
+
+        return this.events.filter(event => {
+          const eventStart = moment(event.start_date)
+          const selectedHour = moment(this.selectedHour)
+
+          const matchesSearch = event?.text?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
+
+          return eventStart.isBetween(startOfWeek, endOfWeek, null, '[]') &&
+            eventStart.hour() === selectedHour.hour() &&
+            matchesSearch
+        }).sort(this.sortListEvents)
+      }
+
       return this.events.filter(event => {
         const eventStart = moment(event.start_date)
         const eventEnd = moment(event.end_date)
@@ -139,6 +168,19 @@ export default {
     },
 
     eventsForSelectedDate () {
+      if (this.viewMode === 'week') {
+        const startOfWeek = moment(this.currentDate.split(' - ')[0], 'D MMM YYYY')
+        const endOfWeek = moment(this.currentDate.split(' - ')[1], 'D MMM YYYY')
+
+        return this.events.filter(event => {
+          const eventStart = moment(event.start_date)
+          const matchesSearch = event?.text?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
+
+          return eventStart.isBetween(startOfWeek, endOfWeek, null, '[]') &&
+            matchesSearch
+        }).sort(this.sortListEvents)
+      }
+
       const selectedDay = moment(this.selectedDate).startOf('day')
 
       return this.events.filter(event => {
@@ -156,14 +198,31 @@ export default {
     },
 
     modalTitle () {
-      return this.eventsModalMode === 'hour'
-        ? `Events for ${moment(this.selectedHour).format(this.timeFormat === 1 ? 'D MMM YYYY, h A' : 'D MMM YYYY, H:mm')}`
-        : `Events for ${moment(this.selectedDate).format('LL')}`
+      const {
+        currentTime,
+        currentTimeAcronym,
+        localTime,
+        localTimeAcronym
+      } = this.getFormattedTime(this.selectedHour, this.listViewTimeFormat)
+
+      if (this.viewMode === 'week') {
+        return this.getWeekViewModalTitle(currentTime, currentTimeAcronym, localTime, localTimeAcronym)
+      }
+
+      if (this.eventsModalMode === 'hour') {
+        return this.getHourViewModalTitle(currentTime, currentTimeAcronym, localTime, localTimeAcronym)
+      }
+
+      return `Showing events for ${moment(this.selectedDate).format('LL')}`
     },
 
     emptyEventsMessage () {
       if (this.searchQuery) {
         return 'No events found for this search.'
+      }
+
+      if (this.viewMode === 'week') {
+        return `There are no events for the week between ${this.currentDate.split(' - ')[0]} and ${this.currentDate.split(' - ')[1]}.`
       }
 
       return `There are no events for this ${this.eventsModalMode === 'hour' ? 'hour' : 'day'}.`
@@ -172,10 +231,37 @@ export default {
 
   methods: {
     formatEventTime (event) {
-      const formatString = this.timeFormat === 1 ? 'h:mm A' : 'HH:mm'
-      const start = moment(event.start_date).format(formatString)
-      const end = moment(event.end_date).format(formatString)
-      return `${start} - ${end}`
+      const {
+        currentStartDate,
+        currentStartTime,
+        currentEndDate,
+        currentEndTime,
+        currentTimeAcronym,
+        localStartDate,
+        localStartTime,
+        localEndDate,
+        localEndTime,
+        localTimeAcronym
+      } = this.getStartEndTime({
+        currentStart: event.start_date,
+        currentEnd: event.end_date,
+        browserStart: event.start_date,
+        browserEnd: event.end_date
+      })
+
+      if (this.viewMode === 'week') {
+        if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
+          return `<strong>${currentStartDate} - ${currentStartTime}</strong> - <strong>${currentEndDate} - ${currentEndTime}</strong> ${currentTimeAcronym} / <strong>${localStartDate} - ${localStartTime}</strong> - <strong>${localEndDate} - ${localEndTime}</strong> ${localTimeAcronym}`
+        }
+
+        return `${localStartDate} - ${localStartTime} - ${localEndDate} - ${localEndTime}`
+      }
+
+      if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
+        return `${currentStartTime} - ${currentEndTime} ${currentTimeAcronym} / ${localStartTime} - ${localEndTime} ${localTimeAcronym}`
+      }
+
+      return `${localStartTime} - ${localEndTime}`
     },
 
     openEventModal (event) {
@@ -214,6 +300,35 @@ export default {
         default:
           return 'Appointment'
       }
+    },
+
+    getWeekViewModalTitle (currentTime, currentTimeAcronym, localTime, localTimeAcronym) {
+      const startOfWeek = this.currentDate.split(' - ')[0]
+      const endOfWeek = this.currentDate.split(' - ')[1]
+
+      if (this.eventsModalMode === 'hour') {
+        if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
+          const currentHour = currentTime?.split(' ')[3]
+          const currentMinutes = currentTime?.split(' ')[4]
+          const localHour = localTime?.split(' ')[3]
+          const localMinutes = localTime?.split(' ')[4]
+
+          return `Showing events for ${currentHour} ${currentMinutes} ${currentTimeAcronym} / ${localHour} ${localMinutes} ${localTimeAcronym} for the week between ${startOfWeek} and ${endOfWeek}`
+        }
+
+        const localTimeHour = `${localTime?.split(' ')[3]} ${localTime?.split(' ')[4]}`
+        return `Showing events for ${localTimeHour} for the week between ${startOfWeek} and ${endOfWeek}`
+      }
+
+      return `Showing events for the week between ${startOfWeek} and ${endOfWeek}`
+    },
+
+    getHourViewModalTitle (currentTime, currentTimeAcronym, localTime, localTimeAcronym) {
+      if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
+        return `Showing events for ${currentTime} ${currentTimeAcronym} / ${localTime} ${localTimeAcronym}`
+      }
+
+      return `Showing events for ${localTime}`
     },
 
     sortListEvents (a, b) {
