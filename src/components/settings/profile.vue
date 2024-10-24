@@ -251,32 +251,33 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row class="align-items-center" :id="`${SettingsMap.contact_card.hash_keyword}-container`">
+      <b-form-row class="align-items-center"
+                  :id="`${SettingsMap.contact_card.hash_keyword}-container`">
         <b-col sm="12" md="6">
 
           <b-form-group label="Name" class="form-label mb-0">
-            <b-form-input
-              type="text"
-              placeholder="Enter name"
-              v-model.trim="$v.user.contact_card_name.$model"
-              :state="validateState('contact_card_name')"
-              @input="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_name')">
+            <b-form-input type="text"
+                          placeholder="Enter name"
+                          :state="validateState('contact_card_name')"
+                          v-model.trim="$v.user.contact_card_name.$model"
+                          @input="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_name')">
             </b-form-input>
             <b-form-invalid-feedback v-if="!$v.user.contact_card_name.maxLength">Name must not exceed 191 characters.</b-form-invalid-feedback>
           </b-form-group>
         </b-col>
 
         <b-col sm="12" md="6">
-          <b-form-group label="Phone Number" class="form-label mb-0">
-            <line-selector v-model.trim="user.contact_card_campaign_id"
-                            :value="user.contact_card_campaign_id"
-                            :multiple="false"
-                            :use-chips="false"
-                            :generic-styling="false"
-                            :generic-multiselect="false"
-                            :clearable="true"
-                            :useInput="true"
-                            @change="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')">
+          <b-form-group label="Phone Number"
+                        class="form-label mb-0">
+            <line-selector :value="user.contact_card_campaign_id"
+                           :multiple="false"
+                           :use-chips="false"
+                           :generic-styling="false"
+                           :generic-multiselect="false"
+                           :clearable="true"
+                           :useInput="true"
+                           v-model.trim="user.contact_card_campaign_id"
+                           @change="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')">
             </line-selector>
           </b-form-group>
         </b-col>

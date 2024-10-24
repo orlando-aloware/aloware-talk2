@@ -77,10 +77,10 @@
       </q-tooltip>
     </b-link>
 
-    <b-link v-if="messageComposer.mode === 'sms'"
-            href="#"
+    <b-link href="#"
             data-testid="add-contact-card-link"
-            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments">
+            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments"
+            v-if="messageComposer.mode === 'sms'">
       <q-menu content-class="mx-height-500 width-300"
               ref="contactCardMenu"
               data-testid="add-contact-card-menu"

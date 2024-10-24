@@ -22,18 +22,18 @@
     </b-col>
 
     <b-col sm="12" md="12">
-      <b-progress v-if="isUploading && !hasError"
-              class="add-contact-card-progress mt-2"
-              variant="success"
-              data-testid="add-contact-card-progress"
-              :max="100">
-        <b-progress-bar :value="uploadPercentage"
-                        data-testid="add-contact-card-progress-bar"
+      <b-progress class="add-contact-card-progress mt-2"
+                  variant="success"
+                  data-testid="add-contact-card-progress"
+                  :max="100"
+                  v-if="isUploading && !hasError">
+        <b-progress-bar data-testid="add-contact-card-progress-bar"
+                        :value="uploadPercentage"
                         :label="`${uploadPercentage}%`"/>
       </b-progress>
-      <p v-if="hasError && !isUploading"
-        data-testid="add-contact-card-error"
-        class="error-notice mt-2">
+      <p data-testid="add-contact-card-error"
+         class="error-notice mt-2"
+         v-if="hasError && !isUploading">
         Error while generating contact card...
       </p>
     </b-col>

@@ -136,8 +136,8 @@
                       <b-button size="sm"
                                 class="btn-remove-attachments"
                                 data-testid="sms-remove-vcard-button"
-                                @click="removeAttachment(attachment)"
-                                pill>
+                                pill
+                                @click="removeAttachment(attachment)">
                         <i class="fa fa-times"></i>
                       </b-button>
                     </div>
