@@ -543,6 +543,10 @@ export default {
           label: 'Top'
         }
       ]
+    },
+
+    enablePdListSelection () {
+      return this.mode === 'add' || this.mode === 'add-contact-list'
     }
   },
 
