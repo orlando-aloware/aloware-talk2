@@ -136,6 +136,50 @@ export default {
           <div class="event-text">${event.text}</div>
         </div>
       `
+    },
+
+    getWeekStartAndEnd (date) {
+      const [startStr, endStr] = date.split(' - ')
+      return {
+        startOfWeek: moment(startStr, 'D MMM YYYY'),
+        endOfWeek: moment(endStr, 'D MMM YYYY')
+      }
+    },
+
+    matchesSearch (eventText) {
+      return eventText?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
+    },
+
+    filterEventsForWeek (extraCondition) {
+      const { startOfWeek, endOfWeek } = this.getWeekStartAndEnd(this.currentDate)
+      return this.events.filter(event => {
+        const eventStart = moment(event.start_date)
+        const matchesSearch = this.matchesSearch(event.text)
+        const isInWeek = eventStart.isBetween(startOfWeek, endOfWeek, null, '[]')
+        const extra = extraCondition ? extraCondition(event) : true
+
+        return isInWeek && matchesSearch && extra
+      })
+    },
+
+    filterEventsForDate (granularity, selectedMoment) {
+      return this.events.filter(event => {
+        const eventStart = moment(event.start_date)
+        const eventEnd = moment(event.end_date)
+        const matchesSearch = this.matchesSearch(event.text)
+
+        let isMatch = false
+        if (granularity === 'hour') {
+          isMatch =
+            eventStart.isSame(selectedMoment, 'hour') ||
+            (eventStart.isBefore(selectedMoment) && eventEnd.isAfter(selectedMoment))
+        } else if (granularity === 'day') {
+          isMatch = eventStart.isSame(selectedMoment, 'day')
+        }
+
+        return isMatch && matchesSearch
+      })
     }
+
   }
 }
