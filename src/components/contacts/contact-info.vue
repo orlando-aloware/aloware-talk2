@@ -219,11 +219,11 @@
                 </q-tooltip>
                 <video-conference-icon data-testid="contact-info-video-conference-icon" width="16"/>
             </b-button>
-            <b-button v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled"
-                      variant="light"
+            <b-button variant="light"
                       size="sm"
                       class="custom-action-button my-1"
                       data-testid="contact-info-merge-button"
+                      v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled"
                       @click="openMergeContactModal">
                 <q-tooltip anchor="bottom middle"
                           data-testid="contact-info-merge-tooltip"
