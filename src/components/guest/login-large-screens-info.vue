@@ -36,7 +36,7 @@
             <div v-if="!isSimpSocial && staticsLoaded">
               <a class="btn btn-primary btn-xl px-5"
                  target="_blank"
-                 href="mailto:support@aloware.com?subject=Enable transcription for free">
+                 href="https://aloware.com/features/ai-analytics/">
                 Request access
               </a>
             </div>
