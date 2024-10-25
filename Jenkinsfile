@@ -63,18 +63,18 @@ pipeline {
                             }
                         }
 
-                        stage('Load Cached Modules') {
-                            when { not { branch 'master' } }
-                            steps {
-                                sh "cp -r ${env.NODE_MODULES_PATH} ."
-                            }
-                        }
+                        // stage('Load Cached Modules') {
+                        //     when { not { branch 'master' } }
+                        //     steps {
+                        //         sh "cp -r ${env.NODE_MODULES_PATH} ."
+                        //     }
+                        // }
 
                         stage('Install Dependencies') {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'yarn cache clean && yarn install --pure-lockfile'
+                                    sh 'yarn install --pure-lockfile'
                                 }
                             }
                         }
