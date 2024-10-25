@@ -139,56 +139,23 @@ export default {
 
     eventsForSelectedHour () {
       if (this.viewMode === 'week') {
-        const startOfWeek = moment(this.currentDate.split(' - ')[0], 'D MMM YYYY')
-        const endOfWeek = moment(this.currentDate.split(' - ')[1], 'D MMM YYYY')
-
-        return this.events.filter(event => {
+        return this.filterEventsForWeek(event => {
           const eventStart = moment(event.start_date)
           const selectedHour = moment(this.selectedHour)
-
-          const matchesSearch = event?.text?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
-
-          return eventStart.isBetween(startOfWeek, endOfWeek, null, '[]') &&
-            eventStart.hour() === selectedHour.hour() &&
-            matchesSearch
+          return eventStart.hour() === selectedHour.hour()
         }).sort(this.sortListEvents)
       }
 
-      return this.events.filter(event => {
-        const eventStart = moment(event.start_date)
-        const eventEnd = moment(event.end_date)
-        const selectedHour = moment(this.selectedHour)
-
-        const matchesSearch = event?.text?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
-
-        return (eventStart.isSame(selectedHour, 'hour') || (eventStart.isBefore(selectedHour) &&
-          eventEnd.isAfter(selectedHour))) &&
-          matchesSearch
-      }).sort(this.sortListEvents)
+      return this.filterEventsForDate('hour', moment(this.selectedHour)).sort(this.sortListEvents)
     },
 
     eventsForSelectedDate () {
       if (this.viewMode === 'week') {
-        const startOfWeek = moment(this.currentDate.split(' - ')[0], 'D MMM YYYY')
-        const endOfWeek = moment(this.currentDate.split(' - ')[1], 'D MMM YYYY')
-
-        return this.events.filter(event => {
-          const eventStart = moment(event.start_date)
-          const matchesSearch = event?.text?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
-
-          return eventStart.isBetween(startOfWeek, endOfWeek, null, '[]') &&
-            matchesSearch
-        }).sort(this.sortListEvents)
+        return this.filterEventsForWeek().sort(this.sortListEvents)
       }
 
       const selectedDay = moment(this.selectedDate).startOf('day')
-
-      return this.events.filter(event => {
-        const eventDate = moment(event.start_date)
-        const matchesSearch = event?.text?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
-
-        return eventDate.isSame(selectedDay, 'day') && matchesSearch
-      })
+      return this.filterEventsForDate('day', selectedDay)
     },
 
     displayedEvents () {
@@ -308,10 +275,14 @@ export default {
 
       if (this.eventsModalMode === 'hour') {
         if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
-          const currentHour = currentTime?.split(' ')[3]
-          const currentMinutes = currentTime?.split(' ')[4]
-          const localHour = localTime?.split(' ')[3]
-          const localMinutes = localTime?.split(' ')[4]
+          if (!currentTime) {
+            return `Showing events for the week between ${startOfWeek} and ${endOfWeek}`
+          }
+
+          const currentHour = currentTime.split(' ')[3]
+          const currentMinutes = currentTime.split(' ')[4]
+          const localHour = localTime.split(' ')[3]
+          const localMinutes = localTime.split(' ')[4]
 
           return `Showing events for ${currentHour} ${currentMinutes} ${currentTimeAcronym} / ${localHour} ${localMinutes} ${localTimeAcronym} for the week between ${startOfWeek} and ${endOfWeek}`
         }
