@@ -485,6 +485,16 @@ export default {
       }
     },
 
+    transcription: {
+      submitSummaryFeedback (communicationId, feedbackType) {
+        return window.axios.post(`${suffixV1}transcription/${communicationId}/summary-feedback`, { feedback: feedbackType })
+      },
+
+      fetchSmartTranscriptionData (communicationId, options) {
+        return window.axios.get(`${suffixV1}transcription/communication/${communicationId}`, options)
+      }
+    },
+
     statics: {
       get (companyId) {
         return window.axios.get('/get-statics', {
@@ -527,15 +537,6 @@ export default {
       }
     },
 
-    alohabot: {
-      getContactSession (id) {
-        return window.axios.get(`${suffixV1}bots/contact/${id}/session`)
-      },
-
-      disengageContact (id, params) {
-        return window.axios.post(`${suffixV1}bots/contact/${id}/disengage`, params)
-      }
-    },
     broadcasts: {
       delete (id) {
         return window.axios.delete(`${suffixV1}broadcasts/${id}`)

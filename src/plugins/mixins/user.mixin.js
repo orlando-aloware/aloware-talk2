@@ -1,6 +1,6 @@
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../../constants/answer-types'
-import _ from 'lodash'
+import { get, isEmpty } from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
@@ -16,12 +16,16 @@ export default {
 
     isModGen () {
       return [2132, 3691].includes(this.currentCompany?.reseller_id)
+    },
+
+    isImpersonate () {
+      return localStorage.getItem('impersonate') === 'true'
     }
   },
 
   methods: {
     getUser (id) {
-      const users = _.get(this, 'users', null)
+      const users = get(this, 'users', null)
 
       if (!id || !users || users.length === 0) {
         return {
@@ -94,6 +98,18 @@ export default {
 
     isCompanyPartOfCustomEdgeLocations (companyId) {
       return storage.local.getItem('custom_edge_location_companies') && storage.local.getItem('custom_edge_location_companies').split(',').includes(String(companyId))
+    },
+
+    // Filters users by excluding those with read-only access and a single/undefined role,
+    // or those with `answer_by` set to `BY_NONE`.
+    filterUsers (users) {
+      if (isEmpty(users)) return []
+
+      return users.filter((user) => {
+        const hasSingleOrUndefinedRole = typeof user.role_names === 'undefined' || user.role_names.length === 1
+
+        return !(hasSingleOrUndefinedRole && user.read_only_access) && user.answer_by !== AnswerTypes.BY_NONE
+      })
     }
   }
 }

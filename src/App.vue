@@ -9,30 +9,29 @@
       </template>
     </b-overlay>
     <header-notification class="flex-grow-0"
-                         v-if="isLoggedIn && !isWidget"/>
-    <simpsocial-migration-banner cookieName="simpsocial-migration"/>
+                         v-if="isLoggedIn && !isWidget" />
+
     <router-view class="flex-grow-1 overflow-hidden"
-                 v-if="cookieValidated"/>
+                 v-if="cookieValidated" />
     <portal-target name="app"
-                   multiple>
-    </portal-target>
+                   multiple />
     <action-notification id="system"
-                         v-if='!isWidget'/>
+                         v-if="!isWidget" />
     <action-notification id="sms"
-                         v-if='!isWidget'/>
+                         v-if="!isWidget" />
     <action-notification id="call"
-                         v-if='!isWidget'/>
+                         v-if="!isWidget" />
     <action-notification id="voicemail"
-                         v-if='!isWidget'/>
+                         v-if="!isWidget" />
     <action-notification id="mention"
-                         v-if='!isWidget'/>
+                         v-if="!isWidget" />
     <action-notification id="incomingCall"
-                         v-if='!isWidget'
-                         position="b-toaster-top-center"/>
+                         v-if="!isWidget"
+                         position="b-toaster-top-center" />
     <action-notification id="callFishing"
                          position="b-toaster-top-center"
-                         v-if='!isWidget'/>
-    <intercom v-if="isIntercomEnabled && !isWidget"/>
+                         v-if="!isWidget" />
+    <intercom v-if="isIntercomEnabled && !isWidget" />
   </div>
 </template>
 <script>
@@ -41,7 +40,6 @@ import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import HeaderNotification from 'components/header-notification'
-import SimpsocialMigrationBanner from 'components/simpsocial-migration-banner.vue'
 import { accessMixin } from 'src/plugins/mixins'
 export default {
   name: 'App',
@@ -53,8 +51,7 @@ export default {
   components: {
     HeaderNotification,
     Intercom,
-    ActionNotification,
-    SimpsocialMigrationBanner
+    ActionNotification
   },
 
   data () {

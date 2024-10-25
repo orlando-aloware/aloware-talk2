@@ -108,7 +108,7 @@ import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { contactLists } from 'src/plugins/mixins'
+import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
 
 export default {
   components: {
@@ -121,7 +121,10 @@ export default {
     ListActions
   },
 
-  mixins: [contactLists],
+  mixins: [
+    contactLists,
+    contactsListFiltersMixin
+  ],
 
   props: {
     id: {
@@ -201,18 +204,12 @@ export default {
     itemName () {
       return this.$options.filters.truncate(this.name, (32 - (2 * (this.layer - 1))))
     },
-    /* isContactsRoute () {
-      return this.$route.meta.title === 'Contacts'
-    }, */
     viewListPath () {
       return this.isContactsRoute ? `/contacts/list/${this.id}` : `/power-dialer/list/${this.id}`
     },
     listPath () {
       return this.isContactsRoute ? '/api/v2/contacts-list/' : '/api/v2/power-dialer-lists/'
     },
-    /* foldersPath () {
-      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
-    }, */
     folderId () {
       const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-item-option-${module}-${this.id}`
@@ -250,7 +247,6 @@ export default {
     ...mapActions('contacts', [
       'removeListOpen',
       'removeListClose',
-      // 'foldersLoaded',
       'listLoaded',
       'listPinToggled',
       'openMoveDialog',
@@ -454,15 +450,6 @@ export default {
       return this.$axios
         .get(`api/v2/contacts-list/${id}/items?per_page=1`)
     },
-    /* reloadFolders () {
-      return this.$axios
-        .get(this.foldersPath)
-        .then((response) => response.data)
-        .then(this.foldersLoaded)
-        .catch((_err) => {
-          this.$generalNotification('Unable to load folders please try again.', 'error')
-        })
-    }, */
     onClickItem () {
       this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
     },
@@ -526,6 +513,14 @@ export default {
       } else {
         this.$router.push(`/power-dialer/list/${event.contact_list.id}`)
       }
+
+      this.initiateUpdateContactsListFilter()
+      this.$VueEvent.fire('fetchContacts', {
+        fromRefresh: true,
+        clear: true,
+        skipCache: true
+      })
+      this.$VueEvent.fire('fetchContactsLists')
 
       this.reloadFolders()
     }
