@@ -11,7 +11,7 @@
     </b-overlay>
 
     <div class="broadcasts__add__sidebar">
-      <steps-wrapper :current-step="currentStep"
+      <steps-wrapper-vertical :current-step="currentStep"
                      :steps="steps"/>
     </div>
 
@@ -34,7 +34,7 @@
 import { mapActions } from 'vuex'
 import BroadcastAddView from 'src/components/broadcasts/broadcast-add-view.vue'
 import ContactsFilters from 'src/components/contacts/contacts-filters.vue'
-import StepsWrapper from 'src/components/generic-wrappers/steps-wrapper.vue'
+import StepsWrapperVertical from 'src/components/generic-wrappers/steps-wrapper-vertical.vue'
 
 export default {
   name: 'broadcast-add',
@@ -42,7 +42,7 @@ export default {
   components: {
     BroadcastAddView,
     ContactsFilters,
-    StepsWrapper
+    StepsWrapperVertical
   },
 
   computed: {
