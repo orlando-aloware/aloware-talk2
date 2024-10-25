@@ -89,18 +89,43 @@ export default {
       `
     },
 
-    getStartEndTime ({ currentStart, currentEnd, browserStart, browserEnd }) {
+    formatDateTime (date, timezone) {
+      if (!date) {
+        return {
+          time: null,
+          date: null,
+          acronym: null
+        }
+      }
+
+      const momentDate = moment(date).tz(timezone)
       return {
-        currentStartTime: currentStart ? moment(currentStart).tz(this.currentTimezone).format(this.timeFormat) : null,
-        currentStartDate: currentStart ? moment(currentStart).tz(this.currentTimezone).format('MM-DD') : null,
-        currentEndTime: currentEnd ? moment(currentEnd).tz(this.currentTimezone).format(this.timeFormat) : null,
-        currentEndDate: currentEnd ? moment(currentEnd).tz(this.currentTimezone).format('MM-DD') : null,
-        currentTimeAcronym: currentStart ? moment(currentStart).tz(this.currentTimezone).format('z') : null,
-        localStartTime: browserStart ? moment(browserStart).tz(this.browserTimeZone).format(this.timeFormat) : null,
-        localStartDate: browserStart ? moment(browserStart).tz(this.browserTimeZone).format('MM-DD') : null,
-        localEndTime: browserEnd ? moment(browserEnd).tz(this.browserTimeZone).format(this.timeFormat) : null,
-        localEndDate: browserEnd ? moment(browserEnd).tz(this.browserTimeZone).format('MM-DD') : null,
-        localTimeAcronym: browserStart ? moment(browserStart).tz(this.browserTimeZone).format('z') : null
+        time: momentDate.format(this.timeFormat),
+        date: momentDate.format('MM-DD'),
+        acronym: momentDate.format('z')
+      }
+    },
+
+    getStartEndTime ({ currentStart, currentEnd, browserStart, browserEnd }) {
+      // Format current times
+      const currentStartFormatted = this.formatDateTime(currentStart, this.currentTimezone)
+      const currentEndFormatted = this.formatDateTime(currentEnd, this.currentTimezone)
+
+      // Format local (browser) times
+      const localStartFormatted = this.formatDateTime(browserStart, this.browserTimeZone)
+      const localEndFormatted = this.formatDateTime(browserEnd, this.browserTimeZone)
+
+      return {
+        currentStartTime: currentStartFormatted.time,
+        currentStartDate: currentStartFormatted.date,
+        currentEndTime: currentEndFormatted.time,
+        currentEndDate: currentEndFormatted.date,
+        currentTimeAcronym: currentStartFormatted.acronym,
+        localStartTime: localStartFormatted.time,
+        localStartDate: localStartFormatted.date,
+        localEndTime: localEndFormatted.time,
+        localEndDate: localEndFormatted.date,
+        localTimeAcronym: localStartFormatted.acronym
       }
     },
 
