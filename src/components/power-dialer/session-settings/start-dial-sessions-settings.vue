@@ -451,6 +451,8 @@ export default {
         name: null,
         script_id: null,
         skip_outside_daytime_hours: 1,
+        force_redial: 0,
+        successful_call_dispositions: [],
         user_id: null,
         warmup_period_in_seconds: 0,
         order: POWER_DIALER_ORDER.default,

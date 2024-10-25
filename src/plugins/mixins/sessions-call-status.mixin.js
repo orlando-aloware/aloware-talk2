@@ -302,7 +302,7 @@ export default {
         })
     },
 
-    redialTask (autoDialTask, redial) {
+    redialTask (autoDialTask, redial, forcedDoubleDial = false) {
       const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
       if (!contactListItemId) {
@@ -318,7 +318,13 @@ export default {
             this.taskToCall.redialed = res.data.data.redialed
           }
 
-          this.$generalNotification(`Success: contact is at the ${position} of the current list`)
+          let message = `Success: contact is at the ${position} of the current list`
+
+          if (forcedDoubleDial) {
+            message = `Contact needs to be redialed, adding to the ${position} of current list`
+          }
+
+          this.$generalNotification(message)
           return Promise.resolve(res)
         }).catch(err => {
           return Promise.reject(err)

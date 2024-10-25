@@ -867,15 +867,18 @@ export default {
     },
 
     shouldRedial () {
-      console.log('shouldRedial', {
-        'this.callDisposition': this.callDisposition,
-        'this.sessionSettings.force_redial': this.sessionSettings.force_redial,
-        'this.dialer.redialedTaskIds.includes(this.activeTask?.id)': this.dialer.redialedTaskIds.includes(this.activeTask?.id)
-      })
+      // force redial disabled or task already redialed
+      if (!this.sessionSettings.force_redial || this.dialer.redialedTaskIds.includes(this.activeTask?.id)) {
+        return false
+      }
 
-      const callDispositionRequiresRedial = this.callDisposition === 963
+      // selected call disposition is a successful call disposition
+      const successfulCallDispositions = this.sessionSettings.successful_call_dispositions
+      if (Array.isArray(successfulCallDispositions) && successfulCallDispositions.includes(this.callDisposition)) {
+        return false
+      }
 
-      return this.sessionSettings.force_redial && callDispositionRequiresRedial && !this.dialer.redialedTaskIds.includes(this.activeTask?.id)
+      return true
     }
   },
 
@@ -1399,7 +1402,13 @@ export default {
         console.log(' %c Double dial required, pushing to bottom', 'background: yellow; color: #000;')
 
         this.addDialerRedialedTaskId(this.activeTask.id)
-        this.onRedial(false)
+
+        const redialNow = this.powerDialerTasks.in_queue.length === 0
+        this.onRedial(redialNow, true)
+
+        if (redialNow) {
+          this.$VueEvent.fire('clearCallDispositionStatus')
+        }
         return
       }
 
@@ -1534,7 +1543,7 @@ export default {
       this.sessionPhoneExpansion = ''
     },
 
-    async onRedial (redial) {
+    async onRedial (redial, forcedDoubleDial = false) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
 
@@ -1560,7 +1569,7 @@ export default {
       this.redialedTask.redialed_now = redial
       this.verifyAgentOnCall = true
 
-      this.redialTask(this.activeTask, redial).then(() => {
+      this.redialTask(this.activeTask, redial, forcedDoubleDial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')

@@ -119,6 +119,8 @@ export default {
     if (!this.isCallInProgressStatus) {
       this.$refs['vm-drop'].disable()
     }
+
+    this.$VueEvent.listen('clearCallDispositionStatus', this.clearCallDispositionStatus)
   },
 
   methods: {
@@ -265,6 +267,15 @@ export default {
 
     isReferenceAvailable (referenceId) {
       return !isEmpty(this.$refs?.[referenceId])
+    },
+
+    clearCallDispositionStatus () {
+      this.selectedCallDisposition = null
+      this.initCallDisposition()
+
+      if (this.isContactNotDisposed) {
+        this.$VueEvent.fire('pauseWrapUp', true)
+      }
     }
   },
 
@@ -296,6 +307,10 @@ export default {
 
       this.$refs['vm-drop'].disable()
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('clearCallDispositionStatus', this.clearCallDispositionStatus)
   }
 }
 </script>

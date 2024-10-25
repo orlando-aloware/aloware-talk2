@@ -11,7 +11,7 @@
         <div :key="cform.name"
              :class="cform.containerClass ?? 'col-6 pl-3'"
              v-for="cform in form.children">
-          <div :class="cform.name === 'force_redial' && currentCompany?.pd_force_redial ? 'opacity-05' : ''">
+          <div :class="disabledClassname(cform.name)">
             <label :class="`label mb-1 ${cform.labelClass}`">
               {{ cform.label }}
             </label>
@@ -117,6 +117,16 @@
                       :false-value="0"
                       :disable="disabled || currentCompany?.pd_force_redial"
                       v-model="resources[cform.name]" />
+          </p>
+
+          <p v-else-if="cform.name === 'successful_call_dispositions'">
+            <call-disposition-selector class="p-0 mt-1 mb-0 dial-sessions__form__call-disposition-selector"
+                                       style="max-width: calc(50% - 16px);"
+                                       :multiple="true"
+                                       :highlighted="false"
+                                       :disable="successfulCallDispositionsDisabled"
+                                       v-model="resources[cform.name]"
+                                       @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
           </p>
 
           <warmup-period-selector class="dial-sessions__form__warmup-period-selector"
@@ -229,6 +239,10 @@ export default {
 
     defaultValues () {
       return DEFAULT_SETTING_VALUES
+    },
+
+    successfulCallDispositionsDisabled () {
+      return this.currentCompany?.power_dialer_settings?.successful_call_dispositions?.length > 0
     }
   },
 
@@ -258,6 +272,18 @@ export default {
 
     onShowWarmUpMenu () {
       this.selectWidth = this.$refs.warmup_period_in_seconds[0].$el.offsetWidth
+    },
+
+    disabledClassname (prop) {
+      if (prop === 'force_redial' && this.currentCompany?.pd_force_redial) {
+        return 'opacity-05'
+      }
+
+      if (prop === 'successful_call_dispositions' && this.successfulCallDispositionsDisabled) {
+        return 'opacity-05'
+      }
+
+      return ''
     }
   },
 
@@ -284,6 +310,12 @@ export default {
       if (this.currentCompany?.pd_force_redial) {
         value.force_redial = 1
       }
+
+      // if company success call disposition settings, override
+      if (this.currentCompany?.power_dialer_settings?.successful_call_dispositions?.length) {
+        value.successful_call_dispositions = this.currentCompany.power_dialer_settings.successful_call_dispositions
+      }
+
       this.resources = value
     },
 
