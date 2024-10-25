@@ -15,7 +15,7 @@ pipeline {
         AWS_CREDS = credentials('aws-credentials')
         AWS_REGION = 'us-west-2'
         NODE_VERSION = '20'
-        NODE_MODULES_PATH = '/cached_modules/npm/${NODE_VERSION}/talk2/node_modules'
+        YARN_CACHE_FOLDER = "${HOME}/.yarn-cache/build-talk-${env.BUILD_ID}"
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -63,18 +63,22 @@ pipeline {
                             }
                         }
 
-                        // stage('Load Cached Modules') {
-                        //     when { not { branch 'master' } }
-                        //     steps {
-                        //         sh "cp -r ${env.NODE_MODULES_PATH} ."
-                        //     }
-                        // }
+                        stage('Setup Yarn') {
+                            steps {
+                                script {
+                                    // Ensure the cache directory exists
+                                    sh "mkdir -p ${YARN_CACHE_FOLDER}"
+                                }
+                            }
+                        }
 
                         stage('Install Dependencies') {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'yarn install --pure-lockfile'
+                                    sh '''yarn install --cache-folder ${YARN_CACHE_FOLDER} --pure-lockfile && \
+                                    npm run dev
+                                    '''
                                 }
                             }
                         }
@@ -183,6 +187,9 @@ pipeline {
             }
         }
         always {
+            // Clean up the cache folder after the build finishes
+            sh "rm -rf ${YARN_CACHE_FOLDER}"
+
             //noInspection GroovyAssignabilityCheck
             cleanWs()
         }
