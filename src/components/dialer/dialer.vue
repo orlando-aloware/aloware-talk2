@@ -404,7 +404,7 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.last_call) {
+      if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
         return
       }
 
