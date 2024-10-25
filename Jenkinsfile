@@ -74,7 +74,7 @@ pipeline {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'yarn install'
+                                    sh 'yarn cache clean && yarn install --pure-lockfile'
                                 }
                             }
                         }
