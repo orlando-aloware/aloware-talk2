@@ -12,6 +12,8 @@ export const INVALID = 5
 export const INTERNATIONAL_DISALLOWED = 6
 /* Not owned contacts */
 export const NOT_OWNED = 7
+/* International number not allowed to be contacted */
+export const INTERNATIONAL_DISALLOWED_TO_CONTACT = 8
 
 export const PD_BULK_ADD_MESSAGES = {
   1: 'With duplicate phone number(s)',
@@ -20,7 +22,8 @@ export const PD_BULK_ADD_MESSAGES = {
   4: 'No primary phone number',
   5: 'Invalid phone number(s)',
   6: 'Contact(s) with International phone number',
-  7: 'Contact(s) not owned'
+  7: 'Contact(s) not owned',
+  8: 'Contact(s) not allowed to be contacted'
 }
 
 export const PD_INTEGRATION_IMPORT_MESSAGES = {

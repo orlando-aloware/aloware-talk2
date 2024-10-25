@@ -339,10 +339,6 @@ export default {
     commit('SET_ACTIVE_TASK', task)
   },
 
-  clearRedialedTasks: ({ commit }) => {
-    commit('CLEAR_REDIALED_TASKS')
-  },
-
   removeFirstInQueueTask: ({ commit }) => {
     commit('REMOVE_FIRST_IN_QUEUE_TASK')
   },

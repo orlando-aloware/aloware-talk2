@@ -164,15 +164,11 @@ export default {
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter',
-      'clearRedialedTasks'
+      'getContact'
     ]),
 
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
-    ]),
-
-    ...mapActions('powerDialer', [
-      'getContact'
     ]),
 
     async fetchContact (taskId = null) {
@@ -310,7 +306,7 @@ export default {
       const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
       if (!contactListItemId) {
-        return
+        return Promise.resolve()
       }
 
       return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`, { redial })

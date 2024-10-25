@@ -541,7 +541,14 @@
           </div>
           <div class="text-center py-3">
             <div class="text-dark">
-              <div v-html="`Do you want to remove the contact: ${fullname}?`"></div>
+              <div>Do you want to remove the contact</div>
+                <strong v-if="fullname === 'No Name'">
+                  <span v-html="`${fullname}`"></span>
+                  {{ selectedItem.phone_number | fixPhone('NATIONAL', true, false, true) }}
+                </strong>
+                <strong v-else>
+                  <span v-html="`${fullname}`"></span>
+                </strong>?
             </div>
           </div>
           <div class="row text-center pt-3 pb-0">
@@ -845,6 +852,10 @@ export default {
     fullname () {
       if (!this.selectedItem) {
         return ''
+      }
+
+      if (!this.selectedItem.first_name && !this.selectedItem.last_name) {
+        return `No Name`
       }
 
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
