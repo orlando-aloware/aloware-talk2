@@ -92,7 +92,8 @@
             The <strong>{{ fromContact }}</strong> contact will be deleted and the following info will be lost:
           </h5>
           <ul>
-            <li v-for="(item, index) in listDeleteInfo" :key="index">{{ item }}</li>
+            <li v-for="(item, index) in listDeleteInfo"
+                :key="index">{{ item }}</li>
           </ul>
 
           <hr />
