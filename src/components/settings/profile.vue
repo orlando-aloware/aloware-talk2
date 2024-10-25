@@ -269,16 +269,10 @@
         <b-col sm="12" md="6">
           <b-form-group label="Phone Number"
                         class="form-label mb-0">
-            <line-selector :value="user.contact_card_campaign_id"
-                           :multiple="false"
-                           :use-chips="false"
-                           :generic-styling="false"
-                           :generic-multiselect="false"
-                           :clearable="true"
-                           :useInput="true"
-                           v-model.trim="user.contact_card_campaign_id"
-                           @change="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')">
-            </line-selector>
+            <user-campaign-selector :user="user"
+                                    v-model.trim="user.contact_card_campaign_id"
+                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')">
+            </user-campaign-selector>
           </b-form-group>
         </b-col>
       </b-form-row>
