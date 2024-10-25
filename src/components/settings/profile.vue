@@ -506,7 +506,6 @@
 <script>
 import AnswerTypeSelector from 'components/generic-selectors/answer-type-selector'
 import UserCampaignSelector from 'components/generic-selectors/user-campaign-selector'
-import LineSelector from 'components/generic-selectors/line-selector'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as Roles from 'src/constants/roles'
 import {
@@ -529,7 +528,7 @@ export default {
     simpsocialMixin
   ],
 
-  components: { UserCampaignSelector, AnswerTypeSelector, LineSelector },
+  components: { UserCampaignSelector, AnswerTypeSelector },
 
   computed: {
     ...mapState(['campaigns', 'statics']),
