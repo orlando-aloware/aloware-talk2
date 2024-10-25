@@ -241,6 +241,13 @@ export default {
       return !(filter.exclude_automated_communications !== undefined &&
         filter.exclude_automated_communications &&
         communication.workflow_id)
+
+      // checks international filter is selected and matches the communication
+      if (filter.has_international !== undefined &&
+        filter.has_international &&
+        !communication.is_international) {
+        return false
+      }
     },
 
     checkCommunicationMatchesUserAccessibility (communication) {
