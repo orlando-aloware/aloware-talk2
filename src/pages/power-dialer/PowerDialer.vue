@@ -80,7 +80,6 @@ import CreateListModal from 'components/create-list-modal'
 import RemoveFolderDialog from 'components/remove-folder'
 import RemoveListModal from 'components/remove-list'
 import RemoveListConfirmation from 'components/remove-list-confirmation'
-import RemoveContact from 'components/remove-contact'
 import RemoveContactConfirmation from 'components/remove-contact-confirmation'
 import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import ColumnHeaders from 'components/column-headers'
@@ -111,7 +110,6 @@ export default {
     RemoveListModal,
     ColumnHeaders,
     RemoveListConfirmation,
-    RemoveContact,
     RemoveContactConfirmation,
     RemoveFolderDialog,
     CreateListModal,

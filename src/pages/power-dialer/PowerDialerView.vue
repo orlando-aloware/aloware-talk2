@@ -195,7 +195,7 @@
     <template slot="table">
       <datatable scroll-area-class="pd-datatable"
                  :stickyHeaders="true"
-                 :columns="columns"
+                 :columns="computedColumns"
                  :is-empty="isEmpty || isStartState"
                  :is-loading-more="isLoadingMore"
                  :is-loading="isLoading"
@@ -348,19 +348,6 @@
                         :color="getStatusColor(getStatusName(contact.task_status))">
                   {{ getStatusName(contact.task_status) }}
                 </q-chip>
-              </td>
-              <td :key="key"
-                  v-else-if="column.name === 'actions'">
-                <button class="btn btn-sm btn-link datatable-row__actions__action--trash"
-                        :disabled="taskAddAndClearingDisabled"
-                        @click="onRemove(contact)">
-                  <trash-o-icon />
-                  <q-tooltip content-class="bg-grey-light11"
-                             anchor="top middle" self="center middle"
-                             v-if="taskAddAndClearingDisabled">
-                    Clearing of task is currently disabled.
-                  </q-tooltip>
-                </button>
               </td>
               <td class="datatable-row__name"
                   :key="`c-${key}`"
@@ -763,6 +750,11 @@ export default {
       'clearList',
       'isFiltersOpen'
     ]),
+
+    computedColumns () {
+      // remove column if its name is "actions". This was implemented because there were no actions in power dialer list available
+      return this.columns.filter(column => column.name !== 'actions')
+    },
 
     taskAddAndClearingDisabled () {
       const isAddDisabled = !this.isAdmin && this.currentCompany.disable_power_dialer_add

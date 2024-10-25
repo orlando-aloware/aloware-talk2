@@ -2,7 +2,7 @@
   <confirm-dialog id="remove-contact-confirmation-dialog"
                   :title="'Are you sure you want to ' + title"
                   :is-busy="isBusy"
-                  @close="removeContactClose; typedConfirmationInputString=''"
+                  @close="onClose"
                   @hide="onHide"
                   @shown="onShown">
     <div slot="content">
@@ -10,7 +10,7 @@
            v-html="message"/>
       <div class="text-left">
         <div class="text-dark">
-          Type "{{confirmationInputString}}" here to confirm
+          Type "{{ confirmationInputString }}" here to confirm
           <input ref="contactsToDeleteInput"
                  class="form-control form-control-search my-2"
                  type="text"
@@ -89,8 +89,8 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     title () {
-      let formattedContactToDeleteCount = this.$options.filters.numFormat(this.contactToDeleteCount)
-      let formattedContactWord = ` contact` + ((this.contactToDeleteCount > 1) ? `s` : ``)
+      const formattedContactToDeleteCount = this.$options.filters.numFormat(this.contactToDeleteCount)
+      const formattedContactWord = ` contact` + ((this.contactToDeleteCount > 1) ? `s` : ``)
       let title = null
       switch (this.removeContactActionType) {
         case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
@@ -194,16 +194,23 @@ export default {
     ]),
 
     onCancel () {
+      this.typedConfirmationInputString = ''
       this.removeContactClose()
       this.$bvModal.hide('remove-contact-confirmation-dialog')
     },
 
     onHide () {
+      this.typedConfirmationInputString = ''
       this.contactsToDelete = null
     },
 
     onShown () {
       this.$refs.contactsToDeleteInput.focus()
+    },
+
+    onClose () {
+      this.typedConfirmationInputString = ''
+      this.removeContactClose()
     },
 
     handleSingleDeletion () {
