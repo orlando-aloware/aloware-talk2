@@ -1,12 +1,12 @@
 <template>
   <b-modal centered
-            hide-footer
-            no-close-on-backdrop
-            no-close-on-esc
-            dialog-class="modal-mc-add"
-            data-testid="merge-contact-modal"
-            v-model="isOpen"
-            @hide="onCloseAttempt">
+           hide-footer
+           no-close-on-backdrop
+           no-close-on-esc
+           dialog-class="modal-mc-add"
+           data-testid="merge-contact-modal"
+           v-model="isOpen"
+           @hide="onCloseAttempt">
     <template #modal-title>
       <h5 v-if="!active_step">
         Which contact do you want to merge <strong>{{ fromContact }}</strong> with?
@@ -17,32 +17,32 @@
     </template>
 
     <div class="merge-contact__sidebar"
-          style="margin-bottom: 2em;">
+         style="margin-bottom: 2em;">
       <steps-wrapper-horizontal :current-step="currentStep" :steps="steps" />
     </div>
 
     <div style="margin-bottom: 2em;">
       <template v-if="active_step === 0">
         <q-input borderless
-                  clearable
-                  ref="searchInput"
-                  class="form-control form-control-search"
-                  placeholder="Search Contact..."
-                  data-testid="search-input"
-                  :loading="contact_searching"
-                  v-model="searchQuery"
-                  @input="onInput"
-                  @click="toggleSearchFocus"
-                  @clear="onClear">
+                 clearable
+                 ref="searchInput"
+                 class="form-control form-control-search"
+                 placeholder="Search Contact..."
+                 data-testid="search-input"
+                 :loading="contact_searching"
+                 v-model="searchQuery"
+                 @input="onInput"
+                 @click="toggleSearchFocus"
+                 @clear="onClear">
           <template v-slot:prepend>
             <search-icon />
           </template>
           <template v-slot:default
                     v-show="isInputFocused">
             <q-tooltip anchor="bottom middle"
-                        self="center middle"
-                        data-testid="search-tooltip"
-                        v-if="!searchQuery || (searchQuery && searchQuery.length < 3)">
+                       self="center middle"
+                       data-testid="search-tooltip"
+                       v-if="!searchQuery || (searchQuery && searchQuery.length < 3)">
               Search requires at least 3 characters
             </q-tooltip>
           </template>
@@ -82,7 +82,8 @@
             The following <strong>{{ fromContact }}</strong> info will be added to the <strong>{{ toContact }}</strong> if applicable:
           </h5>
           <ul>
-            <li v-for="(item, index) in listAddInfo" :key="index">{{ item }}</li>
+            <li v-for="(item, index) in listAddInfo"
+                :key="index">{{ item }}</li>
           </ul>
 
           <hr />
@@ -103,15 +104,15 @@
 
     <div class="dialog-footer d-flex q-gutter-md">
       <q-btn class="flex-grow-1"
-              data-testid="merge-cancel-button"
-              :disabled="isMerging"
-              :label="active_step ? 'Back' : 'Cancel'"
-              @click="active_step ? backToSearch() : closeDialog()"/>
+             data-testid="merge-cancel-button"
+             :disabled="isMerging"
+             :label="active_step ? 'Back' : 'Cancel'"
+             @click="active_step ? backToSearch() : closeDialog()"/>
       <q-btn color="primary"
-              class="flex-grow-1"
-              data-testid="merge-review-button"
-              :disabled="!selectedContact || isMerging"
-              @click="active_step ? mergeContact() : reviewMerge()">
+             class="flex-grow-1"
+             data-testid="merge-review-button"
+             :disabled="!selectedContact || isMerging"
+             @click="active_step ? mergeContact() : reviewMerge()">
         <q-spinner-bars color="white"
                         v-if="isMerging"/>
         {{ !active_step ? 'Review' : (isMerging ? '&nbsp;Merging' : 'Merge') }}
@@ -131,7 +132,11 @@ export default {
 
   components: { SearchIcon, StepsWrapperHorizontal },
 
-  props: { contact: {} },
+  props: {
+    contact: {
+      required: true
+    }
+  },
 
   data () {
     return {

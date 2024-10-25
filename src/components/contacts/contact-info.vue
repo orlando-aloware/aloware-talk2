@@ -226,8 +226,8 @@
                       v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled"
                       @click="openMergeContactModal">
                 <q-tooltip anchor="bottom middle"
-                          data-testid="contact-info-merge-tooltip"
-                          self="center middle">
+                           data-testid="contact-info-merge-tooltip"
+                           self="center middle">
                     Merge
                 </q-tooltip>
                 <merge-contact-icon/>
@@ -240,8 +240,8 @@
                                 :redirect="false">
         </power-dialer-add-modal>
         <merge-contact-modal data-testid="contact-info-merge-contact-modal"
-                            :contact="contact"
-                            v-if="isMergeContactOpen">
+                             :contact="contact"
+                             v-if="isMergeContactOpen">
         </merge-contact-modal>
     </b-card>
 </template>

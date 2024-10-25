@@ -14204,23 +14204,23 @@ h1.contact-list-name-label {
     align-items: center;
     position: relative;
     font-weight: bold;
-    flex: 1; /* Hace que cada paso tome el mismo espacio */
+    flex: 1;
     text-align: center;
 
     &::after {
       content: '';
       position: absolute;
-      background-color: $grey-70; /* Color del separador por defecto */
+      background-color: $grey-70;
       height: 2px;
-      width: calc(100% - 4em); /* Ajusta el ancho del separador según el espaciado necesario */
+      width: calc(100% - 4em);
       top: 20%;
       left: 50%;
-      margin-left: 2em; /* Ajusta según el espaciado necesario */
+      margin-left: 2em;
       transform: translateX(0%);
     }
 
     &:last-of-type::after {
-      display: none; /* Oculta el separador después del último paso */
+      display: none;
     }
 
     &__icon {
@@ -14232,7 +14232,7 @@ h1.contact-list-name-label {
       justify-content: center;
       align-items: center;
       margin-bottom: 8px;
-      z-index: 1; /* Asegura que el icono esté por encima del separador */
+      z-index: 1;
     }
 
     &--active .steps-wrapper-horizontal__step__icon {
@@ -14246,7 +14246,7 @@ h1.contact-list-name-label {
     }
 
     &--completed::after {
-      background-color: $success; /* Cambia el color a verde cuando el paso está completado */
+      background-color: $success;
     }
   }
 }
