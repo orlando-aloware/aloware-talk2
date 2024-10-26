@@ -442,14 +442,13 @@ export default {
     },
 
     isAlwaysAskModeEnabled () {
-      const isPreviousCallingModeInAlwaysAsk = this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
-      const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
-      const isCompanyOrUserAlwaysAsk = isCompanyAlwaysAsk || !this.shouldUseProfileCampaignId()
+      if (!this.authProfile) return false
 
-      return this.previousOutboundCallingMode &&
-        this.authProfile &&
-        this.previousOutboundCallingMode === this.authProfile.outbound_calling_mode &&
-        (isCompanyOrUserAlwaysAsk || isPreviousCallingModeInAlwaysAsk)
+      const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
+
+      const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+
+      return isCompanyAlwaysAsk || isUserAlwaysAsk
     },
 
     updatePreviousOutboundCallingMode () {
