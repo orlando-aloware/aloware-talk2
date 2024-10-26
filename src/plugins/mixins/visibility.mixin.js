@@ -237,17 +237,16 @@ export default {
         communication.tags.length > 0) {
         return false
       }
-      // checks exclude automated communications filter and matches the communication
-      return !(filter.exclude_automated_communications !== undefined &&
-        filter.exclude_automated_communications &&
-        communication.workflow_id)
-
       // checks international filter is selected and matches the communication
       if (filter.has_international !== undefined &&
         filter.has_international &&
         !communication.is_international) {
         return false
       }
+      // checks exclude automated communications filter and matches the communication
+      return !(filter.exclude_automated_communications !== undefined &&
+        filter.exclude_automated_communications &&
+        communication.workflow_id)
     },
 
     checkCommunicationMatchesUserAccessibility (communication) {
