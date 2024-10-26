@@ -136,9 +136,13 @@
 
                 <b-dropdown class="m-0 mb-3 ml-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                             text="..."
-                            right size="sm"
+                            right
+                            size="sm"
                             variant="white"
-                            no-caret>
+                            no-caret
+                            alt="List Options"
+                            title="List Options"
+                            v-if="selectedAllCount === 0">
                   <template #button-content>
                     <i class="fa fa-ellipsis-h"/>
                   </template>
