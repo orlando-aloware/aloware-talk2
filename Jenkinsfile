@@ -15,7 +15,12 @@ pipeline {
         AWS_CREDS = credentials('aws-credentials')
         AWS_REGION = 'us-west-2'
         NODE_VERSION = '20'
-        YARN_CACHE_FOLDER = "${HOME}/.yarn-cache/build-talk-${env.BUILD_ID}"
+        SAFE_JOB_NAME = "${env.JOB_NAME.replaceAll('/', '-').toLowerCase()}"
+        CACHE_FOLDER = "${HOME}/.jenkins-cache/${SAFE_JOB_NAME}"
+        YARN_CACHE_FOLDER = "${CACHE_FOLDER}/yarn"
+        ARTIFACTS_CACHE_FOLDER = "${CACHE_FOLDER}/artifacts"
+        DEVELOP_SAFE_JOB_NAME = "${JOB_NAME.split('/')[0]}-develop"
+        DEVELOP_CACHE_FOLDER = "${HOME}/.jenkins-cache/${DEVELOP_SAFE_JOB_NAME}"
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -31,6 +36,34 @@ pipeline {
                             steps {
                                 script {
                                     notificationSender.sendSlackInfo()
+                                }
+                            }
+                        }
+
+                        stage ('Setup Cache') {
+                            steps {
+                                script {
+                                    // Create the cache directory
+                                    sh "mkdir -p ${CACHE_FOLDER}"
+
+                                    // Attempt to restore node_modules, from the cache directory of this job
+                                    if (fileExists("${ARTIFACTS_CACHE_FOLDER}/node_modules")) {
+                                        sh "rsync -a ${ARTIFACTS_CACHE_FOLDER}/node_modules ."
+                                    }
+
+                                    // If the directories wers not restored, attempt to restore from the develop branch artifacts
+                                    if (!fileExists("node_modules")) {
+                                        if (fileExists("${DEVELOP_CACHE_FOLDER}/artifacts/node_modules")) {
+                                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/artifacts/node_modules ."
+                                        }
+                                    }
+
+                                    // If this job has no cache, attempt to restore from the develop branch cache
+                                    if (!fileExists("{YARN_CACHE_FOLDER}")) {
+                                        if (fileExists("${DEVELOP_CACHE_FOLDER}/yarn")) {
+                                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/yarn ."
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -63,22 +96,11 @@ pipeline {
                             }
                         }
 
-                        stage('Setup Yarn') {
-                            steps {
-                                script {
-                                    // Ensure the cache directory exists
-                                    sh "mkdir -p ${YARN_CACHE_FOLDER}"
-                                }
-                            }
-                        }
-
                         stage('Install Dependencies') {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh '''yarn install --cache-folder ${YARN_CACHE_FOLDER} --pure-lockfile && \
-                                    npm run dev
-                                    '''
+                                    sh "yarn install --cache-folder ${YARN_CACHE_FOLDER} --pure-lockfile"
                                 }
                             }
                         }
@@ -89,6 +111,16 @@ pipeline {
                                 nvm("${NODE_VERSION}") {
                                     sh 'quasar build --debug'
                                 }
+                            }
+                        }
+
+                        stage('Save Cache') {
+                            steps {
+                                // Save the cache via rsync to the cache directory
+                                sh '''
+                                    mkdir -p ${ARTIFACTS_CACHE_FOLDER}
+                                    rsync -a node_modules ${ARTIFACTS_CACHE_FOLDER}
+                                '''
                             }
                         }
 
@@ -187,9 +219,6 @@ pipeline {
             }
         }
         always {
-            // Clean up the cache folder after the build finishes
-            sh "rm -rf ${YARN_CACHE_FOLDER}"
-
             //noInspection GroovyAssignabilityCheck
             cleanWs()
         }
