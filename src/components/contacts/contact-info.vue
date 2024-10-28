@@ -194,6 +194,18 @@
             <b-button variant="light"
                       size="sm"
                       class="custom-action-button my-1"
+                      data-testid="contact-info-remove-power-dialer-button"
+                      @click="removeFromPowerDialerLists">
+                <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-remove-power-dialer-tooltip"
+                           self="center middle">
+                    Remove from all Power Dialers
+                </q-tooltip>
+                <call-remove-icon/>
+            </b-button>
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
                       :disabled="!isSimpSocialIntegrationEnabled"
                       v-if="isSimpSocial"
                       data-testid="contact-info-email-button"
@@ -243,6 +255,11 @@
                              :contact="contact"
                              v-if="isMergeContactOpen">
         </merge-contact-modal>
+        <power-dialer-remove-contact-from-lists-confirmation :contact="contact"
+                                                             data-testid="contact-info-power-dialer-remove-contact-from-lists-confirmation"
+                                                             @close="onClosePowerDialerRemoveContactFromListsConfirmation"
+                                                             @confirm="onClosePowerDialerRemoveContactFromListsConfirmation"
+                                                             @error="onErrorPowerDialerRemoveContactFromListsConfirmation"/>
     </b-card>
 </template>
 
@@ -254,12 +271,14 @@ import TimerIcon from 'src/components/icons/timer-icon'
 import CalendarIcon from 'src/components/icons/calendar-icon'
 import CallIcon from 'src/components/icons/call-icon'
 import AddCallIcon from 'src/components/icons/add-call-icon'
+import CallRemoveIcon from 'src/components/icons/call-remove-icon'
 import PencilOIcon from 'src/components/icons/pencil-o-icon'
 import MergeContactIcon from 'src/components/icons/merge-contact-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
+import PowerDialerRemoveContactFromListsConfirmation from 'src/components/power-dialer/power-dialer-remove-contact-from-lists-confirmation.vue'
 import { aclMixin, simpsocialMixin, timezoneCheckMixin, integrationMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
@@ -292,8 +311,10 @@ export default {
     AppointmentFormModal,
     PowerDialerAddModal,
     MergeContactModal,
+    PowerDialerRemoveContactFromListsConfirmation,
     PencilOIcon,
     AddCallIcon,
+    CallRemoveIcon,
     CallIcon,
     CalendarIcon,
     TimerIcon,
@@ -454,6 +475,24 @@ export default {
         this.isProcessingBlock = false
         this.$generalNotification('Contact was successfully unblocked.', 'success')
       })
+    },
+
+    removeFromPowerDialerLists () {
+      this.$bvModal.show('power-dialer-remove-contact-from-lists-confirmation')
+    },
+
+    onClosePowerDialerRemoveContactFromListsConfirmation () {
+      this.$bvModal.hide('power-dialer-remove-contact-from-lists-confirmation')
+    },
+
+    onErrorPowerDialerRemoveContactFromListsConfirmation (error) {
+      this.$bvModal.hide('power-dialer-remove-contact-from-lists-confirmation')
+      console.log('error', error)
+      if (!error?.response) {
+        return
+      }
+
+      this.$handleErrors(error?.response, 'error')
     }
   }
 }
