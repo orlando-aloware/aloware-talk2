@@ -293,7 +293,7 @@ export default {
     },
 
     showDeleteButton () {
-      return this.hasDeletePermission && !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) && !this.isPowerDialer)
+      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isSimpSocial && !this.isPowerDialer
     },
 
     showRemoveFromListButton () {
@@ -306,11 +306,11 @@ export default {
       if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
         return false
       }
-      return !this.isAddView && !this.isPowerDialer && ((this.canDelete && !this.isSimpSocial))
+      return !this.isAddView && !this.isPowerDialer && this.canDelete && !this.isSimpSocial
     },
 
     showRemoveFromPdListButton () {
-      return this.isPowerDialer && !this.isAddView && ((this.canDelete && !this.isSimpSocial))
+      return this.isPowerDialer && !this.isAddView && this.canDelete && !this.isSimpSocial
     },
 
     showMoreDropdownButton () {
