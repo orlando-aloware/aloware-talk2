@@ -93,6 +93,7 @@
                   v-close-popup
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_OFFLINE ? 'cursor-inherit' : '']"
                   data-testid="profile-offline-time"
+                  :disable="shouldDisableProfileMenuActions"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_OFFLINE)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
@@ -115,6 +116,7 @@
                   v-close-popup
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS ? 'cursor-inherit' : '']"
                   data-testid="profile-available-calls"
+                  :disable="shouldDisableProfileMenuActions"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS)">
             <div class="d-flex align-items-center justify-content-between w-100">
               <div>
@@ -134,7 +136,7 @@
           <q-item dense
                   clickable
                   v-close-popup
-                  :disable="profile.company.force_users_always_available && !hasRole('Company Admin')"
+                  :disable="forceUsersAlwaysAvailable || shouldDisableProfileMenuActions"
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS ? 'cursor-inherit' : '']"
                   data-testid="profile-busy-calls"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS)">
@@ -168,7 +170,7 @@
                   clickable
                   v-close-popup
                   :class="[agentStatus === AgentStatus.AGENT_STATUS_ON_BREAK ? 'cursor-inherit' : '']"
-                  :disable="profile.company.force_users_always_available && !hasRole('Company Admin')"
+                  :disable="(profile.company.force_users_always_available && !hasRole('Company Admin')) || shouldDisableProfileMenuActions"
                   data-testid="profile-on-break"
                   @click="changeStatus(AgentStatus.AGENT_STATUS_ON_BREAK)">
             <div class="d-flex align-items-center justify-content-between w-100">
@@ -199,6 +201,7 @@
           <q-item dense
                   clickable
                   data-testid="profile-turn-notifications-item"
+                  :disable="shouldDisableProfileMenuActions"
                   @click="toggleSleepMode">
             <q-item-section>
               <q-skeleton type="rect"
@@ -221,6 +224,7 @@
                   clickable
                   v-close-popup
                   data-testid="profile-select-account-item"
+                  :disable="shouldDisableProfileMenuActions"
                   v-if="profile?.has_multiple_access"
                   @click="showAccountSelector">
             <q-item-section>
@@ -261,7 +265,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, avatarMixin, userMixin } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
 import LogoutIcon from 'components/icons/logout-icon'
 import HalfMoonIcon from 'components/icons/half-moon-icon'
@@ -279,7 +283,8 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    agentMixin
+    agentMixin,
+    userMixin
   ],
 
   props: {
@@ -338,6 +343,10 @@ export default {
     },
 
     isProfileDropdownDisabled () {
+      return this.shouldDisableProfileMenuActions && (!this.isImpersonate || (this.isImpersonate && this.dialer?.call?.state === 'open'))
+    },
+
+    shouldDisableProfileMenuActions () {
       const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
       const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
       const isForcedDispositionOnWrapUp = (isForcedCallDisposition || isForcedContactDisposition) &&
@@ -350,6 +359,9 @@ export default {
 
     userPersonalLine () {
       return this.profile.campaign_id ? this.campaigns.find(campaign => campaign.id === this.profile.campaign_id) : null
+    },
+    forceUsersAlwaysAvailable () {
+      return this.profile.company.force_users_always_available && !this.hasRole('Company Admin')
     }
   },
 

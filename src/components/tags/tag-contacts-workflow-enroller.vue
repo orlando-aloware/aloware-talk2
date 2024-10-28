@@ -21,7 +21,7 @@
     </template>
 
     <div>
-      <label class="label mt-2 mb-1">Choose the sequence you want this contacts to enroll</label>
+      <label class="label mt-2 mb-1">Choose the sequence in which you want these contacts to be enrolled.</label>
       <sequence-selector :generic-styling="false"
                          data-testid="tags-contacts-workflow-enroller-sequence-selector"
                          @change="setWorkflowId" />

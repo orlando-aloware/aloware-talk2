@@ -4,7 +4,7 @@
          class="calendar d-flex h-100 flex-column">
       <b-overlay class="h-100 w-100 position-absolute"
                  rounded="sm"
-                 :show="true"
+                 :show="loading"
                  v-show="loading">
         <template #overlay>
           <q-spinner-bars color="primary"
@@ -56,6 +56,16 @@
               Go to today
             </q-tooltip>
           </b-button>
+          <b-button size="sm"
+                    variant="light"
+                    class="btn-white btn-rounded px-3 btn-calendar-today"
+                    v-if="view !== 'month'"
+                    @click.prevent="showAllEvents(gotoDate)">
+            {{ isMobile ? 'Events' : 'List all events' }}
+            <q-tooltip anchor="top middle">
+              Show all events
+            </q-tooltip>
+          </b-button>
         </div>
         <div class="calendar__header__action-right">
           <filters :filters="convertedFilters"
@@ -97,8 +107,14 @@
               <td :class="d.today ? 'today': ''"
                   :key="d.dayOfWeek"
                   v-for="d in formattedWeekDays">
+                <a
+                  href="#"
+                  class="day-label"
+                  @click.prevent="goToDayView(d.date)"
+                >
                   <span class="day-of-week">{{ d.dayOfWeek }}</span>
                   <span class="day">{{ d.day }}</span>
+                </a>
               </td>
               <td style="width: 20px"></td>
             </tr>
@@ -120,14 +136,29 @@
                      @add-schedule="addSchedule"
                      @render-events="renderFromEvent"
                      @update-current-date="updateCurrentDate"
-                     @view-change="viewChange">
+                     @toggle-goto-date="onToggleGotoDate"
+                     @expand-day-events="showAllEvents"
+                     @expand-hour-events="showEventsForHour">
           </scheduler>
         </div>
       </div>
       <manager ref="manager"
-               @render-schedule="renderSchedule">
+               @render-schedule="renderSchedule"
+               @close-filters-menu="closeEventModal">
       </manager>
     </div>
+
+    <calendar-event-list :is-mobile="isMobile"
+                         :events-modal-mode="eventsModalMode"
+                         :selected-date="selectedDate"
+                         :selected-hour="selectedHour"
+                         :events="events"
+                         :time-format="timeFormat"
+                         :view-mode="view"
+                         :current-date="currentDate"
+                         v-model="isEventsModalOpen"
+                         @open-event-modal="openEventModal" />
+
     <upgrade-now-page image-link="/assets/images/Calendar.svg"
                       text="Simplify your appointment scheduling and receive timely reminders with Calendar"
                       extra-text="Upgrade today to unlock this feature"
@@ -148,10 +179,12 @@ import Helper from '../../components/calendar/calendar-helper.vue'
 import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
 import UpgradeNowPage from 'components/upgrade-now-page.vue'
+import CalendarEventList from 'components/calendar/calendar-event-list.vue'
 import moment from 'moment'
 import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
 import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'Calendar',
@@ -168,7 +201,8 @@ export default {
     Helper,
     Manager,
     Scheduler,
-    UpgradeNowPage
+    UpgradeNowPage,
+    CalendarEventList
   },
 
   data () {
@@ -179,14 +213,14 @@ export default {
         reminders: true,
         calendar_users: [],
         calendar_mode: null,
-        calendar_min_date: new Date(),
-        calendar_max_date: new Date(),
+        calendar_min_date: moment.utc().startOf('day').toISOString(),
+        calendar_max_date: moment.utc().endOf('day').toISOString(),
         calendar_status: [],
-        limit: 25,
+        limit: 2500,
         page: 1
       },
       loading: true,
-      gotoDate: new Date(),
+      gotoDate: moment.utc().toDate(),
       view: 'month',
       stepMap: {
         'day': 'd',
@@ -195,8 +229,8 @@ export default {
       },
       views: [
         { 'id': 'day', name: 'Day' },
-        { 'id': 'month', name: 'Month' },
-        { 'id': 'week', name: 'Week' }
+        { 'id': 'week', name: 'Week' },
+        { 'id': 'month', name: 'Month' }
       ],
       timeFormat: 1,
       timeFormats: [
@@ -204,12 +238,22 @@ export default {
         { id: 2, format: '24-hour' }
       ],
       cancel_token: this.$axios.CancelToken,
-      source: null
+      source: null,
+      loadingStates: {},
+      requestQueue: [],
+      currentRequestId: null,
+      selectedDate: '',
+      selectedHour: '',
+      isShowingEventEditModal: false,
+      CommunicationDispositionStatus,
+      isEventsModalOpen: false,
+      eventsModalMode: null // 'hour' or 'list'
     }
   },
 
   computed: {
     ...mapState('auth', ['profile']),
+    ...mapState(['isMobile']),
 
     currentDate () {
       let d = ''
@@ -239,15 +283,15 @@ export default {
     formattedWeekDays () {
       const start = moment(this.gotoDate).startOf('isoWeek')
 
-      let cd = start
+      let cd = start.clone()
       let dates = []
 
       for (let i = 0; i < 7; i++) {
         dates.push({
-          date: cd,
+          date: cd.clone(),
           dayOfWeek: cd.format('ddd'),
           day: cd.format('D'),
-          today: cd.format('YYYY-MM-DD') === moment().format('YYYY-MM-DD')
+          today: cd.isSame(moment(), 'day')
         })
 
         cd.add(1, 'd')
@@ -269,11 +313,22 @@ export default {
   mounted () {
     this.timeFormat = this.profile.time_format
 
+    const { view } = this.$route.query
+    if (view && ['day', 'week', 'month'].includes(view)) {
+      this.view = view
+    }
+
+    this.setValidDate()
+
     if ('communication_id' in this.$route.query) {
       this.$axios.get('/api/v1/calendar/events/show/' + this.$route.query.communication_id + '/communication').then(res => {
         this.editSchedule(res.data)
       })
     }
+
+    this.$nextTick(() => {
+      this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+    })
   },
 
   methods: {
@@ -281,6 +336,7 @@ export default {
 
     onDateSelected (date) {
       this.gotoDate = date
+      this.onToggleGotoDate(date)
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
     },
 
@@ -289,9 +345,8 @@ export default {
         ? new Date()
         : moment(this.gotoDate)[direction](1, this.stepMap[this.view]).toDate()
 
-      if (this.view === 'day') {
-        this.gotoDate = date
-      }
+      this.gotoDate = date
+      this.onToggleGotoDate(date)
 
       this.$refs.scheduler.setCurrentView(date, this.view)
     },
@@ -310,16 +365,27 @@ export default {
     },
 
     loadCalendarData (state) {
-      this.loading = true
+      const requestId = Date.now().toString()
+      this.requestQueue.push(requestId)
+
+      // Set loading state for this specific request
+      this.$set(this.loadingStates, requestId, true)
+
+      // Update the overall loading state
+      this.updateOverallLoadingState()
+
+      // Cancel the previous request if it exists
+      if (this.source) {
+        this.source.cancel('Calendar: Previous request cancelled.')
+      }
+
       this.source = this.cancel_token.source()
 
       this.filters.calendar_mode = state.mode
-      this.filters.calendar_min_date = state.min_date
-      this.filters.calendar_max_date = state.max_date
+      this.filters.calendar_min_date = moment.utc(state.min_date).startOf('day').toISOString()
+      this.filters.calendar_max_date = moment.utc(state.max_date).endOf('day').toISOString()
+      this.filters.limit = this.getLimitFilterValue()
 
-      // reset only if the page is set back to one
-      // it basically means that it will reload the data
-      // from the beginning
       if (this.filters.page === 1) {
         this.events = []
         this.$refs.scheduler.clearAll()
@@ -330,28 +396,80 @@ export default {
         cancelToken: this.source.token
       }).then(res => {
         this.events.push(...res.data)
-
         this.$refs.scheduler.customParse(this.events)
+        this.$refs.scheduler.setNavHeightForMultiDayEvents()
 
         if (res.data && res.data.length) {
           this.filters.page++
           this.reloadFromCurrentFilter()
-        } else {
-          this.loading = false
         }
       }).catch(err => {
-        console.log(err)
+        if (!this.$axios.isCancel(err)) {
+          console.log(err)
+        }
+      }).finally(() => {
+        // Remove the request from the queue
+        const index = this.requestQueue.indexOf(requestId)
+        if (index > -1) {
+          this.requestQueue.splice(index, 1)
+        }
 
-        this.loading = false
+        // Set loading state for this specific request to false
+        this.$set(this.loadingStates, requestId, false)
+
+        // Update the overall loading state
+        this.updateOverallLoadingState()
       })
     },
 
+    updateOverallLoadingState () {
+      // If any request is still loading, keep the overall loading state true
+      this.loading = Object.values(this.loadingStates).some(state => state === true)
+    },
+
+    getLimitFilterValue () {
+      if (this.view === 'month') {
+        return 2500
+      }
+
+      if (this.view === 'week') {
+        return 1000
+      }
+
+      if (this.view === 'day') {
+        return 500
+      }
+
+      return 2500
+    },
+
     reloadFromCurrentFilter () {
-      this.loadCalendarData({
+      let state = {
         mode: this.filters.calendar_mode,
         min_date: this.filters.calendar_min_date,
         max_date: this.filters.calendar_max_date
-      })
+      }
+
+      if (this.view === 'month') {
+        const startOfMonth = moment.utc(this.gotoDate).startOf('month')
+        const endOfMonth = moment.utc(this.gotoDate).endOf('month')
+        state.min_date = startOfMonth.toISOString()
+        state.max_date = endOfMonth.toISOString()
+      }
+
+      if (this.view === 'week') {
+        const startOfWeek = moment.utc(this.gotoDate).startOf('isoWeek')
+        const endOfWeek = moment.utc(this.gotoDate).endOf('isoWeek')
+        state.min_date = startOfWeek.toISOString()
+        state.max_date = endOfWeek.toISOString()
+      }
+
+      if (this.view === 'day') {
+        state.min_date = moment.utc(this.gotoDate).startOf('day').toISOString()
+        state.max_date = moment.utc(this.gotoDate).endOf('day').toISOString()
+      }
+
+      this.loadCalendarData(state)
     },
 
     renderFromEvent (state) {
@@ -411,10 +529,15 @@ export default {
         }
       }
 
+      if (this.isShowingEventEditModal) {
+        this.isShowingEventEditModal = false
+        this.isEventsModalOpen = true
+      }
+
       this.$refs.scheduler.customParse(this.events)
     },
 
-    viewChange (mode) {
+    viewChange (mode, newDate) {
       this.view = mode
     },
 
@@ -425,12 +548,123 @@ export default {
           this.setProfile(res.data)
           this.$refs.scheduler.reInit(this.gotoDate, this.view)
         })
+    },
+
+    goToDayView (date) {
+      this.view = 'day'
+      this.gotoDate = date.toDate()
+      this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+
+      const newQuery = {
+        ...this.$route.query,
+        view: this.view,
+        date: moment(this.gotoDate).format('YYYY-MM-DD')
+      }
+
+      this.updateRouteQuery(newQuery)
+    },
+
+    onToggleGotoDate (date, view) {
+      const formattedDate = moment(date).format('YYYY-MM-DD')
+
+      if (view) {
+        this.view = view
+      }
+
+      const newQuery = {
+        ...this.$route.query,
+        date: formattedDate
+      }
+
+      this.updateRouteQuery(newQuery)
+    },
+
+    updateRouteQuery (newQuery) {
+      // Compare the new query with the current route's query to prevent unnecessary navigation which causes errors
+      if (JSON.stringify(newQuery) !== JSON.stringify(this.$route.query)) {
+        this.$router.push({ query: newQuery })
+      }
+    },
+
+    setValidDate (shouldSetCurrentView = false) {
+      const { date } = this.$route.query
+      if (date) {
+        const parsedDate = moment(date)
+        if (parsedDate.isValid()) {
+          this.gotoDate = parsedDate.toDate()
+          return shouldSetCurrentView ? this.$refs.scheduler.setCurrentView(this.gotoDate, this.view) : null
+        }
+
+        // If date is invalid, set gotoDate to today
+        this.gotoDate = moment().toDate()
+        const newQuery = {
+          ...this.$route.query,
+          date: moment(this.gotoDate).format('YYYY-MM-DD')
+        }
+
+        this.updateRouteQuery(newQuery)
+        return shouldSetCurrentView ? this.$refs.scheduler.setCurrentView(this.gotoDate, this.view) : null
+      }
+
+      // If no date provided, default to today
+      this.gotoDate = moment().toDate()
+      const newQuery = {
+        ...this.$route.query,
+        date: moment(this.gotoDate).format('YYYY-MM-DD')
+      }
+
+      this.updateRouteQuery(newQuery)
+      return shouldSetCurrentView ? this.$refs.scheduler.setCurrentView(this.gotoDate, this.view) : null
+    },
+
+    showAllEvents (date) {
+      this.selectedDate = moment(date).format('YYYY-MM-DD')
+      this.eventsModalMode = 'list'
+      this.isEventsModalOpen = true
+    },
+
+    showEventsForHour (selectedDate) {
+      this.selectedHour = selectedDate
+      this.eventsModalMode = 'hour'
+      this.isEventsModalOpen = true
+    },
+
+    openEventModal (event) {
+      this.editSchedule(event)
+      this.isEventsModalOpen = false
+      this.isShowingEventEditModal = true
+    },
+
+    closeEventModal () {
+      if (this.isShowingEventEditModal) {
+        this.isShowingEventEditModal = false
+        this.isEventsModalOpen = true
+      }
     }
   },
 
   watch: {
     view () {
+      const newQuery = {
+        ...this.$route.query,
+        view: this.view
+      }
+
+      this.updateRouteQuery(newQuery)
+
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
+    },
+    '$route.query': {
+      handler (newQuery) {
+        const { view } = newQuery
+
+        if (view && ['day', 'week', 'month'].includes(view)) {
+          this.view = view
+        }
+
+        this.setValidDate(true)
+      },
+      deep: true
     }
   }
 }

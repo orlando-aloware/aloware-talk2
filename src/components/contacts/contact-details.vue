@@ -15,19 +15,18 @@
       <div class="details-component-container h-100"
            ref="detailsComponentContainer">
         <template v-if="!saveBarOnly">
-          <contact-info data-testid="contact-details-info" :campaign-id="campaignId"/>
+          <contact-info data-testid="contact-details-info" :campaign-id="campaignId" />
           <contact-sequence class="w-100"
                             data-testid="contact-details-sequence"
                             :contact="contact"
-                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
+                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+          <contact-push-to-crm data-testid="contact-details-push-to-crm"
+                               :contact="contact"
+                               v-if="isSimpSocial" />
           <contact-aloai-engagement-control ss="w-100"
-                            data-testid="contact-aloai-engagement-control"
-                            :contact="contact"
-                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
-          <contact-aloha-bot class="w-100"
-                             data-testid="contact-details-aloha-bot"
-                             :contact="contact"
-                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
+                                            data-testid="contact-aloai-engagement-control"
+                                            :contact="contact"
+                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>
@@ -50,9 +49,6 @@
                                 data-testid="contact-details-reservations-messages"
                                 :contact="contact"/>
           <contact-scheduled-messages data-testid="contact-details-scheduled-messages"/>
-          <contact-push-to-crm data-testid="contact-details-push-to-crm"
-                               :contact="contact"
-                               v-if="isSimpSocial"/>
           <contact-activity-counts data-testid="contact-details-activity-counts" :summary="communicationsSummary.summaries"/>
           <contact-lines data-testid="contact-details-lines"/>
           <contact-ring-groups data-testid="contact-details-ring-groups"/>
@@ -85,7 +81,6 @@ import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
 import ContactAloaiEngagementControl from 'components/contacts/contact-aloai-engagement-control'
-import ContactAlohaBot from 'components/contacts/contact-aloha-bot'
 import ContactReservations from 'components/contacts/contact-reservations.vue'
 import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
 import EntityTags from 'components/generic-selectors/entity-tags'
@@ -144,7 +139,6 @@ export default {
     ContactInfo,
     ContactPhones,
     BackButton,
-    ContactAlohaBot,
     ContactReservations,
     ContactReservationsMessages,
     EntityTags

@@ -7,6 +7,7 @@
          v-if="!isEmpty(categories)">
       <q-breadcrumbs class="flex black w-100"
                      active-color="black"
+                     gutter="none"
                      :key="summary_index"
                      data-testid="comm-categories-section-breadcrumbs"
                      v-for="(category_summary, summary_index) in categories">
@@ -21,7 +22,7 @@
                           data-testid="comm-categories-section-breadcrumbs-el"
                           v-for="(category, category_index) in category_summary.categories" />
         <span class="pl-2">
-          -<strong class="pl-3">{{ category_summary.relevance }}%</strong>
+          -<strong class="pl-2">{{ category_summary.relevance }}%</strong>
           <q-tooltip class="float-bottom">
             <span>
               Relevance between the conversation and this category: <strong>{{ category_summary.relevance }}%</strong>
