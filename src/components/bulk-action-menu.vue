@@ -222,6 +222,10 @@ export default {
     ]),
 
     currentList () {
+      // myQueue is available only in PD
+      if (this.isPowerDialer && this.selectedList.id === this.myQueue.id) {
+        return this.myQueue
+      }
       return this.lists[this.selectedList.id]
     },
 
@@ -299,9 +303,11 @@ export default {
     showRemoveFromListButton () {
       // if is a default list, dont show
       if (this.currentList.is_default) {
+        console.log('is default list')
         return false
       }
 
+      console.log('is not default list')
       // if is only agent and not billing admin or admin or supervisor and list is public
       if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
         return false

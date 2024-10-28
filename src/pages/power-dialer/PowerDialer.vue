@@ -47,10 +47,6 @@
         <remove-list-modal @on-clear-list="onClear"
                            v-if="isActive" />
         <remove-list-confirmation v-if="isActive" />
-        <remove-contact :is-contact-module-type="false"
-                        :selected-count="selectedContactsCount"
-                        v-if="isActive"
-                        @on-remove="onRemove" />
         <remove-contact-confirmation :selected-count="selectedContactsCount"
                                      v-if="isActive"
                                      @contactsRemoved="updateList" />

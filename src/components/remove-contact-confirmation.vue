@@ -111,8 +111,8 @@ export default {
         return 1
       }
 
-      if (this.selectedContacts[this.selectedList.id]) {
-        let list = this.selectedContacts[this.selectedList.id]
+      if (this.selectedContacts[this.listId]) {
+        let list = this.selectedContacts[this.listId]
         if (this.currentCompany.activate_multi_entity) {
           // do not include contacts with integrations
           list = list.filter(contact => !contact.hasExternalData)
@@ -141,7 +141,13 @@ export default {
     },
 
     listId () {
-      return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+      // refactor to handle this by the `id` instead of the `name`, as the `name` is not unique.
+      // Some list could have "My Queue" as name and it would generate errors
+      if (this.isPowerDialer && this.selectedList.id === this.myQueue.id) {
+        return 'my-queue'
+      }
+
+      return this.selectedList.id
     },
 
     currentList () {
