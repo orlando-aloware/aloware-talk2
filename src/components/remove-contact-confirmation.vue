@@ -151,15 +151,15 @@ export default {
     message () {
       if (this.selectedContacts[this.listId]) {
         const hasIntegrationsCount = this.integrationsCount()
-        const text = []
+        let text = ''
 
         if (hasIntegrationsCount > 1) {
-          text.push(`There are ${hasIntegrationsCount} contacts from integrations and can't be deleted.`)
+          text = `There are ${hasIntegrationsCount} contacts from integrations and can't be deleted.`
         } else if (hasIntegrationsCount > 0) {
-          text.push(`There is a contact from integrations and can't be deleted.`)
+          text = `There is a contact from integrations and can't be deleted.`
         }
 
-        return text.join('<br /><br />')
+        return text
       }
 
       return ''
