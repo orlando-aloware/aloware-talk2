@@ -38,8 +38,6 @@
     <remove-folder-dialog v-if="isActive"/>
     <column-headers :previousRelations="previousRelations"
                     v-if="isActive"/>
-    <remove-contact :selected-count="selectedContactsCount"
-                    v-if="isActive"/>
     <remove-contact-confirmation :selected-count="selectedContactsCount"
                                  v-if="isActive"
                                  @contactsRemoved="onRemoveContacts"/>
@@ -57,7 +55,6 @@ import ContactsSidebar from 'components/contacts/contacts-sidebar.vue'
 import RemoveListModal from 'components/remove-list.vue'
 import RemoveFolderDialog from 'components/remove-folder.vue'
 import ColumnHeaders from 'components/column-headers.vue'
-import RemoveContact from 'components/remove-contact.vue'
 import RemoveContactConfirmation from 'components/remove-contact-confirmation.vue'
 import MoveDialog from 'components/move-dialog.vue'
 import CreateListModal from 'components/create-list-modal.vue'
@@ -95,7 +92,6 @@ export default {
     ContactsSidebar,
     RemoveListModal,
     RemoveFolderDialog,
-    RemoveContact,
     RemoveContactConfirmation,
     ColumnHeaders,
     MoveDialog,

@@ -21,7 +21,8 @@ export default function () {
         headers: DEFAULT_COLUMNS,
         filters: {},
         type: 2,
-        name: 'All Contacts'
+        name: 'All Contacts',
+        is_default: true
       },
       'my-contacts': {
         id: 'my-contacts',
@@ -40,7 +41,8 @@ export default function () {
           }
         ],
         type: 2,
-        name: 'My Contacts'
+        name: 'My Contacts',
+        is_default: true
       },
       unassigned: {
         id: 'unassigned',
@@ -59,7 +61,8 @@ export default function () {
           }
         ],
         type: 2,
-        name: 'Unassigned'
+        name: 'Unassigned',
+        is_default: true
       },
       unanswered: {
         id: 'unanswered',
@@ -78,7 +81,8 @@ export default function () {
           }
         ],
         type: 2,
-        name: 'Unanswered'
+        name: 'Unanswered',
+        is_default: true
       },
       'new-leads': {
         id: 'new-leads',
@@ -97,7 +101,8 @@ export default function () {
           }
         ],
         type: 2,
-        name: 'New Leads'
+        name: 'New Leads',
+        is_default: true
       },
       static: {
         id: 'static',

@@ -278,7 +278,10 @@
                     variant="light"
                     no-caret
                     data-testid="contacts-view-options-dropdown"
-                    right>
+                    alt="List Options"
+                    title="List Options"
+                    right
+                    v-if="selectedAllCount === 0">
           <template #button-content>
             <ellipse-icon />
           </template>
@@ -596,30 +599,6 @@
                     <!--message-o-icon></message-o-icon-->
                     <span class="aloicons action-icons">A</span>
                   </button>
-
-                  <span class='d-inline-block'
-                        tabindex='0'
-                        :id='`contact-remove-option-disabled-wrapper-${index}`'
-                        v-if='hasIntegration(contact)'>
-                    <button class='btn btn-sm datatable-row__actions__action--trash'
-                            data-testid='contact-remove-option-disabled'
-                            :disabled='true'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')">
-                      <span class='aloicons action-icons'>B</span>
-                    </button>
-                    <b-tooltip :target='`contact-remove-option-disabled-wrapper-${index}`'>
-                      This contact is from integration and can't be deleted.
-                    </b-tooltip>
-                  </span>
-
-                  <span v-else>
-                    <button class='btn btn-sm datatable-row__actions__action--trash'
-                            data-testid='contact-remove-option'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact') && !isSimpSocial"
-                            @click='onRemove(contact, id)'>
-                      <span class='aloicons action-icons'>B</span>
-                    </button>
-                  </span>
                 </div>
               </td>
 
@@ -1854,16 +1833,6 @@ export default {
       if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
         this.$router.push(`/contacts`)
       }
-    },
-
-    onRemove (contact, contactListId) {
-      this.setShouldUpdateSelectedListContactCount(false)
-      this.setBulkDelete(false)
-      this.removeContactOpen({
-        ...contact,
-        contactListId: contactListId
-      })
-      // this.$emit('on-action-remove', true)
     },
 
     onMessage (contactId) {
