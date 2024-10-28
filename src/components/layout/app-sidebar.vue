@@ -617,10 +617,12 @@
            :ripple="false"
            v-show="!isActive('Broadcasts') && !canUseBroadcast"
            @click="toggleProFeatureDialog(true)">
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
+      <q-badge rounded
+               floating
+               color="orange"
+               style="top:-5px; right: -5px"
+               v-if="!isSidebarExpanded"
+      />
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
@@ -631,6 +633,10 @@
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
         Broadcasts
+        <q-badge rounded
+                 class="mb-2"
+                 color="orange"
+        />
       </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/broadcast_active.svg"
@@ -842,6 +848,9 @@ export default {
     appLogo () {
       switch (true) {
         case this.statics.whitelabel:
+          if (this.isSidebarExpanded) {
+            return `img:${this.statics.logo_inverse.replace(/\//, '')}` // replace first occurrence of '/'
+          }
           return `img:${this.statics.logo_square.replace(/\//, '')}` // replace first occurrence of '/'
         case this.xmasEnabled:
           return 'img:app-icons/menu/xmas/logo_white.svg'

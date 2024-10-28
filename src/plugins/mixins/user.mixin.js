@@ -16,6 +16,10 @@ export default {
 
     isModGen () {
       return [2132, 3691].includes(this.currentCompany?.reseller_id)
+    },
+
+    isImpersonate () {
+      return localStorage.getItem('impersonate') === 'true'
     }
   },
 
