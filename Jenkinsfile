@@ -15,7 +15,12 @@ pipeline {
         AWS_CREDS = credentials('aws-credentials')
         AWS_REGION = 'us-west-2'
         NODE_VERSION = '20'
-        NODE_MODULES_PATH = '/cached_modules/npm/${NODE_VERSION}/talk2/node_modules'
+        SAFE_JOB_NAME = "${env.JOB_NAME.replaceAll('/', '-').toLowerCase()}"
+        CACHE_FOLDER = "${HOME}/.jenkins-cache/${SAFE_JOB_NAME}"
+        YARN_CACHE_FOLDER = "${CACHE_FOLDER}/yarn"
+        ARTIFACTS_CACHE_FOLDER = "${CACHE_FOLDER}/artifacts"
+        DEVELOP_SAFE_JOB_NAME = "${JOB_NAME.split('/')[0]}-develop"
+        DEVELOP_CACHE_FOLDER = "${HOME}/.jenkins-cache/${DEVELOP_SAFE_JOB_NAME}"
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -31,6 +36,34 @@ pipeline {
                             steps {
                                 script {
                                     notificationSender.sendSlackInfo()
+                                }
+                            }
+                        }
+
+                        stage ('Setup Cache') {
+                            steps {
+                                script {
+                                    // Create the cache directory
+                                    sh "mkdir -p ${CACHE_FOLDER}"
+
+                                    // Attempt to restore node_modules, from the cache directory of this job
+                                    if (fileExists("${ARTIFACTS_CACHE_FOLDER}/node_modules")) {
+                                        sh "rsync -a ${ARTIFACTS_CACHE_FOLDER}/node_modules ."
+                                    }
+
+                                    // If the directories wers not restored, attempt to restore from the develop branch artifacts
+                                    if (!fileExists("node_modules")) {
+                                        if (fileExists("${DEVELOP_CACHE_FOLDER}/artifacts/node_modules")) {
+                                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/artifacts/node_modules ."
+                                        }
+                                    }
+
+                                    // If this job has no cache, attempt to restore from the develop branch cache
+                                    if (!fileExists("{YARN_CACHE_FOLDER}")) {
+                                        if (fileExists("${DEVELOP_CACHE_FOLDER}/yarn")) {
+                                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/yarn ."
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -63,18 +96,11 @@ pipeline {
                             }
                         }
 
-                        stage('Load Cached Modules') {
-                            when { not { branch 'master' } }
-                            steps {
-                                sh "cp -r ${env.NODE_MODULES_PATH} ."
-                            }
-                        }
-
                         stage('Install Dependencies') {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'yarn cache clean && yarn install'
+                                    sh "yarn install --cache-folder ${YARN_CACHE_FOLDER} --pure-lockfile"
                                 }
                             }
                         }
@@ -85,6 +111,16 @@ pipeline {
                                 nvm("${NODE_VERSION}") {
                                     sh 'quasar build --debug'
                                 }
+                            }
+                        }
+
+                        stage('Save Cache') {
+                            steps {
+                                // Save the cache via rsync to the cache directory
+                                sh '''
+                                    mkdir -p ${ARTIFACTS_CACHE_FOLDER}
+                                    rsync -a node_modules ${ARTIFACTS_CACHE_FOLDER}
+                                '''
                             }
                         }
 
@@ -124,7 +160,7 @@ pipeline {
                                         sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
-                                    sh "aws --region ${AWS_REGION} --profile talk2-dev-deployer s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
+                                    sh "aws --region ${AWS_REGION} s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
                                 }
                             }
                         }
