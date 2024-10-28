@@ -87,6 +87,10 @@ export default {
     },
 
     generateTargetUsersTree () {
+      if (this.usersIsLoading) {
+        return []
+      }
+
       if (!this.communication.target_users) {
         return []
       }

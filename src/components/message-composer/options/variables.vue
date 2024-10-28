@@ -58,6 +58,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      attributeDictionaries: 'getAttributeDictionaries'
+    }),
     ...mapGetters('contacts', ['messageComposer']),
     formattedOptions () {
       const contactVariables = [...this.Variables.CONTACT_VARIABLES]
@@ -140,11 +143,11 @@ export default {
           }
         )
       }
-      if (this.Variables.CSF_VARIABLES && this.Variables.CSF_VARIABLES.length > 0) {
+      if (this.attributeDictionaries && this.attributeDictionaries.length > 0) {
         groups.push(
           {
             type: 'CSF Variables',
-            variables: this.Variables.CSF_VARIABLES
+            variables: this.filteredCSFVariables()
           }
         )
       }
@@ -185,6 +188,23 @@ export default {
     },
     onClose () {
       this.$emit('close')
+    },
+    filteredCSFVariables () {
+      let csfVariables = [...this.Variables.CSF_VARIABLES]
+      if (this.attributeDictionaries && this.attributeDictionaries.length) {
+        const customCsfVariables = this.attributeDictionaries.map(dict => ({
+          label: `[csf:${dict.slug}]`,
+          value: `[csf:${dict.slug}]`,
+          description: dict.description
+        }))
+        csfVariables = [...csfVariables, ...customCsfVariables]
+      }
+      if (this.filtered_text) {
+        return csfVariables.filter((variable) =>
+          (variable.label && variable.label.toLowerCase().includes(this.filtered_text.toLowerCase()))
+        )
+      }
+      return csfVariables
     }
   },
   watch: {

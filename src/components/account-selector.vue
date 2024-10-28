@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 import { accessMixin, guestFormsMixin } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn.vue'
 
@@ -101,16 +101,6 @@ export default {
 
     dialogFullScreen () {
       return this.showAccountSelectorFullscreen || this.isMobile
-    }
-  },
-
-  methods: {
-    ...mapActions('cache', ['setCurrentCompany']),
-    ...mapActions('auth', ['logout']),
-
-    closeDialog () {
-      this.setShowAccountSelector(false)
-      this.setShowAccountSelectorFullscreen(false)
     }
   },
 

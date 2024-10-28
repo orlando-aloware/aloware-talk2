@@ -21,6 +21,7 @@ import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
+import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 
 export default {
   name: 'dialer',
@@ -124,6 +125,13 @@ export default {
         // communication has a contact, set the contact.
         if (isActiveTaskInPowerDialerSession || dialerCommunicationHasContact) {
           this.setDialerContact(this.dialer.communication.contact)
+        }
+
+        // if one of these statuses, the call is successfully answered by the contact,
+        // either he picked up the call or it was delivered to voicemail
+        if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ||
+          communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
+          this.setDialerCallSuccessfullyAnswered(true)
         }
       }
 
@@ -404,7 +412,7 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.last_call) {
+      if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
         return
       }
 
@@ -521,6 +529,12 @@ export default {
           const skipedAndActive = this.getSkippedAndActiveTasks()
           const tempSet = new Set(skipedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
           this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+
+          const rejectionReason = REJECTION_REASONS.find(rejectionReason => rejectionReason.type === res.data.rejected_by_app)
+
+          if (rejectionReason) {
+            this.$generalNotification(rejectionReason.message, 'error')
+          }
         }
 
         // we need to prevent proceeding to the next steps if current task's contact id
@@ -775,6 +789,7 @@ export default {
         }
 
         this.setWarnings(this.warnings)
+        this.saveCallIssue(warningName, warningData)
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
@@ -1350,6 +1365,7 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(false)
+      this.setDialerCallSuccessfullyAnswered(false)
     },
 
     countCallDuration () {
@@ -1405,6 +1421,13 @@ export default {
 
     startWrapUpTimer () {
       this.setDialerCurrentStatus('WRAP_UP')
+
+      // when communication is rejected by app, skip wrap-up
+      if (this.dialer.communication?.rejected_by_app) {
+        this.backToDial('Talk-DialerListeners-EndWrapUp')
+        return
+      }
+
       const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
         ? this.currentCompany.wrap_up_seconds
         : this.profile.wrap_up_seconds
@@ -1634,6 +1657,37 @@ export default {
       this.makeCall('call:' + communication.id, communication.campaignId)
     },
 
+    saveCallIssue (warningName, warningData) {
+      if (this.dialer.communication && warningData) {
+        const {
+          samples,
+          ...dataCallIssue
+        } = warningData
+
+        try {
+          // Ensure that the data can be safely converted to JSON
+          const dataString = JSON.stringify(dataCallIssue)
+          const params = {
+            event_name: warningName,
+            communication_id: this.dialer.communication.id,
+            data: dataString
+          }
+
+          // Post call, but handle any errors gracefully
+          this.$axios.post('/api/v2/call-quality-events', params)
+            .catch(err => {
+              console.error('Error saving call issue:', err)
+              this.$handleErrors(err.response)
+            })
+        } catch (error) {
+          console.error('Invalid data for call issue:', error)
+          // Handle the error
+        }
+      } else {
+        console.warn('Warning: Missing required data for saving call issue.')
+      }
+    },
+
     ...mapActions([
       'setDialerToken',
       'setDialerCall',
@@ -1666,7 +1720,8 @@ export default {
       'setDialerError',
       'setDialerErrorDefault',
       'removeParkedCall',
-      'setIsCallBackButtonDisabled'
+      'setIsCallBackButtonDisabled',
+      'setDialerCallSuccessfullyAnswered'
     ])
   },
 

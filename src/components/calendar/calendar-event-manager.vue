@@ -2,13 +2,11 @@
   <b-modal id="calendar-manager-modal"
            size="lg"
            body-class="p-0"
-           no-close-on-esc
            no-close-on-backdrop
            :scrollable="!loading"
            :hide-footer="loading"
            :visible="showManager"
-           @cancel="closeFiltersMenu"
-           @close="closeFiltersMenu">
+           @hidden="closeFiltersMenu">
     <b-overlay class="h-100 w-100 position-absolute"
                rounded="sm"
                :show="true"
@@ -288,7 +286,7 @@
         </button>
         <div class="ml-auto">
             <button class="btn btn-sm btn-outline-dark mr-2"
-                    @click.prevent="closeFiltersMenu">
+                    @click.prevent="onCancelClicked">
               Cancel
             </button>
             <button class="btn btn-sm bg-primary text-white"
@@ -431,6 +429,7 @@ export default {
         footerClass: 'p-2 border-top-0',
         centered: true
       },
+      isSubmitted: false,
       CommunicationDispositionStatus,
       CommunicationTypes
     }
@@ -537,6 +536,7 @@ export default {
 
     editSchedule (sched) {
       this.loading = true
+      this.isSubmitted = false
       let date = moment(sched.start_date)
 
       this.originalSchedule = {
@@ -670,8 +670,7 @@ export default {
               action: 'add'
             })
             this.showManager = false
-
-            this.resetForm()
+            this.isSubmitted = true
 
             this.$generalNotification('Event added.')
           }).catch(err => {
@@ -700,8 +699,7 @@ export default {
               action: 'update'
             })
             this.showManager = false
-
-            this.resetForm()
+            this.isSubmitted = true
 
             this.$generalNotification('Event updated.')
           }).catch(err => {
@@ -730,30 +728,41 @@ export default {
     },
 
     closeFiltersMenu (bvModalEvent) {
-      if (_.isEqual(this.schedule, this.originalSchedule)) {
+      if (_.isEqual(this.schedule, this.originalSchedule) || this.isSubmitted) {
         this.resetForm()
+        this.resetSchedule()
         this.showManager = false
-      } else {
-        // prevent closing
-        bvModalEvent.preventDefault()
-
-        this.$bvModal.msgBoxConfirm('Are you sure you want to close this form?', {
-          ...this.confirmDialogParams,
-          title: 'Confirmation',
-          okTitle: 'Yes, I\'m sure',
-          cancelTitle: 'No, I\'m not'
-        })
-          .then(value => {
-            if (value) {
-              this.resetForm()
-
-              this.$nextTick(() => {
-                this.showManager = false
-                this.$bvModal.hide('calendar-manager-modal')
-              })
-            }
-          })
+        this.$emit('close-filters-menu')
+        return
       }
+
+      // prevent closing
+      bvModalEvent.preventDefault()
+
+      this.$bvModal.msgBoxConfirm('Are you sure you want to close this form?', {
+        ...this.confirmDialogParams,
+        title: 'Confirmation',
+        okTitle: 'Yes, I\'m sure',
+        cancelTitle: 'No, I\'m not'
+      })
+        .then(value => {
+          if (value) {
+            this.resetForm()
+            this.resetSchedule()
+
+            return this.$nextTick(() => {
+              this.showManager = false
+              this.$emit('close-filters-menu')
+              this.$bvModal.hide('calendar-manager-modal')
+            })
+          }
+
+          this.showManager = true
+        })
+    },
+
+    onCancelClicked () {
+      this.showManager = false
     },
 
     updateSmsReminderVariables () {
@@ -853,6 +862,15 @@ export default {
 
     appendSmsReminderTemplateVariable (variable) {
       this.sms_reminder_fields.body = `${(this.sms_reminder_fields.body ?? '')} ${variable}`
+    },
+
+    resetSchedule () {
+      this.schedule = {
+        contact: {},
+        user: this.user.profile,
+        calendar_response: 1
+      }
+      this.originalSchedule = {}
     },
 
     onContactsLoaded () {

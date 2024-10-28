@@ -15,7 +15,7 @@
         </span>
         <strong class="pl-2">
           <span v-if="metricName(info)">
-            {{ `${info.completed_contacts_count}(${info.percentage}%)` }}
+            {{ `${info.completed_contacts_count}(${formatPercentage(info.percentage)}%)` }}
           </span>
         </strong>
       </div>
@@ -35,12 +35,12 @@
             <div
               v-if="info.type === 0"
               class="text-caption pt-1 pl-1 text-grey">
-              {{ info.name === 'Duration' ? `` : `/${info.percentage}` }}
+              {{ info.name === 'Duration' ? `` : `/${formatPercentage(info.percentage)}` }}
             </div>
             <div
               v-else
               class="text-caption pt-1 pl-1 text-grey">
-              {{ `(${info.percentage}%)` }}
+              {{ `(${formatPercentage(info.percentage)}%)` }}
             </div>
           </div>
           <div class="t-label text-caption text-grey-90">
@@ -139,6 +139,9 @@ export default {
         }
       })
       return metric?.label ? metric.label : false
+    },
+    formatPercentage (value) {
+      return value.toFixed(2).replace('.00', '')
     }
   },
   data () {

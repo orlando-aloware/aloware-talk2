@@ -92,11 +92,6 @@
         </div>
       </div>
     </div>
-    <div v-if="shouldShowComplianceMessage" class="composer-footer">
-      <div class="compliance-badge mb-2">
-        {{ disabledComplianceMessage }}
-      </div>
-    </div>
     <block-tooltip placement="top"
                    triggers="hover"
                    target="composer-wrapper"
@@ -186,11 +181,6 @@ export default {
 
     disabledComplianceMessage () {
       return this.selectedLine && this.isMessagingBlocked(this.selectedLine, true) ? this.selectedLine?.blocked_messaging_information?.['reason'] : ''
-    },
-
-    shouldShowComplianceMessage () {
-      let a2pBlock = this.selectedLine && this.selectedLine.blocked_messaging_information && this.selectedLine.blocked_messaging_information['reason'] && !this.selectedLine.blocked_messaging_information['bypassed']
-      return !this.isTrialKYC && this.isMessagingBlocked(this.selectedLine, true) && a2pBlock
     },
 
     canTextToNumber () {

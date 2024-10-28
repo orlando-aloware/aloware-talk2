@@ -164,15 +164,11 @@ export default {
     ...mapActions('powerDialer', [
       'moveContactItems',
       'getSessionTaskByFilter',
-      'clearRedialedTasks'
+      'getContact'
     ]),
 
     ...mapMutations('powerDialer', [
       'TOGGLE_SESSION_LOADER'
-    ]),
-
-    ...mapActions('powerDialer', [
-      'getContact'
     ]),
 
     async fetchContact (taskId = null) {
@@ -310,7 +306,7 @@ export default {
       const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
       if (!contactListItemId) {
-        return
+        return Promise.resolve()
       }
 
       return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/skip`, { redial })
@@ -319,7 +315,7 @@ export default {
           if (redial) {
             position = 'top'
             this.taskToCall.contact_list_item_id = res.data.data.id
-            this.taskToCall.redial = res.data.data.redialed
+            this.taskToCall.redialed = res.data.data.redialed
           }
 
           this.$generalNotification(`Success: contact is at the ${position} of the current list`)
@@ -397,7 +393,7 @@ export default {
 
       // We compare the new set of IN QUEUE tasks retrieved by the API according to pagination
       // but discarding the ones have been skipped so we don't list them again
-      const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.id === element.id))
+      const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.contact_list_item_id === element.contact_list_item_id))
 
       return newInQueueList
     }

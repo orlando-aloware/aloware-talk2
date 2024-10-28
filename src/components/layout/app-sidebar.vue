@@ -186,7 +186,7 @@
       </span>
     </q-btn>
 
-    <q-btn :to="{ path: '/calendar' }"
+    <q-btn :to="{ path: '/calendar', query: { view: 'month' } }"
            :ripple="false"
            icon="img:app-icons/menu/calendar_active.svg"
            align="left"
@@ -206,7 +206,7 @@
         Calendar
       </span>
     </q-btn>
-    <q-btn :to="{ path: '/calendar' }"
+    <q-btn :to="{ path: '/calendar', query: { view: 'month' } }"
            :ripple="false"
            icon="img:app-icons/menu/calendar_gray.svg"
            align="left"
@@ -617,10 +617,12 @@
            :ripple="false"
            v-show="!isActive('Broadcasts') && !canUseBroadcast"
            @click="toggleProFeatureDialog(true)">
-      <q-badge floating
-               rounded
-               color="orange">
-      </q-badge>
+      <q-badge rounded
+               floating
+               color="orange"
+               style="top:-5px; right: -5px"
+               v-if="!isSidebarExpanded"
+      />
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
@@ -631,6 +633,10 @@
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
         Broadcasts
+        <q-badge rounded
+                 class="mb-2"
+                 color="orange"
+        />
       </span>
     </q-btn>
     <q-btn icon="img:app-icons/menu/broadcast_active.svg"
@@ -671,6 +677,52 @@
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
         Broadcasts
+      </span>
+    </q-btn>
+
+    <q-btn :to="{ name: 'AloAi' }"
+           :ripple="false"
+           icon="img:app-icons/menu/aloai_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           data-testid="contacts-sidebar-btn"
+           v-show="isActive('AloAi')"
+           flat
+           v-if="!isSimpSocial">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 data-testid="contacts-sidebar-tooltip"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">AloAi</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        AloAi
+      </span>
+    </q-btn>
+    <q-btn :to="{ name: 'AloAi' }"
+           :ripple="false"
+           icon="img:app-icons/menu/aloai_gray.svg"
+           align="left"
+           padding="10px 20px"
+           class="nav-icons w-100"
+           data-testid="contacts-no-active-sidebar-btn"
+           v-show="!isActive('AloAi')"
+           flat
+           v-if="!isSimpSocial">
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">AloAi</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        AloAi
       </span>
     </q-btn>
 
@@ -796,6 +848,9 @@ export default {
     appLogo () {
       switch (true) {
         case this.statics.whitelabel:
+          if (this.isSidebarExpanded) {
+            return `img:${this.statics.logo_inverse.replace(/\//, '')}` // replace first occurrence of '/'
+          }
           return `img:${this.statics.logo_square.replace(/\//, '')}` // replace first occurrence of '/'
         case this.xmasEnabled:
           return 'img:app-icons/menu/xmas/logo_white.svg'
@@ -843,6 +898,10 @@ export default {
       }
 
       if (['Wallboard Agents', 'Wallboard Calls'].includes(this.$route.name) && name === 'Wallboard') {
+        return true
+      }
+
+      if (this.$route.name === 'AloAi' && name === 'AloAi') {
         return true
       }
 

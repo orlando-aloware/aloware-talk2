@@ -282,7 +282,8 @@ import KycReloadDialog from 'components/kyc-reload-dialog.vue'
 import store from 'src/store'
 import {
   TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
-  TYPE_EXPORT_CONTACT_LIST_ITEMS
+  TYPE_EXPORT_CONTACT_LIST_ITEMS,
+  TYPE_COMMUNICATION
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
 import talk2Api from 'src/plugins/api/api'
@@ -383,7 +384,8 @@ export default {
       accountSuspended: false,
       allowedExports: [
         TYPE_EXPORT_CONTACT_LIST_ITEMS,
-        TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
+        TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
+        TYPE_COMMUNICATION
       ],
       mainListeners: {},
       isElectronEventsStarted: false,
@@ -1012,8 +1014,17 @@ export default {
         return
       }
 
-      const type = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer' : 'Contacts'
-      this.$generalNotification(`${type} list is being exported. Please wait for a while.`, 'success')
+      let message = 'Contacts list is being exported. Please wait for a while.'
+
+      if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        message = 'Power Dialer list is being exported. Please wait for a while.'
+      }
+
+      if (task.export.type === TYPE_COMMUNICATION) {
+        message = 'Contact communications are being exported.'
+      }
+
+      this.$generalNotification(message, 'success')
     }
 
     this.mainListeners.exportEventUpdate = (task) => {
@@ -1021,9 +1032,18 @@ export default {
         return
       }
 
-      const listText = task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS ? 'Power Dialer list' : 'Contacts list'
+      let message = `Your Contacts list export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
+
+      if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
+        message = `Your Power Dialer list export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
+      }
+
+      if (task.export.type === TYPE_COMMUNICATION) {
+        message = `Your Contact communications export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
+      }
+
       this.$generalNotification(
-        `Your ${listText} export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`,
+        message,
         'export-csv',
         0,
         true,
@@ -1484,6 +1504,7 @@ export default {
       this.setDialerCurrentNumber('')
       this.setDialerIsMuted(false)
       this.setDialerCallFishing()
+      this.setDialerCallSuccessfullyAnswered(false)
     },
 
     nl2br (str, isXhtml) {
@@ -1572,6 +1593,7 @@ export default {
         this.getCallDispositions()
         this.getActivityTypes()
         this.getLeadSources()
+        this.getAttributeDictionaries()
         this.getMyQueueList()
       })
     },
@@ -1976,6 +1998,16 @@ export default {
 
           return Promise.reject()
         })
+    },
+
+    getAttributeDictionaries () {
+      if (this.is_widget) {
+        return
+      }
+
+      return this.$axios.get('/api/v1/attribute-dictionary').then(res => {
+        this.setAttributeDictionaries(res.data.data)
+      })
     },
 
     async initAccount () {
@@ -2612,6 +2644,7 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted',
       'setDialerParkedCall',
+      'setDialerCallSuccessfullyAnswered',
       'setFilters',
       'setNotifications',
       'resetNotifications',
@@ -2626,6 +2659,7 @@ export default {
       'removeParkedCall',
       'setSuspended',
       'setLeadSources',
+      'setAttributeDictionaries',
       'updateUserStatus',
       'setStatics',
       'setStaticsLoaded',

@@ -67,6 +67,10 @@ export default {
       required: true
     },
 
+    contact: {
+      required: false
+    },
+
     type: {
       required: true
     },

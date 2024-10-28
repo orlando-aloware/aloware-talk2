@@ -760,7 +760,7 @@ export default {
 
     canRedialNow () {
       return this.dialer.currentStatus === 'CALL_CONNECTED' &&
-        !this.activeTask?.redial &&
+        !this.activeTask?.redialed &&
         !this.isRedialClicked
     },
 
@@ -861,6 +861,10 @@ export default {
           redial: false
         }
       ]
+    },
+
+    shouldRedial () {
+      return this.sessionSettings.force_redial && !this.dialer.callSuccessfullyAnswered && !this.dialer.redialedTaskIds.includes(this.activeTask?.id)
     }
   },
 
@@ -889,7 +893,12 @@ export default {
   },
 
   methods: {
-    ...mapActions(['setShowPhone']),
+    ...mapActions([
+      'setShowPhone',
+      'addDialerRedialedTaskId',
+      'clearDialerRedialedTaskIds',
+      'setDialerCallSuccessfullyAnswered'
+    ]),
 
     ...mapActions('contacts', [
       'setContactClone'
@@ -1253,7 +1262,9 @@ export default {
         }, 500)
       }
 
-      this.clearRedialedTasks()
+      this.clearDialerRedialedTaskIds()
+      this.setDialerCallSuccessfullyAnswered(false)
+
       clearInterval(this.countdownInterval)
 
       setTimeout(() => {
@@ -1375,6 +1386,12 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
+      if (this.shouldRedial) {
+        this.addDialerRedialedTaskId(this.activeTask.id)
+        this.onRedial(false)
+        return
+      }
+
       let noWrapUp = false
       this.loadingNext = true
 

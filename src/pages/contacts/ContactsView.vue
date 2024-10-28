@@ -65,11 +65,10 @@
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <search class="width-260"
-                  data-testid="contacts-view-search-input"
-                  :limitSearchCharacters="false"
+                  limitSearchCharacters
                   :search="search"
                   :disabled="isLoadingDisabled"
-                  @show-error-message="handleLimitCharactersError"
+                  data-testid="contacts-view-search-input"
                   @search="onSearch">
           </search>
           <div class="contacts-total mobile">
@@ -219,7 +218,7 @@
                      :disabled="isDisabledSaveFilter"
                      :customClass="saveFilterButtonCustomClass"
                      data-testid="contacts-view-update-contact-list-compact-button"
-                     v-if="selectedList.type !== ContactListTypes.STATIC && !['all', 'my-contacts', 'unassigned', 'unanswered', 'new-leads'].includes(selectedList.id)"
+                     v-if="selectedList.type !== ContactListTypes.STATIC && !CONTACTS_STRING_KEYS.includes(selectedList.id)"
                      @clicked="onUpdateContactList">
           <q-spinner-bars color="white"
                           class="mr-1"
@@ -291,28 +290,48 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
-                           :disabled="isAddToPowerDialerDisabled"
+                           :disabled="isListActionDisabled"
                            v-if="shouldShowPowerDialer"
-                           @click="addSelectedContacts">
+                           @click="addToPowerDialerList(false)">
             <power-dialer-mobile-icon width="14"
                                       height="14"
                                       color="#62666E" />
-            Add to My Power Dialer
+            Add List to Power Dialer
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
+                           data-testid="contacts-view-add-to-sequence-option-dropdown"
+                           :disabled="isListActionDisabled"
+                           v-if="shouldShowSequences"
+                           @click="openAddToSequence">
+            <add-sequence-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
+            Add List to Sequence
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
+                           data-testid="contacts-view-assign-contacts-option-dropdown"
+                           :disabled="isListActionDisabled"
+                           @click="openAssignContacts">
+            <power-dialer-mobile-icon width="14"
+                                      height="14"
+                                      color="#62666E" />
+            Assign Contact List
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-enroll-aloai-option-dropdown"
-                           :disabled="!this.checked.length"
-                           v-if="currentCompany.aloai_enabled"
-                           @click="openAloAiBotContactsEnrollmentModal">
+                           :disabled="isListActionDisabled"
+                           v-if="shouldShowAloAi"
+                           @click="openAloAiBotContactsEnrollmentModal('add-contact-list')">
             <add-user-icon width="14" height="14" color="#62666E" />
-            Enroll to AloAI Bot
+            Enroll List in AloAI Text Bot
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
+                           :disabled="!totalRows"
                            data-testid="contacts-view-export-as-csv-option-dropdown"
                            @click="exportAsCsv">
             <export-icon />
-            Export as CSV
+            Export List as CSV
           </b-dropdown-item>
           <b-dropdown-item href=""
                            :disabled="isListDeletable"
@@ -325,10 +344,6 @@
             </span>
           </b-dropdown-item>
         </b-dropdown>
-      </div>
-      <div class="limit-characters-error"
-           v-if="showLimitCharactersError">
-        Search requires at least 3 characters
       </div>
     </template>
     <template slot="actions"
@@ -346,7 +361,7 @@
                  data-testid="contacts-view-datatable"
                  :stickyHeaders="true"
                  :columns="columns"
-                 :isEmpty="isEmpty || isStartState"
+                 :isEmpty="isEmpty"
                  :isLoadingMore="isLoadingMore"
                  :is-loading="isLoading"
                  :contact-list-id="id"
@@ -441,7 +456,7 @@
                     </div>
                     <div v-else>
                       <div :class="`${column.draggable ? 'col-indented' : ''}`" data-testid="contacts-view-contact-no-owner-name">
-                        No Name
+                        &nbsp;
                       </div>
                     </div>
                   </div>
@@ -752,15 +767,26 @@
               v-if="!simpleTable">
       <import-contacts-modal ref="importContacts" />
       <power-dialer-add-modal :params="attachedParams()"
+                              :contact-list="selectedList"
+                              :mode="addToPowerDialerMode"
                               :show-in-contacts-page="true"
+                              :selected-all-count="selectedAllCount"
+                              :is-manual-selection="addToPowerDialerIsManualSelection"
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
+      <tag-contacts-workflow-enroller :is-show="showAddToSequence"
+                                      :list="selectedList"
+                                      @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
       <enroll-contacts-to-aloai-modal
         ref="enrollContactsToAloAiModal"
         :params="attachedParams()"
         :contactList="selectedList"
+        :checked-count="selectedAllCount"
       />
+    <assign-contacts-modal :is-show="showAssignContacts"
+                           :list="selectedList"
+                           @closeAssignContactsModal="closeAssignContacts" />
     </template>
   </contacts-screen>
 </template>
@@ -808,7 +834,11 @@ import {
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
+import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
+import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
+import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 
 export default {
   name: 'contacts-view',
@@ -829,6 +859,7 @@ export default {
     DeleteRedIcon,
     ExportIcon,
     PowerDialerMobileIcon,
+    AddSequenceIcon,
     AddUserIcon,
     EditHamburgerIcon,
     Search,
@@ -848,7 +879,9 @@ export default {
     ImportContactsModal,
     BlockTooltip,
     PowerDialerAddModal,
-    EnrollContactsToAloaiModal
+    TagContactsWorkflowEnroller,
+    EnrollContactsToAloaiModal,
+    AssignContactsModal
   },
 
   props: {
@@ -928,8 +961,14 @@ export default {
       ContactListTypes,
       openPDModal: false,
       isContactModule: false,
+      addToPowerDialerMode: 'add',
+      addToPowerDialerIsManualSelection: false,
+      showAddToSequence: false,
+      workflowId: null,
       openAloAiEnrollmentModal: false,
-      showLimitCharactersError: false
+      showAssignContacts: false,
+      showLimitCharactersError: false,
+      CONTACTS_STRING_KEYS
     }
   },
 
@@ -1160,14 +1199,15 @@ export default {
 
       return ids
     },
-
     isContactListSelected () {
-      const blockedIds = ['all', 'unanswered', 'unassigned', 'my-contacts', 'new-leads']
+      const blockedIds = this.CONTACTS_STRING_KEYS
+
       return !blockedIds.includes(this.selectedList.id)
     },
 
-    isAddToPowerDialerDisabled () {
-      return !this.checked.length
+    // Disable List actions if no list is selected or if there no records
+    isListActionDisabled () {
+      return !this.isContactListSelected || !this.totalRows
     }
   },
 
@@ -1231,8 +1271,20 @@ export default {
       this.filterHasChanges = false
     }
 
+    this.viewListeners.addToPowerDialer = () => {
+      this.addToPowerDialerList(true)
+    }
+
+    this.viewListeners.addToAloAi = (mode) => {
+      this.openAloAiBotContactsEnrollmentModal(mode)
+    }
+
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
     this.$VueEvent.listen('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
+
+    // Listeners for "more" options on contact selection
+    this.$VueEvent.listen('addToPowerDialer', this.viewListeners.addToPowerDialer)
+    this.$VueEvent.listen('addToAloAi', this.viewListeners.addToAloAi)
   },
 
   methods: {
@@ -1266,13 +1318,33 @@ export default {
       'addPowerDialerOpen'
     ]),
 
+    setWorkflowId (id) {
+      this.workflowId = id
+    },
+
+    openAddToSequence () {
+      this.showAddToSequence = true
+    },
+
+    closeAddToSequence () {
+      this.showAddToSequence = false
+    },
+
+    openAssignContacts () {
+      this.showAssignContacts = true
+    },
+
+    closeAssignContacts () {
+      this.showAssignContacts = false
+    },
+
     hasIntegration (contact) {
       // activate only for multi-entity allowed company
       return Boolean(this.currentCompany.activate_multi_entity ? contact.external_integration_data && contact.external_integration_data.length > 0 : false)
     },
 
     onSearch (searchText) {
-      this.$emit('search', searchText)
+      this.$emit('search', searchText.trim())
     },
 
     onFetchMyContacts (checked) {
@@ -1380,15 +1452,37 @@ export default {
     addSelectedContacts () {
       this.openPDModal = true
       this.addPowerDialerOpen(true)
+      this.addToPowerDialerMode = 'add'
     },
 
-    openAloAiBotContactsEnrollmentModal () {
+    addToPowerDialerList (isManualSelection = false) {
+      this.openPDModal = true
+      this.addPowerDialerOpen(true)
+      this.addToPowerDialerMode = 'add-contact-list'
+      this.addToPowerDialerIsManualSelection = isManualSelection
+    },
+
+    openAloAiBotContactsEnrollmentModal (mode = 'add-contact-list') {
       if (this.$refs.enrollContactsToAloAiModal) {
         this.$refs.enrollContactsToAloAiModal.isOpen = true
+        this.$refs.enrollContactsToAloAiModal.mode = mode
       }
     },
 
     attachedParams () {
+      // If there are no selected contacts and a contact list is selected
+      // all contacts in the list should be added to the power dialer
+      if (
+        this.checkedItemIds.length === 0 &&
+        this.isContactListSelected
+      ) {
+        return {
+          list_id: this.selectedList.id,
+          selected_all: true,
+          contact_ids: []
+        }
+      }
+
       return {
         contact_ids: this.checkedItemIds,
         ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})
@@ -1870,10 +1964,6 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
-    },
-
-    handleLimitCharactersError (value) {
-      this.showLimitCharactersError = value
     }
   },
 
@@ -1960,6 +2050,8 @@ export default {
     this.$VueEvent.stop('shouldUpdateListCount')
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
     this.$VueEvent.stop('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
+    this.$VueEvent.stop('addToPowerDialer', this.viewListeners.addToPowerDialer)
+    this.$VueEvent.stop('addToAloAi', this.viewListeners.addToAloAi)
   }
 }
 </script>

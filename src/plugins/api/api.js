@@ -4,6 +4,10 @@ import qs from 'qs'
 import _ from 'lodash'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
+const exportCommunications = async (contactId) => {
+  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
+}
+
 export default {
   V1: {
     contact: {
@@ -197,6 +201,14 @@ export default {
         }
 
         return window.axios.get(`${suffixV1}contact/${contactId}/communications-summary`)
+      },
+
+      pushToCrm (contactId) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.post(`${suffixV1}contact/${contactId}/push-to-crm`)
       }
     },
 
@@ -235,6 +247,10 @@ export default {
 
       bulkAssignContactsTo (params) {
         return window.axios.post(`${suffixV1}tags/bulk-assign-contacts-to`, params)
+      },
+
+      convertTagToList (params) {
+        return window.axios.post(`${suffixV2}contacts-list/convert`, params)
       },
 
       addTasksToUserPowerDialer (id, params) {
@@ -469,6 +485,16 @@ export default {
       }
     },
 
+    transcription: {
+      submitSummaryFeedback (communicationId, feedbackType) {
+        return window.axios.post(`${suffixV1}transcription/${communicationId}/summary-feedback`, { feedback: feedbackType })
+      },
+
+      fetchSmartTranscriptionData (communicationId, options) {
+        return window.axios.get(`${suffixV1}transcription/communication/${communicationId}`, options)
+      }
+    },
+
     statics: {
       get (companyId) {
         return window.axios.get('/get-statics', {
@@ -511,15 +537,6 @@ export default {
       }
     },
 
-    alohabot: {
-      getContactSession (id) {
-        return window.axios.get(`${suffixV1}bots/contact/${id}/session`)
-      },
-
-      disengageContact (id, params) {
-        return window.axios.post(`${suffixV1}bots/contact/${id}/disengage`, params)
-      }
-    },
     broadcasts: {
       delete (id) {
         return window.axios.delete(`${suffixV1}broadcasts/${id}`)
@@ -694,7 +711,9 @@ export default {
         return window.axios.get(`api/v2/contacts-list/export-csv`, {
           params: params
         })
-      }
+      },
+
+      exportCommunications
     },
 
     contactFolders: {
@@ -737,6 +756,22 @@ export default {
         return window.axios.get(`api/v2/power-dialer-lists/my-queue`, {
           params: params
         })
+      }
+    },
+
+    contactsList: {
+      assignContactsTo (contactListId, payload = {}) {
+        const params = {
+          assign_to: payload.assign_contacts_to,
+          id: payload.assign_contacts_to === 'ring_group' ? payload.ring_group_id : payload.user_id,
+          force: payload.force,
+          from_talk: true
+        }
+        return window.axios.post(`${suffixV2}contacts-list/${contactListId}/assign`, params)
+      },
+
+      splitListIntoSmallerLists (contactListId, params) {
+        return window.axios.post(`${suffixV2}contacts-list/${contactListId}/split`, params)
       }
     },
 

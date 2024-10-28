@@ -44,7 +44,7 @@ body,
 }
 
 .text-black,
-// .general-notification has to always be black, override system class .text-white which also has !important
+  // .general-notification has to always be black, override system class .text-white which also has !important
 .general-notification.text-black {
   color: $grey-100 !important;
 }
@@ -745,6 +745,8 @@ body,
 
     &.custom-rotate-90 .q-icon {
       transform: rotate(90deg);
+      width: 24px !important;
+      height: 24px !important;
     }
 
     &.bordered-menu-icon .q-icon {
@@ -1459,11 +1461,11 @@ i.option-separator {
   }
 }
 
-.waveform {
-  wave {
-    height: 25px !important;
-    overflow: hidden !important;
-  }
+.waveform-selector {
+  font-size: $f-size-body-xxs;
+  line-height: 13px;
+  letter-spacing: 0.004em;
+  color: $grey-90;
 }
 
 .waveform-timeline {
@@ -1471,6 +1473,11 @@ i.option-separator {
   line-height: 13px;
   letter-spacing: 0.004em;
   color: $grey-90;
+}
+
+.waveform-controls {
+  height: 24px;
+  overflow: hidden;
 }
 
 .audio-player {
@@ -1695,6 +1702,10 @@ i.option-separator {
 
 .fs-6 {
   font-size: 6px !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
 }
 
 .multiselect.border-blue {
@@ -3544,16 +3555,8 @@ i.option-separator {
   }
 }
 
-.max-w-75 {
-  max-width: 75% !important;
-}
-
-.max-w-85 {
-  max-width: 85% !important;
-}
-
-.max-width-266 {
-  max-width: 266px;
+.width-200 {
+  width: 200px;
 }
 
 .width-250 {
@@ -3583,6 +3586,18 @@ i.option-separator {
 .max-width-380 {
   max-width: 380px;
   width: 100%;
+}
+
+.max-w-75 {
+  max-width: 75% !important;
+}
+
+.max-w-85 {
+  max-width: 85% !important;
+}
+
+.max-width-266 {
+  max-width: 266px;
 }
 
 .width-0 {
@@ -8795,15 +8810,20 @@ span.mention {
         margin-right: 14px !important;
       }
 
-      .focus-mode-icon,
-      .logout-icon {
+      .focus-mode-icon {
         margin-right: 8px;
+        margin-top: -2px;
+      }
+
+      .logout-icon {
+        margin-right: 5px;
         margin-top: -2px;
       }
     }
 
     .q-item:not(:first-child) {
-      margin-top: 8px;
+      margin-top: 4px;
+      margin-bottom: 4px;
     }
 
     .q-item:nth-child(6) {
@@ -10587,7 +10607,8 @@ screen and (max-width: 956px) {
         }
 
         svg {
-          margin-right: 10px;
+          width: 16px;
+          margin-right: 8px;
         }
       }
     }
@@ -11163,12 +11184,6 @@ screen and (max-width: 956px) {
       position: relative;
     }
   }
-}
-
-
-.contact-filter-count {
-  top: 0 !important;
-  padding-top: 6px !important;
 }
 
 .q-select-auto-width {
@@ -12179,7 +12194,7 @@ h1.contact-list-name-label {
     flex-direction: column;
     align-items: center;
     background-color: #fff;
-    border-bottom: 1px solid #e0e0e0;
+    padding: 0px 20px;
     z-index: 1000;
 
     &__action-left,
@@ -12188,7 +12203,6 @@ h1.contact-list-name-label {
       flex-grow: 1;
       display: flex;
       justify-content: space-evenly;
-      padding: 0px 20px;
       align-items: center;
     }
 
@@ -12365,6 +12379,7 @@ h1.contact-list-name-label {
           .dhx_footer,
           .dhx_title {
             background-color: transparent !important;
+            cursor: pointer;
           }
         }
 
@@ -12393,17 +12408,25 @@ h1.contact-list-name-label {
 
         .dhx_event_move.dhx_title {
           padding: 0;
+          display: none;
         }
 
         .dhx_cal_event .dhx_body,
         .dhx_cal_event.dhx_cal_select_menu .dhx_body {
           padding: 0;
-          line-height: 19px !important;
-          height: 19px !important;
+          height: fit-content !important;
         }
 
         .dhx_event_resize.dhx_footer {
           display: none;
+        }
+
+        .is_past {
+          cursor: pointer;
+        }
+
+        .dhx_cal_event {
+          cursor: pointer !important;
         }
 
         .dhx_cal_data table tr {
@@ -12425,10 +12448,14 @@ h1.contact-list-name-label {
 
         .dhx_cal_data {
           border-left: 1px solid #dcdfe6;
-          border-right: 1px solid #dcdfe6;
           -webkit-box-sizing: border-box;
           -moz-box-sizing: border-box;
           box-sizing: border-box;
+
+          .dhx_scale_holder {
+            overflow-x: auto;
+            overflow-y: hidden;
+          }
         }
 
         .dhx_month_link {
@@ -12436,11 +12463,31 @@ h1.contact-list-name-label {
           color: #62666E;
           font-size: 11px;
           margin-top: 5px;
+
+          .custom-more-link {
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+
+          .custom-expand-link {
+            color: inherit;
+            text-decoration: none;
+            width: 100%;
+            cursor: pointer;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
         }
 
         .dhx_cal_event,
         .dhx_cal_event_clear {
-          margin-left: 1px;
           font-size: 13px;
           border-radius: 6px;
         }
@@ -12448,6 +12495,70 @@ h1.contact-list-name-label {
         .dhx_month_head {
           text-align: right;
           font-weight: normal;
+        }
+
+        .dhx_scale_hour {
+          display: flex !important;
+          align-items: flex-start;
+          justify-content: center;
+        }
+
+        .dhx_cal_today_button.dhx_cal_nav_button,
+        .dhx_cal_nav_button.dhx_cal_nav_button_custom.dhx_cal_tab.btn-goto-date,
+        .dhx_cal_prev_button.dhx_cal_nav_button,
+        .dhx_cal_next_button.dhx_cal_nav_button,
+        .dhx_cal_date,
+        .dhx_cal_tab.dhx_cal_tab_first,
+        .dhx_cal_tab.dhx_cal_tab_first.active,
+        .dhx_cal_tab,
+        .dhx_cal_tab.dhx_cal_tab_last {
+          display: none !important;
+        }
+
+        .dhx_multi_day {
+          margin-right: 0 20px 0 0 !important;
+        }
+
+        .dhx_more {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .hour-label {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .time-column {
+          width: 50%;
+          text-align: center;
+        }
+
+        .current-time {
+          border-right: 1px solid #dcdfe6;
+        }
+
+        .event-content {
+          .event-time {
+            font-size: 10px;
+          }
+
+          .event-text {
+            font-size: 12px;
+            font-weight: 700;
+          }
+        }
+      }
+
+      .dhx_scheduler_week {
+        .dhx_cal_data {
+          .dhx_scale_holder {
+            > div {
+              min-width: fit-content;
+            }
+          }
         }
       }
 
@@ -12463,6 +12574,16 @@ h1.contact-list-name-label {
           height: calc(100vh - 90px);
         }
       }
+
+      .hour-label {
+        text-decoration: none;
+        width: 100%;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 
@@ -12472,6 +12593,23 @@ h1.contact-list-name-label {
 
   .b-overlay-wrap {
     z-index: 1005;
+  }
+
+  .event {
+    &-content {
+      padding: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &-title {
+      font-weight: bold;
+    }
+
+    &-time {
+      font-size: 0.8em;
+    }
   }
 }
 
@@ -12499,48 +12637,126 @@ h1.contact-list-name-label {
 
 /* Event Colors */
 .event-color-type-12 {
-  // color: #C6DAFC;
-
   &.status-11 {
     color: $upcoming-appointment;
+    &.is_past {
+      color: $upcoming-appointment-is-past;
+
+      &:hover {
+        color: $upcoming-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $upcoming-appointment-hover;
+    }
   }
 
   &.status-9 {
     color: $completed-event;
+    &.is_past {
+      color: $completed-event-is-past;
+
+      &:hover {
+        color: $completed-event-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $completed-event-hover;
+    }
   }
 
   &.status-10 {
     color: $canceled-appointment;
+    &.is_past {
+      color: $canceled-appointment-is-past;
+
+      &:hover {
+        color: $canceled-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $canceled-appointment-hover;
+    }
   }
 
   &.status-14 {
     color: $missed-appointment;
-  }
+    &.is_past {
+      color: $missed-appointment-is-past;
 
-  &.is_past {
-    color: $past-appointment;
+      &:hover {
+        color: $missed-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $missed-appointment-hover;
+    }
   }
 }
 
 .event-color-type-13 {
   &.status-8 {
     color: $upcoming-reminder;
+    &.is_past {
+      color: $upcoming-reminder-is-past;
+
+      &:hover {
+        color: $upcoming-reminder-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $upcoming-reminder-hover;
+    }
   }
 
   &.status-4 {
     color: $completed-event;
+    &.is_past {
+      color: $completed-event-is-past;
+
+      &:hover {
+        color: $completed-event-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $completed-event-hover;
+    }
   }
 
   &.status-5 {
     color: $canceled-reminder;
+    &.is_past {
+      color: $canceled-reminder-is-past;
+
+      &:hover {
+        color: $canceled-reminder-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $canceled-reminder-hover;
+    }
   }
 
   &.status-3 {
     color: $missed-appointment;
-  }
+    &.is_past {
+      color: $missed-appointment-is-past;
 
-  &.is_past {
-    color: $past-reminder;
+      &:hover {
+        color: $missed-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      color: $missed-appointment-hover;
+    }
   }
 }
 
@@ -12549,23 +12765,63 @@ h1.contact-list-name-label {
 
   &.status-11 {
     background-color: $upcoming-appointment;
+    &.is_past {
+      background-color: $upcoming-appointment-is-past;
+
+      &:hover {
+        background-color: $upcoming-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $upcoming-appointment-hover;
+    }
   }
 
   &.status-9 {
     background-color: $completed-event;
+    &.is_past {
+      background-color: $completed-event-is-past;
+
+      &:hover {
+        background-color: $completed-event-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $completed-event-hover;
+    }
   }
 
   &.status-10 {
     background-color: $canceled-appointment;
     text-decoration: line-through;
+    &.is_past {
+      background-color: $canceled-appointment-is-past;
+
+      &:hover {
+        background-color: $canceled-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $canceled-appointment-hover;
+    }
   }
 
   &.status-14 {
     background-color: $missed-appointment;
-  }
+    &.is_past {
+      background-color: $missed-appointment-is-past;
 
-  &.is_past {
-    background-color: $past-appointment;
+      &:hover {
+        background-color: $missed-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $missed-appointment-hover;
+    }
   }
 }
 
@@ -12574,23 +12830,63 @@ h1.contact-list-name-label {
 
   &.status-8 {
     background-color: $upcoming-reminder;
+    &.is_past {
+      background-color: $upcoming-reminder-is-past;
+
+      &:hover {
+        background-color: $upcoming-reminder-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $upcoming-reminder-hover;
+    }
   }
 
   &.status-4 {
-    background-color: $completed-event
+    background-color: $completed-event;
+    &.is_past {
+      background-color: $completed-event-is-past;
+
+      &:hover {
+        background-color: $completed-event-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $completed-event-hover;
+    }
   }
 
   &.status-5 {
     background-color: $canceled-reminder;
     text-decoration: line-through;
+    &.is_past {
+      background-color: $canceled-reminder-is-past;
+
+      &:hover {
+        background-color: $canceled-reminder-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $canceled-reminder-hover;
+    }
   }
 
   &.status-3 {
     background-color: $missed-appointment;
-  }
+    &.is_past {
+      background-color: $missed-appointment-is-past;
 
-  &.is_past {
-    background-color: $past-reminder;
+      &:hover {
+        background-color: $missed-appointment-is-past-hover;
+      }
+    }
+
+    &:hover {
+      background-color: $missed-appointment-hover;
+    }
   }
 }
 
@@ -13916,6 +14212,65 @@ h1.contact-list-name-label {
   }
 }
 
+.steps-wrapper-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__step {
+    color: $grey-90;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    font-weight: bold;
+    flex: 1;
+    text-align: center;
+
+    &::after {
+      content: '';
+      position: absolute;
+      background-color: $grey-70;
+      height: 2px;
+      width: calc(100% - 4em);
+      top: 20%;
+      left: 50%;
+      margin-left: 2em;
+      transform: translateX(0%);
+    }
+
+    &:last-of-type::after {
+      display: none;
+    }
+
+    &__icon {
+      border: solid 1px $grey-70;
+      border-radius: 50%;
+      height: 26px;
+      width: 26px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 8px;
+      z-index: 1;
+    }
+
+    &--active .steps-wrapper-horizontal__step__icon {
+      background-color: $success;
+      color: $white;
+    }
+
+    &--completed .steps-wrapper-horizontal__step__icon {
+      background-color: $success;
+      color: $white;
+    }
+
+    &--completed::after {
+      background-color: $success;
+    }
+  }
+}
+
 .activity-graph {
   &__header {
     display: flex;
@@ -14863,21 +15218,10 @@ h1.contact-list-name-label {
     max-height: 64vh;
     padding: 1em;
     margin: 0 auto 2em auto;
-    border-radius: 14px;
     overflow: auto;
     flex-grow: 1;
 
     .sentiment {
-      width: 45%;
-
-      &-out {
-        margin-left: 0% !important;
-      }
-
-      &-in {
-        margin-left: 53% !important;
-      }
-
       &-circle {
         width: 20px;
         height: 20px;
@@ -14893,7 +15237,7 @@ h1.contact-list-name-label {
     }
 
     .message-box {
-      width: 45%;
+      width: 75%;
       border-radius: 10px;
       padding: .5em;
       font-size: 14px;
@@ -14907,7 +15251,7 @@ h1.contact-list-name-label {
 
       &-in {
         color: black;
-        margin-left: 53% !important;
+        margin-left: 26% !important;
       }
     }
   }
@@ -15201,11 +15545,50 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 
     .logo-image {
       max-width: 200px;
+      max-height: 50px;
       height: auto;
     }
   }
 
   &--icon {
     margin-right: 6px !important;
+  }
+}
+
+.rounded-circle-dot {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 100px !important;
+}
+
+hr {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.bulk-action-menu-dropdown {
+  font-size: .75rem;
+
+  svg {
+    margin-top: 0 !important;
+  }
+}
+
+.bulk-action-menu-dropdown-btn {
+  outline: none;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+}
+
+.calendar-event-list {
+  &-modal-title {
+    font-size: .875rem;
+    font-weight: 500;
+  }
+
+  &-modal {
+    .q-dialog__inner--minimized > div {
+      max-width: 660px !important;
+    }
   }
 }
