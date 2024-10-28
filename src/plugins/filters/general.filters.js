@@ -8,22 +8,27 @@ import * as AgentStatus from '../../constants/agent-status'
 /**
  * Convert to uppercase
  * @param {string} text
- * @returns {string|*|string|string}
+ * @returns {string}
  */
 const toUpperCase = (text) => {
   if (text) {
     return text.toUpperCase()
   }
 
-  return ''
+  return text
 }
 
+/**
+ * Convert to lowercase
+ * @param {string} text
+ * @returns {string}
+ */
 const toLowerCase = (text) => {
   if (text) {
     return text.toLowerCase()
   }
 
-  return ''
+  return text
 }
 
 /**
@@ -36,7 +41,7 @@ const capitalize = (text) => {
     return _.capitalize(text)
   }
 
-  return ''
+  return text
 }
 
 /**

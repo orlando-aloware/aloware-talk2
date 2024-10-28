@@ -9,22 +9,25 @@
                     data-testid="communication-audio-waveform"
                     @ready="loading = false">
           </waveform>
-          <p class="text-black _600">
-            We are processing the {{ typeString | toLowerCase }}. It will be shortly available for download.
-          </p>
-          <download-button v-if="fileUuid && isMigrated"
-                           data-testid="communication-audio-download-button"
-                           is-simple
-                           :communication-id="communication.id"
-                           :filename="filename"
-                           :file-mime-type="mimeType"
-                           :file-uuid="fileUuid"/>
-          <transcription-modal button-text="Show Smart Transcription"
-                               data-testid="communication-audio-transcription-modal"
-                               :communication="communication"
-                               :single-button="true"
-                               v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
+          <download-button
+            v-if="fileUuid && isMigrated"
+            data-testid="communication-audio-download-button"
+            is-simple
+            :communication-id="communication.id"
+            :filename="filename"
+            :file-mime-type="mimeType"
+            :file-uuid="fileUuid"/>
+          <transcription-modal
+            v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"
+            button-text="Show Smart Transcription"
+            data-testid="communication-audio-transcription-modal"
+            :communication="communication"
+            :single-button="true"/>
         </div>
+        <p class="text-black _600"
+          v-if="fileUuid && !isMigrated">
+          We are processing the {{ typeString | toLowerCase }}. It will be shortly available for download.
+        </p>
       </div>
     </div>
     <span class="text-grey-900 record-was-deleted-label"
