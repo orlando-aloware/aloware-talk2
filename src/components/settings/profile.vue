@@ -269,7 +269,8 @@
         <b-col sm="12" md="6">
           <b-form-group label="Phone Number"
                         class="form-label mb-0">
-            <user-campaign-selector :user="user"
+            <user-campaign-selector :key="contactCardCampaignSelectorKey"
+                                    :user="user"
                                     v-model.trim="user.contact_card_campaign_id"
                                     @select="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')">
             </user-campaign-selector>
@@ -626,7 +627,8 @@ export default {
       ],
       AnswerTypes,
       Roles,
-      SettingsMap
+      SettingsMap,
+      contactCardCampaignSelectorKey: 0
     }
   },
 
@@ -682,6 +684,12 @@ export default {
       this.user.password = ''
       this.user.password_confirmation = ''
       this.updateFormValidity()
+    },
+
+    'connectedCampaigns': function () {
+      this.$nextTick(() => {
+        this.contactCardCampaignSelectorKey++
+      })
     }
   }
 }
