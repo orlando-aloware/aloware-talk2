@@ -31,7 +31,7 @@ export default {
     },
 
     getHubspotContactLink (contact) {
-      return this.getHubspotContactBaseLink() + 'contact/' + contact.id
+      return contact?.integration_data?.hubspot?.link
     }
   }
 }

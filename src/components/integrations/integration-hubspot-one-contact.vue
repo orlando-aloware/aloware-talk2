@@ -4,7 +4,7 @@
                     data-testid='integration-hubspot-card-section-1'>
       <a class="external-contact-hubspot-link-icon color-primary"
          target='_blank'
-         :href="getHubspotContactBaseLink() + 'contact/' + integrationData.id">
+         :href="integrationData.link">
         <i class="fa fa-external-link" aria-hidden="true"/>
       </a>
       <p class='mb-0 text-bold' v-if='isPrimary && hasDuplicates'>
@@ -56,7 +56,7 @@
           <q-card-section class='p-0'>
             <h6 class='mb-2'>
               <b-link class='deals-title ml-0'
-                      :href="getHubspotContactBaseLink() + 'deal/' + deal.id"
+                      :href="deal.link"
                       data-testid='integration-hubspot-deal-link'
                       target='_blank'>
                 {{ deal.properties.dealname }}
