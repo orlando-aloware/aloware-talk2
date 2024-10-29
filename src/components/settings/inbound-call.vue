@@ -559,10 +559,19 @@ export default {
         const key = Object.keys(value)[0]
 
         value[key].forEach((day, index) => {
-          if (day.isOpen && day.open !== '24hrs' && !!day.open && (day.close === '24hrs' || !day.close)) {
-            const minutesPerHour = 60
-            const additionalHours = 9
-            const maxHours = 23
+          const minutesPerHour = 60
+          const additionalHours = 9
+          const maxHours = 23
+
+          if (day.open === '' && index !== 0) {
+            const [hoursClose, minutesClose] = [parseInt(value[key][index - 1].close.substring(0, 2), 10), parseInt(value[key][index - 1].close.substring(2, 4), 10)]
+            const totalMinutesOpen = hoursClose * minutesPerHour + minutesClose + this.timeIncrement
+            day.open = this.convertTimeToString(totalMinutesOpen)
+          }
+
+          const validDayOpen = day.isOpen && day.open !== '24hrs' && !!day.open && (day.close === '24hrs' || !day.close)
+
+          if (validDayOpen) {
             const [hours, minutes] = [parseInt(day.open.substring(0, 2), 10), parseInt(day.open.substring(2, 4), 10)]
 
             let totalMinutes = hours * minutesPerHour + minutes + (additionalHours * minutesPerHour)
@@ -572,10 +581,7 @@ export default {
               totalMinutes = maxMinutes
             }
 
-            let newHours = Math.floor(totalMinutes / 60)
-            let newMinutes = totalMinutes % 60
-
-            let closeTime = String(newHours).padStart(2, '0') + String(newMinutes).padStart(2, '0')
+            let closeTime = this.convertTimeToString(totalMinutes)
 
             if (day.open === closeTime) {
               value[key][index].close = '2400'
@@ -661,6 +667,14 @@ export default {
 
       this.updateFormValidity()
     },
+
+    convertTimeToString (totalMinutes) {
+      let newHours = Math.floor(totalMinutes / 60)
+      let newMinutes = totalMinutes % 60
+
+      return String(newHours).padStart(2, '0') + String(newMinutes).padStart(2, '0')
+    },
+
     resetDisableGeoRouting (value) {
       // If the form is saved without operating_states_limits for any country, return to disabled
       let country = (this.user.country || 'us').toLowerCase()
