@@ -448,6 +448,7 @@ const SettingsMap = {
     hash_keyword: 'company-contact-card',
     visible: true
   }
+
 }
 
 export default SettingsMap
