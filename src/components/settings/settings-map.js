@@ -440,8 +440,14 @@ const SettingsMap = {
     route: '/settings/profile',
     hash_keyword: 'contact-card',
     visible: true
+  },
+  'company_contact_card': {
+    title: 'Company Contact Card',
+    description: '',
+    route: '/settings/profile',
+    hash_keyword: 'company-contact-card',
+    visible: true
   }
-
 }
 
 export default SettingsMap
