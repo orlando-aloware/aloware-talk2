@@ -713,6 +713,10 @@ export default {
         })
       },
 
+      removeContactFromList (id, body = {}) {
+        return window.axios.post(`${suffixV2}contacts/${id}/remove-from-lists`, body)
+      },
+
       exportCommunications
     },
 
@@ -781,10 +785,6 @@ export default {
           contact_list_id: contactListId,
           contacts: contacts
         })
-      },
-
-      removeContactFromAllPowerDialerLists (contactId) {
-        return window.axios.post(`${suffixV2}power-dialer-list-items/remove-contact/${contactId}`)
       }
     },
 
