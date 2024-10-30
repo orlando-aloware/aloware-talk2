@@ -2,22 +2,36 @@
   <div class="row no-wrap q-pa-md text-center">
     <b-col sm="12" md="12">
       <div class="mt-2 notice" data-testid="add-contact-card-message">
-        <p class="mb-0">
-          <router-link
-            :to="{ path: '/settings/profile' }"
-            @click.native="onContactCardLinkClicked"
-          >
+        <p>
+          <router-link :to="{ path: '/settings/profile' }"
+                       @click.native="onContactCardLinkClicked">
             Click here
           </router-link>
-          to change the name/phone number of your contact card.
+          to change the name/phone number of the contact card
         </p>
       </div>
     </b-col>
+
+    <b-col sm="12" md="12">
+      <q-select use-input
+                dense
+                outlined
+                input-debounce="100"
+                option-value="id"
+                option-label="name"
+                behavior="menu"
+                label="Select type"
+                :options="contactCardTypes"
+                v-model="type">
+      </q-select>
+    </b-col>
+
     <b-col sm="12" md="12">
       <button class="btn btn-sm btn-primary mt-2"
               data-testid="add-contact-card-button"
+              :disabled="type === ''"
               @click="onContactCardSelected">
-        Send contact card as .vcf file
+        Send {{  type.name?.toLowerCase() }} card as .vcf file
       </button>
     </b-col>
 
@@ -34,7 +48,7 @@
       <p data-testid="add-contact-card-error"
          class="error-notice mt-2"
          v-if="hasError && !isUploading">
-        Error while generating contact card...
+        Error while generating {{ type.name?.toLowerCase() }} card...
       </p>
     </b-col>
   </div>
@@ -67,7 +81,12 @@ export default {
     return {
       isUploading: false,
       uploadPercentage: 0,
-      hasError: false
+      hasError: false,
+      contactCardTypes: [
+        { id: 'contact', name: 'Contact' },
+        { id: 'company', name: 'Company' }
+      ],
+      type: ''
     }
   },
 
@@ -75,7 +94,9 @@ export default {
     ...mapGetters('auth', ['user']),
 
     contactCardName () {
-      return this.user?.profile?.contact_card_name || DEFAULT_CONTACT_NAME
+      return this.type.id === 'contact'
+        ? this.user?.profile?.contact_card_name
+        : this.user?.profile?.company_contact_card_name || DEFAULT_CONTACT_NAME
     }
   },
 
@@ -90,10 +111,15 @@ export default {
     },
 
     generateContactCard () {
-      const vCardData = VCARD_TEMPLATE(
+      const vCardData = this.type.id === 'contact'
+        ? VCARD_TEMPLATE(
         this.user?.profile?.contact_card_name || '',
         this.user?.profile?.contact_card_phone_number || ''
-      )
+        )
+        : VCARD_TEMPLATE(
+        this.user?.profile?.company_contact_card_name || '',
+        this.user?.profile?.company_contact_card_phone_number || ''
+        )
 
       const fileName = `${this.contactCardName.toLowerCase().replace(/\s+/g, '-')}.vcf`
       const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' })
