@@ -12501,7 +12501,6 @@ h1.contact-list-name-label {
           display: flex !important;
           align-items: flex-start;
           justify-content: center;
-          font-weight: 400 !important;
         }
 
         .dhx_cal_today_button.dhx_cal_nav_button,
@@ -12535,10 +12534,6 @@ h1.contact-list-name-label {
         .time-column {
           width: 50%;
           text-align: center;
-
-          &:hover {
-            text-decoration: underline;
-          }
         }
 
         .current-time {
@@ -12584,6 +12579,10 @@ h1.contact-list-name-label {
         text-decoration: none;
         width: 100%;
         cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }

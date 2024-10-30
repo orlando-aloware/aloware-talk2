@@ -310,7 +310,7 @@ export default {
         return 70
       }
 
-      return 150
+      return 130
     },
 
     getMoreCount (count) {
