@@ -142,10 +142,33 @@ export default {
 
       let state = Scheduler.getState()
       this.renderEvents(state)
+
+      // Testing
+      this.$nextTick(() => {
+        this.addTimeZoneHeaderRow()
+      })
+    })
+
+    // Testing
+    Scheduler.attachEvent('onBeforeViewChange', (oldMode, oldDate, mode, date) => {
+      this.isHourScaleHeaderAdded = false
+      return true
     })
 
     Scheduler.init(this.$refs.scheduler, new Date(), 'month')
     Scheduler.parse(this.$props.events)
+
+    // Testing
+    Scheduler.attachEvent('onTemplatesReady', () => {
+      this.addTimeZoneHeaderRow()
+    })
+
+    // Testing
+    Scheduler.attachEvent('onAfterSchedulerResize', () => {
+      this.$nextTick(() => {
+        this.addTimeZoneHeaderRow()
+      })
+    })
 
     this.$refs.scheduler.addEventListener('click', this.handleMoreLink)
     this.$refs.scheduler.addEventListener('click', this.handleDayLabelClick)
@@ -188,6 +211,8 @@ export default {
     },
 
     updateScheduler () {
+      // Testing
+      this.isHourScaleHeaderAdded = false
       Scheduler.updateView()
     },
 
@@ -310,7 +335,7 @@ export default {
         return 70
       }
 
-      return 150
+      return 160
     },
 
     getMoreCount (count) {

@@ -4,7 +4,9 @@ import moment from 'moment'
 export default {
   data () {
     return {
-      browserTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+      browserTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      // Testing
+      isHourScaleHeaderAdded: false
     }
   },
 
@@ -48,7 +50,18 @@ export default {
     },
 
     getLocalTimeAcronym (date) {
-      return date?.format('z')
+      // return date?.format('z')
+      return this.getTimeZoneAbbreviation(date, this.browserTimeZone)
+    },
+
+    // Testing
+    getTimeZoneAbbreviation (date, timeZone) {
+      if (!date) return null
+      const options = { timeZoneName: 'short', timeZone }
+      const formatter = new Intl.DateTimeFormat('en-US', options)
+      const parts = formatter.formatToParts(date.toDate()) // Convert moment to Date object
+      const timeZoneName = parts.find(part => part.type === 'timeZoneName').value
+      return timeZoneName
     },
 
     getHourScaleTemplate (date, Scheduler) {
@@ -66,7 +79,8 @@ export default {
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
         const dateInCurrentTimezone = moment(adjustedDate).tz(this.currentTimezone)
         const currentTimezoneTime = dateInCurrentTimezone.format(this.profile.time_format === 1 ? 'h A' : 'H:00')
-        const currentTimezoneAcronym = dateInCurrentTimezone.format('z')
+        // const currentTimezoneAcronym = dateInCurrentTimezone.format('z')
+        const currentTimezoneAcronym = this.getTimeZoneAbbreviation(dateInCurrentTimezone, this.currentTimezone)
 
         return `
           <div class="hour-label" data-hour="${dateInBrowserTimeZone.hour()}">
@@ -89,6 +103,46 @@ export default {
       `
     },
 
+    addTimeZoneHeaderRow () {
+      if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
+        // Get the scheduler container
+        const schedulerContainer = this.$refs.scheduler
+
+        // Get a date to use for obtaining time zone abbreviations
+        const date = new Date()
+
+        // Get time zone abbreviations
+        const dateInBrowserTimeZone = moment(date).tz(this.browserTimeZone)
+        const localTimeAcronym = this.getLocalTimeAcronym(dateInBrowserTimeZone)
+
+        const dateInCurrentTimezone = moment(date).tz(this.currentTimezone)
+        const currentTimezoneAcronym = this.getTimeZoneAbbreviation(dateInCurrentTimezone, this.currentTimezone)
+
+        // Find the container of the hour scale
+        const hourScaleContainer = schedulerContainer.querySelector('.dhx_scale_holder')
+        if (hourScaleContainer) {
+          // Create the header row
+          const headerRow = document.createElement('div')
+          headerRow.className = 'hour-label header-row'
+
+          const currentTimeZoneDiv = document.createElement('div')
+          currentTimeZoneDiv.className = 'time-column current-time'
+          currentTimeZoneDiv.textContent = currentTimezoneAcronym || ''
+
+          const localTimeZoneDiv = document.createElement('div')
+          localTimeZoneDiv.className = 'time-column local-time'
+          localTimeZoneDiv.textContent = localTimeAcronym || ''
+          console.log('localTimeZoneDiv', localTimeZoneDiv)
+          console.log('currentTimeZoneDiv', currentTimeZoneDiv)
+          headerRow.appendChild(currentTimeZoneDiv)
+          headerRow.appendChild(localTimeZoneDiv)
+
+          // Insert the header row at the top of the hour scale container
+          hourScaleContainer.insertBefore(headerRow, hourScaleContainer.firstChild)
+        }
+      }
+    },
+
     formatDateTime (date, timezone) {
       if (!date) {
         return {
@@ -102,7 +156,8 @@ export default {
       return {
         time: momentDate.format(this.timeFormat),
         date: momentDate.format('MM-DD'),
-        acronym: momentDate.format('z')
+        // acronym: momentDate.format('z')
+        acronym: this.getTimeZoneAbbreviation(momentDate, timezone)
       }
     },
 
