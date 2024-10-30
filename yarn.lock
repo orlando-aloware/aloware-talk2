@@ -13806,7 +13806,7 @@ vue-at@^2.5.0-beta:
 
 "vue-business-hours@github:aloware/vue-business-hours#develop":
   version "1.4.2"
-  resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/1ccd641ef7656daa3400eeeffa9240bfef2cdf0e"
+  resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/14f490b6ff41bb7162e5f4fedfb8eccdc49b7955"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.26"
     "@fortawesome/free-solid-svg-icons" "^6.5.2"
