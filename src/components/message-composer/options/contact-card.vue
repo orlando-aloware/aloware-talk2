@@ -31,7 +31,7 @@
               data-testid="add-contact-card-button"
               :disabled="type === ''"
               @click="onContactCardSelected">
-        Send {{  type.name?.toLowerCase() }} card as .vcf file
+        Send {{ typeName }} card as .vcf file
       </button>
     </b-col>
 
@@ -48,7 +48,7 @@
       <p data-testid="add-contact-card-error"
          class="error-notice mt-2"
          v-if="hasError && !isUploading">
-        Error while generating {{ type.name?.toLowerCase() }} card...
+        Error while generating {{ typeName }} card...
       </p>
     </b-col>
   </div>
@@ -58,7 +58,6 @@
 import { mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
-const DEFAULT_CONTACT_NAME = 'contact-card'
 const VCARD_TEMPLATE = (name, phone) => [
   'BEGIN:VCARD',
   'VERSION:3.0',
@@ -93,10 +92,15 @@ export default {
   computed: {
     ...mapGetters('auth', ['user']),
 
+    typeName () {
+      return this.type.name?.toLowerCase() || ''
+    },
+
     contactCardName () {
-      return this.type.id === 'contact'
+      const cardName = this.type.id === 'contact'
         ? this.user?.profile?.contact_card_name
-        : this.user?.profile?.company_contact_card_name || DEFAULT_CONTACT_NAME
+        : this.user?.profile?.company_contact_card_name
+      return cardName || 'contact-card'
     }
   },
 
@@ -106,20 +110,20 @@ export default {
     },
 
     onContactCardSelected () {
-      const file = this.generateContactCard()
+      const file = this.createVCardFile()
       this.uploadVCard(file)
     },
 
-    generateContactCard () {
-      const vCardData = this.type.id === 'contact'
-        ? VCARD_TEMPLATE(
-        this.user?.profile?.contact_card_name || '',
-        this.user?.profile?.contact_card_phone_number || ''
-        )
-        : VCARD_TEMPLATE(
-        this.user?.profile?.company_contact_card_name || '',
-        this.user?.profile?.company_contact_card_phone_number || ''
-        )
+    createVCardFile () {
+      const name = this.type.id === 'contact'
+        ? this.user?.profile?.contact_card_name
+        : this.user?.profile?.company_contact_card_name
+
+      const phone = this.type.id === 'contact'
+        ? this.user?.profile?.contact_card_phone_number
+        : this.user?.profile?.company_contact_card_phone_number
+
+      const vCardData = VCARD_TEMPLATE(name, phone)
 
       const fileName = `${this.contactCardName.toLowerCase().replace(/\s+/g, '-')}.vcf`
       const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' })
