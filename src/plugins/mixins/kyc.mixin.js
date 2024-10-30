@@ -211,7 +211,6 @@ export default _.merge({
     },
 
     isCanadaLine (selectedLine) {
-      console.log(Array.isArray(selectedLine?.incoming_numbers))
       return selectedLine?.incoming_numbers?.filter(number => number.country === 'CA').length > 0
     }
   }

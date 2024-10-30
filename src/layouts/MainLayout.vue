@@ -1267,19 +1267,16 @@ export default {
       }
 
       if (url.indexOf('alowaretalk:') > -1) {
-        if (url.indexOf('contact:') > -1) {
-          const phoneNumber = action.replace('contact:', '')
-
+        if (url.indexOf('contact:') > -1 || url.indexOf('contact-') > -1) {
+          const phoneNumber = action.replace(/contact[:-]/, '')
           this.$VueEvent.fire('add_contact', {
             phone_number: this.$options.filters.fixPhone(phoneNumber)
           })
-
           return
         }
 
-        if (url.indexOf('call:') > -1) {
-          const phoneNumber = action.replace('call:', '')
-
+        if (url.indexOf('call:') > -1 || url.indexOf('call-') > -1) {
+          const phoneNumber = action.replace(/call[:-]/, '')
           return this.sendCall(phoneNumber)
         }
       }

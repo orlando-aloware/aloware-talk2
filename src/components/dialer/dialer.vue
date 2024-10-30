@@ -405,7 +405,7 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.last_call) {
+      if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
         return
       }
 
@@ -782,6 +782,7 @@ export default {
         }
 
         this.setWarnings(this.warnings)
+        this.saveCallIssue(warningName, warningData)
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_WARNING_CLEARED, (warningName) => {
@@ -1646,6 +1647,37 @@ export default {
       }
 
       this.makeCall('call:' + communication.id, communication.campaignId)
+    },
+
+    saveCallIssue (warningName, warningData) {
+      if (this.dialer.communication && warningData) {
+        const {
+          samples,
+          ...dataCallIssue
+        } = warningData
+
+        try {
+          // Ensure that the data can be safely converted to JSON
+          const dataString = JSON.stringify(dataCallIssue)
+          const params = {
+            event_name: warningName,
+            communication_id: this.dialer.communication.id,
+            data: dataString
+          }
+
+          // Post call, but handle any errors gracefully
+          this.$axios.post('/api/v2/call-quality-events', params)
+            .catch(err => {
+              console.error('Error saving call issue:', err)
+              this.$handleErrors(err.response)
+            })
+        } catch (error) {
+          console.error('Invalid data for call issue:', error)
+          // Handle the error
+        }
+      } else {
+        console.warn('Warning: Missing required data for saving call issue.')
+      }
     },
 
     ...mapActions([

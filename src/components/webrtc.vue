@@ -56,6 +56,12 @@ export default {
     campaignId: {
       type: Number,
       required: false
+    },
+
+    isAlwaysAskModeEnabled: {
+      default: true,
+      type: Boolean,
+      required: false
     }
   },
 
@@ -87,7 +93,9 @@ export default {
       }
 
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
-      return this.campaignId === null && !isCallInProgress.includes(this.dialer?.currentStatus)
+
+      return (!this.campaignId || (this.campaignId && this.isAlwaysAskModeEnabled)) &&
+        !isCallInProgress.includes(this.dialer?.currentStatus)
     }
   },
 
