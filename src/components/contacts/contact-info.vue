@@ -195,7 +195,7 @@
                       size="sm"
                       class="custom-action-button my-1"
                       data-testid="contact-info-remove-power-dialer-button"
-                      @click="removeFromPowerDialerLists">
+                      @click="removeContactFromPowerDialerLists">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-remove-power-dialer-tooltip"
                            self="center middle">
@@ -255,11 +255,11 @@
                              :contact="contact"
                              v-if="isMergeContactOpen">
         </merge-contact-modal>
-        <power-dialer-remove-contact-from-lists-confirmation :contact="contact"
-                                                             data-testid="contact-info-power-dialer-remove-contact-from-lists-confirmation"
-                                                             @close="onClosePowerDialerRemoveContactFromListsConfirmation"
-                                                             @confirm="onClosePowerDialerRemoveContactFromListsConfirmation"
-                                                             @error="onErrorPowerDialerRemoveContactFromListsConfirmation"/>
+        <contact-remove-from-lists-confirmation :contact="contact"
+                                                data-testid="contact-remove-from-lists-confirmation"
+                                                @close="onCloseContactRemoveFromListsConfirmation"
+                                                @confirm="onCloseContactRemoveFromListsConfirmation"
+                                                @error="onErrorContactRemoveFromLists"/>
     </b-card>
 </template>
 
@@ -278,7 +278,7 @@ import AppointmentFormModal from 'src/components/appointments/appointment-form-m
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
-import PowerDialerRemoveContactFromListsConfirmation from 'src/components/power-dialer/power-dialer-remove-contact-from-lists-confirmation.vue'
+import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
 import { aclMixin, simpsocialMixin, timezoneCheckMixin, integrationMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
@@ -311,7 +311,7 @@ export default {
     AppointmentFormModal,
     PowerDialerAddModal,
     MergeContactModal,
-    PowerDialerRemoveContactFromListsConfirmation,
+    ContactRemoveFromListsConfirmation,
     PencilOIcon,
     AddCallIcon,
     CallRemoveIcon,
@@ -477,16 +477,16 @@ export default {
       })
     },
 
-    removeFromPowerDialerLists () {
-      this.$bvModal.show('power-dialer-remove-contact-from-lists-confirmation')
+    removeContactFromPowerDialerLists () {
+      this.$bvModal.show('contact-remove-from-lists-confirmation')
     },
 
-    onClosePowerDialerRemoveContactFromListsConfirmation () {
-      this.$bvModal.hide('power-dialer-remove-contact-from-lists-confirmation')
+    onCloseContactRemoveFromListsConfirmation () {
+      this.$bvModal.hide('contact-remove-from-lists-confirmation')
     },
 
-    onErrorPowerDialerRemoveContactFromListsConfirmation (error) {
-      this.$bvModal.hide('power-dialer-remove-contact-from-lists-confirmation')
+    onErrorContactRemoveFromLists (error) {
+      this.$bvModal.hide('contact-remove-from-lists-confirmation')
       console.log('error', error)
       if (!error?.response) {
         return
