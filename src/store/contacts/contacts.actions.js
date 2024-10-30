@@ -250,10 +250,6 @@ export default {
     commit('ADD_POWER_DIALER_OPEN', isOpen)
   },
 
-  addMergeContactOpen: ({ commit }, isOpen) => {
-    commit('ADD_MERGE_CONTACT_OPEN', isOpen)
-  },
-
   enrollSequenceOpen: ({ commit }, isOpen) => {
     commit('ENROLL_SEQUENCE_OPEN', isOpen)
   },
