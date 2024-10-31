@@ -41,6 +41,17 @@
                        button-text="Modify Tags"
                        :entity-object="contact"
                        :category="TagCategories.CAT_CONTACTS"/>
+          <contact-lists-card title="Public Lists"
+                         data-testid="contact-details-public-lists"
+                         :contact="contact"
+                         :lists="contact.contact_lists"
+          />
+          <contact-lists-card title="Static Lists"
+                         data-testid="contact-details-public-lists"
+                         :contact="contact"
+                         :lists="contact.contact_lists"
+          />
+
           <contact-notes v-if="contact"
                          :contact="contact"
                          data-testid="contact-details-notes"
@@ -67,6 +78,7 @@
 <script>
 import ContactPhones from 'src/components/contacts/contact-phones'
 import ContactInfo from 'src/components/contacts/contact-info'
+import ContactListsCard from 'src/components/contacts/contact-lists-card'
 import ContactNotes from 'src/components/contacts/contact-notes'
 import ContactActivityCounts from 'src/components/contacts/contact-activity-counts'
 import ContactLines from 'src/components/contacts/contact-lines'
@@ -141,6 +153,7 @@ export default {
     ContactRingGroups,
     ContactLines,
     ContactActivityCounts,
+    ContactListsCard,
     ContactNotes,
     ContactInfo,
     ContactPhones,

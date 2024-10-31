@@ -1,4 +1,3 @@
-
 <template>
   <b-card class="border-0 contact-lists-card"
           data-testid="contact-lists-card">
@@ -95,20 +94,32 @@
           No available lists.
         </div>
       </div>
+    <div class="contact-lists-card-header">
+      <h4>{{ title }}</h4>
     </div>
-    <div id="contact-list-card-footer"
-         class="d-flex justify-content-between">
+    <div class="contact-lists-card-body">
+      <div v-for="list in lists" :key="list.id" class="d-flex align-items-start">
+        <list-icon :key="'list_icon_' + list.id"/>
+        <div class="pl-6">{{ list.name }}</div>
+      </div>
+    </div>
+    <div class="notes mt-1"
+         style="min-height: 15px;"
+         data-testid="contact-update-lists"
+         @click="onUpdate">
+    </div>
+    <div class="contacts-list-card-footer">
+
       <div class="generic-multi-select">
         <div class="list-wrapper">
-          <div class="w-100 mt-1"
-               v-if="!showAvailableLists">
+          <div class="w-100 mt-1">
             <b-link href="#"
                     class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
-                    @click="addToList">
+                    @click="onUpdate">
               <slot name="button">
                 <pencil-o-icon />
                 <span class="ml-1">
-              Add to List
+              Modify Lists
             </span>
               </slot>
             </b-link>
@@ -183,10 +194,12 @@
         </div>
       </div>
     </div>
+
   </b-card>
 </template>
 
 <script>
+
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import ListIcon from 'components/icons/list-icon.vue'
 import SearchIcon from 'components/icons/search-icon.vue'
