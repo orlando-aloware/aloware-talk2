@@ -10,8 +10,16 @@
 
     <dialer-listeners @user-logged-in="handleUserLogin"
                       @agent-status-updated="handleAgentStatusUpdate"/>
+
     <div class="p-3"
-         v-if="showAlertAgentOnCall">
+         v-if="criticalErrorHappened">
+      <p><strong>Something went wrong</strong></p>
+      <hr>
+      <p>For some reason we can not proceed with this session. Try to refresh the page and try again.</p>
+    </div>
+
+    <div class="p-3"
+         v-else-if="showAlertAgentOnCall">
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
@@ -102,6 +110,7 @@ export default {
           },
           onDialNumber: async (event) => {
             console.log('DialNumber:', event)
+            this.criticalErrorHappened = false
             if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
               await new Promise(resolve => setTimeout(resolve, 1000))
             }
@@ -110,19 +119,13 @@ export default {
 
             this.showAlertCallFinished = false
 
-            if (event.phone_number) {
-              this.findDefaultOutboundCampaign()
-              console.log('Assign')
-              this.setHubspotDialNumber(event)
-              console.log('assigned', this.hubspotDialNumber)
-              console.log('store', this.$store.state)
-              if (this.timeout) {
-                clearTimeout(this.timeout)
-              }
-              if (this.isAlwaysAskModeEnabled()) {
-                console.log('Always ask mode enabled')
-                this.handleDialNumber()
-              }
+            this.findDefaultOutboundCampaign()
+            this.setHubspotDialNumber(event)
+            if (this.timeout) {
+              clearTimeout(this.timeout)
+            }
+            if (this.isAlwaysAskModeEnabled()) {
+              this.handleDialNumber()
             }
           },
           onVisibilityChanged: (data) => {
@@ -142,6 +145,7 @@ export default {
       defaultOutboundCampaignId: null,
       previousOutboundCallingMode: null,
       showAlertCallFinished: false,
+      criticalErrorHappened: false,
       authProfile: null,
       listeners: {
         userLoggedIn: null,
@@ -170,7 +174,11 @@ export default {
     },
 
     isLoadingDialer () {
-      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) && !this.showAlertAgentOnCall && !this.showAlertCallFinished && !this.dialer?.parkedCall
+      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
+        !this.showAlertAgentOnCall &&
+        !this.showAlertCallFinished &&
+        !this.dialer?.parkedCall &&
+        !this.criticalErrorHappened
     }
   },
 
@@ -265,20 +273,18 @@ export default {
       await this.$axios.post('/api/v1/integrations/hubspot/find-contact', {
         params: this.hubspotDialNumber
       }).then(res => {
-        console.log('Contact:', res)
         this.setContactDetails(res.data)
         this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
         this.handleCall()
       }).catch(err => {
-        console.log('Error: get contact', err)
         this.$handleErrors(err.response)
+        this.criticalErrorHappened = true
       })
     },
 
     async handleDialNumber () {
       console.log('Handle')
-      console.log('Dialer CurrentStatus:', this.dialer?.currentStatus)
-      console.log('Profile AgentStatus', this.profile?.agent_status)
+      console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
         return
