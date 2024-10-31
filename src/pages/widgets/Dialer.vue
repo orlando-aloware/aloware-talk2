@@ -15,7 +15,7 @@
          v-if="criticalErrorHappened">
       <p><strong>Something went wrong</strong></p>
       <hr>
-      <p>For some reason we can not proceed with this session. Try to refresh the page and try again.</p>
+      <p>For some reason we couldn’t complete the call. Please refresh the page and try again.</p>
     </div>
 
     <div class="p-3"
