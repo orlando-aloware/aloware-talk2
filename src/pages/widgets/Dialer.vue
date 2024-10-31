@@ -29,6 +29,7 @@
       :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
+      :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
       v-else-if="allowed"
       @callConnected="handleCallConnectedEvent"
       @callCompleted="handleCallCompletedEvent"
@@ -48,6 +49,7 @@ import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-m
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
+import useContactApi from 'src/shared/composables/use-contact-api.composable'
 
 export default {
   name: 'Dialer',
@@ -149,6 +151,15 @@ export default {
       isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY']
     }
   },
+
+  setup () {
+    const { getLastUsedCallLineByContactId } = useContactApi()
+
+    return {
+      getLastUsedCallLineByContactId
+    }
+  },
+
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
@@ -408,6 +419,7 @@ export default {
 
     findDefaultOutboundCampaign () {
       if (this.isAlwaysAskModeEnabled()) {
+        setTimeout(() => this.setTheLastUsedCallLine(), 1000)
         return
       }
 
@@ -425,10 +437,13 @@ export default {
     },
 
     isAlwaysAskModeEnabled () {
-      return this.previousOutboundCallingMode &&
-        this.authProfile &&
-        this.previousOutboundCallingMode === this.authProfile.outbound_calling_mode &&
-        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+      if (!this.authProfile) return false
+
+      const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
+
+      const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+
+      return isCompanyAlwaysAsk || isUserAlwaysAsk
     },
 
     updatePreviousOutboundCallingMode () {
@@ -503,6 +518,24 @@ export default {
 
       this.$VueEvent.fire('resetCall')
       this.handleCallCompletedEvent(true)
+    },
+
+    async setTheLastUsedCallLine () {
+      if (!this.contactId) {
+        const contact = await this.searchContact(this.hubspotPhoneNumber)
+        if (contact) {
+          this.contactId = contact.contact_id
+        }
+      }
+
+      if (this.campaignId || !this.contactId) return
+      try {
+        const data = await this.getLastUsedCallLineByContactId(this.contactId)
+
+        this.handleChangeCampaignEvent(data.campaign_id)
+      } catch (error) {
+        this.$handleErrors(error.response)
+      }
     }
   },
 

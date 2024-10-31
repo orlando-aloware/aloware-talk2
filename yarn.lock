@@ -13804,9 +13804,9 @@ vue-at@^2.5.0-beta:
   resolved "https://registry.yarnpkg.com/vue-at/-/vue-at-2.5.1.tgz#4a977ffbcb5d6fbc18c402515407188a12e57b23"
   integrity sha512-c17Rn8vVTXp/rvWV76jNB2PVx534eqIAP5/Tv1twCt0ebtRPIgNaJJwSaoRVISQ6vM6m3+owmtpAG1qr5g9fyQ==
 
-"vue-business-hours@github:aloware/vue-business-hours#develop":
+"vue-business-hours@github:aloware/vue-business-hours":
   version "1.4.2"
-  resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/1ccd641ef7656daa3400eeeffa9240bfef2cdf0e"
+  resolved "https://codeload.github.com/aloware/vue-business-hours/tar.gz/14f490b6ff41bb7162e5f4fedfb8eccdc49b7955"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^1.2.26"
     "@fortawesome/free-solid-svg-icons" "^6.5.2"

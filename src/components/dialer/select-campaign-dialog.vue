@@ -48,14 +48,18 @@ export default {
     show: {
       type: Boolean,
       default: false
+    },
+    campaignId: {
+      type: Number,
+      default: null,
+      required: false
     }
   },
 
   data () {
     return {
       visible: false,
-      position: 'top',
-      campaignId: null
+      position: 'top'
     }
   },
 
