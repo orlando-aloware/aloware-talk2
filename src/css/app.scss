@@ -7996,6 +7996,27 @@ button.grey-90 {
 }
 
 .general-notification {
+  position: relative;
+
+  .q-notification__wrapper {
+    display: contents;
+  }
+
+  .download-button {
+    margin-top: 2px;
+  }
+
+  .close-button {
+    background: transparent;
+    border: none;
+
+    .q-btn__content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
   &.bg-green-10 {
     border: 1px solid $green-90;
   }
