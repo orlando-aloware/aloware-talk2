@@ -6,7 +6,6 @@
 <script>
 import Scheduler from 'dhtmlx-scheduler'
 import moment from 'moment'
-import { calendarMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
 const MAX_EVENTS_MONTH = 4
@@ -14,8 +13,6 @@ const MAX_EVENTS_MOBILE = 2
 
 export default {
   name: 'scheduler',
-
-  mixins: [calendarMixin],
 
   props: {
     events: {
@@ -65,7 +62,6 @@ export default {
     Scheduler.config.min_event_width = 60
     Scheduler.config.min_event_height = 20
     Scheduler.config.event_min_dy = 20
-    Scheduler.xy.scale_width = this.getScaleWidth()
 
     Scheduler.templates.week_date = function (start, end) {
       const startDate = moment(start)
@@ -113,19 +109,30 @@ export default {
     }.bind(this)
 
     Scheduler.templates.hour_scale = function (date) {
-      return this.getHourScaleTemplate(date, Scheduler)
+      const hour = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+      return `<div class="hour-label" data-hour="${moment(date).hour()}">${hour}</div>`
     }.bind(this)
 
-    Scheduler.templates.event_text = function (start, end, event) {
-      return this.getEventTextTemplate(start, end, event)
-    }.bind(this)
+    Scheduler.templates.event_date = function (date) {
+      const formatFunc = Scheduler.date.date_to_str(Scheduler.config.hour_date)
+      return formatFunc(date)
+    }
+
+    Scheduler.templates.event_bar_text = function (start, end, event) {
+      return event.text
+        ? event.text
+        : (event.contact.first_name || event.contact.last_name
+          ? `${event.contact.first_name || ''} ${event.contact.last_name || ''}`
+          : event.contact.phone_number)
+    }
+
+    Scheduler.templates.event_text = Scheduler.templates.event_bar_text
 
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
       if (e.target.classList.contains('custom-more-link') ||
         e.target.classList.contains('custom-expand-link') ||
         e.target.classList.contains('day-label') ||
-        e.target.classList.contains('hour-label') ||
-        e.target.classList.contains('time-column')) {
+        e.target.classList.contains('hour-label')) {
         return
       }
 
@@ -138,7 +145,6 @@ export default {
 
     Scheduler.attachEvent('onViewChange', (newView) => {
       this.setNavHeight(newView)
-      this.setSchedulerHeaderTableWidth(newView)
 
       let state = Scheduler.getState()
       this.renderEvents(state)
@@ -252,8 +258,7 @@ export default {
     },
 
     handleHourLabelClick (e) {
-      if (e.target.classList.contains('hour-label') ||
-        e.target.classList.contains('time-column')) {
+      if (e.target.classList.contains('hour-label')) {
         e.preventDefault()
         e.stopPropagation()
 
@@ -281,36 +286,6 @@ export default {
       }
 
       Scheduler.xy.nav_height = 0
-    },
-
-    setSchedulerHeaderTableWidth (currentView) {
-      if (!currentView || currentView !== 'week') {
-        return
-      }
-
-      const headerTableWeek = document.querySelector('.scheduler__header__table--week')
-      if (!headerTableWeek) {
-        return
-      }
-
-      if (this.isMobile) {
-        headerTableWeek.style.width = `calc(100% - ${this.getScaleWidth()}px)`
-        return
-      }
-
-      headerTableWeek.style.width = !this.timezoneIsDifferentThanBrowser ? `calc(100% - ${this.getScaleWidth()}px)` : `calc(100% - ${this.getScaleWidth()}px)`
-    },
-
-    getScaleWidth () {
-      if (this.isMobile) {
-        return 50
-      }
-
-      if (!this.timezoneIsDifferentThanBrowser) {
-        return 70
-      }
-
-      return 130
     },
 
     getMoreCount (count) {

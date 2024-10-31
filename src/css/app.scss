@@ -12424,13 +12424,13 @@ h1.contact-list-name-label {
 
         .dhx_event_move.dhx_title {
           padding: 0;
-          display: none;
         }
 
         .dhx_cal_event .dhx_body,
         .dhx_cal_event.dhx_cal_select_menu .dhx_body {
           padding: 0;
-          height: fit-content !important;
+          line-height: 19px !important;
+          height: 19px !important;
         }
 
         .dhx_event_resize.dhx_footer {
@@ -12545,26 +12545,6 @@ h1.contact-list-name-label {
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-
-        .time-column {
-          width: 50%;
-          text-align: center;
-        }
-
-        .current-time {
-          border-right: 1px solid #dcdfe6;
-        }
-
-        .event-content {
-          .event-time {
-            font-size: 10px;
-          }
-
-          .event-text {
-            font-size: 12px;
-            font-weight: 700;
-          }
         }
       }
 
@@ -14224,65 +14204,6 @@ h1.contact-list-name-label {
           background-color: $success;
         }
       }
-    }
-  }
-}
-
-.steps-wrapper-horizontal {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  &__step {
-    color: $grey-90;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    font-weight: bold;
-    flex: 1;
-    text-align: center;
-
-    &::after {
-      content: '';
-      position: absolute;
-      background-color: $grey-70;
-      height: 2px;
-      width: calc(100% - 4em);
-      top: 20%;
-      left: 50%;
-      margin-left: 2em;
-      transform: translateX(0%);
-    }
-
-    &:last-of-type::after {
-      display: none;
-    }
-
-    &__icon {
-      border: solid 1px $grey-70;
-      border-radius: 50%;
-      height: 26px;
-      width: 26px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 8px;
-      z-index: 1;
-    }
-
-    &--active .steps-wrapper-horizontal__step__icon {
-      background-color: $success;
-      color: $white;
-    }
-
-    &--completed .steps-wrapper-horizontal__step__icon {
-      background-color: $success;
-      color: $white;
-    }
-
-    &--completed::after {
-      background-color: $success;
     }
   }
 }

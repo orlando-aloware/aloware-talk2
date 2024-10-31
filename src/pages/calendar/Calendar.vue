@@ -59,7 +59,7 @@
           <b-button size="sm"
                     variant="light"
                     class="btn-white btn-rounded px-3 btn-calendar-today"
-                    v-if="view !== 'month'"
+                    v-if="view === 'day'"
                     @click.prevent="showAllEvents(gotoDate)">
             {{ isMobile ? 'Events' : 'List all events' }}
             <q-tooltip anchor="top middle">
@@ -154,8 +154,6 @@
                          :selected-hour="selectedHour"
                          :events="events"
                          :time-format="timeFormat"
-                         :view-mode="view"
-                         :current-date="currentDate"
                          v-model="isEventsModalOpen"
                          @open-event-modal="openEventModal" />
 

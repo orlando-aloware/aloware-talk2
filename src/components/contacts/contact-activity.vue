@@ -451,8 +451,7 @@ export default {
         'date_of_birth',
         'cnam_country',
         'cnam_state',
-        'cnam_city',
-        'custom_log'
+        'cnam_city'
       ],
       custom_audit_messages: {
         'is_dnc': [
@@ -719,11 +718,7 @@ export default {
     },
 
     generateCustomAuditMessageWithNotes (communication) {
-      const cleanedNotes = communication.notes ? communication.notes.replace(/\\"/g, '"') : ''
-      const notes = communication.property === 'custom_log'
-        ? ` ${cleanedNotes}`
-        : cleanedNotes ? ` (Reason: ${cleanedNotes})` : ''
-
+      const notes = communication.notes ? ` (Reason: ${communication.notes.replace(/\\"/g, '"')})` : ''
       return this.generateCustomAuditMessage(communication) + notes
     },
 
