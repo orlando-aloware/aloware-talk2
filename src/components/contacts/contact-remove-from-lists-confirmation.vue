@@ -45,8 +45,7 @@ export default {
 
     type: {
       type: Number,
-      default: POWER_DIALER_LIST,
-      required: true
+      default: POWER_DIALER_LIST
     }
   },
 
