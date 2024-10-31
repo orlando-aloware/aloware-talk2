@@ -98,7 +98,9 @@ export default function (/* { ssrContext } */) {
         error: {
           message: '',
           code: null
-        }
+        },
+        redialedTaskIds: [],
+        callSuccessfullyAnswered: false
       },
       warnings: [],
       shouldIntroduce: false,
@@ -295,7 +297,6 @@ export default function (/* { ssrContext } */) {
       isDatatableCountLoading: false,
       showedKycReloadDialog: false,
       isTrialBannerVisible: false,
-      isSimpsocialMigrationBannerVisible: true,
       currentTimezone: null,
       hubspotPhoneNumber: null,
       isRedirectedToHubspotWidget: false,
@@ -402,6 +403,18 @@ export default function (/* { ssrContext } */) {
 
       setDialerError ({ commit }, error) {
         commit('SET_DIALER_ERROR', error)
+      },
+
+      addDialerRedialedTaskId ({ commit }, taskId) {
+        commit('ADD_DIALER_REDIALED_TASK_ID', taskId)
+      },
+
+      clearDialerRedialedTaskIds ({ commit }) {
+        commit('CLEAR_DIALER_REDIALED_TASK_IDS')
+      },
+
+      setDialerCallSuccessfullyAnswered ({ commit }, status) {
+        commit('SET_DIALER_CALL_SUCCESSFULLY_ANSWERED', status)
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -904,10 +917,6 @@ export default function (/* { ssrContext } */) {
         commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
       },
 
-      setIsSimpsocialMigrationBannerVisible ({ commit }, value) {
-        commit('SET_IS_SIMPSOCIAL_MIGRATION_BANNER_VISIBLE', value)
-      },
-
       setCurrentTimezone ({ commit }, timezone) {
         commit('SET_CURRENT_TIMEZONE', timezone)
       },
@@ -1058,6 +1067,18 @@ export default function (/* { ssrContext } */) {
       SET_DIALER_ERROR (state, error) {
         state.dialer.error.message = error.message
         state.dialer.error.code = error.code
+      },
+
+      ADD_DIALER_REDIALED_TASK_ID (state, taskId) {
+        state.dialer.redialedTaskIds.push(taskId)
+      },
+
+      CLEAR_DIALER_REDIALED_TASK_IDS (state) {
+        state.dialer.redialedTaskIds = []
+      },
+
+      SET_DIALER_CALL_SUCCESSFULLY_ANSWERED (state, status) {
+        state.dialer.callSuccessfullyAnswered = status
       },
 
       SET_OLD_AGENT_STATUS (state, status) {
@@ -1727,10 +1748,6 @@ export default function (/* { ssrContext } */) {
 
       SET_IS_TRIAL_BANNER_VISIBLE (state, value) {
         state.isTrialBannerVisible = value
-      },
-
-      SET_IS_SIMPSOCIAL_MIGRATION_BANNER_VISIBLE (state, value) {
-        state.isSimpsocialMigrationBannerVisible = value
       },
 
       SET_CURRENT_TIMEZONE (state, timezone) {

@@ -154,7 +154,7 @@
 
           <hr>
 
-          <div v-if="enablePdListSelection">
+          <div v-if="mode === 'add-contact-list'">
             <label class="label mb-1 text-weight-bold"
                    data-testid="power-dialer-add-modal-conversion-options">
               Select Power Dialer List

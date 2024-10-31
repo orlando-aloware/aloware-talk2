@@ -328,6 +328,19 @@ export default _.merge({
       return false
     },
 
+    /**
+     * Decides if the AloAi should be shown.
+     *
+     * @return {boolean}
+     */
+    shouldShowAloAi () {
+      if (this.currentCompany.aloai_enabled) {
+        return true
+      }
+
+      return false
+    },
+
     logoutLabel () {
       return localStorage.getItem('impersonate') === 'true' ? 'Stop Impersonating' : 'Logout'
     },
