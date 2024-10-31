@@ -71,6 +71,14 @@ export default {
       }
 
       return `Are you sure you want to remove <strong>${this.contact.first_name} ${this.contact.last_name}</strong> from all lists?`
+    },
+
+    confirmationMessage () {
+      if (this.type === POWER_DIALER_LIST) {
+        return 'Contact has been removed from all Power Dialer lists successfully.'
+      }
+
+      return 'Contact has been removed from all lists successfully.'
     }
   },
 
@@ -79,23 +87,15 @@ export default {
       this.$emit('close')
     },
 
-    getConfirmationMessage () {
-      if (this.type === POWER_DIALER_LIST) {
-        return 'Contact has been removed from all Power Dialer lists successfully.'
-      }
-
-      return 'Contact has been removed from all lists successfully.'
-    },
-
     onConfirm () {
       if (!this.contact.id) {
         return
       }
 
       this.isLoading = true
-      talk2Api.V2.contacts.removeContactFromList(this.contact.id, { type: POWER_DIALER_LIST })
+      talk2Api.V2.contacts.removeContactFromList(this.contact.id, { type: this.type })
         .then(() => {
-          this.$generalNotification(this.getConfirmationMessage())
+          this.$generalNotification(this.confirmationMessage)
           this.$emit('confirm')
         })
         .catch((error) => {
