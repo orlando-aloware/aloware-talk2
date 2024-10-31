@@ -109,7 +109,6 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: async (event) => {
-            console.log('DialNumber:', event)
             this.criticalErrorHappened = false
             if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
               await new Promise(resolve => setTimeout(resolve, 1000))
@@ -279,6 +278,9 @@ export default {
       }).catch(err => {
         this.$handleErrors(err.response)
         this.criticalErrorHappened = true
+        if (this.extensions) {
+          this.extensions.callEnded()
+        }
       })
     },
 
