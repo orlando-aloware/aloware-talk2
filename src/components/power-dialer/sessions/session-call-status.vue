@@ -866,6 +866,8 @@ export default {
       ]
     },
 
+    // Should redial if force redial is set, if it has not been redialed yet
+    // and if the call disposition is not a successful call disposition
     shouldRedial () {
       // force redial disabled or task already redialed
       if (!this.sessionSettings.force_redial || this.dialer.redialedTaskIds.includes(this.activeTask?.id)) {
@@ -873,8 +875,8 @@ export default {
       }
 
       // selected call disposition is a successful call disposition
-      const successfulCallDispositions = this.sessionSettings.successful_call_dispositions
-      if (Array.isArray(successfulCallDispositions) && successfulCallDispositions.includes(this.callDisposition)) {
+      const successfulCallDispositionsIds = this.sessionSettings.successful_call_disposition_ids
+      if (Array.isArray(successfulCallDispositionsIds) && successfulCallDispositionsIds.includes(this.callDisposition)) {
         return false
       }
 
@@ -1398,8 +1400,9 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      if (this.shouldRedial) {
-        console.log(' %c Double dial required, pushing to bottom', 'background: yellow; color: #000;')
+      // if task is skipped by any reason (timezone, dnc, etc) we should not request a redial
+      if (this.shouldRedial && !this.isTaskSkipped(this.activeTask?.contact_list_item_id)) {
+        console.log('%c Double dial required, pushing to bottom', 'background: yellow; color: #000;')
 
         this.addDialerRedialedTaskId(this.activeTask.id)
 
@@ -1642,6 +1645,10 @@ export default {
       }
 
       this.processSession(false)
+    },
+
+    isTaskSkipped (contactListItemId) {
+      return contactListItemId && this.skippedTasks.includes(contactListItemId)
     }
   },
 

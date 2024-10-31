@@ -28,7 +28,7 @@ export const SESSION_SETTINGS_ALL_FORMS = [
         labelClass: 'font-weight-bold'
       },
       {
-        name: 'successful_call_dispositions',
+        name: 'successful_call_disposition_ids',
         label: 'Select Successfull Call Dispositions',
         description: 'Select the dispositions that won\'t trigger a double dial, meaning that the call was successfully answered.',
         type: 'select',
@@ -99,7 +99,7 @@ export const DEFAULT_SETTING_VALUES = {
   script_id: null,
   skip_outside_daytime_hours: 1,
   force_redial: 0,
-  successful_call_dispositions: [],
+  successful_call_disposition_ids: [],
   user_id: null,
   warmup_period_in_seconds: 0,
   order: 1,

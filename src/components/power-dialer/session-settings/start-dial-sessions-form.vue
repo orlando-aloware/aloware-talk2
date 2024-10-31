@@ -11,7 +11,7 @@
         <div :key="cform.name"
              :class="cform.containerClass ?? 'col-6 pl-3'"
              v-for="cform in form.children">
-          <div :class="disabledClassname(cform.name)">
+          <div :class="getDisabledTextClass(cform.name)">
             <label :class="`label mb-1 ${cform.labelClass}`">
               {{ cform.label }}
             </label>
@@ -119,12 +119,11 @@
                       v-model="resources[cform.name]" />
           </p>
 
-          <p v-else-if="cform.name === 'successful_call_dispositions'">
+          <p v-else-if="cform.name === 'successful_call_disposition_ids'">
             <call-disposition-selector class="p-0 mt-1 mb-0 dial-sessions__form__call-disposition-selector"
-                                       style="max-width: calc(50% - 16px);"
                                        :multiple="true"
                                        :highlighted="false"
-                                       :disable="successfulCallDispositionsDisabled"
+                                       :disable="disabled"
                                        v-model="resources[cform.name]"
                                        @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
           </p>
@@ -239,10 +238,6 @@ export default {
 
     defaultValues () {
       return DEFAULT_SETTING_VALUES
-    },
-
-    successfulCallDispositionsDisabled () {
-      return this.currentCompany?.power_dialer_settings?.successful_call_dispositions?.length > 0
     }
   },
 
@@ -274,12 +269,8 @@ export default {
       this.selectWidth = this.$refs.warmup_period_in_seconds[0].$el.offsetWidth
     },
 
-    disabledClassname (prop) {
+    getDisabledTextClass (prop) {
       if (prop === 'force_redial' && this.currentCompany?.pd_force_redial) {
-        return 'opacity-05'
-      }
-
-      if (prop === 'successful_call_dispositions' && this.successfulCallDispositionsDisabled) {
         return 'opacity-05'
       }
 
@@ -312,8 +303,8 @@ export default {
       }
 
       // if company success call disposition settings, override
-      if (this.currentCompany?.power_dialer_settings?.successful_call_dispositions?.length) {
-        value.successful_call_dispositions = this.currentCompany.power_dialer_settings.successful_call_dispositions
+      if (this.currentCompany?.power_dialer_settings?.successful_call_disposition_ids?.length) {
+        value.successful_call_disposition_ids = this.currentCompany.power_dialer_settings.successful_call_disposition_ids
       }
 
       this.resources = value
