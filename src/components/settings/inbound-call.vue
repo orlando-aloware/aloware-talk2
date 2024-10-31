@@ -581,6 +581,14 @@ export default {
               totalMinutes = maxMinutes
             }
 
+            if (value[key][index + 1]) {
+              const [hoursOpenNext, minutesOpenNext] = [parseInt(value[key][index + 1].open.substring(0, 2), 10), parseInt(value[key][index + 1].open.substring(2, 4), 10)]
+              const totalMinutesOpenNextAvaliable = hoursOpenNext * minutesPerHour + minutesOpenNext - this.timeIncrement
+              if (totalMinutes > totalMinutesOpenNextAvaliable) {
+                totalMinutes = totalMinutesOpenNextAvaliable
+              }
+            }
+
             let closeTime = this.convertTimeToString(totalMinutes)
 
             if (day.open === closeTime) {
