@@ -41,15 +41,13 @@
                        button-text="Modify Tags"
                        :entity-object="contact"
                        :category="TagCategories.CAT_CONTACTS"/>
-          <contact-lists-card title="Public Lists"
-                         data-testid="contact-details-public-lists"
+          <contact-lists-card data-testid="contact-details-public-lists"
+                         key="contact-public-lists-card"
                          :contact="contact"
-                         :lists="contact.contact_lists"
           />
-          <contact-lists-card title="Static Lists"
-                         data-testid="contact-details-public-lists"
+          <contact-lists-card data-testid="contact-details-private-lists"
+                         key="contact-private-lists-card"
                          :contact="contact"
-                         :lists="contact.contact_lists"
           />
 
           <contact-notes v-if="contact"
