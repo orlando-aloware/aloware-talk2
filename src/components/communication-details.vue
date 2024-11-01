@@ -987,6 +987,8 @@
                              :communication="communication"
                              :ring-group="usedRingGroup"
                              v-if="usedRingGroup"/>
+        <network-logs-display :call-issues="communication.call_quality_events"
+                              :user="communication.user"/>
       </b-col>
     </b-row>
   </div>
@@ -1025,11 +1027,13 @@ import TranscriptionModal from 'src/components/communication/transcription-modal
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import NetworkLogsDisplay from 'components/network-logs/network-logs-display'
 
 export default {
   name: 'communication-details',
 
   components: {
+    NetworkLogsDisplay,
     HubspotActivityTypeSelector,
     PencilOIcon,
     PredefinedTimeDurationSelector,

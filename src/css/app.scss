@@ -12408,13 +12408,13 @@ h1.contact-list-name-label {
 
         .dhx_event_move.dhx_title {
           padding: 0;
-          display: none;
         }
 
         .dhx_cal_event .dhx_body,
         .dhx_cal_event.dhx_cal_select_menu .dhx_body {
           padding: 0;
-          height: fit-content !important;
+          line-height: 19px !important;
+          height: 19px !important;
         }
 
         .dhx_event_resize.dhx_footer {
@@ -12529,26 +12529,6 @@ h1.contact-list-name-label {
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-
-        .time-column {
-          width: 50%;
-          text-align: center;
-        }
-
-        .current-time {
-          border-right: 1px solid #dcdfe6;
-        }
-
-        .event-content {
-          .event-time {
-            font-size: 10px;
-          }
-
-          .event-text {
-            font-size: 12px;
-            font-weight: 700;
-          }
         }
       }
 
@@ -15519,17 +15499,4 @@ hr {
   outline: none;
   border: 1px solid transparent;
   font-size: 0.75rem;
-}
-
-.calendar-event-list {
-  &-modal-title {
-    font-size: .875rem;
-    font-weight: 500;
-  }
-
-  &-modal {
-    .q-dialog__inner--minimized > div {
-      max-width: 660px !important;
-    }
-  }
 }
