@@ -38,7 +38,7 @@ export default {
   props: {
     placeholder: {
       type: String,
-      default: 'Press ENTER to search...'
+      default: 'Search name, phone, email, etc.'
     },
 
     disabled: {
@@ -80,6 +80,7 @@ export default {
         this.searchValue = ''
       }
 
+      this.searchValue = this.searchValue.trim()
       this.$emit('search', this.searchValue)
     }, 500),
 
@@ -93,6 +94,12 @@ export default {
 
     clearSearch () {
       this.searchValue = ''
+    }
+  },
+
+  watch: {
+    search () {
+      this.searchValue = this.search
     }
   }
 }
