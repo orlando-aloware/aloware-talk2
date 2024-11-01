@@ -15445,9 +15445,25 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 }
 
 .limit-characters-error {
-  color: black;
-  font-size: 13px;
-  margin-bottom: 10px;
+  top: 100%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  margin-top: -8px;
+  margin-bottom: 2px;
+}
+
+.search-error-icon {
+  color: red;
+  display: inline-block;
+  transform: scale(1.5);
+  vertical-align: middle;
+}
+
+.search-error-text {
+  position: relative;
+  top: 2px;
+  font-size: 80%;
 }
 
 .form-control-search-component.is-invalid {

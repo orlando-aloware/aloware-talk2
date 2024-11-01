@@ -64,13 +64,14 @@
               v-if="!simpleTable">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
-          <search class="width-260"
+          <contactSearch class="width-260"
                   limitSearchCharacters
                   :search="search"
                   :disabled="isLoadingDisabled"
                   data-testid="contacts-view-search-input"
+                  @show-error="showLimitCharactersError = $event"
                   @search="onSearch">
-          </search>
+          </contactSearch>
           <div class="contacts-total mobile">
             <div class="small text-muted fs-13 text-right"
                  v-if="selectedList.type === ContactListTypes.DYNAMIC">
@@ -344,6 +345,11 @@
             </span>
           </b-dropdown-item>
         </b-dropdown>
+      </div>
+      <div class="limit-characters-error d-flex align-items-center"
+            v-if="showLimitCharactersError">
+          <span class="search-error-icon mr-1">&times;</span>
+          <span class="search-error-text">Search requires at least 3 characters</span>
       </div>
     </template>
     <template slot="actions"
@@ -812,7 +818,7 @@ import SlashIcon from 'components/icons/slash-icon'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import SearchIcon from 'components/icons/search-icon'
 import PlusIcon from 'components/icons/plus-icon'
-import Search from 'components/search'
+import ContactSearch from 'components/contact-search'
 import EditHamburgerIcon from 'components/icons/edit-hamburger-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
@@ -862,7 +868,7 @@ export default {
     AddSequenceIcon,
     AddUserIcon,
     EditHamburgerIcon,
-    Search,
+    ContactSearch,
     PlusIcon,
     SearchIcon,
     EllipseIcon,
