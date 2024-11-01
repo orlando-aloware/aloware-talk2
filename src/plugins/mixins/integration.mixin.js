@@ -16,6 +16,12 @@ export default {
           return 'Zoho'
         case this.currentCompany.pipedrive_integration_enabled:
           return 'Pipedrive'
+        // case this.currentCompany.salesforce_integration_enabled:
+        //   return 'Salesforce'
+        // case this.currentCompany.gohighlevel_integration_enabled:
+        //   return 'HighLevel'
+        // case this.currentCompany.guesty_integration_enabled:
+        //   return 'Guesty'
       }
 
       return null
@@ -35,6 +41,18 @@ export default {
       if (this.currentCompany.pipedrive_integration_enabled) {
         integrations.push('Pipedrive')
       }
+
+      // if (this.currentCompany.salesforce_integration_enabled) {
+      //   integrations.push('Salesforce')
+      // }
+      //
+      // if (this.currentCompany.gohighlevel_integration_enabled) {
+      //   integrations.push('HighLevel')
+      // }
+      //
+      // if (this.currentCompany.guesty_integration_enabled) {
+      //   integrations.push('Guesty')
+      // }
 
       return integrations
     }
