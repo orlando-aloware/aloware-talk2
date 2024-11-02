@@ -235,7 +235,8 @@ export default {
         'to_date',
         'creator_type',
         'dynamic_engagement_date_range',
-        'has_unread'
+        'has_unread',
+        'has_international'
       ],
       inputTimeout: null,
       booleanFields: [
@@ -243,7 +244,8 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'my_contact',
-        'has_unread'
+        'has_unread',
+        'has_international'
       ],
       ChannelType,
       viewName: null,
@@ -562,7 +564,8 @@ export default {
         'first_time_only',
         'exclude_automated_communications',
         'untagged_only',
-        'has_unread'
+        'has_unread',
+        'has_international'
       ]
       const excludeProps = [
         'my_contact'
