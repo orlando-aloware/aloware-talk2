@@ -29,11 +29,11 @@ export const SESSION_SETTINGS_ALL_FORMS = [
       },
       {
         name: 'successful_call_disposition_ids',
-        label: 'Select Successfull Call Dispositions',
+        label: 'Select Successful Call Dispositions',
         description: 'Select the dispositions that won\'t trigger a double dial, meaning that the call was successfully answered.',
         type: 'select',
         items: [],
-        containerClass: 'col-12 mb-3',
+        containerClass: 'col-12',
         labelClass: 'font-weight-bold'
       },
       {

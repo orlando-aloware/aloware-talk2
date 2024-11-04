@@ -11,7 +11,7 @@
         <div :key="cform.name"
              :class="cform.containerClass ?? 'col-6 pl-3'"
              v-for="cform in form.children">
-          <div :class="getDisabledTextClass(cform.name)">
+          <div :class="getDisabledTextClass(cform.name)" v-if="showField(cform.name)">
             <label :class="`label mb-1 ${cform.labelClass}`">
               {{ cform.label }}
             </label>
@@ -120,12 +120,13 @@
           </p>
 
           <p v-else-if="cform.name === 'successful_call_disposition_ids'">
-            <call-disposition-selector class="p-0 mt-1 mb-0 dial-sessions__form__call-disposition-selector"
+            <call-disposition-selector class="p-0 mt-1 mb-3 dial-sessions__form__call-disposition-selector"
                                        :multiple="true"
                                        :highlighted="false"
                                        :disable="disabled"
                                        v-model="resources[cform.name]"
-                                       @change="(eventPayload) => onSettingsChange(eventPayload, cform.name)"/>
+                                       v-show="showField(cform.name)"
+                                       @change="(eventPayload) => onSuccessfulCallDispositionsChange(eventPayload)"/>
           </p>
 
           <warmup-period-selector class="dial-sessions__form__warmup-period-selector"
@@ -275,6 +276,25 @@ export default {
       }
 
       return ''
+    },
+
+    showField (fieldName) {
+      if (fieldName === 'successful_call_disposition_ids' && !this.resources.force_redial) {
+        return false
+      }
+
+      return true
+    },
+
+    onSuccessfulCallDispositionsChange (eventPayload) {
+      this.onSettingsChange(eventPayload, 'successful_call_disposition_ids')
+
+      // if force redial is on, combine call disposition ids with selected successful call dispositions
+      // since they are required in order to not force redial the contact
+      if (this.resources.force_redial) {
+        const successfulCallIds = eventPayload.filter(item => !this.resources.call_disposition_ids.includes(item))
+        this.onSettingsChange([...this.resources.call_disposition_ids, ...successfulCallIds], 'call_disposition_ids')
+      }
     }
   },
 
@@ -305,6 +325,12 @@ export default {
       // if company success call disposition settings, override
       if (this.currentCompany?.power_dialer_settings?.successful_call_disposition_ids?.length) {
         value.successful_call_disposition_ids = this.currentCompany.power_dialer_settings.successful_call_disposition_ids
+
+        if (this.currentCompany?.pd_force_redial) {
+          // if force redial is on, combine call disposition ids with selected successful call dispositions
+          const successfulCallIds = value.successful_call_disposition_ids.filter(id => !value.call_disposition_ids.includes(id))
+          value.call_disposition_ids = [...value.call_disposition_ids, ...successfulCallIds]
+        }
       }
 
       this.resources = value
