@@ -77,6 +77,27 @@
       </q-tooltip>
     </b-link>
 
+    <b-link href="#"
+            data-testid="add-contact-card-link"
+            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments"
+            v-if="messageComposer.mode === 'sms'">
+      <q-menu content-class="mx-height-500 width-300"
+              ref="contactCardMenu"
+              data-testid="add-contact-card-menu"
+              :offset="[0,5]">
+        <contact-card
+          :selectedLine="selectedLine"
+          @contactCardUploaded="onContactCardUploaded"
+          @closeMenu="onContactCardLinkClicked"
+        />
+      </q-menu>
+
+      <contact-card-icon></contact-card-icon>
+      <q-tooltip data-testid="add-contact-card-tooltip">
+        {{  !selectedLine ? 'Please select line before send contact card' : 'Send my contact card' }}
+      </q-tooltip>
+    </b-link>
+
     <b-link v-if="isSimpSocialIntegrationEnabled"
             href="#">
       <q-menu content-class="inventory-menu mx-height-600 overflow-x-hidden"
@@ -118,12 +139,14 @@
 <script>
 import SearchGiphy from 'components/message-composer/options/search-giphy'
 import GifIcon from 'components/icons/gif-icon'
+import ContactCardIcon from 'components/icons/contact-card-icon.vue'
 import Attachments from 'components/message-composer/options/attachments'
 import AttachmentIcon from 'components/icons/attachment-icon'
 import MessageTemplates from 'components/message-composer/options/message-templates'
 import NewCar from 'components/new-car'
 import CalendarTodayIcon from 'components/icons/calendar-today-icon'
 import Variables from 'components/message-composer/options/variables'
+import ContactCard from 'components/message-composer/options/contact-card.vue'
 import VariableIcon from 'components/icons/variable-icon'
 import { mapGetters, mapState } from 'vuex'
 import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
@@ -161,7 +184,9 @@ export default {
     Attachments,
     GifIcon,
     SearchGiphy,
-    NewCar
+    NewCar,
+    ContactCard,
+    ContactCardIcon
   },
 
   mixins: [
@@ -262,6 +287,15 @@ export default {
 
     onPreventNewCarMenuClose () {
       this.newCarMenu = true
+    },
+
+    onContactCardUploaded (files) {
+      this.$emit('attachmentUploaded', files)
+      this.$refs.contactCardMenu.hide()
+    },
+
+    onContactCardLinkClicked () {
+      this.$refs.contactCardMenu.hide()
     }
   }
 }

@@ -245,6 +245,39 @@
         </b-col>
       </b-form-row>
 
+      <b-form-row class="mt-4">
+        <b-col sm="12">
+          <h5 class="form-label">Contact Card</h5>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="align-items-center"
+                  :id="`${SettingsMap.contact_card.hash_keyword}-container`">
+        <b-col sm="12" md="6">
+
+          <b-form-group label="Name" class="form-label mb-0">
+            <b-form-input type="text"
+                          placeholder="Enter name"
+                          :state="validateState('contact_card_name')"
+                          v-model.trim="$v.user.contact_card_name.$model"
+                          @input="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_name')">
+            </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.contact_card_name.maxLength">Name must not exceed 191 characters.</b-form-invalid-feedback>
+          </b-form-group>
+        </b-col>
+
+        <b-col sm="12" md="6">
+          <b-form-group label="Phone Number"
+                        class="form-label mb-0">
+            <user-campaign-selector :key="contactCardCampaignSelectorKey"
+                                    :user="user"
+                                    v-model.trim="user.contact_card_campaign_id"
+                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')">
+            </user-campaign-selector>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
+
       <div :id="`${SettingsMap.backup_routing.hash_keyword}-container`"
            v-show="canBeEdited && [AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by)">
         <b-form-row class="mt-4">
@@ -575,6 +608,9 @@ export default {
         },
         password_confirmation: {
           sameAsPassword: sameAs('password')
+        },
+        contact_card_name: {
+          maxLength: maxLength(191)
         }
       }
     }
@@ -591,7 +627,8 @@ export default {
       ],
       AnswerTypes,
       Roles,
-      SettingsMap
+      SettingsMap,
+      contactCardCampaignSelectorKey: 0
     }
   },
 
@@ -647,6 +684,12 @@ export default {
       this.user.password = ''
       this.user.password_confirmation = ''
       this.updateFormValidity()
+    },
+
+    'connectedCampaigns': function () {
+      this.$nextTick(() => {
+        this.contactCardCampaignSelectorKey++
+      })
     }
   }
 }
