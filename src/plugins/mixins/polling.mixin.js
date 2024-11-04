@@ -4,7 +4,7 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   data () {
     return {
-      pollingInterval: 5 // in seconds
+      pollingInterval: 15 // in seconds
     }
   },
 
@@ -20,7 +20,7 @@ export default {
         this.UPDATE_USER_STATUS(user)
 
         if (companyId === user.company_id) {
-          this.$VueEvent.fire('agent_status_updated', event)
+          this.$VueEvent.fire('agent_status_updated', user)
         }
       }
     }
