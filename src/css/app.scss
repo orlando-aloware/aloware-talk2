@@ -2583,6 +2583,22 @@ i.option-separator {
     font-size: 20px;
   }
 
+  .hubspot-card {
+    .hubspot-icon {
+      font-size: 24px;
+      border-radius: 7px;
+      background: #FF7A59;
+      color: #FFFFFF;
+      border: 5px solid #FF7A59;
+      margin-right: 10px;
+    }
+    .integration-title {
+      font-size: 18px;
+      position: relative;
+      top: -3px;
+    }
+  }
+
   .pipedrive-btn {
     content: url(/integrations/pipedrive-icon.svg);
     margin-right: 20px;
@@ -15520,4 +15536,31 @@ hr {
   outline: none;
   border: 1px solid transparent;
   font-size: 0.75rem;
+}
+
+.calendar-event-list {
+  &-modal-title {
+    font-size: .875rem;
+    font-weight: 500;
+  }
+
+  &-modal {
+    .q-dialog__inner--minimized > div {
+      max-width: 660px !important;
+    }
+  }
+}
+
+.external-contact-hubspot-link-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.duplicateContactPhoneNumberMessage {
+  color: $grey-90;
+}
+
+.hubspot-jit-card-header {
+  margin: 12px;
 }
