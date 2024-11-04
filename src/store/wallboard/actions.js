@@ -118,13 +118,35 @@ export default {
   },
 
   /**
+   * Fetch agents
+   */
+  async fetchAgents ({ commit, state }) {
+    try {
+      if (state.isAgentsLoading) {
+        return
+      }
+
+      commit('SET_AGENTS_LOADING', true)
+
+      const response = await API.V2.users.get()
+
+      commit('SET_AGENTS', response.data)
+      commit('SET_AGENTS_LOADING', false)
+    } catch (err) {
+      commit('SET_AGENTS_LOADING', false)
+      console.log(err.response || err)
+      this._vm.$handleErrors(err.response)
+    }
+  },
+
+  /**
    * Set agent status, calling the API and updating the store
    */
   async setAgentStatus ({ commit }, params) {
     try {
       const response = await API.V1.users.setAgentStatus(params.userId, params.status)
 
-      commit('UPDATE_USER_STATUS', response.data, { root: true })
+      commit('SET_AGENT_STATUS', response.data)
     } catch (err) {
       console.log(err.response || err)
       this._vm.$handleErrors(err.response)

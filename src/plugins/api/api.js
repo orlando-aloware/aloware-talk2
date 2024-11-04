@@ -618,16 +618,6 @@ export default {
     company: {
       get (params) {
         return window.axios.get(`${suffixV1}company/${params.id}`)
-      },
-
-      /**
-       * Endpoint for fetching agents status.
-       * params parameter is used to paginate the data that will be fetch
-       * @handler Api/V1/CompanyController@getAgentsStatus
-       * @return Promise
-       */
-      getAgentsStatus () {
-        return window.axios.get(`${suffixV1}company/agents-status/get`)
       }
     },
 

@@ -16,6 +16,43 @@ export default {
       })
   },
 
+  SET_AGENT: (state, agent) => {
+    const agentIndex = state.agents.findIndex(u => u.id === agent.id)
+
+    // update agent status in store if found
+    if (agentIndex >= 0) {
+      state.agents.splice(agentIndex, 1, agent)
+
+      return
+    }
+
+    state.agents.push(agent)
+  },
+
+  SET_AGENTS: (state, data) => {
+    state.agents = data
+  },
+
+  SET_AGENTS_LOADING: (state, data) => {
+    state.isAgentsLoading = data
+  },
+
+  SET_AGENT_STATUS: (state, data) => {
+    const agentIndex = state.agents.findIndex(agent => agent.id === data.user_id)
+
+    if (agentIndex === -1) {
+      return
+    }
+
+    // update agent status in store if found
+    state.agents[agentIndex].agent_status = data.agent_status
+
+    // update last status date field if present
+    if ('last_agent_status_change' in data) {
+      state.agents[agentIndex].last_agent_status_change = data.last_agent_status_change
+    }
+  },
+
   SET_CALLS_COLUMNS: (state, id) => {
     // id = live, queued or parked
     const prop = `default${id.capitalize()}CallsColumns`
