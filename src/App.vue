@@ -118,12 +118,14 @@ export default {
       })
     }
 
-    // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
-    setTimeout(() => {
-      setInterval(() => {
-        this.pollUsers(this.profile.company_id)
+    if (this.profile?.company_id) {
+      // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
+      setTimeout(() => {
+        setInterval(() => {
+          this.pollUsers(this.profile.company_id)
+        }, this.pollingInterval * 1000)
       }, this.pollingInterval * 1000)
-    }, this.pollingInterval * 1000)
+    }
 
     this.$VueEvent.listen('make_new_call', (data) => {
       let fixedPhoneNumber = this.$options.filters.fixPhone(data.phone_number)
