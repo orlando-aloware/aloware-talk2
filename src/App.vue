@@ -41,7 +41,6 @@ import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import HeaderNotification from 'components/header-notification'
 import { accessMixin, pollingMixin } from 'src/plugins/mixins'
-import { accessMixin, pollingMixin } from 'src/plugins/mixins'
 export default {
   name: 'App',
 
