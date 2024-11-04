@@ -9,7 +9,7 @@
            @hide="onCloseAttempt">
     <template #modal-title>
       <h5 v-if="!active_step">
-        Which contact do you want to merge <strong>{{ fromContact }}</strong> with?
+        Which contact do you want to merge <strong>{{ toContact }}</strong> with?
       </h5>
       <h5 v-else>
         Merge <strong>{{ fromContact }}</strong> with <strong>{{ toContact }}</strong>
@@ -197,11 +197,11 @@ export default {
     },
 
     fromContact () {
-      return this.getFormattedContactName(this.contact)
+      return this.getFormattedContactName(this.selectedContact)
     },
 
     toContact () {
-      return this.getFormattedContactName(this.selectedContact)
+      return this.getFormattedContactName(this.contact)
     }
   },
 
@@ -329,18 +329,20 @@ export default {
       this.isMerging = true
       this.active_step++
 
-      this.$axios.put(`/api/v1/contact/${this.contact.id}/merge-to/${this.selectedContact.id}`)
+      this.$axios.put(`/api/v1/contact/${this.selectedContact.id}/merge-to/${this.contact.id}`)
         .then((res) => {
           if (res.data) {
             this.$generalNotification(`${this.fromContact} successfully merged with ${this.toContact}`, 'success')
 
-            let id = this.selectedContact.id
             this.resetAll()
             this.addMergeContactOpen(false)
 
+            // Navigates temporarily to '/settings' and back to the current route to refresh the view without a full page reload
+            const currentRoute = this.$route.fullPath
+            this.$router.replace({ path: '/settings' })
             setTimeout(() => {
-              this.$router.push('/contacts/' + id)
-            }, 200)
+              this.$router.replace(currentRoute)
+            }, 175)
           }
         })
         .catch((err) => {
