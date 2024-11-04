@@ -484,7 +484,7 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
   let actions = [{
     icon: 'close',
     color: 'black',
-    class: 'close-button px-1 pb-1'
+    class: 'close-button'
   }]
 
   switch (type) {
@@ -499,16 +499,16 @@ Vue.prototype.$generalNotification = function (message, type = null, timeout = 5
       colorClass.data = 'bg-red-10'
       break
     case 'export-csv':
-      actions = [{
+      actions.unshift({
         label: 'Download',
         color: 'primary',
-        class: 'px-2',
+        class: 'download-button px-2',
         handler: () => {
           if (uuid) {
             this.$downloadFileWithUuid(uuid, filename, 'csv')
           }
         }
-      }]
+      })
       colorClass.data = 'bg-green-10'
       break
     case 'redirect':

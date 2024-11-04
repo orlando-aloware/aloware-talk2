@@ -216,7 +216,6 @@ export default function () {
     isAddAppointmentOpen: false,
     isAppointmentSubmitted: false,
     isAddPowerDialerOpen: false,
-    isMergeContactOpen: false,
     isEnrollSequenceOpen: false,
     isAddReminderOpen: false,
     isOptoutActive: true,

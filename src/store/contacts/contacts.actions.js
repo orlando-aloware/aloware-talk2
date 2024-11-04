@@ -149,9 +149,6 @@ export default {
   setContactPhoneNumbers: ({ commit }, phoneNumbers) => {
     commit('SET_CONTACT_PHONE_NUMBERS', phoneNumbers)
   },
-  setConflictedContactPhoneNumbers: ({ commit }, phoneNumbers) => {
-    commit('SET_CONFLICTED_CONTACT_PHONE_NUMBERS', phoneNumbers)
-  },
   setContactRingGroups: ({ commit }, ringGroups) => {
     commit('SET_CONTACT_RING_GROUPS', ringGroups)
   },
@@ -248,10 +245,6 @@ export default {
 
   addPowerDialerOpen: ({ commit }, isOpen) => {
     commit('ADD_POWER_DIALER_OPEN', isOpen)
-  },
-
-  addMergeContactOpen: ({ commit }, isOpen) => {
-    commit('ADD_MERGE_CONTACT_OPEN', isOpen)
   },
 
   enrollSequenceOpen: ({ commit }, isOpen) => {
