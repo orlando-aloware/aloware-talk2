@@ -40,14 +40,12 @@ import ActionNotification from 'components/action-notification'
 import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import HeaderNotification from 'components/header-notification'
-import { accessMixin, pollingMixin } from 'src/plugins/mixins'
-
+import { accessMixin } from 'src/plugins/mixins'
 export default {
   name: 'App',
 
   mixins: [
-    accessMixin,
-    pollingMixin
+    accessMixin
   ],
 
   components: {
@@ -117,13 +115,6 @@ export default {
         }
       })
     }
-
-    // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
-    setTimeout(() => {
-      setInterval(() => {
-        this.pollUsers(this.profile.company_id)
-      }, this.pollingInterval * 1000)
-    }, this.pollingInterval * 1000)
 
     this.$VueEvent.listen('make_new_call', (data) => {
       let fixedPhoneNumber = this.$options.filters.fixPhone(data.phone_number)

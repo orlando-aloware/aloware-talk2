@@ -1,8 +1,8 @@
 import { filterCalls } from 'src/plugins/helpers/functions'
 
 export default {
-  getAgents: (state, getters, rootState) => {
-    return rootState.users
+  getAgents: (state) => {
+    return state.agents
       .filter(agent => {
         // only valid agents
         if (agent.is_destination || agent.read_only_access || !agent.enabled || !agent.active) {

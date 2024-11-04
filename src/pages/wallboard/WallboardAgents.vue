@@ -4,7 +4,7 @@
          :class="['users', `users--${viewMode}`]">
       <b-overlay class="h-100 d-flex flex-column"
                  rounded="sm"
-                 :show="usersIsLoading">
+                 :show="isAgentsLoading">
         <wallboard-agents-header class="flex-grow-0"/>
         <wallboard-agents-table class="flex-grow-1 h-100 overflow-hidden"/>
         <template #overlay>
@@ -30,8 +30,8 @@ export default {
   },
 
   computed: {
-    ...mapState([
-      'usersIsLoading'
+    ...mapState('wallboard', [
+      'isAgentsLoading'
     ]),
 
     ...mapGetters('wallboard', {
