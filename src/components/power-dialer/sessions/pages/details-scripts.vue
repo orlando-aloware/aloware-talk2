@@ -5,7 +5,7 @@
     <q-card-section class="px-0 d-flex flex-column h-100 overflow-hidden">
       <ScriptSelector class="px-3 w-100 flex-grow-0"
                       v-model="scriptId"
-                      @on-change="changeScript" />
+                      @change="changeScript" />
       <div class="t-scroll-y2 py-3 px-3 flex-grow-1"
            style="overflow:auto;"
            v-html="scriptText" />
@@ -116,7 +116,6 @@ export default {
       cachedScripts: [],
       communicationId: null,
       communicationProcessed: false,
-      isProcessingScripts: false,
       listeners: {}
     }
   },
@@ -173,8 +172,7 @@ export default {
 
     cachedScripts: {
       handler (newVal) {
-        if (newVal.length > 0 && this.communicationProcessed && !this.isProcessingScripts) {
-          this.isProcessingScripts = true
+        if (newVal.length > 0 && this.communicationProcessed) {
           console.log('PLA-368: Watcher Cached Scripts:', this.cachedScripts)
           console.log('PLA-368: Watcher Communication ID:', this.communicationId)
 
@@ -195,7 +193,6 @@ export default {
           })
 
           this.cachedScripts = []
-          this.isProcessingScripts = false
         }
       }
     }
