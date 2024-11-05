@@ -207,12 +207,13 @@ import {
   aclMixin,
   contactMixin,
   contactV2AttributesMixin,
+  kycMixin,
   selectorMixin,
   timezoneCheckMixin,
-  visibilityMixin,
-  kycMixin
+  visibilityMixin
 } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
+import useContactApi from 'src/shared/composables/use-contact-api.composable'
 
 export default {
   name: 'dialer-form',
@@ -264,6 +265,14 @@ export default {
         task: 'call',
         show: false
       }
+    }
+  },
+
+  setup () {
+    const { getLastUsedCallLineByContactId } = useContactApi()
+
+    return {
+      getLastUsedCallLineByContactId
     }
   },
 
@@ -378,6 +387,10 @@ export default {
       this.changePhoneNumber(data).then(() => {
         this.makeCall()
       })
+
+      setTimeout(() => {
+        this.setTheLastUsedCallLine()
+      }, 1000)
     })
   },
 
@@ -601,6 +614,19 @@ export default {
 
     hideBlockTooltip () {
       this.blockTooltipHandler.show = false
+    },
+
+    async setTheLastUsedCallLine () {
+      // if there is a campaignId, we don't need to fetch the last used call line
+      if (this.campaignId) return
+
+      try {
+        const data = await this.getLastUsedCallLineByContactId(this.contactId)
+
+        this.campaignId = data.campaign_id
+      } catch (error) {
+        this.$handleErrors(error.response)
+      }
     }
   },
 

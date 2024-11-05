@@ -433,6 +433,13 @@ const SettingsMap = {
     route: '/settings/notification',
     hash_keyword: 'text-notifications',
     visible: true
+  },
+  'contact_card': {
+    title: 'Contact Card',
+    description: '',
+    route: '/settings/profile',
+    hash_keyword: 'contact-card',
+    visible: true
   }
 
 }

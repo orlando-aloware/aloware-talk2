@@ -13,9 +13,6 @@
                                      @delete="onDeletePhone"
                                      @composerMedia="setComposerVariables"
                                      @call="onCall"/>
-          <contact-phones-list-conflicted-items data-testid="contact-phones-list-conflicted-items"
-                                                :phones="conflictedContactPhoneNumbers" />
-
           <b-link ref="phone_form"
                   href="#"
                   class="custom-link text-decoration-none"
@@ -55,7 +52,6 @@ import PlusCircleIcon from 'components/icons/plus-circle-icon'
 import ContactPhonesListItems from 'src/components/contacts/contact-phones-list-items'
 import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
 import _ from 'lodash'
-import ContactPhonesListConflictedItems from 'components/contacts/contact-phones-list-conflicted-items.vue'
 
 export default {
   name: 'contact-phones',
@@ -70,7 +66,6 @@ export default {
   },
 
   components: {
-    ContactPhonesListConflictedItems,
     ContactPhonesListItems,
     PlusCircleIcon,
     ContactPhonesForm
@@ -79,8 +74,7 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'contact',
-      'contactPhoneNumbers',
-      'conflictedContactPhoneNumbers'
+      'contactPhoneNumbers'
     ]),
 
     sortedPhones () {
@@ -116,8 +110,7 @@ export default {
         title: '',
         number: '',
         isPrimary: false,
-        isOptedOut: false,
-        hasExternalData: false
+        isOptedOut: false
       }
     }
   },
@@ -148,8 +141,7 @@ export default {
         title: phone.title,
         number: phone.phone_number,
         isPrimary: phone.phone_number === this.contact.phone_number || false,
-        isOptedOut: phone.is_opted_out,
-        hasExternalData: phone.integration_data && phone.integration_data.length !== 0
+        isOptedOut: phone.is_opted_out
       }
       this.showPhonesForm = true
     },

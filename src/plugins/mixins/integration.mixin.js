@@ -43,6 +43,12 @@ export default {
           return 'Zoho'
         case this.currentCompany.pipedrive_integration_enabled:
           return 'Pipedrive'
+        // case this.currentCompany.salesforce_integration_enabled:
+        //   return 'Salesforce'
+        // case this.currentCompany.gohighlevel_integration_enabled:
+        //   return 'HighLevel'
+        // case this.currentCompany.guesty_integration_enabled:
+        //   return 'Guesty'
       }
 
       return null
@@ -65,7 +71,8 @@ export default {
         params: {
           integration_name: integrationName,
           dialer_mode: dialerMode ? 1 : 0,
-          force: true
+          force: true,
+          with_duplicates: true
         }
       })
     }

@@ -41,6 +41,7 @@ import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import HeaderNotification from 'components/header-notification'
 import { accessMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'App',
 
@@ -157,9 +158,11 @@ export default {
           contactTimezone: contact.timezone
         }
 
-        this.$router.push({
+        const route = data.open_contact_page ? '/contacts/' + callData.contactId : {
           name: 'Phone'
-        }, () => {
+        }
+
+        this.$router.push(route, () => {
           this.$VueEvent.fire('callContact', callData)
         }, () => {
           if (this.$route.name === 'Phone') {
