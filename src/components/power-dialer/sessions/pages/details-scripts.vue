@@ -67,39 +67,40 @@ export default {
     }
   },
 
-  async mounted () {
+  created () {
+    this.listeners.newCommunication = (communication) => {
+      if (communication.contact_id === this.contactId && this.checkCommunicationMatchesUserAccessibility(communication)) {
+        // Mark that new_communication has been processed
+        this.communicationProcessed = true
+
+        console.log('Contact ID:', this.contactId)
+        console.log('Cached Scripts:', this.cachedScripts)
+        console.log('Communication ID:', communication.id)
+
+        // Call the API for all cached scripts
+        this.cachedScripts.forEach(script => {
+          if (script.id && communication.id) {
+            talk2Api.V1.scriptCommunication.store({
+              script_id: script.id,
+              communication_id: communication.id,
+              text: script.text || ''
+            }).catch(err => {
+              console.log('Error storing script communication:', err)
+            })
+          }
+        })
+        // Clear the cache after processing
+        this.cachedScripts = []
+      }
+    })
+
+    this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+  },
+
+  mounted () {
     this.scriptId = this.sessionSettings.script_id
 
-    await this.changeScript()
-
-    // Add the event listener for new communication
-    if (this.contact) {
-      this.$VueEvent.listen('new_communication', communication => {
-        if (communication.contact_id === this.contactId && this.checkCommunicationMatchesUserAccessibility(communication)) {
-          // Mark that new_communication has been processed
-          this.communicationProcessed = true
-
-          console.log('Contact ID:', this.contactId)
-          console.log('Cached Scripts:', this.cachedScripts)
-          console.log('Communication ID:', communication.id)
-
-          // Call the API for all cached scripts
-          this.cachedScripts.forEach(script => {
-            if (script.id && communication.id) {
-              talk2Api.V1.scriptCommunication.store({
-                script_id: script.id,
-                communication_id: communication.id,
-                text: script.text || ''
-              }).catch(err => {
-                console.log('Error storing script communication:', err)
-              })
-            }
-          })
-          // Clear the cache after processing
-          this.cachedScripts = []
-        }
-      })
-    }
+    this.changeScript()
   },
 
   data () {
@@ -107,7 +108,8 @@ export default {
       scriptId: null,
       script: '',
       cachedScripts: [],
-      communicationProcessed: false
+      communicationProcessed: false,
+      listeners: {}
     }
   },
 
@@ -182,7 +184,7 @@ export default {
   },
 
   beforeDestroy () {
-    this.$VueEvent.off('new_communication')
+    this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
   }
 }
 </script>
