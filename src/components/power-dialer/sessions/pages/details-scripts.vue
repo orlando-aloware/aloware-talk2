@@ -17,6 +17,7 @@
 import _ from 'lodash'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ScriptSelector from 'components/generic-selectors/session-scripts-selector'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'DetailsScripts',
@@ -61,16 +62,43 @@ export default {
     }
   },
 
-  mounted () {
+  async mounted () {
     this.scriptId = this.sessionSettings.script_id
 
-    this.changeScript()
+    await this.changeScript()
+
+    // Add the event listener for new communication
+    if (this.contact) {
+      this.$VueEvent.listen('new_communication', communication => {
+        if (communication.contact_id === this.contactId && this.checkCommunicationMatchesUserAccessibility(communication)) {
+          // Mark that new_communication has been processed
+          this.communicationProcessed = true
+
+          // Call the API for all cached scripts
+          this.cachedScripts.forEach(script => {
+            if (script.id && communication.id) {
+              talk2Api.V1.scriptCommunication.store({
+                script_id: script.id,
+                communication_id: communication.id,
+                text: script.text || ''
+              }).catch(err => {
+                console.log('Error storing script communication:', err)
+              })
+            }
+          })
+          // Clear the cache after processing
+          this.cachedScripts = []
+        }
+      })
+    }
   },
 
   data () {
     return {
       scriptId: null,
-      script: ''
+      script: '',
+      cachedScripts: [],
+      communicationProcessed: false
     }
   },
 
@@ -97,7 +125,10 @@ export default {
         })
 
         this.script = res.data
-        this.setScript({ id: this.selectedScript, text: this.script });
+        this.setScript({ id: this.selectedScript, text: this.script })
+
+        // Cache the script change
+        this.cachedScripts.push({ id: this.selectedScript, text: this.script })
 
         return
       }
@@ -112,7 +143,21 @@ export default {
         return script.id === this.selectedScript
       })
 
-      this.setScript({ id: this.selectedScript, text: this.script });
+      this.setScript({ id: this.selectedScript, text: this.script })
+
+      // Cache the script change
+      this.cachedScripts.push({ id: this.selectedScript, text: this.script })
+
+      // If new_communication has already been processed, store the change immediately
+      if (this.communicationProcessed) {
+        talk2Api.V1.scriptCommunication.store({
+          script_id: this.selectedScript,
+          communication_id: this.lastCommunicationId,
+          text: this.script.text || ''
+        }).catch(err => {
+          console.log('Error storing script communication:', err)
+        })
+      }
     }
   },
 
@@ -122,6 +167,10 @@ export default {
         await this.changeScript()
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.off('new_communication')
   }
 }
 </script>

@@ -531,7 +531,7 @@ export default {
       'sessionPaused',
       'activeTask',
       'hubspot',
-      'script',
+      'script'
     ]),
 
     ...mapState([
@@ -1386,9 +1386,9 @@ export default {
           communication_id: this.dialer.communication.id,
           text: this.script.text || ''
         }).catch(err => {
-          console.log('Error storing script communication:', err);
-        });
-      } 
+          console.log('Error storing script communication:', err)
+        })
+      }
 
       this.resetTimer()
 

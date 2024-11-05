@@ -94,8 +94,8 @@ export default {
   },
 
   SET_SCRIPT: (state, payload) => {
-    state.script.id = payload.id;
-    state.script.text = payload.text;
+    state.script.id = payload.id
+    state.script.text = payload.text
   },
 
   SET_CONTACTS: (state, payload) => {
