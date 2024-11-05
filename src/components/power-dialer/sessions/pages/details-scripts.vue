@@ -116,6 +116,7 @@ export default {
       cachedScripts: [],
       communicationId: null,
       communicationProcessed: false,
+      isProcessingScripts: false,
       listeners: {}
     }
   },
@@ -172,7 +173,8 @@ export default {
 
     cachedScripts: {
       handler (newVal) {
-        if (newVal.length > 0 && this.communicationProcessed) {
+        if (newVal.length > 0 && this.communicationProcessed && !this.isProcessingScripts) {
+          this.isProcessingScripts = true
           console.log('PLA-368: Watcher Cached Scripts:', this.cachedScripts)
           console.log('PLA-368: Watcher Communication ID:', this.communicationId)
 
@@ -193,6 +195,7 @@ export default {
           })
 
           this.cachedScripts = []
+          isProcessingScripts: false
         }
       }
     }
