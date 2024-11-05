@@ -74,8 +74,6 @@ export default {
         this.isListenerProcessing = true
 
         this.communicationId = communication.id
-        console.log('PLA-368: Listener this communicationId:', this.communicationId)
-        console.log('PLA-368: Listener Communication ID:', communication.id)
 
         // Call the API for all cached scripts
         try {
