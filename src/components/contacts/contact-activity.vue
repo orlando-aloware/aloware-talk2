@@ -433,7 +433,8 @@ export default {
         'date_of_birth',
         'cnam_country',
         'cnam_state',
-        'cnam_city'
+        'cnam_city',
+        'custom_log'
       ],
       general_audit_properties: [
         'disposition_status_id',
@@ -718,7 +719,11 @@ export default {
     },
 
     generateCustomAuditMessageWithNotes (communication) {
-      const notes = communication.notes ? ` (Reason: ${communication.notes.replace(/\\"/g, '"')})` : ''
+      const cleanedNotes = communication.notes ? communication.notes.replace(/\\"/g, '"') : ''
+      const notes = communication.property === 'custom_log'
+        ? ` ${cleanedNotes}`
+        : cleanedNotes ? ` (Reason: ${cleanedNotes})` : ''
+      
       return this.generateCustomAuditMessage(communication) + notes
     },
 
