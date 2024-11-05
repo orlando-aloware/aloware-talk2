@@ -541,6 +541,7 @@ export default {
       if (currentFilter) {
         currentFilterItem = currentFilter[this.groupItemIndex]
       }
+
       // remove an invalid filter
       if (!value.data &&
         !isEmpty(currentFilterItem) &&
