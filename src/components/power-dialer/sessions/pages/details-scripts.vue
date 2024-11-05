@@ -74,8 +74,8 @@ export default {
         this.communicationProcessed = true
         this.communicationId = communication.id
 
-        console.log('Listener Cached Scripts:', this.cachedScripts)
-        console.log('Listener Communication ID:', this.communicationId)
+        console.log('PLA-368: Listener Cached Scripts:', this.cachedScripts)
+        console.log('PLA-368: Listener Communication ID:', this.communicationId)
 
         // Call the API for all cached scripts
         try {
@@ -173,16 +173,17 @@ export default {
     cachedScripts: {
       handler (newVal) {
         if (newVal.length > 0 && this.communicationProcessed) {
-          console.log('New scripts detected in cache after communication processing:', newVal)
-          console.log('Watcher Cached Scripts:', this.cachedScripts)
-          console.log('Watcher Communication ID:', this.communicationId)
+          console.log('PLA-368: Watcher Cached Scripts:', this.cachedScripts)
+          console.log('PLA-368: Watcher Communication ID:', this.communicationId)
+
+          let lastCommunicationId = _.get(this.activeTask, 'last_communication.id', this.communicationId)
 
           newVal.forEach(async (script) => {
             try {
-              if (script.id && this.communicationId) {
+              if (script.id && lastCommunicationId) {
                 await talk2Api.V1.scriptCommunication.store({
                   script_id: script.id,
-                  communication_id: this.communicationId,
+                  communication_id: lastCommunicationId,
                   text: script.text
                 })
               }
@@ -193,8 +194,7 @@ export default {
 
           this.cachedScripts = []
         }
-      },
-      deep: true
+      }
     }
   },
 
