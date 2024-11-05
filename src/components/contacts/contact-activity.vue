@@ -433,8 +433,7 @@ export default {
         'date_of_birth',
         'cnam_country',
         'cnam_state',
-        'cnam_city',
-        'custom_log'
+        'cnam_city'
       ],
       general_audit_properties: [
         'disposition_status_id',
@@ -452,7 +451,8 @@ export default {
         'date_of_birth',
         'cnam_country',
         'cnam_state',
-        'cnam_city'
+        'cnam_city',
+        'custom_log'
       ],
       custom_audit_messages: {
         'is_dnc': [
@@ -723,7 +723,7 @@ export default {
       const notes = communication.property === 'custom_log'
         ? ` ${cleanedNotes}`
         : cleanedNotes ? ` (Reason: ${cleanedNotes})` : ''
-      
+
       return this.generateCustomAuditMessage(communication) + notes
     },
 
