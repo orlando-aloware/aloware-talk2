@@ -159,7 +159,7 @@ export default {
 
       console.log('Contact ID:', this.contactId)
       console.log('Cached Scripts:', this.cachedScripts)
-      console.log('Communication ID:', communication.id)
+      console.log('Communication ID:', this.lastCommunicationId)
       // If new_communication has already been processed, store the change immediately
       if (this.communicationProcessed) {
         talk2Api.V1.scriptCommunication.store({
