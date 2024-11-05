@@ -137,7 +137,7 @@ export default {
         this.script = res.data
 
         // Cache the script change
-        this.cachedScripts.push({ id: this.selectedScript, text: this.script })
+        this.cachedScripts.push({ id: this.selectedScript, text: this.script.text })
 
         return
       }
@@ -153,7 +153,7 @@ export default {
       })
 
       // Cache the script change
-      this.cachedScripts.push({ id: this.selectedScript, text: this.script })
+      this.cachedScripts.push({ id: this.selectedScript, text: this.script.text })
 
       console.log('Cached Scripts:', this.cachedScripts)
       console.log('Communication ID:', this.lastCommunicationId)
