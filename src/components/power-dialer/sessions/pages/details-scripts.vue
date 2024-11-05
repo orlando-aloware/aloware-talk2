@@ -195,7 +195,7 @@ export default {
           })
 
           this.cachedScripts = []
-          this.isProcessingScripts: false
+          this.isProcessingScripts = false
         }
       }
     }
