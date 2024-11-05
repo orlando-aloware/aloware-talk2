@@ -116,8 +116,7 @@ export default {
   methods: {
     ...mapActions('powerDialer', [
       'getTranslatedScript',
-      'getLastCommunicationScript',
-      'setScript'
+      'getLastCommunicationScript'
     ]),
 
     async changeScript (val) {
@@ -136,7 +135,6 @@ export default {
         })
 
         this.script = res.data
-        this.setScript({ id: this.selectedScript, text: this.script })
 
         // Cache the script change
         this.cachedScripts.push({ id: this.selectedScript, text: this.script })
@@ -153,8 +151,6 @@ export default {
       this.script = lastCommunicationData.data.find(script => {
         return script.id === this.selectedScript
       })
-
-      this.setScript({ id: this.selectedScript, text: this.script })
 
       // Cache the script change
       this.cachedScripts.push({ id: this.selectedScript, text: this.script })

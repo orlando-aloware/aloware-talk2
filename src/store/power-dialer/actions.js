@@ -339,10 +339,6 @@ export default {
     commit('SET_ACTIVE_TASK', task)
   },
 
-  setScript ({ commit }, payload) {
-    commit('SET_SCRIPT', payload)
-  },
-
   removeFirstInQueueTask: ({ commit }) => {
     commit('REMOVE_FIRST_IN_QUEUE_TASK')
   },
