@@ -72,6 +72,7 @@ export default {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         // Mark that new_communication has been processed
         this.communicationProcessed = true
+        this.communicationId = communication.id
 
         console.log('Cached Scripts:', this.cachedScripts)
         console.log('Communication ID:', communication.id)
@@ -81,7 +82,7 @@ export default {
           if (script.id && communication.id) {
             talk2Api.V1.scriptCommunication.store({
               script_id: script.id,
-              communication_id: communication.id,
+              communication_id: this.communicationId,
               text: script.text || ''
             }).catch(err => {
               console.log('Error storing script communication:', err)
@@ -94,7 +95,6 @@ export default {
     }
 
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
-    console.log('Event listener set up for new_communication')
   },
 
   mounted () {
@@ -108,6 +108,7 @@ export default {
       scriptId: null,
       script: '',
       cachedScripts: [],
+      communicationId: null,
       communicationProcessed: false,
       listeners: {}
     }
@@ -148,25 +149,11 @@ export default {
 
       let lastCommunicationData = await this.getLastCommunicationScript(lastCommunicationId)
 
+      this.cachedScripts.push({ id: this.selectedScript, text: this.script.text })
+
       this.script = lastCommunicationData.data.find(script => {
         return script.id === this.selectedScript
       })
-
-      // Cache the script change
-      this.cachedScripts.push({ id: this.selectedScript, text: this.script.text })
-
-      console.log('Cached Scripts:', this.cachedScripts)
-      console.log('Communication ID:', this.lastCommunicationId)
-      // If new_communication has already been processed, store the change immediately
-      if (this.communicationProcessed) {
-        talk2Api.V1.scriptCommunication.store({
-          script_id: this.selectedScript,
-          communication_id: this.lastCommunicationId,
-          text: this.script.text || ''
-        }).catch(err => {
-          console.log('Error storing script communication:', err)
-        })
-      }
     }
   },
 
@@ -176,6 +163,7 @@ export default {
         await this.changeScript()
       }
     },
+
     cachedScripts: {
       handler (newVal) {
         if (newVal.length > 0 && this.communicationProcessed) {
