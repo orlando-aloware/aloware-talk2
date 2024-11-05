@@ -337,12 +337,9 @@ export default {
             this.resetAll()
             this.addMergeContactOpen(false)
 
-            // Navigates temporarily to '/settings' and back to the current route to refresh the view without a full page reload
-            const currentRoute = this.$route.fullPath
-            this.$router.replace({ path: '/settings' })
             setTimeout(() => {
-              this.$router.replace(currentRoute)
-            }, 200)
+              window.location.reload()
+            }, 100)
           }
         })
         .catch((err) => {
