@@ -171,10 +171,10 @@ export default {
 
           newVal.forEach(async (script) => {
             try {
-              if (script.id && this.activeTask?.last_communication?.id) {
+              if (script.id && this.communicationId) {
                 await talk2Api.V1.scriptCommunication.store({
                   script_id: script.id,
-                  communication_id: this.activeTask.last_communication.id,
+                  communication_id: this.communicationId,
                   text: script.text || ''
                 })
                 console.log(`Script with ID ${script.id} processed successfully.`)
