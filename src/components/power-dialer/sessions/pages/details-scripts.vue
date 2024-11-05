@@ -76,19 +76,20 @@ export default {
         this.communicationId = communication.id
         const localCommunicationId = communication.id
 
+        console.log('PLA-368: Listener this communicationId:', this.communicationId)
+        console.log('PLA-368: Listener Communication ID:', localCommunicationId)
+
         // Call the API for all cached scripts
         try {
-          await Promise.all(this.cachedScripts.map(script => {
+          for (const script of this.cachedScripts) {
             if (script.id && localCommunicationId) {
-              return talk2Api.V1.scriptCommunication.store({
+              await talk2Api.V1.scriptCommunication.store({
                 script_id: script.id,
                 communication_id: localCommunicationId,
-                text: script.text
-              }).catch(err => {
-                console.log('Error storing script communication:', err)
+                text: `From listener ${script.text}`
               })
             }
-          }))
+          }
         } catch (err) {
           console.log('Error processing cached scripts:', err)
         } finally {
@@ -180,7 +181,7 @@ export default {
                 await talk2Api.V1.scriptCommunication.store({
                   script_id: script.id,
                   communication_id: lastCommunicationId,
-                  text: script.text
+                  text: `From watcher ${script.text}`
                 })
               }
             } catch (err) {
