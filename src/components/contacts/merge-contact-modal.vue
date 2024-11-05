@@ -342,7 +342,7 @@ export default {
             this.$router.replace({ path: '/settings' })
             setTimeout(() => {
               this.$router.replace(currentRoute)
-            }, 175)
+            }, 200)
           }
         })
         .catch((err) => {
