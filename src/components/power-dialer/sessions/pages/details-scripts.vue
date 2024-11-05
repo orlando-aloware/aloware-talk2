@@ -92,7 +92,7 @@ export default {
         // Clear the cache after processing
         this.cachedScripts = []
       }
-    })
+    }
 
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
   },
