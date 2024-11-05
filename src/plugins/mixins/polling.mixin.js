@@ -4,7 +4,7 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   data () {
     return {
-      pollingInterval: 15, // in seconds
+      pollingInterval: 5, // in seconds
       usersPollInterval: null
     }
   },
@@ -14,10 +14,8 @@ export default {
 
     addUsersPoll () {
       // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
-      setTimeout(() => {
-        this.usersPollInterval = setInterval(() => {
-          this.pollUsers()
-        }, this.pollingInterval * 1000)
+      this.usersPollInterval = setInterval(() => {
+        this.pollUsers()
       }, this.pollingInterval * 1000)
     },
 
