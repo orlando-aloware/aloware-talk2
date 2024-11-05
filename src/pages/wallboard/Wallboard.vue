@@ -13,14 +13,15 @@
 import WallboardHeader from 'src/components/wallboard/wallboard-header.vue'
 import WallboardSidebar from 'src/components/wallboard/wallboard-sidebar.vue'
 import { CALL } from 'src/constants/communication-types'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, pollingMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'Wallboard',
 
   mixins: [
-    aclMixin
+    aclMixin,
+    pollingMixin
   ],
 
   components: {
@@ -94,6 +95,8 @@ export default {
 
     // deleted communication event
     this.$VueEvent.listen('delete_communication', this.deleteCall)
+
+    this.addUsersPoll()
   },
 
   methods: {
