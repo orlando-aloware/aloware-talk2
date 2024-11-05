@@ -69,11 +69,10 @@ export default {
 
   created () {
     this.listeners.newCommunication = (communication) => {
-      if (communication.contact_id === this.contactId && this.checkCommunicationMatchesUserAccessibility(communication)) {
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         // Mark that new_communication has been processed
         this.communicationProcessed = true
 
-        console.log('Contact ID:', this.contactId)
         console.log('Cached Scripts:', this.cachedScripts)
         console.log('Communication ID:', communication.id)
 
@@ -95,6 +94,7 @@ export default {
     }
 
     this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+    console.log('Event listener set up for new_communication')
   },
 
   mounted () {
@@ -155,7 +155,6 @@ export default {
       // Cache the script change
       this.cachedScripts.push({ id: this.selectedScript, text: this.script })
 
-      console.log('Contact ID:', this.contactId)
       console.log('Cached Scripts:', this.cachedScripts)
       console.log('Communication ID:', this.lastCommunicationId)
       // If new_communication has already been processed, store the change immediately
