@@ -70,7 +70,7 @@ export default {
   created () {
     this.listeners.newCommunication = async (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
-        // Mark that new communication listener has been processed
+        // Mark the listener as processing to avoid multiple calls
         this.isListenerProcessing = true
 
         this.communicationId = communication.id
@@ -82,7 +82,7 @@ export default {
               await talk2Api.V1.scriptCommunication.store({
                 script_id: script.id,
                 communication_id: communication.id,
-                text: `From listener ${script.text}`
+                text: script.text
               })
             }
           }
@@ -181,7 +181,7 @@ export default {
                 await talk2Api.V1.scriptCommunication.store({
                   script_id: script.id,
                   communication_id: lastCommunicationId,
-                  text: `From watcher ${script.text}`
+                  text: script.text
                 })
               }
             } catch (err) {
