@@ -2,14 +2,16 @@
   <div class="row no-wrap q-pa-md text-center">
     <b-col sm="12" md="12">
       <div class="mt-2 notice" data-testid="add-contact-card-message">
-        <p class="mb-0">
+        <p class="mb-0 text-justify"
+           v-if="user?.profile?.contact_card_phone_number === null">
+          You don’t have any number linked on this contact card.<br>
           <router-link
             :to="{ path: '/settings/profile' }"
             @click.native="onContactCardLinkClicked"
           >
             Click here
           </router-link>
-          to change the name/phone number of your contact card.
+          to view the settings for the name and phone number(s) for your contact.
         </p>
       </div>
     </b-col>
@@ -17,7 +19,7 @@
       <button class="btn btn-sm btn-primary mt-2"
               data-testid="add-contact-card-button"
               @click="onContactCardSelected">
-        Send contact card as .vcf file
+        Send contact
       </button>
     </b-col>
 
