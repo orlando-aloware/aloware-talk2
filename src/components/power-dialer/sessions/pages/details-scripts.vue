@@ -71,21 +71,19 @@ export default {
     this.listeners.newCommunication = async (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         // Mark that new communication listener has been processed
-        this.communicationProcessed = true
+        this.isListenerProcessing = true
 
         this.communicationId = communication.id
-        const localCommunicationId = communication.id
-
         console.log('PLA-368: Listener this communicationId:', this.communicationId)
         console.log('PLA-368: Listener Communication ID:', localCommunicationId)
 
         // Call the API for all cached scripts
         try {
           for (const script of this.cachedScripts) {
-            if (script.id && localCommunicationId) {
+            if (script.id && communication.id) {
               await talk2Api.V1.scriptCommunication.store({
                 script_id: script.id,
-                communication_id: localCommunicationId,
+                communication_id: communication.id,
                 text: `From listener ${script.text}`
               })
             }
@@ -95,6 +93,8 @@ export default {
         } finally {
           // Clear the cached scripts after processing
           this.cachedScripts = []
+          this.isListenerProcessing = false
+          this.communicationProcessed = true
         }
       }
     }
@@ -114,6 +114,7 @@ export default {
       script: '',
       cachedScripts: [],
       communicationId: null,
+      isListenerProcessing: false,
       communicationProcessed: false,
       listeners: {}
     }
@@ -165,13 +166,14 @@ export default {
   watch: {
     async activeTask (value) {
       if (value && value.id) {
+        this.communicationProcessed = false
         await this.changeScript()
       }
     },
 
     cachedScripts: {
       async handler (scripts) {
-        if (scripts.length > 0 && this.communicationProcessed) {
+        if (scripts.length > 0 && !this.isListenerProcessing && this.communicationProcessed) {
           const lastCommunicationId = _.get(this.activeTask, 'last_communication.id', this.communicationId)
 
           // Call the API for all cached scripts
