@@ -175,6 +175,31 @@ export default {
       if (value && value.id) {
         await this.changeScript()
       }
+    },
+    cachedScripts: {
+      handler (newVal) {
+        if (newVal.length > 0 && this.communicationProcessed) {
+          console.log('New scripts detected in cache after communication processing:', newVal)
+
+          newVal.forEach(async (script) => {
+            try {
+              if (script.id && this.activeTask?.last_communication?.id) {
+                await talk2Api.V1.scriptCommunication.store({
+                  script_id: script.id,
+                  communication_id: this.activeTask.last_communication.id,
+                  text: script.text || ''
+                })
+                console.log(`Script with ID ${script.id} processed successfully.`)
+              }
+            } catch (err) {
+              console.log('Error storing script communication:', err)
+            }
+          })
+
+          this.cachedScripts = []
+        }
+      },
+      deep: true
     }
   },
 
