@@ -68,29 +68,35 @@ export default {
   },
 
   created () {
-    this.listeners.newCommunication = (communication) => {
+    this.listeners.newCommunication = async (communication) => {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         // Mark that new_communication has been processed
         this.communicationProcessed = true
         this.communicationId = communication.id
 
-        console.log('Cached Scripts:', this.cachedScripts)
-        console.log('Communication ID:', communication.id)
+        console.log('Listener Cached Scripts:', this.cachedScripts)
+        console.log('Listener Communication ID:', communication.id)
 
         // Call the API for all cached scripts
-        this.cachedScripts.forEach(script => {
-          if (script.id && communication.id) {
-            talk2Api.V1.scriptCommunication.store({
-              script_id: script.id,
-              communication_id: this.communicationId,
-              text: script.text || ''
-            }).catch(err => {
-              console.log('Error storing script communication:', err)
-            })
-          }
-        })
-        // Clear the cache after processing
-        this.cachedScripts = []
+        try {
+          await Promise.all(this.cachedScripts.map(script => {
+            if (script.id && this.communicationId) {
+              return talk2Api.V1.scriptCommunication.store({
+                script_id: script.id,
+                communication_id: this.communicationId,
+                text: script.text
+              }).catch(err => {
+                console.log('Error storing script communication:', err)
+              })
+            }
+          }))
+        } catch (err) {
+          console.log('Error processing cached scripts:', err)
+        } finally {
+          // Clear the cached scripts after processing
+          this.cachedScripts = []
+          console.log('All cached scripts processed')
+        }
       }
     }
 
@@ -168,6 +174,8 @@ export default {
       handler (newVal) {
         if (newVal.length > 0 && this.communicationProcessed) {
           console.log('New scripts detected in cache after communication processing:', newVal)
+          console.log('Watcher Cached Scripts:', this.cachedScripts)
+          console.log('Watcher Communication ID:', communication.id)
 
           newVal.forEach(async (script) => {
             try {
@@ -175,9 +183,8 @@ export default {
                 await talk2Api.V1.scriptCommunication.store({
                   script_id: script.id,
                   communication_id: this.communicationId,
-                  text: script.text || ''
+                  text: script.text
                 })
-                console.log(`Script with ID ${script.id} processed successfully.`)
               }
             } catch (err) {
               console.log('Error storing script communication:', err)
