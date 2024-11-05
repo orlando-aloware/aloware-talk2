@@ -248,6 +248,7 @@
       <b-form-row class="mt-4">
         <b-col sm="12">
           <h5 class="form-label">Contact Card</h5>
+          <p class="form-helper-text">Only personal lines routed to your user will show. Admins can set personal lines in the Lines settings</p>
         </b-col>
       </b-form-row>
 
@@ -266,7 +267,7 @@
           </b-form-group>
         </b-col>
 
-        <b-col sm="12" md="6">
+        <b-col sm="12" md="4">
           <b-form-group label="Phone Number"
                         class="form-label mb-0">
             <user-campaign-selector :key="contactCardCampaignSelectorKey"
