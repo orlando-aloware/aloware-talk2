@@ -1,6 +1,5 @@
 export default function () {
   return {
-    agents: [],
     calls: {
       live: [],
       parked: [],
@@ -54,7 +53,6 @@ export default function () {
       agent: null,
       agentStatus: 'all'
     },
-    isAgentsLoading: false,
     isLiveCallsLoading: false,
     isOverviewDetailed: false,
     isParkedCallsLoading: false,
