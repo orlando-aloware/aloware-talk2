@@ -75,7 +75,7 @@ export default {
         this.communicationId = communication.id
 
         console.log('Listener Cached Scripts:', this.cachedScripts)
-        console.log('Listener Communication ID:', communication.id)
+        console.log('Listener Communication ID:', this.communicationId)
 
         // Call the API for all cached scripts
         try {
@@ -175,7 +175,7 @@ export default {
         if (newVal.length > 0 && this.communicationProcessed) {
           console.log('New scripts detected in cache after communication processing:', newVal)
           console.log('Watcher Cached Scripts:', this.cachedScripts)
-          console.log('Watcher Communication ID:', communication.id)
+          console.log('Watcher Communication ID:', this.communicationId)
 
           newVal.forEach(async (script) => {
             try {
