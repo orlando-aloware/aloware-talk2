@@ -72,15 +72,17 @@ export default {
       if (this.checkCommunicationMatchesUserAccessibility(communication)) {
         // Mark that new communication listener has been processed
         this.communicationProcessed = true
+
         this.communicationId = communication.id
+        const localCommunicationId = communication.id
 
         // Call the API for all cached scripts
         try {
           await Promise.all(this.cachedScripts.map(script => {
-            if (script.id && this.communicationId) {
+            if (script.id && localCommunicationId) {
               return talk2Api.V1.scriptCommunication.store({
                 script_id: script.id,
-                communication_id: this.communicationId,
+                communication_id: localCommunicationId,
                 text: script.text
               }).catch(err => {
                 console.log('Error storing script communication:', err)
@@ -167,12 +169,12 @@ export default {
     },
 
     cachedScripts: {
-      handler (scripts) {
+      async handler (scripts) {
         if (scripts.length > 0 && this.communicationProcessed) {
-          let lastCommunicationId = _.get(this.activeTask, 'last_communication.id', this.communicationId)
+          const lastCommunicationId = _.get(this.activeTask, 'last_communication.id', this.communicationId)
 
           // Call the API for all cached scripts
-          scripts.forEach(async (script) => {
+          for (const script of scripts) {
             try {
               if (script.id && lastCommunicationId) {
                 await talk2Api.V1.scriptCommunication.store({
@@ -184,7 +186,7 @@ export default {
             } catch (err) {
               console.log('Error storing script communication:', err)
             }
-          })
+          }
 
           this.cachedScripts = []
         }
