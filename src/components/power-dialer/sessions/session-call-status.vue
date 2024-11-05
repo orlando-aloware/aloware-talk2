@@ -530,8 +530,7 @@ export default {
       'countdownTimer',
       'sessionPaused',
       'activeTask',
-      'hubspot',
-      'script'
+      'hubspot'
     ]),
 
     ...mapState([
@@ -1377,17 +1376,6 @@ export default {
 
       if (!this.isSessionRunning) {
         this.isSessionRunning = true
-      }
-
-      // store script communication
-      if (this.script?.id && this.dialer?.communication?.id) {
-        talk2Api.V1.scriptCommunication.store({
-          script_id: this.script.id,
-          communication_id: this.dialer.communication.id,
-          text: this.script.text || ''
-        }).catch(err => {
-          console.log('Error storing script communication:', err)
-        })
       }
 
       this.resetTimer()

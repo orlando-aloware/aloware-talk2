@@ -18,6 +18,7 @@ import _ from 'lodash'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ScriptSelector from 'components/generic-selectors/session-scripts-selector'
 import talk2Api from 'src/plugins/api/api'
+import { visibilityMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'DetailsScripts',
@@ -25,6 +26,10 @@ export default {
   components: {
     ScriptSelector
   },
+
+  mixins: [
+    visibilityMixin
+  ],
 
   props: {
     resources: {
@@ -73,6 +78,10 @@ export default {
         if (communication.contact_id === this.contactId && this.checkCommunicationMatchesUserAccessibility(communication)) {
           // Mark that new_communication has been processed
           this.communicationProcessed = true
+
+          console.log('Contact ID:', this.contactId)
+          console.log('Cached Scripts:', this.cachedScripts)
+          console.log('Communication ID:', communication.id)
 
           // Call the API for all cached scripts
           this.cachedScripts.forEach(script => {
@@ -148,6 +157,9 @@ export default {
       // Cache the script change
       this.cachedScripts.push({ id: this.selectedScript, text: this.script })
 
+      console.log('Contact ID:', this.contactId)
+      console.log('Cached Scripts:', this.cachedScripts)
+      console.log('Communication ID:', communication.id)
       // If new_communication has already been processed, store the change immediately
       if (this.communicationProcessed) {
         talk2Api.V1.scriptCommunication.store({
