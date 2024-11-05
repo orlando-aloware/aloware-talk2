@@ -11,18 +11,20 @@ export default {
   methods: {
     ...mapMutations(['UPDATE_USER_STATUS']),
 
-    async pollUsers (companyId) {
+    pollUsers (companyId) {
       console.log('Polling agents status...')
-      const result = await talk2Api.V1.company.getAgentsStatus()
 
-      // update agent_status of every user
-      for (const user of result.data) {
-        this.UPDATE_USER_STATUS(user)
+      talk2Api.V1.company.getAgentsStatus().then((result) => {
+        // update agent_status of every user
 
-        if (companyId === user.company_id) {
-          this.$VueEvent.fire('agent_status_updated', user)
+        for (const user of result.data) {
+          this.UPDATE_USER_STATUS(user)
+
+          if (companyId === user.company_id) {
+            this.$VueEvent.fire('agent_status_updated', user)
+          }
         }
-      }
+      })
     }
   }
 }
