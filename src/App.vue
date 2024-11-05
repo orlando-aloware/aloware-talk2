@@ -157,9 +157,11 @@ export default {
           contactTimezone: contact.timezone
         }
 
-        this.$router.push({
+        const route = data.open_contact_page ? '/contacts/' + callData.contactId : {
           name: 'Phone'
-        }, () => {
+        }
+
+        this.$router.push(route, () => {
           this.$VueEvent.fire('callContact', callData)
         }, () => {
           if (this.$route.name === 'Phone') {
