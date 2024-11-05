@@ -4,14 +4,24 @@ import talk2Api from 'src/plugins/api/api'
 export default {
   data () {
     return {
-      pollingInterval: 15 // in seconds
+      pollingInterval: 15, // in seconds
+      usersPollInterval: null
     }
   },
 
   methods: {
     ...mapMutations(['UPDATE_USER_STATUS']),
 
-    pollUsers (companyId) {
+    addUsersPoll () {
+      // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
+      setTimeout(() => {
+        this.usersPollInterval = setInterval(() => {
+          this.pollUsers()
+        }, this.pollingInterval * 1000)
+      }, this.pollingInterval * 1000)
+    },
+
+    pollUsers () {
       console.log('Polling agents status...')
 
       talk2Api.V1.company.getAgentsStatus().then((result) => {
@@ -20,11 +30,15 @@ export default {
         for (const user of result.data) {
           this.UPDATE_USER_STATUS(user)
 
-          if (companyId === user.company_id) {
+          if (this.profile.company_id === user.company_id) {
             this.$VueEvent.fire('agent_status_updated', user)
           }
         }
       })
     }
+  },
+
+  beforeDestroy () {
+    clearInterval(this.usersPollInterval)
   }
 }
