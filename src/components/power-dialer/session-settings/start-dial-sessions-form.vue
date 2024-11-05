@@ -11,7 +11,8 @@
         <div :key="cform.name"
              :class="cform.containerClass ?? 'col-6 pl-3'"
              v-for="cform in form.children">
-          <div :class="getDisabledTextClass(cform.name)" v-if="showField(cform.name)">
+          <div :class="getDisabledTextClass(cform.name)" 
+               v-if="showField(cform.name)">
             <label :class="`label mb-1 ${cform.labelClass}`">
               {{ cform.label }}
             </label>
@@ -126,7 +127,7 @@
                                        :disable="disabled"
                                        v-model="resources[cform.name]"
                                        v-show="showField(cform.name)"
-                                       @change="(eventPayload) => onSuccessfulCallDispositionsChange(eventPayload)"/>
+                                       @change="onSuccessfulCallDispositionsChange"/>
           </p>
 
           <warmup-period-selector class="dial-sessions__form__warmup-period-selector"
