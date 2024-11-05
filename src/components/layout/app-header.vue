@@ -532,7 +532,8 @@ export default {
     isDialerReady (value) {
       if (value && this.$route.query && this.$route.query.call) {
         this.$VueEvent.fire('make_new_call', {
-          phone_number: this.$options.filters.fixPhone(this.$route.query.call)
+          phone_number: this.$options.filters.fixPhone(this.$route.query.call),
+          open_contact_page: true
         })
         let query = Object.assign({}, this.$route.query)
         delete query.call
