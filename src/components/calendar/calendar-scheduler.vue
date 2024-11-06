@@ -25,12 +25,28 @@ export default {
           events: []
         }
       }
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    view: {
+      type: String,
+      default: 'month'
     }
   },
 
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState(['isMobile'])
+  },
+
+  watch: {
+    loading (val) {
+      if (!val) {
+        this.addTimeZoneHeaderRow(this.view)
+      }
+    }
   },
 
   mounted () {
@@ -142,14 +158,8 @@ export default {
 
       let state = Scheduler.getState()
       this.renderEvents(state)
-
-      // Testing
-      this.$nextTick(() => {
-        this.addTimeZoneHeaderRow()
-      })
     })
 
-    // Testing
     Scheduler.attachEvent('onBeforeViewChange', (oldMode, oldDate, mode, date) => {
       this.isHourScaleHeaderAdded = false
       return true
@@ -157,18 +167,6 @@ export default {
 
     Scheduler.init(this.$refs.scheduler, new Date(), 'month')
     Scheduler.parse(this.$props.events)
-
-    // Testing
-    Scheduler.attachEvent('onTemplatesReady', () => {
-      this.addTimeZoneHeaderRow()
-    })
-
-    // Testing
-    Scheduler.attachEvent('onAfterSchedulerResize', () => {
-      this.$nextTick(() => {
-        this.addTimeZoneHeaderRow()
-      })
-    })
 
     this.$refs.scheduler.addEventListener('click', this.handleMoreLink)
     this.$refs.scheduler.addEventListener('click', this.handleDayLabelClick)
@@ -211,8 +209,6 @@ export default {
     },
 
     updateScheduler () {
-      // Testing
-      this.isHourScaleHeaderAdded = false
       Scheduler.updateView()
     },
 
@@ -309,21 +305,16 @@ export default {
     },
 
     setSchedulerHeaderTableWidth (currentView) {
-      if (!currentView || currentView !== 'week') {
+      if (!currentView || currentView === 'day') {
         return
       }
 
-      const headerTableWeek = document.querySelector('.scheduler__header__table--week')
+      const headerTableWeek = document.querySelector('.scheduler__header__table')
       if (!headerTableWeek) {
-        return
+
       }
 
-      if (this.isMobile) {
-        headerTableWeek.style.width = `calc(100% - ${this.getScaleWidth()}px)`
-        return
-      }
-
-      headerTableWeek.style.width = !this.timezoneIsDifferentThanBrowser ? `calc(100% - ${this.getScaleWidth()}px)` : `calc(100% - ${this.getScaleWidth()}px)`
+      headerTableWeek.style.width = currentView === 'week' ? `calc(100% - ${this.getScaleWidth()}px)` : '100%'
     },
 
     getScaleWidth () {

@@ -101,10 +101,12 @@
 
       <!-- scheduler -->
       <div class="scheduler d-flex flex-column flex-grow-1 h-100 overflow-hidden-y">
-        <div class="scheduler__header flex-grow-0">
+        <div class="scheduler__header flex-grow-0 row">
           <table :class="['scheduler__header__table', `scheduler__header__table--${view}`]">
             <tr v-if="view === 'week'">
-              <td :class="d.today ? 'today': ''"
+              <td
+                  style="min-width: 200px;"
+                  :class="d.today ? 'today': ''"
                   :key="d.dayOfWeek"
                   v-for="d in formattedWeekDays">
                 <a
@@ -116,7 +118,6 @@
                   <span class="day">{{ d.day }}</span>
                 </a>
               </td>
-              <td style="width: 20px"></td>
             </tr>
 
             <tr v-if="view === 'month'">
@@ -132,6 +133,8 @@
           <scheduler ref="scheduler"
                      :class="['actual-scheduler h-100', view + '-view']"
                      :events="events"
+                     :loading="loading"
+                     :view="view"
                      @edit-schedule="editSchedule"
                      @add-schedule="addSchedule"
                      @render-events="renderFromEvent"

@@ -74,21 +74,21 @@ export default {
 
       const dateInBrowserTimeZone = this.getDateInBrowserTimeZone(adjustedDate)
       const localTime = this.getLocalTime(dateInBrowserTimeZone)
-      const localTimeAcronym = this.getLocalTimeAcronym(dateInBrowserTimeZone)
+      // const localTimeAcronym = this.getLocalTimeAcronym(dateInBrowserTimeZone)
 
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
         const dateInCurrentTimezone = moment(adjustedDate).tz(this.currentTimezone)
         const currentTimezoneTime = dateInCurrentTimezone.format(this.profile.time_format === 1 ? 'h A' : 'H:00')
         // const currentTimezoneAcronym = dateInCurrentTimezone.format('z')
-        const currentTimezoneAcronym = this.getTimeZoneAbbreviation(dateInCurrentTimezone, this.currentTimezone)
+        // const currentTimezoneAcronym = this.getTimeZoneAbbreviation(dateInCurrentTimezone, this.currentTimezone)
 
         return `
           <div class="hour-label" data-hour="${dateInBrowserTimeZone.hour()}">
             <div class="time-column current-time" data-hour="${dateInBrowserTimeZone.hour()}">
-              ${currentTimezoneTime} ${currentTimezoneAcronym}
+              ${currentTimezoneTime}
             </div>
             <div class="time-column local-time" data-hour="${dateInBrowserTimeZone.hour()}">
-              ${localTime} ${localTimeAcronym}
+              ${localTime}
             </div>
           </div>
         `
@@ -103,44 +103,75 @@ export default {
       `
     },
 
-    addTimeZoneHeaderRow () {
+    addTimeZoneHeaderRow (view) {
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
         // Get the scheduler container
         const schedulerContainer = this.$refs.scheduler
+
+        if (!schedulerContainer) return
 
         // Get a date to use for obtaining time zone abbreviations
         const date = new Date()
 
         // Get time zone abbreviations
-        const dateInBrowserTimeZone = moment(date).tz(this.browserTimeZone)
-        const localTimeAcronym = this.getLocalTimeAcronym(dateInBrowserTimeZone)
+        // const dateInBrowserTimeZone = moment(date).tz(this.browserTimeZone)
+        // const localTimeAcronym = this.getLocalTimeAcronym(dateInBrowserTimeZone)
 
         const dateInCurrentTimezone = moment(date).tz(this.currentTimezone)
         const currentTimezoneAcronym = this.getTimeZoneAbbreviation(dateInCurrentTimezone, this.currentTimezone)
 
-        // Find the container of the hour scale
-        const hourScaleContainer = schedulerContainer.querySelector('.dhx_scale_holder')
-        if (hourScaleContainer) {
+        // Find the header
+        const tableHeader = document.querySelector('.scheduler__header__table')
+
+        if (tableHeader) {
           // Create the header row
-          const headerRow = document.createElement('div')
-          headerRow.className = 'hour-label header-row'
+          const ROW_ID = 'time-zone-header-row'
 
-          const currentTimeZoneDiv = document.createElement('div')
-          currentTimeZoneDiv.className = 'time-column current-time'
-          currentTimeZoneDiv.textContent = currentTimezoneAcronym || ''
+          const node = document.getElementById(ROW_ID)
 
-          const localTimeZoneDiv = document.createElement('div')
-          localTimeZoneDiv.className = 'time-column local-time'
-          localTimeZoneDiv.textContent = localTimeAcronym || ''
-          console.log('localTimeZoneDiv', localTimeZoneDiv)
-          console.log('currentTimeZoneDiv', currentTimeZoneDiv)
-          headerRow.appendChild(currentTimeZoneDiv)
-          headerRow.appendChild(localTimeZoneDiv)
+          // in month view we don't need the timezone header
+          if (view === 'month') {
+            // remove if exists
+            if (node) {
+              node.remove()
+            }
+            return
+          }
 
-          // Insert the header row at the top of the hour scale container
-          hourScaleContainer.insertBefore(headerRow, hourScaleContainer.firstChild)
+          // if the header row already exists, don't add it again
+          if (node) {
+            return
+          }
+
+          const headerRow = this.buildTimeZoneHeaderRow(ROW_ID, currentTimezoneAcronym)
+
+          // Insert the timezone in the header if not exists already
+          tableHeader.parentElement.insertBefore(headerRow, tableHeader)
         }
       }
+    },
+
+    buildTimeZoneHeaderRow (id, companyTimezone) {
+      const headerRow = document.createElement('div')
+      headerRow.id = id
+      headerRow.className = 'row text-center'
+      headerRow.style.height = '44px'
+      headerRow.style.width = '160px'
+
+      const currentTimeZoneDiv = document.createElement('div')
+      currentTimeZoneDiv.className = 'col-6 mt-auto pb-1'
+      currentTimeZoneDiv.textContent = companyTimezone || ''
+
+      const localTimeZoneDiv = document.createElement('div')
+      localTimeZoneDiv.className = 'col-6 mt-auto pb-1'
+      localTimeZoneDiv.textContent = ''
+
+      // console.log('localTimeZoneDiv', localTimeZoneDiv)
+      // console.log('currentTimeZoneDiv', currentTimeZoneDiv)
+
+      headerRow.appendChild(currentTimeZoneDiv)
+      headerRow.appendChild(localTimeZoneDiv)
+      return headerRow
     },
 
     formatDateTime (date, timezone) {
@@ -195,17 +226,13 @@ export default {
 
     getEventTextTemplate (start, end, event) {
       const {
-        currentStartTime,
-        currentEndTime,
-        currentTimeAcronym,
         localStartTime,
-        localEndTime,
-        localTimeAcronym
+        localEndTime
       } = this.getStartEndTime({ currentStart: start, currentEnd: end, browserStart: start, browserEnd: end })
 
       let timeString
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
-        timeString = `${currentStartTime} - ${currentEndTime} ${currentTimeAcronym} / ${localStartTime} - ${localEndTime} ${localTimeAcronym}`
+        timeString = `${localStartTime} - ${localEndTime}`
       } else {
         timeString = `${localStartTime} - ${localEndTime}`
       }
@@ -218,11 +245,12 @@ export default {
       `
     },
 
-    getWeekStartAndEnd (date) {
-      const [startStr, endStr] = date.split(' - ')
+    getMomentObjectForWeekStartAndEnd (date) {
+      const [firstDay, lastDayMonthYear] = date.split(' - ')
+      const [lastDay, month, year] = lastDayMonthYear.split(' ')
       return {
-        startOfWeek: moment(startStr, 'D MMM YYYY'),
-        endOfWeek: moment(endStr, 'D MMM YYYY')
+        startOfWeek: moment(`${firstDay} ${month} ${year}`, 'D MMM YYYY'),
+        endOfWeek: moment(`${lastDay} ${month} ${year}`, 'D MMM YYYY')
       }
     },
 
@@ -230,8 +258,9 @@ export default {
       return eventText?.toLowerCase()?.includes(this.searchQuery.toLowerCase())
     },
 
-    filterEventsForWeek (extraCondition) {
-      const { startOfWeek, endOfWeek } = this.getWeekStartAndEnd(this.currentDate)
+    filterEventsForWeek (dateRangeString, extraCondition) {
+      const { startOfWeek, endOfWeek } = this.getMomentObjectForWeekStartAndEnd(dateRangeString)
+
       return this.events.filter(event => {
         const eventStart = moment(event.start_date)
         const matchesSearch = this.matchesSearch(event.text)

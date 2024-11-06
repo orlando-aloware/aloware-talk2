@@ -41,19 +41,21 @@
                 </div>
               </div>
               <div class="col">
-                <div :class="getCancelledEventTextDecoration(event)"
-                     v-if="timezoneIsDifferentThanBrowser && !isMobile">
-                  <div v-html="formatEventTime(event)"></div>
-                  <div>{{ getEventStatusLabel(event?.status) }} {{ getEventTypeLabel(event?.type) }}</div>
-                </div>
-                <div :class="getCancelledEventTextDecoration(event)"
-                     v-else>
-                  {{ formatEventTime(event) }} - {{ getEventStatusLabel(event?.status) }} {{ getEventTypeLabel(event?.type) }}
-                </div>
                 <div class="text-bold"
                      :class="getCancelledEventTextDecoration(event)">
                   {{ event.text }}
                 </div>
+                <div  class="small" :class="getCancelledEventTextDecoration(event)"
+                     v-if="timezoneIsDifferentThanBrowser && !isMobile">
+                  <div v-html="formatEventTime(event)"></div>
+                  <div>{{ getEventStatusLabel(event?.status) }} <span class="text-muted">{{ getEventTypeLabel(event?.type) }}</span></div>
+                </div>
+                <div class="small" :class="getCancelledEventTextDecoration(event)"
+                      v-else
+                     >
+                  {{ formatEventTime(event) }} - {{ getEventStatusLabel(event?.status) }} <span class="text-muted">{{ getEventTypeLabel(event?.type) }}</span>
+                </div>
+
               </div>
             </div>
             <q-separator spaced
@@ -139,7 +141,7 @@ export default {
 
     eventsForSelectedHour () {
       if (this.viewMode === 'week') {
-        return this.filterEventsForWeek(event => {
+        return this.filterEventsForWeek(this.currentDate, event => {
           const eventStart = moment(event.start_date)
           const selectedHour = moment(this.selectedHour)
           return eventStart.hour() === selectedHour.hour()
@@ -151,11 +153,11 @@ export default {
 
     eventsForSelectedDate () {
       if (this.viewMode === 'week') {
-        return this.filterEventsForWeek().sort(this.sortListEvents)
+        return this.filterEventsForWeek(this.currentDate).sort(this.sortListEvents)
       }
 
       const selectedDay = moment(this.selectedDate).startOf('day')
-      return this.filterEventsForDate('day', selectedDay)
+      return this.filterEventsForDate('day', selectedDay).sort(this.sortListEvents)
     },
 
     displayedEvents () {
@@ -189,26 +191,25 @@ export default {
       }
 
       if (this.viewMode === 'week') {
-        return `There are no events for the week between ${this.currentDate.split(' - ')[0]} and ${this.currentDate.split(' - ')[1]}.`
+        return `No events between ${this.currentDate.split(' - ')[0]} and ${this.currentDate.split(' - ')[1]}.`
       }
 
-      return `There are no events for this ${this.eventsModalMode === 'hour' ? 'hour' : 'day'}.`
+      return `No events for this ${this.eventsModalMode === 'hour' ? 'hour' : 'day'}.`
     }
   },
 
   methods: {
     formatEventTime (event) {
       const {
-        currentStartDate,
-        currentStartTime,
-        currentEndDate,
-        currentEndTime,
-        currentTimeAcronym,
+        // currentStartDate,
+        // currentStartTime,
+        // currentEndDate,
+        // currentEndTime,
+        // currentTimeAcronym,
         localStartDate,
         localStartTime,
         localEndDate,
-        localEndTime,
-        localTimeAcronym
+        localEndTime // localTimeAcronym
       } = this.getStartEndTime({
         currentStart: event.start_date,
         currentEnd: event.end_date,
@@ -217,15 +218,16 @@ export default {
       })
 
       if (this.viewMode === 'week') {
-        if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
-          return `<strong>${currentStartDate} - ${currentStartTime}</strong> - <strong>${currentEndDate} - ${currentEndTime}</strong> ${currentTimeAcronym} / <strong>${localStartDate} - ${localStartTime}</strong> - <strong>${localEndDate} - ${localEndTime}</strong> ${localTimeAcronym}`
+        // display both date only if the event spans multiple days
+        if (localStartDate !== localEndDate) {
+          return `${localStartDate} - ${localEndDate} ⋅ ${localStartTime} - ${localEndTime}`
         }
 
-        return `${localStartDate} - ${localStartTime} - ${localEndDate} - ${localEndTime}`
+        return `${localStartDate} ⋅ ${localStartTime} - ${localEndTime}`
       }
 
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
-        return `${currentStartTime} - ${currentEndTime} ${currentTimeAcronym} / ${localStartTime} - ${localEndTime} ${localTimeAcronym}`
+        return `${localStartTime} - ${localEndTime}`
       }
 
       return `${localStartTime} - ${localEndTime}`
@@ -276,29 +278,24 @@ export default {
       if (this.eventsModalMode === 'hour') {
         if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
           if (!currentTime) {
-            return `Showing events for the week between ${startOfWeek} and ${endOfWeek}`
+            return `Showing events for ${startOfWeek} - ${endOfWeek}`
           }
 
-          const currentHour = currentTime.split(' ')[3]
-          const currentMinutes = currentTime.split(' ')[4]
+          // const currentHour = currentTime.split(' ')[3]
+          // const currentMinutes = currentTime.split(' ')[4]
           const localHour = localTime.split(' ')[3]
-          const localMinutes = localTime.split(' ')[4]
 
-          return `Showing events for ${currentHour} ${currentMinutes} ${currentTimeAcronym} / ${localHour} ${localMinutes} ${localTimeAcronym} for the week between ${startOfWeek} and ${endOfWeek}`
+          return `Showing events for ${startOfWeek} - ${endOfWeek} at ${localHour}`
         }
 
         const localTimeHour = `${localTime?.split(' ')[3]} ${localTime?.split(' ')[4]}`
-        return `Showing events for ${localTimeHour} for the week between ${startOfWeek} and ${endOfWeek}`
+        return `Showing events for ${localTimeHour} ${startOfWeek} - ${endOfWeek}`
       }
 
-      return `Showing events for the week between ${startOfWeek} and ${endOfWeek}`
+      return `Showing events for ${startOfWeek} - ${endOfWeek}`
     },
 
     getHourViewModalTitle (currentTime, currentTimeAcronym, localTime, localTimeAcronym) {
-      if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
-        return `Showing events for ${currentTime} ${currentTimeAcronym} / ${localTime} ${localTimeAcronym}`
-      }
-
       return `Showing events for ${localTime}`
     },
 
