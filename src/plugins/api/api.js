@@ -484,7 +484,26 @@ export default {
 
       fetchSmartTranscriptionData (communicationId, options) {
         return window.axios.get(`${suffixV1}transcription/communication/${communicationId}`, options)
+      },
+
+      generateTranscription (communicationId) {
+        if (!communicationId) {
+          return null
+        }
+
+        return window.axios.post(`${suffixV1}communication/${communicationId}`)
+      },
+
+      generateSummary (communicationId) {
+        if (!communicationId) {
+          return null
+        }
+
+        return window.axios.post(
+          `${suffixV1}communication/${communicationId}/generate-summary`
+        )
       }
+
     },
 
     statics: {

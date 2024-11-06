@@ -4,6 +4,20 @@
            data-testid="comm-conversation-section"
            ref="chatArea">
     <div v-if="!isEmpty(messages)">
+      <q-btn color="text-dark-greenish"
+             class="btn btn-inline px-1 py-0"
+             title="Download"
+             flat
+             rounded
+             dense
+             no-caps
+             data-testid="download-button-download-btn"
+             @click="onDownload()">
+        <download-icon height="16"
+                       width="16"
+                       data-testid="download-button-download-icon">
+        </download-icon>
+      </q-btn>
       <div :key="message_index"
            v-for="(message, message_index) in formattedMessages">
         <!--
@@ -47,9 +61,14 @@
 
 <script>
 import _ from 'lodash'
+import DownloadIcon from 'components/icons/contact-activity/download-icon'
 
 export default {
   name: 'ConversationSection',
+
+  components: {
+    DownloadIcon
+  },
 
   props: {
     messages: {
@@ -128,6 +147,14 @@ export default {
         top: newScrollTop,
         behavior: 'smooth' // Enables smooth scrolling
       })
+    },
+
+    /**
+     *
+     * @param fixFilenameExtension
+     */
+    onDownload (transcription = '') {
+
     },
 
     /**
