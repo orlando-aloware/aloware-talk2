@@ -10,11 +10,10 @@
     <div class="p-2">
       <h1 data-testid="aloai-enrollment-control-modal-title"
           class="text-center mb-2">
-        Enrollment Control
+        AloAi Text Bot Enrollment
       </h1>
       <div class="text-center">
-        Manage the enrollment with the bots that you want to interact with this
-        contact.
+        Select the Sales Bot you want to initiate a conversation with this contact.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search placeholder="Search bot"
@@ -30,6 +29,23 @@
                           :value="bot.id"
                           v-model="selectedBotId">
               {{ bot.name }}
+              <!-- Bot Enrolled Label -->
+              <b-popover
+                target="enrolled-badge"
+                triggers="hover"
+                placement="right"
+                delay="100"
+              >
+                This contact is currently enrolled to this bot.
+              </b-popover>
+              <q-badge
+                v-if="isEnrolled(bot.id)"
+                id="enrolled-badge"
+                class="ml-1"
+                color="green"
+              >
+                <span>Enrolled</span>
+              </q-badge>
             </b-form-radio>
           </label>
         </li>
@@ -43,8 +59,8 @@
         <button class="btn btn-sm bg-primary text-white mr-2"
                 data-testid="aloai-enrollment-control-modal-enroll-contact-button"
                 :disabled="isBusy"
-                @click="onSubmitEnrollment">
-          Save changes
+                @click="confirmEnrollment">
+          Enroll
         </button>
       </div>
     </div>
@@ -108,9 +124,32 @@ export default {
     onSearch (searchText) {
       this.searchText = searchText
     },
-    onSubmitEnrollment (event) {
+    confirmEnrollment (event) {
       event.preventDefault()
-
+      // If the contact is already enrolled, confirm we want to re-enroll
+      if (this.isEnrolled(this.selectedBotId)) {
+        this.$bvModal.msgBoxConfirm('Re-enrolling this contact will count as a new enrollment and charged accodingly. Continue?', {
+          title: 'Warning',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'warning',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          footerClass: 'p-2',
+          hideHeaderClose: false,
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.submitEnrollment()
+          }
+        }).catch(() => {
+          // Do nothing
+        })
+      } else {
+        this.submitEnrollment()
+      }
+    },
+    submitEnrollment () {
       if (!this.selectedBotId) {
         this.$generalNotification(
           'Please select a bot to enroll the contact.',
@@ -136,7 +175,7 @@ export default {
           }
 
           this.$generalNotification(errorMsg, 'error')
-          console.error('[onSubmitEnrollment] error', error)
+          console.error('[submitEnrollment] error', error)
         })
         .finally(() => {
           this.isBusy = false
@@ -153,6 +192,14 @@ export default {
     },
     onShown () {
       this.load()
+    },
+    isEnrolled (botId) {
+      // Search in the bot_enrollments object array if the contact is enrolled in the bot
+      console.log('BOT ENROLLMENTS', this.bot_enrollments)
+      console.log('BOT ID', botId)
+      console.log('IS ENROLLED', this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId))
+
+      return this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
     },
     async load () {
       this.isLoading = true
