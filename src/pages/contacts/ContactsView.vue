@@ -275,13 +275,13 @@
 
         <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                     text="..."
-                    variant="light"
+                    :variant="selectedAllCount !== 0 ? '' : 'light'"
                     no-caret
                     data-testid="contacts-view-options-dropdown"
                     alt="List Options"
                     title="List Options"
                     right
-                    v-if="selectedAllCount === 0">
+                    :disabled="selectedAllCount !== 0">
           <template #button-content>
             <ellipse-icon />
           </template>
