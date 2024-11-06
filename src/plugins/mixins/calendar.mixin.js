@@ -1,7 +1,7 @@
 import { mapState } from 'vuex'
 import moment from 'moment'
 import { browserTimezone } from 'src/utils'
-import { TIME_FORMAT_AM_PM } from 'src/constants/calendar'
+import { MONTH_VIEW, TIME_FORMAT_AM_PM } from 'src/constants/calendar'
 
 export default {
   data () {
@@ -126,7 +126,7 @@ export default {
           const node = document.getElementById(ROW_ID)
 
           // in month view we don't need the timezone header
-          if (view === 'month') {
+          if (view === MONTH_VIEW || this.isMobile) {
             // remove if exists
             if (node) {
               node.remove()
