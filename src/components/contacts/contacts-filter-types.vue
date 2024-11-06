@@ -45,7 +45,7 @@
                  data-testid="contacts-filter-secondary-operator-value-input"
                  v-if="operator.value === filterOperator && hasSecondaryOperator" />
       </template>
-      <template v-if="filter.type === 'date'">
+      <template v-if="filter.type === 'date' || filter.type === 'date_time'">
         <q-select option-value="value"
                   dense
                   outlined
@@ -63,15 +63,34 @@
                            data-testid="contacts-filter-operator-value-datepicker"
                            v-if="operator.value === filterOperator && expectsDatepicker">
         </b-form-datepicker>
-        <span v-if="operator.value === filterOperator && hasSecondaryOperator">and</span>
+        <span v-if="operator.value === filterOperator && hasSecondaryOperator && !expectsSelected">and</span>
         <b-form-datepicker label-today="Today"
                            today-button
                            reset-button
                            :date-format-options="format"
                            data-testid="contacts-filter-secondary-operator-value-datepicker"
                            v-model="secondaryFilterOperatorValue"
-                           v-if="operator.value === filterOperator && hasSecondaryOperator">
+                           v-if="operator.value === filterOperator && hasSecondaryOperator && !expectsSelected">
         </b-form-datepicker>
+        <div class="row">
+          <q-input class="q-field--auto-height col-6 mr-2"
+                   type="number"
+                   outlined
+                   dense
+                   data-testid="contacts-filter-operator-value-input"
+                   v-model="filterOperatorValue"
+                   v-if="operator.value === filterOperator && expectsSelected" />
+          <q-select option-value="value"
+                    class="col-4"
+                    dense
+                    outlined
+                    emit-value
+                    map-options
+                    data-testid="contacts-filter-operator-value-date-select"
+                    :options="operator.options"
+                    v-model="secondaryFilterOperatorValue"
+                    v-if="operator.value === filterOperator && expectsSelected" />
+        </div>
       </template>
       <template v-if="isRelationFilterType(filter.type, filter.key) ">
         <q-select ref="filterOperation"
@@ -195,7 +214,7 @@ import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { State } from 'country-state-city'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import EntityTags from 'components/generic-selectors/entity-tags'
-
+import * as DateTimeFilter from '../../constants/contact-filters/date-time'
 export default {
   name: 'contacts-filter-types',
 
@@ -257,7 +276,8 @@ export default {
       secondaryFilterOperatorValueDebounceInProgress: false,
       appliedFiltersInProgress: false,
       appliedTags: [],
-      TagCategories
+      TagCategories,
+      DateTimeFilter
     }
   },
 
@@ -286,12 +306,17 @@ export default {
         case 'number':
           return [1, 2, 3, 4, 5, 6, 7].includes(this.filterOperator)
 
+        case 'date_time':
         case 'date':
           return [1].includes(this.filterOperator)
 
         default:
           return true
       }
+    },
+
+    expectsSelected () {
+      return [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN].includes(this.filterOperator)
     },
 
     expectsDatepicker () {
@@ -305,6 +330,9 @@ export default {
 
         case this.filter.type === 'date':
           return [5].includes(this.filterOperator)
+
+        case this.filter.type === 'date_time':
+          return [DateTimeFilter.OPERATOR_IS_BETWEEN, DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN].includes(this.filterOperator)
 
         case this.filter.key === 'custom_attribute':
           return true
@@ -435,6 +463,10 @@ export default {
           this.setDateValue(value)
           break
 
+        case 'date_time':
+          this.setDateTimeValue(value)
+          break
+
         case 'relation':
           this.setRelationValue(filter)
           break
@@ -493,6 +525,10 @@ export default {
 
         case 'date':
           value.data = this.getDateValue()
+          break
+
+        case 'date_time':
+          value.data = this.getDateTimeValue()
           break
 
         default:
@@ -716,6 +752,31 @@ export default {
       }
     },
 
+    getDateTimeValue () {
+      switch (this.filterOperator) {
+        // in between operator
+        case DateTimeFilter.OPERATOR_IS_BETWEEN:
+        case DateTimeFilter.OPERATOR_IS_MORE_THAN:
+        case DateTimeFilter.OPERATOR_IS_LESS_THAN:
+          return [this.filterOperatorValue, this.secondaryFilterOperatorValue]
+        default:
+          return this.filterOperatorValue
+      }
+    },
+
+    setDateTimeValue (value) {
+      switch (this.filterOperator) {
+        case DateTimeFilter.OPERATOR_IS_BETWEEN:
+        case DateTimeFilter.OPERATOR_IS_MORE_THAN:
+        case DateTimeFilter.OPERATOR_IS_LESS_THAN:
+          this.filterOperatorValue = value[0]
+          this.secondaryFilterOperatorValue = value[1]
+          break
+        default:
+          this.filterOperatorValue = value
+      }
+    },
+
     getRelationTypesValue () {
       let attribute = 'data'
       const data = { data: null }
@@ -772,28 +833,53 @@ export default {
             (isValueValid && !this.hasSecondaryOperator) || (this.filterOperator === 8 || this.filterOperator === 9)
           break
 
+        case 'date_time':
+          let isValidFilter = true
+          const filters = this.allFilters[this.filterGroupIndex]?.filters[this.filter.key]
+          if (filters?.length > 1) {
+            let filtersNotAllowed = []
+            // only allow selecting one of these four options at a time
+            switch (this.filterOperator) {
+              case DateTimeFilter.OPERATOR_IS_MORE_THAN:
+                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_LESS_THAN, DateTimeFilter.OPERATOR_IS_KNOWN, DateTimeFilter.OPERATOR_IS_UNKNOWN]
+                break
+              case DateTimeFilter.OPERATOR_IS_LESS_THAN:
+                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_KNOWN, DateTimeFilter.OPERATOR_IS_UNKNOWN]
+                break
+              case DateTimeFilter.OPERATOR_IS_UNKNOWN:
+                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN, DateTimeFilter.OPERATOR_IS_KNOWN]
+                break
+              case DateTimeFilter.OPERATOR_IS_KNOWN:
+                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN, DateTimeFilter.OPERATOR_IS_UNKNOWN]
+                break
+            }
+            isValidFilter = !filters.some(filter => filtersNotAllowed.includes(filter.operator))
+          }
+          const maxValidHours = 12
+          let isValidTime = false
+          if ([DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN].includes(this.filterOperator) && this.filter.operators && this.hasSecondaryOperator) {
+            const timeValues = this.filter.operators.find(operator => operator.value === this.filterOperator).options
+
+            const timeSelected = timeValues.find(time => time.value === this.secondaryFilterOperatorValue)
+
+            isValidTime = !isNaN(Number(this.filterOperatorValue)) &&
+              this.filterOperatorValue > 0 &&
+              (timeSelected?.label === 'Days' ||
+              (timeSelected?.label === 'Hours' &&
+              this.filterOperatorValue <= maxValidHours)) &&
+              isValidFilter
+          } else {
+            isValidTime = [DateTimeFilter.OPERATOR_IS_KNOWN, DateTimeFilter.OPERATOR_IS_UNKNOWN].includes(this.filterOperator) &&
+              isValidFilter
+          }
+
+          this.isValidated = isValidTime || (this.validDate() && ![DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN].includes(this.filterOperator))
+          break
+
         case 'date':
-          // if there are two operators in a date filter, check if both operator values
-          // are not empty
-          const isSecondOperatorValidValue = this.filterOperatorValue &&
-            this.hasSecondaryOperator &&
-            this.secondaryFilterOperatorValue
-          // if there's only 1 operator in a date filter, check if
-          // numeric operator value is greater than or equal to 0
-          const isOperatorValidNumericValue = typeof this.filterOperatorValue === 'number' &&
-            this.filterOperatorValue >= 0
-          // if there's only 1 operator in a date filter, check if
-          // non numeric operator value is not empty
-          const isOperatorValidNonNumericValue = typeof this.filterOperatorValue !== 'number' &&
-            !isEmpty(this.filterOperatorValue)
-          // if non or numeric filter operator value has a value,
-          // then it is valid for single operator
-          const isOperatorValidValue = (isOperatorValidNumericValue ||
-              isOperatorValidNonNumericValue) &&
-            !this.hasSecondaryOperator
           // we should only allow a date filter to be added if
           // its operator(s) has/have value(s)
-          this.isValidated = isOperatorValidValue || isSecondOperatorValidValue
+          this.isValidated = this.validDate()
           break
 
         case 'selection':
@@ -803,6 +889,29 @@ export default {
         default:
           this.isValidated = false
       }
+    },
+
+    validDate () {
+      // if there are two operators in a date filter, check if both operator values
+      // are not empty
+      const isSecondOperatorValidValue = this.filterOperatorValue &&
+        this.hasSecondaryOperator &&
+        this.secondaryFilterOperatorValue
+      // if there's only 1 operator in a date filter, check if
+      // numeric operator value is greater than or equal to 0
+      const isOperatorValidNumericValue = typeof this.filterOperatorValue === 'number' &&
+        this.filterOperatorValue >= 0
+      // if there's only 1 operator in a date filter, check if
+      // non numeric operator value is not empty
+      const isOperatorValidNonNumericValue = typeof this.filterOperatorValue !== 'number' &&
+        !isEmpty(this.filterOperatorValue)
+      // if non or numeric filter operator value has a value,
+      // then it is valid for single operator
+      const isOperatorValidValue = (isOperatorValidNumericValue ||
+          isOperatorValidNonNumericValue) &&
+        !this.hasSecondaryOperator
+
+      return isOperatorValidValue || isSecondOperatorValidValue
     },
 
     resetForm () {
