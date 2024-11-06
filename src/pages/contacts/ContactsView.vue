@@ -64,14 +64,14 @@
               v-if="!simpleTable">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
-          <contactSearch class="width-260"
+          <ContactSearch class="width-260"
                   limitSearchCharacters
                   :search="search"
                   :disabled="isLoadingDisabled"
                   data-testid="contacts-view-search-input"
                   @show-error="showLimitCharactersError = $event"
                   @search="onSearch">
-          </contactSearch>
+          </ContactSearch>
           <div class="contacts-total mobile">
             <div class="small text-muted fs-13 text-right"
                  v-if="selectedList.type === ContactListTypes.DYNAMIC">

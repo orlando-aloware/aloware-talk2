@@ -52,7 +52,7 @@
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="mb-2 d-flex justify-content-between align-items-center">
-          <contactSearch placeholder="Search All Contacts"
+          <ContactSearch placeholder="Search All Contacts"
                   limitSearchCharacters
                   :disabled="isLoadingDisabled"
                   @show-error="showLimitCharactersError = $event"
@@ -636,7 +636,6 @@ export default {
       listName: '',
       myContacts: false,
       urlRoutePath: '/contacts/list/',
-      showLimitCharactersError: false,
       ContactListTypes
     }
   },
