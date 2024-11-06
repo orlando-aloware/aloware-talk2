@@ -42,7 +42,7 @@
                 v-if="isEnrolled(bot.id)"
                 id="enrolled-badge"
                 class="ml-1"
-                color="green"
+                color="green-6"
               >
                 <span>Enrolled</span>
               </q-badge>
@@ -195,10 +195,6 @@ export default {
     },
     isEnrolled (botId) {
       // Search in the bot_enrollments object array if the contact is enrolled in the bot
-      console.log('BOT ENROLLMENTS', this.bot_enrollments)
-      console.log('BOT ID', botId)
-      console.log('IS ENROLLED', this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId))
-
       return this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
     },
     async load () {
