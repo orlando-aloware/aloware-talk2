@@ -433,7 +433,7 @@ export default {
       const optionsSet = new Set(this.filter.options)
       this.filter.options = [...optionsSet]
     }
-    this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation'].includes(this.filter.type) ? 10 : 500
+    this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation', 'date-time'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = this.$jsonClone(this.currentListFilters)
     const path = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}].operator`
     this.filterOperator = get(this.initialListFilters, path, 1)
@@ -835,8 +835,8 @@ export default {
 
         case 'date_time':
           let isValidFilter = true
-          const filters = this.allFilters[this.filterGroupIndex]?.filters[this.filter.key]
-          if (filters?.length > 1) {
+          const filters = this.currentListFilters[this.filterGroupIndex]?.filters[this.filter.key]
+          if (filters?.length > 0) {
             let filtersNotAllowed = []
             // only allow selecting one of these four options at a time
             switch (this.filterOperator) {
