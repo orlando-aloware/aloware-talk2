@@ -5,7 +5,7 @@
     <q-card-section class="px-0 d-flex flex-column h-100 overflow-hidden">
       <ScriptSelector class="px-3 w-100 flex-grow-0"
                       v-model="scriptId"
-                      @on-change="changeScript" />
+                      @change="changeScript" />
       <div class="t-scroll-y2 py-3 px-3 flex-grow-1"
            style="overflow:auto;"
            v-html="scriptText" />
