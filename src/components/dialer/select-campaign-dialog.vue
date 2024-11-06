@@ -12,15 +12,15 @@
                        rounded
                        behavior="menu"
                        :generic-multiselect="false"
-                       v-model="campaignId"
+                       v-model="localCampaignId"
                        @change="changeCampaignId">
         </line-selector>
 
         <div>
           <q-btn color="primary"
-                rounded
-                :disabled="!campaignId || isAgentOnCall"
-                @click="onCallClick">
+                 rounded
+                 :disabled="!localCampaignId || isAgentOnCall"
+                 @click="onCallClick">
             Call
           </q-btn>
           <q-tooltip v-if="isAgentOnCall">
@@ -59,7 +59,8 @@ export default {
   data () {
     return {
       visible: false,
-      position: 'top'
+      position: 'top',
+      localCampaignId: this.campaignId
     }
   },
 
@@ -77,7 +78,10 @@ export default {
         this.visible = val
       }
 
-      this.campaignId = null
+      this.localCampaignId = null
+    },
+    campaignId (newVal) {
+      this.localCampaignId = newVal
     }
   },
 
@@ -91,13 +95,13 @@ export default {
     },
 
     changeCampaignId (campaignId) {
-      this.campaignId = campaignId
+      this.localCampaignId = campaignId
     },
 
     onCallClick () {
-      this.$emit('change-campaign-id', this.campaignId)
+      this.$emit('change-campaign-id', this.localCampaignId)
 
-      this.$emit('call', this.campaignId)
+      this.$emit('call', this.localCampaignId)
       this.visible = false
     }
   }

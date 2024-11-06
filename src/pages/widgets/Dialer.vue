@@ -114,15 +114,14 @@ export default {
               await new Promise(resolve => setTimeout(resolve, 1000))
             }
 
+            this.setHubspotDialNumber(event)
             this.checkAndResetCallDisposition()
+            await this.getContact()
 
             this.showAlertCallFinished = false
 
-            this.findDefaultOutboundCampaign()
-            this.setHubspotDialNumber(event)
-            if (this.timeout) {
-              clearTimeout(this.timeout)
-            }
+            await this.findDefaultOutboundCampaign()
+
             if (this.isAlwaysAskModeEnabled()) {
               this.handleDialNumber()
             }
@@ -193,15 +192,15 @@ export default {
     if (!this.needsExtensions) {
       this.extensionsVisibility = true
     }
-
-    if (!this.extensions) {
-      this.extensions = new CallingExtensions(this.callSdkOptions)
-    }
   },
 
   async mounted () {
     await this.init()
     this.isFirstLoading = false
+
+    if (!this.extensions) {
+      this.extensions = new CallingExtensions(this.callSdkOptions)
+    }
   },
 
   methods: {
@@ -222,12 +221,12 @@ export default {
       'setCurrentCompany'
     ]),
 
-    init () {
+    async init () {
       if (this.apiKey) {
         storage.local.setItem('api_token', this.apiKey)
       }
       this.loading = true
-      this.check().then((res) => {
+      await this.check().then((res) => {
         storage.local.setItem('company_id', res.data.user.company.id)
         this.setCurrentCompany(res.data.user.company)
         this.resetVuex(['all'])
@@ -255,7 +254,7 @@ export default {
       this.contactName = this.getContactName(contact)
       this.contactTimezone = contact.timezone
       this.companyName = contact.company_name
-      this.contactId = contact.contact_id
+      this.contactId = contact.id
     },
 
     getContactEmitPayload () {
@@ -274,7 +273,6 @@ export default {
       }).then(res => {
         this.setContactDetails(res.data)
         this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
-        this.handleCall()
       }).catch(err => {
         this.$handleErrors(err.response)
         this.criticalErrorHappened = true
@@ -289,18 +287,21 @@ export default {
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
+        console.log('exit one')
         return
       }
 
       // don't allow to make a call if there's a parked call
       if (this.dialer?.parkedCall) {
+        console.log('exit two')
         return
       }
-
+      console.log('after checks', this.canHandleDialNumber())
       this.showAlertAgentOnCall = false
 
       if (this.canHandleDialNumber()) {
-        await this.getContact()
+        console.log('calling')
+        this.handleCall()
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
           this.handleDialNumber()
@@ -425,9 +426,10 @@ export default {
       })
     },
 
-    findDefaultOutboundCampaign () {
+    async findDefaultOutboundCampaign () {
+      console.log('findDefaultOutboundCampaign', this.isAlwaysAskModeEnabled())
       if (this.isAlwaysAskModeEnabled()) {
-        setTimeout(() => this.setTheLastUsedCallLine(), 1000)
+        await this.setTheLastUsedCallLine()
         return
       }
 
@@ -438,6 +440,8 @@ export default {
       } else if (this.shouldUseProfileCampaignId()) {
         this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
       }
+
+      console.log('defaultOutboundCampaignId', this.defaultOutboundCampaignId)
 
       if (this.defaultOutboundCampaignId) {
         this.setCampaignIdAndDialNumber()
@@ -478,6 +482,7 @@ export default {
     },
 
     canHandleDialNumber () {
+      console.log('canHandleDialNumber', this.isRedirectedToHubspotWidget, this.campaignId, this.needsExtensions, this.initialized, this.authProfile, this.dialer?.isReady)
       if (this.isRedirectedToHubspotWidget && this.campaignId) {
         return this.needsExtensions &&
           this.initialized &&
@@ -529,17 +534,11 @@ export default {
     },
 
     async setTheLastUsedCallLine () {
-      if (!this.contactId) {
-        const contact = await this.searchContact(this.hubspotPhoneNumber)
-        if (contact) {
-          this.contactId = contact.contact_id
-        }
-      }
-
+      console.log('setTheLastUsedCallLine', this.campaignId, this.contactId)
       if (this.campaignId || !this.contactId) return
       try {
         const data = await this.getLastUsedCallLineByContactId(this.contactId)
-
+        console.log('setTheLastUsedCallLine', data)
         this.handleChangeCampaignEvent(data.campaign_id)
       } catch (error) {
         this.$handleErrors(error.response)
@@ -554,10 +553,6 @@ export default {
       } else {
         this.showAlertCallFinished = false
       }
-    },
-
-    authProfile () {
-      this.findDefaultOutboundCampaign()
     },
 
     'dialer.currentStatus' () {
