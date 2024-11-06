@@ -433,7 +433,7 @@ export default {
       const optionsSet = new Set(this.filter.options)
       this.filter.options = [...optionsSet]
     }
-    this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation', 'date-time'].includes(this.filter.type) ? 10 : 500
+    this.debounceDelay = ['string', 'boolean', 'number', 'date', 'relation', 'date_time'].includes(this.filter.type) ? 10 : 500
     this.initialListFilters = this.$jsonClone(this.currentListFilters)
     const path = `[${this.filterGroupIndex}].filters[${this.filter.key}][${this.groupItemIndex}].operator`
     this.filterOperator = get(this.initialListFilters, path, 1)
