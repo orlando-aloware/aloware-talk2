@@ -1,18 +1,10 @@
 <template>
   <b-card class="border-0 position-relative contact-about-wrapper" v-if="this.profile.company.aloai_enabled">
-    <h4>AloAi Text Bot</h4>
+    <h4>AloAi Text Bot Enrollment</h4>
 
     <b-card-text class="fs-14 mt-2">
-      This contact is enrolled with one or more bots.
+      Enroll this contact to any of your Sales Bots and let them do the work for you!
     </b-card-text>
-
-    <block-tooltip
-      placement="left"
-      triggers="hover"
-      target="aloai-enrollment-control-popover"
-      task="sequences.enroll"
-      data-testid="aloai-enrollment-control-tooltip"
-    />
 
     <div id="engage-control-popover">
       <b-button
@@ -24,7 +16,7 @@
         @click="openEnrollmententControlModal"
       >
         <add-user-icon data-testid="add-user-icon" height="12" width="12" />
-        Enrollment Control
+        Enroll to Bot
       </b-button>
     </div>
 
@@ -36,12 +28,11 @@
 import AddUserIcon from 'components/icons/add-user-icon-2'
 import AloaiEnrollmentControlModal from 'components/aloai-enrollment-control-modal.vue'
 import { mapGetters } from 'vuex'
-import BlockTooltip from 'components/kyc/block-tooltip'
 
 export default {
   name: 'contact-aloai-enrollment-control',
 
-  components: { AloaiEnrollmentControlModal, AddUserIcon, BlockTooltip },
+  components: { AloaiEnrollmentControlModal, AddUserIcon },
 
   props: {
     contact: {

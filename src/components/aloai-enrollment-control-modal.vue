@@ -21,60 +21,32 @@
                 data-testid="aloai-enrollment-control-modal-search"
                 @search="onSearch"/>
       </div>
-      <q-tabs no-caps
-              inline-label
-              dense
-              class="bg-white text-black border-bottom"
-              content-class="flex-nowrap"
-              :mobile-arrows="false"
-              v-model="selectedTab">
-        <q-tab :name="TABS.ENROLLMENT">
-          Chatbots Enrollment
-          <span class="ml-1">
-            <information-circle-icon class="cursor-pointer" />
-            <q-tooltip anchor="top middle">
-              Select a bot to engage in a new conversation with the contact
-            </q-tooltip>
-          </span>
-        </q-tab>
-      </q-tabs>
-      <q-tab-panels class="h-100"
-                    v-model="selectedTab">
-        <q-tab-panel :name="TABS.ENROLLMENT">
-          <ul class="list-group list-group-flush scrollable-list mb-4">
-            <li class="list-group-item list-group-item-action p-0"
-                :key="`enroll-bot-${key}`"
-                v-for="(bot, key) in this.filteredSalesBots">
-              <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
-                <b-form-radio name="selected-bot"
-                              :value="bot.id"
-                              v-model="selectedBotId">
-                  {{ bot.name }}
-                </b-form-radio>
-              </label>
-            </li>
-          </ul>
-          <div class="d-flex items-center justify-center" style="gap: 15px">
-            <b-button variant="outline"
-                      size="sm"
-                      class="custom-btn"
-                      data-testid="enroll-contacts-to-aloai-modal-close-button"
-                      @click="onHidden">
-              Cancel
-            </b-button>
-            <b-button variant="primary"
-                      size="sm"
-                      class="custom-btn"
-                      data-testid="enroll-contacts-to-aloai-modal-enroll-contact-button"
-                      :disabled="!selectedBotId || isBusy"
-                      @click="onSubmitEnrollment">
-              <q-spinner-bars color="white"
-                              v-if="isBusy"/>
-              Enroll
-            </b-button>
-          </div>
-        </q-tab-panel>
-      </q-tab-panels>
+      <ul class="list-group list-group-flush scrollable-list mb-4">
+        <li class="list-group-item list-group-item-action p-0"
+            :key="`enroll-bot-${key}`"
+            v-for="(bot, key) in this.filteredSalesBots">
+          <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
+            <b-form-radio name="selected-bot"
+                          :value="bot.id"
+                          v-model="selectedBotId">
+              {{ bot.name }}
+            </b-form-radio>
+          </label>
+        </li>
+      </ul>
+      <div class="d-flex items-center justify-center" style="gap: 15px">
+        <button class="btn btn-sm btn-outline-dark mr-2"
+                data-testid="aloai-enrollment-control-modal-close-button"
+                @click="onHidden">
+          Cancel
+        </button>
+        <button class="btn btn-sm bg-primary text-white mr-2"
+                data-testid="aloai-enrollment-control-modal-enroll-contact-button"
+                :disabled="isBusy"
+                @click="onSubmitEnrollment">
+          Save changes
+        </button>
+      </div>
     </div>
   </b-modal>
 </template>
@@ -83,24 +55,13 @@
 import talk2Api from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
+import { AloAiUseCases } from 'src/constants/aloai'
 import { isEmpty } from 'lodash'
-import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
-
-const TABS = {
-  ENGAGEMENT: 'engagement',
-  ENROLLMENT: 'enrollment'
-}
-
-const AloAiUseCases = {
-  SALES: 1,
-  QUESTION_AND_ANSWER: 2,
-  SUPPORT: 3
-}
 
 export default {
   name: 'aloai-enrollment-control-modal',
 
-  components: { Search, InformationCircleIcon },
+  components: { Search },
 
   computed: {
     ...mapGetters('contacts', ['contact']),
@@ -135,10 +96,9 @@ export default {
       isOpen: false,
       bots: [],
       bot_engagements: {},
+      bot_enrollments: {},
       searchText: '',
       isLoading: true,
-      TABS,
-      selectedTab: TABS.ENROLLMENT,
       selectedBotId: null,
       AloAiUseCases
     }
@@ -147,34 +107,6 @@ export default {
   methods: {
     onSearch (searchText) {
       this.searchText = searchText
-    },
-    onSubmit (event) {
-      event.preventDefault()
-      this.isBusy = true
-
-      const params = Object.keys(this.bot_engagements).map((k) => ({
-        aloai_bot_id: k,
-        is_engaged: this.bot_engagements[k]
-      }))
-
-      talk2Api.V2.aloAiBot
-        .updateContactEngagements(this.contact.id, params)
-        .then(() => {
-          this.$generalNotification(
-            'AloAi engagements for the contact have been updated.'
-          )
-          this.onHidden()
-        })
-        .catch((error) => {
-          this.$generalNotification(
-            'Error while updating engagements for the contact.',
-            'error'
-          )
-          console.error('[onSubmit] error', error)
-        })
-        .finally(() => {
-          this.isBusy = false
-        })
     },
     onSubmitEnrollment (event) {
       event.preventDefault()
@@ -227,12 +159,14 @@ export default {
       this.isBusy = true
 
       try {
-        const [bots, contactDisengagedBots] = await Promise.all([
+        const [bots, contactDisengagedBots, contactEnrolledBots] = await Promise.all([
           this.fetchBots(),
-          this.fetchContactDisengagedBots()
+          this.fetchContactDisengagedBots(),
+          this.fetchContactEnrolledBots()
         ])
 
         this.bots = bots
+        this.bot_enrollments = contactEnrolledBots
 
         const disengagedBotIds = contactDisengagedBots?.reduce((acc, v) => {
           acc.push(v.aloai_bot_id)
@@ -272,6 +206,17 @@ export default {
         return data
       } catch (error) {
         console.error('[fetchContactDisengagedBots] error', error)
+        return []
+      }
+    },
+    async fetchContactEnrolledBots () {
+      try {
+        const { data } = await talk2Api.V2.aloAiBot.getContactEnrolledBots(
+          this.contact.id
+        )
+        return data
+      } catch (error) {
+        console.error('[fetchContactEnrolledBots] error', error)
         return []
       }
     }

@@ -23,12 +23,12 @@
           <contact-push-to-crm data-testid="contact-details-push-to-crm"
                                :contact="contact"
                                v-if="isSimpSocial" />
-          <contact-aloai-engagement-control ss="w-100"
-                                            data-testid="contact-aloai-engagement-control"
-                                            :contact="contact"
-                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
+                                            :contact="contact"
+                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+          <contact-aloai-engagement-control ss="w-100"
+                                            data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
                                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
           <contact-phones data-testid="contact-details-contact-phones"/>
