@@ -101,6 +101,7 @@ export default {
       this.searchValue = ''
       this.hasError = false
       this.$emit('show-error', false)
+      this.$emit('search', this.searchValue)
     }
   }
 }
