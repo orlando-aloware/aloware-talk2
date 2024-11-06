@@ -168,6 +168,11 @@
             <timezone-selector v-model="$v.schedule.timezone.$model"
                                @select="timezoneSelected">
             </timezone-selector>
+
+            <div class="alert alert-warning px-2 py-1 mt-1 small"
+                 v-if="scheduleDateInCurrentTimezone && isEventTypeSelected && isContactSelected">
+              <strong>In your local time:</strong> {{ scheduleDateInCurrentTimezone }}
+            </div>
           </b-form-group>
         </b-col>
       </b-row>
@@ -316,6 +321,7 @@ import PredefinedTimeSelector from 'components/predefined-time-selector'
 import TimezoneSelector from 'components/timezone-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
 import moment from 'moment'
+import { getDateInBrowserTimeZone } from 'src/utils'
 require('vue-multiselect/dist/vue-multiselect.min.css')
 
 export default {
@@ -514,6 +520,24 @@ export default {
 
     headerCircleClass () {
       return 'event-color-type-' + this.schedule.type + ' status-' + this.schedule.status + ' ' + (this.schedule.is_past ? 'is_past' : '')
+    },
+
+    scheduleDateInCurrentTimezone () {
+      if (!this.schedule.date || !this.schedule.time) {
+        return ''
+      }
+
+      return this.schedule.date && this.schedule.time
+        ? getDateInBrowserTimeZone(moment.tz(`${this.schedule.date} ${this.schedule.time}`, 'MM/DD/YYYY HH:mm', this.schedule.timezone)).format('LLL')
+        : ''
+    },
+
+    isEventTypeSelected () {
+      return this.schedule.type
+    },
+
+    isContactSelected () {
+      return this.schedule.contact?.id
     }
   },
 
@@ -537,7 +561,7 @@ export default {
     editSchedule (sched) {
       this.loading = true
       this.isSubmitted = false
-      let date = moment(sched.start_date)
+      let date = moment(sched.start_date_original)
 
       this.originalSchedule = {
         id: sched.id,

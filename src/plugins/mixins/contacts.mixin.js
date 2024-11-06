@@ -231,13 +231,13 @@ export default {
 
     onSearch (searchText) {
       // ignore search if previous and current search are the same
-      if (this.previousSearch === searchText) {
+      if (this.previousSearch.trim() === searchText.trim()) {
         return
       }
 
       // requires at least 3 characters to allow the request or
       // empty so that the result will reset back to the original
-      if (searchText && searchText.length < 3) {
+      if (searchText && searchText.trim().length < 3) {
         return
       }
 

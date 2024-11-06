@@ -57,14 +57,6 @@ export default {
         return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
       },
 
-      getConflictedPhoneNumbers (id) {
-        if (!id) {
-          return Promise.reject(this.createAxiosError('Failed to get conflicted phone numbers: Missing contact id!', 400))
-        }
-
-        return window.axios.get(`${suffixV1}contact/${id}/conflicted-phone-numbers`)
-      },
-
       getRingGroups (id) {
         if (!id) {
           return null
@@ -618,6 +610,22 @@ export default {
     company: {
       get (params) {
         return window.axios.get(`${suffixV1}company/${params.id}`)
+      },
+
+      /**
+       * Endpoint for fetching agents status.
+       * params parameter is used to paginate the data that will be fetch
+       * @handler Api/V1/CompanyController@getAgentsStatus
+       * @return Promise
+       */
+      getAgentsStatus () {
+        return window.axios.get(`${suffixV1}company/agents-status/get`)
+      }
+    },
+
+    communicationScript: {
+      store (params) {
+        return window.axios.post(`${suffixV1}communication-script`, params)
       }
     },
 

@@ -725,9 +725,10 @@ export default {
           }
         })
 
-      window.Echo.private('cache-agent-status-' + this.profile.company_id)
+      window.Echo.private('cache-agent-status-user-' + userId)
         .listen('.agent_status.updated', (event) => {
-          if (!this.profile || !event.user_id) {
+          // make sure this occurs only for the logged user
+          if (!this.profile || !event.user_id || this.profile.id !== event.user_id) {
             return
           }
           this.$VueEvent.fire('agent_status_updated', event)

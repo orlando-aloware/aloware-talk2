@@ -406,7 +406,8 @@ export default {
           from_date: Filters.DEFAULT_STATE.filter.from_date,
           to_date: Filters.DEFAULT_STATE.filter.to_date,
           my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-          unread_only: Filters.DEFAULT_STATE.filter.unread_only
+          unread_only: Filters.DEFAULT_STATE.filter.unread_only,
+          has_international: Filters.DEFAULT_STATE.filter.has_international
         }
         return defaultFilterModel
       }
@@ -433,7 +434,8 @@ export default {
           from_date: Filters.DEFAULT_STATE.filter.from_date,
           to_date: Filters.DEFAULT_STATE.filter.to_date,
           my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-          unread_only: Filters.DEFAULT_STATE.filter.unread_only
+          unread_only: Filters.DEFAULT_STATE.filter.unread_only,
+          has_international: Filters.DEFAULT_STATE.filter.has_international
         }
 
         if (['recordings'].includes(this.$route.params.channel)) {
@@ -497,7 +499,8 @@ export default {
         to_date: Filters.DEFAULT_STATE.filter.to_date,
         my_contact: Filters.DEFAULT_STATE.filter.my_contact,
         unread_only: Filters.DEFAULT_STATE.filter.unread_only,
-        creator_type: Filters.DEFAULT_STATE.filter.creator_type
+        creator_type: Filters.DEFAULT_STATE.filter.creator_type,
+        has_international: Filters.DEFAULT_STATE.filter.has_international
       }
 
       return defaultFilterModel
