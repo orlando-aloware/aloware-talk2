@@ -44,7 +44,17 @@
                 v-for="(bot, key) in this.filteredBots">
               <label class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
                      :for="`engage-control-bot-${bot.id}`">
-                {{ bot.name }} - <q-badge color="blue">{{ formatUseCase(bot.use_case) }}</q-badge>
+                <div class="row">
+                  <div class="col-2 p-0 text-center d-flex items-center justify-between">
+                    <!-- Bot Use Case Label -->
+                    <q-badge class="w-100 custom-badge-margin" :color="useCaseColor(bot.use_case)">
+                      <span class="w-100">{{ formatUseCase(bot.use_case) }}</span>
+                    </q-badge>
+                  </div>
+                  <div class="col-10">
+                    <span>{{ bot.name }}</span>
+                  </div>
+                </div>
               </label>
               <b-form-checkbox switch
                               :id="`engage-control-bot-${bot.id}`"
@@ -77,7 +87,7 @@ import talk2Api from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
-import { ALOAI_USE_CASES } from 'src/constants/aloai'
+import { AloAiUseCases } from 'src/constants/aloai'
 import { aloaiMixin } from 'src/plugins/mixins'
 
 export default {
@@ -102,7 +112,7 @@ export default {
     },
     // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
     filteredSalesBots () {
-      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === ALOAI_USE_CASES.SALES)
+      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === AloAiUseCases.SALES)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -123,7 +133,7 @@ export default {
       searchText: '',
       isLoading: true,
       selectedBotId: null,
-      ALOAI_USE_CASES
+      AloAiUseCases
     }
   },
 
@@ -266,5 +276,8 @@ export default {
 .aloai-engagement-control-bots-list {
   max-height: 300px;
   overflow-y: auto;
+}
+.custom-badge-margin {
+  margin-bottom: 1px
 }
 </style>

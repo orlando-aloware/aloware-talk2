@@ -91,7 +91,7 @@ const TABS = {
   ENROLLMENT: 'enrollment'
 }
 
-const ALOAI_USE_CASES = {
+const AloAiUseCases = {
   SALES: 1,
   QUESTION_AND_ANSWER: 2,
   SUPPORT: 3
@@ -117,7 +117,7 @@ export default {
     },
     // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
     filteredSalesBots () {
-      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === ALOAI_USE_CASES.SALES)
+      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === AloAiUseCases.SALES)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -140,7 +140,7 @@ export default {
       TABS,
       selectedTab: TABS.ENROLLMENT,
       selectedBotId: null,
-      ALOAI_USE_CASES
+      AloAiUseCases
     }
   },
 
