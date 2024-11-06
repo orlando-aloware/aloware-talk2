@@ -15,8 +15,8 @@
               data-testid="download-button-download-btn"
               @click="onDownload()">
           <download-icon height="20"
-                        width="20"
-                        data-testid="download-button-download-icon">
+                         width="20"
+                         data-testid="download-button-download-icon">
           </download-icon>
         </q-btn>
         <q-btn color="text-dark-greenish"
@@ -29,9 +29,9 @@
               data-testid="copy-button-copy-btn"
               @click="onDownload()">
           <copy-icon height="20"
-                    width="20"
-                    color="#007bff"
-                    data-testid="copy-button-copy-icon">
+                     width="20"
+                     color="#007bff"
+                     data-testid="copy-button-copy-icon">
           </copy-icon>
         </q-btn>
       </div>
@@ -79,7 +79,7 @@
 <script>
 import _ from 'lodash'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
-import CopyIcon from 'components/icons/contact-activity/copy-icon'
+import CopyIcon from 'components/icons/copy-icon'
 
 export default {
   name: 'ConversationSection',
