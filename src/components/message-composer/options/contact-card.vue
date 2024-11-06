@@ -3,14 +3,14 @@
     <b-col sm="12" md="12">
       <div class="mt-2 notice" data-testid="add-contact-card-message">
         <p class="mb-0 text-justify">
-          <span v-if="isCardPhoneNumberEmpty">You don’t have any number linked on this card.<br></span>
+          <span v-if="isCardPhoneNumberEmpty">You don't have any number linked on this card.<br></span>
           <router-link
             :to="{ path: '/settings/profile' }"
             @click.native="onContactCardLinkClicked"
           >
             Click here
           </router-link>
-          to view the settings for the name and phone number(s) for your contact.
+          to view the settings for the name and phone number(s) for your card.
         </p>
       </div>
     </b-col>
