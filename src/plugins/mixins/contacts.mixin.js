@@ -231,7 +231,7 @@ export default {
 
     onSearch (searchText) {
       // ignore search if previous and current search are the same
-      if (this.previousSearch === searchText) {
+      if (this.previousSearch.trim() === searchText.trim()) {
         return
       }
 
