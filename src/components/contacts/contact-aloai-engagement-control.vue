@@ -23,7 +23,10 @@
         data-testid="aloai-engagement-control-button"
         @click="openEngagementControlModal"
       >
-        <add-user-icon data-testid="add-user-icon" height="12" width="12" />
+        <settings-mobile-icon
+          width="16"
+          height="16"
+        />
         Manage
       </b-button>
     </div>
@@ -33,7 +36,7 @@
 </template>
 
 <script>
-import AddUserIcon from 'components/icons/add-user-icon-2'
+import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
 import AloaiEngagementControlModal from 'components/aloai-engagement-control-modal.vue'
 import { mapGetters } from 'vuex'
 import BlockTooltip from 'components/kyc/block-tooltip'
@@ -41,7 +44,7 @@ import BlockTooltip from 'components/kyc/block-tooltip'
 export default {
   name: 'contact-aloai-engagement-control',
 
-  components: { AloaiEngagementControlModal, AddUserIcon, BlockTooltip },
+  components: { AloaiEngagementControlModal, SettingsMobileIcon, BlockTooltip },
 
   props: {
     contact: {
@@ -65,13 +68,11 @@ export default {
 </script>
 
 <style lang="scss">
-@import 'src/css/variables.scss';
-
 .btn-aloai-engagement-control {
   &:hover {
     svg {
       path {
-        fill: $white;
+        fill: #FFFFFF;
       }
     }
   }
@@ -80,7 +81,7 @@ export default {
     margin-top: -4px;
 
     path {
-      fill: $primary;
+      stroke: #1976d3;
     }
   }
 }

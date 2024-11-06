@@ -15,7 +15,7 @@
         data-testid="aloai-enrollment-control-button"
         @click="openEnrollmententControlModal"
       >
-        <add-user-icon data-testid="add-user-icon" height="12" width="12" />
+        <aloai-icon height="10" width="10" />
         Enroll to Bot
       </b-button>
     </div>
@@ -25,14 +25,14 @@
 </template>
 
 <script>
-import AddUserIcon from 'components/icons/add-user-icon-2'
+import AloaiIcon from 'components/icons/aloai-icon'
 import AloaiEnrollmentControlModal from 'components/aloai-enrollment-control-modal.vue'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'contact-aloai-enrollment-control',
 
-  components: { AloaiEnrollmentControlModal, AddUserIcon },
+  components: { AloaiEnrollmentControlModal, AloaiIcon },
 
   props: {
     contact: {
@@ -56,13 +56,11 @@ export default {
 </script>
 
 <style lang="scss">
-@import 'src/css/variables.scss';
-
 .btn-aloai-enrollment-control {
   &:hover {
     svg {
       path {
-        fill: $white;
+        fill: #FFFFFF;
       }
     }
   }
@@ -71,7 +69,7 @@ export default {
     margin-top: -4px;
 
     path {
-      fill: $primary;
+      fill: #1976d3;
     }
   }
 }
