@@ -6,6 +6,7 @@
 <script>
 import Scheduler from 'dhtmlx-scheduler'
 import moment from 'moment'
+import { DAY_VIEW, MONTH_VIEW, WEEK_VIEW } from 'src/constants/calendar'
 import { calendarMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
@@ -32,7 +33,7 @@ export default {
     },
     view: {
       type: String,
-      default: 'month'
+      default: MONTH_VIEW
     }
   },
 
@@ -287,7 +288,7 @@ export default {
     },
 
     setNavHeight (newView) {
-      if (newView === 'week' || newView === 'day') {
+      if (newView === WEEK_VIEW || newView === DAY_VIEW) {
         return this.setNavHeightForMultiDayEvents()
       }
 
@@ -305,7 +306,7 @@ export default {
     },
 
     setSchedulerHeaderTableWidth (currentView) {
-      if (!currentView || currentView === 'day') {
+      if (!currentView || currentView === DAY_VIEW) {
         return
       }
 
@@ -314,7 +315,7 @@ export default {
 
       }
 
-      headerTableWeek.style.width = currentView === 'week' ? `calc(100% - ${this.getScaleWidth()}px)` : '100%'
+      headerTableWeek.style.width = currentView === WEEK_VIEW ? `calc(100% - ${this.getScaleWidth()}px)` : '100%'
     },
 
     getScaleWidth () {

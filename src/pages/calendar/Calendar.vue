@@ -103,7 +103,7 @@
       <div class="scheduler d-flex flex-column flex-grow-1 h-100 overflow-hidden-y">
         <div class="scheduler__header flex-grow-0 row">
           <table :class="['scheduler__header__table', `scheduler__header__table--${view}`]">
-            <tr v-if="view === 'week'">
+            <tr v-if="view === WEEK_VIEW">
               <td
                   style="min-width: 200px;"
                   :class="d.today ? 'today': ''"
@@ -189,6 +189,7 @@ import api from 'src/plugins/api/api'
 import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import { browserTimezone } from 'src/utils'
+import { CALENDAR_VIEWS, HOUR_VIEW, DAY_VIEW, WEEK_VIEW, MONTH_VIEW } from 'src/constants/calendar'
 
 export default {
   name: 'Calendar',
@@ -211,6 +212,7 @@ export default {
 
   data () {
     return {
+      WEEK_VIEW,
       events: [],
       filters: {
         appointments: true,
@@ -227,14 +229,14 @@ export default {
       gotoDate: moment.utc().toDate(),
       view: 'month',
       stepMap: {
-        'day': 'd',
-        'week': 'w',
-        'month': 'M'
+        DAY_VIEW: 'd',
+        WEEK_VIEW: 'w',
+        MONTH_VIEW: 'M'
       },
       views: [
-        { 'id': 'day', name: 'Day' },
-        { 'id': 'week', name: 'Week' },
-        { 'id': 'month', name: 'Month' }
+        { 'id': DAY_VIEW, name: 'Day' },
+        { 'id': WEEK_VIEW, name: 'Week' },
+        { 'id': MONTH_VIEW, name: 'Month' }
       ],
       timeFormat: 1,
       timeFormats: [
@@ -264,10 +266,10 @@ export default {
       const m = moment(this.gotoDate)
 
       switch (this.view) {
-        case 'day':
+        case DAY_VIEW:
           d = m.format('D MMM YYYY')
           break
-        case 'week':
+        case WEEK_VIEW:
           const start = moment(this.gotoDate).startOf('isoWeek') // first day of current week
           const end = moment(this.gotoDate).endOf('isoWeek') // last day of current week
 
@@ -276,7 +278,7 @@ export default {
             ? start.format('D') + ' - ' + end.format('D MMM YYYY')
             : start.format('D MMM') + ' - ' + end.format('D MMM YYYY')
           break
-        case 'month':
+        case MONTH_VIEW:
           d = m.format('MMMM YYYY')
           break
       }
@@ -340,7 +342,7 @@ export default {
     this.timeFormat = this.profile.time_format
 
     const { view } = this.$route.query
-    if (view && ['day', 'week', 'month'].includes(view)) {
+    if (view && CALENDAR_VIEWS.includes(view)) {
       this.view = view
     }
 
@@ -454,15 +456,15 @@ export default {
     },
 
     getLimitFilterValue () {
-      if (this.view === 'month') {
+      if (this.view === MONTH_VIEW) {
         return 2500
       }
 
-      if (this.view === 'week') {
+      if (this.view === WEEK_VIEW) {
         return 1000
       }
 
-      if (this.view === 'day') {
+      if (this.view === DAY_VIEW) {
         return 500
       }
 
@@ -476,21 +478,21 @@ export default {
         max_date: this.filters.calendar_max_date
       }
 
-      if (this.view === 'month') {
+      if (this.view === MONTH_VIEW) {
         const startOfMonth = moment.utc(this.gotoDate).startOf('month')
         const endOfMonth = moment.utc(this.gotoDate).endOf('month')
         state.min_date = startOfMonth.toISOString()
         state.max_date = endOfMonth.toISOString()
       }
 
-      if (this.view === 'week') {
+      if (this.view === WEEK_VIEW) {
         const startOfWeek = moment.utc(this.gotoDate).startOf('isoWeek')
         const endOfWeek = moment.utc(this.gotoDate).endOf('isoWeek')
         state.min_date = startOfWeek.toISOString()
         state.max_date = endOfWeek.toISOString()
       }
 
-      if (this.view === 'day') {
+      if (this.view === DAY_VIEW) {
         state.min_date = moment.utc(this.gotoDate).startOf('day').toISOString()
         state.max_date = moment.utc(this.gotoDate).endOf('day').toISOString()
       }
@@ -577,7 +579,7 @@ export default {
     },
 
     goToDayView (date) {
-      this.view = 'day'
+      this.view = DAY_VIEW
       this.gotoDate = date.toDate()
       this.$refs.scheduler.setCurrentView(this.gotoDate, this.view)
 
@@ -651,7 +653,7 @@ export default {
 
     showEventsForHour (selectedDate) {
       this.selectedHour = selectedDate
-      this.eventsModalMode = 'hour'
+      this.eventsModalMode = HOUR_VIEW
       this.isEventsModalOpen = true
     },
 
@@ -684,7 +686,7 @@ export default {
       handler (newQuery) {
         const { view } = newQuery
 
-        if (view && ['day', 'week', 'month'].includes(view)) {
+        if (view && CALENDAR_VIEWS.includes(view)) {
           this.view = view
         }
 

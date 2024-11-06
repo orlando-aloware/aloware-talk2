@@ -3,7 +3,7 @@
             :full-width="isMobile"
             :full-height="isMobile"
             :maximized="isMobile"
-            :style="isMobile ? 'width: 100%' : 'width: 660px'"
+            :style="dialogWidth"
             v-model="dialogOpen">
     <q-card style="border-radius: 10px">
       <q-card-section class="d-flex align-items-center justify-between">
@@ -76,6 +76,7 @@ import Search from 'src/components/search.vue'
 import { calendarMixin } from 'src/plugins/mixins'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { HOUR_VIEW, DAY_VIEW, WEEK_VIEW } from 'src/constants/calendar'
 
 export default {
   name: 'calendar-event-list',
@@ -93,11 +94,11 @@ export default {
     },
     eventsModalMode: {
       type: String,
-      default: 'hour'
+      default: HOUR_VIEW
     },
     viewMode: {
       type: String,
-      default: 'day'
+      default: DAY_VIEW
     },
     currentDate: {
       type: [Date, String, Object],
@@ -139,8 +140,12 @@ export default {
       }
     },
 
+    dialogWidth () {
+      return this.isMobile ? 'width: 100%' : 'width: 660px'
+    },
+
     eventsForSelectedHour () {
-      if (this.viewMode === 'week') {
+      if (this.viewMode === WEEK_VIEW) {
         return this.filterEventsForWeek(this.currentDate, event => {
           const eventStart = moment(event.start_date)
           const selectedHour = moment(this.selectedHour)
@@ -152,7 +157,7 @@ export default {
     },
 
     eventsForSelectedDate () {
-      if (this.viewMode === 'week') {
+      if (this.viewMode === WEEK_VIEW) {
         return this.filterEventsForWeek(this.currentDate).sort(this.sortListEvents)
       }
 
@@ -161,7 +166,7 @@ export default {
     },
 
     displayedEvents () {
-      return this.eventsModalMode === 'hour'
+      return this.eventsModalMode === HOUR_VIEW
         ? this.eventsForSelectedHour
         : this.eventsForSelectedDate
     },
@@ -174,11 +179,11 @@ export default {
         localTimeAcronym
       } = this.getFormattedTime(this.selectedHour, this.listViewTimeFormat)
 
-      if (this.viewMode === 'week') {
+      if (this.viewMode === WEEK_VIEW) {
         return this.getWeekViewModalTitle(currentTime, currentTimeAcronym, localTime, localTimeAcronym)
       }
 
-      if (this.eventsModalMode === 'hour') {
+      if (this.eventsModalMode === HOUR_VIEW) {
         return this.getHourViewModalTitle(currentTime, currentTimeAcronym, localTime, localTimeAcronym)
       }
 
@@ -190,11 +195,11 @@ export default {
         return 'No events found for this search.'
       }
 
-      if (this.viewMode === 'week') {
+      if (this.viewMode === WEEK_VIEW) {
         return `No events between ${this.currentDate.split(' - ')[0]} and ${this.currentDate.split(' - ')[1]}.`
       }
 
-      return `No events for this ${this.eventsModalMode === 'hour' ? 'hour' : 'day'}.`
+      return `No events for this ${this.eventsModalMode === HOUR_VIEW ? 'hour' : 'day'}.`
     }
   },
 
@@ -212,7 +217,7 @@ export default {
         browserEnd: event.end_date
       })
 
-      if (this.viewMode === 'week') {
+      if (this.viewMode === WEEK_VIEW) {
         // display both date only if the event spans multiple days
         if (localStartDate !== localEndDate) {
           return `${localStartDate} - ${localEndDate} ⋅ ${localStartTime} - ${localEndTime}`
@@ -270,7 +275,7 @@ export default {
       const startOfWeek = this.currentDate.split(' - ')[0]
       const endOfWeek = this.currentDate.split(' - ')[1]
 
-      if (this.eventsModalMode === 'hour') {
+      if (this.eventsModalMode === HOUR_VIEW) {
         if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
           if (!currentTime) {
             return `Showing events for ${startOfWeek} - ${endOfWeek}`
