@@ -300,7 +300,7 @@
           </b-form-group>
         </b-col>
 
-        <b-col sm="12" md="6">
+        <b-col sm="12" md="4">
           <b-form-group label="Phone Number"
                         class="form-label mb-0">
               <line-selector :value="user.company_contact_card_campaign_id"
