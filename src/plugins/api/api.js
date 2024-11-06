@@ -721,6 +721,10 @@ export default {
         })
       },
 
+      removeContactFromList (id, body = {}) {
+        return window.axios.post(`${suffixV2}contacts/${id}/remove-from-lists`, body)
+      },
+
       exportCommunications
     },
 
