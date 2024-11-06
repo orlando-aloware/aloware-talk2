@@ -11,6 +11,7 @@
                        custom-placeholder="Pick a line"
                        rounded
                        behavior="menu"
+                       ref="lineSelector"
                        :generic-multiselect="false"
                        v-model="localCampaignId"
                        @change="changeCampaignId">
@@ -19,13 +20,10 @@
         <div>
           <q-btn color="primary"
                  rounded
-                 :disabled="!localCampaignId || isAgentOnCall"
+                 :disabled="!localCampaignId"
                  @click="onCallClick">
             Call
           </q-btn>
-          <q-tooltip v-if="isAgentOnCall">
-            There is a call in progress on another device. If you think this is an error, please refresh your screen.
-          </q-tooltip>
         </div>
       </div>
     </q-card>
@@ -34,7 +32,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import * as AgentStatus from 'src/constants/agent-status'
 import LineSelector from 'components/generic-selectors/line-selector'
 
 export default {
@@ -45,10 +42,6 @@ export default {
   },
 
   props: {
-    show: {
-      type: Boolean,
-      default: false
-    },
     campaignId: {
       type: Number,
       default: null,
@@ -58,51 +51,29 @@ export default {
 
   data () {
     return {
-      visible: false,
+      visible: true,
       position: 'top',
       localCampaignId: this.campaignId
     }
   },
 
   computed: {
-    ...mapGetters('auth', ['profile']),
-
-    isAgentOnCall () {
-      return this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-    }
+    ...mapGetters('auth', ['profile'])
   },
 
   watch: {
-    show (val) {
-      if (!this.isAgentOnCall) {
-        this.visible = val
-      }
-
-      this.localCampaignId = null
-    },
     campaignId (newVal) {
       this.localCampaignId = newVal
     }
   },
 
-  mounted () {
-    this.visible = this.show
-  },
-
   methods: {
-    open () {
-      this.show = true
-    },
-
     changeCampaignId (campaignId) {
       this.localCampaignId = campaignId
     },
 
     onCallClick () {
       this.$emit('change-campaign-id', this.localCampaignId)
-
-      this.$emit('call', this.localCampaignId)
-      this.visible = false
     }
   }
 }

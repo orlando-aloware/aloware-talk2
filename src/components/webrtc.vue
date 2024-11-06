@@ -10,10 +10,8 @@
       <parked-call />
     </div>
 
-    <select-campaign-dialog :show="showSelectCampaignDialog"
+    <select-campaign-dialog v-if="showSelectCampaignDialog"
                             :campaignId="campaignId"
-                            v-else
-                            @call="handleCall"
                             @change-campaign-id="handleChangeCampaignId"/>
   </div>
 </template>
@@ -68,7 +66,8 @@ export default {
   data () {
     return {
       mainListeners: {},
-      isMainEventsStarted: false
+      isMainEventsStarted: false,
+      campaignsAreLoaded: false
     }
   },
 
@@ -95,7 +94,9 @@ export default {
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       return (!this.campaignId || (this.campaignId && this.isAlwaysAskModeEnabled)) &&
-        !isCallInProgress.includes(this.dialer?.currentStatus)
+        !isCallInProgress.includes(this.dialer?.currentStatus) &&
+        this.campaignsAreLoaded &&
+        !this.dialer.parkedCall
     }
   },
 
@@ -114,7 +115,12 @@ export default {
       this.getCallDispositions()
       this.getActivityTypes()
       this.getTemplates()
-      this.getCampaigns()
+      const campaignsPromise = this.getCampaigns()
+      if (campaignsPromise) {
+        campaignsPromise.then(() => {
+          this.campaignsAreLoaded = true
+        })
+      }
       this.getRingGroups()
     },
 
@@ -134,9 +140,6 @@ export default {
 
     handleChangeCampaignId (campaignId) {
       this.$emit('changeCampaignId', campaignId)
-    },
-
-    handleCall (campaignId) {
       this.$emit('handleCall', true)
     },
 
@@ -157,7 +160,6 @@ export default {
         this.profile.agent_status !== event.agent_status
       ) {
         this.setAgentStatus(event.agent_status)
-        console.log('Changed agent status from webrtc::agentStatusUpdated [event]: ', event.agent_status)
       }
     }
 
