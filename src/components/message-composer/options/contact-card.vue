@@ -1,26 +1,40 @@
 <template>
   <div class="row no-wrap q-pa-md text-center">
-    <b-col sm="12"
-           md="12"
-           v-if="user?.profile?.contact_card_phone_number === null">
+    <b-col sm="12" md="12">
       <div class="mt-2 notice" data-testid="add-contact-card-message">
         <p class="mb-0 text-justify">
-          You don’t have any number linked on this contact card.<br>
+          <span v-if="isCardPhoneNumberEmpty">You don't have any number linked on this card.<br></span>
           <router-link
             :to="{ path: '/settings/profile' }"
             @click.native="onContactCardLinkClicked"
           >
             Click here
           </router-link>
-          to view the settings for the name and phone number(s) for your contact.
+          to view the settings for the name and phone number(s) for your card.
         </p>
       </div>
     </b-col>
+
+    <b-col sm="12" md="12">
+      <q-select use-input
+                dense
+                outlined
+                input-debounce="100"
+                option-value="id"
+                option-label="name"
+                behavior="menu"
+                label="Select type"
+                :options="contactCardTypes"
+                v-model="type">
+      </q-select>
+    </b-col>
+
     <b-col sm="12" md="12">
       <button class="btn btn-sm btn-primary mt-2"
               data-testid="add-contact-card-button"
+              :disabled="type === ''"
               @click="onContactCardSelected">
-        Send contact
+        Send card
       </button>
     </b-col>
 
@@ -37,7 +51,7 @@
       <p data-testid="add-contact-card-error"
          class="error-notice mt-2"
          v-if="hasError && !isUploading">
-        Error while generating contact card...
+        Error while generating {{ typeName }} card...
       </p>
     </b-col>
   </div>
@@ -47,7 +61,6 @@
 import { mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
-const DEFAULT_CONTACT_NAME = 'contact-card'
 const VCARD_TEMPLATE = (name, phone) => [
   'BEGIN:VCARD',
   'VERSION:3.0',
@@ -70,15 +83,28 @@ export default {
     return {
       isUploading: false,
       uploadPercentage: 0,
-      hasError: false
+      hasError: false,
+      contactCardTypes: [
+        { id: 'contact', name: 'Contact' },
+        { id: 'company', name: 'Company' }
+      ],
+      type: '',
+      isCardPhoneNumberEmpty: false
     }
   },
 
   computed: {
     ...mapGetters('auth', ['user']),
 
+    typeName () {
+      return this.type.name?.toLowerCase() || ''
+    },
+
     contactCardName () {
-      return this.user?.profile?.contact_card_name || DEFAULT_CONTACT_NAME
+      const cardName = this.type.id === 'contact'
+        ? this.user?.profile?.contact_card_name
+        : this.user?.profile?.company_contact_card_name
+      return cardName || 'contact-card'
     }
   },
 
@@ -88,15 +114,20 @@ export default {
     },
 
     onContactCardSelected () {
-      const file = this.generateContactCard()
+      const file = this.createVCardFile()
       this.uploadVCard(file)
     },
 
-    generateContactCard () {
-      const vCardData = VCARD_TEMPLATE(
-        this.user?.profile?.contact_card_name || '',
-        this.user?.profile?.contact_card_phone_number || ''
-      )
+    createVCardFile () {
+      const name = this.type.id === 'contact'
+        ? this.user?.profile?.contact_card_name
+        : this.user?.profile?.company_contact_card_name
+
+      const phone = this.type.id === 'contact'
+        ? this.user?.profile?.contact_card_phone_number
+        : this.user?.profile?.company_contact_card_phone_number
+
+      const vCardData = VCARD_TEMPLATE(name, phone)
 
       const fileName = `${this.contactCardName.toLowerCase().replace(/\s+/g, '-')}.vcf`
       const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' })
@@ -130,6 +161,14 @@ export default {
           this.hasError = true
           this.$handleErrors(error.response)
         })
+    }
+  },
+
+  watch: {
+    'type': function (value) {
+      this.isCardPhoneNumberEmpty =
+        (value.id === 'contact' && this.user?.profile?.contact_card_phone_number === null) ||
+        (value.id === 'company' && this.user?.profile?.company_contact_card_phone_number === null)
     }
   }
 }

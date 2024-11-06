@@ -2398,6 +2398,18 @@ export default {
     changeScript (script) {
       if (script) {
         this.scriptId = script.id
+
+        if (this.dialer?.communication) {
+          API.V1.communicationScript.store({
+            script_id: script.id,
+            communication_id: this.dialer.communication.id,
+            text: script.text
+          }).then(() => {
+            this.$generalNotification('Script added')
+          }).catch(err => {
+            console.log(err)
+          })
+        }
       }
 
       this.script = script

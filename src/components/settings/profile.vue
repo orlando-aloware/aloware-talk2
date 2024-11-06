@@ -279,6 +279,44 @@
         </b-col>
       </b-form-row>
 
+      <b-form-row class="mt-4">
+        <b-col sm="12">
+          <h5 class="form-label">Company Card</h5>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="align-items-center"
+                  :id="`${SettingsMap.company_contact_card.hash_keyword}-container`">
+        <b-col sm="12" md="6">
+
+          <b-form-group label="Name" class="form-label mb-0">
+            <b-form-input type="text"
+                          placeholder="Enter name"
+                          :state="validateState('company_contact_card_name')"
+                          v-model.trim="$v.user.company_contact_card_name.$model"
+                          @input="(eventPayload) => onUpdateFields(eventPayload, 'company_contact_card_name')">
+            </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.company_contact_card_name.maxLength">Name must not exceed 191 characters.</b-form-invalid-feedback>
+          </b-form-group>
+        </b-col>
+
+        <b-col sm="12" md="4">
+          <b-form-group label="Phone Number"
+                        class="form-label mb-0">
+              <line-selector :value="user.company_contact_card_campaign_id"
+                             :multiple="false"
+                             :use-chips="false"
+                             :generic-styling="false"
+                             :generic-multiselect="false"
+                             :clearable="true"
+                             :useInput="true"
+                             v-model.trim="user.company_contact_card_campaign_id"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'company_contact_card_campaign_id')">
+            </line-selector>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
+
       <div :id="`${SettingsMap.backup_routing.hash_keyword}-container`"
            v-show="canBeEdited && [AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by)">
         <b-form-row class="mt-4">
@@ -508,6 +546,7 @@
 <script>
 import AnswerTypeSelector from 'components/generic-selectors/answer-type-selector'
 import UserCampaignSelector from 'components/generic-selectors/user-campaign-selector'
+import LineSelector from 'components/generic-selectors/line-selector'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as Roles from 'src/constants/roles'
 import {
@@ -530,7 +569,7 @@ export default {
     simpsocialMixin
   ],
 
-  components: { UserCampaignSelector, AnswerTypeSelector },
+  components: { UserCampaignSelector, AnswerTypeSelector, LineSelector },
 
   computed: {
     ...mapState(['campaigns', 'statics']),
@@ -611,6 +650,9 @@ export default {
           sameAsPassword: sameAs('password')
         },
         contact_card_name: {
+          maxLength: maxLength(191)
+        },
+        company_contact_card_name: {
           maxLength: maxLength(191)
         }
       }
