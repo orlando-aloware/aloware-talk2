@@ -85,7 +85,8 @@ export default {
   name: 'ConversationSection',
 
   components: {
-    DownloadIcon
+    DownloadIcon,
+    CopyIcon
   },
 
   props: {
