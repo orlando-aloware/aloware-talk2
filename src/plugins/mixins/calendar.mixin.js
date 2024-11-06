@@ -1,10 +1,11 @@
 import { mapState } from 'vuex'
 import moment from 'moment'
+import { browserTimezone } from 'src/utils'
 
 export default {
   data () {
     return {
-      browserTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      browserTimeZone: browserTimezone(),
       // Testing
       isHourScaleHeaderAdded: false
     }
@@ -50,7 +51,6 @@ export default {
     },
 
     getLocalTimeAcronym (date) {
-      // return date?.format('z')
       return this.getTimeZoneAbbreviation(date, this.browserTimeZone)
     },
 
@@ -79,8 +79,6 @@ export default {
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
         const dateInCurrentTimezone = moment(adjustedDate).tz(this.currentTimezone)
         const currentTimezoneTime = dateInCurrentTimezone.format(this.profile.time_format === 1 ? 'h A' : 'H:00')
-        // const currentTimezoneAcronym = dateInCurrentTimezone.format('z')
-        // const currentTimezoneAcronym = this.getTimeZoneAbbreviation(dateInCurrentTimezone, this.currentTimezone)
 
         return `
           <div class="hour-label" data-hour="${dateInBrowserTimeZone.hour()}">
@@ -114,8 +112,6 @@ export default {
         const date = new Date()
 
         // Get time zone abbreviations
-        // const dateInBrowserTimeZone = moment(date).tz(this.browserTimeZone)
-        // const localTimeAcronym = this.getLocalTimeAcronym(dateInBrowserTimeZone)
 
         const dateInCurrentTimezone = moment(date).tz(this.currentTimezone)
         const currentTimezoneAcronym = this.getTimeZoneAbbreviation(dateInCurrentTimezone, this.currentTimezone)
@@ -161,13 +157,11 @@ export default {
       const currentTimeZoneDiv = document.createElement('div')
       currentTimeZoneDiv.className = 'col-6 mt-auto pb-1'
       currentTimeZoneDiv.textContent = companyTimezone || ''
+      currentTimeZoneDiv.title = 'Company Timezone' || ''
 
       const localTimeZoneDiv = document.createElement('div')
       localTimeZoneDiv.className = 'col-6 mt-auto pb-1'
       localTimeZoneDiv.textContent = ''
-
-      // console.log('localTimeZoneDiv', localTimeZoneDiv)
-      // console.log('currentTimeZoneDiv', currentTimeZoneDiv)
 
       headerRow.appendChild(currentTimeZoneDiv)
       headerRow.appendChild(localTimeZoneDiv)

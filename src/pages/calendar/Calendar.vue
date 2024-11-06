@@ -132,7 +132,7 @@
              :class="['scheduler__body', view]">
           <scheduler ref="scheduler"
                      :class="['actual-scheduler h-100', view + '-view']"
-                     :events="events"
+                     :events="eventsConvertedToTheRightTimezone"
                      :loading="loading"
                      :view="view"
                      @edit-schedule="editSchedule"
@@ -155,7 +155,7 @@
                          :events-modal-mode="eventsModalMode"
                          :selected-date="selectedDate"
                          :selected-hour="selectedHour"
-                         :events="events"
+                         :events="eventsConvertedToTheRightTimezone"
                          :time-format="timeFormat"
                          :view-mode="view"
                          :current-date="currentDate"
@@ -188,6 +188,7 @@ import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
 import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import { browserTimezone } from 'src/utils'
 
 export default {
   name: 'Calendar',
@@ -281,6 +282,28 @@ export default {
       }
 
       return d
+    },
+
+    eventsConvertedToTheRightTimezone () {
+      // start_date: "2024-11-07 06:00"
+      // contact_timezone: "America/New_York"
+      const browserTZ = browserTimezone()
+
+      return this.events.map(event => {
+        const startDateInRightTimezone = moment.tz(event.start_date, event.contact_timezone)
+        const endDateInRightTimezone = moment.tz(event.end_date, event.contact_timezone)
+
+        const convertedStartDate = moment(startDateInRightTimezone.utc()).tz(browserTZ)
+        const convertedEndDate = moment(endDateInRightTimezone.utc()).tz(browserTZ)
+
+        return {
+          ...event,
+          start_date_original: event.start_date,
+          end_date_original: event.end_date,
+          start_date: convertedStartDate.format('YYYY-MM-DD HH:mm'),
+          end_date: convertedEndDate.format('YYYY-MM-DD HH:mm')
+        }
+      })
     },
 
     formattedWeekDays () {
@@ -399,7 +422,7 @@ export default {
         cancelToken: this.source.token
       }).then(res => {
         this.events.push(...res.data)
-        this.$refs.scheduler.customParse(this.events)
+        this.$refs.scheduler.customParse(this.eventsConvertedToTheRightTimezone)
         this.$refs.scheduler.setNavHeightForMultiDayEvents()
 
         if (res.data && res.data.length) {
@@ -537,7 +560,7 @@ export default {
         this.isEventsModalOpen = true
       }
 
-      this.$refs.scheduler.customParse(this.events)
+      this.$refs.scheduler.customParse(this.eventsConvertedToTheRightTimezone)
     },
 
     viewChange (mode, newDate) {
