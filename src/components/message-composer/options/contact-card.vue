@@ -1,11 +1,9 @@
 <template>
   <div class="row no-wrap q-pa-md text-center">
-    <b-col sm="12"
-           md="12"
-           v-if="user?.profile?.contact_card_phone_number === null">
+    <b-col sm="12" md="12">
       <div class="mt-2 notice" data-testid="add-contact-card-message">
         <p class="mb-0 text-justify">
-          You don’t have any number linked on this contact card.<br>
+          <span v-if="isCardPhoneNumberEmpty">You don’t have any number linked on this card.<br></span>
           <router-link
             :to="{ path: '/settings/profile' }"
             @click.native="onContactCardLinkClicked"
@@ -36,7 +34,7 @@
               data-testid="add-contact-card-button"
               :disabled="type === ''"
               @click="onContactCardSelected">
-        Send contact
+        Send card
       </button>
     </b-col>
 
@@ -90,7 +88,8 @@ export default {
         { id: 'contact', name: 'Contact' },
         { id: 'company', name: 'Company' }
       ],
-      type: ''
+      type: '',
+      isCardPhoneNumberEmpty: false
     }
   },
 
@@ -162,6 +161,14 @@ export default {
           this.hasError = true
           this.$handleErrors(error.response)
         })
+    }
+  },
+
+  watch: {
+    'type': function (value) {
+      this.isCardPhoneNumberEmpty =
+        (value.id === 'contact' && this.user?.profile?.contact_card_phone_number === null) ||
+        (value.id === 'company' && this.user?.profile?.company_contact_card_phone_number === null)
     }
   }
 }
