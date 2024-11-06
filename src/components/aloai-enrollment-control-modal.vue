@@ -3,71 +3,78 @@
            hide-header
            hide-footer
            centered
-           data-testid="aloai-engagement-control-modal"
+           data-testid="aloai-enrollment-control-modal"
            v-model="isOpen"
            @hidden="onHidden"
            @shown="onShown">
     <div class="p-2">
-      <h1 data-testid="aloai-engagement-control-modal-title"
+      <h1 data-testid="aloai-enrollment-control-modal-title"
           class="text-center mb-2">
-        AloAi Text Bot Engagement
+        Enrollment Control
       </h1>
       <div class="text-center">
-        Manage the bots that you want your contact to interact with. If a bot is disabled, it will no longer respond to this contact.
+        Manage the enrollment with the bots that you want to interact with this
+        contact.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search placeholder="Search bot"
-                data-testid="aloai-engagement-control-modal-search"
+                data-testid="aloai-enrollment-control-modal-search"
                 @search="onSearch"/>
       </div>
-      <b-form data-testid="aloai-engagement-control-modal-form"
-              class="mb-4"
-              @submit.prevent="onSubmit">
-        <div class="p-1"
-             v-if="isLoading">
-          <template v-for="n in 5">
-            <q-skeleton type="text"
-                        animation="fade"
-                        height="40px"
-                        :key="`${n}-skeleton`"/>
-          </template>
-        </div>
-        <ul class="list-group list-group-flush aloai-engagement-control-bots-list"
-            v-else>
-          <div class="text-center py-2"
-               v-if="!this.filteredBots.length">
-            No records to show.
-          </div>
-          <template v-else>
-            <li class="list-group-item list-group-item-action p-2 d-flex items-center justify-between"
-                :key="`ec-bot-${key}`"
-                v-for="(bot, key) in this.filteredBots">
-              <label class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
-                     :for="`engage-control-bot-${bot.id}`">
-                {{ bot.name }} - <q-badge color="blue">{{ formatUseCase(bot.use_case) }}</q-badge>
+      <q-tabs no-caps
+              inline-label
+              dense
+              class="bg-white text-black border-bottom"
+              content-class="flex-nowrap"
+              :mobile-arrows="false"
+              v-model="selectedTab">
+        <q-tab :name="TABS.ENROLLMENT">
+          Chatbots Enrollment
+          <span class="ml-1">
+            <information-circle-icon class="cursor-pointer" />
+            <q-tooltip anchor="top middle">
+              Select a bot to engage in a new conversation with the contact
+            </q-tooltip>
+          </span>
+        </q-tab>
+      </q-tabs>
+      <q-tab-panels class="h-100"
+                    v-model="selectedTab">
+        <q-tab-panel :name="TABS.ENROLLMENT">
+          <ul class="list-group list-group-flush scrollable-list mb-4">
+            <li class="list-group-item list-group-item-action p-0"
+                :key="`enroll-bot-${key}`"
+                v-for="(bot, key) in this.filteredSalesBots">
+              <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
+                <b-form-radio name="selected-bot"
+                              :value="bot.id"
+                              v-model="selectedBotId">
+                  {{ bot.name }}
+                </b-form-radio>
               </label>
-              <b-form-checkbox switch
-                              :id="`engage-control-bot-${bot.id}`"
-                              :value="true"
-                              :unchecked-value="false"
-                              v-model="bot_engagements[bot.id]"/>
             </li>
-          </template>
-        </ul>
-      </b-form>
-      <div class="d-flex items-center justify-center" style="gap: 15px">
-        <button class="btn btn-sm btn-outline-dark mr-2"
-                data-testid="aloai-engagement-control-modal-close-button"
-                @click="onHidden">
-          Cancel
-        </button>
-        <button class="btn btn-sm bg-primary text-white mr-2"
-                data-testid="aloai-engagement-control-modal-enroll-contact-button"
-                :disabled="isBusy"
-                @click="onSubmit">
-          Save changes
-        </button>
-      </div>
+          </ul>
+          <div class="d-flex items-center justify-center" style="gap: 15px">
+            <b-button variant="outline"
+                      size="sm"
+                      class="custom-btn"
+                      data-testid="enroll-contacts-to-aloai-modal-close-button"
+                      @click="onHidden">
+              Cancel
+            </b-button>
+            <b-button variant="primary"
+                      size="sm"
+                      class="custom-btn"
+                      data-testid="enroll-contacts-to-aloai-modal-enroll-contact-button"
+                      :disabled="!selectedBotId || isBusy"
+                      @click="onSubmitEnrollment">
+              <q-spinner-bars color="white"
+                              v-if="isBusy"/>
+              Enroll
+            </b-button>
+          </div>
+        </q-tab-panel>
+      </q-tab-panels>
     </div>
   </b-modal>
 </template>
@@ -77,15 +84,23 @@ import talk2Api from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
-import { ALOAI_USE_CASES } from 'src/constants/aloai'
-import { aloaiMixin } from 'src/plugins/mixins'
+import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+
+const TABS = {
+  ENGAGEMENT: 'engagement',
+  ENROLLMENT: 'enrollment'
+}
+
+const ALOAI_USE_CASES = {
+  SALES: 1,
+  QUESTION_AND_ANSWER: 2,
+  SUPPORT: 3
+}
 
 export default {
-  name: 'aloai-engagement-control-modal',
+  name: 'aloai-enrollment-control-modal',
 
-  components: { Search },
-
-  mixins: [aloaiMixin],
+  components: { Search, InformationCircleIcon },
 
   computed: {
     ...mapGetters('contacts', ['contact']),
@@ -122,6 +137,8 @@ export default {
       bot_engagements: {},
       searchText: '',
       isLoading: true,
+      TABS,
+      selectedTab: TABS.ENROLLMENT,
       selectedBotId: null,
       ALOAI_USE_CASES
     }
@@ -263,7 +280,7 @@ export default {
 </script>
 
 <style scoped>
-.aloai-engagement-control-bots-list {
+.aloai-enrollment-control-bots-list {
   max-height: 300px;
   overflow-y: auto;
 }

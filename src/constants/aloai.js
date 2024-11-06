@@ -1,0 +1,5 @@
+export const ALOAI_USE_CASES = {
+  SALES: 1,
+  QUESTION_AND_ANSWER: 2,
+  SUPPORT: 3
+}
