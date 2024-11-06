@@ -1,8 +1,8 @@
 import { filterCalls } from 'src/plugins/helpers/functions'
 
 export default {
-  getAgents: (state) => {
-    return state.agents
+  getAgents: (state, getters, rootState) => {
+    return rootState.users
       .filter(agent => {
         // only valid agents
         if (agent.is_destination || agent.read_only_access || !agent.enabled || !agent.active) {
@@ -36,16 +36,16 @@ export default {
     return state.filters
   },
 
-  getLiveCalls: (state) => {
-    return filterCalls(state.calls.live, state)
+  getLiveCalls: (state, getters, rootState) => {
+    return filterCalls(state.calls.live, { users: rootState.users, ...state })
   },
 
-  getParkedCalls: (state) => {
-    return filterCalls(state.calls.parked, state)
+  getParkedCalls: (state, getters, rootState) => {
+    return filterCalls(state.calls.parked, { users: rootState.users, ...state })
   },
 
-  getQueuedCalls: (state) => {
-    return filterCalls(state.calls.queued, state)
+  getQueuedCalls: (state, getters, rootState) => {
+    return filterCalls(state.calls.queued, { users: rootState.users, ...state })
   },
 
   getSummary: (state) => {

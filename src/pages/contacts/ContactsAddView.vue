@@ -51,18 +51,22 @@
     </template>
     <template slot="actions">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
-        <search placeholder="Search All Contacts"
-                limitSearchCharacters
-                :disabled="isLoadingDisabled"
-                @search="onSearch" />
-        <div class="px-3">
-          <b-form-checkbox name="check-button"
-                           size="sm"
-                           switch
-                           v-model="myContacts"
-                           @change="onFetchMyContacts">
-            <span class="small text-muted text-uppercase">My Contacts</span>
-          </b-form-checkbox>
+        <div class="mb-2 d-flex justify-content-between align-items-center">
+          <ContactSearch placeholder="Search All Contacts"
+                  limitSearchCharacters
+                  :disabled="isLoadingDisabled"
+                  @show-error="showLimitCharactersError = $event"
+                  @search="onSearch" />
+
+          <div class="px-3">
+            <b-form-checkbox name="check-button"
+                            size="sm"
+                            switch
+                            v-model="myContacts"
+                            @change="onFetchMyContacts">
+              <span class="small text-muted text-uppercase">My Contacts</span>
+            </b-form-checkbox>
+          </div>
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center">
@@ -98,6 +102,11 @@
             </compact-btn>
           </div>
         </div>
+      </div>
+      <div class="limit-characters-error d-flex align-items-center"
+            v-if="showLimitCharactersError">
+          <span class="search-error-icon mr-1">&times;</span>
+          <span class="search-error-text">Search requires at least 3 characters</span>
       </div>
     </template>
     <template slot="actions">
@@ -441,7 +450,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import CompactBtn from 'src/components/compact-btn.vue'
 import ContactsScreen from 'src/components/contacts/contacts-screen.vue'
-import Search from 'src/components/search.vue'
+import ContactSearch from 'src/components/contact-search.vue'
 import Datatable from 'src/components/datatable.vue'
 import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import FolderStaticIcon from 'src/components/icons/folder-static-icon.vue'
@@ -463,7 +472,7 @@ export default {
     ContactsFilters,
     CompactBtn,
     ContactsScreen,
-    Search,
+    ContactSearch,
     Datatable,
     ImportContactsModal,
     TextPopover,

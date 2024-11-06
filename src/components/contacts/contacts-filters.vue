@@ -512,6 +512,10 @@ export default {
                 ? filterItem.value.split(',')
                 : [trueValue]
 
+              // if filter has input and select
+              if (Array.isArray(filterItem.value) && options) {
+                trueValue = [`${filterItem.value[0]} ${options.find(item => item.value === filterItem.value[1]).label}`]
+              }
               // when 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
               // the content in 'field' will be concatenated at the end of the string
               let field = null

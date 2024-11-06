@@ -1,6 +1,8 @@
 <template>
   <div class="row no-wrap q-pa-md text-center">
-    <b-col sm="12" md="12">
+    <b-col sm="12"
+           md="12"
+           v-if="user?.profile?.contact_card_phone_number === null">
       <div class="mt-2 notice" data-testid="add-contact-card-message">
         <p class="mb-0 text-justify">
           <span v-if="isCardPhoneNumberEmpty">You don’t have any number linked on this card.<br></span>

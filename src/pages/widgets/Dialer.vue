@@ -10,8 +10,16 @@
 
     <dialer-listeners @user-logged-in="handleUserLogin"
                       @agent-status-updated="handleAgentStatusUpdate"/>
+
     <div class="p-3"
-         v-if="showAlertAgentOnCall">
+         v-if="criticalErrorHappened">
+      <p><strong>Something went wrong</strong></p>
+      <hr>
+      <p>For some reason we couldn’t complete the call. Please refresh the page and try again.</p>
+    </div>
+
+    <div class="p-3"
+         v-else-if="showAlertAgentOnCall">
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
@@ -29,6 +37,7 @@
       :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
+      :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
       v-else-if="allowed"
       @callConnected="handleCallConnectedEvent"
       @callCompleted="handleCallCompletedEvent"
@@ -48,6 +57,7 @@ import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-m
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
+import useContactApi from 'src/shared/composables/use-contact-api.composable'
 
 export default {
   name: 'Dialer',
@@ -99,6 +109,7 @@ export default {
             this.extensionsInitialized = true
           },
           onDialNumber: async (event) => {
+            this.criticalErrorHappened = false
             if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
               await new Promise(resolve => setTimeout(resolve, 1000))
             }
@@ -107,15 +118,13 @@ export default {
 
             this.showAlertCallFinished = false
 
-            if (event.phone_number) {
-              this.findDefaultOutboundCampaign()
-              this.setHubspotPhoneNumber(event.phone_number)
-              if (this.timeout) {
-                clearTimeout(this.timeout)
-              }
-              if (this.isAlwaysAskModeEnabled()) {
-                this.handleDialNumber(event.phone_number)
-              }
+            this.findDefaultOutboundCampaign()
+            this.setHubspotDialNumber(event)
+            if (this.timeout) {
+              clearTimeout(this.timeout)
+            }
+            if (this.isAlwaysAskModeEnabled()) {
+              this.handleDialNumber()
             }
           },
           onVisibilityChanged: (data) => {
@@ -135,6 +144,7 @@ export default {
       defaultOutboundCampaignId: null,
       previousOutboundCallingMode: null,
       showAlertCallFinished: false,
+      criticalErrorHappened: false,
       authProfile: null,
       listeners: {
         userLoggedIn: null,
@@ -144,17 +154,30 @@ export default {
       isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY']
     }
   },
+
+  setup () {
+    const { getLastUsedCallLineByContactId } = useContactApi()
+
+    return {
+      getLastUsedCallLineByContactId
+    }
+  },
+
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget', 'dialer', 'hubspotPhoneNumber', 'isRedirectedToHubspotWidget']),
+    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber', 'isRedirectedToHubspotWidget']),
 
     allowed () {
       return this.authProfile && this.initialized
     },
 
     isLoadingDialer () {
-      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) && !this.showAlertAgentOnCall && !this.showAlertCallFinished && !this.dialer?.parkedCall
+      return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
+        !this.showAlertAgentOnCall &&
+        !this.showAlertCallFinished &&
+        !this.dialer?.parkedCall &&
+        !this.criticalErrorHappened
     }
   },
 
@@ -192,7 +215,7 @@ export default {
     ...mapActions([
       'resetVuex',
       'setIsWidget',
-      'setHubspotPhoneNumber'
+      'setHubspotDialNumber'
     ]),
 
     ...mapActions('cache', [
@@ -237,7 +260,7 @@ export default {
 
     getContactEmitPayload () {
       return {
-        currentNumber: this.hubspotPhoneNumber,
+        currentNumber: this.hubspotDialNumber?.phoneNumber,
         contactName: this.contactName,
         companyName: this.companyName,
         contactId: this.contactId,
@@ -245,22 +268,23 @@ export default {
       }
     },
 
-    async searchContact (phoneNumber) {
-      if (!phoneNumber) {
-        return null
-      }
-
-      const url = '/api/v2/contacts/quick-search'
-      const response = await this.$axios.get(url, {
-        params: {
-          search: phoneNumber
+    async getContact () {
+      await this.$axios.post('/api/v1/integrations/hubspot/find-contact', {
+        params: this.hubspotDialNumber
+      }).then(res => {
+        this.setContactDetails(res.data)
+        this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
+        this.handleCall()
+      }).catch(err => {
+        this.$handleErrors(err.response)
+        this.criticalErrorHappened = true
+        if (this.extensions) {
+          this.extensions.callEnded()
         }
       })
-
-      return response.data.data.length > 0 ? response.data.data[0] : null
     },
 
-    async handleDialNumber (phoneNumber) {
+    async handleDialNumber () {
       console.log('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
@@ -275,21 +299,11 @@ export default {
 
       this.showAlertAgentOnCall = false
 
-      if (!this.hubspotPhoneNumber && phoneNumber) {
-        this.setHubspotPhoneNumber(phoneNumber)
-      }
-
       if (this.canHandleDialNumber()) {
-        const contact = await this.searchContact(this.hubspotPhoneNumber)
-
-        if (contact) {
-          this.setContactDetails(contact)
-          this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
-          this.handleCall()
-        }
+        await this.getContact()
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
-          this.handleDialNumber(this.hubspotPhoneNumber)
+          this.handleDialNumber()
         }, 1000)
       }
     },
@@ -305,7 +319,7 @@ export default {
 
       if (this.defaultOutboundCampaignId) {
         this.campaignId = this.defaultOutboundCampaignId
-        this.handleDialNumber(this.hubspotPhoneNumber)
+        this.handleDialNumber()
       }
     },
 
@@ -341,7 +355,7 @@ export default {
       // if shouldHandleDialNumber is true, then handleDialNumber will set the contact name and timezone
       // to proceed to execute checkContactTimezone and makeCall
       if (shouldHandleDialNumber) {
-        this.handleDialNumber(this.hubspotPhoneNumber)
+        this.handleDialNumber()
         return
       }
 
@@ -392,7 +406,7 @@ export default {
         }
 
         if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-          this.handleDialNumber(this.hubspotPhoneNumber)
+          this.handleDialNumber()
         }
       }
     },
@@ -403,7 +417,7 @@ export default {
       }
 
       this.$VueEvent.fire('makeCall', {
-        currentNumber: this.$options.filters.fixPhone(this.hubspotPhoneNumber),
+        currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
         outboundCampaignId: this.campaignId.toString(),
         contactName: this.contactName,
         companyName: this.companyName,
@@ -413,6 +427,7 @@ export default {
 
     findDefaultOutboundCampaign () {
       if (this.isAlwaysAskModeEnabled()) {
+        setTimeout(() => this.setTheLastUsedCallLine(), 1000)
         return
       }
 
@@ -430,10 +445,13 @@ export default {
     },
 
     isAlwaysAskModeEnabled () {
-      return this.previousOutboundCallingMode &&
-        this.authProfile &&
-        this.previousOutboundCallingMode === this.authProfile.outbound_calling_mode &&
-        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+      if (!this.authProfile) return false
+
+      const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
+
+      const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+
+      return isCompanyAlwaysAsk || isUserAlwaysAsk
     },
 
     updatePreviousOutboundCallingMode () {
@@ -456,7 +474,7 @@ export default {
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
       // Wait to finish the generate token to avoid conflicts with device
-      setTimeout(() => { this.handleDialNumber(this.hubspotPhoneNumber) }, 500)
+      setTimeout(() => { this.handleDialNumber() }, 500)
     },
 
     canHandleDialNumber () {
@@ -508,6 +526,24 @@ export default {
 
       this.$VueEvent.fire('resetCall')
       this.handleCallCompletedEvent(true)
+    },
+
+    async setTheLastUsedCallLine () {
+      if (!this.contactId) {
+        const contact = await this.searchContact(this.hubspotPhoneNumber)
+        if (contact) {
+          this.contactId = contact.contact_id
+        }
+      }
+
+      if (this.campaignId || !this.contactId) return
+      try {
+        const data = await this.getLastUsedCallLineByContactId(this.contactId)
+
+        this.handleChangeCampaignEvent(data.campaign_id)
+      } catch (error) {
+        this.$handleErrors(error.response)
+      }
     }
   },
 
