@@ -631,9 +631,9 @@ export default {
       }
     },
 
-    scriptCommunication: {
+    communicationScript: {
       store (params) {
-        return window.axios.post(`${suffixV1}script-communication`, params)
+        return window.axios.post(`${suffixV1}communication-script`, params)
       }
     },
 

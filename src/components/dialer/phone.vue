@@ -2400,7 +2400,7 @@ export default {
         this.scriptId = script.id
 
         if (this.dialer?.communication) {
-          API.V1.scriptCommunication.store({
+          API.V1.communicationScript.store({
             script_id: script.id,
             communication_id: this.dialer.communication.id,
             text: script.text

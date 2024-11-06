@@ -79,7 +79,7 @@ export default {
         try {
           for (const script of this.cachedScripts) {
             if (script.id && communication.id) {
-              await talk2Api.V1.scriptCommunication.store({
+              await talk2Api.V1.communicationScript.store({
                 script_id: script.id,
                 communication_id: communication.id,
                 text: script.text
@@ -178,7 +178,7 @@ export default {
           for (const script of scripts) {
             try {
               if (script.id && lastCommunicationId) {
-                await talk2Api.V1.scriptCommunication.store({
+                await talk2Api.V1.communicationScript.store({
                   script_id: script.id,
                   communication_id: lastCommunicationId,
                   text: script.text
