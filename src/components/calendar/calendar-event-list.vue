@@ -201,11 +201,6 @@ export default {
   methods: {
     formatEventTime (event) {
       const {
-        // currentStartDate,
-        // currentStartTime,
-        // currentEndDate,
-        // currentEndTime,
-        // currentTimeAcronym,
         localStartDate,
         localStartTime,
         localEndDate,
@@ -281,8 +276,6 @@ export default {
             return `Showing events for ${startOfWeek} - ${endOfWeek}`
           }
 
-          // const currentHour = currentTime.split(' ')[3]
-          // const currentMinutes = currentTime.split(' ')[4]
           const localHour = localTime.split(' ')[3]
           const localMinutes = localTime.split(' ')[4]
 
