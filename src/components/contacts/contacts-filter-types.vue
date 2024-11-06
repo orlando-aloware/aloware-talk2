@@ -838,15 +838,19 @@ export default {
           const filters = this.allFilters[this.filterGroupIndex]?.filters[this.filter.key]
           if (filters?.length > 1) {
             let filtersNotAllowed = []
+            // only allow selecting one of these four options at a time
             switch (this.filterOperator) {
               case DateTimeFilter.OPERATOR_IS_MORE_THAN:
-                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_LESS_THAN, DateTimeFilter.OPERATOR_IS_UNKNOWN]
+                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_LESS_THAN, DateTimeFilter.OPERATOR_IS_KNOWN, DateTimeFilter.OPERATOR_IS_UNKNOWN]
                 break
               case DateTimeFilter.OPERATOR_IS_LESS_THAN:
-                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_UNKNOWN]
+                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_KNOWN, DateTimeFilter.OPERATOR_IS_UNKNOWN]
                 break
               case DateTimeFilter.OPERATOR_IS_UNKNOWN:
-                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN]
+                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN, DateTimeFilter.OPERATOR_IS_KNOWN]
+                break
+              case DateTimeFilter.OPERATOR_IS_KNOWN:
+                filtersNotAllowed = [DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN, DateTimeFilter.OPERATOR_IS_UNKNOWN]
                 break
             }
             isValidFilter = !filters.some(filter => filtersNotAllowed.includes(filter.operator))
