@@ -58,7 +58,7 @@
           </div>
           <b-link class="self-center trash-icon custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
                   href="#"
-                  v-if="isPublicList && canEditLists && !isRemoving"
+                  v-if="canEditList(list) && !isRemoving"
           >
             <slot name="button">
               <span class='aloicons trash-icon'
@@ -81,7 +81,7 @@
         :dialogId="dialogId"
         :contact="contact"
         :list="selectedList"
-        v-if="isPublicList && canEditLists && contact && selectedList"
+        v-if="contact && selectedList"
         @deleting="onDeleting"
         @deleted="onDeleted"
         @finally="onFinally"
@@ -96,8 +96,7 @@
     <div id="contact-list-card-footer"
          class="d-flex justify-content-between">
       <div class="generic-multi-select">
-        <div class="list-wrapper"
-             v-if="canEditLists">
+        <div class="list-wrapper">
           <div class="w-100 mt-1">
             <b-link href="#"
                     class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
@@ -197,6 +196,18 @@ export default {
         lists = lists.filter(list => list.name.toLowerCase().includes(this.searchQuery.toLowerCase()))
       }
 
+      // sort lists by contact_folder_created_by === this.profile.id first
+      lists.sort((a, b) => {
+        if (a.contact_folder_created_by === this.profile.id) {
+          return -1
+        }
+
+        if (b.contact_folder_created_by === this.profile.id) {
+          return 1
+        }
+
+        return 0
+      })
       return lists
     },
 
@@ -208,10 +219,6 @@ export default {
 
     canOnlyViewLists () {
       return !this.isBillingAdminOrAdminOrSupervisor && this.isAgent
-    },
-
-    canEditLists () {
-      return this.isBillingAdminOrAdminOrSupervisor
     }
   },
 
@@ -235,6 +242,15 @@ export default {
   },
 
   methods: {
+    canEditList (list) {
+      if (this.isPublicList) {
+        return this.isBillingAdminOrAdminOrSupervisor
+      }
+
+      if (list.contact_folder_created_by === this.profile.id) {
+        return true
+      }
+    },
     onInput (value) {
 
     },
