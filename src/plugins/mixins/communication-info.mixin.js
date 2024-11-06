@@ -208,6 +208,10 @@ export default {
           return 'Line was proxied.'
         case CommunicationRejectionReasons.REJECTION_REASON_CONTACT_DNC:
           return 'Contact was DNC.'
+        case CommunicationRejectionReasons.REJECTION_REASON_PHONE_NUMBER_OPTED_OUT:
+          return 'Contact was opted out from receiving messages.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CONTACT_IS_NOT_TCPA_APPROVED:
+          return 'Contact was non-TCPA Approved.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DISABLED:
           return 'Company was not enabled.'
         case CommunicationRejectionReasons.REJECTION_REASON_MESSAGE_EMPTY:

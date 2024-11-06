@@ -20,7 +20,7 @@
 import CheckIcon from 'src/components/icons/check-icon.vue'
 
 export default {
-  name: 'steps-wrapper',
+  name: 'steps-wrapper-vertical',
 
   components: {
     CheckIcon

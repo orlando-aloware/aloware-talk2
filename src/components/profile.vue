@@ -265,7 +265,7 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin, agentMixin, avatarMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, avatarMixin, userMixin } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
 import LogoutIcon from 'components/icons/logout-icon'
 import HalfMoonIcon from 'components/icons/half-moon-icon'
@@ -283,7 +283,8 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    agentMixin
+    agentMixin,
+    userMixin
   ],
 
   props: {
@@ -342,8 +343,7 @@ export default {
     },
 
     isProfileDropdownDisabled () {
-      const isImpersonate = localStorage.getItem('impersonate')
-      return this.shouldDisableProfileMenuActions && (!isImpersonate || (isImpersonate && this.dialer?.call?.state === 'open'))
+      return this.shouldDisableProfileMenuActions && (!this.isImpersonate || (this.isImpersonate && this.dialer?.call?.state === 'open'))
     },
 
     shouldDisableProfileMenuActions () {

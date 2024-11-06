@@ -297,9 +297,8 @@ export default function (/* { ssrContext } */) {
       isDatatableCountLoading: false,
       showedKycReloadDialog: false,
       isTrialBannerVisible: false,
-      isSimpsocialMigrationBannerVisible: true,
       currentTimezone: null,
-      hubspotPhoneNumber: null,
+      hubspotDialNumber: null,
       isRedirectedToHubspotWidget: false,
       isCallBackButtonDisabled: false,
       isFirstLoad: true,
@@ -918,16 +917,12 @@ export default function (/* { ssrContext } */) {
         commit('SET_IS_TRIAL_BANNER_VISIBLE', value)
       },
 
-      setIsSimpsocialMigrationBannerVisible ({ commit }, value) {
-        commit('SET_IS_SIMPSOCIAL_MIGRATION_BANNER_VISIBLE', value)
-      },
-
       setCurrentTimezone ({ commit }, timezone) {
         commit('SET_CURRENT_TIMEZONE', timezone)
       },
 
-      setHubspotPhoneNumber ({ commit }, value) {
-        commit('SET_HUBSPOT_PHONE_NUMBER', value)
+      setHubspotDialNumber ({ commit }, value) {
+        commit('SET_HUBSPOT_DIAL_NUMBER', value)
       },
 
       setIsRedirectedToHubspotWidget ({ commit }, value) {
@@ -1755,16 +1750,12 @@ export default function (/* { ssrContext } */) {
         state.isTrialBannerVisible = value
       },
 
-      SET_IS_SIMPSOCIAL_MIGRATION_BANNER_VISIBLE (state, value) {
-        state.isSimpsocialMigrationBannerVisible = value
-      },
-
       SET_CURRENT_TIMEZONE (state, timezone) {
         state.currentTimezone = timezone
       },
 
-      SET_HUBSPOT_PHONE_NUMBER (state, value) {
-        state.hubspotPhoneNumber = value
+      SET_HUBSPOT_DIAL_NUMBER (state, value) {
+        state.hubspotDialNumber = value
       },
 
       SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {
