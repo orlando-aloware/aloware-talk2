@@ -4,20 +4,37 @@
            data-testid="comm-conversation-section"
            ref="chatArea">
     <div v-if="!isEmpty(messages)">
-      <q-btn color="text-dark-greenish"
-             class="btn btn-inline px-1 py-0"
-             title="Download"
-             flat
-             rounded
-             dense
-             no-caps
-             data-testid="download-button-download-btn"
-             @click="onDownload()">
-        <download-icon height="16"
-                       width="16"
-                       data-testid="download-button-download-icon">
-        </download-icon>
-      </q-btn>
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: -4px;">
+        <q-btn color="text-dark-greenish"
+              class="btn btn-inline px-1 py-0"
+              title="Download transcription"
+              flat
+              rounded
+              dense
+              no-caps
+              data-testid="download-button-download-btn"
+              @click="onDownload()">
+          <download-icon height="20"
+                        width="20"
+                        data-testid="download-button-download-icon">
+          </download-icon>
+        </q-btn>
+        <q-btn color="text-dark-greenish"
+              class="btn btn-inline px-1 py-0"
+              title="Copy transcription"
+              flat
+              rounded
+              dense
+              no-caps
+              data-testid="copy-button-copy-btn"
+              @click="onDownload()">
+          <copy-icon height="20"
+                    width="20"
+                    color="#007bff"
+                    data-testid="copy-button-copy-icon">
+          </copy-icon>
+        </q-btn>
+      </div>
       <div :key="message_index"
            v-for="(message, message_index) in formattedMessages">
         <!--
@@ -62,6 +79,7 @@
 <script>
 import _ from 'lodash'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
+import CopyIcon from 'components/icons/contact-activity/copy-icon'
 
 export default {
   name: 'ConversationSection',
