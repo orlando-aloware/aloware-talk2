@@ -11,7 +11,6 @@
                        custom-placeholder="Pick a line"
                        rounded
                        behavior="menu"
-                       ref="lineSelector"
                        :generic-multiselect="false"
                        v-model="localCampaignId"
                        @change="changeCampaignId">

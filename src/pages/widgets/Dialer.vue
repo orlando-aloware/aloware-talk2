@@ -337,6 +337,13 @@ export default {
 
       console.warn('handleUserLogin_3', this.defaultOutboundCampaignId)
 
+      // if empty then onDialNumber event was not called - skip calling,
+      // if not empty then dialer was called, and we are here after login page so we must dial the number
+      if (!this.hubspotDialNumber) {
+        return
+      }
+
+      console.warn('handleUserLogin_4', this.defaultOutboundCampaignId)
       this.postDialNumber()
     },
 
