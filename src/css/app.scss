@@ -2583,6 +2583,22 @@ i.option-separator {
     font-size: 20px;
   }
 
+  .hubspot-card {
+    .hubspot-icon {
+      font-size: 24px;
+      border-radius: 7px;
+      background: #FF7A59;
+      color: #FFFFFF;
+      border: 5px solid #FF7A59;
+      margin-right: 10px;
+    }
+    .integration-title {
+      font-size: 18px;
+      position: relative;
+      top: -3px;
+    }
+  }
+
   .pipedrive-btn {
     content: url(/integrations/pipedrive-icon.svg);
     margin-right: 20px;
@@ -7996,6 +8012,27 @@ button.grey-90 {
 }
 
 .general-notification {
+  position: relative;
+
+  .q-notification__wrapper {
+    display: contents;
+  }
+
+  .download-button {
+    margin-top: 2px;
+  }
+
+  .close-button {
+    background: transparent;
+    border: none;
+
+    .q-btn__content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
   &.bg-green-10 {
     border: 1px solid $green-90;
   }
@@ -14192,6 +14229,65 @@ h1.contact-list-name-label {
   }
 }
 
+.steps-wrapper-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__step {
+    color: $grey-90;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    font-weight: bold;
+    flex: 1;
+    text-align: center;
+
+    &::after {
+      content: '';
+      position: absolute;
+      background-color: $grey-70;
+      height: 2px;
+      width: calc(100% - 4em);
+      top: 20%;
+      left: 50%;
+      margin-left: 2em;
+      transform: translateX(0%);
+    }
+
+    &:last-of-type::after {
+      display: none;
+    }
+
+    &__icon {
+      border: solid 1px $grey-70;
+      border-radius: 50%;
+      height: 26px;
+      width: 26px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 8px;
+      z-index: 1;
+    }
+
+    &--active .steps-wrapper-horizontal__step__icon {
+      background-color: $success;
+      color: $white;
+    }
+
+    &--completed .steps-wrapper-horizontal__step__icon {
+      background-color: $success;
+      color: $white;
+    }
+
+    &--completed::after {
+      background-color: $success;
+    }
+  }
+}
+
 .activity-graph {
   &__header {
     display: flex;
@@ -15445,9 +15541,25 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 }
 
 .limit-characters-error {
-  color: black;
-  font-size: 13px;
-  margin-bottom: 10px;
+  top: 100%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  margin-top: -8px;
+  margin-bottom: 2px;
+}
+
+.search-error-icon {
+  color: red;
+  display: inline-block;
+  transform: scale(1.5);
+  vertical-align: middle;
+}
+
+.search-error-text {
+  position: relative;
+  top: 2px;
+  font-size: 80%;
 }
 
 .form-control-search-component.is-invalid {
@@ -15499,4 +15611,31 @@ hr {
   outline: none;
   border: 1px solid transparent;
   font-size: 0.75rem;
+}
+
+.calendar-event-list {
+  &-modal-title {
+    font-size: .875rem;
+    font-weight: 500;
+  }
+
+  &-modal {
+    .q-dialog__inner--minimized > div {
+      max-width: 660px !important;
+    }
+  }
+}
+
+.external-contact-hubspot-link-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.duplicateContactPhoneNumberMessage {
+  color: $grey-90;
+}
+
+.hubspot-jit-card-header {
+  margin: 12px;
 }

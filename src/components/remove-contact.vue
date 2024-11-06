@@ -91,16 +91,8 @@ export default {
       }
 
       if (this.selectedContacts[this.selectedList.id]) {
-        const hasIntegrationsCount = this.integrationsCount()
         const text = []
-
-        if (hasIntegrationsCount > 1) {
-          text.push(`There are ${hasIntegrationsCount} contacts from integrations and can't be deleted.`)
-        } else if (hasIntegrationsCount > 0) {
-          text.push(`There is a contact from integrations and can't be deleted.`)
-        }
-
-        const canBeDeleted = this.selectedCount - hasIntegrationsCount
+        const canBeDeleted = this.selectedCount
 
         if (canBeDeleted > 0) {
           text.push(`Are you sure you want to remove <span>${this.$options.filters.numFormat(canBeDeleted)}</span> contact${canBeDeleted > 1 ? 's' : ''}?`)
@@ -113,7 +105,7 @@ export default {
     },
 
     canBeDeleted () {
-      return this.contactToRemove || (this.selectedContacts[this.selectedList.id] && this.integrationsCount() < this.selectedCount)
+      return this.contactToRemove || (this.selectedContacts[this.selectedList.id])
     },
 
     listId () {
@@ -148,18 +140,6 @@ export default {
       'removeContactClose',
       'setContactRemoveActionType'
     ]),
-
-    integrationsCount () {
-      if (!this.contactToRemove && this.selectedContacts[this.selectedList.id]) {
-        // disable integrations count if multi entity is not activated
-        if (!this.currentCompany.activate_multi_entity) {
-          return 0
-        }
-        return this.selectedContacts[this.selectedList.id].filter(contact => contact.has_integration).length
-      }
-
-      return 0
-    },
 
     onRemoveFromList () {
       this.flag = true

@@ -237,7 +237,7 @@ export default {
 
       // requires at least 3 characters to allow the request or
       // empty so that the result will reset back to the original
-      if (searchText && searchText.length < 3) {
+      if (searchText && searchText.trim().length < 3) {
         return
       }
 

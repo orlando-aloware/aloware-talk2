@@ -15,7 +15,7 @@ export default {
     },
 
     isModGen () {
-      return [2132, 3691].includes(this.currentCompany?.reseller_id)
+      return this.currentCompany?.reseller_id === 2132
     },
 
     isImpersonate () {
