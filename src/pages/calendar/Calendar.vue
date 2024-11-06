@@ -287,8 +287,6 @@ export default {
     },
 
     eventsConvertedToTheRightTimezone () {
-      // start_date: "2024-11-07 06:00"
-      // contact_timezone: "America/New_York"
       const browserTZ = browserTimezone()
 
       return this.events.map(event => {

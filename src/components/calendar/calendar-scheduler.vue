@@ -6,7 +6,7 @@
 <script>
 import Scheduler from 'dhtmlx-scheduler'
 import moment from 'moment'
-import { DAY_VIEW, MONTH_VIEW, WEEK_VIEW } from 'src/constants/calendar'
+import { DAY_VIEW, MONTH_VIEW, TIME_FORMAT_AM_PM, WEEK_VIEW } from 'src/constants/calendar'
 import { calendarMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
@@ -70,7 +70,7 @@ export default {
     ]
 
     Scheduler.config.date_format = '%Y-%m-%d %g:%i %A'
-    Scheduler.config.hour_date = this.profile.time_format === 1 ? '%g:%i %A' : '%G:%i'
+    Scheduler.config.hour_date = this.profile.time_format === TIME_FORMAT_AM_PM ? '%g:%i %A' : '%G:%i'
     Scheduler.config.dblclick_create = false
     Scheduler.config.details_on_dblclick = false
     Scheduler.config.drag_event_body = false
@@ -234,7 +234,7 @@ export default {
     },
 
     reInit (date, view) {
-      Scheduler.config.hour_date = this.profile.time_format === 1 ? '%g:%i %A' : '%G:%i'
+      Scheduler.config.hour_date = this.profile.time_format === TIME_FORMAT_AM_PM ? '%g:%i %A' : '%G:%i'
 
       Scheduler.init(this.$refs.scheduler, date, view)
       Scheduler.parse(this.$props.events)

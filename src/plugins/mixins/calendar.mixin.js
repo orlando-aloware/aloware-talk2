@@ -1,12 +1,12 @@
 import { mapState } from 'vuex'
 import moment from 'moment'
 import { browserTimezone } from 'src/utils'
+import { TIME_FORMAT_AM_PM } from 'src/constants/calendar'
 
 export default {
   data () {
     return {
       browserTimeZone: browserTimezone(),
-      // Testing
       isHourScaleHeaderAdded: false
     }
   },
@@ -20,11 +20,11 @@ export default {
     },
 
     timeFormat () {
-      return this.profile.time_format === 1 ? 'h:mm A' : 'HH:mm'
+      return this.profile.time_format === TIME_FORMAT_AM_PM ? 'h:mm A' : 'HH:mm'
     },
 
     listViewTimeFormat () {
-      return this.profile.time_format === 1 ? 'D MMM YYYY, h A' : 'D MMM YYYY, H:mm'
+      return this.profile.time_format === TIME_FORMAT_AM_PM ? 'D MMM YYYY, h A' : 'D MMM YYYY, H:mm'
     }
   },
 
@@ -47,7 +47,7 @@ export default {
     },
 
     getLocalTime (date) {
-      return date?.format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+      return date?.format(this.profile.time_format === TIME_FORMAT_AM_PM ? 'h A' : 'H:00')
     },
 
     getLocalTimeAcronym (date) {
@@ -78,7 +78,7 @@ export default {
 
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
         const dateInCurrentTimezone = moment(adjustedDate).tz(this.currentTimezone)
-        const currentTimezoneTime = dateInCurrentTimezone.format(this.profile.time_format === 1 ? 'h A' : 'H:00')
+        const currentTimezoneTime = dateInCurrentTimezone.format(this.profile.time_format === TIME_FORMAT_AM_PM ? 'h A' : 'H:00')
 
         return `
           <div class="hour-label" data-hour="${dateInBrowserTimeZone.hour()}">
