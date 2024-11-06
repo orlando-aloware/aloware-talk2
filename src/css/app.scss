@@ -12445,13 +12445,13 @@ h1.contact-list-name-label {
 
         .dhx_event_move.dhx_title {
           padding: 0;
+          display: none;
         }
 
         .dhx_cal_event .dhx_body,
         .dhx_cal_event.dhx_cal_select_menu .dhx_body {
           padding: 0;
-          line-height: 19px !important;
-          height: 19px !important;
+          height: fit-content !important;
         }
 
         .dhx_event_resize.dhx_footer {
@@ -12538,6 +12538,7 @@ h1.contact-list-name-label {
           display: flex !important;
           align-items: flex-start;
           justify-content: center;
+          font-weight: 400 !important;
         }
 
         .dhx_cal_today_button.dhx_cal_nav_button,
@@ -12566,6 +12567,30 @@ h1.contact-list-name-label {
           display: flex;
           align-items: center;
           justify-content: center;
+        }
+
+        .time-column {
+          width: 50%;
+          text-align: center;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+
+        .current-time {
+          border-right: 1px solid #dcdfe6;
+        }
+
+        .event-content {
+          .event-time {
+            font-size: 10px;
+          }
+
+          .event-text {
+            font-size: 12px;
+            font-weight: 700;
+          }
         }
       }
 
@@ -12597,8 +12622,9 @@ h1.contact-list-name-label {
         width: 100%;
         cursor: pointer;
 
-        &:hover {
-          text-decoration: underline;
+        &.header-row {
+          font-weight: bold;
+          text-align: center;
         }
       }
     }
@@ -15599,6 +15625,21 @@ hr {
   margin-bottom: 0.75rem;
 }
 
+
+.external-contact-hubspot-link-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.duplicateContactPhoneNumberMessage {
+  color: $grey-90;
+}
+
+.hubspot-jit-card-header {
+  margin: 12px;
+}
+
 .bulk-action-menu-dropdown {
   font-size: .75rem;
 
@@ -15624,18 +15665,4 @@ hr {
       max-width: 660px !important;
     }
   }
-}
-
-.external-contact-hubspot-link-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-.duplicateContactPhoneNumberMessage {
-  color: $grey-90;
-}
-
-.hubspot-jit-card-header {
-  margin: 12px;
 }
