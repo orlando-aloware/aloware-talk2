@@ -230,9 +230,11 @@ export default {
     },
 
     onSearch (searchText) {
-      // ignore search if previous and current search are the same
-      if (this.previousSearch.trim() === searchText.trim()) {
-        return
+      // If both are non-null, compare trimmed values ignore search if previous and current search are the same
+      if (this.previousSearch !== null && searchText !== null) {
+        if (this.previousSearch.trim() === searchText.trim()) {
+          return
+        }
       }
 
       // requires at least 3 characters to allow the request or
