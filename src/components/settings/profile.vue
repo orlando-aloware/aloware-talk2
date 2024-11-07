@@ -248,7 +248,44 @@
       <b-form-row class="mt-4">
         <b-col sm="12">
           <h5 class="form-label">Contact Card</h5>
-          <p class="form-helper-text">Only personal lines routed to your user will show. Admins can set personal lines in the Lines settings</p>
+          <p class="form-helper-text">Only personal lines routed to your user will show. Admins can set personal lines in the Lines settings. You can send this contact card via SMS to your clients.</p>
+
+          <a href="javascript:void(0)"
+             class="text-primary" style="text-decoration: underline;"
+             @click="showPreviewContactCard = !showPreviewContactCard">
+            {{ showPreviewContactCard ? 'Hide Card' : 'Preview Card' }}
+          </a>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="mt-2"
+                  v-if="showPreviewContactCard">
+        <b-col sm="12" md="6">
+          <div class="preview-card-box">
+            <div class="d-flex align-items-center mb-2">
+              <div class="preview-avatar mr-3">
+                {{ getInitials(user.contact_card_name) }}
+              </div>
+              <div>
+                <h5 class="mb-0">{{ user.contact_card_name }}</h5>
+                <p class="mb-0 text-muted">{{ selectedNumberContactCard | fixPhone('NATIONAL', true, false, true) }}</p>
+              </div>
+            </div>
+            <div class="d-flex justify-content-around mt-4">
+              <div class="text-center icon-container">
+                <div class="icon-circle">
+                  <b-icon icon="telephone-fill" class="text-white"></b-icon>
+                </div>
+                Call
+              </div>
+              <div class="text-center icon-container">
+                <div class="icon-circle">
+                  <b-icon icon="chat-dots-fill" class="text-white"></b-icon>
+                </div>
+                Message
+              </div>
+            </div>
+          </div>
         </b-col>
       </b-form-row>
 
@@ -267,13 +304,22 @@
           </b-form-group>
         </b-col>
 
-        <b-col sm="12" md="4">
-          <b-form-group label="Phone Number"
-                        class="form-label mb-0">
+        <b-col sm="12" md="6">
+          <b-form-group class="form-label mb-0">
+            <div class="d-flex align-items-center">
+              <label class="col-form-label">Phone Number</label>
+              <span class="mx-1 d-flex align-items-center" v-if="user.contact_card_campaign_id">
+                <information-circle-icon color="#2F80ED"></information-circle-icon>
+                <q-tooltip anchor="center start" self="center left" :offset="[-20, 10]">
+                  <p>The phone number for contact card can't be cleared, only changed.</p>
+                </q-tooltip>
+              </span>
+            </div>
             <user-campaign-selector :key="contactCardCampaignSelectorKey"
                                     :user="user"
                                     v-model.trim="user.contact_card_campaign_id"
-                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')">
+                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')"
+                                    @selectedNumber="updateSelectedNumberContactCard">
             </user-campaign-selector>
           </b-form-group>
         </b-col>
@@ -300,9 +346,9 @@
           </b-form-group>
         </b-col>
 
-        <b-col sm="12" md="4">
-          <b-form-group label="Phone Number"
-                        class="form-label mb-0">
+        <b-col sm="12" md="6">
+          <b-form-group class="form-label mb-0">
+              <label class="col-form-label">Phone Number</label>
               <line-selector :value="user.company_contact_card_campaign_id"
                              :multiple="false"
                              :use-chips="false"
@@ -311,7 +357,8 @@
                              :clearable="true"
                              :useInput="true"
                              v-model.trim="user.company_contact_card_campaign_id"
-                             @change="(eventPayload) => onUpdateFields(eventPayload, 'company_contact_card_campaign_id')">
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'company_contact_card_campaign_id')"
+                             @selectedNumber="updateSelectedNumberCompanyCard">
             </line-selector>
           </b-form-group>
         </b-col>
@@ -558,6 +605,7 @@ import {
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { required, maxLength, minLength, email, sameAs, helpers } from 'vuelidate/lib/validators'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'profile',
@@ -569,7 +617,7 @@ export default {
     simpsocialMixin
   ],
 
-  components: { UserCampaignSelector, AnswerTypeSelector, LineSelector },
+  components: { UserCampaignSelector, AnswerTypeSelector, LineSelector, InformationCircleIcon },
 
   computed: {
     ...mapState(['campaigns', 'statics']),
@@ -737,3 +785,44 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+.preview-card-box {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 2em;
+  max-width: 325px;
+  min-width: auto !important;
+}
+
+.preview-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+}
+
+.preview-card-box .icon-circle {
+  background-color: #007bff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.preview-card-box .icon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9em;
+}
+
+</style>

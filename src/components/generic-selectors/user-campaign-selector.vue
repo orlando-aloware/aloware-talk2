@@ -137,6 +137,10 @@ export default {
 
     model (val) {
       this.$emit('select', this.model ? this.model : AnswerTypes.BY_NONE)
+
+      // return the incoming number of the selected campaign
+      const found = this.userCampaigns.find(campaign => campaign.id === val)
+      this.$emit('selectedNumber', found ? found.incoming_number : '')
     }
   }
 }
