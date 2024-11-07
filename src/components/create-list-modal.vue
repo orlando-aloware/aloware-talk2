@@ -158,6 +158,11 @@ export default {
     }
   },
 
+  mounted () {
+    this.loadFolders()
+    this.loadPublicLists()
+  },
+
   computed: {
     ...mapGetters('contacts', [
       'createList',
@@ -180,10 +185,12 @@ export default {
     },
 
     isCreateListModeFromBulkMenuOrFilters () {
+      console.log('isCreateListModeFromBulkMenuOrFilters', [this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode))
       return [this.CreateListMode.FROM_FILTERS, this.CreateListMode.FROM_BULK_MENU].includes(this.createList.mode)
     },
 
     userCanAddPublicList () {
+      console.log('userCanAddPublicList', this.isBillingAdminOrAdminOrSupervisor)
       return this.isBillingAdminOrAdminOrSupervisor
     },
 

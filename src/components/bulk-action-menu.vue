@@ -47,7 +47,7 @@
              data-testid="bulk-action-menu-remove-from-list-link"
              :disabled="disabledRemoveOnList"
              @click="onRemoveFromList">
-            <i class="fa fa-ban text-danger" />
+            <i class="fa fa-user-minus text-danger" />
             Remove {{ contactsWord }} From List
           </a>
         </div>
@@ -58,7 +58,7 @@
              data-testid="bulk-action-menu-remove-from-pd-list-link"
              :disabled="disabledRemoveOnPdList"
              @click="onRemoveFromPdList">
-            <i class="fa fa-ban text-danger" />
+            <i class="fa fa-user-minus text-danger" />
             Remove {{ contactsWord }} From List
           </a>
         </div>
