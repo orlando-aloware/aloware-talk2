@@ -116,6 +116,18 @@ export default {
       this.loading = false
     },
 
+    async getPublicListsV2 (page = null, perPage = null) {
+      await API.V2.contactList.public({
+        page: page,
+        size: perPage
+      }).then(response => {
+        this.publicLists = response.data.data
+      }).catch((err) => {
+        console.error(err)
+        this.$generalNotification('Unable to load public lists please try again.', 'error')
+      })
+    },
+
     loadPublicLists () {
       this.isLoading = true
       this.setPublicListsLoaded(false)
