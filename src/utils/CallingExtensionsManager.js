@@ -17,11 +17,9 @@ class CallingExtensionsManager {
       this.options = options
 
       try {
-        console.warn('CallingExtensionsManager: initialize', options)
         this.callingExtensions = await new CallingExtensions(this.options)
-        console.warn('CallingExtensionsManager: initialized', this.callingExtensions)
       } catch (error) {
-        console.error('Error: Extensions SDK is not available', error)
+        console.warning('Error: Extensions SDK is not available', error)
       }
     }
     return this.callingExtensions

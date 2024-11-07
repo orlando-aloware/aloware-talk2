@@ -96,7 +96,6 @@ export default {
         // eventHandlers handle inbound messages
         eventHandlers: {
           onReady: () => {
-            console.warn('onReady')
             this.$VueEvent.fire('resetCall')
 
             const payload = {
@@ -109,10 +108,8 @@ export default {
               }
             }
             this.extensions.initialized(payload)
-            // this.extensionsInitialized = true
           },
           onDialNumber: async (event) => {
-            console.warn('onDialNumber', event)
             this.criticalErrorHappened = false
             this.defaultCampaignInitialized = false
             this.setHubspotDialNumber(event)
@@ -124,7 +121,6 @@ export default {
             await this.postDialNumber()
           },
           onVisibilityChanged: (data) => {
-            console.warn('onVisibilityChanged', data)
             this.extensionsVisibility = !data?.isHidden
 
             if (!this.extensionsVisibility) {
@@ -186,27 +182,24 @@ export default {
 
     this.needsExtensions = this.$route.name === 'Hubspot Call Extension'
 
-    console.warn('Route', this.$route.name, this.needsExtensions)
-
     if (!this.needsExtensions) {
       this.extensionsVisibility = true
     }
   },
 
   async mounted () {
-    console.warn('mounted extension before', this.extensions)
-
     try {
+      // init of CallingExtensions has to be once and do not repeat when, for instance, login page was called
+      // otherwise we lose connection with parent window
       this.extensions = await CallingExtensionsManager.initialize(this.callSdkOptions)
     } catch (error) {
-      console.error('Error 2: ', error)
+      // there may iframe issue like "Blocked a frame with origin" but we don't want to break the whole app, it is still usable
+      console.log('Error during CallingExtensions init', error)
     }
 
     CallingExtensionsManager.subscribe(this.callSdkOptions.eventHandlers)
 
     this.extensionsInitialized = true
-
-    console.warn('mounted after', this.extensions)
     await this.init()
     this.isFirstLoading = false
   },
@@ -313,20 +306,17 @@ export default {
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
-        console.warn('exit one')
         return
       }
 
       // don't allow to make a call if there's a parked call
       if (this.dialer?.parkedCall) {
-        console.warn('exit two')
         return
       }
-      console.warn('after checks', this.canHandleDialNumber())
+
       this.showAlertAgentOnCall = false
 
       if (this.canHandleDialNumber()) {
-        console.warn('calling')
         this.handleCall()
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
@@ -336,9 +326,7 @@ export default {
     },
 
     handleUserLogin () {
-      console.warn('handleUserLogin', this.needsExtensions, this.extensionsInitialized)
       if (this.needsExtensions && this.extensionsInitialized) {
-        console.warn('userLoggedIn_2')
         this.extensions.userLoggedIn()
         // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
         if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
@@ -346,15 +334,12 @@ export default {
         }
       }
 
-      console.warn('handleUserLogin_3', this.defaultOutboundCampaignId)
-
       // if empty then onDialNumber event was not called - skip calling,
       // if not empty then dialer was called, and we are here after login page so we must dial the number
       if (!this.hubspotDialNumber) {
         return
       }
 
-      console.warn('handleUserLogin_4', this.defaultOutboundCampaignId)
       this.postDialNumber()
     },
 
@@ -375,12 +360,10 @@ export default {
     },
 
     handleChangeCampaignEvent (campaignId) {
-      console.warn('handleChangeCampaignEvent', campaignId)
       this.campaignId = campaignId
     },
 
     handleCall () {
-      console.warn(new Error('test error'))
       this.loading = true
       const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
@@ -393,8 +376,6 @@ export default {
         timezone: this.contactTimezone,
         name: this.contactName
       }
-
-      console.log('contactData', contactData)
 
       this.checkContactTimezone(contactData, this.makeCall, this.onCancelCall)
       this.isDialed = true
@@ -448,14 +429,6 @@ export default {
         return
       }
 
-      console.warn('makeCall', {
-        currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
-        outboundCampaignId: this.campaignId.toString(),
-        contactName: this.contactName,
-        companyName: this.companyName,
-        contactId: this.contactId
-      })
-
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
         outboundCampaignId: this.campaignId.toString(),
@@ -466,7 +439,6 @@ export default {
     },
 
     async findDefaultOutboundCampaign () {
-      console.warn('findDefaultOutboundCampaign', this.isAlwaysAskModeEnabled())
       if (this.isAlwaysAskModeEnabled()) {
         await this.setTheLastUsedCallLine()
         this.defaultCampaignInitialized = true
@@ -478,8 +450,6 @@ export default {
       } else if (this.shouldUseProfileCampaignId()) {
         this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
       }
-
-      console.warn('defaultOutboundCampaignId', this.defaultOutboundCampaignId)
 
       if (this.defaultOutboundCampaignId) {
         this.setCampaignIdAndDialNumber()
@@ -494,8 +464,6 @@ export default {
       const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
 
       const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
-
-      console.warn('isAlwaysAskModeEnabled_2', isCompanyAlwaysAsk, isUserAlwaysAsk, this.authProfile.outbound_calling_mode)
 
       return isCompanyAlwaysAsk || isUserAlwaysAsk
     },
@@ -520,8 +488,6 @@ export default {
     },
 
     canHandleDialNumber () {
-      console.warn('canHandleDialNumber', this.campaignId, this.needsExtensions, this.initialized, this.authProfile, this.dialer?.isReady)
-
       return this.needsExtensions &&
         this.extensionsInitialized &&
         this.extensionsVisibility &&
@@ -566,11 +532,9 @@ export default {
     },
 
     async setTheLastUsedCallLine () {
-      console.warn('setTheLastUsedCallLine', this.campaignId, this.contactId)
       if (this.campaignId || !this.contactId) return
       try {
         const data = await this.getLastUsedCallLineByContactId(this.contactId)
-        console.warn('setTheLastUsedCallLine_2', data)
         this.handleChangeCampaignEvent(data.campaign_id)
       } catch (error) {
         this.$handleErrors(error.response)
@@ -580,14 +544,9 @@ export default {
 
   watch: {
     authenticated (newVal) {
-      console.warn('authenticated', newVal, this.extensions)
       if (newVal && this.extensions) {
         this.extensions.initialized({
-          isLoggedIn: newVal,
-          sizeInfo: {
-            height: 522,
-            width: 300
-          }
+          isLoggedIn: newVal
         })
       }
     },

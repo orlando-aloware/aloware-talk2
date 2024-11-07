@@ -1389,7 +1389,7 @@ export default {
     },
 
     checkSuspended (data, isUser = false) {
-      const isCurrentUser = isUser ? this.profile.id === data.id : false
+      const isCurrentUser = isUser ? this.profile?.id === data?.id : false
       const isGuestOrAuthenticatedUser = !isUser || isCurrentUser
 
       if (!data.enabled && isGuestOrAuthenticatedUser && this.$route.name !== 'Suspended') {
