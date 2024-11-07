@@ -114,6 +114,7 @@ export default {
           this.$emit('deleted')
         })
         .catch((_err) => {
+          console.error(_err)
           this.$generalNotification('Unable to remove contact from list. Please try again.', 'error')
         }).finally(() => {
           this.isBusy = false
