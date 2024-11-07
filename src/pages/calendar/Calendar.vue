@@ -188,8 +188,8 @@ import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
 import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import { browserTimezone } from 'src/utils'
-import { CALENDAR_VIEWS, HOUR_VIEW, DAY_VIEW, WEEK_VIEW, MONTH_VIEW } from 'src/constants/calendar'
+import { getBrowserTimeZone } from 'src/utils'
+import { CALENDAR_VIEWS, HOUR_VIEW, DAY_VIEW, WEEK_VIEW, MONTH_VIEW, DEFAULT_VIEW } from 'src/constants/calendar'
 
 export default {
   name: 'Calendar',
@@ -227,11 +227,11 @@ export default {
       },
       loading: true,
       gotoDate: moment.utc().toDate(),
-      view: 'month',
+      view: DEFAULT_VIEW,
       stepMap: {
-        DAY_VIEW: 'd',
-        WEEK_VIEW: 'w',
-        MONTH_VIEW: 'M'
+        'day': 'd',
+        'week': 'w',
+        'month': 'M'
       },
       views: [
         { 'id': DAY_VIEW, name: 'Day' },
@@ -287,7 +287,7 @@ export default {
     },
 
     eventsConvertedToTheRightTimezone () {
-      const browserTZ = browserTimezone()
+      const browserTZ = getBrowserTimeZone()
 
       return this.events.map(event => {
         const startDateInRightTimezone = moment.tz(event.start_date, event.contact_timezone)
