@@ -99,8 +99,8 @@ export default {
     },
     isNotOwned (userId) {
       return userId &&
-        userId !== this.profile?.id &&
-        this.profile?.contacts_visibility === CONTACTS_ACCESS_OWNED_ONLY
+        userId !== this.profile.id &&
+        this.profile.contacts_visibility === CONTACTS_ACCESS_OWNED_ONLY
     },
     isNotOwnedFilter (userId) {
       return userId &&

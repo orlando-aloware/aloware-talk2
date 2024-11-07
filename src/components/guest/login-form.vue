@@ -158,11 +158,16 @@ export default {
   },
 
   methods: {
+    ...mapActions('auth', ['setProfile']),
+
     verifyToken () {
       window.axios.post(`verify-token/${this.token}`).then(res => {
         storage.local.setItem('shared_cookie', res.data.meta.hashed_token)
         storage.local.setItem('api_token', res.data.meta.token)
         this.clearError()
+        // make sure the whole user was set
+        // usually it happens inside of .check() before login which is failed because of guest found instead
+        this.setProfile(res.data?.data)
         this.onLoginSuccess({
           data: {
             data: {

@@ -50,7 +50,6 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
-// import CallingExtensions from '@hubspot/calling-extensions-sdk'
 import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
@@ -114,6 +113,7 @@ export default {
             this.defaultCampaignInitialized = false
             this.setHubspotDialNumber(event)
 
+            // do not continue if we not logged-in
             if (!this.initialized) {
               return
             }
@@ -191,6 +191,7 @@ export default {
     try {
       // init of CallingExtensions has to be once and do not repeat when, for instance, login page was called
       // otherwise we lose connection with parent window
+      // that's why a global class was added
       this.extensions = await CallingExtensionsManager.initialize(this.callSdkOptions)
     } catch (error) {
       // there may iframe issue like "Blocked a frame with origin" but we don't want to break the whole app, it is still usable
