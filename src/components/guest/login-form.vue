@@ -166,7 +166,6 @@ export default {
         storage.local.setItem('api_token', res.data.meta.token)
         this.clearError()
         // make sure the whole user was set
-        // usually it happens inside of .check() before login which is failed because of guest found instead
         this.setProfile(res.data?.data)
         this.onLoginSuccess({
           data: {
