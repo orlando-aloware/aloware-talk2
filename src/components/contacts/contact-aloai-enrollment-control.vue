@@ -39,7 +39,7 @@
         class="btn-aloai-enrollment-control"
         block
         data-testid="aloai-enrollment-control-button"
-        @click="openEnrollmententControlModal"
+        @click="openEnrollmentControlModal"
       >
         <aloai-icon height="10" width="10" />
         Enroll to Bot
@@ -118,7 +118,7 @@ export default {
   },
 
   methods: {
-    openEnrollmententControlModal () {
+    openEnrollmentControlModal () {
       if (this.$refs.aloaiEnrollmentControlModalRef) {
         this.$refs.aloaiEnrollmentControlModalRef.isOpen = true
       }
