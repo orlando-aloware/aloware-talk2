@@ -1,19 +1,21 @@
 <template>
   <confirm-dialog id="remove-contact-confirmation-dialog"
-                  :title="title"
+                  :title="'Are you sure you want to ' + title"
                   :is-busy="isBusy"
-                  @close="removeContactClose"
+                  @close="onClose"
                   @hide="onHide"
                   @shown="onShown">
     <div slot="content">
+      <div class="text-left"
+           v-html="message"/>
       <div class="text-left">
         <div class="text-dark">
-          Type the number of contacts below to delete
+          Type "{{ confirmationInputString }}" here to confirm
           <input ref="contactsToDeleteInput"
-                 class="form-control form-control-search"
+                 class="form-control form-control-search my-2"
                  type="text"
-                 :placeholder="contactToDeleteCount"
-                 v-model="contactsToDelete"/>
+                 :placeholder="confirmationInputString"
+                 v-model="typedConfirmationInputString" />
         </div>
       </div>
     </div>
@@ -27,7 +29,7 @@
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
-                :disabled="(contactsToDelete !== contactToDeleteCount.toString()) || isBusy"
+                :disabled="(confirmationInputString !== typedConfirmationInputString) || isBusy"
                 @click="onConfirm">
           <b-spinner variant="warning"
                      type="grow"
@@ -35,7 +37,7 @@
                      small
                      v-if="isBusy">
           </b-spinner>
-          Delete
+          {{ confirmationInputString  }}
         </button>
       </div>
     </div>
@@ -87,7 +89,21 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     title () {
-      return `Delete ${this.$options.filters.numFormat(this.contactToDeleteCount)} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
+      const formattedContactToDeleteCount = this.$options.filters.numFormat(this.contactToDeleteCount)
+      const formattedContactWord = ` contact` + ((this.contactToDeleteCount > 1) ? `s` : ``)
+      let title = null
+      switch (this.removeContactActionType) {
+        case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
+          title = `remove ${formattedContactToDeleteCount}` + formattedContactWord + ` from the list?`
+          break
+        case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
+          title = `delete ${formattedContactToDeleteCount}` + formattedContactWord + `?`
+      }
+      return title
+    },
+
+    confirmationInputString () {
+      return this.removeContactActionType === ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY ? 'Remove' : 'Delete'
     },
 
     contactToDeleteCount () {
@@ -120,11 +136,34 @@ export default {
     },
 
     listId () {
-      return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+      // refactor to handle this by the `id` instead of the `name`, as the `name` is not unique.
+      // Some list could have "My Queue" as name and it would generate errors
+      if (this.isPowerDialer && this.selectedList.id === this.myQueue.id) {
+        return 'my-queue'
+      }
+
+      return this.selectedList.id
     },
 
     currentList () {
       return this.listItems[this.selectedList.id]
+    },
+
+    message () {
+      if (this.selectedContacts[this.listId]) {
+        const hasIntegrationsCount = this.integrationsCount()
+        let text = ''
+
+        if (hasIntegrationsCount > 1) {
+          text = `There are ${hasIntegrationsCount} contacts from integrations and can't be deleted.`
+        } else if (hasIntegrationsCount > 0) {
+          text = `There is a contact from integrations and can't be deleted.`
+        }
+
+        return text
+      }
+
+      return ''
     }
   },
 
@@ -133,6 +172,7 @@ export default {
       isBusy: false,
       contactsToDelete: null,
       ContactsListRemoveFromTypes,
+      typedConfirmationInputString: '',
       STATIC
     }
   },
@@ -155,16 +195,23 @@ export default {
     ]),
 
     onCancel () {
+      this.typedConfirmationInputString = ''
       this.removeContactClose()
       this.$bvModal.hide('remove-contact-confirmation-dialog')
     },
 
     onHide () {
+      this.typedConfirmationInputString = ''
       this.contactsToDelete = null
     },
 
     onShown () {
       this.$refs.contactsToDeleteInput.focus()
+    },
+
+    onClose () {
+      this.typedConfirmationInputString = ''
+      this.removeContactClose()
     },
 
     handleSingleDeletion () {
@@ -338,6 +385,18 @@ export default {
       if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
         this.handleBulkDeletion()
       }
+    },
+
+    integrationsCount () {
+      if (!this.contactToRemove && this.selectedContacts[this.listId]) {
+        // disable integrations count if multi entity is not activated
+        if (!this.currentCompany.activate_multi_entity) {
+          return 0
+        }
+        return this.selectedContacts[this.listId].filter(contact => contact.has_integration).length
+      }
+
+      return 0
     }
   }
 }
