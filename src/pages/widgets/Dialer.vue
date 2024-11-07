@@ -98,6 +98,17 @@ export default {
           onReady: () => {
             console.warn('onReady')
             this.$VueEvent.fire('resetCall')
+
+            const payload = {
+              // Whether a user is logged-in
+              isLoggedIn: this.authenticated,
+              // Optionally send the desired widget size
+              sizeInfo: {
+                height: 522,
+                width: 300
+              }
+            }
+            this.extensions.initialized(payload)
             // this.extensionsInitialized = true
           },
           onDialNumber: async (event) => {
@@ -151,7 +162,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber', 'isRedirectedToHubspotWidget']),
+    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber']),
 
     allowed () {
       return this.authProfile && this.initialized && this.defaultCampaignInitialized
@@ -383,6 +394,8 @@ export default {
         name: this.contactName
       }
 
+      console.log('contactData', contactData)
+
       this.checkContactTimezone(contactData, this.makeCall, this.onCancelCall)
       this.isDialed = true
     },
@@ -482,6 +495,8 @@ export default {
 
       const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
 
+      console.warn('isAlwaysAskModeEnabled_2', isCompanyAlwaysAsk, isUserAlwaysAsk, this.authProfile.outbound_calling_mode)
+
       return isCompanyAlwaysAsk || isUserAlwaysAsk
     },
 
@@ -505,13 +520,7 @@ export default {
     },
 
     canHandleDialNumber () {
-      console.warn('canHandleDialNumber', this.isRedirectedToHubspotWidget, this.campaignId, this.needsExtensions, this.initialized, this.authProfile, this.dialer?.isReady)
-      if (this.isRedirectedToHubspotWidget && this.campaignId) {
-        return this.needsExtensions &&
-          this.initialized &&
-          this.authProfile &&
-          this.dialer?.isReady
-      }
+      console.warn('canHandleDialNumber', this.campaignId, this.needsExtensions, this.initialized, this.authProfile, this.dialer?.isReady)
 
       return this.needsExtensions &&
         this.extensionsInitialized &&
@@ -521,7 +530,7 @@ export default {
         this.dialer?.isReady &&
         // if isAlwaysAskModeEnabled is true then dialing will be triggered from select campaign dialog component
         (this.campaignId !== null ? !this.isAlwaysAskModeEnabled() : false) &&
-        (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition))
+        (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? !this.checkForceDisposition : true)
     },
 
     checkAgentHasActiveCallInAnotherDevice () {
@@ -574,7 +583,11 @@ export default {
       console.warn('authenticated', newVal, this.extensions)
       if (newVal && this.extensions) {
         this.extensions.initialized({
-          isLoggedIn: newVal
+          isLoggedIn: newVal,
+          sizeInfo: {
+            height: 522,
+            width: 300
+          }
         })
       }
     },
@@ -583,6 +596,8 @@ export default {
         this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
       } else {
         this.showAlertCallFinished = false
+        // if hidden, reset HubSpot dial number
+        this.setHubspotDialNumber(null)
       }
     },
 
