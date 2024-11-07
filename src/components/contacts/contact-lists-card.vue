@@ -198,6 +198,7 @@ export default {
     return {
       isLoading: false,
       isRemoving: false,
+      isAdding: false,
       prevValue: '',
       iconColor: '#256eff',
       showSearchIcon: true,
@@ -268,26 +269,20 @@ export default {
       return lists
     },
 
+    computedAvailableLists () {
+      // remove deleted
+      const lists = this.isPublicListsCard ? this.loadedAllPublicLists : this.loadedAllPrivateLists
+
+      if (!lists) {
+        return []
+      }
+      return lists.filter(list => !this.contactLists.some(contactList => contactList.id === list.id))
+    },
+
     paginatedLists () {
       const start = (this.page - 1) * this.perPage
       const end = start + this.perPage
       return this.lists.slice(start, end)
-    },
-
-    computedAvailableLists () {
-      if (this.isPublicListsCard) {
-        const publicLists = this.loadedAllPublicLists
-        if (!publicLists) {
-          return []
-        }
-        return publicLists.filter(list => !this.contactLists.some(contactList => contactList.id === list.id))
-      }
-
-      return this.lists
-    },
-
-    canOnlyViewLists () {
-      return !this.isBillingAdminOrAdminOrSupervisor && this.isAgent
     }
   },
 
@@ -320,6 +315,7 @@ export default {
       })
     },
     addContactListItems () {
+      this.isAdding = true
       return this.$axios.post(`/api/v2/contact-list-items-bulk-lists`, {
         contact_id: this.contact.id,
         list_ids: this.newSelectedListIds
@@ -331,10 +327,16 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to add contact to list. Please try again.', 'error')
         }).finally(() => {
+          this.isAdding = false
         })
     },
     addListToContactLists () {
-      this.contactLists = this.contactLists.concat(this.computedAvailableLists.filter(list => this.newSelectedListIds.includes(list.id)))
+      console.log('addListToContactLists')
+      const addedLists = this.computedAvailableLists.filter(list => this.newSelectedListIds.includes(list.id))
+      for (let i = 0; i < addedLists.length; i++) {
+        console.log('addedLists[i]', addedLists[i])
+        this.contactLists.push(addedLists[i])
+      }
       this.newSelectedListIds = null
       this.showAvailableLists = false
     },
@@ -402,17 +404,17 @@ export default {
     },
 
     async loadAvailableLists () {
-      if (this.isPublicListsCard) {
-        await this.getPublicListsV2(1, 99999)
-        this.loadedAllPublicLists = this.publicLists
-        return
+      let params = {
+        page: 1,
+        per_page: 99999
       }
-
-      this.fetchContactsLists().then((response) => {
-        console.log('response', response)
-      })
-
-      // console.log('availableLists', this.availableLists)
+      if (this.isPublicListsCard) {
+        this.loadedAllPublicLists = await this.getPublicListsV2(params)
+      } else {
+        params.user_id = this.profile.id
+        params.private_only = true
+        this.loadedAllPrivateLists = await this.getListsV2(params)
+      }
     }
   },
   watch: {

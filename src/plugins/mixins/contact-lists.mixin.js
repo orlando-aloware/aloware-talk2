@@ -116,12 +116,18 @@ export default {
       this.loading = false
     },
 
-    async getPublicListsV2 (page = null, perPage = null) {
-      await API.V2.contactList.public({
-        page: page,
-        size: perPage
-      }).then(response => {
-        this.publicLists = response.data.data
+    async getListsV2 (params = {}) {
+      return API.V2.contactList.get(params).then(response => {
+        return response.data.data
+      }).catch((err) => {
+        console.error(err)
+        this.$generalNotification('Unable to load public lists please try again.', 'error')
+      })
+    },
+
+    async getPublicListsV2 (params) {
+      return API.V2.contactList.public(params).then(response => {
+        return response.data.data
       }).catch((err) => {
         console.error(err)
         this.$generalNotification('Unable to load public lists please try again.', 'error')
