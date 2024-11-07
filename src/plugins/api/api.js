@@ -875,6 +875,9 @@ export default {
       getContactDisengagedBots (contactId) {
         return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
       },
+      getContactEnrolledBots (contactId) {
+        return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/enrolled-bots`)
+      },
       updateContactEngagements (contactId, engagements) {
         return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-status`, { engagements })
       },
