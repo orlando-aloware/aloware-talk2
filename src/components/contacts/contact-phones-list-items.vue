@@ -26,13 +26,6 @@
 
         <b-badge variant="danger"
                  class="badge-phone-info"
-                 data-testid="contact-phones-list-items-has-conflict"
-                 v-if="hasConflictedContacts(phone)">
-          Has conflicts
-        </b-badge>
-
-        <b-badge variant="danger"
-                 class="badge-phone-info"
                  data-testid="contact-phones-list-items-invalid-number-badge"
                  v-if="phone.is_invalid">
           Invalid Number
@@ -104,10 +97,6 @@
             </b-dropdown-item>
           </b-dropdown>
         </div>
-        <div class="phone-number-duplicates-icon">
-          <contact-phone-number-duplicates :phone_number="phone"
-                                           v-if="hasConflictedContacts(phone)" />
-        </div>
       </div>
     </div>
   </div>
@@ -121,7 +110,6 @@ import TextIcon from 'components/icons/text-icon'
 import CallIcon from 'components/icons/call-icon'
 import FaxIcon from 'components/icons/fax-icon'
 import TrashIcon from 'components/icons/trash-icon'
-import ContactPhoneNumberDuplicates from 'components/contacts/contact-phone-number-duplicates'
 
 export default {
   name: 'contact-phones-list-items',
@@ -129,7 +117,6 @@ export default {
   mixins: [aclMixin],
 
   components: {
-    ContactPhoneNumberDuplicates,
     TrashIcon,
     FaxIcon,
     CallIcon,
@@ -152,8 +139,7 @@ export default {
   methods: {
     phoneCanBeDeleted (phone) {
       return this.hasPermissionTo('archive contact') &&
-        phone.phone_number !== this.contact.phone_number &&
-        this.currentCompany.activate_multi_entity ? phone.integration_data && phone.integration_data.length === 0 : true
+        phone.phone_number !== this.contact.phone_number
     },
     onEdit (phone) {
       this.$emit('edit', phone)
@@ -169,11 +155,7 @@ export default {
 
     onCall (phone) {
       this.$emit('call', phone)
-    },
-    hasConflictedContacts (phone) {
-      return Array.isArray(phone.conflicted_contacts) && phone.conflicted_contacts.length !== 0
     }
-
   }
 }
 </script>

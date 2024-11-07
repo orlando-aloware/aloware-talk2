@@ -4,112 +4,20 @@
             data-testid="integration-hubspot-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="contactLink">
-          <b-link target="_blank"
-                  data-testid="integration-hubspot-hubspot-link"
-                  :href="contactLink">
-            <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Hubspot</span>
-          </b-link>
-        </q-item-section>
-        <q-item-section v-else>
-          <a href="#"
-             data-testid="integration-hubspot-hubspot-a-tag"
-             onclick="return false;">
-            <i class="fab fa-hubspot hubspot-icon"></i>
-            <span class="integration-title">Hubspot</span>
-          </a>
-        </q-item-section>
+        <span class='hubspot-jit-card-header'>
+          <i class="fab fa-hubspot hubspot-icon"></i>
+          <span class="integration-title">Hubspot</span>
+        </span>
       </q-item>
-
       <q-separator data-testid="integration-hubspot-separator" />
-
-      <q-card-section v-if="integrationData && integrationData.properties" data-testid="integration-hubspot-card-section-1">
-        <p class="mb-0"
-           data-testid="integration-hubspot-name"
-           v-if="isNameAvailable">
-          <span class="data-icon-label">Name: </span>
-          <span class="data-value">
-             <q-tooltip anchor="top middle"
-                        self="center middle">
-              {{ fullName }}
-            </q-tooltip>
-            {{ fullName }}
-          </span>
-        </p>
-        <p class="mb-0"
-           data-testid="integration-hubspot-email"
-           v-if="integrationData.properties.email">
-          <span class="data-icon-label">Email: </span>
-          <span class="data-value">{{ integrationData.properties.email.value }}</span>
-        </p>
-        <p class="mb-0"
-           data-testid="integration-hubspot-company"
-           v-if="integrationData.properties.company">
-          <span class="data-icon-label">Company: </span>
-          <span class="data-value">{{ integrationData.properties.company.value }}</span>
-        </p>
-        <p class="mb-0"
-           data-testid="integration-hubspot-owner"
-           v-if="integrationData.properties.hubspot_owner">
-          <span class="data-icon-label">Owner: </span>
-          <span class="data-value">{{ integrationData.properties.hubspot_owner.firstName + ' ' + integrationData.properties.hubspot_owner.lastName }}</span>
-        </p>
+      <q-card-section class='duplicateContactPhoneNumberMessage'
+                      v-if='hasDuplicates'>
+        {{ duplicatePhoneNumbersDescription }}
       </q-card-section>
-
-      <q-card-section class="pt-0 pb-0"
-                      data-testid="integration-hubspot-card-section-2"
-                      v-if="integrationData && integrationData.properties">
-        <q-card class="deals mb-1"
-                v-for="(deal, index) in integrationData.properties.deals"
-                :key="index"
-                flat bordered>
-          <q-card-section>
-            <q-card-section class="p-0">
-              <h6 class="mb-2">
-                <b-link class="deals-title ml-0"
-                        :href="hubspotContactBaseLink + 'deal/' + deal.dealId"
-                        data-testid="integration-hubspot-deal-link"
-                        target="_blank">
-                  {{ deal.properties.dealname.value }}
-                </b-link>
-              </h6>
-              <p class="mb-1 d-flex"  data-testid="integration-hubspot-amount">
-                <span class="data-icon-label">Amount: </span>
-                <span class="data-value ml-1"
-                      v-if="deal.properties && deal.properties.amount">
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    {{ deal.properties.amount.value | toCurrency }}
-                  </q-tooltip>
-                  {{ deal.properties.amount.value | toCurrency }}
-                </span>
-              </p>
-              <p class="mb-1 d-flex"  data-testid="integration-hubspot-pipeline">
-                <span class="data-icon-label">Pipeline: </span>
-                <span class="data-value ml-1">
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    {{ deal.properties.pipeline.label }}
-                  </q-tooltip>
-                  {{ deal.properties.pipeline.label }}
-                </span>
-              </p>
-              <p class="mb-1 d-flex"  data-testid="integration-hubspot-stage">
-                <span class="data-icon-label">Stage: </span>
-                <span class="data-value ml-1">
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    {{ deal.properties.dealstage.label }}
-                  </q-tooltip>
-                  {{ deal.properties.dealstage.label }}
-                </span>
-              </p>
-            </q-card-section>
-          </q-card-section>
-        </q-card>
-      </q-card-section>
-
+      <q-separator v-if='hasDuplicates' />
+      <integration-hubspot-one-contact v-if='integrationData'
+                                       :integration-data="integrationData"
+                                       is-primary />
       <q-card-section  data-testid="integration-hubspot-card-section-3">
         <b-row>
           <b-button class="text-white"
@@ -137,10 +45,9 @@
           </b-button>
         </b-row>
       </q-card-section>
-
       <q-card-section
         data-testid="integration-hubspot-card-section-4"
-        v-if="integrationData && integrationData.properties && integrationData.properties.email && integrationData.properties.email.value && false">
+        v-if="integrationData && integrationData.properties && integrationData.properties.email && false">
         <b-row>
           <b-button class="text-white btn-block"
                     size="sm"
@@ -153,31 +60,48 @@
           </b-button>
         </b-row>
       </q-card-section>
-    </q-card>
 
-    <q-menu content-class="mx-height-300"
-            ref="templatesMenu"
-            no-parent-event
-            no-focus
-            data-testid="hubspot-workflow-popover"
-            :offset="[366, -105]"
-            v-model="showWorkflowSelectorForm">
-      <div class="no-wrap q-pa-md">
-        <workflow-selector data-testid="integration-hubspot-workflow-selector"
-                           @onWorkflowSelected="onWorkflowSelected"/>
-        <b-button class="btn-block"
-                  size="sm"
-                  variant="primary"
-                  data-testid="integration-hubspot-enroll-button"
-                  :disabled="isEnrolling || !isWorkflowValid"
-                  @click.prevent="enrollToWorkflow">
-          <q-spinner-bars v-if="isEnrolling"
-                          color="white">
-          </q-spinner-bars>
-          {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
+      <q-menu content-class="mx-height-300"
+              ref="templatesMenu"
+              no-parent-event
+              no-focus
+              data-testid="hubspot-workflow-popover"
+              :offset="[366, -105]"
+              v-model="showWorkflowSelectorForm">
+        <div class="no-wrap q-pa-md">
+          <workflow-selector data-testid="integration-hubspot-workflow-selector"
+                             @onWorkflowSelected="onWorkflowSelected"/>
+          <b-button class="btn-block"
+                    size="sm"
+                    variant="primary"
+                    data-testid="integration-hubspot-enroll-button"
+                    :disabled="isEnrolling || !isWorkflowValid"
+                    @click.prevent="enrollToWorkflow">
+            <q-spinner-bars v-if="isEnrolling"
+                            color="white">
+            </q-spinner-bars>
+            {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
+          </b-button>
+        </div>
+      </q-menu>
+
+      <div v-if='hasDuplicates'>
+        <div v-if="showDuplicates">
+          <div v-for="duplicate in this.integrationData.duplicates"
+               :key="duplicate.id">
+            <q-separator data-testid="integration-hubspot-separator" />
+            <integration-hubspot-one-contact :integrationData="duplicate"/>
+          </div>
+        </div>
+        <b-button size="sm"
+                  variant="link"
+                  tabindex="0"
+                  block
+                  @click="toggleDuplicates">
+          {{ showDuplicates ? 'See less matches' : 'See all matches' }}
         </b-button>
       </div>
-    </q-menu>
+    </q-card>
   </div>
 </template>
 
@@ -191,11 +115,12 @@ import {
   integrationMixin,
   simpsocialMixin
 } from 'src/plugins/mixins'
+import IntegrationHubspotOneContact from 'components/integrations/integration-hubspot-one-contact.vue'
 
 export default {
   name: 'integration-hubspot',
 
-  components: { WorkflowSelector },
+  components: { IntegrationHubspotOneContact, WorkflowSelector },
 
   mixins: [
     hubspotIntegrationMixin,
@@ -225,36 +150,6 @@ export default {
       return this.workflow.id
     },
 
-    isNameAvailable () {
-      return this.integrationData.properties.firstname !== undefined || this.integrationData.properties.lastname !== undefined
-    },
-
-    fullName () {
-      const firstname = this.integrationData.properties.firstname ? this.integrationData.properties.firstname.value : ''
-      const lastname = this.integrationData.properties.lastname ? this.integrationData.properties.lastname.value : ''
-      return `${firstname} ${lastname}`.trim()
-    },
-
-    companyDomain () {
-      return this.currentCompany.hubspot_company_ui_domain || 'app.hubspot.com'
-    },
-
-    hubspotContactBaseLink () {
-      if (!this.contactIntegrationDataLoaded) {
-        return
-      }
-
-      return this.getHubspotContactBaseLink()
-    },
-
-    contactLink () {
-      if (!this.contactIntegrationDataLoaded) {
-        return
-      }
-
-      return this.getHubspotContactLink(this.contact)
-    },
-
     isContactValid () {
       return this.contact && this.contact.id
     },
@@ -265,6 +160,23 @@ export default {
 
     isContactAndRouteValid () {
       return this.isContactValid && this.isRouteMatch
+    },
+
+    hasDuplicates () {
+      return this.integrationData && this.integrationData.duplicates && this.integrationData.duplicates.length > 0
+    },
+
+    duplicatePhoneNumbersDescription () {
+      if (!this.integrationData || !this.integrationData.duplicates) {
+        return ''
+      }
+
+      const values = [...new Set(this.integrationData.duplicates
+        .flatMap(item => [...new Set(item.duplicated_by.map(item => item.value))]))]
+
+      return 'This contact has other matches with the same number' +
+        (values.length > 1 ? 's' : '') +
+        (values.length ? `: ${values.join(', ')}` : '')
     }
   },
 
@@ -278,7 +190,8 @@ export default {
         id: null
       },
       integrationData: null,
-      contactIntegrationDataLoaded: false
+      contactIntegrationDataLoaded: false,
+      showDuplicates: false
     }
   },
 
@@ -309,7 +222,7 @@ export default {
 
     enrollToWorkflow () {
       this.isEnrolling = true
-      this.workflow.email = this.integrationData.properties.email ? this.integrationData.properties.email.value : ''
+      this.workflow.email = this.integrationData.properties.email ? this.integrationData.properties.email : ''
       return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow).then(response => {
         this.resetWorkflowEnrollment()
         // emit on parent if there's a need to do after workflow enrollment
@@ -339,6 +252,10 @@ export default {
           this.$generalNotification('Contact has been successfully synced.')
         }
       })
+    },
+
+    toggleDuplicates () {
+      this.showDuplicates = !this.showDuplicates
     }
   },
 

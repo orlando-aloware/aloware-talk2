@@ -320,6 +320,9 @@ export default {
   ADD_POWER_DIALER_OPEN: (state, isOpen) => {
     state.isAddPowerDialerOpen = isOpen
   },
+  ADD_MERGE_CONTACT_OPEN: (state, isOpen) => {
+    state.isMergeContactOpen = isOpen
+  },
   ENROLL_SEQUENCE_OPEN: (state, isOpen) => {
     state.isEnrollSequenceOpen = isOpen
   },

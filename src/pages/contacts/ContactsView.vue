@@ -64,13 +64,14 @@
               v-if="!simpleTable">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
-          <search class="width-260"
+          <ContactSearch class="width-260"
                   limitSearchCharacters
                   :search="search"
                   :disabled="isLoadingDisabled"
                   data-testid="contacts-view-search-input"
+                  @show-error="showLimitCharactersError = $event"
                   @search="onSearch">
-          </search>
+          </ContactSearch>
           <div class="contacts-total mobile">
             <div class="small text-muted fs-13 text-right"
                  v-if="selectedList.type === ContactListTypes.DYNAMIC">
@@ -348,6 +349,11 @@
           </b-dropdown-item>
         </b-dropdown>
       </div>
+      <div class="limit-characters-error d-flex align-items-center"
+            v-if="showLimitCharactersError">
+          <span class="search-error-icon mr-1">&times;</span>
+          <span class="search-error-text">Search requires at least 3 characters</span>
+      </div>
     </template>
     <template slot="actions"
               v-if="!simpleTable">
@@ -364,7 +370,7 @@
                  data-testid="contacts-view-datatable"
                  :stickyHeaders="true"
                  :columns="columns"
-                 :isEmpty="isEmpty || isStartState"
+                 :isEmpty="isEmpty"
                  :isLoadingMore="isLoadingMore"
                  :is-loading="isLoading"
                  :contact-list-id="id"
@@ -791,7 +797,7 @@ import SlashIcon from 'components/icons/slash-icon'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import SearchIcon from 'components/icons/search-icon'
 import PlusIcon from 'components/icons/plus-icon'
-import Search from 'components/search'
+import ContactSearch from 'components/contact-search'
 import EditHamburgerIcon from 'components/icons/edit-hamburger-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
@@ -841,7 +847,7 @@ export default {
     AddSequenceIcon,
     AddUserIcon,
     EditHamburgerIcon,
-    Search,
+    ContactSearch,
     PlusIcon,
     SearchIcon,
     EllipseIcon,
@@ -1317,13 +1323,8 @@ export default {
       this.showAssignContacts = false
     },
 
-    hasIntegration (contact) {
-      // activate only for multi-entity allowed company
-      return Boolean(this.currentCompany.activate_multi_entity ? contact.external_integration_data && contact.external_integration_data.length > 0 : false)
-    },
-
     onSearch (searchText) {
-      this.$emit('search', searchText.trim())
+      this.$emit('search', searchText)
     },
 
     onFetchMyContacts (checked) {

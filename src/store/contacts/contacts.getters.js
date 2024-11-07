@@ -67,6 +67,7 @@ export default {
   isAddAppointmentOpen: (state) => state.isAddAppointmentOpen,
   isAppointmentSubmitted: (state) => state.isAppointmentSubmitted,
   isAddPowerDialerOpen: (state) => state.isAddPowerDialerOpen,
+  isMergeContactOpen: (state) => state.isMergeContactOpen,
   isEnrollSequenceOpen: (state) => state.isEnrollSequenceOpen,
   isAddReminderOpen: (state) => state.isAddReminderOpen,
   changingSelectedContact: (state) => state.changingSelectedContact,

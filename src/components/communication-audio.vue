@@ -9,20 +9,25 @@
                     data-testid="communication-audio-waveform"
                     @ready="loading = false">
           </waveform>
-          <download-button v-if="fileUuid"
-                           data-testid="communication-audio-download-button"
-                           is-simple
-                           :communication-id="communication.id"
-                           :filename="filename"
-                           :file-mime-type="mimeType"
-                           :file-uuid="fileUuid"/>
-          <transcription-modal button-text="Show Transcription"
-                               data-testid="communication-audio-transcription-modal"
-                               :communication="communication"
-                               :contact="contact"
-                               :single-button="true"
-                               v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"/>
+          <download-button
+            v-if="fileUuid && isMigrated"
+            data-testid="communication-audio-download-button"
+            is-simple
+            :communication-id="communication.id"
+            :filename="filename"
+            :file-mime-type="mimeType"
+            :file-uuid="fileUuid"/>
+          <transcription-modal
+            v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"
+            button-text="Show Smart Transcription"
+            data-testid="communication-audio-transcription-modal"
+            :communication="communication"
+            :single-button="true"/>
         </div>
+        <p class="text-black _600"
+          v-if="fileUuid && !isMigrated">
+          We are processing the {{ typeString | toLowerCase }}. It will be shortly available for download.
+        </p>
       </div>
     </div>
     <span class="text-grey-900 record-was-deleted-label"
@@ -83,6 +88,7 @@ export default {
       filename: '',
       loading: false,
       mimeType: '',
+      isMigrated: false,
       UploadedFileTypes
     }
   },
@@ -96,8 +102,12 @@ export default {
       return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? this.communication.recording_is_deleted : false
     },
 
+    typeString () {
+      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? 'Recording' : 'Voicemail'
+    },
+
     title () {
-      return (this.type === this.UploadedFileTypes.TYPE_CALL_RECORDING) ? 'Play Recording' : 'Play Voicemail'
+      return 'Play ' + this.typeString
     }
   },
 
@@ -123,6 +133,7 @@ export default {
             this.remoteUrl = response.data.url
             this.downloadUrl = response.data.download_url
             this.mimeType = response.data.mimetype || ''
+            this.isMigrated = response.data.is_migrated
           }).catch(err => {
             console.log(err)
             this.loading = false

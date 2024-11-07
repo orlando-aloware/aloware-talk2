@@ -352,6 +352,7 @@ export default {
 
       try {
         await talk2Api.V2.contacts.exportCommunications(this.contact.id)
+        this.$generalNotification('Contact communications export request has been successfully submitted and is queued for processing.')
       } catch (error) {
         console.log(error)
         this.$generalNotification('Unable to process export request! Please try again later.', 'error')

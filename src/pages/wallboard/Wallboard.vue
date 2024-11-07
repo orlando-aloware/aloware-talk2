@@ -13,14 +13,15 @@
 import WallboardHeader from 'src/components/wallboard/wallboard-header.vue'
 import WallboardSidebar from 'src/components/wallboard/wallboard-sidebar.vue'
 import { CALL } from 'src/constants/communication-types'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, pollingMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'Wallboard',
 
   mixins: [
-    aclMixin
+    aclMixin,
+    pollingMixin
   ],
 
   components: {
@@ -49,7 +50,6 @@ export default {
   }),
 
   created () {
-    this.fetchAgents()
     this.fetchLiveCalls()
     this.fetchParkedCalls()
     this.fetchQueuedCalls()
@@ -95,11 +95,12 @@ export default {
 
     // deleted communication event
     this.$VueEvent.listen('delete_communication', this.deleteCall)
+
+    this.addUsersPoll()
   },
 
   methods: {
     ...mapActions('wallboard', [
-      'fetchAgents',
       'fetchLiveCalls',
       'fetchParkedCalls',
       'fetchQueuedCalls',
@@ -108,11 +109,14 @@ export default {
 
     ...mapMutations('wallboard', {
       deleteCall: 'DELETE_CALL',
-      setAgent: 'SET_AGENT',
-      setAgentStatus: 'SET_AGENT_STATUS',
       setLiveCall: 'SET_LIVE_CALL',
       setParkedCall: 'SET_PARKED_CALL',
       setQueuedCall: 'SET_QUEUED_CALL'
+    }),
+
+    ...mapMutations({
+      setAgent: 'UPDATE_USER',
+      setAgentStatus: 'UPDATE_USER_STATUS'
     })
   },
 
