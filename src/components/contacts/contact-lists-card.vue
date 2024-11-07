@@ -97,14 +97,15 @@
          class="d-flex justify-content-between">
       <div class="generic-multi-select">
         <div class="list-wrapper">
-          <div class="w-100 mt-1">
+          <div class="w-100 mt-1"
+               v-if="!showAvailableLists">
             <b-link href="#"
                     class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
-                    @click="onUpdate">
+                    @click="addToList">
               <slot name="button">
                 <pencil-o-icon />
                 <span class="ml-1">
-              Modify Lists
+              Add to List
             </span>
               </slot>
             </b-link>
@@ -129,6 +130,40 @@
 
       </div>
     </div>
+    <div id="contact-list-card-add-to-list"
+         class="d-flex justify-content-between">
+      <div class="w-100 mt-1"
+           v-if="showAvailableLists">
+        <q-select
+          compact
+          use-input
+          input-debounce="0"
+          behavior="menu"
+          map-options
+          emit-value
+          multiple
+          clearable
+          option-value="id"
+          option-label="name"
+          style="width: 100%;"
+          v-model="newSelectedListIds"
+          :options="addToListOptions"
+          @filter="filterNewLists"
+        >
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+        <div class="d-flex justify-content-between">
+          <b-button type="button" size="sm" variant="light" @click="cancelAddToList">Cancel</b-button>
+          <b-button type="button" size="sm" variant="primary" @click="addContactListItems">Save</b-button>
+        </div>
+      </div>
+    </div>
   </b-card>
 </template>
 
@@ -138,14 +173,14 @@ import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import ListIcon from 'components/icons/list-icon.vue'
 import SearchIcon from 'components/icons/search-icon.vue'
 
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, contactLists } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import RemoveContactListItemConfirmation from 'components/remove-contact-list-item-confirmation.vue'
 
 export default {
   name: 'contact-lists-card',
 
-  mixins: [aclMixin],
+  mixins: [aclMixin, contactLists],
   components: {
     RemoveContactListItemConfirmation,
     PencilOIcon,
@@ -159,16 +194,37 @@ export default {
     }
   },
 
+  data () {
+    return {
+      isLoading: false,
+      isRemoving: false,
+      prevValue: '',
+      iconColor: '#256eff',
+      showSearchIcon: true,
+      searchQuery: '',
+      page: 1,
+      perPage: 5,
+      newSelectedListIds: null,
+      showAvailableLists: false,
+      availableLists: null,
+      selectedList: null,
+      contactLists: null,
+      loadedAllPublicLists: null,
+      loadedAllPrivateLists: null,
+      addToListOptions: null
+    }
+  },
+
   computed: {
     ...mapState('auth', [
       'profile'
     ]),
 
     title () {
-      return this.isPublicList ? 'Public Lists' : 'Private Lists'
+      return this.isPublicListsCard ? 'Public Lists' : 'Private Lists'
     },
 
-    isPublicList () {
+    isPublicListsCard () {
       return this.$vnode.key === 'contact-public-lists-card'
     },
 
@@ -185,9 +241,10 @@ export default {
         return []
       }
 
-      let lists = this.contactLists.filter(list => list.show_in_public_folder === this.isPublicList)
+      let lists = this.contactLists.filter(list => list.show_in_public_folder === this.isPublicListsCard)
 
-      if (!this.isBillingAdminOrAdminOrSupervisor && this.isAgent) {
+      // agents can only view private lists owned by them and public lists
+      if (!this.isPublicListsCard && !this.isBillingAdminOrAdminOrSupervisor && this.isAgent) {
         // filter only lists that the agent has access to
         lists = lists.filter(list => list.contact_folder_created_by === this.profile.id)
       }
@@ -217,33 +274,31 @@ export default {
       return this.lists.slice(start, end)
     },
 
+    computedAvailableLists () {
+      if (this.isPublicListsCard) {
+        const publicLists = this.loadedAllPublicLists
+        if (!publicLists) {
+          return []
+        }
+        return publicLists.filter(list => !this.contactLists.some(contactList => contactList.id === list.id))
+      }
+
+      return this.lists
+    },
+
     canOnlyViewLists () {
       return !this.isBillingAdminOrAdminOrSupervisor && this.isAgent
     }
   },
 
-  data () {
-    return {
-      isLoading: false,
-      isRemoving: false,
-      prevValue: '',
-      iconColor: '#256eff',
-      showSearchIcon: true,
-      searchQuery: '',
-      page: 1,
-      perPage: 5,
-      selectedList: null,
-      contactLists: null
-    }
-  },
-
   beforeMount () {
     this.contactLists = this.contact.contact_lists
+    this.loadAvailableLists()
   },
 
   methods: {
     canEditList (list) {
-      if (this.isPublicList) {
+      if (this.isPublicListsCard) {
         return this.isBillingAdminOrAdminOrSupervisor
       }
 
@@ -251,12 +306,49 @@ export default {
         return true
       }
     },
+    filterNewLists (val, update) {
+      if (val === '') {
+        update(() => {
+          this.addToListOptions = this.computedAvailableLists
+        })
+        return
+      }
+
+      update(() => {
+        const needle = val.toLowerCase()
+        this.addToListOptions = this.computedAvailableLists.filter(list => list.name.toLowerCase().indexOf(needle) > -1)
+      })
+    },
+    addContactListItems () {
+      return this.$axios.post(`/api/v2/contact-list-items-bulk-lists`, {
+        contact_id: this.contact.id,
+        list_ids: this.newSelectedListIds
+      })
+        .then(() => {
+          this.$generalNotification('The Contact was added to the list successfully.')
+          this.addListToContactLists()
+        })
+        .catch((_err) => {
+          this.$generalNotification('Unable to add contact to list. Please try again.', 'error')
+        }).finally(() => {
+        })
+    },
+    addListToContactLists () {
+      this.contactLists = this.contactLists.concat(this.computedAvailableLists.filter(list => this.newSelectedListIds.includes(list.id)))
+      this.newSelectedListIds = null
+      this.showAvailableLists = false
+    },
     onInput (value) {
 
     },
+    onAdd (value) {
 
-    onUpdate () {
-
+    },
+    addToList () {
+      this.showAvailableLists = true
+    },
+    cancelAddToList () {
+      this.showAvailableLists = false
     },
 
     onSearch () {
@@ -307,6 +399,20 @@ export default {
       }
 
       return false
+    },
+
+    async loadAvailableLists () {
+      if (this.isPublicListsCard) {
+        await this.getPublicListsV2(1, 99999)
+        this.loadedAllPublicLists = this.publicLists
+        return
+      }
+
+      this.fetchContactsLists().then((response) => {
+        console.log('response', response)
+      })
+
+      // console.log('availableLists', this.availableLists)
     }
   },
   watch: {
