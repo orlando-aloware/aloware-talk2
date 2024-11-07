@@ -195,7 +195,7 @@ export default {
     },
     isEnrolled (botId) {
       // Search in the bot_enrollments object array if the contact is enrolled in the bot
-      return this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
+      return !!this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
     },
     async load () {
       this.isLoading = true

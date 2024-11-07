@@ -14,18 +14,21 @@
       <br />
       <!-- Bot Use Case Label -->
       <q-badge
-        :color="useCaseColor(firstEnrolledBot.use_case)"
+        :color="useCaseColor(firstEnrolledBot?.use_case)"
         class="mr-1"
       >
-        <span>{{ formatUseCase(firstEnrolledBot.use_case) }}</span>
+        <span>{{ formatUseCase(firstEnrolledBot?.use_case) }}</span>
       </q-badge>
-      <b>{{ firstEnrolledBot.name }}</b>
+      <b>{{ firstEnrolledBot?.name }}</b>
       <br />
       <q-badge
         v-if="isEnrolledToMultipleBots"
-        color="blue-6"
+        color="grey"
       >
-        <span>+ {{ extraEnrolledBotsCount }} bot(s)</span>
+        <span>
+          + {{ extraEnrolledBotsCount }}
+          bot<span v-if="extraEnrolledBotsCount > 1">(s)</span>
+        </span>
       </q-badge>
     </b-card-text>
 
@@ -93,7 +96,9 @@ export default {
 
       let bot = this.bots.find((bot) => bot.id === this.botEnrollments[0].aloai_bot_id)
 
-      console.log('firstEnrolledBot', bot)
+      if (!bot) {
+        return null
+      }
 
       // Get the first enrolled bot with the id coming from the enrollments
       return this.bots.find((bot) => bot.id === this.botEnrollments[0].aloai_bot_id)
