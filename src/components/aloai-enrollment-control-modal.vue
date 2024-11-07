@@ -128,7 +128,7 @@ export default {
       event.preventDefault()
       // If the contact is already enrolled, confirm we want to re-enroll
       if (this.isEnrolled(this.selectedBotId)) {
-        this.$bvModal.msgBoxConfirm('Re-enrolling this contact will count as a new enrollment and charged accodingly. Continue?', {
+        this.$bvModal.msgBoxConfirm('Re-enrolling this contact will count as a new enrollment and charged accordingly. Continue?', {
           title: 'Warning',
           size: 'sm',
           buttonSize: 'sm',
