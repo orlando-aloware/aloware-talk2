@@ -41,7 +41,11 @@
         data-testid="aloai-enrollment-control-button"
         @click="openEnrollmentControlModal"
       >
-        <aloai-icon height="10" width="10" />
+        <aloai-icon
+          class="mr-1"
+          height="10"
+          width="10"
+        />
         <span v-if="!isEnrolledToABot">Enroll to Bot</span>
         <span v-else>Enroll to another Bot</span>
       </b-button>
