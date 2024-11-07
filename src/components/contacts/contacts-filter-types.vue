@@ -75,11 +75,13 @@
         <div class="row">
           <q-input class="q-field--auto-height col-6 mr-2"
                    type="number"
+                   min="0"
                    outlined
                    dense
                    data-testid="contacts-filter-operator-value-input"
                    v-model="filterOperatorValue"
-                   v-if="operator.value === filterOperator && expectsSelected" />
+                   v-if="operator.value === filterOperator && expectsSelected"
+                   @input="validateNumericValue"/>
           <q-select option-value="value"
                     class="col-4"
                     dense
@@ -276,6 +278,7 @@ export default {
       secondaryFilterOperatorValueDebounceInProgress: false,
       appliedFiltersInProgress: false,
       appliedTags: [],
+      isUpdating: false,
       TagCategories,
       DateTimeFilter
     }
@@ -565,8 +568,10 @@ export default {
 
         // we assign the filter data
         if (!isEmpty(currentFilter[this.groupItemIndex])) {
+          this.isUpdating = true
           currentFilter[this.groupItemIndex] = data
         } else {
+          this.isUpdating = false
           currentFilter.push(data)
         }
       }
@@ -836,7 +841,7 @@ export default {
         case 'date_time':
           let isValidFilter = true
           const filters = this.currentListFilters[this.filterGroupIndex]?.filters[this.filter.key]
-          if (filters?.length > 0) {
+          if (filters?.length > 0 && !this.isUpdating) {
             let filtersNotAllowed = []
             // only allow selecting one of these four options at a time
             switch (this.filterOperator) {
@@ -970,6 +975,11 @@ export default {
 
     isTagsFilterType (type, key) {
       return ['multi_relation'].includes(type) && key === 'tags'
+    },
+
+    validateNumericValue () {
+      const value = parseInt(this.filterOperatorValue, 10)
+      this.filterOperatorValue = isNaN(value) || value < 0 ? 0 : value
     }
   },
 
@@ -981,6 +991,9 @@ export default {
       if (this.filter.key === 'tags') {
         this.appliedTags = []
       }
+
+      const options = this.filter.operators.find(operator => operator.value === this.filterOperator)?.options
+      this.secondaryFilterOperatorValue = this.expectsSelected && options ? options[0].value : ''
 
       if (!this.hasValue) {
         this.filterOperatorDebounceInProgress = true
