@@ -328,6 +328,44 @@
       <b-form-row class="mt-4">
         <b-col sm="12">
           <h5 class="form-label">Company Card</h5>
+          <p class="form-helper-text">You can send this company card via SMS to your clients</p>
+
+          <a href="javascript:void(0)"
+             class="text-primary" style="text-decoration: underline;"
+             @click="showPreviewCompanyCard = !showPreviewCompanyCard">
+            {{ showPreviewCompanyCard ? 'Hide Card' : 'Preview Card' }}
+          </a>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="mt-2"
+                  v-if="showPreviewCompanyCard">
+        <b-col sm="12" md="6">
+          <div class="preview-card-box">
+            <div class="d-flex align-items-center mb-2">
+              <div class="preview-avatar mr-3">
+                {{ getInitials(user.company_contact_card_name) }}
+              </div>
+              <div>
+                <h5 class="mb-0">{{ user.company_contact_card_name }}</h5>
+                <p class="mb-0 text-muted">{{ selectedNumberCompanyCard | fixPhone('NATIONAL', true, false, true) }}</p>
+              </div>
+            </div>
+            <div class="d-flex justify-content-around mt-4">
+              <div class="text-center icon-container">
+                <div class="icon-circle">
+                  <b-icon icon="telephone-fill" class="text-white"></b-icon>
+                </div>
+                Call
+              </div>
+              <div class="text-center icon-container">
+                <div class="icon-circle">
+                  <b-icon icon="chat-dots-fill" class="text-white"></b-icon>
+                </div>
+                Message
+              </div>
+            </div>
+          </div>
         </b-col>
       </b-form-row>
 
@@ -719,7 +757,11 @@ export default {
       AnswerTypes,
       Roles,
       SettingsMap,
-      contactCardCampaignSelectorKey: 0
+      contactCardCampaignSelectorKey: 0,
+      showPreviewContactCard: false,
+      selectedNumberContactCard: '',
+      showPreviewCompanyCard: false,
+      selectedNumberCompanyCard: ''
     }
   },
 
@@ -759,6 +801,21 @@ export default {
       }
 
       this.updateFormValidity()
+    },
+
+    getInitials (name) {
+      if (!name) return ''
+      const words = name.split(' ')
+      const initials = words.slice(0, 2).map(word => word.charAt(0).toUpperCase())
+      return initials.join('')
+    },
+
+    updateSelectedNumberContactCard (number) {
+      this.selectedNumberContactCard = number
+    },
+
+    updateSelectedNumberCompanyCard (number) {
+      this.selectedNumberCompanyCard = number
     }
   },
 
@@ -793,10 +850,9 @@ export default {
   border-radius: 8px;
   padding: 2em;
   max-width: 325px;
-  min-width: auto !important;
 }
 
-.preview-avatar {
+.preview-card-box .preview-avatar {
   width: 50px;
   height: 50px;
   border-radius: 50%;
