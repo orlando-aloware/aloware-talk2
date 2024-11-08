@@ -150,7 +150,7 @@
             <b-col sm="12"
                    md="6">
               <b-form-group class="form-label"
-                            label="International">
+                            label="International Only">
                 <b-form-checkbox class="cursor-pointer switch-success"
                                  size="lg"
                                  switch

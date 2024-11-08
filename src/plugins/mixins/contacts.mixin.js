@@ -230,8 +230,8 @@ export default {
     },
 
     onSearch (searchText) {
-      // ignore search if previous and current search are the same
-      if (this.previousSearch === searchText) {
+      // Ignore search if previousSearch and searchText are both non-null and their trimmed values are identical
+      if (this.previousSearch !== null && searchText !== null && this.previousSearch.trim() === searchText.trim()) {
         return
       }
 

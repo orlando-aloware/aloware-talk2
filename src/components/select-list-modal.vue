@@ -21,7 +21,6 @@
             <i class="fa fa-times"/>
           </button>
         </div>
-
         <div class="pt-3">
           <b-form-row>
             <b-col md="10">
@@ -42,17 +41,30 @@
             </b-col>
           </b-form-row>
         </div>
+        <div class="tree-container"
+             v-if="filteredPublicLists.length">
+          <select-list-tree-folder class="select-list-tree-folder"
+                                   name="Public Lists"
+                                   key="publicLists"
+                                   :layer="0"
+                                   :order="0"
+                                   :has-edit="1"
+                                   :has-delete="0"
+                                   :folders="null"
+                                   :lists="filteredPublicLists"
+          />
+        </div>
         <div class="tree-container">
           <select-list-tree-folder class="select-list-tree-folder"
-                                   :name="folder.name"
-                                   :key="folder.id"
+                                   name="My Lists"
+                                   :layer="0"
                                    :id="folder.id"
+                                   :key="folder.id"
                                    :order="folder.order"
                                    :hasEdit="folder.has_edit"
                                    :hasDelete="folder.has_delete"
                                    :folders="folder.child_folders"
                                    :lists="folder.lists.filter(list => list.type === ContactListTypes.STATIC && list.id !== selectedList.id)"
-                                   :layer="0"
                                    v-for="folder in folders"/>
         </div>
       </div>
@@ -82,11 +94,13 @@ export default {
       'selectedStaticList',
       'selectedList',
       'folders',
+      'publicLists',
       'search'
     ]),
-
     ...mapState(['isDatatableSelectedAll']),
-
+    filteredPublicLists () {
+      return this.publicLists.filter(list => list.type === ContactListTypes.STATIC && list.id !== this.selectedList.id)
+    },
     getTitle () {
       return 'Add to Static Lists'
     }
@@ -153,6 +167,9 @@ export default {
             const { message, html } = extractErrorMessage(error)
             console.log(html)
             this.$generalNotification(message, 'error')
+          } else {
+            this.$generalNotification('Unable to add Contact to Static List. Please check if You are authorized to edit this list.', 'error')
+            this.isLoading = false
           }
         })
         .finally(() => {

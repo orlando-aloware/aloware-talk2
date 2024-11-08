@@ -1,14 +1,14 @@
 <template>
   <div class="pinned border-top ">
     <div class="d-flex pinned__content flex-column">
-      <div v-if="!lists.length && !isLoading"
+      <div v-if="!computedPublicLists.length && !isLoading"
            class="item-empty">
         <span class="fs-12 text-muted" data-testid="contact-shared-no-public-list-available">
           No public list available
         </span>
       </div>
       <contacts-shared-item v-else
-                            v-for="item in lists"
+                            v-for="item in computedPublicLists"
                             :data-testid="'contacts-shared-'+item.name.toLowerCase().replace(/ /g, '-')"
                             :item="item"
                             :key="item.id">
@@ -36,13 +36,14 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
+import { mapActions, mapGetters } from 'vuex'
 import ContactsSharedItem from 'components/contacts/contacts-shared-item'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
+import { contactLists } from 'src/plugins/mixins'
 
 export default {
 
+  mixins: [contactLists],
   components: {
     ContactsSidebarLoader,
     ContactsSharedItem
@@ -51,7 +52,6 @@ export default {
     return {
       isCreatingFolder: false,
       isLoading: false,
-      lists: [],
       layer: 1,
       listeners: {},
       paginated: false,
@@ -64,7 +64,11 @@ export default {
     ...mapActions('contacts', [
       'foldersLoaded',
       'createListOpen',
+      'setPublicLists',
       'setPublicListsLoaded'
+    ]),
+    ...mapGetters('contacts', [
+      'publicLists'
     ]),
     onCreateFolderToggle () {
       this.isCreatingFolder = !this.isCreatingFolder
@@ -73,64 +77,40 @@ export default {
       this.createListOpen({
         contact_folder_id: null
       })
-    },
-
-    loadFolders () {
-      this.isLoading = true
-      this.setPublicListsLoaded(false)
-      this.lists = []
-      talk2Api.V2.contactList.public({
-        page: this.paginationPage,
-        size: this.perPage
-      }).then(response => {
-        const total = response.data.total
-        this.lastPage = Math.ceil(total > this.perPage ? Math.ceil(total / this.perPage) : 1)
-
-        if (total > this.perPage) {
-          this.paginated = true
-        }
-
-        this.lists = response.data.data
-      }).catch((err) => {
-        console.error(err)
-        this.$generalNotification('Unable to load folders please try again.', 'error')
-        this.setPublicListsLoaded(true)
-        this.isLoading = false
-      }).finally(() => {
-        this.isLoading = false
-        this.setPublicListsLoaded(true)
-      })
     }
   },
   computed: {
     foldersWithoutRoot () {
-      return this.lists.filter(folder => folder.name !== 'Root')
+      return this.computedPublicLists.filter(folder => folder.name !== 'Root')
     },
     rootFolder () {
-      return this.lists.find(folder => folder.name === 'Root')
+      return this.computedPublicLists.find(folder => folder.name === 'Root')
+    },
+    computedPublicLists () {
+      return this.$store.getters['contacts/publicLists']
     }
   },
   mounted () {
-    this.loadFolders()
+    this.loadPublicLists()
     this.listeners.fetchContactsLists = () => {
-      this.loadFolders()
+      this.loadPublicLists()
     }
     this.$VueEvent.listen('fetchContactsLists', this.listeners.fetchContactsLists)
   },
   watch: {
     paginationPage () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
-      this.loadFolders()
+      this.loadPublicLists()
     },
 
     perPage () {
       this.$emit('paginated', { page: this.paginationPage, per_page: this.perPage })
-      this.loadFolders()
+      this.loadPublicLists()
     },
 
     $route (to) {
       if (to.name !== 'Contacts') {
-        this.loadFolders()
+        this.loadPublicLists()
       }
     }
   },
