@@ -168,6 +168,15 @@ export default {
     },
 
     isLoadingDialer () {
+      console.log(
+        'isLoadingDialerStatuses:',
+        this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus),
+        !this.showAlertAgentOnCall,
+        !this.showAlertCallFinished,
+        !this.dialer?.parkedCall,
+        !this.criticalErrorHappened
+      )
+
       return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
         !this.showAlertAgentOnCall &&
         !this.showAlertCallFinished &&
