@@ -1,12 +1,12 @@
 import { mapState } from 'vuex'
 import moment from 'moment'
-import { browserTimezone } from 'src/utils'
+import { getBrowserTimeZone } from 'src/utils'
 import { MONTH_VIEW, TIME_FORMAT_AM_PM } from 'src/constants/calendar'
 
 export default {
   data () {
     return {
-      browserTimeZone: browserTimezone(),
+      browserTimeZone: getBrowserTimeZone(),
       isHourScaleHeaderAdded: false
     }
   },
@@ -50,8 +50,8 @@ export default {
       return date?.format(this.profile.time_format === TIME_FORMAT_AM_PM ? 'h A' : 'H:00')
     },
 
-    getLocalTimeAcronym (date) {
-      return this.getTimeZoneAbbreviation(date, this.browserTimeZone)
+    getLocalTimeAcronym () {
+      return this.getTimeZoneAbbreviation(moment(), this.browserTimeZone)
     },
 
     // Testing
@@ -74,7 +74,6 @@ export default {
 
       const dateInBrowserTimeZone = this.getDateInBrowserTimeZone(adjustedDate)
       const localTime = this.getLocalTime(dateInBrowserTimeZone)
-      // const localTimeAcronym = this.getLocalTimeAcronym(dateInBrowserTimeZone)
 
       if (this.timezoneIsDifferentThanBrowser && !this.isMobile) {
         const dateInCurrentTimezone = moment(adjustedDate).tz(this.currentTimezone)
@@ -112,10 +111,11 @@ export default {
         const date = new Date()
 
         // Get time zone abbreviations
-
+        console.log('this.currentTimezone', this.currentTimezone)
+        console.log('this.browserTimeZone', this.browserTimeZone)
         const dateInCurrentTimezone = moment(date).tz(this.currentTimezone)
         const currentTimezoneAcronym = this.getTimeZoneAbbreviation(dateInCurrentTimezone, this.currentTimezone)
-
+        const localTimeAcronym = this.getLocalTimeAcronym()
         // Find the header
         const tableHeader = document.querySelector('.scheduler__header__table')
 
@@ -139,7 +139,7 @@ export default {
             return
           }
 
-          const headerRow = this.buildTimeZoneHeaderRow(ROW_ID, currentTimezoneAcronym)
+          const headerRow = this.buildTimeZoneHeaderRow(ROW_ID, currentTimezoneAcronym, localTimeAcronym)
 
           // Insert the timezone in the header if not exists already
           tableHeader.parentElement.insertBefore(headerRow, tableHeader)
@@ -147,7 +147,7 @@ export default {
       }
     },
 
-    buildTimeZoneHeaderRow (id, companyTimezone) {
+    buildTimeZoneHeaderRow (id, companyTimezone, localTimeAcronym) {
       const headerRow = document.createElement('div')
       headerRow.id = id
       headerRow.className = 'row text-center'
@@ -161,7 +161,7 @@ export default {
 
       const localTimeZoneDiv = document.createElement('div')
       localTimeZoneDiv.className = 'col-6 mt-auto pb-1'
-      localTimeZoneDiv.textContent = ''
+      localTimeZoneDiv.textContent = localTimeAcronym || ''
 
       headerRow.appendChild(currentTimeZoneDiv)
       headerRow.appendChild(localTimeZoneDiv)
@@ -181,7 +181,6 @@ export default {
       return {
         time: momentDate.format(this.timeFormat),
         date: momentDate.format('MM-DD'),
-        // acronym: momentDate.format('z')
         acronym: this.getTimeZoneAbbreviation(momentDate, timezone)
       }
     },
