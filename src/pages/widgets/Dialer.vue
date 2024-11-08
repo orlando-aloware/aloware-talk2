@@ -129,6 +129,9 @@ export default {
             if (!this.extensionsVisibility) {
               this.endActiveCall()
             }
+          },
+          defaultEventHandler (event) {
+            console.info('Event received. Do you need to handle it?', event)
           }
         }
       },
@@ -170,6 +173,7 @@ export default {
     isLoadingDialer () {
       console.log(
         'isLoadingDialerStatuses:',
+        this.dialer?.currentStatus,
         this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus),
         !this.showAlertAgentOnCall,
         !this.showAlertCallFinished,
@@ -237,7 +241,8 @@ export default {
 
     async postDialNumber () {
       while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-        await new Promise(resolve => setTimeout(resolve, 200)) // Check every 200ms
+        await new Promise(resolve => setTimeout(resolve, 1000)) // Check every 1sec
+        console.log('currentStatus and agentStatus', this.dialer.currentStatus, this.agentStatus)
       }
 
       this.checkAndResetCallDisposition()
