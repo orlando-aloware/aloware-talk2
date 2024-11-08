@@ -113,7 +113,6 @@ export default {
           },
           onDialNumber: async (event) => {
             this.criticalErrorHappened = false
-            this.defaultCampaignInitialized = false
             this.setHubspotDialNumber(event)
 
             // do not continue if we not logged-in
@@ -129,9 +128,6 @@ export default {
             if (!this.extensionsVisibility) {
               this.endActiveCall()
             }
-          },
-          defaultEventHandler (event) {
-            console.info('Event received. Do you need to handle it?', event)
           }
         }
       },
@@ -171,16 +167,6 @@ export default {
     },
 
     isLoadingDialer () {
-      console.log(
-        'isLoadingDialerStatuses:',
-        this.dialer?.currentStatus,
-        this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus),
-        !this.showAlertAgentOnCall,
-        !this.showAlertCallFinished,
-        !this.dialer?.parkedCall,
-        !this.criticalErrorHappened
-      )
-
       return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
         !this.showAlertAgentOnCall &&
         !this.showAlertCallFinished &&
@@ -242,7 +228,6 @@ export default {
     async postDialNumber () {
       while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         await new Promise(resolve => setTimeout(resolve, 1000)) // Check every 1sec
-        console.log('currentStatus and agentStatus', this.dialer.currentStatus, this.agentStatus)
       }
 
       this.checkAndResetCallDisposition()
@@ -324,6 +309,11 @@ export default {
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
+        return
+      }
+
+      // stop if modal is disabled
+      if (!this.extensionsVisibility) {
         return
       }
 
