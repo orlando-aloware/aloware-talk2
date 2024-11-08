@@ -294,7 +294,8 @@
         <b-col sm="12" md="6">
 
           <b-form-group label="Name" class="form-label mb-0">
-            <b-form-input type="text"
+            <b-form-input class="contact-card-name"
+                          type="text"
                           placeholder="Enter name"
                           :state="validateState('contact_card_name')"
                           v-model.trim="$v.user.contact_card_name.$model"
@@ -374,7 +375,8 @@
         <b-col sm="12" md="6">
 
           <b-form-group label="Name" class="form-label mb-0">
-            <b-form-input type="text"
+            <b-form-input class="company-card-name"
+                          type="text"
                           placeholder="Enter name"
                           :state="validateState('company_contact_card_name')"
                           v-model.trim="$v.user.company_contact_card_name.$model"
@@ -842,3 +844,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.contact-card-name {
+  height: 39px;
+}
+
+.company-card-name {
+  height: 39px;
+}
+</style>
