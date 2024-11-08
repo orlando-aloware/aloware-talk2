@@ -125,10 +125,17 @@ export default {
     },
     onShowMenu () {
       this.selectWidth = this.$refs.userCampaignSelector.$el.offsetWidth
+    },
+    findAndemitSelectedNumber (value) {
+      // return the incoming number of the selected campaign
+      const found = this.userCampaigns.find(campaign => campaign.id === value)
+      this.$emit('selectedNumber', found ? found.incoming_number : '')
     }
   },
   mounted () {
     this.options = this.userCampaigns
+
+    this.findAndemitSelectedNumber(this.value)
   },
   watch: {
     value () {
@@ -138,9 +145,7 @@ export default {
     model (val) {
       this.$emit('select', this.model ? this.model : AnswerTypes.BY_NONE)
 
-      // return the incoming number of the selected campaign
-      const found = this.userCampaigns.find(campaign => campaign.id === val)
-      this.$emit('selectedNumber', found ? found.incoming_number : '')
+      this.findAndemitSelectedNumber(val)
     }
   }
 }
