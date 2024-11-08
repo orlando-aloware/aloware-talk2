@@ -328,7 +328,7 @@
       <b-form-row class="mt-4">
         <b-col sm="12">
           <h5 class="form-label">Company Card</h5>
-          <p class="form-helper-text">You can send this company card via SMS to your clients</p>
+          <p class="form-helper-text">You can send this company card via SMS to your clients.</p>
 
           <a href="javascript:void(0)"
              class="text-primary" style="text-decoration: underline;"
