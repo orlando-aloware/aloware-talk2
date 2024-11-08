@@ -227,8 +227,8 @@ export default {
     ]),
 
     async postDialNumber () {
-      if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
+      while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+        await new Promise(resolve => setTimeout(resolve, 200)) // Check every 200ms
       }
 
       this.checkAndResetCallDisposition()
@@ -487,8 +487,7 @@ export default {
 
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
-      // Wait to finish the generate token to avoid conflicts with device
-      setTimeout(() => { this.handleDialNumber() }, 500)
+      this.handleDialNumber()
     },
 
     canHandleDialNumber () {
