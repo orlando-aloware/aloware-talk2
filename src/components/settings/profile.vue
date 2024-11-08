@@ -294,7 +294,7 @@
         <b-col sm="12" md="6">
 
           <b-form-group label="Name" class="form-label mb-0">
-            <b-form-input style="height: 39.5px;"
+            <b-form-input class="contact-card-name"
                           type="text"
                           placeholder="Enter name"
                           :state="validateState('contact_card_name')"
@@ -375,7 +375,7 @@
         <b-col sm="12" md="6">
 
           <b-form-group label="Name" class="form-label mb-0">
-            <b-form-input style="height: 39px;"
+            <b-form-input class="company-card-name"
                           type="text"
                           placeholder="Enter name"
                           :state="validateState('company_contact_card_name')"
@@ -844,3 +844,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.contact-card-name {
+  height: 39px;
+}
+
+.company-card-name {
+  height: 39px;
+}
+</style>
