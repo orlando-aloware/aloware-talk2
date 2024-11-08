@@ -84,7 +84,10 @@ export default {
       initialized: false,
       needsExtensions: false,
       extensionsInitialized: false,
-      extensionsVisibility: false,
+      // not always this can be switched to true before call
+      // in HS Task view it's opening window automatically without sending event when
+      // maybe it sends an event before our component is mounted
+      extensionsVisibility: true,
       extensions: null,
       timeout: null,
       showAlertAgentOnCall: false,
