@@ -297,7 +297,7 @@ export default function (/* { ssrContext } */) {
       showedKycReloadDialog: false,
       isTrialBannerVisible: false,
       currentTimezone: null,
-      hubspotPhoneNumber: null,
+      hubspotDialNumber: null,
       isRedirectedToHubspotWidget: false,
       isCallBackButtonDisabled: false,
       isFirstLoad: true,
@@ -916,8 +916,8 @@ export default function (/* { ssrContext } */) {
         commit('SET_CURRENT_TIMEZONE', timezone)
       },
 
-      setHubspotPhoneNumber ({ commit }, value) {
-        commit('SET_HUBSPOT_PHONE_NUMBER', value)
+      setHubspotDialNumber ({ commit }, value) {
+        commit('SET_HUBSPOT_DIAL_NUMBER', value)
       },
 
       setIsRedirectedToHubspotWidget ({ commit }, value) {
@@ -1745,8 +1745,8 @@ export default function (/* { ssrContext } */) {
         state.currentTimezone = timezone
       },
 
-      SET_HUBSPOT_PHONE_NUMBER (state, value) {
-        state.hubspotPhoneNumber = value
+      SET_HUBSPOT_DIAL_NUMBER (state, value) {
+        state.hubspotDialNumber = value
       },
 
       SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {

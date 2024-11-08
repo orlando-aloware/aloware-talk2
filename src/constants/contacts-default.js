@@ -19,7 +19,8 @@ export const DEFAULT_STATE = {
       filters: {},
       type: 2,
       module_type: 0,
-      name: 'All Contacts'
+      name: 'All Contacts',
+      is_default: true
     },
     'my-contacts': {
       id: 'my-contacts',
@@ -34,7 +35,8 @@ export const DEFAULT_STATE = {
       },
       type: 2,
       module_type: 0,
-      name: 'My Contacts'
+      name: 'My Contacts',
+      is_default: true
     },
     unassigned: {
       id: 'unassigned',
@@ -49,7 +51,8 @@ export const DEFAULT_STATE = {
       },
       type: 2,
       module_type: 0,
-      name: 'Unassigned Contacts'
+      name: 'Unassigned Contacts',
+      is_default: true
     },
     unanswered: {
       id: 'unanswered',
@@ -64,7 +67,8 @@ export const DEFAULT_STATE = {
       },
       type: 2,
       module_type: 0,
-      name: 'Unanswered Contacts'
+      name: 'Unanswered Contacts',
+      is_default: true
     },
     'new-leads': {
       id: 'new-leads',
@@ -79,7 +83,8 @@ export const DEFAULT_STATE = {
       },
       type: 2,
       module_type: 0,
-      name: 'New Leads'
+      name: 'New Leads',
+      is_default: true
     },
     'my-queue': {
       id: 'my-queue',
@@ -88,7 +93,8 @@ export const DEFAULT_STATE = {
       filters: {},
       type: 1,
       module_type: 2,
-      name: 'My Queue'
+      name: 'My Queue',
+      is_default: false
     },
     static: {
       id: 'static',
@@ -196,6 +202,7 @@ export const DEFAULT_STATE = {
   isAddAppointmentOpen: false,
   isAppointmentSubmitted: false,
   isAddPowerDialerOpen: false,
+  isMergeContactOpen: false,
   isEnrollSequenceOpen: false,
   isAddReminderOpen: false,
   isOptoutActive: true,

@@ -173,7 +173,6 @@ export default {
     }
 
     this.dialerListeners.resetCall = () => {
-      console.log('Resetting call')
       this.resetCall()
     }
 
@@ -1340,8 +1339,8 @@ export default {
       })
     },
 
-    resetCall (signature) {
-      console.log('Resetting call', signature)
+    resetCall () {
+      console.log('Resetting call')
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()

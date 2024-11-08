@@ -5,7 +5,7 @@
     <q-card-section class="px-0 d-flex flex-column h-100 overflow-hidden">
       <ScriptSelector class="px-3 w-100 flex-grow-0"
                       v-model="scriptId"
-                      @on-change="changeScript" />
+                      @change="changeScript" />
       <div class="t-scroll-y2 py-3 px-3 flex-grow-1"
            style="overflow:auto;"
            v-html="scriptText" />
@@ -17,6 +17,8 @@
 import _ from 'lodash'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import ScriptSelector from 'components/generic-selectors/session-scripts-selector'
+import talk2Api from 'src/plugins/api/api'
+import { visibilityMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'DetailsScripts',
@@ -24,6 +26,10 @@ export default {
   components: {
     ScriptSelector
   },
+
+  mixins: [
+    visibilityMixin
+  ],
 
   props: {
     resources: {
@@ -61,6 +67,39 @@ export default {
     }
   },
 
+  created () {
+    this.listeners.newCommunication = async (communication) => {
+      if (this.checkCommunicationMatchesUserAccessibility(communication)) {
+        // Mark the listener as processing to avoid multiple calls
+        this.isListenerProcessing = true
+
+        this.communicationId = communication.id
+
+        // Call the API for all cached scripts
+        try {
+          for (const script of this.cachedScripts) {
+            if (script.id && communication.id) {
+              await talk2Api.V1.communicationScript.store({
+                script_id: script.id,
+                communication_id: communication.id,
+                text: script.text
+              })
+            }
+          }
+        } catch (err) {
+          console.log('Error processing cached scripts:', err)
+        } finally {
+          // Clear the cached scripts after processing
+          this.cachedScripts = []
+          this.isListenerProcessing = false
+          this.communicationProcessed = true
+        }
+      }
+    }
+
+    this.$VueEvent.listen('new_communication', this.listeners.newCommunication)
+  },
+
   mounted () {
     this.scriptId = this.sessionSettings.script_id
 
@@ -70,7 +109,12 @@ export default {
   data () {
     return {
       scriptId: null,
-      script: ''
+      script: '',
+      cachedScripts: [],
+      communicationId: null,
+      isListenerProcessing: false,
+      communicationProcessed: false,
+      listeners: {}
     }
   },
 
@@ -97,6 +141,9 @@ export default {
 
         this.script = res.data
 
+        // Cache the script change
+        this.cachedScripts.push({ id: this.selectedScript, text: this.script.text })
+
         return
       }
 
@@ -105,6 +152,8 @@ export default {
       }
 
       let lastCommunicationData = await this.getLastCommunicationScript(lastCommunicationId)
+
+      this.cachedScripts.push({ id: this.selectedScript, text: this.script.text })
 
       this.script = lastCommunicationData.data.find(script => {
         return script.id === this.selectedScript
@@ -115,9 +164,39 @@ export default {
   watch: {
     async activeTask (value) {
       if (value && value.id) {
+        this.communicationProcessed = false
         await this.changeScript()
       }
+    },
+
+    cachedScripts: {
+      async handler (scripts) {
+        if (scripts.length > 0 && !this.isListenerProcessing && this.communicationProcessed) {
+          const lastCommunicationId = _.get(this.activeTask, 'last_communication.id', this.communicationId)
+
+          // Call the API for all cached scripts
+          for (const script of scripts) {
+            try {
+              if (script.id && lastCommunicationId) {
+                await talk2Api.V1.communicationScript.store({
+                  script_id: script.id,
+                  communication_id: lastCommunicationId,
+                  text: script.text
+                })
+              }
+            } catch (err) {
+              console.log('Error storing script communication:', err)
+            }
+          }
+
+          this.cachedScripts = []
+        }
+      }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('new_communication', this.listeners.newCommunication)
   }
 }
 </script>

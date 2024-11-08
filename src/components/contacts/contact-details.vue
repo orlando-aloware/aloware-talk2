@@ -23,6 +23,10 @@
           <contact-push-to-crm data-testid="contact-details-push-to-crm"
                                :contact="contact"
                                v-if="isSimpSocial" />
+          <contact-aloai-enrollment-control ss="w-100"
+                                            data-testid="contact-aloai-enrollment-control"
+                                            :contact="contact"
+                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
           <contact-aloai-engagement-control ss="w-100"
                                             data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
@@ -81,6 +85,7 @@ import _ from 'lodash'
 import Profile from 'components/profile'
 import ContactSequence from 'components/contacts/contact-sequence'
 import ContactAloaiEngagementControl from 'components/contacts/contact-aloai-engagement-control'
+import ContactAloaiEnrollmentControl from 'components/contacts/contact-aloai-enrollment-control'
 import ContactReservations from 'components/contacts/contact-reservations.vue'
 import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
 import EntityTags from 'components/generic-selectors/entity-tags'
@@ -125,6 +130,7 @@ export default {
   components: {
     ContactSequence,
     ContactAloaiEngagementControl,
+    ContactAloaiEnrollmentControl,
     Profile,
     ContactSaveBar,
     ContactScheduledMessages,

@@ -1,19 +1,21 @@
 <template>
   <confirm-dialog id="remove-contact-confirmation-dialog"
-                  :title="title"
+                  :title="confirmationInputString + ' Contact Confirmation'"
                   :is-busy="isBusy"
-                  @close="removeContactClose"
+                  @close="onClose"
                   @hide="onHide"
                   @shown="onShown">
     <div slot="content">
+      <div class="text-left"
+           v-html="message"/>
       <div class="text-left">
-        <div class="text-dark">
-          Type the number of contacts below to delete
+        <div class="text-dark py-2" v-if="isDeleteContactConfirmation">
+          Type "{{ confirmationInputString }}" here to confirm.
           <input ref="contactsToDeleteInput"
-                 class="form-control form-control-search"
+                 class="form-control form-control-search my-2"
                  type="text"
-                 :placeholder="contactToDeleteCount"
-                 v-model="contactsToDelete"/>
+                 :placeholder="confirmationInputString"
+                 v-model="typedConfirmationInputString" />
         </div>
       </div>
     </div>
@@ -27,7 +29,7 @@
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
-                :disabled="(contactsToDelete !== contactToDeleteCount.toString()) || isBusy"
+                :disabled="disablesConfirmButton"
                 @click="onConfirm">
           <b-spinner variant="warning"
                      type="grow"
@@ -35,7 +37,7 @@
                      small
                      v-if="isBusy">
           </b-spinner>
-          Delete
+          {{ confirmationInputString  }}
         </button>
       </div>
     </div>
@@ -86,8 +88,41 @@ export default {
 
     ...mapState('cache', ['currentCompany']),
 
-    title () {
-      return `Delete ${this.$options.filters.numFormat(this.contactToDeleteCount)} contact` + ((this.contactToDeleteCount > 1) ? `s` : ``) + `?`
+    message () {
+      const formattedContactToDeleteCount = this.$options.filters.numFormat(this.contactToDeleteCount)
+      const formattedContactWord = ` contact` + ((this.contactToDeleteCount > 1) ? `s` : ``)
+      let message = null
+      switch (this.removeContactActionType) {
+        case ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY:
+          message = `remove ${formattedContactToDeleteCount}` + formattedContactWord + ` from the list?`
+          break
+        case ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS:
+          message = `delete ${formattedContactToDeleteCount}` + formattedContactWord + `?`
+      }
+      return 'Are you sure you want to ' + message
+    },
+
+    disablesConfirmButton () {
+      if (this.isBusy) {
+        return true
+      }
+
+      if (this.isDeleteContactConfirmation &&
+        this.confirmationInputString !== this.typedConfirmationInputString) {
+        return true
+      }
+      return false
+    },
+
+    isRemoveFromContactListOnlyConfirmation () {
+      return this.removeContactActionType === ContactsListRemoveFromTypes.REMOVE_FROM_LIST_ONLY
+    },
+    isDeleteContactConfirmation () {
+      return this.removeContactActionType === ContactsListRemoveFromTypes.REMOVE_FROM_CONTACTS
+    },
+
+    confirmationInputString () {
+      return this.isRemoveFromContactListOnlyConfirmation ? 'Remove' : 'Delete'
     },
 
     contactToDeleteCount () {
@@ -97,11 +132,6 @@ export default {
 
       if (this.selectedContacts[this.listId]) {
         let list = this.selectedContacts[this.listId]
-        if (this.currentCompany.activate_multi_entity) {
-          // do not include contacts with integrations
-          list = list.filter(contact => !contact.hasExternalData)
-        }
-
         return list.length
       }
 
@@ -125,7 +155,13 @@ export default {
     },
 
     listId () {
-      return this.selectedList.name === 'My Queue' ? 'my-queue' : this.selectedList.id
+      // refactor to handle this by the `id` instead of the `name`, as the `name` is not unique.
+      // Some list could have "My Queue" as name and it would generate errors
+      if (this.isPowerDialer && this.selectedList.id === this.myQueue.id) {
+        return 'my-queue'
+      }
+
+      return this.selectedList.id
     },
 
     currentList () {
@@ -138,6 +174,7 @@ export default {
       isBusy: false,
       contactsToDelete: null,
       ContactsListRemoveFromTypes,
+      typedConfirmationInputString: '',
       STATIC
     }
   },
@@ -160,16 +197,25 @@ export default {
     ]),
 
     onCancel () {
+      this.typedConfirmationInputString = ''
       this.removeContactClose()
       this.$bvModal.hide('remove-contact-confirmation-dialog')
     },
 
     onHide () {
+      this.typedConfirmationInputString = ''
       this.contactsToDelete = null
     },
 
     onShown () {
-      this.$refs.contactsToDeleteInput.focus()
+      if (this.isDeleteContactConfirmation) {
+        this.$refs.contactsToDeleteInput.focus()
+      }
+    },
+
+    onClose () {
+      this.typedConfirmationInputString = ''
+      this.removeContactClose()
     },
 
     handleSingleDeletion () {
@@ -251,9 +297,7 @@ export default {
       this.isBusy = true
       // exclude contacts with integrations and get the contact ids
       let ids = this.selectedContacts[this.listId].reduce((acc, contact) => {
-        if (this.currentCompany.activate_multi_entity ? !contact.has_integration : true) {
-          acc.push(this.isContactsRoute ? contact.id : contact.contact_list_item_id)
-        }
+        acc.push(this.isContactsRoute ? contact.id : contact.contact_list_item_id)
         return acc
       }, [])
 
@@ -345,6 +389,18 @@ export default {
       if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
         this.handleBulkDeletion()
       }
+    },
+
+    integrationsCount () {
+      if (!this.contactToRemove && this.selectedContacts[this.listId]) {
+        // disable integrations count if multi entity is not activated
+        if (!this.currentCompany.activate_multi_entity) {
+          return 0
+        }
+        return this.selectedContacts[this.listId].filter(contact => contact.has_integration).length
+      }
+
+      return 0
     }
   }
 }
