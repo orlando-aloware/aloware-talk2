@@ -146,7 +146,7 @@
                     <div v-if="customSummary" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
                       <q-btn color="text-dark-greenish"
                             class="btn btn-inline px-1 py-0"
-                            title="Download transcription"
+                            title="Download Summary"
                             flat
                             rounded
                             dense
@@ -160,13 +160,13 @@
                       </q-btn>
                       <q-btn color="text-dark-greenish"
                             class="btn btn-inline px-1 py-0"
-                            title="Copy transcription"
+                            title="Copy Summary"
                             flat
                             rounded
                             dense
                             no-caps
                             data-testid="copy-button-copy-btn"
-                            @click="onDownload()">
+                            @click="onCopy()">
                         <copy-icon height="20"
                                   width="20"
                                   color="#007bff"
@@ -479,16 +479,46 @@ export default {
       }
     },
 
-    /*
-      * Download the transcription.
-      * @public
-      *
-      * @param {string} transcription
-      *
-      * @returns {void}
-      */
-    onDownload (transcription = '') {
+    /**
+     * Download the custom summary as a text file.
+     * @public
+     *
+     * @returns {void}
+     */
+    onDownload () {
+      if (!this.customSummary) return
 
+      // Create a Blob with the custom summary content
+      const blob = new Blob([this.customSummary], { type: 'text/plain' })
+      const url = URL.createObjectURL(blob)
+
+      // Create a temporary link to initiate the download
+      const a = document.createElement('a')
+      a.href = url
+      a.download = this.communication.id + '_summary.txt'
+      a.click()
+
+      // Revoke the object URL to release memory
+      URL.revokeObjectURL(url)
+    },
+
+    /**
+     * Copy the custom summary to the clipboard.
+     * @public
+     *
+     * @returns {void}
+     */
+    onCopy () {
+      if (!this.customSummary) return
+
+      navigator.clipboard.writeText(this.customSummary)
+        .then(() => {
+          this.$generalNotification('Summary copied to clipboard')
+        })
+        .catch(err => {
+          console.error('Failed to copy summary: ', err)
+          this.$generalNotification('Failed to copy summary', 'error')
+        })
     },
 
     handleClose () {
