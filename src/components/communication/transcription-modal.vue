@@ -495,7 +495,9 @@ export default {
       // Create a temporary link to initiate the download
       const a = document.createElement('a')
       a.href = url
-      a.download = this.communication.id + '_summary.txt'
+      a.href = url
+      // Generate filename with the current date and time in "YYYYMMDD_HHMMSS" format
+      a.download = `summary_${new Date().toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-')}.txt`
       a.click()
 
       // Revoke the object URL to release memory

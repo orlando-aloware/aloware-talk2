@@ -4,7 +4,7 @@
            data-testid="comm-conversation-section"
            ref="chatArea">
     <div v-if="!isEmpty(messages)">
-      <div style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
+      <div style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px">
         <q-btn color="text-dark-greenish"
               class="btn btn-inline px-1 py-0"
               title="Download transcription"
@@ -27,7 +27,7 @@
               dense
               no-caps
               data-testid="copy-button-copy-btn"
-              @click="onDownload()">
+              @click="onCopy()">
           <copy-icon height="20"
                      width="20"
                      color="#007bff"
@@ -169,11 +169,58 @@ export default {
     },
 
     /**
-     *
-     * @param fixFilenameExtension
+     * Generates a Markdown-formatted transcription from messages.
+     * @returns {string} - The full transcription in Markdown format.
      */
-    onDownload (transcription = '') {
+    generateMarkdownTranscription () {
+      return this.formattedMessages.map(message => {
+        let cleanText = message.formattedText
+          .replace(/<\/?(b|strong)>/g, '**') // Replace <b> and <strong> tags with Markdown bold (**)
+          .replace(/<\/?(i|em)>/g, '*') // Replace <i> and <em> tags with Markdown italics (*)
+          .replace(/<\/?[^>]+(>|$)/g, '') // Remove all other HTML tags
+        return `**${message.speaker}:**\n${cleanText}\n`
+      }).join('\n---\n\n')
+    },
 
+    /**
+     * Downloads the transcription as a Markdown file.
+     * @public
+     *
+     * @returns {void}
+     */
+    onDownload () {
+      const markdownTranscription = this.generateMarkdownTranscription()
+
+      // Create a Blob with the transcription content
+      const blob = new Blob([markdownTranscription], { type: 'text/markdown' })
+      const url = URL.createObjectURL(blob)
+
+      const a = document.createElement('a')
+      a.href = url
+      // set filename to include the current date and time
+      a.download = `transcript_${new Date().toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-')}.txt`
+      a.click()
+
+      URL.revokeObjectURL(url)
+    },
+
+    /**
+     * Copies the Markdown transcription to the clipboard.
+     * @public
+     *
+     * @returns {void}
+     */
+    onCopy () {
+      const markdownTranscription = this.generateMarkdownTranscription()
+
+      navigator.clipboard.writeText(markdownTranscription)
+        .then(() => {
+          this.$generalNotification('Transcription copied to clipboard')
+        })
+        .catch(err => {
+          console.error('Failed to copy transcription: ', err)
+          this.$generalNotification('Failed to copy transcription', 'error')
+        })
     },
 
     /**
