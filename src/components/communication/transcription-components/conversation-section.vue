@@ -4,7 +4,7 @@
            data-testid="comm-conversation-section"
            ref="chatArea">
     <div v-if="!isEmpty(messages)">
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: -4px;">
+      <div style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
         <q-btn color="text-dark-greenish"
               class="btn btn-inline px-1 py-0"
               title="Download transcription"

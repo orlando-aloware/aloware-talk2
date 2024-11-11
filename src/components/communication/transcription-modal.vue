@@ -222,6 +222,8 @@ import talk2Api from 'src/plugins/api/api'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as FeedbackConstants from 'src/constants/feedback-types'
 import * as CommunicationDirection from 'src/constants/communication-direction'
+import DownloadIcon from 'components/icons/contact-activity/download-icon'
+import CopyIcon from 'components/icons/copy-icon'
 
 export default {
   name: 'TranscriptionModal',
@@ -239,7 +241,9 @@ export default {
     CustomKeywordsSection,
     SentimentAnalysisSection,
     TalkTimeAnalysisSection,
-    ConversationSection
+    ConversationSection,
+    DownloadIcon,
+    CopyIcon
   },
 
   props: {
