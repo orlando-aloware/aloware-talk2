@@ -226,14 +226,14 @@ export default {
     ]),
 
     async postDialNumber () {
-      while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-        await new Promise(resolve => setTimeout(resolve, 1000)) // Check every 1sec
-      }
+      this.showAlertCallFinished = false
+
+      do {
+        await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
+      } while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)
 
       this.checkAndResetCallDisposition()
       await this.getContact()
-
-      this.showAlertCallFinished = false
 
       await this.findDefaultOutboundCampaign()
 
