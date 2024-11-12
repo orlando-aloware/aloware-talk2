@@ -88,7 +88,6 @@ import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
 import { aloaiMixin } from 'src/plugins/mixins'
-import { AloAiUseCases } from 'src/constants/aloai'
 
 export default {
   name: 'aloai-engagement-control-modal',
@@ -100,7 +99,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact']),
     filteredBots () {
-      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === AloAiUseCases.SALES)
+      let bots = this.bots
 
       // If not search, retreve all sales bots
       if (!isEmpty(this.searchText)) {
@@ -108,7 +107,6 @@ export default {
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
         )
       }
-
       return bots.sort((a, b) =>
         a.name?.toUpperCase() > b.name?.toUpperCase() ? 1 : -1
       )
