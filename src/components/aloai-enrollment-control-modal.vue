@@ -3,79 +3,64 @@
            hide-header
            hide-footer
            centered
-           data-testid="aloai-engagement-control-modal"
+           data-testid="aloai-enrollment-control-modal"
            v-model="isOpen"
            @hidden="onHidden"
            @shown="onShown">
     <div class="p-2">
-      <h1 data-testid="aloai-engagement-control-modal-title"
+      <h1 data-testid="aloai-enrollment-control-modal-title"
           class="text-center mb-2">
-        AloAi Text Bot Engagement
+        AloAi Text Bot Enrollment
       </h1>
       <div class="text-center">
-        Manage the bots that you want your contact to interact with. If a bot is disabled, it will no longer respond to this contact.
+        Select the Sales Bot you want to initiate a conversation with this contact.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search placeholder="Search bot"
-                data-testid="aloai-engagement-control-modal-search"
+                data-testid="aloai-enrollment-control-modal-search"
                 @search="onSearch"/>
       </div>
-      <b-form data-testid="aloai-engagement-control-modal-form"
-              class="mb-4"
-              @submit.prevent="onSubmit">
-        <div class="p-1"
-             v-if="isLoading">
-          <template v-for="n in 5">
-            <q-skeleton type="text"
-                        animation="fade"
-                        height="40px"
-                        :key="`${n}-skeleton`"/>
-          </template>
-        </div>
-        <ul class="list-group list-group-flush aloai-engagement-control-bots-list"
-            v-else>
-          <div class="text-center py-2"
-               v-if="!this.filteredBots.length">
-            No records to show.
-          </div>
-          <template v-else>
-            <li class="list-group-item list-group-item-action p-2 d-flex items-center justify-between"
-                :key="`ec-bot-${key}`"
-                v-for="(bot, key) in this.filteredBots">
-              <label class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
-                     :for="`engage-control-bot-${bot.id}`">
-                <div class="row">
-                  <div class="col-2 p-0 text-center d-flex items-center justify-between">
-                    <!-- Bot Use Case Label -->
-                    <q-badge class="w-100 custom-badge-margin" :color="useCaseColor(bot.use_case)">
-                      <span class="w-100">{{ formatUseCase(bot.use_case) }}</span>
-                    </q-badge>
-                  </div>
-                  <div class="col-10">
-                    <span>{{ bot.name }}</span>
-                  </div>
-                </div>
-              </label>
-              <b-form-checkbox switch
-                              :id="`engage-control-bot-${bot.id}`"
-                              :value="true"
-                              :unchecked-value="false"
-                              v-model="bot_engagements[bot.id]"/>
-            </li>
-          </template>
-        </ul>
-      </b-form>
+      <ul class="list-group list-group-flush scrollable-list mb-4">
+        <li class="list-group-item list-group-item-action p-0"
+            :key="`enroll-bot-${key}`"
+            v-for="(bot, key) in this.filteredSalesBots">
+          <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
+            <b-form-radio name="selected-bot"
+                          :value="bot.id"
+                          v-model="selectedBotId">
+              {{ bot.name }}
+              <!-- Bot Enrolled Label -->
+              <b-popover
+                target="enrolled-badge"
+                triggers="hover"
+                placement="right"
+                delay="100"
+              >
+                This contact is currently enrolled to this bot.
+              </b-popover>
+              <q-badge
+                v-if="isEnrolled(bot.id)"
+                id="enrolled-badge"
+                class="ml-1"
+                color="green-6"
+              >
+                <span>Enrolled</span>
+              </q-badge>
+            </b-form-radio>
+          </label>
+        </li>
+      </ul>
       <div class="d-flex items-center justify-center" style="gap: 15px">
         <button class="btn btn-sm btn-outline-dark mr-2"
-                data-testid="aloai-engagement-control-modal-close-button"
+                data-testid="aloai-enrollment-control-modal-close-button"
                 @click="onHidden">
           Cancel
         </button>
         <button class="btn btn-sm bg-primary text-white mr-2"
-                data-testid="aloai-engagement-control-modal-enroll-contact-button"
+                data-testid="aloai-enrollment-control-modal-enroll-contact-button"
                 :disabled="isBusy"
-                @click="onSubmit">
-          Save changes
+                @click="confirmEnrollment">
+          Enroll
         </button>
       </div>
     </div>
@@ -86,20 +71,30 @@
 import talk2Api from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
+import { AloAiUseCases } from 'src/constants/aloai'
 import { isEmpty } from 'lodash'
-import { aloaiMixin } from 'src/plugins/mixins'
 
 export default {
-  name: 'aloai-engagement-control-modal',
+  name: 'aloai-enrollment-control-modal',
 
   components: { Search },
-
-  mixins: [aloaiMixin],
 
   computed: {
     ...mapGetters('contacts', ['contact']),
     filteredBots () {
       let bots = this.bots
+      if (!isEmpty(this.searchText)) {
+        bots = bots.filter((bot) =>
+          bot.name.toLowerCase().includes(this.searchText.toLowerCase())
+        )
+      }
+      return bots.sort((a, b) =>
+        a.name?.toUpperCase() > b.name?.toUpperCase() ? 1 : -1
+      )
+    },
+    // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
+    filteredSalesBots () {
+      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === AloAiUseCases.SALES)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -117,9 +112,11 @@ export default {
       isOpen: false,
       bots: [],
       bot_engagements: {},
+      bot_enrollments: {},
       searchText: '',
       isLoading: true,
-      selectedBotId: null
+      selectedBotId: null,
+      AloAiUseCases
     }
   },
 
@@ -127,37 +124,32 @@ export default {
     onSearch (searchText) {
       this.searchText = searchText
     },
-    onSubmit (event) {
+    confirmEnrollment (event) {
       event.preventDefault()
-      this.isBusy = true
-
-      const params = Object.keys(this.bot_engagements).map((k) => ({
-        aloai_bot_id: k,
-        is_engaged: this.bot_engagements[k]
-      }))
-
-      talk2Api.V2.aloAiBot
-        .updateContactEngagements(this.contact.id, params)
-        .then(() => {
-          this.$generalNotification(
-            'AloAi engagements for the contact have been updated.'
-          )
-          this.onHidden()
+      // If the contact is already enrolled, confirm we want to re-enroll
+      if (this.isEnrolled(this.selectedBotId)) {
+        this.$bvModal.msgBoxConfirm('Re-enrolling this contact will count as a new enrollment and charged accordingly. Continue?', {
+          title: 'Warning',
+          size: 'sm',
+          buttonSize: 'sm',
+          okVariant: 'warning',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          footerClass: 'p-2',
+          hideHeaderClose: false,
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.submitEnrollment()
+          }
+        }).catch(() => {
+          // Do nothing
         })
-        .catch((error) => {
-          this.$generalNotification(
-            'Error while updating engagements for the contact.',
-            'error'
-          )
-          console.error('[onSubmit] error', error)
-        })
-        .finally(() => {
-          this.isBusy = false
-        })
+      } else {
+        this.submitEnrollment()
+      }
     },
-    onSubmitEnrollment (event) {
-      event.preventDefault()
-
+    submitEnrollment () {
       if (!this.selectedBotId) {
         this.$generalNotification(
           'Please select a bot to enroll the contact.',
@@ -183,7 +175,7 @@ export default {
           }
 
           this.$generalNotification(errorMsg, 'error')
-          console.error('[onSubmitEnrollment] error', error)
+          console.error('[submitEnrollment] error', error)
         })
         .finally(() => {
           this.isBusy = false
@@ -201,17 +193,23 @@ export default {
     onShown () {
       this.load()
     },
+    isEnrolled (botId) {
+      // Search in the bot_enrollments object array if the contact is enrolled in the bot
+      return !!this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
+    },
     async load () {
       this.isLoading = true
       this.isBusy = true
 
       try {
-        const [bots, contactDisengagedBots] = await Promise.all([
+        const [bots, contactDisengagedBots, contactEnrolledBots] = await Promise.all([
           this.fetchBots(),
-          this.fetchContactDisengagedBots()
+          this.fetchContactDisengagedBots(),
+          this.fetchContactEnrolledBots()
         ])
 
         this.bots = bots
+        this.bot_enrollments = contactEnrolledBots
 
         const disengagedBotIds = contactDisengagedBots?.reduce((acc, v) => {
           acc.push(v.aloai_bot_id)
@@ -253,17 +251,25 @@ export default {
         console.error('[fetchContactDisengagedBots] error', error)
         return []
       }
+    },
+    async fetchContactEnrolledBots () {
+      try {
+        const { data } = await talk2Api.V2.aloAiBot.getContactEnrolledBots(
+          this.contact.id
+        )
+        return data
+      } catch (error) {
+        console.error('[fetchContactEnrolledBots] error', error)
+        return []
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.aloai-engagement-control-bots-list {
+.aloai-enrollment-control-bots-list {
   max-height: 300px;
   overflow-y: auto;
-}
-.custom-badge-margin {
-  margin-bottom: 1px
 }
 </style>

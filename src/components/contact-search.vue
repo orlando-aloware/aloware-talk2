@@ -1,6 +1,6 @@
 <template>
   <div class="position-relative">
-    <q-input :class="[border ? 'form-control' : 'border-0']"
+    <q-input :class="[{ 'input-error': hasError}, border ? 'form-control' : 'border-0']"
              :placeholder="placeholder"
              :disabled="disabled"
              class="form-control-search"
@@ -10,19 +10,14 @@
              data-testid="search-input"
              @blur="onBlur"
              @focus="onFocus"
-             @clear="onInput"
+             @clear="clearSearch"
+             @keyup.enter="onSearch"
              @input="onInput">
       <template v-slot:prepend>
-        <search-icon/>
-      </template>
-      <template v-slot:default
-                v-if="limitSearchCharacters">
-        <q-tooltip anchor="bottom middle"
-                   self="center middle"
-                   data-testid="search-tooltip"
-                   v-if="!searchValue || (searchValue && searchValue.length < 3)">
-          Search requires at least 3 characters
-        </q-tooltip>
+        <span class="search-icon-component"
+              @click="onSearch">
+          <search-icon/>
+        </span>
       </template>
     </q-input>
   </div>
@@ -38,7 +33,7 @@ export default {
   props: {
     placeholder: {
       type: String,
-      default: 'Search name, phone, email, etc.'
+      default: 'Press ENTER to search...'
     },
 
     disabled: {
@@ -64,7 +59,8 @@ export default {
 
   data () {
     return {
-      searchValue: ''
+      searchValue: '',
+      hasError: false
     }
   },
 
@@ -73,16 +69,25 @@ export default {
   },
 
   methods: {
-    onInput: _.debounce(function () {
-      // send an empty string on null value
-      // (happens when page is from contact page - clicked from result)
+    onSearch: _.debounce(function () {
       if (!this.searchValue) {
         this.searchValue = ''
       }
-
-      this.searchValue = this.searchValue.trim()
       this.$emit('search', this.searchValue)
-    }, 1200),
+      if (this.limitSearchCharacters && this.searchValue && this.searchValue.trim().length < 3) {
+        this.hasError = true
+      } else {
+        this.hasError = false
+      }
+      this.$emit('show-error', this.hasError)
+    }, 500),
+
+    onInput () {
+      if (!this.searchValue || this.searchValue.trim().length > 2) {
+        this.hasError = false
+        this.$emit('show-error', this.hasError)
+      }
+    },
 
     onFocus: function () {
       this.$emit('focus', this.searchValue)
@@ -94,13 +99,17 @@ export default {
 
     clearSearch () {
       this.searchValue = ''
-    }
-  },
-
-  watch: {
-    search () {
-      this.searchValue = this.search
+      this.hasError = false
+      this.$emit('show-error', false)
+      this.$emit('search', this.searchValue)
     }
   }
 }
 </script>
+
+<style scoped>
+.input-error {
+  border: 1px solid red;
+  border-radius: 4px;
+}
+</style>

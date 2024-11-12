@@ -623,6 +623,12 @@ export default {
       }
     },
 
+    communicationScript: {
+      store (params) {
+        return window.axios.post(`${suffixV1}communication-script`, params)
+      }
+    },
+
     auth: {
       impersonate (userId, userAccess = false, user = null) {
         let isImpersonating = true
@@ -713,6 +719,10 @@ export default {
         return window.axios.get(`api/v2/contacts-list/export-csv`, {
           params: params
         })
+      },
+
+      removeContactFromList (id, body = {}) {
+        return window.axios.post(`${suffixV2}contacts/${id}/remove-from-lists`, body)
       },
 
       exportCommunications
@@ -864,6 +874,9 @@ export default {
       },
       getContactDisengagedBots (contactId) {
         return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
+      },
+      getContactEnrolledBots (contactId) {
+        return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/enrolled-bots`)
       },
       updateContactEngagements (contactId, engagements) {
         return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-status`, { engagements })

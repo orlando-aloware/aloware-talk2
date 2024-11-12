@@ -50,7 +50,6 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
-import CallingExtensions from '@hubspot/calling-extensions-sdk'
 import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
@@ -58,6 +57,7 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import { timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
+import CallingExtensionsManager from 'src/utils/CallingExtensionsManager'
 
 export default {
   name: 'Dialer',
@@ -84,10 +84,14 @@ export default {
       initialized: false,
       needsExtensions: false,
       extensionsInitialized: false,
-      extensionsVisibility: false,
+      // not always this can be switched to true before call
+      // in HS Task view it's opening window automatically without sending event when
+      // maybe it sends an event before our component is mounted
+      extensionsVisibility: true,
       extensions: null,
       timeout: null,
       showAlertAgentOnCall: false,
+      defaultCampaignInitialized: false,
       callSdkOptions: {
         // Whether to log various inbound/outbound messages to console
         debugMode: true,
@@ -106,26 +110,17 @@ export default {
               }
             }
             this.extensions.initialized(payload)
-            this.extensionsInitialized = true
           },
           onDialNumber: async (event) => {
             this.criticalErrorHappened = false
-            if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-              await new Promise(resolve => setTimeout(resolve, 1000))
-            }
-
-            this.checkAndResetCallDisposition()
-
-            this.showAlertCallFinished = false
-
-            this.findDefaultOutboundCampaign()
             this.setHubspotDialNumber(event)
-            if (this.timeout) {
-              clearTimeout(this.timeout)
+
+            // do not continue if we not logged-in
+            if (!this.initialized) {
+              return
             }
-            if (this.isAlwaysAskModeEnabled()) {
-              this.handleDialNumber()
-            }
+
+            await this.postDialNumber()
           },
           onVisibilityChanged: (data) => {
             this.extensionsVisibility = !data?.isHidden
@@ -142,7 +137,6 @@ export default {
       contactId: '',
       campaignId: null,
       defaultOutboundCampaignId: null,
-      previousOutboundCallingMode: null,
       showAlertCallFinished: false,
       criticalErrorHappened: false,
       authProfile: null,
@@ -166,10 +160,10 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber', 'isRedirectedToHubspotWidget']),
+    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber']),
 
     allowed () {
-      return this.authProfile && this.initialized
+      return this.authProfile && this.initialized && this.defaultCampaignInitialized
     },
 
     isLoadingDialer () {
@@ -193,13 +187,22 @@ export default {
     if (!this.needsExtensions) {
       this.extensionsVisibility = true
     }
-
-    if (!this.extensions) {
-      this.extensions = new CallingExtensions(this.callSdkOptions)
-    }
   },
 
   async mounted () {
+    try {
+      // init of CallingExtensions has to be once and do not repeat when, for instance, login page was called
+      // otherwise we lose connection with parent window
+      // that's why a global class was added
+      this.extensions = await CallingExtensionsManager.initialize(this.callSdkOptions)
+    } catch (error) {
+      // there may iframe issue like "Blocked a frame with origin" but we don't want to break the whole app, it is still usable
+      console.log('Error during CallingExtensions init', error)
+    }
+
+    CallingExtensionsManager.subscribe(this.callSdkOptions.eventHandlers)
+
+    this.extensionsInitialized = true
     await this.init()
     this.isFirstLoading = false
   },
@@ -222,12 +225,30 @@ export default {
       'setCurrentCompany'
     ]),
 
-    init () {
+    async postDialNumber () {
+      while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+        await new Promise(resolve => setTimeout(resolve, 1000)) // Check every 1sec
+      }
+
+      this.checkAndResetCallDisposition()
+      await this.getContact()
+
+      this.showAlertCallFinished = false
+
+      await this.findDefaultOutboundCampaign()
+
+      if (this.isAlwaysAskModeEnabled()) {
+        this.handleDialNumber()
+      }
+    },
+
+    async init () {
       if (this.apiKey) {
         storage.local.setItem('api_token', this.apiKey)
       }
       this.loading = true
-      this.check().then((res) => {
+
+      await this.check().then((res) => {
         storage.local.setItem('company_id', res.data.user.company.id)
         this.setCurrentCompany(res.data.user.company)
         this.resetVuex(['all'])
@@ -255,7 +276,7 @@ export default {
       this.contactName = this.getContactName(contact)
       this.contactTimezone = contact.timezone
       this.companyName = contact.company_name
-      this.contactId = contact.contact_id
+      this.contactId = contact.id
     },
 
     getContactEmitPayload () {
@@ -274,7 +295,6 @@ export default {
       }).then(res => {
         this.setContactDetails(res.data)
         this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
-        this.handleCall()
       }).catch(err => {
         this.$handleErrors(err.response)
         this.criticalErrorHappened = true
@@ -292,6 +312,11 @@ export default {
         return
       }
 
+      // stop if modal is disabled
+      if (!this.extensionsVisibility) {
+        return
+      }
+
       // don't allow to make a call if there's a parked call
       if (this.dialer?.parkedCall) {
         return
@@ -300,7 +325,7 @@ export default {
       this.showAlertAgentOnCall = false
 
       if (this.canHandleDialNumber()) {
-        await this.getContact()
+        this.handleCall()
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
           this.handleDialNumber()
@@ -317,10 +342,13 @@ export default {
         }
       }
 
-      if (this.defaultOutboundCampaignId) {
-        this.campaignId = this.defaultOutboundCampaignId
-        this.handleDialNumber()
+      // if empty then onDialNumber event was not called - skip calling,
+      // if not empty then dialer was called, and we are here after login page so we must dial the number
+      if (!this.hubspotDialNumber) {
+        return
       }
+
+      this.postDialNumber()
     },
 
     handleCallConnectedEvent () {
@@ -343,19 +371,12 @@ export default {
       this.campaignId = campaignId
     },
 
-    handleCall (shouldHandleDialNumber) {
+    handleCall () {
       this.loading = true
       const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       // if there's a call in progress or in wrap up, we omit the call
       if (isCallInProgressOrWrapUp.includes(this.dialer?.currentStatus)) {
-        return
-      }
-
-      // if shouldHandleDialNumber is true, then handleDialNumber will set the contact name and timezone
-      // to proceed to execute checkContactTimezone and makeCall
-      if (shouldHandleDialNumber) {
-        this.handleDialNumber()
         return
       }
 
@@ -425,13 +446,12 @@ export default {
       })
     },
 
-    findDefaultOutboundCampaign () {
+    async findDefaultOutboundCampaign () {
       if (this.isAlwaysAskModeEnabled()) {
-        setTimeout(() => this.setTheLastUsedCallLine(), 1000)
+        await this.setTheLastUsedCallLine()
+        this.defaultCampaignInitialized = true
         return
       }
-
-      this.updatePreviousOutboundCallingMode()
 
       if (this.shouldUseCompanyCampaignId()) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
@@ -442,6 +462,8 @@ export default {
       if (this.defaultOutboundCampaignId) {
         this.setCampaignIdAndDialNumber()
       }
+
+      this.defaultCampaignInitialized = true
     },
 
     isAlwaysAskModeEnabled () {
@@ -452,10 +474,6 @@ export default {
       const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
 
       return isCompanyAlwaysAsk || isUserAlwaysAsk
-    },
-
-    updatePreviousOutboundCallingMode () {
-      this.previousOutboundCallingMode = this.authProfile?.outbound_calling_mode
     },
 
     shouldUseCompanyCampaignId () {
@@ -473,27 +491,19 @@ export default {
 
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
-      // Wait to finish the generate token to avoid conflicts with device
-      setTimeout(() => { this.handleDialNumber() }, 500)
+      this.handleDialNumber()
     },
 
     canHandleDialNumber () {
-      if (this.isRedirectedToHubspotWidget && this.campaignId) {
-        return this.needsExtensions &&
-          this.initialized &&
-          this.authProfile &&
-          this.dialer?.isReady &&
-          this.campaignId !== null
-      }
-
       return this.needsExtensions &&
         this.extensionsInitialized &&
         this.extensionsVisibility &&
         this.initialized &&
         this.authProfile &&
         this.dialer?.isReady &&
-        this.campaignId !== null &&
-        (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP || (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition))
+        // if isAlwaysAskModeEnabled is true then dialing will be triggered from select campaign dialog component
+        (this.campaignId !== null ? !this.isAlwaysAskModeEnabled() : false) &&
+        (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? !this.checkForceDisposition : true)
     },
 
     checkAgentHasActiveCallInAnotherDevice () {
@@ -529,17 +539,9 @@ export default {
     },
 
     async setTheLastUsedCallLine () {
-      if (!this.contactId) {
-        const contact = await this.searchContact(this.hubspotPhoneNumber)
-        if (contact) {
-          this.contactId = contact.contact_id
-        }
-      }
-
       if (this.campaignId || !this.contactId) return
       try {
         const data = await this.getLastUsedCallLineByContactId(this.contactId)
-
         this.handleChangeCampaignEvent(data.campaign_id)
       } catch (error) {
         this.$handleErrors(error.response)
@@ -548,16 +550,21 @@ export default {
   },
 
   watch: {
+    authenticated (newVal) {
+      if (newVal && this.extensions) {
+        this.extensions.initialized({
+          isLoggedIn: newVal
+        })
+      }
+    },
     extensionsVisibility () {
       if (this.extensionsVisibility) {
         this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
       } else {
         this.showAlertCallFinished = false
+        // if hidden, reset HubSpot dial number
+        this.setHubspotDialNumber(null)
       }
-    },
-
-    authProfile () {
-      this.findDefaultOutboundCampaign()
     },
 
     'dialer.currentStatus' () {

@@ -6,6 +6,8 @@
 <script>
 import Scheduler from 'dhtmlx-scheduler'
 import moment from 'moment'
+import { DAY_VIEW, MONTH_VIEW, TIME_FORMAT_AM_PM, WEEK_VIEW } from 'src/constants/calendar'
+import { calendarMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
 const MAX_EVENTS_MONTH = 4
@@ -13,6 +15,8 @@ const MAX_EVENTS_MOBILE = 2
 
 export default {
   name: 'scheduler',
+
+  mixins: [calendarMixin],
 
   props: {
     events: {
@@ -22,12 +26,28 @@ export default {
           events: []
         }
       }
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    view: {
+      type: String,
+      default: MONTH_VIEW
     }
   },
 
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState(['isMobile'])
+  },
+
+  watch: {
+    loading (val) {
+      if (!val) {
+        this.addTimeZoneHeaderRow(this.view)
+      }
+    }
   },
 
   mounted () {
@@ -50,7 +70,7 @@ export default {
     ]
 
     Scheduler.config.date_format = '%Y-%m-%d %g:%i %A'
-    Scheduler.config.hour_date = this.profile.time_format === 1 ? '%g:%i %A' : '%G:%i'
+    Scheduler.config.hour_date = this.profile.time_format === TIME_FORMAT_AM_PM ? '%g:%i %A' : '%G:%i'
     Scheduler.config.dblclick_create = false
     Scheduler.config.details_on_dblclick = false
     Scheduler.config.drag_event_body = false
@@ -62,6 +82,7 @@ export default {
     Scheduler.config.min_event_width = 60
     Scheduler.config.min_event_height = 20
     Scheduler.config.event_min_dy = 20
+    Scheduler.xy.scale_width = this.getScaleWidth()
 
     Scheduler.templates.week_date = function (start, end) {
       const startDate = moment(start)
@@ -109,30 +130,19 @@ export default {
     }.bind(this)
 
     Scheduler.templates.hour_scale = function (date) {
-      const hour = moment(date).format(this.profile.time_format === 1 ? 'h A' : 'H:00')
-      return `<div class="hour-label" data-hour="${moment(date).hour()}">${hour}</div>`
+      return this.getHourScaleTemplate(date, Scheduler)
     }.bind(this)
 
-    Scheduler.templates.event_date = function (date) {
-      const formatFunc = Scheduler.date.date_to_str(Scheduler.config.hour_date)
-      return formatFunc(date)
-    }
-
-    Scheduler.templates.event_bar_text = function (start, end, event) {
-      return event.text
-        ? event.text
-        : (event.contact.first_name || event.contact.last_name
-          ? `${event.contact.first_name || ''} ${event.contact.last_name || ''}`
-          : event.contact.phone_number)
-    }
-
-    Scheduler.templates.event_text = Scheduler.templates.event_bar_text
+    Scheduler.templates.event_text = function (start, end, event) {
+      return this.getEventTextTemplate(start, end, event)
+    }.bind(this)
 
     Scheduler.attachEvent('onEmptyClick', (date, e) => {
       if (e.target.classList.contains('custom-more-link') ||
         e.target.classList.contains('custom-expand-link') ||
         e.target.classList.contains('day-label') ||
-        e.target.classList.contains('hour-label')) {
+        e.target.classList.contains('hour-label') ||
+        e.target.classList.contains('time-column')) {
         return
       }
 
@@ -145,9 +155,15 @@ export default {
 
     Scheduler.attachEvent('onViewChange', (newView) => {
       this.setNavHeight(newView)
+      this.setSchedulerHeaderTableWidth(newView)
 
       let state = Scheduler.getState()
       this.renderEvents(state)
+    })
+
+    Scheduler.attachEvent('onBeforeViewChange', (oldMode, oldDate, mode, date) => {
+      this.isHourScaleHeaderAdded = false
+      return true
     })
 
     Scheduler.init(this.$refs.scheduler, new Date(), 'month')
@@ -218,7 +234,7 @@ export default {
     },
 
     reInit (date, view) {
-      Scheduler.config.hour_date = this.profile.time_format === 1 ? '%g:%i %A' : '%G:%i'
+      Scheduler.config.hour_date = this.profile.time_format === TIME_FORMAT_AM_PM ? '%g:%i %A' : '%G:%i'
 
       Scheduler.init(this.$refs.scheduler, date, view)
       Scheduler.parse(this.$props.events)
@@ -258,7 +274,8 @@ export default {
     },
 
     handleHourLabelClick (e) {
-      if (e.target.classList.contains('hour-label')) {
+      if (e.target.classList.contains('hour-label') ||
+        e.target.classList.contains('time-column')) {
         e.preventDefault()
         e.stopPropagation()
 
@@ -271,7 +288,7 @@ export default {
     },
 
     setNavHeight (newView) {
-      if (newView === 'week' || newView === 'day') {
+      if (newView === WEEK_VIEW || newView === DAY_VIEW) {
         return this.setNavHeightForMultiDayEvents()
       }
 
@@ -286,6 +303,31 @@ export default {
       }
 
       Scheduler.xy.nav_height = 0
+    },
+
+    setSchedulerHeaderTableWidth (currentView) {
+      if (!currentView || currentView === DAY_VIEW) {
+        return
+      }
+
+      const headerTableWeek = document.querySelector('.scheduler__header__table')
+      if (!headerTableWeek) {
+
+      }
+
+      headerTableWeek.style.width = currentView === WEEK_VIEW ? `calc(100% - ${this.getScaleWidth()}px)` : '100%'
+    },
+
+    getScaleWidth () {
+      if (this.isMobile) {
+        return 50
+      }
+
+      if (!this.timezoneIsDifferentThanBrowser) {
+        return 70
+      }
+
+      return 160
     },
 
     getMoreCount (count) {
