@@ -100,8 +100,6 @@ export default {
     ...mapGetters('contacts', ['contact']),
     filteredBots () {
       let bots = this.bots
-
-      // If not search, retreve all sales bots
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
