@@ -276,10 +276,13 @@
 
         <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                     text="..."
-                    variant="light"
+                    :variant="selectedAllCount !== 0 ? '' : 'light'"
                     no-caret
                     data-testid="contacts-view-options-dropdown"
-                    right>
+                    alt="List Options"
+                    title="List Options"
+                    right
+                    :disabled="selectedAllCount !== 0">
           <template #button-content>
             <ellipse-icon />
           </template>
@@ -601,13 +604,6 @@
                           @click="onMessage(contact.id)">
                     <!--message-o-icon></message-o-icon-->
                     <span class="aloicons action-icons">A</span>
-                  </button>
-
-                  <button class='btn btn-sm datatable-row__actions__action--trash'
-                          data-testid='contact-remove-option'
-                          v-if="!list.show_in_public_folder && hasPermissionTo('archive contact') && !isSimpSocial"
-                          @click='onRemove(contact, id)'>
-                    <span class='aloicons action-icons'>B</span>
                   </button>
                 </div>
               </td>
@@ -1838,16 +1834,6 @@ export default {
       if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
         this.$router.push(`/contacts`)
       }
-    },
-
-    onRemove (contact, contactListId) {
-      this.setShouldUpdateSelectedListContactCount(false)
-      this.setBulkDelete(false)
-      this.removeContactOpen({
-        ...contact,
-        contactListId: contactListId
-      })
-      // this.$emit('on-action-remove', true)
     },
 
     onMessage (contactId) {

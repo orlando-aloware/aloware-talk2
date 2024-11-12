@@ -41,6 +41,28 @@
           </div>
         </template>
         <div class="items"
+             v-if="showRemoveFromListButton">
+          <a href=""
+             class="text-danger"
+             data-testid="bulk-action-menu-remove-from-list-link"
+             :disabled="disabledRemoveOnList"
+             @click="onRemoveFromList">
+            <i class="fa fa-user-minus text-danger" />
+            Remove {{ contactsWord }} From List
+          </a>
+        </div>
+        <div class="items"
+             v-if="showRemoveFromPdListButton">
+          <a href=""
+             class="text-danger"
+             data-testid="bulk-action-menu-remove-from-pd-list-link"
+             :disabled="disabledRemoveOnPdList"
+             @click="onRemoveFromPdList">
+            <i class="fa fa-user-minus text-danger" />
+            Remove {{ contactsWord }} From List
+          </a>
+        </div>
+        <div class="items"
              v-if="showDeleteButton">
           <a href=""
              class="text-danger"
@@ -48,7 +70,7 @@
              :disabled="disabledDelete"
              @click="onDelete">
             <i class="fa fa-trash text-danger"/>
-            Delete
+            Delete {{ contactsWord }}
           </a>
         </div>
         <div class="items"
@@ -127,6 +149,7 @@ import {
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
+import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 
 export default {
   name: 'bulk-action-menu',
@@ -144,6 +167,16 @@ export default {
 
   props: {
     disabledDelete: {
+      type: Boolean,
+      default: false
+    },
+
+    disabledRemoveOnList: {
+      type: Boolean,
+      default: false
+    },
+
+    disabledRemoveOnPdList: {
       type: Boolean,
       default: false
     },
@@ -178,7 +211,8 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     ...mapGetters('contacts', [
-      'selectedList'
+      'selectedList',
+      'lists'
     ]),
 
     ...mapGetters('powerDialer', ['myQueue']),
@@ -191,6 +225,18 @@ export default {
       'isDatatableCountLoading',
       'isDatatableSelectedAll'
     ]),
+
+    currentList () {
+      // myQueue is available only in PD
+      if (this.isPowerDialer && this.selectedList.id === this.myQueue.id) {
+        return this.myQueue
+      }
+      return this.lists[this.selectedList.id]
+    },
+
+    contactsWord () {
+      return this.checkedCount > 1 ? 'Contacts' : 'Contact'
+    },
 
     selectedContactIds () {
       return this.selectedContacts[this.id].map(contact => contact.contact_list_item_id)
@@ -256,7 +302,26 @@ export default {
     },
 
     showDeleteButton () {
-      return !this.isAddView && ((this.hasDeletePermission && this.canDelete && !this.isSimpSocial) || this.isPowerDialer)
+      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isSimpSocial && !this.isPowerDialer
+    },
+
+    showRemoveFromListButton () {
+      // if is a default list, dont show
+      if (this.currentList.is_default) {
+        console.log('is default list')
+        return false
+      }
+
+      console.log('is not default list')
+      // if is only agent and not billing admin or admin or supervisor and list is public
+      if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
+        return false
+      }
+      return !this.isAddView && !this.isPowerDialer && this.canDelete && !this.isSimpSocial
+    },
+
+    showRemoveFromPdListButton () {
+      return this.isPowerDialer && !this.isAddView && this.canDelete && !this.isSimpSocial
     },
 
     showMoreDropdownButton () {
@@ -288,7 +353,8 @@ export default {
       'removeContactOpen',
       'createListOpen',
       'selectListOpen',
-      'setSelectedStaticList'
+      'setSelectedStaticList',
+      'setContactRemoveActionType'
     ]),
 
     ...mapActions('powerDialer', [
@@ -304,8 +370,35 @@ export default {
       }
 
       this.setBulkDelete(true)
-      this.$bvModal.show('remove-contact-dialog')
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_CONTACTS)
       this.$emit('on-delete')
+      e.preventDefault()
+    },
+
+    onRemoveFromList (e) {
+      if (this.disabledDelete) {
+        e.preventDefault()
+        return
+      }
+
+      this.setBulkDelete(true)
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.$emit('on-remove-from-list')
+      e.preventDefault()
+    },
+
+    onRemoveFromPdList (e) {
+      if (this.disabledRemoveOnPdList) {
+        e.preventDefault()
+        return
+      }
+
+      this.setBulkDelete(true)
+      this.setContactRemoveActionType(ContactListRemoveFromTypes.REMOVE_FROM_LIST_ONLY)
+      this.$bvModal.show('remove-contact-confirmation-dialog')
+      this.$emit('on-remove')
       e.preventDefault()
     },
 

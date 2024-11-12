@@ -249,12 +249,20 @@ export default _.merge({
       return this.hasRole(Roles.COMPANY_ADMIN)
     },
 
+    isBillingAdmin () {
+      return this.hasRole(Roles.BILLING_ADMIN)
+    },
+
     isSupervisor () {
       return this.hasRole(Roles.COMPANY_SUPERVISOR)
     },
 
     isAdminOrSupervisor () {
       return this.hasRole(Roles.COMPANY_ADMIN) || this.hasRole(Roles.COMPANY_SUPERVISOR)
+    },
+
+    isBillingAdminOrAdminOrSupervisor () {
+      return this.isBillingAdmin || this.isAdminOrSupervisor
     },
     /**
      * Decides if the Broadcast should be shown.

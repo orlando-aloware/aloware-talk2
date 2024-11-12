@@ -73,11 +73,11 @@ export const REJECTION_REASONS = [
     message: 'The caller account is inactive'
   },
   {
-    type: CommunicationRejectionReasons.REJECTION_REASON_NO_AUTO_DIAL_TASK_REMAINING,
+    type: CommunicationRejectionReasons.REJECTION_REASON_NO_POWER_DIALER_TASK_REMAINING,
     message: 'There were no power dialer tasks remaining to run'
   },
   {
-    type: CommunicationRejectionReasons.REJECTION_REASON_AUTO_DIAL_TASK_NOT_QUEUED,
+    type: CommunicationRejectionReasons.REJECTION_REASON_POWER_DIALER_TASK_NOT_QUEUED,
     message: 'The auto-dial task is not in the queue for this call'
   },
   {
