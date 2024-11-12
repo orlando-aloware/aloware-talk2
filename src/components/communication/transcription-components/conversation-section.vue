@@ -7,7 +7,7 @@
       <div style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px">
         <q-btn color="text-dark-greenish"
               class="btn btn-inline px-1 py-0"
-              title="Download transcription"
+              title="Download Transcription"
               flat
               rounded
               dense
@@ -21,7 +21,7 @@
         </q-btn>
         <q-btn color="text-dark-greenish"
               class="btn btn-inline px-1 py-0"
-              title="Copy transcription"
+              title="Copy Transcription"
               flat
               rounded
               dense

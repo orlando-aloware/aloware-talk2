@@ -491,7 +491,7 @@ export default {
           return null
         }
 
-        return window.axios.post(`${suffixV1}communication/${communicationId}`)
+        return window.axios.post(`${suffixV1}transcription/communication/${communicationId}`)
       },
 
       generateSummary (communicationId) {
@@ -500,7 +500,7 @@ export default {
         }
 
         return window.axios.post(
-          `${suffixV1}communication/${communicationId}/generate-summary`
+          `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )
       }
 
