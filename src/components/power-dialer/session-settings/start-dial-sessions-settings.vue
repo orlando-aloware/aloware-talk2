@@ -554,7 +554,7 @@ export default {
 
     ...mapActions([
       'setDialerCommunication',
-      'clearDialerRedialedTaskIds'
+      'clearDialerRedialedTasksCount'
     ]),
 
     ...mapMutations('powerDialer', [
@@ -811,7 +811,7 @@ export default {
         this.setDialerCommunication()
       }
 
-      this.clearDialerRedialedTaskIds()
+      this.clearDialerRedialedTasksCount()
     },
 
     getSettingsItemClass (setting) {

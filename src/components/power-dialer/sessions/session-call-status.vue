@@ -869,8 +869,13 @@ export default {
     // Should redial if force redial is set, if it has not been redialed yet
     // and if the call disposition is not a successful call disposition
     shouldRedial () {
-      // force redial disabled or task already redialed
-      if (!this.sessionSettings.force_redial || this.dialer.redialedTaskIds.includes(this.activeTask?.id)) {
+      // min_redials = 0 (redial disabled)
+      if (!this.sessionSettings.min_redials || this.sessionSettings.min_redials === 0) {
+        return false
+      }
+
+      // exceeded required min_redials attempts
+      if (this.dialer.redialedTasksCount[this.activeTask?.id] > this.sessionSettings.min_redials) {
         return false
       }
 
@@ -911,8 +916,8 @@ export default {
   methods: {
     ...mapActions([
       'setShowPhone',
-      'addDialerRedialedTaskId',
-      'clearDialerRedialedTaskIds'
+      'incrementDialerRedialedTask',
+      'clearDialerRedialedTasksCount'
     ]),
 
     ...mapActions('contacts', [
@@ -1277,7 +1282,7 @@ export default {
         }, 500)
       }
 
-      this.clearDialerRedialedTaskIds()
+      this.clearDialerRedialedTasksCount()
 
       clearInterval(this.countdownInterval)
 
@@ -1404,7 +1409,7 @@ export default {
       if (this.shouldRedial && !this.isTaskSkipped(this.activeTask?.contact_list_item_id)) {
         console.log('%c Double dial required, pushing to bottom', 'background: yellow; color: #000;')
 
-        this.addDialerRedialedTaskId(this.activeTask.id)
+        this.incrementDialerRedialedTask(this.activeTask.id)
 
         const redialNow = this.powerDialerTasks.in_queue.length === 0
         this.onRedial(redialNow, true)

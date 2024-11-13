@@ -5,7 +5,7 @@
          v-show="sessionPaused">
       Session Paused
     </div>
-    <div class="t-menu pb-2"
+    <div class="t-menu pb-4"
          v-show="!sessionPaused">
       <chips-ellipsis headerLabel="CALL DISPOSITION"
                       headerClass="t-menu__header no-border t-dense d-flex align-items-center"
@@ -38,6 +38,15 @@
                       :display-count="3"
                       :is-empty="isVoicemailEmpty"
                       @on-selected-item="onVmDrop"/>
+      <chips-ellipsis headerLabel="SEND MESSAGE"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                      ref="smsTemplatesSelector"
+                      identity="send-message"
+                      default-label="No SMS Templates"
+                      :list-items="smsTemplates"
+                      :display-count="4"
+                      :is-empty="isSmsTemplatesEmpty"
+                      @on-selected-item="onSmsTemplateSelected"/>
     </div>
   </q-card>
 </template>
@@ -70,7 +79,8 @@ export default {
   data () {
     return {
       voicemails: [],
-      loadingSendVmDrop: false
+      loadingSendVmDrop: false,
+      smsTemplates: []
     }
   },
 
@@ -106,11 +116,16 @@ export default {
 
     isVoicemailEmpty () {
       return isEmpty(this.voicemails)
+    },
+
+    isSmsTemplatesEmpty () {
+      return isEmpty(this.smsTemplates)
     }
   },
 
   created () {
     this.getVmDrops()
+    this.getSmsTemplates()
   },
 
   mounted () {
@@ -145,6 +160,12 @@ export default {
         }
 
         this.voicemails = res.data.filter(vm => this.sessionSettings.vm_drop_ids.includes(vm.id))
+      })
+    },
+
+    getSmsTemplates () {
+      API.V1.smsTemplate.get().then(res => {
+        this.smsTemplates = res.data.filter((item) => item.user_id === this.profile.id)
       })
     },
 
@@ -243,6 +264,10 @@ export default {
       if (this.isReferenceAvailable('callDispositionSelector')) {
         this.$refs.callDispositionSelector.enable()
       }
+
+      if (this.isReferenceAvailable('smsTemplatesSelector')) {
+        this.$refs.smsTemplatesSelector.enable()
+      }
     },
 
     onVmDrop (item) {
@@ -263,6 +288,11 @@ export default {
         this.$refs['vm-drop'].enable()
         this.$refs['vm-drop'].hideLoading()
       })
+    },
+
+    onSmsTemplateSelected (item) {
+      this.$refs['smsTemplatesSelector'].disable()
+      console.log('onSmsTemplateSelected', item)
     },
 
     isReferenceAvailable (referenceId) {
