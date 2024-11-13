@@ -28,16 +28,11 @@
               </div>
 
               <div class="d-flex header-btn-wrapper">
-                <b-button variant="success"
-                          size="sm"
-                          data-testid="comm-details-generate-transcription-button"
-                          class="mr-2"
-                          v-if="isTranscriptionAllowed(communication)"
-                          @click="generateTranscription(communication.id)">
-                  <sparkle-icon :width="20" :height="20" color="white" style="overflow: visible"/>
-                  Generate Transcription
-                </b-button>
-
+                <generate-transcription-button class="mr-2"
+                                               variant="button"
+                                               data-testid="comm-details-generate-transcription-button"
+                                               :communication="communication">
+                </generate-transcription-button>
                 <div class="flex items-center mr-1 h-100"
                      data-testid="comm-transcription-modal-btn"
                      v-if="!communication.transcription_is_deleted && communication.metadata?.transcription_info?.summary"
@@ -1012,7 +1007,6 @@ import {
   classicMixin,
   userMixin,
   communicationInfoMixin,
-  transcriptionMixin,
   simpsocialMixin,
   goBackMixin
 } from 'src/plugins/mixins'
@@ -1039,7 +1033,7 @@ import * as CommunicationCallbackStatus from '../constants/callback-status'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import NetworkLogsDisplay from 'components/network-logs/network-logs-display'
-import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import GenerateTranscriptionButton from 'components/generate-transcription-button'
 
 export default {
   name: 'communication-details',
@@ -1057,12 +1051,11 @@ export default {
     DownloadButton,
     TranscriptionModal,
     EntityTags,
-    SparkleIcon
+    GenerateTranscriptionButton
   },
 
   mixins: [
     communicationInfoMixin,
-    transcriptionMixin,
     classicMixin,
     userMixin,
     aclMixin,
@@ -1265,19 +1258,6 @@ export default {
 
     getClassicUrlLineActivity (campaignId) {
       return `${this.getClassicURL(this.isSimpSocial)}/lines/${campaignId}/activity`
-    },
-
-    generateTranscription (communicationId) {
-      talk2Api.V1.transcription.generateTranscription(communicationId)
-        .then(response => {
-          const message = response.data.message || 'Transcription generation started.'
-          this.$generalNotification(message, 'success')
-        })
-        .catch(error => {
-          const errorMessage = error.response?.data?.message || 'Failed to start transcription generation.'
-          console.error('Failed to generate transcription:', error)
-          this.$generalNotification(errorMessage, 'error')
-        })
     },
 
     onArchive () {

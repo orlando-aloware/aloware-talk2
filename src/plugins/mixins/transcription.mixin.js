@@ -13,7 +13,7 @@ export default {
     isTranscriptionAllowed (communication) {
       return this.isTranscriptionEnabled &&
              communication.type === CommunicationTypes.CALL &&
-             // this.showAudio(communication) &&
+             this.showAudio(communication) &&
              !communication.metadata?.transcription_info
     },
     isTranscriptionEnabled () {
