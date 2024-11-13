@@ -27,7 +27,7 @@
       >
         <span>
           + {{ extraEnrolledBotsCount }}
-          bot<span v-if="extraEnrolledBotsCount > 1">(s)</span>
+          bot<span v-if="extraEnrolledBotsCount > 1">s</span>
         </span>
       </q-badge>
     </b-card-text>

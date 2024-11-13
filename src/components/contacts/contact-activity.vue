@@ -452,7 +452,10 @@ export default {
         'cnam_country',
         'cnam_state',
         'cnam_city',
-        'custom_log'
+        'custom_log',
+        'aloai_text_bot_enrollment',
+        'aloai_text_bot_disengagement',
+        'aloai_text_bot_reengagement'
       ],
       custom_audit_messages: {
         'is_dnc': [
