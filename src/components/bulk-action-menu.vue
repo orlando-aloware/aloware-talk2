@@ -166,6 +166,11 @@ export default {
   components: { PowerDialerMobileIcon, AddUserIcon },
 
   props: {
+    id: {
+      type: [Number, String],
+      required: true
+    },
+
     disabledDelete: {
       type: Boolean,
       default: false
@@ -239,6 +244,7 @@ export default {
     },
 
     selectedContactIds () {
+      console.log(this)
       return this.selectedContacts[this.id].map(contact => contact.contact_list_item_id)
     },
 
