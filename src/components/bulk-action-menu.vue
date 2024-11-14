@@ -312,12 +312,12 @@ export default {
     },
 
     showRemoveFromListButton () {
-      // if is a default list, dont show
-      if (this.currentList.is_default) {
+      if (this.isAddView || this.isPowerDialer || this.isSimpSocial) {
         return false
       }
 
-      if (this.lists[this.id]?.type === ContactListTypes.DYNAMIC) {
+      // if is a default list, dont show
+      if (this.currentList && this.currentList.is_default) {
         return false
       }
 
@@ -326,7 +326,7 @@ export default {
         return false
       }
 
-      return !this.isAddView && !this.isPowerDialer && this.canDelete && !this.isSimpSocial
+      return !this.canDelete
     },
 
     showRemoveFromPdListButton () {
