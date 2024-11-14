@@ -331,7 +331,7 @@ export default {
         return false
       }
 
-      return !this.canDelete
+      return true
     },
 
     showRemoveFromPdListButton () {
