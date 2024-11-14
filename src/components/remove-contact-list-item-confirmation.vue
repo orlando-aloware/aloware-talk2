@@ -1,6 +1,6 @@
 <template>
   <confirm-dialog :id="dialogId"
-                  :title='`Are you sure you want to remove ${this.contact.name} from "${list.name}" list?`'
+                  title='Remove Contact From List Confirmation'
                   :is-busy="isBusy"
                   @close="onClose"
                   @hide="onHide"
@@ -8,12 +8,7 @@
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          Type "{{ confirmationInputString }}" here to confirm
-          <input ref="confirmationInput"
-                 class="form-control form-control-search my-2"
-                 type="text"
-                 :placeholder="confirmationInputString"
-                 v-model="typedConfirmationInputString" />
+          {{`Are you sure you want to remove ${this.contact.name} from "${list.name}" list?`}}
         </div>
       </div>
     </div>
@@ -27,7 +22,7 @@
           Cancel
         </button>
         <button class="btn btn-sm btn-danger mr-2"
-                :disabled="(confirmationInputString !== typedConfirmationInputString) || isBusy"
+                :disabled="isBusy"
                 @click="onConfirm">
           <b-spinner variant="warning"
                      type="grow"
@@ -35,7 +30,7 @@
                      small
                      v-if="isBusy">
           </b-spinner>
-          {{ confirmationInputString }}
+          Remove
         </button>
       </div>
     </div>
@@ -67,40 +62,29 @@ export default {
     }
   },
 
-  computed: {
-    confirmationInputString () {
-      return 'Remove'
-    }
-  },
-
   data () {
     return {
       isBusy: false,
       contactsToDelete: null,
-      typedConfirmationInputString: '',
       STATIC
     }
   },
 
   methods: {
     onCancel () {
-      this.typedConfirmationInputString = ''
       this.$bvModal.hide(this.dialogId)
     },
 
     onHide () {
-      this.typedConfirmationInputString = ''
       this.$bvModal.hide(this.dialogId)
     },
 
     onShown () {
-      this.typedConfirmationInputString = ''
       this.busy = false
       this.$refs.confirmationInput.focus()
     },
 
     onClose () {
-      this.typedConfirmationInputString = ''
     },
 
     handleDeletion () {
