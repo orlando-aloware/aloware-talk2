@@ -150,6 +150,7 @@ import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
 import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
   name: 'bulk-action-menu',
@@ -166,6 +167,11 @@ export default {
   components: { PowerDialerMobileIcon, AddUserIcon },
 
   props: {
+    id: {
+      type: [Number, String],
+      required: true
+    },
+
     disabledDelete: {
       type: Boolean,
       default: false
@@ -315,12 +321,17 @@ export default {
         return false
       }
 
+      // hide for dynamic lists
+      if (this.lists[this.id]?.type === ContactListTypes.DYNAMIC) {
+        return false
+      }
+
       // if is only agent and not billing admin or admin or supervisor and list is public
       if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
         return false
       }
 
-      return !this.canDelete
+      return this.canDelete
     },
 
     showRemoveFromPdListButton () {
