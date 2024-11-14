@@ -47,7 +47,7 @@
              data-testid="bulk-action-menu-remove-from-list-link"
              :disabled="disabledRemoveOnList"
              @click="onRemoveFromList">
-            <i class="fa fa-ban text-danger" />
+            <i class="fa fa-user-minus text-danger" />
             Remove {{ contactsWord }} From List
           </a>
         </div>
@@ -58,7 +58,7 @@
              data-testid="bulk-action-menu-remove-from-pd-list-link"
              :disabled="disabledRemoveOnPdList"
              @click="onRemoveFromPdList">
-            <i class="fa fa-ban text-danger" />
+            <i class="fa fa-user-minus text-danger" />
             Remove {{ contactsWord }} From List
           </a>
         </div>
@@ -144,8 +144,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
 import {
   aclMixin,
-  simpsocialMixin,
-  viewMixin
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
@@ -161,8 +160,7 @@ export default {
 
   mixins: [
     aclMixin,
-    simpsocialMixin,
-    viewMixin
+    simpsocialMixin
   ],
 
   components: { PowerDialerMobileIcon, AddUserIcon },
@@ -181,6 +179,11 @@ export default {
     disabledRemoveOnPdList: {
       type: Boolean,
       default: false
+    },
+
+    totalRows: {
+      type: Number,
+      default: 0
     },
 
     isLoading: {
@@ -205,6 +208,8 @@ export default {
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
+
     ...mapGetters('contacts', [
       'selectedList',
       'lists'
@@ -301,8 +306,12 @@ export default {
     },
 
     showRemoveFromListButton () {
+      if (this.isAddView || this.isPowerDialer || this.isSimpSocial) {
+        return false
+      }
+
       // if is a default list, dont show
-      if (this.currentList.is_default) {
+      if (this.currentList && this.currentList.is_default) {
         return false
       }
 
@@ -310,7 +319,8 @@ export default {
       if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
         return false
       }
-      return !this.isAddView && !this.isPowerDialer && this.canDelete && !this.isSimpSocial
+
+      return !this.canDelete
     },
 
     showRemoveFromPdListButton () {

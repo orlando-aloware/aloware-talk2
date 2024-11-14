@@ -696,7 +696,9 @@ export default {
           window.VueEvent.fire('contact_list_import_failed', event)
         })
         .listen('.contact-list.created', (event) => {
-          window.VueEvent.fire('contact_list_created', event)
+          if (this.profile && event.user_id && event.user_id === this.profile.id) {
+            window.VueEvent.fire('contact_list_created', event)
+          }
         })
         .listen('.broadcasts.created', (event) => {
           window.VueEvent.fire('broadcasts_created', event.broadcaster)
@@ -723,9 +725,10 @@ export default {
           }
         })
 
-      window.Echo.private('cache-agent-status-' + this.profile.company_id)
+      window.Echo.private('cache-agent-status-user-' + userId)
         .listen('.agent_status.updated', (event) => {
-          if (!this.profile || !event.user_id) {
+          // make sure this occurs only for the logged user
+          if (!this.profile || !event.user_id || this.profile.id !== event.user_id) {
             return
           }
           this.$VueEvent.fire('agent_status_updated', event)

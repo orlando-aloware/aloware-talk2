@@ -2583,6 +2583,22 @@ i.option-separator {
     font-size: 20px;
   }
 
+  .hubspot-card {
+    .hubspot-icon {
+      font-size: 24px;
+      border-radius: 7px;
+      background: #FF7A59;
+      color: #FFFFFF;
+      border: 5px solid #FF7A59;
+      margin-right: 10px;
+    }
+    .integration-title {
+      font-size: 18px;
+      position: relative;
+      top: -3px;
+    }
+  }
+
   .pipedrive-btn {
     content: url(/integrations/pipedrive-icon.svg);
     margin-right: 20px;
@@ -7996,6 +8012,27 @@ button.grey-90 {
 }
 
 .general-notification {
+  position: relative;
+
+  .q-notification__wrapper {
+    display: contents;
+  }
+
+  .download-button {
+    margin-top: 2px;
+  }
+
+  .close-button {
+    background: transparent;
+    border: none;
+
+    .q-btn__content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
   &.bg-green-10 {
     border: 1px solid $green-90;
   }
@@ -12408,13 +12445,13 @@ h1.contact-list-name-label {
 
         .dhx_event_move.dhx_title {
           padding: 0;
+          display: none;
         }
 
         .dhx_cal_event .dhx_body,
         .dhx_cal_event.dhx_cal_select_menu .dhx_body {
           padding: 0;
-          line-height: 19px !important;
-          height: 19px !important;
+          height: fit-content !important;
         }
 
         .dhx_event_resize.dhx_footer {
@@ -12501,6 +12538,7 @@ h1.contact-list-name-label {
           display: flex !important;
           align-items: flex-start;
           justify-content: center;
+          font-weight: 400 !important;
         }
 
         .dhx_cal_today_button.dhx_cal_nav_button,
@@ -12529,6 +12567,30 @@ h1.contact-list-name-label {
           display: flex;
           align-items: center;
           justify-content: center;
+        }
+
+        .time-column {
+          width: 50%;
+          text-align: center;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+
+        .current-time {
+          border-right: 1px solid #dcdfe6;
+        }
+
+        .event-content {
+          .event-time {
+            font-size: 10px;
+          }
+
+          .event-text {
+            font-size: 12px;
+            font-weight: 700;
+          }
         }
       }
 
@@ -12560,8 +12622,9 @@ h1.contact-list-name-label {
         width: 100%;
         cursor: pointer;
 
-        &:hover {
-          text-decoration: underline;
+        &.header-row {
+          font-weight: bold;
+          text-align: center;
         }
       }
     }
@@ -14192,6 +14255,65 @@ h1.contact-list-name-label {
   }
 }
 
+.steps-wrapper-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__step {
+    color: $grey-90;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    font-weight: bold;
+    flex: 1;
+    text-align: center;
+
+    &::after {
+      content: '';
+      position: absolute;
+      background-color: $grey-70;
+      height: 2px;
+      width: calc(100% - 4em);
+      top: 20%;
+      left: 50%;
+      margin-left: 2em;
+      transform: translateX(0%);
+    }
+
+    &:last-of-type::after {
+      display: none;
+    }
+
+    &__icon {
+      border: solid 1px $grey-70;
+      border-radius: 50%;
+      height: 26px;
+      width: 26px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 8px;
+      z-index: 1;
+    }
+
+    &--active .steps-wrapper-horizontal__step__icon {
+      background-color: $success;
+      color: $white;
+    }
+
+    &--completed .steps-wrapper-horizontal__step__icon {
+      background-color: $success;
+      color: $white;
+    }
+
+    &--completed::after {
+      background-color: $success;
+    }
+  }
+}
+
 .activity-graph {
   &__header {
     display: flex;
@@ -15445,9 +15567,25 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 }
 
 .limit-characters-error {
-  color: black;
-  font-size: 13px;
-  margin-bottom: 10px;
+  top: 100%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  margin-top: -8px;
+  margin-bottom: 2px;
+}
+
+.search-error-icon {
+  color: red;
+  display: inline-block;
+  transform: scale(1.5);
+  vertical-align: middle;
+}
+
+.search-error-text {
+  position: relative;
+  top: 2px;
+  font-size: 80%;
 }
 
 .form-control-search-component.is-invalid {
@@ -15487,6 +15625,21 @@ hr {
   margin-bottom: 0.75rem;
 }
 
+
+.external-contact-hubspot-link-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.duplicateContactPhoneNumberMessage {
+  color: $grey-90;
+}
+
+.hubspot-jit-card-header {
+  margin: 12px;
+}
+
 .bulk-action-menu-dropdown {
   font-size: .75rem;
 
@@ -15500,3 +15653,67 @@ hr {
   border: 1px solid transparent;
   font-size: 0.75rem;
 }
+
+.calendar-event-list {
+  &-modal-title {
+    font-size: .875rem;
+    font-weight: 500;
+  }
+
+  &-modal {
+    .q-dialog__inner--minimized > div {
+      max-width: 660px !important;
+    }
+  }
+}
+
+.external-contact-hubspot-link-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.duplicateContactPhoneNumberMessage {
+  color: $grey-90;
+}
+
+.hubspot-jit-card-header {
+  margin: 12px;
+}
+
+.preview-card-box {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 2em;
+  max-width: 325px;
+}
+
+.preview-card-box .preview-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+}
+
+.preview-card-box .icon-circle {
+  background-color: #007bff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.preview-card-box .icon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9em;
+}
+

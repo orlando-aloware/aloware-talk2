@@ -532,7 +532,14 @@
           </div>
           <div class="text-center py-3">
             <div class="text-dark">
-              <div v-html="`Do you want to remove the contact: ${fullname}?`"></div>
+              <div>Do you want to remove the contact</div>
+                <strong v-if="fullname === 'No Name'">
+                  <span v-html="`${fullname}`"></span>
+                  {{ selectedItem.phone_number | fixPhone('NATIONAL', true, false, true) }}
+                </strong>
+                <strong v-else>
+                  <span v-html="`${fullname}`"></span>
+                </strong>?
             </div>
           </div>
           <div class="row text-center pt-3 pb-0">
@@ -841,6 +848,10 @@ export default {
     fullname () {
       if (!this.selectedItem) {
         return ''
+      }
+
+      if (!this.selectedItem.first_name && !this.selectedItem.last_name) {
+        return `No Name`
       }
 
       return `${this.selectedItem.first_name} ${this.selectedItem.last_name}`
@@ -1246,12 +1257,59 @@ export default {
      * Notifies summary of contacts added to PD list
      */
     checkTaskAddedNotification () {
-      const notification = this.bulkAddNotifications(this.$route.params.id)
-      this.bulkAddStatusReport = notification?.status_report
+      const notifications = this.bulkAddNotifications(this.selectedListId)
+      // Verify if notifications is not an array and set the status report
+      if (!Array.isArray(notifications)) {
+        this.bulkAddStatusReport = notifications?.status_report
+        return
+      }
+
+      // notifications is an array and will receive the status report in batches
+      // get the identifier of the first notification
+      const identifier = notifications[0]?.status_report?.identifier
+      const batchSize = notifications[0]?.status_report?.batch_size ?? 1
+      // get the batches of notifications with the same identifier
+      const batches = notifications.filter(notification => notification.status_report.identifier === identifier)
+      // process the batches to get the total values for status report
+      const statusReport = batches.reduce((acc, notification) => {
+        const currentFail = notification.status_report.fail
+
+        // Sum the fail values according to the keys
+        for (const [key, value] of Object.entries(currentFail)) {
+          acc.fail[key] = (acc.fail[key] || 0) + value
+        }
+
+        return {
+          info: {
+            selected: acc.info.selected + notification.status_report.info.selected
+          },
+          success: {
+            total: acc.success.total + notification.status_report.success.total
+          },
+          fail: acc.fail
+        }
+      }, {
+        identifier: identifier,
+        batch_number: notifications[0]?.status_report?.batch_number,
+        info: {
+          selected: 0
+        },
+        success: {
+          total: 0
+        },
+        fail: {}
+      })
+
+      // Set the status report to the component if is the last batch
+      if (batchSize > 1 && batchSize === batches.length) {
+        this.bulkAddStatusReport = statusReport
+      } else if (batchSize === 1) {
+        this.bulkAddStatusReport = statusReport
+      }
     },
 
     onTaskAddedNotificationClose () {
-      this.clearBulkActionNotification(this.$route.params.id)
+      this.clearBulkActionNotification(this.selectedListId)
       this.bulkAddStatusReport = {}
     }
   },

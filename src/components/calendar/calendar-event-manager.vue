@@ -3,6 +3,7 @@
            size="lg"
            body-class="p-0"
            no-close-on-backdrop
+           no-close-on-esc
            :scrollable="!loading"
            :hide-footer="loading"
            :visible="showManager"
@@ -168,6 +169,11 @@
             <timezone-selector v-model="$v.schedule.timezone.$model"
                                @select="timezoneSelected">
             </timezone-selector>
+
+            <div class="alert alert-warning px-2 py-1 mt-1 small"
+                 v-if="scheduleDateInCurrentTimezone && isEventTypeSelected && isContactSelected">
+              <strong>In your local time:</strong> {{ scheduleDateInCurrentTimezone }}
+            </div>
           </b-form-group>
         </b-col>
       </b-row>
@@ -316,7 +322,14 @@ import PredefinedTimeSelector from 'components/predefined-time-selector'
 import TimezoneSelector from 'components/timezone-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
 import moment from 'moment'
+import { getDateInBrowserTimeZone } from 'src/utils'
 require('vue-multiselect/dist/vue-multiselect.min.css')
+
+const DATE_FORMAT = 'MM/DD/YYYY'
+const HOUR_FORMAT = 'HH:mm'
+
+const DEFAULT_HOUR = '06:00'
+const DEFAULT_HOUR_REMINDER = '10:00'
 
 export default {
   name: 'calendar-event-manager',
@@ -402,8 +415,8 @@ export default {
         is_past: true,
         text: '',
         timezone: this.profile?.timezone,
-        date: moment().format('MM/DD/YYYY'),
-        time: '06:00',
+        date: moment().format(DATE_FORMAT),
+        time: DEFAULT_HOUR,
         type: null
       },
       originalSchedule: {},
@@ -416,7 +429,7 @@ export default {
         body: '',
         campaign_id: null,
         frequencies: ['1'],
-        time: '10:00'
+        time: DEFAULT_HOUR_REMINDER
       },
       title: 'Add Event',
       confirmDialogParams: {
@@ -427,6 +440,8 @@ export default {
         okVariant: 'primary',
         headerClass: 'p-2 border-bottom-0',
         footerClass: 'p-2 border-top-0',
+        noCloseOnBackdrop: true,
+        noCloseOnEsc: true,
         centered: true
       },
       isSubmitted: false,
@@ -514,6 +529,26 @@ export default {
 
     headerCircleClass () {
       return 'event-color-type-' + this.schedule.type + ' status-' + this.schedule.status + ' ' + (this.schedule.is_past ? 'is_past' : '')
+    },
+
+    scheduleDateInCurrentTimezone () {
+      if (!this.schedule.date || !this.schedule.time) {
+        return ''
+      }
+
+      const dateTimeInBrowserTimeZone = getDateInBrowserTimeZone(moment.tz(`${this.schedule.date} ${this.schedule.time}`, `${DATE_FORMAT} ${HOUR_FORMAT}`, this.schedule.timezone))
+
+      return this.schedule.date !== dateTimeInBrowserTimeZone.format(DATE_FORMAT) || this.schedule.time !== dateTimeInBrowserTimeZone.format(HOUR_FORMAT)
+        ? dateTimeInBrowserTimeZone.format('LLL')
+        : ''
+    },
+
+    isEventTypeSelected () {
+      return this.schedule.type
+    },
+
+    isContactSelected () {
+      return this.schedule.contact?.id
     }
   },
 
@@ -537,13 +572,13 @@ export default {
     editSchedule (sched) {
       this.loading = true
       this.isSubmitted = false
-      let date = moment(sched.start_date)
+      let date = moment(sched.start_date_original)
 
       this.originalSchedule = {
         id: sched.id,
         type: sched.type,
-        date: date.format('MM/DD/YYYY'),
-        time: date.format('HH:mm'),
+        date: date.format(DATE_FORMAT),
+        time: date.format(HOUR_FORMAT),
         duration: sched.duration,
         contact: sched.contact,
         user: sched.user,
@@ -588,7 +623,7 @@ export default {
       this.originalSchedule = {
         id: null,
         type: type,
-        date: d.format('MM/DD/YYYY'),
+        date: d.format(DATE_FORMAT),
         time: '06:00',
         duration: 15,
         contact: contact,
@@ -833,7 +868,7 @@ export default {
     },
 
     dateSelected (value) {
-      this.schedule.date = value ? moment(value).format('MM/DD/YYYY') : null
+      this.schedule.date = value ? moment(value).format(DATE_FORMAT) : null
     },
 
     timeSelected (time) {

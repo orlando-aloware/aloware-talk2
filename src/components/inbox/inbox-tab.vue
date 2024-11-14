@@ -284,6 +284,8 @@ export default {
       'isMobile'
     ]),
 
+    ...mapState('cache', ['currentCompany']),
+
     ...mapState('inbox', [
       'taskCounts',
       'liveContacts',
@@ -571,8 +573,11 @@ export default {
         this.fetchTaskCounts()
       }
 
-      const filteredContacts = this.contacts.filter(item => item.id !== contact.id)
-      await this.setContacts(filteredContacts)
+      // It only makes sense to remove a Contact from the current inbox list if the account is enabled to control task statuses and the current status view is not ALL
+      // Example: the user is looking at the Open tasks and sends a message to an Open Contact. This Contact Task will now move to the Pending status, so it should be removed from the current view, because it's going to show on the Pending view.
+      if (this.currentCompany?.contact_status_control_enabled && this.currentTask !== InboxTaskStatus.STATUS_ALL) {
+        await this.setContacts(this.contacts.filter(item => item.id !== contact.id))
+      }
 
       if (typeof callback !== 'undefined') {
         callback()

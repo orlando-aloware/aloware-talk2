@@ -45,7 +45,8 @@ export const DEFAULT_STATE = {
     my_contact: 0,
     contact_owner: [],
     creator_type: null,
-    dynamic_engagement_date_range: 0
+    dynamic_engagement_date_range: 0,
+    has_international: 0
   }
 }
 
@@ -72,5 +73,6 @@ export const EXCERPT = {
   my_contact: DEFAULT_STATE.filter.my_contact,
   creator_type: DEFAULT_STATE.filter.creator_type,
   dynamic_engagement_date_range: DEFAULT_STATE.filter.dynamic_engagement_date_range,
-  has_unread: DEFAULT_STATE.filter.has_unread
+  has_unread: DEFAULT_STATE.filter.has_unread,
+  has_international: DEFAULT_STATE.filter.has_international
 }

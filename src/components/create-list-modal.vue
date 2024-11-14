@@ -158,6 +158,11 @@ export default {
     }
   },
 
+  mounted () {
+    this.loadFolders()
+    this.loadPublicLists()
+  },
+
   computed: {
     ...mapGetters('contacts', [
       'createList',
@@ -184,7 +189,7 @@ export default {
     },
 
     userCanAddPublicList () {
-      return this.isBillingAdminOrAdminOrSupervisor
+      return !this.isPowerDialer && this.isBillingAdminOrAdminOrSupervisor
     },
 
     isNameValid () {

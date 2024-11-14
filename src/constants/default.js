@@ -233,7 +233,6 @@ export const DEFAULT_STATE = {
   isWhiteLabel: false,
   isDatatableSelectedAll: false,
   isDatatableCountLoading: false,
-  hubspotPhoneNumber: null,
   isRedirectedToHubspotWidget: false,
   showAccountSelector: false,
   showAccountSelectorFullscreen: false,

@@ -55,7 +55,7 @@
       <hr v-if="existingContactsBeforeImport"/>
       <p class="font-weight-bold"
          v-if="existingContactsBeforeImport">
-        {{ addedFromContact + existingContactsBeforeImport }} Total {{ fixMessage('task(s)', addedFromContact + existingContactsBeforeImport) }} in queue
+        {{ addedFromContact + existingContactsBeforeImport }} Total {{ fixMessage('task(s)', addedFromContact + existingContactsBeforeImport) }}, in the Power Dialer list
       </p>
     </div>
     <template slot="modal-footer">

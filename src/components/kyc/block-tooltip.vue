@@ -127,9 +127,6 @@ export default {
         case 'broadcasts':
           text = 'broadcasts'
           break
-        case 'alohabot':
-          text = 'alohabot'
-          break
         case 'sequences':
           text = 'sequences'
           break

@@ -208,6 +208,10 @@ export default {
           return 'Line was proxied.'
         case CommunicationRejectionReasons.REJECTION_REASON_CONTACT_DNC:
           return 'Contact was DNC.'
+        case CommunicationRejectionReasons.REJECTION_REASON_PHONE_NUMBER_OPTED_OUT:
+          return 'Contact was opted out from receiving messages.'
+        case CommunicationRejectionReasons.REJECTION_REASON_CONTACT_IS_NOT_TCPA_APPROVED:
+          return 'Contact was non-TCPA Approved.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DISABLED:
           return 'Company was not enabled.'
         case CommunicationRejectionReasons.REJECTION_REASON_MESSAGE_EMPTY:
@@ -224,9 +228,9 @@ export default {
           return 'Received a call from a user without the permission to make an outbound call.'
         case CommunicationRejectionReasons.REJECTION_REASON_USER_NOT_ACTIVE:
           return 'Received a call from a paused user.'
-        case CommunicationRejectionReasons.REJECTION_REASON_NO_AUTO_DIAL_TASK_REMAINING:
+        case CommunicationRejectionReasons.REJECTION_REASON_NO_POWER_DIALER_TASK_REMAINING:
           return 'There were no power dialer tasks remaining to run.'
-        case CommunicationRejectionReasons.REJECTION_REASON_AUTO_DIAL_TASK_NOT_QUEUED:
+        case CommunicationRejectionReasons.REJECTION_REASON_POWER_DIALER_TASK_NOT_QUEUED:
           return 'Tried to run a power dialer task that is not queued.'
         case CommunicationRejectionReasons.REJECTION_REASON_CAMPAIGN_NOT_FOUND:
           return 'Couldn\'t find an outbound line for this call.'
