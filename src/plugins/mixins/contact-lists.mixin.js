@@ -121,7 +121,7 @@ export default {
         return response.data.data
       }).catch((err) => {
         console.error(err)
-        this.$generalNotification('Unable to load public lists please try again.', 'error')
+        this.$generalNotification('Unable to load contact lists please try again.', 'error')
       })
     },
 
@@ -130,7 +130,7 @@ export default {
         return response.data.data
       }).catch((err) => {
         console.error(err)
-        this.$generalNotification('Unable to load public lists please try again.', 'error')
+        this.$generalNotification('Unable to load public contact lists please try again.', 'error')
       })
     },
 

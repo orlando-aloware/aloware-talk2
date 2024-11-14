@@ -160,7 +160,16 @@
         </q-select>
         <div class="d-flex justify-content-between">
           <b-button type="button" size="sm" variant="light" @click="cancelAddToList">Cancel</b-button>
-          <b-button type="button" size="sm" variant="primary" @click="addContactListItems">Save</b-button>
+          <b-button type="button" size="sm"  variant="primary" @click="addContactListItems" :disabled="isAdding">
+            <span> Save </span>
+            <b-spinner
+            class="pull-right self-center custom-link text-decoration-none"
+            variant="warning"
+            type="grow"
+            label="Removing contact from list"
+            v-if="isAdding"
+            small>
+          </b-spinner></b-button>
         </div>
       </div>
     </div>
@@ -296,7 +305,6 @@ export default {
       if (this.isPublicListsCard) {
         return this.isBillingAdminOrAdminOrSupervisor
       }
-
       if (list.contact_folder_created_by === this.profile.id) {
         return true
       }
