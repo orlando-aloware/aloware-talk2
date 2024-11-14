@@ -860,18 +860,10 @@ export default {
             }
             isValidFilter = !filters.some(filter => filtersNotAllowed.includes(filter.operator))
           }
-          const maxValidHours = 12
           let isValidTime = false
           if ([DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN].includes(this.filterOperator) && this.filter.operators && this.hasSecondaryOperator) {
-            const timeValues = this.filter.operators.find(operator => operator.value === this.filterOperator).options
-
-            const timeSelected = timeValues.find(time => time.value === this.secondaryFilterOperatorValue)
-
             isValidTime = !isNaN(Number(this.filterOperatorValue)) &&
               this.filterOperatorValue > 0 &&
-              (timeSelected?.label === 'Days' ||
-              (timeSelected?.label === 'Hours' &&
-              this.filterOperatorValue <= maxValidHours)) &&
               isValidFilter
           } else {
             isValidTime = [DateTimeFilter.OPERATOR_IS_KNOWN, DateTimeFilter.OPERATOR_IS_UNKNOWN].includes(this.filterOperator) &&
