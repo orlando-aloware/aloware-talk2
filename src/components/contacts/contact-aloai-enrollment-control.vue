@@ -10,26 +10,50 @@
       v-if="isEnrolledToABot"
       class="fs-14 mt-2"
     >
-      Currently enrolled to:
-      <br />
-      <!-- Bot Use Case Label -->
-      <q-badge
-        :color="useCaseColor(firstEnrolledBot?.use_case)"
-        class="mr-1"
-      >
-        <span>{{ formatUseCase(firstEnrolledBot?.use_case) }}</span>
-      </q-badge>
-      <b>{{ firstEnrolledBot?.name }}</b>
-      <br />
+      <b-media data-testid="contact-sequence-media">
+        <template #aside>
+          <aloai-icon
+            class="mr-1"
+            height="38"
+            width="38"
+          />
+        </template>
+
+        <h5 class="mt-0">{{ firstEnrolledBot?.name }}</h5>
+        <p class="mb-0 text-muted fs-13 mt-1">
+          <q-badge
+            :color="useCaseColor(firstEnrolledBot?.use_case)"
+            class="mr-1"
+          >
+            <span>{{ formatUseCase(firstEnrolledBot?.use_case) }}</span>
+          </q-badge>
+        </p>
+      </b-media>
       <q-badge
         v-if="isEnrolledToMultipleBots"
         color="grey"
       >
         <span>
-          + {{ extraEnrolledBotsCount }}
+          +{{ extraEnrolledBotsCount }}
           bot<span v-if="extraEnrolledBotsCount > 1">s</span>
         </span>
       </q-badge>
+      <b-button
+        class="mt-2"
+        variant="outline-danger"
+        size="sm"
+        block
+        data-testid="disenroll-contact-button"
+        @click="openDisenrollmentConfirmation"
+      >
+        <i class="fa fa-trash"></i> Disenroll from bot
+      </b-button>
+    </b-card-text>
+    <b-card-text
+      v-else
+      class="fs-14 mt-2"
+    >
+      This contact is currently not enrolled to a bot.
     </b-card-text>
 
     <div id="engage-control-popover">
@@ -127,6 +151,46 @@ export default {
       if (this.$refs.aloaiEnrollmentControlModalRef) {
         this.$refs.aloaiEnrollmentControlModalRef.isOpen = true
       }
+    },
+    openDisenrollmentConfirmation () {
+      this.$bvModal.msgBoxConfirm('Disenrolling this contact will . Continue?', {
+        title: 'Warning',
+        size: 'sm',
+        buttonSize: 'sm',
+        okVariant: 'warning',
+        okTitle: 'Yes',
+        cancelTitle: 'No',
+        footerClass: 'p-2',
+        hideHeaderClose: false,
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          this.disenrollContact()
+        }
+      }).catch(() => {
+        // Do nothing
+      })
+    },
+    disenrollContact () {
+      talk2Api.V2.aloAiBot
+        .disenrollContact(this.firstEnrolledBot.id, { contact_ids: [this.contact.id] })
+        .then(() => {
+          this.$generalNotification(
+            'Contact successfully disenrolled from the selected AloAi Text Bot.'
+          )
+          this.onHidden()
+        })
+        .catch((error) => {
+          let errorMsg = 'Error while enrolling contact to AloAi Text Bot.'
+          if (error?.response.data?.message) {
+            errorMsg = error.response.data.message
+          }
+
+          this.$generalNotification(errorMsg, 'error')
+          console.error('[submitEnrollment] error', error)
+        })
+        .finally(() => {
+        })
     },
     async fetchBots () {
       try {

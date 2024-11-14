@@ -883,6 +883,9 @@ export default {
       },
       enrollContacts (botId, params) {
         return window.axios.post(`${suffixV1}aloai/${botId}/enroll-contacts`, params)
+      },
+      disenrollContact (botId, params) {
+        return window.axios.post(`${suffixV1}aloai/${botId}/disenroll-contacts`, params)
       }
     }
   }

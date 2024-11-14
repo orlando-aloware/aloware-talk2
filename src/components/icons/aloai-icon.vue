@@ -1,7 +1,7 @@
 <template>
   <!-- Generator: Adobe Illustrator 27.2.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
   <svg version="1.1" id="svg3231" xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="22px" height="22px"
+    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" :width="width" :height="height"
     viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve">
   <g id="g3237" transform="matrix(1.3333333,0,0,-1.3333333,0,682.66667)">
     <g id="g3239">

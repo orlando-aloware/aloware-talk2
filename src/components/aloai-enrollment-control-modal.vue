@@ -164,12 +164,12 @@ export default {
         .enrollContacts(this.selectedBotId, { contact_ids: [this.contact.id] })
         .then(() => {
           this.$generalNotification(
-            'Contact successfully enrolled to the selected AloAi Bot.'
+            'Contact successfully enrolled to the selected AloAi Text Bot.'
           )
           this.onHidden()
         })
         .catch((error) => {
-          let errorMsg = 'Error while enrolling contact to AloAi Bot.'
+          let errorMsg = 'Error while enrolling contact to AloAi Text Bot.'
           if (error?.response.data?.message) {
             errorMsg = error.response.data.message
           }
