@@ -150,6 +150,7 @@ import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
 import * as ContactListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
   name: 'bulk-action-menu',
@@ -317,7 +318,9 @@ export default {
       if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
         return false
       }
-      return !this.isAddView && !this.isPowerDialer && this.canDelete && !this.isSimpSocial
+      return !this.isAddView && !this.isPowerDialer && this.canDelete && !this.isSimpSocial &&
+        // do not allow to delete from dynamic remote list
+        this.currentList?.type !== ContactListTypes.DYNAMIC_REMOTE_LIST
     },
 
     showRemoveFromPdListButton () {
