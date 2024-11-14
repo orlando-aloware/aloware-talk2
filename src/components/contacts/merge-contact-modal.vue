@@ -232,7 +232,6 @@ export default {
       if (!this.searchQuery) {
         this.searchQuery = ''
       }
-      this.searchQuery = this.searchQuery.trim()
       this.fetchContact(this.searchQuery)
     }, 500),
 
