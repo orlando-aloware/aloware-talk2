@@ -306,18 +306,21 @@ export default {
     },
 
     showRemoveFromListButton () {
-      // if is a default list, dont show
-      if (this.currentList.is_default) {
-        console.log('is default list')
+      if (this.isAddView || this.isPowerDialer || this.isSimpSocial) {
         return false
       }
 
-      console.log('is not default list')
+      // if is a default list, dont show
+      if (this.currentList && this.currentList.is_default) {
+        return false
+      }
+
       // if is only agent and not billing admin or admin or supervisor and list is public
       if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
         return false
       }
-      return !this.isAddView && !this.isPowerDialer && this.canDelete && !this.isSimpSocial
+
+      return !this.canDelete
     },
 
     showRemoveFromPdListButton () {
