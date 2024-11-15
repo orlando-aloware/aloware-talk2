@@ -232,7 +232,6 @@ export default {
       if (!this.searchQuery) {
         this.searchQuery = ''
       }
-      this.searchQuery = this.searchQuery.trim()
       this.fetchContact(this.searchQuery)
     }, 500),
 
@@ -250,7 +249,11 @@ export default {
 
     selectContact (contact) {
       this.selectedContact = contact
-      this.searchQuery = contact.name
+
+      this.searchQuery = contact.name === ''
+        ? this.getFormattedContactName(contact)
+        : this.$options.filters.fixContactName(contact.name)
+
       this.showMenu = false
     },
 

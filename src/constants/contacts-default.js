@@ -150,7 +150,8 @@ export const DEFAULT_STATE = {
     type: 1,
     open: false,
     contact_folder_id: null,
-    filters: []
+    filters: [],
+    show_in_public_folder: false
   },
   selectList: {
     contact_list_id: null,

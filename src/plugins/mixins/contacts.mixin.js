@@ -1251,9 +1251,7 @@ export default {
 
     backendTablesDictionary () {
       return {
-        'inbound_calls_count': 'inbound_call_count',
         'inbound_texts_count': 'inbound_sms_count',
-        'outbound_calls_count': 'outbound_call_count',
         'outbound_texts_count': 'outbound_sms_count'
       }
     },
