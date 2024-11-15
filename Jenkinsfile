@@ -24,7 +24,7 @@ pipeline {
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
-        API_URL_OVERWRITE = 'https://pr-10785.mde.alodev.org'
+        API_URL_OVERWRITE = ''
     }
 
     stages {
@@ -81,7 +81,7 @@ pipeline {
                             steps {
                                 script {
                                     //String text
-                                    withCredentials([file(credentialsId: 'talk2-dev-env-soketi', variable: 'dev_env')]) {
+                                    withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
                                         // text = readFile(dev_env)
                                         sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                                     }
