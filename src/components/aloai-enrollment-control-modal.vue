@@ -31,7 +31,7 @@
               {{ bot.name }}
               <!-- Bot Enrolled Label -->
               <b-popover
-                target="enrolled-badge"
+                :target="`enrolled-badge-${bot.id}`"
                 triggers="hover"
                 placement="right"
                 delay="100"
@@ -40,7 +40,7 @@
               </b-popover>
               <q-badge
                 v-if="isEnrolled(bot.id)"
-                id="enrolled-badge"
+                :id="`enrolled-badge-${bot.id}`"
                 class="ml-1"
                 color="green-6"
               >

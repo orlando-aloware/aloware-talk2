@@ -84,7 +84,10 @@ export default {
       initialized: false,
       needsExtensions: false,
       extensionsInitialized: false,
-      extensionsVisibility: false,
+      // not always this can be switched to true before call
+      // in HS Task view it's opening window automatically without sending event when
+      // maybe it sends an event before our component is mounted
+      extensionsVisibility: true,
       extensions: null,
       timeout: null,
       showAlertAgentOnCall: false,
@@ -110,7 +113,6 @@ export default {
           },
           onDialNumber: async (event) => {
             this.criticalErrorHappened = false
-            this.defaultCampaignInitialized = false
             this.setHubspotDialNumber(event)
 
             // do not continue if we not logged-in
@@ -224,14 +226,14 @@ export default {
     ]),
 
     async postDialNumber () {
-      if (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
+      this.showAlertCallFinished = false
+
+      do {
+        await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
+      } while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)
 
       this.checkAndResetCallDisposition()
       await this.getContact()
-
-      this.showAlertCallFinished = false
 
       await this.findDefaultOutboundCampaign()
 
@@ -307,6 +309,11 @@ export default {
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
+        return
+      }
+
+      // stop if modal is disabled
+      if (!this.extensionsVisibility) {
         return
       }
 
@@ -484,8 +491,7 @@ export default {
 
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
-      // Wait to finish the generate token to avoid conflicts with device
-      setTimeout(() => { this.handleDialNumber() }, 500)
+      this.handleDialNumber()
     },
 
     canHandleDialNumber () {

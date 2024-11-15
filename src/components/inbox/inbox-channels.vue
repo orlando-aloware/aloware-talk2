@@ -1458,7 +1458,7 @@ export default {
     },
 
     searchText (value) {
-      value = value.trim()
+      value = value?.trim()
 
       // sanity check: minimum of 3 character required
       if (!value || value.length < 3) {

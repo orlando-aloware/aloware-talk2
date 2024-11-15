@@ -37,9 +37,9 @@ export const REJECTION_REASON_USER_NOT_PERMITTED_TO_MAKE_CALL = 18
 // A communication is rejected due the caller is not active
 export const REJECTION_REASON_USER_NOT_ACTIVE = 19
 // A communication is rejected cause there is no auto dial task remaining
-export const REJECTION_REASON_NO_AUTO_DIAL_TASK_REMAINING = 20
+export const REJECTION_REASON_NO_POWER_DIALER_TASK_REMAINING = 20
 // A communication is rejected due the auto dial task is not queued
-export const REJECTION_REASON_AUTO_DIAL_TASK_NOT_QUEUED = 21
+export const REJECTION_REASON_POWER_DIALER_TASK_NOT_QUEUED = 21
 // A communication is rejected due the absence of campaign
 export const REJECTION_REASON_CAMPAIGN_NOT_FOUND = 22
 // A communication is rejected due the absence of incoming number
