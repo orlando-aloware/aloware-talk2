@@ -25,6 +25,10 @@ const integrations = [
   {
     name: 'Guesty',
     value: 'guesty_integration_enabled'
+  },
+  {
+    name: 'Salesforce',
+    value: 'salesforce_integration_enabled'
   }
 ]
 
