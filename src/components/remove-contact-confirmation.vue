@@ -365,7 +365,7 @@ export default {
             })
           }
 
-          this.$generalNotification('Contacts was successfully removed.')
+          this.$generalNotification('Contacts are being removed from the list. This may take a few moments to update. Please refresh your page to confirm the changes.')
         })
         .catch((_err) => {
           if (!isChunked) {
