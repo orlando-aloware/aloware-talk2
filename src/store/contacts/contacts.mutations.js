@@ -156,13 +156,13 @@ export default {
     state.createList = { ...state.createList, ...payload, open: true }
   },
   CREATE_DIALOG_OPEN: (state, { id, type }) => {
-    state.createDialog = { open: true, id, type }
+    state.createDialog = { open: true, show_in_public_folder: false, id, type }
   },
   CREATE_DIALOG_CLOSE: (state) => {
     state.createDialog = { open: false }
   },
   CREATE_LIST_CLOSE: (state) => {
-    state.createList = { folderId: null, open: false, mode: '', type: 1, contact_folder_id: null, name: '', filters: [] }
+    state.createList = { folderId: null, open: false, mode: '', type: 1, contact_folder_id: null, name: '', show_in_public_folder: false, filters: [] }
   },
 
   SELECT_LIST_OPEN: (state, payload) => {
@@ -319,6 +319,9 @@ export default {
   },
   ADD_POWER_DIALER_OPEN: (state, isOpen) => {
     state.isAddPowerDialerOpen = isOpen
+  },
+  ADD_MERGE_CONTACT_OPEN: (state, isOpen) => {
+    state.isMergeContactOpen = isOpen
   },
   ENROLL_SEQUENCE_OPEN: (state, isOpen) => {
     state.isEnrollSequenceOpen = isOpen
@@ -546,5 +549,8 @@ export default {
     if (index !== -1) {
       state.inProgressAxiosUniqueIds.splice(index, 1)
     }
+  },
+  SET_PUBLIC_LISTS (state, value) {
+    state.publicLists = value
   }
 }

@@ -64,13 +64,14 @@
               v-if="!simpleTable">
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
-          <search class="width-260"
+          <ContactSearch class="width-260"
                   limitSearchCharacters
                   :search="search"
                   :disabled="isLoadingDisabled"
                   data-testid="contacts-view-search-input"
+                  @show-error="showLimitCharactersError = $event"
                   @search="onSearch">
-          </search>
+          </ContactSearch>
           <div class="contacts-total mobile">
             <div class="small text-muted fs-13 text-right"
                  v-if="selectedList.type === ContactListTypes.DYNAMIC">
@@ -275,10 +276,13 @@
 
         <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
                     text="..."
-                    variant="light"
+                    :variant="selectedAllCount !== 0 ? '' : 'light'"
                     no-caret
                     data-testid="contacts-view-options-dropdown"
-                    right>
+                    alt="List Options"
+                    title="List Options"
+                    right
+                    :disabled="selectedAllCount !== 0">
           <template #button-content>
             <ellipse-icon />
           </template>
@@ -344,6 +348,11 @@
             </span>
           </b-dropdown-item>
         </b-dropdown>
+      </div>
+      <div class="limit-characters-error d-flex align-items-center"
+            v-if="showLimitCharactersError">
+          <span class="search-error-icon mr-1">&times;</span>
+          <span class="search-error-text">Search requires at least 3 characters</span>
       </div>
     </template>
     <template slot="actions"
@@ -596,30 +605,6 @@
                     <!--message-o-icon></message-o-icon-->
                     <span class="aloicons action-icons">A</span>
                   </button>
-
-                  <span class='d-inline-block'
-                        tabindex='0'
-                        :id='`contact-remove-option-disabled-wrapper-${index}`'
-                        v-if='hasIntegration(contact)'>
-                    <button class='btn btn-sm datatable-row__actions__action--trash'
-                            data-testid='contact-remove-option-disabled'
-                            :disabled='true'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact')">
-                      <span class='aloicons action-icons'>B</span>
-                    </button>
-                    <b-tooltip :target='`contact-remove-option-disabled-wrapper-${index}`'>
-                      This contact is from integration and can't be deleted.
-                    </b-tooltip>
-                  </span>
-
-                  <span v-else>
-                    <button class='btn btn-sm datatable-row__actions__action--trash'
-                            data-testid='contact-remove-option'
-                            v-if="!list.show_in_public_folder && hasPermissionTo('archive contact') && !isSimpSocial"
-                            @click='onRemove(contact, id)'>
-                      <span class='aloicons action-icons'>B</span>
-                    </button>
-                  </span>
                 </div>
               </td>
 
@@ -812,7 +797,7 @@ import SlashIcon from 'components/icons/slash-icon'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import SearchIcon from 'components/icons/search-icon'
 import PlusIcon from 'components/icons/plus-icon'
-import Search from 'components/search'
+import ContactSearch from 'components/contact-search'
 import EditHamburgerIcon from 'components/icons/edit-hamburger-icon'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
@@ -862,7 +847,7 @@ export default {
     AddSequenceIcon,
     AddUserIcon,
     EditHamburgerIcon,
-    Search,
+    ContactSearch,
     PlusIcon,
     SearchIcon,
     EllipseIcon,
@@ -1338,13 +1323,8 @@ export default {
       this.showAssignContacts = false
     },
 
-    hasIntegration (contact) {
-      // activate only for multi-entity allowed company
-      return Boolean(this.currentCompany.activate_multi_entity ? contact.external_integration_data && contact.external_integration_data.length > 0 : false)
-    },
-
     onSearch (searchText) {
-      this.$emit('search', searchText.trim())
+      this.$emit('search', searchText)
     },
 
     onFetchMyContacts (checked) {
@@ -1854,16 +1834,6 @@ export default {
       if (this.id === 'unsaved' && _.isEmpty(this.unsavedList)) {
         this.$router.push(`/contacts`)
       }
-    },
-
-    onRemove (contact, contactListId) {
-      this.setShouldUpdateSelectedListContactCount(false)
-      this.setBulkDelete(false)
-      this.removeContactOpen({
-        ...contact,
-        contactListId: contactListId
-      })
-      // this.$emit('on-action-remove', true)
     },
 
     onMessage (contactId) {

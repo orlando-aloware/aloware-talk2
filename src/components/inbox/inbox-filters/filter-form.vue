@@ -147,6 +147,19 @@
                 </callback-status-selector>
               </b-form-group>
             </b-col>
+            <b-col sm="12"
+                   md="6">
+              <b-form-group class="form-label"
+                            label="International Only">
+                <b-form-checkbox class="cursor-pointer switch-success"
+                                 size="lg"
+                                 switch
+                                 :value="1"
+                                 :unchecked-value="0"
+                                 v-model="filter.has_international">
+                </b-form-checkbox>
+              </b-form-group>
+            </b-col>
           </b-form-row>
         </div>
 

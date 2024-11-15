@@ -245,6 +245,165 @@
         </b-col>
       </b-form-row>
 
+      <b-form-row class="mt-4">
+        <b-col sm="12">
+          <h5 class="form-label">Contact Card</h5>
+          <p class="form-helper-text">Only personal lines routed to your user will show. Admins can set personal lines in the Lines settings. You can send this contact card via SMS to your clients.</p>
+
+          <a href="javascript:void(0)"
+             class="text-primary" style="text-decoration: underline;"
+             @click="showPreviewContactCard = !showPreviewContactCard">
+            {{ showPreviewContactCard ? 'Hide Card' : 'Preview Card' }}
+          </a>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="mt-2"
+                  v-if="showPreviewContactCard">
+        <b-col sm="12" md="6">
+          <div class="preview-card-box">
+            <div class="d-flex align-items-center mb-2">
+              <div class="preview-avatar mr-3">
+                {{ getInitials(user.contact_card_name) }}
+              </div>
+              <div>
+                <h5 class="mb-0">{{ user.contact_card_name }}</h5>
+                <p class="mb-0 text-muted">{{ selectedNumberContactCard | fixPhone('NATIONAL', true, false, true) }}</p>
+              </div>
+            </div>
+            <div class="d-flex justify-content-around mt-4">
+              <div class="text-center icon-container">
+                <div class="icon-circle">
+                  <b-icon icon="telephone-fill" class="text-white"></b-icon>
+                </div>
+                Call
+              </div>
+              <div class="text-center icon-container">
+                <div class="icon-circle">
+                  <b-icon icon="chat-dots-fill" class="text-white"></b-icon>
+                </div>
+                Message
+              </div>
+            </div>
+          </div>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="align-items-center"
+                  :id="`${SettingsMap.contact_card.hash_keyword}-container`">
+        <b-col sm="12" md="6">
+
+          <b-form-group label="Name" class="form-label mb-0">
+            <b-form-input class="contact-card-name"
+                          type="text"
+                          placeholder="Enter name"
+                          :state="validateState('contact_card_name')"
+                          v-model.trim="$v.user.contact_card_name.$model"
+                          @input="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_name')">
+            </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.contact_card_name.maxLength">Name must not exceed 191 characters.</b-form-invalid-feedback>
+          </b-form-group>
+        </b-col>
+
+        <b-col sm="12" md="6">
+          <b-form-group class="form-label mb-0">
+            <div class="d-flex align-items-center">
+              <label class="col-form-label">Phone Number</label>
+              <span class="mx-1 d-flex align-items-center" v-if="user.contact_card_campaign_id">
+                <information-circle-icon color="#2F80ED"></information-circle-icon>
+                <q-tooltip anchor="center start" self="center left" :offset="[-20, 10]">
+                  <p>The phone number for contact card can't be cleared, only changed.</p>
+                </q-tooltip>
+              </span>
+            </div>
+            <user-campaign-selector :key="contactCardCampaignSelectorKey"
+                                    :user="user"
+                                    v-model.trim="user.contact_card_campaign_id"
+                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'contact_card_campaign_id')"
+                                    @selectedNumber="updateSelectedNumberContactCard">
+            </user-campaign-selector>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="mt-4">
+        <b-col sm="12">
+          <h5 class="form-label">Company Card</h5>
+          <p class="form-helper-text">You can send this company card via SMS to your clients.</p>
+
+          <a href="javascript:void(0)"
+             class="text-primary" style="text-decoration: underline;"
+             @click="showPreviewCompanyCard = !showPreviewCompanyCard">
+            {{ showPreviewCompanyCard ? 'Hide Card' : 'Preview Card' }}
+          </a>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="mt-2"
+                  v-if="showPreviewCompanyCard">
+        <b-col sm="12" md="6">
+          <div class="preview-card-box">
+            <div class="d-flex align-items-center mb-2">
+              <div class="preview-avatar mr-3">
+                {{ getInitials(user.company_contact_card_name) }}
+              </div>
+              <div>
+                <h5 class="mb-0">{{ user.company_contact_card_name }}</h5>
+                <p class="mb-0 text-muted">{{ selectedNumberCompanyCard | fixPhone('NATIONAL', true, false, true) }}</p>
+              </div>
+            </div>
+            <div class="d-flex justify-content-around mt-4">
+              <div class="text-center icon-container">
+                <div class="icon-circle">
+                  <b-icon icon="telephone-fill" class="text-white"></b-icon>
+                </div>
+                Call
+              </div>
+              <div class="text-center icon-container">
+                <div class="icon-circle">
+                  <b-icon icon="chat-dots-fill" class="text-white"></b-icon>
+                </div>
+                Message
+              </div>
+            </div>
+          </div>
+        </b-col>
+      </b-form-row>
+
+      <b-form-row class="align-items-center"
+                  :id="`${SettingsMap.company_contact_card.hash_keyword}-container`">
+        <b-col sm="12" md="6">
+
+          <b-form-group label="Name" class="form-label mb-0">
+            <b-form-input class="company-card-name"
+                          type="text"
+                          placeholder="Enter name"
+                          :state="validateState('company_contact_card_name')"
+                          v-model.trim="$v.user.company_contact_card_name.$model"
+                          @input="(eventPayload) => onUpdateFields(eventPayload, 'company_contact_card_name')">
+            </b-form-input>
+            <b-form-invalid-feedback v-if="!$v.user.company_contact_card_name.maxLength">Name must not exceed 191 characters.</b-form-invalid-feedback>
+          </b-form-group>
+        </b-col>
+
+        <b-col sm="12" md="6">
+          <b-form-group class="form-label mb-0">
+              <label class="col-form-label">Phone Number</label>
+              <line-selector :value="user.company_contact_card_campaign_id"
+                             :multiple="false"
+                             :use-chips="false"
+                             :generic-styling="false"
+                             :generic-multiselect="false"
+                             :clearable="true"
+                             :useInput="true"
+                             v-model.trim="user.company_contact_card_campaign_id"
+                             @change="(eventPayload) => onUpdateFields(eventPayload, 'company_contact_card_campaign_id')"
+                             @selectedNumber="updateSelectedNumberCompanyCard">
+            </line-selector>
+          </b-form-group>
+        </b-col>
+      </b-form-row>
+
       <div :id="`${SettingsMap.backup_routing.hash_keyword}-container`"
            v-show="canBeEdited && [AnswerTypes.BY_BROWSER, AnswerTypes.BY_IP_PHONE].includes(user.answer_by)">
         <b-form-row class="mt-4">
@@ -474,6 +633,7 @@
 <script>
 import AnswerTypeSelector from 'components/generic-selectors/answer-type-selector'
 import UserCampaignSelector from 'components/generic-selectors/user-campaign-selector'
+import LineSelector from 'components/generic-selectors/line-selector'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as Roles from 'src/constants/roles'
 import {
@@ -485,6 +645,7 @@ import {
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { required, maxLength, minLength, email, sameAs, helpers } from 'vuelidate/lib/validators'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'profile',
@@ -496,7 +657,7 @@ export default {
     simpsocialMixin
   ],
 
-  components: { UserCampaignSelector, AnswerTypeSelector },
+  components: { UserCampaignSelector, AnswerTypeSelector, LineSelector, InformationCircleIcon },
 
   computed: {
     ...mapState(['campaigns', 'statics']),
@@ -575,6 +736,12 @@ export default {
         },
         password_confirmation: {
           sameAsPassword: sameAs('password')
+        },
+        contact_card_name: {
+          maxLength: maxLength(191)
+        },
+        company_contact_card_name: {
+          maxLength: maxLength(191)
         }
       }
     }
@@ -591,7 +758,12 @@ export default {
       ],
       AnswerTypes,
       Roles,
-      SettingsMap
+      SettingsMap,
+      contactCardCampaignSelectorKey: 0,
+      showPreviewContactCard: false,
+      selectedNumberContactCard: '',
+      showPreviewCompanyCard: false,
+      selectedNumberCompanyCard: ''
     }
   },
 
@@ -631,6 +803,21 @@ export default {
       }
 
       this.updateFormValidity()
+    },
+
+    getInitials (name) {
+      if (!name) return ''
+      const words = name.split(' ')
+      const initials = words.slice(0, 2).map(word => word.charAt(0).toUpperCase())
+      return initials.join('')
+    },
+
+    updateSelectedNumberContactCard (number) {
+      this.selectedNumberContactCard = number
+    },
+
+    updateSelectedNumberCompanyCard (number) {
+      this.selectedNumberCompanyCard = number
     }
   },
 
@@ -647,7 +834,23 @@ export default {
       this.user.password = ''
       this.user.password_confirmation = ''
       this.updateFormValidity()
+    },
+
+    'connectedCampaigns': function () {
+      this.$nextTick(() => {
+        this.contactCardCampaignSelectorKey++
+      })
     }
   }
 }
 </script>
+
+<style scoped>
+.contact-card-name {
+  height: 39px;
+}
+
+.company-card-name {
+  height: 39px;
+}
+</style>

@@ -386,6 +386,10 @@ export default {
       if (!this.genericMultiselect) {
         this.showInputPlaceholder()
       }
+
+      // return the incoming number of the selected campaign
+      const found = this.campaigns.find(campaign => campaign.id === val)
+      this.$emit('selectedNumber', found ? found.incoming_number : '')
     },
 
     campaignsIsLoading (val) {

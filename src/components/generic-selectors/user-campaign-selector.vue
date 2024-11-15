@@ -125,10 +125,17 @@ export default {
     },
     onShowMenu () {
       this.selectWidth = this.$refs.userCampaignSelector.$el.offsetWidth
+    },
+    findAndEmitSelectedNumber (value) {
+      // return the incoming number of the selected campaign
+      const found = this.userCampaigns.find(campaign => campaign.id === value)
+      this.$emit('selectedNumber', found ? found.incoming_number : '')
     }
   },
   mounted () {
     this.options = this.userCampaigns
+
+    this.findAndEmitSelectedNumber(this.value)
   },
   watch: {
     value () {
@@ -137,6 +144,8 @@ export default {
 
     model (val) {
       this.$emit('select', this.model ? this.model : AnswerTypes.BY_NONE)
+
+      this.findAndEmitSelectedNumber(val)
     }
   }
 }

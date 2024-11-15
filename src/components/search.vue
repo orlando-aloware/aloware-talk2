@@ -82,7 +82,7 @@ export default {
 
       this.searchValue = this.searchValue.trim()
       this.$emit('search', this.searchValue)
-    }, 500),
+    }, 1200),
 
     onFocus: function () {
       this.$emit('focus', this.searchValue)

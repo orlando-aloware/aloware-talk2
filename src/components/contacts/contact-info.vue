@@ -194,6 +194,18 @@
             <b-button variant="light"
                       size="sm"
                       class="custom-action-button my-1"
+                      data-testid="contact-info-remove-power-dialer-button"
+                      @click="removeContactFromPowerDialerLists">
+                <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-remove-power-dialer-tooltip"
+                           self="center middle">
+                    Remove from all Power Dialers
+                </q-tooltip>
+                <call-remove-icon/>
+            </b-button>
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
                       :disabled="!isSimpSocialIntegrationEnabled"
                       v-if="isSimpSocial"
                       data-testid="contact-info-email-button"
@@ -219,6 +231,19 @@
                 </q-tooltip>
                 <video-conference-icon data-testid="contact-info-video-conference-icon" width="16"/>
             </b-button>
+            <b-button variant="light"
+                      size="sm"
+                      class="custom-action-button my-1"
+                      data-testid="contact-info-merge-button"
+                      v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled"
+                      @click="openMergeContactModal">
+                <q-tooltip anchor="bottom middle"
+                           data-testid="contact-info-merge-tooltip"
+                           self="center middle">
+                    Merge
+                </q-tooltip>
+                <merge-contact-icon/>
+            </b-button>
         </div>
         <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"></appointment-form-modal>
         <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
@@ -226,6 +251,15 @@
                                 data-testid="contact-info-power-dialer-add-modal"
                                 :redirect="false">
         </power-dialer-add-modal>
+        <contact-remove-from-lists-confirmation :contact="contact"
+                                                data-testid="contact-remove-from-lists-confirmation"
+                                                @close="onCloseContactRemoveFromListsConfirmation"
+                                                @confirm="onCloseContactRemoveFromListsConfirmation"
+                                                @error="onErrorContactRemoveFromLists"/>
+        <merge-contact-modal data-testid="contact-info-merge-contact-modal"
+                             :contact="contact"
+                             v-if="isMergeContactOpen">
+        </merge-contact-modal>
     </b-card>
 </template>
 
@@ -237,11 +271,15 @@ import TimerIcon from 'src/components/icons/timer-icon'
 import CalendarIcon from 'src/components/icons/calendar-icon'
 import CallIcon from 'src/components/icons/call-icon'
 import AddCallIcon from 'src/components/icons/add-call-icon'
+import CallRemoveIcon from 'src/components/icons/call-remove-icon'
 import PencilOIcon from 'src/components/icons/pencil-o-icon'
+import MergeContactIcon from 'src/components/icons/merge-contact-icon'
 import AppointmentFormModal from 'src/components/appointments/appointment-form-modal'
 import ContactAddReminderModal from 'src/components/contacts/contact-add-reminder-modal'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
-import { aclMixin, simpsocialMixin, timezoneCheckMixin } from 'src/plugins/mixins'
+import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
+import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
+import { aclMixin, simpsocialMixin, timezoneCheckMixin, integrationMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
@@ -260,7 +298,8 @@ export default {
   mixins: [
     aclMixin,
     simpsocialMixin,
-    timezoneCheckMixin
+    timezoneCheckMixin,
+    integrationMixin
   ],
 
   components: {
@@ -271,11 +310,15 @@ export default {
     ContactAddReminderModal,
     AppointmentFormModal,
     PowerDialerAddModal,
+    ContactRemoveFromListsConfirmation,
+    MergeContactModal,
     PencilOIcon,
     AddCallIcon,
+    CallRemoveIcon,
     CallIcon,
     CalendarIcon,
     TimerIcon,
+    MergeContactIcon,
     Avatar,
     ContactNameForm
   },
@@ -284,6 +327,8 @@ export default {
     ...mapState(['isMobile']),
 
     ...mapState('cache', ['currentCompany']),
+
+    ...mapState('contacts', ['isMergeContactOpen']),
 
     ...mapGetters('contacts', [
       'contact',
@@ -325,13 +370,18 @@ export default {
       'setContactNameEditOpen',
       'addAppointmentOpen',
       'addReminderOpen',
-      'addPowerDialerOpen'
+      'addPowerDialerOpen',
+      'addMergeContactOpen'
     ]),
 
     ...mapActions(['setShowPhone']),
 
     openPowerDialerModal () {
       this.addPowerDialerOpen(true)
+    },
+
+    openMergeContactModal () {
+      this.addMergeContactOpen(true)
     },
 
     openEmailBlast () {
@@ -425,6 +475,24 @@ export default {
         this.isProcessingBlock = false
         this.$generalNotification('Contact was successfully unblocked.', 'success')
       })
+    },
+
+    removeContactFromPowerDialerLists () {
+      this.$bvModal.show('contact-remove-from-lists-confirmation')
+    },
+
+    onCloseContactRemoveFromListsConfirmation () {
+      this.$bvModal.hide('contact-remove-from-lists-confirmation')
+    },
+
+    onErrorContactRemoveFromLists (error) {
+      this.$bvModal.hide('contact-remove-from-lists-confirmation')
+      console.log('error', error)
+      if (!error?.response) {
+        return
+      }
+
+      this.$handleErrors(error?.response, 'error')
     }
   }
 }

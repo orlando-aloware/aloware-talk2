@@ -451,7 +451,11 @@ export default {
         'date_of_birth',
         'cnam_country',
         'cnam_state',
-        'cnam_city'
+        'cnam_city',
+        'custom_log',
+        'aloai_text_bot_enrollment',
+        'aloai_text_bot_disengagement',
+        'aloai_text_bot_reengagement'
       ],
       custom_audit_messages: {
         'is_dnc': [
@@ -718,7 +722,11 @@ export default {
     },
 
     generateCustomAuditMessageWithNotes (communication) {
-      const notes = communication.notes ? ` (Reason: ${communication.notes.replace(/\\"/g, '"')})` : ''
+      const cleanedNotes = communication.notes ? communication.notes.replace(/\\"/g, '"') : ''
+      const notes = communication.property === 'custom_log'
+        ? ` ${cleanedNotes}`
+        : cleanedNotes ? ` (Reason: ${cleanedNotes})` : ''
+
       return this.generateCustomAuditMessage(communication) + notes
     },
 

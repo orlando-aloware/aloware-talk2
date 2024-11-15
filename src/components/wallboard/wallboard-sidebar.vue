@@ -59,11 +59,14 @@ export default {
     }),
 
     ...mapState('wallboard', [
-      'isAgentsLoading',
       'isLiveCallsLoading',
       'isParkedCallsLoading',
       'isQueuedCallsLoading',
       'isSummaryLoading'
+    ]),
+
+    ...mapState([
+      'usersIsLoading'
     ]),
 
     items () {
@@ -73,7 +76,7 @@ export default {
           route: '/wallboard/agents',
           icon: 'wallboard-agents-icon',
           counter: this.agents.length,
-          loading: this.isAgentsLoading
+          loading: this.usersIsLoading
         }, {
           name: 'Queued Calls',
           route: '/wallboard/queued-calls',
@@ -97,7 +100,7 @@ export default {
     },
 
     isLoading () {
-      return this.isAgentsLoading ||
+      return this.usersIsLoading ||
         this.isLiveCallsLoading ||
         this.isParkedCallsLoading ||
         this.isQueuedCallsLoading ||
@@ -107,7 +110,6 @@ export default {
 
   methods: {
     ...mapActions('wallboard', [
-      'fetchAgents',
       'fetchLiveCalls',
       'fetchParkedCalls',
       'fetchQueuedCalls',
@@ -115,7 +117,6 @@ export default {
     ]),
 
     fetchAll () {
-      this.fetchAgents()
       this.fetchLiveCalls()
       this.fetchParkedCalls()
       this.fetchQueuedCalls()
