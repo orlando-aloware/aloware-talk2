@@ -244,12 +244,6 @@ export default {
 
       storage.local.setItem('company_id', company.id)
 
-      // redirect to Alo classic for agents
-      if (!this.$q.platform.is.electron) {
-        location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
-        return
-      }
-
       let redirectPath = '/'
       const redirectQuery = this.$route.query?.redirect
 
