@@ -24,6 +24,48 @@
            padding="none"
            class="nav-icons w-100"
            data-testid="communication-active-sidebar-btn"
+           v-show="isActive('Inboxes')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Inboxes</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+            Inboxes
+      </span>
+    </q-btn>
+    <q-btn :to="{ name: 'Inboxes' }"
+           :ripple="false"
+           icon="img:app-icons/menu/inbox_gray.svg"
+           align="left"
+           padding="10px 20px"
+           class="nav-icons w-100"
+           data-testid="communication-no-active-sidebar-btn"
+           v-show="!isActive('Inboxes')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Inboxes</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+            Inboxes
+      </span>
+    </q-btn>
+    <q-btn :to="{ name: 'Inbox' }"
+           :ripple="false"
+           icon="img:app-icons/menu/communications_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           data-testid="communication-active-sidebar-btn"
            v-show="isActive('Inbox')"
            flat>
       <q-tooltip anchor="center right"
@@ -40,7 +82,7 @@
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
            :ripple="false"
-           icon="img:app-icons/menu/inbox_gray.svg"
+           icon="img:app-icons/menu/communications_gray.svg"
            align="left"
            padding="10px 20px"
            class="nav-icons w-100"

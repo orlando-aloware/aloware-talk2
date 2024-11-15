@@ -198,7 +198,7 @@ export default {
 
       this.onLoadShowTasks = false
 
-      if (this.$q.screen.lt.md && this.$route.name === 'Inbox') {
+      if (this.$q.screen.lt.md && this.$route.name === 'Inboxes') {
         const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
@@ -230,7 +230,7 @@ export default {
         this.onLoadShowTasks = true
       }
 
-      if (to.name === 'Inbox') {
+      if (to.name === 'Inboxes') {
         const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
