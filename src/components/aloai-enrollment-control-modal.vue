@@ -166,7 +166,7 @@ export default {
           this.$generalNotification(
             'Contact successfully enrolled to the selected AloAi Text Bot.'
           )
-          // Wait for 2.5 seconds before refreshing the enrolled bots list
+          // Give our Queue some time to enroll the contact
           this.$emit('contactEnrolled')
 
           this.onHidden()

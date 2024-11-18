@@ -19,12 +19,12 @@
       <h4>AloAi Text Bot Enrollment</h4>
 
       <b-card-text class="fs-14 mt-2">
-        <span v-if="isEnrolledToABot">Currently enrolled to:</span>
+        <span v-if="hasBotEnrollments">Currently enrolled to:</span>
         <span v-else>Enroll this contact to any of your Sales Bots and let them do the work for you!</span>
       </b-card-text>
 
       <b-card-text
-        v-if="isEnrolledToABot"
+        v-if="hasBotEnrollments"
         class="fs-14 mt-2"
       >
         <b-media data-testid="contact-bot-enrollment-media">
@@ -152,7 +152,7 @@
             height="22"
             width="22"
           />
-          <span v-if="!isEnrolledToABot">Enroll to Bot</span>
+          <span v-if="!hasBotEnrollments">Enroll to Bot</span>
           <span v-else>Enroll to more Bots</span>
         </b-button>
       </div>
@@ -200,14 +200,6 @@ export default {
     ...mapGetters('auth', ['profile']),
     hasBotEnrollments () {
       return !_.isEmpty(this.botEnrollments)
-    },
-    isEnrolledToABot () {
-      // Sanity check
-      if (this.hasBotEnrollments) {
-        return false
-      }
-
-      return this.botEnrollments.length > 0
     },
     isEnrolledToMultipleBots () {
       // Sanity check
