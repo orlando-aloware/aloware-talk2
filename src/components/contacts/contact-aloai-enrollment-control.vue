@@ -1,9 +1,25 @@
 <template>
+  <b-overlay
+    :show="isBusy"
+    rounded="sm"
+    data-testid="contact-bot-overlay"
+    variant="white"
+  >
   <b-card class="border-0 position-relative contact-about-wrapper" v-if="profile?.company?.aloai_enabled">
     <h4>AloAi Text Bot Enrollment</h4>
 
-    <b-card-text class="fs-14 mt-2">
+    <b-card-text
+      v-if="!isEnrolledToABot"
+      class="fs-14 mt-2"
+    >
       Enroll this contact to any of your Sales Bots and let them do the work for you!
+    </b-card-text>
+
+    <b-card-text
+      v-else
+      class="fs-14 mt-2"
+    >
+      Currently enrolled to:
     </b-card-text>
 
     <b-card-text
@@ -14,46 +30,87 @@
         <template #aside>
           <aloai-icon
             class="mr-1"
-            height="38"
-            width="38"
+            height="42"
+            width="42"
           />
         </template>
 
-        <h5 class="mt-0">{{ firstEnrolledBot?.name }}</h5>
+        <h5 class="mt-0">{{ displayedBot?.name }}</h5>
         <p class="mb-0 text-muted fs-13 mt-1">
           <q-badge
-            :color="useCaseColor(firstEnrolledBot?.use_case)"
+            :color="useCaseColor(displayedBot?.use_case)"
             class="mr-1"
           >
-            <span>{{ formatUseCase(firstEnrolledBot?.use_case) }}</span>
+            <span>{{ formatUseCase(displayedBot?.use_case) }}</span>
           </q-badge>
         </p>
       </b-media>
-      <q-badge
-        v-if="isEnrolledToMultipleBots"
-        color="grey"
-      >
-        <span>
-          +{{ extraEnrolledBotsCount }}
-          bot<span v-if="extraEnrolledBotsCount > 1">s</span>
-        </span>
-      </q-badge>
+
+      <div class="mt-3">
+        <b-button href="#"
+                  variant="outline-primary"
+                  size="sm"
+                  class="mr-1"
+                  data-testid="refresh-sequence-info-button"
+                  @click="refreshBots">
+          <i class="fa fa-sync-alt"></i>
+          <q-tooltip anchor="top middle"
+                      self="center middle">
+            Refresh bots information
+          </q-tooltip>
+        </b-button>
+        <!-- Arrows for Pagination -->
+        <b-button v-if="isEnrolledToMultipleBots" href="#"
+                  variant="outline-secondary"
+                  size="sm"
+                  class="mr-1"
+                  data-testid="refresh-sequence-info-button"
+                  @click="prevBot">
+          <i class="fa fa-angle-left"></i>
+          <q-tooltip anchor="top middle"
+                      self="center middle">
+            Previous Bot
+          </q-tooltip>
+        </b-button>
+        <span v-if="isEnrolledToMultipleBots" class="fs-14 mx-2 no-select">{{ activeBotIndex + 1 }}/{{ botEnrollments.length }}</span>
+        <b-button v-if="isEnrolledToMultipleBots" @click="nextBot" href="#"
+                  variant="outline-secondary"
+                  size="sm"
+                  class="ml-1 mr-1"
+                  data-testid="refresh-sequence-info-button">
+          <i class="fa fa-angle-right"></i>
+          <q-tooltip anchor="top middle"
+                      self="center middle">
+            Next Bot
+          </q-tooltip>
+        </b-button>
+        <b-button href="#"
+                  variant="outline-danger"
+                  size="sm"
+                  data-testid="disenroll-contact-button"
+                  v-if="!isEnrolledToMultipleBots"
+                  @click="openDisenrollmentConfirmation">
+          <i class="fa fa-trash"></i> Disenroll from Bot
+        </b-button>
+      </div>
+
       <b-button
-        class="mt-2"
+        class="mt-3"
         variant="outline-danger"
         size="sm"
         block
         data-testid="disenroll-contact-button"
+        v-if="isEnrolledToMultipleBots"
         @click="openDisenrollmentConfirmation"
       >
-        <i class="fa fa-trash"></i> Disenroll from bot
+        <i class="fa fa-trash"></i> Disenroll from Bot
       </b-button>
     </b-card-text>
     <b-card-text
       v-else
       class="fs-14 mt-2"
     >
-      This contact is currently not enrolled to a bot.
+      This contact is currently not enrolled to a Bot.
     </b-card-text>
 
     <div id="engage-control-popover">
@@ -67,16 +124,20 @@
       >
         <aloai-icon
           class="mr-1"
-          height="10"
-          width="10"
+          height="22"
+          width="22"
         />
         <span v-if="!isEnrolledToABot">Enroll to Bot</span>
         <span v-else>Enroll to another Bot</span>
       </b-button>
     </div>
 
-    <aloai-enrollment-control-modal ref="aloaiEnrollmentControlModalRef" />
+    <aloai-enrollment-control-modal
+      ref="aloaiEnrollmentControlModalRef"
+      @contactEnrolled="refreshBots"
+    />
   </b-card>
+</b-overlay>
 </template>
 
 <script>
@@ -85,6 +146,7 @@ import AloaiIcon from 'components/icons/aloai-icon'
 import AloaiEnrollmentControlModal from 'components/aloai-enrollment-control-modal.vue'
 import { mapGetters } from 'vuex'
 import { aloaiMixin } from 'src/plugins/mixins'
+import _ from 'lodash'
 
 export default {
   name: 'contact-aloai-enrollment-control',
@@ -103,57 +165,90 @@ export default {
   data () {
     return {
       bots: [],
-      botEnrollments: []
+      botEnrollments: [],
+      activeBotIndex: 0,
+      isBusy: false
     }
   },
 
   computed: {
     ...mapGetters('auth', ['profile']),
     isEnrolledToABot () {
+      if (_.isEmpty(this.botEnrollments)) {
+        return false
+      }
+
       return this.botEnrollments.length > 0
     },
     isEnrolledToMultipleBots () {
+      if (_.isEmpty(this.botEnrollments)) {
+        return false
+      }
+
       return this.botEnrollments.length > 1
     },
     extraEnrolledBotsCount () {
+      if (_.isEmpty(this.botEnrollments)) {
+        return 0
+      }
+
       return this.botEnrollments.length - 1
     },
-    firstEnrolledBot () {
-      if (!this.isEnrolledToABot) {
+    displayedBot () {
+      if (_.isEmpty(this.botEnrollments)) {
         return null
       }
 
-      let bot = this.bots.find((bot) => bot.id === this.botEnrollments[0].aloai_bot_id)
-
-      if (!bot) {
-        return null
-      }
-
-      // Get the first enrolled bot with the id coming from the enrollments
-      return this.bots.find((bot) => bot.id === this.botEnrollments[0].aloai_bot_id)
+      return this.bots[this.activeBotIndex]
     }
   },
 
   mounted () {
-    this.fetchBots()
-      .then((bots) => {
-        this.bots = bots
-      })
-
-    this.fetchContactEnrolledBots()
-      .then((botEnrollments) => {
-        this.botEnrollments = botEnrollments
-      })
+    this.refreshBots()
   },
 
   methods: {
+    refreshBots () {
+      this.isBusy = true
+      this.fetchBots()
+        .then((bots) => {
+          this.bots = bots
+          this.fetchContactBotEnrollments()
+            .then((botEnrollments) => {
+              this.botEnrollments = botEnrollments
+              this.isBusy = false
+            })
+        })
+    },
+    prevBot () {
+      if (_.isEmpty(this.botEnrollments)) {
+        return
+      }
+
+      if (this.activeBotIndex > 0) {
+        this.activeBotIndex--
+      } else {
+        this.activeBotIndex = this.botEnrollments.length - 1
+      }
+    },
+    nextBot () {
+      if (_.isEmpty(this.botEnrollments)) {
+        return
+      }
+
+      if (this.activeBotIndex < this.botEnrollments.length - 1) {
+        this.activeBotIndex++
+      } else {
+        this.activeBotIndex = 0
+      }
+    },
     openEnrollmentControlModal () {
       if (this.$refs.aloaiEnrollmentControlModalRef) {
         this.$refs.aloaiEnrollmentControlModalRef.isOpen = true
       }
     },
     openDisenrollmentConfirmation () {
-      this.$bvModal.msgBoxConfirm('Disenrolling this contact will . Continue?', {
+      this.$bvModal.msgBoxConfirm(`Disenrolling this contact from #${this.displayedBot.id} ${this.displayedBot.name} Bot will . Continue?`, {
         title: 'Warning',
         size: 'sm',
         buttonSize: 'sm',
@@ -172,8 +267,9 @@ export default {
       })
     },
     disenrollContact () {
+      this.isBusy = true
       talk2Api.V2.aloAiBot
-        .disenrollContact(this.firstEnrolledBot.id, { contact_ids: [this.contact.id] })
+        .disenrollContact(this.displayedBot.id, { contact_ids: [this.contact.id] })
         .then(() => {
           this.$generalNotification(
             'Contact successfully disenrolled from the selected AloAi Text Bot.'
@@ -190,6 +286,7 @@ export default {
           console.error('[submitEnrollment] error', error)
         })
         .finally(() => {
+          this.isBusy = false
         })
     },
     async fetchBots () {
@@ -204,14 +301,14 @@ export default {
         return []
       }
     },
-    async fetchContactEnrolledBots () {
+    async fetchContactBotEnrollments () {
       try {
-        const { data } = await talk2Api.V2.aloAiBot.getContactEnrolledBots(
+        const { data } = await talk2Api.V2.aloAiBot.getContactBotEnrollments(
           this.contact.id
         )
         return data
       } catch (error) {
-        console.error('[fetchContactEnrolledBots] error', error)
+        console.error('[fetchContactBotEnrollments] error', error)
         return []
       }
     }
