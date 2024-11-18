@@ -166,7 +166,11 @@ export default {
           this.$generalNotification(
             'Contact successfully enrolled to the selected AloAi Text Bot.'
           )
-          this.$emit('contactEnrolled')
+          // Wait for 3 seconds
+          setTimeout(() => {
+            this.$emit('contactEnrolled')
+          }, 3000)
+
           this.onHidden()
         })
         .catch((error) => {

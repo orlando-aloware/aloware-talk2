@@ -278,7 +278,7 @@ export default {
         })
         .catch((error) => {
           let errorMsg = 'Error while enrolling contact to AloAi Text Bot.'
-          if (error?.response.data?.message) {
+          if (error?.response?.data?.message) {
             errorMsg = error.response.data.message
           }
 
