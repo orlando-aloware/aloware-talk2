@@ -203,7 +203,7 @@ export default {
     },
     isEnrolledToMultipleBots () {
       // Sanity check
-      if (this.hasBotEnrollments) {
+      if (!this.hasBotEnrollments) {
         return false
       }
 
@@ -211,7 +211,7 @@ export default {
     },
     extraEnrolledBotsCount () {
       // Sanity check
-      if (this.hasBotEnrollments) {
+      if (!this.hasBotEnrollments) {
         return 0
       }
 
@@ -219,7 +219,7 @@ export default {
     },
     displayedBot () {
       // Sanity check
-      if (this.hasBotEnrollments) {
+      if (!this.hasBotEnrollments) {
         return null
       }
 
@@ -276,7 +276,7 @@ export default {
         })
     },
     prevBot () {
-      if (this.hasBotEnrollments) {
+      if (!this.hasBotEnrollments) {
         return
       }
 
@@ -287,7 +287,7 @@ export default {
       }
     },
     nextBot () {
-      if (this.hasBotEnrollments) {
+      if (!this.hasBotEnrollments) {
         return
       }
 
