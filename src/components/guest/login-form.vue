@@ -107,7 +107,6 @@
 import { mapActions, mapState } from 'vuex'
 import { aclMixin, guestFormsMixin, recaptchaMixin, simpsocialMixin } from 'src/plugins/mixins'
 import SecurityCode from 'components/guest/security-code'
-import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
 
 export default {
@@ -124,14 +123,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated']),
-    ...mapState(['statics', 'staticsLoaded', 'isWidget']),
-
-    shouldRedirectToClassic () {
-      return this.profile &&
-        this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC &&
-        !this.isAdmin &&
-        !this.profile?.company?.force_talk
-    }
+    ...mapState(['statics', 'staticsLoaded', 'isWidget'])
   },
 
   data () {
@@ -251,12 +243,6 @@ export default {
       this.setDefaultIsShortenedUrlRemembered()
 
       storage.local.setItem('company_id', company.id)
-
-      // redirect to Alo classic for agents
-      if (this.shouldRedirectToClassic && !this.$q.platform.is.electron) {
-        location.href = process.env.API_URL + '?from_talk_2=1&token=' + storage.local.getItem('shared_cookie')
-        return
-      }
 
       let redirectPath = '/'
       const redirectQuery = this.$route.query?.redirect
