@@ -194,11 +194,14 @@ export default {
       }
 
       // Filter bots using the botEnrollments aloai_bot_id
-      let filteredBots = this.bots.filter((bot) => bot.id === this.botEnrollments[this.activeBotIndex].aloai_bot_id)
+      let enrolledBots = this.bots.filter((bot) => bot.id === this.botEnrollments[this.activeBotIndex].aloai_bot_id)
 
-      console.log('filteredBots', filteredBots)
+      if (_.isEmpty(enrolledBots)) {
+        console.warn('No bot found for the current enrollment')
+        return null
+      }
 
-      return filteredBots[0]
+      return enrolledBots[0]
     }
   },
 
@@ -216,6 +219,8 @@ export default {
     },
     refreshBots () {
       this.isBusy = true
+      this.bots = []
+      this.botEnrollments = []
       this.fetchBots()
         .then((bots) => {
           this.bots = bots
