@@ -17,7 +17,7 @@
         </q-spinner-bars>
       </div>
     </div>
-    <q-btn :to="{ name: 'Inbox' }"
+    <q-btn :to="{ name: 'Inboxes' }"
            :ripple="false"
            icon="img:app-icons/menu/inbox_active.svg"
            align="left"
@@ -931,7 +931,11 @@ export default {
         return true
       }
 
-      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
+      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name) && name === 'Inboxes') {
+        return true
+      }
+
+      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task', 'Inbox Channel Task Status Communications'].includes(this.$route.name) && name === 'Inbox') {
         return true
       }
 
@@ -978,6 +982,18 @@ export default {
   watch: {
     lightMode () {
       this.modeIcon = this.lightMode ? 'img:app-icons/menu/mode_gray.svg' : 'img:app-icons/menu/mode_gray.svg'
+    },
+
+    $route (to, from) {
+      if (to.name !== from.name) {
+        if (this.$route.name === 'Inboxes') {
+          this.$router.push('/channels/inbox/all')
+        }
+
+        if (this.$route.name === 'Inbox') {
+          this.$router.push('/channels/calls')
+        }
+      }
     }
   }
 }

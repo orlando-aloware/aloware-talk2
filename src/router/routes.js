@@ -90,47 +90,7 @@ const routes = [
             meta: {
               title: 'Inboxes'
             }
-          }//,
-          // {
-          //   path: 'channels/:channel/contacts/:id/communications/:communicationId',
-          //   name: 'Inbox Contact',
-          //   component: Contact,
-          //   meta: {
-          //     title: 'Inboxes'
-          //   }
-          // },
-          // {
-          //   path: 'channels/:channel/:status/contacts/:id/communications/:communicationId',
-          //   name: 'Inbox Contact Communication',
-          //   component: Contact,
-          //   meta: {
-          //     title: 'Inboxes'
-          //   }
-          // },
-          // {
-          //   path: 'channels/:channel',
-          //   name: 'Inbox Channel',
-          //   component: Inbox,
-          //   meta: {
-          //     title: 'Inboxes'
-          //   }
-          // },
-          // {
-          //   path: 'channels/view/:viewId/:status',
-          //   name: 'Inbox View',
-          //   component: Inbox,
-          //   meta: {
-          //     title: 'Inboxes'
-          //   }
-          // },
-          // {
-          //   path: 'channels/view/:viewId/:status/contacts/:id',
-          //   name: 'Inbox View Contact Task',
-          //   component: Contact,
-          //   meta: {
-          //     title: 'Inboxes'
-          //   }
-          // }
+          }
         ]
       },
       {
@@ -141,22 +101,14 @@ const routes = [
           title: 'Communications'
         },
         children: [
-          // {
-          //   path: 'channels/:channel/:status/contacts/:id',
-          //   name: 'Inbox Contact Task',
-          //   component: Contact,
-          //   meta: {
-          //     title: 'Communications'
-          //   }
-          // },
-          // {
-          //   path: 'channels/:channel/:status',
-          //   name: 'Inbox Channel Task Status',
-          //   component: Contact,
-          //   meta: {
-          //     title: 'Communications'
-          //   }
-          // },
+          {
+            path: 'channels/:channel/:status',
+            name: 'Inbox Channel Task Status Communications',
+            component: Contact,
+            meta: {
+              title: 'Communications'
+            }
+          },
           {
             path: 'channels/:channel/contacts/:id/communications/:communicationId',
             name: 'Inbox Contact',
