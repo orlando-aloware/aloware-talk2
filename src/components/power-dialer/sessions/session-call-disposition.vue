@@ -47,7 +47,7 @@
                       :display-count="4"
                       :forced="requireSmsSending"
                       :is-empty="isSmsTemplatesEmpty"
-                      v-if="sessionSettings.force_sms"
+                      v-if="sessionSettings.min_redials > 0 && sessionSettings.force_sms"
                       @on-selected-item="onSelectedSmsTemplate"/>
     </div>
   </q-card>

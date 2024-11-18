@@ -118,7 +118,7 @@
       </div>
 
       <div class="col-12 mb-4"
-          v-show="resources.min_redials > 0">
+           v-show="resources.min_redials > 0">
         <div class="d-flex items-center justify-between">
           <div :class="disableField('force_sms') ? 'opacity-05' : ''">
             <label class="label mb-1 text-weight-bold">
@@ -138,7 +138,7 @@
       <div class="col-12 pl-3 mb-4"
           v-show="resources.min_redials > 0">
         <div>
-          <label class="label mb-1 text-weight-bold">
+          <label :class="`label mb-1 text-weight-bold ${disableField('successful_call_disposition_ids') ? 'opacity-05' : ''}`">
             Select Successful Call Dispositions
           </label>
           <div>Select the dispositions that won't require the contact to be redialed, meaning that the call was successfully answered</div>
@@ -147,6 +147,7 @@
                                     :multiple="true"
                                     :highlighted="false"
                                     v-model="resources.successful_call_disposition_ids"
+                                    :disable="disableField('successful_call_disposition_ids')"
                                     @change="onSuccessfulCallDispositionsChange"/>
       </div>
 
@@ -387,24 +388,24 @@ export default {
       // if force redial is enabled
       if (powerDialerSettings.min_redials > 0) {
         value.min_redials = powerDialerSettings.min_redials
+      }
 
-        if (powerDialerSettings.force_immediate_redial) {
-          value.force_immediate_redial = 1
-        }
+      if (powerDialerSettings.force_immediate_redial) {
+        value.force_immediate_redial = 1
+      }
 
-        if (powerDialerSettings.force_sms) {
-          value.force_sms = 1
-        }
+      if (powerDialerSettings.force_sms) {
+        value.force_sms = 1
+      }
 
-        const settingsSuccessfulCallDispositionIds = powerDialerSettings.successful_call_disposition_ids
+      const settingsSuccessfulCallDispositionIds = powerDialerSettings.successful_call_disposition_ids
 
-        // if company has successful call disposition settings, merge it to current dispositions
-        if (settingsSuccessfulCallDispositionIds?.length) {
-          value.successful_call_disposition_ids = settingsSuccessfulCallDispositionIds
+      // if company has successful call disposition settings, merge it to current dispositions
+      if (settingsSuccessfulCallDispositionIds?.length) {
+        value.successful_call_disposition_ids = settingsSuccessfulCallDispositionIds
 
-          const companySuccessfulCallIds = settingsSuccessfulCallDispositionIds.filter(id => !value.call_disposition_ids.includes(id))
-          value.call_disposition_ids = [...value.call_disposition_ids, ...companySuccessfulCallIds]
-        }
+        const companySuccessfulCallIds = settingsSuccessfulCallDispositionIds.filter(id => !value.call_disposition_ids.includes(id))
+        value.call_disposition_ids = [...value.call_disposition_ids, ...companySuccessfulCallIds]
       }
 
       return value
@@ -417,10 +418,13 @@ export default {
 
       const powerDialerSettings = this.currentCompany?.power_dialer_settings ?? {}
 
+      const redialRequired = powerDialerSettings.min_redials > 0
+
       switch (field) {
-        case 'min_redials': return powerDialerSettings.min_redials > 0
-        case 'force_immediate_redial': return powerDialerSettings.force_immediate_redial
-        case 'successful_call_disposition_ids': return powerDialerSettings.successful_call_disposition_ids?.length > 0
+        case 'min_redials': return redialRequired
+        case 'force_immediate_redial': return redialRequired && powerDialerSettings.force_immediate_redial
+        case 'force_sms': return redialRequired && powerDialerSettings.force_sms
+        case 'successful_call_disposition_ids': return redialRequired && powerDialerSettings.successful_call_disposition_ids?.length > 0
       }
 
       return false

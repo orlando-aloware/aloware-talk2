@@ -166,7 +166,7 @@ export default {
 
       // min_redials = 0 (redial disabled)
       if (!minRedials || minRedials === 0) {
-        console.log('%c MIN REDIALS NOT SET', 'background-color: red; color: white')
+        console.log('%c redial disabled', 'background-color: green; color: white')
         return false
       }
 
