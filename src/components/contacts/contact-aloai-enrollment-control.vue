@@ -274,6 +274,8 @@ export default {
           this.$generalNotification(
             'Contact successfully disenrolled from the selected AloAi Text Bot.'
           )
+
+          this.refreshBots()
         })
         .catch((error) => {
           let errorMsg = 'Error while disenrolled contact to AloAi Text Bot.'
