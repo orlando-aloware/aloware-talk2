@@ -5,6 +5,12 @@
     data-testid="contact-sequence-overlay"
     variant="white"
   >
+  <template #overlay>
+    <q-spinner-bars
+      color="primary"
+      size="40px"
+    />
+  </template>
   <b-card class="border-0 position-relative contact-about-wrapper" v-if="profile?.company?.aloai_enabled">
     <h4>AloAi Text Bot Enrollment</h4>
 
