@@ -167,9 +167,7 @@ export default {
             'Contact successfully enrolled to the selected AloAi Text Bot.'
           )
           // Wait for 2.5 seconds before refreshing the enrolled bots list
-          setTimeout(() => {
-            this.$emit('contactEnrolled')
-          }, 2500)
+          this.$emit('contactEnrolled')
 
           this.onHidden()
         })

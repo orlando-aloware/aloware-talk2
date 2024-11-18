@@ -2,7 +2,7 @@
   <b-overlay
     :show="isBusy"
     rounded="sm"
-    data-testid="contact-bot-overlay"
+    data-testid="contact-sequence-overlay"
     variant="white"
   >
   <b-card class="border-0 position-relative contact-about-wrapper" v-if="profile?.company?.aloai_enabled">
@@ -106,12 +106,6 @@
         <i class="fa fa-trash"></i> Disenroll from Bot
       </b-button>
     </b-card-text>
-    <b-card-text
-      v-else
-      class="fs-14 mt-2"
-    >
-      This contact is currently not enrolled to a Bot.
-    </b-card-text>
 
     <div id="engage-control-popover">
       <b-button
@@ -134,7 +128,7 @@
 
     <aloai-enrollment-control-modal
       ref="aloaiEnrollmentControlModalRef"
-      @contactEnrolled="refreshBots"
+      @contactEnrolled="onContactEnrolled"
     />
   </b-card>
 </b-overlay>
@@ -199,7 +193,12 @@ export default {
         return null
       }
 
-      return this.bots[this.activeBotIndex]
+      // Filter bots using the botEnrollments aloai_bot_id
+      let filteredBots = this.bots.filter((bot) => bot.id === this.botEnrollments[this.activeBotIndex].aloai_bot_id)
+
+      console.log('filteredBots', filteredBots)
+
+      return filteredBots[0]
     }
   },
 
@@ -208,6 +207,13 @@ export default {
   },
 
   methods: {
+    onContactEnrolled () {
+      this.isBusy = true
+      // sleep 2500
+      setTimeout(() => {
+        this.refreshBots()
+      }, 2500)
+    },
     refreshBots () {
       this.isBusy = true
       this.fetchBots()
@@ -267,7 +273,6 @@ export default {
       })
     },
     disenrollContact () {
-      this.isBusy = true
       talk2Api.V2.aloAiBot
         .disenrollContact(this.displayedBot.id, { contact_ids: [this.contact.id] })
         .then(() => {
@@ -275,7 +280,11 @@ export default {
             'Contact successfully disenrolled from the selected AloAi Text Bot.'
           )
 
-          this.refreshBots()
+          // sleep 2.5 seconds to allow the bot to update the contact
+          this.isBusy = true
+          setTimeout(() => {
+            this.refreshBots()
+          }, 2500)
         })
         .catch((error) => {
           let errorMsg = 'Error while disenrolled contact to AloAi Text Bot.'
@@ -285,9 +294,6 @@ export default {
 
           this.$generalNotification(errorMsg, 'error')
           console.error('[submitEnrollment] error', error)
-        })
-        .finally(() => {
-          this.isBusy = false
         })
     },
     async fetchBots () {
