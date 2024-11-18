@@ -330,6 +330,11 @@ export default {
         return false
       }
 
+      // If user have been granted Delete permission, which is higher than Removing from list permission
+      if (this.hasDeletePermission) {
+        return this.canDelete
+      }
+
       // if is only agent and not billing admin, or admin, or supervisor and list is public
       if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
         return false
@@ -344,7 +349,7 @@ export default {
       }
 
       if (this.isPowerDialer) {
-        return true
+        return this.canDelete
       }
 
       return false
