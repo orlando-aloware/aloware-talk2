@@ -98,8 +98,7 @@ export default function (/* { ssrContext } */) {
         error: {
           message: '',
           code: null
-        },
-        redialedTasksCount: []
+        }
       },
       warnings: [],
       shouldIntroduce: false,
@@ -402,14 +401,6 @@ export default function (/* { ssrContext } */) {
 
       setDialerError ({ commit }, error) {
         commit('SET_DIALER_ERROR', error)
-      },
-
-      incrementDialerRedialedTask ({ commit }, taskId) {
-        commit('INCREMENT_DIALER_REDIALED_TASK_COUNT', taskId)
-      },
-
-      clearDialerRedialedTasksCount ({ commit }) {
-        commit('CLEAR_DIALER_REDIALED_TASKS_COUNT')
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -1062,18 +1053,6 @@ export default function (/* { ssrContext } */) {
       SET_DIALER_ERROR (state, error) {
         state.dialer.error.message = error.message
         state.dialer.error.code = error.code
-      },
-
-      INCREMENT_DIALER_REDIALED_TASK_COUNT (state, taskId) {
-        if (state.dialer.redialedTasksCount[taskId]) {
-          state.dialer.redialedTasksCount[taskId]++
-        } else {
-          state.dialer.redialedTasksCount[taskId] = 1
-        }
-      },
-
-      CLEAR_DIALER_REDIALED_TASKS_COUNT (state) {
-        state.dialer.redialedTasksCount = []
       },
 
       SET_OLD_AGENT_STATUS (state, status) {

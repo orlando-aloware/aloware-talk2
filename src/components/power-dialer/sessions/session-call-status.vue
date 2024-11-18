@@ -533,7 +533,8 @@ export default {
       'countdownTimer',
       'sessionPaused',
       'activeTask',
-      'hubspot'
+      'hubspot',
+      'redialedTasksCount'
     ]),
 
     ...mapState([
@@ -864,28 +865,6 @@ export default {
           redial: false
         }
       ]
-    },
-
-    // Should redial if force redial is set, if it has not been redialed yet
-    // and if the call disposition is not a successful call disposition
-    shouldRedial () {
-      // min_redials = 0 (redial disabled)
-      if (!this.sessionSettings.min_redials || this.sessionSettings.min_redials === 0) {
-        return false
-      }
-
-      // exceeded required min_redials attempts
-      if (this.dialer.redialedTasksCount[this.activeTask?.id] > this.sessionSettings.min_redials) {
-        return false
-      }
-
-      // selected call disposition is a successful call disposition
-      const successfulCallDispositionsIds = this.sessionSettings.successful_call_disposition_ids
-      if (Array.isArray(successfulCallDispositionsIds) && successfulCallDispositionsIds.includes(this.callDisposition)) {
-        return false
-      }
-
-      return true
     }
   },
 
@@ -909,15 +888,14 @@ export default {
     this.$VueEvent.listen('redial_task', this.requeueTask)
     this.$VueEvent.listen('holdFailed', this.onHoldFailed)
     this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
+    this.$VueEvent.listen('onNextTask', this.onNextTask)
 
     this.isSessionRunning = false
   },
 
   methods: {
     ...mapActions([
-      'setShowPhone',
-      'incrementDialerRedialedTask',
-      'clearDialerRedialedTasksCount'
+      'setShowPhone'
     ]),
 
     ...mapActions('contacts', [
@@ -926,7 +904,8 @@ export default {
 
     ...mapActions('powerDialer', [
       'reQueuePowerDialerTask',
-      'removeFirstInQueueTask'
+      'removeFirstInQueueTask',
+      'incrementRedialedTaskCount'
     ]),
 
     onDispositionsClick () {
@@ -1282,8 +1261,6 @@ export default {
         }, 500)
       }
 
-      this.clearDialerRedialedTasksCount()
-
       clearInterval(this.countdownInterval)
 
       setTimeout(() => {
@@ -1405,18 +1382,19 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      // if task is skipped by any reason (timezone, dnc, etc) we should not request a redial
-      if (this.shouldRedial && !this.isTaskSkipped(this.activeTask?.contact_list_item_id)) {
-        console.log('%c Double dial required, pushing to bottom', 'background: yellow; color: #000;')
+      if (this.redialRequired) {
+        this.incrementRedialedTaskCount(this.activeTask.id)
 
-        this.incrementDialerRedialedTask(this.activeTask.id)
-
-        const redialNow = this.powerDialerTasks.in_queue.length === 0
+        // redial immediately if immediate redial is on or no tasks left
+        const redialNow = this.sessionSettings.force_immediate_redial || this.powerDialerTasks.in_queue.length === 0
         this.onRedial(redialNow, true)
+
+        console.log(`%c Redial required, pushing to ${redialNow ? 'TOP' : 'BOTTOM'}`, 'background: yellow; color: #000;')
 
         if (redialNow) {
           this.$VueEvent.fire('clearCallDispositionStatus')
         }
+
         return
       }
 
@@ -1650,10 +1628,6 @@ export default {
       }
 
       this.processSession(false)
-    },
-
-    isTaskSkipped (contactListItemId) {
-      return contactListItemId && this.skippedTasks.includes(contactListItemId)
     }
   },
 
@@ -1776,6 +1750,7 @@ export default {
     this.$VueEvent.stop('redial_task', this.requeueTask)
     this.$VueEvent.stop('holdFailed', this.onHoldFailed)
     this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
+    this.$VueEvent.stop('onNextTask', this.onNextTask)
   }
 }
 </script>

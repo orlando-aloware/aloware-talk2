@@ -549,12 +549,12 @@ export default {
       'getTemporarySessionSetting',
       'updateContactsList',
       'getSessionSetting',
-      'getPowerDialerList'
+      'getPowerDialerList',
+      'clearRedialSettings'
     ]),
 
     ...mapActions([
-      'setDialerCommunication',
-      'clearDialerRedialedTasksCount'
+      'setDialerCommunication'
     ]),
 
     ...mapMutations('powerDialer', [
@@ -811,7 +811,7 @@ export default {
         this.setDialerCommunication()
       }
 
-      this.clearDialerRedialedTasksCount()
+      this.clearRedialSettings()
     },
 
     getSettingsItemClass (setting) {

@@ -11,30 +11,36 @@
             Line
           </label>
           <line-selector :multiple="false"
-                         :use-chips="true"
-                         :disable="disabled"
-                         :generic-styling="false"
-                         :generic-multiselect="false"
-                         :force-remove-missing-values="true"
-                         v-model="resources.campaign_id"
-                         @change="(eventPayload) => onSettingsChange(eventPayload, 'campaign_id')"/>
+                        :use-chips="true"
+                        :disable="disabled"
+                        :generic-styling="false"
+                        :generic-multiselect="false"
+                        :force-remove-missing-values="true"
+                        v-model="resources.campaign_id"
+                        @change="(eventPayload) => onSettingsChange(eventPayload, 'campaign_id')"/>
         </div>
-      </div>
 
-      <div class="col-12 mb-4 d-flex items-center justify-between">
-        <div>
-          <label class="label mb-1 text-weight-bold">
-            Skip Outside Daytime Hours
-          </label>
-          <div>You can skip contacts that are in a timezone outside the daytime hours</div>
+        <div class="col-6 mb-4">
+          <div>
+            <label class="label mb-1">
+              Skip Outside Daytime Hours
+            </label>
+            <span class="ml-1 cursor-pointer">
+              <information-circle-icon color="#2F80ED"/>
+              <q-tooltip anchor="top middle"
+                         self="center middle">
+                You can skip contacts that are in a timezone outside the daytime hours
+              </q-tooltip>
+            </span>
+          </div>
+          <q-toggle size="md"
+                    val="md"
+                    :true-value="1"
+                    :false-value="0"
+                    :disable="disabled"
+                    v-model="resources.skip_outside_daytime_hours" />
         </div>
-        <q-toggle size="md"
-                  val="md"
-                  :true-value="1"
-                  :false-value="0"
-                  :disable="disabled"
-                  v-model="resources.skip_outside_daytime_hours" />
-      </div>
+    </div>
 
       <div class="row">
         <div class="col-6 pl-3">
@@ -69,8 +75,7 @@
         </div>
       </div>
 
-      <div>
-      <div class="label mb-2 text-weight-bold text-subtitle1 pl-3 py-2">
+      <div class="label mt-3 mb-2 text-weight-bold text-subtitle1 pl-3 py-2">
         Redial Settings
       </div>
 
@@ -90,12 +95,12 @@
                   data-testid="datatable-per-page-select"
                   :disable="disableField('min_redials')"
                   :options="minRedialOptions"
-                  :display-value="resources.min_redials === 0 ? '0 (No redial required)' : `${resources.min_redials} times`"
+                  :display-value="resources.min_redials === 0 ? '0 (No redial required)' : `${resources.min_redials} time${resources.min_redials > 1 ? 's' : ''}`"
                   v-model="resources.min_redials" />
       </div>
 
       <div class="col-12 mb-4"
-           v-show="resources.min_redials > 0">
+          v-show="resources.min_redials > 0">
         <div class="d-flex items-center justify-between">
           <div :class="disableField('force_immediate_redial') ? 'opacity-05' : ''">
             <label class="label mb-1 text-weight-bold">
@@ -131,12 +136,12 @@
       </div>
 
       <div class="col-12 pl-3 mb-4"
-           v-show="resources.min_redials > 0">
+          v-show="resources.min_redials > 0">
         <div>
           <label class="label mb-1 text-weight-bold">
             Select Successful Call Dispositions
           </label>
-          <div>Select the dispositions that won't trigger a double dial, meaning that the call was successfully answered</div>
+          <div>Select the dispositions that won't require the contact to be redialed, meaning that the call was successfully answered</div>
         </div>
         <call-disposition-selector class="p-0 mt-1 dial-sessions__form__call-disposition-selector"
                                     :multiple="true"
@@ -144,7 +149,7 @@
                                     v-model="resources.successful_call_disposition_ids"
                                     @change="onSuccessfulCallDispositionsChange"/>
       </div>
-    </div>
+
       <div class="label mt-4 mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
         Customizations
       </div>
@@ -242,6 +247,7 @@ import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
 import SessionOrderSelector from 'components/generic-selectors/session-order-selector.vue'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'StartDialSessionsForm',
@@ -279,7 +285,8 @@ export default {
     ContactDispositionSelector,
     VmDropSelector,
     CallDispositionSelector,
-    SessionOrderSelector
+    SessionOrderSelector,
+    InformationCircleIcon
   },
 
   data () {
@@ -327,8 +334,10 @@ export default {
     },
 
     minRedialOptions () {
-      const options = Array(11).fill(0).map((_, index) => ({ value: index, label: `${index} times` }))
-      options[0].label = '0 (No redial required)'
+      const options = [
+        { value: 0, label: '0 (No redial required)' },
+        ...Array(10).fill(0).map((_, index) => ({ value: index + 1, label: `${index + 1} time${index > 1 ? 's' : ''}` }))
+      ]
       return options
     }
   },
@@ -375,27 +384,27 @@ export default {
     applyCompanyRedialSettings (value) {
       const powerDialerSettings = this.currentCompany?.power_dialer_settings ?? {}
 
+      // if force redial is enabled
       if (powerDialerSettings.min_redials > 0) {
         value.min_redials = powerDialerSettings.min_redials
-      }
 
-      // if company success call disposition settings, override
-      if (powerDialerSettings.successful_call_disposition_ids?.length) {
-        value.successful_call_disposition_ids = powerDialerSettings.successful_call_disposition_ids
+        if (powerDialerSettings.force_immediate_redial) {
+          value.force_immediate_redial = 1
+        }
 
-        // combine call disposition ids with selected successful call dispositions
-        if (powerDialerSettings.min_redials > 0) {
-          const companySuccessfulCallIds = powerDialerSettings.successful_call_disposition_ids.filter(id => !value.call_disposition_ids.includes(id))
+        if (powerDialerSettings.force_sms) {
+          value.force_sms = 1
+        }
+
+        const settingsSuccessfulCallDispositionIds = powerDialerSettings.successful_call_disposition_ids
+
+        // if company has successful call disposition settings, merge it to current dispositions
+        if (settingsSuccessfulCallDispositionIds?.length) {
+          value.successful_call_disposition_ids = settingsSuccessfulCallDispositionIds
+
+          const companySuccessfulCallIds = settingsSuccessfulCallDispositionIds.filter(id => !value.call_disposition_ids.includes(id))
           value.call_disposition_ids = [...value.call_disposition_ids, ...companySuccessfulCallIds]
         }
-      }
-
-      if (powerDialerSettings.force_immediate_redial) {
-        value.force_immediate_redial = 1
-      }
-
-      if (powerDialerSettings.force_sms) {
-        value.force_sms = 1
       }
 
       return value

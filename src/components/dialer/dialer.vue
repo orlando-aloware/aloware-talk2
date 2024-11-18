@@ -57,7 +57,8 @@ export default {
       dialerListeners: {},
       AgentStatus,
       WebrtcEvents,
-      CommunicationDispositionStatus
+      CommunicationDispositionStatus,
+      taskRedialed: false
     }
   },
 
@@ -1341,6 +1342,13 @@ export default {
 
     resetCall () {
       console.log('Resetting call')
+
+      if (!this.taskRedialed && this.isSessionRunning && this.redialRequired) {
+        this.taskRedialed = true
+        this.$VueEvent.fire('onNextTask')
+        return
+      }
+
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()
@@ -1357,6 +1365,11 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(false)
+
+      // avoid redialing multiple times
+      setTimeout(() => {
+        this.taskRedialed = false
+      }, 300)
     },
 
     countCallDuration () {

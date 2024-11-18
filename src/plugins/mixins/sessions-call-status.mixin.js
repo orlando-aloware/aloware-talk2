@@ -45,7 +45,8 @@ export default {
       'countdownTimer',
       'isSessionRunning',
       'taskToCall',
-      'hasActiveTask'
+      'hasActiveTask',
+      'redialedTasksCount'
     ]),
 
     ...mapGetters('contacts', [
@@ -153,6 +154,39 @@ export default {
         open_time: '09:00:00',
         close_time: '18:00:00'
       }
+    },
+
+    // Should redial if min_redials is set to > 0
+    // if has redialed less than min_redials
+    // and if the call disposition is not a successful call disposition
+    redialRequired () {
+      // console.log('%c [redialRequired]', 'background-color: purple; color: white', { sessionSettings: this.sessionSettings, activeTask: this.activeTask, redialedTasksCount: this.redialedTasksCount })
+
+      const minRedials = this.sessionSettings.min_redials
+
+      // min_redials = 0 (redial disabled)
+      if (!minRedials || minRedials === 0) {
+        console.log('%c MIN REDIALS NOT SET', 'background-color: red; color: white')
+        return false
+      }
+
+      // exceeded required min_redials attempts
+      if (this.redialedTasksCount[this.activeTask?.id] >= minRedials) {
+        return false
+      }
+
+      // selected call disposition is a successful call disposition
+      const successfulCallDispositionsIds = this.sessionSettings.successful_call_disposition_ids
+      if (Array.isArray(successfulCallDispositionsIds) && successfulCallDispositionsIds.includes(this.callDisposition)) {
+        return false
+      }
+
+      // if task is skipped by any reason (timezone, dnc, etc) we should not request a redial
+      if (this.isTaskSkipped(this.activeTask?.contact_list_item_id)) {
+        return false
+      }
+
+      return true
     }
   },
 
@@ -402,6 +436,10 @@ export default {
       const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.contact_list_item_id === element.contact_list_item_id))
 
       return newInQueueList
+    },
+
+    isTaskSkipped (contactListItemId) {
+      return contactListItemId && this.skippedTasks.includes(contactListItemId)
     }
   }
 }
