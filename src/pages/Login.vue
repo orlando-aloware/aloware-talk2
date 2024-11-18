@@ -20,7 +20,6 @@ import {
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
 import LoginForm from 'components/guest/login-form'
 import { mapActions, mapState } from 'vuex'
-import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as storage from 'src/plugins/helpers/storage'
 import UserAlreadyHaveAccountDialog from 'src/components/account-registration/user-already-have-account-dialog.vue'
 import talk2Api from 'src/plugins/api/api'
@@ -42,18 +41,7 @@ export default {
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('accountRegistration', ['shouldRedirectToLogin']),
-    ...mapState(['statics']),
-
-    shouldRedirectToClassic () {
-      const urlParams = new URLSearchParams(window.location.search)
-      const fromClassic = Number(urlParams.get('from_classic'))
-
-      return this.profile &&
-        this.profile.default_app === AppDefaultLogin.APP_ALOWARE_CLASSIC &&
-        fromClassic !== 1 &&
-        !this.isAdmin &&
-        !this.profile?.company?.force_talk
-    }
+    ...mapState(['statics'])
   },
 
   methods: {
@@ -67,9 +55,7 @@ export default {
           const response = this.getCookieUser()
           if (response) {
             response.then(res => {
-              if (res.data.data.company.talk_enabled) {
-                this.cookieUserValidated(res)
-              }
+              this.cookieUserValidated(res)
             })
           }
         }
@@ -87,11 +73,7 @@ export default {
 
       storage.local.setItem('company_id', company.id)
 
-      if (this.shouldRedirectToClassic) {
-        location.href = `${this.getClassicURL(this.isSimpSocial)}?from_talk_2=1&token=${storage.local.getItem('shared_cookie')}`
-      } else {
-        window.location.reload()
-      }
+      window.location.reload()
     },
 
     redirectTimeout () {
