@@ -201,7 +201,7 @@ export default {
         return null
       }
 
-      return enrolledBots[0]
+      return enrolledBots[this.activeBotIndex]
     }
   },
 
