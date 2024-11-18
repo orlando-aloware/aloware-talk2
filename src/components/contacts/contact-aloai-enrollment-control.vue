@@ -189,13 +189,15 @@ export default {
       return this.botEnrollments.length - 1
     },
     displayedBot () {
+      // Sanity check
       if (_.isEmpty(this.botEnrollments)) {
         return null
       }
 
       // Filter bots using the botEnrollments aloai_bot_id
-      let enrolledBots = this.bots.filter((bot) => bot.id === this.botEnrollments[this.activeBotIndex].aloai_bot_id)
+      let enrolledBots = this.bots.filter((bot) => bot.id === this.botEnrollments.find(enrollment => enrollment.aloai_bot_id === bot.id)?.aloai_bot_id)
 
+      // Sanity check
       if (_.isEmpty(enrolledBots)) {
         console.warn('No bot found for the current enrollment')
         return null
@@ -219,14 +221,24 @@ export default {
     },
     refreshBots () {
       this.isBusy = true
-      this.bots = []
-      this.botEnrollments = []
+      // this.bots = []
+      // this.botEnrollments = []
+      const previousActiveBotIndex = this.activeBotIndex
+
       this.fetchBots()
         .then((bots) => {
           this.bots = bots
           this.fetchContactBotEnrollments()
             .then((botEnrollments) => {
               this.botEnrollments = botEnrollments
+              // Determine the new activeBotIndex based on:
+              if (previousActiveBotIndex === 0) {
+                this.activeBotIndex = 0 // First bot, keep it as 0
+              } else if (previousActiveBotIndex >= botEnrollments.length) {
+                this.activeBotIndex = botEnrollments.length - 1 // Last bot, move to the previous valid index
+              } else {
+                this.activeBotIndex = previousActiveBotIndex // Middle, keep the previous index
+              }
               this.isBusy = false
             })
         })
