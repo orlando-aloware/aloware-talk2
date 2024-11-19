@@ -195,6 +195,7 @@
                       size="sm"
                       class="custom-action-button my-1"
                       data-testid="contact-info-remove-power-dialer-button"
+                      v-if="hasPowerDialerLists"
                       @click="removeContactFromPowerDialerLists">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-remove-power-dialer-tooltip"
@@ -285,6 +286,7 @@ import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import EmailIcon from 'components/icons/email-icon'
 import VideoConferenceIcon from 'components/icons/video-conference-icon'
+import { POWER_DIALER_LIST } from 'src/constants/contact-list-types'
 
 export default {
   name: 'contact-info',
@@ -353,6 +355,11 @@ export default {
       return {
         contact_ids: [this.contact.id]
       }
+    },
+
+    hasPowerDialerLists () {
+      console.log('this.contact?.contact_lists', this.contact?.contact_lists)
+      return this.contact?.contact_lists?.some((list) => list.module_type === POWER_DIALER_LIST)
     }
   },
 
