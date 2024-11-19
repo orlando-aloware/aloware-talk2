@@ -534,8 +534,7 @@ export default {
       'sessionPaused',
       'activeTask',
       'hubspot',
-      'redialedTasksCount',
-      'activeTaskRedialed'
+      'redialedTasksCount'
     ]),
 
     ...mapState([
@@ -1386,7 +1385,7 @@ export default {
       if (this.redialRequired) {
         this.incrementRedialedTaskCount(this.activeTask.id)
 
-        // redial immediately if immediate redial is on or no tasks left
+        // redial immediately if immediate redial is ON or no tasks left
         const redialNow = this.sessionSettings.force_immediate_redial || this.powerDialerTasks.in_queue.length === 0
         this.onRedial(redialNow, true)
 
@@ -1396,7 +1395,7 @@ export default {
           this.$VueEvent.fire('clearCallDispositionStatus')
         }
 
-        this.activeTaskRedialed = true
+        this.activeTask.forcedRedial = true
         return
       }
 

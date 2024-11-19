@@ -70,11 +70,11 @@ export default {
 
     ...mapState('auth', ['profile', 'authenticated']),
 
-    ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
+    ...mapState('powerDialer', ['powerDialerTasks']),
 
     ...mapState(['isWidget']),
 
-    ...mapFields('powerDialer', ['activeTaskRedialed']),
+    ...mapFields('powerDialer', ['activeTask']),
 
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
@@ -1344,9 +1344,10 @@ export default {
     },
 
     resetCall () {
-      console.log('Resetting call', { 'activeTaskRedialed': this.activeTaskRedialed })
+      console.log('Resetting call', { activeTask: this.activeTask })
 
-      if (!this.activeTaskRedialed && this.isSessionRunning && this.redialRequired) {
+      if (this.isSessionRunning && this.redialRequired && this.activeTask && !this.activeTask.forcedRedial) {
+        this.activeTask.forcedRedial = true
         this.$VueEvent.fire('onNextTask')
         return
       }
