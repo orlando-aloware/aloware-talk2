@@ -865,7 +865,7 @@ export default {
     async hasSmsTemplates () {
       try {
         const res = await API.V1.smsTemplate.get()
-        return res.data.filter((item) => item.user_id === this.profile.id).length
+        return res.data.length > 0
       } catch (err) {
         console.error('[hasSmsTemplates] error', err)
         return false

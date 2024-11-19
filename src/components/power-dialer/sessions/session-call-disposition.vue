@@ -169,7 +169,7 @@ export default {
 
     getSmsTemplates () {
       API.V1.smsTemplate.get().then(res => {
-        this.smsTemplates = res.data.filter((item) => item.user_id === this.profile.id)
+        this.smsTemplates = res.data
       })
     },
 
@@ -279,8 +279,6 @@ export default {
       if (!this.isReferenceAvailable('smsTemplatesSelector')) {
         return
       }
-
-      // console.log('initSmsTemplate', { callDisposition: this.callDisposition, successfulDispo: this.sessionSettings.successful_call_disposition_ids })
 
       if (['READY', 'MAKING_CALL'].includes(this.dialer.currentStatus) && this.$refs.smsTemplatesSelector.enabled) {
         this.$refs.smsTemplatesSelector.disable()
@@ -407,6 +405,10 @@ export default {
     },
 
     callDisposition () {
+      this.initSmsTemplate()
+    },
+
+    contactDisposition () {
       this.initSmsTemplate()
     }
   },
