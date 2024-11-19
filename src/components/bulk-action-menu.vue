@@ -312,7 +312,11 @@ export default {
     },
 
     showRemoveFromListButton () {
-      if (this.isAddView || this.isPowerDialer || this.isSimpSocial) {
+      if (this.isAddView) {
+        return false
+      }
+
+      if (this.isPowerDialer) {
         return false
       }
 
@@ -326,7 +330,12 @@ export default {
         return false
       }
 
-      // if is only agent and not billing admin or admin or supervisor and list is public
+      // If user have been granted Delete permission, which is higher than Removing from list permission
+      if (this.hasDeletePermission) {
+        return this.canDelete
+      }
+
+      // if is only agent and not billing admin, or admin, or supervisor and list is public
       if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
         return false
       }
@@ -337,7 +346,15 @@ export default {
     },
 
     showRemoveFromPdListButton () {
-      return this.isPowerDialer && !this.isAddView && this.canDelete && !this.isSimpSocial
+      if (this.isAddView) {
+        return false
+      }
+
+      if (this.isPowerDialer) {
+        return this.canDelete
+      }
+
+      return false
     },
 
     showMoreDropdownButton () {
