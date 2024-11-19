@@ -59,8 +59,28 @@ export const networkIssues = {
       }
     ]
   },
-  packetsLostFraction: {
+  'high-packet-loss': {
     description: 'Inbound packet loss',
+    trigger: 'Packet loss > 1% in 3 out of last 5 samples',
+    details: 'Packet loss is measured as the percentage of packets that were sent but not received at the SDK sensors. High packet loss can result in choppy audio or a dropped call.',
+    bucketing: [
+      {
+        min: 3,
+        max: Infinity
+      }, {
+        min: 2,
+        max: 3
+      }, {
+        min: 1,
+        max: 2
+      }, {
+        min: 0,
+        max: 1
+      }
+    ]
+  },
+  'high-packets-lost-fraction': {
+    description: 'Inbound packet loss Fraction',
     trigger: 'Packet loss > 3% in 7 out of last 10 samples',
     details: 'A more severe event than merely high-packet-loss. Packet loss can result in choppy audio or a dropped call.',
     bucketing: [
