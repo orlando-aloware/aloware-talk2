@@ -19,7 +19,7 @@
           <q-card class="ring-group-snapshot-card mb-2 text-15"
                   flat
                   bordered
-                  v-if="networkIssues[callIssue.data.name]"
+                  v-if="networkIssues[callIssue.data.name] || networkIssues[callIssue.event_name]"
           >
             <div class="text-left m-4 ">
               <h5 class="mr-1">Agent:</h5>
