@@ -45,6 +45,10 @@ export default {
         return false
       }
 
+      if (['READY', 'MAKING_CALL'].includes(this.dialer.currentStatus)) {
+        return false
+      }
+
       const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
 
       return isForcedContactDisposition && !this.isContactDisposed
