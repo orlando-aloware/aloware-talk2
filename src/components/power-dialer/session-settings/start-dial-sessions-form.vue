@@ -137,8 +137,8 @@
 
       <div class="col-12 pl-3 mb-4"
           v-show="resources.min_redials > 0">
-        <div>
-          <label :class="`label mb-1 text-weight-bold ${disableField('successful_call_disposition_ids') ? 'opacity-05' : ''}`">
+        <div :class="disableField('successful_call_disposition_ids') ? 'opacity-05' : ''">
+          <label class="label mb-1 text-weight-bold">
             Select Successful Call Dispositions
           </label>
           <div>Select the dispositions that won't require the contact to be redialed, meaning that the call was successfully answered</div>
