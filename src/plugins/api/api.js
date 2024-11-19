@@ -885,7 +885,7 @@ export default {
         return window.axios.post(`${suffixV1}aloai/${botId}/enroll-contacts`, params)
       },
       disenrollContact (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/disenroll-contacts`, params)
+        return window.axios.post(`${suffixV1}aloai/${botId}/disenroll-contact`, params)
       }
     }
   }

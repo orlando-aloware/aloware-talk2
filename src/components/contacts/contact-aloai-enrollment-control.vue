@@ -321,7 +321,7 @@ export default {
     },
     disenrollContact () {
       talk2Api.V2.aloAiBot
-        .disenrollContact(this.displayedBot.id, { contact_ids: [this.contact.id] })
+        .disenrollContact(this.displayedBot.id, { contact_id: this.contact.id })
         .then(() => {
           this.$generalNotification(
             'Contact successfully disenrolled from the selected AloAi Text Bot.'
