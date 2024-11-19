@@ -92,18 +92,18 @@
                 {{ callIssue.data.avg }}%
                 <br/><br/>
 
-                {{ networkIssues[callIssue.data.name].details }}
+                {{ networkIssues[callIssue.event_name].details }}
               </div>
               <div v-else-if="callIssue.event_name === 'high-packets-lost-fraction'">
                 <network-signal-strength :value-issue="callIssue.data.avg"
-                                         :issue="networkIssues[callIssue.data.name]"
-                                         :title="networkIssues[callIssue.data.name].trigger"
+                                         :issue="networkIssues[callIssue.event_name]"
+                                         :title="networkIssues[callIssue.event_name].trigger"
                 />
                 <h5 class="mr-1">Inbound Packet Loss Fraction: </h5>
                 {{ callIssue.data.avg }}%
                 <br/><br/>
 
-                {{ networkIssues[callIssue.data.name].details }}
+                {{ networkIssues[callIssue.event_name].details }}
               </div>
             </div>
           </q-card>
