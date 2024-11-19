@@ -6,6 +6,7 @@
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   agentMixin,
@@ -72,6 +73,8 @@ export default {
     ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
 
     ...mapState(['isWidget']),
+
+    ...mapFields('powerDialer', ['activeTaskRedialed']),
 
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
@@ -1341,10 +1344,9 @@ export default {
     },
 
     resetCall () {
-      console.log('Resetting call')
+      console.log('Resetting call', { 'activeTaskRedialed': this.activeTaskRedialed })
 
-      if (!this.taskRedialed && this.isSessionRunning && this.redialRequired) {
-        this.taskRedialed = true
+      if (!this.activeTaskRedialed && this.isSessionRunning && this.redialRequired) {
         this.$VueEvent.fire('onNextTask')
         return
       }
@@ -1367,9 +1369,9 @@ export default {
       this.setShowIncomingCallNotification(false)
 
       // avoid redialing multiple times
-      setTimeout(() => {
-        this.taskRedialed = false
-      }, 300)
+      // setTimeout(() => {
+      //   this.taskRedialed = false
+      // }, 300)
     },
 
     countCallDuration () {

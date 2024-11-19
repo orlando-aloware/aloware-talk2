@@ -534,7 +534,8 @@ export default {
       'sessionPaused',
       'activeTask',
       'hubspot',
-      'redialedTasksCount'
+      'redialedTasksCount',
+      'activeTaskRedialed'
     ]),
 
     ...mapState([
@@ -1395,6 +1396,7 @@ export default {
           this.$VueEvent.fire('clearCallDispositionStatus')
         }
 
+        this.activeTaskRedialed = true
         return
       }
 
