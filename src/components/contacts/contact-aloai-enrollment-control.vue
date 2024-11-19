@@ -162,6 +162,34 @@
         @contactEnrolled="onContactEnrolled"
       />
     </b-card>
+
+    <confirm-dialog
+      id="contact-disenroll-from-bot"
+      title="Disenroll Contact from AloAi Text Bot"
+      @close="closeDisenrollmentConfirmation"
+    >
+      <div slot="content">
+        <p v-html="confirmDeletionMessage"/>
+      </div>
+      <div slot="footer">
+        <div class="d-flex w-100">
+          <div class="flex-grow-1"/>
+          <button class="btn btn-sm btn-outline-dark mr-2"
+                  :disabled="isBusy"
+                  @click="closeDisenrollmentConfirmation">
+            Cancel
+          </button>
+          <button class="btn btn-sm btn-danger"
+                  :disabled="isBusy"
+                  @click="disenrollContact">
+            <span v-if="isBusy">
+              <i class="fas fa-circle-notch fa-spin"></i>
+            </span>
+            Yes, I'm sure
+          </button>
+        </div>
+      </div>
+    </confirm-dialog>
   </b-overlay>
 </template>
 
@@ -169,6 +197,7 @@
 import talk2Api from 'src/plugins/api/api'
 import AloaiIcon from 'components/icons/aloai-icon'
 import AloaiEnrollmentControlModal from 'components/aloai-enrollment-control-modal.vue'
+import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapGetters } from 'vuex'
 import { aloaiMixin } from 'src/plugins/mixins'
 import _ from 'lodash'
@@ -176,7 +205,7 @@ import _ from 'lodash'
 export default {
   name: 'contact-aloai-enrollment-control',
 
-  components: { AloaiEnrollmentControlModal, AloaiIcon },
+  components: { AloaiEnrollmentControlModal, AloaiIcon, ConfirmDialog },
 
   mixins: [aloaiMixin],
 
@@ -233,6 +262,10 @@ export default {
       }
 
       return enrolledBots[this.activeBotIndex]
+    },
+    confirmDeletionMessage () {
+      let name = this.contact.first_name || 'No Name'
+      return `Are you sure you want to remove <b>${name}</b> from <b>${this.displayedBot?.name}</b>?`
     }
   },
 
@@ -303,21 +336,10 @@ export default {
       }
     },
     openDisenrollmentConfirmation () {
-      this.$bvModal.msgBoxConfirm(`Disenrolling this contact from #${this.displayedBot.id} ${this.displayedBot.name} Bot will . Continue?`, {
-        title: 'Warning',
-        size: 'sm',
-        buttonSize: 'sm',
-        okVariant: 'warning',
-        okTitle: 'Yes',
-        cancelTitle: 'No',
-        footerClass: 'p-2',
-        hideHeaderClose: false,
-        centered: true
-      }).then(confirm => {
-        if (confirm) {
-          this.disenrollContact()
-        }
-      })
+      this.$bvModal.show('contact-disenroll-from-bot')
+    },
+    closeDisenrollmentConfirmation () {
+      this.$bvModal.hide('contact-disenroll-from-bot')
     },
     disenrollContact () {
       talk2Api.V2.aloAiBot
@@ -326,6 +348,8 @@ export default {
           this.$generalNotification(
             'Contact successfully disenrolled from the selected AloAi Text Bot.'
           )
+
+          this.closeDisenrollmentConfirmation()
 
           // Make it busy, refreshing the bots will turn it off
           this.isBusy = true
