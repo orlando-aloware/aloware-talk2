@@ -164,12 +164,15 @@ export default {
         .enrollContacts(this.selectedBotId, { contact_ids: [this.contact.id] })
         .then(() => {
           this.$generalNotification(
-            'Contact successfully enrolled to the selected AloAi Bot.'
+            'Contact successfully enrolled to the selected AloAi Text Bot.'
           )
+          // Give our Queue some time to enroll the contact
+          this.$emit('contactEnrolled')
+
           this.onHidden()
         })
         .catch((error) => {
-          let errorMsg = 'Error while enrolling contact to AloAi Bot.'
+          let errorMsg = 'Error while enrolling contact to AloAi Text Bot.'
           if (error?.response.data?.message) {
             errorMsg = error.response.data.message
           }
@@ -205,7 +208,7 @@ export default {
         const [bots, contactDisengagedBots, contactEnrolledBots] = await Promise.all([
           this.fetchBots(),
           this.fetchContactDisengagedBots(),
-          this.fetchContactEnrolledBots()
+          this.fetchContactBotEnrollments()
         ])
 
         this.bots = bots
@@ -252,14 +255,14 @@ export default {
         return []
       }
     },
-    async fetchContactEnrolledBots () {
+    async fetchContactBotEnrollments () {
       try {
-        const { data } = await talk2Api.V2.aloAiBot.getContactEnrolledBots(
+        const { data } = await talk2Api.V2.aloAiBot.getContactBotEnrollments(
           this.contact.id
         )
         return data
       } catch (error) {
-        console.error('[fetchContactEnrolledBots] error', error)
+        console.error('[fetchContactBotEnrollments] error', error)
         return []
       }
     }
