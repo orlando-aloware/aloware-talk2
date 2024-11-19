@@ -102,20 +102,15 @@ export default {
   },
 
   mounted () {
-    // if account is not allowed to access talk, we need to logout
-    if (this.profile && !this.profile.company.talk_enabled) {
-      this.logout()
-    } else {
-      // proceed to cookie validation if account is talk allowed access
-      this.getSharedCookie().then(sharedCookie => {
-        this.sharedCookie = sharedCookie
-        this.checkAccesses()
+    // proceed to cookie validation if account is talk allowed access
+    this.getSharedCookie().then(sharedCookie => {
+      this.sharedCookie = sharedCookie
+      this.checkAccesses()
 
-        if (storage.local.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
-          this.validateCookieUser()
-        }
-      })
-    }
+      if (storage.local.getItem('shared_cookie') !== this.sharedCookie && this.$route.name !== 'Login') {
+        this.validateCookieUser()
+      }
+    })
 
     this.$VueEvent.listen('make_new_call', (data) => {
       let fixedPhoneNumber = this.$options.filters.fixPhone(data.phone_number)
