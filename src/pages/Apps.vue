@@ -1,0 +1,96 @@
+<template>
+  <div class="h-100">
+    <upgrade-now-page
+      class="mt-5"
+      title-text="Open with our desktop app"
+      :text="getActionText"
+      :extra-text="`Phone: ${phone}`"
+      extra-text2="👇"
+      image-link="/assets/images/logo.png"
+      :show-button="false"
+    />
+
+    <!-- display a banner with empashis with the getActionText if the
+    action is not allowed -->
+    <div
+      v-if="!isAllowedActions"
+      class="q-pa-md q-gutter-sm d-flex justify-content-center"
+    >
+      <q-banner inline-actions rounded class="bg-orange text-white">
+        <span class="font-weight-bolder"> {{ getActionText }} </span>
+      </q-banner>
+    </div>
+
+    <!-- HERE BUTTON TO OPEN DEEP LINK -->
+    <div v-else class="d-flex justify-content-center mt-3">
+      <q-btn
+        class="q-mt-xl px-4"
+        label="Open App"
+        color="primary"
+        no-caps
+        unelevated
+        @click="openDeepLink"
+      />
+    </div>
+  </div>
+</template>
+
+<script>
+import UpgradeNowPage from 'src/components/upgrade-now-page.vue'
+
+const OPEN_CONTACTA_ACTION = 'open-contact'
+const CALL_ACTION = 'call'
+
+const AVAILABLES_ACTIONS = [OPEN_CONTACTA_ACTION, CALL_ACTION]
+
+const OPEN_CONTACT_DESCRIPTION = 'Opening the contact...'
+const CALL_DESCRIPTION = 'Calling...'
+
+const ALOWARE_PROTOCOL = 'alowaretalk://'
+
+export default {
+  name: 'Apps',
+
+  components: {
+    UpgradeNowPage
+  },
+  // get action and phone from get params
+  props: ['action', 'phone'],
+  computed: {
+    getActionText () {
+      if (this.isContactAction) {
+        return OPEN_CONTACT_DESCRIPTION
+      }
+
+      if (this.isCallAction) {
+        return CALL_DESCRIPTION
+      }
+
+      return "We couldn't find the action you are looking for"
+    },
+    isCallAction () {
+      return this.action === CALL_ACTION
+    },
+    isContactAction () {
+      return this.action === OPEN_CONTACTA_ACTION
+    },
+    isAllowedActions () {
+      return AVAILABLES_ACTIONS.includes(this.action)
+    }
+  },
+  methods: {
+    openDeepLink () {
+      // Open deep link
+      if (!this.isAllowedActions) {
+        return
+      }
+
+      window.open(`${ALOWARE_PROTOCOL}${this.action}-${this.phone}`, '_blank')
+    }
+  },
+
+  mounted () {
+    this.openDeepLink()
+  }
+}
+</script>
