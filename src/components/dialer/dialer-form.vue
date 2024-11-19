@@ -31,7 +31,7 @@
             <line-selector class="line-selector"
                            prepend="From:"
                            specificClass="dialer-line-selector"
-                           :disable="forceOutboundLine && defaultOutboundCampaignId"
+                           :disable="(defaultOutboundCampaignId && mode === 'call') && forceOutboundLine"
                            :generic-multiselect="false"
                            v-model="campaignId"
                            @change="changeCampaignId">
