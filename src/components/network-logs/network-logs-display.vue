@@ -83,12 +83,23 @@
 
                 {{ networkIssues[callIssue.data.name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === 'packetsLostFraction'">
+              <div v-else-if="callIssue.event_name === 'high-packet-loss'">
                 <network-signal-strength :value-issue="callIssue.data.avg"
                                          :issue="networkIssues[callIssue.data.name]"
                                          :title="networkIssues[callIssue.data.name].trigger"
                 />
                 <h5 class="mr-1">Inbound Packet Loss: </h5>
+                {{ callIssue.data.avg }}%
+                <br/><br/>
+
+                {{ networkIssues[callIssue.data.name].details }}
+              </div>
+              <div v-else-if="callIssue.event_name === 'high-packets-lost-fraction'">
+                <network-signal-strength :value-issue="callIssue.data.avg"
+                                         :issue="networkIssues[callIssue.data.name]"
+                                         :title="networkIssues[callIssue.data.name].trigger"
+                />
+                <h5 class="mr-1">Inbound Packet Loss Fraction: </h5>
                 {{ callIssue.data.avg }}%
                 <br/><br/>
 
@@ -136,9 +147,9 @@ export default {
       if (!threshold || !values || values.length === 0) return 'N/A'
 
       values = values.filter((value) => {
-        if (threshold.name === 'max') {
+        if (threshold.name === 'max' || threshold.name === 'maxAverage') {
           return value > threshold.value
-        } else if (threshold.name === 'min') {
+        } else if (threshold.name === 'min' || threshold.name === 'minAverage') {
           return value < threshold.value
         }
       })
