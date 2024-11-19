@@ -13,36 +13,40 @@
                       identity="call-disposition"
                       default-label="No Call Dispositions"
                       initiallyDisabled
+                      collapsible
                       :list-items="filteredCallDispositions"
                       :selected-item="callDisposition"
                       :display-count="4"
                       :forced="isHighlightedCallDisposition"
                       @on-selected-item="onSelectedCallDisposition" />
       <chips-ellipsis headerLabel="CONTACT DISPOSITION"
-                      headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
+                      headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-2"
                       ref="contactDispositionSelector"
                       identity="contact-disposition"
                       default-label="No Contact Dispositions"
+                      collapsible
                       :list-items="filteredContactDispositions"
                       :selected-item="contactDisposition"
                       :display-count="6"
                       :forced="isHighlightedContactDisposition"
                       @on-selected-item="onSelectedContactDisposition" />
       <chips-ellipsis headerLabel="VOICEMAIL"
-                      headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center pt-2"
                       ref="vm-drop"
                       identity="vm-drop"
                       default-label="No Voicemail"
                       initiallyDisabled
+                      collapsible
                       :list-items="voicemails"
                       :display-count="3"
                       :is-empty="isVoicemailEmpty"
                       @on-selected-item="onVmDrop"/>
       <chips-ellipsis headerLabel="SEND MESSAGE"
-                      headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center pt-2"
                       ref="smsTemplatesSelector"
                       identity="send-message"
                       default-label="No SMS Templates"
+                      collapsible
                       :list-items="smsTemplates"
                       :display-count="4"
                       :forced="requireSmsSending"
