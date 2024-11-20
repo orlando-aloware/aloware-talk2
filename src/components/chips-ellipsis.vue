@@ -7,7 +7,8 @@
                 style="width: 30px; height: 25px; margin-top: -1px;"
                 v-if="collapsible"
                 @click="toggleCollapse">
-          <i class="fa" :class="[!collapsed ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
+          <i class="fa"
+             :class="[!collapsed ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
         </button>
         <span @click="toggleCollapse">{{ headerLabel }}</span>
         <span class="text-xxs2 text-danger text-capitalize font-weight-bold"
