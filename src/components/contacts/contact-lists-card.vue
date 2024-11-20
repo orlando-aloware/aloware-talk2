@@ -196,6 +196,7 @@ export default {
   name: 'contact-lists-card',
 
   mixins: [aclMixin, contactLists],
+
   components: {
     FolderDynamicIcon,
     RemoveContactListItemConfirmation,
