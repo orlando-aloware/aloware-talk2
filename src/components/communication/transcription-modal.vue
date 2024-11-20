@@ -175,7 +175,7 @@
                       </q-btn>
                     </div>
                     <div class="summary-status-container">
-                      <div v-if="summary_status == SummaryStatus.STATUS_QUEUED">
+                      <div v-if="!summary_status">
                         <generate-summary-button class="mr-2"
                                                 data-testid="comm-details-generate-summary-button"
                                                 :communication="communication">
@@ -185,7 +185,7 @@
                         <q-icon name="error" color="red" size="md" />
                         <span>Summary generation failed.</span>
                       </div>
-                      <div v-else-if="summary_status == SummaryStatus.STATUS_PROCESSING" class="status-message">
+                      <div v-else-if="summary_status == SummaryStatus.STATUS_PROCESSING || summary_status == SummaryStatus.STATUS_QUEUED" class="status-message">
                         <q-icon name="hourglass_empty" color="blue" size="md" />
                         <span>Your summary is being processed. Please wait...</span>
                       </div>
