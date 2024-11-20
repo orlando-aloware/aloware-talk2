@@ -59,8 +59,7 @@
           </div>
           <b-link class="self-center trash-icon custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
                   href="#"
-                  v-if="canEditList(list) && !isRemoving"
-          >
+                  v-if="canEditList(list) && !isRemoving">
             <slot name="button">
               <span class='aloicons trash-icon'
                     :style="'color:' + iconColor + '!important'"
