@@ -86,9 +86,12 @@
         <folder-static-icon data-testid="contacts-shared-static-icon"
                             v-if="item.type === ContactListTypes.STATIC">
         </folder-static-icon>
-        <folder-dynamic-icon data-testid="contacts-shared-dynamic-icon"
+        <folder-dynamic-icon data-testid="contacts-shared-dynamic-remote-icon"
                              color="#00bf4a"
-                             v-if="item.type === ContactListTypes.DYNAMIC || item.type === ContactListTypes.DYNAMIC_REMOTE_LIST || !item.type">
+                             v-if="item.type === ContactListTypes.DYNAMIC">
+        </folder-dynamic-icon>
+        <folder-dynamic-icon data-testid="contacts-shared-dynamic-icon"
+                             v-if="item.type === ContactListTypes.DYNAMIC || !item.type">
         </folder-dynamic-icon>
       </div>
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
