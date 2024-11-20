@@ -336,7 +336,7 @@ export default {
         })
     },
 
-    redialTask (autoDialTask, redial, forcedDoubleDial = false) {
+    redialTask (autoDialTask, redial, forcedRedial = false) {
       const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
       if (!contactListItemId) {
@@ -354,7 +354,7 @@ export default {
 
           let message = `Success: contact is at the ${position} of the current list`
 
-          if (forcedDoubleDial) {
+          if (forcedRedial) {
             message = `Contact needs to be redialed, adding to the ${position} of current list`
           }
 

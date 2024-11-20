@@ -1530,7 +1530,7 @@ export default {
       this.sessionPhoneExpansion = ''
     },
 
-    async onRedial (redial, forcedDoubleDial = false) {
+    async onRedial (redial, forcedRedial = false) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
 
@@ -1556,7 +1556,7 @@ export default {
       this.redialedTask.redialed_now = redial
       this.verifyAgentOnCall = true
 
-      this.redialTask(this.activeTask, redial, forcedDoubleDial).then(() => {
+      this.redialTask(this.activeTask, redial, forcedRedial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
