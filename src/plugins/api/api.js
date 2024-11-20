@@ -875,14 +875,17 @@ export default {
       getContactDisengagedBots (contactId) {
         return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
       },
-      getContactEnrolledBots (contactId) {
-        return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/enrolled-bots`)
+      getContactBotEnrollments (contactId) {
+        return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/enrollments`)
       },
       updateContactEngagements (contactId, engagements) {
         return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-status`, { engagements })
       },
       enrollContacts (botId, params) {
         return window.axios.post(`${suffixV1}aloai/${botId}/enroll-contacts`, params)
+      },
+      disenrollContact (botId, params) {
+        return window.axios.post(`${suffixV1}aloai/${botId}/disenroll-contact`, params)
       }
     }
   }
