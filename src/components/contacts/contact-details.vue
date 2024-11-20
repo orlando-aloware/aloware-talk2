@@ -42,12 +42,12 @@
                        :entity-object="contact"
                        :category="TagCategories.CAT_CONTACTS"/>
           <contact-lists-card data-testid="contact-details-public-lists"
-                         key="contact-public-lists-card"
-                         :contact="contact"
+                              key="contact-public-lists-card"
+                              :contact="contact"
           />
           <contact-lists-card data-testid="contact-details-private-lists"
-                         key="contact-private-lists-card"
-                         :contact="contact"
+                              key="contact-private-lists-card"
+                              :contact="contact"
           />
 
           <contact-notes v-if="contact"

@@ -47,7 +47,11 @@
              :key="list.id"
         >
           <list-icon class="mr-3 self-center"
-                     :key="'list_icon_' + list.id + index" />
+                     :key="'list_icon_' + list.id + index"
+                     v-if="list.type === 1"/>
+          <folder-dynamic-icon class="mr-3 self-center"
+                               :key="'list_icon_' + list.id + index"
+                               v-else/>
           <div class="list-name pr-1">
             <q-tooltip anchor="top middle"
                        self="center middle"
@@ -186,12 +190,14 @@ import SearchIcon from 'components/icons/search-icon.vue'
 import { aclMixin, contactLists } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import RemoveContactListItemConfirmation from 'components/remove-contact-list-item-confirmation.vue'
+import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 
 export default {
   name: 'contact-lists-card',
 
   mixins: [aclMixin, contactLists],
   components: {
+    FolderDynamicIcon,
     RemoveContactListItemConfirmation,
     PencilOIcon,
     ListIcon,
@@ -303,9 +309,15 @@ export default {
 
   methods: {
     canEditList (list) {
+      // dynamic list
+      if (list.type === 2) {
+        return false
+      }
+
       if (this.isPublicListsCard) {
         return this.isBillingAdminOrAdminOrSupervisor
       }
+
       if (list.contact_folder_created_by === this.profile.id) {
         return true
       }
@@ -340,10 +352,8 @@ export default {
         })
     },
     addListToContactLists () {
-      console.log('addListToContactLists')
       const addedLists = this.computedAvailableLists.filter(list => this.newSelectedListIds.includes(list.id))
       for (let i = 0; i < addedLists.length; i++) {
-        console.log('addedLists[i]', addedLists[i])
         this.contactLists.push(addedLists[i])
       }
       this.newSelectedListIds = null
@@ -415,7 +425,8 @@ export default {
     async loadAvailableLists () {
       let params = {
         page: 1,
-        per_page: 99999
+        per_page: 99999,
+        list_type: 1
       }
       if (this.isPublicListsCard) {
         this.loadedAllPublicLists = await this.getPublicListsV2(params)
