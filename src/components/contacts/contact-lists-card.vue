@@ -67,25 +67,22 @@
               </span>
             </slot>
           </b-link>
-          <b-spinner
-            class="self-center trash-icon custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
-            variant="warning"
-            type="grow"
-            label="Removing contact from list"
-            small
-            v-if="isRemoving && selectedList?.id === list.id">
+          <b-spinner class="self-center trash-icon custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
+                     variant="warning"
+                     type="grow"
+                     label="Removing contact from list"
+                     small
+                     v-if="isRemoving && selectedList?.id === list.id">
           </b-spinner>
         </div>
       </template>
-      <remove-contact-list-item-confirmation
-        :dialogId="dialogId"
-        :contact="contact"
-        :list="selectedList"
-        v-if="contact && selectedList"
-        @deleting="onDeleting"
-        @deleted="onDeleted"
-        @finally="onFinally"
-      />
+      <remove-contact-list-item-confirmation :dialogId="dialogId"
+                                             :contact="contact"
+                                             :list="selectedList"
+                                             v-if="contact && selectedList"
+                                             @deleting="onDeleting"
+                                             @deleted="onDeleted"
+                                             @finally="onFinally"/>
       <div v-if="lists.length === 0">
         <div class="d-flex justify-content-center align-items-center mt-1"
              style="height: 100%;">
@@ -134,22 +131,20 @@
          class="d-flex justify-content-between">
       <div class="w-100 mt-1"
            v-if="showAvailableLists">
-        <q-select
-          compact
-          use-input
-          input-debounce="0"
-          behavior="menu"
-          map-options
-          emit-value
-          multiple
-          clearable
-          option-value="id"
-          option-label="name"
-          style="width: 100%;"
-          v-model="newSelectedListIds"
-          :options="addToListOptions"
-          @filter="filterNewLists"
-        >
+        <q-select compact
+                  use-input
+                  input-debounce="0"
+                  behavior="menu"
+                  map-options
+                  emit-value
+                  multiple
+                  clearable
+                  option-value="id"
+                  option-label="name"
+                  style="width: 100%;"
+                  :options="addToListOptions"
+                  v-model="newSelectedListIds"
+                  @filter="filterNewLists">
           <template v-slot:no-option>
             <q-item>
               <q-item-section class="text-grey">
@@ -159,15 +154,23 @@
           </template>
         </q-select>
         <div class="d-flex justify-content-between">
-          <b-button type="button" size="sm" variant="light" @click="cancelAddToList">Cancel</b-button>
-            <b-button type="button" size="sm"  variant="primary" @click="addContactListItems" :disabled="isAdding">
-              <b-spinner
-              class="pull-right self-center custom-link text-decoration-none"
-              variant="warning"
-              type="grow"
-              label="Removing contact from list"
-              v-if="isAdding"
-              small>
+          <b-button type="button"
+                    size="sm"
+                    variant="light"
+                    @click="cancelAddToList">
+            Cancel
+          </b-button>
+            <b-button type="button"
+                      size="sm"
+                      variant="primary"
+                      @click="addContactListItems"
+                      :disabled="isAdding">
+              <b-spinner class="pull-right self-center custom-link text-decoration-none"
+                         variant="warning"
+                         type="grow"
+                         label="Removing contact from list"
+                         small
+                         v-if="isAdding">
             </b-spinner>
             <span> Save </span>
           </b-button>
