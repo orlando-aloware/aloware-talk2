@@ -486,6 +486,7 @@ export default {
         return window.axios.get(`${suffixV1}transcription/communication/${communicationId}`, options)
       },
 
+      // Generate transcription for the communication
       generateTranscription (communicationId) {
         if (!communicationId) {
           return null
@@ -494,6 +495,7 @@ export default {
         return window.axios.post(`${suffixV1}transcription/communication/${communicationId}`)
       },
 
+      // Generate summary for the transcription
       generateSummary (communicationId) {
         if (!communicationId) {
           return null
@@ -503,7 +505,6 @@ export default {
           `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )
       }
-
     },
 
     statics: {

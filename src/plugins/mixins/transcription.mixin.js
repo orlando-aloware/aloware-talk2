@@ -17,6 +17,7 @@ export default {
              !communication.metadata?.transcription_info // check if the transcription is already processed
     },
 
+    // check if the summarization is allowed for the communication
     isSummarizationAllowed (communication) {
       return communication.is_eligible_for_transcribe &&
              this.showAudio(communication) &&
