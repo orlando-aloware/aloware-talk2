@@ -46,7 +46,7 @@
              :key="list.id">
           <list-icon class="mr-3 self-center"
                      :key="'list_icon_' + list.id + index"
-                     v-if="list.type === 1"/>
+                     v-if="list.type === listTypeStatic"/>
           <folder-dynamic-icon class="mr-3 self-center"
                                :key="'list_icon_' + list.id + index"
                                v-else/>
@@ -178,6 +178,8 @@
 </template>
 
 <script>
+const LIST_TYPE_STATIC = 1
+const LIST_TYPE_DYNAMIC = 2
 
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import ListIcon from 'components/icons/list-icon.vue'
@@ -224,7 +226,8 @@ export default {
       contactLists: null,
       loadedAllPublicLists: null,
       loadedAllPrivateLists: null,
-      addToListOptions: null
+      addToListOptions: null,
+      listTypeStatic: LIST_TYPE_STATIC
     }
   },
 
@@ -232,7 +235,6 @@ export default {
     ...mapState('auth', [
       'profile'
     ]),
-
     title () {
       return this.isPublicListsCard ? 'Public Lists' : 'Private Lists'
     },
@@ -306,7 +308,7 @@ export default {
   methods: {
     canEditList (list) {
       // dynamic list
-      if (list.type === 2) {
+      if (list.type === LIST_TYPE_DYNAMIC) {
         return false
       }
 
