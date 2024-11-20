@@ -457,7 +457,6 @@ export default {
       this.contactName = data.contactName
       this.companyName = data.companyName
       this.contactId = data.contactId
-      console.log('contactId', this.contactId)
       this.contactTimezone = data.contactTimezone
 
       if (!this.contactId) {
