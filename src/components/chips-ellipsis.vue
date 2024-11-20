@@ -60,14 +60,13 @@
               <template #button-content>
                 <i :class="dropdownIconClass"></i>
               </template>
-              <template
-                v-for="(chip, key) in filteredListItems">
+              <template v-for="(chip, key) in filteredListItems">
                 <b-dropdown-item href="#"
-                                :key="`2-${key}`"
-                                :class="getDropdownItemClass(chip.id)"
-                                :enabled="!loading"
-                                v-if="key >= displayCount"
-                                @click="onClick(chip)">
+                                 :key="`2-${key}`"
+                                 :class="getDropdownItemClass(chip.id)"
+                                 :enabled="!loading"
+                                 v-if="key >= displayCount"
+                                 @click="onClick(chip)">
                   {{ chip.name }}
                 </b-dropdown-item>
               </template>
