@@ -18,15 +18,15 @@
                          :color="iconColor" />
           </slot>
         </b-link>
-        <q-input placeholder="Search List name"
+        <q-input class="form-control form-control-search"
+                 placeholder="Search List name"
                  dense
-                 class="form-control form-control-search"
-                 v-model="searchQuery"
                  borderless
                  clearable
                  data-testid="search-input"
                  ref="searchListNameInput"
-                 v-show="!showSearchIcon">
+                 v-show="!showSearchIcon"
+                 v-model="searchQuery">
           <template v-slot:prepend>
             <search-icon />
           </template>
@@ -46,7 +46,7 @@
              :key="list.id">
           <list-icon class="mr-3 self-center"
                      :key="'list_icon_' + list.id + index"
-                     v-if="list.type === listTypeStatic"/>
+                     v-if="list.type === ContactListTypes.STATIC"/>
           <folder-dynamic-icon class="mr-3 self-center"
                                :key="'list_icon_' + list.id + index"
                                v-else/>
@@ -163,8 +163,8 @@
             <b-button type="button"
                       size="sm"
                       variant="primary"
-                      @click="addContactListItems"
-                      :disabled="isAdding">
+                      :disabled="isAdding"
+                      @click="addContactListItems">
               <b-spinner class="pull-right self-center custom-link text-decoration-none"
                          variant="warning"
                          type="grow"
@@ -181,9 +181,6 @@
 </template>
 
 <script>
-const LIST_TYPE_STATIC = 1
-const LIST_TYPE_DYNAMIC = 2
-
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import ListIcon from 'components/icons/list-icon.vue'
 import SearchIcon from 'components/icons/search-icon.vue'
@@ -191,6 +188,7 @@ import { aclMixin, contactLists } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import RemoveContactListItemConfirmation from 'components/remove-contact-list-item-confirmation.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
   name: 'contact-lists-card',
@@ -234,7 +232,7 @@ export default {
       loadedAllPublicLists: null,
       loadedAllPrivateLists: null,
       addToListOptions: null,
-      listTypeStatic: LIST_TYPE_STATIC
+      ContactListTypes
     }
   },
 
@@ -311,7 +309,7 @@ export default {
   methods: {
     canEditList (list) {
       // dynamic list
-      if (list.type === LIST_TYPE_DYNAMIC) {
+      if (list.type === ContactListTypes.DYNAMIC) {
         return false
       }
 
@@ -408,7 +406,7 @@ export default {
       let params = {
         page: 1,
         per_page: 99999,
-        list_type: 1
+        list_type: ContactListTypes.STATIC
       }
       if (this.isPublicContactListCard) {
         this.loadedAllPublicLists = await this.getPublicListsV2(params)
