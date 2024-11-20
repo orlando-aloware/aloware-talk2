@@ -330,6 +330,11 @@ export default {
         return false
       }
 
+      // do not allow to delete from dynamic remote list
+      if (this.currentList?.type === ContactListTypes.DYNAMIC_REMOTE_LIST) {
+        return false
+      }
+
       // If user have been granted Delete permission, which is higher than Removing from list permission
       if (this.hasDeletePermission) {
         return this.canDelete
@@ -340,9 +345,7 @@ export default {
         return false
       }
 
-      return this.canDelete &&
-        // do not allow to delete from dynamic remote list
-        this.currentList?.type !== ContactListTypes.DYNAMIC_REMOTE_LIST
+      return this.canDelete
     },
 
     showRemoveFromPdListButton () {
