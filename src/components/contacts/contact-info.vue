@@ -17,7 +17,8 @@
                     <div class="mt-1 mb-0 contact-name-wrapper">
                         <q-tooltip anchor="top middle"
                                    data-testid="contact-info-name-tooltip"
-                                   self="center middle">
+                                   self="center middle"
+                                   content-class="fs-12">
                             {{ contactName }}
                         </q-tooltip>
                         <h2 class="contact-name pb-1">{{ contactName }}</h2>
@@ -31,7 +32,8 @@
                       data-testid="contact-info-copy-phone-number-link"
                       @click.prevent="copyPhoneNumber(contact.phone_number)">
                 <q-tooltip anchor="top middle"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                   Copy
                 </q-tooltip>
                 <i class="material-icons" data-testid="contact-info-copy-phone-number-icon">content_copy</i>
@@ -101,10 +103,12 @@
                       @click="callContact">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-call-tooltip"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Call
                 </q-tooltip>
-                <call-icon/>
+                <call-icon width="14"
+                           height="14"/>
             </b-button>
 
             <b-button variant="light"
@@ -115,7 +119,8 @@
                       data-testid="contact-info-block-button"
                       @click="blockContact">
                 <q-tooltip anchor="bottom middle"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Block
                 </q-tooltip>
                 <i class="fa fa-lock"
@@ -136,7 +141,8 @@
                       data-testid="contact-info-unblock-button"
                       @click="unBlockContact">
                 <q-tooltip anchor="bottom middle"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Unblock
                 </q-tooltip>
                 <q-spinner-bars class="mr-1"
@@ -161,7 +167,8 @@
                       @click="addAppointmentOpen(true)">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-add-appointment-tooltip"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Add appointment
                 </q-tooltip>
                 <calendar-icon/>
@@ -174,7 +181,8 @@
                       @click="addReminderOpen(true)">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-add-reminder-tooltip"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Add reminder
                 </q-tooltip>
                 <timer-icon></timer-icon>
@@ -186,7 +194,8 @@
                       @click="openPowerDialerModal">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-add-power-dialer-tooltip"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Add to power dialer
                 </q-tooltip>
                 <add-call-icon/>
@@ -200,7 +209,8 @@
                       @click="removeContactFromPowerDialerLists">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-remove-power-dialer-tooltip"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Remove from all Power Dialers
                 </q-tooltip>
                 <call-remove-icon/>
@@ -214,7 +224,8 @@
                       @click="openEmailBlast">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-email-tooltip"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Email
                 </q-tooltip>
                 <email-icon width="16"/>
@@ -228,7 +239,8 @@
                       @click="openVideoConference">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-video-conference-tooltip"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Video Conference
                 </q-tooltip>
                 <video-conference-icon data-testid="contact-info-video-conference-icon" width="16"/>
@@ -241,7 +253,8 @@
                       @click="openMergeContactModal">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-merge-tooltip"
-                           self="center middle">
+                           self="center middle"
+                           content-class="fs-12">
                     Merge
                 </q-tooltip>
                 <merge-contact-icon/>
