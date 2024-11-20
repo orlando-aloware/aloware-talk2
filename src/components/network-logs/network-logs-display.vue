@@ -23,7 +23,7 @@
           >
             <div class="text-left m-4 ">
               <h5 class="mr-1">Agent:</h5>
-              {{ user.full_name }}<br/>
+              {{ user?.full_name ?? '-' }}<br/>
               <div v-if="callIssue.data.name === 'rtt'">
                 <network-signal-strength :value-issue="callIssue.data.avg"
                                          :issue="networkIssues[callIssue.data.name]"
