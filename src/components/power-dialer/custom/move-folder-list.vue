@@ -44,6 +44,9 @@
               <folder-static-icon color="#62666E"
                                   v-if="item.type === ContactListTypes.STATIC"
               ></folder-static-icon>
+              <folder-dynamic-icon color="#00bf4a"
+                                   v-if="item.type === ContactListTypes.DYNAMIC_REMOTE_LIST"
+              ></folder-dynamic-icon>
               <folder-dynamic-icon color="#62666E"
                                    v-if="item.type === ContactListTypes.DYNAMIC"
               ></folder-dynamic-icon>

@@ -25,6 +25,11 @@
                               v-if="list.type === ContactListTypes.STATIC">
           </folder-static-icon>
           <folder-dynamic-icon class="mr-3"
+                               color="#00bf4a"
+                               data-testid="contacts-view-folder-dynamic-remote-icon"
+                               v-if="list.type === ContactListTypes.DYNAMIC_REMOTE_LIST">
+          </folder-dynamic-icon>
+          <folder-dynamic-icon class="mr-3"
                                data-testid="contacts-view-folder-static-icon"
                                v-if="list.type === ContactListTypes.DYNAMIC">
           </folder-dynamic-icon>

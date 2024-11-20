@@ -330,6 +330,11 @@ export default {
         return false
       }
 
+      // do not allow to delete from dynamic remote list
+      if (this.currentList?.type === ContactListTypes.DYNAMIC_REMOTE_LIST) {
+        return false
+      }
+
       // If user have been granted Delete permission, which is higher than Removing from list permission
       if (this.hasDeletePermission) {
         // if is SimpSocial and user is just agent don't show, even when user has specific permission to delete contacts

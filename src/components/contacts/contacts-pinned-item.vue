@@ -13,6 +13,9 @@
        @click="toggleSidebar($event, route)">
       <div class="icon d-flex align-items-center">
         <folder-static-icon v-if="item.type === ContactListTypes.STATIC" data-testid="contacts-pinned-static-icon" ></folder-static-icon>
+        <folder-dynamic-icon color="#00bf4a"
+                             data-testid="contacts-pinned-dynamic-remote-icon"
+                             v-if="item.type === ContactListTypes.DYNAMIC_REMOTE_LIST"></folder-dynamic-icon>
         <folder-dynamic-icon v-if="item.type === ContactListTypes.DYNAMIC || !item.type" data-testid="contacts-pinned-dyamic-icon" ></folder-dynamic-icon>
       </div>
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
