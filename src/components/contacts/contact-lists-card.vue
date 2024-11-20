@@ -187,7 +187,6 @@ const LIST_TYPE_DYNAMIC = 2
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import ListIcon from 'components/icons/list-icon.vue'
 import SearchIcon from 'components/icons/search-icon.vue'
-
 import { aclMixin, contactLists } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import RemoveContactListItemConfirmation from 'components/remove-contact-list-item-confirmation.vue'
