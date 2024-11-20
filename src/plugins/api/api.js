@@ -822,6 +822,9 @@ export default {
       },
       public (params) {
         return window.axios.get(`${suffixV2}contacts-list/public`, { params })
+      },
+      async update (id, params) {
+        return window.axios.put(`${suffixV2}contacts-list/${id}`, params)
       }
     },
 
