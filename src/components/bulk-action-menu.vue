@@ -332,6 +332,10 @@ export default {
 
       // If user have been granted Delete permission, which is higher than Removing from list permission
       if (this.hasDeletePermission) {
+        // if is SimpSocial and user is just agent, dont show, event with specific permission
+        if (this.isSimpSocial && this.isAgent && !this.isBillingAdminOrAdminOrSupervisor) {
+          return false
+        }
         return this.canDelete
       }
 
