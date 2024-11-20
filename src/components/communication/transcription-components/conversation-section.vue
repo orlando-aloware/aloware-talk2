@@ -6,28 +6,28 @@
     <div v-if="!isEmpty(messages)">
       <div style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px">
         <q-btn color="text-dark-greenish"
-              class="btn btn-inline px-1 py-0"
-              title="Download Transcription"
-              flat
-              rounded
-              dense
-              no-caps
-              data-testid="download-button-download-btn"
-              @click="onDownload()">
+               class="btn btn-inline px-1 py-0"
+               title="Download Transcription"
+               flat
+               rounded
+               dense
+               no-caps
+               data-testid="download-button-download-btn"
+               @click="onDownload()">
           <download-icon height="20"
                          width="20"
                          data-testid="download-button-download-icon">
           </download-icon>
         </q-btn>
         <q-btn color="text-dark-greenish"
-              class="btn btn-inline px-1 py-0"
-              title="Copy Transcription"
-              flat
-              rounded
-              dense
-              no-caps
-              data-testid="copy-button-copy-btn"
-              @click="onCopy()">
+               class="btn btn-inline px-1 py-0"
+               title="Copy Transcription"
+               flat
+               rounded
+               dense
+               no-caps
+               data-testid="copy-button-copy-btn"
+               @click="onCopy()">
           <copy-icon height="20"
                      width="20"
                      color="#007bff"
