@@ -1,12 +1,12 @@
 <template>
   <div class="h-100">
     <upgrade-now-page class="mt-5"
-                      title-text="Open with our desktop app"
-                      :text="getActionText"
-                      :extra-text="`Phone: ${phone}`"
                       extra-text2="👇"
                       image-link="/assets/images/logo.png"
+                      title-text="Open with our desktop app"
+                      :extra-text="`Phone: ${phone}`"
                       :show-button="false"
+                      :text="getActionText"
     />
 
     <!-- display a banner with empashis with the getActionText if the
