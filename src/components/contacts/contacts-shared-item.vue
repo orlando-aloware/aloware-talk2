@@ -88,7 +88,7 @@
         </folder-static-icon>
         <folder-dynamic-icon data-testid="contacts-shared-dynamic-remote-icon"
                              color="#00bf4a"
-                             v-if="item.type === ContactListTypes.DYNAMIC">
+                             v-if="item.type === ContactListTypes.DYNAMIC_REMOTE_LIST">
         </folder-dynamic-icon>
         <folder-dynamic-icon data-testid="contacts-shared-dynamic-icon"
                              v-if="item.type === ContactListTypes.DYNAMIC || !item.type">
