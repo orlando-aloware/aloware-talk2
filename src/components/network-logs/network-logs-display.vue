@@ -15,7 +15,7 @@
                       v-if="showNetworkLogs"
       >
         <div :key="callIssueIndex"
-             v-for="(callIssue,callIssueIndex) in mapCallIssues">
+             v-for="(callIssue, callIssueIndex) in mapCallIssues">
           <q-card class="ring-group-snapshot-card mb-2 text-15"
                   flat
                   bordered
@@ -24,7 +24,7 @@
             <div class="text-left m-4 ">
               <h5 class="mr-1">Agent:</h5>
               {{ user?.full_name ?? '-' }}<br/>
-              <div v-if="callIssue.data.name === 'rtt'">
+              <div v-if="callIssue.data.name === RTT_EVENT">
                 <network-signal-strength :value-issue="callIssue.data.avg"
                                          :issue="networkIssues[callIssue.data.name]"
                                          :title="networkIssues[callIssue.data.name].trigger"
@@ -37,7 +37,7 @@
 
                 {{ networkIssues[callIssue.data.name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === 'mos'">
+              <div v-else-if="callIssue.data.name === MOS_EVENT">
                 <network-signal-strength :value-issue="callIssue.data.avg"
                                          :issue="networkIssues[callIssue.data.name]"
                                          :title="networkIssues[callIssue.data.name].trigger"
@@ -48,7 +48,7 @@
 
                 {{ networkIssues[callIssue.data.name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === 'jitter'">
+              <div v-else-if="callIssue.data.name === JITTER_EVENT">
                 <network-signal-strength :value-issue="callIssue.data.max"
                                          :issue="networkIssues[callIssue.data.name]"
                                          :title="networkIssues[callIssue.data.name].trigger"
@@ -61,7 +61,7 @@
 
                 {{ networkIssues[callIssue.data.name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === 'bytesReceived'">
+              <div v-else-if="callIssue.data.name === BYTES_RECEIVED_EVENT">
                 <network-signal-strength :value-issue="callIssue.data.min"
                                          :issue="networkIssues[callIssue.data.name]"
                                          :title="networkIssues[callIssue.data.name].trigger"
@@ -72,7 +72,7 @@
 
                 {{ networkIssues[callIssue.data.name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === 'bytesSent'">
+              <div v-else-if="callIssue.data.name === BYTES_SENT_EVENT">
                 <network-signal-strength :value-issue="callIssue.data.min"
                                          :issue="networkIssues[callIssue.data.name]"
                                          :title="networkIssues[callIssue.data.name].trigger"
@@ -83,7 +83,7 @@
 
                 {{ networkIssues[callIssue.data.name].details }}
               </div>
-              <div v-else-if="callIssue.event_name === 'high-packet-loss'">
+              <div v-else-if="callIssue.event_name === HIGH_PACKET_LOSS_EVENT">
                 <network-signal-strength :value-issue="callIssue.data.avg"
                                          :issue="networkIssues[callIssue.event_name]"
                                          :title="networkIssues[callIssue.event_name].trigger"
@@ -94,7 +94,7 @@
 
                 {{ networkIssues[callIssue.event_name].details }}
               </div>
-              <div v-else-if="callIssue.event_name === 'high-packets-lost-fraction'">
+              <div v-else-if="callIssue.event_name === HIGH_PACKETS_LOST_FRACTION_EVENT">
                 <network-signal-strength :value-issue="callIssue.data.avg"
                                          :issue="networkIssues[callIssue.event_name]"
                                          :title="networkIssues[callIssue.event_name].trigger"
@@ -120,7 +120,7 @@
 </template>
 <script>
 import NetworkSignalStrength from 'components/network-logs/network-signal-strength'
-import { networkIssues } from '../../constants/network-logs/network-issues'
+import { RTT_EVENT, MOS_EVENT, JITTER_EVENT, HIGH_PACKET_LOSS_EVENT, HIGH_PACKETS_LOST_FRACTION_EVENT, BYTES_RECEIVED_EVENT, BYTES_SENT_EVENT, networkIssues } from '../../constants/network-logs/network-issues'
 
 export default {
   name: 'network-logs-display',
@@ -138,6 +138,13 @@ export default {
 
   data () {
     return {
+      RTT_EVENT,
+      MOS_EVENT,
+      JITTER_EVENT,
+      HIGH_PACKET_LOSS_EVENT,
+      HIGH_PACKETS_LOST_FRACTION_EVENT,
+      BYTES_RECEIVED_EVENT,
+      BYTES_SENT_EVENT,
       networkIssues
     }
   },
