@@ -43,10 +43,12 @@
                        :category="TagCategories.CAT_CONTACTS"/>
           <contact-lists-card data-testid="contact-details-public-lists"
                               key="contact-public-lists-card"
+                              :is-public-contact-list-card="true"
                               :contact="contact"
           />
           <contact-lists-card data-testid="contact-details-private-lists"
                               key="contact-private-lists-card"
+                              :is-public-contact-list-card="false"
                               :contact="contact"
           />
 
