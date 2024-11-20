@@ -208,6 +208,10 @@ export default {
   props: {
     contact: {
       required: true
+    },
+    isPublicContactListCard: {
+      required: true,
+      type: Boolean
     }
   },
 
@@ -239,11 +243,7 @@ export default {
       'profile'
     ]),
     title () {
-      return this.isPublicListsCard ? 'Public Lists' : 'Private Lists'
-    },
-
-    isPublicListsCard () {
-      return this.$vnode.key === 'contact-public-lists-card'
+      return this.isPublicContactListCard ? 'Public Lists' : 'Private Lists'
     },
 
     dialogId () {
@@ -259,10 +259,10 @@ export default {
         return []
       }
 
-      let lists = this.contactLists.filter(list => list.show_in_public_folder === this.isPublicListsCard)
+      let lists = this.contactLists.filter(list => list.show_in_public_folder === this.isPublicContactListCard)
 
       // agents can only view private lists owned by them and public lists
-      if (!this.isPublicListsCard && !this.isBillingAdminOrAdminOrSupervisor && this.isAgent) {
+      if (!this.isPublicContactListCard && !this.isBillingAdminOrAdminOrSupervisor && this.isAgent) {
         // filter only lists that the agent has access to
         lists = lists.filter(list => list.contact_folder_created_by === this.profile.id)
       }
@@ -288,7 +288,7 @@ export default {
 
     computedAvailableLists () {
       // remove deleted
-      const lists = this.isPublicListsCard ? this.loadedAllPublicLists : this.loadedAllPrivateLists
+      const lists = this.isPublicContactListCard ? this.loadedAllPublicLists : this.loadedAllPrivateLists
 
       if (!lists) {
         return []
@@ -315,7 +315,7 @@ export default {
         return false
       }
 
-      if (this.isPublicListsCard) {
+      if (this.isPublicContactListCard) {
         return this.isBillingAdminOrAdminOrSupervisor
       }
 
@@ -410,7 +410,7 @@ export default {
         per_page: 99999,
         list_type: 1
       }
-      if (this.isPublicListsCard) {
+      if (this.isPublicContactListCard) {
         this.loadedAllPublicLists = await this.getPublicListsV2(params)
       } else {
         params.user_id = this.profile.id
