@@ -125,7 +125,7 @@
                        label="Transcription"/>
                 <q-tab name="summary"
                        label="Summary"
-                       :disable="!currentCompany?.transcription_settings?.summarization_enabled || !customSummary"/>
+                       :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
               </q-tabs>
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
@@ -143,8 +143,64 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    <div v-if="customSummary" class="custom-summary" v-html="parseMarkdown(customSummary)" />
-                    <div v-if="customSummary" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
+                      <q-btn color="text-dark-greenish"
+                             class="btn btn-inline px-1 py-0"
+                             title="Download Summary"
+                             flat
+                             rounded
+                             dense
+                             no-caps
+                             data-testid="download-button-download-btn"
+                             @click="onDownload()">
+                        <download-icon height="20"
+                                       width="20"
+                                       data-testid="download-button-download-icon">
+                        </download-icon>
+                      </q-btn>
+                      <q-btn color="text-dark-greenish"
+                             class="btn btn-inline px-1 py-0"
+                             title="Copy Summary"
+                             flat
+                             rounded
+                             dense
+                             no-caps
+                             data-testid="copy-button-copy-btn"
+                             @click="onCopy()">
+                        <copy-icon height="20"
+                                   width="20"
+                                   color="#007bff"
+                                   data-testid="copy-button-copy-icon">
+                        </copy-icon>
+                      </q-btn>
+                    </div>
+                    <div class="summary-status-container">
+                      <div v-if="!summary_status">
+                        <generate-summary-button class="mr-2"
+                                                 data-testid="comm-details-generate-summary-button"
+                                                 :is-generating="isGenerating"
+                                                 :communication="communication"
+                                                 @updateGenerating="updateGenerating">
+                        </generate-summary-button>
+                      </div>
+                      <div v-else-if="summary_status == SummaryStatus.STATUS_FAILED" class="status-message">
+                        <q-icon name="error" color="red" size="md" />
+                        <div>Summary generation failed. Please try again later.</div>
+                        <br>
+                        <generate-summary-button class="mr-2"
+                                                 data-testid="comm-details-generate-summary-button"
+                                                 :is-generating="isGenerating"
+                                                 :communication="communication"
+                                                 @updateGenerating="updateGenerating">
+                        </generate-summary-button>
+                      </div>
+                      <div v-else-if="summary_status == SummaryStatus.STATUS_PROCESSING || summary_status == SummaryStatus.STATUS_QUEUED" class="status-message">
+                        <q-icon name="hourglass_empty" color="blue" size="md" />
+                        <span>Your summary is being processed. Please wait...</span>
+                      </div>
+                    </div>
+                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
+                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
                       <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
@@ -191,6 +247,10 @@ import talk2Api from 'src/plugins/api/api'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as FeedbackConstants from 'src/constants/feedback-types'
 import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as SummaryStatus from 'src/constants/summary-status'
+import DownloadIcon from 'components/icons/contact-activity/download-icon'
+import CopyIcon from 'components/icons/copy-icon'
+import GenerateSummaryButton from 'components/generate-summary-button'
 
 export default {
   name: 'TranscriptionModal',
@@ -208,7 +268,10 @@ export default {
     CustomKeywordsSection,
     SentimentAnalysisSection,
     TalkTimeAnalysisSection,
-    ConversationSection
+    ConversationSection,
+    DownloadIcon,
+    CopyIcon,
+    GenerateSummaryButton
   },
 
   props: {
@@ -242,9 +305,10 @@ export default {
       sentiment_analysis: [],
       talk_time_analysis: [],
       messages: [],
-      summaryEngine: null,
-      customSummary: null,
-      summaryPrompt: null,
+      summary_engine: null,
+      custom_summary: null,
+      summary_prompt: null,
+      summary_status: null,
       feedback: null,
       upvoteActive: false,
       downvoteActive: false,
@@ -264,7 +328,8 @@ export default {
         'NEGATIVE': '#ff7d74'
       },
       UploadedFileTypes,
-      isEmpty
+      isEmpty,
+      isGenerating: false
     }
   },
 
@@ -297,6 +362,9 @@ export default {
           }
         ]
       }
+    },
+    SummaryStatus () {
+      return SummaryStatus
     },
     CommunicationTypes () {
       return CommunicationTypes
@@ -383,9 +451,10 @@ export default {
       this.messages = data.messages
       this.sentiment_analysis = data.sentiment_analysis_summary
       this.talk_time_analysis = data.talk_time_analysis
-      this.summaryEngine = data.summary_engine
-      this.customSummary = data.custom_summary
-      this.summaryPrompt = data.summary_prompt
+      this.summary_engine = data.summary_engine
+      this.custom_summary = data.custom_summary
+      this.summary_prompt = data.summary_prompt
+      this.summary_status = data.summary_status
       this.feedback = data.feedback
       this.upvoteActive = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
       this.downvoteActive = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
@@ -442,6 +511,50 @@ export default {
       if (showTranscription === 'true') {
         this.fetchSmartTranscriptionData()
       }
+    },
+
+    /**
+     * Download the custom summary as a text file.
+     * @public
+     *
+     * @returns {void}
+     */
+    onDownload () {
+      if (!this.custom_summary) return
+
+      // Create a Blob with the custom summary content
+      const blob = new Blob([this.custom_summary], { type: 'text/plain' })
+      const url = URL.createObjectURL(blob)
+
+      // Create a temporary link to initiate the download
+      const a = document.createElement('a')
+      a.href = url
+      a.href = url
+      // Generate filename with the current date and time in "YYYYMMDD_HHMMSS" format
+      a.download = `summary_${new Date().toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-')}.txt`
+      a.click()
+
+      // Revoke the object URL to release memory
+      URL.revokeObjectURL(url)
+    },
+
+    /**
+     * Copy the custom summary to the clipboard.
+     * @public
+     *
+     * @returns {void}
+     */
+    onCopy () {
+      if (!this.custom_summary) return
+
+      navigator.clipboard.writeText(this.custom_summary)
+        .then(() => {
+          this.$generalNotification('Summary copied to clipboard')
+        })
+        .catch(err => {
+          console.error('Failed to copy summary: ', err)
+          this.$generalNotification('Failed to copy summary', 'error')
+        })
     },
 
     handleClose () {
@@ -523,6 +636,10 @@ export default {
       }
     },
 
+    updateGenerating (status) {
+      this.isGenerating = status
+    },
+
     /**
      * Update the summary feedback.
      * @param type
@@ -566,4 +683,14 @@ export default {
 .pt-12 {
   padding-top: 12px;
 }
+
+.status-message {
+  display: flex;
+  align-items: center;
+}
+
+.status-message span {
+  margin-left: 4px;
+}
+
 </style>
