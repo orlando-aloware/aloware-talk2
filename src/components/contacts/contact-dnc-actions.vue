@@ -6,10 +6,11 @@
               class="custom-action-button"
               data-testid="contact-dnc-actions-button"
               @click="dncContact">
-      <q-tooltip v-if="!contact.is_dnc"
-                 anchor="bottom middle"
+      <q-tooltip anchor="bottom middle"
                  data-testid="contact-dnc-actions-tooltip"
-                 self="center middle">
+                 self="center middle"
+                 content-class="fs-12"
+                 v-if="!contact.is_dnc">
         DNC
       </q-tooltip>
 

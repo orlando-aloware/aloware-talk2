@@ -1009,6 +1009,19 @@ export default {
       }
     },
 
+    fetchContact: _.debounce(function (shouldShowLoading = true) {
+      if (shouldShowLoading) {
+        this.selectedContactChanging(true)
+      }
+
+      this.processFetchContactInfo((selectedContact) => {
+        this.setContact(selectedContact)
+        this.setContactClone(selectedContact)
+        this.resetChangedContactProperties([])
+        this.selectedContactChanging(false)
+      })
+    }, 1000),
+
     processFetchContactInfo (callback, isFetchContact = true) {
       this.loadingContactInProgress()
 
