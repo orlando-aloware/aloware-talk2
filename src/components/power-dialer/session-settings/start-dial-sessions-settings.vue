@@ -347,6 +347,7 @@ import {
   kycMixin,
   aclMixin
 } from 'src/plugins/mixins'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'StartDialSessionsSettings',
@@ -451,6 +452,7 @@ export default {
         name: null,
         script_id: null,
         skip_outside_daytime_hours: 1,
+        successful_call_disposition_ids: [],
         user_id: null,
         warmup_period_in_seconds: 0,
         order: POWER_DIALER_ORDER.default,
@@ -547,12 +549,12 @@ export default {
       'getTemporarySessionSetting',
       'updateContactsList',
       'getSessionSetting',
-      'getPowerDialerList'
+      'getPowerDialerList',
+      'clearRedialSettings'
     ]),
 
     ...mapActions([
-      'setDialerCommunication',
-      'clearDialerRedialedTaskIds'
+      'setDialerCommunication'
     ]),
 
     ...mapMutations('powerDialer', [
@@ -578,6 +580,14 @@ export default {
       this.loading = true
       this.isDialing = true
       this.loadingText = this.defaultTrigger ? 'Redirecting you to Power Dialer session..' : 'Applying changes to session settings..'
+
+      // redial: check if force_sms is set and no sms templates are available
+      if (this.requireSmsSending(this.selectedItem) && !(await this.hasSmsTemplates())) {
+        this.loading = false
+        this.isDialing = false
+        this.$generalNotification('You need to have at least one SMS template since "Force Send SMS" is enabled by your Admin.', 'error')
+        return
+      }
 
       if (this.temporarySetting.id === this.selectedItem.id) {
         const newSettings = { ...this.filterSelectedItem }
@@ -809,7 +819,7 @@ export default {
         this.setDialerCommunication()
       }
 
-      this.clearDialerRedialedTaskIds()
+      this.clearRedialSettings()
     },
 
     getSettingsItemClass (setting) {
@@ -845,6 +855,20 @@ export default {
     cancelNewSetting () {
       this.newSettingName = ''
       this.newSetting = false
+    },
+
+    requireSmsSending (sessionSettings) {
+      return sessionSettings?.min_redials > 0 && sessionSettings?.force_sms
+    },
+
+    async hasSmsTemplates () {
+      try {
+        const res = await API.V1.smsTemplate.get()
+        return res.data.length > 0
+      } catch (err) {
+        console.error('[hasSmsTemplates] error', err)
+        return false
+      }
     }
   },
 

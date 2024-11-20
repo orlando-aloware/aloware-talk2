@@ -3,71 +3,79 @@
     <div :class="headerClass"
          v-if="headerLabel">
       <div class="header__header__title font-weight-bold text-grey-8 pl-3 flex-grow-1">
-        {{ headerLabel }}
+        <button class="btn btn-sm p-0 mr-2"
+                style="width: 30px; height: 25px; margin-top: -1px;"
+                v-if="collapsible"
+                @click="toggleCollapse">
+          <i class="fa"
+             :class="[!collapsed ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
+        </button>
+        <span @click="toggleCollapse">{{ headerLabel }}</span>
         <span class="text-xxs2 text-danger text-capitalize font-weight-bold"
               v-if="isForcedAndNotDisposed">
         Required
       </span>
       </div>
     </div>
-    <div class="d-flex t-menu__content over-flow px-3">
-      <div class="chip-ellipsis position-relative"
-           :class="dispositionClass">
-        <b-overlay class="h-100 w-100 position-absolute"
-                   :class="overlayClass"
-                   :show="disabled || loading">
-          <template #overlay>
-            <div v-if="disabled"></div>
-            <q-spinner-bars color="primary"
-                            size="20px"
-                            v-else/>
-          </template>
-        </b-overlay>
-        <div class="pl-1"
-             v-if="hasContent">
-          <template v-for="(chip, key) in filteredListItems">
-            <q-chip outline
-                    clickable
-                    square
-                    :class="getChipClass(chip.id)"
-                    :style="getChipStyle(chip.id, chip.color)"
-                    :key="`1-${key}`"
-                    :color="`grey-5`"
-                    :enabled="!disabled && !loading"
-                    v-if="key < displayCount"
-                    @click="onClick(chip)">
-              <div :class="chipContentClass">
-                {{ chip.name }}
-              </div>
-            </q-chip>
-          </template>
-          <b-dropdown text="..."
-                      no-caret
-                      right size="sm"
-                      variant="white"
-                      :disabled="disabled || loading"
-                      :class="dropdownClass"
-                      v-if="hasExceededLimit">
-            <template #button-content>
-              <i :class="dropdownIconClass"></i>
+    <div :class="collapsible ? 'mt-1' : ''"
+         v-show="!collapsible ? true : !collapsed">
+      <div class="d-flex t-menu__content over-flow px-3">
+        <div class="chip-ellipsis position-relative"
+            :class="dispositionClass">
+          <b-overlay class="h-100 w-100 position-absolute"
+                     :class="overlayClass"
+                     :show="disabled || loading">
+            <template #overlay>
+              <div v-if="disabled"></div>
+              <q-spinner-bars color="primary"
+                              size="20px"
+                              v-else/>
             </template>
-            <template
-              v-for="(chip, key) in filteredListItems">
-              <b-dropdown-item href="#"
-                               :key="`2-${key}`"
-                               :class="getDropdownItemClass(chip.id)"
-                               :enabled="!loading"
-                               v-if="key >= displayCount"
-                               @click="onClick(chip)">
-                {{ chip.name }}
-              </b-dropdown-item>
+          </b-overlay>
+          <div class="pl-1"
+               v-if="hasContent">
+            <template v-for="(chip, key) in filteredListItems">
+              <q-chip outline
+                      clickable
+                      square
+                      :class="getChipClass(chip.id)"
+                      :style="getChipStyle(chip.id, chip.color)"
+                      :key="`1-${key}`"
+                      :color="`grey-5`"
+                      :enabled="!disabled && !loading"
+                      v-if="key < displayCount"
+                      @click="onClick(chip)">
+                <div :class="chipContentClass">
+                  {{ chip.name }}
+                </div>
+              </q-chip>
             </template>
-          </b-dropdown>
-        </div>
-        <div class="text-caption text-grey-6 text-weight-bold"
-             :class="emptyClass"
-             v-else>
-          {{ defaultLabel }}
+            <b-dropdown text="..."
+                        no-caret
+                        right size="sm"
+                        variant="white"
+                        :disabled="disabled || loading"
+                        :class="dropdownClass"
+                        v-if="hasExceededLimit">
+              <template #button-content>
+                <i :class="dropdownIconClass"></i>
+              </template>
+              <template v-for="(chip, key) in filteredListItems">
+                <b-dropdown-item href="#"
+                                 :key="`2-${key}`"
+                                 :class="getDropdownItemClass(chip.id)"
+                                 :enabled="!loading"
+                                 v-if="key >= displayCount"
+                                 @click="onClick(chip)">
+                  {{ chip.name }}
+                </b-dropdown-item>
+              </template>
+            </b-dropdown>
+          </div>
+          <div :class="`text-caption text-grey-6 text-weight-bold ${emptyClass}`"
+               v-else>
+            {{ defaultLabel }}
+          </div>
         </div>
       </div>
     </div>
@@ -130,13 +138,19 @@ export default {
     isEmpty: {
       type: Boolean,
       default: false
+    },
+
+    collapsible: {
+      type: Boolean,
+      default: false
     }
   },
 
   data () {
     return {
       loading: false,
-      disabled: true
+      disabled: true,
+      collapsed: true
     }
   },
 
@@ -247,11 +261,7 @@ export default {
     },
 
     emptyClass () {
-      const emptyClass = this.isEmpty ? 'p-1' : ''
-
-      return [
-        emptyClass
-      ]
+      return this.isEmpty ? 'p-1' : ''
     }
   },
 
@@ -260,6 +270,14 @@ export default {
   },
 
   methods: {
+    toggleCollapse () {
+      if (!this.collapsible) {
+        return
+      }
+
+      this.collapsed = !this.collapsed
+    },
+
     onClick (chip) {
       this.$emit('on-selected-item', chip)
       this.loading = true
@@ -301,6 +319,14 @@ export default {
       return [
         activeClass
       ]
+    }
+  },
+
+  watch: {
+    disabled () {
+      if (this.collapsible && this.isForcedAndNotDisposed) {
+        this.collapsed = false
+      }
     }
   }
 }
