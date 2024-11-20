@@ -181,13 +181,13 @@
                                                 :communication="communication">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status == SummaryStatus.STATUS_PROCESSING" class="mr-2">
-                        <q-icon name="hourglass_empty" color="blue" />
-                        <span>Your summary is being processed. Please wait...</span>
+                      <div v-else-if="summary_status == SummaryStatus.STATUS_FAILED" class="status-message">
+                        <q-icon name="error" color="red" size="md" />
+                        <span>Summary generation failed.</span>
                       </div>
-                      <div v-else-if="summary_status == SummaryStatus.STATUS_FAILED" class="mr-2">
-                        <q-icon name="error" color="red" />
-                        <span>Summary generation failed. Please try again later.</span>
+                      <div v-else-if="summary_status == SummaryStatus.STATUS_PROCESSING" class="status-message">
+                        <q-icon name="hourglass_empty" color="blue" size="md" />
+                        <span>Your summary is being processed. Please wait...</span>
                       </div>
                     </div>
                     <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
@@ -669,4 +669,14 @@ export default {
 .pt-12 {
   padding-top: 12px;
 }
+
+.status-message {
+  display: flex;
+  align-items: center;
+}
+
+.status-message span {
+  margin-left: 4px;
+}
+
 </style>
