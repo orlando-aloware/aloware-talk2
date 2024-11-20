@@ -71,6 +71,15 @@
         <span>{{ id === undefined ? 'Discard' : 'Delete'}}</span>
       </template>
     </contact-menu-item>
+    <contact-menu-item v-if="hasShowInPublicFolderPermission"
+                       @click="$emit('showInPublicFolder')" >
+      <template slot="icon">
+        <eye-icon></eye-icon>
+      </template>
+      <template slot="title">
+        <span>Convert to Public</span>
+      </template>
+    </contact-menu-item>
   </contact-menu>
 </template>
 
@@ -83,9 +92,10 @@ import PlusIcon from 'components/icons/plus-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
 import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
-import * as ContactListTypes from 'src/constants/contacts-list-types'
 import MoveIcon from 'components/icons/move-icon.vue'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { contactLists } from 'src/plugins/mixins'
+import EyeIcon from 'components/icons/eye-icon.vue'
 
 export default {
   components: {
@@ -97,7 +107,8 @@ export default {
     DuplicateIcon,
     TrashIcon,
     PinIcon,
-    MoveIcon
+    MoveIcon,
+    EyeIcon
   },
   mixins: [contactLists],
   data () {
@@ -133,6 +144,10 @@ export default {
       type: Number,
       required: false,
       default: 1
+    },
+    hasShowInPublicFolderPermission: {
+      type: Boolean,
+      required: true
     },
     isPinned: {
       type: Boolean
