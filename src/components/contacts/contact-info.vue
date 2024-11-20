@@ -195,6 +195,7 @@
                       size="sm"
                       class="custom-action-button my-1"
                       data-testid="contact-info-remove-power-dialer-button"
+                      :disabled="isRemovingFromPowerDialerLists"
                       v-if="hasPowerDialerLists"
                       @click="removeContactFromPowerDialerLists">
                 <q-tooltip anchor="bottom middle"
@@ -250,12 +251,13 @@
         <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
         <power-dialer-add-modal :params="addPowerDialerParams"
                                 data-testid="contact-info-power-dialer-add-modal"
-                                :redirect="false">
+                                :redirect="false"
+                                @saved="onSavedPowerDialer">
         </power-dialer-add-modal>
         <contact-remove-from-lists-confirmation :contact="contact"
                                                 data-testid="contact-remove-from-lists-confirmation"
                                                 @close="onCloseContactRemoveFromListsConfirmation"
-                                                @confirm="onCloseContactRemoveFromListsConfirmation"
+                                                @confirm="onConfirmContactRemoveFromListsConfirmation"
                                                 @error="onErrorContactRemoveFromLists"/>
         <merge-contact-modal data-testid="contact-info-merge-contact-modal"
                              :contact="contact"
@@ -280,13 +282,12 @@ import ContactAddReminderModal from 'src/components/contacts/contact-add-reminde
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
-import { aclMixin, simpsocialMixin, timezoneCheckMixin, integrationMixin } from 'src/plugins/mixins'
+import { aclMixin, simpsocialMixin, timezoneCheckMixin, integrationMixin, contactMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import EmailIcon from 'components/icons/email-icon'
 import VideoConferenceIcon from 'components/icons/video-conference-icon'
-import { POWER_DIALER_LIST } from 'src/constants/contact-list-types'
 
 export default {
   name: 'contact-info',
@@ -301,7 +302,8 @@ export default {
     aclMixin,
     simpsocialMixin,
     timezoneCheckMixin,
-    integrationMixin
+    integrationMixin,
+    contactMixin
   ],
 
   components: {
@@ -358,8 +360,7 @@ export default {
     },
 
     hasPowerDialerLists () {
-      console.log('this.contact?.contact_lists', this.contact?.contact_lists)
-      return this.contact?.contact_lists?.some((list) => list.module_type === POWER_DIALER_LIST)
+      return this.contact?.power_dialer_lists?.length > 0
     }
   },
 
@@ -368,7 +369,8 @@ export default {
       showEditForm: false,
       isProcessingDNC: false,
       isProcessingBlock: false,
-      isVideoConferenceLinkSending: false
+      isVideoConferenceLinkSending: false,
+      isRemovingFromPowerDialerLists: false
     }
   },
 
@@ -490,6 +492,21 @@ export default {
 
     onCloseContactRemoveFromListsConfirmation () {
       this.$bvModal.hide('contact-remove-from-lists-confirmation')
+    },
+
+    onConfirmContactRemoveFromListsConfirmation () {
+      this.$bvModal.hide('contact-remove-from-lists-confirmation')
+
+      this.isRemovingFromPowerDialerLists = true
+      this.fetchContact(false)
+      setTimeout(() => {
+        this.isRemovingFromPowerDialerLists = false
+      }, 4000)
+    },
+
+    onSavedPowerDialer () {
+      this.fetchContact(false)
+      this.isRemovingFromPowerDialerLists = false
     },
 
     onErrorContactRemoveFromLists (error) {
