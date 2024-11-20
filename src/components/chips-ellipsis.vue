@@ -22,8 +22,8 @@
         <div class="chip-ellipsis position-relative"
             :class="dispositionClass">
           <b-overlay class="h-100 w-100 position-absolute"
-                    :class="overlayClass"
-                    :show="disabled || loading">
+                     :class="overlayClass"
+                     :show="disabled || loading">
             <template #overlay>
               <div v-if="disabled"></div>
               <q-spinner-bars color="primary"
@@ -32,7 +32,7 @@
             </template>
           </b-overlay>
           <div class="pl-1"
-              v-if="hasContent">
+               v-if="hasContent">
             <template v-for="(chip, key) in filteredListItems">
               <q-chip outline
                       clickable
@@ -72,9 +72,8 @@
               </template>
             </b-dropdown>
           </div>
-          <div class="text-caption text-grey-6 text-weight-bold"
-              :class="emptyClass"
-              v-else>
+          <div :class="`text-caption text-grey-6 text-weight-bold ${emptyClass}`"
+               v-else>
             {{ defaultLabel }}
           </div>
         </div>
@@ -262,11 +261,7 @@ export default {
     },
 
     emptyClass () {
-      const emptyClass = this.isEmpty ? 'p-1' : ''
-
-      return [
-        emptyClass
-      ]
+      return this.isEmpty ? 'p-1' : ''
     }
   },
 

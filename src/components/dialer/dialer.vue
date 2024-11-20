@@ -1344,7 +1344,7 @@ export default {
     },
 
     resetCall () {
-      console.log('Resetting call', { activeTask: this.activeTask })
+      // console.log('Resetting call', { activeTask: this.activeTask })
 
       if (this.isSessionRunning && this.redialRequired && this.activeTask && !this.activeTask.forcedRedial) {
         this.activeTask.forcedRedial = true
@@ -1368,11 +1368,6 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(false)
-
-      // avoid redialing multiple times
-      // setTimeout(() => {
-      //   this.taskRedialed = false
-      // }, 300)
     },
 
     countCallDuration () {

@@ -160,8 +160,6 @@ export default {
     // if has redialed less than min_redials
     // and if the call disposition is not a successful call disposition
     redialRequired () {
-      // console.log('%c [redialRequired]', 'background-color: purple; color: white', { sessionSettings: this.sessionSettings, activeTask: this.activeTask, redialedTasksCount: this.redialedTasksCount })
-
       const minRedials = this.sessionSettings.min_redials
 
       // min_redials = 0 (redial disabled)

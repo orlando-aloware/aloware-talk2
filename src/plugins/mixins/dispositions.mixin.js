@@ -74,8 +74,6 @@ export default {
     },
 
     requireSmsSending () {
-      // console.log('requireSmsSending', { tasksSentSmsTemplates: this.tasksSentSmsTemplates, activeTask: this.activeTask })
-
       if (!this.activeTask) {
         return false
       }

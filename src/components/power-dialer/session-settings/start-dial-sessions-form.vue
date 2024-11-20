@@ -161,11 +161,11 @@
             Set Call Disposition Shortcuts
           </label>
           <call-disposition-selector class="pb-2 dial-sessions__form__call-disposition-selector"
-                                      :multiple="true"
-                                      :highlighted="isChanged('call_dispositions')"
-                                      :disable="disabled"
-                                      v-model="resources.call_disposition_ids"
-                                      @change="(eventPayload) => onSettingsChange(eventPayload, 'call_disposition_ids')"/>
+                                     :multiple="true"
+                                     :highlighted="isChanged('call_dispositions')"
+                                     :disable="disabled"
+                                     v-model="resources.call_disposition_ids"
+                                     @change="(eventPayload) => onSettingsChange(eventPayload, 'call_disposition_ids')"/>
         </div>
 
         <div class="col-6 pl-3">
@@ -337,7 +337,16 @@ export default {
     minRedialOptions () {
       const options = [
         { value: 0, label: '0 (No redial required)' },
-        ...Array(10).fill(0).map((_, index) => ({ value: index + 1, label: `${index + 1} time${(index + 1) > 1 ? 's' : ''}` }))
+        // fill with x times from 1 to 10
+        ...Array(10)
+          .fill(0)
+          .map((_, index) => {
+            const value = index + 1;
+            return {
+              value,
+              label: `${value} time${value > 1 ? "s" : ""}`,
+            };
+          }),
       ]
       return options
     }
@@ -376,7 +385,7 @@ export default {
 
       // if force redial is on, combine call disposition ids with selected successful call dispositions
       // since they are required in order to not force redial the contact
-      if (this.resources.force_redial) {
+      if (this.resources.min_redials > 0) {
         const successfulCallIds = eventPayload.filter(item => !this.resources.call_disposition_ids.includes(item))
         this.onSettingsChange([...this.resources.call_disposition_ids, ...successfulCallIds], 'call_disposition_ids')
       }
@@ -451,8 +460,6 @@ export default {
     },
 
     settings (value) {
-      console.log('this.currentCompany', this.currentCompany)
-
       this.applyCompanyRedialSettings(value)
       this.resources = value
     },
