@@ -1,5 +1,4 @@
 import { mapState } from 'vuex'
-import * as CommunicationTypes from 'src/constants/communication-types'
 import { communicationInfoMixin } from 'src/plugins/mixins'
 
 export default {
@@ -10,15 +9,19 @@ export default {
   },
 
   methods: {
+    // check if the transcription is allowed for the communication
     isTranscriptionAllowed (communication) {
-      return this.isTranscriptionEnabled &&
-             communication.type === CommunicationTypes.CALL &&
+      return communication.is_eligible_for_transcribe &&
              this.showAudio(communication) &&
-             !communication.metadata?.transcription_info
+             this.isOlderThan(communication.created_at, 10) && // check if the communication is older than 5 minutes for queue processing
+             !communication.metadata?.transcription_info // check if the transcription is already processed
     },
-    isTranscriptionEnabled () {
-      return this.currentCompany?.transcription_settings?.call_transcription_enabled &&
-             this.currentCompany?.transcription_enabled
+
+    // checks if a given timestamp is older than the specified number of minutes
+    isOlderThan (createdAt, minutes) {
+      if (!createdAt) return false
+      const timeDifference = Date.now() - new Date(createdAt).getTime()
+      return timeDifference >= minutes * 60 * 1000
     }
   }
 }
