@@ -1,6 +1,6 @@
 <template>
-  <confirm-dialog :id="dialogId"
-                  title='Remove Contact From List Confirmation'
+  <confirm-dialog title='Remove Contact From List Confirmation'
+                  :id="dialogId"
                   :is-busy="isBusy"
                   @hide="onHide"
                   @shown="onShown">
