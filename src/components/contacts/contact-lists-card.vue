@@ -26,8 +26,7 @@
                  clearable
                  data-testid="search-input"
                  ref="searchListNameInput"
-                 v-show="!showSearchIcon"
-        >
+                 v-show="!showSearchIcon">
           <template v-slot:prepend>
             <search-icon />
           </template>
