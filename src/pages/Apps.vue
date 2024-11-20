@@ -1,36 +1,34 @@
 <template>
   <div class="h-100">
-    <upgrade-now-page
-      class="mt-5"
-      title-text="Open with our desktop app"
-      :text="getActionText"
-      :extra-text="`Phone: ${phone}`"
-      extra-text2="👇"
-      image-link="/assets/images/logo.png"
-      :show-button="false"
+    <upgrade-now-page class="mt-5"
+                      title-text="Open with our desktop app"
+                      :text="getActionText"
+                      :extra-text="`Phone: ${phone}`"
+                      extra-text2="👇"
+                      image-link="/assets/images/logo.png"
+                      :show-button="false"
     />
 
     <!-- display a banner with empashis with the getActionText if the
     action is not allowed -->
-    <div
-      v-if="!isAllowedActions"
-      class="q-pa-md q-gutter-sm d-flex justify-content-center"
-    >
-      <q-banner inline-actions rounded class="bg-orange text-white">
+    <div class="q-pa-md q-gutter-sm d-flex justify-content-center"
+         v-if="!isAllowedActions">
+      <q-banner inline-actions
+                rounded
+                class="bg-orange text-white">
         <span class="font-weight-bolder"> {{ getActionText }} </span>
       </q-banner>
     </div>
 
     <!-- HERE BUTTON TO OPEN DEEP LINK -->
-    <div v-else class="d-flex justify-content-center mt-3">
-      <q-btn
-        class="q-mt-xl px-4"
-        label="Open App"
-        color="primary"
-        no-caps
-        unelevated
-        @click="openDeepLink"
-      />
+    <div class="d-flex justify-content-center mt-3"
+         v-else>
+      <q-btn class="q-mt-xl px-4"
+             label="Open App"
+             color="primary"
+             no-caps
+             unelevated
+             @click="openDeepLink" />
     </div>
   </div>
 </template>
@@ -55,7 +53,16 @@ export default {
     UpgradeNowPage
   },
   // get action and phone from get params
-  props: ['action', 'phone'],
+  props: {
+    action: {
+      type: String,
+      required: true
+    },
+    phone: {
+      type: String,
+      required: true
+    }
+  },
   computed: {
     getActionText () {
       if (this.isContactAction) {
@@ -85,10 +92,7 @@ export default {
         return
       }
 
-      const opened = await window.open(
-        `${ALOWARE_PROTOCOL}${this.action}-${this.phone}`,
-        '_blank'
-      )
+      const opened = await window.open(`${ALOWARE_PROTOCOL}${this.action}-${this.phone}`, '_blank')
       if (opened) {
         window.close()
       }
