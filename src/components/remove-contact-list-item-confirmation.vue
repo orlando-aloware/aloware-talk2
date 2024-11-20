@@ -2,7 +2,6 @@
   <confirm-dialog :id="dialogId"
                   title='Remove Contact From List Confirmation'
                   :is-busy="isBusy"
-                  @close="onClose"
                   @hide="onHide"
                   @shown="onShown">
     <div slot="content">
@@ -82,9 +81,6 @@ export default {
     onShown () {
       this.busy = false
       this.$refs.confirmationInput.focus()
-    },
-
-    onClose () {
     },
 
     handleDeletion () {
