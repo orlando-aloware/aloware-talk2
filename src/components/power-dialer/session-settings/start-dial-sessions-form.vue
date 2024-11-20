@@ -337,7 +337,7 @@ export default {
     minRedialOptions () {
       const options = [
         { value: 0, label: '0 (No redial required)' },
-        ...Array(10).fill(0).map((_, index) => ({ value: index + 1, label: `${index + 1} time${index > 1 ? 's' : ''}` }))
+        ...Array(10).fill(0).map((_, index) => ({ value: index + 1, label: `${index + 1} time${(index + 1) > 1 ? 's' : ''}` }))
       ]
       return options
     }
