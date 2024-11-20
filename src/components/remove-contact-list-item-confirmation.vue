@@ -80,7 +80,6 @@ export default {
 
     onShown () {
       this.busy = false
-      this.$refs.confirmationInput.focus()
     },
 
     handleDeletion () {
