@@ -143,7 +143,7 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    <div v-if="custom_summary" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
+                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
                       <q-btn color="text-dark-greenish"
                              class="btn btn-inline px-1 py-0"
                              title="Download Summary"
@@ -190,8 +190,8 @@
                         <span>Summary generation failed. Please try again later.</span>
                       </div>
                     </div>
-                    <div v-if="custom_summary" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
-                    <div v-if="custom_summary" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
+                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
                       <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
@@ -299,6 +299,7 @@ export default {
       summary_engine: null,
       custom_summary: null,
       summary_prompt: null,
+      summary_status: null,
       feedback: null,
       upvoteActive: false,
       downvoteActive: false,

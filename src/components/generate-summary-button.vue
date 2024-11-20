@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isTranscriptionAllowed(communication)">
+    <div v-if="isSummarizationAllowed(communication)">
         <b-button variant="success"
                   size="sm"
                   data-testid="comm-details-generate-summary-button"
