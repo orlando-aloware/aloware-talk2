@@ -11,13 +11,13 @@
             Line
           </label>
           <line-selector :multiple="false"
-                        :use-chips="true"
-                        :disable="disabled"
-                        :generic-styling="false"
-                        :generic-multiselect="false"
-                        :force-remove-missing-values="true"
-                        v-model="resources.campaign_id"
-                        @change="(eventPayload) => onSettingsChange(eventPayload, 'campaign_id')"/>
+                         :use-chips="true"
+                         :disable="disabled"
+                         :generic-styling="false"
+                         :generic-multiselect="false"
+                         :force-remove-missing-values="true"
+                         v-model="resources.campaign_id"
+                         @change="(eventPayload) => onSettingsChange(eventPayload, 'campaign_id')"/>
         </div>
 
         <div class="col-6 mb-4">
@@ -58,11 +58,11 @@
             Phone Script
           </label>
           <script-selector class="w-100 dial-sessions__form__script-selector"
-                            :class="[resources.script_id ? 'populated': '']"
-                            :disable="disabled"
-                            :clearable="true"
-                            v-model="resources.script_id"
-                            @change="(eventPayload) => onSettingsChange(eventPayload, 'script_id')"/>
+                           :class="[resources.script_id ? 'populated': '']"
+                           :disable="disabled"
+                           :clearable="true"
+                           v-model="resources.script_id"
+                           @change="(eventPayload) => onSettingsChange(eventPayload, 'script_id')"/>
         </div>
 
         <div class="col-6 pl-3">
@@ -144,11 +144,11 @@
           <div>Select the dispositions that won't require the contact to be redialed, meaning that the call was successfully answered</div>
         </div>
         <call-disposition-selector class="p-0 mt-1 dial-sessions__form__call-disposition-selector"
-                                    :multiple="true"
-                                    :highlighted="false"
-                                    v-model="resources.successful_call_disposition_ids"
-                                    :disable="disableField('successful_call_disposition_ids')"
-                                    @change="onSuccessfulCallDispositionsChange"/>
+                                   :multiple="true"
+                                   :highlighted="false"
+                                   :disable="disableField('successful_call_disposition_ids')"
+                                   v-model="resources.successful_call_disposition_ids"
+                                   @change="onSuccessfulCallDispositionsChange"/>
       </div>
 
       <div class="label mt-4 mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
@@ -341,12 +341,12 @@ export default {
         ...Array(10)
           .fill(0)
           .map((_, index) => {
-            const value = index + 1;
+            const value = index + 1
             return {
               value,
-              label: `${value} time${value > 1 ? "s" : ""}`,
-            };
-          }),
+              label: `${value} time${value > 1 ? 's' : ''}`
+            }
+          })
       ]
       return options
     }
