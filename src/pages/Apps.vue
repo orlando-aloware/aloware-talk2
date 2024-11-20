@@ -79,13 +79,19 @@ export default {
     }
   },
   methods: {
-    openDeepLink () {
+    async openDeepLink () {
       // Open deep link
       if (!this.isAllowedActions) {
         return
       }
 
-      window.open(`${ALOWARE_PROTOCOL}${this.action}-${this.phone}`, '_blank')
+      const opened = await window.open(
+        `${ALOWARE_PROTOCOL}${this.action}-${this.phone}`,
+        '_blank'
+      )
+      if (opened) {
+        window.close()
+      }
     }
   },
 
