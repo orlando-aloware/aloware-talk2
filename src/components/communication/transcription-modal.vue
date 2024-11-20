@@ -177,13 +177,22 @@
                     <div class="summary-status-container">
                       <div v-if="!summary_status">
                         <generate-summary-button class="mr-2"
-                                                data-testid="comm-details-generate-summary-button"
-                                                :communication="communication">
+                                                 data-testid="comm-details-generate-summary-button"
+                                                 :is-generating="isGenerating"
+                                                 :communication="communication"
+                                                 @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
                       <div v-else-if="summary_status == SummaryStatus.STATUS_FAILED" class="status-message">
                         <q-icon name="error" color="red" size="md" />
-                        <span>Summary generation failed.</span>
+                        <div>Summary generation failed. Please try again later.</div>
+                        <br>
+                        <generate-summary-button class="mr-2"
+                                                 data-testid="comm-details-generate-summary-button"
+                                                 :is-generating="isGenerating"
+                                                 :communication="communication"
+                                                 @updateGenerating="updateGenerating">
+                        </generate-summary-button>
                       </div>
                       <div v-else-if="summary_status == SummaryStatus.STATUS_PROCESSING || summary_status == SummaryStatus.STATUS_QUEUED" class="status-message">
                         <q-icon name="hourglass_empty" color="blue" size="md" />
@@ -319,7 +328,8 @@ export default {
         'NEGATIVE': '#ff7d74'
       },
       UploadedFileTypes,
-      isEmpty
+      isEmpty,
+      isGenerating: false
     }
   },
 
@@ -624,6 +634,10 @@ export default {
       if (this.tabName === 'transcription') {
         this.$refs.conversationSection.syncScroll(time)
       }
+    },
+
+    updateGenerating (status) {
+      this.isGenerating = status
     },
 
     /**

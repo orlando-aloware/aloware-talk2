@@ -1,12 +1,19 @@
 <template>
     <div v-if="isSummarizationAllowed(communication)">
-        <b-button variant="success"
+        <b-button id="generate-summary-button"
+                  variant="success"
+                  class="generate-summary-button"
                   size="sm"
                   data-testid="comm-details-generate-summary-button"
+                  :disabled="isGenerating"
                   @click="generateSummary(communication.id)">
             <sparkle-icon width="20" height="20" color="white"/>
-            Generate Summary
+            <span v-if="isGenerating">Generating Summary...</span>
+            <span v-else>Generate Summary</span>
         </b-button>
+        <q-tooltip v-if="isGenerating">
+          The process might take some time. Consider refreshing the page later to see the updates.
+        </q-tooltip>
     </div>
 </template>
 
@@ -22,6 +29,10 @@ export default {
   props: {
     communication: {
       type: Object,
+      required: true
+    },
+    isGenerating: {
+      type: Boolean,
       required: true
     }
   },
@@ -42,12 +53,21 @@ export default {
      */
     generateSummary: _.debounce(function (communicationId) {
       this.$generalNotification('Summary generation started.', 'success')
+      this.$emit('updateGenerating', true)
       talk2Api.V1.transcription.generateSummary(communicationId)
         .catch(error => {
           const errorMessage = error.response?.data?.message || 'Failed to start summary generation.'
           this.$generalNotification(errorMessage, 'error')
+          this.$emit('updateGenerating', false) // Reset on error
         })
     }, 1000)
   }
 }
 </script>
+
+<style scoped>
+.generate-summary-button {
+  display: flex;
+  justify-content: center;
+}
+</style>
