@@ -43,8 +43,7 @@
          class="my-3">
       <template v-for="(list, index) in paginatedLists">
         <div class="d-flex align-items-start list-item"
-             :key="list.id"
-        >
+             :key="list.id">
           <list-icon class="mr-3 self-center"
                      :key="'list_icon_' + list.id + index"
                      v-if="list.type === 1"/>
