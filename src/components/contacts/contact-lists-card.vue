@@ -355,12 +355,6 @@ export default {
       this.newSelectedListIds = null
       this.showAvailableLists = false
     },
-    onInput (value) {
-
-    },
-    onAdd (value) {
-
-    },
     addToList () {
       this.showAvailableLists = true
     },
@@ -405,19 +399,6 @@ export default {
       this.isRemoving = false
       this.$bvModal.hide(this.dialogId)
     },
-
-    isEllipsisActive (index) {
-      const test = this.$refs
-      if (test.listNamesRef) {
-        const element = this.$refs.listNamesRef[index]
-        console.log('this.$refs.listNamesRef', element, element.offsetWidth < element.scrollWidth)
-        // return true
-        return element.offsetWidth < element.scrollWidth
-      }
-
-      return false
-    },
-
     async loadAvailableLists () {
       let params = {
         page: 1,
@@ -431,11 +412,6 @@ export default {
         params.private_only = true
         this.loadedAllPrivateLists = await this.getListsV2(params)
       }
-    }
-  },
-  watch: {
-    'contact.id': function () {
-
     }
   }
 }
