@@ -448,7 +448,7 @@ export default {
 
     async findDefaultOutboundCampaign () {
       if (this.isAlwaysAskModeEnabled()) {
-        await this.setTheLastUsedCallLine()
+        await this.setLastUsedCallLine()
         this.defaultCampaignInitialized = true
         return
       }
@@ -538,8 +538,9 @@ export default {
       this.handleCallCompletedEvent(true)
     },
 
-    async setTheLastUsedCallLine () {
+    async setLastUsedCallLine () {
       if (this.campaignId || !this.contactId) return
+
       try {
         const data = await this.getLastUsedCallLineByContactId(this.contactId)
         this.handleChangeCampaignEvent(data.campaign_id)

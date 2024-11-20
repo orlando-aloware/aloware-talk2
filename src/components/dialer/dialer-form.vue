@@ -397,7 +397,7 @@ export default {
       })
 
       setTimeout(() => {
-        this.setTheLastUsedCallLine()
+        this.setLastUsedCallLine()
       }, 1000)
     })
   },
@@ -457,6 +457,7 @@ export default {
       this.contactName = data.contactName
       this.companyName = data.companyName
       this.contactId = data.contactId
+      console.log('contactId', this.contactId)
       this.contactTimezone = data.contactTimezone
 
       if (!this.contactId) {
@@ -624,9 +625,9 @@ export default {
       this.blockTooltipHandler.show = false
     },
 
-    async setTheLastUsedCallLine () {
-      // if there is a campaignId, we don't need to fetch the last used call line
-      if (this.campaignId) return
+    async setLastUsedCallLine () {
+      // if there is a campaignId or no contactId, we don't need to fetch the last used call line
+      if (this.campaignId || !this.contactId) return
 
       try {
         const data = await this.getLastUsedCallLineByContactId(this.contactId)
