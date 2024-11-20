@@ -52,8 +52,7 @@
                                v-else/>
           <div class="list-name pr-1">
             <q-tooltip anchor="top middle"
-                       self="center middle"
-            >
+                       self="center middle">
               {{ list.name }}
             </q-tooltip>
             <span ref="listNamesRef">{{ list.name }}</span>
