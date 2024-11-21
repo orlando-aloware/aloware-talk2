@@ -83,16 +83,8 @@
          ]"
          @click="toggleSidebar($event)">
       <div class="icon d-flex align-items-center">
-        <folder-static-icon data-testid="contacts-shared-static-icon"
-                            v-if="item.type === ContactListTypes.STATIC">
-        </folder-static-icon>
-        <folder-dynamic-icon data-testid="contacts-shared-dynamic-remote-icon"
-                             color="#00bf4a"
-                             v-if="item.type === ContactListTypes.DYNAMIC_REMOTE_LIST">
-        </folder-dynamic-icon>
-        <folder-dynamic-icon data-testid="contacts-shared-dynamic-icon"
-                             v-if="item.type === ContactListTypes.DYNAMIC || !item.type">
-        </folder-dynamic-icon>
+        <contact-list-type-icon testIdSuffix='shared'
+                                :type="item.type" />
       </div>
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
         <span>{{ item.name }}</span>
@@ -125,13 +117,12 @@
 </template>
 
 <script>
-import FolderStaticIcon from 'components/icons/folder-static-icon'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapState } from 'vuex'
 import ListActions from 'components/list-actions.vue'
 import FolderOption from 'components/icons/folder-option.vue'
 import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
+import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 
 export default {
   name: 'contacts-shared-item',
@@ -142,8 +133,7 @@ export default {
   ],
 
   components: {
-    FolderDynamicIcon,
-    FolderStaticIcon,
+    ContactListTypeIcon,
     FolderOption,
     ListActions
   },

@@ -308,7 +308,9 @@ export default {
     },
 
     showDeleteButton () {
-      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isSimpSocial && !this.isPowerDialer
+      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isSimpSocial && !this.isPowerDialer &&
+        // hide button when dynamic remote list fetched
+        this.lists[this.id]?.type !== ContactListTypes.DYNAMIC_REMOTE_LIST
     },
 
     showRemoveFromListButton () {
