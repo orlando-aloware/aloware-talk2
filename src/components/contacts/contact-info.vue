@@ -204,14 +204,13 @@
                       size="sm"
                       class="custom-action-button my-1"
                       data-testid="contact-info-remove-power-dialer-button"
-                      :disabled="isRemovingFromPowerDialerLists"
-                      v-if="hasPowerDialerLists"
+                      :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists"
                       @click="removeContactFromPowerDialerLists">
                 <q-tooltip anchor="bottom middle"
                            data-testid="contact-info-remove-power-dialer-tooltip"
                            self="center middle"
                            content-class="fs-12">
-                    Remove from all Power Dialers
+                    {{ hasPowerDialerListsText }}
                 </q-tooltip>
                 <call-remove-icon/>
             </b-button>
@@ -374,6 +373,10 @@ export default {
 
     hasPowerDialerLists () {
       return this.contact?.power_dialer_lists?.length > 0
+    },
+
+    hasPowerDialerListsText () {
+      return this.hasPowerDialerLists ? 'Remove contact from all Power Dialer lists' : 'This contact is not part of any Power Dialer list'
     }
   },
 
