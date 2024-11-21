@@ -143,7 +143,7 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
+                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
                       <q-btn color="text-dark-greenish"
                              class="btn btn-inline px-1 py-0"
                              title="Download Summary"
@@ -183,7 +183,7 @@
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status == SummaryStatus.STATUS_FAILED" class="status-message">
+                      <div v-else-if="summary_status === SummaryStatus.STATUS_FAILED" class="status-message">
                         <q-icon name="error" color="red" size="md" />
                         <div>Summary generation failed. Please try again later.</div>
                         <br>
@@ -194,24 +194,22 @@
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status == SummaryStatus.STATUS_PROCESSING || summary_status == SummaryStatus.STATUS_QUEUED" class="status-message">
+                      <div v-else-if="summary_status === SummaryStatus.STATUS_PROCESSING || summary_status === SummaryStatus.STATUS_QUEUED" class="status-message">
                         <q-icon name="hourglass_empty" color="blue" size="md" />
                         <span>Your summary is being processed. Please wait...</span>
                       </div>
                     </div>
-                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
-                    <div v-if="summary_status == SummaryStatus.STATUS_COMPLETED" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
+                    <div v-if="custom_summary ||summary_status === SummaryStatus.STATUS_COMPLETED" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
                       <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
-                        style="cursor: pointer;"
                         :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
                         @click="submitFeedback('upvote')"
                       />
                       <span class="mx-1"></span>
                       <img
                         class="clickable-icon"
-                        style="cursor: pointer;"
                         :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
                         @click="submitFeedback('downvote')"
                       />
@@ -691,6 +689,10 @@ export default {
 
 .status-message span {
   margin-left: 4px;
+}
+
+.clickable-icon {
+  cursor: pointer;
 }
 
 </style>
