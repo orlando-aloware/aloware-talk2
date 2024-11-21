@@ -3,17 +3,17 @@
     <folder-static-icon color="#62666E"
                          :data-testid="`contacts-${testIdSuffix}-static-icon`"
                         v-if="isStatic">
-      <q-tooltip anchor="top middle" self="center middle">Static</q-tooltip>
+      <q-tooltip anchor="top middle" self="center middle">Static List</q-tooltip>
     </folder-static-icon>
     <folder-dynamic-icon color="#00bf4a"
                          :data-testid="`contacts-${testIdSuffix}-dynamic-remote-icon`"
                          v-if="isDynamicRemote">
-      <q-tooltip anchor="top middle" self="center middle">Dynamic from Integration</q-tooltip>
+      <q-tooltip anchor="top middle" self="center middle">Dynamic List from Integration</q-tooltip>
     </folder-dynamic-icon>
     <folder-dynamic-icon color="#62666E"
                          :data-testid="`contacts-${testIdSuffix}-dynamic-icon`"
                          v-if="isDynamic">
-      <q-tooltip anchor="top middle" self="center middle">Dynamic from Aloware</q-tooltip>
+      <q-tooltip anchor="top middle" self="center middle">Dynamic List from Aloware</q-tooltip>
     </folder-dynamic-icon>
   </span>
 </template>
