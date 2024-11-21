@@ -1,10 +1,14 @@
 <template>
   <div class="html-viewer">
     <div v-html="displayContent"></div>
-    <div v-if="isTruncated && !isExpanded" class="expand-indicator" @click="toggleExpand">
+    <div v-if="isTruncated && !isExpanded"
+         class="expand-indicator"
+         @click="toggleExpand">
       Show More
     </div>
-    <div v-if="isExpanded" class="collapse-indicator" @click="toggleExpand">
+    <div v-if="isExpanded"
+         class="collapse-indicator"
+         @click="toggleExpand">
       Show Less
     </div>
   </div>

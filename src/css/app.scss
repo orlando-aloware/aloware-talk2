@@ -15741,11 +15741,7 @@ hr {
   position: relative;
   background-color: rgba(255, 255, 255, 0.9); /* bg-white bg-opacity-90 */
   margin: 2px;
-  border-radius: 0.5rem; /* rounded-lg */
-
-  .q-hoverable:hover > .q-focus-helper {
-    opacity: 0 !important;
-  }
+  border-radius: 0.3rem; /* rounded-lg */
 
   ul, ol {
     padding-inline-start: 16px;
