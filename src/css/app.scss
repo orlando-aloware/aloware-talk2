@@ -1413,7 +1413,7 @@ i.option-separator {
 }
 
 .communication-info {
-  display: inline-block;
+  display: block;
   font-size: 14px;
   line-height: 18px;
 
@@ -1434,6 +1434,10 @@ i.option-separator {
   .q-item__section--side {
     padding-left: 0px;
     padding-right: 0.5rem !important;
+  }
+
+  .more-details {
+    color: $blue;
   }
 }
 
@@ -1986,7 +1990,7 @@ i.option-separator {
   border-bottom-right-radius: 12px;
 }
 
-.collapsed-has-notes {
+.collapsed-can-expand {
   &.no-expansion,
   .q-item {
     border-bottom-left-radius: 0 !important;
@@ -5087,12 +5091,6 @@ i.option-separator {
         padding-left: 40px;
       }
     }
-  }
-}
-
-.communication-info {
-  .more-details {
-    color: $blue;
   }
 }
 

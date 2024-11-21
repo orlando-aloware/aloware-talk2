@@ -811,9 +811,9 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div>
-      <div class="px-3 pt-2 border border-top-0 border-bottom-0 text-left"
-           v-show="!activeName"
+    <div v-show="!activeName">
+      <div class="px-3 pt-2 border border-top-0 text-left"
+           :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
            v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
         <div class="d-flex align-items-center w-100">
           <communication-audio :communication="communication"
@@ -826,8 +826,8 @@
         </div>
       </div>
 
-      <div class="px-3 pt-2 border border-top-0 border-bottom-0 text-left"
-           v-show="!activeName"
+      <div class="px-3 pt-2 border border-top-0 text-left"
+           :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
            v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type) && communication.has_voicemail">
         <div class="d-flex flex-row align-items-center w-100">
           <communication-audio :communication="communication"
@@ -841,7 +841,7 @@
       </div>
     </div>
     <div class="px-3 pt-2 bottom-radius border border-top-0 text-left bg-white notes-body overflow-auto text-break"
-         v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE && !isParkedCall && !isActiveCall">
+         v-if="hasNotes && communication.type !== CommunicationTypes.NOTE && !activeName && !isParkedCall && !isActiveCall">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
          v-html="$options.filters.nl2br(communication.notes)">
@@ -1072,6 +1072,11 @@ export default {
         (this.communication.body &&
           this.communication.type === CommunicationTypes.NOTE))
     },
+
+    hasAudio () {
+      return this.communication.type === CommunicationTypes.CALL && (this.showAudio(this.communication) || !this.communication.has_voicemail)
+    },
+
     parseBody () {
       if (this.communication.type === CommunicationTypes.NOTE) {
         return this.parseMentionToView(this.communication.body)
@@ -1101,15 +1106,15 @@ export default {
     },
 
     onBeforeActivityHide () {
-      if (this.hasNotes) {
-        this.activityExpansionClass = ['activity-unexpanded collapsed-has-notes']
+      if (this.hasNotes || this.hasAudio) {
+        this.activityExpansionClass = ['activity-unexpanded collapsed-can-expand']
       }
     },
 
     onActivityHide () {
       const activityClass = { data: 'activity-unexpanded' }
-      if (this.hasNotes) {
-        activityClass.data += ' collapsed-has-notes'
+      if (this.hasNotes || this.hasAudio) {
+        activityClass.data += ' collapsed-can-expand'
       }
       this.activityExpansionClass = [activityClass.data]
     },
@@ -1249,6 +1254,12 @@ export default {
   watch: {
     hasNotes () {
       if (this.hasNotes && !this.activeName) {
+        this.onActivityHide()
+      }
+    },
+
+    hasAudio () {
+      if (this.hasAudio && !this.activeName) {
         this.onActivityHide()
       }
     }
