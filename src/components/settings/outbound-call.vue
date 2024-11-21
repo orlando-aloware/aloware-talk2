@@ -19,12 +19,23 @@
             <h5 class="form-label">Caller ID</h5>
             <p class="form-helper-text">Decide what line is used when this user makes an outbound call.</p>
           </div>
-          <p class="text-bold fs-12">Outbound line: <b-badge variant="warning" v-if="currentCompany && currentCompany.force_outbound_line">Forced at account level</b-badge></p>
+          <p class="text-bold fs-12"
+             :class="{ 'mb-1': selectedCampaignInAccountLevel && outboundLineSettingsDisabled }">
+            Outbound line: <b-badge variant="warning" v-if="currentCompany && currentCompany.force_outbound_line">Forced at account level</b-badge>
+          </p>
+          <p class="fs-12"
+             v-if="selectedCampaignInAccountLevel">
+             Selected line in the account level: <b>{{ selectedCampaignInAccountLevel }}</b></p>
           <b-form-group label="" v-slot="{ ariaDescribedby }">
             <b-form-radio-group
-              v-model="user.outbound_calling_selector"
+              class="outbound-line-selector"
+              triggers="manual"
               :options="options"
               :aria-describedby="ariaDescribedby"
+              :disabled="outboundLineSettingsDisabled"
+              :title="outboundLineTooltipTitle"
+              v-b-tooltip.hover.bottom
+              v-model="user.outbound_calling_selector"
               @change="(eventPayload) => onUpdateFields(eventPayload, 'outbound_calling_selector')">
             </b-form-radio-group>
           </b-form-group>
@@ -48,6 +59,7 @@
                            :use-input="true"
                            :generic-styling="false"
                            :generic-multiselect="false"
+                           :disable="outboundLineSettingsDisabled"
                            @change="(eventPayload) => onUpdateFields(eventPayload, 'default_outbound_campaign_id')">
             </line-selector>
             <b-form-invalid-feedback v-if="!$v.user.default_outbound_campaign_id.required">Please select an outbound line.</b-form-invalid-feedback>
@@ -159,15 +171,39 @@ export default {
     }
   },
 
+  data () {
+    return {
+      showOutboundLineSelector: false,
+      selected: '',
+      status: '',
+      options: [
+        { text: 'Use Company Default', value: 2, notEnabled: this.outboundLineSettingsDisabled },
+        { text: 'Select Manually', value: 1, notEnabled: this.outboundLineSettingsDisabled },
+        { text: 'Always Ask', value: 3, notEnabled: this.outboundLineSettingsDisabled }
+      ],
+      callRecordingsOptions: [
+        { text: 'Use Company Default', value: 1 },
+        { text: 'Always Record', value: 2 },
+        { text: 'Never Record', value: 3 }
+      ],
+      accountLevelOutboundCampaign: null,
+      SettingsMap
+    }
+  },
+
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('settings', ['userClone']),
+    ...mapState(['campaigns']),
+
     outboundCallSettingEnabled () {
       return !this.hasRole(['Company Admin', 'Company Agent']) || (this.currentCompany && this.currentCompany.force_outbound_recording)
     },
+
     vmDropUploadUrl () {
       return `${window.axios.defaults.baseURL}/api/v1/user/pre-recorded-voicemail`
     },
+
     rules () {
       const rulesObject = { data: {} }
 
@@ -189,6 +225,22 @@ export default {
       }
 
       return rulesObject.data
+    },
+
+    outboundLineSettingsDisabled () {
+      return this.currentCompany.force_outbound_line
+    },
+
+    outboundLineTooltipTitle () {
+      return this.outboundLineSettingsDisabled ? 'Outbound line settings are disabled because it is forced at the account level' : ''
+    },
+
+    selectedCampaignInAccountLevel () {
+      if (!this.currentCompany || !this.currentCompany.force_outbound_line) {
+        return ''
+      }
+
+      return this.accountLevelOutboundCampaign?.name
     }
   },
 
@@ -198,33 +250,17 @@ export default {
     }
   },
 
-  data () {
-    return {
-      showOutboundLineSelector: false,
-      selected: '',
-      status: '',
-      options: [
-        { text: 'Use Company Default', value: 2, notEnabled: this.outboundCallSettingEnabled },
-        { text: 'Select Manually', value: 1, notEnabled: this.outboundCallSettingEnabled },
-        { text: 'Always Ask', value: 3, notEnabled: this.outboundCallSettingEnabled }
-      ],
-      callRecordingsOptions: [
-        { text: 'Use Company Default', value: 1 },
-        { text: 'Always Record', value: 2 },
-        { text: 'Never Record', value: 3 }
-      ],
-      SettingsMap
-    }
-  },
-
   methods: {
     ...mapActions('settings', ['updateChangedUserProperties']),
+
     extensionSelected (extension) {
       this.user.extension = extension
     },
+
     campaignSelected (campaignId) {
       this.user.campaign_id = campaignId
     },
+
     onUpdateFields (value, prop) {
       this.user[prop] = value
       this.updateChangedUserProperties({
@@ -245,11 +281,33 @@ export default {
       }
 
       this.updateFormValidity()
+    },
+
+    setupAccountLevelOutboundCampaign () {
+      if (this.currentCompany && this.currentCompany.force_outbound_line) {
+        this.accountLevelOutboundCampaign = this.campaigns?.find(campaign => campaign.id === this.currentCompany.default_outbound_campaign_id)
+      }
     }
   },
 
   mounted () {
     this.showOutboundLineSelector = this.user.outbound_calling_selector === 1
+  },
+
+  watch: {
+    'currentCompany.force_outbound_line': {
+      immediate: true,
+      handler () {
+        this.setupAccountLevelOutboundCampaign()
+      }
+    },
+
+    'campaigns': {
+      immediate: true,
+      handler () {
+        this.setupAccountLevelOutboundCampaign()
+      }
+    }
   }
 }
 </script>
