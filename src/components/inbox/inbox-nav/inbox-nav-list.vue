@@ -293,7 +293,8 @@ export default {
         return
       }
 
-      if (this.activeChannel.value === nextActive && this.$q.screen.lt.md) {
+      if (this.activeChannel.value === nextActive && this.$q.screen.lt.md &&
+        this.activeChannel.value !== 'calls' && nextActive !== 'calls') {
         this.$emit('toInbox')
 
         return
