@@ -50,7 +50,6 @@ export default {
         unread_texts_count: 0
       },
       selectedContactCampaigns: [],
-      contactPhoneNumbers: [],
       communicationsPage: 1,
       communicationsPerPage: 10,
       contactIncomingNumber: null,
@@ -802,7 +801,6 @@ export default {
       this.contactId = null
       this.selectedCampaignId = null
       this.selectedPhoneNumber = null
-      this.contactPhoneNumbers = []
     },
 
     markAllAsRead () {
