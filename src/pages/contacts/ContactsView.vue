@@ -57,6 +57,11 @@
 
     <template slot="actions"
               v-if="!simpleTable">
+      <al-alert class='w-100 align-items-center'>
+        <div class="text-dark" >
+          This is a list managed by HubSpot
+        </div>
+      </al-alert>
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <ContactSearch class="width-260"
