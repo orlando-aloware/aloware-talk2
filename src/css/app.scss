@@ -15771,3 +15771,20 @@ hr {
   color: transparent;
   background-image: linear-gradient(to right, #2563EB, #9333EA); /* from-blue-600 to-purple-600 */
 }
+
+.outbound-line-selector {
+  max-width: 460px !important;
+}
+
+.tooltip {
+  .tooltip-inner {
+    background-color: $grey-light11 !important;
+    font-size: 12px !important;
+    color: black !important;
+  }
+
+  .arrow::before {
+    border-bottom-color: $grey-light11 !important;
+    opacity: 0 !important;
+  }
+}
