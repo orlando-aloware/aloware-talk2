@@ -26,11 +26,11 @@
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
-                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+                                            v-if="showAloAiControls" />
           <contact-aloai-engagement-control ss="w-100"
                                             data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
-                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+                                            v-if="showAloAiControls" />
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>
@@ -183,6 +183,13 @@ export default {
       }
 
       return 'No Name'
+    },
+
+    showAloAiControls () {
+      return !this.isSimpSocial &&
+        this.currentCompany.aloai_enabled &&
+        this.contact && !this.contact.is_dnc &&
+        this.hasPermissionTo('update contact')
     }
   },
 
