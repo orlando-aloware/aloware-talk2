@@ -809,7 +809,42 @@
         </div>
       </q-expansion-item>
     </q-list>
-    <div class="px-3 pt-2 bottom-radius border-no-top text-left bg-white notes-body overflow-auto text-break"
+    <div>
+      <div class="px-3 pt-2 border border-top-0 border-bottom-0 text-left"
+           v-show="!activeName"
+           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication)">
+        <label class="form-control-label">
+          Call Recording
+        </label>
+        <div class="d-flex align-items-center w-100">
+          <communication-audio :communication="communication"
+                               :contact="contact"
+                               :type="UploadedFileTypes.TYPE_CALL_RECORDING"
+                               :uniqueId="communication.id + '1'"
+                               class="mb-2"
+                               data-testid="communication-info-call-recording-audio">
+          </communication-audio>
+        </div>
+      </div>
+
+      <div class="px-3 pt-2 border border-top-0 border-bottom-0 text-left"
+           v-show="!activeName"
+           v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type) && communication.has_voicemail">
+        <label class="form-control-label">
+          Voicemail
+        </label>
+        <div class="d-flex flex-row align-items-center w-100">
+          <communication-audio :communication="communication"
+                               :contact="contact"
+                               :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
+                               :uniqueId="communication.id + '2'"
+                               class="mb-2"
+                               data-testid="communication-info-voicemail-audio">
+          </communication-audio>
+        </div>
+      </div>
+    </div>
+    <div class="px-3 pt-2 bottom-radius border border-top-0 text-left bg-white notes-body overflow-auto text-break"
          v-if="communication.notes && !activeName && communication.type !== CommunicationTypes.NOTE && !isParkedCall && !isActiveCall">
       <label class="form-control-label mb-1 text-left">Note</label>
       <p class="text-left"
