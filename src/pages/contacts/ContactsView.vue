@@ -57,7 +57,8 @@
 
     <template slot="actions"
               v-if="!simpleTable">
-      <al-alert class='w-100 align-items-center'>
+      <al-alert class='w-100 align-items-center'
+                v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST'>
         <div class="text-dark" >
           This is a list managed by HubSpot
         </div>
