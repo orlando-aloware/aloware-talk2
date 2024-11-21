@@ -5,8 +5,8 @@
            flat
            round
            dense
-           data-testid="comm-transcription-modal-single-btn"
            :size="buttonSize"
+           data-testid="comm-transcription-modal-single-btn"
            @click="fetchSmartTranscriptionData">
       <q-tooltip>
         <span>
@@ -694,5 +694,4 @@ export default {
 .clickable-icon {
   cursor: pointer;
 }
-
 </style>

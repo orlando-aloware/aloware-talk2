@@ -16,12 +16,13 @@
       </q-item>
     </q-list>
 
-    <q-list v-else-if="(communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall && !communication.callback_status) || isCallFishingMode"
-            bordered
-            class="rounded-contact-activity b-radius-12"
-            :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
-            data-testid="communication-info-show-phone"
-            @click="onShowPhone">
+    <q-list
+      v-else-if="(communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && isLiveCall && !communication.callback_status) || isCallFishingMode"
+      bordered
+      class="rounded-contact-activity b-radius-12"
+      :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
+      data-testid="communication-info-show-phone"
+      @click="onShowPhone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
           <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
@@ -30,12 +31,13 @@
         </div>
         <div class="text-lt p-x"
              :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
-            <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && !isActiveCall && !isParkedCall">
+            <span
+              v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type) && !isActiveCall && !isParkedCall">
               {{ communication.direction | fixCommDirection }}
               {{ communication.type | fixCommType }}
             </span>
-            <span v-else-if="isParkedCall">Parked Call</span>
-            <span v-else class="call-connected-text">Connected</span>
+          <span v-else-if="isParkedCall">Parked Call</span>
+          <span v-else class="call-connected-text">Connected</span>
         </div>
         <q-item-section class="text-lt pl-2 text-left"
                         data-testid="communication-info-duration-section"
@@ -150,10 +152,10 @@
                   data-testid="communication-info-hangup-call-and-answer"
                   @click="onHangUpCurrentCallAndAnswer">
             <q-item-section>
-              <hangup-icon  width="16"
-                            height="16"
-                            data-testid="communication-info-hangup-call-and-answer-icon"
-                            class="hangup-icon"></hangup-icon>
+              <hangup-icon width="16"
+                           height="16"
+                           data-testid="communication-info-hangup-call-and-answer-icon"
+                           class="hangup-icon"></hangup-icon>
               <span>Hang up Current Call &amp; Answer</span>
             </q-item-section>
           </q-item>
@@ -187,10 +189,10 @@
                   data-testid="communication-info-hangup-call-and-connect"
                   @click="onHangupCurrentCallAndConnect">
             <q-item-section>
-              <hangup-icon  width="16"
-                            height="16"
-                            data-testid="communication-info-hangup-call-and-connect-icon"
-                            class="hangup-icon"></hangup-icon>
+              <hangup-icon width="16"
+                           height="16"
+                           data-testid="communication-info-hangup-call-and-connect-icon"
+                           class="hangup-icon"></hangup-icon>
               <span>Hang up Current Call &amp; Connect</span>
             </q-item-section>
           </q-item>
@@ -250,7 +252,7 @@
                   height="200px"
                   :src="image.url">
                   <template v-slot:loading>
-                    <q-spinner-gears />
+                    <q-spinner-gears/>
                   </template>
                   <template v-slot:error>
                     <div class="absolute-full flex flex-center bg-negative text-white">
@@ -327,19 +329,19 @@
               <div class="form-group row">
                 <label class="form-control-label w-100">From</label>
                 <div class="d-flex align-items-center"
-                      v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
+                     v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
                   {{ communication.lead_number | fixPhone }}
                 </div>
                 <div class="d-flex align-items-center"
-                      v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
+                     v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
                   {{ communication.lead_number }}
                 </div>
                 <div class="d-flex align-items-center"
-                      v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
+                     v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
                   {{ communication.incoming_number }}
                 </div>
                 <div class="d-flex align-items-center"
-                      v-else>
+                     v-else>
                   {{ getCommunicationCampaignName() }}
                   <br v-if="getCommunicationCampaignName()">
                   {{ communication.incoming_number | fixPhone }}
@@ -349,21 +351,21 @@
               <div class="form-group row mb-0">
                 <label class="form-control-label w-100">To</label>
                 <div class="d-flex align-items-center"
-                      v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
+                     v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
                   {{ getCommunicationCampaignName() }}
                   <br v-if="getCommunicationCampaignName()">
                   {{ communication.incoming_number | fixPhone }}
                 </div>
                 <div class="d-flex align-items-center"
-                      v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
+                     v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
                   {{ communication.incoming_number }}
                 </div>
                 <div class="d-flex align-items-center"
-                      v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
+                     v-else-if="communication.direction === CommunicationDirections.OUTBOUND && communication.type === CommunicationTypes.EMAIL">
                   {{ communication.lead_number }}
                 </div>
                 <div class="d-flex align-items-center"
-                      v-else>
+                     v-else>
                   {{ communication.lead_number | fixPhone }}
                 </div>
               </div>
@@ -697,8 +699,8 @@
                     </label>
                     <div class="d-flex align-items-center flex-column w-100">
                       <div v-for="(attachment, index) in communication.attachments"
-                            :key="index"
-                            class="text-dark-greenish w-100">
+                           :key="index"
+                           class="text-dark-greenish w-100">
                         <download-button is-simple
                                          show-file-name
                                          data-testid="communication-info-download-files-button"
@@ -719,7 +721,7 @@
                                :entity-object="communication"
                                :category="TagCategories.CAT_COMMUNICATIONS"
                                :use-card="false"
-                               :use-add-icon="true" />
+                               :use-add-icon="true"/>
                 </div>
 
                 <label class="form-control-label mb-1">Notes</label>
@@ -778,7 +780,7 @@
                    :class="[communication.type === CommunicationTypes.REMINDER ? 'text-left' : 'justify-center']">
                 <open-calendar-button :communicationId="communication.id"
                                       data-testid="communication-info-open-calendar-button"
-                                      class="pr-2" />
+                                      class="pr-2"/>
                 <sms-reminders ref="sms-reminder"
                                class="d-flex flex-row justify-content-center w-100"
                                data-testid="communication-info-sms-reminders"
@@ -812,10 +814,7 @@
     <div>
       <div class="px-3 pt-2 border border-top-0 border-bottom-0 text-left"
            v-show="!activeName"
-           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication)">
-        <label class="form-control-label">
-          Call Recording
-        </label>
+           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
         <div class="d-flex align-items-center w-100">
           <communication-audio :communication="communication"
                                :contact="contact"
@@ -830,9 +829,6 @@
       <div class="px-3 pt-2 border border-top-0 border-bottom-0 text-left"
            v-show="!activeName"
            v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type) && communication.has_voicemail">
-        <label class="form-control-label">
-          Voicemail
-        </label>
         <div class="d-flex flex-row align-items-center w-100">
           <communication-audio :communication="communication"
                                :contact="contact"
@@ -851,22 +847,35 @@
          v-html="$options.filters.nl2br(communication.notes)">
       </p>
     </div>
+
+    <div class="ai-effect-container mt-2"
+         v-if="CommunicationTypes.CALL && !activeName && showAudio(communication) && communication.has_transcription">
+      <div class="ai-effect-gradient"></div>
+      <div class="ai-effect-blur"></div>
+      <div class="ai-effect-content p-2">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <h3 class="ai-effect-gradient-text text-16">Powered by AloAi
+              <sparkle-icon width="16" height="16" color="#9333EA"/>
+            </h3>
+          </div>
+
+          <a class="transcription-link text-decoration-none"
+             @click.prevent="fetchSmartTranscriptionData(communication)">
+            Show transcription
+          </a>
+        </div>
+        <div class="text-left-align text-13">
+          <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
-import {
-  aclMixin,
-  avatarMixin,
-  communicationInfoMixin,
-  dateMixin,
-  userMixin,
-  notificationMixin,
-  liveCallsMixin,
-  mentionsMixin,
-  simpsocialMixin
-} from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
@@ -895,6 +904,11 @@ import DownloadButton from 'components/download-button'
 import API from 'src/plugins/api/api'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+import TranscriptionModal from 'components/communication/transcription-modal.vue'
+import ExpandableHtmlViewer from 'components/communication/ExpandableHtmlViewer.vue'
 
 export default {
   name: 'communication-info',
@@ -912,6 +926,9 @@ export default {
   ],
 
   components: {
+    ExpandableHtmlViewer,
+    TranscriptionModal,
+    SparkleIcon,
     HubspotActivityTypeSelector,
     OpenCalendarButton,
     IgnoreCallIcon,
@@ -1211,6 +1228,21 @@ export default {
 
     onOpenUserInClassicClicked (userId) {
       window.open(this.getClassicUrlUserActivity(userId), '_blank')
+    },
+
+    /**
+     * Parse markdown text to HTML.
+     * @param {string} summaryText
+     *
+     * @returns {string}
+     */
+    parseMarkdown (summaryText) {
+      const rawHtml = marked(summaryText)
+      return DOMPurify.sanitize(rawHtml)
+    },
+
+    fetchSmartTranscriptionData (communication) {
+      this.$VueEvent.fire('fetchSmartTranscriptionData', communication.id)
     }
   },
 

@@ -958,6 +958,7 @@ body,
 
 .custom-link {
   font-size: $f-size-body-sm;
+  cursor: pointer;
   color: $blue;
 
   i {
@@ -1359,7 +1360,6 @@ i.option-separator {
 }
 
 .contact-activity {
-  max-width: 380px;
   transition: transform 270ms cubic-bezier(0.79, 0.14, 0.15, 0.86) 0ms, border-color 270ms linear 0ms;
 
   .q-item {
@@ -4368,10 +4368,6 @@ i.option-separator {
   .phone-info {
     width: 200px;
     height: 150px;
-
-    .w-100 {
-      width: 100%;
-    }
 
     .add-status {
       margin-left: 23px;
@@ -15712,3 +15708,72 @@ hr {
   font-size: 0.9em;
 }
 
+.w-100 {
+  width: 100%;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+/* Container for the entire effect */
+.ai-effect-container {
+  position: relative;
+  border-radius: 0.5rem; /* rounded-lg */
+  overflow: hidden;
+}
+
+/* Gradient background */
+.ai-effect-gradient {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to bottom right, #60A5FA, #A855F7, #EC4899); /* from-blue-400 via-purple-500 to-pink-500 */
+  opacity: 0.75;
+}
+
+/* Blur effect */
+.ai-effect-blur {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(4px); /* backdrop-blur-sm */
+}
+
+/* Content container */
+.ai-effect-content {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.9); /* bg-white bg-opacity-90 */
+  margin: 2px;
+  border-radius: 0.5rem; /* rounded-lg */
+
+  .q-hoverable:hover > .q-focus-helper {
+    opacity: 0 !important;
+  }
+
+  ul, ol {
+    padding-inline-start: 16px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+}
+
+.transcription-link {
+  cursor: pointer;
+  color: $dark-grey;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.transcription-link:hover {
+  color: $dark;
+  font-weight: 600;
+}
+
+/* Gradient text effect */
+.ai-effect-gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to right, #2563EB, #9333EA); /* from-blue-600 to-purple-600 */
+}
