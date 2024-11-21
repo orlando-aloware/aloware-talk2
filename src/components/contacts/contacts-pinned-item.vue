@@ -12,11 +12,8 @@
        data-testid="contacts-shared-list-link"
        @click="toggleSidebar($event, route)">
       <div class="icon d-flex align-items-center">
-        <folder-static-icon v-if="item.type === ContactListTypes.STATIC" data-testid="contacts-pinned-static-icon" ></folder-static-icon>
-        <folder-dynamic-icon color="#00bf4a"
-                             data-testid="contacts-pinned-dynamic-remote-icon"
-                             v-if="item.type === ContactListTypes.DYNAMIC_REMOTE_LIST"></folder-dynamic-icon>
-        <folder-dynamic-icon v-if="item.type === ContactListTypes.DYNAMIC || !item.type" data-testid="contacts-pinned-dyamic-icon" ></folder-dynamic-icon>
+        <contact-list-type-icon testIdSuffix='pinned'
+                                :type="item.type" />
       </div>
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
         <span>{{ item.name }}</span>
@@ -39,17 +36,15 @@
 </template>
 
 <script>
-import FolderStaticIcon from 'components/icons/folder-static-icon'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { isNaN } from 'lodash'
+import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 
 export default {
   name: 'contacts-pinned-item',
   components: {
-    FolderDynamicIcon,
-    FolderStaticIcon
+    ContactListTypeIcon
   },
   data () {
     return {
