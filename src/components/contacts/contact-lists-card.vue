@@ -52,8 +52,13 @@
                                v-else/>
           <div class="list-name pr-1">
             <q-tooltip anchor="top middle"
-                       self="center middle">
-              {{ list.name }}
+                       self="center middle"  v-if="list.name.length > 30 || (!list.show_in_public_folder && isBillingAdminOrAdminOrSupervisor)">
+              <template v-if="list.name.length > 30">
+                <strong>Name:</strong>{{ list.name }} <br/>
+              </template>
+              <template v-if="!list.show_in_public_folder && isBillingAdminOrAdminOrSupervisor">
+                <strong>Created by:</strong> {{ list.contact_folder_created_by_name }} <br/>
+              </template>
             </q-tooltip>
             <span ref="listNamesRef">{{ list.name }}</span>
           </div>
