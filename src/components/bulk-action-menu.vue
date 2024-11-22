@@ -333,7 +333,7 @@ export default {
       // If user have been granted Delete permission, which is higher than Removing from list permission
       if (this.hasDeletePermission) {
         // if is SimpSocial and user is just agent don't show, even when user has specific permission to delete contacts
-        if (this.isSimpSocial && this.isAgent && !this.isBillingAdminOrAdminOrSupervisor) {
+        if (this.isSimpSocial && this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
           return false
         }
         return this.canDelete
