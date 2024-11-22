@@ -567,6 +567,11 @@ export default {
     },
 
     async beginDial () {
+      if (this.selectedItem.min_redials > 0 && !this.selectedItem.successful_call_disposition_ids?.length) {
+        this.$generalNotification('Please select at least one Successful Call Disposition', 'error')
+        return
+      }
+
       this.cleanupDialer()
       const requests = {
         res: null,

@@ -99,6 +99,22 @@
                   v-model="resources.min_redials" />
       </div>
 
+      <div class="col-12 pl-3 mb-4"
+           v-show="resources.min_redials > 0">
+        <div :class="disableField('successful_call_disposition_ids') ? 'opacity-05' : ''">
+          <label class="label mb-1 text-weight-bold">
+            Select Successful Call Dispositions
+          </label>
+          <div>Select the dispositions that won't require the contact to be redialed, meaning that the call was successfully answered</div>
+        </div>
+        <call-disposition-selector class="p-0 mt-1 dial-sessions__form__call-disposition-selector"
+                                   :multiple="true"
+                                   :highlighted="false"
+                                   :disable="disableField('successful_call_disposition_ids')"
+                                   v-model="resources.successful_call_disposition_ids"
+                                   @change="onSuccessfulCallDispositionsChange"/>
+      </div>
+
       <div class="col-12 mb-4"
           v-show="resources.min_redials > 0">
         <div class="d-flex items-center justify-between">
@@ -133,22 +149,6 @@
                     :disable="disableField('force_sms')"
                     v-model="resources.force_sms" />
         </div>
-      </div>
-
-      <div class="col-12 pl-3 mb-4"
-          v-show="resources.min_redials > 0">
-        <div :class="disableField('successful_call_disposition_ids') ? 'opacity-05' : ''">
-          <label class="label mb-1 text-weight-bold">
-            Select Successful Call Dispositions
-          </label>
-          <div>Select the dispositions that won't require the contact to be redialed, meaning that the call was successfully answered</div>
-        </div>
-        <call-disposition-selector class="p-0 mt-1 dial-sessions__form__call-disposition-selector"
-                                   :multiple="true"
-                                   :highlighted="false"
-                                   :disable="disableField('successful_call_disposition_ids')"
-                                   v-model="resources.successful_call_disposition_ids"
-                                   @change="onSuccessfulCallDispositionsChange"/>
       </div>
 
       <div class="label mt-4 mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
