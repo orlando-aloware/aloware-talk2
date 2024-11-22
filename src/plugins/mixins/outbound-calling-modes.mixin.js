@@ -10,16 +10,15 @@ export default {
     ...mapState('settings', ['user']),
 
     isAlwaysAskOutboundCallingMode () {
-      console.log('profile', this.user.outbound_calling_selector)
-      return this.user.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_ALWAYS_ASK
+      return this.user?.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_ALWAYS_ASK
     },
 
     isSelectManuallyOutboundCallingMode () {
-      return this.user.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_SELECT_MANUALLY
+      return this.user?.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_SELECT_MANUALLY
     },
 
     isUseCompanyDefaultOutboundCallingMode () {
-      return this.user.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_USE_COMPANY_DEFAULT
+      return this.user?.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_USE_COMPANY_DEFAULT
     }
   }
 }
