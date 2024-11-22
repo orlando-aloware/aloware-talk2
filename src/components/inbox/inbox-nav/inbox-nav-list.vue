@@ -22,7 +22,7 @@
 
     <hr>
 
-    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isInboxViewsEnabledCompany">
+    <div v-if="showInboxViews">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -150,6 +150,10 @@ export default {
         channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
       }
       return channels
+    },
+
+    showInboxViews () {
+      return (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) && ['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)
     }
   },
 
@@ -199,7 +203,7 @@ export default {
 
     this.initializeDateRanges()
 
-    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
+    if (this.showInboxViews) {
       this.getFilters()
         .then(() => {
           if (this.$route.params?.viewId) {
@@ -216,7 +220,7 @@ export default {
   },
 
   mounted () {
-    this.navListItemsFinal = (this.$route.name.includes('Inbox') && !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)) ? this.navListItems.filter(item => item.value !== 'inbox') : this.navListItems.filter(item => item.value === 'inbox')
+    this.navListItemsFinal = (this.$route.name.includes('Inbox') && !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)) ? this.navListItems.filter(item => item.value !== 'inbox') : this.navListItems.filter(item => item.value === 'inbox')
 
     this.listeners.pinnedViewsEvents = () => {
       this.getPinnedViews()
@@ -476,7 +480,7 @@ export default {
 
     $route (to, from) {
       if (to.name !== from.name) {
-        this.navListItemsFinal = (to.name.includes('Inbox') && !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status'].includes(to.name))
+        this.navListItemsFinal = (to.name.includes('Inbox') && !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(to.name))
           ? this.navListItems.filter(item => item.value !== 'inbox')
           : this.navListItems.filter(item => item.value === 'inbox')
       }

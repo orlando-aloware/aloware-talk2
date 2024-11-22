@@ -931,11 +931,11 @@ export default {
         return true
       }
 
-      if (['Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name) && name === 'Inboxes') {
+      if (['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inboxes') {
         return true
       }
 
-      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task', 'Inbox Channel Task Status Communications'].includes(this.$route.name) && name === 'Inbox') {
+      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Communication', 'Inbox Channel Task Status Communications'].includes(this.$route.name) && name === 'Inbox') {
         return true
       }
 

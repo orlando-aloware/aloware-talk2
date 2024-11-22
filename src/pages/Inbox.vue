@@ -192,7 +192,7 @@ export default {
 
   watch: {
     '$route.name': function (value) {
-      const isNotInboxRouteName = !value.includes('Inbox') && ['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status'].includes(value)
+      const isNotInboxRouteName = !value.includes('Inbox') && ['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(value)
       this.setChannel(isNotInboxRouteName)
     },
 

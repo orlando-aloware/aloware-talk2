@@ -9,7 +9,7 @@
             content-class="q-tabs__content--align-justify"
             dense>
       <q-route-tab name="inboxes"
-                   to="/"
+                   to="/channels/inbox/all"
                    :content-class="tab === 'inboxes' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
                    :active="tab === 'inboxes'"

@@ -143,7 +143,7 @@ export default {
     this.resetVuex(['inbox', 'non-cache'])
     this.closed = this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('Inbox') && this.$q.screen.lt.md
 
-    this.showBackButton = !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status'].includes(this.$route.name)
+    this.showBackButton = !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)
   },
 
   mounted () {
@@ -241,7 +241,7 @@ export default {
 
       this.togglePageHeader()
 
-      this.showBackButton = !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status'].includes(to.name)
+      this.showBackButton = !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(to.name)
     },
 
     isInboxTaskOpened () {
