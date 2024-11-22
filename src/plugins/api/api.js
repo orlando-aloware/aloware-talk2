@@ -819,18 +819,27 @@ export default {
     integrations: {
       hubspot: {
         importList (target, params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-hubspot-list/${target}`, params)
+        },
+        importListToPowerDialer (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-hubspot-list/${target}`, params)
         }
       },
 
       zoho: {
         importView (target, params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-zoho-view/${target}`, params)
+        },
+        importViewToPowerDialer (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-zoho-view/${target}`, params)
         }
       },
 
       pipedrive: {
         importFilter (target, params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-pipedrive-filter/${target}`, params)
+        },
+        importFilterToPowerDialer (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-pipedrive-filter/${target}`, params)
         }
       }
