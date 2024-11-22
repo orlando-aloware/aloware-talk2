@@ -134,11 +134,6 @@ const getCookieUser = async ({ commit }) => {
       data
     } = response.data
 
-    if (!data.company.talk_enabled) {
-      commit('SET_LOADING', false)
-      return Promise.reject()
-    }
-
     storage.local.setItem('api_token', meta.token)
 
     commit('SET_FIRST_LOGIN', data.first_login, { root: true })

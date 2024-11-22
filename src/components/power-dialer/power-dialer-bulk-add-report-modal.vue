@@ -1,5 +1,5 @@
 <template>
-  <b-modal title="Contact Upload Summary"
+  <b-modal title="Contact Add Summary"
            size="md"
            centered
            no-close-on-esc

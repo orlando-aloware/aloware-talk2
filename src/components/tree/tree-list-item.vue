@@ -23,12 +23,8 @@
           <div class="folder__icon d-flex align-items-center">
             <template
               v-if="isContactsRoute">
-              <folder-static-icon color="#62666E"
-                v-if="type === ContactListTypes.STATIC"
-              ></folder-static-icon>
-              <folder-dynamic-icon color="#62666E"
-                v-if="type === ContactListTypes.DYNAMIC"
-              ></folder-dynamic-icon>
+              <contact-list-type-icon testIdSuffix='tree-list-item'
+                                      :type="type" />
             </template>
             <template
               v-else>
@@ -81,6 +77,7 @@
                         :contacts-count="contactsCount"
                         :has-edit="hasEdit"
                         :has-delete="hasDelete"
+                        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
                         :is-pinned="isPinned"
                         @remove="onRemoveList"
                         @rename="onRenameList"
@@ -88,6 +85,7 @@
                         @move="onMove"
                         @duplicate="onDuplicate"
                         @split="onSplit"
+                        @showInPublicFolder="onShowInPublicFolder"
                         @clonestatic="onCloneStatic"/>
         </b-popover>
       </div>
@@ -102,20 +100,18 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
-import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 import DialIcon from 'components/icons/dial-icon.vue'
 import ListActions from '../list-actions.vue'
 import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
+import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 
 export default {
   components: {
+    ContactListTypeIcon,
     FolderArrowCloseIcon,
     FolderOption,
-    FolderStaticIcon,
-    FolderDynamicIcon,
     DialIcon,
     UnsavedIcon,
     ListActions
@@ -148,6 +144,9 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    hasShowInPublicFolderPermission: {
+      type: Boolean
     },
     showInPublicFolder: {
       type: Boolean,
@@ -283,6 +282,22 @@ export default {
         id: this.id,
         type: ContactListTypes.STATIC
       })
+    },
+    onShowInPublicFolder () {
+      this.$root.$emit('bv::hide::popover')
+      const params = { show_in_public_folder: true }
+      const id = this.id
+
+      this.updateContactList(id, params)
+        .then((response) => {
+          this.$generalNotification('Contact list has been successfully converted to public')
+          this.reloadFolders()
+          this.loadPublicLists()
+        })
+        .catch((error) => {
+          const { message } = extractErrorMessage(error)
+          this.$generalNotification(message, 'error')
+        })
     },
     createList (params) {
       this.$axios

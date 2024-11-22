@@ -31,7 +31,7 @@
             <line-selector class="line-selector"
                            prepend="From:"
                            specificClass="dialer-line-selector"
-                           :disable="defaultOutboundCampaignId && mode === 'call'"
+                           :disable="lineSelectorDisabled"
                            :generic-multiselect="false"
                            v-model="campaignId"
                            @change="changeCampaignId">
@@ -373,6 +373,14 @@ export default {
 
     disabledComplianceMessage () {
       return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
+    },
+
+    forceOutboundLine () {
+      return this.currentCompany && this.currentCompany.force_outbound_line
+    },
+
+    lineSelectorDisabled () {
+      return (this.defaultOutboundCampaignId && this.mode === 'call') && this.forceOutboundLine
     }
   },
 
@@ -389,7 +397,7 @@ export default {
       })
 
       setTimeout(() => {
-        this.setTheLastUsedCallLine()
+        this.setLastUsedCallLine()
       }, 1000)
     })
   },
@@ -616,9 +624,9 @@ export default {
       this.blockTooltipHandler.show = false
     },
 
-    async setTheLastUsedCallLine () {
-      // if there is a campaignId, we don't need to fetch the last used call line
-      if (this.campaignId) return
+    async setLastUsedCallLine () {
+      // if there is a campaignId or no contactId, we don't need to fetch the last used call line
+      if (this.campaignId || !this.contactId) return
 
       try {
         const data = await this.getLastUsedCallLineByContactId(this.contactId)

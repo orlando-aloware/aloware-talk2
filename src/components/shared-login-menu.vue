@@ -1,5 +1,5 @@
 <template>
-  <div v-if="profile && profile.company.talk_enabled && canSwitchApps"
+  <div v-if="profile && canSwitchApps"
        class="bridge-menu-wrapper">
     <q-btn v-if="isAdmin || isSupervisor"
            outline
@@ -82,15 +82,11 @@ export default {
         return true
       }
 
-      return !this.profile.company.force_talk
+      return false
     },
 
     alowareClassic () {
-      if (this.profile.company.force_talk) {
-        return `Admin`
-      }
-
-      return `Classic`
+      return `Admin`
     },
 
     alowareTalk () {
