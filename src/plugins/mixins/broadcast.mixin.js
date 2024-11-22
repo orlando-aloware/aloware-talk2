@@ -3,6 +3,7 @@ import _ from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 import { mapActions, mapState } from 'vuex'
 import * as ChannelType from 'src/constants/inbox-channels'
+import { getWebSocketCredentials } from 'src/boot/helpers'
 
 export default {
   computed: {
@@ -50,13 +51,15 @@ export default {
        * for events that are broadcast by Laravel. Echo and event broadcasting
        * allows your team to easily build robust real-time web applications.
        */
+      const broadcastDriver = this.profile.company.broadcast_driver || 'pusher'
+      const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials(broadcastDriver)
       window.Echo = new Echo({
         authEndpoint: `${process.env.API_URL}/broadcasting/auth`,
         broadcaster: 'pusher',
-        key: storage.local.getItem('ws_app_key'),
-        cluster: storage.local.getItem('ws_cluster'),
-        wsHost: storage.local.getItem('ws_host'),
-        wssHost: storage.local.getItem('ws_host'),
+        key: WS_APP_KEY,
+        cluster: WS_CLUSTER,
+        wsHost: WS_HOST,
+        wssHost: WS_HOST,
         encrypted: true,
         forceTLS: true,
         auth: {
@@ -67,7 +70,7 @@ export default {
         enabledTransports: ['ws', 'wss'],
         disableStats: true
       })
-      console.log('broadcast initiated')
+      console.log('broadcast initiated with ' + broadcastDriver)
       this.broadcastListen()
     },
     broadcastListen () {
