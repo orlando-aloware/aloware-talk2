@@ -211,7 +211,8 @@ import {
   kycMixin,
   selectorMixin,
   timezoneCheckMixin,
-  visibilityMixin
+  visibilityMixin,
+  outboundCallingModesMixin
 } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
@@ -226,7 +227,8 @@ export default {
     visibilityMixin,
     aclMixin,
     selectorMixin,
-    kycMixin
+    kycMixin,
+    outboundCallingModesMixin
   ],
 
   components: {
@@ -396,7 +398,10 @@ export default {
 
       await this.changePhoneNumber(data)
       await this.setLastUsedCallLine()
-      this.makeCall()
+
+      if (this.campaignId && !this.isAlwaysAskOutboundCallingMode) {
+        this.makeCall()
+      }
     })
   },
 
