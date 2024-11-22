@@ -17,7 +17,7 @@
                      anchor="bottom start"
                      self="center start"
                      :offset="[0, 18]">
-            Hubspot integration is disabled.
+            HubSpot integration is disabled.
           </q-tooltip>
         </div>
       </div>
