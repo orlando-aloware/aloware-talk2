@@ -184,7 +184,7 @@ export default {
 
   data () {
     return {
-      showNavItemSeparator: this.value === 'voicemails' || this.label === 'Channels'
+      showNavItemSeparator: this.value === 'voicemails' || (this.label === 'Channels' && this.value !== '')
     }
   },
 
