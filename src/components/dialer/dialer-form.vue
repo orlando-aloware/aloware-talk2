@@ -399,7 +399,7 @@ export default {
       await this.changePhoneNumber(data)
       await this.setLastUsedCallLine()
 
-      if (this.campaignId && !this.isAlwaysAskOutboundCallingMode) {
+      if (this.campaignId && (!this.isAlwaysAskOutboundCallingMode || this.forceOutboundLine)) {
         this.makeCall()
       }
     })
