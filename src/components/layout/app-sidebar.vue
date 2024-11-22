@@ -990,7 +990,7 @@ export default {
           this.$router.push('/channels/inbox/all')
         }
 
-        if (this.$route.name === 'Inbox') {
+        if (this.$route.name === 'Inbox' && !this.$q.screen.lt.md) {
           this.$router.push('/channels/calls')
         }
       }

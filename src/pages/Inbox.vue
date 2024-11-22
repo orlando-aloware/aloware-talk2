@@ -142,7 +142,7 @@ export default {
   },
 
   created () {
-    if (['Inboxes', 'Inbox Channel'].includes(this.$route.name)) {
+    if (this.$route.path === '/channels/inbox' || this.$route.path === '/') {
       this.$router.push('/channels/inbox/all')
     }
 
