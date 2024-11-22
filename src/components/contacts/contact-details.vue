@@ -26,11 +26,11 @@
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
-                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+                                            v-if="showAloAiControls" />
           <contact-aloai-engagement-control ss="w-100"
                                             data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
-                                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+                                            v-if="showAloAiControls" />
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>
@@ -41,6 +41,17 @@
                        button-text="Modify Tags"
                        :entity-object="contact"
                        :category="TagCategories.CAT_CONTACTS"/>
+          <contact-lists-card data-testid="contact-details-public-lists"
+                              key="contact-public-lists-card"
+                              :is-public-contact-list-card="true"
+                              :contact="contact"
+          />
+          <contact-lists-card data-testid="contact-details-private-lists"
+                              key="contact-private-lists-card"
+                              :is-public-contact-list-card="false"
+                              :contact="contact"
+          />
+
           <contact-notes v-if="contact"
                          :contact="contact"
                          data-testid="contact-details-notes"
@@ -67,6 +78,7 @@
 <script>
 import ContactPhones from 'src/components/contacts/contact-phones'
 import ContactInfo from 'src/components/contacts/contact-info'
+import ContactListsCard from 'src/components/contacts/contact-lists-card'
 import ContactNotes from 'src/components/contacts/contact-notes'
 import ContactActivityCounts from 'src/components/contacts/contact-activity-counts'
 import ContactLines from 'src/components/contacts/contact-lines'
@@ -141,6 +153,7 @@ export default {
     ContactRingGroups,
     ContactLines,
     ContactActivityCounts,
+    ContactListsCard,
     ContactNotes,
     ContactInfo,
     ContactPhones,
@@ -170,6 +183,13 @@ export default {
       }
 
       return 'No Name'
+    },
+
+    showAloAiControls () {
+      return !this.isSimpSocial &&
+        this.currentCompany.aloai_enabled &&
+        this.contact && !this.contact.is_dnc &&
+        this.hasPermissionTo('update contact')
     }
   },
 

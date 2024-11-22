@@ -115,7 +115,7 @@ export default {
     },
 
     checkClick () {
-      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://meetings.hubspot.com/joe264/ssu-get-demo'
+      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://meetings.hubspot.com/alwr/aloware-demo'
 
       if (this.defaultClick) {
         window.open(defaultLink, '_blank')

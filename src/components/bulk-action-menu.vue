@@ -308,7 +308,9 @@ export default {
     },
 
     showDeleteButton () {
-      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isSimpSocial && !this.isPowerDialer
+      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isSimpSocial && !this.isPowerDialer &&
+        // hide button when dynamic remote list fetched
+        this.lists[this.id]?.type !== ContactListTypes.DYNAMIC_REMOTE_LIST
     },
 
     showRemoveFromListButton () {
@@ -330,8 +332,17 @@ export default {
         return false
       }
 
+      // do not allow to delete from dynamic remote list
+      if (this.currentList?.type === ContactListTypes.DYNAMIC_REMOTE_LIST) {
+        return false
+      }
+
       // If user have been granted Delete permission, which is higher than Removing from list permission
       if (this.hasDeletePermission) {
+        // if is SimpSocial and user is just agent don't show, even when user has specific permission to delete contacts
+        if (this.isSimpSocial && this.isAgent && !this.isBillingAdminOrAdminOrSupervisor) {
+          return false
+        }
         return this.canDelete
       }
 

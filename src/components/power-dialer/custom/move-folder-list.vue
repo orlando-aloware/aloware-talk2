@@ -41,12 +41,8 @@
             @click="onTarget(item)"
             class="folder-item folder__indent flex-grow-1 d-flex align-items-center">
             <div class="folder__name pd-name-create">
-              <folder-static-icon color="#62666E"
-                                  v-if="item.type === ContactListTypes.STATIC"
-              ></folder-static-icon>
-              <folder-dynamic-icon color="#62666E"
-                                   v-if="item.type === ContactListTypes.DYNAMIC"
-              ></folder-dynamic-icon>
+              <contact-list-type-icon testIdSuffix='move-folder-list'
+                                      :type="item.type" />
               {{ item.name }}
             </div>
           </div>
@@ -74,14 +70,12 @@ import { mapActions, mapGetters } from 'vuex'
 import MoveFolderItem from 'src/components/power-dialer/custom/move-folder-item.vue'
 import CreateListItem from 'src/components/power-dialer/custom/create-list-item.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import FolderStaticIcon from 'components/icons/folder-static-icon'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
+import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 
 export default {
   name: 'MoveFolderList',
   components: {
-    FolderDynamicIcon,
-    FolderStaticIcon,
+    ContactListTypeIcon,
     MoveFolderItem,
     CreateListItem
   },

@@ -50,7 +50,6 @@ export default {
         unread_texts_count: 0
       },
       selectedContactCampaigns: [],
-      contactPhoneNumbers: [],
       communicationsPage: 1,
       communicationsPerPage: 10,
       contactIncomingNumber: null,
@@ -802,7 +801,6 @@ export default {
       this.contactId = null
       this.selectedCampaignId = null
       this.selectedPhoneNumber = null
-      this.contactPhoneNumbers = []
     },
 
     markAllAsRead () {
@@ -1008,6 +1006,19 @@ export default {
         })
       }
     },
+
+    fetchContact: _.debounce(function (shouldShowLoading = true) {
+      if (shouldShowLoading) {
+        this.selectedContactChanging(true)
+      }
+
+      this.processFetchContactInfo((selectedContact) => {
+        this.setContact(selectedContact)
+        this.setContactClone(selectedContact)
+        this.resetChangedContactProperties([])
+        this.selectedContactChanging(false)
+      })
+    }, 1000),
 
     processFetchContactInfo (callback, isFetchContact = true) {
       this.loadingContactInProgress()

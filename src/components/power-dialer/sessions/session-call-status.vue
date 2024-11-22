@@ -458,7 +458,9 @@ import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-m
 import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
 import {
   sessionCallStatusMixin,
-  dialerWrapUpMixin, aclMixin
+  dialerWrapUpMixin,
+  aclMixin,
+  dispositionsOptionsMixin
 } from 'src/plugins/mixins'
 import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
@@ -492,7 +494,8 @@ export default {
   mixins: [
     aclMixin,
     sessionCallStatusMixin,
-    dialerWrapUpMixin
+    dialerWrapUpMixin,
+    dispositionsOptionsMixin
   ],
 
   props: {
@@ -532,7 +535,8 @@ export default {
       'countdownTimer',
       'sessionPaused',
       'activeTask',
-      'hubspot'
+      'hubspot',
+      'redialedTasksCount'
     ]),
 
     ...mapState([
@@ -863,10 +867,6 @@ export default {
           redial: false
         }
       ]
-    },
-
-    shouldRedial () {
-      return this.sessionSettings.force_redial && !this.dialer.callSuccessfullyAnswered && !this.dialer.redialedTaskIds.includes(this.activeTask?.id)
     }
   },
 
@@ -890,16 +890,14 @@ export default {
     this.$VueEvent.listen('redial_task', this.requeueTask)
     this.$VueEvent.listen('holdFailed', this.onHoldFailed)
     this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
+    this.$VueEvent.listen('onNextTask', this.onNextTask)
 
     this.isSessionRunning = false
   },
 
   methods: {
     ...mapActions([
-      'setShowPhone',
-      'addDialerRedialedTaskId',
-      'clearDialerRedialedTaskIds',
-      'setDialerCallSuccessfullyAnswered'
+      'setShowPhone'
     ]),
 
     ...mapActions('contacts', [
@@ -908,7 +906,8 @@ export default {
 
     ...mapActions('powerDialer', [
       'reQueuePowerDialerTask',
-      'removeFirstInQueueTask'
+      'removeFirstInQueueTask',
+      'incrementRedialedTaskCount'
     ]),
 
     onDispositionsClick () {
@@ -1267,9 +1266,6 @@ export default {
         }, 500)
       }
 
-      this.clearDialerRedialedTaskIds()
-      this.setDialerCallSuccessfullyAnswered(false)
-
       clearInterval(this.countdownInterval)
 
       setTimeout(() => {
@@ -1391,9 +1387,20 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      if (this.shouldRedial) {
-        this.addDialerRedialedTaskId(this.activeTask.id)
-        this.onRedial(false)
+      if (this.redialRequired) {
+        this.incrementRedialedTaskCount(this.activeTask.id)
+
+        // redial immediately if immediate redial is ON or no tasks left
+        const redialNow = this.sessionSettings.force_immediate_redial || this.powerDialerTasks.in_queue.length === 0
+        this.onRedial(redialNow, true)
+
+        console.log(`%c Redial required, pushing to ${redialNow ? 'TOP' : 'BOTTOM'}`, 'background: yellow; color: #000;')
+
+        if (redialNow) {
+          this.$VueEvent.fire('clearCallDispositionStatus')
+        }
+
+        this.activeTask.forcedRedial = true
         return
       }
 
@@ -1528,7 +1535,7 @@ export default {
       this.sessionPhoneExpansion = ''
     },
 
-    async onRedial (redial) {
+    async onRedial (redial, forcedRedial = false) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
 
@@ -1554,7 +1561,7 @@ export default {
       this.redialedTask.redialed_now = redial
       this.verifyAgentOnCall = true
 
-      this.redialTask(this.activeTask, redial).then(() => {
+      this.redialTask(this.activeTask, redial, forcedRedial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
@@ -1749,6 +1756,7 @@ export default {
     this.$VueEvent.stop('redial_task', this.requeueTask)
     this.$VueEvent.stop('holdFailed', this.onHoldFailed)
     this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
+    this.$VueEvent.stop('onNextTask', this.onNextTask)
 
     window.localStorage.removeItem(PD_PAUSED_PROP_NAME)
   }

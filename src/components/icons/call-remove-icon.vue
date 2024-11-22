@@ -1,6 +1,6 @@
 <template>
-  <svg width="17"
-       height="17"
+  <svg :width="width"
+       :height="height"
        viewBox="0 0 17 17"
        fill="none"
        xmlns="http://www.w3.org/2000/svg">
@@ -23,6 +23,17 @@
 
 <script>
 export default {
-  name: 'call-remove-icon'
+  name: 'call-remove-icon',
+
+  props: {
+    width: {
+      type: [Number, String],
+      default: 16
+    },
+    height: {
+      type: [Number, String],
+      default: 16
+    }
+  }
 }
 </script>
