@@ -8,12 +8,8 @@
       >
         <div class="folder__indent" :style="indentStyle"></div>
         <div class="folder__icon">
-          <folder-static-icon
-            v-if="type === ContactListTypes.STATIC"
-          ></folder-static-icon>
-          <folder-dynamic-icon
-            v-if="type === ContactListTypes.DYNAMIC"
-          ></folder-dynamic-icon>
+          <contact-list-type-icon testIdSuffix='list-tree'
+                                  :type="type" />
         </div>
         <div class="folder__name">
           <span>
@@ -27,14 +23,11 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import FolderStaticIcon from 'components/icons/folder-static-icon.vue'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
+import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 
 export default {
   components: {
-    FolderStaticIcon,
-    FolderDynamicIcon
-
+    ContactListTypeIcon
   },
   computed: {
     ...mapGetters('contacts', ['selectedStaticList']),

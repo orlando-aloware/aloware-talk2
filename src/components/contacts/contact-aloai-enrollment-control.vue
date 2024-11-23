@@ -359,7 +359,7 @@ export default {
           }, 2000)
         })
         .catch((error) => {
-          let errorMsg = 'Error while disenrolled contact to AloAi Text Bot.'
+          let errorMsg = 'Error while disenrolling contact from AloAi Text Bot.'
           if (error?.response?.data?.message) {
             errorMsg = error.response.data.message
           }

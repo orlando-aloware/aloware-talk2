@@ -23,6 +23,11 @@
             data-testid="communication-audio-transcription-modal"
             :communication="communication"
             :single-button="true"/>
+          <generate-transcription-button class="mr-2"
+                                         variant="icon"
+                                         data-testid="comm-details-generate-transcription-icon-button"
+                                         :communication="communication">
+          </generate-transcription-button>
         </div>
         <p class="text-black _600"
           v-if="fileUuid && !isMigrated">
@@ -47,6 +52,7 @@ import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import Waveform from 'components/waveform'
 import DownloadButton from 'components/download-button'
 import TranscriptionModal from 'components/communication/transcription-modal'
+import GenerateTranscriptionButton from 'components/generate-transcription-button'
 
 export default {
   name: 'communication-audio',
@@ -59,7 +65,8 @@ export default {
   components: {
     DownloadButton,
     Waveform,
-    TranscriptionModal
+    TranscriptionModal,
+    GenerateTranscriptionButton
   },
 
   props: {

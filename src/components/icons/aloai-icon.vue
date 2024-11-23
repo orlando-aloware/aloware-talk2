@@ -26,7 +26,7 @@
           </g>
           <g id="g3259" transform="translate(253.4639,350.1357)">
             <g id="path3261">
-              <rect x="-245" y="157.7" class="st0" width="1" height="-2"/>
+              <rect x="-245" y="157.7" class="st0" width="1" height="0"/>
             </g>
           </g>
           <g id="g3263" transform="translate(271.1807,267.9668)">

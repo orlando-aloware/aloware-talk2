@@ -20,14 +20,9 @@
               <slash-icon class="title-slash d-flex align-items-center" />
             </div>
           </div>
-          <folder-static-icon class="title-static-icon mr-3"
-                              data-testid="contacts-view-folder-static-icon"
-                              v-if="list.type === ContactListTypes.STATIC">
-          </folder-static-icon>
-          <folder-dynamic-icon class="mr-3"
-                               data-testid="contacts-view-folder-static-icon"
-                               v-if="list.type === ContactListTypes.DYNAMIC">
-          </folder-dynamic-icon>
+          <contact-list-type-icon class="mr-3"
+                                  testIdSuffix='contacts-view'
+                                  :type="list.type" />
           <div class="d-flex align-items-center">
             <span :class="`list-name ${isUnsavedList ? 'text-grey-30' : ''}`">
               {{ list.name || (isUnsavedList ? unsavedList.name : '') }}
@@ -62,6 +57,12 @@
 
     <template slot="actions"
               v-if="!simpleTable">
+      <al-alert class='w-100 align-items-center'
+                v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST'>
+        <div class="text-dark" >
+          This is a list managed by HubSpot
+        </div>
+      </al-alert>
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
         <div class="d-flex justify-content-between align-items-center">
           <ContactSearch class="width-260"
@@ -790,8 +791,6 @@ import { FROM_FILTERS } from 'src/constants/contacts-list-create-mode'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
 import talk2Api from 'src/plugins/api/api'
-import FolderStaticIcon from 'components/icons/folder-static-icon'
-import FolderDynamicIcon from 'components/icons/folder-dynamic-icon'
 import CloseIcon from 'components/icons/close-icon'
 import SlashIcon from 'components/icons/slash-icon'
 import EllipseIcon from 'components/icons/ellipse-icon'
@@ -824,6 +823,8 @@ import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
+import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
+import AlAlert from 'components/alert/index.vue'
 
 export default {
   name: 'contacts-view',
@@ -839,6 +840,8 @@ export default {
   ],
 
   components: {
+    AlAlert,
+    ContactListTypeIcon,
     RefreshIcon,
     BackButton,
     DeleteRedIcon,
@@ -853,8 +856,6 @@ export default {
     EllipseIcon,
     SlashIcon,
     CloseIcon,
-    FolderDynamicIcon,
-    FolderStaticIcon,
     ContactCreateModal,
     ContactsFilters,
     BulkActionMenu,

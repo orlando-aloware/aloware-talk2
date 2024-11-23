@@ -74,10 +74,10 @@ export default {
 
     confirmationMessage () {
       if (this.type === POWER_DIALER_LIST) {
-        return 'Contact has been removed from all Power Dialer lists successfully.'
+        return 'The contact has been successfully removed from All Power Dialer Lists'
       }
 
-      return 'Contact has been removed from all lists successfully.'
+      return 'The contact has been successfully removed from All Lists'
     }
   },
 
