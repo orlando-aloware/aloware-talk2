@@ -752,7 +752,7 @@
                                  placement="right"
                                  data-testid="communication-info-as-mandated-popover"
                                  delay="100">
-                        Your account admin as mandated call dispositions.
+                        Your account admin has mandated call dispositions.
                       </b-popover>
                     </label>
                   </div>
