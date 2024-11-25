@@ -2531,7 +2531,7 @@ i.option-separator {
 .integration-wrapper {
   margin-bottom: 10px;
 
-  .hubspot-card {
+  .integration-card {
     box-shadow: 0 2px 10px rgb(4 4 4 / 10%) !important;
   }
 
@@ -2582,7 +2582,7 @@ i.option-separator {
     font-size: 20px;
   }
 
-  .hubspot-card {
+  .integration-card {
     .hubspot-icon {
       font-size: 24px;
       border-radius: 7px;
@@ -2595,6 +2595,11 @@ i.option-separator {
       font-size: 18px;
       position: relative;
       top: -3px;
+    }
+    .salesforce-icon {
+      font-size: 32px;
+      margin-right: 10px;
+      margin-top: 3px;
     }
   }
 

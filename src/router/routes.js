@@ -531,7 +531,7 @@ const routes = [
     component: Dialer
   },
   {
-    name: 'Hubspot Call Extension',
+    name: 'HubSpot Call Extension',
     path: '/widgets/hubspot-call-extension',
     props: true,
     component: Dialer

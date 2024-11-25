@@ -45,7 +45,7 @@
                             data-testid="integration-hubspot-sync-spinner"
                             color="white">
             </q-spinner-bars>
-            {{ isSyncing ? 'Syncing...' : 'Sync with Hubspot' }}
+            {{ isSyncing ? 'Syncing...' : 'Sync with HubSpot' }}
             <q-tooltip anchor="center start"
                        self="center left"
                        data-testid="integration-hubspot-sync-tooltip"

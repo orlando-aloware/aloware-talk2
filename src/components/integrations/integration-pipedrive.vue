@@ -1,6 +1,6 @@
 <template>
   <div class="integration-wrapper" data-testid="integration-pipedrive-wrapper">
-    <q-card class="hubspot-card"
+    <q-card class="integration-card"
             data-testid="integration-pipedrive-card"
             flat>
       <q-item class="p-0">
