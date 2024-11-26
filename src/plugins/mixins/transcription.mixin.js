@@ -14,6 +14,7 @@ export default {
     isTranscriptionAllowed (communication) {
       return communication.is_eligible_for_transcribe &&
              this.showAudio(communication) &&
+             !communication.metadata?.transcription_info &&
              this.isOlderThan(communication.created_at, 15) // check if the communication is older than 15 minutes for queue processing
     },
 
