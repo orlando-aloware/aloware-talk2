@@ -1,5 +1,4 @@
 import { mapActions, mapState } from 'vuex'
-import { mapFields } from 'vuex-map-fields'
 import _ from 'lodash'
 
 export default {
@@ -11,12 +10,6 @@ export default {
     ]),
 
     ...mapState('cache', ['currentCompany']),
-
-    ...mapFields('powerDialer', [
-      'activeTask',
-      'sessionSettings',
-      'tasksSentSmsTemplates'
-    ]),
 
     contact () {
       const contact = this.dialer.contact
@@ -45,10 +38,6 @@ export default {
         return false
       }
 
-      if (['READY', 'MAKING_CALL'].includes(this.dialer.currentStatus)) {
-        return false
-      }
-
       const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
 
       return isForcedContactDisposition && !this.isContactDisposed
@@ -71,15 +60,6 @@ export default {
         !this.profile?.last_call?.call_disposition_id
 
       return shouldForceContactDisposition || shouldForceCallDisposition
-    },
-
-    requireSmsSending () {
-      if (!this.activeTask) {
-        return false
-      }
-
-      // if forcing to send_sms and sms template is not sent yet
-      return Boolean(this.sessionSettings.force_sms) && !this.tasksSentSmsTemplates[this.activeTask.id]
     }
   },
 

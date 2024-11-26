@@ -361,14 +361,5 @@ export default {
 
   clearBulkActionNotification ({ commit }, value) {
     commit('CLEAR_BULK_ACTION_NOTIFICATION', value)
-  },
-
-  incrementRedialedTaskCount ({ commit }, taskId) {
-    commit('INCREMENT_REDIALED_TASK_COUNT', taskId)
-  },
-
-  clearRedialSettings ({ commit }) {
-    commit('CLEAR_REDIALED_TASKS_COUNT')
-    commit('CLEAR_SENT_TASKS_SMS_TEMPLATES')
   }
 }
