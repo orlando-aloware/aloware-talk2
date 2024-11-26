@@ -143,7 +143,8 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
+                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED"
+                         style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
                       <q-btn color="text-dark-greenish"
                              class="btn btn-inline px-1 py-0"
                              title="Download Summary"
@@ -303,7 +304,12 @@ export default {
       isLoading: true,
       show_form: false,
       remoteUrl: null,
+      downloadUrl: null,
+      fileUuid: null,
+      filename: '',
+      mimeType: '',
       isMigrated: false,
+      speakers: [],
       iab_categories: [],
       highlights: [],
       entities: [],
@@ -341,6 +347,8 @@ export default {
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
+
     splitChannels () {
       if (this.communication.direction === CommunicationDirection.INBOUND) {
         return [
@@ -370,13 +378,14 @@ export default {
         ]
       }
     },
+
     SummaryStatus () {
       return SummaryStatus
     },
+
     CommunicationTypes () {
       return CommunicationTypes
     },
-    ...mapState('cache', ['currentCompany']),
 
     formattedMessages () {
       return this.messages.map(message => ({

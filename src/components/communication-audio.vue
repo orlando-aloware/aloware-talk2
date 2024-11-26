@@ -94,9 +94,9 @@ export default {
       downloadUrl: null,
       fileUuid: null,
       filename: '',
-      loading: false,
       mimeType: '',
       isMigrated: false,
+      loading: false,
       UploadedFileTypes
     }
   },
