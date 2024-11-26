@@ -20,7 +20,7 @@ export default {
 
     // check if the summarization is allowed for the communication
     isSummarizationAllowed (communication) {
-      return this.isTranscriptionAllowed(communication)
+      return communication.has_transcription
     },
 
     // checks if a given timestamp is older than the specified number of minutes
