@@ -184,7 +184,8 @@
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status === SummaryStatus.STATUS_FAILED" class="status-message">
+                      <div v-else-if="summary_status === SummaryStatus.STATUS_FAILED"
+                           class="status-message">
                         <q-icon name="error" color="red" size="md" />
                         <div>Summary generation failed. Please try again later.</div>
                         <br>
@@ -196,13 +197,18 @@
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status === SummaryStatus.STATUS_PROCESSING || summary_status === SummaryStatus.STATUS_QUEUED" class="status-message">
+                      <div v-else-if="summary_status === SummaryStatus.STATUS_PROCESSING || summary_status === SummaryStatus.STATUS_QUEUED"
+                           class="status-message">
                         <q-icon name="hourglass_empty" color="blue" size="md" />
                         <span>Your summary is being processed. Please wait...</span>
                       </div>
                     </div>
-                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
-                    <div v-if="custom_summary ||summary_status === SummaryStatus.STATUS_COMPLETED" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED"
+                         class="custom-summary"
+                         v-html="parseMarkdown(custom_summary)">
+                    </div>
+                    <div v-if="custom_summary ||summary_status === SummaryStatus.STATUS_COMPLETED"
+                         class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
                       <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
