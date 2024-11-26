@@ -20,8 +20,7 @@ export default {
 
     // check if the summarization is allowed for the communication
     isSummarizationAllowed (communication) {
-      return communication.is_eligible_for_transcribe &&
-             this.showAudio(communication) &&
+      return communication.has_transcription &&
              this.isOlderThan(communication.created_at, 15) // check if the communication is older than 15 minutes for queue processing
     },
 
