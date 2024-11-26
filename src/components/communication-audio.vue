@@ -19,7 +19,7 @@
             :file-uuid="fileUuid"/>
           <transcription-modal
             v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"
-            button-text="Show Smart Transcription"
+            button-text="Show Transcription"
             data-testid="communication-audio-transcription-modal"
             :communication="communication"
             :single-button="true"/>

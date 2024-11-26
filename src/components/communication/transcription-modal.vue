@@ -15,7 +15,7 @@
       </q-tooltip>
     </q-btn>
 
-    <!-- Smart Transcription modal. -->
+    <!-- AloAi Voice Analytics modal. -->
     <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
@@ -432,7 +432,7 @@ export default {
     },
 
     /**
-     * Sets Smart Transcription panel data.
+     * Sets AloAi Voice Analytics panel data.
      * @public
      *
      * @param {Object} data
