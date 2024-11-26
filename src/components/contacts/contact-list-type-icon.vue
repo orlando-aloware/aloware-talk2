@@ -8,12 +8,12 @@
     <folder-dynamic-icon color="#00bf4a"
                          :data-testid="`contacts-${testIdSuffix}-dynamic-remote-icon`"
                          v-if="isDynamicRemote">
-      <q-tooltip anchor="top middle" self="center middle">Dynamic List from Integration</q-tooltip>
+      <q-tooltip anchor="top middle" self="center middle">External dynamic list (integrations)</q-tooltip>
     </folder-dynamic-icon>
     <folder-dynamic-icon color="#62666E"
                          :data-testid="`contacts-${testIdSuffix}-dynamic-icon`"
                          v-if="isDynamic">
-      <q-tooltip anchor="top middle" self="center middle">Dynamic List</q-tooltip>
+      <q-tooltip anchor="top middle" self="center middle">Internal dynamic list</q-tooltip>
     </folder-dynamic-icon>
   </span>
 </template>
