@@ -1,6 +1,6 @@
-import actions from './actions';
-import getters from './getters';
-import mutations from './mutations';
+import actions from './transcriptions.actions'
+import getters from './transcriptions.getters'
+import mutations from './transcriptions.mutations'
 
 export default {
   namespaced: true,

@@ -12,7 +12,7 @@ import contacts from './contacts'
 import inbox from './inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
-import transcription from '/transcription'
+import transcriptions from './transcriptions'
 import settings from './settings'
 import broadcast from './broadcast'
 import wallboard from './wallboard'
@@ -42,7 +42,7 @@ export default function (/* { ssrContext } */) {
       inbox,
       stats,
       powerDialer,
-      transcription,
+      transcriptions,
       settings,
       broadcast,
       wallboard,

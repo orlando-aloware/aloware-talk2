@@ -39,6 +39,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import talk2Api from 'src/plugins/api/api'
+import { transcriptionMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'generate-transcription-button',
@@ -55,18 +56,20 @@ export default {
     }
   },
 
+  mixins: [transcriptionMixin],
+
   components: {
     SparkleIcon
   },
 
   computed: {
-    ...mapGetters('transcription', {
+    ...mapGetters('transcriptions', {
       isGenerating: 'isGenerating'
     })
   },
 
   methods: {
-    ...mapActions('transcription', ['setGeneratingStatus']),
+    ...mapActions('transcriptions', ['setGeneratingStatus']),
 
     /**
      * Handles the transcription generation process.

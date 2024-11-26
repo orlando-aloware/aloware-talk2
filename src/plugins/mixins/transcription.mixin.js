@@ -28,7 +28,8 @@ export default {
 
       const serverTimeFormat = 'YYYY-MM-DD HH:mm:ss'
       const serverTimeZone = 'UTC'
-      // Parse the server time
+
+      // Parse the timestamp in the given format and timezone
       const serverTime = moment.tz(timestamp, serverTimeFormat, serverTimeZone)
 
       // Current time in the same timezone
