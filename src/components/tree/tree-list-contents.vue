@@ -81,7 +81,6 @@
       <tree-list-item class="flex-grow-1 w-100"
                       :name="list.name"
                       :show-in-public-folder="list.show_in_public_folder"
-                      :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
                       :contacts-count="list.no_of_contacts ?? 0"
                       :key="list.id"
                       :id="list.id"
@@ -102,7 +101,6 @@
       :type="unsavedList.type"
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
-      :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
     />
   </div>
 </template>
@@ -132,9 +130,6 @@ export default {
     },
     hasDelete: {
       type: Number
-    },
-    hasShowInPublicFolderPermission: {
-      type: Boolean
     },
     isRootList: {
       type: Boolean,
