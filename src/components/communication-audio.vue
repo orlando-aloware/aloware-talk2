@@ -26,7 +26,8 @@
           <generate-transcription-button class="mr-2"
                                          variant="icon"
                                          data-testid="comm-details-generate-transcription-icon-button"
-                                         :communication="communication">
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated">
           </generate-transcription-button>
         </div>
         <p class="text-black _600"
@@ -141,6 +142,10 @@ export default {
             this.downloadUrl = response.data.download_url
             this.mimeType = response.data.mimetype || ''
             this.isMigrated = response.data.is_migrated
+            this.$emit('audio-file-updated', {
+              fileUuid: this.fileUuid,
+              isMigrated: this.isMigrated
+            })
           }).catch(err => {
             console.log(err)
             this.loading = false

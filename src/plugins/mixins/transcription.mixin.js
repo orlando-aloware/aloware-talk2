@@ -1,5 +1,6 @@
 import { mapState } from 'vuex'
 import { communicationInfoMixin } from 'src/plugins/mixins'
+import moment from 'moment-timezone'
 
 export default {
   mixins: [communicationInfoMixin],
@@ -13,22 +14,28 @@ export default {
     isTranscriptionAllowed (communication) {
       return communication.is_eligible_for_transcribe &&
              this.showAudio(communication) &&
-             this.isOlderThan(communication.created_at, 10) && // check if the communication is older than 10 minutes for queue processing
-             !communication.metadata?.transcription_info // check if the transcription is already processed
+             !communication.metadata?.transcription_info &&
+             this.isOlderThan(communication.created_at, 15) // check if the communication is older than 15 minutes for queue processing
     },
 
     // check if the summarization is allowed for the communication
     isSummarizationAllowed (communication) {
-      return communication.is_eligible_for_transcribe &&
-             this.showAudio(communication) &&
-             this.isOlderThan(communication.created_at, 10) // check if the communication is older than 10 minutes for queue processing
+      return this.isTranscriptionAllowed(communication)
     },
 
     // checks if a given timestamp is older than the specified number of minutes
-    isOlderThan (createdAt, minutes) {
-      if (!createdAt) return false
-      const timeDifference = Date.now() - new Date(createdAt).getTime()
-      return timeDifference >= minutes * 60 * 1000
+    isOlderThan (timestamp, minutes) {
+      if (!timestamp) return false
+
+      const serverTimeFormat = 'YYYY-MM-DD HH:mm:ss'
+      const serverTimeZone = 'UTC'
+
+      // Parse the timestamp in the given format and timezone
+      const serverTime = moment.tz(timestamp, serverTimeFormat, serverTimeZone)
+
+      // Current time in the same timezone
+      const now = moment.tz(moment.tz.guess())
+      return now.diff(serverTime, 'minutes') >= minutes
     }
   }
 }
