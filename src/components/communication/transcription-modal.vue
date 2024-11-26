@@ -180,6 +180,7 @@
                                                  data-testid="comm-details-generate-summary-button"
                                                  :is-generating="isGenerating"
                                                  :communication="communication"
+                                                 v-if="fileUuid && isMigrated"
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
@@ -191,6 +192,7 @@
                                                  data-testid="comm-details-generate-summary-button"
                                                  :is-generating="isGenerating"
                                                  :communication="communication"
+                                                 v-if="fileUuid && isMigrated"
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
@@ -295,6 +297,7 @@ export default {
       isLoading: true,
       show_form: false,
       remoteUrl: null,
+      isMigrated: false,
       iab_categories: [],
       highlights: [],
       entities: [],
@@ -426,6 +429,7 @@ export default {
           this.remoteUrl = res.data.url
           this.downloadUrl = res.data.download_url
           this.mimeType = res.data.mimetype || ''
+          this.isMigrated = res.data.is_migrated
         }).catch(err => {
           console.log('Couldn\'t fetch call recording.', err)
         })
