@@ -332,6 +332,8 @@ export default {
         return false
       }
 
+      const isUserOnlyAgentInPublicFolder = this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder
+
       // do not allow to delete from dynamic remote list
       if (this.currentList?.type === ContactListTypes.DYNAMIC_REMOTE_LIST) {
         return false
@@ -340,14 +342,14 @@ export default {
       // If user have been granted Delete permission, which is higher than Removing from list permission
       if (this.hasDeletePermission) {
         // if is SimpSocial and user is just agent don't show, even when user has specific permission to delete contacts
-        if (this.isSimpSocial && this.isAgent && !this.isBillingAdminOrAdminOrSupervisor) {
+        if (this.isSimpSocial && isUserOnlyAgentInPublicFolder) {
           return false
         }
         return this.canDelete
       }
 
       // if is only agent and not billing admin, or admin, or supervisor and list is public
-      if (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor && this.lists[this.id]?.show_in_public_folder) {
+      if (isUserOnlyAgentInPublicFolder) {
         return false
       }
 
