@@ -379,10 +379,6 @@ export default {
       return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
     },
 
-    forceOutboundLine () {
-      return this.currentCompany && this.currentCompany.force_outbound_line
-    },
-
     lineSelectorDisabled () {
       return (this.defaultOutboundCampaignId && this.mode === 'call') && this.forceOutboundLine
     }
@@ -399,7 +395,7 @@ export default {
       await this.changePhoneNumber(data)
       await this.setLastUsedCallLine()
 
-      if (this.campaignId && (!this.isAlwaysAskOutboundCallingMode || this.forceOutboundLine)) {
+      if (this.campaignId && (this.shouldMakeCallDirectlyAccountLevel || this.shouldMakeCallDirectlyUserLevel)) {
         this.makeCall()
       }
     })
