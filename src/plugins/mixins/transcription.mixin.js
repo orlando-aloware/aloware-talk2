@@ -20,8 +20,7 @@ export default {
 
     // check if the summarization is allowed for the communication
     isSummarizationAllowed (communication) {
-      return communication.has_transcription &&
-             this.isOlderThan(communication.created_at, 15) // check if the communication is older than 15 minutes for queue processing
+      return communication.has_transcription
     },
 
     // checks if a given timestamp is older than the specified number of minutes
