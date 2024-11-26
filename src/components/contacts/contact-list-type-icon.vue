@@ -13,7 +13,7 @@
     <folder-dynamic-icon color="#62666E"
                          :data-testid="`contacts-${testIdSuffix}-dynamic-icon`"
                          v-if="isDynamic">
-      <q-tooltip anchor="top middle" self="center middle">Dynamic List from Aloware</q-tooltip>
+      <q-tooltip anchor="top middle" self="center middle">Dynamic List</q-tooltip>
     </folder-dynamic-icon>
   </span>
 </template>
