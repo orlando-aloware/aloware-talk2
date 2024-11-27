@@ -89,7 +89,8 @@
                     </template>
                   </contact-menu-item>
 
-                  <contact-menu-item data-testid="create-new-list-by-manual-selection" @click="onCreateByManualSelection">
+                  <contact-menu-item data-testid="create-new-list-by-manual-selection"
+                                     @click="onCreateByManualSelection">
                     <template slot="title">
                       <span class="create-item">
                         Create new list &amp; select contacts
