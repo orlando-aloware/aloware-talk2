@@ -22,8 +22,7 @@
     "deploy-win": "quasar build -d -m electron -T win -b builder -P always",
     "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always",
     "prepare": "husky",
-    "deploy-dev": "s3-spa-upload ./dist/spa talk.alodev.org -m s3-spa-upload.config.json",
-    "deploy-prod": "s3-spa-upload ./dist/spa talk.aloware.com -m s3-spa-upload.config.json"
+    "upload-s3": "AWS_REGION=${AWS_REGION:us-west-2} WORKSPACE=${WORKSPACE:.} TALK_URL=${TALK_URL:-talk.alodev.org} s3-spa-upload ./dist/spa $URL -m s3-spa-upload.config.json"
   },
   "dependencies": {
     "@fortawesome/fontawesome-common-types": "6.6.0",
