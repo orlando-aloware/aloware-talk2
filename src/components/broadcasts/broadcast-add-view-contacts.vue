@@ -214,6 +214,7 @@ export default {
       switch (list.type) {
         // for static lists, just add the list ID in the params
         case ContactListTypes.STATIC:
+        case ContactListTypes.DYNAMIC_REMOTE_LIST:
           this.source.list.type = 'static'
           break
 
