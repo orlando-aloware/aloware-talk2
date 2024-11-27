@@ -563,7 +563,7 @@ export default {
       } else if (this.$route.name === 'Contact' && this.selectedList?.type === ContactListTypes.STATIC) {
         // use id from currently selected contacts list
         query.list_id = this.selectedList.id
-      } else if (this.list && this.list.type === ContactListTypes.STATIC && this.$route.path && !this.$route.path.includes('/add')) {
+      } else if (this.list && (this.list.type === ContactListTypes.STATIC || this.list.type === ContactListTypes.DYNAMIC_REMOTE_LIST) && this.$route.path && !this.$route.path.includes('/add')) {
         // use id from currently selected contacts list derived from route
         query.list_id = this.id
       }
@@ -1251,9 +1251,7 @@ export default {
 
     backendTablesDictionary () {
       return {
-        'inbound_calls_count': 'inbound_call_count',
         'inbound_texts_count': 'inbound_sms_count',
-        'outbound_calls_count': 'outbound_call_count',
         'outbound_texts_count': 'outbound_sms_count'
       }
     },

@@ -152,7 +152,7 @@ export default {
 
       bvModalEvent.preventDefault()
 
-      this.$bvModal.msgBoxConfirm(`Are you sure you want to close the ${this.formName}form?`, {
+      this.$bvModal.msgBoxConfirm(`Are you sure you want to close the ${this.formName} form?`, {
         title: `Close ${this.formName}`,
         okTitle: 'Yes, I\'m sure',
         cancelTitle: 'No, I\'m not',

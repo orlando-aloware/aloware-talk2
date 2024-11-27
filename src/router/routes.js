@@ -35,6 +35,7 @@ const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
 const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
 const AloAi = () => import('pages/AloAi.vue')
+const Apps = () => import('pages/Apps.vue')
 
 const routes = [
   {
@@ -530,10 +531,22 @@ const routes = [
     component: Dialer
   },
   {
-    name: 'Hubspot Call Extension',
+    name: 'HubSpot Call Extension',
     path: '/widgets/hubspot-call-extension',
     props: true,
     component: Dialer
+  },
+  // deep link handlers
+  // Apps handlers to open custom protocol
+  //
+  {
+    name: 'Desktop App',
+    path: '/apps',
+    props: (route) => ({ action: route.query.action, phone: route.query.phone }),
+    component: Apps,
+    meta: {
+      title: 'Open with the desktop app...'
+    }
   },
   // Always leave this as last one,
   // but you can also remove it

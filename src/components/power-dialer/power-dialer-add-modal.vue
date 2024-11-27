@@ -659,6 +659,7 @@ export default {
           this.loading--
           this.addPowerDialerOpen(false)
           this.createPdListClose()
+          this.$emit('saved')
         })
     },
 

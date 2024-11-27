@@ -958,6 +958,7 @@ body,
 
 .custom-link {
   font-size: $f-size-body-sm;
+  cursor: pointer;
   color: $blue;
 
   i {
@@ -1359,7 +1360,6 @@ i.option-separator {
 }
 
 .contact-activity {
-  max-width: 380px;
   transition: transform 270ms cubic-bezier(0.79, 0.14, 0.15, 0.86) 0ms, border-color 270ms linear 0ms;
 
   .q-item {
@@ -1413,7 +1413,7 @@ i.option-separator {
 }
 
 .communication-info {
-  display: inline-block;
+  display: block;
   font-size: 14px;
   line-height: 18px;
 
@@ -1434,6 +1434,10 @@ i.option-separator {
   .q-item__section--side {
     padding-left: 0px;
     padding-right: 0.5rem !important;
+  }
+
+  .more-details {
+    color: $blue;
   }
 }
 
@@ -1981,17 +1985,12 @@ i.option-separator {
   height: 0;
 }
 
-.border-no-top {
-  border: 1px solid $grey-60;
-  border-top: 0 !important;
-}
-
 .bottom-radius {
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
 }
 
-.collapsed-has-notes {
+.collapsed-can-expand {
   &.no-expansion,
   .q-item {
     border-bottom-left-radius: 0 !important;
@@ -2532,7 +2531,7 @@ i.option-separator {
 .integration-wrapper {
   margin-bottom: 10px;
 
-  .hubspot-card {
+  .integration-card {
     box-shadow: 0 2px 10px rgb(4 4 4 / 10%) !important;
   }
 
@@ -2583,7 +2582,7 @@ i.option-separator {
     font-size: 20px;
   }
 
-  .hubspot-card {
+  .integration-card {
     .hubspot-icon {
       font-size: 24px;
       border-radius: 7px;
@@ -2596,6 +2595,11 @@ i.option-separator {
       font-size: 18px;
       position: relative;
       top: -3px;
+    }
+    .salesforce-icon {
+      font-size: 32px;
+      margin-right: 10px;
+      margin-top: 3px;
     }
   }
 
@@ -4374,10 +4378,6 @@ i.option-separator {
     width: 200px;
     height: 150px;
 
-    .w-100 {
-      width: 100%;
-    }
-
     .add-status {
       margin-left: 23px;
       font-size: $f-size-body-xs;
@@ -5096,12 +5096,6 @@ i.option-separator {
         padding-left: 40px;
       }
     }
-  }
-}
-
-.communication-info {
-  .more-details {
-    color: $blue;
   }
 }
 
@@ -15717,3 +15711,85 @@ hr {
   font-size: 0.9em;
 }
 
+.w-100 {
+  width: 100%;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+/* Container for the entire effect */
+.ai-effect-container {
+  position: relative;
+  border-radius: 0.5rem; /* rounded-lg */
+  overflow: hidden;
+}
+
+/* Gradient background */
+.ai-effect-gradient {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to bottom right, #60A5FA, #A855F7, #EC4899); /* from-blue-400 via-purple-500 to-pink-500 */
+  opacity: 0.75;
+}
+
+/* Blur effect */
+.ai-effect-blur {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(4px); /* backdrop-blur-sm */
+}
+
+/* Content container */
+.ai-effect-content {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.9); /* bg-white bg-opacity-90 */
+  margin: 2px;
+  border-radius: 0.3rem; /* rounded-lg */
+
+  ul, ol {
+    padding-inline-start: 16px;
+  }
+
+  h3 {
+    font-size: 14px;
+  }
+}
+
+.transcription-link {
+  cursor: pointer;
+  color: $dark-grey;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.transcription-link:hover {
+  color: $dark;
+  font-weight: 600;
+}
+
+/* Gradient text effect */
+.ai-effect-gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to right, #2563EB, #9333EA); /* from-blue-600 to-purple-600 */
+}
+
+.outbound-line-selector {
+  max-width: 460px !important;
+}
+
+.tooltip {
+  .tooltip-inner {
+    background-color: $grey-light11 !important;
+    font-size: 12px !important;
+    color: black !important;
+  }
+
+  .arrow::before {
+    border-bottom-color: $grey-light11 !important;
+    opacity: 0 !important;
+  }
+}

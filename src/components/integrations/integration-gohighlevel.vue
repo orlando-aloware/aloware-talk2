@@ -1,6 +1,6 @@
 <template>
   <div class="integration-wrapper" data-testid="integration-gohighlevel-wrapper">
-    <q-card class="hubspot-card"
+    <q-card class="integration-card"
             data-testid="integration-gohighlevel-card"
             flat>
       <q-item class="p-0">
@@ -11,7 +11,7 @@
             <table data-testid="integration-gohighlevel-table-1">
               <tr data-testid="integration-gohighlevel-table-1-row">
                 <td data-testid="integration-gohighlevel-table-1-column-1"><img class="gohighlevel-btn" /></td>
-                <td data-testid="integration-gohighlevel-table-1-column-2"><span class="integration-title">GoHighLevel</span></td>
+                <td data-testid="integration-gohighlevel-table-1-column-2"><span class="integration-title">HighLevel</span></td>
               </tr>
             </table>
           </b-link>
@@ -23,7 +23,7 @@
               <table data-testid="integration-gohighlevel-table-2">
                 <tr data-testid="integration-gohighlevel-table-2-row">
                   <td data-testid="integration-gohighlevel-table-2-column-1"><img class="gohighlevel-btn" /></td>
-                  <td data-testid="integration-gohighlevel-table-2-column-2"><span class="integration-title">GoHighLevel</span></td>
+                  <td data-testid="integration-gohighlevel-table-2-column-2"><span class="integration-title">HighLevel</span></td>
                 </tr>
               </table>
           </a>
@@ -97,15 +97,15 @@
             <q-spinner-bars v-if="isSyncing"
                             data-testid="integration-gohighlevel-sync-spinner"
                             color="white"/>
-            {{ isSyncing ? 'Syncing...' : 'Sync with GoHighLevel' }}
+            {{ isSyncing ? 'Syncing...' : 'Sync with HighLevel' }}
             <q-tooltip anchor="center start"
                        data-testid="integration-gohighlevel-sync-tooltip"
                        self="center left"
                        :offset="[-220, 10]">
-              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and GoHighLevel.</p>
+              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and HighLevel.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>
-              <p class="mt-1 mb-0">- The contact was recently merged in GoHighLevel with another contact.</p>
-              <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and GoHighLevel data on this contact.</p>
+              <p class="mt-1 mb-0">- The contact was recently merged in HighLevel with another contact.</p>
+              <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and HighLevel data on this contact.</p>
             </q-tooltip>
           </b-button>
         </b-row>

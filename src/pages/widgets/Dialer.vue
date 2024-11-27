@@ -182,7 +182,7 @@ export default {
       this.small = true
     }
 
-    this.needsExtensions = this.$route.name === 'Hubspot Call Extension'
+    this.needsExtensions = this.$route.name === 'HubSpot Call Extension'
 
     if (!this.needsExtensions) {
       this.extensionsVisibility = true
@@ -448,7 +448,7 @@ export default {
 
     async findDefaultOutboundCampaign () {
       if (this.isAlwaysAskModeEnabled()) {
-        await this.setTheLastUsedCallLine()
+        await this.setLastUsedCallLine()
         this.defaultCampaignInitialized = true
         return
       }
@@ -538,8 +538,9 @@ export default {
       this.handleCallCompletedEvent(true)
     },
 
-    async setTheLastUsedCallLine () {
+    async setLastUsedCallLine () {
       if (this.campaignId || !this.contactId) return
+
       try {
         const data = await this.getLastUsedCallLineByContactId(this.contactId)
         this.handleChangeCampaignEvent(data.campaign_id)
