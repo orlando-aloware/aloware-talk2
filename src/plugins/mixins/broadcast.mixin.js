@@ -51,7 +51,7 @@ export default {
        * for events that are broadcast by Laravel. Echo and event broadcasting
        * allows your team to easily build robust real-time web applications.
        */
-      const broadcastDriver = this.profile.company.broadcast_driver || 'pusher'
+      const broadcastDriver = this.profile.broadcast_driver || 'pusher'
       const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials(broadcastDriver)
       window.Echo = new Echo({
         authEndpoint: `${process.env.API_URL}/broadcasting/auth`,
