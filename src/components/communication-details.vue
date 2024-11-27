@@ -1031,11 +1031,11 @@ import PredefinedTimeDurationSelector from 'components/predefined-time-duration-
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import DownloadButton from 'components/download-button'
 import TranscriptionModal from 'src/components/communication/transcription-modal'
-import * as CommunicationCallbackStatus from '../constants/callback-status'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import NetworkLogsDisplay from 'components/network-logs/network-logs-display'
 import GenerateTranscriptionButton from 'components/generate-transcription-button'
+import * as CommunicationCallbackStatus from '../constants/callback-status'
 
 export default {
   name: 'communication-details',
