@@ -162,6 +162,7 @@
                       <q-btn color="text-dark-greenish"
                              class="btn btn-inline px-1 py-0"
                              title="Copy Summary"
+                             v-if="!isWidget"
                              flat
                              rounded
                              dense
@@ -347,6 +348,7 @@ export default {
   },
 
   computed: {
+    ...mapState(['isWidget']),
     ...mapState('cache', ['currentCompany']),
 
     splitChannels () {

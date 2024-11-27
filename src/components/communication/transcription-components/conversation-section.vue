@@ -22,6 +22,7 @@
         <q-btn color="text-dark-greenish"
                class="btn btn-inline px-1 py-0"
                title="Copy Transcription"
+               v-if="!isWidget"
                flat
                rounded
                dense
@@ -80,6 +81,7 @@
 import _ from 'lodash'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
 import CopyIcon from 'components/icons/copy-icon'
+import { mapState } from 'vuex'
 
 export default {
   name: 'ConversationSection',
@@ -108,6 +110,10 @@ export default {
     return {
       currentMessageIndex: -1
     }
+  },
+
+  computed: {
+    ...mapState(['isWidget'])
   },
 
   methods: {
