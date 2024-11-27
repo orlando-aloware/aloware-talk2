@@ -295,6 +295,7 @@ import * as TrialStatus from 'src/constants/trial-account-status'
 import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
+import { FINISHED } from 'src/constants/export-status'
 
 export default {
   name: 'MyLayout',
@@ -1029,6 +1030,10 @@ export default {
 
     this.mainListeners.exportEventUpdate = (task) => {
       if (!this.allowedExports.includes(task.export.type) || task.export.user_id !== this.profile.id) {
+        return
+      }
+
+      if (task.export.status !== FINISHED) {
         return
       }
 
