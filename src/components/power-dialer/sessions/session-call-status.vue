@@ -1749,7 +1749,6 @@ export default {
     this.$VueEvent.stop('redial_task', this.requeueTask)
     this.$VueEvent.stop('holdFailed', this.onHoldFailed)
     this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
-    this.$VueEvent.stop('onNextTask', this.onNextTask)
 
     window.localStorage.removeItem(PD_PAUSED_PROP_NAME)
   }
