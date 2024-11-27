@@ -1,7 +1,7 @@
 <template>
     <div class="integration-wrapper"
         data-testid="integration-salesforce-wrapper">
-        <q-card class="salesforce-card"
+        <q-card class="integration-card"
             data-testid="integration-salesforce-card"
             flat>
             <q-item class="p-0">

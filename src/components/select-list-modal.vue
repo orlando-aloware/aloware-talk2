@@ -263,16 +263,7 @@ export default {
         return
       }
 
-      this.$bvModal.msgBoxConfirm('Are you sure you want to continue?', {
-        buttonSize: 'sm',
-        okTitle: 'Yes',
-        cancelTitle: 'No',
-        centered: true
-      }).then(confirm => {
-        if (confirm) {
-          this.processSubmit()
-        }
-      })
+      this.processSubmit()
     },
 
     loadFolders () {

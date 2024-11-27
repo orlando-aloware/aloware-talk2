@@ -36,10 +36,10 @@
 <script>
 import UpgradeNowPage from 'src/components/upgrade-now-page.vue'
 
-const OPEN_CONTACTA_ACTION = 'open-contact'
+const OPEN_CONTACT_ACTION = 'open-contact'
 const CALL_ACTION = 'call'
 
-const AVAILABLES_ACTIONS = [OPEN_CONTACTA_ACTION, CALL_ACTION]
+const AVAILABLE_ACTIONS = [OPEN_CONTACT_ACTION, CALL_ACTION]
 
 const OPEN_CONTACT_DESCRIPTION = 'Opening the contact...'
 const CALL_DESCRIPTION = 'Calling...'
@@ -79,10 +79,10 @@ export default {
       return this.action === CALL_ACTION
     },
     isContactAction () {
-      return this.action === OPEN_CONTACTA_ACTION
+      return this.action === OPEN_CONTACT_ACTION
     },
     isAllowedActions () {
-      return AVAILABLES_ACTIONS.includes(this.action)
+      return AVAILABLE_ACTIONS.includes(this.action)
     }
   },
   methods: {

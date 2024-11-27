@@ -15,7 +15,7 @@
       </q-tooltip>
     </q-btn>
 
-    <!-- Smart Transcription modal. -->
+    <!-- AloAi Voice Analytics modal. -->
     <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
@@ -143,7 +143,8 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
+                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED"
+                         style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
                       <q-btn color="text-dark-greenish"
                              class="btn btn-inline px-1 py-0"
                              title="Download Summary"
@@ -180,10 +181,12 @@
                                                  data-testid="comm-details-generate-summary-button"
                                                  :is-generating="isGenerating"
                                                  :communication="communication"
+                                                 v-if="fileUuid && isMigrated"
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status === SummaryStatus.STATUS_FAILED" class="status-message">
+                      <div v-else-if="summary_status === SummaryStatus.STATUS_FAILED"
+                           class="status-message">
                         <q-icon name="error" color="red" size="md" />
                         <div>Summary generation failed. Please try again later.</div>
                         <br>
@@ -191,16 +194,22 @@
                                                  data-testid="comm-details-generate-summary-button"
                                                  :is-generating="isGenerating"
                                                  :communication="communication"
+                                                 v-if="fileUuid && isMigrated"
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status === SummaryStatus.STATUS_PROCESSING || summary_status === SummaryStatus.STATUS_QUEUED" class="status-message">
+                      <div v-else-if="summary_status === SummaryStatus.STATUS_PROCESSING || summary_status === SummaryStatus.STATUS_QUEUED"
+                           class="status-message">
                         <q-icon name="hourglass_empty" color="blue" size="md" />
                         <span>Your summary is being processed. Please wait...</span>
                       </div>
                     </div>
-                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
-                    <div v-if="custom_summary ||summary_status === SummaryStatus.STATUS_COMPLETED" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED"
+                         class="custom-summary"
+                         v-html="parseMarkdown(custom_summary)">
+                    </div>
+                    <div v-if="custom_summary ||summary_status === SummaryStatus.STATUS_COMPLETED"
+                         class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
                       <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
@@ -295,6 +304,12 @@ export default {
       isLoading: true,
       show_form: false,
       remoteUrl: null,
+      downloadUrl: null,
+      fileUuid: null,
+      filename: '',
+      mimeType: '',
+      isMigrated: false,
+      speakers: [],
       iab_categories: [],
       highlights: [],
       entities: [],
@@ -332,6 +347,8 @@ export default {
   },
 
   computed: {
+    ...mapState('cache', ['currentCompany']),
+
     splitChannels () {
       if (this.communication.direction === CommunicationDirection.INBOUND) {
         return [
@@ -361,13 +378,14 @@ export default {
         ]
       }
     },
+
     SummaryStatus () {
       return SummaryStatus
     },
+
     CommunicationTypes () {
       return CommunicationTypes
     },
-    ...mapState('cache', ['currentCompany']),
 
     formattedMessages () {
       return this.messages.map(message => ({
@@ -426,13 +444,14 @@ export default {
           this.remoteUrl = res.data.url
           this.downloadUrl = res.data.download_url
           this.mimeType = res.data.mimetype || ''
+          this.isMigrated = res.data.is_migrated
         }).catch(err => {
           console.log('Couldn\'t fetch call recording.', err)
         })
     },
 
     /**
-     * Sets Smart Transcription panel data.
+     * Sets AloAi Voice Analytics panel data.
      * @public
      *
      * @param {Object} data
