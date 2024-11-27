@@ -21,7 +21,8 @@
     "deploy-linux": "quasar build -d -m electron -T linux -b builder -P always",
     "deploy-win": "quasar build -d -m electron -T win -b builder -P always",
     "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always",
-    "prepare": "husky"
+    "prepare": "husky",
+    "upload-s3": "bash -c 'AWS_REGION=${AWS_REGION:-us-west-2} WORKSPACE=${WORKSPACE:-.} TALK_URL=${TALK_URL:-talk.alodev.org} s3-spa-upload ./dist/spa $TALK_URL -m s3-spa-upload.config.json'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-common-types": "6.6.0",
@@ -128,6 +129,7 @@
     "husky": "^9.1.4",
     "laravel-echo": "^1.16.0",
     "pusher-js": "^8.3.0",
+    "s3-spa-upload": "^2.1.5",
     "vue-loader": "^15.9.6",
     "vue-template-compiler": "^2.7.16"
   },
