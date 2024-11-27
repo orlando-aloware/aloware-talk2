@@ -1076,7 +1076,7 @@ export default {
     },
 
     hasAudio () {
-      return this.communication.type === CommunicationTypes.CALL && (this.showAudio(this.communication) || !this.communication.has_voicemail)
+      return this.communication.type === CommunicationTypes.CALL && this.showAudio(this.communication) && !this.communication.has_voicemail
     },
 
     parseBody () {
