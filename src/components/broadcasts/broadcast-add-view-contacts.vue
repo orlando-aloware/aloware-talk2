@@ -223,7 +223,7 @@ export default {
           let filters = list.filters
 
           if (typeof list.filters === 'object') {
-            // clear non numeric keys
+            // clear non-numeric keys
             const keys = Object.keys(list.filters).filter(key => !isNaN(+key))
             // use key's value but respecting keys order
             filters = keys.map(key => list.filters[key])
