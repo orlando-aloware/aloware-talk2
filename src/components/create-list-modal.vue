@@ -78,16 +78,16 @@
           </div>
         </div>
 
-        <div v-if="createList.type === IMPORT_FROM_INTEGRATION_TYPE && integrationsEnabled.length > 0">
+        <div v-if="showIntegrationSelector">
           <hr class="w-100 my-2" />
           <div class="mb-3"
-                v-if="integrationsEnabled.length > 1">
+               v-if="integrationsEnabled.length > 1">
               <div class="row">
                   <div class="col-6 d-flex align-items-center pl-0">
                       <span>Select from available integrations: </span>
                   </div>
                   <div class="col-6 pr-0">
-                      <q-select style="word-break: break-all;"
+                      <q-select class="break-words"
                                 color="primary"
                                 use-input
                                 emit-value
@@ -95,13 +95,12 @@
                                 dense
                                 hide-bottom-space
                                 :options="integrationsEnabled"
-                                v-model="selectedIntegration">
-                      </q-select>
+                                v-model="selectedIntegration"/>
                   </div>
               </div>
           </div>
           <p class="mb-2"
-              v-else>
+             v-else>
               Currently enabled integration: <span class="text-bold"> {{ integrationsEnabled[0] }} </span>
           </p>
           <integration-list-selector ref="list-selector"
@@ -113,7 +112,7 @@
                                      :integration="selectedIntegration ?? ''"
                                      @change="onListSelectorChange"/>
 
-          <div v-if="getIntegration === 'hubspot'">
+          <div v-if="getIntegration === HUBSPOT_INTEGRATION">
             <b-form-group class="checkbox-wrapper">
               <b-form-checkbox :value="true"
                                :unchecked-value="false"
@@ -130,7 +129,7 @@
               </b-form-checkbox>
             </b-form-group>
           </div>
-      </div>
+        </div>
 
         <template v-else-if="userCanAddPublicList">
           <hr class="w-100 my-2"
@@ -190,7 +189,7 @@
              title="List Already Exists"
              centered
              v-model="showIntegrationImportConfirmDialog"
-             @close="showIntegrationImportConfirmDialog = false">
+             @close="onConfirmIntegrationImportClose">
       <div class="text-left">
         <div class="text-dark">
           {{ integrationImportConfirmMessage }}
@@ -233,8 +232,9 @@ import {
   integrationMixin
 } from 'src/plugins/mixins'
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
-import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 import talk2Api from 'src/plugins/api/api'
+import { HUBSPOT_INTEGRATION, PIPEDRIVE_INTEGRATION, ZOHO_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   components: {
@@ -354,6 +354,10 @@ export default {
 
     getIntegration () {
       return (this.selectedIntegration ?? this.integrationsEnabled[0])?.toLowerCase()
+    },
+
+    showIntegrationSelector () {
+      return this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.integrationsEnabled?.length > 0
     }
   },
 
@@ -682,11 +686,11 @@ export default {
       }
 
       switch (this.getIntegration) {
-        case 'hubspot':
+        case HUBSPOT_INTEGRATION:
           return this.importFromHubspot()
-        case 'pipedrive':
+        case PIPEDRIVE_INTEGRATION:
           return this.addPipedriveFilter()
-        case 'zoho':
+        case ZOHO_INTEGRATION:
           return this.addZohoView()
       }
     },
@@ -695,7 +699,7 @@ export default {
       return talk2Api.V2.integrations.hubspot.importList(this.integrationListId, { dynamic_import: this.hubspotDynamicImport })
         .then(response => response.data)
         .then(data => {
-          this.$generalNotification('Your HubSpot contact list is being imported. We will notify you when it\'s ready.')
+          this.$generalNotification("Your HubSpot contact list is being imported. We will notify you when it's ready.")
           this.createListClose()
           this.loadFolders()
           this.loadPublicLists()
@@ -743,18 +747,17 @@ export default {
 
     async checkIntegrationImport () {
       switch (this.getIntegration) {
-        case 'hubspot':
+        case HUBSPOT_INTEGRATION:
           return this.checkHubspotList()
-        case 'pipedrive':
+        case PIPEDRIVE_INTEGRATION:
           return this.checkPipedriveFilter()
-        case 'zoho':
+        case ZOHO_INTEGRATION:
           return this.checkZohoView()
       }
     },
 
     async checkHubspotList () {
-      const res = await this.$axios
-        .get('/api/v2/contacts-list/hubspot-list-exists/' + this.integrationListId)
+      const res = await talk2Api.V2.integrations.hubspot.listExists(this.integrationListId)
 
       if (res.data.exists) {
         this.integrationImportConfirmMessage = 'The HubSpot list you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
@@ -763,8 +766,7 @@ export default {
     },
 
     async checkZohoView () {
-      const res = await this.$axios
-        .get('/api/v2/contacts-list/zoho-view-exists/' + this.integrationListId)
+      const res = await talk2Api.V2.integrations.zoho.viewExists(this.integrationListId)
 
       if (res.data.exists) {
         this.integrationImportConfirmMessage = 'The Zoho view you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
@@ -773,13 +775,16 @@ export default {
     },
 
     async checkPipedriveFilter () {
-      const res = await this.$axios
-        .get('/api/v2/contacts-list/pipedrive-filter-exists/' + this.integrationListId)
+      const res = await talk2Api.V2.integrations.pipedrive.filterExists(this.integrationListId)
 
       if (res.data.exists) {
         this.integrationImportConfirmMessage = 'The Pipedrive filter you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
         this.showIntegrationImportConfirmDialog = true
       }
+    },
+
+    onConfirmIntegrationImportClose () {
+      this.showIntegrationImportConfirmDialog = false
     }
   },
 
@@ -802,7 +807,10 @@ export default {
       integrationList: null,
       hubspotDynamicImport: false,
       showIntegrationImportConfirmDialog: false,
-      integrationImportConfirmMessage: ''
+      integrationImportConfirmMessage: '',
+      HUBSPOT_INTEGRATION,
+      PIPEDRIVE_INTEGRATION,
+      ZOHO_INTEGRATION
     }
   },
 
@@ -815,3 +823,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.break-words {
+  word-break: break-all;
+}
+</style>
