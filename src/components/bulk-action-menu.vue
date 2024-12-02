@@ -144,8 +144,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
 import {
   aclMixin,
-  simpsocialMixin,
-  viewMixin
+  simpsocialMixin
 } from 'src/plugins/mixins'
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
@@ -162,8 +161,7 @@ export default {
 
   mixins: [
     aclMixin,
-    simpsocialMixin,
-    viewMixin
+    simpsocialMixin
   ],
 
   components: { PowerDialerMobileIcon, AddUserIcon },
