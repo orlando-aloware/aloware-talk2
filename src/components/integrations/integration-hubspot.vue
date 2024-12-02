@@ -1,12 +1,12 @@
 <template>
   <div class="integration-wrapper" data-testid="integration-hubspot-wrapper">
-    <q-card class="hubspot-card"
+    <q-card class="integration-card"
             data-testid="integration-hubspot-card"
             flat>
       <q-item class="p-0">
         <span class='hubspot-jit-card-header'>
           <i class="fab fa-hubspot hubspot-icon"></i>
-          <span class="integration-title">Hubspot</span>
+          <span class="integration-title">HubSpot</span>
         </span>
       </q-item>
       <q-separator data-testid="integration-hubspot-separator" />
@@ -32,7 +32,7 @@
                             data-testid="integration-hubspot-sync-spinner"
                             color="white">
             </q-spinner-bars>
-            {{ isSyncing ? 'Syncing...' : 'Sync with Hubspot' }}
+            {{ isSyncing ? 'Syncing...' : 'Sync with HubSpot' }}
             <q-tooltip anchor="center start"
                        self="center left"
                        data-testid="integration-hubspot-sync-tooltip"

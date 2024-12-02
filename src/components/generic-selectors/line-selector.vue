@@ -23,7 +23,7 @@
               :outlined="outlined"
               :borderless="borderless"
               :clearable="clearable"
-              :loading="campaignsIsLoading"
+              :loading="campaignsIsLoading || isLoading"
               :use-input="useInput"
               :error="hasError"
               :options="options"
@@ -221,6 +221,11 @@ export default {
     customPlaceholder: {
       type: String,
       default: ''
+    },
+
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   },
 

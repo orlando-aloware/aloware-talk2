@@ -752,7 +752,7 @@
                                  placement="right"
                                  data-testid="communication-info-as-mandated-popover"
                                  delay="100">
-                        Your account admin as mandated call dispositions.
+                        Your account admin has mandated call dispositions.
                       </b-popover>
                     </label>
                   </div>
@@ -849,11 +849,12 @@
     </div>
 
     <div class="ai-effect-container mt-2"
-         v-if="CommunicationTypes.CALL && !activeName && showAudio(communication) && communication.has_transcription && communication.call_summary">
+         v-if="CommunicationTypes.CALL && showAudio(communication) && communication.has_transcription">
       <div class="ai-effect-gradient"></div>
       <div class="ai-effect-blur"></div>
       <div class="ai-effect-content p-2">
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between"
+             :class="[ communication.call_summary ? 'mb-2' : '']">
           <div class="flex items-center gap-2">
             <h3 class="ai-effect-gradient-text text-16">Powered by AloAi
               <sparkle-icon width="16" height="16" color="#9333EA"/>
@@ -865,7 +866,8 @@
             Show transcription
           </a>
         </div>
-        <div class="text-left-align text-13">
+        <div class="text-left-align text-13"
+             v-if="communication.call_summary">
           <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
         </div>
       </div>
@@ -1074,7 +1076,7 @@ export default {
     },
 
     hasAudio () {
-      return this.communication.type === CommunicationTypes.CALL && (this.showAudio(this.communication) || !this.communication.has_voicemail)
+      return this.communication.type === CommunicationTypes.CALL && this.showAudio(this.communication) && !this.communication.has_voicemail
     },
 
     parseBody () {

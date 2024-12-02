@@ -18,7 +18,7 @@ export const CREATOR_TYPE_HUBSPOT = 8
 export const CREATOR_TYPE_ZAPIER = 9
 // Communication that initiated from AlohaBot
 export const CREATOR_TYPE_ALOHABOT = 10 // Deprecated
-// Communication that initiated from GoHighLevel
+// Communication that initiated from HighLevel
 export const CREATOR_TYPE_GOHIGHLEVEL = 11
 // Communication that initiated from AloAi
 export const CREATOR_TYPE_ALOAI = 12
@@ -66,7 +66,7 @@ export const ALL_CREATOR_TYPES = [
   },
   {
     id: CREATOR_TYPE_GOHIGHLEVEL,
-    label: 'GoHighLevel'
+    label: 'HighLevel'
   },
   {
     id: CREATOR_TYPE_ALOAI,

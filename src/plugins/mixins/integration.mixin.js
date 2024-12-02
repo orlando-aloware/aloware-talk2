@@ -7,7 +7,7 @@ const integrations = [
     value: 'pipedrive_integration_enabled'
   },
   {
-    name: 'GoHighLevel',
+    name: 'HighLevel',
     value: 'gohighlevel_integration_enabled'
   },
   {

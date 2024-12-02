@@ -591,16 +591,7 @@ export default {
       }
 
       if (this.createList.type === this.ContactListTypes.STATIC) {
-        this.$bvModal.msgBoxConfirm('Are you sure you want to continue?', {
-          buttonSize: 'sm',
-          okTitle: 'Yes',
-          cancelTitle: 'No',
-          centered: true
-        }).then(confirm => {
-          if (confirm) {
-            this.processSubmit()
-          }
-        })
+        this.processSubmit()
       } else {
         if (this.unsavedList) {
           this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action will overwrite any unsaved data. Do you wish to continue?', {

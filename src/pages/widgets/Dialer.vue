@@ -182,7 +182,7 @@ export default {
       this.small = true
     }
 
-    this.needsExtensions = this.$route.name === 'Hubspot Call Extension'
+    this.needsExtensions = this.$route.name === 'HubSpot Call Extension'
 
     if (!this.needsExtensions) {
       this.extensionsVisibility = true

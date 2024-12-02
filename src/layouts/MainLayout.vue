@@ -295,6 +295,7 @@ import * as TrialStatus from 'src/constants/trial-account-status'
 import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
+import { FINISHED } from 'src/constants/export-status'
 
 export default {
   name: 'MyLayout',
@@ -1032,6 +1033,10 @@ export default {
         return
       }
 
+      if (task.export.status !== FINISHED) {
+        return
+      }
+
       let message = `Your Contacts list export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
 
       if (task.export.type === TYPE_EXPORT_POWER_DIALER_LIST_ITEMS) {
@@ -1501,6 +1506,7 @@ export default {
       this.setDialerCurrentNumber('')
       this.setDialerIsMuted(false)
       this.setDialerCallFishing()
+      this.setDialerCallSuccessfullyAnswered(false)
     },
 
     nl2br (str, isXhtml) {
@@ -2640,6 +2646,7 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted',
       'setDialerParkedCall',
+      'setDialerCallSuccessfullyAnswered',
       'setFilters',
       'setNotifications',
       'resetNotifications',
