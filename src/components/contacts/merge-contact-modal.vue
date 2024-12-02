@@ -318,7 +318,7 @@ export default {
           })
           .catch((err) => {
             if (!this.$axios.isCancel(err)) {
-              this.$root.handleErrors(err.response)
+              this.$handleErrors(err.response)
             }
           })
           .finally(() => {

@@ -1,3 +1,4 @@
+
 <template>
   <b-card class="border-0 contact-lists-card"
           data-testid="contact-lists-card">

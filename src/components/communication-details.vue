@@ -31,7 +31,8 @@
                 <generate-transcription-button class="mr-2"
                                                variant="button"
                                                data-testid="comm-details-generate-transcription-button"
-                                               :communication="communication">
+                                               :communication="communication"
+                                               v-if="fileUuid && isMigrated">
                 </generate-transcription-button>
                 <div class="flex items-center mr-1 h-100"
                      data-testid="comm-transcription-modal-btn"
@@ -813,7 +814,8 @@
                                        data-testid="comm-details-recording-comm-audio"
                                        :communication="communication"
                                        :type="UploadedFileTypes.TYPE_CALL_RECORDING"
-                                       :uniqueId="communication.id + '1'"/>
+                                       :uniqueId="communication.id + '1'"
+                                       @audio-file-updated="handleAudioFileUpdated"/>
                 </div>
                 <div class="d-flex align-items-center mt-3"
                      v-else>
@@ -1029,11 +1031,11 @@ import PredefinedTimeDurationSelector from 'components/predefined-time-duration-
 import PencilOIcon from 'components/icons/pencil-o-icon'
 import DownloadButton from 'components/download-button'
 import TranscriptionModal from 'src/components/communication/transcription-modal'
-import * as CommunicationCallbackStatus from '../constants/callback-status'
 import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import NetworkLogsDisplay from 'components/network-logs/network-logs-display'
 import GenerateTranscriptionButton from 'components/generate-transcription-button'
+import * as CommunicationCallbackStatus from '../constants/callback-status'
 
 export default {
   name: 'communication-details',
@@ -1067,6 +1069,8 @@ export default {
     return {
       activeName: false,
       isEditingNote: false,
+      fileUuid: null,
+      isMigrated: false,
       CommunicationTypes,
       CommunicationCurrentStatus,
       CommunicationDispositionStatus,
@@ -1346,6 +1350,11 @@ export default {
         .split('_')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ')
+    },
+
+    handleAudioFileUpdated ({ fileUuid, isMigrated }) {
+      this.fileUuid = fileUuid
+      this.isMigrated = isMigrated
     }
   }
 }

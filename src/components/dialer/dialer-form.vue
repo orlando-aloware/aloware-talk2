@@ -33,6 +33,7 @@
                            specificClass="dialer-line-selector"
                            :disable="lineSelectorDisabled"
                            :generic-multiselect="false"
+                           :is-loading="isLoadingLastUsedCallLine"
                            v-model="campaignId"
                            @change="changeCampaignId">
             </line-selector>
@@ -210,7 +211,8 @@ import {
   kycMixin,
   selectorMixin,
   timezoneCheckMixin,
-  visibilityMixin
+  visibilityMixin,
+  outboundCallingModesMixin
 } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
@@ -225,7 +227,8 @@ export default {
     visibilityMixin,
     aclMixin,
     selectorMixin,
-    kycMixin
+    kycMixin,
+    outboundCallingModesMixin
   ],
 
   components: {
@@ -264,7 +267,8 @@ export default {
       blockTooltipHandler: {
         task: 'call',
         show: false
-      }
+      },
+      isLoadingLastUsedCallLine: false
     }
   },
 
@@ -375,30 +379,25 @@ export default {
       return this.selectedCampaign && this.isMessagingBlocked(this.selectedCampaign, true) && this.mode === 'text' ? this.selectedCampaign?.blocked_messaging_information?.['reason'] : ''
     },
 
-    forceOutboundLine () {
-      return this.currentCompany && this.currentCompany.force_outbound_line
-    },
-
     lineSelectorDisabled () {
       return (this.defaultOutboundCampaignId && this.mode === 'call') && this.forceOutboundLine
     }
   },
 
   created () {
-    this.$VueEvent.listen('changePhoneNumber', (data) => {
+    this.$VueEvent.listen('changePhoneNumber', async (data) => {
       if (!this.campaignId) {
-        this.findDefaultOutboundCampaign()
+        await this.findDefaultOutboundCampaign()
       }
 
       this.setMode('call')
 
-      this.changePhoneNumber(data).then(() => {
-        this.makeCall()
-      })
+      await this.changePhoneNumber(data)
+      await this.setLastUsedCallLine()
 
-      setTimeout(() => {
-        this.setLastUsedCallLine()
-      }, 1000)
+      if (this.campaignId && (this.shouldMakeCallDirectlyAccountLevel || this.shouldMakeCallDirectlyUserLevel)) {
+        this.makeCall()
+      }
     })
   },
 
@@ -629,11 +628,14 @@ export default {
       if (this.campaignId || !this.contactId) return
 
       try {
+        this.isLoadingLastUsedCallLine = true
         const data = await this.getLastUsedCallLineByContactId(this.contactId)
 
         this.campaignId = data.campaign_id
       } catch (error) {
         this.$handleErrors(error.response)
+      } finally {
+        this.isLoadingLastUsedCallLine = false
       }
     }
   },

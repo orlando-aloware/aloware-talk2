@@ -98,7 +98,7 @@ export default {
         .catch(err => {
           this.setPageTitle('Login - Talk')
           console.log(err)
-          this.$root.handleErrors(err.response)
+          this.$handleErrors(err.response)
         })
         .finally(() => {
           this.setStaticsLoaded(true)
