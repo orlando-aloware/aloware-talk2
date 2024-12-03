@@ -37,6 +37,10 @@ export default {
       type: Object,
       required: true
     },
+    contact: {
+      type: Object,
+      required: false
+    },
     talk_time_analysis: {
       type: Object,
       required: true
@@ -65,7 +69,7 @@ export default {
     },
 
     getSpeakerName (speaker) {
-      return (speaker === 'AGENT') ? this.communication?.user?.name : this.communication?.contact?.name
+      return (speaker === 'AGENT') ? this.communication?.user?.name : (this.communication?.contact?.name ?? this.contact?.name)
     }
   }
 }

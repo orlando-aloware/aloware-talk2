@@ -74,6 +74,7 @@
             </div>
             <div class="d-flex flex-row align-items-center mt-2">
               <talk-time-analysis-section :communication="communication"
+                                          :contact="contact"
                                           :talk_time_analysis="talk_time_analysis"
                                           :speakers="speakers"
                                           :is-empty="isEmpty"
@@ -133,6 +134,7 @@
                 <q-tab-panel class="p-0"
                              name="transcription">
                   <conversation-section :communication="communication"
+                                        :contact="contact"
                                         :messages="messages"
                                         :formatted-messages="formattedMessages"
                                         :is-empty="isEmpty"
@@ -287,9 +289,11 @@ export default {
 
   props: {
     communication: {
+      type: Object,
       required: true
     },
     contact: {
+      type: Object,
       required: false
     },
     buttonText: {

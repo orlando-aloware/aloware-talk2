@@ -22,6 +22,7 @@
             button-text="Show Transcription"
             data-testid="communication-audio-transcription-modal"
             :communication="communication"
+            :contact="contact"
             :single-button="true"/>
           <generate-transcription-button class="mr-2"
                                          variant="icon"
@@ -72,10 +73,12 @@ export default {
 
   props: {
     communication: {
+      type: Object,
       required: true
     },
 
     contact: {
+      type: Object,
       required: false
     },
 
