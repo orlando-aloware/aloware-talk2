@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <template v-show="isDemoCompany">
+      <div v-show="isDemoCompany">
         <div class="label mt-3 mb-2 text-weight-bold text-subtitle1 pl-3 py-2">
           Redial Settings
         </div>
@@ -151,7 +151,7 @@
                       v-model="resources.force_sms" />
           </div>
         </div>
-      </template>
+      </div>
 
       <div class="label mt-4 mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
         Customizations
