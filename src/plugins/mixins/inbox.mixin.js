@@ -50,7 +50,8 @@ export default {
       'Inbox',
       'Inbox Contact Task',
       'Inbox Channel Task Status',
-      'Inbox Contact Communication'
+      'Inbox Contact Communication',
+      'Inbox Channel Task Status Communications'
     ]
     const inboxViewsRoutes = [
       'Inbox View',
