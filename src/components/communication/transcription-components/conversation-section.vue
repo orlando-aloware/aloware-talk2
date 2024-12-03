@@ -207,7 +207,7 @@ export default {
     getSpeakerName (speaker) {
       let speakerName = (speaker === 'AGENT') ? this.communication?.user?.name : this.communication?.contact?.name
 
-      if (speakerName === null) {
+      if (speakerName === undefined) {
         return speaker
       } else {
         return `${speakerName}`
