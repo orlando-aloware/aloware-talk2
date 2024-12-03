@@ -366,6 +366,8 @@
                 </div>
                 <div class="d-flex align-items-center"
                      v-else>
+                  {{ getCommunicationContactName() }}
+                  <br v-if="getCommunicationContactName()">
                   {{ communication.lead_number | fixPhone }}
                 </div>
               </div>
@@ -1144,6 +1146,10 @@ export default {
       }
 
       return null
+    },
+
+    getCommunicationContactName () {
+      return this.communication?.contact?.name ?? this.contact?.name
     },
 
     getRingGroup (id, getName = false) {

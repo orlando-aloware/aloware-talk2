@@ -96,6 +96,10 @@ export default {
       type: Object,
       required: true
     },
+    contact: {
+      type: Object,
+      required: false
+    },
     messages: {
       type: Array,
       required: true
@@ -205,7 +209,7 @@ export default {
     },
 
     getSpeakerName (speaker) {
-      let speakerName = (speaker === 'AGENT') ? this.communication?.user?.name : this.communication?.contact?.name
+      let speakerName = (speaker === 'AGENT') ? this.communication?.user?.name : (this.communication?.contact?.name ?? this.contact?.name)
 
       if (speakerName === undefined) {
         return speaker
