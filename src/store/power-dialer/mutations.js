@@ -244,5 +244,21 @@ export default {
 
   CLEAR_BULK_ACTION_NOTIFICATION (state, contactListId) {
     delete state.bulkAddContactsNotification[contactListId]
+  },
+
+  INCREMENT_REDIALED_TASK_COUNT (state, taskId) {
+    if (state.redialedTasksCount[taskId]) {
+      state.redialedTasksCount[taskId]++
+    } else {
+      state.redialedTasksCount[taskId] = 1
+    }
+  },
+
+  CLEAR_REDIALED_TASKS_COUNT (state) {
+    state.redialedTasksCount = {}
+  },
+
+  CLEAR_SENT_TASKS_SMS_TEMPLATES (state) {
+    state.tasksSentSmsTemplates = {}
   }
 }

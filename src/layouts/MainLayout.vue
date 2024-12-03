@@ -1506,7 +1506,6 @@ export default {
       this.setDialerCurrentNumber('')
       this.setDialerIsMuted(false)
       this.setDialerCallFishing()
-      this.setDialerCallSuccessfullyAnswered(false)
     },
 
     nl2br (str, isXhtml) {
@@ -2646,7 +2645,6 @@ export default {
       'setDialerCurrentNumber',
       'setDialerIsMuted',
       'setDialerParkedCall',
-      'setDialerCallSuccessfullyAnswered',
       'setFilters',
       'setNotifications',
       'resetNotifications',

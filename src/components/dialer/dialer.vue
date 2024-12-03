@@ -6,6 +6,7 @@
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   agentMixin,
@@ -57,7 +58,8 @@ export default {
       dialerListeners: {},
       AgentStatus,
       WebrtcEvents,
-      CommunicationDispositionStatus
+      CommunicationDispositionStatus,
+      taskRedialed: false
     }
   },
 
@@ -68,9 +70,11 @@ export default {
 
     ...mapState('auth', ['profile', 'authenticated']),
 
-    ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
+    ...mapState('powerDialer', ['powerDialerTasks']),
 
     ...mapState(['isWidget']),
+
+    ...mapFields('powerDialer', ['activeTask']),
 
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
@@ -125,13 +129,6 @@ export default {
         // communication has a contact, set the contact.
         if (isActiveTaskInPowerDialerSession || dialerCommunicationHasContact) {
           this.setDialerContact(this.dialer.communication.contact)
-        }
-
-        // if one of these statuses, the call is successfully answered by the contact,
-        // either he picked up the call or it was delivered to voicemail
-        if (communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW ||
-          communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
-          this.setDialerCallSuccessfullyAnswered(true)
         }
       }
 
@@ -1347,7 +1344,14 @@ export default {
     },
 
     resetCall () {
-      console.log('Resetting call')
+      // console.log('Resetting call', { activeTask: this.activeTask })
+
+      if (this.isSessionRunning && this.redialRequired && this.activeTask && !this.activeTask.forcedRedial) {
+        this.activeTask.forcedRedial = true
+        this.$VueEvent.fire('onNextTask')
+        return
+      }
+
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()
@@ -1364,7 +1368,6 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(false)
-      this.setDialerCallSuccessfullyAnswered(false)
     },
 
     countCallDuration () {
@@ -1719,8 +1722,7 @@ export default {
       'setDialerError',
       'setDialerErrorDefault',
       'removeParkedCall',
-      'setIsCallBackButtonDisabled',
-      'setDialerCallSuccessfullyAnswered'
+      'setIsCallBackButtonDisabled'
     ])
   },
 
