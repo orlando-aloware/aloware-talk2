@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Highlights section. -->
-    <h2 class="mt-4 mb-1 text-dark" data-testid="comm-highlights-section">Highlights</h2>
+    <h2 class="mb-1 text-dark" data-testid="comm-highlights-section">Highlights</h2>
     <hr class="my-1">
     <!-- Sanity check. -->
     <div v-if="!isEmpty(highlights)">

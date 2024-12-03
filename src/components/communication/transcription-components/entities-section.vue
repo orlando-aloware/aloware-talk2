@@ -14,17 +14,19 @@
           <div class="speaker--title">{{ speaker }}</div>
           <div :key="type_index"
                v-for="(type, type_index) in entityTypes">
-            {{ type | ucfirst }}
+            <template v-if="entities[speaker][type]">
+              <span class="font-weight-light mr-2">{{ type | ucfirst }}: </span>
 
-            <q-chip class="q-mx-sm q-my-sm q-chip__content white-color"
-                    color="green-11"
-                    text-color="white"
-                    dense
-                    :key="entity_index"
-                    data-testid="comm-entities-section-chip"
-                    v-for="(entity, entity_index) in entities[speaker][type]">
-              {{ entity }}
-            </q-chip>
+              <q-chip class="q-mx-sm q-my-sm q-chip__content white-color"
+                      color="green-11"
+                      text-color="white"
+                      dense
+                      :key="entity_index"
+                      data-testid="comm-entities-section-chip"
+                      v-for="(entity, entity_index) in entities[speaker][type]">
+                {{ entity }}
+              </q-chip>
+            </template>
           </div>
         </div>
       </div>
