@@ -75,81 +75,83 @@
         </div>
       </div>
 
-      <div class="label mt-3 mb-2 text-weight-bold text-subtitle1 pl-3 py-2">
-        Redial Settings
-      </div>
-
-      <div class="col-12 pl-3 mb-4">
-        <div :class="disableField('min_redials') ? 'opacity-05' : ''">
-          <label class="label mb-1 text-weight-bold">
-            Minimum Number of Redials
-          </label>
-          <div>Choose how many times a contact has to be redialed until a successful call disposition is achieved</div>
+      <template v-show="isDemoCompany">
+        <div class="label mt-3 mb-2 text-weight-bold text-subtitle1 pl-3 py-2">
+          Redial Settings
         </div>
-        <q-select class="mt-2 q-select-pager"
-                  option-value="value"
-                  option-label="label"
-                  outlined
-                  dense
-                  emit-value
-                  data-testid="datatable-per-page-select"
-                  :disable="disableField('min_redials')"
-                  :options="minRedialOptions"
-                  :display-value="resources.min_redials === 0 ? '0 (No redial required)' : `${resources.min_redials} time${resources.min_redials > 1 ? 's' : ''}`"
-                  v-model="resources.min_redials" />
-      </div>
 
-      <div class="col-12 pl-3 mb-4"
-           v-show="resources.min_redials > 0">
-        <div :class="disableField('successful_call_disposition_ids') ? 'opacity-05' : ''">
-          <label class="label mb-1 text-weight-bold">
-            Select Successful Call Dispositions
-          </label>
-          <div>Select the dispositions that won't require the contact to be redialed, meaning that the call was successfully answered</div>
-        </div>
-        <call-disposition-selector class="p-0 mt-1 dial-sessions__form__call-disposition-selector"
-                                   :multiple="true"
-                                   :highlighted="false"
-                                   :disable="disableField('successful_call_disposition_ids')"
-                                   v-model="resources.successful_call_disposition_ids"
-                                   @change="onSuccessfulCallDispositionsChange"/>
-      </div>
-
-      <div class="col-12 mb-4"
-          v-show="resources.min_redials > 0">
-        <div class="d-flex items-center justify-between">
-          <div :class="disableField('force_immediate_redial') ? 'opacity-05' : ''">
+        <div class="col-12 pl-3 mb-4">
+          <div :class="disableField('min_redials') ? 'opacity-05' : ''">
             <label class="label mb-1 text-weight-bold">
-              Force Immediate Redial
+              Minimum Number of Redials
             </label>
-            <div>Immediately redial the contact, instead of pushing it to the bottom</div>
+            <div>Choose how many times a contact has to be redialed until a successful call disposition is achieved</div>
           </div>
-          <q-toggle size="md"
-                    val="md"
-                    :true-value="1"
-                    :false-value="0"
-                    :disable="disableField('force_immediate_redial')"
-                    v-model="resources.force_immediate_redial" />
+          <q-select class="mt-2 q-select-pager"
+                    option-value="value"
+                    option-label="label"
+                    outlined
+                    dense
+                    emit-value
+                    data-testid="datatable-per-page-select"
+                    :disable="disableField('min_redials')"
+                    :options="minRedialOptions"
+                    :display-value="resources.min_redials === 0 ? '0 (No redial required)' : `${resources.min_redials} time${resources.min_redials > 1 ? 's' : ''}`"
+                    v-model="resources.min_redials" />
         </div>
-      </div>
 
-      <div class="col-12 mb-4"
-           v-show="resources.min_redials > 0">
-        <div class="d-flex items-center justify-between">
-          <div :class="disableField('force_sms') ? 'opacity-05' : ''">
+        <div class="col-12 pl-3 mb-4"
+             v-show="resources.min_redials > 0">
+          <div :class="disableField('successful_call_disposition_ids') ? 'opacity-05' : ''">
             <label class="label mb-1 text-weight-bold">
-              Force SMS Sending on Unsuccessful Calls
+              Select Successful Call Dispositions
             </label>
-            <div>Request sending a SMS if the selected call disposition is not a Successful Call Disposition</div>
+            <div>Select the dispositions that won't require the contact to be redialed, meaning that the call was successfully answered</div>
           </div>
-          <q-toggle size="md"
-                    val="md"
-                    :true-value="1"
-                    :false-value="0"
-                    :disable="disableField('force_sms')"
-                    v-model="resources.force_sms" />
+          <call-disposition-selector class="p-0 mt-1 dial-sessions__form__call-disposition-selector"
+                                     :multiple="true"
+                                     :highlighted="false"
+                                     :disable="disableField('successful_call_disposition_ids')"
+                                     v-model="resources.successful_call_disposition_ids"
+                                     @change="onSuccessfulCallDispositionsChange"/>
         </div>
-      </div>
+
+        <div class="col-12 mb-4"
+             v-show="resources.min_redials > 0">
+          <div class="d-flex items-center justify-between">
+            <div :class="disableField('force_immediate_redial') ? 'opacity-05' : ''">
+              <label class="label mb-1 text-weight-bold">
+                Force Immediate Redial
+              </label>
+              <div>Immediately redial the contact, instead of pushing it to the bottom</div>
+            </div>
+            <q-toggle size="md"
+                      val="md"
+                      :true-value="1"
+                      :false-value="0"
+                      :disable="disableField('force_immediate_redial')"
+                      v-model="resources.force_immediate_redial" />
+          </div>
+        </div>
+
+        <div class="col-12 mb-4"
+             v-show="resources.min_redials > 0">
+          <div class="d-flex items-center justify-between">
+            <div :class="disableField('force_sms') ? 'opacity-05' : ''">
+              <label class="label mb-1 text-weight-bold">
+                Force SMS Sending on Unsuccessful Calls
+              </label>
+              <div>Request sending a SMS if the selected call disposition is not a Successful Call Disposition</div>
+            </div>
+            <q-toggle size="md"
+                      val="md"
+                      :true-value="1"
+                      :false-value="0"
+                      :disable="disableField('force_sms')"
+                      v-model="resources.force_sms" />
+          </div>
+        </div>
+      </template>
 
       <div class="label mt-4 mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
         Customizations
@@ -249,6 +251,7 @@ import SessionOrderSelector from 'components/generic-selectors/session-order-sel
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { WARM_UP_PERIOD_LIST } from 'src/constants/power-dialer/power-dialer-list'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'StartDialSessionsForm',
@@ -289,6 +292,8 @@ export default {
     SessionOrderSelector,
     InformationCircleIcon
   },
+
+  mixins: [userMixin],
 
   data () {
     return {
@@ -349,6 +354,10 @@ export default {
           })
       ]
       return options
+    },
+
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   },
 
@@ -392,6 +401,12 @@ export default {
     },
 
     applyCompanyRedialSettings (value) {
+      // if not a demo company, disable required redial feature
+      if (!this.isDemoCompany) {
+        value.min_redials = 0
+        return value
+      }
+
       const powerDialerSettings = this.currentCompany?.power_dialer_settings ?? {}
 
       // if force redial is enabled
