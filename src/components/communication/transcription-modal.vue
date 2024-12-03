@@ -73,7 +73,8 @@
                                :file-uuid="fileUuid"/>
             </div>
             <div class="d-flex flex-row align-items-center mt-2">
-              <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
+              <talk-time-analysis-section :communication="communication"
+                                          :talk_time_analysis="talk_time_analysis"
                                           :speakers="speakers"
                                           :is-empty="isEmpty"
                                           data-testid="comm-transcription-modal-talk-time-analysis-section"/>
@@ -130,7 +131,8 @@
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
                              name="transcription">
-                  <conversation-section :messages="messages"
+                  <conversation-section :communication="communication"
+                                        :messages="messages"
                                         :formatted-messages="formattedMessages"
                                         :is-empty="isEmpty"
                                         ref="conversationSection"
