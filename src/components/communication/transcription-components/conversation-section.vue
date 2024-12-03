@@ -51,7 +51,7 @@
            :id="'msg-' + message_index"
            :class="message.classes.messageBoxClass"
            :style="{ border: message.sentimentBorder }">
-          <strong>Speaker: {{ getSpeakerName(message.speaker) }}</strong>
+          <strong :style="getSpeakerClass(message.speaker)">Speaker: {{ getSpeakerName(message.speaker) }}</strong>
           <br>
           <span style="line-height: 1.6"
                 v-html="message.formattedText">
@@ -190,6 +190,18 @@ export default {
           .replace(/<\/?[^>]+(>|$)/g, '') // Remove all other HTML tags
         return `**${this.getSpeakerName(message.speaker)}:**\n${cleanText}\n`
       }).join('\n---\n\n')
+    },
+
+    getSpeakerClass (speaker) {
+      let style = {
+        color: 'rgb(150, 0, 150)'
+      }
+
+      if (speaker === 'CONTACT') {
+        style.color = 'rgb(0, 150, 150)'
+      }
+
+      return style
     },
 
     getSpeakerName (speaker) {

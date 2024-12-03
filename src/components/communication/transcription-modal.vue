@@ -91,9 +91,10 @@
           <div class="row py-4"
                v-if="!isLoading">
             <div id="reference-column"
-                 class="col-6 pt-12">
+                 class="col-6 pt-10">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
+                                  v-if="false"
                                   data-testid="comm-transcription-modal-category-section"/>
 
               <highlights-section :highlights="highlights"
@@ -701,8 +702,8 @@ export default {
 </script>
 
 <style scoped>
-.pt-12 {
-  padding-top: 12px;
+.pt-10 {
+  padding-top: 10px;
 }
 
 .status-message {
