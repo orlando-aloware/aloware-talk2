@@ -27,15 +27,15 @@
                  type="text"
                  placeholder="Untitled List"
                  autofocus
-                 :disabled="isLoading || createList.type === IMPORT_FROM_INTEGRATION_TYPE"
+                 :disabled="disableNameInput"
                  v-model="createList.name"/>
-          <small v-if="createList.type === IMPORT_FROM_INTEGRATION_TYPE" class="text-dark">List name will be obtained from the selected integration List</small>
+          <small v-if="isIntegrationListType" class="text-dark">List name will be obtained from the selected integration List</small>
         </div>
 
         <div :class="['flex-grow-1', isCreateListModeFromBulkMenuOrFilters ? 'py-4' : 'pt-4 pb-2']"
              v-if="![CreateListMode.FROM_FILTERS, CreateListMode.FROM_BULK_MENU].includes(createList.mode) && isDefault">
           <div class="form-check mb-2"
-               @click="createList.type = ContactListTypes.DYNAMIC">
+               @click="onListTypeSelected(ContactListTypes.DYNAMIC)">
             <input class="form-check-input"
                    type="radio"
                    id="dynamicList"
@@ -49,7 +49,7 @@
             </label>
           </div>
           <div class="form-check"
-               @click="createList.type = ContactListTypes.STATIC">
+               @click="onListTypeSelected(ContactListTypes.STATIC)">
             <input class="form-check-input"
                    type="radio"
                    id="staticList"
@@ -63,11 +63,11 @@
             </label>
           </div>
           <div class="form-check mt-2"
-               @click="createList.type = IMPORT_FROM_INTEGRATION_TYPE">
+               @click="onListTypeSelected(IMPORT_FROM_INTEGRATION_TYPE)">
             <input class="form-check-input"
                    type="radio"
                    id="staticListFromIntegration"
-                   :checked="createList.type === IMPORT_FROM_INTEGRATION_TYPE"/>
+                   :checked="isIntegrationListType"/>
             <label for="staticListFromIntegration">
               <div class="create-list-modal__list-title">List from Integration</div>
               <div class="create-list-modal__list-desc">
@@ -358,6 +358,14 @@ export default {
 
     showIntegrationSelector () {
       return this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.integrationsEnabled?.length > 0
+    },
+
+    isIntegrationListType () {
+      return this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE
+    },
+
+    disableNameInput () {
+      return this.isLoading || this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE
     }
   },
 
@@ -785,6 +793,10 @@ export default {
 
     onConfirmIntegrationImportClose () {
       this.showIntegrationImportConfirmDialog = false
+    },
+
+    onListTypeSelected (listType) {
+      this.createList.type = listType
     }
   },
 
