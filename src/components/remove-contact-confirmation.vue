@@ -251,15 +251,6 @@ export default {
         data: payload
       })
         .then(() => {
-          if (this.isAllContactsSelected) {
-            this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
-          } else {
-            this.$VueEvent.fire('fetchContacts', {
-              clear: true,
-              skipCache: true
-            })
-          }
-
           this.$generalNotification('Contact was successfully removed.')
         })
         .catch((_err) => {
@@ -351,18 +342,6 @@ export default {
             } else {
               isChunked = false
             }
-          }
-
-          this.$emit('contactsRemoved', this.selectedList)
-
-          // avoid requesting the contacts again when is deletion all
-          if (this.isDatatableSelectedAll) {
-            this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
-          } else {
-            this.$VueEvent.fire('fetchContacts', {
-              clear: true,
-              skipCache: true
-            })
           }
 
           this.$generalNotification('Contacts are being removed from the list. This may take a few moments to update. Please refresh your page to confirm the changes.')
