@@ -1,16 +1,25 @@
-import { mapMutations } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import { isEmpty, omit } from 'lodash'
 
 export default {
   data () {
     return {
       pollingInterval: 5, // in seconds
-      usersPollInterval: null
+      usersPollInterval: null,
+      contactsPollInterval: null
     }
   },
 
+  computed: {
+    ...mapState(['forceContactsPoll'])
+  },
+
   methods: {
-    ...mapMutations(['UPDATE_USER_STATUS']),
+    ...mapMutations([
+      'UPDATE_USER_STATUS',
+      'FORCE_CONTACTS_POLL'
+    ]),
 
     addUsersPoll () {
       // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
@@ -33,10 +42,53 @@ export default {
           }
         }
       })
+    },
+
+    addContactsPoll () {
+      // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
+      this.usersPollInterval = setInterval(() => {
+        this.pollContacts()
+      }, this.pollingInterval * 1000)
+    },
+
+    pollContacts () {
+      /*
+      These are the scenarios where the poll shouldn't happen automatically:
+      - some contacts are selected
+      - filters component is opened
+      - filters aren't empty
+      all rules above won't be considered when forceContactsPoll is forced
+       */
+      const hasCheckedContacts = this.checkedItemIds.length > 0
+      const hasFilters = !isEmpty(omit(this.currentListFilters, ['contact_lists'])) // hack for PD
+
+      if ((hasCheckedContacts || this.isFiltersOpen || hasFilters) && !this.forceContactsPoll) {
+        return
+      }
+
+      switch (this.$route.name) {
+        case 'Contacts':
+          this.pollContactsIntoContactsPage()
+          break
+        case 'Power Dialer':
+          this.pollContactsIntoPowerDialerPage()
+      }
+
+      // reset force flag
+      this.FORCE_CONTACTS_POLL(false)
+    },
+
+    pollContactsIntoContactsPage () {
+      console.log('polling contacts into contacts page...')
+    },
+
+    pollContactsIntoPowerDialerPage () {
+      console.log('polling contacts into PD page...')
     }
   },
 
   beforeDestroy () {
     clearInterval(this.usersPollInterval)
+    clearInterval(this.contactsPollInterval)
   }
 }
