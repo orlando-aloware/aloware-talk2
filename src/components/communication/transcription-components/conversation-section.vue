@@ -51,7 +51,7 @@
            :id="'msg-' + message_index"
            :class="message.classes.messageBoxClass"
            :style="{ border: message.sentimentBorder }">
-          <strong>Speaker: {{ message.speaker }}</strong>
+          <strong>Speaker: {{ getSpeakerName(message.speaker) }}</strong>
           <br>
           <span style="line-height: 1.6"
                 v-html="message.formattedText">
@@ -92,6 +92,10 @@ export default {
   },
 
   props: {
+    communication: {
+      type: Object,
+      required: true
+    },
     messages: {
       type: Array,
       required: true
@@ -184,8 +188,18 @@ export default {
           .replace(/<\/?(b|strong)>/g, '**') // Replace <b> and <strong> tags with Markdown bold (**)
           .replace(/<\/?(i|em)>/g, '*') // Replace <i> and <em> tags with Markdown italics (*)
           .replace(/<\/?[^>]+(>|$)/g, '') // Remove all other HTML tags
-        return `**${message.speaker}:**\n${cleanText}\n`
+        return `**${this.getSpeakerName(message.speaker)}:**\n${cleanText}\n`
       }).join('\n---\n\n')
+    },
+
+    getSpeakerName (speaker) {
+      let speakerName = (speaker === 'AGENT') ? this.communication?.user?.name : this.communication?.contact?.name
+
+      if (speakerName === null) {
+        return speaker
+      } else {
+        return `${speakerName}`
+      }
     },
 
     /**
