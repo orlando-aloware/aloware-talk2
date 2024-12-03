@@ -59,8 +59,8 @@
               v-if="!simpleTable">
       <al-alert class='w-100 align-items-center'
                 v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST'>
-        <div class="text-dark" >
-          This is a list managed by HubSpot
+        <div class="text-dark">
+          <span v-html="dynamicListHubSpotMessage"></span> and click <a href="javascript:void(0);" @click="updateRemoteList">[ Update ]</a> to sync.
         </div>
       </al-alert>
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
@@ -992,6 +992,15 @@ export default {
       'profile'
     ]),
 
+    dynamicListHubSpotMessage () {
+      let text = 'This is a list managed by HubSpot. Make your changes'
+      if (this.list.remote_list_url) {
+        text = text + ` <a target='_blank' href='${this.list.remote_list_url}'>here</a>`
+      }
+
+      return text
+    },
+
     fixedContactsData () {
       if (!_.isEqual(this.$parent.$data.contactsData, this.contactsData) && this.$parent.$data.contactsData !== undefined) {
         return this.$parent.$data.contactsData
@@ -1343,6 +1352,17 @@ export default {
 
     onLoadMore () {
       this.$emit('loadMore')
+    },
+
+    async updateRemoteList () {
+      try {
+        const response = await this.$axios.post(`/api/v2/contacts-list/${this.list.id}/force-remote-list-update`)
+        this.$generalNotification(response.data.message, 'success')
+      } catch (error) {
+        const { message, html } = extractErrorMessage(error)
+        console.log(html)
+        this.$generalNotification(message, 'error')
+      }
     },
 
     getListData (id) {
