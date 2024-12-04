@@ -16,10 +16,6 @@ export default _.merge({
       return this.getStatus()
     },
 
-    ssuEnabled () {
-      return this.statics?.kyc_ssu_enabled || false
-    },
-
     isTrial () {
       return this.currentCompany?.is_trial
     },
@@ -29,10 +25,6 @@ export default _.merge({
     },
 
     isKYCFilled () {
-      if (!this.ssuEnabled) {
-        return false
-      }
-
       return this.currentCompany?.kyc_filled
     }
   },
