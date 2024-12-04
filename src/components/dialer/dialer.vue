@@ -1344,8 +1344,8 @@ export default {
     },
 
     resetCall () {
-      // console.log('Resetting call', { activeTask: this.activeTask })
-
+      // before reseting the call and proceeding to the next task,
+      // check if a redial is required and trigger onNextTask to perform the redial logic
       if (this.isSessionRunning && this.redialRequired && this.activeTask && !this.activeTask.forcedRedial) {
         this.activeTask.forcedRedial = true
         this.$VueEvent.fire('onNextTask')

@@ -45,6 +45,7 @@ export default {
         return false
       }
 
+      // prevent showing the required border if the call is starting to be executed
       if (['READY', 'MAKING_CALL'].includes(this.dialer.currentStatus)) {
         return false
       }
