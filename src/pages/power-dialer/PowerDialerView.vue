@@ -1203,7 +1203,6 @@ export default {
         )
         .then((res) => {
           this.$generalNotification(res.data.message)
-          this.$emit('on-list-update', { id: this.filteredListId })
         })
         .catch(() => {
           this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
