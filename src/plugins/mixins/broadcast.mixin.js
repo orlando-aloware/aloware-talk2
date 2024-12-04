@@ -52,8 +52,27 @@ export default {
        * allows your team to easily build robust real-time web applications.
        */
       const broadcastDriver = this.profile.broadcast_driver || 'pusher'
+      let fallbackDriver = null
+
       window.Echo = this.initEcho(broadcastDriver)
       this.broadcastListen()
+
+      // If error to connect, try to connect with pusher as fallback
+      window.Echo.connector.pusher.connection.bind('error', (err) => {
+        // Don't try to connect if already tried with fallback driver
+        if (fallbackDriver) {
+          console.log('Error to connect to fallback driver: ' + broadcastDriver, err)
+          return
+        }
+
+        // Define the fallback driver, only pusher and soketi exists today
+        fallbackDriver = broadcastDriver === 'pusher' ? 'soketi' : 'pusher'
+        console.log('Error to connect to: ' + broadcastDriver, 'Connecting to fallback driver: ' + fallbackDriver, err)
+
+        // Try to connect with fallback driver
+        window.Echo = this.initEcho(fallbackDriver)
+        this.broadcastListen()
+      })
     },
     initEcho (broadcastDriver) {
       console.log('broadcast initiated with ' + broadcastDriver)
