@@ -70,10 +70,10 @@ const routes = [
       },
       {
         path: '',
-        name: 'Inbox',
+        name: 'Inboxes',
         component: Inbox,
         meta: {
-          title: 'Communications'
+          title: 'Inboxes'
         },
         children: [
           {
@@ -81,12 +81,46 @@ const routes = [
             name: 'Inbox Contact Task',
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: 'Inboxes'
             }
           },
           {
             path: 'channels/:channel/:status',
             name: 'Inbox Channel Task Status',
+            component: Contact,
+            meta: {
+              title: 'Inboxes'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status',
+            name: 'Inbox View',
+            component: Inbox,
+            meta: {
+              title: 'Inboxes'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status/contacts/:id',
+            name: 'Inbox View Contact Task',
+            component: Contact,
+            meta: {
+              title: 'Inboxes'
+            }
+          }
+        ]
+      },
+      {
+        path: '',
+        name: 'Inbox',
+        component: Inbox,
+        meta: {
+          title: 'Communications'
+        },
+        children: [
+          {
+            path: 'channels/:channel/:status',
+            name: 'Inbox Channel Task Status Communications',
             component: Contact,
             meta: {
               title: 'Communications'
@@ -112,22 +146,6 @@ const routes = [
             path: 'channels/:channel',
             name: 'Inbox Channel',
             component: Inbox,
-            meta: {
-              title: 'Communications'
-            }
-          },
-          {
-            path: 'channels/view/:viewId/:status',
-            name: 'Inbox View',
-            component: Inbox,
-            meta: {
-              title: 'Communications'
-            }
-          },
-          {
-            path: 'channels/view/:viewId/:status/contacts/:id',
-            name: 'Inbox View Contact Task',
-            component: Contact,
             meta: {
               title: 'Communications'
             }
@@ -531,7 +549,7 @@ const routes = [
     component: Dialer
   },
   {
-    name: 'Hubspot Call Extension',
+    name: 'HubSpot Call Extension',
     path: '/widgets/hubspot-call-extension',
     props: true,
     component: Dialer

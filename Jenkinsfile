@@ -21,6 +21,7 @@ pipeline {
         ARTIFACTS_CACHE_FOLDER = "${CACHE_FOLDER}/artifacts"
         DEVELOP_SAFE_JOB_NAME = "${JOB_NAME.split('/')[0]}-develop"
         DEVELOP_CACHE_FOLDER = "${HOME}/.jenkins-cache/${DEVELOP_SAFE_JOB_NAME}"
+        TALK_URL = "${env.GIT_BRANCH.toLowerCase().contains('pr') ? "${env.GIT_BRANCH.toLowerCase()}.talk" : 'talk'}.${DEV_DOMAIN}"
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -141,7 +142,6 @@ pipeline {
                                 script {
                                     def branchName = env.GIT_BRANCH.toLowerCase()
                                     def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
-                                    def envUrl = "${subDomain}.${DEV_DOMAIN}"
 
                                     dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                                         sh '''
@@ -157,10 +157,10 @@ pipeline {
                                             sh "terraform workspace select ${branchName}"
                                         }
 
-                                        sh "terraform apply -var environment='develop' -var domainName='${envUrl}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                                        sh "terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
-                                    sh "aws --region ${AWS_REGION} s3 sync ${WORKSPACE}/dist/spa s3://${envUrl}"
+                                    sh "yarn upload-s3"
                                 }
                             }
                         }
@@ -192,14 +192,13 @@ pipeline {
             script {
                 def branchName = env.GIT_BRANCH.toLowerCase()
                 def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
-                def envUrl = "${subDomain}.${DEV_DOMAIN}"
 
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
                         sh "echo ${GIT_AUTH_PSW} > tmp_token.txt"
                         sh 'gh auth login --with-token < tmp_token.txt'
-                        sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${envUrl}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                        sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${TALK_URL}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
                     }
                 } catch (Exception e) {
                     echo 'We could not add the comment in Github PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'

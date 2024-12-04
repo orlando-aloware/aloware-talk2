@@ -89,7 +89,8 @@
                     </template>
                   </contact-menu-item>
 
-                  <contact-menu-item data-testid="create-new-list-by-manual-selection" @click="onCreateByManualSelection">
+                  <contact-menu-item data-testid="create-new-list-by-manual-selection"
+                                     @click="onCreateByManualSelection">
                     <template slot="title">
                       <span class="create-item">
                         Create new list &amp; select contacts
@@ -133,7 +134,6 @@
                           :endpoint="foldersEndpoint"
                           :hasEdit="folders[0].has_edit"
                           :hasDelete="folders[0].has_delete"
-                          :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
                           :folders="folder.child_folders"
                           :lists="folder.lists"
                           :layer="0"
@@ -146,7 +146,6 @@
                         :hasEdit="folders[0].has_edit"
                         :endpoint="foldersEndpoint"
                         :hasDelete="folders[0].has_delete"
-                        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
                         :isRootList="true"
                         :folders="[]"
                         :lists="folders[0].lists"
@@ -182,7 +181,6 @@ import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 // import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import pdList from 'src/plugins/mixins/power-dialer-list'
-import aclMixin from 'src/plugins/mixins/acl.mixin'
 import { createPopper } from '@popperjs/core'
 
 export default {
@@ -192,7 +190,7 @@ export default {
       default: true
     }
   },
-  mixins: [pdList, aclMixin],
+  mixins: [pdList],
   components: {
     ContactsSidebarLoader,
     TreeFolder,
@@ -257,9 +255,7 @@ export default {
     isContact () {
       return this.routeName === 'Contacts' && this.isContactModuleType
     },
-    hasShowInPublicFolderPermission () {
-      return this.isBillingAdminOrAdminOrSupervisor
-    },
+
     isIntegrationEnabled () {
       return this.currentCompany &&
           (this.currentCompany.hubspot_integration_enabled ||

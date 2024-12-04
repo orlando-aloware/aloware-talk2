@@ -15,7 +15,7 @@
       </q-tooltip>
     </q-btn>
 
-    <!-- Smart Transcription modal. -->
+    <!-- AloAi Voice Analytics modal. -->
     <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
@@ -73,7 +73,9 @@
                                :file-uuid="fileUuid"/>
             </div>
             <div class="d-flex flex-row align-items-center mt-2">
-              <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
+              <talk-time-analysis-section :communication="communication"
+                                          :contact="contact"
+                                          :talk_time_analysis="talk_time_analysis"
                                           :speakers="speakers"
                                           :is-empty="isEmpty"
                                           data-testid="comm-transcription-modal-talk-time-analysis-section"/>
@@ -90,9 +92,10 @@
           <div class="row py-4"
                v-if="!isLoading">
             <div id="reference-column"
-                 class="col-6 pt-12">
+                 class="col-6 pt-10">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
+                                  v-if="false"
                                   data-testid="comm-transcription-modal-category-section"/>
 
               <highlights-section :highlights="highlights"
@@ -130,7 +133,9 @@
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
                              name="transcription">
-                  <conversation-section :messages="messages"
+                  <conversation-section :communication="communication"
+                                        :contact="contact"
+                                        :messages="messages"
                                         :formatted-messages="formattedMessages"
                                         :is-empty="isEmpty"
                                         ref="conversationSection"
@@ -143,7 +148,8 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED" style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
+                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED"
+                         style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
                       <q-btn color="text-dark-greenish"
                              class="btn btn-inline px-1 py-0"
                              title="Download Summary"
@@ -161,6 +167,7 @@
                       <q-btn color="text-dark-greenish"
                              class="btn btn-inline px-1 py-0"
                              title="Copy Summary"
+                             v-if="!isWidget"
                              flat
                              rounded
                              dense
@@ -180,10 +187,12 @@
                                                  data-testid="comm-details-generate-summary-button"
                                                  :is-generating="isGenerating"
                                                  :communication="communication"
+                                                 v-if="fileUuid && isMigrated"
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status === SummaryStatus.STATUS_FAILED" class="status-message">
+                      <div v-else-if="summary_status === SummaryStatus.STATUS_FAILED"
+                           class="status-message">
                         <q-icon name="error" color="red" size="md" />
                         <div>Summary generation failed. Please try again later.</div>
                         <br>
@@ -191,16 +200,22 @@
                                                  data-testid="comm-details-generate-summary-button"
                                                  :is-generating="isGenerating"
                                                  :communication="communication"
+                                                 v-if="fileUuid && isMigrated"
                                                  @updateGenerating="updateGenerating">
                         </generate-summary-button>
                       </div>
-                      <div v-else-if="summary_status === SummaryStatus.STATUS_PROCESSING || summary_status === SummaryStatus.STATUS_QUEUED" class="status-message">
+                      <div v-else-if="summary_status === SummaryStatus.STATUS_PROCESSING || summary_status === SummaryStatus.STATUS_QUEUED"
+                           class="status-message">
                         <q-icon name="hourglass_empty" color="blue" size="md" />
                         <span>Your summary is being processed. Please wait...</span>
                       </div>
                     </div>
-                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED" class="custom-summary" v-html="parseMarkdown(custom_summary)" />
-                    <div v-if="custom_summary ||summary_status === SummaryStatus.STATUS_COMPLETED" class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED"
+                         class="custom-summary"
+                         v-html="parseMarkdown(custom_summary)">
+                    </div>
+                    <div v-if="custom_summary ||summary_status === SummaryStatus.STATUS_COMPLETED"
+                         class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
                       <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                       <img
                         class="clickable-icon"
@@ -274,9 +289,11 @@ export default {
 
   props: {
     communication: {
+      type: Object,
       required: true
     },
     contact: {
+      type: Object,
       required: false
     },
     buttonText: {
@@ -295,6 +312,12 @@ export default {
       isLoading: true,
       show_form: false,
       remoteUrl: null,
+      downloadUrl: null,
+      fileUuid: null,
+      filename: '',
+      mimeType: '',
+      isMigrated: false,
+      speakers: [],
       iab_categories: [],
       highlights: [],
       entities: [],
@@ -332,6 +355,9 @@ export default {
   },
 
   computed: {
+    ...mapState(['isWidget']),
+    ...mapState('cache', ['currentCompany']),
+
     splitChannels () {
       if (this.communication.direction === CommunicationDirection.INBOUND) {
         return [
@@ -361,13 +387,14 @@ export default {
         ]
       }
     },
+
     SummaryStatus () {
       return SummaryStatus
     },
+
     CommunicationTypes () {
       return CommunicationTypes
     },
-    ...mapState('cache', ['currentCompany']),
 
     formattedMessages () {
       return this.messages.map(message => ({
@@ -426,13 +453,14 @@ export default {
           this.remoteUrl = res.data.url
           this.downloadUrl = res.data.download_url
           this.mimeType = res.data.mimetype || ''
+          this.isMigrated = res.data.is_migrated
         }).catch(err => {
           console.log('Couldn\'t fetch call recording.', err)
         })
     },
 
     /**
-     * Sets Smart Transcription panel data.
+     * Sets AloAi Voice Analytics panel data.
      * @public
      *
      * @param {Object} data
@@ -678,8 +706,8 @@ export default {
 </script>
 
 <style scoped>
-.pt-12 {
-  padding-top: 12px;
+.pt-10 {
+  padding-top: 10px;
 }
 
 .status-message {

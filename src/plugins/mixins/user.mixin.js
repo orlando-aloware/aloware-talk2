@@ -76,8 +76,10 @@ export default {
           return user.name + ' - SIP'
         case !user.name && user.sip_uri:
           return 'No Name - SIP'
-        default:
+        case user.phone_number:
           return 'No Name (' + user.phone_number + ')'
+        default:
+          return 'Deleted User'
       }
     },
 

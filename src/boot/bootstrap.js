@@ -372,6 +372,9 @@ Vue.prototype.$handleErrors = function (response, title = null) {
       case 404:
         message.data = response?.data?.error ?? 'Requested resource not found.'
         break
+      case 429:
+        message.data = 'Too many requests have been sent. Please wait a moment and try again later.'
+        break
       case 413:
         message.data = 'File too large. Please try again with a smaller file.'
         break

@@ -22,6 +22,7 @@
         <q-btn color="text-dark-greenish"
                class="btn btn-inline px-1 py-0"
                title="Copy Transcription"
+               v-if="!isWidget"
                flat
                rounded
                dense
@@ -50,7 +51,7 @@
            :id="'msg-' + message_index"
            :class="message.classes.messageBoxClass"
            :style="{ border: message.sentimentBorder }">
-          <strong>Speaker: {{ message.speaker }}</strong>
+          <strong :style="getSpeakerClass(message.speaker)">Speaker: {{ getSpeakerName(message.speaker) }}</strong>
           <br>
           <span style="line-height: 1.6"
                 v-html="message.formattedText">
@@ -80,6 +81,7 @@
 import _ from 'lodash'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
 import CopyIcon from 'components/icons/copy-icon'
+import { mapState } from 'vuex'
 
 export default {
   name: 'ConversationSection',
@@ -90,6 +92,14 @@ export default {
   },
 
   props: {
+    communication: {
+      type: Object,
+      required: true
+    },
+    contact: {
+      type: Object,
+      required: false
+    },
     messages: {
       type: Array,
       required: true
@@ -108,6 +118,10 @@ export default {
     return {
       currentMessageIndex: -1
     }
+  },
+
+  computed: {
+    ...mapState(['isWidget'])
   },
 
   methods: {
@@ -178,8 +192,30 @@ export default {
           .replace(/<\/?(b|strong)>/g, '**') // Replace <b> and <strong> tags with Markdown bold (**)
           .replace(/<\/?(i|em)>/g, '*') // Replace <i> and <em> tags with Markdown italics (*)
           .replace(/<\/?[^>]+(>|$)/g, '') // Remove all other HTML tags
-        return `**${message.speaker}:**\n${cleanText}\n`
+        return `**${this.getSpeakerName(message.speaker)}:**\n${cleanText}\n`
       }).join('\n---\n\n')
+    },
+
+    getSpeakerClass (speaker) {
+      let style = {
+        color: 'rgb(150, 0, 150)'
+      }
+
+      if (speaker === 'CONTACT') {
+        style.color = 'rgb(0, 150, 150)'
+      }
+
+      return style
+    },
+
+    getSpeakerName (speaker) {
+      let speakerName = (speaker === 'AGENT') ? this.communication?.user?.name : (this.communication?.contact?.name ?? this.contact?.name)
+
+      if (speakerName === undefined) {
+        return speaker
+      } else {
+        return `${speakerName}`
+      }
     },
 
     /**

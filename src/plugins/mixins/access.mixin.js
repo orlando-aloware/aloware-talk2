@@ -43,7 +43,7 @@ export default {
         })
         .catch(err => {
           console.error(err)
-          this.$root.handleErrors(err.response)
+          this.$handleErrors(err.response)
         })
         .finally(() => {
           this.isLoadingAccesses = false
@@ -88,7 +88,7 @@ export default {
         })
         .catch(err => {
           console.error(err)
-          this.$root.handleErrors(err.response)
+          this.$handleErrors(err.response)
           this.isLoadingAccesses = false
         })
     },

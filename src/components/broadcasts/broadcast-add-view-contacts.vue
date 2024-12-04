@@ -214,6 +214,7 @@ export default {
       switch (list.type) {
         // for static lists, just add the list ID in the params
         case ContactListTypes.STATIC:
+        case ContactListTypes.DYNAMIC_REMOTE_LIST:
           this.source.list.type = 'static'
           break
 
@@ -222,7 +223,7 @@ export default {
           let filters = list.filters
 
           if (typeof list.filters === 'object') {
-            // clear non numeric keys
+            // clear non-numeric keys
             const keys = Object.keys(list.filters).filter(key => !isNaN(+key))
             // use key's value but respecting keys order
             filters = keys.map(key => list.filters[key])
