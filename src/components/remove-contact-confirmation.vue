@@ -47,7 +47,7 @@
 <script>
 import { chunk, get, isEmpty } from 'lodash'
 import ConfirmDialog from 'components/confirm-dialog.vue'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 import { STATIC } from 'src/constants/contacts-list-types'
@@ -196,6 +196,8 @@ export default {
       'contactsLoaded'
     ]),
 
+    ...mapMutations(['FORCE_CONTACTS_POLL']),
+
     onCancel () {
       this.typedConfirmationInputString = ''
       this.removeContactClose()
@@ -251,6 +253,9 @@ export default {
         data: payload
       })
         .then(() => {
+          // force a contacts poll to be executed once
+          this.FORCE_CONTACTS_POLL(true)
+
           this.$generalNotification('Contact was successfully removed.')
         })
         .catch((_err) => {
@@ -343,6 +348,9 @@ export default {
               isChunked = false
             }
           }
+
+          // force a contacts poll to be executed once
+          this.FORCE_CONTACTS_POLL(true)
 
           this.$generalNotification('Contacts are being removed from the list. This may take a few moments to update. Please refresh your page to confirm the changes.')
         })
