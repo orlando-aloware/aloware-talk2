@@ -1,6 +1,5 @@
 // Return the WebSocket credentials based on the broadcast driver
 export const getWebSocketCredentials = (driver) => {
-  // Soketi should not be used in production
   if (driver === 'soketi') {
     return {
       WS_APP_KEY: process.env.SOKETI_APP_KEY,
