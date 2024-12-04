@@ -60,7 +60,8 @@
       <al-alert class='w-100 align-items-center'
                 v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST'>
         <div class="text-dark">
-          <span v-html="dynamicListHubSpotMessage"></span> and click <a href="javascript:void(0);" @click="updateRemoteList">[ Update ]</a> to sync.
+          <span v-html="dynamicListHubSpotMessage"></span>
+          <span v-if='this.list.remote_list_url'> and click '<a href="javascript:void(0);" @click="updateRemoteList">Sync with HubSpot</a>' for immediate update, or wait up to one hour for automatic sync.</span>
         </div>
       </al-alert>
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
@@ -292,6 +293,14 @@
                            @click="onEditColumnsClicked">
             <edit-hamburger-icon />
             Edit Columns
+          </b-dropdown-item>
+          <b-dropdown-item href="#"
+                           data-testid="contacts-view-sync-with-integration-dropdown"
+                           v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST && this.list.remote_list_url'
+                           @click="updateRemoteList">
+            <folder-dynamic-icon color="#00bf4a"
+                                 :data-testid="`contacts-view-sync-dynamic-remote-icon`"/>
+            Sync with HubSpot
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
@@ -825,6 +834,7 @@ import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 import AlAlert from 'components/alert/index.vue'
+import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 
 export default {
   name: 'contacts-view',
@@ -840,6 +850,7 @@ export default {
   ],
 
   components: {
+    FolderDynamicIcon,
     AlAlert,
     ContactListTypeIcon,
     RefreshIcon,
@@ -993,9 +1004,9 @@ export default {
     ]),
 
     dynamicListHubSpotMessage () {
-      let text = 'This is a list managed by HubSpot. Make your changes'
+      let text = 'This is a list managed by HubSpot.'
       if (this.list.remote_list_url) {
-        text = text + ` <a target='_blank' href='${this.list.remote_list_url}'>here</a>`
+        text = text + ` Make your changes <a target='_blank' href='${this.list.remote_list_url}'>here</a>`
       }
 
       return text
@@ -1254,6 +1265,28 @@ export default {
       })
     })
 
+    this.viewListeners.listenDynamicListUpdate = (event) => {
+      if (parseInt(event?.contact_list_id) !== parseInt(this.id)) {
+        return
+      }
+
+      this.$VueEvent.fire('fetchContacts')
+      this.$generalNotification(`Contact list was synced`, 'success')
+    }
+
+    this.viewListeners.listenDynamicListUpdateFailed = (event) => {
+      if (parseInt(event?.contact_list?.id) !== parseInt(this.id)) {
+        return
+      }
+
+      // even if it failed, some changes may occur, so we need to update the list
+      this.$VueEvent.fire('fetchContacts')
+      this.$generalNotification(
+        'An error prevented the list from being synced. Please try again later.',
+        'error'
+      )
+    }
+
     this.viewListeners.setDataCount = _.debounce((data) => {
       const event = data.event
       const filters = data.filters
@@ -1273,6 +1306,9 @@ export default {
     this.viewListeners.addToAloAi = (mode) => {
       this.openAloAiBotContactsEnrollmentModal(mode)
     }
+
+    this.$VueEvent.listen('contact_list_import_hubspot', this.viewListeners.listenDynamicListUpdate)
+    this.$VueEvent.listen('contact_list_import_failed', this.viewListeners.listenDynamicListUpdateFailed)
 
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
     this.$VueEvent.listen('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
@@ -1359,8 +1395,7 @@ export default {
         const response = await this.$axios.post(`/api/v2/contacts-list/${this.list.id}/force-remote-list-update`)
         this.$generalNotification(response.data.message, 'success')
       } catch (error) {
-        const { message, html } = extractErrorMessage(error)
-        console.log(html)
+        const { message } = extractErrorMessage(error)
         this.$generalNotification(message, 'error')
       }
     },
@@ -2038,6 +2073,8 @@ export default {
   },
 
   beforeDestroy () {
+    this.$VueEvent.stop('contact_list_import_hubspot')
+    this.$VueEvent.stop('contact_list_import_failed')
     this.$VueEvent.stop('shouldUpdateListCount')
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
     this.$VueEvent.stop('updateHasFilterChanges', this.viewListeners.updateHasFilterChanges)
