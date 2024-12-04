@@ -2,6 +2,13 @@
   <div v-if="profile && canSwitchApps"
        class="bridge-menu-wrapper">
     <q-btn v-if="isAdmin || isSupervisor"
+                 outline
+                 class="q-btn-standard q-mr-md"
+                 @click="showInfoBox = true">
+      <sparkle-icon width="16" height="16" color="#9333EA"/>
+      <span>AI Engine Ready</span>
+    </q-btn>
+    <q-btn v-if="isAdmin || isSupervisor"
            outline
            class="q-btn-standard"
            :href="classicUrl"
@@ -52,6 +59,30 @@
         </q-item>
       </q-list>
     </q-btn-dropdown>
+    <q-dialog v-model="showInfoBox">
+      <div style="position: absolute; top: 65px; right: 5px; width: 400px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); padding: 15px; font-family: Arial, sans-serif; background: linear-gradient(90deg, #9333ea, #6b46c1); color: white;">
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+          <span style="font-size: 24px; margin-right: 10px;">🎁</span>
+          <span style="font-size: 16px; font-weight: bold;">
+            We've enabled 5000 minutes of AloAi voice analytics for your account.
+          </span>
+        </div>
+        <p style="margin-bottom: 10px;">
+          Our AI engine will transcribe, analyze, and summarize your calls. Navigate to any contact you've called to see it in effect.
+          <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
+        </p>
+        <div>
+          <a href="#"
+            style="color: #ffe4e6; text-decoration: underline; display: block; margin-bottom: 5px;">
+            Read more: agent guide to AloAi voice analytics
+          </a>
+          <a href="#"
+            style="color: #ffe4e6; text-decoration: underline; display: block;">
+            Read more: admins guide to AloAi voice analytics
+          </a>
+        </div>
+      </div>
+    </q-dialog>
   </div>
 </template>
 
@@ -62,6 +93,7 @@ import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { cloneDeep } from 'lodash'
 import { aclMixin, classicMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'shared-login-menu',
@@ -71,6 +103,10 @@ export default {
     classicMixin,
     simpsocialMixin
   ],
+
+  components: {
+    SparkleIcon
+  },
 
   computed: {
     ...mapGetters('auth', ['profile']),
@@ -101,7 +137,8 @@ export default {
   data () {
     return {
       user: null,
-      AppDefaultLogin
+      AppDefaultLogin,
+      showInfoBox: false
     }
   },
 
