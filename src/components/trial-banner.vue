@@ -156,11 +156,11 @@ export default {
     },
 
     shouldShowUnlockTrialExperienceButton () {
-      return (this.isCompanyKYC && !this.isKYCFilled) || this.isCompanyA2pCampaignApproved
+      return (!this.isKYCFilled) || this.isCompanyA2pCampaignApproved
     },
 
     shouldShowRegistrationInReviewButton () {
-      return (this.isCompanyKYC && !this.isKYCFilled) || !this.isCompanyA2pCampaignApproved
+      return (!this.isKYCFilled) || !this.isCompanyA2pCampaignApproved
     }
   },
 
@@ -186,7 +186,7 @@ export default {
   },
 
   mounted () {
-    if (this.isCompanyKYC) {
+    if (this.isTrial) {
       this.setIsTrialBannerVisible(true)
     }
   }

@@ -65,7 +65,7 @@
 
         <shared-login-menu v-if="!isElectron" />
 
-        <header-help v-if="!isTrialKYC" />
+        <header-help v-if="!isTrial" />
 
         <profile :hideProfileInfo="isMobileTransitionWidth" />
 

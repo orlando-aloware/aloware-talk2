@@ -908,11 +908,6 @@ export default {
       return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
     },
 
-    isKycAccount () {
-      const status = this.profile?.company?.kyc_status
-      return status !== KycLogs.KYC_STATUS_NONE
-    },
-
     sidebarIcon () {
       return this.isSidebarExpanded ? 'unfold_less' : 'unfold_more'
     }

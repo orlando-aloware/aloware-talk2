@@ -179,11 +179,7 @@ export default {
     },
 
     onOpenFinishRegistration (link) {
-      if (!this.isCompanyKYC) {
-        const link = this.getLink(this.link)
-
-        return window.open(link, '_self')
-      }
+      return window.open(link, '_self')
     },
 
     getLink (link) {

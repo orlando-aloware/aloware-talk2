@@ -20,20 +20,8 @@ export default _.merge({
       return this.statics?.kyc_ssu_enabled || false
     },
 
-    isTrialKYC () {
-      if (!this.ssuEnabled) {
-        return false
-      }
-
-      return this.currentCompany?.is_kyc && this.currentCompany?.is_trial
-    },
-
-    isCompanyKYC () {
-      if (!this.ssuEnabled) {
-        return false
-      }
-
-      return this.currentCompany?.is_kyc
+    isTrial () {
+      return this.currentCompany?.is_trial
     },
 
     isCompanyA2pCampaignApproved () {
@@ -50,13 +38,9 @@ export default _.merge({
   },
 
   methods: {
-    skipRestrictions (kycStatus) {
-      return !this.ssuEnabled || kycStatus === KycLogs.KYC_STATUS_NONE
-    },
-
     getStatus () {
       // Gets the KYC status from the company
-      return this.currentCompany?.is_trial ? this.currentCompany.kyc_status : KycLogs.KYC_STATUS_NONE
+      return this.currentCompany.kyc_status
     },
 
     shouldAllowSmsTraffic (selectedLine) {
@@ -90,119 +74,47 @@ export default _.merge({
     },
 
     enabledToCreateContacts () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.CREATE_CONTACTS_ALLOWED.includes(kycStatus)
+      return true
     },
 
     enabledToImportContacts () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.IMPORT_CONTACTS_ALLOWED.includes(kycStatus)
+      return true
     },
 
     enabledToCallNumber (phone) {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      phone = this.$options.filters.fixPhone(phone)
-
-      if (phone === this.profile?.phone_number) {
-        return KycLogs.ONESELF_CALLS_ALLOWED.includes(kycStatus)
-      }
-
-      return KycLogs.CALLS_TO_OTHERS_ALLOWED.includes(kycStatus)
+      return true
     },
 
     enabledToTextNumber () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.TEXTS_ALLOWED.includes(kycStatus)
+      return true
     },
 
     singleTestNumberPurchased () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.SINGLE_TEST_NUMBER_PURCHASED_ALLOWED.includes(kycStatus)
+      return true
     },
 
     enabledToBuyNewNumbers () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.BUY_NEW_NUMBERS_ALLOWED.includes(kycStatus)
+      return true
     },
 
     enabledToAddSequences () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.ADD_SEQUENCES_ALLOWED.includes(kycStatus)
+      return true
     },
 
     enabledToAddBroadcasts () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.ADD_BROADCASTS_ALLOWED.includes(kycStatus)
+      return true
     },
 
     allowedToEnableIntegrationsPage () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.ENABLE_INTEGRATIONS_ALLOWED.includes(kycStatus)
+      return true
     },
 
     enabledToSkipTrialAndSubscribe () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.SKIP_TRIAL_ALLOWED.includes(kycStatus)
+      return true
     },
 
     isViewOnlyAccess () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return false
-      }
-
-      return KycLogs.VIEW_ONLY_ALLOWED.includes(kycStatus)
+      return this.currentCompany?.is_trial
     },
 
     onOpenFinishRegistration () {

@@ -9,7 +9,7 @@
     <template v-if="isAuthenticated && !loading && companyHasTrialStatus">
       <trial-expired-modal v-if="isTrialExpired"/>
       <cancelled-account-modal v-else-if="isCancelledAccount"/>
-      <trial-banner v-else-if="isTrialKYC"/>
+      <trial-banner v-else-if="isTrial"/>
     </template>
     <div class="h-100"
          :class="{ 'page': !isWidget }">
@@ -991,7 +991,7 @@ export default {
     }
 
     this.mainListeners.kycStatusUpdated = (company) => {
-      if (this.isTrialKYC && this.isNotSimpsocial && !this.isModGen) {
+      if (this.isTrial && this.isNotSimpsocial && !this.isModGen) {
         this.setShowedKycReloadDialog(true)
       }
     }

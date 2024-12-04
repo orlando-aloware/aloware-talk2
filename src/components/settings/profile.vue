@@ -17,7 +17,6 @@
           <b-form-group
             label="First Name"
             class="form-label"
-            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               type="text"
@@ -36,7 +35,6 @@
           <b-form-group
             class="form-label"
             label="Last Name"
-            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               v-model.trim="$v.user.last_name.$model"
@@ -78,7 +76,6 @@
           <b-form-group
             class="form-label"
             label="Email"
-            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               type="text"
@@ -690,14 +687,6 @@ export default {
       return this.campaigns.filter((campaign) => {
         return campaign.user_id === this.user.id
       })
-    },
-
-    isCompanyKYCNotAbleToAddUser () {
-      if (!this.isCompanyKYC) {
-        return false
-      }
-
-      return this.user.id === this.profile.id
     }
   },
 
