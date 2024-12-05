@@ -33,7 +33,7 @@
     </div>
 
     <portal to="diagnosisButtons">
-      <a @click="onOpenFinishRegistration(link)"
+      <a @click="onOpenFinishRegistration()"
          v-if="link && !link.external">
         <b-button class="text-nowrap"
                   variant="primary"
@@ -43,7 +43,7 @@
       </a>
 
       <a target="_blank"
-         @click="onOpenFinishRegistration(link)"
+         @click="onOpenFinishRegistration()"
          v-if="link && link.external">
         <b-button class="text-nowrap"
                   variant="primary"
@@ -178,7 +178,8 @@ export default {
       return regEx.test(url)
     },
 
-    onOpenFinishRegistration (link) {
+    onOpenFinishRegistration () {
+      const link = this.getLink(this.link)
       return window.open(link, '_self')
     },
 
