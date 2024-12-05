@@ -15761,6 +15761,57 @@ hr {
   }
 }
 
+.ai-info-box {
+  position: absolute;
+  top: 65px;
+  right: 5px;
+  width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(90deg, #9333ea, #6b46c1);
+  color: white;
+
+  .ai-info-box-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+
+    .ai-info-box-icon {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+
+    .ai-info-box-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+  }
+
+  .ai-info-box-content {
+    margin-bottom: 10px;
+
+    strong {
+      font-weight: bold;
+    }
+  }
+
+  .ai-info-box-links {
+    a {
+      color: #ffe4e6;
+      text-decoration: underline;
+      display: block;
+      margin-bottom: 5px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+
 .transcription-link {
   cursor: pointer;
   color: $dark-grey;
