@@ -394,7 +394,6 @@ import CommunicationActivityGraph from 'src/components/communication-activity-gr
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import CompactBtn from 'components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { COLUMNS } from 'src/constants/broadcast/home-columns'
@@ -414,7 +413,6 @@ export default {
     DeleteRedIcon,
     CompactBtn,
     RelativeTime,
-    BlockTooltip,
     UpgradeNowPage
   },
 
