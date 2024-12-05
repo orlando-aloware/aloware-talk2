@@ -694,7 +694,7 @@ export default {
     },
 
     isCompanyKYCNotAbleToAddUser () {
-      return this.profile?.company?.kyc_status === KycLogs.KYC_STATUS_APPROVED
+      return this.profile?.company?.kyc_status !== KycLogs.KYC_STATUS_APPROVED
     }
   },
 
