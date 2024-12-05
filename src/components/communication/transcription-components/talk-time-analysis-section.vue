@@ -6,13 +6,19 @@
               [key]: speaker as a string value.
               [value]: talk time ratio float.
       -->
-    <div class="d-flex flex-row align-items-center justify-content-between lh-30 width-200"
+    <div class="d-flex flex-row align-items-center justify-content-between lh-30 gap-30"
          :key="speaker_index"
          v-for="(speaker, speaker_index) in speakers">
       <div>
-        <i class="fa-solid fa-circle mr-2" :style="getSpeakerClass(speaker_index)"></i>
-        <span>{{ speaker }}:</span>
+        <i class="fa-solid fa-circle mr-2"
+           :style="getSpeakerClass(speaker_index)"></i>
+        <b>{{ speaker }}</b>
+        <b v-if="getSpeakerName(speaker)">: </b>
+        <span>
+          {{ getSpeakerName(speaker) }}
+        </span>
       </div>
+
       <div data-testid="comm-talk-time-analysis-section-speaker">
         <strong class="ml-1">{{ talk_time_analysis[speaker] }}% </strong>
         <span>talk time</span>
@@ -27,6 +33,14 @@ export default {
   name: 'TalkTimeAnalysisSection',
 
   props: {
+    communication: {
+      type: Object,
+      required: true
+    },
+    contact: {
+      type: Object,
+      required: false
+    },
     talk_time_analysis: {
       type: Object,
       required: true
@@ -52,6 +66,10 @@ export default {
       }
 
       return style
+    },
+
+    getSpeakerName (speaker) {
+      return (speaker === 'AGENT') ? this.communication?.user?.name : (this.communication?.contact?.name ?? this.contact?.name)
     }
   }
 }
@@ -60,5 +78,9 @@ export default {
 <style scoped>
 .lh-30 {
   line-height: 30px;
+}
+
+.gap-30 {
+  gap: 30px;
 }
 </style>

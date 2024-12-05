@@ -73,7 +73,9 @@
                                :file-uuid="fileUuid"/>
             </div>
             <div class="d-flex flex-row align-items-center mt-2">
-              <talk-time-analysis-section :talk_time_analysis="talk_time_analysis"
+              <talk-time-analysis-section :communication="communication"
+                                          :contact="contact"
+                                          :talk_time_analysis="talk_time_analysis"
                                           :speakers="speakers"
                                           :is-empty="isEmpty"
                                           data-testid="comm-transcription-modal-talk-time-analysis-section"/>
@@ -90,7 +92,7 @@
           <div class="row py-4"
                v-if="!isLoading">
             <div id="reference-column"
-                 class="col-6 pt-12">
+                 class="col-6 pt-10">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
                                   data-testid="comm-transcription-modal-category-section"/>
@@ -130,7 +132,9 @@
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
                              name="transcription">
-                  <conversation-section :messages="messages"
+                  <conversation-section :communication="communication"
+                                        :contact="contact"
+                                        :messages="messages"
                                         :formatted-messages="formattedMessages"
                                         :is-empty="isEmpty"
                                         ref="conversationSection"
@@ -284,9 +288,11 @@ export default {
 
   props: {
     communication: {
+      type: Object,
       required: true
     },
     contact: {
+      type: Object,
       required: false
     },
     buttonText: {
@@ -699,8 +705,8 @@ export default {
 </script>
 
 <style scoped>
-.pt-12 {
-  padding-top: 12px;
+.pt-10 {
+  padding-top: 10px;
 }
 
 .status-message {
