@@ -186,7 +186,7 @@ export default {
   },
 
   mounted () {
-    if (this.isTrial) {
+    if (this.isTrial && !this.isSimpSocial) {
       this.setIsTrialBannerVisible(true)
     }
   }
