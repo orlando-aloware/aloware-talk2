@@ -60,24 +60,22 @@
       </q-list>
     </q-btn-dropdown>
     <q-dialog v-model="showInfoBox">
-      <div style="position: absolute; top: 65px; right: 5px; width: 400px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); padding: 15px; font-family: Arial, sans-serif; background: linear-gradient(90deg, #9333ea, #6b46c1); color: white;">
-        <div style="display: flex; align-items: center; margin-bottom: 5px;">
-          <span style="font-size: 24px; margin-right: 10px;">🎁</span>
-          <span style="font-size: 16px; font-weight: bold;">
+      <div class="ai-info-box">
+        <div class="ai-info-box-header">
+          <span class="ai-info-box-icon">🎁</span>
+          <span class="ai-info-box-title">
             We've enabled 5000 minutes of AloAi voice analytics for your account.
           </span>
         </div>
-        <p style="margin-bottom: 10px;">
+        <p class="ai-info-box-content">
           Our AI engine will transcribe, analyze, and summarize your calls. Navigate to any contact you've called to see it in effect.
           <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
         </p>
-        <div>
-          <a href="#"
-            style="color: #ffe4e6; text-decoration: underline; display: block; margin-bottom: 5px;">
+        <div class="ai-info-box-links">
+          <a href="#">
             Read more: agent guide to AloAi voice analytics
           </a>
-          <a href="#"
-            style="color: #ffe4e6; text-decoration: underline; display: block;">
+          <a href="#">
             Read more: admins guide to AloAi voice analytics
           </a>
         </div>
