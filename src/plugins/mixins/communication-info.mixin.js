@@ -270,7 +270,7 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_PROVIDER_ALLOWS_ONLY_ONE_ATTACHMENT:
           return 'Provider allows only one attachment.'
         case CommunicationRejectionReasons.REJECTION_REASON_NOT_MULTIMEDIA_MESSAGING_ENABLED:
-          return 'We couldn\'t send a MMS from a non-MMS capable number.'
+          return 'You cannot send an MMS from a non-MMS-capable number.'
       }
     },
 
