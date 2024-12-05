@@ -17,6 +17,7 @@
           <b-form-group
             label="First Name"
             class="form-label"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               type="text"
@@ -35,6 +36,7 @@
           <b-form-group
             class="form-label"
             label="Last Name"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               v-model.trim="$v.user.last_name.$model"
@@ -76,6 +78,7 @@
           <b-form-group
             class="form-label"
             label="Email"
+            :disabled="isCompanyKYCNotAbleToAddUser"
           >
             <b-form-input
               type="text"
@@ -639,6 +642,7 @@ import {
   kycMixin,
   simpsocialMixin
 } from 'src/plugins/mixins'
+import * as KycLogs from 'src/constants/kyc-logs'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { required, maxLength, minLength, email, sameAs, helpers } from 'vuelidate/lib/validators'
@@ -687,6 +691,10 @@ export default {
       return this.campaigns.filter((campaign) => {
         return campaign.user_id === this.user.id
       })
+    },
+
+    isCompanyKYCNotAbleToAddUser () {
+      return this.profile?.company?.kyc_status === KycLogs.KYC_STATUS_APPROVED
     }
   },
 
