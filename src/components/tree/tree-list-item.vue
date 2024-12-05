@@ -77,6 +77,7 @@
                         :contacts-count="contactsCount"
                         :has-edit="hasEdit"
                         :has-delete="hasDelete"
+                        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
                         :is-pinned="isPinned"
                         @remove="onRemoveList"
                         @rename="onRenameList"
@@ -84,6 +85,7 @@
                         @move="onMove"
                         @duplicate="onDuplicate"
                         @split="onSplit"
+                        @showInPublicFolder="onShowInPublicFolder"
                         @clonestatic="onCloneStatic"/>
         </b-popover>
       </div>
@@ -142,6 +144,9 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    hasShowInPublicFolderPermission: {
+      type: Boolean
     },
     showInPublicFolder: {
       type: Boolean,
@@ -277,6 +282,22 @@ export default {
         id: this.id,
         type: ContactListTypes.STATIC
       })
+    },
+    onShowInPublicFolder () {
+      this.$root.$emit('bv::hide::popover')
+      const params = { show_in_public_folder: true }
+      const id = this.id
+
+      this.updateContactList(id, params)
+        .then((response) => {
+          this.$generalNotification('Contact list has been successfully converted to public')
+          this.reloadFolders()
+          this.loadPublicLists()
+        })
+        .catch((error) => {
+          const { message } = extractErrorMessage(error)
+          this.$generalNotification(message, 'error')
+        })
     },
     createList (params) {
       this.$axios

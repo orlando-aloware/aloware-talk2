@@ -470,6 +470,8 @@ import talk2Api from 'src/plugins/api/api'
 import HangupIcon from 'components/icons/hangup-icon.vue'
 import PlayBarIcon from 'components/icons/play-bar-icon.vue'
 
+const PD_PAUSED_PROP_NAME = 'is_power_dialer_paused'
+
 export default {
   name: 'SessionCallStatus',
 
@@ -1054,11 +1056,6 @@ export default {
     start () {
       this.resetSession()
       this.initialize()
-
-      // Force pause if session is started after being manually paused (it might happen when internet is restablished)
-      if (this.sessionPaused) {
-        this.onTogglePause()
-      }
     },
 
     async initialize () {
@@ -1119,6 +1116,11 @@ export default {
         }
 
         setTimeout(() => {
+          if (this.sessionPaused || window.localStorage.getItem(PD_PAUSED_PROP_NAME) === 'true') {
+            this.onTogglePause()
+            return
+          }
+
           this.startWarmUpCountDown()
         }, 1000)
       }
@@ -1192,6 +1194,9 @@ export default {
 
     onTogglePause () {
       this.togglePause = !this.togglePause
+
+      // this will be stored as string
+      window.localStorage.setItem(PD_PAUSED_PROP_NAME, this.togglePause)
 
       if (this.togglePause) {
         this.sessionPaused = true
@@ -1752,6 +1757,8 @@ export default {
     this.$VueEvent.stop('holdFailed', this.onHoldFailed)
     this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
     this.$VueEvent.stop('onNextTask', this.onNextTask)
+
+    window.localStorage.removeItem(PD_PAUSED_PROP_NAME)
   }
 }
 </script>

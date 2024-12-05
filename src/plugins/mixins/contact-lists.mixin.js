@@ -116,6 +116,10 @@ export default {
       this.loading = false
     },
 
+    async updateContactList (id, params) {
+      await API.V2.contactList.update(id, params)
+    },
+
     loadPublicLists () {
       this.isLoading = true
       this.setPublicListsLoaded(false)
