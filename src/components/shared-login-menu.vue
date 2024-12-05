@@ -64,7 +64,11 @@
         <div class="ai-info-box-header">
           <span class="ai-info-box-icon">🎁</span>
           <span class="ai-info-box-title">
-            We've enabled 5000 minutes of AloAi voice analytics for your account.
+            We've enabled
+            <span v-if="currentCompany?.plan?.included_transcription_min !== undefined">
+              {{ currentCompany.plan.included_transcription_min }} minutes of
+            </span>
+            AloAi voice analytics for your account.
           </span>
         </div>
         <p class="ai-info-box-content">
@@ -72,10 +76,12 @@
           <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
         </p>
         <div class="ai-info-box-links">
-          <a href="#">
+          <a href="https://support.aloware.com/en/articles/10233960-aloai-voice-analytics-for-agents"
+             target="_blank">
             Read more: agent guide to AloAi voice analytics
           </a>
-          <a href="#">
+          <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics"
+             target="_blank">
             Read more: admins guide to AloAi voice analytics
           </a>
         </div>
@@ -110,6 +116,8 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     ...mapState(['statics']),
+
+    ...mapState('cache', ['currentCompany']),
 
     canSwitchApps () {
       if (this.isAdmin || this.isSupervisor) {
