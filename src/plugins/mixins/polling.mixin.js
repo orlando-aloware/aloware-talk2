@@ -48,7 +48,7 @@ export default {
       // runs after 'polling_interval' seconds the app is initiated, every 'polling_interval' seconds
       this.usersPollInterval = setInterval(() => {
         this.pollContacts()
-      }, this.pollingInterval * 1000)
+      }, 10 * 1000) // every 10 seconds
     },
 
     pollContacts () {
@@ -57,12 +57,13 @@ export default {
       - some contacts are selected
       - filters component is opened
       - filters aren't empty
-      all rules above won't be considered when forceContactsPoll is forced
+      any of the rules above won't be considered when forceContactsPoll is forced
        */
       const hasCheckedContacts = this.checkedItemIds.length > 0
       const hasFilters = !isEmpty(omit(this.currentListFilters, ['contact_lists'])) // hack for PD
+      const hasSearch = !isEmpty(this.search)
 
-      if ((hasCheckedContacts || this.isFiltersOpen || hasFilters) && !this.forceContactsPoll) {
+      if ((hasCheckedContacts || this.isFiltersOpen || hasFilters || hasSearch) && !this.forceContactsPoll) {
         return
       }
 
@@ -80,10 +81,17 @@ export default {
 
     pollContactsIntoContactsPage () {
       console.log('polling contacts into contacts page...')
+
+      this.$VueEvent.fire('fetchContacts', {
+        clear: true,
+        skipCache: true
+      })
     },
 
     pollContactsIntoPowerDialerPage () {
       console.log('polling contacts into PD page...')
+
+      this.loadList(this.selectedList.id)
     }
   },
 
