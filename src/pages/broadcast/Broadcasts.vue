@@ -72,17 +72,10 @@
             </template>
           </q-btn-toggle>
         </div>
-        <block-tooltip placement="left"
-                       triggers="hover"
-                       target="broadcast-popover"
-                       task="broadcasts.create"
-                       v-if="!this.canAddBroadcasts">
-        </block-tooltip>
         <div id="broadcast-popover"
              class="broadcasts__home__header__new-button">
           <compact-btn variant="success"
                        class="mr-2"
-                       :disabled="!this.canAddBroadcasts"
                        v-if="hasSmsEnabled && hasPermissionTo(['create broadcast message', 'update broadcast'])"
                        @clicked="$router.push({ path: '/broadcasts/new' })">
             <plus-icon class="mr-1"
@@ -90,7 +83,6 @@
             New Bulk Message
           </compact-btn>
           <compact-btn variant="primary"
-                       :disabled="!this.canAddBroadcasts"
                        v-if="hasRvmEnabled && hasPermissionTo(['create broadcast rvm', 'update broadcast'])"
                        @clicked="$router.push({ path: '/broadcasts/new?type=rvm' })">
             <plus-icon class="mr-1"
@@ -580,10 +572,6 @@ export default {
           icon: 'context-menu-rename.svg'
         }
       ]
-    },
-
-    canAddBroadcasts () {
-      return this.enabledToAddBroadcasts()
     },
 
     columnsByViewport () {

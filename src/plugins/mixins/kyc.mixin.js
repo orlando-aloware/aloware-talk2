@@ -60,14 +60,6 @@ export default _.merge({
       return selectedLine.is_10_dlc && selectedLine.has_approved_a2p_use_case
     },
 
-    enabledToAddSequences () {
-      return true
-    },
-
-    enabledToAddBroadcasts () {
-      return true
-    },
-
     onOpenFinishRegistration () {
       const link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
       return window.open(link, '_self')
