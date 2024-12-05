@@ -60,10 +60,6 @@ export default _.merge({
       return selectedLine.is_10_dlc && selectedLine.has_approved_a2p_use_case
     },
 
-    enabledToImportContacts () {
-      return true
-    },
-
     enabledToCallNumber (phone) {
       return true
     },
@@ -72,27 +68,11 @@ export default _.merge({
       return true
     },
 
-    singleTestNumberPurchased () {
-      return true
-    },
-
-    enabledToBuyNewNumbers () {
-      return true
-    },
-
     enabledToAddSequences () {
       return true
     },
 
     enabledToAddBroadcasts () {
-      return true
-    },
-
-    allowedToEnableIntegrationsPage () {
-      return true
-    },
-
-    enabledToSkipTrialAndSubscribe () {
       return true
     },
 
