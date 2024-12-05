@@ -2091,7 +2091,6 @@ i.option-separator {
     .list-group-item {
       padding: 0 0.5rem;
       height: 65px;
-      margin-bottom: 13px;
 
       > div {
         > div:nth-child(2),
@@ -9411,7 +9410,7 @@ screen and (max-width: 956px) {
   }
   .inbox-side {
     &__left {
-      max-width: 120px;
+      max-width: 135px;
 
       .count-label {
         margin-left: 10px;

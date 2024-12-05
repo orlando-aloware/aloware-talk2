@@ -13,7 +13,7 @@
        @click="toggleSidebar($event, route)">
       <div class="icon d-flex align-items-center">
         <contact-list-type-icon testIdSuffix='pinned'
-                                :type="item.type" />
+                                :type="item?.type" />
       </div>
       <div class="pr-3 flex-grow-1 item-name d-flex align-items-center">
         <span>{{ item.name }}</span>

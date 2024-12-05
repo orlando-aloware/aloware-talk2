@@ -198,6 +198,7 @@
               </b-col>
             </b-form-row>
             <hr/>
+
             <b-form-row data-testid="comm-details-disposition-row">
               <b-col class="pl-0 pr-0" data-testid="comm-details-disposition-col">
                 <q-item-label>From: </q-item-label>
@@ -205,7 +206,21 @@
               <b-col data-testid="comm-details-disposition-col">
                 <div class="d-flex align-items-center"
                      v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL">
-                  {{ communication.lead_number | fixPhone }}
+                  <div>
+                    <div class="flex items-center mr-1 h-100"
+                         v-if="communication?.contact"
+                         @click="onOpenContactClicked">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click for more info
+                      </q-tooltip>
+                      <span class="text-blue cursor-pointer">
+                          {{ communication.contact.name | fixContactName }}
+                      </span>
+                    </div>
+                    {{ communication.lead_number | fixPhone }}
+                  </div>
                 </div>
                 <div class="d-flex align-items-center"
                      v-else-if="communication.direction === CommunicationDirections.INBOUND && communication.type === CommunicationTypes.EMAIL">
@@ -294,8 +309,8 @@
                       <span class="text-blue cursor-pointer">
                         {{ usedCampaign?.name }}
                       </span>
-                      {{ communication.incoming_number }}
                     </div>
+                    {{ communication.incoming_number }}
                   </div>
                 </div>
                 <div class="d-flex align-items-center"
@@ -304,7 +319,21 @@
                 </div>
                 <div class="d-flex align-items-center"
                      v-else>
-                  {{ communication.lead_number | fixPhone }}
+                  <div>
+                    <div class="flex items-center mr-1 h-100"
+                         v-if="communication?.contact"
+                         @click="onOpenContactClicked">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px">
+                        Click for more info
+                      </q-tooltip>
+                      <span class="text-blue cursor-pointer">
+                          {{ communication.contact.name | fixContactName }}
+                      </span>
+                    </div>
+                    {{ communication.lead_number | fixPhone }}
+                  </div>
                 </div>
               </b-col>
             </b-form-row>
@@ -326,49 +355,6 @@
               <hr/>
             </div>
 
-            <div v-if="[CommunicationTypes.CALL, CommunicationTypes.SMS, CommunicationTypes.EMAIL, CommunicationTypes.NOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
-              <b-form-row data-testid="comm-details-disposition-row">
-              <b-col class="pl-0 pr-0">
-                <q-item-label>User: </q-item-label>
-              </b-col>
-              <b-col>
-                <q-icon class="status-icon d-inline-block text-danger"
-                        :state="communication.rejected_by_app"
-                        :name="rejectionToIcon(communication.rejected_by_app)"
-                        v-if="communication.rejected_by_app !== 0">
-                  <q-tooltip anchor="top middle"
-                             self="bottom middle"
-                             max-width="150px"
-                             data-testid="comm-details-tooltip">
-                    {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
-                  </q-tooltip>
-                </q-icon>
-                <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
-                  <div class="flex items-center mr-1 h-100"
-                       data-testid="comm-details-open-users"
-                       @click="onOpenUserInClassicClicked(communication?.user_id)">
-                    <span class="text-blue cursor-pointer"
-                          :title="getUserName(getUser(communication.user_id))">
-                      <q-tooltip class="item"
-                                 content-class="bg-grey-light11"
-                                 anchor="top left"
-                                 self="center middle"
-                                 data-testid="comm-details-click-more-info-tooltip">
-                        Click For More Info
-                      </q-tooltip>
-                      {{ getUserName(getUser(communication.user_id)) }}
-                    </span>
-                  </div>
-                </div>
-                <div v-else>
-                  <span class="text-greyish">
-                    -
-                  </span>
-                </div>
-              </b-col>
-            </b-form-row>
-              <hr/>
-            </div>
             <div v-if="communication.type === CommunicationTypes.CALL && communication.attempting_users && communication.attempting_users.length > 0 && verbose">
               <b-form-row data-testid="comm-details-row">
                 <b-col class="pl-0 pr-0">
@@ -1155,7 +1141,7 @@ export default {
 
       switch (this.communication.disposition_status2) {
         case CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW:
-          return text + 'left a'
+          return text + 'was missed and contact left a'
         case CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW:
           return text
         case CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW:
@@ -1303,6 +1289,12 @@ export default {
 
     onEditNote () {
       this.isEditingNote = true
+    },
+
+    onOpenContactClicked () {
+      this.$router.push(this.getContactRouteLink(this.communication)).catch(err => {
+        console.log(err)
+      })
     },
 
     onOpenLineInClassicClicked (campaignId) {

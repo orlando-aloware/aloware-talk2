@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mb-4">
     <h2 class="mb-1 text-dark" data-testid="comm-categories-section-h2">Categories</h2>
     <hr class="my-1">
 
