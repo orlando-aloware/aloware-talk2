@@ -95,7 +95,6 @@
                  class="col-6 pt-10">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
-                                  v-if="false"
                                   data-testid="comm-transcription-modal-category-section"/>
 
               <highlights-section :highlights="highlights"
