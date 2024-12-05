@@ -214,7 +214,6 @@
             </b-form-radio>
             <b-form-radio inline
                           value="Company Supervisor"
-                          :disabled="viewOnly"
                           :aria-describedby="ariaDescribedby"
                           v-model="user.role_name"
                           @change="(eventPayload) => onUpdateFields(eventPayload, 'role_name')">

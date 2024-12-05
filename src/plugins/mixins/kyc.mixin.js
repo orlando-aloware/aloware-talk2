@@ -7,10 +7,6 @@ export default _.merge({
     ...mapState('cache', ['currentCompany']),
     ...mapState('contacts', ['selectedLine']),
 
-    viewOnly () {
-      return this.isViewOnlyAccess()
-    },
-
     currentKycStatus () {
       return this.getStatus()
     },
@@ -64,10 +60,6 @@ export default _.merge({
       return selectedLine.is_10_dlc && selectedLine.has_approved_a2p_use_case
     },
 
-    enabledToCreateContacts () {
-      return true
-    },
-
     enabledToImportContacts () {
       return true
     },
@@ -102,10 +94,6 @@ export default _.merge({
 
     enabledToSkipTrialAndSubscribe () {
       return true
-    },
-
-    isViewOnlyAccess () {
-      return this.currentCompany?.is_trial
     },
 
     onOpenFinishRegistration () {

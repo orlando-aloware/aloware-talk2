@@ -57,13 +57,6 @@
             </b-col>
             <b-col class="p-0">
               <div class="d-flex float-right">
-                <block-tooltip placement="left"
-                               triggers="click"
-                               target="contacts-create-popover"
-                               task="contacts.create"
-                               v-if="!canCreateContacts">
-                </block-tooltip>
-
                 <compact-btn customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                              variant="outlined-light"
                              tooltip-text="Reset"
@@ -116,16 +109,10 @@
                       <i class="fa fa-search mr-1" />
                       Select Contacts & Add to List
                     </b-dropdown-item>
-                    <b-dropdown-item v-if="canCreateContacts"
+                    <b-dropdown-item
                                      href="#"
                                      :disabled="taskAddAndClearingDisabled"
                                      v-b-modal:create-contact-modal>
-                      <i class="fa fa-plus mr-1" />
-                      {{ createContactToListText }}
-                    </b-dropdown-item>
-                    <b-dropdown-item v-else
-                                     href="#"
-                                     disabled>
                       <i class="fa fa-plus mr-1" />
                       {{ createContactToListText }}
                     </b-dropdown-item>
@@ -589,7 +576,6 @@ import TrashOIcon from 'components/icons/trash-o-icon'
 import ConfirmDialog from 'components/confirm-dialog'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import ContactCreateModal from 'components/contacts/contact-create-modal'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import talk2Api from 'src/plugins/api/api'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { POWER_DIALER_ROUTE_META_ID } from 'src/constants/power-dialer/power-dialer'
@@ -698,7 +684,6 @@ export default {
     Breadcrumbs,
     ContactCreateModal,
     BulkActionMenu,
-    BlockTooltip,
     PowerDialerBulkAddReportModal,
     RefreshIcon,
     ContactsFilters
@@ -926,10 +911,6 @@ export default {
 
     showMobileFilters () {
       return this.$q.screen.width <= PD_MAX_FILTER_LG
-    },
-
-    canCreateContacts () {
-      return this.enabledToCreateContacts()
     }
   },
 
