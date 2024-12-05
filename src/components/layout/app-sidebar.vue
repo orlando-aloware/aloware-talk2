@@ -843,7 +843,6 @@
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 import { broadcastsMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
-import * as KycLogs from 'src/constants/kyc-logs'
 
 export default {
   name: 'app-sidebar',

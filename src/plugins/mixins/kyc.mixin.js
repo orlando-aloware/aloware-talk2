@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import * as KycLogs from '../../constants/kyc-logs'
 import { mapState } from 'vuex'
 
 export default _.merge({
