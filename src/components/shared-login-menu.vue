@@ -1,7 +1,7 @@
 <template>
   <div v-if="profile && canSwitchApps"
        class="bridge-menu-wrapper">
-    <q-btn v-if="isAdmin || isSupervisor"
+    <q-btn v-if="(isAdmin || isSupervisor) && showAloAiPromotionButton"
                  outline
                  class="q-btn-standard q-mr-md"
                  @click="showInfoBox = true">
@@ -121,6 +121,10 @@ export default {
       return false
     },
 
+    showAiEngineButton () {
+      return this.screenWidth >= 1200
+    },
+
     alowareClassic () {
       return `Admin`
     },
@@ -134,11 +138,16 @@ export default {
     }
   },
 
+  mounted () {
+    window.addEventListener('resize', this.toggleOnResize)
+  },
+
   data () {
     return {
       user: null,
       AppDefaultLogin,
-      showInfoBox: false
+      showInfoBox: false,
+      screenWidth: window.innerWidth
     }
   },
 
@@ -160,6 +169,10 @@ export default {
       })
     },
 
+    updateScreenWidth () {
+      this.screenWidth = window.innerWidth
+    },
+
     onInput () {
       this.updateDefaultLogin()
     }
@@ -167,6 +180,12 @@ export default {
 
   created () {
     this.user = cloneDeep(this.profile)
+
+    window.addEventListener('resize', this.updateScreenWidth)
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateScreenWidth)
   }
 }
 </script>
