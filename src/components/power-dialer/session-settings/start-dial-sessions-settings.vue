@@ -1,18 +1,12 @@
 <template>
   <div class="t-session-settings">
-    <block-tooltip placement="left"
-                   triggers="click"
-                   target="pd-call-popover"
-                   task="call"
-                   v-if="callDisabled">
-    </block-tooltip>
     <div id="pd-call-popover"
          v-if="defaultTrigger">
       <q-btn class="start-dial-button p-0"
              color="success"
              no-caps
              unelevated
-             :disabled="disabledTrigger || callDisabled || isAgentOnCall"
+             :disabled="disabledTrigger || isAgentOnCall"
              @click="dialPreparation">
         <PhoneIcon class="mr-2"
                    color="white"
@@ -477,10 +471,6 @@ export default {
 
     canSaveSettings () {
       return this.settingNameLength > 0 && this.settingNameLength <= 191
-    },
-
-    callDisabled () {
-      return !this.enabledToCallNumber()
     },
 
     isSettingsOwner () {

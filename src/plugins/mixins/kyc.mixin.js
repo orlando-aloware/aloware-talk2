@@ -60,14 +60,6 @@ export default _.merge({
       return selectedLine.is_10_dlc && selectedLine.has_approved_a2p_use_case
     },
 
-    enabledToCallNumber (phone) {
-      return true
-    },
-
-    enabledToTextNumber () {
-      return true
-    },
-
     enabledToAddSequences () {
       return true
     },
