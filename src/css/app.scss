@@ -15825,6 +15825,7 @@ hr {
 
 /* Gradient text effect */
 .ai-effect-gradient-text {
+  cursor: pointer;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
