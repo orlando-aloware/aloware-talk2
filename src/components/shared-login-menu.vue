@@ -127,7 +127,7 @@ export default {
       return false
     },
 
-    showAiEngineButton () {
+    showAloAiPromotionButton () {
       return this.screenWidth >= 1200
     },
 
