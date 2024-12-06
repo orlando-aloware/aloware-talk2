@@ -886,10 +886,10 @@
           <span class="ai-info-box-icon">🎁</span>
           <span class="ai-info-box-title">
             We've enabled
-            <span v-if="currentCompany?.plan?.included_transcription_min !== undefined">
+            <span v-if="currentCompany?.plan?.included_transcription_min > 0">
               {{ currentCompany.plan.included_transcription_min }} minutes of
             </span>
-            AloAi voice analytics for your account.
+            AloAi Voice Analytics for your account.
           </span>
         </div>
         <p class="ai-info-box-content">
@@ -897,13 +897,16 @@
           <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
         </p>
         <div class="ai-info-box-links">
-          <a href="https://support.aloware.com/en/articles/10233960-aloai-voice-analytics-for-agents"
+          Read more:
+          <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics"
              target="_blank">
-            Agents guide to AloAi voice analytics
+            Agents guide to AloAi Voice Analytics
           </a>
+          <br>
+          Read more:
           <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics"
              target="_blank">
-            Admins guide to AloAi voice analytics
+            Admins guide to AloAi Voice Analytics
           </a>
         </div>
       </div>

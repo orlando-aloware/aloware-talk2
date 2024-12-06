@@ -2,9 +2,9 @@
   <div v-if="profile && canSwitchApps"
        class="bridge-menu-wrapper">
     <q-btn v-if="showAloAiPromotionButton"
-                 outline
-                 class="q-btn-standard q-mr-md"
-                 @click="showInfoBox = true">
+           outline
+           class="q-btn-standard q-mr-md"
+           @click="showInfoBox = true">
       <sparkle-icon width="16" height="16" color="#9333EA"/>
       <span>AI Engine Ready</span>
     </q-btn>
@@ -14,7 +14,7 @@
            :href="classicUrl"
            @click="onGoToClassic">
 
-        <span>{{ alowareClassic }}</span>
+      <span>{{ alowareClassic }}</span>
     </q-btn>
     <q-btn-dropdown
       v-else
@@ -76,12 +76,14 @@
           <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
         </p>
         <div class="ai-info-box-links">
-          Read more: <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics"
+          Read more:
+          <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics"
              target="_blank">
             Agents guide to AloAi Voice Analytics
           </a>
           <br>
-          Read more: <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics"
+          Read more:
+          <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics"
              target="_blank">
             Admins guide to AloAi Voice Analytics
           </a>
