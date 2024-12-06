@@ -859,7 +859,6 @@
              :class="[ communication.call_summary ? 'mb-2' : '']">
           <div class="flex items-center gap-2">
             <h3 class="ai-effect-gradient-text"
-                style="cursor: pointer;"
                 @click="currentCompany?.transcription_settings?.is_trial ? (showInfoBox = true) : null">
               Powered by AloAi
               <template v-if="currentCompany?.transcription_settings?.is_trial && currentCompany?.plan?.included_transcription_min > 0">
