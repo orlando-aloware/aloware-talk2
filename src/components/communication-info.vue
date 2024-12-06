@@ -858,7 +858,7 @@
         <div class="flex items-center justify-between"
              :class="[ communication.call_summary ? 'mb-2' : '']">
           <div class="flex items-center gap-2">
-            <h3 class="ai-effect-gradient-text text-15"
+            <h3 class="ai-effect-gradient-text"
                 style="cursor: pointer;"
                 @click="currentCompany?.transcription_settings?.is_trial ? (showInfoBox = true) : null">
               Powered by AloAi
