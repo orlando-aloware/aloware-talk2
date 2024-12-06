@@ -96,7 +96,7 @@ export default {
     },
 
     hasRvmEnabled () {
-      return this.currentCompany.bulk_rvm_enabled
+      return this.currentCompany.bulk_rvm_enabled && !this.currentCompany.is_trial
     },
 
     hasSmsEnabled () {
