@@ -35,6 +35,11 @@ export default _.merge({
         return true
       }
 
+      // when trial allow in UI to send SMS but fail on the backend
+      if (this.isTrial) {
+        return true
+      }
+
       /**
        * Allow sms traffic on Dialer and Contact text Composer component
        */
