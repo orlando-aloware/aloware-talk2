@@ -862,7 +862,7 @@
                 style="cursor: pointer;"
                 @click="currentCompany?.transcription_settings?.is_trial ? (showInfoBox = true) : null">
               Powered by AloAi
-              <template v-if="currentCompany?.transcription_settings?.is_trial && currentCompany?.plan?.included_transcription_min !== undefined">
+              <template v-if="currentCompany?.transcription_settings?.is_trial && currentCompany?.plan?.included_transcription_min > 0">
                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
               </template>
               <sparkle-icon width="16" height="16" color="#9333EA"/>
