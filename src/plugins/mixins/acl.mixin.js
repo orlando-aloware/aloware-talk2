@@ -169,39 +169,6 @@ export default _.merge({
       }
     },
 
-    isBlockedFrom (permissions) {
-      let blockedAccess = []
-
-      switch (this.usage?.plan?.use_case) {
-        case 'iPro':
-          blockedAccess = [
-            'barge & whisper'
-          ]
-          break
-        case 'uPro':
-          // @todo
-          blockedAccess = [
-          ]
-          break
-        case 'xPro':
-          // @todo
-          blockedAccess = [
-          ]
-          break
-      }
-
-      if (Array.isArray(permissions)) {
-        for (let permission of permissions) {
-          if (blockedAccess.includes(permission)) {
-            return true
-          }
-        }
-        return false
-      } else {
-        return blockedAccess.includes(permissions)
-      }
-    },
-
     shouldShowUpgradeNow () {
       return !this.isSimpSocial()
     },
