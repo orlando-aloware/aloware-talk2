@@ -899,11 +899,11 @@
         <div class="ai-info-box-links">
           <a href="https://support.aloware.com/en/articles/10233960-aloai-voice-analytics-for-agents"
              target="_blank">
-            Read more: agent guide to AloAi voice analytics
+            Agent guide to AloAi voice analytics
           </a>
           <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics"
              target="_blank">
-            Read more: admins guide to AloAi voice analytics
+            Admins guide to AloAi voice analytics
           </a>
         </div>
       </div>
