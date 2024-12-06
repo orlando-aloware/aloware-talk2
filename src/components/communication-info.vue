@@ -860,8 +860,11 @@
           <div class="flex items-center gap-2">
             <h3 class="ai-effect-gradient-text text-15"
                 style="cursor: pointer;"
-                @click="showInfoBox = true">
-              Powered by AloAi (free 5K trial)
+                @click="currentCompany?.transcription_settings?.is_trial ? (showInfoBox = true) : null">
+              Powered by AloAi
+              <template v-if="currentCompany?.transcription_settings?.is_trial && currentCompany?.plan?.included_transcription_min !== undefined">
+                (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
+              </template>
               <sparkle-icon width="16" height="16" color="#9333EA"/>
             </h3>
           </div>
