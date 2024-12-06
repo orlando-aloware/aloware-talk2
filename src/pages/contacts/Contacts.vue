@@ -39,8 +39,7 @@
     <column-headers :previousRelations="previousRelations"
                     v-if="isActive"/>
     <remove-contact-confirmation :selected-count="selectedContactsCount"
-                                 v-if="isActive"
-                                 @contactsRemoved="onRemoveContacts"/>
+                                 v-if="isActive"/>
     <move-dialog v-if="isActive"/>
     <create-list-modal v-if="isActive"/>
     <select-list-modal v-if="isActive"/>
@@ -214,12 +213,6 @@ export default {
         .catch(err => {
           console.log(err)
         })
-    },
-
-    onRemoveContacts () {
-      if (!this.isAllContactsSelected) {
-        this.$VueEvent.fire('fetchContacts', { clear: true })
-      }
     }
   },
 

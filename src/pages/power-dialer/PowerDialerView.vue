@@ -600,7 +600,8 @@ import {
   avatarMixin,
   powerDialerMixin,
   powerDialerInitMixin,
-  kycMixin
+  kycMixin,
+  pollingMixin
 } from 'src/plugins/mixins'
 import { PD_MAX_FILTER_LG } from 'src/constants/viewport-sizes'
 
@@ -682,7 +683,8 @@ export default {
     aclMixin,
     viewMixin,
     avatarMixin,
-    kycMixin
+    kycMixin,
+    pollingMixin
   ],
 
   components: {
@@ -721,6 +723,7 @@ export default {
     }
 
     this.init()
+    this.addContactsPoll()
   },
 
   computed: {
@@ -930,6 +933,16 @@ export default {
 
     canCreateContacts () {
       return this.enabledToCreateContacts()
+    },
+
+    checkedItemIds () {
+      const ids = []
+
+      this.checked.forEach(check => {
+        ids.push(check.id)
+      })
+
+      return ids
     }
   },
 
@@ -1190,7 +1203,6 @@ export default {
         )
         .then((res) => {
           this.$generalNotification(res.data.message)
-          this.$emit('on-list-update', { id: this.filteredListId })
         })
         .catch(() => {
           this.$generalNotification('Unable to delete the selected contact. Please contact system administrator.', 'error')
