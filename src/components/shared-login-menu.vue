@@ -1,7 +1,7 @@
 <template>
   <div v-if="profile && canSwitchApps"
        class="bridge-menu-wrapper">
-    <q-btn v-if="(isAdmin || isSupervisor) && showAloAiPromotionButton"
+    <q-btn v-if="showAloAiPromotionButton"
                  outline
                  class="q-btn-standard q-mr-md"
                  @click="showInfoBox = true">
