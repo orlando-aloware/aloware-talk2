@@ -31,7 +31,6 @@
                      @paginated="onPaginate"
                      @loadMore="beforeOnLoadMore(selectedList)"
                      @onSelectedCountChange="onSelectedCountChange"
-                     @on-list-update="updateList"
                      @on-my-queue-list="myQueueList">
         </router-view>
 
@@ -48,8 +47,7 @@
                            v-if="isActive" />
         <remove-list-confirmation v-if="isActive" />
         <remove-contact-confirmation :selected-count="selectedContactsCount"
-                                     v-if="isActive"
-                                     @contactsRemoved="updateList" />
+                                     v-if="isActive" />
         <remove-folder-dialog :is-contact-module-type="false" />
         <create-list-modal :is-default="false" />
       </template>
@@ -450,10 +448,6 @@ export default {
 
     beforeOnLoadMore (selectedList) {
       this.onLoadMore(selectedList)
-    },
-
-    async updateList (data) {
-      await this.loadList(data.id)
     },
 
     onClear () {

@@ -813,7 +813,8 @@ import {
   viewMixin,
   contactsListFiltersMixin,
   simpsocialMixin,
-  kycMixin
+  kycMixin,
+  pollingMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
@@ -837,7 +838,8 @@ export default {
     viewMixin,
     contactsListFiltersMixin,
     simpsocialMixin,
-    kycMixin
+    kycMixin,
+    pollingMixin
   ],
 
   components: {
@@ -1302,6 +1304,8 @@ export default {
     // Listeners for "more" options on contact selection
     this.$VueEvent.listen('addToPowerDialer', this.viewListeners.addToPowerDialer)
     this.$VueEvent.listen('addToAloAi', this.viewListeners.addToAloAi)
+
+    this.addContactsPoll()
   },
 
   methods: {
