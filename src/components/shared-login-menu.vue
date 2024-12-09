@@ -76,17 +76,24 @@
           <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
         </p>
         <div class="ai-info-box-links">
-          Read more:
-          <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics"
-             target="_blank">
-            Agents guide to AloAi Voice Analytics
-          </a>
-          <br>
-          Read more:
-          <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics"
-             target="_blank">
-            Admins guide to AloAi Voice Analytics
-          </a>
+          <strong>Guides:</strong>
+          <ul class="pl-4">
+            <li>
+              <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics" target="_blank">
+                Agents guide to AloAi Voice Analytics
+              </a>
+            </li>
+            <li>
+              <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics" target="_blank">
+                Admins guide to AloAi Voice Analytics
+              </a>
+            </li>
+          </ul>
+          Revolutionize your calls with AloAI Voice Analytics; read the
+            <a href="https://aloware.com/blog/aloai-voice-analytics-announcement" target="_blank">
+              blog post
+            </a>
+            to learn more!
         </div>
       </div>
     </q-dialog>
