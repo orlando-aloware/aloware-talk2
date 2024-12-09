@@ -165,6 +165,20 @@
           <q-card-section class="pt-0 pb-0"
                           v-if="communication?.contact"
                           data-testid="comm-details-contact-section">
+            <!--CONTACT-->
+            <b-form-row data-testid="comm-details-contact-row">
+              <b-col class="pl-0 pr-0">
+                <q-item-label>Contact: </q-item-label>
+              </b-col>
+              <b-col>
+                <router-link :to="getContactRouteLink(communication)"
+                             data-testid="comm-details-contact-router-link">
+                  {{ communication.contact.name | fixContactName }}
+                </router-link>
+              </b-col>
+            </b-form-row>
+            <hr/>
+
             <!--DISPOSITION-->
             <b-form-row data-testid="comm-details-disposition-row">
               <b-col class="pl-0 pr-0">

@@ -62,6 +62,7 @@
                         :communication="communication"
                         :messages="messages"
                         data-testid="comm-transcription-modal-waveform"
+                        ref="waveformComponent"
                         @time-update="updateCurrentTime">
               </waveform>
               <download-button v-if="fileUuid"
@@ -95,7 +96,6 @@
                  class="col-6 pt-10">
               <categories-section :categories="iab_categories"
                                   :is-empty="isEmpty"
-                                  v-if="false"
                                   data-testid="comm-transcription-modal-category-section"/>
 
               <highlights-section :highlights="highlights"
@@ -139,7 +139,9 @@
                                         :formatted-messages="formattedMessages"
                                         :is-empty="isEmpty"
                                         ref="conversationSection"
-                                        data-testid="comm-transcription-modal-conversation-section"/>
+                                        data-testid="comm-transcription-modal-conversation-section"
+                                        @seek-audio="handleSeekAudio">
+                  </conversation-section>
                 </q-tab-panel>
 
                 <q-tab-panel class="p-0"
@@ -686,8 +688,11 @@ export default {
           this.$generalNotification('Failed to submit feedback.', 'error')
           console.log('Error submitting summary feedback:', err)
         })
-    }
+    },
 
+    handleSeekAudio (startTime) {
+      this.$refs.waveformComponent.seekAudio(startTime)
+    }
   },
 
   watch: {

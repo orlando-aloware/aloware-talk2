@@ -1,13 +1,20 @@
 <template>
   <div v-if="profile && canSwitchApps"
        class="bridge-menu-wrapper">
+    <q-btn v-if="showAloAiPromotionButton"
+           outline
+           class="q-btn-standard q-mr-md"
+           @click="showInfoBox = true">
+      <sparkle-icon width="16" height="16" color="#9333EA"/>
+      <span>AI Engine Ready</span>
+    </q-btn>
     <q-btn v-if="isAdmin || isSupervisor"
            outline
            class="q-btn-standard"
            :href="classicUrl"
            @click="onGoToClassic">
 
-        <span>{{ alowareClassic }}</span>
+      <span>{{ alowareClassic }}</span>
     </q-btn>
     <q-btn-dropdown
       v-else
@@ -52,6 +59,44 @@
         </q-item>
       </q-list>
     </q-btn-dropdown>
+    <q-dialog v-model="showInfoBox">
+      <div class="ai-info-box">
+        <div class="ai-info-box-header">
+          <span class="ai-info-box-icon">🎁</span>
+          <span class="ai-info-box-title">
+            We've enabled
+            <span v-if="currentCompany?.plan?.included_transcription_min > 0">
+              {{ currentCompany.plan.included_transcription_min }} minutes of
+            </span>
+            AloAi Voice Analytics for your account.
+          </span>
+        </div>
+        <p class="ai-info-box-content">
+          Our AI engine will transcribe, analyze, and summarize your calls. Navigate to any contact you've called to see it in effect.
+          <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
+        </p>
+        <div class="ai-info-box-links">
+          <strong>Guides:</strong>
+          <ul class="pl-4">
+            <li>
+              <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics" target="_blank">
+                Agents guide to AloAi Voice Analytics
+              </a>
+            </li>
+            <li>
+              <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics" target="_blank">
+                Admins guide to AloAi Voice Analytics
+              </a>
+            </li>
+          </ul>
+          Revolutionize your calls with AloAI Voice Analytics; read the
+            <a href="https://aloware.com/blog/aloai-voice-analytics-announcement" target="_blank">
+              blog post
+            </a>
+            to learn more!
+        </div>
+      </div>
+    </q-dialog>
   </div>
 </template>
 
@@ -62,6 +107,7 @@ import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { cloneDeep } from 'lodash'
 import { aclMixin, classicMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'shared-login-menu',
@@ -72,10 +118,16 @@ export default {
     simpsocialMixin
   ],
 
+  components: {
+    SparkleIcon
+  },
+
   computed: {
     ...mapGetters('auth', ['profile']),
 
     ...mapState(['statics']),
+
+    ...mapState('cache', ['currentCompany']),
 
     canSwitchApps () {
       if (this.isAdmin || this.isSupervisor) {
@@ -83,6 +135,10 @@ export default {
       }
 
       return false
+    },
+
+    showAloAiPromotionButton () {
+      return this.currentCompany?.transcription_settings?.is_trial && this.screenWidth >= 1200
     },
 
     alowareClassic () {
@@ -98,10 +154,16 @@ export default {
     }
   },
 
+  mounted () {
+    window.addEventListener('resize', this.toggleOnResize)
+  },
+
   data () {
     return {
       user: null,
-      AppDefaultLogin
+      AppDefaultLogin,
+      showInfoBox: false,
+      screenWidth: window.innerWidth
     }
   },
 
@@ -123,6 +185,10 @@ export default {
       })
     },
 
+    updateScreenWidth () {
+      this.screenWidth = window.innerWidth
+    },
+
     onInput () {
       this.updateDefaultLogin()
     }
@@ -130,6 +196,12 @@ export default {
 
   created () {
     this.user = cloneDeep(this.profile)
+
+    window.addEventListener('resize', this.updateScreenWidth)
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateScreenWidth)
   }
 }
 </script>
