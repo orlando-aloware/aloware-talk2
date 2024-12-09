@@ -40,7 +40,27 @@
                     :disable="disabled"
                     v-model="resources.skip_outside_daytime_hours" />
         </div>
-    </div>
+      </div>
+
+      <div class="row" v-if="!isDemoCompany">
+        <div class="col-12 mb-4">
+          <div class="flex justify-content-between d-items-center">
+            <div :class="disableField('force_redial') ? 'opacity-05' : ''">
+              <label class="label mb-1 text-weight-bold">
+                Force Redial
+              </label>
+              <div>Redial a contact when it doesn't pick up the call</div>
+            </div>
+            <q-toggle size="md"
+                      val="md"
+                      :true-value="1"
+                      :false-value="0"
+                      :disable="disableField('force_redial')"
+                      v-model="resources.force_redial" />
+
+          </div>
+        </div>
+      </div>
 
       <div class="row">
         <div class="col-6 pl-3">
@@ -401,11 +421,14 @@ export default {
     },
 
     applyCompanyRedialSettings (value) {
-      // if not a demo company, disable required redial feature
+      // if not a demo company, disable v2 required redial feature
       if (!this.isDemoCompany) {
         value.min_redials = 0
         return value
       }
+
+      // disable v1 flag if company is not demo
+      value.force_redial = 0
 
       const powerDialerSettings = this.currentCompany?.power_dialer_settings ?? {}
 
@@ -445,6 +468,7 @@ export default {
       const redialRequired = powerDialerSettings.min_redials > 0
 
       switch (field) {
+        case 'force_redial': return !this.isDemoCompany && this.currentCompany?.pd_force_redial
         case 'min_redials': return redialRequired
         case 'force_immediate_redial': return redialRequired && powerDialerSettings.force_immediate_redial
         case 'force_sms': return redialRequired && powerDialerSettings.force_sms
