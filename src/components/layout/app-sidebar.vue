@@ -895,6 +895,9 @@ export default {
           }
           return `img:${this.statics.logo_square.replace(/\//, '')}` // replace first occurrence of '/'
         case this.xmasEnabled:
+          if (this.isSidebarExpanded) {
+            return 'img:app-icons/menu/xmas/xmas-logo-inverse.png'
+          }
           return 'img:app-icons/menu/xmas/logo_white.svg'
         default:
           if (this.isSidebarExpanded) {
