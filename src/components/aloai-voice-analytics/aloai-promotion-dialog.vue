@@ -3,13 +3,13 @@
     <div class="ai-info-box">
       <div class="ai-info-box-header">
         <span class="ai-info-box-icon">🎁</span>
+        <span class="ai-info-box-title">
+          {{ modalContent.title }}
+        </span>
       </div>
-      <p class="ai-info-box-content">
-        {{ modalMessage }}
+      <p class="ai-info-box-content text-white">
+        {{ modalContent.message }}
       </p>
-      <div v-if="additionalMessage" class="ai-info-box-content">
-        {{ additionalMessage }}
-      </div>
       <div class="ai-info-box-links">
         <strong>Guides:</strong>
           <ul class="pl-4">
@@ -47,7 +47,7 @@ export default {
     }
   },
 
-  emits: ['sendModalTitle', 'update:dialogVisible'],
+  emits: ['sendButtonTitle', 'update:dialogVisible'],
 
   data () {
     return {
@@ -66,6 +66,10 @@ export default {
       return this.currentCompany?.used_transcription_min || 0
     },
 
+    transcriptionRate () {
+      return this.currentCompany?.transcription_settings?.transcription_rate || '0.03'
+    },
+
     isTrial () {
       return this.currentCompany?.transcription_settings?.is_trial
     },
@@ -79,40 +83,44 @@ export default {
       return (this.usedMinutes * 100) / this.includedMinutes
     },
 
-    modalTitle () {
-      if (!this.transcriptionEnabled) return 'AI Engine Off'
-      return 'AI Engine Ready'
-    },
-
-    modalMessage () {
+    modalContent () {
+      // Centralized modal logic based on conditions
       if (!this.transcriptionEnabled) {
-        return this.isTrial
-          ? 'Call transcription and summaries have been deactivated. Upgrade your plan to continue enjoying these features.'
-          : `You’ve used all ${this.includedMinutes} minutes included in your plan. Upgrade to reactivate features.`
+        return {
+          title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. As a result, call transcription and summaries have been deactivated.`,
+          message: `To reactivate these features, you can upgrade your plan to include more minutes and continue enjoying the full benefits of our AI-powered services.`
+        }
       }
 
       if (this.isTrial) {
-        return `Your AloAi Voice Analytics is Active! You currently have ${this.includedMinutes} minutes included in your plan.`
+        return {
+          title: `You currently have ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
+          message: `Need more minutes to keep up with your growing needs? Upgrade your plan now for additional minutes and enhanced features.`
+        }
       }
 
-      if (this.usagePercentage >= 80) {
-        return `You’ve almost reached the limit of your ${this.includedMinutes} minutes. Upgrade to avoid interruptions.`
+      if (this.usagePercentage >= 80 && this.usagePercentage < 100) {
+        return {
+          title: `You’ve almost reached the limit of your ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine has been working hard to transcribe, analyze, and summarize your calls, helping you get the most out of every conversation.`,
+          message: `To avoid interruptions in service, consider upgrading your plan for more minutes and additional features tailored to meet your growing needs.`
+        }
       }
 
       if (this.usedMinutes >= this.includedMinutes) {
-        const rate = this.currentCompany?.transcription_settings?.transcription_rate || '0.03'
-        return `You’ve used all ${this.includedMinutes} minutes. Each transcription minute will cost ${rate} cents. Upgrade for more minutes.`
+        return {
+          title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just $${this.transcriptionRate} (3 cents/min).`,
+          message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
+        }
       }
 
-      return `Your AloAi Voice Analytics is Active! You have ${this.includedMinutes} minutes included.`
+      return {
+        title: `You currently have ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
+        message: `Need more minutes to keep up with your growing needs? Upgrade your plan now for additional minutes and enhanced features.`
+      }
     },
 
-    // Additional message for usage percentage >= 80
-    additionalMessage () {
-      if (this.usagePercentage >= 80) {
-        return 'Our AI engine has been helping you get the most out of every conversation. Upgrade for additional minutes.'
-      }
-      return null
+    buttonTitle () {
+      return this.transcriptionEnabled ? 'AI Engine Ready' : 'AI Engine Off'
     }
   },
 
@@ -123,10 +131,10 @@ export default {
     internalDialogVisible (newVal) {
       this.$emit('update:dialogVisible', newVal) // Sync to parent
     },
-    modalTitle: {
+    buttonTitle: {
       immediate: true,
       handler (newTitle) {
-        this.$emit('sendModalTitle', newTitle)
+        this.$emit('sendButtonTitle', newTitle)
       }
     }
   }
