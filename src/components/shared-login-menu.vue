@@ -77,7 +77,7 @@
         </p>
         <div class="ai-info-box-links">
           <strong>Guides:</strong>
-          <ul>
+          <ul class="pl-4">
             <li>
               <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics" target="_blank">
                 Agents guide to AloAi Voice Analytics
