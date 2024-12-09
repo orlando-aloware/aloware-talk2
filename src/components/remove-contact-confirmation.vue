@@ -47,7 +47,7 @@
 <script>
 import { chunk, get, isEmpty } from 'lodash'
 import ConfirmDialog from 'components/confirm-dialog.vue'
-import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_LIST_ITEMS } from 'src/constants/power-dialer/default-list-items'
 import { STATIC } from 'src/constants/contacts-list-types'
@@ -196,8 +196,6 @@ export default {
       'contactsLoaded'
     ]),
 
-    ...mapMutations(['FORCE_CONTACTS_POLL']),
-
     onCancel () {
       this.typedConfirmationInputString = ''
       this.removeContactClose()
@@ -253,8 +251,14 @@ export default {
         data: payload
       })
         .then(() => {
-          // force a contacts poll to be executed once
-          this.FORCE_CONTACTS_POLL(true)
+          if (this.isAllContactsSelected) {
+            this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
+          } else {
+            this.$VueEvent.fire('fetchContacts', {
+              clear: true,
+              skipCache: true
+            })
+          }
 
           this.$generalNotification('Contact was successfully removed.')
         })
@@ -349,8 +353,17 @@ export default {
             }
           }
 
-          // force a contacts poll to be executed once
-          this.FORCE_CONTACTS_POLL(true)
+          this.$emit('contactsRemoved', this.selectedList)
+
+          // avoid requesting the contacts again when is deletion all
+          if (this.isDatatableSelectedAll) {
+            this.$VueEvent.fire('decreaseContactsCountFromCurrentList', { count: this.contactToDeleteCount })
+          } else {
+            this.$VueEvent.fire('fetchContacts', {
+              clear: true,
+              skipCache: true
+            })
+          }
 
           this.$generalNotification('Contacts are being removed from the list. This may take a few moments to update. Please refresh your page to confirm the changes.')
         })
