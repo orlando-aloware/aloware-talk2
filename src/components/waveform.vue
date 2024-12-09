@@ -275,6 +275,11 @@ export default {
       if (this.player) {
         this.player.playPause()
       }
+    },
+    seekAudio (startTime) {
+      if (this.player && this.ready) {
+        this.player.setTime(startTime / 1000)
+      }
     }
   },
 

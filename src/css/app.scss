@@ -15757,7 +15757,57 @@ hr {
   }
 
   h3 {
-    font-size: 14px;
+    font-size: 13px;
+  }
+}
+
+.ai-info-box {
+  position: absolute;
+  top: 125px;
+  right: 5px;
+  width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(90deg, #9333ea, #6b46c1);
+  color: white;
+
+  .ai-info-box-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+
+    .ai-info-box-icon {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+
+    .ai-info-box-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+  }
+
+  .ai-info-box-content {
+    margin-bottom: 10px;
+
+    strong {
+      font-weight: bold;
+    }
+  }
+
+  .ai-info-box-links {
+    a {
+      color: #ffe4e6;
+      text-decoration: underline;
+      display: inline-block;
+      margin-bottom: 5px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 
@@ -15775,6 +15825,7 @@ hr {
 
 /* Gradient text effect */
 .ai-effect-gradient-text {
+  cursor: pointer;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;

@@ -208,7 +208,7 @@ export default {
     },
 
     onShown () {
-      if (this.isDeleteContactConfirmation) {
+      if (this.isDeleteContactConfirmation && this.$refs.contactsToDeleteInput) {
         this.$refs.contactsToDeleteInput.focus()
       }
     },

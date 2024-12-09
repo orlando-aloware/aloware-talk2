@@ -858,7 +858,12 @@
         <div class="flex items-center justify-between"
              :class="[ communication.call_summary ? 'mb-2' : '']">
           <div class="flex items-center gap-2">
-            <h3 class="ai-effect-gradient-text text-16">Powered by AloAi
+            <h3 class="ai-effect-gradient-text"
+                @click="currentCompany?.transcription_settings?.is_trial ? (showInfoBox = true) : null">
+              Powered by AloAi
+              <template v-if="currentCompany?.transcription_settings?.is_trial && currentCompany?.plan?.included_transcription_min > 0">
+                (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
+              </template>
               <sparkle-icon width="16" height="16" color="#9333EA"/>
             </h3>
           </div>
@@ -874,6 +879,44 @@
         </div>
       </div>
     </div>
+    <q-dialog v-model="showInfoBox">
+      <div class="ai-info-box">
+        <div class="ai-info-box-header">
+          <span class="ai-info-box-icon">🎁</span>
+          <span class="ai-info-box-title">
+            We've enabled
+            <span v-if="currentCompany?.plan?.included_transcription_min > 0">
+              {{ currentCompany.plan.included_transcription_min }} minutes of
+            </span>
+            AloAi Voice Analytics for your account.
+          </span>
+        </div>
+        <p class="ai-info-box-content">
+          Our AI engine will transcribe, analyze, and summarize your calls. Navigate to any contact you've called to see it in effect.
+          <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
+        </p>
+        <div class="ai-info-box-links">
+          <strong>Guides:</strong>
+          <ul class="pl-4">
+            <li>
+              <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics" target="_blank">
+                Agents guide to AloAi Voice Analytics
+              </a>
+            </li>
+            <li>
+              <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics" target="_blank">
+                Admins guide to AloAi Voice Analytics
+              </a>
+            </li>
+          </ul>
+          Revolutionize your calls with AloAI Voice Analytics; read the
+            <a href="https://aloware.com/blog/aloai-voice-analytics-announcement" target="_blank">
+              blog post
+            </a>
+            to learn more!
+        </div>
+      </div>
+    </q-dialog>
   </div>
 </template>
 
@@ -1005,6 +1048,7 @@ export default {
       isRejecting: false,
       isHangingUp: false,
       isParking: false,
+      showInfoBox: false,
       defaultProps: {
         children: 'children',
         label: 'label'

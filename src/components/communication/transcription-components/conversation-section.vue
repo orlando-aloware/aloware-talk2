@@ -37,7 +37,8 @@
         </q-btn>
       </div>
       <div :key="message_index"
-           v-for="(message, message_index) in formattedMessages">
+           v-for="(message, message_index) in formattedMessages"
+           @click="seekAudio(message.start)">
         <!--
           Any agent message will prompt on the left side of conversation.
           Any customer message will prompt on the right side of conversation.
@@ -273,6 +274,10 @@ export default {
         // Remove this event listener after the animation ends
         messageElement.removeEventListener('animationend', handleAnimationEnd)
       })
+    },
+
+    seekAudio (startTime) {
+      this.$emit('seek-audio', startTime)
     }
   }
 }
