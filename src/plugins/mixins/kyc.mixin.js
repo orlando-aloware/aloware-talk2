@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { mapState } from 'vuex'
+import * as KycLogs from '../../constants/kyc-logs'
 
 export default _.merge({
   computed: {
@@ -8,7 +9,7 @@ export default _.merge({
     ...mapState('contacts', ['selectedLine']),
 
     currentKycStatus () {
-      return this.getStatus()
+      return this.currentCompany?.kyc_status
     },
 
     isTrial () {
@@ -21,22 +22,16 @@ export default _.merge({
 
     isKYCFilled () {
       return this.currentCompany?.kyc_filled
+    },
+
+    canChangeNameAndEmail () {
+      return this.profile?.company?.kyc_status !== KycLogs.KYC_STATUS_APPROVED
     }
   },
 
   methods: {
-    getStatus () {
-      // Gets the KYC status from the company
-      return this.currentCompany.kyc_status
-    },
-
     shouldAllowSmsTraffic (selectedLine) {
       if (!selectedLine) {
-        return true
-      }
-
-      // when trial allow in UI to send SMS but fail on the backend
-      if (this.isTrial) {
         return true
       }
 

@@ -991,7 +991,7 @@ export default {
     }
 
     this.mainListeners.kycStatusUpdated = (company) => {
-      if (this.isTrial && this.isNotSimpsocial && !this.isModGen) {
+      if (this.isTrial && !this.isSimpSocial && !this.isModGen) {
         this.setShowedKycReloadDialog(true)
       }
     }

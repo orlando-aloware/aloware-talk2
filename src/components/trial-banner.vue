@@ -156,11 +156,11 @@ export default {
     },
 
     shouldShowUnlockTrialExperienceButton () {
-      return (!this.isKYCFilled) || this.isCompanyA2pCampaignApproved
+      return !this.isKYCFilled || this.isCompanyA2pCampaignApproved
     },
 
     shouldShowRegistrationInReviewButton () {
-      return (!this.isKYCFilled) || !this.isCompanyA2pCampaignApproved
+      return !this.isKYCFilled || !this.isCompanyA2pCampaignApproved
     }
   },
 
