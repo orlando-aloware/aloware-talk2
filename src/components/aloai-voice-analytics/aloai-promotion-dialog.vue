@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="dialogVisible">
+  <q-dialog v-model="internalDialogVisible">
     <div class="ai-info-box">
       <div class="ai-info-box-header">
         <span class="ai-info-box-icon">🎁</span>
@@ -48,6 +48,12 @@ export default {
   },
 
   emits: ['sendModalTitle', 'update:dialogVisible'],
+
+  data () {
+    return {
+      internalDialogVisible: this.dialogVisible
+    }
+  },
 
   computed: {
     ...mapState('cache', ['currentCompany']),
@@ -101,6 +107,7 @@ export default {
       return `Your AloAi Voice Analytics is Active! You have ${this.includedMinutes} minutes included.`
     },
 
+    // Additional message for usage percentage >= 80
     additionalMessage () {
       if (this.usagePercentage >= 80) {
         return 'Our AI engine has been helping you get the most out of every conversation. Upgrade for additional minutes.'
@@ -108,7 +115,14 @@ export default {
       return null
     }
   },
+
   watch: {
+    dialogVisible (newVal) {
+      this.internalDialogVisible = newVal // Sync from parent
+    },
+    internalDialogVisible (newVal) {
+      this.$emit('update:dialogVisible', newVal) // Sync to parent
+    },
     modalTitle: {
       immediate: true,
       handler (newTitle) {
