@@ -228,6 +228,11 @@ export default {
         return false
       }
 
+      // when trial allow in UI to send SMS but fail on the backend
+      if (this.isTrial) {
+        return false
+      }
+
       let a2pBlock = false
 
       // Do not bypass the Line Selector Option to keep showing the (i) blue icon

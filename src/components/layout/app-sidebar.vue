@@ -843,7 +843,6 @@
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 import { broadcastsMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
-import * as KycLogs from 'src/constants/kyc-logs'
 
 export default {
   name: 'app-sidebar',
@@ -909,11 +908,6 @@ export default {
 
     isDemoCompany () {
       return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
-    },
-
-    isKycAccount () {
-      const status = this.profile?.company?.kyc_status
-      return status !== KycLogs.KYC_STATUS_NONE
     },
 
     sidebarIcon () {

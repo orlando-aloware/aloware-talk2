@@ -381,19 +381,14 @@ export default {
     },
 
     isSendTextDisabled () {
-      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber || this.isSending
+      return !this.validSms || this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || this.isSending
     },
 
     isSendTextInputDisabled () {
       if (!this.shouldAllowSmsTraffic(this.selectedLine)) {
         return true
       }
-      return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled || !this.canTextToNumber
-    },
-
-    canTextToNumber () {
-      const phoneNumber = this.messageComposer.sms.phone_number
-      return this.enabledToTextNumber(phoneNumber) && !this.disabledMessage
+      return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled
     }
   },
 

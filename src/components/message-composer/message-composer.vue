@@ -92,14 +92,6 @@
         </div>
       </div>
     </div>
-    <block-tooltip placement="top"
-                   triggers="hover"
-                   target="composer-wrapper"
-                   task="text"
-                   :message="disabledComplianceMessage"
-                   data-testid="message-composer-block-tooltip"
-                   v-if="!canTextToNumber">
-    </block-tooltip>
   </div>
 </template>
 
@@ -120,7 +112,6 @@ import talk2Api from 'src/plugins/api/api'
 import MessageComposerFax from 'components/message-composer/message-composer-fax'
 import MessageComposerEmail from 'components/message-composer/message-composer-email'
 import MessageComposerNote from 'components/message-composer/message-composer-note'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as Roles from 'src/constants/roles'
 
@@ -148,8 +139,7 @@ export default {
     MessageComposerFax,
     LineSelector,
     ContactPhoneNumberSelector,
-    MessageComposerSms,
-    BlockTooltip
+    MessageComposerSms
   },
 
   computed: {
@@ -181,11 +171,6 @@ export default {
 
     disabledComplianceMessage () {
       return this.selectedLine && this.isMessagingBlocked(this.selectedLine, true) ? this.selectedLine?.blocked_messaging_information?.['reason'] : ''
-    },
-
-    canTextToNumber () {
-      const phoneNumber = this.messageComposer.sms.phone_number
-      return this.enabledToTextNumber(phoneNumber) && !this.disabledComplianceMessage
     }
   },
 

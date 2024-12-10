@@ -229,13 +229,6 @@
                           v-if="isUpdatingList" />
           {{ isUpdatingList ? ' Saving...' : 'Save' }}
         </compact-btn>
-        <block-tooltip placement="left"
-                       triggers="hover"
-                       target="contacts-create-popover"
-                       task="contacts.create"
-                       data-testid="contacts-view-add-contacts-tooltip"
-                       v-if="!canCreateContacts">
-        </block-tooltip>
         <b-dropdown text="Add Contacts"
                     variant="light"
                     class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
@@ -263,7 +256,6 @@
               Select Existing Contacts & Add to List
             </b-dropdown-item>
             <b-dropdown-item href="#"
-                             :disabled="!canCreateContacts"
                              data-testid="contacts-view-create-new-contact-item"
                              @click="onShowCreateContact">
               <plus-icon color="#62666E"></plus-icon>
@@ -812,7 +804,6 @@ import AddUserIcon from 'components/icons/add-user-icon'
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import BackButton from 'components/back-button'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import {
@@ -874,7 +865,6 @@ export default {
     ContactsScreen,
     Datatable,
     ImportContactsModal,
-    BlockTooltip,
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
     EnrollContactsToAloaiModal,
@@ -1122,10 +1112,6 @@ export default {
 
     canAddContacts () {
       return this.list.type === ContactListTypes.STATIC && this.isEditable
-    },
-
-    canCreateContacts () {
-      return this.enabledToCreateContacts()
     },
 
     fixedColumns () {
