@@ -306,8 +306,7 @@ export default function (/* { ssrContext } */) {
       showAccountSelector: false,
       showAccountSelectorFullscreen: false,
       showAccountSelectorFirstLoad: false,
-      accesses: [],
-      forceContactsPoll: false
+      accesses: []
     },
 
     getters: {
@@ -1786,10 +1785,6 @@ export default function (/* { ssrContext } */) {
 
       SET_ACCESSES (state, accesses) {
         state.accesses = accesses
-      },
-
-      FORCE_CONTACTS_POLL (state, value) {
-        state.forceContactsPoll = value
       },
 
       updateField
