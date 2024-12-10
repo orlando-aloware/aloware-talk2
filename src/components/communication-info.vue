@@ -819,6 +819,7 @@
            v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
         <div class="d-flex align-items-center w-100">
           <communication-audio :communication="communication"
+                               ref="callRecording"
                                :contact="contact"
                                :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                :uniqueId="communication.id + '1'"
@@ -869,7 +870,7 @@
           </div>
 
           <a class="transcription-link text-decoration-none"
-             @click.prevent="fetchSmartTranscriptionData(communication)">
+             @click.prevent="fetchSmartTranscriptionData()">
             Show transcription
           </a>
         </div>
@@ -1298,8 +1299,10 @@ export default {
       return DOMPurify.sanitize(rawHtml)
     },
 
-    fetchSmartTranscriptionData (communication) {
-      this.$VueEvent.fire('fetchSmartTranscriptionData', communication.id)
+    fetchSmartTranscriptionData () {
+      if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
+        this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
+      }
     }
   },
 
