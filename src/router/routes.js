@@ -70,48 +70,6 @@ const routes = [
       },
       {
         path: '',
-        name: 'Inboxes',
-        component: Inbox,
-        meta: {
-          title: 'Inboxes'
-        },
-        children: [
-          {
-            path: 'channels/:channel/:status/contacts/:id',
-            name: 'Inbox Contact Task',
-            component: Contact,
-            meta: {
-              title: 'Inboxes'
-            }
-          },
-          {
-            path: 'channels/:channel/:status',
-            name: 'Inbox Channel Task Status',
-            component: Contact,
-            meta: {
-              title: 'Inboxes'
-            }
-          },
-          {
-            path: 'channels/view/:viewId/:status',
-            name: 'Inbox View',
-            component: Inbox,
-            meta: {
-              title: 'Inboxes'
-            }
-          },
-          {
-            path: 'channels/view/:viewId/:status/contacts/:id',
-            name: 'Inbox View Contact Task',
-            component: Contact,
-            meta: {
-              title: 'Inboxes'
-            }
-          }
-        ]
-      },
-      {
-        path: '',
         name: 'Inbox',
         component: Inbox,
         meta: {
@@ -119,8 +77,16 @@ const routes = [
         },
         children: [
           {
+            path: 'channels/:channel/:status/contacts/:id',
+            name: 'Inbox Contact Task',
+            component: Contact,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
             path: 'channels/:channel/:status',
-            name: 'Inbox Channel Task Status Communications',
+            name: 'Inbox Channel Task Status',
             component: Contact,
             meta: {
               title: 'Communications'
@@ -146,6 +112,22 @@ const routes = [
             path: 'channels/:channel',
             name: 'Inbox Channel',
             component: Inbox,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status',
+            name: 'Inbox View',
+            component: Inbox,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status/contacts/:id',
+            name: 'Inbox View Contact Task',
+            component: Contact,
             meta: {
               title: 'Communications'
             }

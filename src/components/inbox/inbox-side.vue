@@ -3,7 +3,7 @@
     <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
-        <back-button v-if="showBackButton" data-testid="inbox-side-back-btn" @click="back"/>
+        <back-button data-testid="inbox-side-back-btn" @click="back"/>
         <span class="truncated-text"
               v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
         <inbox-toggle-filters :should-show-unreads-toggle="true"
@@ -84,8 +84,7 @@ export default {
       hasMore: false,
       isLoadingMore: false,
       isLoaded: true,
-      onLoadShowTasks: true,
-      showBackButton: true
+      onLoadShowTasks: true
     }
   },
 
@@ -126,7 +125,6 @@ export default {
     isShowPageHeader () {
       const inRoutesWithoutHeader = [
         'Inbox Channel Task Status',
-        'Inbox Channel Task Status Communications',
         'Inbox Contact',
         'Inbox Contact Task'
       ]
@@ -142,8 +140,6 @@ export default {
   created () {
     this.resetVuex(['inbox', 'non-cache'])
     this.closed = this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('Inbox') && this.$q.screen.lt.md
-
-    this.showBackButton = !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)
   },
 
   mounted () {
@@ -202,7 +198,7 @@ export default {
 
       this.onLoadShowTasks = false
 
-      if (this.$q.screen.lt.md && this.$route.name === 'Inbox Channel') {
+      if (this.$q.screen.lt.md && this.$route.name === 'Inbox') {
         const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
@@ -234,14 +230,12 @@ export default {
         this.onLoadShowTasks = true
       }
 
-      if (to.name === 'Inboxes') {
+      if (to.name === 'Inbox') {
         const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
 
       this.togglePageHeader()
-
-      this.showBackButton = !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(to.name)
     },
 
     isInboxTaskOpened () {
