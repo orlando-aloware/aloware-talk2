@@ -51,7 +51,7 @@ export default {
        * for events that are broadcast by Laravel. Echo and event broadcasting
        * allows your team to easily build robust real-time web applications.
        */
-      const broadcastDriver = this.profile.company.broadcast_driver || 'pusher'
+      const broadcastDriver = this.currentCompany.broadcast_driver || 'pusher'
 
       window.Echo = this.initEcho(broadcastDriver)
       this.broadcastListen()
@@ -63,13 +63,19 @@ export default {
       }
 
       // If error to connect, try to connect with other driver as fallback
+      window.Echo.connector.pusher.connection.unbind('error')
       window.Echo.connector.pusher.connection.bind('error', (err) => {
+        console.error('Error to connect to ws driver', err)
+        if (window.fallbackDriver) {
+          console.log('Fallback driver already started', window.fallbackDriver)
+          return
+        }
         // Define the fallback driver, only pusher and soketi exists today
-        const fallbackDriver = broadcastDriver === 'pusher' ? 'soketi' : 'pusher'
-        console.log('Error to connect to: ' + broadcastDriver, 'Connecting to fallback driver: ' + fallbackDriver, err)
+        window.fallbackDriver = broadcastDriver === 'pusher' ? 'soketi' : 'pusher'
+        console.log('Error to connect to: ' + broadcastDriver, 'Connecting to fallback driver: ' + window.fallbackDriver, err)
 
         // Try to connect with fallback driver
-        window.Echo = this.initEcho(fallbackDriver)
+        window.Echo = this.initEcho(window.fallbackDriver)
         this.broadcastListen()
       })
     },
