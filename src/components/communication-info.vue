@@ -859,9 +859,9 @@
              :class="[ communication.call_summary ? 'mb-2' : '']">
           <div class="flex items-center gap-2">
             <h3 class="ai-effect-gradient-text"
-                @click="currentCompany?.transcription_settings?.is_trial ? (showInfoBox = true) : null">
+                @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
               Powered by AloAi
-              <template v-if="currentCompany?.plan?.included_transcription_min > 0">
+              <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
               </template>
               <sparkle-icon width="16" height="16" color="#9333EA"/>

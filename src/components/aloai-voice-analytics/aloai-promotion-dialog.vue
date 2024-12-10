@@ -60,15 +60,15 @@ export default {
     ...mapState('auth', ['profile']),
 
     includedMinutes () {
-      return this.currentCompany?.plan?.included_transcription_min || 0
+      return this.currentCompany?.plan?.included_transcription_min
     },
 
     usedMinutes () {
-      return this.currentCompany?.used_transcription_min || 0
+      return this.currentCompany?.used_transcription_min
     },
 
     transcriptionRate () {
-      return this.currentCompany?.transcription_settings?.transcription_rate || '0.03'
+      return this.currentCompany?.transcription_settings?.transcription_rate
     },
 
     isTrial () {
@@ -95,7 +95,7 @@ export default {
 
       if (this.usedMinutes >= this.includedMinutes) {
         return {
-          title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just $${Number(this.profile.rate?.transcription || 0).toFixed(2)} (${Math.round(Number(this.profile?.rate?.transcription || 0) * 100)} cents/min).`,
+          title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just $${Number(this.profile.rate?.transcription).toFixed(2)} (${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min).`,
           message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
         }
       }

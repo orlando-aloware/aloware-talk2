@@ -4,7 +4,7 @@
     <q-btn v-if="showAloAiPromotionButton"
            outline
            class="q-btn-standard q-mr-md"
-           @click="showInfoBox = true">
+           @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
       <sparkle-icon width="16" height="16" color="#9333EA"/>
       <span>{{ aiEngineButtonTitle }}</span>
     </q-btn>
@@ -104,7 +104,7 @@ export default {
     },
 
     showAloAiPromotionButton () {
-      return this.screenWidth >= 1200
+      return this.currentCompany?.transciption_enabled && this.screenWidth >= 1200
     },
 
     alowareClassic () {
