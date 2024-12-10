@@ -3,6 +3,7 @@ import _ from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 import { mapActions, mapState } from 'vuex'
 import * as ChannelType from 'src/constants/inbox-channels'
+import { getWebSocketCredentials } from 'src/boot/helpers'
 
 export default {
   computed: {
@@ -50,20 +51,314 @@ export default {
        * for events that are broadcast by Laravel. Echo and event broadcasting
        * allows your team to easily build robust real-time web applications.
        */
-      window.Echo = new Echo({
+      const broadcastDriver = this.currentCompany.broadcast_driver || 'pusher'
+
+      window.Echo = this.initEcho(broadcastDriver)
+      this.broadcastListen()
+
+      // This is a loading test for soketi server second driver
+      if (broadcastDriver === 'pusher' && process.env.API_URL !== 'production') {
+        window.secondEchoDriver = this.initEcho('soketi')
+        this.broadcastListenSecondDriver()
+      }
+
+      // If error to connect, try to connect with other driver as fallback
+      window.Echo.connector.pusher.connection.unbind('error')
+      window.Echo.connector.pusher.connection.bind('error', (err) => {
+        console.error('Error to connect to ws driver', err)
+        if (window.fallbackDriver) {
+          console.log('Fallback driver already started', window.fallbackDriver)
+          return
+        }
+        // Define the fallback driver, only pusher and soketi exists today
+        window.fallbackDriver = broadcastDriver === 'pusher' ? 'soketi' : 'pusher'
+        console.log('Error to connect to: ' + broadcastDriver, 'Connecting to fallback driver: ' + window.fallbackDriver, err)
+
+        // Try to connect with fallback driver
+        window.Echo = this.initEcho(window.fallbackDriver)
+        this.broadcastListen()
+      })
+    },
+    initEcho (broadcastDriver) {
+      console.log('broadcast initiated with ' + broadcastDriver)
+      const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials(broadcastDriver)
+      return new Echo({
         authEndpoint: `${process.env.API_URL}/broadcasting/auth`,
         broadcaster: 'pusher',
-        key: storage.local.getItem('pusher_app_key'),
-        cluster: storage.local.getItem('pusher_cluster'),
+        key: WS_APP_KEY,
+        cluster: WS_CLUSTER,
+        wsHost: WS_HOST,
+        wssHost: WS_HOST,
+        encrypted: true,
         forceTLS: true,
         auth: {
           headers: {
-            Authorization: `Bearer ${storage.local.getItem('api_token')}`
+            Authorization: `Bearer ${storage.local.getItem('api_token')}`,
+            driver: broadcastDriver
           }
-        }
+        },
+        enabledTransports: ['ws', 'wss'],
+        disableStats: true
       })
-      console.log('broadcast initiated')
-      this.broadcastListen()
+    },
+    broadcastListenSecondDriver () {
+      const userId = _.get(this.profile, 'id', null)
+
+      if (!userId) {
+        return
+      }
+
+      window.secondEchoDriver.private('user-' + userId)
+        .listen('.user.status.updated', (event) => {
+          console.log('.user.status.updated')
+        })
+        .listen('.user.in-app.contact.contact_assigned', (event) => {
+          console.log('.user.in-app.contact.contact_assigned')
+        })
+        .listen('.user.in-app.appointment', (event) => {
+          console.log('.user.in-app.appointment')
+        })
+        .listen('.user.in-app.reminder', (event) => {
+          console.log('.user.in-app.reminder')
+        })
+        .listen('.user.in-app.communication.new_call', (event) => {
+          console.log('.user.in-app.communication.new_call')
+        })
+        .listen('.user.desktop.incoming_number.high_sms_volume', (event) => {
+          console.log('.user.desktop.incoming_number.high_sms_volume')
+        })
+        .listen('.user.in-app.communication.answered_call', (event) => {
+          console.log('.user.in-app.communication.answered_call')
+        })
+        .listen('.user.in-app.communication.new_sms', (event) => {
+          console.log('.user.in-app.communication.new_sms')
+        })
+        .listen('.user.in-app.communication.new_voicemail', (event) => {
+          console.log('.user.in-app.communication.new_voicemail')
+        })
+        .listen('.user.in-app.communication.new_fax', (event) => {
+          console.log('.user.in-app.communication.new_fax')
+        })
+        .listen('.user.desktop.contact.contact_assigned', (event) => {
+          console.log('.user.desktop.contact.contact_assigned')
+        })
+        .listen('.user.desktop.appointment', (event) => {
+          console.log('.user.desktop.appointment')
+        })
+        .listen('.user.desktop.reminder', (event) => {
+          console.log('.user.desktop.reminder')
+        })
+        .listen('.user.desktop.communication.new_call', (event) => {
+          console.log('.user.desktop.communication.new_call')
+        })
+        .listen('.user.desktop.communication.answered_call', (event) => {
+          console.log('.user.desktop.communication.answered_call')
+        })
+        .listen('.user.desktop.communication.new_sms', (event) => {
+          console.log('.user.desktop.communication.new_sms')
+        })
+        .listen('.user.desktop.communication.new_voicemail', (event) => {
+          console.log('.user.desktop.communication.new_voicemail')
+        })
+        .listen('.user.desktop.communication.new_fax', (event) => {
+          console.log('.user.desktop.communication.new_fax')
+        })
+        .listen('.user.logout', (event) => {
+          console.log('.user.logout')
+        })
+        .listen('.communication.created', (event) => {
+          console.log('.communication.created')
+        })
+        .listen('.communication.updated', (event) => {
+          console.log('.communication.updated')
+        })
+        .listen('.user.contact_list_item.created', (event) => {
+          console.log('.user.contact_list_item.created')
+        })
+        .listen('.user.contact_list_item.updated', (event) => {
+          console.log('.user.contact_list_item.updated')
+        })
+        .listen('.user.contact_list_item.deleting', (event) => {
+          console.log('.user.contact_list_item.deleting')
+        })
+        .listen('.user.session_metrics_calculation', (event) => {
+          console.log('.user.session_metrics_calculation')
+        })
+        .listen('.bulk_contact_list_items.created', (event) => {
+          console.log('.bulk_contact_list_items.created')
+        })
+        .listen('.bulk_contact_list_items.deleted', (event) => {
+          console.log('.bulk_contact_list_items.deleted')
+        })
+        .listen('.bulk_contacts.deleted', (event) => {
+          console.log('.bulk_contacts.deleted')
+        })
+        .listen('.export-events', (event) => {
+          console.log('.export-events')
+        })
+        .listen('.bulk_tags.deleted', (event) => {
+          console.log('.bulk_tags.deleted')
+        })
+        .listen('.power_dialer_contact.removed', (event) => {
+          console.log('.power_dialer_contact.removed')
+        })
+
+      window.secondEchoDriver.private('company-' + this.profile.company_id)
+        .listen('.company.updated', (event) => {
+          console.log('.company.updated')
+        })
+        .listen('.communication.created', (event) => {
+          console.log('.communication.created')
+        })
+        .listen('.communication.updated', (event) => {
+          console.log('.communication.updated')
+        })
+        .listen('.communication.deleted', (event) => {
+          console.log('.communication.deleted')
+        })
+        .listen('.incoming_number.created', (event) => {
+          console.log('.incoming_number.created')
+        })
+        .listen('.ring_group.created', (event) => {
+          console.log('.ring_group.created')
+        })
+        .listen('.ring_group.updated', (event) => {
+          console.log('.ring_group.updated')
+        })
+        .listen('.ring_group.deleted', (event) => {
+          console.log('.ring_group.deleted')
+        })
+        .listen('.campaign.created', (event) => {
+          console.log('.campaign.created')
+        })
+        .listen('.campaign.updated', (event) => {
+          console.log('.campaign.updated')
+        })
+        .listen('.campaign.deleted', (event) => {
+          console.log('.campaign.deleted')
+        })
+        .listen('.tag.created', (event) => {
+          console.log('.tag.created')
+        })
+        .listen('.tag.updated', (event) => {
+          console.log('.tag.updated')
+        })
+        .listen('.tag.deleting', (event) => {
+          console.log('.tag.deleting')
+        })
+        .listen('.disposition_status.created', (event) => {
+          console.log('.disposition_status.created')
+        })
+        .listen('.disposition_status.updated', (event) => {
+          console.log('.disposition_status.updated')
+        })
+        .listen('.disposition_status.deleted', (event) => {
+          console.log('.disposition_status.deleted')
+        })
+        .listen('.call_disposition.bulk_created', (event) => {
+          console.log('.call_disposition.bulk_created')
+        })
+        .listen('.call_disposition.created', (event) => {
+          console.log('.call_disposition.created')
+        })
+        .listen('.call_disposition.updated', (event) => {
+          console.log('.call_disposition.updated')
+        })
+        .listen('.call_disposition.deleted', (event) => {
+          console.log('.call_disposition.deleted')
+        })
+        .listen('.activity_type.created', (event) => {
+          console.log('.activity_type.created')
+        })
+        .listen('.activity_type.deleted', (event) => {
+          console.log('.activity_type.deleted')
+        })
+        .listen('.contact.created', (event) => {
+          console.log('.contact.created')
+        })
+        .listen('.contact.updated', (event) => {
+          console.log('.contact.updated')
+        })
+        .listen('.contact.deleted', (event) => {
+          console.log('.contact.deleted')
+        })
+        .listen('.contact_audit.created', (event) => {
+          console.log('.contact_audit.created')
+        })
+        .listen('.filter.created', (event) => {
+          console.log('.filter.created')
+        })
+        .listen('.filter.updated', (event) => {
+          console.log('.filter.updated')
+        })
+        .listen('.filter.deleted', (event) => {
+          console.log('.filter.deleted')
+        })
+        .listen('.user.created', (event) => {
+          console.log('.user.created')
+        })
+        .listen('.user.updated', (event) => {
+          console.log('.user.updated')
+        })
+        .listen('.user.deleted', (event) => {
+          console.log('.user.deleted')
+        })
+        .listen('.workflow.created', (event) => {
+          console.log('.workflow.created')
+        })
+        .listen('.workflow.updated', (event) => {
+          console.log('.workflow.updated')
+        })
+        .listen('.workflow.deleted', (event) => {
+          console.log('.workflow.deleted')
+        })
+        .listen('.export-events', (event) => {
+          console.log('.export-events')
+        })
+        .listen('.export.created', (event) => {
+          console.log('.export.created')
+        })
+        .listen('.export.updated', (event) => {
+          console.log('.export.updated')
+        })
+        .listen('.export.deleted', (event) => {
+          console.log('.export.deleted')
+        })
+        .listen('.contact-list.import-hubspot', (event) => {
+          console.log('.contact-list.import-hubspot')
+        })
+        .listen('.contact-list.import-zoho', (event) => {
+          console.log('.contact-list.import-zoho')
+        })
+        .listen('.contact-list.import-pipedrive', (event) => {
+          console.log('.contact-list.import-pipedrive')
+        })
+        .listen('.contact-list.import-failed', (event) => {
+          console.log('.contact-list.import-failed')
+        })
+        .listen('.contact-list.created', (event) => {
+          console.log('.contact-list.created')
+        })
+        .listen('.broadcasts.created', (event) => {
+          console.log('.broadcasts.created')
+        })
+        .listen('.broadcasts.updated', (event) => {
+          console.log('.broadcasts.updated')
+        })
+        .listen('.broadcasts.deleted', (event) => {
+          console.log('.broadcasts.deleted')
+        })
+        .listen('.script.deleted', (event) => {
+          console.log('.script.deleted')
+        })
+        .listen('.kyc_status_updated', (event) => {
+          console.log('.kyc_status_updated')
+        })
+
+      window.secondEchoDriver.private('cache-agent-status-user-' + userId)
+        .listen('.agent_status.updated', (event) => {
+          console.log('.agent_status.updated')
+        })
     },
     broadcastListen () {
       const userId = _.get(this.profile, 'id', null)
@@ -737,6 +1032,10 @@ export default {
     broadcastLeave () {
       if (!window.Echo) {
         return
+      }
+
+      if (window.secondEchoDriver) {
+        window.secondEchoDriver.disconnect()
       }
 
       if (this.profile) {
