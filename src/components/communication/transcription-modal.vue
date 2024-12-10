@@ -16,7 +16,8 @@
     </q-btn>
 
     <!-- AloAi Voice Analytics modal. -->
-    <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
+    <q-dialog v-model="show_form"
+              data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
           <!--COMM TYPE-->
@@ -415,17 +416,9 @@ export default {
 
   mounted () {
     this.checkAndShowTranscriptionModal()
-
-    this.$VueEvent.listen('fetchSmartTranscriptionData', communicationId => this.handleFetchSmartTranscriptionData(communicationId))
   },
 
   methods: {
-    handleFetchSmartTranscriptionData (communicationId) {
-      if (this.communication.id === communicationId) {
-        this.fetchSmartTranscriptionData()
-      }
-    },
-
     fetchSmartTranscriptionData () {
       this.isLoading = true
       this.show_form = true

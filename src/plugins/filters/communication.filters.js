@@ -2,7 +2,7 @@ import * as CommunicationCurrentStatus from '../../constants/communication-curre
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CallbackStatus from '../../constants/callback-status'
 import * as CommunicationTransferTypes from '../../constants/communication-transfer-types'
-import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
+import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS, LRN_NOT_PERFORMED } from 'src/constants/lrn-types'
 import { ALL_CREATOR_TYPES } from 'src/constants/creator-types'
 
 /**
@@ -205,6 +205,7 @@ const fixLrnTypeBadge = (type) => {
     case LRN_TYPE_LANDLINE:
       return 'yellow-1'
     case LRN_TYPE_WIRELESS:
+    case LRN_NOT_PERFORMED:
       return 'blue-3'
     case LRN_TYPE_VOIP:
       return 'purple-2'

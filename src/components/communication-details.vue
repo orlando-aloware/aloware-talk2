@@ -37,7 +37,7 @@
                 <div class="flex items-center mr-1 h-100"
                      data-testid="comm-transcription-modal-btn"
                      v-if="!communication.transcription_is_deleted && communication.metadata?.transcription_info?.summary"
-                     @click="fetchSmartTranscriptionData(communication)">
+                     @click="fetchSmartTranscriptionData()">
                   <span class="text-blue cursor-pointer">
                     Show Transcription
                   </span>
@@ -789,7 +789,8 @@
             </b-form-row>
 
             <!--RECORDING-->
-            <b-form-row v-if="communication.type === CommunicationTypes.CALL" data-testid="comm-details-recording-card">
+            <b-form-row v-if="communication.type === CommunicationTypes.CALL"
+                        data-testid="comm-details-recording-card">
               <b-col class="pl-0 pr-0" data-testid="comm-details-recording-col">
                 <q-item-label class="mt-3 custom-item-label">Recording: </q-item-label>
               </b-col>
@@ -798,6 +799,7 @@
                      v-if="showAudio(communication)">
                   <communication-audio class="mb-2"
                                        data-testid="comm-details-recording-comm-audio"
+                                       ref="callRecording"
                                        :communication="communication"
                                        :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                        :uniqueId="communication.id + '1'"
@@ -1189,8 +1191,10 @@ export default {
   },
 
   methods: {
-    fetchSmartTranscriptionData (communication) {
-      this.$VueEvent.fire('fetchSmartTranscriptionData', communication.id)
+    fetchSmartTranscriptionData () {
+      if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
+        this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
+      }
     },
     getContactRouteLink (communication) {
       if (this.isWidget) {

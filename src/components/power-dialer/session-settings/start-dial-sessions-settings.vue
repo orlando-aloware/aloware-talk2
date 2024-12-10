@@ -1,18 +1,12 @@
 <template>
   <div class="t-session-settings">
-    <block-tooltip placement="left"
-                   triggers="click"
-                   target="pd-call-popover"
-                   task="call"
-                   v-if="callDisabled">
-    </block-tooltip>
     <div id="pd-call-popover"
          v-if="defaultTrigger">
       <q-btn class="start-dial-button p-0"
              color="success"
              no-caps
              unelevated
-             :disabled="disabledTrigger || callDisabled || isAgentOnCall"
+             :disabled="disabledTrigger || isAgentOnCall"
              @click="dialPreparation">
         <PhoneIcon class="mr-2"
                    color="white"
@@ -341,7 +335,6 @@ import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import * as AgentStatus from 'src/constants/agent-status'
 import SettingIcon from 'components/icons/setting-o-icon'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import { isEmpty, isEqual } from 'lodash'
 import {
   kycMixin,
@@ -376,8 +369,7 @@ export default {
     StartDialSessionsForm,
     PhoneIcon,
     CheckIcon,
-    SettingIcon,
-    BlockTooltip
+    SettingIcon
   },
 
   computed: {
@@ -477,10 +469,6 @@ export default {
 
     canSaveSettings () {
       return this.settingNameLength > 0 && this.settingNameLength <= 191
-    },
-
-    callDisabled () {
-      return !this.enabledToCallNumber()
     },
 
     isSettingsOwner () {
