@@ -104,7 +104,7 @@ export default {
     },
 
     showAloAiPromotionButton () {
-      return this.currentCompany?.transciption_enabled && this.screenWidth >= 1200
+      return this.currentCompany?.transcription_enabled && this.screenWidth >= 1200
     },
 
     alowareClassic () {
