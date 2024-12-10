@@ -272,11 +272,6 @@ export default {
       required: false
     },
 
-    category: {
-      required: true,
-      type: Number
-    },
-
     isFilter: {
       required: false,
       type: Boolean,

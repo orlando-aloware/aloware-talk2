@@ -2435,7 +2435,7 @@ i.option-separator {
   }
 }
 
-.tags-wrapper {
+.tags-wrapper, .lists-wrapper {
   .badge-tag {
     background: transparent;
     font-weight: 500;
@@ -2495,7 +2495,7 @@ i.option-separator {
   }
 }
 
-.tags-filter-wrapper {
+.tags-filter-wrapper, .lists-filter-wrapper {
   .card-body {
     padding: 0 !important;
   }
