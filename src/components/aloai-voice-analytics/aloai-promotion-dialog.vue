@@ -86,13 +86,6 @@ export default {
 
     modalContent () {
       // Centralized modal logic based on conditions
-      if (!this.transcriptionEnabled) {
-        return {
-          title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. As a result, call transcription and summaries have been deactivated.`,
-          message: `To reactivate these features, you can upgrade your plan to include more minutes and continue enjoying the full benefits of our AI-powered services.`
-        }
-      }
-
       if (this.usagePercentage >= 80 && this.usagePercentage < 100) {
         return {
           title: `You’ve almost reached the limit of your ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine has been working hard to transcribe, analyze, and summarize your calls, helping you get the most out of every conversation.`,
@@ -114,7 +107,7 @@ export default {
     },
 
     buttonTitle () {
-      return (this.transcriptionEnabled && this.usagePercentage < 100) ? 'AI Engine Ready' : 'AI Engine Off'
+      return (this.transcriptionEnabled && this.usagePercentage < 100 && !this.currentCompany?.transcription_settings?.overusage_restriction_enabled) ? 'AI Engine Ready' : 'AI Engine Off'
     }
   },
 
