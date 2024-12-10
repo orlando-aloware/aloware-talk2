@@ -57,6 +57,7 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany']),
+    ...mapState('auth', ['profile']),
 
     includedMinutes () {
       return this.currentCompany?.plan?.included_transcription_min || 0
@@ -108,7 +109,7 @@ export default {
 
       if (this.usedMinutes >= this.includedMinutes) {
         return {
-          title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just $${this.transcriptionRate} (3 cents/min).`,
+          title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just $${Number(this.profile.rate?.transcription?.toFixed(2))} (${Math.round(this.profile?.rate?.transcription * 100)} cents/min).`,
           message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
         }
       }

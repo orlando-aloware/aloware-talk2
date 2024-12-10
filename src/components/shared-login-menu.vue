@@ -59,8 +59,9 @@
         </q-item>
       </q-list>
     </q-btn-dropdown>
-  <aloai-promotion-dialog :dialogVisible="showInfoBox"
-                          @update:dialogVisible="showInfoBox = $event" />  </div>
+    <aloai-promotion-dialog :dialogVisible="showInfoBox"
+                            @update:dialogVisible="showInfoBox = $event" />
+  </div>
 </template>
 
 <script>
