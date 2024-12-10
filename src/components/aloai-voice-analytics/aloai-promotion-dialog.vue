@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import { over } from 'lodash'
 import { mapState } from 'vuex'
 
 export default {
@@ -71,12 +72,12 @@ export default {
       return this.currentCompany?.transcription_settings?.transcription_rate
     },
 
-    isTrial () {
-      return this.currentCompany?.transcription_settings?.is_trial
-    },
-
     transcriptionEnabled () {
       return this.currentCompany?.transcription_settings?.call_transcription_enabled
+    },
+
+    overusageRestrictionEnabled () {
+      return this.currentCompany?.transcription_settings?.overusage_restriction_enabled
     },
 
     usagePercentage () {
@@ -94,9 +95,15 @@ export default {
       }
 
       if (this.usedMinutes >= this.includedMinutes) {
+        if (this.overusageRestrictionEnabled) {
+          return {
+            title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just $${Number(this.profile.rate?.transcription).toFixed(2)} (${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min).`,
+            message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
+          }
+        }
         return {
-          title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just $${Number(this.profile.rate?.transcription).toFixed(2)} (${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min).`,
-          message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
+          title: `You’ve reached the ${this.includedMinutes} minutes limit included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just $${Number(this.profile.rate?.transcription).toFixed(2)} (${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min).`,
+          message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
         }
       }
 
@@ -107,7 +114,10 @@ export default {
     },
 
     buttonTitle () {
-      return (this.transcriptionEnabled && this.usagePercentage < 100 && (!this.currentCompany?.transcription_settings?.overusage_restriction_enabled && this.usedMinutes >= this.includedMinutes)) ? 'AI Engine Ready' : 'AI Engine Off'
+      if (this.transcriptionEnabled && (this.usagePercentage < 100 || !this.overusageRestrictionEnabled)) {
+        return 'AI Engine Ready'
+      }
+      return 'AI Engine Off'
     }
   },
 
