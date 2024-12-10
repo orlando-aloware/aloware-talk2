@@ -107,7 +107,7 @@ export default {
     },
 
     buttonTitle () {
-      return (this.transcriptionEnabled && this.usagePercentage < 100 && !this.currentCompany?.transcription_settings?.overusage_restriction_enabled) ? 'AI Engine Ready' : 'AI Engine Off'
+      return (this.transcriptionEnabled && this.usagePercentage < 100 && (!this.currentCompany?.transcription_settings?.overusage_restriction_enabled && this.usedMinutes >= this.includedMinutes)) ? 'AI Engine Ready' : 'AI Engine Off'
     }
   },
 
