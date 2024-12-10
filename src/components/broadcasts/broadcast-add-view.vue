@@ -241,7 +241,7 @@ export default {
 
       switch (true) {
         // if integrations, enabled only for HubSpot
-        case this.currentStep.id === 1 && (!isEmpty(this.source?.list) || !isEmpty(this.source.filters) || isIntegrationHubspot):
+        case this.currentStep.id === 1 && (!isEmpty(this.source?.list) || isIntegrationHubspot):
           return 'broadcast-contacts-preview'
         // if integrations, enabled only for HubSpot
         case [2, 3, 4].includes(this.currentStep.id) && (isIntegration ? isIntegrationHubspot : true):
@@ -256,7 +256,6 @@ export default {
         case this.currentStep.id === 1:
           return {
             list: this.source.list,
-            filters: this.source.filters,
             integration: this.source.integration
           }
         case this.currentStep.id === 2 || this.currentStep.id === 3:
@@ -331,7 +330,6 @@ export default {
 
   methods: {
     ...mapActions('contacts', [
-      'setCurrentListFilters',
       'setMessageComposerSmsBody',
       'setMessageComposerSmsGif',
       'setMessageComposerAttachments',
@@ -516,10 +514,6 @@ export default {
 
       bulkMessage.contact_list_id = !isEmpty(this.source.list) ? this.source.list.id : null
 
-      if (!isEmpty(this.source.filters)) {
-        bulkMessage.talk_filters = this.source.filters
-      }
-
       // set filters too if list is dynamic
       if (!isEmpty(this.source.list) && this.source.list.type === 'dynamic') {
         bulkMessage.talk_filters = this.source.list.filters
@@ -544,8 +538,6 @@ export default {
 
       API.V1.broadcasts[method](bulkMessage)
         .then(() => {
-          this.setCurrentListFilters({})
-
           this.$emit('loading', false)
 
           this.$generalNotification('We have put your bulk message campaign on our outbound queue. Please wait a few minutes for us to send your messages.', 'success')
@@ -565,7 +557,6 @@ export default {
     this.setMessageComposerSmsBody('')
     this.setMessageComposerSmsGif('')
     this.setMessageComposerAttachments([])
-    this.setCurrentListFilters({})
     this.setSelectedCampaign({})
     this.rmv = null
   }

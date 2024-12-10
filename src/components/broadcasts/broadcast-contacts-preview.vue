@@ -122,8 +122,6 @@ export default {
       switch (true) {
         case !isEmpty(this.list):
           return 'No contacts found on the current list'
-        case !isEmpty(this.filters):
-          return 'No contacts found based on the current filters'
         case !isEmpty(this.integration):
           return 'Contacts preview isn\'t available for integrations'
         default:
@@ -160,7 +158,7 @@ export default {
   }),
 
   created () {
-    if (!this.list && !this.filters) {
+    if (!this.list /* && !this.filters */) {
       throw new Error('A list or filters are required to preview the contacts')
     }
 
@@ -174,10 +172,6 @@ export default {
       switch (true) {
         case !isEmpty(this.list):
           this.setContactsListFilter()
-          this.loadContacts()
-          break
-        case !isEmpty(this.filters):
-          this.setContactsFilters()
           this.loadContacts()
           break
         case !isEmpty(this.integration) && this.integration.name === 'HubSpot':
@@ -247,10 +241,6 @@ export default {
       }
     },
 
-    setContactsFilters () {
-      this.currentFilters.filter_groups = this.filters
-    },
-
     async setIntegrationHubspot () {
       this.loading = true
 
@@ -265,13 +255,6 @@ export default {
 
   watch: {
     list: {
-      deep: true,
-      handler () {
-        this.init()
-      }
-    },
-
-    filters: {
       deep: true,
       handler () {
         this.init()

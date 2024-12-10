@@ -73,7 +73,6 @@ import ContactsListSelector from 'src/components/generic-selectors/contacts-list
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { integrationMixin } from 'src/plugins/mixins'
-import { mapActions, mapGetters } from 'vuex'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -98,16 +97,10 @@ export default {
   },
 
   computed: {
-    ...mapGetters('contacts', [
-      'currentListFilters'
-    ]),
-
     isValid () {
       switch (this.optionSelected) {
         case 'list':
           return !!this.source.list.id || !isEmpty(this.source.filters)
-        case 'filter':
-          return !isEmpty(this.source.filters)
         case 'integration':
           return !isEmpty(this.source.integration?.list)
         default:
@@ -120,11 +113,6 @@ export default {
         {
           value: 'list',
           text: 'By List',
-          enabled: true
-        },
-        {
-          value: 'filter',
-          text: 'By Filter',
           enabled: true
         },
         {
@@ -147,7 +135,6 @@ export default {
     optionSelected: null,
     source: {
       list: {},
-      filters: {},
       integration: {}
     }
   }),
@@ -155,11 +142,6 @@ export default {
   mounted () {
     if (!isEmpty(this.defaultSource.list)) {
       this.optionSelected = 'list'
-    }
-
-    if (!isEmpty(this.defaultSource.filters)) {
-      this.optionSelected = 'filter'
-      this.openFilters()
     }
 
     if (!isEmpty(this.defaultSource.integration)) {
@@ -170,12 +152,6 @@ export default {
   },
 
   methods: {
-    ...mapActions('contacts', [
-      'closeFilters',
-      'openFilters',
-      'setCurrentListFilters'
-    ]),
-
     getOptionClasses (option) {
       return [
         'broadcast-add__contacts__options__option',
@@ -243,15 +219,7 @@ export default {
     reset () {
       this.source = {
         list: {},
-        filters: {},
         integration: {}
-      }
-
-      if (this.optionSelected === 'filter') {
-        this.openFilters()
-      } else {
-        this.closeFilters()
-        this.setCurrentListFilters({})
       }
     }
   },
@@ -265,21 +233,6 @@ export default {
       deep: true,
       handler (value) {
         this.$emit('source-updated', value)
-      }
-    },
-
-    currentListFilters: {
-      deep: true,
-      immediate: true,
-      handler (value) {
-        this.source.filters = value
-      }
-    },
-
-    optionSelected: {
-      immediate: true,
-      handler (value) {
-        this.$VueEvent.fire('toggle-contact-filters', value === 'filter')
       }
     }
   }
