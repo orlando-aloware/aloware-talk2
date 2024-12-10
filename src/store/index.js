@@ -101,7 +101,6 @@ export default function (/* { ssrContext } */) {
           message: '',
           code: null
         },
-        redialedTaskIds: [],
         callSuccessfullyAnswered: false
       },
       warnings: [],
@@ -404,14 +403,6 @@ export default function (/* { ssrContext } */) {
 
       setDialerError ({ commit }, error) {
         commit('SET_DIALER_ERROR', error)
-      },
-
-      addDialerRedialedTaskId ({ commit }, taskId) {
-        commit('ADD_DIALER_REDIALED_TASK_ID', taskId)
-      },
-
-      clearDialerRedialedTaskIds ({ commit }) {
-        commit('CLEAR_DIALER_REDIALED_TASK_IDS')
       },
 
       setDialerCallSuccessfullyAnswered ({ commit }, status) {
@@ -1068,14 +1059,6 @@ export default function (/* { ssrContext } */) {
       SET_DIALER_ERROR (state, error) {
         state.dialer.error.message = error.message
         state.dialer.error.code = error.code
-      },
-
-      ADD_DIALER_REDIALED_TASK_ID (state, taskId) {
-        state.dialer.redialedTaskIds.push(taskId)
-      },
-
-      CLEAR_DIALER_REDIALED_TASK_IDS (state) {
-        state.dialer.redialedTaskIds = []
       },
 
       SET_DIALER_CALL_SUCCESSFULLY_ANSWERED (state, status) {

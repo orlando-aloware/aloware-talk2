@@ -6,6 +6,7 @@
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   agentMixin,
@@ -57,7 +58,8 @@ export default {
       dialerListeners: {},
       AgentStatus,
       WebrtcEvents,
-      CommunicationDispositionStatus
+      CommunicationDispositionStatus,
+      taskRedialed: false
     }
   },
 
@@ -68,9 +70,11 @@ export default {
 
     ...mapState('auth', ['profile', 'authenticated']),
 
-    ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
+    ...mapState('powerDialer', ['powerDialerTasks']),
 
     ...mapState(['isWidget']),
+
+    ...mapFields('powerDialer', ['activeTask']),
 
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
@@ -1347,7 +1351,14 @@ export default {
     },
 
     resetCall () {
-      console.log('Resetting call')
+      // before reseting the call and proceeding to the next task,
+      // check if a redial is required and trigger onNextTask to perform the redial logic
+      if (this.isSessionRunning && this.redialRequired && this.activeTask && !this.activeTask.forcedRedial) {
+        this.activeTask.forcedRedial = true
+        this.$VueEvent.fire('onNextTask')
+        return
+      }
+
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()

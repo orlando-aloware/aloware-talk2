@@ -5,7 +5,7 @@
          v-show="sessionPaused">
       Session Paused
     </div>
-    <div class="t-menu pb-2"
+    <div class="t-menu pb-4"
          v-show="!sessionPaused">
       <chips-ellipsis headerLabel="CALL DISPOSITION"
                       headerClass="t-menu__header no-border t-dense d-flex align-items-center"
@@ -13,31 +13,46 @@
                       identity="call-disposition"
                       default-label="No Call Dispositions"
                       initiallyDisabled
+                      collapsible
                       :list-items="filteredCallDispositions"
                       :selected-item="callDisposition"
                       :display-count="4"
                       :forced="isHighlightedCallDisposition"
                       @on-selected-item="onSelectedCallDisposition" />
       <chips-ellipsis headerLabel="CONTACT DISPOSITION"
-                      headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-0"
+                      headerClass="t-menu__header t-dense d-flex align-items-center no-border pt-2"
                       ref="contactDispositionSelector"
                       identity="contact-disposition"
                       default-label="No Contact Dispositions"
+                      collapsible
                       :list-items="filteredContactDispositions"
                       :selected-item="contactDisposition"
                       :display-count="6"
                       :forced="isHighlightedContactDisposition"
                       @on-selected-item="onSelectedContactDisposition" />
       <chips-ellipsis headerLabel="VOICEMAIL"
-                      headerClass="t-menu__header no-border t-dense d-flex align-items-center"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center pt-2"
                       ref="vm-drop"
                       identity="vm-drop"
                       default-label="No Voicemail"
                       initiallyDisabled
+                      collapsible
                       :list-items="voicemails"
                       :display-count="3"
                       :is-empty="isVoicemailEmpty"
                       @on-selected-item="onVmDrop"/>
+      <chips-ellipsis headerLabel="SEND MESSAGE"
+                      headerClass="t-menu__header no-border t-dense d-flex align-items-center pt-2"
+                      ref="smsTemplatesSelector"
+                      identity="send-message"
+                      default-label="No SMS Templates"
+                      collapsible
+                      :list-items="smsTemplates"
+                      :display-count="4"
+                      :forced="requireSmsSending"
+                      :is-empty="isSmsTemplatesEmpty"
+                      v-if="sessionSettings.min_redials > 0 && sessionSettings.force_sms"
+                      @on-selected-item="onSelectedSmsTemplate"/>
     </div>
   </q-card>
 </template>
@@ -70,13 +85,16 @@ export default {
   data () {
     return {
       voicemails: [],
-      loadingSendVmDrop: false
+      loadingSendVmDrop: false,
+      smsTemplates: []
     }
   },
 
   computed: {
     ...mapFields('powerDialer', [
-      'sessionPaused'
+      'sessionPaused',
+      'activeTask',
+      'tasksSentSmsTemplates'
     ]),
 
     ...mapState('auth', [
@@ -106,11 +124,16 @@ export default {
 
     isVoicemailEmpty () {
       return isEmpty(this.voicemails)
+    },
+
+    isSmsTemplatesEmpty () {
+      return isEmpty(this.smsTemplates)
     }
   },
 
   created () {
     this.getVmDrops()
+    this.getSmsTemplates()
   },
 
   mounted () {
@@ -119,6 +142,8 @@ export default {
     if (!this.isCallInProgressStatus) {
       this.$refs['vm-drop'].disable()
     }
+
+    this.$VueEvent.listen('clearCallDispositionStatus', this.clearCallDispositionStatus)
   },
 
   methods: {
@@ -143,6 +168,12 @@ export default {
         }
 
         this.voicemails = res.data.filter(vm => this.sessionSettings.vm_drop_ids.includes(vm.id))
+      })
+    },
+
+    getSmsTemplates () {
+      API.V1.smsTemplate.get().then(res => {
+        this.smsTemplates = res.data
       })
     },
 
@@ -231,6 +262,11 @@ export default {
       })
     },
 
+    refreshDispositionActions () {
+      this.initCallDisposition()
+      this.initSmsTemplate()
+    },
+
     initCallDisposition () {
       if (isEmpty(this.dialer.communication) &&
         this.isReferenceAvailable('callDispositionSelector')) {
@@ -240,6 +276,41 @@ export default {
 
       if (this.isReferenceAvailable('callDispositionSelector')) {
         this.$refs.callDispositionSelector.enable()
+      }
+    },
+
+    initSmsTemplate () {
+      if (!this.isReferenceAvailable('smsTemplatesSelector')) {
+        return
+      }
+
+      if (['READY', 'MAKING_CALL'].includes(this.dialer.currentStatus) && this.$refs.smsTemplatesSelector.enabled) {
+        this.$refs.smsTemplatesSelector.disable()
+        return
+      }
+
+      if (!this.callDisposition) {
+        this.$refs.smsTemplatesSelector.disable()
+        return
+      }
+
+      // sms template already sent for this task, disable it
+      if (this.activeTask && this.tasksSentSmsTemplates[this.activeTask.id]) {
+        this.$refs.smsTemplatesSelector.disable()
+        return
+      }
+
+      // enable selection if selected disposition is not a successful call disposition
+      const successfulCallDispositionsIds = this.sessionSettings.successful_call_disposition_ids
+      if (Array.isArray(successfulCallDispositionsIds) && !successfulCallDispositionsIds.includes(this.callDisposition)) {
+        this.$refs.smsTemplatesSelector.enable()
+
+        if (this.requireSmsSending) {
+          // pause wrap up and wait for SMS selection
+          this.$VueEvent.fire('pauseWrapUp', true)
+        }
+      } else {
+        this.$refs.smsTemplatesSelector.disable()
       }
     },
 
@@ -263,8 +334,44 @@ export default {
       })
     },
 
+    onSelectedSmsTemplate (item) {
+      this.tasksSentSmsTemplates[this.activeTask.id] = item.id
+
+      const message = {
+        body: item.body,
+        contact_id: this.contact.id,
+        campaign_id: this.sessionSettings.campaign_id,
+        phone_number: this.contact.phone_number
+      }
+
+      API.V1.message.send(message)
+        .then(() => {
+          this.$refs['smsTemplatesSelector'].disable()
+          this.$refs['smsTemplatesSelector'].hideLoading()
+          this.$generalNotification('Message sent successfully')
+        }).catch(err => {
+          console.log('[onSelectedSmsTemplate]', err)
+          this.$generalNotification('Failed to send message', 'warning')
+
+          this.$refs['smsTemplatesSelector'].disable()
+          this.$refs['smsTemplatesSelector'].hideLoading()
+        }).finally(() => {
+          // sms send, proceed to next task
+          this.$VueEvent.fire('pauseWrapUp', false)
+        })
+    },
+
     isReferenceAvailable (referenceId) {
       return !isEmpty(this.$refs?.[referenceId])
+    },
+
+    clearCallDispositionStatus () {
+      this.selectedCallDisposition = null
+      this.refreshDispositionActions()
+
+      if (this.isContactNotDisposed) {
+        this.$VueEvent.fire('pauseWrapUp', true)
+      }
     }
   },
 
@@ -272,7 +379,7 @@ export default {
     'contact.id': function () {
       this.selectedContactDisposition = null
       this.selectedCallDisposition = null
-      this.initCallDisposition()
+      this.refreshDispositionActions()
 
       if (this.isContactNotDisposed) {
         this.$VueEvent.fire('pauseWrapUp', true)
@@ -280,11 +387,15 @@ export default {
     },
 
     sessionPaused () {
-      this.initCallDisposition()
+      this.refreshDispositionActions()
     },
 
     'dialer.communication': function (communication) {
-      this.initCallDisposition()
+      this.refreshDispositionActions()
+    },
+
+    'dialer.currentStatus': function (status) {
+      console.log('currentStatus', status)
     },
 
     isCallInProgressStatus (value) {
@@ -295,7 +406,19 @@ export default {
       }
 
       this.$refs['vm-drop'].disable()
+    },
+
+    callDisposition () {
+      this.initSmsTemplate()
+    },
+
+    contactDisposition () {
+      this.initSmsTemplate()
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('clearCallDispositionStatus', this.clearCallDispositionStatus)
   }
 }
 </script>
