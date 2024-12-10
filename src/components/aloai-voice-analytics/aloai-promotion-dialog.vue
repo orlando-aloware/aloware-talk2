@@ -93,13 +93,6 @@ export default {
         }
       }
 
-      if (this.isTrial) {
-        return {
-          title: `You currently have ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
-          message: `Need more minutes to keep up with your growing needs? Upgrade your plan now for additional minutes and enhanced features.`
-        }
-      }
-
       if (this.usagePercentage >= 80 && this.usagePercentage < 100) {
         return {
           title: `You’ve almost reached the limit of your ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine has been working hard to transcribe, analyze, and summarize your calls, helping you get the most out of every conversation.`,
@@ -121,7 +114,7 @@ export default {
     },
 
     buttonTitle () {
-      return this.transcriptionEnabled ? 'AI Engine Ready' : 'AI Engine Off'
+      return (this.transcriptionEnabled && this.usagePercentage < 100) ? 'AI Engine Ready' : 'AI Engine Off'
     }
   },
 
