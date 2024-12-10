@@ -6,7 +6,7 @@
            class="q-btn-standard q-mr-md"
            @click="showInfoBox = true">
       <sparkle-icon width="16" height="16" color="#9333EA"/>
-      <span>AI Engine Ready</span>
+      <span>{{ aiEngineButtonTitle }}</span>
     </q-btn>
     <q-btn v-if="isAdmin || isSupervisor"
            outline
@@ -60,7 +60,7 @@
       </q-list>
     </q-btn-dropdown>
     <aloai-promotion-dialog :dialogVisible="showInfoBox"
-                            @update:dialogVisible="showInfoBox = $event" />
+                            @update:dialogVisible="showInfoBox = $event"/>
   </div>
 </template>
 
@@ -117,6 +117,12 @@ export default {
 
     classicUrl () {
       return `${this.getClassicURL(this.isSimpSocial)}?from_talk_2=1&token=${storage.local.getItem('shared_cookie')}`
+    },
+
+    aiEngineButtonTitle () {
+      return this.currentCompany?.transcription_settings?.call_transcription_enabled
+        ? 'AI Engine Ready'
+        : 'AI Engine Off'
     }
   },
 
