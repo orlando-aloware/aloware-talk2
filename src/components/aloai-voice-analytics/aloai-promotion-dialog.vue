@@ -50,7 +50,7 @@ export default {
     }
   },
 
-  emits: ['sendButtonTitle', 'update:dialogVisible'],
+  emits: [update:dialogVisible'],
 
   data () {
     return {
@@ -117,13 +117,6 @@ export default {
         title: `You currently have ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
         message: `Need more minutes to keep up with your growing needs? Upgrade your plan now for additional minutes and enhanced features.`
       }
-    },
-
-    buttonTitle () {
-      if (this.transcriptionEnabled && (this.usagePercentage < 100 || !this.overusageRestrictionEnabled)) {
-        return 'AI Engine Ready'
-      }
-      return 'AI Engine Off'
     }
   },
 
@@ -133,12 +126,6 @@ export default {
     },
     internalDialogVisible (newVal) {
       this.$emit('update:dialogVisible', newVal) // Sync to parent
-    },
-    buttonTitle: {
-      immediate: true,
-      handler (newTitle) {
-        this.$emit('sendButtonTitle', newTitle)
-      }
     }
   }
 }
