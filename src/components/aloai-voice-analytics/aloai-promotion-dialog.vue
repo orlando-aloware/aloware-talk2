@@ -50,7 +50,7 @@ export default {
     }
   },
 
-  emits: [update:dialogVisible'],
+  emits: ['update:dialogVisible'],
 
   data () {
     return {
