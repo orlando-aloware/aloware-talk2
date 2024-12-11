@@ -387,11 +387,11 @@ export default {
     },
 
     defaultOutboundLine () {
-      if (this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_SELECTOR_SELECT_MANUALLY) {
-        return this.profile.default_outbound_campaign_id
+      if (this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+        return this.profile.default_outbound_campaign_id ?? this.currentCompany.default_outbound_campaign_id
       }
 
-      return this.currentCompany.default_outbound_campaign_id
+      return null
     }
   },
 
