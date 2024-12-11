@@ -38,7 +38,6 @@
 </template>
 
 <script>
-import { over } from 'lodash'
 import { mapState } from 'vuex'
 
 export default {
