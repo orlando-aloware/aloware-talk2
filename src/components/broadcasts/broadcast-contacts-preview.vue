@@ -31,7 +31,8 @@
           <template v-for="column in columns">
             <td :key="column.name"
                 v-if="column.name === 'name'">
-              <name-wrapper link-path="/contacts/"
+              <name-wrapper dnc-badge
+                            link-path="/contacts/"
                             :resource="contact" />
             </td>
 
@@ -146,19 +147,19 @@ export default {
       per_page: 25,
       sort: 'last_engagement_at',
       order: 'desc',
-      force_slave: 1,
-      filters: {
-        dnc_option: {
-          value: 5, // only contacts without dnc
-          operator: 1 // is equal to
-        }
-      }
+      force_slave: 1
+      // filters: {
+      //   dnc_option: {
+      //     value: 5, // only contacts without dnc
+      //     operator: 1 // is equal to
+      //   }
+      // }
     },
     currentFilters: {}
   }),
 
   created () {
-    if (!this.list /* && !this.filters */) {
+    if (!this.list) {
       throw new Error('A list or filters are required to preview the contacts')
     }
 
