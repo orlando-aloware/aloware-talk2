@@ -4,7 +4,7 @@
       <div class="ai-info-box-header">
         <span class="ai-info-box-icon"
               v-if="usagePercentage < 100 && isTrial">
-              🎁
+          🎁
         </span>
         <span class="ai-info-box-title">
           {{ modalContent.title }}
@@ -95,7 +95,7 @@ export default {
       // Centralized modal logic based on conditions
       if (this.usagePercentage >= 80 && this.usagePercentage < 100) {
         return {
-          title: `You’ve almost reached the limit of your ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine has been working hard to transcribe, analyze, and summarize your calls, helping you get the most out of every conversation.`,
+          title: `You’ve almost reached the limit of your ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. Our AI engine has been working hard to transcribe, analyze, and summarize your calls, helping you get the most out of every conversation.`,
           message: `To avoid interruptions in service, consider upgrading your plan for more minutes and additional features tailored to meet your growing needs.`
         }
       }
@@ -103,18 +103,19 @@ export default {
       if (this.usedMinutes >= this.includedMinutes) {
         if (this.overusageRestrictionEnabled) {
           return {
-            title: `You’ve used all ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just $${Number(this.profile.rate?.transcription).toFixed(2)} (${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min).`,
+            title: `You’ve used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just ${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min.`,
             message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
           }
         }
+
         return {
-          title: `You’ve reached the ${this.includedMinutes} minutes limit included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just $${Number(this.profile.rate?.transcription).toFixed(2)} (${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min).`,
+          title: `You’ve reached the ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just ${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min.`,
           message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
         }
       }
 
       return {
-        title: `You currently have ${this.includedMinutes} minutes included in your plan for AloAi Voice Analytics. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
+        title: `You currently have ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
         message: `Need more minutes to keep up with your growing needs? Upgrade your plan now for additional minutes and enhanced features.`
       }
     }
