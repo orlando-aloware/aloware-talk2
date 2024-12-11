@@ -1,10 +1,10 @@
 <template>
-  <div class="mb-4">
+  <div class="mb-4"
+       v-if="!isEmpty(categories)">
     <h2 class="mb-1 text-dark" data-testid="comm-categories-section-h2">Categories</h2>
     <hr class="my-1">
 
-    <div class="q-my-md"
-         v-if="!isEmpty(categories)">
+    <div class="q-my-md">
       <q-breadcrumbs class="flex black w-100"
                      active-color="black"
                      gutter="none"
@@ -30,18 +30,6 @@
           </q-tooltip>
         </span>
       </q-breadcrumbs>
-    </div>
-
-    <!-- If no categories were detected. -->
-    <div v-else-if="!isSimpSocial">
-      <span>
-        We couldn't find any categories in this call. For more information please check
-        <a class="link"
-           data-testid="comm-categories-section-this-article-link"
-           href="https://support.aloware.com/en/articles/9037887-frequently-asked-questions-smart-transcription">
-          this article.
-        </a>
-      </span>
     </div>
   </div>
 </template>

@@ -1,18 +1,12 @@
 <template>
   <div class="t-session-settings">
-    <block-tooltip placement="left"
-                   triggers="click"
-                   target="pd-call-popover"
-                   task="call"
-                   v-if="callDisabled">
-    </block-tooltip>
     <div id="pd-call-popover"
          v-if="defaultTrigger">
       <q-btn class="start-dial-button p-0"
              color="success"
              no-caps
              unelevated
-             :disabled="disabledTrigger || callDisabled || isAgentOnCall"
+             :disabled="disabledTrigger || isAgentOnCall"
              @click="dialPreparation">
         <PhoneIcon class="mr-2"
                    color="white"
@@ -341,12 +335,12 @@ import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
 import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import * as AgentStatus from 'src/constants/agent-status'
 import SettingIcon from 'components/icons/setting-o-icon'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import { isEmpty, isEqual } from 'lodash'
 import {
   kycMixin,
   aclMixin
 } from 'src/plugins/mixins'
+import API from 'src/plugins/api/api'
 
 export default {
   name: 'StartDialSessionsSettings',
@@ -376,8 +370,7 @@ export default {
     StartDialSessionsForm,
     PhoneIcon,
     CheckIcon,
-    SettingIcon,
-    BlockTooltip
+    SettingIcon
   },
 
   computed: {
@@ -451,6 +444,7 @@ export default {
         name: null,
         script_id: null,
         skip_outside_daytime_hours: 1,
+        successful_call_disposition_ids: [],
         user_id: null,
         warmup_period_in_seconds: 0,
         order: POWER_DIALER_ORDER.default,
@@ -477,10 +471,6 @@ export default {
 
     canSaveSettings () {
       return this.settingNameLength > 0 && this.settingNameLength <= 191
-    },
-
-    callDisabled () {
-      return !this.enabledToCallNumber()
     },
 
     isSettingsOwner () {
@@ -547,12 +537,12 @@ export default {
       'getTemporarySessionSetting',
       'updateContactsList',
       'getSessionSetting',
-      'getPowerDialerList'
+      'getPowerDialerList',
+      'clearRedialSettings'
     ]),
 
     ...mapActions([
-      'setDialerCommunication',
-      'clearDialerRedialedTaskIds'
+      'setDialerCommunication'
     ]),
 
     ...mapMutations('powerDialer', [
@@ -565,6 +555,11 @@ export default {
     },
 
     async beginDial () {
+      if (this.selectedItem.min_redials > 0 && !this.selectedItem.successful_call_disposition_ids?.length) {
+        this.$generalNotification('Please select at least one Successful Call Disposition', 'error')
+        return
+      }
+
       this.cleanupDialer()
       const requests = {
         res: null,
@@ -578,6 +573,14 @@ export default {
       this.loading = true
       this.isDialing = true
       this.loadingText = this.defaultTrigger ? 'Redirecting you to Power Dialer session..' : 'Applying changes to session settings..'
+
+      // redial: check if force_sms is set and no sms templates are available
+      if (this.requireSmsSending(this.selectedItem) && !(await this.hasSmsTemplates())) {
+        this.loading = false
+        this.isDialing = false
+        this.$generalNotification('You need to have at least one SMS template since "Force Send SMS" is enabled by your Admin.', 'error')
+        return
+      }
 
       if (this.temporarySetting.id === this.selectedItem.id) {
         const newSettings = { ...this.filterSelectedItem }
@@ -809,7 +812,7 @@ export default {
         this.setDialerCommunication()
       }
 
-      this.clearDialerRedialedTaskIds()
+      this.clearRedialSettings()
     },
 
     getSettingsItemClass (setting) {
@@ -845,6 +848,20 @@ export default {
     cancelNewSetting () {
       this.newSettingName = ''
       this.newSetting = false
+    },
+
+    requireSmsSending (sessionSettings) {
+      return sessionSettings?.min_redials > 0 && sessionSettings?.force_sms
+    },
+
+    async hasSmsTemplates () {
+      try {
+        const res = await API.V1.smsTemplate.get()
+        return res.data.length > 0
+      } catch (err) {
+        console.error('[hasSmsTemplates] error', err)
+        return false
+      }
     }
   },
 

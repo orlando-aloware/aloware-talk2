@@ -9410,7 +9410,7 @@ screen and (max-width: 956px) {
   }
   .inbox-side {
     &__left {
-      max-width: 135px;
+      max-width: 120px;
 
       .count-label {
         margin-left: 10px;
@@ -14439,6 +14439,7 @@ h1.contact-list-name-label {
   .password-hint {
     ul {
       padding-top: 10px;
+      list-style-type: none;
     }
 
     li {

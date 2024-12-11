@@ -325,14 +325,13 @@ export default {
       const isCallDisabled = !this.validPhoneNumber ||
       !this.phoneNumber.length ||
       !this.campaignId ||
-      !this.enabledToCallNumber(this.phoneNumber) ||
       this.isAgentOnCall
 
       return isCallDisabled
     },
 
     sendDisabled () {
-      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage || !this.enabledToTextNumber(this.phoneNumber)
+      return !this.validPhoneNumber || !this.phoneNumber.length || !this.campaignId || !this.textMessage
     },
 
     isBlockTooltipPopoverEnabled () {
@@ -346,15 +345,7 @@ export default {
         return true
       }
 
-      if (this.mode === 'call') {
-        return !this.enabledToCallNumber(this.phoneNumber)
-      }
-
-      if (this.mode === 'text') {
-        return !this.enabledToTextNumber(this.phoneNumber)
-      }
-
-      return !this.enabledToCallNumber(this.phoneNumber) || !this.enabledToTextNumber(this.phoneNumber)
+      return false
     },
 
     dialerFormClass () {

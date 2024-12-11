@@ -16,7 +16,8 @@
     </q-btn>
 
     <!-- AloAi Voice Analytics modal. -->
-    <q-dialog v-model="show_form" data-testid="comm-transcription-modal-dialog">
+    <q-dialog v-model="show_form"
+              data-testid="comm-transcription-modal-dialog">
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
           <!--COMM TYPE-->
@@ -62,6 +63,7 @@
                         :communication="communication"
                         :messages="messages"
                         data-testid="comm-transcription-modal-waveform"
+                        ref="waveformComponent"
                         @time-update="updateCurrentTime">
               </waveform>
               <download-button v-if="fileUuid"
@@ -138,7 +140,9 @@
                                         :formatted-messages="formattedMessages"
                                         :is-empty="isEmpty"
                                         ref="conversationSection"
-                                        data-testid="comm-transcription-modal-conversation-section"/>
+                                        data-testid="comm-transcription-modal-conversation-section"
+                                        @seek-audio="handleSeekAudio">
+                  </conversation-section>
                 </q-tab-panel>
 
                 <q-tab-panel class="p-0"
@@ -412,17 +416,9 @@ export default {
 
   mounted () {
     this.checkAndShowTranscriptionModal()
-
-    this.$VueEvent.listen('fetchSmartTranscriptionData', communicationId => this.handleFetchSmartTranscriptionData(communicationId))
   },
 
   methods: {
-    handleFetchSmartTranscriptionData (communicationId) {
-      if (this.communication.id === communicationId) {
-        this.fetchSmartTranscriptionData()
-      }
-    },
-
     fetchSmartTranscriptionData () {
       this.isLoading = true
       this.show_form = true
@@ -685,8 +681,11 @@ export default {
           this.$generalNotification('Failed to submit feedback.', 'error')
           console.log('Error submitting summary feedback:', err)
         })
-    }
+    },
 
+    handleSeekAudio (startTime) {
+      this.$refs.waveformComponent.seekAudio(startTime)
+    }
   },
 
   watch: {

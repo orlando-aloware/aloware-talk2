@@ -3,7 +3,7 @@
        id="notification-container"
        v-if="isShow">
     <div class="d-flex">
-      <div class="pr-1 align-self-center flex-grow-1">
+      <div class="pr-1 align-self-center flex-grow-1 notification-body">
         <strong :class="diagnosisClass">
           <i class="fa fa-exclamation-triangle"/>
           {{ firstDiagnosis }}
@@ -33,7 +33,7 @@
     </div>
 
     <portal to="diagnosisButtons">
-      <a @click="onOpenFinishRegistration(link)"
+      <a @click="onOpenFinishRegistration()"
          v-if="link && !link.external">
         <b-button class="text-nowrap"
                   variant="primary"
@@ -43,7 +43,7 @@
       </a>
 
       <a target="_blank"
-         @click="onOpenFinishRegistration(link)"
+         @click="onOpenFinishRegistration()"
          v-if="link && link.external">
         <b-button class="text-nowrap"
                   variant="primary"
@@ -178,12 +178,9 @@ export default {
       return regEx.test(url)
     },
 
-    onOpenFinishRegistration (link) {
-      if (!this.isCompanyKYC) {
-        const link = this.getLink(this.link)
-
-        return window.open(link, '_self')
-      }
+    onOpenFinishRegistration () {
+      const link = this.getLink(this.link)
+      return window.open(link, '_self')
     },
 
     getLink (link) {
@@ -196,3 +193,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.notification-body {
+  font-size: 13px;
+  width: 75%;
+}
+</style>

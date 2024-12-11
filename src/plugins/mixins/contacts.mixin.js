@@ -641,6 +641,10 @@ export default {
         query.my_contacts = params.my_contacts
       }
 
+      if (params?.skipCache) {
+        query.skip_cache = true
+      }
+
       if (params.task_status) {
         powerQuery.task_status = params.task_status
       }

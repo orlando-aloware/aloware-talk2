@@ -21,6 +21,7 @@
             v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"
             button-text="Show Transcription"
             data-testid="communication-audio-transcription-modal"
+            ref="transcriptionModal"
             :communication="communication"
             :contact="contact"
             :single-button="true"/>
@@ -32,7 +33,7 @@
           </generate-transcription-button>
         </div>
         <p class="text-black _600"
-          v-if="fileUuid && !isMigrated">
+           v-if="fileUuid && !isMigrated">
           We are processing the {{ typeString | toLowerCase }}. It will be shortly available for download.
         </p>
       </div>
@@ -46,10 +47,7 @@
 </template>
 
 <script>
-import {
-  aclMixin,
-  communicationInfoMixin
-} from 'src/plugins/mixins'
+import { aclMixin, communicationInfoMixin } from 'src/plugins/mixins'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import Waveform from 'components/waveform'
 import DownloadButton from 'components/download-button'
