@@ -1,7 +1,7 @@
 <template>
   <div data-testid="inbox-nav-item-wrapper">
     <hr class="nav-item-separator"
-        v-if="value === 'voicemails' || label === 'Channels'"/>
+        v-if="showNavItemSeparator"/>
 
     <a class="inbox-nav-item mx-2 px-1"
        href="/"
@@ -182,6 +182,12 @@ export default {
     }
   },
 
+  data () {
+    return {
+      showNavItemSeparator: this.value === 'voicemails' || (this.label === 'Channels' && this.value !== '')
+    }
+  },
+
   methods: {
     onClick (e) {
       if (this.disabled) {
@@ -189,6 +195,14 @@ export default {
       }
 
       this.$emit('click', this.value)
+    }
+  },
+
+  watch: {
+    $route (to, from) {
+      if (to.name !== from.name) {
+        this.showNavItemSeparator = to.name !== 'Inboxes' ? this.value === 'voicemails' : false
+      }
     }
   }
 }

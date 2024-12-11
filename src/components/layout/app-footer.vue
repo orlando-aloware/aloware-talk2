@@ -8,15 +8,28 @@
             class="light text-grey footer-tabs"
             content-class="q-tabs__content--align-justify"
             dense>
+      <q-route-tab name="inboxes"
+                   to="/channels/inbox/all"
+                   :content-class="tab === 'inboxes' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
+                   :ripple="false"
+                   :active="tab === 'inboxes'"
+                   no-caps
+                   exact>
+        <span class="tab-icon">
+          <inbox-mobile-icon
+            :color="isActive('inboxes') ? '#256EFF' : '#A3A3A3'"/>
+        </span>
+        Inboxes
+      </q-route-tab>
       <q-route-tab name="inbox"
-                   to="/"
+                   to="/channels/calls"
                    :content-class="tab === 'inbox' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
                    :active="tab === 'inbox'"
                    no-caps
                    exact>
         <span class="tab-icon">
-          <inbox-mobile-icon
+          <communications-mobile-icon
             :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'"/>
         </span>
         Comm.’s
@@ -194,6 +207,7 @@
 
 <script>
 import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon'
+import CommunicationsMobileIcon from 'components/icons/mobile-menu/communications-mobile-icon'
 import ContactsMobileIcon from 'components/icons/mobile-menu/contacts-mobile-icon'
 import StatsMobileIcon from 'components/icons/mobile-menu/stats-mobile-icon'
 import MoreMobileIcon from 'components/icons/mobile-menu/more-mobile-icon'
@@ -216,6 +230,7 @@ export default {
     StatsMobileIcon,
     ContactsMobileIcon,
     InboxMobileIcon,
+    CommunicationsMobileIcon,
     ContactMenu,
     ContactMenuItem,
     CalendarMobileIcon
@@ -256,7 +271,7 @@ export default {
   },
   data () {
     return {
-      tab: 'inbox',
+      tab: 'inboxes',
       parkedCallQueue: []
     }
   },
@@ -276,7 +291,7 @@ export default {
       // this.updateTab()
     },
     getTab () {
-      if ((['Inbox'].includes(this.$route.name) && this.$q.screen.lt.md) ||
+      if ((['Inboxes'].includes(this.$route.name) && this.$q.screen.lt.md) ||
         ['Countact'].includes(this.$route.name)) {
         this.setShowContactsHeader(false)
       }
@@ -286,12 +301,15 @@ export default {
       }
 
       switch (this.$route.name) {
+        case 'Inboxes':
+        case 'Inbox Contact Task':
+        case 'Inbox Channel Task Status':
+          return 'inboxes'
         case 'Inbox':
         case 'Inbox Channel':
         case 'Inbox Contact':
-        case 'Inbox Contact Task':
-        case 'Inbox Channel Task Status':
         case 'Inbox Contact Communication':
+        case 'Inbox Channel Task Status Communications':
           return 'inbox'
         case 'Contacts':
         case 'Contact':
@@ -328,7 +346,7 @@ export default {
   watch: {
     'tab': _.debounce(function (newValue, oldValue) {
       if (!newValue) {
-        this.tab = 'inbox'
+        this.tab = 'inboxes'
       }
 
       if (this.tab === 'phone') {

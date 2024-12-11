@@ -22,7 +22,7 @@
 
     <hr>
 
-    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isInboxViewsEnabledCompany">
+    <div v-if="showInboxViews">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -139,17 +139,21 @@ export default {
 
     inboxChannels () {
       if (this.profile?.campaign_id) {
-        return this.navListItems
+        return this.navListItemsFinal
       }
 
       // hard-coded disabling my-personal-line channel
-      const channels = this.navListItems
+      const channels = this.navListItemsFinal
       let index = channels.findIndex(channel => channel.value === 'my-personal-line')
       if (channels[index]) {
         channels[index].disabled = true
         channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
       }
       return channels
+    },
+
+    showInboxViews () {
+      return (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) && ['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)
     }
   },
 
@@ -189,14 +193,17 @@ export default {
         pinnedViewsEvents: null,
         openInboxViewPopup: null,
         deletedFilter: null
-      }
+      },
+      navListItemsFinal: []
     }
   },
 
   created () {
+    this.navListItemsFinal = this.$route.name !== 'Inboxes' ? this.navListItems.filter(item => item.value !== 'inbox') : this.navListItems.filter(item => item.value === 'inbox')
+
     this.initializeDateRanges()
 
-    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
+    if (this.showInboxViews) {
       this.getFilters()
         .then(() => {
           if (this.$route.params?.viewId) {
@@ -213,6 +220,8 @@ export default {
   },
 
   mounted () {
+    this.navListItemsFinal = (this.$route.name.includes('Inbox') && !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)) ? this.navListItems.filter(item => item.value !== 'inbox') : this.navListItems.filter(item => item.value === 'inbox')
+
     this.listeners.pinnedViewsEvents = () => {
       this.getPinnedViews()
     }
@@ -288,14 +297,15 @@ export default {
         return
       }
 
-      if (this.activeChannel.value === nextActive && this.$q.screen.lt.md) {
+      if (this.activeChannel.value === nextActive && this.$q.screen.lt.md &&
+        this.activeChannel.value !== 'calls' && nextActive !== 'calls') {
         this.$emit('toInbox')
 
         return
       }
 
       this.active = nextActive
-      const channel = this.navListItems.find(item => item.value === nextActive)
+      const channel = this.navListItemsFinal.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 
       // redirect page to Channel
@@ -429,7 +439,7 @@ export default {
           const viewId = val.split('-')[1]
           activeChannel = this.getPinnedViewChannel(viewId)
         } else {
-          activeChannel = this.navListItems.find(item => item.value === val)
+          activeChannel = this.navListItemsFinal.find(item => item.value === val)
         }
 
         this.$emit('active', activeChannel)
@@ -465,6 +475,14 @@ export default {
           console.log(err)
           this.$handleErrors(err.response)
         })
+      }
+    },
+
+    $route (to, from) {
+      if (to.name !== from.name) {
+        this.navListItemsFinal = (to.name.includes('Inbox') && !['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(to.name))
+          ? this.navListItems.filter(item => item.value !== 'inbox')
+          : this.navListItems.filter(item => item.value === 'inbox')
       }
     }
   },
