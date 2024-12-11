@@ -490,7 +490,7 @@ export default {
       console.log('this.defaultOutboundLine', this.defaultOutboundLine)
       console.log('this.this.currentCompany.default_outbound_campaign_id', this.currentCompany.default_outbound_campaign_id)
 
-      if (this.shouldShowLineSelector && this.defaultOutboundLine) {
+      if (!this.shouldShowLineSelector && this.defaultOutboundLine) {
         data.outboundCampaignId = this.defaultOutboundLine
         this.$VueEvent.fire('makeCall', data)
         return
