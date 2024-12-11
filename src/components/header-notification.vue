@@ -3,7 +3,7 @@
        id="notification-container"
        v-if="isShow">
     <div class="d-flex">
-      <div class="pr-1 align-self-center flex-grow-1">
+      <div class="pr-1 align-self-center flex-grow-1 notification-body">
         <strong :class="diagnosisClass">
           <i class="fa fa-exclamation-triangle"/>
           {{ firstDiagnosis }}
@@ -193,3 +193,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.notification-body {
+  font-size: 13px;
+  width: 75%;
+}
+</style>
