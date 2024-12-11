@@ -2,7 +2,10 @@
   <q-dialog v-model="internalDialogVisible">
     <div class="ai-info-box">
       <div class="ai-info-box-header">
-        <span class="ai-info-box-icon">🎁</span>
+        <span class="ai-info-box-icon"
+              v-if="usagePercentage < 100 && isTrial">
+              🎁
+        </span>
         <span class="ai-info-box-title">
           {{ modalContent.title }}
         </span>
@@ -78,6 +81,10 @@ export default {
 
     overusageRestrictionEnabled () {
       return this.currentCompany?.transcription_settings?.overusage_restriction_enabled
+    },
+
+    isTrial () {
+      return this.currentCompany?.transcription_settings?.is_trial
     },
 
     usagePercentage () {
