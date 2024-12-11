@@ -4,9 +4,9 @@
     <q-btn v-if="showAloAiPromotionButton"
            outline
            class="q-btn-standard q-mr-md"
-           @click="showInfoBox = true">
+           @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
       <sparkle-icon width="16" height="16" color="#9333EA"/>
-      <span>AI Engine Ready</span>
+      <span>{{ aiEngineButtonTitle }}</span>
     </q-btn>
     <q-btn v-if="isAdmin || isSupervisor"
            outline
@@ -59,44 +59,8 @@
         </q-item>
       </q-list>
     </q-btn-dropdown>
-    <q-dialog v-model="showInfoBox">
-      <div class="ai-info-box">
-        <div class="ai-info-box-header">
-          <span class="ai-info-box-icon">🎁</span>
-          <span class="ai-info-box-title">
-            We've enabled
-            <span v-if="currentCompany?.plan?.included_transcription_min > 0">
-              {{ currentCompany.plan.included_transcription_min }} minutes of
-            </span>
-            AloAi Voice Analytics for your account.
-          </span>
-        </div>
-        <p class="ai-info-box-content">
-          Our AI engine will transcribe, analyze, and summarize your calls. Navigate to any contact you've called to see it in effect.
-          <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
-        </p>
-        <div class="ai-info-box-links">
-          <strong>Guides:</strong>
-          <ul class="pl-4">
-            <li>
-              <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics" target="_blank">
-                Agents guide to AloAi Voice Analytics
-              </a>
-            </li>
-            <li>
-              <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics" target="_blank">
-                Admins guide to AloAi Voice Analytics
-              </a>
-            </li>
-          </ul>
-          Revolutionize your calls with AloAI Voice Analytics; read the
-            <a href="https://aloware.com/blog/aloai-voice-analytics-announcement" target="_blank">
-              blog post
-            </a>
-            to learn more!
-        </div>
-      </div>
-    </q-dialog>
+    <aloai-promotion-dialog :dialogVisible="showInfoBox"
+                            @update:dialogVisible="showInfoBox = $event"/>
   </div>
 </template>
 
@@ -108,6 +72,7 @@ import { cloneDeep } from 'lodash'
 import { aclMixin, classicMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
 
 export default {
   name: 'shared-login-menu',
@@ -119,7 +84,8 @@ export default {
   ],
 
   components: {
-    SparkleIcon
+    SparkleIcon,
+    AloaiPromotionDialog
   },
 
   computed: {
@@ -138,7 +104,7 @@ export default {
     },
 
     showAloAiPromotionButton () {
-      return this.currentCompany?.transcription_settings?.is_trial && this.screenWidth >= 1200
+      return this.currentCompany?.transcription_enabled && this.screenWidth >= 1200
     },
 
     alowareClassic () {
@@ -151,6 +117,13 @@ export default {
 
     classicUrl () {
       return `${this.getClassicURL(this.isSimpSocial)}?from_talk_2=1&token=${storage.local.getItem('shared_cookie')}`
+    },
+
+    aiEngineButtonTitle () {
+      return (this.currentCompany?.transcription_settings?.call_transcription_enabled &&
+             (this.currentCompany?.used_transcription_min < this.currentCompany?.plan?.included_transcription_min || !this.currentCompany?.transcription_settings?.overusage_restriction_enabled))
+        ? 'AI Engine Ready'
+        : 'AI Engine Off'
     }
   },
 
