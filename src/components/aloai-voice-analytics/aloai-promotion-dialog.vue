@@ -1,40 +1,40 @@
 <template>
-  <q-dialog v-model="internalDialogVisible">
-    <div class="ai-info-box">
-      <div class="ai-info-box-header">
+    <q-dialog v-model="internalDialogVisible">
+        <div class="ai-info-box">
+            <div class="ai-info-box-header">
         <span class="ai-info-box-icon"
               v-if="usagePercentage < 100 && isTrial">
           🎁
         </span>
-        <span class="ai-info-box-title">
+                <span class="ai-info-box-title">
           {{ modalContent.title }}
         </span>
-      </div>
-      <p class="ai-info-box-content text-white">
-        {{ modalContent.message }}
-      </p>
-      <div class="ai-info-box-links">
-        <strong>Guides:</strong>
-          <ul class="pl-4">
-            <li>
-              <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics" target="_blank">
-                Agents guide to AloAi Voice Analytics
-              </a>
-            </li>
-            <li>
-              <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics" target="_blank">
-                Admins guide to AloAi Voice Analytics
-              </a>
-            </li>
-          </ul>
-          Revolutionize your calls with AloAI Voice Analytics; read the
-            <a href="https://aloware.com/blog/aloai-voice-analytics-announcement" target="_blank">
-              blog post
-            </a>
-            to learn more!
+            </div>
+            <p class="ai-info-box-content text-white">
+                {{ modalContent.message }}
+            </p>
+            <div class="ai-info-box-links">
+                <strong>Guides:</strong>
+                <ul class="pl-4">
+                    <li>
+                        <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics" target="_blank">
+                            Agents guide to AloAi Voice Analytics
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics" target="_blank">
+                            Admins guide to AloAi Voice Analytics
+                        </a>
+                    </li>
+                </ul>
+                Revolutionize your calls with AloAI Voice Analytics; read the
+                <a href="https://aloware.com/blog/aloai-voice-analytics-announcement" target="_blank">
+                    blog post
+                </a>
+                to learn more!
+            </div>
         </div>
-    </div>
-  </q-dialog>
+    </q-dialog>
 </template>
 
 <script>
@@ -71,7 +71,7 @@ export default {
     },
 
     transcriptionRate () {
-      return this.currentCompany?.transcription_settings?.transcription_rate
+      return this.profile?.rate?.transcription
     },
 
     transcriptionEnabled () {
@@ -103,13 +103,13 @@ export default {
       if (this.usedMinutes >= this.includedMinutes) {
         if (this.overusageRestrictionEnabled) {
           return {
-            title: `You’ve used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just ${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min.`,
+            title: `You’ve used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
             message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
           }
         }
 
         return {
-          title: `You’ve reached the ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just ${Math.round(Number(this.profile?.rate?.transcription) * 100)} cents/min.`,
+          title: `You’ve reached the ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
           message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
         }
       }
