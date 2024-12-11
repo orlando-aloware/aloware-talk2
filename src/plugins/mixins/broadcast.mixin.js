@@ -56,8 +56,8 @@ export default {
       window.Echo = this.initEcho(broadcastDriver)
       this.broadcastListen()
 
-      // This is a loading test for soketi server second driver
-      if (broadcastDriver === 'pusher' && process.env.API_URL !== 'production') {
+      // This is a stress test for soketi server, should be removed in the future
+      if (broadcastDriver === 'pusher') {
         window.secondEchoDriver = this.initEcho('soketi')
         this.broadcastListenSecondDriver()
       }
