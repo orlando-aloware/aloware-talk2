@@ -383,7 +383,7 @@ export default {
     },
 
     isAlwaysAskEnabled () {
-      return this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+      return this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
     },
 
     defaultOutboundCampaignId () {
