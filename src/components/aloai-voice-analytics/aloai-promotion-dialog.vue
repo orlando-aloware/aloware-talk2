@@ -27,7 +27,7 @@
                         </a>
                     </li>
                 </ul>
-                Revolutionize your calls with AloAI Voice Analytics; read the
+                Revolutionize your calls with AloAi Voice Analytics; read the
                 <a href="https://aloware.com/blog/aloai-voice-analytics-announcement" target="_blank">
                     blog post
                 </a>

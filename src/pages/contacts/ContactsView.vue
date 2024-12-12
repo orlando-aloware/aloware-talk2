@@ -328,7 +328,7 @@
                            v-if="shouldShowAloAi"
                            @click="openAloAiBotContactsEnrollmentModal('add-contact-list')">
             <add-user-icon width="14" height="14" color="#62666E" />
-            Enroll List in AloAI Text Bot
+            Enroll List in AloAi Text Bot
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
