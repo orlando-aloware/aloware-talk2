@@ -382,13 +382,13 @@ export default {
       return this.hasPowerDialerLists ? 'Remove contact from all Power Dialer lists' : 'This contact is not part of any Power Dialer list'
     },
 
-    shouldShowLineSelector () {
+    isAlwaysAskEnabled () {
       return this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
     },
 
-    defaultOutboundLine () {
-      if (this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
-        return this.profile.default_outbound_campaign_id ?? this.currentCompany.default_outbound_campaign_id
+    defaultOutboundCampaignId () {
+      if (this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+        return this.profile?.default_outbound_campaign_id ?? this.currentCompany?.default_outbound_campaign_id
       }
 
       return null
@@ -485,13 +485,8 @@ export default {
         return
       }
 
-      console.log('this.shouldShowLineSelector', this.shouldShowLineSelector)
-      console.log('this.this.profile.outbound_calling_mode', this.profile.outbound_calling_mode)
-      console.log('this.defaultOutboundLine', this.defaultOutboundLine)
-      console.log('this.this.currentCompany.default_outbound_campaign_id', this.currentCompany.default_outbound_campaign_id)
-
-      if (!this.shouldShowLineSelector && this.defaultOutboundLine) {
-        data.outboundCampaignId = this.defaultOutboundLine
+      if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
+        data.outboundCampaignId = this.defaultOutboundCampaignId
         this.$VueEvent.fire('makeCall', data)
         return
       }
