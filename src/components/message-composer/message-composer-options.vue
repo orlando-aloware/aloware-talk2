@@ -34,7 +34,7 @@
       </q-menu>
       <attachment-icon data-testid="message-composer-attachment-icon"></attachment-icon>
       <q-tooltip data-testid="message-composer-add-tooltip">
-        {{  !selectedLine ? 'Please select line before adding attachments' : 'Add attachments' }}
+        {{ !hasSelectedLine ? 'Please select line before adding attachments' : 'Add attachments' }}
       </q-tooltip>
     </b-link>
 
@@ -79,7 +79,7 @@
 
     <b-link href="#"
             data-testid="add-contact-card-link"
-            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments"
+            :disabled="!hasSelectedLine || isTextingDisabled || !canAddMoreAttachments"
             v-if="messageComposer.mode === 'sms'">
       <q-menu content-class="mx-height-500 width-300"
               ref="contactCardMenu"
@@ -94,7 +94,7 @@
 
       <contact-card-icon></contact-card-icon>
       <q-tooltip data-testid="add-contact-card-tooltip">
-        {{  !selectedLine ? 'Please select line before send contact card' : 'Send contact card' }}
+        {{ !hasSelectedLine ? 'Please select line before send contact card' : 'Send contact card' }}
       </q-tooltip>
     </b-link>
 
@@ -224,6 +224,10 @@ export default {
       const hasGif = this.messageComposer.sms.gif_url !== ''
 
       return ((hasGif ? 1 : 0) + this.messageComposer.sms.attachments.length) < this.maxAttachments
+    },
+
+    hasSelectedLine () {
+      return this.selectedLine && this.selectedLine.id
     }
   },
 
