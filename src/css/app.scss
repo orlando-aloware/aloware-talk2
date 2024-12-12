@@ -14135,6 +14135,11 @@ h1.contact-list-name-label {
             &__counter {
               margin-left: 20px;
               color: $grey-90;
+
+              &--dnc {
+                color: $red-90;
+                margin-left: 5px;
+              }
             }
           }
 
