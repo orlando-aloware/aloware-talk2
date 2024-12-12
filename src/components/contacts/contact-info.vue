@@ -347,14 +347,14 @@ export default {
 
     ...mapState('contacts', ['isMergeContactOpen']),
 
+    ...mapState('auth', ['profile']),
+
     ...mapGetters('contacts', [
       'contact',
       'isContactNameEditOpen',
       'contactPhoneNumbers',
       'changingSelectedContact'
     ]),
-
-    ...mapState('auth', ['profile']),
 
     contactName () {
       if (this.contact) {
