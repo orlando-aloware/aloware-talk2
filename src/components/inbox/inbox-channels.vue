@@ -828,8 +828,7 @@ export default {
       'Inbox Contact Communication',
       'Inbox Contact',
       'Inbox Channel Task Status',
-      'Inbox Contact Task',
-      'Inbox Channel Task Status Communications'
+      'Inbox Contact Task'
     ]
     const generalChannelRoutes = ['Inbox Channel', 'Inbox Contact']
     const communicationsChannelRoutes = ['Inbox Contact', 'Inbox Contact Communication']
@@ -1231,7 +1230,7 @@ export default {
 
     toggleMentionType () {
       this.$router.push({
-        name: 'Inbox Channel Task Status Communications',
+        name: 'Inbox Channel Task Status',
         params: {
           channel: 'mentions',
           status: this.mentionType
@@ -1439,7 +1438,7 @@ export default {
   watch: {
     $route (to, from) {
       this.previousRoute = from
-      const inboxRoutes = ['Inbox Channel', 'Inbox', 'Inbox Channel Task Status', 'Inbox Channel Task Status Communications']
+      const inboxRoutes = ['Inbox Channel', 'Inbox', 'Inbox Channel Task Status']
 
       if (inboxRoutes.includes(this.$route.name)) {
         this.isLoaded = false

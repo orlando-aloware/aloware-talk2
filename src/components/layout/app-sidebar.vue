@@ -17,51 +17,9 @@
         </q-spinner-bars>
       </div>
     </div>
-    <q-btn :to="{ name: 'Inboxes' }"
-           :ripple="false"
-           icon="img:app-icons/menu/inbox_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           data-testid="communication-active-sidebar-btn"
-           v-show="isActive('Inboxes')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Inboxes</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-            Inboxes
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Inboxes' }"
-           :ripple="false"
-           icon="img:app-icons/menu/inbox_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           data-testid="communication-no-active-sidebar-btn"
-           v-show="!isActive('Inboxes')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Inboxes</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-            Inboxes
-      </span>
-    </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
            :ripple="false"
-           icon="img:app-icons/menu/communications_active.svg"
+           icon="img:app-icons/menu/inbox_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
@@ -82,7 +40,7 @@
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
            :ripple="false"
-           icon="img:app-icons/menu/communications_gray.svg"
+           icon="img:app-icons/menu/inbox_gray.svg"
            align="left"
            padding="10px 20px"
            class="nav-icons w-100"
@@ -843,7 +801,6 @@
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 import { broadcastsMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
-import * as KycLogs from 'src/constants/kyc-logs'
 
 export default {
   name: 'app-sidebar',
@@ -911,11 +868,6 @@ export default {
       return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
     },
 
-    isKycAccount () {
-      const status = this.profile?.company?.kyc_status
-      return status !== KycLogs.KYC_STATUS_NONE
-    },
-
     sidebarIcon () {
       return this.isSidebarExpanded ? 'unfold_less' : 'unfold_more'
     }
@@ -934,11 +886,7 @@ export default {
         return true
       }
 
-      if (['Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inboxes') {
-        return true
-      }
-
-      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Communication', 'Inbox Channel Task Status Communications'].includes(this.$route.name) && name === 'Inbox') {
+      if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
         return true
       }
 
@@ -985,18 +933,6 @@ export default {
   watch: {
     lightMode () {
       this.modeIcon = this.lightMode ? 'img:app-icons/menu/mode_gray.svg' : 'img:app-icons/menu/mode_gray.svg'
-    },
-
-    $route (to, from) {
-      if (to.name !== from.name) {
-        if (this.$route.name === 'Inboxes') {
-          this.$router.push('/channels/inbox/all')
-        }
-
-        if (this.$route.name === 'Inbox' && !this.$q.screen.lt.md) {
-          this.$router.push('/channels/calls')
-        }
-      }
     }
   }
 }

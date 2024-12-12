@@ -50,14 +50,6 @@
           This contact is currently not enrolled to a sequence.
         </b-card-text>
 
-        <block-tooltip placement="left"
-                       triggers="hover"
-                       target="enroll-to-sequence-popover"
-                       task="sequences.enroll"
-                       data-testid="enroll-to-sequence-tooltip"
-                       v-if="!enabledToAddSequences()">
-        </block-tooltip>
-
         <div id="enroll-to-sequence-popover">
           <b-button variant="outline-primary"
                     size="sm"
@@ -65,7 +57,7 @@
                     block
                     data-testid="enroll-to-sequence-button"
                     @click="openSequenceModal"
-                    :disabled="!enabledToAddSequences() || !isEnabledToEnroll">
+                    :disabled="!isEnabledToEnroll">
             <add-sequence-icon color="white"
                               data-testid="add-sequence-icon"
                               :height="12"
@@ -96,7 +88,6 @@ import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import EnrollSequenceModal from 'components/enroll-sequence-modal'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import BlockTooltip from 'components/kyc/block-tooltip'
 import { kycMixin } from 'src/plugins/mixins'
 import { isEmpty, debounce } from 'lodash'
 
@@ -107,7 +98,10 @@ export default {
     kycMixin
   ],
 
-  components: { EnrollSequenceModal, AddSequenceIcon, BlockTooltip },
+  components: {
+    EnrollSequenceModal,
+    AddSequenceIcon
+  },
 
   data () {
     return {

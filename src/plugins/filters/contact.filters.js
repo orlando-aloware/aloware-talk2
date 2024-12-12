@@ -143,6 +143,8 @@ const fixLrnType = (lrnType) => {
         return 'VOIP'
       case LrnTypes.LRN_TYPE_OTHER:
         return 'Other'
+      case LrnTypes.LRN_NOT_PERFORMED:
+        return 'LRN not performed'
       default:
         return ''
     }

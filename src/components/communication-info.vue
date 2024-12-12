@@ -819,6 +819,7 @@
            v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
         <div class="d-flex align-items-center w-100">
           <communication-audio :communication="communication"
+                               ref="callRecording"
                                :contact="contact"
                                :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                :uniqueId="communication.id + '1'"
@@ -859,9 +860,9 @@
              :class="[ communication.call_summary ? 'mb-2' : '']">
           <div class="flex items-center gap-2">
             <h3 class="ai-effect-gradient-text"
-                @click="currentCompany?.transcription_settings?.is_trial ? (showInfoBox = true) : null">
+                @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
               Powered by AloAi
-              <template v-if="currentCompany?.transcription_settings?.is_trial && currentCompany?.plan?.included_transcription_min > 0">
+              <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
               </template>
               <sparkle-icon width="16" height="16" color="#9333EA"/>
@@ -869,7 +870,7 @@
           </div>
 
           <a class="transcription-link text-decoration-none"
-             @click.prevent="fetchSmartTranscriptionData(communication)">
+             @click.prevent="fetchSmartTranscriptionData()">
             Show transcription
           </a>
         </div>
@@ -879,44 +880,8 @@
         </div>
       </div>
     </div>
-    <q-dialog v-model="showInfoBox">
-      <div class="ai-info-box">
-        <div class="ai-info-box-header">
-          <span class="ai-info-box-icon">🎁</span>
-          <span class="ai-info-box-title">
-            We've enabled
-            <span v-if="currentCompany?.plan?.included_transcription_min > 0">
-              {{ currentCompany.plan.included_transcription_min }} minutes of
-            </span>
-            AloAi Voice Analytics for your account.
-          </span>
-        </div>
-        <p class="ai-info-box-content">
-          Our AI engine will transcribe, analyze, and summarize your calls. Navigate to any contact you've called to see it in effect.
-          <strong>Love it? Contact us for an unbeatable offer to make it permanent.</strong>
-        </p>
-        <div class="ai-info-box-links">
-          <strong>Guides:</strong>
-          <ul class="pl-4">
-            <li>
-              <a href="https://support.aloware.com/en/articles/10233960-guide-for-agents-using-aloai-voice-analytics" target="_blank">
-                Agents guide to AloAi Voice Analytics
-              </a>
-            </li>
-            <li>
-              <a href="https://support.aloware.com/en/articles/10235067-guide-for-admins-using-aloai-voice-analytics" target="_blank">
-                Admins guide to AloAi Voice Analytics
-              </a>
-            </li>
-          </ul>
-          Revolutionize your calls with AloAI Voice Analytics; read the
-            <a href="https://aloware.com/blog/aloai-voice-analytics-announcement" target="_blank">
-              blog post
-            </a>
-            to learn more!
-        </div>
-      </div>
-    </q-dialog>
+    <aloai-promotion-dialog :dialogVisible="showInfoBox"
+                            @update:dialogVisible="showInfoBox = $event" />
   </div>
 </template>
 
@@ -956,6 +921,7 @@ import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import TranscriptionModal from 'components/communication/transcription-modal.vue'
 import ExpandableHtmlViewer from 'components/communication/ExpandableHtmlViewer.vue'
+import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
 
 export default {
   name: 'communication-info',
@@ -992,7 +958,8 @@ export default {
     SmsReminders,
     TargetUsersTree,
     DownloadButton,
-    EntityTags
+    EntityTags,
+    AloaiPromotionDialog
   },
 
   props: {
@@ -1298,8 +1265,10 @@ export default {
       return DOMPurify.sanitize(rawHtml)
     },
 
-    fetchSmartTranscriptionData (communication) {
-      this.$VueEvent.fire('fetchSmartTranscriptionData', communication.id)
+    fetchSmartTranscriptionData () {
+      if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
+        this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
+      }
     }
   },
 
