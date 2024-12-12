@@ -30,12 +30,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Inbox</span>
+        <span class="font-weight-bold text-sm">Inboxes</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        Inbox
+        Inboxes
       </span>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
@@ -51,12 +51,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Inbox</span>
+        <span class="font-weight-bold text-sm">Inboxes</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        Inbox
+        Inboxes
       </span>
     </q-btn>
 

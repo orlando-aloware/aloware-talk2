@@ -74,7 +74,7 @@ const routes = [
         name: 'Inbox',
         component: Inbox,
         meta: {
-          title: 'Inbox'
+          title: 'Inboxes'
         },
         children: [
           {
