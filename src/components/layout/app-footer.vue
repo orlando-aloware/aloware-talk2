@@ -1,13 +1,13 @@
 <template>
   <div>
-    <q-tabs v-model="tab"
-            active-color="positive"
+    <q-tabs active-color="positive"
             indicator-color="transparent"
             align="justify"
-            :breakpoint="600"
             class="light text-grey footer-tabs"
             content-class="q-tabs__content--align-justify"
-            dense>
+            :breakpoint="600"
+            dense
+            v-model="tab">
       <q-route-tab name="inbox"
                    to="/"
                    :content-class="tab === 'inbox' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
@@ -16,8 +16,19 @@
                    no-caps
                    exact>
         <span class="tab-icon">
-          <inbox-mobile-icon
-            :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'"/>
+          <inbox-mobile-icon :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'" />
+        </span>
+        Inboxes
+      </q-route-tab>
+      <q-route-tab name="communications"
+                   to="/communications"
+                   :content-class="tab === 'communications' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
+                   :ripple="false"
+                   :active="tab === 'communications'"
+                   no-caps
+                   exact>
+        <span class="tab-icon">
+          <communications-mobile-icon :color="isActive('communications') ? '#256EFF' : '#A3A3A3'" />
         </span>
         Comm.’s
       </q-route-tab>
@@ -146,15 +157,15 @@
         Settings
       </q-route-tab>
       <q-tab name="more"
-             :id="'mobile-menu-item-more'"
              :content-class="moreContentClass"
              :ripple="false"
              :active="isMoreActive"
-             v-show="false"
+             exact
              no-caps
-             exact>
+             v-show="false"
+             :id="'mobile-menu-item-more'">
         <span class="tab-icon">
-          <more-mobile-icon/>
+          <more-mobile-icon />
         </span>
         More
       </q-tab>
@@ -194,6 +205,7 @@
 
 <script>
 import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon'
+import CommunicationsMobileIcon from 'components/icons/mobile-menu/communications-mobile-icon'
 import ContactsMobileIcon from 'components/icons/mobile-menu/contacts-mobile-icon'
 import StatsMobileIcon from 'components/icons/mobile-menu/stats-mobile-icon'
 import MoreMobileIcon from 'components/icons/mobile-menu/more-mobile-icon'
@@ -216,6 +228,7 @@ export default {
     StatsMobileIcon,
     ContactsMobileIcon,
     InboxMobileIcon,
+    CommunicationsMobileIcon,
     ContactMenu,
     ContactMenuItem,
     CalendarMobileIcon
@@ -276,8 +289,7 @@ export default {
       // this.updateTab()
     },
     getTab () {
-      if ((['Inbox'].includes(this.$route.name) && this.$q.screen.lt.md) ||
-        ['Countact'].includes(this.$route.name)) {
+      if (['Inbox'].includes(this.$route.name) && this.$q.screen.lt.md) {
         this.setShowContactsHeader(false)
       }
 
@@ -286,6 +298,10 @@ export default {
       }
 
       switch (this.$route.name) {
+        case 'Communications':
+        // case 'Inbox Contact Task':
+        // case 'Inbox Channel Task Status':
+          return 'communications'
         case 'Inbox':
         case 'Inbox Channel':
         case 'Inbox Contact':

@@ -30,12 +30,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Communications</span>
+        <span class="font-weight-bold text-sm">Inbox</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        Communications
+        Inbox
       </span>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
@@ -51,9 +51,50 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Communications</span>
+        <span class="font-weight-bold text-sm">Inbox</span>
       </q-tooltip>
 
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Inbox
+      </span>
+    </q-btn>
+
+    <q-btn :to="{ name: 'Communications' }"
+           :ripple="false"
+           icon="img:app-icons/menu/communications_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           data-testid="communication-active-sidebar-btn"
+           v-show="isActive('Communications')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Communications</span>
+      </q-tooltip>
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Communications
+      </span>
+    </q-btn>
+    <q-btn :to="{ name: 'Communications' }"
+           :ripple="false"
+           icon="img:app-icons/menu/communications_gray.svg"
+           align="left"
+           padding="10px 20px"
+           class="nav-icons w-100"
+           data-testid="communication-no-active-sidebar-btn"
+           v-show="!isActive('Communications')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Communications</span>
+      </q-tooltip>
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
         Communications

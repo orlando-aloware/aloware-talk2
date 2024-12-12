@@ -3,7 +3,8 @@
     <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
-        <back-button data-testid="inbox-side-back-btn" @click="back"/>
+        <!-- TODO: then remove because not needed in mobile view anymore for inbox -->
+        <!-- <back-button data-testid="inbox-side-back-btn" @click="back"/> -->
         <span class="truncated-text"
               v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
         <inbox-toggle-filters :should-show-unreads-toggle="true"
@@ -57,7 +58,7 @@ import { mapActions, mapState } from 'vuex'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
-import BackButton from 'components/back-button'
+// import BackButton from 'components/back-button'
 import InboxToggleFilters from 'components/inbox/inbox-toggle-filters'
 import Profile from 'components/profile'
 
@@ -65,7 +66,7 @@ export default {
   name: 'inbox-side',
 
   components: {
-    BackButton,
+    // BackButton,
     InboxTab,
     InboxChannels,
     InboxNavList,
