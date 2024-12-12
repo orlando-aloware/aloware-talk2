@@ -233,8 +233,8 @@ export default {
         countsDncPromise
       ])
         .then((promises) => {
-          this.dncContactsCount = parseInt(promises[2].data.count)
           this.contactsCount = parseInt(promises[1].data.count)
+          this.dncContactsCount = parseInt(promises[2].data.count)
 
           this.loading = false
         })
@@ -285,8 +285,15 @@ export default {
 
     contactsCount: {
       immediate: true,
-      handler (count) {
-        this.$emit('contacts-count', (count - this.dncContactsCount))
+      handler () {
+        this.$emit('contacts-count', (this.contactsCount - this.dncContactsCount))
+      }
+    },
+
+    dncContactsCount: {
+      immediate: true,
+      handler () {
+        this.$emit('contacts-count', (this.contactsCount - this.dncContactsCount))
       }
     }
   },

@@ -53,7 +53,7 @@
                  :is="footerComponent"
                  v-bind="footerComponentProps"
                  @input="footerComponentChanged"
-                 @contacts-length="onContactsLength"/>
+                 @contacts-count="onContactsLength"/>
     </div>
 
     <confirm-dialog id="outside-business-hours-dialog"
