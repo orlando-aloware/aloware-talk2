@@ -4,6 +4,7 @@ import * as CommunicationTypes from '../../constants/communication-types'
 import * as CommunicationRejectionReasons from '../../constants/communication-rejection-reasons'
 import * as CallbackStatus from '../../constants/callback-status'
 import { head } from 'lodash'
+import { REJECTION_REASON_EMERGENCY_NUMBER } from '../../constants/communication-rejection-reasons'
 
 export default {
   methods: {
@@ -269,6 +270,8 @@ export default {
           return `You have reached the maximum number of trial ${resource}.`
         case CommunicationRejectionReasons.REJECTION_REASON_PROVIDER_ALLOWS_ONLY_ONE_ATTACHMENT:
           return 'Provider allows only one attachment.'
+        case CommunicationRejectionReasons.REJECTION_REASON_EMERGENCY_NUMBER:
+          return 'Emergency calling is not allowed.'
       }
     },
 

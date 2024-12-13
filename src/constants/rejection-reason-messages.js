@@ -1,4 +1,5 @@
 import * as CommunicationRejectionReasons from './communication-rejection-reasons'
+import { REJECTION_REASON_EMERGENCY_NUMBER } from './communication-rejection-reasons'
 export const REJECTION_REASONS = [
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_CREDITS,
@@ -135,5 +136,9 @@ export const REJECTION_REASONS = [
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_TRIAL_LIMIT_EXCEEDED,
     message: 'Trial limits have been exceeded; calls cannot be made'
+  },
+  {
+    type: CommunicationRejectionReasons.REJECTION_REASON_EMERGENCY_NUMBER,
+    message: 'Calls to emergency numbers are not allowed'
   }
 ]
