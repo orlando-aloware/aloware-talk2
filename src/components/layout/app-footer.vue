@@ -1,36 +1,34 @@
 <template>
   <div>
-    <q-tabs v-model="tab"
-            active-color="positive"
+    <q-tabs active-color="positive"
             indicator-color="transparent"
             align="justify"
-            :breakpoint="600"
             class="light text-grey footer-tabs"
             content-class="q-tabs__content--align-justify"
-            dense>
-      <q-route-tab name="inboxes"
-                   to="/channels/inbox/all"
-                   :content-class="tab === 'inboxes' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'inboxes'"
-                   no-caps
-                   exact>
-        <span class="tab-icon">
-          <inbox-mobile-icon
-            :color="isActive('inboxes') ? '#256EFF' : '#A3A3A3'"/>
-        </span>
-        Inboxes
-      </q-route-tab>
+            :breakpoint="600"
+            dense
+            v-model="tab">
       <q-route-tab name="inbox"
-                   to="/channels/calls"
+                   to="/"
                    :content-class="tab === 'inbox' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
                    :active="tab === 'inbox'"
                    no-caps
                    exact>
         <span class="tab-icon">
-          <communications-mobile-icon
-            :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'"/>
+          <inbox-mobile-icon :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'" />
+        </span>
+        Inboxes
+      </q-route-tab>
+      <q-route-tab name="communications"
+                   to="/communications"
+                   :content-class="tab === 'communications' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
+                   :ripple="false"
+                   :active="tab === 'communications'"
+                   no-caps
+                   exact>
+        <span class="tab-icon">
+          <communications-mobile-icon :color="isActive('communications') ? '#256EFF' : '#A3A3A3'" />
         </span>
         Comm.’s
       </q-route-tab>
@@ -159,15 +157,15 @@
         Settings
       </q-route-tab>
       <q-tab name="more"
-             :id="'mobile-menu-item-more'"
              :content-class="moreContentClass"
              :ripple="false"
              :active="isMoreActive"
-             v-show="false"
+             exact
              no-caps
-             exact>
+             v-show="false"
+             :id="'mobile-menu-item-more'">
         <span class="tab-icon">
-          <more-mobile-icon/>
+          <more-mobile-icon />
         </span>
         More
       </q-tab>
@@ -271,7 +269,7 @@ export default {
   },
   data () {
     return {
-      tab: 'inboxes',
+      tab: 'inbox',
       parkedCallQueue: []
     }
   },
@@ -291,8 +289,7 @@ export default {
       // this.updateTab()
     },
     getTab () {
-      if ((['Inboxes'].includes(this.$route.name) && this.$q.screen.lt.md) ||
-        ['Countact'].includes(this.$route.name)) {
+      if (['Inbox'].includes(this.$route.name) && this.$q.screen.lt.md) {
         this.setShowContactsHeader(false)
       }
 
@@ -301,15 +298,16 @@ export default {
       }
 
       switch (this.$route.name) {
-        case 'Inboxes':
-        case 'Inbox Contact Task':
-        case 'Inbox Channel Task Status':
-          return 'inboxes'
+        case 'Communications':
+        // case 'Inbox Contact Task':
+        // case 'Inbox Channel Task Status':
+          return 'communications'
         case 'Inbox':
         case 'Inbox Channel':
         case 'Inbox Contact':
+        case 'Inbox Contact Task':
+        case 'Inbox Channel Task Status':
         case 'Inbox Contact Communication':
-        case 'Inbox Channel Task Status Communications':
           return 'inbox'
         case 'Contacts':
         case 'Contact':
@@ -346,7 +344,7 @@ export default {
   watch: {
     'tab': _.debounce(function (newValue, oldValue) {
       if (!newValue) {
-        this.tab = 'inboxes'
+        this.tab = 'inbox'
       }
 
       if (this.tab === 'phone') {

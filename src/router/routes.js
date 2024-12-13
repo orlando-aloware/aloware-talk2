@@ -4,6 +4,7 @@ const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
 const ResetPassword = () => import('pages/ResetPassword.vue')
 const Inbox = () => import('pages/Inbox.vue')
+const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
 const Contact = () => import('src/pages/contacts/Contact.vue')
 const Contacts = () => import('src/pages/contacts/Contacts.vue')
 const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
@@ -70,7 +71,7 @@ const routes = [
       },
       {
         path: '',
-        name: 'Inboxes',
+        name: 'Inbox',
         component: Inbox,
         meta: {
           title: 'Inboxes'
@@ -81,7 +82,7 @@ const routes = [
             name: 'Inbox Contact Task',
             component: Contact,
             meta: {
-              title: 'Inboxes'
+              title: 'Inbox'
             }
           },
           {
@@ -89,41 +90,7 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: Contact,
             meta: {
-              title: 'Inboxes'
-            }
-          },
-          {
-            path: 'channels/view/:viewId/:status',
-            name: 'Inbox View',
-            component: Inbox,
-            meta: {
-              title: 'Inboxes'
-            }
-          },
-          {
-            path: 'channels/view/:viewId/:status/contacts/:id',
-            name: 'Inbox View Contact Task',
-            component: Contact,
-            meta: {
-              title: 'Inboxes'
-            }
-          }
-        ]
-      },
-      {
-        path: '',
-        name: 'Inbox',
-        component: Inbox,
-        meta: {
-          title: 'Communications'
-        },
-        children: [
-          {
-            path: 'channels/:channel/:status',
-            name: 'Inbox Channel Task Status Communications',
-            component: Contact,
-            meta: {
-              title: 'Communications'
+              title: 'Inbox'
             }
           },
           {
@@ -131,7 +98,7 @@ const routes = [
             name: 'Inbox Contact',
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: 'Inbox'
             }
           },
           {
@@ -139,7 +106,7 @@ const routes = [
             name: 'Inbox Contact Communication',
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: 'Inbox'
             }
           },
           {
@@ -147,10 +114,35 @@ const routes = [
             name: 'Inbox Channel',
             component: Inbox,
             meta: {
-              title: 'Communications'
+              title: 'Inbox'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status',
+            name: 'Inbox View',
+            component: Inbox,
+            meta: {
+              title: 'Inbox'
+            }
+          },
+          {
+            path: 'channels/view/:viewId/:status/contacts/:id',
+            name: 'Inbox View Contact Task',
+            component: Contact,
+            meta: {
+              title: 'Inbox'
             }
           }
         ]
+      },
+      {
+        path: '/communications',
+        name: 'Communications',
+        component: CommunicationsView,
+        meta: {
+          title: 'Communications'
+        },
+        children: []
       },
       {
         path: 'contacts',

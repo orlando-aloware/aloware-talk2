@@ -95,22 +95,6 @@ export default {
     ]),
 
     setChannel (routeChanged = false) {
-      if (this.$route.name === 'Inboxes' && !this.activeChannel) {
-        const channel = this.navListItems.find(item => item.value === 'inbox')
-        this.setActiveChannel(channel)
-        this.handleInboxNavigation(routeChanged)
-
-        return
-      }
-
-      if (this.$route.name === 'Inbox' && !this.activeChannel) {
-        const channel = this.navListItems.find(item => item.value === 'calls')
-        this.setActiveChannel(channel)
-        this.handleInboxNavigation(routeChanged)
-
-        return
-      }
-
       if (this.inboxChannelRoutes.includes(this.$route.name)) {
         let channel = null
 
@@ -122,10 +106,14 @@ export default {
         }
 
         this.setActiveChannel(channel)
+        return
       }
-    },
 
-    handleInboxNavigation (routeChanged) {
+      if (this.$route.name === 'Inbox' && !this.activeChannel) {
+        const channel = this.navListItems.find(item => item.value === 'inbox')
+        this.setActiveChannel(channel)
+      }
+
       if (routeChanged && this.$refs['inbox-side']) {
         this.$refs['inbox-side'].navigateToInbox()
       }
@@ -142,10 +130,6 @@ export default {
   },
 
   created () {
-    if (this.$route.path === '/channels/inbox' || this.$route.path === '/') {
-      this.$router.push('/channels/inbox/all')
-    }
-
     if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
       this.getPinnedViews()
     }
@@ -160,7 +144,7 @@ export default {
   mounted () {
     // when the user tries to access the channel directly but without a personal line
     if (this.$route.params?.channel === 'my-personal-line' && !this.profile.campaign_id) {
-      this.$router.push({ name: 'Inboxes' })
+      this.$router.push({ name: 'Inbox' })
       return
     }
 
@@ -192,7 +176,7 @@ export default {
 
   watch: {
     '$route.name': function (value) {
-      const isNotInboxRouteName = !value.includes('Inbox') && ['Inboxes', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox View', 'Inbox View Contact Task'].includes(value)
+      const isNotInboxRouteName = !value.includes('Inbox')
       this.setChannel(isNotInboxRouteName)
     },
 
