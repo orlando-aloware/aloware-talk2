@@ -38,6 +38,13 @@ const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidg
 const AloAi = () => import('pages/AloAi.vue')
 const Apps = () => import('pages/Apps.vue')
 
+export const COMMUNICATIONS_BASE_PATH = 'communications'
+export const DEFAULT_COMMUNICATIONS_CHANNEL = 'communications-logs'
+export const DEFAULT_COMMUNICATIONS_ROUTE_PATH = `/${COMMUNICATIONS_BASE_PATH}/${DEFAULT_COMMUNICATIONS_CHANNEL}`
+
+export const DEFAULT_COMMUNICATIONS_ROUTE_NAME = 'Communications'
+export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications Views'
+
 const routes = [
   {
     path: '/',
@@ -136,13 +143,30 @@ const routes = [
         ]
       },
       {
-        path: '/communications',
-        name: 'Communications',
+        path: COMMUNICATIONS_BASE_PATH,
+        name: DEFAULT_COMMUNICATIONS_ROUTE_NAME,
         component: CommunicationsView,
         meta: {
           title: 'Communications'
         },
-        children: []
+        children: [
+          {
+            path: ':channel',
+            name: `${DEFAULT_COMMUNICATIONS_ROUTE_NAME} Channel`,
+            component: CommunicationsView,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'view/:viewId/:status',
+            name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
+            component: CommunicationsView,
+            meta: {
+              title: 'Communications'
+            }
+          }
+        ]
       },
       {
         path: 'contacts',
