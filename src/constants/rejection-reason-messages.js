@@ -1,5 +1,5 @@
 import * as CommunicationRejectionReasons from './communication-rejection-reasons'
-import { REJECTION_REASON_EMERGENCY_NUMBER } from './communication-rejection-reasons'
+
 export const REJECTION_REASONS = [
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_CREDITS,

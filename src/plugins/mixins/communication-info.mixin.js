@@ -4,7 +4,6 @@ import * as CommunicationTypes from '../../constants/communication-types'
 import * as CommunicationRejectionReasons from '../../constants/communication-rejection-reasons'
 import * as CallbackStatus from '../../constants/callback-status'
 import { head } from 'lodash'
-import { REJECTION_REASON_EMERGENCY_NUMBER } from '../../constants/communication-rejection-reasons'
 
 export default {
   methods: {
