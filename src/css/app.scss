@@ -3758,6 +3758,9 @@ i.option-separator {
 
 .inbox-side {
   max-width: 558px;
+  &.no-max-width {
+    max-width: unset!important;
+  }
   width: 100% !important;
   background-color: $white;
   display: flex;
@@ -9195,6 +9198,10 @@ span.mention {
   max-width: 558px;
   width: 100%;
   flex: 0 0 100%;
+
+  &.no-max-width {
+    max-width: unset!important;
+  }
 }
 
 .unsupported {
@@ -9394,6 +9401,10 @@ screen and (max-width: 956px) {
 
 @media (min-width: 1160px) and (max-width: 1261px) {
   .inbox-side {
+    &__left {
+      max-width: 433px;
+    }
+
     &__right {
       .custom-toggle-button {
         margin-left: 1px !important;
@@ -9410,7 +9421,7 @@ screen and (max-width: 956px) {
   }
   .inbox-side {
     &__left {
-      max-width: 135px;
+      max-width: 185px;
 
       .count-label {
         margin-left: 10px;

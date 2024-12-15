@@ -1,9 +1,9 @@
 import { storiesOf } from '@storybook/vue'
 
-import InboxNavItemView from './inbox-nav-item-view.vue'
-import InboxNavIcon from './inbox-nav-icon.vue'
+import InboxNavItemView from './communications-nav-item-view.vue'
+import InboxNavIcon from './communications-nav-icon.vue'
 import InboxNavBadge from './inbox-nav-badge.vue'
-import InboxNavItems from './inbox-nav-list.vue'
+import InboxNavItems from './communications-nav-list.vue'
 import InboxNavToggleView from './inbox-nav-toggle-view.vue'
 
 const items = () => ({

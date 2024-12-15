@@ -44,6 +44,8 @@ export const DEFAULT_COMMUNICATIONS_ROUTE_PATH = `/${COMMUNICATIONS_BASE_PATH}/$
 
 export const DEFAULT_COMMUNICATIONS_ROUTE_NAME = 'Communications'
 export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications Views'
+export const COMMUNICATIONS_CHANNELS_ROUTE_NAME = 'Communications Channels'
+export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Channel Task Status'
 
 const routes = [
   {
@@ -89,7 +91,7 @@ const routes = [
             name: 'Inbox Contact Task',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -97,7 +99,7 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -105,7 +107,7 @@ const routes = [
             name: 'Inbox Contact',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -113,7 +115,7 @@ const routes = [
             name: 'Inbox Contact Communication',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -121,7 +123,7 @@ const routes = [
             name: 'Inbox Channel',
             component: Inbox,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -129,7 +131,7 @@ const routes = [
             name: 'Inbox View',
             component: Inbox,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -137,7 +139,7 @@ const routes = [
             name: 'Inbox View Contact Task',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           }
         ]
@@ -152,7 +154,7 @@ const routes = [
         children: [
           {
             path: ':channel',
-            name: `${DEFAULT_COMMUNICATIONS_ROUTE_NAME} Channel`,
+            name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
             component: CommunicationsView,
             meta: {
               title: 'Communications'
@@ -162,6 +164,14 @@ const routes = [
             path: 'view/:viewId/:status',
             name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
             component: CommunicationsView,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: ':channel/:status',
+            name: COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME,
+            component: Contact,
             meta: {
               title: 'Communications'
             }

@@ -12,12 +12,13 @@ import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
 import moment from 'moment'
+import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 
 export default {
   mixins: [userMixin],
 
   computed: {
-    ...mapState('inbox', [
+    ...mapState('communications', [
       'isFetchingContacts',
       'contactsCurrentPage',
       'liveContacts',
@@ -47,14 +48,14 @@ export default {
 
   data () {
     const inboxRoutes = [
-      'Inbox',
-      'Inbox Contact Task',
-      'Inbox Channel Task Status',
-      'Inbox Contact Communication'
+      'Communications',
+      'Communications Contact Task',
+      'Communications Channel Task Status',
+      'Communications Contact Communication'
     ]
     const inboxViewsRoutes = [
-      'Inbox View',
-      'Inbox View Contact Task'
+      'Communications View',
+      'Communications View Contact Task'
     ]
 
     return {
@@ -116,8 +117,8 @@ export default {
         ...inboxRoutes,
         ...inboxViewsRoutes,
         ...[
-          'Inbox Channel',
-          'Inbox Contact'
+          'Communications Channel',
+          'Communications Contact'
         ]
       ],
       inboxViewsRoutes: inboxViewsRoutes,
@@ -132,7 +133,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', [
+    ...mapActions('communications', [
       'setLiveContacts',
       'setSelectedContact',
       'setHasMoreContacts',
@@ -286,7 +287,7 @@ export default {
                   this.setOpenTaskCount(+response.data.count)
                 }
 
-                if (!this.activeChannel || this.activeChannel.value === 'inbox' || forInbox) {
+                if (!this.activeChannel || this.activeChannel.value === DEFAULT_COMMUNICATIONS_CHANNEL || forInbox) {
                   this.setInboxOpenTaskCount(+response.data.count)
                 }
               }
@@ -300,7 +301,7 @@ export default {
                   this.setPendingTaskCount(+response.data.count)
                 }
 
-                if (!this.activeChannel || this.activeChannel.value === 'inbox' || forInbox) {
+                if (!this.activeChannel || this.activeChannel.value === DEFAULT_COMMUNICATIONS_CHANNEL || forInbox) {
                   this.setInboxPendingTaskCount(+response.data.count)
                 }
               }

@@ -110,7 +110,7 @@ export default {
     ]),
 
     isShown () {
-      return (this.$route?.meta?.title === 'Inboxes')
+      return (this.$route?.meta?.title === 'Inboxes' && this.$route.params.channel !== 'mentions')
     },
 
     toggleFiltersClass () {

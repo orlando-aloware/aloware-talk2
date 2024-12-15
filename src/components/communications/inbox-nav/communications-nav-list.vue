@@ -17,12 +17,12 @@
               :pending-count="pendingCount"
               :disabled="item.disabled"
               :tooltip="item.tooltip"
-              v-for="item in inboxChannels"
+              v-for="item in communicationsChannels"
               @click="onItemClicked" />
 
     <hr>
 
-    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isInboxViewsEnabledCompany">
+    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || CommunicationsInboxViewsEnabledCompany">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -55,36 +55,37 @@
           <span data-testid="inbox-nav-list-no-pinned-views">No Pinned Views</span>
         </div>
 
-      <inbox-views target="#edit-views-icon"
-                   :views="allInboxFilters"
-                   data-testid="inbox-nav-list-inbox-views"
-                   @closed="onCloseViewsList"/>
+      <communications-views target="#edit-views-icon"
+                            :views="allInboxFilters"
+                            data-testid="inbox-nav-list-inbox-views"
+                            @closed="onCloseViewsList"/>
     </div>
   </div>
 </template>
 
 <script>
-import NavItem from './inbox-nav-item'
-import InboxViews from 'src/components/inbox/inbox-views.vue'
+import NavItem from './communications-nav-item.vue'
+import CommunicationsViews from 'src/components/communications/communications-views.vue'
 import { mapActions, mapState, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import { get } from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
-import { communicationsRoutesMixin, inboxMixin, userMixin } from 'src/plugins/mixins'
+import { communicationsRoutesMixin, communicationsMixin, userMixin } from 'src/plugins/mixins'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME, COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME, DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 
 export default {
-  name: 'inbox-nav-list',
+  name: 'communications-nav-list',
 
   components: {
-    InboxViews,
+    CommunicationsViews,
     NavItem
   },
 
   mixins: [
     communicationsRoutesMixin,
-    inboxMixin,
+    communicationsMixin,
     userMixin
   ],
 
@@ -110,7 +111,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', [
+    ...mapState('communications', [
       'navListItems',
       'activeChannel',
       'selectedFilter',
@@ -123,7 +124,7 @@ export default {
       'isFilterDialogForView'
     ]),
 
-    ...mapGetters('inbox', [
+    ...mapGetters('communications', [
       'allInboxFilters'
     ]),
 
@@ -137,7 +138,7 @@ export default {
       return !this.$q.screen.lt.md || isMobileInboxRoutes
     },
 
-    inboxChannels () {
+    communicationsChannels () {
       if (this.profile?.campaign_id) {
         return this.navListItems
       }
@@ -196,7 +197,7 @@ export default {
   created () {
     this.initializeDateRanges()
 
-    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
+    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.CommunicationsInboxViewsEnabledCompany) {
       this.getFilters()
         .then(() => {
           if (this.$route.params?.viewId) {
@@ -235,7 +236,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', [
+    ...mapActions('communications', [
       'setActiveChannel',
       'setSelectedFilter',
       'resetChannelChangedFilterFields',
@@ -299,9 +300,9 @@ export default {
       this.setActiveChannel(channel)
 
       // redirect page to Channel
-      if (this.active !== 'inbox') {
+      if (this.active !== DEFAULT_COMMUNICATIONS_CHANNEL) {
         this.$router.push({
-          name: 'Inbox Channel',
+          name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
           params: {
             channel: this.active
           }
@@ -315,14 +316,14 @@ export default {
 
       // redirect page to Inbox
       this.$router.push({
-        name: 'Inbox Channel Task Status',
+        name: COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME,
         params: {
           channel: this.active,
           status: InboxTaskStatus.DEFAULT_STATUS
         }
       }).catch(err => {
         //  properly reload contacts if redirected or navigation clicked to the same "inbox" route
-        if (this.$route.name === 'Inbox' || this.$route.params.channel === 'inbox') {
+        if (this.$route.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME || this.$route.params.channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
           this.loadContactTasks()
         }
 
@@ -385,7 +386,7 @@ export default {
       this.loadContactTasks()
 
       this.$router.push({
-        name: 'Inbox View',
+        name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
         params: {
           viewId: this.selectedFilter.id,
           status: this.statusText,
@@ -455,7 +456,7 @@ export default {
         this.setActiveChannel(channel)
 
         this.$router.push({
-          name: 'Inbox View',
+          name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
           params: {
             viewId: this.appliedFilter.id,
             status: this.statusText,

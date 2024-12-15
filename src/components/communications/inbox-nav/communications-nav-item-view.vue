@@ -3,16 +3,16 @@
     <h4>Navigation Item</h4>
     <div class="mb-3">
       <div class="text-muted mb-1">Inactive</div>
-      <inbox-nav-item label="Tasks" value="tasks" icon="task" />
+      <nav-item label="Tasks" value="tasks" icon="task" />
     </div>
     <div class="mb-3">
       <div class="text-muted mb-1">Active</div>
-      <inbox-nav-item label="Tasks" value="tasks" icon="task" :isActive="true" />
+      <nav-item label="Tasks" value="tasks" icon="task" :isActive="true" />
     </div>
 
     <div class="mb-3">
       <div class="text-muted mb-1">Badge Default</div>
-      <inbox-nav-item
+      <nav-item
         label="Tasks"
         value="tasks"
         icon="task"
@@ -25,7 +25,7 @@
 
     <div class="mb-3">
       <div class="text-muted mb-1">Badge Danger</div>
-      <inbox-nav-item
+      <nav-item
         label="Tasks"
         value="tasks"
         icon="task"
@@ -39,7 +39,7 @@
     <div class="mb-3">
       <div class="text-muted mb-1">Compressed</div>
       <div class="compressed">
-        <inbox-nav-item
+        <nav-item
           label="Tasks"
           value="tasks"
           icon="task"
@@ -55,10 +55,10 @@
 </template>
 
 <script>
-import InboxNavItem from './inbox-nav-item.vue'
+import NavItem from './communications-nav-item.vue'
 export default {
   components: {
-    InboxNavItem
+    NavItem
   }
 }
 </script>

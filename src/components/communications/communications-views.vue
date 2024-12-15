@@ -69,7 +69,7 @@
 <script>
 import Search from 'src/components/search.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { inboxMixin } from 'src/plugins/mixins'
+import { communicationsMixin } from 'src/plugins/mixins'
 import { CHANNEL_INBOX } from 'src/constants/inbox-channels'
 
 export default {
@@ -78,7 +78,7 @@ export default {
   },
 
   mixins: [
-    inboxMixin
+    communicationsMixin
   ],
 
   props: {
@@ -105,13 +105,13 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', [
+    ...mapState('communications', [
       'pinnedViews',
       'isFilterDialogShown',
       'showViewsList'
     ]),
 
-    ...mapGetters('inbox', [
+    ...mapGetters('communications', [
       'allInboxFilters'
     ]),
 
@@ -131,7 +131,7 @@ export default {
   }),
 
   methods: {
-    ...mapActions('inbox', [
+    ...mapActions('communications', [
       'setFilterDialogForView',
       'setIsEditingView',
       'toggleFilterDialog',

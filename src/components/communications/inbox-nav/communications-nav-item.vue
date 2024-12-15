@@ -75,18 +75,18 @@
 </template>
 
 <script>
-import Icon from './inbox-nav-icon.vue'
+import Icon from './communications-nav-icon.vue'
 import { mapState, mapGetters } from 'vuex'
 
 export default {
-  name: 'inbox-nav-item',
+  name: 'communications-nav-item',
 
   components: {
     Icon
   },
 
   computed: {
-    ...mapState('inbox', [
+    ...mapState('communications', [
       'isLoadingOpenTaskCount',
       'isLoadingPendingTaskCount'
     ]),

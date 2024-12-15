@@ -1,5 +1,5 @@
 <template>
-  <div class="inbox-wrapper border-right" data-testid="inbox-side-wrapper">
+  <div class="inbox-wrapper border-right no-max-width" data-testid="inbox-side-wrapper">
     <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
@@ -12,12 +12,12 @@
       <profile class="p-0"
                :hide-profile-info="true"/>
     </div>
-    <div class="inbox-side border-top-0 flex-grow-0 h-100 overflow-hidden">
+    <div class="inbox-side border-top-0 flex-grow-0 h-100 overflow-hidden no-max-width">
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
           <div class="inbox-side__nav h-100">
-            <inbox-nav-list :closed="closed"
+            <communications-nav-list :closed="closed"
                             :openCount="inboxTaskCounts.open"
                             :pendingCount="inboxTaskCounts.pending"
                             :value.sync="active"
@@ -25,19 +25,24 @@
                             data-testid="inbox-side-nav-list"
                             @active="newActive"
                             @toInbox="navigateToInbox">
-            </inbox-nav-list>
+            </communications-nav-list>
           </div>
         </div>
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
-           :class="{'inbox-side__right--opened': isInboxTaskOpened }">
-        <!-- Inbox Tab (Inbox/Inbox View) UI -->
+      :class="{'inbox-side__right--opened': isInboxTaskOpened }">
+
+      <div class="d-flex justify-content-center mx-auto pt-5">
+        <h1>Communications Table: {{ channelName }}</h1>
+      </div>
+      <!-- TODO: purge this and all unused components
+        Inbox Tab (Inbox/Inbox View) UI
         <inbox-tab :search-text="searchText"
                    v-if="!activeChannel || activeChannel.value === DEFAULT_COMMUNICATIONS_CHANNEL || activeChannel.value.indexOf('view') !== -1"
                    data-testid="inbox-side-inbox-tab"
                    @itemSelected="onItemSelected" />
 
-        <!-- Channels (Communications) UI -->
+        Channels (Communications) UI
         <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
                         :filter-type="activeChannel?.type"
                         :answer-status="activeChannel?.answerStatus"
@@ -46,6 +51,7 @@
                         :sort="sort"
                         data-testid="inbox-side-inbox-channels"
                         v-if="activeChannel && ![DEFAULT_COMMUNICATIONS_CHANNEL].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
+                        -->
       </div>
     </div>
   </div>
@@ -54,11 +60,11 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import InboxNavList from 'components/communications/inbox-nav/inbox-nav-list'
-import InboxChannels from 'components/communications/inbox-channels'
-import InboxTab from 'components/communications/inbox-tab'
+import CommunicationsNavList from 'components/communications/inbox-nav/communications-nav-list'
+// import InboxChannels from 'components/communications/inbox-channels'
+// import InboxTab from 'components/communications/inbox-tab.vue'
 import BackButton from 'components/back-button'
-import CommunicationsToggleFilters from 'components/communications/communications-toggle-filters'
+import CommunicationsToggleFilters from 'components/communications/communications-toggle-filters.vue'
 import Profile from 'components/profile'
 import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 
@@ -67,9 +73,9 @@ export default {
 
   components: {
     BackButton,
-    InboxTab,
-    InboxChannels,
-    InboxNavList,
+    // InboxTab,
+    // InboxChannels,
+    CommunicationsNavList,
     Profile,
     CommunicationsToggleFilters
   },
@@ -226,7 +232,7 @@ export default {
 
   watch: {
     $route (to, from) {
-      const redirectingToInbox = (to.name.includes(DEFAULT_COMMUNICATIONS_ROUTE_NAME) && to.name !== DEFAULT_COMMUNICATIONS_ROUTE_NAME) || from.name === 'Inbox View'
+      const redirectingToInbox = (to.name.includes(DEFAULT_COMMUNICATIONS_ROUTE_NAME) && to.name !== DEFAULT_COMMUNICATIONS_ROUTE_NAME) || from.name === 'Communications View'
 
       if (redirectingToInbox) {
         this.onLoadShowTasks = true
