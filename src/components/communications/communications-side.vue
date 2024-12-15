@@ -6,8 +6,8 @@
         <back-button data-testid="inbox-side-back-btn" @click="back"/>
         <span class="truncated-text"
               v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
-        <communications-toggle-filters :should-show-unreads-toggle="true"
-                                       data-testid="inbox-side-my-contacts-filter"/>
+        <!-- <communications-toggle-filters :should-show-unreads-toggle="true"
+                                       data-testid="inbox-side-my-contacts-filter"/> -->
       </div>
       <profile class="p-0"
                :hide-profile-info="true"/>
@@ -64,7 +64,7 @@ import CommunicationsNavList from 'components/communications/inbox-nav/communica
 // import InboxChannels from 'components/communications/inbox-channels'
 // import InboxTab from 'components/communications/inbox-tab.vue'
 import BackButton from 'components/back-button'
-import CommunicationsToggleFilters from 'components/communications/communications-toggle-filters.vue'
+// import CommunicationsToggleFilters from 'components/communications/communications-toggle-filters.vue'
 import Profile from 'components/profile'
 import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 
@@ -76,8 +76,8 @@ export default {
     // InboxTab,
     // InboxChannels,
     CommunicationsNavList,
-    Profile,
-    CommunicationsToggleFilters
+    Profile
+    // CommunicationsToggleFilters
   },
 
   data () {

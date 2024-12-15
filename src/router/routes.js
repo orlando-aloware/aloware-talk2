@@ -43,8 +43,8 @@ export const DEFAULT_COMMUNICATIONS_CHANNEL = 'communications-logs'
 export const DEFAULT_COMMUNICATIONS_ROUTE_PATH = `/${COMMUNICATIONS_BASE_PATH}/${DEFAULT_COMMUNICATIONS_CHANNEL}`
 
 export const DEFAULT_COMMUNICATIONS_ROUTE_NAME = 'Communications'
-export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications Views'
-export const COMMUNICATIONS_CHANNELS_ROUTE_NAME = 'Communications Channels'
+export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications View'
+export const COMMUNICATIONS_CHANNELS_ROUTE_NAME = 'Communications Channel'
 export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Channel Task Status'
 
 const routes = [
