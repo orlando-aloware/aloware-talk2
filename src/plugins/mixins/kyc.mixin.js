@@ -53,6 +53,13 @@ export default _.merge({
         return true
       }
 
+      if (this.isTrial) {
+        /**
+         * if Its trial -> Allow messaging , let it fail on compliance
+         */
+        return true
+      }
+
       /**
        *   3 - A2P Campaign + 10DLC Line -> Allow messaging
        *   4 - No A2P Campaign + 10DLC -> Not allowed
