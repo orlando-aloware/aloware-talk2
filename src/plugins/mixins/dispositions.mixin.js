@@ -37,7 +37,9 @@ export default {
 
       const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
 
-      return isForcedCallDisposition && !this.isCallDisposed
+      const isForceRedialEnabled = this.sessionSettings.min_redials > 0
+
+      return (isForcedCallDisposition || isForceRedialEnabled) && !this.isCallDisposed
     },
 
     isHighlightedContactDisposition () {
@@ -53,6 +55,14 @@ export default {
       const isForcedContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition
 
       return isForcedContactDisposition && !this.isContactDisposed
+    },
+
+    isHighlightedSmsTemplate () {
+      if (!this.isCallDisposed) {
+        return false
+      }
+
+      return this.requireSmsSending
     },
 
     hasContactDisposition () {
