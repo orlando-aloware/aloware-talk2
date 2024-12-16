@@ -74,7 +74,10 @@ export default {
 
     ...mapState(['isWidget']),
 
-    ...mapFields('powerDialer', ['activeTask']),
+    ...mapFields('powerDialer', [
+      'activeTask',
+      'sessionPaused'
+    ]),
 
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
@@ -1386,7 +1389,7 @@ export default {
     },
 
     countWrapUpDuration () {
-      if (this.wrapUpPaused) {
+      if (this.wrapUpPaused || this.sessionPaused) {
         return
       }
 

@@ -49,7 +49,7 @@
                       collapsible
                       :list-items="smsTemplates"
                       :display-count="4"
-                      :forced="requireSmsSending"
+                      :forced="isHighlightedSmsTemplate"
                       :is-empty="isSmsTemplatesEmpty"
                       v-if="sessionSettings.min_redials > 0 && sessionSettings.force_sms"
                       @on-selected-item="onSelectedSmsTemplate"/>
