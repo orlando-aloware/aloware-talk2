@@ -412,12 +412,12 @@ export default {
       let params = {
         page: 1,
         per_page: 99999,
-        list_type: ContactListTypes.STATIC
+        list_type: ContactListTypes.STATIC,
+        user_id: (this.isAgent && !this.isBillingAdminOrAdminOrSupervisor) || !this.isPublicContactListCard ? this.profile.id : null
       }
       if (this.isPublicContactListCard) {
         this.loadedAllPublicLists = await this.getPublicListsV2(params)
       } else {
-        params.user_id = this.profile.id
         params.private_only = true
         this.loadedAllPrivateLists = await this.getListsV2(params)
       }
