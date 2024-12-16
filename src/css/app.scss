@@ -2638,6 +2638,22 @@ i.option-separator {
   }
 }
 
+.integration-wrapper-generic {
+  .integration-card {
+    .integration-jit-card-header {
+      margin-bottom: 4px;
+
+      .integration-icon-in-header {
+        margin-right: 10px;
+      }
+    }
+
+    .integration-title {
+      top: -9px;
+    }
+  }
+}
+
 .workflow-enroll-popover {
   left: -340px !important;
   width: 300px;
@@ -15625,7 +15641,7 @@ hr {
 }
 
 
-.external-contact-hubspot-link-icon {
+.external-contact-integration-link-icon {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -15635,7 +15651,7 @@ hr {
   color: $grey-90;
 }
 
-.hubspot-jit-card-header {
+.integration-jit-card-header {
   margin: 12px;
 }
 
@@ -15664,20 +15680,6 @@ hr {
       max-width: 660px !important;
     }
   }
-}
-
-.external-contact-hubspot-link-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-.duplicateContactPhoneNumberMessage {
-  color: $grey-90;
-}
-
-.hubspot-jit-card-header {
-  margin: 12px;
 }
 
 .preview-card-box {
