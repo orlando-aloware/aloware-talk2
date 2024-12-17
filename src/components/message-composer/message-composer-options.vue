@@ -227,7 +227,7 @@ export default {
     },
 
     hasSelectedLine () {
-      return this.selectedLine && this.selectedLine.id
+      return this.selectedLine?.id
     }
   },
 
