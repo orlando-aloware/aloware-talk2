@@ -55,7 +55,7 @@ export default _.merge({
 
       if (this.isTrial) {
         /**
-         * if Its trial -> Allow messaging , let it fail on compliance
+         * If it's trial -> Allow messaging, let it fail on compliance
          */
         return true
       }
