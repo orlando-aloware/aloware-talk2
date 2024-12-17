@@ -147,7 +147,7 @@ export default {
     },
     hasShowInPublicFolderPermission: {
       type: Boolean,
-      required: true
+      default: false
     },
     isPinned: {
       type: Boolean
