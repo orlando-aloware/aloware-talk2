@@ -94,7 +94,7 @@
 
       <contact-card-icon></contact-card-icon>
       <q-tooltip data-testid="add-contact-card-tooltip">
-        {{ !hasSelectedLine ? 'Please select line before send contact card' : 'Send contact card' }}
+        {{ !hasSelectedLine ? 'Please select a line before sending the contact card' : 'Send contact card' }}
       </q-tooltip>
     </b-link>
 
