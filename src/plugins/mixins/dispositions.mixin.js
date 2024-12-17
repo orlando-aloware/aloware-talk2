@@ -28,11 +28,11 @@ export default {
     },
 
     isForcedCallDisposition () {
-      return (this.currentCompany && this.currentCompany.force_call_disposition) || this.isForcedRedialEnabled
+      return this.currentCompany?.force_call_disposition || this.isForcedRedialEnabled
     },
 
     isForcedContactDisposition () {
-      return this.currentCompany && this.currentCompany.force_contact_disposition
+      return this.currentCompany?.force_contact_disposition
     },
 
     isNotDisposed () {
@@ -105,7 +105,7 @@ export default {
 
       // selected call disposition is a successful call disposition
       const successfulCallDispositionsIds = this.sessionSettings?.successful_call_disposition_ids
-      const successfulCallDispositionSelected = Array.isArray(successfulCallDispositionsIds) && successfulCallDispositionsIds.includes(this.callDisposition)
+      const successfulCallDispositionSelected = successfulCallDispositionsIds?.includes(this.callDisposition)
 
       // if force redial is enabled, force sms sending if the
       // selected call disposition is not one of the successful call dispositions
