@@ -87,6 +87,7 @@
         :hasDelete="hasDelete"
         :layer="layer + 1"
         :endpoint="endpoint"
+        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
         data-testid="tree-folder-contents"
       ></tree-folder-contents>
       <tree-list-contents
