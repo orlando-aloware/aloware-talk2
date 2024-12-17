@@ -60,7 +60,7 @@
       </span>
     </q-btn>
 
-    <q-btn :to="{ name: 'Communications' }"
+    <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
            :ripple="false"
            icon="img:app-icons/menu/communications_active.svg"
            align="left"
@@ -80,7 +80,7 @@
         Communications
       </span>
     </q-btn>
-    <q-btn :to="{ name: 'Communications' }"
+    <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
            :ripple="false"
            icon="img:app-icons/menu/communications_gray.svg"
            align="left"
@@ -842,6 +842,7 @@
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 import { broadcastsMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 
 export default {
   name: 'app-sidebar',
@@ -917,7 +918,8 @@ export default {
 
   data () {
     return {
-      modeIcon: 'img:app-icons/menu/mode_gray.svg'
+      modeIcon: 'img:app-icons/menu/mode_gray.svg',
+      DEFAULT_COMMUNICATIONS_ROUTE_PATH
     }
   },
 
@@ -928,6 +930,11 @@ export default {
       }
 
       if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
+        return true
+      }
+
+      // if the route name includes Communications and name is Communications
+      if (this.$route.name.includes('Communications') && name === 'Communications') {
         return true
       }
 

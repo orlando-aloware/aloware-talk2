@@ -1,23 +1,23 @@
 <template>
-  <div class="inbox-wrapper border-right" data-testid="inbox-side-wrapper">
+  <div class="inbox-wrapper border-right no-max-width" data-testid="inbox-side-wrapper">
     <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
         <back-button data-testid="inbox-side-back-btn" @click="back"/>
         <span class="truncated-text"
               v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
-        <inbox-toggle-filters :should-show-unreads-toggle="true"
-                              data-testid="inbox-side-my-contacts-filter"/>
+        <!-- <communications-toggle-filters :should-show-unreads-toggle="true"
+                                       data-testid="inbox-side-my-contacts-filter"/> -->
       </div>
       <profile class="p-0"
                :hide-profile-info="true"/>
     </div>
-    <div class="inbox-side border-top-0 flex-grow-0 h-100 overflow-hidden">
+    <div class="inbox-side border-top-0 flex-grow-0 h-100 overflow-hidden no-max-width">
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
           <div class="inbox-side__nav h-100">
-            <inbox-nav-list :closed="closed"
+            <communications-nav-list :closed="closed"
                             :openCount="inboxTaskCounts.open"
                             :pendingCount="inboxTaskCounts.pending"
                             :value.sync="active"
@@ -25,19 +25,24 @@
                             data-testid="inbox-side-nav-list"
                             @active="newActive"
                             @toInbox="navigateToInbox">
-            </inbox-nav-list>
+            </communications-nav-list>
           </div>
         </div>
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
-           :class="{'inbox-side__right--opened': isInboxTaskOpened }">
-        <!-- Inbox Tab (Inbox/Inbox View) UI -->
+      :class="{'inbox-side__right--opened': isInboxTaskOpened }">
+
+      <div class="d-flex justify-content-center mx-auto pt-5">
+        <h1>Communications Table: {{ channelName }}</h1>
+      </div>
+      <!-- TODO: purge this and all unused components
+        Inbox Tab (Inbox/Inbox View) UI
         <inbox-tab :search-text="searchText"
-                   v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
+                   v-if="!activeChannel || activeChannel.value === DEFAULT_COMMUNICATIONS_CHANNEL || activeChannel.value.indexOf('view') !== -1"
                    data-testid="inbox-side-inbox-tab"
                    @itemSelected="onItemSelected" />
 
-        <!-- Channels (Communications) UI -->
+        Channels (Communications) UI
         <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
                         :filter-type="activeChannel?.type"
                         :answer-status="activeChannel?.answerStatus"
@@ -45,7 +50,8 @@
                         :search-text="searchText"
                         :sort="sort"
                         data-testid="inbox-side-inbox-channels"
-                        v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
+                        v-if="activeChannel && ![DEFAULT_COMMUNICATIONS_CHANNEL].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
+                        -->
       </div>
     </div>
   </div>
@@ -54,28 +60,30 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
-import InboxChannels from 'components/inbox/inbox-channels'
-import InboxTab from 'components/inbox/inbox-tab'
+import CommunicationsNavList from 'components/communications/inbox-nav/communications-nav-list'
+// import InboxChannels from 'components/communications/inbox-channels'
+// import InboxTab from 'components/communications/inbox-tab.vue'
 import BackButton from 'components/back-button'
-import InboxToggleFilters from 'components/inbox/inbox-toggle-filters'
+// import CommunicationsToggleFilters from 'components/communications/communications-toggle-filters.vue'
 import Profile from 'components/profile'
+import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 
 export default {
-  name: 'inbox-side',
+  name: 'communications-side',
 
   components: {
     BackButton,
-    InboxTab,
-    InboxChannels,
-    InboxNavList,
-    Profile,
-    InboxToggleFilters
+    // InboxTab,
+    // InboxChannels,
+    CommunicationsNavList,
+    Profile
+    // CommunicationsToggleFilters
   },
 
   data () {
     return {
-      active: 'inbox',
+      DEFAULT_COMMUNICATIONS_CHANNEL,
+      active: DEFAULT_COMMUNICATIONS_CHANNEL,
       closed: false,
       searchText: '',
       sort: '',
@@ -89,7 +97,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', [
+    ...mapState('communications', [
       'activeChannel',
       'communications',
       'taskCounts',
@@ -104,8 +112,8 @@ export default {
     },
 
     isInboxTaskOpened () {
-      const isInboxChildRoutesMobileScreen = this.$route.name !== 'Inbox' &&
-        this.$route.name.toLowerCase().includes('inbox') &&
+      const isInboxChildRoutesMobileScreen = this.$route.name !== DEFAULT_COMMUNICATIONS_ROUTE_NAME &&
+        this.$route.name.includes(DEFAULT_COMMUNICATIONS_ROUTE_NAME) &&
         this.$q.screen.lt.md
 
       return !this.$q.screen.lt.md || this.onLoadShowTasks || isInboxChildRoutesMobileScreen
@@ -113,7 +121,7 @@ export default {
 
     channelName () {
       const path = this.$route.path.split('/')
-      const name = _.get(path, '[2]', 'Inbox').replace('-', ' ')
+      const name = _.get(path, '[2]', 'Communications').replace('-', ' ')
 
       if (this.isMobile && this.$q.screen.lt.md && name === 'all communications') {
         return 'All comms'
@@ -124,9 +132,9 @@ export default {
 
     isShowPageHeader () {
       const inRoutesWithoutHeader = [
-        'Inbox Channel Task Status',
-        'Inbox Contact',
-        'Inbox Contact Task'
+        'Communications Channel Task Status',
+        'Communications Contact',
+        'Communications Contact Task'
       ]
 
       const isShowPageHeaderMobileScreen = this.isMobile &&
@@ -138,8 +146,8 @@ export default {
   },
 
   created () {
-    this.resetVuex(['inbox', 'non-cache'])
-    this.closed = this.$route.name !== 'Inbox' && this.$route.name.toLowerCase().includes('Inbox') && this.$q.screen.lt.md
+    this.resetVuex(['communications', 'non-cache'])
+    this.closed = this.$route.name !== DEFAULT_COMMUNICATIONS_ROUTE_NAME && this.$q.screen.lt.md
   },
 
   mounted () {
@@ -157,17 +165,17 @@ export default {
   },
 
   activated () {
-    this.active = 'inbox'
+    this.active = DEFAULT_COMMUNICATIONS_CHANNEL
   },
 
   deactivated () {
-    this.active = 'inbox'
+    this.active = DEFAULT_COMMUNICATIONS_CHANNEL
   },
 
   methods: {
     ...mapActions('contacts', ['setShowContactsHeader']),
 
-    ...mapActions('inbox', [
+    ...mapActions('communications', [
       'gettingTasksList',
       'setActiveChannel',
       'setCommunications'
@@ -190,16 +198,16 @@ export default {
     back () {
       this.setShowContactsHeader(true)
 
-      if (this.$route.name !== 'Inbox') {
+      if (this.$route.name !== DEFAULT_COMMUNICATIONS_ROUTE_NAME) {
         this.$router.push({
-          name: 'Inbox'
+          name: DEFAULT_COMMUNICATIONS_ROUTE_NAME
         })
       }
 
       this.onLoadShowTasks = false
 
-      if (this.$q.screen.lt.md && this.$route.name === 'Inbox') {
-        const channel = this.navListItems.find(item => item.value === 'inbox')
+      if (this.$q.screen.lt.md && this.$route.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME) {
+        const channel = this.navListItems.find(item => item.value === DEFAULT_COMMUNICATIONS_CHANNEL)
         this.setActiveChannel(channel)
       }
     },
@@ -224,14 +232,15 @@ export default {
 
   watch: {
     $route (to, from) {
-      const redirectingToInbox = (to.name.includes('Inbox') && to.name !== 'Inbox') || from.name === 'Inbox View'
+      const redirectingToInbox = (to.name.includes(DEFAULT_COMMUNICATIONS_ROUTE_NAME) && to.name !== DEFAULT_COMMUNICATIONS_ROUTE_NAME) || from.name === 'Communications View'
 
       if (redirectingToInbox) {
         this.onLoadShowTasks = true
       }
 
-      if (to.name === 'Inbox') {
-        const channel = this.navListItems.find(item => item.value === 'inbox')
+      // TODO: make this as route level please!
+      if (to.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME) {
+        const channel = this.navListItems.find(item => item.value === DEFAULT_COMMUNICATIONS_CHANNEL)
         this.setActiveChannel(channel)
       }
 

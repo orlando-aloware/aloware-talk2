@@ -38,6 +38,15 @@ const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidg
 const AloAi = () => import('pages/AloAi.vue')
 const Apps = () => import('pages/Apps.vue')
 
+export const COMMUNICATIONS_BASE_PATH = 'communications'
+export const DEFAULT_COMMUNICATIONS_CHANNEL = 'communications-logs'
+export const DEFAULT_COMMUNICATIONS_ROUTE_PATH = `/${COMMUNICATIONS_BASE_PATH}/${DEFAULT_COMMUNICATIONS_CHANNEL}`
+
+export const DEFAULT_COMMUNICATIONS_ROUTE_NAME = 'Communications'
+export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications View'
+export const COMMUNICATIONS_CHANNELS_ROUTE_NAME = 'Communications Channel'
+export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Channel Task Status'
+
 const routes = [
   {
     path: '/',
@@ -82,7 +91,7 @@ const routes = [
             name: 'Inbox Contact Task',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -90,7 +99,7 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -98,7 +107,7 @@ const routes = [
             name: 'Inbox Contact',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -106,7 +115,7 @@ const routes = [
             name: 'Inbox Contact Communication',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -114,7 +123,7 @@ const routes = [
             name: 'Inbox Channel',
             component: Inbox,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -122,7 +131,7 @@ const routes = [
             name: 'Inbox View',
             component: Inbox,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           },
           {
@@ -130,19 +139,44 @@ const routes = [
             name: 'Inbox View Contact Task',
             component: Contact,
             meta: {
-              title: 'Inbox'
+              title: 'Inboxes'
             }
           }
         ]
       },
       {
-        path: '/communications',
-        name: 'Communications',
+        path: COMMUNICATIONS_BASE_PATH,
+        name: DEFAULT_COMMUNICATIONS_ROUTE_NAME,
         component: CommunicationsView,
         meta: {
           title: 'Communications'
         },
-        children: []
+        children: [
+          {
+            path: ':channel',
+            name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
+            component: CommunicationsView,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: 'view/:viewId/:status',
+            name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
+            component: CommunicationsView,
+            meta: {
+              title: 'Communications'
+            }
+          },
+          {
+            path: ':channel/:status',
+            name: COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME,
+            component: Contact,
+            meta: {
+              title: 'Communications'
+            }
+          }
+        ]
       },
       {
         path: 'contacts',

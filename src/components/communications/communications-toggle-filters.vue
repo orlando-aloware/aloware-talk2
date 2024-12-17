@@ -66,16 +66,16 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { inboxRoutesMixin } from 'src/plugins/mixins'
+import { communicationsRoutesMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
-  name: 'inbox-toggle-filters',
+  name: 'communications-toggle-filters',
 
   mixins: [
-    inboxRoutesMixin
+    communicationsRoutesMixin
   ],
 
   components: {
@@ -100,7 +100,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', [
+    ...mapState('communications', [
       'inboxShowMyContacts',
       'inboxShowUnreads',
       'isInboxFiltersLoaded',
@@ -110,7 +110,7 @@ export default {
     ]),
 
     isShown () {
-      return (this.$route?.meta?.title === 'Inboxes' && this.$route.params.channel !== 'mentions')
+      return (this.$route?.meta?.title === 'Communications' && this.$route.params.channel !== 'mentions')
     },
 
     toggleFiltersClass () {
@@ -127,7 +127,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', [
+    ...mapActions('communications', [
       'setInboxShowMyContacts',
       'setInboxShowUnreads',
       'setIsInboxRefreshBtnLoading'
@@ -143,11 +143,11 @@ export default {
 
     fireInboxLoadEvent () {
       if (this.inboxTaskRoutes.includes(this.$route.name)) {
-        this.$VueEvent.fire('inbox_load_contacts', this.inboxShowMyContactsFilter, this.inboxShowUnreadsFilter)
+        this.$VueEvent.fire('communications_load_contacts', this.inboxShowMyContactsFilter, this.inboxShowUnreadsFilter)
         return
       }
 
-      this.$VueEvent.fire('inbox_load_communications', this.inboxShowMyContactsFilter, this.inboxShowUnreadsFilter)
+      this.$VueEvent.fire('communications_load_communications', this.inboxShowMyContactsFilter, this.inboxShowUnreadsFilter)
     },
 
     onMyContactsChange () {
@@ -170,7 +170,7 @@ export default {
 
     refreshInbox () {
       this.setIsInboxRefreshBtnLoading(true)
-      this.$VueEvent.fire('fetchInbox')
+      this.$VueEvent.fire('fetchCommunications')
     }
   },
 

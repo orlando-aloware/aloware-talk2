@@ -39,6 +39,8 @@ export default function ({ store }) {
   })
 
   Router.beforeEach((to, from, next) => {
+    console.log('going to ...', to)
+
     next()
     const isWidget = to.matched.some(route => route?.meta?.isWidget)
 

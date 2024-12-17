@@ -21,7 +21,7 @@
         Inboxes
       </q-route-tab>
       <q-route-tab name="communications"
-                   to="/communications"
+                   :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
                    :content-class="tab === 'communications' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
                    :active="tab === 'communications'"
@@ -217,6 +217,7 @@ import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-ico
 import CalendarMobileIcon from 'components/icons/mobile-menu/calendar-mobile-icon.vue'
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
+import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 
 export default {
   name: 'app-footer',
@@ -270,6 +271,7 @@ export default {
   data () {
     return {
       tab: 'inbox',
+      DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       parkedCallQueue: []
     }
   },
@@ -299,8 +301,9 @@ export default {
 
       switch (this.$route.name) {
         case 'Communications':
-        // case 'Inbox Contact Task':
-        // case 'Inbox Channel Task Status':
+        case 'Communications Channel':
+        case 'Communications Contact Task':
+        case 'Communications Channel Task Status':
           return 'communications'
         case 'Inbox':
         case 'Inbox Channel':
