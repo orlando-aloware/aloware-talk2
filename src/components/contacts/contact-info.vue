@@ -300,6 +300,7 @@ import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import EmailIcon from 'components/icons/email-icon'
 import VideoConferenceIcon from 'components/icons/video-conference-icon'
+import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 
 export default {
   name: 'contact-info',
@@ -346,6 +347,8 @@ export default {
 
     ...mapState('contacts', ['isMergeContactOpen']),
 
+    ...mapState('auth', ['profile']),
+
     ...mapGetters('contacts', [
       'contact',
       'isContactNameEditOpen',
@@ -377,6 +380,18 @@ export default {
 
     hasPowerDialerListsText () {
       return this.hasPowerDialerLists ? 'Remove contact from all Power Dialer lists' : 'This contact is not part of any Power Dialer list'
+    },
+
+    isAlwaysAskEnabled () {
+      return this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+    },
+
+    defaultOutboundCampaignId () {
+      if (this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+        return this.profile?.default_outbound_campaign_id ?? this.currentCompany?.default_outbound_campaign_id
+      }
+
+      return null
     }
   },
 
@@ -467,6 +482,12 @@ export default {
           this.$VueEvent.fire('changePhoneNumber', data)
         }, 100)
 
+        return
+      }
+
+      if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
+        data.outboundCampaignId = this.defaultOutboundCampaignId
+        this.$VueEvent.fire('makeCall', data)
         return
       }
 
