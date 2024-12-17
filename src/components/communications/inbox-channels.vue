@@ -198,7 +198,7 @@ import {
   aclMixin,
   dateMixin,
   visibilityMixin,
-  inboxMixin
+  communicationsMixin
 } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import TaskList from 'components/inbox/channel-tasks/task-list'
@@ -215,7 +215,7 @@ import SearchToggle from 'components/search-toggle'
 import CreateFilterDialog from 'components/inbox/inbox-filters/create-filter-dialog'
 import UserSelector from 'components/generic-selectors/user-selector'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
-import moment from 'moment'
+import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 
 export default {
   name: 'inbox-channels',
@@ -224,7 +224,7 @@ export default {
     aclMixin,
     dateMixin,
     visibilityMixin,
-    inboxMixin
+    communicationsMixin
   ],
 
   components: {
@@ -345,7 +345,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', [
+    ...mapState('communications', [
       'isGettingTasksList',
       'activeChannel',
       'communications',
@@ -740,7 +740,7 @@ export default {
 
   mounted () {
     // check for url parameter filter to preselect and load
-    if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.tagId) {
+    if ([DEFAULT_COMMUNICATIONS_CHANNEL].includes(this.$route.params.channel) && this.$route.query?.tagId) {
       this.setInboxShowMyContacts(false)
       this.filter = this.channelDefaultFilterModel.filter
       this.updateChannelChangedFilterFields({
@@ -749,7 +749,7 @@ export default {
       })
     }
 
-    if (['all-communications'].includes(this.$route.params.channel) && this.$route.query?.broadcastIds) {
+    if ([DEFAULT_COMMUNICATIONS_CHANNEL].includes(this.$route.params.channel) && this.$route.query?.broadcastIds) {
       this.filter = this.channelDefaultFilterModel.filter
       this.updateChannelChangedFilterFields({
         name: 'broadcasts',
@@ -858,7 +858,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', [
+    ...mapActions('communications', [
       'gettingTasksList',
       'setCommunications',
       'setSelectedCommunication',
@@ -875,7 +875,8 @@ export default {
       'setInboxShowMyContacts',
       'setInboxShowUnreads',
       'setFilterDialogForView',
-      'setIsEditingView'
+      'setIsEditingView',
+      'setInboxFilters'
     ]),
 
     processToggleFilter (value) {
@@ -935,6 +936,7 @@ export default {
       this.resetChannelChangedFilterFields()
       this.setCommunications([])
       this.setAppliedFilter(null)
+      this.setInboxFilters(null)
     },
 
     onApplyFilter (filter) {
@@ -1027,84 +1029,6 @@ export default {
         default:
           return true
       }
-    },
-
-    getCommunications (filters, callback) {
-      let params = this.$jsonClone(filters)
-      let api = talk2Api.V1.reports.communications
-      this.setIsInboxFiltersLoaded(true)
-      this.gettingTasksList(true)
-      this.communicationsListHasError = false
-
-      if (this.firstTimeLoading) {
-        const timezone = this.currentTimezone
-        const dateFormat = 'YYYY-MM-DD HH:mm:ss'
-        const fromDate = moment().tz(timezone).subtract(30, 'days').startOf('day').format(dateFormat)
-        const toDate = moment().tz(timezone).endOf('day').format(dateFormat)
-
-        params.from_date = fromDate
-        params.to_date = toDate
-        this.filter.from_date = fromDate
-        this.filter.to_date = toDate
-        this.firstTimeLoading = false
-      }
-
-      // payload specific for Mentions
-      if (this.$route.params.channel === 'mentions') {
-        api = talk2Api.V2.mentions
-        params = {
-          ...{
-            direction: this.mentionType,
-            page: params.page || 1,
-            per_page: params.per_page || 20,
-            mentioner_user_id: params.mentioner_user_id,
-            mentioned_user_id: params.mentioned_user_id,
-            search_fields: params.search_fields,
-            search_text: params.search_text
-          }
-        }
-      }
-
-      if (this.$route.params.channel !== 'mentions') {
-        params = { ...params, order: this.sorting.order }
-      } else {
-        params = { ...params, order_by: this.sorting.order }
-      }
-
-      params = this.removeUnnecessaryParameters(params)
-      params = this.filtersToggle(params)
-
-      this.source.cancel('Loading of communication operation is canceled by the user.')
-      this.source = this.cancelToken.source()
-
-      return api.get({ params: params, cancelToken: this.source.token })
-        .then(response => {
-          if (response) {
-            this.gettingTasksList(false)
-            this.setCommunications(response.data.data)
-            this.currentPage = response.data.current_page
-            this.setHasMoreCommunications(response.data.next_page_url)
-            this.isLoaded = true
-            this.pagination = _.clone(response.data)
-            delete this.pagination.data
-
-            if (typeof callback !== 'undefined') {
-              callback()
-            }
-          }
-        }).catch(thrown => {
-          if (window.axios.isCancel(thrown) && thrown) {
-            console.log('Request canceled', thrown.message)
-            return
-          }
-
-          this.gettingTasksList(false)
-          this.communicationsListHasError = true
-          const channelName = this.$route.params.channel !== 'mentions'
-            ? 'communications'
-            : 'mentions'
-          this.$generalNotification(`An exception was encountered while fetching ${channelName}.`, 'error')
-        })
     },
 
     loadMoreCommunications (filters) {
@@ -1526,6 +1450,14 @@ export default {
       if (communicationChannels.includes(value)) {
         this.getCommunications(this.filter)
       }
+    },
+
+    filter: {
+      handler (newVal) {
+        this.setInboxFilters(newVal)
+      },
+      deep: true,
+      immediate: true
     }
   },
 
@@ -1535,6 +1467,7 @@ export default {
     this.$VueEvent.stop('delete_communication', this.listeners.deleteCommunication)
     this.$VueEvent.stop('mark_contact_communications_all_as_read', this.listeners.markContactCommunicationsAllAsRead)
     this.$VueEvent.stop('communications_load_communications', this.listeners.communicationsLoadCommunications)
+    this.resetFilters()
   }
 }
 </script>
