@@ -305,7 +305,7 @@ export default {
       if (Array.isArray(successfulCallDispositionsIds) && !successfulCallDispositionsIds.includes(this.callDisposition)) {
         this.$refs.smsTemplatesSelector.enable()
 
-        if (this.requireSmsSending) {
+        if (this.isForcedSmsSending) {
           // pause wrap up and wait for SMS selection
           this.$VueEvent.fire('pauseWrapUp', true)
         }
