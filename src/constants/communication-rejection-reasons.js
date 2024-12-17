@@ -86,3 +86,5 @@ export const REJECTION_REASON_TRIAL_LIMIT_EXCEEDED = 42
 export const REJECTION_REASON_PROVIDER_ALLOWS_ONLY_ONE_ATTACHMENT = 43
 // A MMS was rejected to send by our system because incoming number is not MMS capable
 export const REJECTION_REASON_NOT_MULTIMEDIA_MESSAGING_ENABLED = 44
+// Rejected to send by our system because it's an emergency number
+export const REJECTION_REASON_EMERGENCY_NUMBER = 45
