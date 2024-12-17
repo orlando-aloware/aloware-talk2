@@ -90,6 +90,12 @@
         </b-popover>
       </div>
     </router-link>
+
+    <convert-list-to-public-dialog :list-id="id"
+                                   :list-name="name"
+                                   v-model="convertToPublicDialog"
+                                   @closed="convertToPublicDialog = false"
+                                   @converted="onListConvertedToPublic"/>
   </div>
 </template>
 
@@ -106,6 +112,7 @@ import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
+import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog.vue'
 
 export default {
   components: {
@@ -114,7 +121,8 @@ export default {
     FolderOption,
     DialIcon,
     UnsavedIcon,
-    ListActions
+    ListActions,
+    ConvertListToPublicDialog
   },
 
   mixins: [
@@ -167,7 +175,8 @@ export default {
       isRenaming: false,
       folderExists: false,
       inputTimeout: null,
-      folderInterval: null
+      folderInterval: null,
+      convertToPublicDialog: false
     }
   },
 
@@ -285,19 +294,13 @@ export default {
     },
     onShowInPublicFolder () {
       this.$root.$emit('bv::hide::popover')
-      const params = { show_in_public_folder: true }
-      const id = this.id
+      this.convertToPublicDialog = true
+    },
+    onListConvertedToPublic () {
+      this.convertToPublicDialog = false
 
-      this.updateContactList(id, params)
-        .then((response) => {
-          this.$generalNotification('Contact list has been successfully converted to public')
-          this.reloadFolders()
-          this.loadPublicLists()
-        })
-        .catch((error) => {
-          const { message } = extractErrorMessage(error)
-          this.$generalNotification(message, 'error')
-        })
+      this.reloadFolders()
+      this.loadPublicLists()
     },
     createList (params) {
       this.$axios
