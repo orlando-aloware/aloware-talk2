@@ -249,7 +249,8 @@ import {
   userMixin,
   settingsMixin,
   broadcastsMixin,
-  accessMixin
+  accessMixin,
+  dispositionsMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -343,7 +344,8 @@ export default {
     userMixin,
     settingsMixin,
     broadcastsMixin,
-    accessMixin
+    accessMixin,
+    dispositionsMixin
   ],
 
   data () {
@@ -2914,6 +2916,11 @@ export default {
 
     agentStatus (toVal, fromVal) {
       if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+        // if not yet disposed, do not end Wrap-Up
+        if (this.isNotDisposed) {
+          return
+        }
+
         this.$VueEvent.fire('endWrapUp')
       }
     },
