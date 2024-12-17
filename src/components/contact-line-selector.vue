@@ -21,11 +21,13 @@
 <script>
 import VueMultiselect from 'vue-multiselect'
 import LinesMixins from 'src/plugins/mixins/lines.mixin'
+import { aclMixin } from 'src/boot/mixins'
 
 export default {
   name: 'contact-line-selector',
 
   mixins: [
+    aclMixin,
     LinesMixins
   ],
 
@@ -52,12 +54,22 @@ export default {
     preselectFirst: {
       type: Boolean,
       default: false
+    },
+
+    capabilities: {
+      type: Array,
+      default: null
     }
   },
 
   computed: {
     formattedLineOptions () {
       const contactLines = { data: [] }
+
+      if (this.capabilities) {
+        return this.campaignsWithCapabilities
+      }
+
       if (this.contactCampaignsFromCommunications.length > 0) {
         contactLines.data = [...this.contactCampaignsFromCommunications]
 
@@ -95,7 +107,8 @@ export default {
 
   data () {
     return {
-      line: null
+      line: null,
+      campaignsWithCapabilities: []
     }
   },
 
@@ -104,11 +117,37 @@ export default {
     if (this.value) {
       this.line = this.formattedLineOptions.find(line => line.id === this.value)
     }
+    if (this.capabilities) {
+      this.getCampaignsByCapabilities(this.capabilities)
+    }
   },
 
   methods: {
     onSelect (selected) {
       this.$emit('select', selected)
+    },
+
+    getCampaignsByCapabilities (capabilities) {
+      if (this.hasPermissionTo('list campaign')) {
+        return this.$axios
+          .get('/api/v1/campaign', {
+            mode: 'no-cors',
+            params: {
+              is_lite: true,
+              capabilities: this.capabilities
+            }
+          })
+          .then((res) => {
+            this.campaignsWithCapabilities = res.data.sort((a, b) => {
+              const textA = a.name.toUpperCase()
+              const textB = b.name.toUpperCase()
+              return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      }
     }
   }
 }
