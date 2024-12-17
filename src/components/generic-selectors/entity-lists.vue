@@ -5,17 +5,17 @@
          :data-testid="`${entity}-lists-wrapper`"
          v-if="!useCard">
       <contacts-list-multi-select :data-testid="`${entity}-lists-multi-select`"
-                        :label="label"
-                        :button-text="buttonText"
-                        :values="listIds"
-                        :current="currentLists"
-                        :canEdit="hasPermissionTo(['list contact list item', 'view contact list item'])"
-                        :options-is-grouped="true"
-                        :height="height"
-                        :is-filter="isFilter"
-                        :dense="dense"
-                        :placeholder="placeholder"
-                        @lists-values-updated="handleSaveListsOrFilteringLists">
+                                  :label="label"
+                                  :button-text="buttonText"
+                                  :values="listIds"
+                                  :current="currentLists"
+                                  :can-edit="hasPermissionTo(['list contact list item', 'view contact list item'])"
+                                  :options-is-grouped="true"
+                                  :height="height"
+                                  :is-filter="isFilter"
+                                  :dense="dense"
+                                  :placeholder="placeholder"
+                                  @lists-values-updated="handleSaveListsOrFilteringLists">
         <template v-slot:button
                   v-if="useAddIcon">
           <add-icon-circle height="14"
@@ -33,17 +33,17 @@
             :class="{ 'lists-filter-wrapper': isFilter, 'lists-wrapper--dense': dense }"
             v-else>
       <contacts-list-multi-select :data-testid="`${entity}-lists-multi-select`"
-                        :label="label"
-                        :button-text="buttonText"
-                        :values="listIds"
-                        :current="currentLists"
-                        :canEdit="hasPermissionTo(['list contact list item', 'view contact list item'])"
-                        :options-is-grouped="true"
-                        :height="height"
-                        :is-filter="isFilter"
-                        :dense="dense"
-                        :placeholder="placeholder"
-                        @lists-values-updated="handleSaveListsOrFilteringLists">
+                                  :label="label"
+                                  :button-text="buttonText"
+                                  :values="listIds"
+                                  :current="currentLists"
+                                  :can-edit="hasPermissionTo(['list contact list item', 'view contact list item'])"
+                                  :options-is-grouped="true"
+                                  :height="height"
+                                  :is-filter="isFilter"
+                                  :dense="dense"
+                                  :placeholder="placeholder"
+                                  @lists-values-updated="handleSaveListsOrFilteringLists">
       </contacts-list-multi-select>
     </b-card>
   </div>
