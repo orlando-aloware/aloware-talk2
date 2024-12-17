@@ -269,6 +269,8 @@ export default {
           return `You have reached the maximum number of trial ${resource}.`
         case CommunicationRejectionReasons.REJECTION_REASON_PROVIDER_ALLOWS_ONLY_ONE_ATTACHMENT:
           return 'Provider allows only one attachment.'
+        case CommunicationRejectionReasons.REJECTION_REASON_EMERGENCY_NUMBER:
+          return 'Emergency calling is not allowed.'
       }
     },
 

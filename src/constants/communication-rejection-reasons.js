@@ -84,3 +84,5 @@ export const REJECTION_REASON_SMS_TO_SELF_NUMBER = 41
 export const REJECTION_REASON_TRIAL_LIMIT_EXCEEDED = 42
 // Rejected to send by our system because provider allows only one attachment
 export const REJECTION_REASON_PROVIDER_ALLOWS_ONLY_ONE_ATTACHMENT = 43
+// Rejected to send by our system because it's an emergency number
+export const REJECTION_REASON_EMERGENCY_NUMBER = 45
