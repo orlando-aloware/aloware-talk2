@@ -32,7 +32,7 @@
                    flat
                    @click="editView(view.id)">
               <q-tooltip>
-                <span>Edit View</span>
+                <span>Edit Filter</span>
               </q-tooltip>
             </q-btn>
             <q-btn size="xs"
@@ -41,7 +41,7 @@
                    @click="pinView(view.id)">
               <q-icon name="o_push_pin"></q-icon>
               <q-tooltip>
-                <span>Pin View</span>
+                <span>Pin Filter</span>
               </q-tooltip>
             </q-btn>
             <q-btn icon="push_pin"
@@ -51,7 +51,7 @@
                    v-if="isPinnedView(view.id)"
                    @click="unpinView(view.id)">
               <q-tooltip>
-                <span>Unpin View</span>
+                <span>Unpin Filter</span>
               </q-tooltip>
             </q-btn>
           </span>
@@ -60,7 +60,7 @@
 
       <span class="p-3 text-bold text-grey-90 cursor-pointer custom-link"
             @click="onCreateView">
-        Create View
+        Create Filter
       </span>
     </div>
   </b-popover>

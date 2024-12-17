@@ -429,6 +429,10 @@ export default {
       communications: {
         get (params) {
           return window.axios.get(`${suffixV1}reports/communications`, params)
+        },
+
+        getCount (params) {
+          return window.axios.get(`${suffixV1}reports/communications/count`, params)
         }
       }
     },

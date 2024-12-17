@@ -12,6 +12,9 @@ export default {
   SET_COMMUNICATIONS: (state, communications) => {
     state.communications = communications
   },
+  SET_COMMUNICATIONS_COUNT: (state, count) => {
+    state.communicationsCount = count
+  },
   SET_COMMUNICATIONS_CURRENT_PAGE: (state, page) => {
     state.communicationsCurrentPage = page
   },
@@ -221,5 +224,8 @@ export default {
   },
   SET_IS_INBOX_REFRESH_BTN_LOADING (state, value) {
     state.isInboxRefreshBtnLoading = value
+  },
+  SET_INBOX_FILTERS (state, filters) {
+    state.inboxFilters = filters
   }
 }

@@ -39,7 +39,7 @@ const AloAi = () => import('pages/AloAi.vue')
 const Apps = () => import('pages/Apps.vue')
 
 export const COMMUNICATIONS_BASE_PATH = 'communications'
-export const DEFAULT_COMMUNICATIONS_CHANNEL = 'communications-logs'
+export const DEFAULT_COMMUNICATIONS_CHANNEL = 'all'
 export const DEFAULT_COMMUNICATIONS_ROUTE_PATH = `/${COMMUNICATIONS_BASE_PATH}/${DEFAULT_COMMUNICATIONS_CHANNEL}`
 
 export const DEFAULT_COMMUNICATIONS_ROUTE_NAME = 'Communications'

@@ -1,7 +1,9 @@
+import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+
 const DEFAULT_CHANNEL = {
   label: 'Communications Logs',
-  value: 'communications-logs',
-  icon: 'call',
+  value: DEFAULT_COMMUNICATIONS_CHANNEL,
+  icon: 'all-communications',
   disabled: false,
   default: true
 }
@@ -64,14 +66,6 @@ export default function () {
         answerStatus: 'recorded'
       },
       {
-        label: 'All Communications',
-        value: 'all-communications',
-        icon: 'all-communications',
-        disabled: false,
-        type: 'all',
-        answerStatus: 'all'
-      },
-      {
         label: 'My Personal Line',
         value: 'my-personal-line',
         icon: 'person',
@@ -81,6 +75,7 @@ export default function () {
       }
     ],
     communications: [],
+    communicationsCount: 0,
     communicationsCurrentPage: 0,
     hasMoreCommunications: false,
     contacts: [],
@@ -118,6 +113,7 @@ export default function () {
     inboxCompanyFilters: [],
     isEditingView: false,
     showViewsList: false,
-    isInboxRefreshBtnLoading: false
+    isInboxRefreshBtnLoading: false,
+    inboxFilters: {}
   }
 }
