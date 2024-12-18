@@ -32,10 +32,29 @@
                     blog post
                 </a>
                 to learn more!
-                <div v-if="isCallRecordingDisabled">
+                <div v-if="isAllCallRecordingDisabled">
                     <br>
-                    <span style="color: #ff9800; vertical-align: middle;">⚠️</span>
+                    <span style="color: #ff9800; vertical-align: middle; margin-right: 4px;">⚠️</span>
                     <strong>You’re currently not recording any calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
+                    <ul class="pl-4">
+                        <li>
+                            For inbound call recordings:
+                            <a :href="inboundCallRecordingUrl" target="_blank">
+                                Link
+                            </a>
+                        </li>
+                        <li>
+                        For outbound call recordings:
+                            <a :href="outboundCallRecordingUrl" target="_blank">
+                                Link
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div v-else-if="isAnyCallRecordingDisabled">
+                    <br>
+                    <span style="color: #ff9800; vertical-align: middle; margin-right: 4px;">⚠️</span>
+                    <strong>You’re currently not recording all your calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
                     <ul class="pl-4">
                         <li>
                             For inbound call recordings:
@@ -149,9 +168,16 @@ export default {
       return `${process.env.API_URL}/account?tab=calling-settings#inbound_call_recording_mode`
     },
 
-    isCallRecordingDisabled () {
+    isAllCallRecordingDisabled () {
       return (
         this.currentCompany?.inbound_call_recording_mode === InboundCallRecordingModes.INBOUND_CALL_RECORDING_MODE_NEVER &&
+        this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER
+      )
+    },
+
+    isAnyCallRecordingDisabled () {
+      return (
+        this.currentCompany?.inbound_call_recording_mode === InboundCallRecordingModes.INBOUND_CALL_RECORDING_MODE_NEVER ||
         this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER
       )
     }
