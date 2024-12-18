@@ -34,7 +34,7 @@
                 to learn more!
                 <div v-if="isAnyCallRecordingDisabled">
                     <br>
-                    <span style="color: #ff9800; vertical-align: middle; margin-right: 4px;">⚠️</span>
+                    <span class="mr-1">⚠️</span>
                     <strong v-if="isAllCallRecordingDisabled">You’re currently not recording any calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
                     <strong v-else>You’re currently not recording all your calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
                     <ul class="pl-4">
