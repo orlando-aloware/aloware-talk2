@@ -15,22 +15,25 @@
       <div class="details-component-container h-100"
            ref="detailsComponentContainer">
         <template v-if="!saveBarOnly">
-          <contact-info data-testid="contact-details-info" :campaign-id="campaignId" />
+          <contact-info data-testid="contact-details-info" :campaign-id="campaignId"/>
           <contact-sequence class="w-100"
                             data-testid="contact-details-sequence"
                             :contact="contact"
-                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')" />
+                            v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
           <contact-push-to-crm data-testid="contact-details-push-to-crm"
                                :contact="contact"
-                               v-if="isSimpSocial" />
+                               v-if="isSimpSocial"/>
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
-                                            v-if="showAloAiControls" />
+                                            v-if="showAloAiControls"/>
           <contact-aloai-engagement-control ss="w-100"
                                             data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
-                                            v-if="showAloAiControls" />
+                                            v-if="showAloAiControls"/>
+          <contact-conversation-insights :contact="contact"
+                                         data-testid="contact-conversation-insights"
+                                         v-if="!isSimpSocial && contact && isDemoCompany"/>
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>
@@ -61,8 +64,8 @@
                                 data-testid="contact-details-reservations"
                                 :contact="contact"/>
           <contact-reservations-messages v-if="contact && showGuestyReservations()"
-                                data-testid="contact-details-reservations-messages"
-                                :contact="contact"/>
+                                         data-testid="contact-details-reservations-messages"
+                                         :contact="contact"/>
           <contact-scheduled-messages data-testid="contact-details-scheduled-messages"/>
           <contact-activity-counts data-testid="contact-details-activity-counts" :summary="communicationsSummary.summaries"/>
           <contact-lines data-testid="contact-details-lines"/>
@@ -89,7 +92,7 @@ import ContactIntegrations from 'src/components/contacts/contact-integrations'
 import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
 import ContactPushToCrm from 'src/components/contacts/contact-push-to-crm'
 import BackButton from 'components/back-button'
-import { mapGetters, mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import ContactSaveBar from 'components/contacts/contact-save-bar'
@@ -102,13 +105,8 @@ import ContactReservations from 'components/contacts/contact-reservations.vue'
 import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import {
-  aclMixin,
-  contactMixin,
-  contactV2AttributesMixin,
-  visibilityMixin,
-  simpsocialMixin
-} from 'src/plugins/mixins'
+import { aclMixin, contactMixin, contactV2AttributesMixin, simpsocialMixin, visibilityMixin, userMixin } from 'src/plugins/mixins'
+import ContactConversationInsights from 'components/aloai/contact-conversation-insights.vue'
 
 export default {
   name: 'contact-details',
@@ -136,10 +134,12 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    userMixin
   ],
 
   components: {
+    ContactConversationInsights,
     ContactSequence,
     ContactAloaiEngagementControl,
     ContactAloaiEnrollmentControl,
@@ -190,6 +190,10 @@ export default {
         this.currentCompany.aloai_enabled &&
         this.contact && !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
+    },
+
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   },
 
