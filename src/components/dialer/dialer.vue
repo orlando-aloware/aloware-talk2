@@ -76,7 +76,8 @@ export default {
 
     ...mapFields('powerDialer', [
       'activeTask',
-      'sessionPaused'
+      'sessionPaused',
+      'redialedTask'
     ]),
 
     isNotInProgressCall () {
@@ -98,6 +99,10 @@ export default {
 
     shouldPushPhoneRoute () {
       return (this.isMobile && !this.isWidget) && this.$route.name !== 'Phone'
+    },
+
+    isOnPowerDialerSessionRoute () {
+      return this.$route?.meta?.id === 'power-dialer-session'
     }
   },
 
@@ -1359,11 +1364,7 @@ export default {
     },
 
     resetCall () {
-      // before reseting the call and proceeding to the next task,
-      // check if a redial is required and trigger onNextTask to perform the redial logic
-      if (this.isSessionRunning && this.redialRequired && this.activeTask && !this.activeTask.forcedRedial) {
-        this.activeTask.forcedRedial = true
-        this.$VueEvent.fire('onNextTask')
+      if (this.shouldProcessRedial()) {
         return
       }
 
@@ -1704,6 +1705,33 @@ export default {
       } else {
         console.warn('Warning: Missing required data for saving call issue.')
       }
+    },
+
+    // Check if the resetting call needs to be redialed
+    // then process the redial before resetting
+    shouldProcessRedial () {
+      // If not on a PD session/page or no activeTask
+      if (!this.isSessionRunning || !this.isOnPowerDialerSessionRoute || !this.activeTask) {
+        return false
+      }
+
+      // Redial not required, skip
+      if (!this.redialRequired) {
+        return false
+      }
+
+      // Skip if task already being redialed
+      if (this.redialedTask?.id || this.activeTask.forcedRedial) {
+        return false
+      }
+
+      // Set active task as redialed, so it won't process redial again for this task
+      this.activeTask.forcedRedial = true
+
+      // Trigger onNextTask to handle redialing
+      this.$VueEvent.fire('onNextTask')
+
+      return true
     },
 
     ...mapActions([

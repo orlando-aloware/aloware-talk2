@@ -577,6 +577,7 @@
                   </b-button>
                 </div>
               </div>
+              <small v-if="isHighlightedSmsTemplate" class="text-danger pl-2">Required</small>
             </div>
 
             <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
@@ -678,7 +679,7 @@
 
         <b-button variant="primary"
                   :disabled="isNotDisposed || isNotOnWrapUp || temporaryDisableFinishButton"
-                  @click="endWrapUp">
+                  @click="onFinish">
           <span>Finish</span>
           <span v-if="dialer.wrapUpTimer"> ({{ dialer.wrapUpTimer }}s)</span>
         </b-button>
@@ -1252,12 +1253,14 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   communicationInfoMixin,
   notificationMixin,
   dispositionsMixin,
   agentMixin,
-  dialerCommunicationMixin
+  dialerCommunicationMixin,
+  sessionCallStatusMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -1371,7 +1374,8 @@ export default {
     notificationMixin,
     dispositionsMixin,
     agentMixin,
-    dialerCommunicationMixin
+    dialerCommunicationMixin,
+    sessionCallStatusMixin
   ],
 
   props: {
@@ -1494,6 +1498,11 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     ...mapState('auth', ['profile']),
+
+    ...mapFields('powerDialer', [
+      'activeTask',
+      'tasksSentSmsTemplates'
+    ]),
 
     isCallCompleted () {
       return ((this.dialer.communication && this.dialer.communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) || ['HANGING_UP_CALL', 'CALL_DISCONNECTED', 'WRAP_UP'].includes(this.dialer.currentStatus))
@@ -1826,10 +1835,6 @@ export default {
       return !_.isEmpty(this.dialer.call) &&
         this.dialer.call.direction === 'OUTGOING' &&
         !this.hasCallFishingCommunication
-    },
-
-    isOnPowerDialerSessionRoute () {
-      return this.$route.meta.id === 'power-dialer-session'
     },
 
     isCallFishingCommunicationInParkedCalls () {
@@ -2252,6 +2257,15 @@ export default {
       this.$emit('onPhoneVisible', false)
     },
 
+    onFinish () {
+      if (this.isOnPowerDialerSessionRoute && this.redialRequired) {
+        this.$VueEvent.fire('onNextTask')
+        return
+      }
+
+      this.endWrapUp()
+    },
+
     endWrapUp (type = 'finish') {
       if (this.$route.name === 'Power Dialer') {
         this.$VueEvent.fire('endWrapUpPDSession')
@@ -2458,6 +2472,12 @@ export default {
         message: this.template.body,
         phone_number: this.dialer.communication.lead_number
       }).then(res => {
+        if (this.activeTask) {
+          this.tasksSentSmsTemplates[this.activeTask.id] = this.templateId
+          // force state reload
+          this.tasksSentSmsTemplates = this.$jsonClone(this.tasksSentSmsTemplates)
+        }
+
         this.template = null
         this.templateId = null
         this.loadingSendMessage = false

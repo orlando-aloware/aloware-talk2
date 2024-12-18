@@ -521,8 +521,7 @@ export default {
       loadingHold: false,
       loadingUnhold: false,
       isRedialClicked: false,
-      isProcessingDNC: false,
-      redialedTask: {}
+      isProcessingDNC: false
     }
   },
 
@@ -536,7 +535,8 @@ export default {
       'sessionPaused',
       'activeTask',
       'hubspot',
-      'redialedTasksCount'
+      'redialedTasksCount',
+      'redialedTask'
     ]),
 
     ...mapState([
@@ -883,6 +883,10 @@ export default {
 
       // now should redial if call is not successfully answered
       return !this.dialer.callSuccessfullyAnswered
+    },
+
+    isOnPowerDialerSessionRoute () {
+      return this.$route?.meta?.id === 'power-dialer-session'
     }
   },
 

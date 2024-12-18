@@ -446,7 +446,8 @@ export default {
     ]),
 
     ...mapState('powerDialer', [
-      'ongoingSession'
+      'ongoingSession',
+      'countdownTimer'
     ]),
 
     ...mapState(['xmasEnabled']),
@@ -2916,8 +2917,8 @@ export default {
 
     agentStatus (toVal, fromVal) {
       if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-        // if not yet disposed, do not end Wrap-Up
-        if (this.isNotDisposed) {
+        // if not yet disposed or countdown timer hasn't ended, do not end Wrap-Up
+        if (this.isNotDisposed || this.countdownTimer > 0) {
           return
         }
 
