@@ -101,7 +101,7 @@
               {{ getRingGroupName(col.value) }}
             </div>
             <div v-else-if="col.name === 'created_at'">
-              {{ col.value | fixDateTime }}
+              <start-time :row="props.row" :value="col.value" />
             </div>
             <div v-else-if="col.name === 'talk_time'">
               {{ col.value }}
@@ -207,6 +207,7 @@ import EllipseIcon from 'components/icons/ellipse-icon'
 import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
 import NotePopover from './note-popover.vue'
+import StartTime from './start-time.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -230,7 +231,8 @@ export default {
     EllipseIcon,
     CommunicationTableSettings,
     CommunicationsTags,
-    NotePopover
+    NotePopover,
+    StartTime
   },
 
   data () {
