@@ -870,7 +870,7 @@ export default {
               isValidFilter
           }
 
-          this.isValidated = isValidTime || (this.validDate() && ![DateTimeFilter.OPERATOR_IS_MORE_THAN, DateTimeFilter.OPERATOR_IS_LESS_THAN].includes(this.filterOperator))
+          this.isValidated = isValidTime || this.validDate()
           break
 
         case 'date':

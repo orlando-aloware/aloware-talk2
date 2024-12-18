@@ -2,13 +2,13 @@
     <q-dialog v-model="internalDialogVisible">
         <div class="ai-info-box">
             <div class="ai-info-box-header">
-        <span class="ai-info-box-icon"
-              v-if="usagePercentage < 100 && isTrial">
-          🎁
-        </span>
+                <span class="ai-info-box-icon"
+                      v-if="usagePercentage < 100 && isTrial">
+                  🎁
+                </span>
                 <span class="ai-info-box-title">
-          {{ modalContent.title }}
-        </span>
+                  {{ modalContent.title }}
+                </span>
             </div>
             <p class="ai-info-box-content text-white">
                 {{ modalContent.message }}

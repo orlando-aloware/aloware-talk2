@@ -683,6 +683,16 @@ export default {
   },
 
   V2: {
+    contact: {
+      getConversationSummary (contactId, params) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary`, params)
+      }
+    },
+
     contacts: {
       get (id, sourceToken = null) {
         if (!id || id === 'undefined') {

@@ -271,6 +271,8 @@ export default {
           return 'Provider allows only one attachment.'
         case CommunicationRejectionReasons.REJECTION_REASON_NOT_MULTIMEDIA_MESSAGING_ENABLED:
           return 'The selected number cannot send an MMS. Use an MMS-capable number or remove media attachments and try again.'
+        case CommunicationRejectionReasons.REJECTION_REASON_EMERGENCY_NUMBER:
+          return 'Emergency calling is not allowed.'
       }
     },
 

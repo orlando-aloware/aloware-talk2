@@ -586,6 +586,11 @@ export default {
           this.$VueEvent.fire('communicationLoaded')
           this.loadingCommunication = false
 
+          // Move task to skipped list
+          const skipedAndActive = this.getSkippedAndActiveTasks()
+          const tempSet = new Set(skipedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
+
           return Promise.reject(err)
         }
 
