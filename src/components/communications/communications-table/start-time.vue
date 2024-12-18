@@ -22,7 +22,7 @@
         </span>
 
       <span class="fa fa-voicemail text-negative"
-          v-if="row.has_voicemail || true"
+          v-if="row.has_voicemail"
           >
           <q-tooltip trigger="hover">
             has voice mail
@@ -30,7 +30,7 @@
         </span>
 
       <span class="fa fa-file-text text-primary"
-            v-if="row.has_transcription && !row.transcription_is_deleted || true"
+            v-if="row.has_transcription && !row.transcription_is_deleted"
           >
           <q-tooltip trigger="hover">
               has transcription
