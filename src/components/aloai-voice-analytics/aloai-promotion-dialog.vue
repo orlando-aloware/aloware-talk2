@@ -32,41 +32,19 @@
                     blog post
                 </a>
                 to learn more!
-                <div v-if="isAllCallRecordingDisabled">
+                <div v-if="isAnyCallRecordingDisabled">
                     <br>
                     <span style="color: #ff9800; vertical-align: middle; margin-right: 4px;">⚠️</span>
-                    <strong>You’re currently not recording any calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
+                    <strong v-if="isAllCallRecordingDisabled">You’re currently not recording any calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
+                    <strong v-else>You’re currently not recording all your calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
                     <ul class="pl-4">
                         <li>
-                            For inbound call recordings:
-                            <a :href="inboundCallRecordingUrl" target="_blank">
-                                Link
-                            </a>
+                            <span>For inbound call recordings: </span>
+                            <a :href="inboundCallRecordingUrl" target="_blank">Link</a>
                         </li>
                         <li>
-                        For outbound call recordings:
-                            <a :href="outboundCallRecordingUrl" target="_blank">
-                                Link
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div v-else-if="isAnyCallRecordingDisabled">
-                    <br>
-                    <span style="color: #ff9800; vertical-align: middle; margin-right: 4px;">⚠️</span>
-                    <strong>You’re currently not recording all your calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
-                    <ul class="pl-4">
-                        <li>
-                            For inbound call recordings:
-                            <a :href="inboundCallRecordingUrl" target="_blank">
-                                Link
-                            </a>
-                        </li>
-                        <li>
-                        For outbound call recordings:
-                            <a :href="outboundCallRecordingUrl" target="_blank">
-                                Link
-                            </a>
+                            <span>For outbound call recordings: </span>
+                            <a :href="outboundCallRecordingUrl" target="_blank">Link</a>
                         </li>
                     </ul>
                 </div>
