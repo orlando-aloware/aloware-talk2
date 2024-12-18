@@ -98,8 +98,16 @@ export default {
       return shouldForceContactDisposition || shouldForceCallDisposition
     },
 
+    isOnPowerDialerSessionRoute () {
+      return this.$route?.meta?.id === 'power-dialer-session'
+    },
+
     isForcedSmsSending () {
       if (!this.activeTask) {
+        return false
+      }
+
+      if (!this.isOnPowerDialerSessionRoute) {
         return false
       }
 
