@@ -90,7 +90,10 @@
                       tabindex="0"
                       block
                       @click="handleRegenerate">
-              {{ isGenerating ? '🧙‍♂️️🪄✨' : '🪄 Regenerate Insights' }}
+              {{ !isGenerating ? '🧙‍♂️️🪄 Regenerate Insights' : '' }}
+              <q-spinner-bars v-if="isGenerating"
+                              color="white">
+              </q-spinner-bars>
             </b-button>
 
             <div class="timestamp"
