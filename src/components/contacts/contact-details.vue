@@ -23,6 +23,9 @@
           <contact-push-to-crm data-testid="contact-details-push-to-crm"
                                :contact="contact"
                                v-if="isSimpSocial"/>
+          <contact-conversation-insights :contact="contact"
+                                         data-testid="contact-conversation-insights"
+                                         v-if="!isSimpSocial && contact && isDemoCompany"/>
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
@@ -31,9 +34,6 @@
                                             data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
                                             v-if="showAloAiControls"/>
-          <contact-conversation-insights :contact="contact"
-                                         data-testid="contact-conversation-insights"
-                                         v-if="!isSimpSocial && contact && isDemoCompany"/>
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>
