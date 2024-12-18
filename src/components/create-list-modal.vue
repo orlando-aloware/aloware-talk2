@@ -719,7 +719,7 @@ export default {
     },
 
     addZohoView () {
-      return talk2Api.V2.integrations.zoho.importViewToPowerDialer(this.integrationListId)
+      return talk2Api.V2.integrations.zoho.importView(this.integrationListId)
         .then(response => response.data)
         .then(data => {
           this.$generalNotification('Your Zoho view is being imported. We will notify you when it\'s ready.')
@@ -734,7 +734,7 @@ export default {
     },
 
     addPipedriveFilter () {
-      return talk2Api.V2.integrations.pipedrive.importFilterToPowerDialer(this.integrationListId)
+      return talk2Api.V2.integrations.pipedrive.importFilter(this.integrationListId)
         .then(response => response.data)
         .then(data => {
           this.$generalNotification('Your Pipedrive filter is being imported. We will notify you when it\'s ready.')
