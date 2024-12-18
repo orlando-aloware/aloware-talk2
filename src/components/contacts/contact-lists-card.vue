@@ -266,7 +266,7 @@ export default {
       let lists = this.contactLists.filter(list => list.show_in_public_folder === this.isPublicContactListCard)
 
       // agents can only view private lists owned by them and public lists
-      if (!this.isPublicContactListCard && !this.isBillingAdminOrAdminOrSupervisor && this.isAgent) {
+      if (!this.isPublicContactListCard && this.isAgentOnly) {
         // filter only lists that the agent has access to
         lists = lists.filter(list => list.contact_folder_created_by === this.profile.id)
       }
@@ -304,6 +304,10 @@ export default {
       const start = (this.page - 1) * this.perPage
       const end = start + this.perPage
       return this.lists.slice(start, end)
+    },
+
+    isAgentOnly () {
+      return this.isAgent && !this.isBillingAdminOrAdminOrSupervisor
     }
   },
 
@@ -412,12 +416,12 @@ export default {
       let params = {
         page: 1,
         per_page: 99999,
-        list_type: ContactListTypes.STATIC
+        list_type: ContactListTypes.STATIC,
+        user_id: this.isAgentOnly || !this.isPublicContactListCard ? this.profile.id : null
       }
       if (this.isPublicContactListCard) {
         this.loadedAllPublicLists = await this.getPublicListsV2(params)
       } else {
-        params.user_id = this.profile.id
         params.private_only = true
         this.loadedAllPrivateLists = await this.getListsV2(params)
       }
