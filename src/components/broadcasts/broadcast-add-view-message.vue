@@ -14,6 +14,7 @@
       <div class="broadcast-add__schedule__row__fields">
         <contact-line-selector :value="propCampaign?.id"
                                :use-groups="false"
+                               :capabilities="capabilities"
                                @select="onCampaignSelected"/>
         <broadcast-warning-note :campaign="propCampaign" />
       </div>
@@ -207,7 +208,8 @@ export default {
   data: () => ({
     maxSmsBodyLength: 1600, // Maximum length of a single SMS message body.
     throttle: null, // Throttling settings for the campaign, controls the rate of message sending.
-    mpsLimit: 0.25 // Maximum messages per second (MPS) that the campaign is allowed to send.
+    mpsLimit: 0.25, // Maximum messages per second (MPS) that the campaign is allowed to send.
+    capabilities: ['sms', 'mms']
   }),
 
   computed: {
