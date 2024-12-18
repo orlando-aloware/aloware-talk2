@@ -51,7 +51,8 @@
                 <h4 class="column-title">Agents</h4>
                 <ul class="action-list">
                   <li v-for="(action, index) in insights.summary.follow_up_actions.agents" :key="index">
-                    <strong>{{ action.name }}:</strong> {{ action.action }}
+                    <strong>{{ action.name }}:</strong>
+                    <div class="no-p-margin" v-html="parseMarkdown(action.action)"></div>
                   </li>
                 </ul>
               </div>
@@ -60,7 +61,8 @@
                 <h4 class="column-title">Contact</h4>
                 <ul class="action-list">
                   <li v-for="(action, index) in insights.summary.follow_up_actions.contact" :key="index">
-                    <strong>{{ action.name }}:</strong> {{ action.action }}
+                    <strong>{{ action.name }}:</strong>
+                    <div class="no-p-margin" v-html="parseMarkdown(action.action)"></div>
                   </li>
                 </ul>
               </div>
@@ -74,7 +76,8 @@
                 <li v-for="(opportunity, index) in insights.summary.coaching_opportunities"
                     :key="index">
                   <template v-if="opportunity.agent && opportunity.opportunity">
-                    <strong>{{ opportunity.agent }}:</strong> {{ opportunity.opportunity }}
+                    <strong>{{ opportunity.agent }}:</strong>
+                    <div class="no-p-margin" v-html="parseMarkdown(opportunity.opportunity)"></div>
                   </template>
                 </li>
               </ul>
