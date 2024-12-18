@@ -1,5 +1,5 @@
 <template>
-  <div class="communication-logs-container ">
+  <div class="communication-logs-container flex-grow-1 d-flex flex-column">
     <h3 class="title pl-3">
       {{ title }}
     </h3>
@@ -28,7 +28,7 @@
       </div>
     </div>
 
-    <q-table class="communication-logs-table"
+    <q-table class="communication-logs-table flex-grow-1"
              row-key="index"
              virtual-scroll
              :data="communicationsData"

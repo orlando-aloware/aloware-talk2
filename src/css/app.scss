@@ -9460,6 +9460,15 @@ screen and (max-width: 956px) {
   .inbox-wrapper,
   .inbox-side {
     max-width: 313px;
+
+    &__right.no-max-width {
+      width: unset!important;
+    }
+
+    &__right {
+      width: 270px;
+    }
+
   }
   .inbox-side {
     &__nav {
@@ -9494,11 +9503,6 @@ screen and (max-width: 956px) {
       .inbox-side {
         max-width: unset;
       }
-    }
-  }
-  .inbox-side {
-    &__right {
-      width: 270px;
     }
   }
   .contact-page {
@@ -15921,7 +15925,7 @@ hr {
     }
 
     @media screen and (min-height: 701px) and (max-height: 900px) {
-      max-height: 60vh;
+      max-height: 70vh;
     }
 
     @media screen and (min-height: 601px) and (max-height: 700px) {

@@ -5,9 +5,11 @@
             :color="iconColor"
             style="font-size: 1.5rem;"
     />
-    <b-popover v-if="note" triggers="hover"
-               :target="`note-${_uid}`" >
-          <div class="font-weight-bolder">{{ note }}</div>
+    <b-popover v-if="note"
+               triggers="hover"
+               :target="`note-${_uid}`"
+               style="" >
+          <div class="font-weight-bolder" style="max-width: 30rem; max-height: 50vh; overflow-y: scroll;">{{ note }}</div>
     </b-popover>
   </div>
 </template>

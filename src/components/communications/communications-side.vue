@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <div class="inbox-side__right border-left d-flex align-items-start flex-column"
+      <div class="inbox-side__right border-left d-flex align-items-start flex-column no-max-width"
       :class="{'inbox-side__right--opened': isInboxTaskOpened }">
         <CommunicationLogsTable class="flex-grow-1"/>
       <!-- TODO: purge this and all unused components
