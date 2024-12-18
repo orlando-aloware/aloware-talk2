@@ -1256,7 +1256,7 @@ export default {
         return
       }
 
-      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('fetchContacts', { clear: true })
       this.$generalNotification(`Contact list was synced`, 'success')
     }
 
@@ -1266,7 +1266,7 @@ export default {
       }
 
       // even if it failed, some changes may occur, so we need to update the list
-      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('fetchContacts', { clear: true })
       this.$generalNotification(
         'An error prevented the list from being synced. Please try again later.',
         'error'
