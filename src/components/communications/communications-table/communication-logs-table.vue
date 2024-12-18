@@ -125,6 +125,10 @@
             <template v-else-if="col.name === 'tags'">
               <communications-tags :tags="col.value" />
             </template>
+            <!-- v-if notes -->
+            <div v-else-if="col.name === 'notes'">
+              <note-popover :note="col.value"/>
+            </div>
             <div v-else-if="col.name === 'operations'">
               <div class="d-flex justify-content-center context-menu">
                 <b-dropdown no-caret
@@ -202,6 +206,7 @@ import CompactBtn from 'components/compact-btn'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
+import NotePopover from './note-popover.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -224,7 +229,8 @@ export default {
     CompactBtn,
     EllipseIcon,
     CommunicationTableSettings,
-    CommunicationsTags
+    CommunicationsTags,
+    NotePopover
   },
 
   data () {
