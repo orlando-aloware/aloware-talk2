@@ -1,16 +1,16 @@
 <template>
   <div class="communication-logs-container ">
-    <h3 class="title">
+    <h3 class="title pl-3">
       {{ title }}
     </h3>
-    <div class="count">
+    <div class="count  pl-3">
       <strong v-if="!isLoadingCommunicationsCount">{{ communicationsCount }} Communications</strong>
       <q-spinner-bars class="mr-1"
                       color="primary"
                       size="14px"
                       v-else />
     </div>
-    <div class="filters">
+    <div class="filters  pl-3">
       <div class="search">
         <search-input class="width-260"
                       limit-search-characters
@@ -19,7 +19,7 @@
                       data-testid="contacts-view-search-input"
                       @search="onSearch" />
       </div>
-      <div class="setting">
+      <div class="setting pr-3">
         <compact-btn variant="primary"
                      :compact="false"
                      @clicked="changeTableSettingsVisibility(true)">
@@ -41,7 +41,8 @@
              @virtual-scroll="onScroll">
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td :props="props"
+<!--           <div class="font-weight-bolder">{{ props.row.id }}</div>
+ -->          <q-td :props="props"
                 v-for="col in props.cols"
                 :key="col.name">
             <div class="status-icon centered-content"
@@ -51,7 +52,9 @@
                    props.row.direction,
                    props.row.type,
                    props.row.callback_status
-                 )" />
+                 )">
+
+            </div>
             <div v-else-if="col.name === 'incoming_number'">
               <div v-if="props.row?.campaign_id">
                 {{ getCampaignName(props.row?.campaign_id) }}
@@ -98,7 +101,7 @@
               </ul>
             </div>
             <div v-else-if="col.name === 'ring_group'">
-              {{ getRingGroupName(col.value) }}
+              {{ getRingGroupName(props.row) }}
             </div>
             <div v-else-if="col.name === 'created_at'">
               <start-time :row="props.row" :value="col.value" />
@@ -129,6 +132,11 @@
             <div v-else-if="col.name === 'notes'">
               <note-popover :note="col.value"/>
             </div>
+            <!-- v-if creator_type -->
+            <div v-else-if="col.name === 'creator_type'">
+              {{ col.value | translateCreatorType }}
+            </div>
+
             <div v-else-if="col.name === 'operations'">
               <div class="d-flex justify-content-center context-menu">
                 <b-dropdown no-caret
@@ -208,6 +216,7 @@ import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
 import NotePopover from './note-popover.vue'
 import StartTime from './start-time.vue'
+import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -222,6 +231,7 @@ export default {
   mixins: [
     aclMixin,
     communicationsMixin,
+    ringGroupsMixin,
     userMixin
   ],
 
@@ -515,9 +525,9 @@ export default {
       this.$emit('change-column-headers-modal', value)
     },
 
-    getRingGroupName (ringGroupId) {
-      // Replace with actual logic to get ring group name
-      return ringGroupId ? `Ring Group ${ringGroupId}` : '-'
+    getRingGroupName (row) {
+      const rg = this.getRingGroup(row.ring_group_id)
+      return rg ? rg.name : '-'
     },
 
     getSequenceName (workflowId) {
