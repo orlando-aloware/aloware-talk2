@@ -32,6 +32,25 @@
                     blog post
                 </a>
                 to learn more!
+                <div v-if="isCallRecordingDisabled">
+                    <br>
+                    <span style="color: #ff9800; vertical-align: middle;">⚠️</span>
+                    <strong>You’re currently not recording any calls. To take advantage of our AloAi Voice Analytics product, turn on call recordings:</strong>
+                    <ul class="pl-4">
+                        <li>
+                            For inbound call recordings:
+                            <a :href="inboundCallRecordingUrl" target="_blank">
+                                Link
+                            </a>
+                        </li>
+                        <li>
+                        For outbound call recordings:
+                            <a :href="outboundCallRecordingUrl" target="_blank">
+                                Link
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </q-dialog>
@@ -39,6 +58,8 @@
 
 <script>
 import { mapState } from 'vuex'
+import * as InboundCallRecordingModes from 'src/constants/inbound-call-recording-modes'
+import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
 
 export default {
   name: 'aloai-promotion-dialog',
@@ -118,6 +139,21 @@ export default {
         title: `You currently have ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. Our AI engine will transcribe, analyze, and summarize your calls effortlessly. Simply navigate to any contact you've called to see it in action.`,
         message: `Need more minutes to keep up with your growing needs? Upgrade your plan now for additional minutes and enhanced features.`
       }
+    },
+
+    outboundCallRecordingUrl () {
+      return `${process.env.API_URL}/account?tab=calling-settings#outbound_call_recording_mode`
+    },
+
+    inboundCallRecordingUrl () {
+      return `${process.env.API_URL}/account?tab=calling-settings#inbound_call_recording_mode`
+    },
+
+    isCallRecordingDisabled () {
+      return (
+        this.currentCompany?.inbound_call_recording_mode === InboundCallRecordingModes.INBOUND_CALL_RECORDING_MODE_NEVER &&
+        this.currentCompany?.outbound_call_recording_mode === OutboundCallRecordingModes.OUTBOUND_CALL_RECORDING_MODE_NEVER
+      )
     }
   },
 
