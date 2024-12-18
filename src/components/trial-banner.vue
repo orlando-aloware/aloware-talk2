@@ -79,16 +79,6 @@
                unelevated
                v-if="shouldShowUnlockTrialExperienceButton"
                @click="onOpenFinishRegistration" />
-        <q-btn class="q-mr-lg"
-               color="primary"
-               size="md"
-               label="Registration in Review"
-               rounded
-               dense
-               no-caps
-               unelevated
-               v-if="shouldShowRegistrationInReviewButton"
-               @click="onOpenRegistrationInReview" />
       </div>
       <div class="button-index">
         <compact-btn customClass="fs-24 _500 position-relative not-focusable text-red-130"
@@ -157,10 +147,6 @@ export default {
 
     shouldShowUnlockTrialExperienceButton () {
       return !this.isKYCFilled || this.isCompanyA2pCampaignApproved
-    },
-
-    shouldShowRegistrationInReviewButton () {
-      return !this.isKYCFilled || !this.isCompanyA2pCampaignApproved
     }
   },
 
