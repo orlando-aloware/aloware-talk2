@@ -98,7 +98,7 @@
 
             <div class="timestamp"
                  v-if="insights?.updated_at">
-              Last updated: {{ formatDate(insights.updated_at) }}
+              Last updated: {{ insights.updated_at | fixDateTime }}
             </div>
           </div>
           <div class="text-center"
@@ -189,16 +189,6 @@ export default {
         this.insights = response.data
       }).finally(() => {
         this.insightsLoaded = true
-      })
-    },
-
-    formatDate (dateString) {
-      return new Date(dateString).toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
       })
     },
 
