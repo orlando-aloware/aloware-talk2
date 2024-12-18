@@ -81,7 +81,7 @@ export default {
       let message = ''
 
       switch (status) {
-        case KycLogs.KYC_STATUS_NONE:
+        case KycLogs.KYC_STATUS_NONE || KycLogs.KYC_STATUS_APPROVED:
           message = ''
           break
         case KycLogs.KYC_STATUS_REJECTED:
