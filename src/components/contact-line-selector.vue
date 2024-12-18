@@ -118,7 +118,7 @@ export default {
       this.line = this.formattedLineOptions.find(line => line.id === this.value)
     }
     if (this.capabilities) {
-      this.getCampaignsByCapabilities(this.capabilities)
+      this.getCampaignsByCapabilities()
     }
   },
 
@@ -127,7 +127,7 @@ export default {
       this.$emit('select', selected)
     },
 
-    getCampaignsByCapabilities (capabilities) {
+    getCampaignsByCapabilities () {
       if (this.hasPermissionTo('list campaign')) {
         return this.$axios
           .get('/api/v1/campaign', {
