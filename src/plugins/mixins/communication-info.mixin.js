@@ -264,15 +264,16 @@ export default {
           return 'You cannot place a call to your own number.'
         case CommunicationRejectionReasons.REJECTION_REASON_SMS_TO_SELF_NUMBER:
           return 'You cannot send a text to your own number.'
-        case CommunicationRejectionReasons.REJECTION_REASON_TRIAL_LIMIT_EXCEEDED:
-          const resource = type === CommunicationTypes.CALL ? 'calls' : 'messages'
-          return `You have reached the maximum number of trial ${resource}.`
+        case CommunicationRejectionReasons.REJECTION_REASON_TRIAL_CALLS_LIMIT_EXCEEDED:
+          return `You have reached the maximum number of trial calls.`
         case CommunicationRejectionReasons.REJECTION_REASON_PROVIDER_ALLOWS_ONLY_ONE_ATTACHMENT:
           return 'Provider allows only one attachment.'
         case CommunicationRejectionReasons.REJECTION_REASON_NOT_MULTIMEDIA_MESSAGING_ENABLED:
           return 'The selected number cannot send an MMS. Use an MMS-capable number or remove media attachments and try again.'
         case CommunicationRejectionReasons.REJECTION_REASON_EMERGENCY_NUMBER:
           return 'Emergency calling is not allowed.'
+        case CommunicationRejectionReasons.REJECTION_REASON_KYC_CALLS_OUTBOUND_RESTRICTION:
+          return 'Your KYC plan is not allowed to make calls to this number. Submit your business information for verification to unlock calling features to other numbers.'
       }
     },
 
