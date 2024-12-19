@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'relative-time',
 
@@ -33,6 +35,10 @@ export default {
     }
   },
 
+  computed: {
+    ...mapState(['currentTimezone'])
+  },
+
   data () {
     return {
       relativeTime: null
@@ -51,7 +57,7 @@ export default {
   methods: {
     getRelativeTime () {
       if (this.humanized) {
-        this.relativeTime = this.$options.filters.fixDurationHumanize(this.fromTime) + ' ago'
+        this.relativeTime = this.$options.filters.fixDurationHumanize(this.fromTime, this.currentTimezone)
       } else {
         this.relativeTime = this.$options.filters.fixDurationUTCRelative(this.fromTime)
       }
