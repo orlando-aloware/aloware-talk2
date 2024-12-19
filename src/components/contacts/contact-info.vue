@@ -40,6 +40,7 @@
               </b-link>
 
               <br/>
+
               <b-badge class="badge-phone-info mr-1"
                        :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
                        data-testid="contact-info-lrn-type-badge"
