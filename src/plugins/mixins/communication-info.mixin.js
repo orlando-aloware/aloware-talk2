@@ -273,7 +273,7 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_EMERGENCY_NUMBER:
           return 'Emergency calling is not allowed.'
         case CommunicationRejectionReasons.REJECTION_REASON_KYC_CALLS_OUTBOUND_RESTRICTION:
-          return 'Your KYC plan is not allowed to make calls to this number. Submit your business information for verification to unlock calling features to other numbers.'
+          return 'Your trial plan is not allowed to make calls to this number. Submit your business information for verification to unlock calling features to other numbers.'
       }
     },
 
