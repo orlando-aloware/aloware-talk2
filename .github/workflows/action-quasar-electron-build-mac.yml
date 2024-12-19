@@ -104,6 +104,7 @@ jobs:
           ENV_RECAPTCHA_SITE_KEY: ${{ secrets.recaptcha_site_key }}
           ENV_DEMO_COMPANY_IDS: ${{ secrets.demo_company_ids }}
           ENV_XMAS_ENABLED: ${{ secrets.xmas_enabled }}
+          ENV_NEW_COMMUNICATIONS_FEATURE_ENABLED: ${{ secrets.new_communications_feature_enabled }}
           ENV_XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
           ENV_CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
@@ -176,6 +177,9 @@ jobs:
           # Xmas
           XMAS_ENABLED: ${{ secrets.xmas_enabled }}
           XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
+
+          # New Communications Feature
+          NEW_COMMUNICATIONS_FEATURE_ENABLED: ${{ secrets.new_communications_feature_enabled }}
 
           # Read Reviews
           URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}

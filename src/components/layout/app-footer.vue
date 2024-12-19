@@ -18,7 +18,7 @@
         <span class="tab-icon">
           <inbox-mobile-icon :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'" />
         </span>
-        Inboxes
+        {{inboxMenuTitle}}
       </q-route-tab>
       <q-route-tab name="communications"
                    :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
@@ -26,11 +26,13 @@
                    :ripple="false"
                    :active="tab === 'communications'"
                    no-caps
-                   exact>
+                   exact
+                   v-if="hasNewCommunicationsFeatureEnabled"
+                   >
         <span class="tab-icon">
           <communications-mobile-icon :color="isActive('communications') ? '#256EFF' : '#A3A3A3'" />
         </span>
-        Comm.’s
+        {{ COMMUNICATIONS_MENU_TITLE_MOBILE }}
       </q-route-tab>
       <q-route-tab name="contacts"
                    to="/contacts"
@@ -217,7 +219,8 @@ import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-ico
 import CalendarMobileIcon from 'components/icons/mobile-menu/calendar-mobile-icon.vue'
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
-import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
+import { COMMUNICATIONS_MENU_TITLE_MOBILE, DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE } from 'src/router/routes'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'app-footer',
@@ -234,6 +237,10 @@ export default {
     ContactMenuItem,
     CalendarMobileIcon
   },
+
+  mixins: [
+    userMixin
+  ],
 
   computed: {
     ...mapState([
@@ -266,12 +273,19 @@ export default {
       }
 
       return []
+    },
+    /*
+      WAT-1105: when the feature not corresponds inbox remains as communications
+    */
+    inboxMenuTitle () {
+      return this.hasNewCommunicationsFeatureEnabled ? INBOXES_MENU_TITLE : COMMUNICATIONS_MENU_TITLE_MOBILE
     }
   },
   data () {
     return {
       tab: 'inbox',
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
+      COMMUNICATIONS_MENU_TITLE_MOBILE,
       parkedCallQueue: []
     }
   },

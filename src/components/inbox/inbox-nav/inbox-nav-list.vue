@@ -17,12 +17,12 @@
               :pending-count="pendingCount"
               :disabled="item.disabled"
               :tooltip="item.tooltip"
-              v-for="item in inboxes"
+              v-for="item in inboxesToShow"
               @click="onItemClicked" />
 
     <hr>
 
-    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isInboxViewsEnabledCompany">
+    <div v-if="shouldShowViewsUnderChannels">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -137,8 +137,22 @@ export default {
       return !this.$q.screen.lt.md || isMobileInboxRoutes
     },
 
-    inboxes () {
-      return this.navListItems
+    inboxesToShow () {
+      /* WAT-1105: the channels and view are being moved to communications menu
+        so should not being displayed here if the feature is active */
+      return this.hasNewCommunicationsFeatureEnabled
+        ? this.navListItems.filter(item => item.default)// only shows the default "inbox"
+        : this.navListItems
+    },
+
+    shouldShowViewsUnderChannels () {
+      /* WAT-1105: the channels and view are being moved to communications menu
+        so should not being displayed here if the feature is active */
+      if (this.hasNewCommunicationsFeatureEnabled) {
+        return false
+      }
+
+      return (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany)
     }
   },
 

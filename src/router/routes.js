@@ -47,6 +47,11 @@ export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications View'
 export const COMMUNICATIONS_CHANNELS_ROUTE_NAME = 'Communications Channel'
 export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Channel Task Status'
 
+// NO difference in the titles for Inboxes on mobile
+export const INBOXES_MENU_TITLE = 'Inboxes'
+export const COMMUNICATIONS_MENU_TITLE = 'Communications'
+export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comm.’s'
+
 const routes = [
   {
     path: '/',
@@ -83,7 +88,7 @@ const routes = [
         name: 'Inbox',
         component: Inbox,
         meta: {
-          title: 'Inboxes'
+          title: INBOXES_MENU_TITLE
         },
         children: [
           {
@@ -91,7 +96,7 @@ const routes = [
             name: 'Inbox Contact Task',
             component: Contact,
             meta: {
-              title: 'Inboxes'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -99,7 +104,7 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: Contact,
             meta: {
-              title: 'Inboxes'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -107,7 +112,7 @@ const routes = [
             name: 'Inbox Contact',
             component: Contact,
             meta: {
-              title: 'Inboxes'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -115,7 +120,7 @@ const routes = [
             name: 'Inbox Contact Communication',
             component: Contact,
             meta: {
-              title: 'Inboxes'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -123,7 +128,7 @@ const routes = [
             name: 'Inbox Channel',
             component: Inbox,
             meta: {
-              title: 'Inboxes'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -131,7 +136,7 @@ const routes = [
             name: 'Inbox View',
             component: Inbox,
             meta: {
-              title: 'Inboxes'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -139,7 +144,7 @@ const routes = [
             name: 'Inbox View Contact Task',
             component: Contact,
             meta: {
-              title: 'Inboxes'
+              title: INBOXES_MENU_TITLE
             }
           }
         ]
@@ -149,7 +154,7 @@ const routes = [
         name: DEFAULT_COMMUNICATIONS_ROUTE_NAME,
         component: CommunicationsView,
         meta: {
-          title: 'Communications'
+          title: COMMUNICATIONS_MENU_TITLE
         },
         children: [
           {
@@ -157,7 +162,7 @@ const routes = [
             name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
             component: CommunicationsView,
             meta: {
-              title: 'Communications'
+              title: COMMUNICATIONS_MENU_TITLE
             }
           },
           {
@@ -165,7 +170,7 @@ const routes = [
             name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
             component: CommunicationsView,
             meta: {
-              title: 'Communications'
+              title: COMMUNICATIONS_MENU_TITLE
             }
           },
           {
@@ -173,7 +178,7 @@ const routes = [
             name: COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME,
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: COMMUNICATIONS_MENU_TITLE
             }
           }
         ]

@@ -30,12 +30,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Inboxes</span>
+        <span class="font-weight-bold text-sm">{{inboxMenuTitle}}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        Inboxes
+        {{inboxMenuTitle}}
       </span>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
@@ -51,12 +51,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Inboxes</span>
+        <span class="font-weight-bold text-sm">{{inboxMenuTitle}}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        Inboxes
+        {{inboxMenuTitle}}
       </span>
     </q-btn>
 
@@ -68,16 +68,17 @@
            class="nav-icons w-100"
            data-testid="communication-active-sidebar-btn"
            v-show="isActive('Communications')"
+           v-if="hasNewCommunicationsFeatureEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Communications</span>
+        <span class="font-weight-bold text-sm">{{COMMUNICATIONS_MENU_TITLE}}</span>
       </q-tooltip>
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        Communications
+        {{COMMUNICATIONS_MENU_TITLE}}
       </span>
     </q-btn>
     <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
@@ -88,16 +89,17 @@
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
            v-show="!isActive('Communications')"
+           v-if="hasNewCommunicationsFeatureEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Communications</span>
+        <span class="font-weight-bold text-sm">{{COMMUNICATIONS_MENU_TITLE}}</span>
       </q-tooltip>
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        Communications
+        {{COMMUNICATIONS_MENU_TITLE}}
       </span>
     </q-btn>
 
@@ -841,8 +843,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import { broadcastsMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
-import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
+import { broadcastsMixin, kycMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE, COMMUNICATIONS_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-sidebar',
@@ -868,7 +870,8 @@ export default {
   mixins: [
     simpsocialMixin,
     kycMixin,
-    broadcastsMixin
+    broadcastsMixin,
+    userMixin
   ],
 
   computed: {
@@ -912,6 +915,12 @@ export default {
 
     sidebarIcon () {
       return this.isSidebarExpanded ? 'unfold_less' : 'unfold_more'
+    },
+    /*
+      WAT-1105: when the feature not corresponds inbox remains as communications
+    */
+    inboxMenuTitle () {
+      return this.hasNewCommunicationsFeatureEnabled ? INBOXES_MENU_TITLE : COMMUNICATIONS_MENU_TITLE
     }
 
   },
@@ -919,6 +928,7 @@ export default {
   data () {
     return {
       modeIcon: 'img:app-icons/menu/mode_gray.svg',
+      COMMUNICATIONS_MENU_TITLE,
       DEFAULT_COMMUNICATIONS_ROUTE_PATH
     }
   },
