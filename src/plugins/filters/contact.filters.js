@@ -157,6 +157,11 @@ const validLrnType = (type) => {
   return ![null, undefined].includes(type)
 }
 
+const getUrlToLrnInfo = (lrnType) => {
+  const url = 'https://support.aloware.com/en/articles/9034177-understanding-lrn-location-routing-numbers-in-aloware'
+  return lrnType === LrnTypes.LRN_NOT_PERFORMED ? url : null
+}
+
 /**
  * Fix task status name, returns name
  * @param {number} taskStatusId
@@ -215,6 +220,7 @@ export default ({ Vue }) => {
     fixLrnType,
     fixCount,
     validLrnType,
+    getUrlToLrnInfo,
     fixTaskStatusName,
     getTaskStatusIdByName
   }

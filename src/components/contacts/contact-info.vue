@@ -40,11 +40,14 @@
               </b-link>
 
               <br/>
-
               <b-badge class="badge-phone-info mr-1"
                        :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
                        data-testid="contact-info-lrn-type-badge"
-                       v-if="phone && $options.filters.validLrnType(phone.lrn_type)">
+                       v-if="phone && $options.filters.validLrnType(phone.lrn_type)"
+                       :href="$options.filters.getUrlToLrnInfo(phone.lrn_type)">
+                <q-tooltip v-if="phone.lrn_type === LRN_NOT_PERFORMED">
+                  This contact exceeds the 1000-contact limit included in trial.
+                </q-tooltip>
                 {{ phone.lrn_type | fixLrnType }}
               </b-badge>
 
@@ -301,6 +304,7 @@ import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import EmailIcon from 'components/icons/email-icon'
 import VideoConferenceIcon from 'components/icons/video-conference-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
 
 export default {
   name: 'contact-info',
@@ -401,7 +405,8 @@ export default {
       isProcessingDNC: false,
       isProcessingBlock: false,
       isVideoConferenceLinkSending: false,
-      isRemovingFromPowerDialerLists: false
+      isRemovingFromPowerDialerLists: false,
+      LRN_NOT_PERFORMED
     }
   },
 
