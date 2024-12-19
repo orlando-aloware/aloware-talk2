@@ -114,7 +114,6 @@
                   variant="light"
                   size="sm"
                   pill
-                  data-testid="contact-information-toggle"
                   @click="onExpanded">
           <i class="material-icons icon">{{ isExpanded ? 'expand_less' : 'expand_more' }}</i>
         </b-button>
