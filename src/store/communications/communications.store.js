@@ -2,7 +2,8 @@ const DEFAULT_CHANNEL = {
   label: 'Communications Logs',
   value: 'communications-logs',
   icon: 'call',
-  disabled: false
+  disabled: false,
+  default: true
 }
 
 export default function () {

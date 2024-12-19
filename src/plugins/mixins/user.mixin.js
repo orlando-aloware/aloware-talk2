@@ -20,6 +20,27 @@ export default {
 
     isImpersonate () {
       return localStorage.getItem('impersonate') === 'true'
+    },
+
+    /*
+      WAT-1105:
+        > IF environment variable is FALSE:
+          - nothing changes for any company
+
+        > IF environment variable is TRUE:
+          - For Aloware demo companies:
+            - new Communications menu is enabled showing the communications logs table
+            - hidding channels and view from both Inboxes and Communications menus
+
+          - For all other companies:
+            - new Communications menu not shown
+            - Inbox menu has no changes, that means is named still "Communications" and shows the channels and view
+
+    */
+    hasNewCommunicationsFeatureEnabled () {
+      // TODO: remove this console log once confirmed the assert its working
+      console.log('in hasNewCommunicationsFeatureEnabled ', process.env.NEW_COMMUNICATIONS_FEATURE_ENABLED)
+      return this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) && process.env.NEW_COMMUNICATIONS_FEATURE_ENABLED
     }
   },
 

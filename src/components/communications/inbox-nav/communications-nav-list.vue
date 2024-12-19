@@ -22,7 +22,7 @@
 
     <hr>
 
-    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || CommunicationsInboxViewsEnabledCompany">
+    <div v-if="shouldShowViewsUnderChannels">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -139,6 +139,12 @@ export default {
     },
 
     communicationsChannels () {
+      /*
+        WAT-1105: the channels and view are being moved to this communications menu
+        but for now we will only being displayed the communications logs
+      */
+      if (this.hasNewCommunicationsFeatureEnabled) { return this.navListItems.filter(item => item.default) } // only shows the default "communications logs"
+
       if (this.profile?.campaign_id) {
         return this.navListItems
       }
@@ -151,6 +157,16 @@ export default {
         channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
       }
       return channels
+    },
+
+    shouldShowViewsUnderChannels () {
+      /* WAT-1105: the channels and view are being moved to communications menu
+        so should not being displayed here if the feature is active */
+      if (this.hasNewCommunicationsFeatureEnabled) {
+        return false
+      }
+
+      return (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany)
     }
   },
 
