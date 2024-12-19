@@ -2,7 +2,7 @@
   <div>
     <q-card-section v-if='integrationData && integrationData.properties'
                     data-testid='integration-hubspot-card-section-1'>
-      <a class="external-contact-hubspot-link-icon color-primary"
+      <a class="external-contact-integration-link-icon color-primary"
          target='_blank'
          :href="integrationData.link">
         <i class="fa fa-external-link" aria-hidden="true"/>

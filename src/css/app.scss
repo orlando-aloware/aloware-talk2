@@ -2573,37 +2573,26 @@ i.option-separator {
     }
   }
 
+  .hubspot-icon {
+    font-size: 24px;
+    border-radius: 7px;
+    background: #FF7A59;
+    color: #FFFFFF;
+    border: 5px solid #FF7A59;
+    margin-right: 10px;
+  }
   .integration-title {
-    font-size: 16px;
     font-weight: 500;
     color: #303133;
+    font-size: 18px;
+    position: relative;
+    top: -3px;
   }
-
-  .hubspot-icon {
-    color: #FF7A59;
-    margin-right: 20px;
-    font-size: 20px;
-  }
-
-  .integration-card {
-    .hubspot-icon {
-      font-size: 24px;
-      border-radius: 7px;
-      background: #FF7A59;
-      color: #FFFFFF;
-      border: 5px solid #FF7A59;
-      margin-right: 10px;
-    }
-    .integration-title {
-      font-size: 18px;
-      position: relative;
-      top: -3px;
-    }
-    .salesforce-icon {
-      font-size: 32px;
-      margin-right: 10px;
-      margin-top: 3px;
-    }
+  .salesforce-icon {
+    font-size: 32px;
+    margin-right: 10px;
+    margin-top: 3px;
+    color: #0d9dda;
   }
 
   .pipedrive-btn {
@@ -2636,6 +2625,28 @@ i.option-separator {
   .data-icon-label {
     font-weight: 400;
   }
+
+  .integrations-logo {
+    background-size: contain !important;
+    width: 32px;
+    height: 32px;
+    margin-top: 3px;
+    display: inline-block;
+  }
+}
+
+.integration-wrapper-generic {
+  .integration-jit-card-header {
+    margin-bottom: 4px;
+
+    .integration-icon-in-header {
+      margin-right: 10px;
+    }
+  }
+
+  .integration-title {
+    top: -9px;
+  }
 }
 
 .workflow-enroll-popover {
@@ -2659,13 +2670,6 @@ i.option-separator {
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(4, 4, 4, 0.04);
     padding: 16px;
-
-    .integrations-logo {
-      background-size: contain !important;
-      width: 18px;
-      height: 18px;
-      margin-top: 3px;
-    }
   }
 }
 
@@ -15625,7 +15629,7 @@ hr {
 }
 
 
-.external-contact-hubspot-link-icon {
+.external-contact-integration-link-icon {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -15635,7 +15639,7 @@ hr {
   color: $grey-90;
 }
 
-.hubspot-jit-card-header {
+.integration-jit-card-header {
   margin: 12px;
 }
 
@@ -15664,20 +15668,6 @@ hr {
       max-width: 660px !important;
     }
   }
-}
-
-.external-contact-hubspot-link-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-.duplicateContactPhoneNumberMessage {
-  color: $grey-90;
-}
-
-.hubspot-jit-card-header {
-  margin: 12px;
 }
 
 .preview-card-box {
