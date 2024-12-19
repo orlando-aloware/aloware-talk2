@@ -143,6 +143,6 @@ export const REJECTION_REASONS = [
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_KYC_CALLS_OUTBOUND_RESTRICTION,
-    message: 'Your trial plan is not allowed to make calls to this number'
+    message: 'Your trial plan does not allow to make calls to this number'
   }
 ]
