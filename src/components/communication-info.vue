@@ -887,7 +887,7 @@
 
 <script>
 import _ from 'lodash'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin, visibilityMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
@@ -935,7 +935,8 @@ export default {
     notificationMixin,
     liveCallsMixin,
     mentionsMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    visibilityMixin
   ],
 
   components: {
@@ -1104,6 +1105,18 @@ export default {
   created () {
     this.onActivityHide()
 
+    this.listeners.updateCommunication = async (communication) => {
+      if (!this.checkCommunicationMatchesUserAccessibility(communication)) {
+        return
+      }
+
+      if (this.communication && this.communication.id === communication.id) {
+        this.communication = _.merge({}, this.communication, communication)
+      }
+    }
+
+    this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
+
     // make appointments and reminders opened by default
     if ([CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(this.communication.type)) {
       this.activeName = true
@@ -1270,6 +1283,10 @@ export default {
         this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('update_communication', this.listeners.updateCommunication)
   },
 
   watch: {
