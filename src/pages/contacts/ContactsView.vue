@@ -1167,7 +1167,8 @@ export default {
         this.defaultIds.includes(this.id) ||
         this.isUpdatingList ||
         !this.listContactsLoaded ||
-        this.list.show_in_public_folder
+        this.list.show_in_public_folder ||
+        this.list.type === this.ContactListTypes.DYNAMIC_REMOTE_LIST
     },
 
     simpsocialMessengerIframeLink () {
