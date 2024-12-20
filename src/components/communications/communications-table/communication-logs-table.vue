@@ -52,9 +52,7 @@
                    props.row.direction,
                    props.row.type,
                    props.row.callback_status
-                 )">
-
-            </div>
+                 )" />
             <div v-else-if="col.name === 'incoming_number'">
               <div v-if="props.row?.campaign_id">
                 {{ getCampaignName(props.row?.campaign_id) }}
@@ -64,41 +62,7 @@
               </div>
             </div>
             <div v-else-if="col.name === 'teams'">
-              <ul class="teams-list">
-                <template v-if="!expandedTeams[props.row.id]">
-                  <li class="team-item"
-                      v-for="team in col.value?.slice(0, 3)"
-                      :key="team">
-                    {{ team }}
-                  </li>
-                  <li class="see-more"
-                      v-if="col.value?.length > 3"
-                      @click="toggleTeams(props.row.id)">
-                    <q-btn flat
-                           dense
-                           size="sm"
-                           color="primary"
-                           label="See more"
-                           class="q-px-none" />
-                  </li>
-                </template>
-                <template v-else>
-                  <li class="team-item"
-                      v-for="team in col.value"
-                      :key="team">
-                    {{ team }}
-                  </li>
-                  <li class="see-more"
-                      @click="toggleTeams(props.row.id)">
-                    <q-btn flat
-                           dense
-                           size="sm"
-                           color="primary"
-                           label="See less"
-                           class="q-px-none" />
-                  </li>
-                </template>
-              </ul>
+              <communications-teams :teams="col.value" />
             </div>
             <div v-else-if="col.name === 'ring_group'">
               {{ getRingGroupName(props.row) }}
@@ -232,6 +196,7 @@ import SearchInput from 'components/search-input'
 import CompactBtn from 'components/compact-btn'
 import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
+import CommunicationsTeams from './communications-teams.vue'
 import NotePopover from './note-popover.vue'
 import StartTime from './start-time.vue'
 import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
@@ -264,6 +229,7 @@ export default {
     CommunicationsOperations,
     CommunicationTableSettings,
     CommunicationsTags,
+    CommunicationsTeams,
     NotePopover,
     StartTime,
     TalkTime,
