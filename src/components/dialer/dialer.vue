@@ -6,6 +6,7 @@
 import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   agentMixin,
@@ -57,7 +58,8 @@ export default {
       dialerListeners: {},
       AgentStatus,
       WebrtcEvents,
-      CommunicationDispositionStatus
+      CommunicationDispositionStatus,
+      taskRedialed: false
     }
   },
 
@@ -68,9 +70,15 @@ export default {
 
     ...mapState('auth', ['profile', 'authenticated']),
 
-    ...mapState('powerDialer', ['activeTask', 'powerDialerTasks']),
+    ...mapState('powerDialer', ['powerDialerTasks']),
 
     ...mapState(['isWidget']),
+
+    ...mapFields('powerDialer', [
+      'activeTask',
+      'sessionPaused',
+      'redialedTask'
+    ]),
 
     isNotInProgressCall () {
       return !this.dialer.call || !this.dialer.communication ||
@@ -91,6 +99,10 @@ export default {
 
     shouldPushPhoneRoute () {
       return (this.isMobile && !this.isWidget) && this.$route.name !== 'Phone'
+    },
+
+    isOnPowerDialerSessionRoute () {
+      return this.$route?.meta?.id === 'power-dialer-session'
     }
   },
 
@@ -578,6 +590,11 @@ export default {
           this.setDialerDeal()
           this.$VueEvent.fire('communicationLoaded')
           this.loadingCommunication = false
+
+          // Move task to skipped list
+          const skipedAndActive = this.getSkippedAndActiveTasks()
+          const tempSet = new Set(skipedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
 
           return Promise.reject(err)
         }
@@ -1347,7 +1364,10 @@ export default {
     },
 
     resetCall () {
-      console.log('Resetting call')
+      if (this.shouldProcessRedial()) {
+        return
+      }
+
       this.stopCallTimer()
       this.stopWrapUpTimer()
       this.stopParkedCallTimer()
@@ -1375,7 +1395,7 @@ export default {
     },
 
     countWrapUpDuration () {
-      if (this.wrapUpPaused) {
+      if (this.wrapUpPaused || this.sessionPaused) {
         return
       }
 
@@ -1685,6 +1705,33 @@ export default {
       } else {
         console.warn('Warning: Missing required data for saving call issue.')
       }
+    },
+
+    // Check if the resetting call needs to be redialed
+    // then process the redial before resetting
+    shouldProcessRedial () {
+      // If not on a PD session/page or no activeTask
+      if (!this.isSessionRunning || !this.isOnPowerDialerSessionRoute || !this.activeTask) {
+        return false
+      }
+
+      // Redial not required, skip
+      if (!this.redialRequired) {
+        return false
+      }
+
+      // Skip if task already being redialed
+      if (this.redialedTask?.id || this.activeTask.forcedRedial) {
+        return false
+      }
+
+      // Set active task as redialed, so it won't process redial again for this task
+      this.activeTask.forcedRedial = true
+
+      // Trigger onNextTask to handle redialing
+      this.$VueEvent.fire('onNextTask')
+
+      return true
     },
 
     ...mapActions([

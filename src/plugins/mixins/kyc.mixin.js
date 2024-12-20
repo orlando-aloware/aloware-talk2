@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import * as KycLogs from '../../constants/kyc-logs'
 import { mapState } from 'vuex'
+import * as KycLogs from '../../constants/kyc-logs'
 
 export default _.merge({
   computed: {
@@ -8,32 +8,12 @@ export default _.merge({
     ...mapState('cache', ['currentCompany']),
     ...mapState('contacts', ['selectedLine']),
 
-    viewOnly () {
-      return this.isViewOnlyAccess()
-    },
-
     currentKycStatus () {
-      return this.getStatus()
+      return this.currentCompany?.kyc_status
     },
 
-    ssuEnabled () {
-      return this.statics?.kyc_ssu_enabled || false
-    },
-
-    isTrialKYC () {
-      if (!this.ssuEnabled) {
-        return false
-      }
-
-      return this.currentCompany?.is_kyc && this.currentCompany?.is_trial
-    },
-
-    isCompanyKYC () {
-      if (!this.ssuEnabled) {
-        return false
-      }
-
-      return this.currentCompany?.is_kyc
+    isTrial () {
+      return this.currentCompany?.is_trial
     },
 
     isCompanyA2pCampaignApproved () {
@@ -41,24 +21,15 @@ export default _.merge({
     },
 
     isKYCFilled () {
-      if (!this.ssuEnabled) {
-        return false
-      }
-
       return this.currentCompany?.kyc_filled
+    },
+
+    canChangeNameAndEmail () {
+      return this.profile?.company?.kyc_status !== KycLogs.KYC_STATUS_APPROVED
     }
   },
 
   methods: {
-    skipRestrictions (kycStatus) {
-      return !this.ssuEnabled || kycStatus === KycLogs.KYC_STATUS_NONE
-    },
-
-    getStatus () {
-      // Gets the KYC status from the company
-      return this.currentCompany?.is_trial ? this.currentCompany.kyc_status : KycLogs.KYC_STATUS_NONE
-    },
-
     shouldAllowSmsTraffic (selectedLine) {
       if (!selectedLine) {
         return true
@@ -82,127 +53,18 @@ export default _.merge({
         return true
       }
 
+      if (this.isTrial) {
+        /**
+         * If it's trial -> Allow messaging, let it fail on compliance
+         */
+        return true
+      }
+
       /**
        *   3 - A2P Campaign + 10DLC Line -> Allow messaging
        *   4 - No A2P Campaign + 10DLC -> Not allowed
        */
       return selectedLine.is_10_dlc && selectedLine.has_approved_a2p_use_case
-    },
-
-    enabledToCreateContacts () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.CREATE_CONTACTS_ALLOWED.includes(kycStatus)
-    },
-
-    enabledToImportContacts () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.IMPORT_CONTACTS_ALLOWED.includes(kycStatus)
-    },
-
-    enabledToCallNumber (phone) {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      phone = this.$options.filters.fixPhone(phone)
-
-      if (phone === this.profile?.phone_number) {
-        return KycLogs.ONESELF_CALLS_ALLOWED.includes(kycStatus)
-      }
-
-      return KycLogs.CALLS_TO_OTHERS_ALLOWED.includes(kycStatus)
-    },
-
-    enabledToTextNumber () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.TEXTS_ALLOWED.includes(kycStatus)
-    },
-
-    singleTestNumberPurchased () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.SINGLE_TEST_NUMBER_PURCHASED_ALLOWED.includes(kycStatus)
-    },
-
-    enabledToBuyNewNumbers () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.BUY_NEW_NUMBERS_ALLOWED.includes(kycStatus)
-    },
-
-    enabledToAddSequences () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.ADD_SEQUENCES_ALLOWED.includes(kycStatus)
-    },
-
-    enabledToAddBroadcasts () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.ADD_BROADCASTS_ALLOWED.includes(kycStatus)
-    },
-
-    allowedToEnableIntegrationsPage () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.ENABLE_INTEGRATIONS_ALLOWED.includes(kycStatus)
-    },
-
-    enabledToSkipTrialAndSubscribe () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return true
-      }
-
-      return KycLogs.SKIP_TRIAL_ALLOWED.includes(kycStatus)
-    },
-
-    isViewOnlyAccess () {
-      const kycStatus = this.getStatus()
-
-      if (this.skipRestrictions(kycStatus)) {
-        return false
-      }
-
-      return KycLogs.VIEW_ONLY_ALLOWED.includes(kycStatus)
     },
 
     onOpenFinishRegistration () {

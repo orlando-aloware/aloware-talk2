@@ -208,7 +208,7 @@ export default {
     },
 
     onShown () {
-      if (this.isDeleteContactConfirmation) {
+      if (this.isDeleteContactConfirmation && this.$refs.contactsToDeleteInput) {
         this.$refs.contactsToDeleteInput.focus()
       }
     },
@@ -389,18 +389,6 @@ export default {
       if (Object.keys(this.selectedContacts).length !== 0 && this.selectedContacts[this.selectedList.id].constructor !== Object && this.isBulkDelete) {
         this.handleBulkDeletion()
       }
-    },
-
-    integrationsCount () {
-      if (!this.contactToRemove && this.selectedContacts[this.listId]) {
-        // disable integrations count if multi entity is not activated
-        if (!this.currentCompany.activate_multi_entity) {
-          return 0
-        }
-        return this.selectedContacts[this.listId].filter(contact => contact.has_integration).length
-      }
-
-      return 0
     }
   }
 }

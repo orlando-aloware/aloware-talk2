@@ -786,7 +786,7 @@ export default {
       delete params.target
       delete params.size
 
-      return talk2Api.V2.integrations.hubspot.importList(target, params)
+      return talk2Api.V2.integrations.hubspot.importListToPowerDialer(target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your HubSpot contact list is being imported. We will notify you when it\'s ready.')
@@ -806,7 +806,7 @@ export default {
       delete params.target
       delete params.size
 
-      return talk2Api.V2.integrations.zoho.importView(target, params)
+      return talk2Api.V2.integrations.zoho.importViewToPowerDialer(target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your Zoho view is being imported. We will notify you when it\'s ready.')
@@ -826,7 +826,7 @@ export default {
       delete params.target
       delete params.size
 
-      return talk2Api.V2.integrations.pipedrive.importFilter(target, params)
+      return talk2Api.V2.integrations.pipedrive.importFilterToPowerDialer(target, params)
         .then(response => response.data)
         .then(data => {
           const notification = this.$generalNotification('Your Pipedrive filter is being imported. We will notify you when it\'s ready.')

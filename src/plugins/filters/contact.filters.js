@@ -143,6 +143,8 @@ const fixLrnType = (lrnType) => {
         return 'VOIP'
       case LrnTypes.LRN_TYPE_OTHER:
         return 'Other'
+      case LrnTypes.LRN_NOT_PERFORMED:
+        return 'LRN not performed'
       default:
         return ''
     }
@@ -153,6 +155,11 @@ const fixLrnType = (lrnType) => {
 
 const validLrnType = (type) => {
   return ![null, undefined].includes(type)
+}
+
+const getUrlToLrnInfo = (lrnType) => {
+  const url = 'https://support.aloware.com/en/articles/9034177-understanding-lrn-location-routing-numbers-in-aloware'
+  return lrnType === LrnTypes.LRN_NOT_PERFORMED ? url : null
 }
 
 /**
@@ -213,6 +220,7 @@ export default ({ Vue }) => {
     fixLrnType,
     fixCount,
     validLrnType,
+    getUrlToLrnInfo,
     fixTaskStatusName,
     getTaskStatusIdByName
   }

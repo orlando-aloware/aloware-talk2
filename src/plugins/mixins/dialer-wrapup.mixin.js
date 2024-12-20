@@ -1,6 +1,9 @@
 import { mapState } from 'vuex'
+import { dispositionsMixin } from 'src/plugins/mixins'
 
 export default {
+  mixins: [dispositionsMixin],
+
   data () {
     return {
       wrapUpPaused: false,
@@ -26,17 +29,6 @@ export default {
 
       return this.isForcedContactDisposition &&
         !hasContactDisposition
-    },
-
-    isForcedCallDisposition () {
-      return this.currentCompany && this.currentCompany.force_call_disposition
-    },
-
-    isNotDisposed () {
-      const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
-      const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
-
-      return isForceCallDisposition || isForceContactDisposition
     }
   },
 
@@ -64,7 +56,7 @@ export default {
 
   watch: {
     isContactNotDisposed (value) {
-      if (!value && !this.isForcedCallDisposition) {
+      if (!value && !this.isForcedCallDisposition && !this.isForcedSmsSending) {
         this.wrapUpPaused = false
       }
     }

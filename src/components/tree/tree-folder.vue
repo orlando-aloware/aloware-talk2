@@ -87,6 +87,7 @@
         :hasDelete="hasDelete"
         :layer="layer + 1"
         :endpoint="endpoint"
+        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
         data-testid="tree-folder-contents"
       ></tree-folder-contents>
       <tree-list-contents
@@ -94,6 +95,7 @@
         :layer="layer + 1"
         :hasEdit="hasEdit"
         :hasDelete="hasDelete"
+        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
         :endpoint="endpoint"
         :folder-id="id"
         data-testid="tree-list-contents-1"
@@ -106,6 +108,7 @@
       :layer="layer + 1"
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
+      :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
       :isRootList="isRootList"
       :endpoint="endpoint"
       :folder-id="id"
@@ -165,6 +168,10 @@ export default {
 
     hasDelete: {
       type: Number
+    },
+
+    hasShowInPublicFolderPermission: {
+      type: Boolean
     },
 
     isRootList: {

@@ -27,7 +27,7 @@ export default {
   props: {
     type: {
       type: Number,
-      required: true
+      required: false
     },
     testIdSuffix: {
       type: String,

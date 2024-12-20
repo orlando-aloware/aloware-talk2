@@ -209,7 +209,7 @@
       </div>
     </div>
 
-    <b-button class="contact-information-toggle"
+    <b-button class="expand-toggle"
               variant="light"
               size="sm"
               pill

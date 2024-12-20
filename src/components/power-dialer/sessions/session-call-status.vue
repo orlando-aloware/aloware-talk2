@@ -458,7 +458,9 @@ import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-m
 import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
 import {
   sessionCallStatusMixin,
-  dialerWrapUpMixin, aclMixin
+  dialerWrapUpMixin,
+  aclMixin,
+  dispositionsOptionsMixin
 } from 'src/plugins/mixins'
 import { isEmpty, cloneDeep, get, debounce } from 'lodash'
 import moment from 'moment-timezone'
@@ -467,6 +469,8 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import talk2Api from 'src/plugins/api/api'
 import HangupIcon from 'components/icons/hangup-icon.vue'
 import PlayBarIcon from 'components/icons/play-bar-icon.vue'
+
+const PD_PAUSED_PROP_NAME = 'is_power_dialer_paused'
 
 export default {
   name: 'SessionCallStatus',
@@ -490,7 +494,8 @@ export default {
   mixins: [
     aclMixin,
     sessionCallStatusMixin,
-    dialerWrapUpMixin
+    dialerWrapUpMixin,
+    dispositionsOptionsMixin
   ],
 
   props: {
@@ -516,8 +521,7 @@ export default {
       loadingHold: false,
       loadingUnhold: false,
       isRedialClicked: false,
-      isProcessingDNC: false,
-      redialedTask: {}
+      isProcessingDNC: false
     }
   },
 
@@ -530,7 +534,9 @@ export default {
       'countdownTimer',
       'sessionPaused',
       'activeTask',
-      'hubspot'
+      'hubspot',
+      'redialedTasksCount',
+      'redialedTask'
     ]),
 
     ...mapState([
@@ -863,8 +869,24 @@ export default {
       ]
     },
 
-    shouldRedial () {
-      return this.sessionSettings.force_redial && !this.dialer.callSuccessfullyAnswered && !this.dialer.redialedTaskIds.includes(this.activeTask?.id)
+    // v1 legacy redial (for non demo companies, should be deprecated once v2 redial is released)
+    shouldRedialLegacy () {
+      // force redial disabled
+      if (!this.sessionSettings.force_redial) {
+        return false
+      }
+
+      // task already redialed
+      if (this.redialedTasksCount[this.activeTask?.id] > 0) {
+        return false
+      }
+
+      // now should redial if call is not successfully answered
+      return !this.dialer.callSuccessfullyAnswered
+    },
+
+    isOnPowerDialerSessionRoute () {
+      return this.$route?.meta?.id === 'power-dialer-session'
     }
   },
 
@@ -888,16 +910,14 @@ export default {
     this.$VueEvent.listen('redial_task', this.requeueTask)
     this.$VueEvent.listen('holdFailed', this.onHoldFailed)
     this.$VueEvent.listen('unholdFailed', this.onUnholdFailed)
+    this.$VueEvent.listen('onNextTask', this.onNextTask)
 
     this.isSessionRunning = false
   },
 
   methods: {
     ...mapActions([
-      'setShowPhone',
-      'addDialerRedialedTaskId',
-      'clearDialerRedialedTaskIds',
-      'setDialerCallSuccessfullyAnswered'
+      'setShowPhone'
     ]),
 
     ...mapActions('contacts', [
@@ -906,7 +926,8 @@ export default {
 
     ...mapActions('powerDialer', [
       'reQueuePowerDialerTask',
-      'removeFirstInQueueTask'
+      'removeFirstInQueueTask',
+      'incrementRedialedTaskCount'
     ]),
 
     onDispositionsClick () {
@@ -982,6 +1003,11 @@ export default {
         this.wrapUpPaused
 
       this.countdownInterval = setInterval(() => {
+        // if paused, we should not continue the countdown
+        if (this.sessionPaused) {
+          return
+        }
+
         // if status in wrap-up and has wrap-up seconds but wrap up is paused due to
         // forced call or contact disposition, we should not continue the countdown
         if (this.wrapUpSeconds !== -1 && this.dialer.currentStatus === 'WRAP_UP' &&
@@ -991,7 +1017,8 @@ export default {
 
         // end countdown if previously in wrap-up status and paused due to forced
         // call and contact disposition and status changed and is no longer in wrap-up
-        if (wasInWrapUpStatusAndPaused && this.dialer.currentStatus !== 'WRAP_UP') {
+        // and countdown type is wrap-up (so it doesn't skip warm-up period)
+        if (wasInWrapUpStatusAndPaused && this.dialer.currentStatus !== 'WRAP_UP' && this.wrapUp) {
           this.countdownTimer = 0
         }
 
@@ -1055,11 +1082,6 @@ export default {
     start () {
       this.resetSession()
       this.initialize()
-
-      // Force pause if session is started after being manually paused (it might happen when internet is restablished)
-      if (this.sessionPaused) {
-        this.onTogglePause()
-      }
     },
 
     async initialize () {
@@ -1120,6 +1142,11 @@ export default {
         }
 
         setTimeout(() => {
+          if (this.sessionPaused || window.localStorage.getItem(PD_PAUSED_PROP_NAME) === 'true') {
+            this.onTogglePause()
+            return
+          }
+
           this.startWarmUpCountDown()
         }, 1000)
       }
@@ -1194,6 +1221,9 @@ export default {
     onTogglePause () {
       this.togglePause = !this.togglePause
 
+      // this will be stored as string
+      window.localStorage.setItem(PD_PAUSED_PROP_NAME, this.togglePause)
+
       if (this.togglePause) {
         this.sessionPaused = true
         return
@@ -1261,9 +1291,6 @@ export default {
           }
         }, 500)
       }
-
-      this.clearDialerRedialedTaskIds()
-      this.setDialerCallSuccessfullyAnswered(false)
 
       clearInterval(this.countdownInterval)
 
@@ -1386,9 +1413,28 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      if (this.shouldRedial) {
-        this.addDialerRedialedTaskId(this.activeTask.id)
+      // v1 legacy redial (for non demo companies, should be deprecated once v2 redial is released)
+      if (this.shouldRedialLegacy) {
+        this.incrementRedialedTaskCount(this.activeTask.id)
         this.onRedial(false)
+        return
+      }
+
+      // v2 redial (for demo companies)
+      if (this.redialRequired) {
+        this.incrementRedialedTaskCount(this.activeTask.id)
+
+        // redial immediately if immediate redial is ON or no tasks left
+        const redialNow = this.sessionSettings.force_immediate_redial || this.powerDialerTasks.in_queue.length === 0
+        this.onRedial(redialNow, true)
+
+        console.log(`%c Redial required, pushing to ${redialNow ? 'TOP' : 'BOTTOM'}`, 'background: yellow; color: #000;')
+
+        if (redialNow) {
+          this.$VueEvent.fire('clearCallDispositionStatus')
+        }
+
+        this.activeTask.forcedRedial = true
         return
       }
 
@@ -1523,7 +1569,7 @@ export default {
       this.sessionPhoneExpansion = ''
     },
 
-    async onRedial (redial) {
+    async onRedial (redial, forcedRedial = false) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
 
@@ -1549,7 +1595,11 @@ export default {
       this.redialedTask.redialed_now = redial
       this.verifyAgentOnCall = true
 
-      this.redialTask(this.activeTask, redial).then(() => {
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('pauseWrapUp', true)
+      }
+
+      this.redialTask(this.activeTask, redial, forcedRedial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
@@ -1744,6 +1794,9 @@ export default {
     this.$VueEvent.stop('redial_task', this.requeueTask)
     this.$VueEvent.stop('holdFailed', this.onHoldFailed)
     this.$VueEvent.stop('unholdFailed', this.onUnholdFailed)
+    this.$VueEvent.stop('onNextTask', this.onNextTask)
+
+    window.localStorage.removeItem(PD_PAUSED_PROP_NAME)
   }
 }
 </script>

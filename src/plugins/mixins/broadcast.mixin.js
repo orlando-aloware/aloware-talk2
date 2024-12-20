@@ -3,6 +3,7 @@ import _ from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 import { mapActions, mapState } from 'vuex'
 import * as ChannelType from 'src/constants/inbox-channels'
+import { getWebSocketCredentials } from 'src/boot/helpers'
 
 export default {
   computed: {
@@ -50,20 +51,159 @@ export default {
        * for events that are broadcast by Laravel. Echo and event broadcasting
        * allows your team to easily build robust real-time web applications.
        */
-      window.Echo = new Echo({
+      const broadcastDriver = this.currentCompany.broadcast_driver || 'pusher'
+
+      window.Echo = this.initEcho(broadcastDriver)
+      this.broadcastListen()
+
+      // This is a stress test for soketi server, should be removed in the future
+      if (broadcastDriver === 'pusher') {
+        window.secondEchoDriver = this.initEcho('soketi')
+        this.broadcastListenSecondDriver()
+      }
+
+      // If error to connect, try to connect with other driver as fallback
+      window.Echo.connector.pusher.connection.unbind('error')
+      window.Echo.connector.pusher.connection.bind('error', (err) => {
+        console.error('Error to connect to ws driver', err)
+        if (window.fallbackDriver) {
+          console.log('Fallback driver already started', window.fallbackDriver)
+          return
+        }
+        // Define the fallback driver, only pusher and soketi exists today
+        window.fallbackDriver = broadcastDriver === 'pusher' ? 'soketi' : 'pusher'
+        console.log('Error to connect to: ' + broadcastDriver, 'Connecting to fallback driver: ' + window.fallbackDriver, err)
+
+        // Try to connect with fallback driver
+        window.Echo = this.initEcho(window.fallbackDriver)
+        this.broadcastListen()
+      })
+    },
+    initEcho (broadcastDriver) {
+      console.log('broadcast initiated with ' + broadcastDriver)
+      const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials(broadcastDriver)
+      return new Echo({
         authEndpoint: `${process.env.API_URL}/broadcasting/auth`,
         broadcaster: 'pusher',
-        key: storage.local.getItem('pusher_app_key'),
-        cluster: storage.local.getItem('pusher_cluster'),
+        key: WS_APP_KEY,
+        cluster: WS_CLUSTER,
+        wsHost: WS_HOST,
+        wssHost: WS_HOST,
+        encrypted: true,
         forceTLS: true,
         auth: {
           headers: {
-            Authorization: `Bearer ${storage.local.getItem('api_token')}`
+            Authorization: `Bearer ${storage.local.getItem('api_token')}`,
+            driver: broadcastDriver
           }
-        }
+        },
+        enabledTransports: ['ws', 'wss'],
+        disableStats: true
       })
-      console.log('broadcast initiated')
-      this.broadcastListen()
+    },
+    broadcastListenSecondDriver () {
+      const userId = _.get(this.profile, 'id', null)
+
+      if (!userId) {
+        return
+      }
+
+      const userEvents = [
+        '.user.status.updated',
+        '.user.in-app.contact.contact_assigned',
+        '.user.in-app.appointment',
+        '.user.in-app.reminder',
+        '.user.in-app.communication.new_call',
+        '.user.desktop.incoming_number.high_sms_volume',
+        '.user.in-app.communication.answered_call',
+        '.user.in-app.communication.new_sms',
+        '.user.in-app.communication.new_voicemail',
+        '.user.in-app.communication.new_fax',
+        '.user.desktop.contact.contact_assigned',
+        '.user.desktop.appointment',
+        '.user.desktop.reminder',
+        '.user.desktop.communication.new_call',
+        '.user.desktop.communication.answered_call',
+        '.user.desktop.communication.new_sms',
+        '.user.desktop.communication.new_voicemail',
+        '.user.desktop.communication.new_fax',
+        '.user.logout',
+        '.communication.created',
+        '.communication.updated',
+        '.user.contact_list_item.created',
+        '.user.contact_list_item.updated',
+        '.user.contact_list_item.deleting',
+        '.user.session_metrics_calculation',
+        '.bulk_contact_list_items.created',
+        '.bulk_contact_list_items.deleted',
+        '.bulk_contacts.deleted',
+        '.export-events',
+        '.bulk_tags.deleted',
+        '.power_dialer_contact.removed'
+      ]
+
+      const companyEvents = [
+        '.company.updated',
+        '.communication.created',
+        '.communication.updated',
+        '.communication.deleted',
+        '.incoming_number.created',
+        '.ring_group.created',
+        '.ring_group.updated',
+        '.ring_group.deleted',
+        '.campaign.created',
+        '.campaign.updated',
+        '.campaign.deleted',
+        '.tag.created',
+        '.tag.updated',
+        '.tag.deleting',
+        '.disposition_status.created',
+        '.disposition_status.updated',
+        '.disposition_status.deleted',
+        '.call_disposition.bulk_created',
+        '.call_disposition.created',
+        '.call_disposition.updated',
+        '.call_disposition.deleted',
+        '.activity_type.created',
+        '.activity_type.deleted',
+        '.contact.created',
+        '.contact.updated',
+        '.contact.deleted',
+        '.contact_audit.created',
+        '.filter.created',
+        '.filter.updated',
+        '.filter.deleted',
+        '.user.created',
+        '.user.updated',
+        '.user.deleted',
+        '.workflow.created',
+        '.workflow.updated',
+        '.workflow.deleted',
+        '.export-events',
+        '.export.created',
+        '.export.updated',
+        '.export.deleted',
+        '.contact-list.import-hubspot',
+        '.contact-list.import-zoho',
+        '.contact-list.import-pipedrive',
+        '.contact-list.import-failed',
+        '.contact-list.created',
+        '.broadcasts.created',
+        '.broadcasts.updated',
+        '.broadcasts.deleted',
+        '.script.deleted',
+        '.kyc_status_updated'
+      ]
+
+      userEvents.forEach(event => {
+        window.secondEchoDriver.private('user-' + userId).listen(event, (event) => {})
+      })
+
+      companyEvents.forEach(event => {
+        window.secondEchoDriver.private('company-' + this.profile.company_id).listen(event, (event) => {})
+      })
+
+      window.secondEchoDriver.private('cache-agent-status-user-' + userId).listen('.agent_status.updated', (event) => {})
     },
     broadcastListen () {
       const userId = _.get(this.profile, 'id', null)
@@ -737,6 +877,10 @@ export default {
     broadcastLeave () {
       if (!window.Echo) {
         return
+      }
+
+      if (window.secondEchoDriver) {
+        window.secondEchoDriver.disconnect()
       }
 
       if (this.profile) {

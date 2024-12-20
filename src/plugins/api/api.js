@@ -683,6 +683,16 @@ export default {
   },
 
   V2: {
+    contact: {
+      getConversationSummary (contactId, params) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary`, params)
+      }
+    },
+
     contacts: {
       get (id, sourceToken = null) {
         if (!id || id === 'undefined') {
@@ -819,18 +829,36 @@ export default {
     integrations: {
       hubspot: {
         importList (target, params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-hubspot-list/${target}`, params)
+        },
+        listExists (target) {
+          return window.axios.get(`${suffixV2}contacts-list/hubspot-list-exists/${target}`)
+        },
+        importListToPowerDialer (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-hubspot-list/${target}`, params)
         }
       },
 
       zoho: {
         importView (target, params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-zoho-view/${target}`, params)
+        },
+        viewExists (target) {
+          return window.axios.get(`${suffixV2}contacts-list/zoho-view-exists/${target}`)
+        },
+        importViewToPowerDialer (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-zoho-view/${target}`, params)
         }
       },
 
       pipedrive: {
         importFilter (target, params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-pipedrive-filter/${target}`, params)
+        },
+        filterExists (target) {
+          return window.axios.get(`${suffixV2}contacts-list/pipedrive-filter-exists/${target}`)
+        },
+        importFilterToPowerDialer (target, params) {
           return window.axios.post(`${suffixV2}power-dialer-lists/import-pipedrive-filter/${target}`, params)
         }
       }
@@ -842,6 +870,9 @@ export default {
       },
       public (params) {
         return window.axios.get(`${suffixV2}contacts-list/public`, { params })
+      },
+      async update (id, params) {
+        return window.axios.put(`${suffixV2}contacts-list/${id}`, params)
       }
     },
 

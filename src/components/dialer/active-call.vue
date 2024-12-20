@@ -73,12 +73,12 @@ import { mapFields } from 'vuex-map-fields'
 import { mapState } from 'vuex'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as AgentStatus from 'src/constants/agent-status'
-import { dialerWrapUpMixin } from 'src/plugins/mixins'
+import { dialerWrapUpMixin, sessionCallStatusMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'active-call',
 
-  mixins: [dialerWrapUpMixin],
+  mixins: [dialerWrapUpMixin, sessionCallStatusMixin],
 
   data () {
     return {
@@ -210,6 +210,12 @@ export default {
     endWrapUp ($event) {
       $event.stopPropagation()
       $event.preventDefault()
+
+      if (this.isOnPowerDialerSessionRoute && this.redialRequired) {
+        this.$VueEvent.fire('onNextTask')
+        return
+      }
+
       this.$VueEvent.fire('endWrapUp')
       this.$VueEvent.fire('endWrapUpPDSession')
     },

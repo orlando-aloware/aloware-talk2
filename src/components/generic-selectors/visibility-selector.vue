@@ -111,8 +111,8 @@ export default {
           description: 'Can see all contacts.'
         },
         {
-          value: ContactAccessTypes.CONTACTS_ACCESS_TEAM,
-          label: 'Team Only (Beta)',
+          value: ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP_USERS,
+          label: 'Ring Group Users Only',
           description: 'Can only see contacts owned by users in any ring groups that this user belongs to.'
         },
         {

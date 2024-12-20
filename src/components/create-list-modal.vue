@@ -27,14 +27,15 @@
                  type="text"
                  placeholder="Untitled List"
                  autofocus
-                 :disabled="isLoading"
+                 :disabled="disableNameInput"
                  v-model="createList.name"/>
+          <small v-if="isIntegrationListType" class="text-dark">List name will be obtained from the selected integration List</small>
         </div>
 
         <div :class="['flex-grow-1', isCreateListModeFromBulkMenuOrFilters ? 'py-4' : 'pt-4 pb-2']"
              v-if="![CreateListMode.FROM_FILTERS, CreateListMode.FROM_BULK_MENU].includes(createList.mode) && isDefault">
           <div class="form-check mb-2"
-               @click="createList.type = ContactListTypes.DYNAMIC">
+               @click="onListTypeSelected(ContactListTypes.DYNAMIC)">
             <input class="form-check-input"
                    type="radio"
                    id="dynamicList"
@@ -48,7 +49,7 @@
             </label>
           </div>
           <div class="form-check"
-               @click="createList.type = ContactListTypes.STATIC">
+               @click="onListTypeSelected(ContactListTypes.STATIC)">
             <input class="form-check-input"
                    type="radio"
                    id="staticList"
@@ -61,9 +62,76 @@
               </div>
             </label>
           </div>
+          <div class="form-check mt-2"
+               @click="onListTypeSelected(IMPORT_FROM_INTEGRATION_TYPE)">
+            <input class="form-check-input"
+                   type="radio"
+                   id="staticListFromIntegration"
+                   :checked="isIntegrationListType"/>
+            <label for="staticListFromIntegration">
+              <div class="create-list-modal__list-title">List from Integration</div>
+              <div class="create-list-modal__list-desc">
+                It will be initially populated by the selected integration list; able to manually select and
+                adjust order of contacts
+              </div>
+            </label>
+          </div>
         </div>
 
-        <template v-if="userCanAddPublicList">
+        <div v-if="showIntegrationSelector">
+          <hr class="w-100 my-2" />
+          <div class="mb-3"
+               v-if="integrationsEnabled.length > 1">
+              <div class="row">
+                  <div class="col-6 d-flex align-items-center pl-0">
+                      <span>Select from available integrations: </span>
+                  </div>
+                  <div class="col-6 pr-0">
+                      <q-select class="break-words"
+                                color="primary"
+                                use-input
+                                emit-value
+                                map-options
+                                dense
+                                hide-bottom-space
+                                :options="integrationsEnabled"
+                                v-model="selectedIntegration"/>
+                  </div>
+              </div>
+          </div>
+          <p class="mb-2"
+             v-else>
+              Currently enabled integration: <span class="text-bold"> {{ integrationsEnabled[0] }} </span>
+          </p>
+          <integration-list-selector ref="list-selector"
+                                     :use-chips="false"
+                                     :multiple="false"
+                                     :clearable="true"
+                                     :generic-styling="false"
+                                     :disable="shouldDisableListSelector"
+                                     :integration="selectedIntegration ?? ''"
+                                     @change="onListSelectorChange"/>
+
+          <div v-if="getIntegration === HUBSPOT_INTEGRATION">
+            <b-form-group class="checkbox-wrapper">
+              <b-form-checkbox :value="true"
+                               :unchecked-value="false"
+                               v-model="hubspotDynamicImport">
+                <span>Keep list in sync with HubSpot</span>
+                <span class="ml-2">
+                  <information-circle-icon class="cursor-pointer"/>
+                  <q-tooltip>
+                    <p><b>Activate this option to automatically sync your HubSpot lists with Aloware.</b></p>
+                    <p>HubSpot's Active lists will be updated hourly, reflecting the addition and removal of contacts based on specific HubSpot criteria.</p>
+                    <p>Static lists in HubSpot will remain unchanged until manual updates are made in the CRM, which will also be reflected in Aloware during periodic synchronization.</p>
+                  </q-tooltip>
+                </span>
+              </b-form-checkbox>
+            </b-form-group>
+          </div>
+        </div>
+
+        <template v-else-if="userCanAddPublicList">
           <hr class="w-100 my-2"
               v-if="!isCreateListModeFromBulkMenuOrFilters"/>
           <div :class="['flex-grow-1', isCreateListModeFromBulkMenuOrFilters ? 'py-4' : 'pt-2 pb-4']">
@@ -109,13 +177,34 @@
             Cancel
           </button>
           <button class="btn btn-block btn-primary mt-0"
-                  :disabled="!isNameValid || isLoading"
+                  :disabled="disableSubmit"
                   @click="onSubmit">
-            Create
+            {{ submitText }}
           </button>
         </div>
       </div>
     </b-overlay>
+
+    <b-modal modal-class="confirm-dialog"
+             title="List Already Exists"
+             centered
+             v-model="showIntegrationImportConfirmDialog"
+             @close="onConfirmIntegrationImportClose">
+      <div class="text-left">
+        <div class="text-dark">
+          {{ integrationImportConfirmMessage }}
+        </div>
+      </div>
+      <template slot="modal-footer">
+        <div class="d-flex w-100">
+          <div class="flex-grow-1"></div>
+          <button class="btn btn-sm btn-primary mr-2"
+                  @click="onConfirmIntegrationImport">
+            Continue
+          </button>
+        </div>
+      </template>
+    </b-modal>
   </b-modal>
 </template>
 
@@ -139,14 +228,26 @@ import {
 import { chunk, isEmpty } from 'lodash'
 import {
   aclMixin,
-  contactLists
+  contactLists,
+  integrationMixin
 } from 'src/plugins/mixins'
+import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
+import talk2Api from 'src/plugins/api/api'
+import { HUBSPOT_INTEGRATION, PIPEDRIVE_INTEGRATION, ZOHO_INTEGRATION } from 'src/constants/integrations'
 
 export default {
+  components: {
+    IntegrationListSelector,
+    InformationCircleIcon
+  },
+
   mixins: [
     aclMixin,
-    contactLists
+    contactLists,
+    integrationMixin
   ],
+
   inject: [
     'selectedContacts'
   ],
@@ -161,6 +262,10 @@ export default {
   mounted () {
     this.loadFolders()
     this.loadPublicLists()
+    if (this.integrationsEnabled.length === 1) {
+      this.selectedIntegration = this.integrationsEnabled[0]
+      this.loadSelectionOptions()
+    }
   },
 
   computed: {
@@ -218,6 +323,49 @@ export default {
 
     isPowerDialer () {
       return this.$route.name.includes('Power Dialer')
+    },
+
+    submitText () {
+      if (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE) {
+        return 'Import'
+      }
+      return 'Create'
+    },
+
+    shouldDisableListSelector () {
+      return this.selectedIntegration === null
+    },
+
+    disableSubmit () {
+      if (this.isLoading) {
+        return true
+      }
+
+      if (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE) {
+        return !this.integrationList
+      }
+
+      return !this.isNameValid
+    },
+
+    integrationListId () {
+      return this.integrationList?.listId ?? this.integrationList?.id
+    },
+
+    getIntegration () {
+      return (this.selectedIntegration ?? this.integrationsEnabled[0])?.toLowerCase()
+    },
+
+    showIntegrationSelector () {
+      return this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE && this.integrationsEnabled?.length > 0
+    },
+
+    isIntegrationListType () {
+      return this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE
+    },
+
+    disableNameInput () {
+      return this.isLoading || this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE
     }
   },
 
@@ -441,6 +589,11 @@ export default {
     },
 
     onSubmit () {
+      if (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE) {
+        this.processIntegrationListSubmit()
+        return
+      }
+
       // should skip list's loading view after creating the list
       if (this.createList.type === this.ContactListTypes.STATIC &&
         !this.isDatatableSelectedAll &&
@@ -508,6 +661,142 @@ export default {
         .catch((_err) => {
           this.$generalNotification('Unable to load folders please try again.', 'error')
         })
+    },
+
+    loadSelectionOptions () {
+      if (this.$refs['list-selector'] === undefined) {
+        return
+      }
+
+      this.$refs['list-selector'].selectedId = null
+      this.$refs['list-selector'].getListsOfEnabledIntegration()
+    },
+
+    onListSelectorChange (payload) {
+      this.integrationList = payload.list
+    },
+
+    async processIntegrationListSubmit () {
+      this.isLoading = true
+      await this.checkIntegrationImport()
+
+      if (this.showIntegrationImportConfirmDialog) {
+        this.isLoading = false
+        return
+      }
+
+      this.importFromIntegration()
+    },
+
+    importFromIntegration () {
+      if (!this.isLoading) {
+        this.isLoading = true
+      }
+
+      switch (this.getIntegration) {
+        case HUBSPOT_INTEGRATION:
+          return this.importFromHubspot()
+        case PIPEDRIVE_INTEGRATION:
+          return this.addPipedriveFilter()
+        case ZOHO_INTEGRATION:
+          return this.addZohoView()
+      }
+    },
+
+    importFromHubspot () {
+      return talk2Api.V2.integrations.hubspot.importList(this.integrationListId, { dynamic_import: this.hubspotDynamicImport })
+        .then(response => response.data)
+        .then(data => {
+          this.$generalNotification("Your HubSpot contact list is being imported. It can take a couple of minutes if it's a large list.")
+          this.createListClose()
+          this.loadFolders()
+          this.loadPublicLists()
+        })
+        .catch(_err => {
+          this.isLoading = false
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
+    },
+
+    addZohoView () {
+      return talk2Api.V2.integrations.zoho.importView(this.integrationListId)
+        .then(response => response.data)
+        .then(data => {
+          this.$generalNotification('Your Zoho view is being imported. It can take a couple of minutes depending on the view.')
+          this.createListClose()
+          this.loadFolders()
+          this.loadPublicLists()
+        })
+        .catch(_err => {
+          this.isLoading = false
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
+    },
+
+    addPipedriveFilter () {
+      return talk2Api.V2.integrations.pipedrive.importFilter(this.integrationListId)
+        .then(response => response.data)
+        .then(data => {
+          this.$generalNotification('Your Pipedrive filter is being imported. It can take a couple of minutes depending on the filter.')
+          this.createListClose()
+          this.loadFolders()
+          this.loadPublicLists()
+        })
+        .catch(_err => {
+          this.isLoading = false
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
+    },
+
+    onConfirmIntegrationImport () {
+      this.showIntegrationImportConfirmDialog = false
+      this.importFromIntegration()
+    },
+
+    async checkIntegrationImport () {
+      switch (this.getIntegration) {
+        case HUBSPOT_INTEGRATION:
+          return this.checkHubspotList()
+        case PIPEDRIVE_INTEGRATION:
+          return this.checkPipedriveFilter()
+        case ZOHO_INTEGRATION:
+          return this.checkZohoView()
+      }
+    },
+
+    async checkHubspotList () {
+      const res = await talk2Api.V2.integrations.hubspot.listExists(this.integrationListId)
+
+      if (res.data.exists) {
+        this.integrationImportConfirmMessage = 'The HubSpot list you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.showIntegrationImportConfirmDialog = true
+      }
+    },
+
+    async checkZohoView () {
+      const res = await talk2Api.V2.integrations.zoho.viewExists(this.integrationListId)
+
+      if (res.data.exists) {
+        this.integrationImportConfirmMessage = 'The Zoho view you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.showIntegrationImportConfirmDialog = true
+      }
+    },
+
+    async checkPipedriveFilter () {
+      const res = await talk2Api.V2.integrations.pipedrive.filterExists(this.integrationListId)
+
+      if (res.data.exists) {
+        this.integrationImportConfirmMessage = 'The Pipedrive filter you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.showIntegrationImportConfirmDialog = true
+      }
+    },
+
+    onConfirmIntegrationImportClose () {
+      this.showIntegrationImportConfirmDialog = false
+    },
+
+    onListTypeSelected (listType) {
+      this.createList.type = listType
     }
   },
 
@@ -523,7 +812,17 @@ export default {
         FROM_BULK_MENU
       },
       errorMsg: '',
-      ContactListTypes
+      ContactListTypes,
+      // Static type to choose for importing from integration
+      IMPORT_FROM_INTEGRATION_TYPE: 99,
+      selectedIntegration: null,
+      integrationList: null,
+      hubspotDynamicImport: false,
+      showIntegrationImportConfirmDialog: false,
+      integrationImportConfirmMessage: '',
+      HUBSPOT_INTEGRATION,
+      PIPEDRIVE_INTEGRATION,
+      ZOHO_INTEGRATION
     }
   },
 
@@ -536,3 +835,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.break-words {
+  word-break: break-all;
+}
+</style>

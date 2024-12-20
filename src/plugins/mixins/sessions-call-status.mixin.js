@@ -45,7 +45,8 @@ export default {
       'countdownTimer',
       'isSessionRunning',
       'taskToCall',
-      'hasActiveTask'
+      'hasActiveTask',
+      'redialedTasksCount'
     ]),
 
     ...mapGetters('contacts', [
@@ -153,6 +154,37 @@ export default {
         open_time: '09:00:00',
         close_time: '18:00:00'
       }
+    },
+
+    // Should redial if min_redials is set to > 0
+    // if has redialed less than min_redials
+    // and if the call disposition is not a successful call disposition
+    redialRequired () {
+      const minRedials = this.sessionSettings?.min_redials
+
+      // min_redials = 0 (redial disabled)
+      if (!minRedials || minRedials === 0) {
+        console.log('%c redial disabled', 'background-color: green; color: white')
+        return false
+      }
+
+      // exceeded required min_redials attempts
+      if (this.redialedTasksCount[this.activeTask?.id] >= minRedials) {
+        return false
+      }
+
+      // selected call disposition is a successful call disposition
+      const successfulCallDispositionsIds = this.sessionSettings?.successful_call_disposition_ids
+      if (successfulCallDispositionsIds?.includes(this.callDisposition)) {
+        return false
+      }
+
+      // if task is skipped by any reason (timezone, dnc, etc) we should not request a redial
+      if (this.isTaskSkipped(this.activeTask?.contact_list_item_id)) {
+        return false
+      }
+
+      return true
     }
   },
 
@@ -302,7 +334,7 @@ export default {
         })
     },
 
-    redialTask (autoDialTask, redial) {
+    redialTask (autoDialTask, redial, forcedRedial = false) {
       const contactListItemId = get(autoDialTask, 'contact_list_item_id', null)
 
       if (!contactListItemId) {
@@ -318,7 +350,13 @@ export default {
             this.taskToCall.redialed = res.data.data.redialed
           }
 
-          this.$generalNotification(`Success: contact is at the ${position} of the current list`)
+          let message = `Success: contact is at the ${position} of the current list`
+
+          if (forcedRedial) {
+            message = `Contact needs to be redialed, adding to the ${position} of current list`
+          }
+
+          this.$generalNotification(message)
           return Promise.resolve(res)
         }).catch(err => {
           return Promise.reject(err)
@@ -396,6 +434,10 @@ export default {
       const newInQueueList = currInQueue.filter(element => !currSkippedAndInProgress.some(item => item.contact_list_item_id === element.contact_list_item_id))
 
       return newInQueueList
+    },
+
+    isTaskSkipped (contactListItemId) {
+      return contactListItemId && this.skippedTasks.includes(contactListItemId)
     }
   }
 }

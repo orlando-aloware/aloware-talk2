@@ -77,6 +77,7 @@
                         :contacts-count="contactsCount"
                         :has-edit="hasEdit"
                         :has-delete="hasDelete"
+                        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
                         :is-pinned="isPinned"
                         @remove="onRemoveList"
                         @rename="onRenameList"
@@ -84,10 +85,17 @@
                         @move="onMove"
                         @duplicate="onDuplicate"
                         @split="onSplit"
+                        @showInPublicFolder="onShowInPublicFolder"
                         @clonestatic="onCloneStatic"/>
         </b-popover>
       </div>
     </router-link>
+
+    <convert-list-to-public-dialog :list-id="id"
+                                   :list-name="name"
+                                   v-model="convertToPublicDialog"
+                                   @closed="convertToPublicDialog = false"
+                                   @converted="onListConvertedToPublic"/>
   </div>
 </template>
 
@@ -104,6 +112,7 @@ import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
+import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog.vue'
 
 export default {
   components: {
@@ -112,7 +121,8 @@ export default {
     FolderOption,
     DialIcon,
     UnsavedIcon,
-    ListActions
+    ListActions,
+    ConvertListToPublicDialog
   },
 
   mixins: [
@@ -143,6 +153,9 @@ export default {
     hasDelete: {
       type: Number
     },
+    hasShowInPublicFolderPermission: {
+      type: Boolean
+    },
     showInPublicFolder: {
       type: Boolean,
       required: false,
@@ -162,7 +175,8 @@ export default {
       isRenaming: false,
       folderExists: false,
       inputTimeout: null,
-      folderInterval: null
+      folderInterval: null,
+      convertToPublicDialog: false
     }
   },
 
@@ -277,6 +291,16 @@ export default {
         id: this.id,
         type: ContactListTypes.STATIC
       })
+    },
+    onShowInPublicFolder () {
+      this.$root.$emit('bv::hide::popover')
+      this.convertToPublicDialog = true
+    },
+    onListConvertedToPublic () {
+      this.convertToPublicDialog = false
+
+      this.reloadFolders()
+      this.loadPublicLists()
     },
     createList (params) {
       this.$axios
