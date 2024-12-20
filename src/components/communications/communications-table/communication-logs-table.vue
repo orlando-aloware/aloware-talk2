@@ -104,13 +104,15 @@
               {{ getRingGroupName(props.row) }}
             </div>
             <div v-else-if="col.name === 'created_at'">
-              <start-time :row="props.row" :value="col.value" />
+              <start-time :row="props.row"
+                          :value="col.value" />
             </div>
             <div v-else-if="col.name === 'talk_time'">
-              {{ col.value }}
+              <talk-time :row="props.row" />
             </div>
+
             <div v-else-if="col.name === 'duration'">
-              {{ col.value }}
+              <duration :row="props.row" />
             </div>
             <div v-else-if="col.name === 'contact'">
               <div v-if="props.row?.contact">
@@ -130,7 +132,7 @@
             </template>
             <!-- v-if notes -->
             <div v-else-if="col.name === 'notes'">
-              <note-popover :note="col.value"/>
+              <note-popover :note="col.value" />
             </div>
             <!-- v-if creator_type -->
             <div v-else-if="col.name === 'creator_type'">
@@ -138,20 +140,8 @@
             </div>
 
             <div v-else-if="col.name === 'operations'">
-              <div class="d-flex justify-content-center context-menu">
-                <b-dropdown no-caret
-                            size="sm"
-                            container="body"
-                            center>
-                  <template #button-content>
-                    <ellipse-icon />
-                  </template>
-                  <b-dropdown-item dense
-                                   clickable>
-                    Edit
-                  </b-dropdown-item>
-                </b-dropdown>
-              </div>
+              <!-- dummy yet -->
+              <communications-operations :row="props.row" />
             </div>
             <div v-else>
               {{ col.value }}
@@ -211,12 +201,14 @@
 import { aclMixin, communicationsMixin, userMixin } from 'src/plugins/mixins'
 import SearchInput from 'components/search-input'
 import CompactBtn from 'components/compact-btn'
-import EllipseIcon from 'components/icons/ellipse-icon'
 import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
 import NotePopover from './note-popover.vue'
 import StartTime from './start-time.vue'
 import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
+import CommunicationsOperations from './communications-operations.vue'
+import TalkTime from './talk-time.vue'
+import Duration from './duration.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -238,11 +230,13 @@ export default {
   components: {
     SearchInput,
     CompactBtn,
-    EllipseIcon,
+    CommunicationsOperations,
     CommunicationTableSettings,
     CommunicationsTags,
     NotePopover,
-    StartTime
+    StartTime,
+    TalkTime,
+    Duration
   },
 
   data () {
