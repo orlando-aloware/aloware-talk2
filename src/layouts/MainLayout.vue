@@ -6,7 +6,7 @@
          v-if="!isWidget">
       <span>This screen size is not supported.</span>
     </div>
-    <template v-if="isAuthenticated && !loading && companyHasTrialStatus">
+    <template v-if="isAuthenticated && !loading && companyHasTrialStatus && !isWidget">
       <trial-expired-modal v-if="isTrialExpired"/>
       <cancelled-account-modal v-else-if="isCancelledAccount"/>
       <trial-banner v-else-if="isTrial"/>

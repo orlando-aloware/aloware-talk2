@@ -44,7 +44,8 @@
             </section>
 
             <!-- Follow-up Actions -->
-            <section class="summary-section">
+            <section class="summary-section"
+                     v-if="insights?.summary?.follow_up_actions?.agents?.length > 0 || insights?.summary?.follow_up_actions?.contact?.length > 0">
               <h3 class="section-title">Follow-up Actions</h3>
               <div class="follow-up-column"
                    v-if="insights?.summary?.follow_up_actions?.agents?.length > 0">

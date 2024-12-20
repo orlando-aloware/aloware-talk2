@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { kycMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { kycMixin } from 'src/plugins/mixins'
 import * as KycLogs from '../../constants/kyc-logs'
 import { mapState } from 'vuex'
 
@@ -23,8 +23,7 @@ export default {
   name: 'block-tooltip',
 
   mixins: [
-    kycMixin,
-    simpsocialMixin
+    kycMixin
   ],
 
   components: {
