@@ -111,9 +111,28 @@
               <talk-time :row="props.row" />
             </div>
 
+            <div v-else-if="col.name === 'wait_time'">
+                <wait-time :row="props.row" />
+            </div>
+
+            <div v-else-if="col.name ==='hold_time'">
+              <hold-time :row="props.row" />
+            </div>
+
             <div v-else-if="col.name === 'duration'">
               <duration :row="props.row" />
             </div>
+
+            <div v-else-if="col.name === 'resolution2'">
+              <div class="row"
+                   data-testid="resolution-row">
+                <div class="col-12 d-flex align-items-center justify-content-left"
+                     data-testid="resolution-div">
+                  <span>{{ getVisibleResolution(props.row) }}</span>
+                </div>
+              </div>
+            </div>
+
             <div v-else-if="col.name === 'contact'">
               <div v-if="props.row?.contact">
                 <div>
@@ -124,16 +143,20 @@
                 {{ col.value | fixPhone('NATIONAL', true) }}
               </div>
             </div>
+
             <div v-else-if="col.name === 'user_id'">
               {{ getUserName(getUser(col.value)) }}
             </div>
+
             <template v-else-if="col.name === 'tags'">
               <communications-tags :tags="col.value" />
             </template>
+
             <!-- v-if notes -->
             <div v-else-if="col.name === 'notes'">
               <note-popover :note="col.value" />
             </div>
+
             <!-- v-if creator_type -->
             <div v-else-if="col.name === 'creator_type'">
               {{ col.value | translateCreatorType }}
@@ -143,6 +166,12 @@
               <!-- dummy yet -->
               <communications-operations :row="props.row" />
             </div>
+
+            <span data-testid="email-span"
+                  class="text-muted break-word"
+                  v-else-if="col.name === 'email'">
+                  {{ props.row.contact ? props.row.contact.email : '' }}
+            </span>
             <div v-else>
               {{ col.value }}
             </div>
@@ -209,6 +238,8 @@ import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
 import CommunicationsOperations from './communications-operations.vue'
 import TalkTime from './talk-time.vue'
 import Duration from './duration.vue'
+import WaitTime from './wait-time.vue'
+import HoldTime from './hold-time.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -236,7 +267,9 @@ export default {
     NotePopover,
     StartTime,
     TalkTime,
-    Duration
+    Duration,
+    WaitTime,
+    HoldTime
   },
 
   data () {
@@ -534,14 +567,8 @@ export default {
       return broadcastId ? `Broadcast ${broadcastId}` : '-'
     },
 
-    getResolutionName (resolutionCode) {
-      // Replace with actual mapping of resolution codes to names
-      const resolutions = {
-        1: 'Connected',
-        2: 'Not Connected'
-        // Add other resolutions
-      }
-      return resolutions[resolutionCode] || 'Unknown'
+    getVisibleResolution (communication) {
+      return this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateResolutionText(communication.resolution2)))
     },
 
     updatePaginationButtons () {
