@@ -67,6 +67,9 @@
             <div v-else-if="col.name === 'ring_group'">
               {{ getRingGroupName(props.row) }}
             </div>
+            <div v-else-if="col.name === 'workflow'">
+              {{ getWorkflowName(props.row) }}
+            </div>
             <div v-else-if="col.name === 'created_at'">
               <start-time :row="props.row"
                           :value="col.value" />
@@ -200,6 +203,7 @@ import CommunicationsTeams from './communications-teams.vue'
 import NotePopover from './note-popover.vue'
 import StartTime from './start-time.vue'
 import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
+import workflowsMixin from 'src/plugins/mixins/workflows.mixin'
 import CommunicationsOperations from './communications-operations.vue'
 import TalkTime from './talk-time.vue'
 import Duration from './duration.vue'
@@ -220,6 +224,7 @@ export default {
     aclMixin,
     communicationsMixin,
     ringGroupsMixin,
+    workflowsMixin,
     userMixin
   ],
 
@@ -523,9 +528,9 @@ export default {
       return rg ? rg.name : '-'
     },
 
-    getSequenceName (workflowId) {
-      // Replace with actual logic to get sequence name
-      return workflowId ? `Sequence ${workflowId}` : '-'
+    getWorkflowName (row) {
+      const seq = this.getWorkflow(row.workflow_id)
+      return seq ? seq.name : '-'
     },
 
     getBroadcastName (broadcastId) {
