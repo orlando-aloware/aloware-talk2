@@ -1111,15 +1111,14 @@ export default {
       //   return
       // }
 
-      // if (this.communication && this.communication.id === communication.id) {
-      const updatedFields = {
-        call_summary: communication.call_summary,
-        call_transcription_status: communication.call_transcription_status,
-        call_summary_status: communication.call_summary_status
+      if (this.communication && this.communication.id === communication.id) {
+        const updatedFields = {
+          call_summary: communication.call_summary,
+          call_transcription_status: communication.call_transcription_status,
+          call_summary_status: communication.call_summary_status
+        }
+        _.merge(this.communication, updatedFields)
       }
-
-      _.merge(this.communication, updatedFields)
-      // }
 
       console.log('Updated call_summary:', this.communication.call_summary)
       console.log('Updated call_transcription_status:', this.communication.call_transcription_status)
