@@ -1119,10 +1119,6 @@ export default {
         }
         _.merge(this.communication, updatedFields)
       }
-
-      console.log('Updated call_summary:', this.communication.call_summary)
-      console.log('Updated call_transcription_status:', this.communication.call_transcription_status)
-      console.log('Updated call_summary_status:', this.communication.call_summary_status)
     }
 
     this.$VueEvent.listen('update_communication', this.listeners.updateCommunication)
