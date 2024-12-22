@@ -501,9 +501,6 @@ export default {
           this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
-          console.log('### Updated call_summary:', event?.communication?.call_summary)
-          console.log('### Updated call_transcription_status:', event?.communication?.call_transcription_status)
-          console.log('Updated call_summary_status:', event?.communication.call_summary_status)
           if (event.tags) {
             event.communication.tags = event.tags
             event.communication.tag_ids = event.communication.tags.map((a) => a.id)
@@ -618,9 +615,6 @@ export default {
           this.$VueEvent.fire('new_communication', event.communication)
         })
         .listen('.communication.updated', (event) => {
-          console.log('>>> Updated call_summary:', event?.communication?.call_summary)
-          console.log('>>> Updated call_transcription_status:', event?.communication?.call_transcription_status)
-          console.log('>>> Updated call_summary_status:', event?.communication.call_summary_status)
           if (event.tags) {
             event.communication.tags = event.tags
             event.communication.tag_ids = event.communication.tags.map((a) => a.id)
