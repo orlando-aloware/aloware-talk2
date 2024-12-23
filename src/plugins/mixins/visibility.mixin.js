@@ -326,8 +326,8 @@ export default {
         // @todo for ring group only access (UI doesn't know that contact relationship with ring groups at this stage)
       }
 
-      // team only access
-      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_TEAM) {
+      // ring group users only access
+      if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP_USERS) {
         // if user does not have unassigned access
         if (this.isUserDoesntHaveUnassignedAccess(communication, 'communication')) {
           return false

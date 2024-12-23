@@ -160,7 +160,7 @@ export default {
     // if has redialed less than min_redials
     // and if the call disposition is not a successful call disposition
     redialRequired () {
-      const minRedials = this.sessionSettings.min_redials
+      const minRedials = this.sessionSettings?.min_redials
 
       // min_redials = 0 (redial disabled)
       if (!minRedials || minRedials === 0) {
@@ -174,8 +174,8 @@ export default {
       }
 
       // selected call disposition is a successful call disposition
-      const successfulCallDispositionsIds = this.sessionSettings.successful_call_disposition_ids
-      if (Array.isArray(successfulCallDispositionsIds) && successfulCallDispositionsIds.includes(this.callDisposition)) {
+      const successfulCallDispositionsIds = this.sessionSettings?.successful_call_disposition_ids
+      if (successfulCallDispositionsIds?.includes(this.callDisposition)) {
         return false
       }
 

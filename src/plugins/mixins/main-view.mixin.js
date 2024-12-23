@@ -49,8 +49,7 @@ export default {
         data.contacts.map(
           item => ({
             'id': item.id,
-            'contact_list_item_id': item.contact_list_item_id,
-            'has_integration': Boolean(item.has_integration || (item.external_integration_data && item.external_integration_data.length > 0))
+            'contact_list_item_id': item.contact_list_item_id
           })
         )
       )

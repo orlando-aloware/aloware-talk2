@@ -335,8 +335,6 @@ export default {
     },
 
     onSelectedSmsTemplate (item) {
-      this.tasksSentSmsTemplates[this.activeTask.id] = item.id
-
       const message = {
         body: item.body,
         contact_id: this.contact.id,
@@ -356,6 +354,11 @@ export default {
           this.$refs['smsTemplatesSelector'].disable()
           this.$refs['smsTemplatesSelector'].hideLoading()
         }).finally(() => {
+          this.tasksSentSmsTemplates[this.activeTask.id] = item.id
+
+          // force state reload
+          this.tasksSentSmsTemplates = this.$jsonClone(this.tasksSentSmsTemplates)
+
           // sms send, proceed to next task
           this.$VueEvent.fire('pauseWrapUp', false)
         })

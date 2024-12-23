@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { kycMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { kycMixin } from 'src/plugins/mixins'
 import * as KycLogs from '../../constants/kyc-logs'
 import { mapState } from 'vuex'
 
@@ -23,8 +23,7 @@ export default {
   name: 'block-tooltip',
 
   mixins: [
-    kycMixin,
-    simpsocialMixin
+    kycMixin
   ],
 
   components: {
@@ -81,7 +80,7 @@ export default {
       let message = ''
 
       switch (status) {
-        case KycLogs.KYC_STATUS_NONE:
+        case KycLogs.KYC_STATUS_NONE || KycLogs.KYC_STATUS_APPROVED:
           message = ''
           break
         case KycLogs.KYC_STATUS_REJECTED:

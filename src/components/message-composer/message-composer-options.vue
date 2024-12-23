@@ -22,7 +22,7 @@
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
             data-testid="sms-upload-attachment-link"
-            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments">
+            :disabled="!hasSelectedLine || isTextingDisabled || !canAddMoreAttachments">
       <q-menu ref="attachmentMenu"
               data-testid="sms-upload-attachment-menu"
               :offset="[0,5]">
@@ -34,7 +34,7 @@
       </q-menu>
       <attachment-icon data-testid="message-composer-attachment-icon"></attachment-icon>
       <q-tooltip data-testid="message-composer-add-tooltip">
-        {{ !hasSelectedLine ? 'Please select line before adding attachments' : 'Add attachments' }}
+        {{ !hasSelectedLine ? 'Please select a line before adding attachments' : 'Add attachments' }}
       </q-tooltip>
     </b-link>
 

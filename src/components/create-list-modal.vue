@@ -707,7 +707,7 @@ export default {
       return talk2Api.V2.integrations.hubspot.importList(this.integrationListId, { dynamic_import: this.hubspotDynamicImport })
         .then(response => response.data)
         .then(data => {
-          this.$generalNotification("Your HubSpot contact list is being imported. We will notify you when it's ready.")
+          this.$generalNotification("Your HubSpot contact list is being imported. It can take a couple of minutes if it's a large list.")
           this.createListClose()
           this.loadFolders()
           this.loadPublicLists()
@@ -719,10 +719,10 @@ export default {
     },
 
     addZohoView () {
-      return talk2Api.V2.integrations.zoho.importViewToPowerDialer(this.integrationListId)
+      return talk2Api.V2.integrations.zoho.importView(this.integrationListId)
         .then(response => response.data)
         .then(data => {
-          this.$generalNotification('Your Zoho view is being imported. We will notify you when it\'s ready.')
+          this.$generalNotification('Your Zoho view is being imported. It can take a couple of minutes depending on the view.')
           this.createListClose()
           this.loadFolders()
           this.loadPublicLists()
@@ -734,10 +734,10 @@ export default {
     },
 
     addPipedriveFilter () {
-      return talk2Api.V2.integrations.pipedrive.importFilterToPowerDialer(this.integrationListId)
+      return talk2Api.V2.integrations.pipedrive.importFilter(this.integrationListId)
         .then(response => response.data)
         .then(data => {
-          this.$generalNotification('Your Pipedrive filter is being imported. We will notify you when it\'s ready.')
+          this.$generalNotification('Your Pipedrive filter is being imported. It can take a couple of minutes depending on the filter.')
           this.createListClose()
           this.loadFolders()
           this.loadPublicLists()

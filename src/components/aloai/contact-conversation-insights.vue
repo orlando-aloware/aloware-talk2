@@ -44,7 +44,8 @@
             </section>
 
             <!-- Follow-up Actions -->
-            <section class="summary-section">
+            <section class="summary-section"
+                     v-if="insights?.summary?.follow_up_actions?.agents?.length > 0 || insights?.summary?.follow_up_actions?.contact?.length > 0">
               <h3 class="section-title">Follow-up Actions</h3>
               <div class="follow-up-column"
                    v-if="insights?.summary?.follow_up_actions?.agents?.length > 0">
@@ -90,12 +91,15 @@
                       tabindex="0"
                       block
                       @click="handleRegenerate">
-              {{ isGenerating ? '🧙‍♂️️🪄✨' : '🪄 Regenerate Insights' }}
+              {{ !isGenerating ? '🧙‍♂️️🪄 Regenerate Insights' : '' }}
+              <q-spinner-bars v-if="isGenerating"
+                              color="white">
+              </q-spinner-bars>
             </b-button>
 
             <div class="timestamp"
                  v-if="insights?.updated_at">
-              Last updated: {{ formatDate(insights.updated_at) }}
+              Last updated: {{ insights.updated_at | fixDateTime }}
             </div>
           </div>
           <div class="text-center"
@@ -111,7 +115,6 @@
                   variant="light"
                   size="sm"
                   pill
-                  data-testid="contact-information-toggle"
                   @click="onExpanded">
           <i class="material-icons icon">{{ isExpanded ? 'expand_less' : 'expand_more' }}</i>
         </b-button>
@@ -186,16 +189,6 @@ export default {
         this.insights = response.data
       }).finally(() => {
         this.insightsLoaded = true
-      })
-    },
-
-    formatDate (dateString) {
-      return new Date(dateString).toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
       })
     },
 

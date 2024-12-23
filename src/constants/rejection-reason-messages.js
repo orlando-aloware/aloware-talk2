@@ -134,11 +134,15 @@ export const REJECTION_REASONS = [
     message: 'The call cannot be completed because the caller and recipient are the same'
   },
   {
-    type: CommunicationRejectionReasons.REJECTION_REASON_TRIAL_LIMIT_EXCEEDED,
+    type: CommunicationRejectionReasons.REJECTION_REASON_TRIAL_CALLS_LIMIT_EXCEEDED,
     message: 'Trial limits have been exceeded; calls cannot be made'
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_EMERGENCY_NUMBER,
     message: 'Calls to emergency numbers are not allowed'
+  },
+  {
+    type: CommunicationRejectionReasons.REJECTION_REASON_KYC_CALLS_OUTBOUND_RESTRICTION,
+    message: 'Your trial plan does not allow you to make calls to this number'
   }
 ]

@@ -6,7 +6,7 @@
          v-if="!isWidget">
       <span>This screen size is not supported.</span>
     </div>
-    <template v-if="isAuthenticated && !loading && companyHasTrialStatus">
+    <template v-if="isAuthenticated && !loading && companyHasTrialStatus && !isWidget">
       <trial-expired-modal v-if="isTrialExpired"/>
       <cancelled-account-modal v-else-if="isCancelledAccount"/>
       <trial-banner v-else-if="isTrial"/>
@@ -446,7 +446,8 @@ export default {
     ]),
 
     ...mapState('powerDialer', [
-      'ongoingSession'
+      'ongoingSession',
+      'countdownTimer'
     ]),
 
     ...mapState(['xmasEnabled']),
@@ -2916,8 +2917,8 @@ export default {
 
     agentStatus (toVal, fromVal) {
       if (fromVal === AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-        // if not yet disposed, do not end Wrap-Up
-        if (this.isNotDisposed) {
+        // if not yet disposed or countdown timer hasn't ended, do not end Wrap-Up
+        if (this.isNotDisposed || this.countdownTimer > 0) {
           return
         }
 
