@@ -4952,7 +4952,12 @@ i.option-separator {
 }
 
 .relative-time {
-  color: $grey-mid
+  color: $grey-mid;
+  display: inline-block;
+
+  &::first-letter {
+    text-transform: capitalize;
+  }
 }
 
 .mycard {
