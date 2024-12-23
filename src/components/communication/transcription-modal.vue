@@ -203,9 +203,8 @@
                           <div class="transcription-summary-container">
                             <span class="transcription-message text-decoration-none"
                                   v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED">
-                              <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization in Progress</span>
+                              <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization Pending</span>
                               <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in Progress</span>
-                              <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_FAILED">Error in Summarization</span>
                             </span>
                           </div>
                         </div>
