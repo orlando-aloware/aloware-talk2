@@ -86,6 +86,9 @@
                     <span class="data-value">{{ integrationData.other_phone }}</span>
                 </p>
             </q-card-section>
+          <sync-with-integration integration_name='salesforce'
+                                 :contact_id='contact.id'
+                                 @sync-complete="getData"/>
         </q-card>
     </div>
   </template>
@@ -95,9 +98,11 @@ import { mapState } from 'vuex'
 import {
   integrationMixin
 } from 'src/plugins/mixins'
+import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
 
 export default {
   name: 'integration-salesforce',
+  components: { SyncWithIntegration },
 
   mixins: [
     integrationMixin
