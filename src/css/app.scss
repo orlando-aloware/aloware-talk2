@@ -15829,8 +15829,14 @@ hr {
 }
 
 .transcription-message {
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 600;
+}
+
+.transcription-summary-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Gradient text effect */

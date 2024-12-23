@@ -868,18 +868,26 @@
               <sparkle-icon width="16" height="16" color="#9333EA"/>
             </h3>
           </div>
-          <a class="transcription-link text-decoration-none"
-            @click.prevent="fetchSmartTranscriptionData()"
-            v-if="communication.has_transcription">
-            Show transcription
-          </a>
-          <span class="transcription_message text-decoration-none"
-                v-else>
-            <span v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_CREATED">Transcription Not Generated</span>
-            <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_PROCESSING">Transcription in Progress</span>
-            <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_COMPLETED">Transcription in Progress</span>
-            <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">Error in Transcription</span>
-          </span>
+          <div class="transcription-summary-container">
+            <a class="transcription-link text-decoration-none"
+              @click.prevent="fetchSmartTranscriptionData()"
+              v-if="communication.has_transcription && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED">
+              Show transcription
+            </a>
+            <span class="transcription-message text-decoration-none"
+                  v-else>
+              <span v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_CREATED">Transcription Not Generated</span>
+              <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_PROCESSING">Transcription in Progress</span>
+              <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_COMPLETED">Transcription in Progress</span>
+              <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">Error in Transcription</span>
+            </span>
+            <span class="transcription-message text-decoration-none"
+                  v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_summary_status">
+              <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization in Progress</span>
+              <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in Progress</span>
+              <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_FAILED">Error in Summarization</span>
+            </span>
+          </div>
         </div>
         <div class="text-left-align text-13"
              v-if="communication.call_summary">
