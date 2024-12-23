@@ -852,7 +852,7 @@
     </div>
 
     <div class="ai-effect-container mt-2"
-         v-if="CommunicationTypes.CALL && showAudio(communication) && communication.has_transcription">
+         v-if="CommunicationTypes.CALL && showAudio(communication)">
       <div class="ai-effect-gradient"></div>
       <div class="ai-effect-blur"></div>
       <div class="ai-effect-content p-2">
@@ -868,11 +868,18 @@
               <sparkle-icon width="16" height="16" color="#9333EA"/>
             </h3>
           </div>
-
           <a class="transcription-link text-decoration-none"
-             @click.prevent="fetchSmartTranscriptionData()">
+            @click.prevent="fetchSmartTranscriptionData()"
+            v-if="communication.has_transcription">
             Show transcription
           </a>
+          <span class="transcription_message text-decoration-none"
+                v-else>
+            <span v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_CREATED">Transcription Not Generated</span>
+            <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_PROCESSING">Transcription in Progress</span>
+            <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_COMPLETED">Transcription in Progress</span>
+            <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">Error in Transcription</span>
+          </span>
         </div>
         <div class="text-left-align text-13"
              v-if="communication.call_summary">
@@ -904,6 +911,8 @@ import * as CommunicationDirections from '../constants/communication-direction'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
 import * as CommunicationRejectionReasons from '../constants/communication-rejection-reasons'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
+import * as TranscriptionStatus from '../constants/transcription-status'
+import * as SummaryStatus from '../constants/summary-status'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -1065,6 +1074,8 @@ export default {
       UploadedFileTypes,
       CommunicationRejectionReasons,
       CommunicationCallbackStatus,
+      TranscriptionStatus,
+      SummaryStatus,
       TagCategories
     }
   },

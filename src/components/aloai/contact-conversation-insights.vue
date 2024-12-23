@@ -6,7 +6,9 @@
       <div class="ai-effect-blur"></div>
       <b-card-body class="ai-effect-content">
         <div class="w-100">
-          <h4 class="ai-effect-gradient-text">AloAi Conversation Insights
+          <h4 class="ai-effect-gradient-text"
+              @click="onExpanded">
+            AloAi Conversation Insights
             <sparkle-icon width="16" height="16" color="#9333EA"/>
           </h4>
         </div>
