@@ -202,7 +202,7 @@
                           </div>
                           <div class="transcription-summary-container">
                             <span class="transcription-message text-decoration-none"
-                                  v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_summary_status">
+                                  v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED">
                               <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization in Progress</span>
                               <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in Progress</span>
                               <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_FAILED">Error in Summarization</span>
@@ -296,6 +296,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as FeedbackConstants from 'src/constants/feedback-types'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as SummaryStatus from 'src/constants/summary-status'
+import * as TranscriptionStatus from 'src/constants/transcription-status'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
 import CopyIcon from 'components/icons/copy-icon'
 import GenerateSummaryButton from 'components/generate-summary-button'
@@ -428,6 +429,10 @@ export default {
 
     SummaryStatus () {
       return SummaryStatus
+    },
+
+    TranscriptionStatus () {
+      return TranscriptionStatus
     },
 
     CommunicationTypes () {

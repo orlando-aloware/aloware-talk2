@@ -882,7 +882,7 @@
               <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">Error in Transcription</span>
             </span>
             <span class="transcription-message text-decoration-none"
-                  v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_summary_status">
+                  v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED">
               <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization in Progress</span>
               <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in Progress</span>
               <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_FAILED">Error in Summarization</span>

@@ -7,12 +7,16 @@ import * as SummaryStatus from 'src/constants/summary-status'
 export default {
   mixins: [communicationInfoMixin],
 
-  components: {
-    TranscriptionStatus
-  },
-
   computed: {
-    ...mapState('cache', ['currentCompany'])
+    ...mapState('cache', ['currentCompany']),
+
+    SummaryStatus () {
+      return SummaryStatus
+    },
+
+    TranscriptionStatus () {
+      return TranscriptionStatus
+    }
   },
 
   methods: {
@@ -21,7 +25,9 @@ export default {
       return communication.is_eligible_for_transcribe &&
              this.showAudio(communication) &&
              !communication.metadata?.transcription_info &&
-             !communication.call_transcription_status
+             communication.call_transcription_status !== TranscriptionStatus.STATUS_PROCESSING &&
+             communication.call_transcription_status !== TranscriptionStatus.STATUS_QUEUED &&
+             communication.call_transcription_status !== TranscriptionStatus.STATUS_COMPLETED
     },
 
     // check if the summarization is allowed for the communication
