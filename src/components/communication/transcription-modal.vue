@@ -229,7 +229,7 @@
                           <div v-else-if="communication.call_summary_status === SummaryStatus.STATUS_FAILED"
                               class="status-message">
                             <q-icon name="error" color="red" size="md" />
-                            <div>Summary generation failed. Please try again later.</div>
+                            <div>Summary generation failed. Please try again later. </div>
                             <br>
                             <generate-summary-button class="mr-2"
                                                     data-testid="comm-details-generate-summary-button"
