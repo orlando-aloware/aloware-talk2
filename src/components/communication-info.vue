@@ -852,7 +852,7 @@
     </div>
 
     <div class="ai-effect-container mt-2"
-         v-if="CommunicationTypes.CALL && showAudio(communication)">
+         v-if="CommunicationTypes.CALL && showAudio(communication) && communication.has_transcription">
       <div class="ai-effect-gradient"></div>
       <div class="ai-effect-blur"></div>
       <div class="ai-effect-content p-2">
