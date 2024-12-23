@@ -51,7 +51,7 @@ export default {
        * for events that are broadcast by Laravel. Echo and event broadcasting
        * allows your team to easily build robust real-time web applications.
        */
-      const broadcastDriver = this.currentCompany.broadcast_driver || 'pusher'
+      const broadcastDriver = this.currentCompany?.broadcast_driver || 'pusher'
 
       window.Echo = this.initEcho(broadcastDriver)
       this.broadcastListen()
