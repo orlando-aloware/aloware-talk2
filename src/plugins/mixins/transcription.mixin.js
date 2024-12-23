@@ -1,9 +1,15 @@
 import { mapState } from 'vuex'
 import { communicationInfoMixin } from 'src/plugins/mixins'
 import moment from 'moment-timezone'
+import * as TranscriptionStatus from 'src/constants/transcription-status'
+import * as SummaryStatus from 'src/constants/summary-status'
 
 export default {
   mixins: [communicationInfoMixin],
+
+  components: {
+    TranscriptionStatus
+  },
 
   computed: {
     ...mapState('cache', ['currentCompany'])
@@ -15,12 +21,14 @@ export default {
       return communication.is_eligible_for_transcribe &&
              this.showAudio(communication) &&
              !communication.metadata?.transcription_info &&
-             this.isOlderThan(communication.created_at, 15) // check if the communication is older than 15 minutes for queue processing
+             !communication.call_transcription_status
     },
 
     // check if the summarization is allowed for the communication
     isSummarizationAllowed (communication) {
-      return communication.has_transcription
+      return communication.has_transcription &&
+             communication.call_summary_status !== SummaryStatus.STATUS_QUEUED &&
+             communication.call_summary_status !== SummaryStatus.STATUS_PROCESSING
     },
 
     // checks if a given timestamp is older than the specified number of minutes

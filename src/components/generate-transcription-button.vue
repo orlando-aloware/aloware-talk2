@@ -30,7 +30,7 @@
     </q-btn>
 
     <q-tooltip v-if="isGenerating(communication.id)">
-      The process might take some time. Consider refreshing the page later to see the updates.
+      The process might take some time.
     </q-tooltip>
   </div>
 </template>
