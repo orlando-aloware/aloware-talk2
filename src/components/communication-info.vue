@@ -871,7 +871,7 @@
           <div class="transcription-summary-container">
             <a class="transcription-link text-decoration-none"
               @click.prevent="fetchSmartTranscriptionData()"
-              v-if="communication.has_transcription && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED">
+              v-if="communication.has_transcription">
               Show transcription
             </a>
             <span class="transcription-message text-decoration-none"
