@@ -36,7 +36,7 @@
                 </generate-transcription-button>
                 <div class="flex items-center mr-1 h-100"
                      data-testid="comm-transcription-modal-btn"
-                     v-if="!communication.transcription_is_deleted && communication.metadata?.transcription_info?.summary"
+                     v-if="!communication.transcription_is_deleted && communication.has_transcription"
                      @click="fetchSmartTranscriptionData()">
                   <span class="text-blue cursor-pointer">
                     Show Transcription

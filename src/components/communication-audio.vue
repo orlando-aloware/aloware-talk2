@@ -18,7 +18,7 @@
             :file-mime-type="mimeType"
             :file-uuid="fileUuid"/>
           <transcription-modal
-            v-if="!communication?.transcription_is_deleted && communication?.metadata?.transcription_info?.summary"
+            v-if="!communication?.transcription_is_deleted && communication?.has_transcription"
             button-text="Show Transcription"
             data-testid="communication-audio-transcription-modal"
             ref="transcriptionModal"
