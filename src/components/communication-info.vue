@@ -876,13 +876,13 @@
             </a>
             <span class="transcription-message text-decoration-none"
                   v-else>
-              <span v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_PROCESSING">Transcription in Progress</span>
-              <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_COMPLETED">Transcription in Progress</span>
+              <span v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_PROCESSING">Transcription in progress</span>
+              <span v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_COMPLETED">Transcription in progress</span>
             </span>
             <span class="transcription-message text-decoration-none"
                   v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED">
-              <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization Pending</span>
-              <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in Progress</span>
+              <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization pending</span>
+              <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in progress</span>
             </span>
           </div>
         </div>

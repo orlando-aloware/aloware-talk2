@@ -290,6 +290,27 @@ export default {
         return false
       }
 
+      // focus mode
+      // if (this.profile.focus_mode) {
+      //   // checks if communication's contact is owned by the user
+      //   if (communication.contact &&
+      //     communication.contact.user_id &&
+      //     communication.contact.user_id !== this.profile.id) {
+      //     return false
+      //   }
+      //
+      //   // if contact does not have an owner
+      //   if (communication.contact &&
+      //     !communication.contact.user_id) {
+      //     return false
+      //   }
+      //
+      //   // if contact does not exist
+      //   if (!communication.contact) {
+      //     return false
+      //   }
+      // }
+
       // ring group only access
       if (this.profile.contacts_visibility === ContactAccessTypes.CONTACTS_ACCESS_RING_GROUP) {
         // if user does not have unassigned access

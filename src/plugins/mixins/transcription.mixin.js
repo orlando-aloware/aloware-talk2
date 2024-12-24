@@ -7,16 +7,15 @@ import * as SummaryStatus from 'src/constants/summary-status'
 export default {
   mixins: [communicationInfoMixin],
 
-  computed: {
-    ...mapState('cache', ['currentCompany']),
-
-    SummaryStatus () {
-      return SummaryStatus
-    },
-
-    TranscriptionStatus () {
-      return TranscriptionStatus
+  data () {
+    return {
+      TranscriptionStatus,
+      SummaryStatus
     }
+  },
+
+  computed: {
+    ...mapState('cache', ['currentCompany'])
   },
 
   methods: {
@@ -25,16 +24,13 @@ export default {
       return communication.is_eligible_for_transcribe &&
              this.showAudio(communication) &&
              !communication.metadata?.transcription_info &&
-             communication.call_transcription_status !== TranscriptionStatus.STATUS_PROCESSING &&
-             communication.call_transcription_status !== TranscriptionStatus.STATUS_QUEUED &&
-             communication.call_transcription_status !== TranscriptionStatus.STATUS_COMPLETED
+             ![TranscriptionStatus.STATUS_PROCESSING, TranscriptionStatus.STATUS_QUEUED, TranscriptionStatus.STATUS_COMPLETED].includes(communication.call_transcription_status)
     },
 
     // check if the summarization is allowed for the communication
     isSummarizationAllowed (communication) {
       return communication.has_transcription &&
-             communication.call_summary_status !== SummaryStatus.STATUS_QUEUED &&
-             communication.call_summary_status !== SummaryStatus.STATUS_PROCESSING
+             ![SummaryStatus.STATUS_QUEUED, SummaryStatus.STATUS_PROCESSING].includes(communication.call_summary_status)
     },
 
     // checks if a given timestamp is older than the specified number of minutes
