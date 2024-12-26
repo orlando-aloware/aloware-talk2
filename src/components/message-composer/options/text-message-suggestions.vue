@@ -11,6 +11,28 @@
           </h4>
         </q-item-label>
 
+        <q-item-label>
+          <q-input v-model="personalizedMessage"
+                   placeholder="Ask AloAi to write a response..."
+                   input-class="q-px-md"
+                   autogrow
+                   dense
+                   borderless>
+            <template v-slot:append>
+              <q-btn icon="auto_fix_high"
+                     type="submit"
+                     color="primary"
+                     round
+                     dense
+                     flat
+                     @click="handleRegenerate">
+              </q-btn>
+            </template>
+          </q-input>
+        </q-item-label>
+
+        <q-separator/>
+
         <div class="text-message-suggestions"
              :class="[ (suggestionsLoaded && (!suggestions || suggestions?.messages?.length === 0)) ? 'no-message' : '' ]">
           <template v-if="!suggestionsLoaded">
@@ -89,6 +111,7 @@ export default {
 
   data () {
     return {
+      personalizedMessage: '',
       suggestions: null,
       isGenerating: false,
       suggestionsLoaded: false
@@ -100,7 +123,8 @@ export default {
       this.suggestionsLoaded = false
       return talk2Api.V2.contact.getTextMessageSuggestions(this.contact.id, {
         params: {
-          force
+          force,
+          personalized_message: this.personalizedMessage
         }
       }).then(response => {
         this.suggestions = response.data.content
