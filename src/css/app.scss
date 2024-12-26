@@ -15912,6 +15912,14 @@ hr {
       scroll-margin-top: 48px;
     }
 
+    td {
+      padding: 16px;
+
+      & *.d-flex {
+        row-gap: 8px;
+      }
+    }
+
     @media screen and (min-height: 1281px) {
       max-height: 82vh;
     }

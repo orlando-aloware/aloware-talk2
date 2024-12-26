@@ -1,82 +1,73 @@
 
 <template>
-  <div class="">
-    <span>{{ value | fixDateTime }}</span>
-    <div class="mt-1 d-flex align-items-center justify-content-center text-xs"
+  <div class="d-flex flex-column">
+    <span>{{ value | fixFullDateUTCRelative }}</span>
+    <div class="d-flex align-items-center text-xs"
          data-testid="start-time-row"
-         v-if="row.call_disposition_id" >
+         v-if="row.call_disposition_id">
       <i class="fa fa-bolt"
-         :style="{ color: callDispositionColor(row.call_disposition_id) }"></i>
+         :style="{ color: callDispositionColor(row.call_disposition_id) }"/>
         <span class="ml-1 text-grey-900">{{ callDispositionName(row.call_disposition_id)}}</span>
     </div>
 
-    <!--TODO: here goes the actions, meanwhile just icons to define if has the things -->
-    <div class="mt-1 col-12 d-flex justify-content-around text-xs gutter-2">
-      <span  class="fa fa-microphone"
-          v-if="row.has_recording || row.recording_is_deleted"
-          :style="{ color: row.has_recording ? 'green' : 'grey' }"
-      >
-          <q-tooltip trigger="hover">
-            has recording
-          </q-tooltip>
-        </span>
+    <span class="cursor-pointer text-primary"
+          :id="`recording-comm-${row.id}`"
+          v-if="row.has_recording || row.recording_is_deleted">
+      <i class="fa-solid fa-play"/> Left Recording
 
-      <span class="fa fa-voicemail text-negative"
-          v-if="row.has_voicemail"
-          >
-          <q-tooltip trigger="hover">
-            has voice mail
-          </q-tooltip>
-        </span>
+      <b-popover triggers="click blur"
+                 placement="bottom"
+                 :target="`recording-comm-${row.id}`">
+        <communication-audio data-testid="comm-log-communication-audio"
+                             :communication="row"
+                             :unique-id="row.id + '1'"
+                             :type="UploadedFileTypes.TYPE_CALL_RECORDING"/>
+      </b-popover>
+    </span>
 
-      <span class="fa fa-file-text text-primary"
-            v-if="row.has_transcription && !row.transcription_is_deleted"
-          >
-          <q-tooltip trigger="hover">
-              has transcription
-            </q-tooltip>
-        </span>
-    </div>
+    <span class="cursor-pointer text-primary"
+          :id="`voicemail-comm-${row.id}`"
+          v-if="row.has_voicemail">
+      <i class="fa-solid fa-play"/> Left Voicemail
 
-      <!--  <div class="row mt-2"
-                    data-testid="start-time-row"
-                    v-if="scope.row.has_recording || scope.row.recording_is_deleted">
-                  <div class="col-12">
-                      <communication-audio :communication="scope.row"
-                                            data-testid="comm-log-communication-audio"
-                                            :type="UploadedFileTypes.TYPE_CALL_RECORDING">
-                      </communication-audio>
-                  </div>
-              </div>
-              <div class="row mt-2"
-                    data-testid="start-time-row"
-                    v-if="scope.row.has_voicemail">
-                  <div class="col-12">
-                      <communication-audio :communication="scope.row"
-                                            data-testid="comm-log-communication-voicemail"
-                                            :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL">
-                      </communication-audio>
-                  </div>
-              </div>
-              <div class="row mt-2"
-                    v-if="scope.row.has_transcription && !scope.row.transcription_is_deleted">
-                  <div class="col-12">
-                      <communication-transcription-button
-                          data-testid="comm-log-communication-transcription-button"
-                          :communication="scope.row"
-                          :button_text="'Show Transcription'"
-                      ></communication-transcription-button>
-                  </div>
-              </div> -->
-    </div>
+      <b-popover triggers="click blur"
+                 placement="bottom"
+                 :target="`voicemail-comm-${row.id}`">
+        <communication-audio data-testid="comm-log-communication-audio"
+                             :communication="row"
+                             :unique-id="row.id + '1'"
+                             :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"/>
+      </b-popover>
+      </span>
+
+    <span class="cursor-pointer text-primary d-flex align-items-center"
+          v-if="row.has_transcription && !row.transcription_is_deleted">
+      <i class="fa-solid fa-play mr-1"/>
+        <transcription-modal no-button
+                             data-testid="communication-audio-transcription-modal"
+                             ref="transcriptionModal"
+                             :communication="row"
+                             :contact="row.contact" />
+    </span>
+  </div>
 </template>
 
 <script>
 import { callDispositionMixin } from 'src/plugins/mixins'
+import CommunicationAudio from 'components/communication-audio.vue'
+import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
+import TranscriptionModal from 'components/communication/transcription-modal.vue'
 
 export default {
   name: 'StartTime',
+
   mixins: [callDispositionMixin],
+
+  components: {
+    TranscriptionModal,
+    CommunicationAudio
+  },
+
   props: {
     value: {
       type: String,
@@ -87,6 +78,9 @@ export default {
       required: false
     }
   },
-  computed: {}
+
+  data: () => ({
+    UploadedFileTypes
+  })
 }
 </script>
