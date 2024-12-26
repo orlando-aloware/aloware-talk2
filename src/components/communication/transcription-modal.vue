@@ -1,5 +1,10 @@
 <template>
   <div data-testid="transcription-modal-wrapper">
+    <span v-if="noButton"
+          @click="fetchSmartTranscriptionData">
+      {{ buttonText }}
+    </span>
+
     <q-btn icon="chat"
            color="primary"
            flat
@@ -7,6 +12,7 @@
            dense
            :size="buttonSize"
            data-testid="comm-transcription-modal-single-btn"
+           v-else
            @click="fetchSmartTranscriptionData">
       <q-tooltip>
         <span>
@@ -306,6 +312,10 @@ export default {
     buttonSize: {
       type: String,
       default: 'sm'
+    },
+    noButton: {
+      type: Boolean,
+      default: false
     }
   },
 
