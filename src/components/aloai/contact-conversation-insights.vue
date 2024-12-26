@@ -90,6 +90,7 @@
                       variant="primary"
                       tabindex="0"
                       block
+                      :disabled="isGenerating"
                       @click="handleRegenerate">
               {{ !isGenerating ? '🧙‍♂️️🪄 Regenerate Insights' : '' }}
               <q-spinner-bars v-if="isGenerating"

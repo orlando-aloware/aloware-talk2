@@ -148,7 +148,7 @@ body,
   &.q-btn__wrapper,
   &.q-btn__content,
   &.q-avatar__content,
-  &.q-item,
+  &.q-item:not(.default),
   &.q-field__native,
   &.q-chip__content,
   .q-field__inner {
