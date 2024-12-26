@@ -104,7 +104,7 @@
             </div>
 
             <div v-else-if="col.name === 'user_id'">
-              {{ getUserName(getUser(col.value)) }}
+              <user :value="col.value" />
             </div>
 
             <template v-else-if="col.name === 'tags'">
@@ -186,7 +186,7 @@
 </template>
 
 <script>
-import { aclMixin, communicationsMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, communicationsMixin } from 'src/plugins/mixins'
 import SearchInput from 'components/search-input'
 import CompactBtn from 'components/compact-btn'
 import CommunicationTableSettings from './communication-table-settings.vue'
@@ -202,6 +202,7 @@ import Duration from './duration.vue'
 import WaitTime from './wait-time.vue'
 import HoldTime from './hold-time.vue'
 import Contact from './contact.vue'
+import User from './user.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -217,8 +218,7 @@ export default {
     aclMixin,
     communicationsMixin,
     ringGroupsMixin,
-    workflowsMixin,
-    userMixin
+    workflowsMixin
   ],
 
   components: {
@@ -234,7 +234,8 @@ export default {
     Duration,
     WaitTime,
     HoldTime,
-    Contact
+    Contact,
+    User
   },
 
   data () {
