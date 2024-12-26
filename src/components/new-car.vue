@@ -102,6 +102,16 @@
                   </h5>
                   <b>Description:</b>
                   <p>{{ car.description | truncate(100) }}</p>
+                  <b>Year:</b>
+                  <p>{{ car.year }}</p>
+                  <b>Make:</b>
+                  <p>{{ car.make }}</p>
+                  <b>Model:</b>
+                  <p>{{ car.model }}</p>
+                  <b>Color:</b>
+                  <p>{{ car.colour }}</p>
+                  <b>Interior Color:</b>
+                  <p>{{ car.interior_color }}</p>
                   <b>Price:</b>
                   <p>{{ car.price | toCurrency }}</p>
                 </div>
