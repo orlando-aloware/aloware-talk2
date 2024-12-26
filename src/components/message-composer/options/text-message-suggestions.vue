@@ -22,6 +22,7 @@
               <q-btn icon="auto_fix_high"
                      type="submit"
                      color="primary"
+                     :disabled="isGenerating"
                      round
                      dense
                      flat
@@ -71,16 +72,6 @@
 
         <q-item class="default">
           <q-item-section>
-            <b-button class="text-white"
-                      size="sm"
-                      variant="primary"
-                      tabindex="0"
-                      block
-                      :disabled="isGenerating"
-                      @click="handleRegenerate">
-              {{ !isGenerating ? '🧙‍♂️️🪄 Regenerate Messages' : 'Generating Messages ✨' }}
-            </b-button>
-
             <div class="timestamp"
                  :class="[ suggestionsLoaded ? '' : 'hide']">
               Last updated:
