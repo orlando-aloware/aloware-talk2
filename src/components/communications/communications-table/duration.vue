@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column"
-       data-testid="duration-div">
+       data-testid="duration-row">
     <div class="d-flex align-items-center justify-content-left"
          v-if="row.type === CommunicationTypes.CALL">
       <span>{{ row.duration | fixDuration }}</span>
@@ -18,7 +18,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
-  name: 'TalkTime',
+  name: 'Contact',
 
   props: {
     row: {

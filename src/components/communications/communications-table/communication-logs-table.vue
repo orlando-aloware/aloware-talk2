@@ -100,14 +100,7 @@
             </div>
 
             <div v-else-if="col.name === 'contact'">
-              <div v-if="props.row?.contact">
-                <div>
-                  {{ props.row.contact.name | fixContactName }}
-                </div>
-              </div>
-              <div v-else>
-                {{ col.value | fixPhone('NATIONAL', true) }}
-              </div>
+              <contact :row="props.row" />
             </div>
 
             <div v-else-if="col.name === 'user_id'">
@@ -208,6 +201,7 @@ import TalkTime from './talk-time.vue'
 import Duration from './duration.vue'
 import WaitTime from './wait-time.vue'
 import HoldTime from './hold-time.vue'
+import Contact from './contact.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -239,7 +233,8 @@ export default {
     TalkTime,
     Duration,
     WaitTime,
-    HoldTime
+    HoldTime,
+    Contact
   },
 
   data () {
