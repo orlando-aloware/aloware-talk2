@@ -102,32 +102,32 @@
                   </h5>
                   <p class="d-flex">
                     <span class="text-bold">Description:</span>
-                    <span class="ml-2">{{ car.description | truncate(100) }}</span>
+                    <span class="ml-1">{{ car.description | truncate(100) }}</span>
                   </p>
-                  <p class="d-flex">
+                  <h5 class="d-flex">
                     <span class="text-bold">Year:</span>
-                    <span class="ml-2">{{ car.year }}</span>
-                  </p>
-                  <p class="d-flex">
+                    <span class="ml-1">{{ car.year }}</span>
+                  </h5>
+                  <h5 class="d-flex">
                     <span class="text-bold">Make:</span>
-                    <span class="ml-2">{{ car.make }}</span>
-                  </p>
-                  <p class="d-flex">
+                    <span class="ml-1">{{ car.make }}</span>
+                  </h5>
+                  <h5 class="d-flex">
                     <span class="text-bold">Model:</span>
-                    <span class="ml-2">{{ car.model }}</span>
-                  </p>
-                  <p class="d-flex">
+                    <span class="ml-1">{{ car.model }}</span>
+                  </h5>
+                  <h5 class="d-flex">
                     <span class="text-bold">Color:</span>
-                    <span class="ml-2">{{ car.colour }}</span>
-                  </p>
-                  <p class="d-flex">
+                    <span class="ml-1">{{ car.colour }}</span>
+                  </h5>
+                  <h5 class="d-flex">
                     <span class="text-bold">Interior Color:</span>
-                    <span class="ml-2">{{ car.interior_color }}</span>
-                  </p>
-                  <p class="d-flex">
+                    <span class="ml-1">{{ car.interior_color }}</span>
+                  </h5>
+                  <h5 class="d-flex">
                     <span class="text-bold">Price:</span>
-                    <span class="ml-2">{{ car.price | toCurrency }}</span>
-                  </p>
+                    <span class="ml-1">{{ car.price | toCurrency }}</span>
+                  </h5>
                 </div>
               </q-card-section>
             </q-card>
