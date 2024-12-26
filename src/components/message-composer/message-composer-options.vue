@@ -2,7 +2,7 @@
   <div class="message-options" data-testid="message-composer-o">
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
-            data-testid="add-gif-image-butto "
+            data-testid="add-gif-image-button"
             :disabled="isTextingDisabled || !canAddMoreAttachments">
       <q-menu content-class="mx-height-500"
               ref="giphyMenu"
@@ -15,7 +15,7 @@
 
       <gif-icon></gif-icon>
       <q-tooltip data-testid="add-gif-image-tooltip">
-        Add Gif image
+        Add GIF image
       </q-tooltip>
     </b-link>
 
@@ -98,6 +98,25 @@
       </q-tooltip>
     </b-link>
 
+    <b-link v-if="messageComposer.mode === 'sms' && isDemoCompany"
+            href="#"
+            data-testid="add-suggested-text-messages-button"
+            :disabled="isTextingDisabled">
+      <q-menu content-class="mx-height-500 width-380 ai-effect-container"
+              ref="suggestedTextMessagesMenu"
+              data-testid="add-suggested-text-messages-menu"
+              anchor="top left"
+              self="bottom left"
+              :offset="[0,5]">
+        <text-message-suggestions :contact="contact" @selected="onTextMessageSuggestionSelected" @loaded="onTextMessageSuggestionsLoaded"></text-message-suggestions>
+      </q-menu>
+
+      <sparkle-icon width="18" height="18" color="#9333EA"/>
+      <q-tooltip data-testid="add-suggested-text-messages-tooltip">
+        AloAi-crafted message suggestions based on past interactions with the contact
+      </q-tooltip>
+    </b-link>
+
     <b-link v-if="isSimpSocialIntegrationEnabled"
             href="#">
       <q-menu content-class="inventory-menu mx-height-600 overflow-x-hidden"
@@ -149,10 +168,12 @@ import Variables from 'components/message-composer/options/variables'
 import ContactCard from 'components/message-composer/options/contact-card.vue'
 import VariableIcon from 'components/icons/variable-icon'
 import { mapGetters, mapState } from 'vuex'
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, userMixin, simpsocialMixin } from 'src/plugins/mixins'
 import SimpsocialInventoryIcon from 'components/icons/simpsocial-inventory-icon'
 import SimpsocialCreditApplicationIcon from 'components/icons/simpsocial-credit-application-icon'
 import talk2Api from 'src/plugins/api/api'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import TextMessageSuggestions from 'components/message-composer/options/text-message-suggestions.vue'
 
 export default {
   name: 'message-composer-options',
@@ -174,6 +195,8 @@ export default {
   },
 
   components: {
+    TextMessageSuggestions,
+    SparkleIcon,
     SimpsocialCreditApplicationIcon,
     SimpsocialInventoryIcon,
     VariableIcon,
@@ -191,6 +214,7 @@ export default {
 
   mixins: [
     aclMixin,
+    userMixin,
     simpsocialMixin
   ],
 
@@ -211,6 +235,10 @@ export default {
       'messageComposer',
       'contact'
     ]),
+
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    },
 
     isTextingDisabled () {
       return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
@@ -235,6 +263,15 @@ export default {
     onGifSelected (gif) {
       this.$emit('gifSelected', gif)
       this.$refs.giphyMenu.hide()
+    },
+
+    onTextMessageSuggestionSelected (suggestion) {
+      this.$emit('textMessageSuggestionSelected', suggestion)
+      this.$refs.suggestedTextMessagesMenu.hide()
+    },
+
+    onTextMessageSuggestionsLoaded () {
+      this.$refs.suggestedTextMessagesMenu.updatePosition()
     },
 
     onAttachmentUploaded (files) {

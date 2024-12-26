@@ -690,6 +690,14 @@ export default {
         }
 
         return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary`, params)
+      },
+
+      getTextMessageSuggestions (contactId, params) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/text-message-suggestions`, params)
       }
     },
 
