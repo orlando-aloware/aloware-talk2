@@ -100,20 +100,34 @@
                       Vin #: {{ car.vin }}
                     </span>
                   </h5>
-                  <b>Description:</b>
-                  <p>{{ car.description | truncate(100) }}</p>
-                  <b>Year:</b>
-                  <p>{{ car.year }}</p>
-                  <b>Make:</b>
-                  <p>{{ car.make }}</p>
-                  <b>Model:</b>
-                  <p>{{ car.model }}</p>
-                  <b>Color:</b>
-                  <p>{{ car.colour }}</p>
-                  <b>Interior Color:</b>
-                  <p>{{ car.interior_color }}</p>
-                  <b>Price:</b>
-                  <p>{{ car.price | toCurrency }}</p>
+                  <p class="d-flex">
+                    <span class="text-bold">Description:</span>
+                    <span class="ml-2">{{ car.description | truncate(100) }}</span>
+                  </p>
+                  <p class="d-flex">
+                    <span class="text-bold">Year:</span>
+                    <span class="ml-2">{{ car.year }}</span>
+                  </p>
+                  <p class="d-flex">
+                    <span class="text-bold">Make:</span>
+                    <span class="ml-2">{{ car.make }}</span>
+                  </p>
+                  <p class="d-flex">
+                    <span class="text-bold">Model:</span>
+                    <span class="ml-2">{{ car.model }}</span>
+                  </p>
+                  <p class="d-flex">
+                    <span class="text-bold">Color:</span>
+                    <span class="ml-2">{{ car.colour }}</span>
+                  </p>
+                  <p class="d-flex">
+                    <span class="text-bold">Interior Color:</span>
+                    <span class="ml-2">{{ car.interior_color }}</span>
+                  </p>
+                  <p class="d-flex">
+                    <span class="text-bold">Price:</span>
+                    <span class="ml-2">{{ car.price | toCurrency }}</span>
+                  </p>
                 </div>
               </q-card-section>
             </q-card>
