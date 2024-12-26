@@ -66,9 +66,7 @@
             <div v-else-if="col.name === 'ring_group'">
               {{ getRingGroupName(props.row) }}
             </div>
-            <div v-else-if="col.name === 'workflow'">
-              {{ getWorkflowName(props.row) }}
-            </div>
+
             <div v-else-if="col.name === 'created_at'">
               <start-time :row="props.row"
                           :value="col.value" />
@@ -105,6 +103,14 @@
 
             <div v-else-if="col.name === 'user_id'">
               <user :value="col.value" />
+            </div>
+
+            <div v-else-if="col.name === 'workflow'">
+              <workflow :value="props.row.workflow_id" />
+            </div>
+
+            <div v-else-if="col.name === 'broadcast'">
+              <broadcast :value="props.row.broadcast_id" />
             </div>
 
             <template v-else-if="col.name === 'tags'">
@@ -203,6 +209,8 @@ import WaitTime from './wait-time.vue'
 import HoldTime from './hold-time.vue'
 import Contact from './contact.vue'
 import User from './user.vue'
+import Broadcast from './broadcast.vue'
+import Workflow from './Workflow'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -235,7 +243,9 @@ export default {
     WaitTime,
     HoldTime,
     Contact,
-    User
+    User,
+    Broadcast,
+    Workflow
   },
 
   data () {
@@ -521,16 +531,6 @@ export default {
     getRingGroupName (row) {
       const rg = this.getRingGroup(row.ring_group_id)
       return rg ? rg.name : '-'
-    },
-
-    getWorkflowName (row) {
-      const seq = this.getWorkflow(row.workflow_id)
-      return seq ? seq.name : '-'
-    },
-
-    getBroadcastName (broadcastId) {
-      // Replace with actual logic to get broadcast name
-      return broadcastId ? `Broadcast ${broadcastId}` : '-'
     },
 
     getVisibleResolution (communication) {

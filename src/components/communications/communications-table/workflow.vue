@@ -2,12 +2,12 @@
   <div class="d-flex flex-column"
        data-testid="user-row">
     <span v-if="isAgent && value">
-      {{ getUserName(getUser(value)) }}
+      {{ workflow.name || '-' }}
     </span>
     <a target='_blank'
-       :href="getUserURL(value)"
+       :href="getWorkflowURL(value)"
        v-else-if="value">
-      {{ getUserName(getUser(value)) }}
+      {{ workflow.name || '-' }}
     </a>
     <span v-else>
       -
@@ -16,13 +16,13 @@
 </template>
 
 <script>
-import { userMixin, aclMixin, classicMixin } from 'src/plugins/mixins'
+import { aclMixin, classicMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
 
 export default {
-  name: 'User',
+  name: 'Workflow',
 
   mixins: [
-    userMixin,
     aclMixin,
     classicMixin
   ],
@@ -31,6 +31,14 @@ export default {
     value: {
       type: Number,
       required: false
+    }
+  },
+
+  computed: {
+    ...mapState(['workflows']),
+
+    workflow () {
+      return this.workflows.find(workflow => workflow.id === this.value) || {}
     }
   }
 }
