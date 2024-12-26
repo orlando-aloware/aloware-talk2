@@ -178,4 +178,9 @@ export default {
 .hide {
   visibility: hidden;
 }
+
+.row .q-field__native.q-px-md {
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
 </style>
