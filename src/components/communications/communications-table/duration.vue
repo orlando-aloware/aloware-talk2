@@ -1,38 +1,39 @@
 <template>
-  <div>
-    <div class="row"
-         data-testid="duration-div"
+  <div class="d-flex flex-column"
+       data-testid="duration-div">
+    <div class="d-flex align-items-center justify-content-left"
          v-if="row.type === CommunicationTypes.CALL">
-      <div class="col-12 d-flex align-items-center justify-content-left">
-        <span>{{ row.duration | fixDuration }}</span>
-      </div>
+      <span>{{ row.duration | fixDuration }}</span>
     </div>
-    <div class="row">
-      <div class="col-12 d-flex align-items-center justify-content-left"
-           data-testid="status-div">
-        <span>{{ getVisibleStatus(row) }}</span>
-      </div>
+
+    <div class="d-flex align-items-center justify-content-left"
+         data-testid="status-div">
+      <span>{{ getVisibleStatus(row) }}</span>
     </div>
   </div>
 </template>
+
 <script>
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 
 export default {
   name: 'TalkTime',
+
   props: {
     row: {
       type: Object,
       required: true
     }
   },
+
   data () {
     return {
       CommunicationTypes,
       CommunicationCurrentStatus
     }
   },
+
   methods: {
     getVisibleStatus (communication) {
       if (communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {

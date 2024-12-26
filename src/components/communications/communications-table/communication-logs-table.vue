@@ -41,17 +41,16 @@
              @virtual-scroll="onScroll">
       <template v-slot:body="props">
         <q-tr :props="props">
-<!--           <div class="font-weight-bolder">{{ props.row.id }}</div>
- -->          <q-td :props="props"
-                v-for="col in props.cols"
-                :key="col.name">
+          <q-td :props="props"
+                :key="col.name"
+                v-for="col in props.cols">
             <div class="status-icon centered-content"
                  v-if="col.name === 'disposition_status2'"
                  v-html="stateToIcon(
-                   props.row.disposition_status2,
-                   props.row.direction,
-                   props.row.type,
-                   props.row.callback_status
+                    props.row.disposition_status2,
+                    props.row.direction,
+                    props.row.type,
+                    props.row.callback_status
                  )" />
             <div v-else-if="col.name === 'incoming_number'">
               <div v-if="props.row?.campaign_id">
@@ -79,7 +78,7 @@
             </div>
 
             <div v-else-if="col.name === 'wait_time'">
-                <wait-time :row="props.row" />
+              <wait-time :row="props.row" />
             </div>
 
             <div v-else-if="col.name ==='hold_time'">
