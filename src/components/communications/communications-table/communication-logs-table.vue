@@ -98,6 +98,16 @@
               <attempting-users :row="props.row"/>
             </div>
 
+            <div v-else-if="col.name === 'transfer_prior_user_ids'">
+              <transferred prop="transfer_prior_user_ids"
+                           :row="props.row" />
+            </div>
+
+            <div v-else-if="col.name === 'transfer_target_user_ids'">
+              <transferred prop="transfer_target_user_ids"
+                           :row="props.row" />
+            </div>
+
             <div v-else-if="col.name === 'contact'">
               <contact :row="props.row" />
             </div>
@@ -217,6 +227,7 @@ import Resolution from './resolution.vue'
 import Location from './location.vue'
 import Lines from './lines.vue'
 import AttemptingUsers from './attempting-users.vue'
+import Transferred from './transferred.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -256,7 +267,8 @@ export default {
     Resolution,
     Location,
     Lines,
-    AttemptingUsers
+    AttemptingUsers,
+    Transferred
   },
 
   data () {
