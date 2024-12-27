@@ -143,6 +143,12 @@
               <queue-resolution :row="props.row" />
             </div>
 
+            <div data-testid="email-span"
+                  class="break-word"
+                  v-else-if="col.name === 'email'">
+              <span>{{ props.row.contact ? props.row.contact.email : '' }}</span>
+            </div>
+
             <template v-else-if="col.name === 'tags'">
               <communications-tags :tags="col.value" />
             </template>
@@ -162,13 +168,8 @@
               <communications-operations :row="props.row" />
             </div>
 
-            <span data-testid="email-span"
-                  class="text-muted break-word"
-                  v-else-if="col.name === 'email'">
-                  {{ props.row.contact ? props.row.contact.email : '' }}
-            </span>
             <div v-else>
-              {{ col.value }}
+              <span>{{ col.value }}</span>
             </div>
           </q-td>
         </q-tr>
