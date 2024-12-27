@@ -55,9 +55,7 @@
                 {{ col.value | fixPhone('NATIONAL', true) }}
               </div>
             </div>
-            <div v-else-if="col.name === 'teams'">
-              <communications-teams :teams="col.value" />
-            </div>
+
             <div v-else-if="col.name === 'ring_group'">
               {{ getRingGroupName(props.row) }}
             </div>
@@ -76,6 +74,26 @@
 
             <div v-else-if="col.name ==='hold_time'">
               <hold-time :row="props.row" />
+            </div>
+
+            <div v-else-if="col.name === 'contact'">
+              <contact :row="props.row" />
+            </div>
+
+            <div v-else-if="col.name === 'user_id'">
+              <user :value="col.value" />
+            </div>
+
+            <div v-else-if="col.name === 'teams'">
+              <communications-teams :teams="col.value" />
+            </div>
+
+            <div v-else-if="col.name === 'broadcast'">
+              <broadcast :value="props.row.broadcast_id" />
+            </div>
+
+            <div v-else-if="col.name === 'workflow'">
+              <workflow :value="props.row.workflow_id" />
             </div>
 
             <div v-else-if="col.name === 'duration'">
@@ -117,20 +135,12 @@
               <transfer-type :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'contact'">
-              <contact :row="props.row" />
+            <div v-else-if="col.name === 'callback_status'">
+              <callback-status :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'user_id'">
-              <user :value="col.value" />
-            </div>
-
-            <div v-else-if="col.name === 'workflow'">
-              <workflow :value="props.row.workflow_id" />
-            </div>
-
-            <div v-else-if="col.name === 'broadcast'">
-              <broadcast :value="props.row.broadcast_id" />
+            <div v-else-if="col.name === 'queue_resolution2'">
+              <queue-resolution :row="props.row" />
             </div>
 
             <template v-else-if="col.name === 'tags'">
@@ -238,6 +248,8 @@ import Lines from './lines.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
 import TransferType from './transfer-type.vue'
+import CallbackStatus from './callback-status.vue'
+import QueueResolution from './queue-resolution.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -279,7 +291,9 @@ export default {
     Lines,
     AttemptingUsers,
     Transferred,
-    TransferType
+    TransferType,
+    CallbackStatus,
+    QueueResolution
   },
 
   data () {
