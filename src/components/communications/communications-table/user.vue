@@ -7,6 +7,10 @@
        :href="getUserURL(value)"
        v-else-if="value">
       {{ getUserName(getUser(value)) }}
+
+      <q-tooltip>
+        Click to go to user's page
+      </q-tooltip>
     </a>
     <span v-else>
       -

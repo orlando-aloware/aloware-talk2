@@ -108,8 +108,13 @@
                            :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'in_cold_transfer'">
+            <div data-testid="cold-transfer-row"
+                 v-else-if="col.name === 'in_cold_transfer'">
               <span>{{ props.row.in_cold_transfer ? 'Yes' : 'No' }}</span>
+            </div>
+
+            <div v-else-if="col.name === 'transfer_type'">
+              <transfer-type :row="props.row" />
             </div>
 
             <div v-else-if="col.name === 'contact'">
@@ -232,6 +237,7 @@ import Location from './location.vue'
 import Lines from './lines.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
+import TransferType from './transfer-type.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -272,7 +278,8 @@ export default {
     Location,
     Lines,
     AttemptingUsers,
-    Transferred
+    Transferred,
+    TransferType
   },
 
   data () {
