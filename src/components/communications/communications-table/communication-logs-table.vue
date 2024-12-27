@@ -88,13 +88,7 @@
             </div>
 
             <div v-else-if="col.name === 'resolution2'">
-              <div class="row"
-                   data-testid="resolution-row">
-                <div class="col-12 d-flex align-items-center justify-content-left"
-                     data-testid="resolution-div">
-                  <span>{{ getVisibleResolution(props.row) }}</span>
-                </div>
-              </div>
+              <resolution :row="props.row" />
             </div>
 
             <div v-else-if="col.name === 'contact'">
@@ -211,6 +205,7 @@ import Contact from './contact.vue'
 import User from './user.vue'
 import Broadcast from './broadcast.vue'
 import Workflow from './Workflow'
+import Resolution from './resolution'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -245,7 +240,8 @@ export default {
     Contact,
     User,
     Broadcast,
-    Workflow
+    Workflow,
+    Resolution
   },
 
   data () {
@@ -531,10 +527,6 @@ export default {
     getRingGroupName (row) {
       const rg = this.getRingGroup(row.ring_group_id)
       return rg ? rg.name : '-'
-    },
-
-    getVisibleResolution (communication) {
-      return this.$options.filters.capitalize(this.$options.filters.replaceDash(this.$options.filters.translateResolutionText(communication.resolution2)))
     },
 
     updatePaginationButtons () {
