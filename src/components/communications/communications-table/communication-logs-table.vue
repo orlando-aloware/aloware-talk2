@@ -161,13 +161,13 @@
               <note-popover :note="col.value" />
             </div>
 
+            <template v-else-if="col.name === 'csat_score'">
+              <csat-score :row="props.row" />
+            </template>
+
             <div v-else-if="col.name === 'operations'">
               <!-- dummy yet -->
               <communications-operations :row="props.row" />
-            </div>
-
-            <div v-else>
-              <span>{{ col.value }}</span>
             </div>
           </q-td>
         </q-tr>
@@ -250,6 +250,7 @@ import TransferType from './transfer-type.vue'
 import CallbackStatus from './callback-status.vue'
 import QueueResolution from './queue-resolution.vue'
 import CreatorType from './creator-type.vue'
+import CsatScore from './csat-score.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -294,7 +295,8 @@ export default {
     TransferType,
     CallbackStatus,
     QueueResolution,
-    CreatorType
+    CreatorType,
+    CsatScore
   },
 
   data () {
