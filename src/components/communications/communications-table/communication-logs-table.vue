@@ -149,18 +149,16 @@
               <span>{{ props.row.contact ? props.row.contact.email : '' }}</span>
             </div>
 
+            <div v-else-if="col.name === 'creator_type'">
+              <creator-type :row="props.row" />
+            </div>
+
             <template v-else-if="col.name === 'tags'">
               <communications-tags :tags="col.value" />
             </template>
 
-            <!-- v-if notes -->
             <div v-else-if="col.name === 'notes'">
               <note-popover :note="col.value" />
-            </div>
-
-            <!-- v-if creator_type -->
-            <div v-else-if="col.name === 'creator_type'">
-              {{ col.value | translateCreatorType }}
             </div>
 
             <div v-else-if="col.name === 'operations'">
@@ -251,6 +249,7 @@ import Transferred from './transferred.vue'
 import TransferType from './transfer-type.vue'
 import CallbackStatus from './callback-status.vue'
 import QueueResolution from './queue-resolution.vue'
+import CreatorType from './creator-type.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -294,7 +293,8 @@ export default {
     Transferred,
     TransferType,
     CallbackStatus,
-    QueueResolution
+    QueueResolution,
+    CreatorType
   },
 
   data () {
