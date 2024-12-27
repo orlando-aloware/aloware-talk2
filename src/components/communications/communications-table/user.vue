@@ -1,6 +1,5 @@
 <template>
-  <div class="d-flex flex-column"
-       data-testid="user-row">
+  <div data-testid="user-row">
     <span v-if="isAgent && value">
       {{ getUserName(getUser(value)) }}
     </span>

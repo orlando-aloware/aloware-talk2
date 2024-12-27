@@ -95,6 +95,10 @@
               <location :row="props.row" />
             </div>
 
+            <div v-else-if="col.name === 'line'">
+              <lines :value="props.row.campaign_id" />
+            </div>
+
             <div v-else-if="col.name === 'contact'">
               <contact :row="props.row" />
             </div>
@@ -211,6 +215,7 @@ import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
 import Resolution from './resolution.vue'
 import Location from './location.vue'
+import Lines from './lines.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -247,7 +252,8 @@ export default {
     Broadcast,
     Workflow,
     Resolution,
-    Location
+    Location,
+    Lines
   },
 
   data () {
