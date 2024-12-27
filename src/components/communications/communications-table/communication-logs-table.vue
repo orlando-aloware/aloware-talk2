@@ -95,7 +95,7 @@
             </div>
 
             <div v-else-if="col.name === 'attempting_users'">
-              attempting users
+              <attempting-users :row="props.row"/>
             </div>
 
             <div v-else-if="col.name === 'contact'">
@@ -216,6 +216,7 @@ import Workflow from './workflow.vue'
 import Resolution from './resolution.vue'
 import Location from './location.vue'
 import Lines from './lines.vue'
+import AttemptingUsers from './attempting-users.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -254,7 +255,8 @@ export default {
     Workflow,
     Resolution,
     Location,
-    Lines
+    Lines,
+    AttemptingUsers
   },
 
   data () {
