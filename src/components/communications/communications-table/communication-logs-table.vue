@@ -44,14 +44,9 @@
           <q-td :props="props"
                 :key="col.name"
                 v-for="col in props.cols">
-            <div class="status-icon centered-content"
-                 v-if="col.name === 'disposition_status2'"
-                 v-html="stateToIcon(
-                    props.row.disposition_status2,
-                    props.row.direction,
-                    props.row.type,
-                    props.row.callback_status
-                 )" />
+            <div v-if="col.name === 'disposition_status2'">
+              <disposition :row="props.row" />
+            </div>
             <div v-else-if="col.name === 'incoming_number'">
               <div v-if="props.row?.campaign_id">
                 {{ getCampaignName(props.row?.campaign_id) }}
@@ -97,6 +92,10 @@
 
             <div v-else-if="col.name === 'line'">
               <lines :value="props.row.campaign_id" />
+            </div>
+
+            <div v-else-if="col.name === 'attempting_users'">
+              attempting users
             </div>
 
             <div v-else-if="col.name === 'contact'">
@@ -205,6 +204,7 @@ import StartTime from './start-time.vue'
 import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
 import workflowsMixin from 'src/plugins/mixins/workflows.mixin'
 import CommunicationsOperations from './communications-operations.vue'
+import Disposition from './disposition.vue'
 import TalkTime from './talk-time.vue'
 import Duration from './duration.vue'
 import WaitTime from './wait-time.vue'
@@ -241,6 +241,7 @@ export default {
     CommunicationTableSettings,
     CommunicationsTags,
     CommunicationsTeams,
+    Disposition,
     NotePopover,
     StartTime,
     TalkTime,
