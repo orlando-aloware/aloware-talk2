@@ -108,6 +108,10 @@
                            :row="props.row" />
             </div>
 
+            <div v-else-if="col.name === 'in_cold_transfer'">
+              <span>{{ props.row.in_cold_transfer ? 'Yes' : 'No' }}</span>
+            </div>
+
             <div v-else-if="col.name === 'contact'">
               <contact :row="props.row" />
             </div>
