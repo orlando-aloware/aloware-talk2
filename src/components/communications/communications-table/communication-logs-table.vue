@@ -91,6 +91,10 @@
               <resolution :row="props.row" />
             </div>
 
+            <div v-else-if="col.name === 'lead_location'">
+              <location :row="props.row" />
+            </div>
+
             <div v-else-if="col.name === 'contact'">
               <contact :row="props.row" />
             </div>
@@ -204,8 +208,9 @@ import HoldTime from './hold-time.vue'
 import Contact from './contact.vue'
 import User from './user.vue'
 import Broadcast from './broadcast.vue'
-import Workflow from './Workflow'
-import Resolution from './resolution'
+import Workflow from './workflow.vue'
+import Resolution from './resolution.vue'
+import Location from './location.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -241,7 +246,8 @@ export default {
     User,
     Broadcast,
     Workflow,
-    Resolution
+    Resolution,
+    Location
   },
 
   data () {
