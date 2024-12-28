@@ -4961,7 +4961,12 @@ i.option-separator {
 }
 
 .relative-time {
-  color: $grey-mid
+  color: $grey-mid;
+  display: inline-block;
+
+  &::first-letter {
+    text-transform: capitalize;
+  }
 }
 
 .mycard {
@@ -15830,6 +15835,17 @@ hr {
 .transcription-link:hover {
   color: $dark;
   font-weight: 600;
+}
+
+.transcription-message {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.transcription-summary-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Gradient text effect */

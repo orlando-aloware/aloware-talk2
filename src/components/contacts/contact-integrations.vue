@@ -78,7 +78,6 @@ export default {
         !this.currentCompany.hubspot_integration_enabled &&
         !this.currentCompany.stripe_integration_enabled &&
         !this.currentCompany.zoho_integration_enabled &&
-        !this.currentCompany.helpscout_integration_enabled &&
         !this.currentCompany.guesty_integration_enabled &&
         !this.currentCompany.gohighlevel_integration_enabled &&
         !this.currentCompany.salesforce_integration_enabled
@@ -100,11 +99,6 @@ export default {
     isZohoEnabled () {
       return !!(this.currentCompany &&
         this.currentCompany.zoho_integration_enabled)
-    },
-
-    isHelpScoutEnabled () {
-      return !!(this.currentCompany &&
-        this.currentCompany.helpscout_integration_enabled)
     },
 
     isGuestyEnabled () {
