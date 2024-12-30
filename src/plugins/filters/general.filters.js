@@ -2,7 +2,6 @@ import _ from 'lodash'
 import numeral from 'numeral'
 import numFormat from 'vue-filter-number-format'
 import googlePhone from 'google-libphonenumber'
-import * as CampaignCallRouterBehavior from '../../constants/campaign-call-router-behaviors'
 import * as AgentStatus from '../../constants/agent-status'
 
 /**
@@ -83,26 +82,6 @@ const humanReadableDialMode = (mode) => {
       return 'Sequential'
     case 2:
       return 'Round-robin'
-  }
-
-  return '-'
-}
-
-/**
- * Human readable call router behaviour
- * @param {string} mode
- * @returns {string}
- */
-const humanReadableCallRouterBehavior = (mode) => {
-  switch (mode) {
-    case CampaignCallRouterBehavior.CALL_ROUTER_BEHAVIOR_MODE_FAST_FORWARD:
-      return 'Fast Forward'
-    case CampaignCallRouterBehavior.CALL_ROUTER_BEHAVIOR_MODE_SMART_QUEUE:
-      return 'Smart Queue'
-    case CampaignCallRouterBehavior.CALL_ROUTER_BEHAVIOR_MODE_DEAD_END:
-      return 'Dead End'
-    case CampaignCallRouterBehavior.CALL_ROUTER_BEHAVIOR_MODE_IVR:
-      return 'IVR'
   }
 
   return '-'
@@ -702,7 +681,6 @@ export default ({ Vue }) => {
     initials,
     humanReadableBool,
     humanReadableDialMode,
-    humanReadableCallRouterBehavior,
     ucfirst,
     checkIfEmpty,
     checkIfTrue,
