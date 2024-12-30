@@ -98,7 +98,7 @@
       </q-tooltip>
     </b-link>
 
-    <b-link v-if="messageComposer.mode === 'sms' && isDemoCompany && contact"
+    <b-link v-if="messageComposer.mode === 'sms' && isDemoCompany && contact?.id"
             href="#"
             data-testid="add-suggested-text-messages-button"
             :disabled="isTextingDisabled">
