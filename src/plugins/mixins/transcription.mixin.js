@@ -24,7 +24,7 @@ export default {
       return communication.is_eligible_for_transcribe &&
              this.showAudio(communication) &&
              !communication.metadata?.transcription_info &&
-             ![TranscriptionStatus.STATUS_PROCESSING, TranscriptionStatus.STATUS_QUEUED, TranscriptionStatus.STATUS_COMPLETED].includes(communication.call_transcription_status)
+             ![TranscriptionStatus.STATUS_PROCESSING, TranscriptionStatus.STATUS_COMPLETED, TranscriptionStatus.STATUS_PARSED].includes(communication.call_transcription_status)
     },
 
     // check if the summarization is allowed for the communication
