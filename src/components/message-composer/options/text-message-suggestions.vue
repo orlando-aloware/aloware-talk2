@@ -4,14 +4,14 @@
     <div class="ai-effect-blur"></div>
     <div class="ai-effect-content">
       <q-list>
-        <q-item-label class="q-pa-md">
+        <q-item-label class="q-pa-md pb-2">
           <h4 class="ai-effect-gradient-text">
             AloAi-Crafted Message Suggestions
             <sparkle-icon width="16" height="16" color="#9333EA"/>
           </h4>
         </q-item-label>
 
-        <q-item-label>
+        <q-item-label class="mt-0">
           <q-input v-model="personalizedMessage"
                    placeholder="Ask AloAi to write a message or personalize it..."
                    input-class="q-px-md text-13"
@@ -72,7 +72,7 @@
           </template>
         </div>
 
-        <q-item class="default footer">
+        <q-item class="default footer bordered-top">
           <q-item-section>
             <div class="timestamp"
                  :class="[ suggestionsLoaded && suggestions ? '' : 'hide']">
