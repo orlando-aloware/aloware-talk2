@@ -13,11 +13,12 @@
 
         <q-item-label>
           <q-input v-model="personalizedMessage"
-                   placeholder="Ask AloAi to write a response..."
-                   input-class="q-px-md"
+                   placeholder="Ask AloAi to write a message or personalize it..."
+                   input-class="q-px-md text-13"
                    autogrow
                    dense
-                   borderless>
+                   borderless
+                   @input="emitChanged">
             <template v-slot:append>
               <q-btn icon="auto_fix_high"
                      type="submit"
@@ -58,22 +59,23 @@
                       @click="selectSuggestion(suggestion)">
                 <q-item-section>{{ suggestion }}</q-item-section>
               </q-item>
-              <q-separator/>
+              <q-separator v-if="index != suggestions.messages.length - 1"/>
             </div>
           </template>
           <template v-else>
             <q-item class="default">
               <q-item-section>
-                <h5>Sorry, our wizard failed at suggesting anything!</h5>
+                <h5 v-if="!contact?.id && !suggestions">Please write a short message above and let us generate something for you.</h5>
+                <h5 v-else>Sorry, our wizard failed at suggesting anything!</h5>
               </q-item-section>
             </q-item>
           </template>
         </div>
 
-        <q-item class="default">
+        <q-item class="default footer">
           <q-item-section>
             <div class="timestamp"
-                 :class="[ suggestionsLoaded ? '' : 'hide']">
+                 :class="[ suggestionsLoaded && suggestions ? '' : 'hide']">
               Last updated:
               <template v-if="suggestions?.created_at">{{ suggestions.created_at | fixDateTime }}</template>
             </div>
@@ -96,7 +98,7 @@ export default {
   props: {
     contact: {
       type: Object,
-      required: true
+      required: false
     }
   },
 
@@ -112,7 +114,10 @@ export default {
   methods: {
     getData (force = false) {
       this.suggestionsLoaded = false
-      return talk2Api.V2.contact.getTextMessageSuggestions(this.contact.id, {
+      setTimeout(() => {
+        this.$emit('loaded')
+      }, 100)
+      return talk2Api.V2.contact.getTextMessageSuggestions(this.contact?.id, {
         params: {
           force,
           personalized_message: this.personalizedMessage
@@ -137,22 +142,37 @@ export default {
     selectSuggestion (suggestion) {
       console.log('Selected suggestion:', suggestion)
       this.$emit('selected', suggestion)
+    },
+
+    emitChanged () {
+      setTimeout(() => {
+        this.$emit('loaded')
+      }, 100)
     }
   },
 
   mounted () {
-    this.getData()
+    if (this.contact?.id) {
+      this.getData()
+    } else {
+      this.suggestionsLoaded = true
+    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.footer {
+  padding: 0;
+  min-height: 24px;
+}
+
 .text-message-suggestions {
   height: 300px;
   overflow-y: scroll;
 
   &.no-message {
-    height: 25px !important;
+    height: 50px !important;
   }
 }
 

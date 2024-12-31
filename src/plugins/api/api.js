@@ -694,7 +694,7 @@ export default {
 
       getTextMessageSuggestions (contactId, params) {
         if (!contactId) {
-          return null
+          return window.axios.get(`/api/v2/contacts/text-message-suggestions`, params)
         }
 
         return window.axios.get(`/api/v2/contacts/${contactId}/text-message-suggestions`, params)

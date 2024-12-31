@@ -98,15 +98,15 @@
       </q-tooltip>
     </b-link>
 
-    <b-link v-if="messageComposer.mode === 'sms' && isDemoCompany && contact?.id"
+    <b-link v-if="messageComposer.mode === 'sms' && isDemoCompany"
             href="#"
             data-testid="add-suggested-text-messages-button"
             :disabled="isTextingDisabled">
       <q-menu content-class="mx-height-500 width-380 ai-effect-container"
               ref="suggestedTextMessagesMenu"
               data-testid="add-suggested-text-messages-menu"
-              anchor="top left"
-              self="bottom left"
+              anchor="bottom left"
+              self="top left"
               :offset="[0,5]">
         <text-message-suggestions :contact="contact" @selected="onTextMessageSuggestionSelected" @loaded="onTextMessageSuggestionsLoaded"></text-message-suggestions>
       </q-menu>
