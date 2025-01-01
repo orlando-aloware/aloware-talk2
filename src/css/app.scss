@@ -9462,11 +9462,7 @@ screen and (max-width: 956px) {
     max-width: 313px;
 
     &__right.no-max-width {
-      width: unset!important;
-    }
-
-    &__right {
-      width: 270px;
+      max-width: unset!important;
     }
 
   }
