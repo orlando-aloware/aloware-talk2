@@ -146,7 +146,7 @@
             <div data-testid="email-span"
                   class="break-word"
                   v-else-if="col.name === 'email'">
-              <span>{{ props.row.contact ? props.row.contact.email : '' }}</span>
+              <span>{{ props.row.contact?.email || '-' }}</span>
             </div>
 
             <div v-else-if="col.name === 'creator_type'">
@@ -154,7 +154,7 @@
             </div>
 
             <template v-else-if="col.name === 'tags'">
-              <communications-tags :tags="col.value" />
+              <communications-tags :communication="props.row"/>
             </template>
 
             <div v-else-if="col.name === 'notes'">

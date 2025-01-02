@@ -1,52 +1,57 @@
 <template>
-  <div class="d-flex flex-column truncate-chip-labels"
-       v-if="tags?.length">
-    <!--TODO: chequear el color -->
-    <tag :name="firstTag.name"
-         :color="firstTag.color" />
-    <span class="text-primary ml-1 cursor-pointer"
-          v-if="restOfTags.length"
-          :id="`tags-more-${_uid}`"
-    >
-      + {{ restOfTags.length }} more
+  <div class="d-flex flex-column truncate-chip-labels">
+    <span class="d-flex align-items-center cursor-pointer text-primary"
+          :id="`comm-tag-${_uid}`">
+      <add-icon-circle height="14"
+                       width="14"
+                       color="#256EFF"/>
+        <span class="ml-1">
+          Add Tags
+        </span>
     </span>
-    <b-popover triggers="hover"
-               :target="`tags-more-${_uid}`"
-               v-if="restOfTags.length">
-      <span class="d-block mb-1"
-            v-for="tag in restOfTags"
-            :key="tag.id"
-      >
-        <tag :name="tag.name"
-             :color="tag.color" />
-      </span>
+    <tags-cell-list see-more-new-line
+                    see-more-class="text-primary"
+                    :tags="communication.tags"
+                    v-if="communication.tags?.length" />
+
+    <b-popover placement="bottom"
+               triggers="click blur"
+               :target="`comm-tag-${_uid}`">
+      <entity-tags start-editing
+                   entity="communication"
+                   entity-type="contacts"
+                   :entity-object="communication"
+                   :category="TagCategories.CAT_COMMUNICATIONS"
+                   :use-card="false"
+                   :use-add-icon="true" />
     </b-popover>
   </div>
-  <span v-else> - </span>
 </template>
+
 <script>
-import { first } from 'lodash'
-import Tag from './tag'
+import TagsCellList from 'components/tags/tags-cell-list.vue'
+import EntityTags from 'components/generic-selectors/entity-tags.vue'
+import AddIconCircle from 'components/icons/add-icon-circle.vue'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 
 export default {
   name: 'CommunicationsTags',
+
   components: {
-    Tag
+    AddIconCircle,
+    TagsCellList,
+    EntityTags
   },
+
   props: {
-    tags: {
-      type: Array,
-      default: () => [],
-      required: true
+    communication: {
+      type: Object,
+      required: false
     }
   },
-  computed: {
-    firstTag () {
-      return first(this.tags) || {}
-    },
-    restOfTags () {
-      return this.tags.slice(1)
-    }
-  }
+
+  data: () => ({
+    TagCategories
+  })
 }
 </script>
