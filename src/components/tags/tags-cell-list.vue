@@ -1,5 +1,6 @@
 <template>
-  <div class="d-flex align-items-center contact-tags-item popover-items"
+  <div class="d-flex contact-tags-item popover-items"
+       :class="{ 'align-items-center': !seeMoreNewLine, 'flex-column': seeMoreNewLine }"
        v-if="tags.length"
        v-b-popover.hover="popoverOptions">
     <span>
@@ -12,7 +13,7 @@
         {{ tags[0].name | truncate(27) }}
       </span>
     </span>
-    <span class="ml-1 text-grey-7"
+    <span :class="`ml-1 text-grey-7 ${seeMoreClass}`"
           v-if="tags.length > 1">
       +{{ (tags.length - 1) }} more
     </span>
@@ -28,6 +29,16 @@ export default {
       type: Array,
       default: () => [],
       required: true
+    },
+
+    seeMoreClass: {
+      type: String,
+      default: ''
+    },
+
+    seeMoreNewLine: {
+      type: Boolean,
+      default: false
     }
   },
 
