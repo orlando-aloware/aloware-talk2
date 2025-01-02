@@ -67,7 +67,9 @@ export default {
         .catch(error => {
           const errorMessage = error.response?.data?.message || 'Failed to start summary generation.'
           this.$generalNotification(errorMessage, 'error')
-          this.$emit('updateGenerating', false) // Reset on error
+        })
+        .finally(() => {
+          this.$emit('updateGenerating', false)
         })
     }, 1000)
   }
