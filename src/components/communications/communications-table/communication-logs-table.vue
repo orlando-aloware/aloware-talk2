@@ -158,7 +158,7 @@
             </template>
 
             <div v-else-if="col.name === 'notes'">
-              <note-popover :note="col.value" />
+              <wallboard-calls-note :communication="props.row" />
             </div>
 
             <template v-else-if="col.name === 'csat_score'">
@@ -227,7 +227,6 @@ import CompactBtn from 'components/compact-btn'
 import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
 import CommunicationsTeams from './communications-teams.vue'
-import NotePopover from './note-popover.vue'
 import StartTime from './start-time.vue'
 import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
 import workflowsMixin from 'src/plugins/mixins/workflows.mixin'
@@ -251,6 +250,7 @@ import CallbackStatus from './callback-status.vue'
 import QueueResolution from './queue-resolution.vue'
 import CreatorType from './creator-type.vue'
 import CsatScore from './csat-score.vue'
+import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -277,7 +277,6 @@ export default {
     CommunicationsTags,
     CommunicationsTeams,
     Disposition,
-    NotePopover,
     StartTime,
     TalkTime,
     Duration,
@@ -296,7 +295,8 @@ export default {
     CallbackStatus,
     QueueResolution,
     CreatorType,
-    CsatScore
+    CsatScore,
+    WallboardCallsNote
   },
 
   data () {
