@@ -379,12 +379,6 @@ export default {
 
     applyFilter () {
       this.resetChannelChangedFilterFields()
-      const myContactsFilter = get(this.selectedFilter.filter, 'my_contact', null)
-
-      // set My Contacts toggle state
-      if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
-        this.setInboxShowMyContacts(Boolean(myContactsFilter))
-      }
 
       const unreadsFilter = get(this.filter, 'unread_only', null)
 

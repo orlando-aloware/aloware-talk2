@@ -7650,7 +7650,7 @@ table.datatable {
   }
 }
 
-
+#comms-channel-filter-modal,
 #inbox-channel-filter-modal {
   .modal-content {
     border-radius: 8px;
@@ -7835,6 +7835,8 @@ table.datatable {
 }
 
 @media (min-width: 992px) {
+  #comms-channel-filter-modal .modal-lg,
+  #comms-channel-filter-modal.modal-xl,
   #inbox-channel-filter-modal .modal-lg,
   #inbox-channel-filter-modal.modal-xl {
     max-width: 950px;

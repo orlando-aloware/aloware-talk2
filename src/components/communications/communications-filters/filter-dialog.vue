@@ -5,8 +5,8 @@
            hide-header
            hide-footer
            data-testid="filter-dialog-modal"
-           id="inbox-channel-filter-modal"
-           ref="inboxChannelFilterModal"
+           id="comms-channel-filter-modal"
+           ref="commsChannelFilterModal"
            v-model="isOpen"
            @hidden="onHidden"
            @show="onShow"
@@ -28,16 +28,20 @@
                   <span>New (Untitled)</span>
                   <span class="position-absolute check-icon"
                         v-if="!selectedFilter">
-                    <check-o-icon data-testid="filter-dialog-check-o-icon" color="#040404"/>
+                    <check-o-icon data-testid="filter-dialog-check-o-icon"
+                                  color="#040404" />
                   </span>
                 </div>
               </div>
             </div>
-            <h5 class="text-uppercase filter-group-title" data-testid="filter-dialog-personal-filter-title">Personal Filters</h5>
+            <h5 class="text-uppercase filter-group-title"
+                data-testid="filter-dialog-personal-filter-title">
+              Personal Filters
+            </h5>
             <div class="saved-filters">
               <q-skeleton type="rect"
                           v-if="isGettingFilters"
-                          data-testid="filter-dialog-skeleton"/>
+                          data-testid="filter-dialog-skeleton" />
               <p class="text-muted fs-12 empty-filter-placeholder pl-2"
                  v-show="!isGettingFilters"
                  v-if="personalFilters.length < 1"
@@ -87,15 +91,15 @@
            :class="!isFilterDialogForView ? 'w-50' : ''">
         <div class="d-flex justify-content-between mb-3 px-3">
           <q-input class="view-filter-name mb-0 w-50"
-                   ref="viewName"
                    debounce="500"
                    :label="filterFormDisplayName"
                    :dense="true"
                    clearable
                    data-testid="filter-dialog-view-name-input"
-                   v-model.trim="viewName"
                    v-if="isEditingView && selectedFilter && (!+selectedFilter?.is_on_company || selectedFilter?.scope === 'user')"
-                   @keyup.enter="renameFilter"/>
+                   ref="viewName"
+                   v-model.trim="viewName"
+                   @keyup.enter="renameFilter" />
           <div class="w-100 text-left pt-2 pb-1"
                v-else>
             <span class="filter-name">{{ filterFormDisplayName }}</span>
@@ -103,15 +107,16 @@
           <compact-btn class="border-0 pl-0 pr-0"
                        data-testid="filter-dialog-close-compact-btn"
                        @clicked="onHide">
-            <close-icon iconColor="#000000"/>
+            <close-icon icon-color="#000000" />
           </compact-btn>
         </div>
-        <filter-form ref="inboxChannelFilterForm"
-                     :default-filter-model="loadedDefaultFilterModel"
+        <filter-form :default-filter-model="loadedDefaultFilterModel"
                      :filter="filter"
                      :reset="reset"
-                     data-testid="filter-dialog-filter-form">
-        </filter-form>
+                     data-testid="filter-dialog-filter-form"
+                     ref="commsChannelFilterForm"
+        />
+
         <div class="d-flex justify-content-end mt-sm-3 px-3">
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
@@ -135,13 +140,13 @@
             </compact-btn>
             <compact-btn variant="success"
                          :disabled="isUpdatingFilter"
-                         v-if="isViewEditModeOrNonView"
                          data-testid="filter-dialog-apply-compact-btn"
+                         v-if="isViewEditModeOrNonView"
                          @clicked="onApply">
               <q-spinner-bars color="white"
                               class="mr-1"
-                              v-if="isUpdatingFilter"
-                              data-testid="filter-dialog-spinners-bars"/>
+                              data-testid="filter-dialog-spinners-bars"
+                              v-if="isUpdatingFilter" />
               {{ applyButtonText }}
             </compact-btn>
           </div>
@@ -173,10 +178,10 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as Filters from 'src/constants/filters'
 import { communicationsMixin } from 'src/plugins/mixins'
+import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 
 export default {
-  name: 'filter-dialog',
-
+  name: 'FilterDialog',
   components: {
     CloseIcon,
     CompactBtn,
@@ -319,16 +324,6 @@ export default {
     },
 
     channelFilterName () {
-      const isInbox = !this.$route.params.channel && this.$route.name === 'Inbox'
-
-      if (this.isFilterDialogForView || ['Inbox View', 'Inbox View Contact Task'].includes(this.$route.name)) {
-        return 'Views'
-      }
-
-      if (isInbox || this.$route.params.channel === 'inbox') {
-        return 'Inbox Filters'
-      }
-
       if (this.$route.params.channel === 'messages') {
         return 'Messages Filters'
       }
@@ -337,16 +332,8 @@ export default {
         return 'Voice Messages Filters'
       }
 
-      if (this.$route.params.channel === 'mentions') {
-        return 'Mentions Filters'
-      }
-
-      if (this.$route.params.channel === 'all-communications') {
+      if (this.$route.params.channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
         return 'All Comms. Filters'
-      }
-
-      if (this.$route.params.channel === 'my-personal-line') {
-        return 'My Comms. Filters'
       }
 
       return 'Calls & Recordings Filters'
@@ -461,7 +448,7 @@ export default {
     ...mapActions(['setIsFirstLoad']),
 
     hideModal () {
-      this.$refs.inboxChannelFilterModal.hide()
+      this.$refs.commsChannelFilterModal.hide()
     },
 
     onHidden () {
@@ -547,12 +534,6 @@ export default {
     onApply (skipChangedFields = false) {
       this.reset = false
       this.resetChannelChangedFilterFields()
-
-      const myContactsFilter = _.get(this.filter, 'my_contact', null)
-
-      if (myContactsFilter !== null && myContactsFilter !== (this.inboxShowMyContacts | 0)) {
-        this.setInboxShowMyContacts(Boolean(myContactsFilter))
-      }
 
       const unreadsFilter = _.get(this.filter, 'unread_only', null)
 

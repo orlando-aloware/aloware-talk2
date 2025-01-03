@@ -46,7 +46,7 @@
                        variant="primary"
                        data-testid="inbox-channels-filter-badge"
                        v-if="hasChannelFilterChanges"
-                       v-b-modal:inbox-channel-filter-modal>
+                       v-b-modal:comms-channel-filter-modal>
                 {{ changedFilterFieldCount }}
               </b-badge>
             </div>

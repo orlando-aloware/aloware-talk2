@@ -13,7 +13,7 @@
              variant="primary"
              data-testid="inbox-channels-filter-badge"
              v-if="hasChannelFilterChanges"
-             v-b-modal:inbox-channel-filter-modal>
+             v-b-modal:comms-channel-filter-modal>
       {{ changedFilterFieldCount }}
     </b-badge>
 
@@ -61,20 +61,7 @@ export default {
 
   },
   props: {
-    filterType: {
-      type: String,
-      required: false,
-      default () {
-        return DEFAULT_COMMUNICATIONS_CHANNEL === this.$route.params.channel && this.$route.query?.tagId
-          ? 'all'
-          : 'call'
-      }
-    },
-    answerStatus: {
-      type: String,
-      required: false,
-      default: 'all'
-    }
+
   },
   computed: {
     ...mapState('communications', [
@@ -91,6 +78,26 @@ export default {
       'channelChangedFilterFields',
       'appliedFilter'
     ]),
+    filterType () {
+      if (this.activeChannel?.type) {
+        return this.activeChannel?.type
+      }
+      return DEFAULT_COMMUNICATIONS_CHANNEL === this.$route.params.channel && this.$route.query?.tagId
+        ? 'all'
+        : 'call'
+    },
+    answerStatus () {
+      if (this.activeChannel?.answerStatus) {
+        return this.activeChannel?.answerStatus
+      }
+      return 'all'
+    },
+    channel () {
+      if (this.activeChannel?.value) {
+        return this.activeChannel?.value
+      }
+      return 'calls'
+    },
     changedFilterFieldCount () {
       const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
 
@@ -253,7 +260,8 @@ export default {
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
       'setInboxShowUnreads',
-      'setInboxFilters' */
+       */
+      'setInboxFilters',
       'setChannelClonedFilter',
       'setFilterDialogForView',
       'setIsEditingView',
@@ -342,9 +350,9 @@ export default {
 
       sessionStorage.setItem('date-selected', 'Last 30 Days')
       // TODO: reset filters
-      // this.resetFilters()
+      this.resetFilters()
       this.setSelectedFilter(null)
-      // this.getCommunications(this.filter)
+      this.getCommunications(this.filter)
     },
 
     resetFilters () {
@@ -385,6 +393,16 @@ export default {
       this.setInboxFilters(null)
     }
 
+  },
+
+  watch: {
+    filter: {
+      handler (newVal) {
+        this.setInboxFilters(newVal)
+      },
+      deep: true,
+      immediate: true
+    }
   }
 }
 </script>

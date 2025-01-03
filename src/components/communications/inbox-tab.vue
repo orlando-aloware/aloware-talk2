@@ -57,7 +57,7 @@
                        class="ml-1 fs-12"
                        variant="primary"
                        data-testid="inbox-tab-applied-filter-badge"
-                       v-b-modal:inbox-channel-filter-modal>
+                       v-b-modal:comms-channel-filter-modal>
                 {{ changedFilterFieldCount }}
               </b-badge>
             </div>
