@@ -1,12 +1,12 @@
 <template>
-  <b-modal id="inbox-channel-filter-modal"
-           ref="inboxChannelFilterModal"
-           size="lg"
+  <b-modal size="lg"
            modal-class="confirm-dialog"
            hide-header-close
            hide-header
            hide-footer
            data-testid="filter-dialog-modal"
+           id="inbox-channel-filter-modal"
+           ref="inboxChannelFilterModal"
            v-model="isOpen"
            @hidden="onHidden"
            @show="onShow"
@@ -161,18 +161,18 @@
 </template>
 
 <script>
-import FilterForm from 'components/inbox/inbox-filters/filter-form'
+import FilterForm from 'components/communications/communications-filters/filter-form'
 import { mapActions, mapState } from 'vuex'
 import CompactBtn from 'components/compact-btn'
 import talk2Api from 'src/plugins/api/api'
-import FilterListItems from 'components/inbox/inbox-filters/filter-list-items'
+import FilterListItems from 'components/communications/communications-filters/filter-list-items'
 import CheckOIcon from 'components/icons/check-o-icon'
 import CloseIcon from 'components/icons/close-icon'
 import _ from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as Filters from 'src/constants/filters'
-import { inboxMixin } from 'src/plugins/mixins'
+import { communicationsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'filter-dialog',
@@ -186,7 +186,7 @@ export default {
   },
 
   mixins: [
-    inboxMixin
+    communicationsMixin
   ],
 
   props: {
@@ -290,7 +290,7 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', [
+    ...mapState('communications', [
       'channelChangedFilterFields',
       'selectedFilter',
       'isFilterDialogShown',
@@ -439,7 +439,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', [
+    ...mapActions('communications', [
       'toggleFilterModelForm',
       'setSelectedFilter',
       'setAppliedFilter',

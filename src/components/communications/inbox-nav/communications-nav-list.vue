@@ -5,19 +5,19 @@
     <nav-item badge-value="20"
               badge-color="danger"
               data-testid="inbox-nav-list-nav-item"
-              :key="item.name"
               :label="item.label"
               :value="item.value"
               :icon="item.icon"
               :group="item.group"
-              :isActive="isActive(item.value)"
+              :is-active="isActive(item.value)"
               :closed="closed"
               :badge="true"
-              :openCount="openCount"
+              :open-count="openCount"
               :pending-count="pendingCount"
               :disabled="item.disabled"
               :tooltip="item.tooltip"
               v-for="item in communicationsChannels"
+              :key="item.name"
               @click="onItemClicked" />
 
     <hr>
@@ -30,13 +30,13 @@
                 data-testid="inbox-nav-list-nav-item"
                 :group="true">
         <template #action-icon>
-            <q-btn id="edit-views-icon"
-                   class="mr-3 cursor-pointer"
-                   icon="edit"
-                   size="xs"
-                   flat
-                   data-testid="inbox-nav-list-nav-item-btn"
-                   @click="onShowViewsList"/>
+          <q-btn class="mr-3 cursor-pointer"
+                 icon="edit"
+                 size="xs"
+                 flat
+                 data-testid="inbox-nav-list-nav-item-btn"
+                 id="edit-views-icon"
+                 @click="onShowViewsList" />
         </template>
       </nav-item>
 
@@ -45,20 +45,20 @@
                 :value="`view-${view.filter_id}`"
                 :label="view.filter.name"
                 :is-active="isActive(view, 'view')"
-                :key="`${view.filter.name}-${index}`"
                 data-testid="inbox-nav-list-nav-item"
                 v-for="(view, index) in pinnedViews"
+                :key="`${view.filter.name}-${index}`"
                 @click="onItemClicked" />
 
-        <div class="py-3 text-center text-13 text-word-wrap"
-             v-if="pinnedViews.length < 1">
-          <span data-testid="inbox-nav-list-no-pinned-views">No Pinned Filters</span>
-        </div>
+      <div class="py-3 text-center text-13 text-word-wrap"
+           v-if="pinnedViews.length < 1">
+        <span data-testid="inbox-nav-list-no-pinned-views">No Pinned Filters</span>
+      </div>
 
       <communications-views target="#edit-views-icon"
                             :views="allInboxFilters"
                             data-testid="inbox-nav-list-inbox-views"
-                            @closed="onCloseViewsList"/>
+                            @closed="onCloseViewsList" />
     </div>
   </div>
 </template>
@@ -302,12 +302,6 @@ export default {
       this.setIsFirstLoad(true)
 
       if (!this.activeChannel) {
-        return
-      }
-
-      if (this.activeChannel.value === nextActive && this.$q.screen.lt.md) {
-        this.$emit('toInbox')
-
         return
       }
 

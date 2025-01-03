@@ -44,12 +44,6 @@ export default function () {
         answerStatus: 'all'
       },
       {
-        label: 'Mentions',
-        value: 'mentions',
-        icon: 'mention',
-        disabled: false
-      },
-      {
         label: 'Voicemails',
         value: 'voicemails',
         icon: 'voicemail',
@@ -64,7 +58,14 @@ export default function () {
         disabled: false,
         type: 'call',
         answerStatus: 'recorded'
+      }
+      /* {
+        label: 'Mentions',
+        value: 'mentions',
+        icon: 'mention',
+        disabled: false
       },
+
       {
         label: 'My Personal Line',
         value: 'my-personal-line',
@@ -72,7 +73,7 @@ export default function () {
         disabled: false,
         type: 'all',
         answerStatus: 'all'
-      }
+      } */
     ],
     communications: [],
     communicationsCount: 0,
