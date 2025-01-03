@@ -98,8 +98,7 @@ export default {
       try {
         await talk2Api.V1.transcription.generateTranscription(communicationId)
       } catch (error) {
-        const errorMessage =
-          error.response?.data?.message || 'Failed to start transcription generation.'
+        const errorMessage = error.response?.data?.message || 'Failed to start transcription generation.'
         this.$generalNotification(errorMessage, 'error')
         this.setGeneratingStatus({ communicationId, status: false })
       }
