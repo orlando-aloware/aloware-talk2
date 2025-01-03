@@ -15887,7 +15887,7 @@ hr {
     }
 
     thead tr:first-child th {
-      top: 0;
+      top: -16px; // padding height
       z-index: 1;
     }
 

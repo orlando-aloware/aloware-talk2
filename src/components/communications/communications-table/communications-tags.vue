@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column truncate-chip-labels">
+  <div class="d-flex flex-column">
     <span class="d-flex align-items-center cursor-pointer text-primary"
           :id="`comm-tag-${_uid}`">
       <add-icon-circle height="14"
