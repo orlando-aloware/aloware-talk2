@@ -890,9 +890,8 @@
             </span>
           </div>
         </div>
-        <div class="text-left-align text-13"
+        <div class="text-left-align text-15"
              v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
-          <q-icon name="error" color="red" size="md" />
           <div>Transcription generation failed. Please try again later. </div>
           <generate-transcription-button class="mr-2"
                                          variant="button"
