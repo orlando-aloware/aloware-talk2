@@ -26,12 +26,12 @@ import * as SummaryStatus from 'src/constants/summary-status'
 export default {
   name: 'generate-summary-button',
 
-  data() {
+  data () {
     return {
       SummaryStatus
     }
   },
-  
+
   props: {
     communication: {
       type: Object,
@@ -48,9 +48,9 @@ export default {
   },
 
   computed: {
-    isSummarizationAllowed() {
+    isSummarizationAllowed () {
       return this.communication.has_transcription &&
-             ![SummaryStatus.STATUS_QUEUED, SummaryStatus.STATUS_PROCESSING].includes(this.communication.call_summary_status);
+             ![SummaryStatus.STATUS_QUEUED, SummaryStatus.STATUS_PROCESSING].includes(this.communication.call_summary_status)
     }
   },
 

@@ -94,7 +94,7 @@ export default {
     })
   },
 
-  beforeDestroy() {
+  beforeDestroy () {
     this.$VueEvent.stop('update_communication')
   },
 

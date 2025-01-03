@@ -40,7 +40,7 @@ import { mapGetters, mapActions } from 'vuex'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import talk2Api from 'src/plugins/api/api'
 import { communicationInfoMixin } from 'src/plugins/mixins'
-import * as TranscriptionStatus from 'src/constants/transcription-status';
+import * as TranscriptionStatus from 'src/constants/transcription-status'
 
 export default {
   name: 'generate-transcription-button',
@@ -59,7 +59,7 @@ export default {
 
   mixins: [communicationInfoMixin],
 
-  data() {
+  data () {
     return {
       TranscriptionStatus
     }
@@ -74,14 +74,14 @@ export default {
       isGenerating: 'isGenerating'
     }),
 
-    isTranscriptionAllowed() {
+    isTranscriptionAllowed () {
       return this.communication.is_eligible_for_transcribe &&
              this.showAudio(this.communication) &&
              ![TranscriptionStatus.STATUS_CREATED,
                TranscriptionStatus.STATUS_PROCESSING,
                TranscriptionStatus.STATUS_COMPLETED,
                TranscriptionStatus.STATUS_PARSED
-             ].includes(this.communication.call_transcription_status);
+             ].includes(this.communication.call_transcription_status)
     }
   },
 
