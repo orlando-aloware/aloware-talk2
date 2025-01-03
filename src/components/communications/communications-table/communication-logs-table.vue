@@ -57,7 +57,7 @@
             </div>
 
             <div v-else-if="col.name === 'ring_group'">
-              {{ getRingGroupName(props.row) }}
+              <ring-group :row="props.row" />
             </div>
 
             <div v-else-if="col.name === 'created_at'">
@@ -231,6 +231,7 @@ import StartTime from './start-time.vue'
 import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
 import workflowsMixin from 'src/plugins/mixins/workflows.mixin'
 import CommunicationsOperations from './communications-operations.vue'
+import RingGroup from './ring-group.vue'
 import Disposition from './disposition.vue'
 import TalkTime from './talk-time.vue'
 import Duration from './duration.vue'
@@ -276,6 +277,7 @@ export default {
     CommunicationTableSettings,
     CommunicationsTags,
     CommunicationsTeams,
+    RingGroup,
     Disposition,
     StartTime,
     TalkTime,
@@ -577,11 +579,6 @@ export default {
     changeTableSettingsVisibility (value) {
       this.showColumnHeadersModal = value
       this.$emit('change-column-headers-modal', value)
-    },
-
-    getRingGroupName (row) {
-      const rg = this.getRingGroup(row.ring_group_id)
-      return rg ? rg.name : '-'
     },
 
     updatePaginationButtons () {
