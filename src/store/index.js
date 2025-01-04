@@ -18,6 +18,7 @@ import broadcast from './broadcast'
 import wallboard from './wallboard'
 import tagsModule from './tags'
 import accountRegistration from './account-registration'
+import listsModule from './lists'
 import API from '../plugins/api/api'
 import * as storage from '../plugins/helpers/storage'
 import * as DefaultCachePaths from 'src/constants/default-cache'
@@ -48,7 +49,8 @@ export default function (/* { ssrContext } */) {
       wallboard,
       cache,
       tagsModule,
-      accountRegistration
+      accountRegistration,
+      listsModule
     },
 
     state: {
@@ -64,6 +66,7 @@ export default function (/* { ssrContext } */) {
       workflows: [],
       changelogs: [],
       broadcasts: [],
+      lists: [],
       dispositionStatuses: [],
       callDispositions: [],
       activityTypes: [],
@@ -509,6 +512,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_BROADCASTS', broadcasts)
       },
 
+      setLists ({ commit }, lists) {
+        commit('SET_LISTS', lists)
+      },
+
       setTemplates ({ commit }, templates) {
         commit('SET_TEMPLATES', templates)
       },
@@ -597,6 +604,7 @@ export default function (/* { ssrContext } */) {
           commit('wallboard/RESET_VUEX', null, { root: true })
           commit('tagsModule/RESET_VUEX', null, { root: true })
           commit('broadcast/RESET_VUEX', null, { root: true })
+          commit('lists/RESET_VUEX', null, { root: true })
         }
       },
 
@@ -1225,6 +1233,10 @@ export default function (/* { ssrContext } */) {
 
       SET_BROADCASTS (state, broadcasts) {
         state.broadcasts = broadcasts
+      },
+
+      SET_LISTS (state, lists) {
+        state.lists = lists
       },
 
       NEW_FILTER (state, filter) {
