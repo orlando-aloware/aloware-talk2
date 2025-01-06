@@ -94,7 +94,7 @@ export default {
     },
     // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
     filteredSalesBots () {
-      let bots = this.bots.filter((bot) => bot.use_case === AloAi.USE_CASES.SALES)
+      let bots = this.bots.filter((bot) => bot.use_case === AloAi.USE_CASE_SALES)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())

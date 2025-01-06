@@ -5,11 +5,11 @@ export default _.merge({
   methods: {
     formatUseCase (useCase) {
       switch (useCase) {
-        case AloAi.USE_CASES.SALES:
+        case AloAi.USE_CASE_SALES:
           return 'Sales'
-        case AloAi.USE_CASES.QUESTION_AND_ANSWER:
+        case AloAi.USE_CASE_QUESTION_AND_ANSWER:
           return 'Q&A'
-        case AloAi.USE_CASES.SUPPORT:
+        case AloAi.USE_CASE_SUPPORT:
           return 'Support'
         default:
           return 'Unknown'
@@ -18,9 +18,9 @@ export default _.merge({
     useCaseColor (status) {
       return (
         {
-          [AloAi.USE_CASES.SALES]: 'green-6',
-          [AloAi.USE_CASES.SUPPORT]: 'blue-gray-6',
-          [AloAi.USE_CASES.QUESTION_AND_ANSWER]: 'orange-6'
+          [AloAi.USE_CASE_SALES]: 'green-6',
+          [AloAi.USE_CASE_SUPPORT]: 'blue-gray-6',
+          [AloAi.USE_CASE_QUESTION_AND_ANSWER]: 'orange-6'
         }[status] || 'black'
       )
     }

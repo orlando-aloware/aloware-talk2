@@ -276,7 +276,7 @@ export default {
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots({
           enabled: true,
-          use_case: AloAi.USE_CASES.SALES,
+          use_case: AloAi.USE_CASE_SALES,
           type: AloAi.TYPE_TEXT
         })
         return data?.data ?? []
