@@ -72,6 +72,14 @@ export default {
           this.$emit('updateGenerating', false)
         })
     }, 1000)
+  },
+
+  watch: {
+    'communication.call_summary_status': function (newStatus) {
+      if (newStatus === SummaryStatus.STATUS_FAILED) {
+        this.$emit('updateGenerating', false)
+      }
+    }
   }
 }
 </script>

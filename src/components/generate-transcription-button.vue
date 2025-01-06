@@ -103,6 +103,14 @@ export default {
         this.setGeneratingStatus({ communicationId, status: false })
       }
     }
+  },
+
+  watch: {
+    'communication.call_transcription_status': function (newStatus) {
+      if (newStatus === TranscriptionStatus.STATUS_ERROR) {
+        this.setGeneratingStatus({ communicationId: this.communication.id, status: false })
+      }
+    }
   }
 }
 </script>
