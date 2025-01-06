@@ -1,8 +1,9 @@
 <template>
   <div class="inbox-nav-list h-100 overflow-x-hidden"
        data-testid="inbox-nav-list-wrapper"
+       :class="{'inbox-nav-list--closed': closed}"
        id="communications-nav-list"
-       :class="{'inbox-nav-list--closed': closed}">
+  >
     <nav-item badge-value="20"
               badge-color="danger"
               data-testid="inbox-nav-list-nav-item"

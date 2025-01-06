@@ -33,9 +33,9 @@
                    @applyFilter="onApplyFilter"
                    @onResetFilter="resetFilters" />
 
-    <!--
-      <create-filter-dialog :filter-model="newFilterModel" data-testid="comms-channels-create-filter-dialog"/>
-    -->
+    <create-filter-dialog :filter-model="newFilterModel"
+                          data-testid="comms-channels-create-filter-dialog"
+                          @created="afterCreatedNewFilter" />
   </div>
 </template>
 <script>
@@ -44,6 +44,8 @@ import _ from 'lodash'
 import { mapState, mapActions, mapGetters } from 'vuex'
 import CompactBtn from 'src/components/compact-btn'
 import FilterDialog from 'components/communications/communications-filters/filter-dialog'
+import CreateFilterDialog from 'components/communications/communications-filters/create-filter-dialog'
+
 import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 import { communicationsMixin } from 'src/plugins/mixins'
 
@@ -55,8 +57,8 @@ export default {
   ],
   components: {
     CompactBtn,
-    FilterDialog
-
+    FilterDialog,
+    CreateFilterDialog
   },
   props: {
 
@@ -126,7 +128,13 @@ export default {
   },
   data () {
     return {
-      filter: null
+      filter: null,
+      newFilterModel: {
+        name: '',
+        type: 2,
+        filter: [],
+        scope: 'user'
+      }
     }
   },
   mounted () {
@@ -232,6 +240,10 @@ export default {
       */
       this.newFilterModel = { ...this.newFilterModel, filter: filter, type: filterType }
       this.toggleFilterModelForm(true)
+    },
+
+    afterCreatedNewFilter (filter) {
+      this.setSelectedFilter(filter)
     },
 
     onResetFilters () {

@@ -12,7 +12,8 @@
             <b-col sm="12"
                    md="6">
               <b-form-group class="form-label"
-                            data-testid="filter-form-quick-access-form-group">
+                            data-testid="filter-form-quick-access-form-group"
+              >
                 <template v-slot:label>
                   <span>{{ dateRangeLabel }}</span>
                   <span class="pl-1"
@@ -41,6 +42,11 @@
                     {{ getDateRangeInputLabel(picker) }}
                   </template>
                 </date-range-picker>
+                <span class="small text-ligth"
+                      v-if="filter.from_date"
+                >
+                  {{ dateInCompanyTimezone(filter.from_date) }} - {{ dateInCompanyTimezone(filter.to_date) }}
+                </span>
               </b-form-group>
             </b-col>
             <b-col sm="12"
@@ -468,13 +474,15 @@ import { communicationsRoutesMixin, userMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import moment from 'moment'
 import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
+import companyTimezoneMixin from 'src/plugins/mixins/company-timezone.mixin'
 
 export default {
   name: 'FilterForm',
 
   mixins: [
     communicationsRoutesMixin,
-    userMixin
+    userMixin,
+    companyTimezoneMixin
   ],
 
   components: {
