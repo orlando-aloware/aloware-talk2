@@ -4,7 +4,8 @@
         v-if="communication.contact && communication.type !== CommunicationTypes.EMAIL"
         @click="callContact">
     <call-o-icon height="16"
-               width="16" />
+                 width="16"
+                 color="#62666E"/>
 
     <q-tooltip>
       Call Back
