@@ -1,12 +1,13 @@
 <template>
   <div class="d-flex justify-content-center context-menu">
-    <reply-communication-button custom-class="operation-button mx-1"
+    <reply-communication-button class="operation-button mx-1"
                                 :communication="row" />
 
-    <call-communication-button custom-class="operation-button mx-1"
+    <call-communication-button class="operation-button mx-1"
                                :communication="row" />
 
-<!--    <operation-info :communication="row" />-->
+    <details-communication-button class="operation-button mx-1"
+                                  :communication="row" />
 
 <!--    <operation-archive :communication="row" />-->
 
@@ -21,13 +22,15 @@
 <script>
 import ReplyCommunicationButton from 'components/communication/reply-communication-button.vue'
 import CallCommunicationButton from 'components/communication/call-communication-button.vue'
+import DetailsCommunicationButton from 'components/communication/details-communication-button.vue'
 
 export default {
   name: 'CommunicationsOperations',
 
   components: {
     ReplyCommunicationButton,
-    CallCommunicationButton
+    CallCommunicationButton,
+    DetailsCommunicationButton
   },
 
   props: {

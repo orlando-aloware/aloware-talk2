@@ -1,6 +1,5 @@
 <template>
   <span class="cursor-pointer"
-        :class="customClass"
         data-testid="comm-reply-button"
         v-if="communication.type === CommunicationTypes.SMS && hasPermissionTo('send sms')"
         @click="goToContactPage">
@@ -34,11 +33,6 @@ export default {
     communication: {
       type: Object,
       required: true
-    },
-
-    customClass: {
-      type: String,
-      default: ''
     }
   },
 

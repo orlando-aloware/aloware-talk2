@@ -35,11 +35,6 @@ export default {
     communication: {
       type: Object,
       required: true
-    },
-
-    customClass: {
-      type: String,
-      default: ''
     }
   },
 
