@@ -121,7 +121,7 @@
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        Lists
+        LML
       </span>
     </q-btn>
     <q-btn :to="{ path: '/lists' }"
@@ -136,12 +136,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Lists</span>
+        <span class="font-weight-bold text-sm">LML</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        Lists
+        LML
       </span>
     </q-btn>
 

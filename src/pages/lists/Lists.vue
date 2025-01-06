@@ -1,127 +1,81 @@
 <template>
-  <div class="h-100">
-    <div class="lists__home position-relative d-flex flex-column h-100">
-      <div class="lists__home__table flex-grow-1">
-        <div class="lists__home__table flex-grow-1">
-          <datatable class="h-100"
-                     ref="listsTable"
-                     use-empty-slot
-                     :sticky-headers="true"
+  <div class="lists-container flex-grow-1 d-flex flex-column">
+    <div class="count  pl-3">
+      <strong v-if="!isLoading">{{ listsCount }} Lists</strong>
+      <q-spinner-bars class="mr-1"
+                      color="primary"
+                      size="14px"
+                      v-else />
+    </div>
+
+    <q-table class="lists-table flex-grow-1"
+             row-key="index"
+             virtual-scroll
+             :data="listsData"
                      :columns="fixedColumns"
-                     :is-empty="isListsTableEmpty"
-                     :show-select-all="false"
-                     :paginated="true"
-                     :show-pagination="true"
-                     :last-page="pagination.totalPages"
-                     :current-page="pagination.currentPage"
-                     :total-rows="listsCount"
-                     :loading="loading">
-            <template slot="tbody">
-              <tr :key="rowIndex"
-                  v-for="(row, rowIndex) in lists">
-                <template v-for="(col, colIndex) in fixedColumns">
-                  <td :key="`c-${colIndex}`"
-                      v-if="col.name === 'name'">
-                    <span>
-                      {{ row['name'] }}
-                      <q-tooltip anchor="top middle"
-                                 self="top end"
-                                 :offset="[0, 40]"
-                                 v-if="row['name'].length > 54">
-                        {{ row['name'] }}
-                      </q-tooltip>
+             :loading="isLoadingMore || isLoading"
+             :virtual-scroll-item-size="100"
+             :virtual-scroll-sticky-size-start="100"
+             :pagination="pagination"
+             :rows-per-page-options="[0]"
+             @virtual-scroll="onScroll">
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td :props="props"
+                :key="col.name"
+                v-for="col in props.cols">
+            <div v-if="col.name === 'name'">
+              {{ props.row.name }}
+            </div>
+            <div v-else-if="col.name === 'date_created'">
+              <relative-time humanized
+                             :from-time="props.row[col.field]" />
+            </div>
+            <div v-else-if="col.name === 'no_of_contacts'">
+              {{ props.row.no_of_contacts }}
+            </div>
+            <div v-else-if="col.name === 'type'">
+              {{ getContactListType(props.row) }}
+            </div>
+            <div v-else-if="col.name === 'show_in_public_folder'">
+              {{ props.row.show_in_public_folder }}
+            </div>
+            <div v-else-if="col.name === 'source'">
+              <span v-if="props.row.source_name">
+                {{ props.row.source_name | ucwords }}
                     </span>
-                  </td>
-
-                  <td :key="`c-${colIndex}`"
-                      v-else-if="col.name === 'date_created'">
-                    <relative-time humanized
-                                   :from-time="row[col.field]" />
-                  </td>
-
-                  <td :key="`c-${colIndex}`"
-                      v-else-if="col.name === 'no_of_contacts'">
-                    {{ row[col.field] }}
-                  </td>
-
-                  <td :key="`c-${colIndex}`"
-                      v-else-if="col.name === 'type'">
-                    {{ getContactListType(row) }}
-                  </td>
-
-                  <td :key="`c-${colIndex}`"
-                      v-else-if="col.name === 'show_in_public_folder'">
-                    {{ row[col.field] }}
-                  </td>
-
-                  <td :key="`c-${colIndex}`"
-                      v-else-if="col.name === 'source'">
-                    {{ row[col.field] }}
-                  </td>
-
-                  <td :key="`c-${colIndex}`"
-                      v-else-if="col.name === 'import_status'">
-                    {{ row[col.field] }}
-                  </td>
-
-                  <td :key="`c-${colIndex}`"
-                      v-else-if="col.name === 'imported_at'">
-                      <relative-time humanized
-                                     :from-time="row[col.field]"
-                                     v-if="row[col.field]" />
                       <span v-else>-</span>
-                  </td>
-
-                  <td :key="`c-${colIndex}`"
-                    :class="col.stickyRight ? 'sticky-right' : ''"
-                    v-else-if="col.field === 'actions'">
-                    <div class="context-menu keep-visible">
-                      <b-dropdown class="position-absolute"
-                                  size="sm"
-                                  container="body"
-                                  right
-                                  :style="{ 'margin-top': '-0.9rem', right: '0.5rem' }"
-                                  :id="getContextMenuTargetElementId(row)"
-                                  @show="onContextMenuShow(row)"
-                                  @hide="onContextMenuHide(row)">
-                        <template #button-content>
-                          <ellipse-icon/>
-                        </template>
-                        <b-dropdown-item dense
-                                        clickable
-                                        :key="id"
-                                        :disabled="!shouldAllowContextMenuButton(item, row)"
-                                        v-for="(item, id) in contextMenuListItemsForSelectedRow"
-                                        @click="onContextMenuButtonClicked(item, row)">
-                          <div class="d-flex align-items-center">
-                            <template v-if="item.name === 'delete'">
-                              <delete-red-icon class="mr-2" />
-                            </template>
-                            <template v-else>
-                              <img class="mr-2"
-                                  :src="`app-icons/menu/${item.icon}`" />
-                            </template>
-                            <span :class="[item.name === 'delete' ? 'text-danger' : '']">
-                              {{ item.label }}
+            </div>
+            <div v-else-if="col.name === 'import_status'">
+              <span v-if="props.row.import_status_name">
+                {{ props.row.import_status_name | ucwords }}
                             </span>
+              <span v-else>-</span>
                           </div>
-                        </b-dropdown-item>
-                      </b-dropdown>
+            <div v-else-if="col.name === 'imported_at'">
+              <relative-time humanized
+                             :from-time="props.row[col.field]"
+                             v-if="props.row[col.field]" />
+              <span v-else>-</span>
                     </div>
-                  </td>
+          </q-td>
+        </q-tr>
                 </template>
-              </tr>
-            </template>
-            <template #empty>
-              <div class="lists__home__table--empty"
-                  v-if="isListsTableEmpty && !loading">
-                <div class="h5 px-2 text-center">No data</div>
+
+      <template v-slot:loading>
+        <div class="d-flex justify-center">
+          <q-spinner-bars color="primary"
+                          size="30px" />
               </div>
             </template>
-          </datatable>
+
+      <template v-slot:no-data>
+        <div class="w-100 text-center"
+             v-if="!isLoadingMore && !isLoading">
+          <h2> No data </h2>
         </div>
-      </div>
-    </div>
+      </template>
+    </q-table>
   </div>
 </template>
 
