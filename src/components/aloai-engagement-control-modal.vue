@@ -88,6 +88,7 @@ import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
 import { aloaiMixin } from 'src/plugins/mixins'
+import * as AloAi from 'src/constants/aloai'
 
 export default {
   name: 'aloai-engagement-control-modal',
@@ -99,7 +100,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact']),
     filteredBots () {
-      let bots = this.bots
+      let bots = this.bots.filter((bot) => bot.type === AloAi.TYPE_TEXT)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -119,7 +120,8 @@ export default {
       bot_engagements: {},
       searchText: '',
       isLoading: true,
-      selectedBotId: null
+      selectedBotId: null,
+      AloAi
     }
   },
 

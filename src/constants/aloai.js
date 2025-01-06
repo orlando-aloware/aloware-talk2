@@ -4,5 +4,5 @@ export const USE_CASES = {
   SUPPORT: 3
 }
 
-export const TYPE_TEXT = 'text'
-export const TYPE_VOICE = 'voice'
+export const TYPE_TEXT = 1
+export const TYPE_VOICE = 2
