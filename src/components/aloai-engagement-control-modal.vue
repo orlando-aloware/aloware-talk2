@@ -100,7 +100,7 @@ export default {
   computed: {
     ...mapGetters('contacts', ['contact']),
     filteredBots () {
-      let bots = this.bots.filter((bot) => bot.type === AloAi.TYPE_TEXT)
+      let bots = this.bots
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -238,7 +238,10 @@ export default {
         if (this.bots.length > 0) {
           return this.bots
         }
-        const { data } = await talk2Api.V2.aloAiBot.getBots()
+        const { data } = await talk2Api.V2.aloAiBot.getBots({
+          enabled: true,
+          type: AloAi.TYPE_TEXT
+        })
         return data?.data ?? []
       } catch (error) {
         console.error('[fetchBots] error', error)

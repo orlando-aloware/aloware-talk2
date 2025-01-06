@@ -123,6 +123,7 @@ import talk2Api from 'src/plugins/api/api'
 import { mapGetters, mapState } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
+import * as AloAi from 'src/constants/aloai'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 
 export default {
@@ -151,7 +152,7 @@ export default {
     ]),
     ...mapState(['isDatatableSelectedAll']),
     filteredBots () {
-      let bots = this.bots.filter((bot) => bot.type === AloAi.TYPE_TEXT)
+      let bots = this.bots
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -275,7 +276,8 @@ export default {
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots({
           enabled: true,
-          use_case: 1
+          use_case: AloAi.USE_CASES.SALES,
+          type: AloAi.TYPE_TEXT
         })
         return data?.data ?? []
       } catch (error) {
