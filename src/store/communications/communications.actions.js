@@ -116,11 +116,17 @@ export default {
   setPinnedViews: ({ commit }, value) => {
     commit('SET_PINNED_VIEWS', value)
   },
-  setInboxPersonalFilters: ({ commit }, value) => {
-    commit('SET_INBOX_PERSONAL_FILTERS', value)
+  setPersonalFilters: ({ commit }, value) => {
+    commit('SET_PERSONAL_FILTERS', value)
   },
-  setInboxCompanyFilters: ({ commit }, value) => {
-    commit('SET_INBOX_COMPANY_FILTERS', value)
+  setCompanyFilters: ({ commit }, value) => {
+    commit('SET_COMPANY_FILTERS', value)
+  },
+  setIsDeletingFilter: ({ commit }, value) => {
+    commit('SET_IS_DELETING_FILTER', value)
+  },
+  setIsUpdatingFilter: ({ commit }, value) => {
+    commit('SET_IS_UPDATING_FILTER', value)
   },
   setIsEditingView: ({ commit }, value) => {
     commit('SET_IS_EDITING_VIEW', value)

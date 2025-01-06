@@ -34,55 +34,12 @@
                 </div>
               </div>
             </div>
-            <h5 class="text-uppercase filter-group-title"
-                data-testid="filter-dialog-personal-filter-title">
-              Personal Filters
-            </h5>
-            <div class="saved-filters">
-              <q-skeleton type="rect"
-                          v-if="isGettingFilters"
-                          data-testid="filter-dialog-skeleton" />
-              <p class="text-muted fs-12 empty-filter-placeholder pl-2"
-                 v-show="!isGettingFilters"
-                 v-if="personalFilters.length < 1"
-                 data-testid="filter-dialog-none-p">
-                None
-              </p>
-              <filter-list-items :key="item.id"
-                                 :filter="item"
-                                 v-for="item in personalFilters"
-                                 data-testid="filter-dialog-filter-list-items"
-                                 @filterSelected="onSelectFilter"
-                                 @filterRename="onRenameFilter"
-                                 @filterDelete="(e) => onDeleteFilter(e, item)">
-              </filter-list-items>
-            </div>
-            <h5 class="text-uppercase filter-group-title mt-4">Company Filters</h5>
-            <div class="saved-filters">
-              <q-skeleton type="rect"
-                          data-testid="filter-dialog-skeleton"
-                          v-if="isGettingFilters"/>
-              <p class="text-muted fs-12 empty-filter-placeholder pl-2"
-                 v-show="!isGettingFilters"
-                 v-if="companyFilters.length < 1">
-                None
-              </p>
-
-              <div class="filter-items cursor-pointer"
-                   :class="getFilterItemClass(item)"
-                   :key="item.id"
-                   v-for="item in companyFilters"
-                   data-testid="filter-dialog-select-filter"
-                   @click="onSelectFilter(item)">
-                <span>
-                  <q-tooltip anchor="top middle"
-                             self="center middle">
-                    {{ item.name }}
-                  </q-tooltip>
-                  {{ item.name }}
-                </span>
-              </div>
-            </div>
+            <saved-filters :filter-type="filterTypeForGetSavedFilters"
+                           :current-tags="filter?.tags || []"
+                           :fetch-filters="fetchSavedFilters"
+                           @filters-fetched="fetchSavedFilters = false"
+                           @filterSelected="(item) => onSelectFilter(item)"
+            />
           </div>
         </div>
       </div>
@@ -170,7 +127,7 @@ import FilterForm from 'components/communications/communications-filters/filter-
 import { mapActions, mapState } from 'vuex'
 import CompactBtn from 'components/compact-btn'
 import talk2Api from 'src/plugins/api/api'
-import FilterListItems from 'components/communications/communications-filters/filter-list-items'
+import SavedFilters from 'components/communications/communications-filters/saved-filters'
 import CheckOIcon from 'components/icons/check-o-icon'
 import CloseIcon from 'components/icons/close-icon'
 import _ from 'lodash'
@@ -186,7 +143,7 @@ export default {
     CloseIcon,
     CompactBtn,
     FilterForm,
-    FilterListItems,
+    SavedFilters,
     CheckOIcon
   },
 
@@ -210,11 +167,7 @@ export default {
   data () {
     return {
       isRenaming: false,
-      isDeletingFilter: false,
-      isUpdatingFilter: false,
-      isGettingFilters: false,
-      personalFilters: [],
-      companyFilters: [],
+      fetchSavedFilters: false,
       filterToEdit: null,
       filter: {},
       clonedFilter: {},
@@ -270,28 +223,14 @@ export default {
     this.toggleFilterDialog()
 
     this.$VueEvent.listen('channel_filter_created', filter => {
-      if (filter.is_on_company) {
-        this.companyFilters.push(filter)
-        return
-      }
-
-      // add to personal filters of currently selected channel
-      if (filter.type === this.filterModel.type) {
-        this.personalFilters.push(filter)
-      }
-
-      // update inbox views popup list
-      const exists = this.inboxPersonalFilters.find(item => +item.id === +filter.id)
-      if (filter.type === ChannelType.CHANNEL_INBOX && !exists) {
-        this.inboxPersonalFilters.push(filter)
-      }
+      this.fetchSavedFilters = true
     })
 
-    this.$VueEvent.listen('my_contacts_update_filter', () => {
-      this.filter = { ...this.appliedFilter.filter }
-      this.filter.my_contact = +this.inboxShowMyContacts
-      this.onApply(true)
-    })
+    // this.$VueEvent.listen('my_contacts_update_filter', () => {
+    //  this.filter = { ...this.appliedFilter.filter }
+    //  this.filter.my_contact = +this.inboxShowMyContacts
+    //  this.onApply(true)
+    // })
   },
 
   computed: {
@@ -309,8 +248,9 @@ export default {
       'pinnedViews',
       'isFilterDialogForView',
       'isEditingView',
+      'isUpdatingFilter',
       'activeChannel',
-      'inboxPersonalFilters'
+      'personalFilters'
     ]),
 
     isOpen: {
@@ -422,6 +362,12 @@ export default {
       }
 
       return this.filterModel
+    },
+
+    filterTypeForGetSavedFilters () {
+      return this.filterModel.type === ChannelType.CHANNEL_RECORDINGS
+        ? ChannelType.CHANNEL_CALLS
+        : this.filterModel.type
     }
   },
 
@@ -439,12 +385,11 @@ export default {
       'setInboxShowUnreads',
       'setPinnedViews',
       'setFilterDialogForView',
-      'setFilterDialogForView',
+      'setIsUpdatingFilter',
       'setInboxPersonalFilters',
       'setShowViewsList'
     ]),
 
-    ...mapActions(['setTags']),
     ...mapActions(['setIsFirstLoad']),
 
     hideModal () {
@@ -475,10 +420,8 @@ export default {
 
     onShow () {
       this.setShowViewsList(false)
-      this.personalFilters = []
-      this.companyFilters = []
+      this.fetchSavedFilters = true
       this.filterFields = Object.keys(this.loadedDefaultFilterModel.filter)
-      this.getFilters()
 
       // if not editing a certain view, set default group filter for elements
       if (this.isFilterDialogForView && !this.isEditingView) {
@@ -535,11 +478,11 @@ export default {
       this.reset = false
       this.resetChannelChangedFilterFields()
 
-      const unreadsFilter = _.get(this.filter, 'unread_only', null)
+      // const unreadsFilter = _.get(this.filter, 'unread_only', null)
 
-      if (unreadsFilter !== null && unreadsFilter !== (this.inboxShowUnreads | 0)) {
-        this.setInboxShowUnreads(Boolean(unreadsFilter))
-      }
+      // if (unreadsFilter !== null && unreadsFilter !== (this.inboxShowUnreads | 0)) {
+      //  this.setInboxShowUnreads(Boolean(unreadsFilter))
+      // }
 
       const booleanProps = [
         'first_time_only',
@@ -603,14 +546,14 @@ export default {
       const hasSelectedFilterChanges = this.selectedFilter && userScope && this.filterHasChanges
 
       if (hasSelectedFilterChanges) {
-        this.isUpdatingFilter = true
+        this.setIsUpdatingFilter(true)
 
         this.updateFilter(this.selectedFilter, {
           filter: this.filter,
           type: this.loadedDefaultFilterModel.type,
           name: this.selectedFilter.name
         }).then(res => {
-          this.isUpdatingFilter = false
+          this.setIsUpdatingFilter(false)
         }).catch(error => {
           const {
             message,
@@ -656,6 +599,7 @@ export default {
     },
 
     onSelectFilter (personalFilter) {
+      console.log('onSelectFilter called')
       this.setSelectedFilter(personalFilter)
       if (!personalFilter) {
         this.filter = { ...this.filterModel.filter }
@@ -693,50 +637,6 @@ export default {
       this.applyFilter()
     },
 
-    getFilters () {
-      if (this.filterModel.type === ChannelType.CHANNEL_MENTIONS) {
-        return
-      }
-
-      this.isGettingFilters = true
-      const type = this.filterModel.type === ChannelType.CHANNEL_RECORDINGS
-        ? ChannelType.CHANNEL_CALLS
-        : (this.isFilterDialogForView ? ChannelType.CHANNEL_INBOX : this.filterModel.type)
-
-      return talk2Api.V2.inbox.filters.get({ type: type })
-        .then(response => {
-          this.personalFilters = response.data.data.user || []
-          this.companyFilters = response.data.data.company || []
-
-          // Gather all tags IDs from, filter data, personal and company filters into a single list for display in select
-          let tagsIds = []
-
-          if (this.filter.tags) {
-            tagsIds = [...new Set([...tagsIds, ...this.filter.tags])]
-          }
-
-          this.personalFilters.forEach(filter => {
-            if (filter.filter.tags) {
-              tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]
-            }
-          })
-          this.companyFilters.forEach(filter => {
-            if (filter.filter.tags) {
-              tagsIds = [...new Set([...tagsIds, ...filter.filter.tags])]
-            }
-          })
-          this.getTagsByIds(tagsIds)
-        })
-    },
-
-    getTagsByIds (ids) {
-      return talk2Api.V1.tags.get({ params: { tag_ids: ids } })
-        .then(response => {
-          this.setTags(response.data.data)
-          this.isGettingFilters = false
-        })
-    },
-
     updateFilter (filter, params) {
       if (!params.scope) {
         const scope = [1, '1', true].includes(filter.is_on_company) ? 'company' : 'user'
@@ -751,8 +651,6 @@ export default {
       }
 
       return talk2Api.V2.inbox.filters.update(filter.id, params).then(res => {
-        const updatedFilter = res.data.filter
-
         if (this.selectedFilter && this.selectedFilter.id === filter.id) {
           const filter = { ...this.selectedFilter }
           filter.filter = { ...this.filter }
@@ -764,66 +662,12 @@ export default {
             this.setChannelClonedFilter(filter.filter)
           }
         }
-
-        if (!updatedFilter.is_on_company) {
-          const personalFiltersIndex = this.personalFilters.findIndex(item => item.id === filter.id)
-          const inboxPersonalFiltersIndex = this.inboxPersonalFilters.findIndex(item => item.id === filter.id)
-          const pinnedViewIndex = this.pinnedViews.findIndex(view => +view.filter_id === +filter.id)
-
-          // update personal filters based on actively selected channel
-          if (personalFiltersIndex >= 0 && updatedFilter.type === this.loadedDefaultFilterModel.type) {
-            this.personalFilters[personalFiltersIndex] = updatedFilter
-          }
-
-          // update inbox personal filters loaded in inbox views list
-          if (inboxPersonalFiltersIndex >= 0 && updatedFilter.type === ChannelType.CHANNEL_INBOX) {
-            this.inboxPersonalFilters[inboxPersonalFiltersIndex] = updatedFilter
-            this.setInboxPersonalFilters([...this.inboxPersonalFilters])
-          }
-
-          // update the pinned view if it is pinned
-          if (pinnedViewIndex >= 0) {
-            this.pinnedViews[pinnedViewIndex].filter = updatedFilter
-            this.setPinnedViews([...this.pinnedViews])
-          }
-        }
       })
     },
 
+    /* TODO: this could be removed when "VIEWS" code will be removed deprecation-ref=1 */
     onRenameFilter (filter) {
       this.updateFilter(filter, filter)
-    },
-
-    onDeleteFilter (filter) {
-      this.isDeletingFilter = true
-
-      return talk2Api.V2.inbox.filters.delete(filter.id).then(res => {
-        this.isDeletingFilter = false
-
-        if (this.selectedFilter && this.selectedFilter.id === filter.id) {
-          this.setSelectedFilter(null)
-        }
-
-        if (!filter.is_on_company) {
-          // update the personal filters of currently selected channel
-          if (filter.type === this.filterModel.type) {
-            this.personalFilters = this.personalFilters.filter(item => item.id !== filter.id)
-          }
-
-          // update inbox views popup list
-          if (filter.type === ChannelType.CHANNEL_INBOX) {
-            const inboxPersonalFilters = this.inboxPersonalFilters.filter(item => item.id !== filter.id)
-            this.setInboxPersonalFilters(inboxPersonalFilters)
-          }
-
-          // update the pinned view if it is pinned
-          const pinnedViewIndex = this.pinnedViews.findIndex(view => +view.filter_id === +filter.id)
-          if (pinnedViewIndex >= 0) {
-            this.pinnedViews.splice(pinnedViewIndex, 1)
-            this.setPinnedViews(this.pinnedViews)
-          }
-        }
-      })
     },
 
     applyFilter () {
@@ -855,6 +699,7 @@ export default {
       return [selectedFilterClass]
     },
 
+    /* TODO: this could be removed when "VIEWS" code will be removed deprecation-ref=1 */
     renameFilter () {
       if (_.isEmpty(this.viewName)) {
         this.viewName = null

@@ -35,9 +35,6 @@
       <div class="inbox-side__right border-left d-flex align-items-start flex-column no-max-width"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
         <CommunicationLogsTable class="flex-grow-1"
-                                :filter-type="activeChannel?.type"
-                                :answer-status="activeChannel?.answerStatus"
-                                :channel="activeChannel?.value"
                                 data-testid="communications-side-communications-table" />
       <!-- TODO: purge this and all unused components
         Inbox Tab (Inbox/Inbox View) UI

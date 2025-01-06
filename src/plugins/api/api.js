@@ -272,6 +272,18 @@ export default {
       }
     },
 
+    filters: {
+      async get ({ isOnCompany } = {}) {
+        const { data = [] } = await window.axios.get(`${suffixV1}filter`)
+
+        if (isOnCompany) {
+          return data.filter(filter => filter.is_on_company)
+        }
+
+        return data
+      }
+    },
+
     ringGroups: {
       get () {
         return window.axios.get(`${suffixV1}ring-group`)

@@ -210,11 +210,17 @@ export default {
   SET_PINNED_VIEWS (state, value) {
     state.pinnedViews = value
   },
-  SET_INBOX_PERSONAL_FILTERS (state, value) {
-    state.inboxPersonalFilters = value
+  SET_PERSONAL_FILTERS (state, value) {
+    state.personalFilters = value
   },
-  SET_INBOX_COMPANY_FILTERS (state, value) {
-    state.inboxCompanyFilters = value
+  SET_COMPANY_FILTERS (state, value) {
+    state.companyFilters = value
+  },
+  SET_IS_DELETING_FILTER (state, value) {
+    state.isDeletingFilter = value
+  },
+  SET_IS_UPDATING_FILTER (state, value) {
+    state.isUpdatingFilter = value
   },
   SET_IS_EDITING_VIEW (state, value) {
     state.isEditingView = value

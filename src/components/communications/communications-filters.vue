@@ -41,19 +41,17 @@
 <script>
 import _ from 'lodash'
 
-import { mapState, mapActions } from 'vuex'
-import * as ChannelType from 'src/constants/inbox-channels'
-import * as Filters from 'src/constants/filters'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import CompactBtn from 'src/components/compact-btn'
 import FilterDialog from 'components/communications/communications-filters/filter-dialog'
 import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
-import { communicationsMixin, visibilityMixin } from 'src/plugins/mixins'
+import { communicationsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'CommunicationsFilters',
   mixins: [
-    communicationsMixin,
-    visibilityMixin
+    communicationsMixin
+  //  visibilityMixin
   ],
   components: {
     CompactBtn,
@@ -64,6 +62,9 @@ export default {
 
   },
   computed: {
+    ...mapGetters('communications', [
+      'channelDefaultFilterModel'
+    ]),
     ...mapState('communications', [
       /*
       'isGettingTasksList',
@@ -82,7 +83,7 @@ export default {
       if (this.activeChannel?.type) {
         return this.activeChannel?.type
       }
-      return DEFAULT_COMMUNICATIONS_CHANNEL === this.$route.params.channel && this.$route.query?.tagId
+      return DEFAULT_COMMUNICATIONS_CHANNEL === this.$route.params.channel
         ? 'all'
         : 'call'
     },
@@ -108,121 +109,6 @@ export default {
       return this.channelChangedFilterFields.length
     },
 
-    channelDefaultFilterModel () {
-      let defaultFilterModel = {
-        name: '',
-        type: ChannelType.CHANNEL_MESSAGES,
-        filter: [],
-        scope: 'user'
-      }
-
-      if (this.$route.params.channel === 'voicemails') {
-        defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
-        defaultFilterModel.filter = {
-          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-          direction: Filters.DEFAULT_STATE.filter.direction,
-          tags: Filters.DEFAULT_STATE.filter.tags,
-          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-          users: Filters.DEFAULT_STATE.filter.users,
-          workflows: Filters.DEFAULT_STATE.filter.workflows,
-          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-          from_date: Filters.DEFAULT_STATE.filter.from_date,
-          to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-          unread_only: Filters.DEFAULT_STATE.filter.unread_only,
-          has_international: Filters.DEFAULT_STATE.filter.has_international
-        }
-        return defaultFilterModel
-      }
-
-      if (['calls', 'recordings'].includes(this.$route.params.channel)) {
-        defaultFilterModel.type = ChannelType.CHANNEL_CALLS
-        defaultFilterModel.filter = {
-          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-          direction: Filters.DEFAULT_STATE.filter.direction,
-          answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-          min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-          transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-          callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-          tags: Filters.DEFAULT_STATE.filter.tags,
-          call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-          users: Filters.DEFAULT_STATE.filter.users,
-          workflows: Filters.DEFAULT_STATE.filter.workflows,
-          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-          from_date: Filters.DEFAULT_STATE.filter.from_date,
-          to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-          unread_only: Filters.DEFAULT_STATE.filter.unread_only,
-          has_international: Filters.DEFAULT_STATE.filter.has_international
-        }
-
-        if (['recordings'].includes(this.$route.params.channel)) {
-          defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
-          defaultFilterModel.filter.answer_status = 'recorded'
-        }
-
-        return defaultFilterModel
-      }
-
-      if (this.$route.params.channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
-        defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-        defaultFilterModel.filter = { ...Filters.DEFAULT_STATE.filter }
-
-        if (this.$route.query?.tagId) {
-          defaultFilterModel.filter.tags = [+this.$route.query.tagId]
-        }
-
-        if (this.$route.query?.broadcastIds) {
-          defaultFilterModel.filter.broadcasts = typeof this.$route.query.broadcastIds === 'string' ? [this.$route.query.broadcastIds] : this.$route.query.broadcastIds
-        }
-
-        return defaultFilterModel
-      }
-
-      if (this.activeChannel?.value === 'my-personal-line') {
-        defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-        defaultFilterModel.filter = {
-          ...Filters.DEFAULT_STATE.filter,
-          campaigns: [this.profile.campaign_id]
-        }
-
-        return defaultFilterModel
-      }
-
-      defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
-      defaultFilterModel.filter = {
-        campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-        direction: Filters.DEFAULT_STATE.filter.direction,
-        answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-        tags: Filters.DEFAULT_STATE.filter.tags,
-        first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-        untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-        exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-        incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-        users: Filters.DEFAULT_STATE.filter.users,
-        workflows: Filters.DEFAULT_STATE.filter.workflows,
-        broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-        contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-        from_date: Filters.DEFAULT_STATE.filter.from_date,
-        to_date: Filters.DEFAULT_STATE.filter.to_date,
-        my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-        unread_only: Filters.DEFAULT_STATE.filter.unread_only,
-        creator_type: Filters.DEFAULT_STATE.filter.creator_type,
-        has_international: Filters.DEFAULT_STATE.filter.has_international
-      }
-
-      return defaultFilterModel
-    },
-
     filterWrapperClass () {
       const highlightedClass = this.hasChannelFilterChanges || this.appliedFilter
         ? '--highlighted'
@@ -234,7 +120,6 @@ export default {
     },
 
     hasChannelFilterChanges () {
-      // return true
       return this.channelChangedFilterFields.length > 0
     }
 
@@ -244,39 +129,43 @@ export default {
       filter: null
     }
   },
+  mounted () {
+    this.filter = _.clone(this.channelDefaultFilterModel.filter)
+  },
   methods: {
     ...mapActions('communications', [
       /*  'gettingTasksList',
-      'setCommunications',
+
       'setSelectedCommunication',
 
-      'resetChannelChangedFilterFields',
-
-      'setAppliedFilter',
       'setHasMoreCommunications',
-      'toggleFilterModelForm',
+
       'toggleFilterDialogWithFilters',
       'setIsInboxFiltersLoaded',
       'updateChannelChangedFilterFields',
       'setInboxShowMyContacts',
       'setInboxShowUnreads',
        */
-      'setInboxFilters',
+      'resetChannelChangedFilterFields',
+      'setAppliedFilter',
       'setChannelClonedFilter',
+      'setCommunications',
+      'setInboxFilters',
       'setFilterDialogForView',
+
       'setIsEditingView',
       'setSelectedFilter',
-      'toggleFilterDialog'
+      'toggleFilterDialog',
+      'toggleFilterModelForm'
     ]),
     onClickAppliedFilterButton () {
-      alert('Applied filters')
-
       this.setFilterDialogForView(false)
       this.setIsEditingView(false)
       this.toggleFilterDialog(true)
     },
     onApplyFilter (filter) {
-      /* TODO: this might be removed, as views are a failed project */
+    /* TODO: this could be removed when "VIEWS" code will be removed deprecation-ref=1 */
+
       /*
       if (this.isFilterDialogForView) {
 
@@ -327,14 +216,14 @@ export default {
       // channel cloned filter are the current filter settings populated in the filter dialog form
       // especially when there is no applied or selected filter.
       this.setChannelClonedFilter(this.filter)
-      this.getCommunications(this.filter)
+      this.getCommunications(this.communicationFilters)
     },
 
     onCreateNewFilter (filter) {
       let filterType = this.channelDefaultFilterModel.type
 
       // making sure to save the filter type (inbox) when it's created from "Create View"
-      // TODO:  this might be removed, as views are a failed project
+      /* TODO: this could be removed when "VIEWS" code will be removed deprecation-ref=1 */
       /*
       if (this.isFilterDialogForView) {
         filterType = ChannelType.CHANNEL_INBOX
@@ -346,19 +235,17 @@ export default {
     },
 
     onResetFilters () {
-      alert('Reset filters')
-
       sessionStorage.setItem('date-selected', 'Last 30 Days')
       // TODO: reset filters
       this.resetFilters()
       this.setSelectedFilter(null)
-      this.getCommunications(this.filter)
+      this.getCommunications(this.communicationFilters)
     },
 
     resetFilters () {
-      this.filter = _.clone(Filters.DEFAULT_STATE.filter)
-      this.filter.search_text = this.searchText
-      this.filter.search_fields = this.searchFields
+      // this.filter = _.clone(Filters.DEFAULT_STATE.filter)
+      this.filter = { ...this.channelDefaultFilterModel.filter }
+
       this.filter.per_page = 20
 
       this.filter.cursor = null

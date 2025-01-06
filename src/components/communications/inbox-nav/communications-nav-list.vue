@@ -1,6 +1,7 @@
 <template>
   <div class="inbox-nav-list h-100 overflow-x-hidden"
        data-testid="inbox-nav-list-wrapper"
+       id="communications-nav-list"
        :class="{'inbox-nav-list--closed': closed}">
     <nav-item badge-value="20"
               badge-color="danger"
@@ -21,6 +22,14 @@
               @click="onItemClicked" />
 
     <hr>
+
+    <!-- filters -->
+    <saved-filters class="px-2 left-column-wrapper"
+                   :fetch-filters="fetchSavedFilters"
+                   :filter-type="filterTypeForGetSavedFilters"
+                   @filters-fetched="fetchSavedFilters = false"
+                   @filterSelected="(item) => onSelectSavedFilter(item)"
+    />
 
     <div v-if="shouldShowViewsUnderChannels">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
@@ -56,7 +65,7 @@
       </div>
 
       <communications-views target="#edit-views-icon"
-                            :views="allInboxFilters"
+                            :views="allSavedFilters"
                             data-testid="inbox-nav-list-inbox-views"
                             @closed="onCloseViewsList" />
     </div>
@@ -66,9 +75,8 @@
 <script>
 import NavItem from './communications-nav-item.vue'
 import CommunicationsViews from 'src/components/communications/communications-views.vue'
+import SavedFilters from '../communications-filters/saved-filters.vue'
 import { mapActions, mapState, mapGetters } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
-import { get } from 'lodash'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
 import { communicationsRoutesMixin, communicationsMixin, userMixin } from 'src/plugins/mixins'
@@ -80,6 +88,7 @@ export default {
 
   components: {
     CommunicationsViews,
+    SavedFilters,
     NavItem
   },
 
@@ -118,14 +127,13 @@ export default {
       'appliedFilter',
       'isFilterDialogShown',
       'pinnedViews',
-      'inboxPersonalFilters',
-      'inboxCompanyFilters',
       'isEditingView',
       'isFilterDialogForView'
     ]),
 
     ...mapGetters('communications', [
-      'allInboxFilters'
+      'allSavedFilters',
+      'channelDefaultFilterModel'
     ]),
 
     ...mapGetters('auth', [
@@ -159,6 +167,12 @@ export default {
       return channels
     },
 
+    filterTypeForGetSavedFilters () {
+      return this.channelDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS
+        ? ChannelType.CHANNEL_CALLS
+        : this.channelDefaultFilterModel.type
+    },
+
     shouldShowViewsUnderChannels () {
       /* WAT-1105: the channels and view are being moved to communications menu
         so should not being displayed here if the feature is active */
@@ -173,7 +187,7 @@ export default {
   data () {
     return {
       active: this.value,
-      isGettingFilters: false,
+      fetchSavedFilters: false,
       filterFields: [
         'campaigns',
         'ring_groups',
@@ -212,21 +226,7 @@ export default {
 
   created () {
     this.initializeDateRanges()
-
-    if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.CommunicationsInboxViewsEnabledCompany) {
-      this.getFilters()
-        .then(() => {
-          if (this.$route.params?.viewId) {
-            // get view id
-            const viewId = +this.$route.params.viewId
-            // get filter from all filters list
-            const filter = this.allInboxFilters.find(filter => +filter.id === +viewId)
-
-            this.setStatus()
-            this.onSelectView(filter)
-          }
-        })
-    }
+    this.fetchSavedFilters = true
   },
 
   mounted () {
@@ -257,14 +257,11 @@ export default {
       'setSelectedFilter',
       'resetChannelChangedFilterFields',
       'setAppliedFilter',
-      'setInboxShowMyContacts',
-      'setInboxShowUnreads',
       'setInbox',
       'setChannelClonedFilter',
       'setFilterDialogForView',
-      'setInboxPersonalFilters',
-      'setInboxCompanyFilters',
-      'setShowViewsList'
+      'setShowViewsList',
+      'toggleFilterDialog'
     ]),
 
     ...mapActions(['setIsFirstLoad']),
@@ -350,16 +347,9 @@ export default {
       return this.isShowActive && this.activeChannel && this.activeChannel.value === value
     },
 
-    getFilters () {
-      this.isGettingFilters = true
-
-      return talk2Api.V2.inbox.filters.get({ type: ChannelType.CHANNEL_INBOX })
-        .then(response => {
-          this.setInboxPersonalFilters(response.data.data.user || [])
-          this.setInboxCompanyFilters(response.data.data.company || [])
-
-          this.isGettingFilters = false
-        })
+    async onSelectSavedFilter (filter) {
+      await this.setSelectedFilter(filter)
+      this.toggleFilterDialog(true)
     },
 
     onSelectView (filter) {
@@ -379,12 +369,6 @@ export default {
 
     applyFilter () {
       this.resetChannelChangedFilterFields()
-
-      const unreadsFilter = get(this.filter, 'unread_only', null)
-
-      if (unreadsFilter !== null && unreadsFilter !== (this.inboxShowUnreads | 0)) {
-        this.setInboxShowUnreads(Boolean(unreadsFilter))
-      }
 
       this.setAppliedFilter(this.selectedFilter)
       this.loadContactTasks()

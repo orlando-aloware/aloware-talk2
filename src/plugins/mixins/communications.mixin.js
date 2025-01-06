@@ -820,6 +820,8 @@ export default {
       }
 
       // let params = this.$jsonClone(filters)
+      console.log('getCommunications')
+      console.log('received filters', filters)
       let params = {
         from_date: '',
         to_date: '',
@@ -856,7 +858,7 @@ export default {
         has_appointments: 0,
         has_reminders: 0,
         contact_country: '',
-        changed: false,
+        changed: true,
         states_limit: { us: [], ca: [] },
         initial_line_only: 0,
         search_text: '',
@@ -1039,7 +1041,7 @@ export default {
         this.getCommunications(this.communicationFilters)
       }
     },
-
+    /* TODO: this triggers 6 times on each filtering, but is the only wait the table is updated inmediatly yet */
     communicationFilters: function (newVal) {
       this.getCommunications(newVal)
     }
