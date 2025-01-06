@@ -35,7 +35,8 @@ export const COLUMNS = [
     name: 'type',
     label: 'Type',
     field: 'type',
-    draggable: true
+    draggable: true,
+    resizable: true
   },
   {
     name: 'show_in_public_folder',
