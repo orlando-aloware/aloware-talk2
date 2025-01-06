@@ -15978,6 +15978,16 @@ hr {
       padding-bottom: 0 !important;
       margin-bottom: 0 !important;
     }
+
+    .operation-button {
+      border: solid 1px #D8D8D8;
+      border-radius: 6px;
+      height: 28px;
+      width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 
   .title {
