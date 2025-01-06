@@ -151,7 +151,7 @@ export default {
     ]),
     ...mapState(['isDatatableSelectedAll']),
     filteredBots () {
-      let bots = this.bots
+      let bots = this.bots.filter((bot) => bot.type === AloAi.TYPE_TEXT)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
