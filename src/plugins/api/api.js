@@ -929,7 +929,7 @@ export default {
 
     aloAiBot: {
       getBots (params = {}) {
-        return window.axios.get(`${suffixV1}aloai/bots`, { params })
+        return window.axios.get(`${suffixV1}aloai/bot`, { params })
       },
       getContactDisengagedBots (contactId) {
         return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
