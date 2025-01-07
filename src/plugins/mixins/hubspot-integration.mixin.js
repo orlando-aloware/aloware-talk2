@@ -24,7 +24,7 @@ export default {
       if (this.currentCompany &&
         this.currentCompany.hubspot_integration_enabled &&
         this.currentCompany.hubspot_marketing_portal_id) {
-        return `https://${this.companyDomain}/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
+        return `https://${this.companyDomain}/embed/${this.currentCompany.hubspot_marketing_portal_id}/0-1/`
       }
 
       return false
