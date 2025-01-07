@@ -65,6 +65,13 @@ export default {
 
     statusText () {
       return this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase()
+    },
+
+    lastPage () {
+      if (!this.communicationsCount) {
+        return 1
+      }
+      return Math.ceil(this.communicationsCount / this.perPage)
     }
   },
 
@@ -130,9 +137,9 @@ export default {
         { value: 50, label: '50 Per Page' },
         { value: 100, label: '100 Per Page' }
       ],
-      lastPage: 1,
+      // lastPage: 1,
       maxPaginationPages: 5,
-      communicationsData: [],
+      // communicationsData: [],
       isLoading: false,
       nextCursor: null,
       countSource: null,
@@ -206,6 +213,7 @@ export default {
       'setPinnedViews',
       'setContacts',
       'setCommunications',
+      'appendCommunications',
       'setCommunicationsCount',
       'setHasMoreCommunications'
     ]),
@@ -783,10 +791,11 @@ export default {
     },
 
     resetCommunications () {
-      this.communicationsData = []
+      // this.communicationsData = []
+      this.setCommunications([])
       this.setCommunicationsCount(0)
       this.paginationPage = 1
-      this.lastPage = 1
+      // this.lastPage = 1
       this.setHasMoreCommunications(null)
     },
 
@@ -807,14 +816,16 @@ export default {
     },
 
     getCommunications (filters, callback, isLoadMore = false) {
-      if (this.isLoading) {
-        return
-      }
+      // if (this.isLoading) {
+      //  return
+      // }
+      this.isLoading = true
 
       if (!isLoadMore) {
-        this.isLoading = true
+        console.log('enter isLoadMore and clean data')
         this.paginationPage = 1
-        this.communicationsData = []
+        this.setCommunications([])
+        // this.communicationsData = []
       } else {
         this.isLoadingMore = true
       }
@@ -872,18 +883,6 @@ export default {
       this.gettingTasksList(true)
       this.communicationsListHasError = false
 
-      if (this.firstTimeLoading || !params.from_date || !params.to_date) {
-        const timezone = this.currentTimezone
-        const dateFormat = 'YYYY-MM-DD HH:mm:ss'
-        const fromDate = moment().tz(timezone).subtract(30, 'days').startOf('day').format(dateFormat)
-        const toDate = moment().tz(timezone).endOf('day').format(dateFormat)
-
-        params.from_date = fromDate
-        params.to_date = toDate
-
-        this.firstTimeLoading = false
-      }
-
       // payload specific for Mentions
       if (this.$route.params.channel === 'mentions') {
         api = talk2Api.V2.mentions
@@ -928,19 +927,22 @@ export default {
           if (response) {
             this.gettingTasksList(false)
             const data = response.data.data
-
+            console.log('data fetched', data)
             if (isLoadMore && data.length > 0) {
-              this.communicationsData.push(...data)
+              console.log('first if')
+              // this.communicationsData.push(...data)
+              this.appendCommunications(data)
             } else {
               if (data.length > 0) {
-                this.communicationsData = data
+                console.log('second if')
+                // this.communicationsData = [...data]
+                this.setCommunications(data)
               }
             }
 
-            // this.setCommunications(data)
             // this.nextCursor = response.data.next_cursor
             this.currentPage = response.data.current_page
-            this.lastPage = Math.ceil(this.communicationsCount / this.perPage)
+
             this.setHasMoreCommunications(response.data.next_page_url)
             this.isLoaded = true
             this.pagination = _.clone(response.data)
@@ -967,6 +969,7 @@ export default {
           this.$generalNotification(`An exception was encountered while fetching ${channelName}.`, 'error')
         })
         .finally(() => {
+          console.log('isLoading false')
           this.isLoading = false
           this.isLoadingMore = false
         })
@@ -1030,8 +1033,8 @@ export default {
     this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
-    this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
-    this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+    // this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
+    // this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
   },
 
   watch: {
@@ -1040,10 +1043,12 @@ export default {
       if (newVal === DEFAULT_COMMUNICATIONS_CHANNEL) {
         this.getCommunications(this.communicationFilters)
       }
-    },
-    /* TODO: this triggers 6 times on each filtering, but is the only wait the table is updated inmediatly yet */
-    communicationFilters: function (newVal) {
-      this.getCommunications(newVal)
     }
+    /* TODO: this triggers 6 times on each filtering, but is the only wait the table is updated inmediatly yet */
+    // communicationFilters: debounce(function (newVal) {
+    //  this.resetCommunications()
+    //  this.getCommunications(newVal)
+    // }, 800)
+
   }
 }

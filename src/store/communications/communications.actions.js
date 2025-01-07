@@ -8,6 +8,9 @@ export default {
   setCommunications: ({ commit }, communications) => {
     commit('SET_COMMUNICATIONS', communications)
   },
+  appendCommunications: ({ commit }, communications) => {
+    commit('APPEND_COMMUNICATIONS', communications)
+  },
   setCommunicationsCount: ({ commit }, count) => {
     commit('SET_COMMUNICATIONS_COUNT', count)
   },

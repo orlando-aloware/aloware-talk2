@@ -18,6 +18,9 @@ export default {
   SET_COMMUNICATIONS_CURRENT_PAGE: (state, page) => {
     state.communicationsCurrentPage = page
   },
+  APPEND_COMMUNICATIONS: (state, communications) => {
+    state.communications = state.communications.concat(communications)
+  },
   GETTING_TASKS_LIST: (state, isGetting) => {
     state.isGettingTasksList = isGetting
   },

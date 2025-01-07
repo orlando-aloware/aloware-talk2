@@ -41,18 +41,20 @@
 <script>
 import _ from 'lodash'
 
-import { mapState, mapActions, mapGetters } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import CompactBtn from 'src/components/compact-btn'
 import FilterDialog from 'components/communications/communications-filters/filter-dialog'
 import CreateFilterDialog from 'components/communications/communications-filters/create-filter-dialog'
 
 import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 import { communicationsMixin } from 'src/plugins/mixins'
+import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
 export default {
   name: 'CommunicationsFilters',
   mixins: [
-    communicationsMixin
+    communicationsMixin,
+    communicationsDefaultFilterModelMixin
   //  visibilityMixin
   ],
   components: {
@@ -64,9 +66,6 @@ export default {
 
   },
   computed: {
-    ...mapGetters('communications', [
-      'channelDefaultFilterModel'
-    ]),
     ...mapState('communications', [
       /*
       'isGettingTasksList',
@@ -224,7 +223,10 @@ export default {
       // channel cloned filter are the current filter settings populated in the filter dialog form
       // especially when there is no applied or selected filter.
       this.setChannelClonedFilter(this.filter)
-      this.getCommunications(this.communicationFilters)
+
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     },
 
     onCreateNewFilter (filter) {
@@ -251,8 +253,6 @@ export default {
       // TODO: reset filters
       this.resetFilters()
       this.setSelectedFilter(null)
-
-      this.getCommunications(this.communicationFilters)
     },
 
     resetFilters () {
@@ -283,9 +283,6 @@ export default {
       this.filter.answer_status = this.answerStatus
       // this.mentionUserId = null
 
-      // this.filter.date_from = null
-      // this.filter.date_to = null
-
       this.filterRight = 'newest'
       this.sorting.order = 'desc'
 
@@ -295,6 +292,9 @@ export default {
       this.setIsFirstLoad(true)
       this.setAppliedFilter(null)
       this.setInboxFilters(null)
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     }
 
   },

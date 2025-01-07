@@ -81,6 +81,8 @@ import { mapActions, mapState, mapGetters } from 'vuex'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
 import { communicationsRoutesMixin, communicationsMixin, userMixin } from 'src/plugins/mixins'
+import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
+
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME, COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME, DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 
@@ -96,6 +98,7 @@ export default {
   mixins: [
     communicationsRoutesMixin,
     communicationsMixin,
+    communicationsDefaultFilterModelMixin,
     userMixin
   ],
 
@@ -133,8 +136,7 @@ export default {
     ]),
 
     ...mapGetters('communications', [
-      'allSavedFilters',
-      'channelDefaultFilterModel'
+      'allSavedFilters'
     ]),
 
     ...mapGetters('auth', [

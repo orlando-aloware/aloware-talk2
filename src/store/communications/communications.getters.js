@@ -87,7 +87,6 @@ export default {
         changed: true
       }
 
-      console.log(defaultFilterModel)
       return defaultFilterModel
     }
 

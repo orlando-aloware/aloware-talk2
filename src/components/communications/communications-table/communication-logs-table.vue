@@ -45,7 +45,7 @@
       class="communication-logs-table flex-grow-1"
       row-key="index"
       virtual-scroll
-      :data="communicationsData"
+      :data="communications"
       :columns="columns"
       :loading="isLoadingMore || isLoading"
       :virtual-scroll-item-size="100"
@@ -594,7 +594,10 @@ export default {
     onSearch (value) {
       this.searchQuery = value
       this.paginationPage = 1
-      this.getCommunications(this.communicationFilters)
+
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     },
 
     changeTableSettingsVisibility (value) {
@@ -621,7 +624,12 @@ export default {
         return
       }
 
-      const lastIndex = this.communicationsData.length - 1
+      const lastIndex = this.communications.length - 1
+      console.log('is loading more:', this.isLoadingMore)
+      console.log('pagination page:', this.paginationPage)
+      console.log('last page:', this.lastPage)
+      console.log('to:', to)
+      console.log('last index:', lastIndex)
       if (
         !this.isLoadingMore &&
         this.paginationPage < this.lastPage &&
@@ -701,7 +709,9 @@ export default {
 
   mounted () {
     if (this.hasPermissionTo('list communication')) {
-      this.getCommunications(this.communicationFilters)
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     }
   }
 }
