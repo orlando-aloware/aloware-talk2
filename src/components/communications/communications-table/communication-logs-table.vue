@@ -652,10 +652,6 @@ export default {
       }
     },
 
-    toggleTeams (rowId) {
-      this.$set(this.expandedTeams, rowId, !this.expandedTeams[rowId])
-    },
-
     onCommunicationArchived (communicationId) {
       const index = this.communicationsData.findIndex(communication => communication.id === communicationId)
 

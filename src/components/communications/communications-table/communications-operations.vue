@@ -13,9 +13,15 @@
                                   :communication="row"
                                   @archived="$emit('archived', $event)"/>
 
-<!--    <operation-terminate :communication="row" />-->
+    <terminate-communication-button class="operation-button mx-1"
+                                    icon-height="16"
+                                    icon-width="16"
+                                    :communication="row" />
 
-<!--    <operation-barge :communication="row" />-->
+    <barge-communication-button class="operation-button mx-1"
+                                icon-height="16"
+                                icon-width="16"
+                                :communication="row" />
 
 <!--    <operation-whisper :communication="row" />-->
   </div>
@@ -26,6 +32,8 @@ import ReplyCommunicationButton from 'components/communication/reply-communicati
 import CallCommunicationButton from 'components/communication/call-communication-button.vue'
 import DetailsCommunicationButton from 'components/communication/details-communication-button.vue'
 import ArchiveCommunicationButton from 'components/communication/archive-communication-button.vue'
+import TerminateCommunicationButton from 'components/communication/terminate-communication-button.vue'
+import BargeCommunicationButton from 'components/communication/barge-communication-button.vue'
 
 export default {
   name: 'CommunicationsOperations',
@@ -34,7 +42,9 @@ export default {
     ReplyCommunicationButton,
     CallCommunicationButton,
     DetailsCommunicationButton,
-    ArchiveCommunicationButton
+    ArchiveCommunicationButton,
+    TerminateCommunicationButton,
+    BargeCommunicationButton
   },
 
   props: {
