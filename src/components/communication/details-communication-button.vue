@@ -1,6 +1,7 @@
 <template>
-  <span class="cursor-pointer operation-button"
+  <span class="cursor-pointer"
         data-testid="comm-details-button"
+        v-if="communication.contact_id"
         @click="seeDetails">
     <information-circle-icon height="16"
                              width="16"
@@ -14,15 +15,9 @@
 
 <script>
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
-import { aclMixin } from 'src/plugins/mixins'
-import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'details-communication-button',
-
-  mixins: [
-    aclMixin
-  ],
 
   components: {
     InformationCircleIcon
@@ -32,17 +27,8 @@ export default {
     communication: {
       type: Object,
       required: true
-    },
-
-    customClass: {
-      type: String,
-      default: ''
     }
   },
-
-  data: () => ({
-    CommunicationTypes
-  }),
 
   methods: {
     seeDetails () {

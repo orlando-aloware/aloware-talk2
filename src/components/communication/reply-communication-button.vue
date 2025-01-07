@@ -5,7 +5,7 @@
         @click="goToContactPage">
     <reply-icon height="16"
                 width="16"
-                icon-color="grey"/>
+                color="#62666E"/>
 
     <q-tooltip>
       Reply
