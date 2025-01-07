@@ -9,12 +9,12 @@
 export default {
   props: {
     width: {
-      type: Number,
+      type: [Number, String],
       default: 24
     },
 
     height: {
-      type: Number,
+      type: [Number, String],
       default: 24
     },
 
