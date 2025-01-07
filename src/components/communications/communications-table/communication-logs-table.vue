@@ -167,7 +167,8 @@
 
             <div v-else-if="col.name === 'operations'">
               <!-- dummy yet -->
-              <communications-operations :row="props.row" />
+              <communications-operations :row="props.row"
+                                         @archived="onCommunicationArchived"/>
             </div>
           </q-td>
         </q-tr>
@@ -653,6 +654,14 @@ export default {
 
     toggleTeams (rowId) {
       this.$set(this.expandedTeams, rowId, !this.expandedTeams[rowId])
+    },
+
+    onCommunicationArchived (communicationId) {
+      const index = this.communicationsData.findIndex(communication => communication.id === communicationId)
+
+      if (index) {
+        this.communicationsData.splice(index, 1)
+      }
     }
   },
 

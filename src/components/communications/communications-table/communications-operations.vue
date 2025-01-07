@@ -9,7 +9,9 @@
     <details-communication-button class="operation-button mx-1"
                                   :communication="row" />
 
-<!--    <operation-archive :communication="row" />-->
+    <archive-communication-button class="operation-button mx-1"
+                                  :communication="row"
+                                  @archived="$emit('archived', $event)"/>
 
 <!--    <operation-terminate :communication="row" />-->
 
@@ -23,6 +25,7 @@
 import ReplyCommunicationButton from 'components/communication/reply-communication-button.vue'
 import CallCommunicationButton from 'components/communication/call-communication-button.vue'
 import DetailsCommunicationButton from 'components/communication/details-communication-button.vue'
+import ArchiveCommunicationButton from 'components/communication/archive-communication-button.vue'
 
 export default {
   name: 'CommunicationsOperations',
@@ -30,7 +33,8 @@ export default {
   components: {
     ReplyCommunicationButton,
     CallCommunicationButton,
-    DetailsCommunicationButton
+    DetailsCommunicationButton,
+    ArchiveCommunicationButton
   },
 
   props: {
