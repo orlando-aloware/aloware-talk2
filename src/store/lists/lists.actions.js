@@ -9,11 +9,13 @@ export default {
 
       commit('SET_LISTS_LOADING', true)
 
-      const res = await API.V2.contactList.get({
+      const params = {
         page: page || 1,
         size: perPage || 10,
-        search: state.search
-      })
+        ...(state.search && { search: state.search })
+      }
+
+      const res = await API.V2.contactList.get(params)
 
       commit('SET_LISTS', res.data.data)
       commit('SET_LISTS_COUNT', res.data.total)
