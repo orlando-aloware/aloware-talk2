@@ -941,10 +941,10 @@ export default {
         return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-status`, { engagements })
       },
       enrollContacts (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/enroll-contacts`, params)
+        return window.axios.post(`${suffixV1}aloai/bot/${botId}/enroll-contacts`, params)
       },
       disenrollContact (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/disenroll-contact`, params)
+        return window.axios.post(`${suffixV1}aloai/bot/${botId}/disenroll-contact`, params)
       }
     }
   }

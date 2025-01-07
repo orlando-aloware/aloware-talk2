@@ -71,7 +71,7 @@
 import talk2Api from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
-import { AloAiUseCases } from 'src/constants/aloai'
+import * as AloAi from 'src/constants/aloai'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -94,7 +94,7 @@ export default {
     },
     // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
     filteredSalesBots () {
-      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === AloAiUseCases.SALES)
+      let bots = this.bots.filter((bot) => bot.use_case === AloAi.USE_CASE_SALES)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -116,7 +116,7 @@ export default {
       searchText: '',
       isLoading: true,
       selectedBotId: null,
-      AloAiUseCases
+      AloAi
     }
   },
 
@@ -237,7 +237,10 @@ export default {
         if (this.bots.length > 0) {
           return this.bots
         }
-        const { data } = await talk2Api.V2.aloAiBot.getBots()
+        const { data } = await talk2Api.V2.aloAiBot.getBots({
+          enabled: true,
+          type: AloAi.TYPE_TEXT
+        })
         return data?.data ?? []
       } catch (error) {
         console.error('[fetchBots] error', error)

@@ -656,13 +656,14 @@
                   </label>
                   <div class="d-flex align-items-center w-100 mb-2 border-bottom"
                        v-if="showAudio(communication)">
-                    <communication-audio :communication="communication"
+                    <communication-audio class="mb-2"
+                                         data-testid="communication-info-call-recording-audio"
+                                         v-if="activeName"
+                                         :communication="communication"
                                          :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                          :uniqueId="communication.id + '1'"
-                                         class="mb-2"
-                                         data-testid="communication-info-call-recording-audio"
-                                         v-if="activeName">
+                                         @audio-file-updated="handleAudioFileUpdated">
                     </communication-audio>
                   </div>
                   <div class="form-control-label w-100 mb-2 pb-2 border-bottom" data-testid="communication-info-no-call-recording"
@@ -679,13 +680,14 @@
                   </label>
                   <div class="d-flex flex-row align-items-center w-100 mb-2 border-bottom"
                        v-if="communication.has_voicemail">
-                    <communication-audio :communication="communication"
+                    <communication-audio class="mb-2"
+                                         data-testid="communication-info-voicemail-audio"
+                                         :communication="communication"
                                          :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                          :uniqueId="communication.id + '2'"
-                                         class="mb-2"
-                                         data-testid="communication-info-voicemail-audio"
-                                         v-if="activeName">
+                                         v-if="activeName"
+                                         @audio-file-updated="handleAudioFileUpdated">
                     </communication-audio>
                   </div>
                   <div class="form-control-label w-100 mb-2 pb-2 border-bottom" data-testid="communication-info-no-voicemail"
@@ -818,13 +820,14 @@
            :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
            v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
         <div class="d-flex align-items-center w-100">
-          <communication-audio :communication="communication"
+          <communication-audio class="mb-2"
+                               data-testid="communication-info-call-recording-audio"
                                ref="callRecording"
+                               :communication="communication"
                                :contact="contact"
                                :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                :uniqueId="communication.id + '1'"
-                               class="mb-2"
-                               data-testid="communication-info-call-recording-audio">
+                               @audio-file-updated="handleAudioFileUpdated">
           </communication-audio>
         </div>
       </div>
@@ -838,7 +841,8 @@
                                :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                :uniqueId="communication.id + '2'"
                                class="mb-2"
-                               data-testid="communication-info-voicemail-audio">
+                               data-testid="communication-info-voicemail-audio"
+                               @audio-file-updated="handleAudioFileUpdated">
           </communication-audio>
         </div>
       </div>
@@ -852,7 +856,7 @@
     </div>
 
     <div class="ai-effect-container mt-2"
-         v-if="CommunicationTypes.CALL && showAudio(communication) && communication.has_transcription">
+         v-if="isAloaiDialogVisible">
       <div class="ai-effect-gradient"></div>
       <div class="ai-effect-blur"></div>
       <div class="ai-effect-content p-2">
@@ -885,6 +889,16 @@
               <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in progress</span>
             </span>
           </div>
+        </div>
+        <div class="text-left-align text-15"
+             v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
+          <div>Transcription generation failed. Please try again later. </div>
+          <generate-transcription-button class="mr-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated">
+          </generate-transcription-button>
         </div>
         <div class="text-left-align text-13"
              v-if="communication.call_summary">
@@ -936,6 +950,7 @@ import DOMPurify from 'dompurify'
 import TranscriptionModal from 'components/communication/transcription-modal.vue'
 import ExpandableHtmlViewer from 'components/communication/ExpandableHtmlViewer.vue'
 import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
+import GenerateTranscriptionButton from 'components/generate-transcription-button'
 
 export default {
   name: 'communication-info',
@@ -973,7 +988,8 @@ export default {
     TargetUsersTree,
     DownloadButton,
     EntityTags,
-    AloaiPromotionDialog
+    AloaiPromotionDialog,
+    GenerateTranscriptionButton
   },
 
   props: {
@@ -1030,6 +1046,8 @@ export default {
       isHangingUp: false,
       isParking: false,
       showInfoBox: false,
+      fileUuid: null,
+      isMigrated: false,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -1114,6 +1132,20 @@ export default {
       }
 
       return this.communication.body
+    },
+
+    isAloaiDialogVisible () {
+      const allowedStatuses = [
+        TranscriptionStatus.STATUS_PROCESSING,
+        TranscriptionStatus.STATUS_COMPLETED,
+        TranscriptionStatus.STATUS_ERROR
+      ]
+
+      return (
+        this.CommunicationTypes.CALL &&
+        this.showAudio(this.communication) &&
+        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+      )
     }
   },
 
@@ -1279,6 +1311,11 @@ export default {
     parseMarkdown (summaryText) {
       const rawHtml = marked(summaryText)
       return DOMPurify.sanitize(rawHtml)
+    },
+
+    handleAudioFileUpdated ({ fileUuid, isMigrated }) {
+      this.fileUuid = fileUuid
+      this.isMigrated = isMigrated
     },
 
     fetchSmartTranscriptionData () {
