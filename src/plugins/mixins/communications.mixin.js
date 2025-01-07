@@ -497,6 +497,7 @@ export default {
           'min_talk_time',
           'untagged_only',
           'exclude_automated_communications',
+          'not_disposed',
           'first_time_only'
         ]
 

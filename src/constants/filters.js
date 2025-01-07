@@ -46,7 +46,8 @@ export const DEFAULT_STATE = {
     contact_owner: [],
     creator_type: null,
     dynamic_engagement_date_range: 0,
-    has_international: 0
+    has_international: 0,
+    not_disposed: 0
   }
 }
 

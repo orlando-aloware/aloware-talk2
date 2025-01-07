@@ -181,6 +181,7 @@ export default {
         'callback_status',
         'tags',
         'call_dispositions',
+        'not_disposed',
         'first_time_only',
         'untagged_only',
         'exclude_automated_communications',
@@ -199,6 +200,7 @@ export default {
       ],
       inputTimeout: null,
       booleanFields: [
+        'not_disposed',
         'first_time_only',
         'exclude_automated_communications',
         'untagged_only',
@@ -486,6 +488,7 @@ export default {
       // }
 
       const booleanProps = [
+        'not_disposed',
         'first_time_only',
         'exclude_automated_communications',
         'untagged_only',
@@ -685,6 +688,7 @@ export default {
       this.filter = {
         ...this.filter,
         untagged_only: +this.filter.untagged_only,
+        not_disposed: +this.filter.not_disposed,
         first_time_only: +this.filter.first_time_only,
         exclude_automated_communications: +this.filter.exclude_automated_communications,
         my_contact: +this.filter.my_contact,

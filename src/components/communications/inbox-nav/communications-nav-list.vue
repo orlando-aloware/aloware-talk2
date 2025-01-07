@@ -201,6 +201,7 @@ export default {
         'callback_status',
         'tags',
         'call_dispositions',
+        'not_disposed',
         'first_time_only',
         'untagged_only',
         'exclude_automated_communications',
@@ -214,6 +215,7 @@ export default {
         'creator_type'
       ],
       booleanFields: [
+        'not_disposed',
         'first_time_only',
         'exclude_automated_communications',
         'untagged_only',
