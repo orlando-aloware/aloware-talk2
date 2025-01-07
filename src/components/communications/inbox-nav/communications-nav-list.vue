@@ -285,7 +285,7 @@ export default {
         for (const range in this.ranges) {
           const hasDatesValues = view.filter.filter && view.filter.filter.from_date && view.filter.filter.to_date
           if (hasDatesValues && view.filter.filter.from_date === this.ranges[range][0] && view.filter.filter.to_date === this.ranges[range][1]) {
-            sessionStorage.setItem('date-selected', range)
+            sessionStorage.setItem('date-selected-comms', range)
             sessionStorage.setItem('view-selected', viewId)
             break
           }

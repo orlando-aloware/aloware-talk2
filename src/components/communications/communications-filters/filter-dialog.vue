@@ -194,7 +194,8 @@ export default {
         'creator_type',
         'dynamic_engagement_date_range',
         'has_unread',
-        'has_international'
+        'has_international',
+        'type'
       ],
       inputTimeout: null,
       booleanFields: [
@@ -460,7 +461,7 @@ export default {
       const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.filterModel.filter
 
       this.reset = true
-      sessionStorage.removeItem('date-selected')
+      sessionStorage.removeItem('date-selected-comms')
       this.setIsFirstLoad(true)
 
       for (const item in useFilter) {
@@ -574,15 +575,15 @@ export default {
       }
 
       // add the communication type and answer_status filters
-      const communicationType = _.get(this.value, 'type', null)
+      // const communicationType = _.get(this.value, 'type', null)
       const communicationAnswerStatus = _.get(this.value, 'answer_status', null)
       const finalFilters = {
         ...this.filter
       }
 
-      if (communicationType) {
-        finalFilters.type = communicationType
-      }
+      // if (communicationType) {
+      //  finalFilters.type = communicationType
+      // }
 
       if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.filterModel.type) &&
         communicationAnswerStatus) {
@@ -623,14 +624,14 @@ export default {
         for (const range in this.ranges) {
           const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
           if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
-            sessionStorage.setItem('date-selected', range)
+            sessionStorage.setItem('date-selected-comms', range)
             inRange = true
             break
           }
         }
 
         if (!inRange) {
-          sessionStorage.setItem('date-selected', 'custom')
+          sessionStorage.setItem('date-selected-comms', 'custom')
         }
       }
 

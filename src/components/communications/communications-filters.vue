@@ -141,6 +141,7 @@ export default {
     this.filter = _.clone(this.channelDefaultFilterModel.filter)
   },
   methods: {
+    ...mapActions(['setIsFirstLoad']),
     ...mapActions('communications', [
       /*  'gettingTasksList',
 
@@ -160,7 +161,6 @@ export default {
       'setCommunications',
       'setInboxFilters',
       'setFilterDialogForView',
-
       'setIsEditingView',
       'setSelectedFilter',
       'toggleFilterDialog',
@@ -247,10 +247,11 @@ export default {
     },
 
     onResetFilters () {
-      sessionStorage.setItem('date-selected', 'Last 30 Days')
+      sessionStorage.removeItem('date-selected-comms')
       // TODO: reset filters
       this.resetFilters()
       this.setSelectedFilter(null)
+
       this.getCommunications(this.communicationFilters)
     },
 
@@ -282,12 +283,16 @@ export default {
       this.filter.answer_status = this.answerStatus
       // this.mentionUserId = null
 
+      // this.filter.date_from = null
+      // this.filter.date_to = null
+
       this.filterRight = 'newest'
       this.sorting.order = 'desc'
 
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
       this.setCommunications([])
+      this.setIsFirstLoad(true)
       this.setAppliedFilter(null)
       this.setInboxFilters(null)
     }

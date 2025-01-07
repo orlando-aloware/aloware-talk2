@@ -82,6 +82,20 @@
                                      @change="eventPayload => onFilterChange(eventPayload, 'ring_groups')" />
               </b-form-group>
             </b-col>
+
+            <b-col sm="12"
+                   md="6"
+                   v-if="isInboxOrAllCallsChannel">
+              <b-form-group class="form-label"
+                            label="Type">
+                <communication-type-filter-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
+                                                    :highlighted="isChanged('type')"
+                                                    :use-input="false"
+                                                    data-testid="filter-form-comm-type-selector"
+                                                    v-model="filter.type"
+                                                    @select="eventPayload => onFilterChange(eventPayload, 'type')" />
+              </b-form-group>
+            </b-col>
           </b-form-row>
         </div>
 
@@ -458,6 +472,7 @@ import TransferTypeSelector from 'components/generic-selectors/transfer-type-sel
 import TalkTimeSelector from 'components/generic-selectors/talk-time-selector'
 import AnswerStatusSelector from 'components/generic-selectors/answer-status-selector'
 import CommunicationDirectionSelector from 'components/generic-selectors/communication-direction-selector'
+import CommunicationTypeFilterSelector from 'components/generic-selectors/communication-type-filter-selector'
 import CallDispositionSelector from 'components/generic-selectors/call-disposition-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
 import IncomingNumberSelector from 'components/generic-selectors/incoming-number-selector'
@@ -476,6 +491,10 @@ import moment from 'moment'
 import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 import companyTimezoneMixin from 'src/plugins/mixins/company-timezone.mixin'
 
+const RANGE_1_DAY = 'Today'
+const RANGE_7_DAYS = 'Last 7 Days'
+const RANGE_30_DAYS = 'Last 30 Days'
+
 export default {
   name: 'FilterForm',
 
@@ -491,6 +510,7 @@ export default {
     IncomingNumberSelector,
     UserSelector,
     CommunicationDirectionSelector,
+    CommunicationTypeFilterSelector,
     AnswerStatusSelector,
     TalkTimeSelector,
     TransferTypeSelector,
@@ -551,6 +571,20 @@ export default {
     dateHasChanges () {
       return this.filter.from_date !== this.defaultFilterModel.filter.from_date ||
         this.filter.to_date !== this.defaultFilterModel.filter.to_date
+    },
+
+    defaultDateRangeBasedOnCompanyPreferences () {
+      /* in the company preference the "default_report_period" is saved as 'day', 'week', or 'month' */
+
+      const profilePreference = this.profile?.default_report_period || 'day'
+
+      const RANGES_MAP = {
+        'day': RANGE_1_DAY,
+        'week': RANGE_7_DAYS,
+        'month': RANGE_30_DAYS
+      }
+
+      return RANGES_MAP[profilePreference]
     },
 
     isRangeSelectionOpen () {
@@ -702,12 +736,12 @@ export default {
 
           listItems.forEach(li => {
             li.addEventListener('click', () => {
-              sessionStorage.setItem('date-selected', li.getAttribute('data-range-key'))
+              sessionStorage.setItem('date-selected-comms', li.getAttribute('data-range-key'))
             })
 
             li.classList.remove('active')
 
-            if (li.getAttribute('data-range-key') === sessionStorage.getItem('date-selected')) {
+            if (li.getAttribute('data-range-key') === sessionStorage.getItem('date-selected-comms')) {
               li.classList.add('active')
             }
           })
@@ -716,7 +750,7 @@ export default {
     },
 
     onFinishSelection (dateRange) {
-      sessionStorage.setItem('date-selected', 'custom')
+      sessionStorage.setItem('date-selected-comms', 'custom')
     },
 
     onFilterChange (value, prop) {
@@ -738,7 +772,7 @@ export default {
       }
 
       if (this.isFirstLoad || this.reset) {
-        return `${this.$options.filters.date(this.ranges['Last 30 Days'][0])} - ${this.$options.filters.date(this.ranges['Last 30 Days'][1])}`
+        return `${this.$options.filters.date(this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0])} - ${this.$options.filters.date(this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1])}`
       }
 
       return 'All Time'
@@ -764,10 +798,10 @@ export default {
       const DATE_FORMAT = 'MM/DD/YYYY HH:mm:ss'
 
       this.ranges = {
-        'Today': [this.parseDatePicker(moment().tz(timezone).startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        [RANGE_1_DAY]: [this.parseDatePicker(moment().tz(timezone).startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Yesterday': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'days').endOf('day').format(DATE_FORMAT))],
-        'Last 7 Days': [this.parseDatePicker(moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
-        'Last 30 Days': [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        [RANGE_7_DAYS]: [this.parseDatePicker(moment().tz(timezone).subtract(7, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
+        [RANGE_30_DAYS]: [this.parseDatePicker(moment().tz(timezone).subtract(30, 'days').startOf('day').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'This Month So Far': [this.parseDatePicker(moment().tz(timezone).startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).endOf('day').format(DATE_FORMAT))],
         'Last Month': [this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').startOf('month').format(DATE_FORMAT)), this.parseDatePicker(moment().tz(timezone).subtract(1, 'months').endOf('month').format(DATE_FORMAT))],
         'All Time': [null, null]
@@ -794,12 +828,14 @@ export default {
 
   mounted () {
     const viewId = sessionStorage.getItem('view-selected')
-    if (this.isFirstLoad && !viewId) {
-      this.setIsFirstLoad(false)
-      sessionStorage.setItem('date-selected', 'Last 30 Days')
 
-      this.dateRange.startDate = this.ranges['Last 30 Days'][0]
-      this.dateRange.endDate = this.ranges['Last 30 Days'][1]
+    if (this.isFirstLoad && !viewId) {
+      console.log('isFirstLoad')
+      this.setIsFirstLoad(false)
+      sessionStorage.setItem('date-selected-comms', this.defaultDateRangeBasedOnCompanyPreferences)
+
+      this.dateRange.startDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0]
+      this.dateRange.endDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1]
     } else {
       this.dateRange.startDate = this.filter.from_date
       this.dateRange.endDate = this.filter.to_date
@@ -875,8 +911,9 @@ export default {
 
     reset (newVal) {
       if (newVal) {
-        this.dateRange.startDate = this.ranges['Last 30 Days'][0]
-        this.dateRange.endDate = this.ranges['Last 30 Days'][1]
+        console.log('reset dates')
+        this.dateRange.startDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0]
+        this.dateRange.endDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1]
         this.filter.from_date = this.dateRange.startDate
         this.filter.to_date = this.dateRange.endDate
         this.getDateRangeInputLabel()

@@ -885,7 +885,7 @@ export default {
     },
 
     onResetFilters () {
-      sessionStorage.setItem('date-selected', 'Last 30 Days')
+      sessionStorage.setItem('date-selected-comms', 'Last 30 Days')
       this.firstTimeLoading = true
       this.resetFilters()
       this.setSelectedFilter(null)
