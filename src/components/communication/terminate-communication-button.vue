@@ -106,6 +106,7 @@ export default {
         .then(() => {
           this.$generalNotification('Communication terminated successfully.', 'success')
           this.loading = false
+          this.$emit('terminated', this.communication.id)
         })
         .catch(err => {
           this.loading = false

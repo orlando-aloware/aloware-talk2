@@ -166,9 +166,9 @@
             </template>
 
             <div v-else-if="col.name === 'operations'">
-              <!-- dummy yet -->
               <communications-operations :row="props.row"
-                                         @archived="onCommunicationArchived"/>
+                                         @archived="removeCommunication"
+                                         @terminated="removeCommunication"/>
             </div>
           </q-td>
         </q-tr>
@@ -652,7 +652,7 @@ export default {
       }
     },
 
-    onCommunicationArchived (communicationId) {
+    removeCommunication (communicationId) {
       const index = this.communicationsData.findIndex(communication => communication.id === communicationId)
 
       if (index) {

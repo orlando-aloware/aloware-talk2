@@ -1,17 +1,15 @@
 <template>
-  <div>
-    <span class="cursor-pointer"
-          data-testid="comm-barge-comm-button-dialog-click"
-          @click="dialog"
-          v-if="userCanBargeAndWhisper(communication)">
-      <volume-high-icon height="22"
-                        data-testid="comm-barge-comm-button-volume-high-icon-2"
-                        width="22"/>
-      <q-tooltip>
-        Barge
-      </q-tooltip>
-    </span>
-  </div>
+  <span class="cursor-pointer"
+        data-testid="comm-barge-comm-button-dialog-click"
+        @click="dialog"
+        v-if="userCanBargeAndWhisper(communication)">
+    <volume-high-icon data-testid="comm-barge-comm-button-volume-high-icon-2"
+                      :height="iconHeight"
+                      :width="iconWidth"/>
+    <q-tooltip>
+      Barge
+    </q-tooltip>
+  </span>
 </template>
 
 <script>
@@ -42,6 +40,16 @@ export default {
       type: Boolean,
       default: true,
       required: false
+    },
+
+    iconHeight: {
+      type: [Number, String],
+      default: 22
+    },
+
+    iconWidth: {
+      type: [Number, String],
+      default: 22
     }
   },
 

@@ -2,10 +2,9 @@
   <div>
     <span class="cursor-pointer"
           data-testid="comm-whisper-button-whisper-span"
-          @click="dialog"
-          v-if="userCanBargeAndWhisper(communication)">
-      <ear-icon height="22"
-                width="22"/>
+          @click="dialog">
+      <ear-icon :height="iconHeight"
+                :width="iconWidth"/>
       <q-tooltip>
         Whisper
       </q-tooltip>
@@ -41,6 +40,16 @@ export default {
       type: Boolean,
       default: true,
       required: false
+    },
+
+    iconHeight: {
+      type: [Number, String],
+      default: 22
+    },
+
+    iconWidth: {
+      type: [Number, String],
+      default: 22
     }
   },
 

@@ -16,14 +16,18 @@
     <terminate-communication-button class="operation-button mx-1"
                                     icon-height="16"
                                     icon-width="16"
-                                    :communication="row" />
+                                    :communication="row"
+                                    @terminated="$emit('terminated', $event)"/>
 
     <barge-communication-button class="operation-button mx-1"
                                 icon-height="16"
                                 icon-width="16"
                                 :communication="row" />
 
-<!--    <operation-whisper :communication="row" />-->
+    <whisper-communication-button class="operation-button mx-1"
+                                  icon-height="16"
+                                  icon-width="16"
+                                  :communication="row" />
   </div>
 </template>
 
@@ -34,11 +38,13 @@ import DetailsCommunicationButton from 'components/communication/details-communi
 import ArchiveCommunicationButton from 'components/communication/archive-communication-button.vue'
 import TerminateCommunicationButton from 'components/communication/terminate-communication-button.vue'
 import BargeCommunicationButton from 'components/communication/barge-communication-button.vue'
+import WhisperCommunicationButton from 'components/communication/whisper-communication-button.vue'
 
 export default {
   name: 'CommunicationsOperations',
 
   components: {
+    WhisperCommunicationButton,
     ReplyCommunicationButton,
     CallCommunicationButton,
     DetailsCommunicationButton,

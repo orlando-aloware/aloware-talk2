@@ -1,5 +1,5 @@
 <template>
-  <span class="cursor-pointer operation-button"
+  <span class="cursor-pointer"
         data-testid="comm-call-back-button"
         v-if="communication.contact && communication.type !== CommunicationTypes.EMAIL"
         @click="callContact">
