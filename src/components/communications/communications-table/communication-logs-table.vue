@@ -5,13 +5,12 @@
     </h3>
     <div class="filters pl-3">
       <div class="search">
-        <search-input
-          class="width-260"
-          limit-search-characters
-          :search="search"
-          :disabled="isLoadingDisabled"
-          data-testid="contacts-view-search-input"
-          @search="onSearch"
+        <search-input class="width-260"
+                      limit-search-characters
+                      :search="search"
+                      :disabled="isLoadingDisabled"
+                      data-testid="contacts-view-search-input"
+                      @search="onSearch"
         />
       </div>
 
@@ -20,7 +19,8 @@
           <template v-if="!isLoadingCommunicationsCount">
             {{ communicationsCount }} Communications
           </template>
-          <q-skeleton type="text" style="width: 80px" v-else />
+          <q-skeleton type="text"
+                      style="width: 80px" v-else />
         </div>
 
         <hr
@@ -41,22 +41,23 @@
       </div>
     </div>
 
-    <q-table
-      class="communication-logs-table flex-grow-1"
-      row-key="index"
-      virtual-scroll
-      :data="communications"
-      :columns="columns"
-      :loading="isLoadingMore || isLoading"
-      :virtual-scroll-item-size="100"
-      :virtual-scroll-sticky-size-start="100"
-      :pagination="pagination"
-      :rows-per-page-options="[0]"
-      @virtual-scroll="onScroll"
+    <q-table class="communication-logs-table flex-grow-1"
+             row-key="index"
+             virtual-scroll
+             :data="communications"
+             :columns="columns"
+             :loading="isLoadingMore || isLoading"
+             :virtual-scroll-item-size="100"
+             :virtual-scroll-sticky-size-start="100"
+             :pagination="pagination"
+             :rows-per-page-options="[0]"
+             @virtual-scroll="onScroll"
     >
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td :props="props" :key="col.name" v-for="col in props.cols">
+          <q-td :props="props"
+                v-for="col in props.cols"
+                :key="col.name">
             <div v-if="col.name === 'disposition_status2'">
               <disposition :row="props.row" />
             </div>
@@ -74,7 +75,8 @@
             </div>
 
             <div v-else-if="col.name === 'created_at'">
-              <start-time :row="props.row" :value="col.value" />
+              <start-time :row="props.row"
+                          :value="col.value" />
             </div>
             <div v-else-if="col.name === 'talk_time'">
               <talk-time :row="props.row" />
@@ -129,11 +131,13 @@
             </div>
 
             <div v-else-if="col.name === 'transfer_prior_user_ids'">
-              <transferred prop="transfer_prior_user_ids" :row="props.row" />
+              <transferred prop="transfer_prior_user_ids"
+                           :row="props.row" />
             </div>
 
             <div v-else-if="col.name === 'transfer_target_user_ids'">
-              <transferred prop="transfer_target_user_ids" :row="props.row" />
+              <transferred prop="transfer_target_user_ids"
+                           :row="props.row" />
             </div>
 
             <div
@@ -191,11 +195,13 @@
       </template>
       <template v-slot:loading>
         <div class="d-flex justify-center">
-          <q-spinner-bars color="primary" size="30px" />
+          <q-spinner-bars color="primary"
+                          size="30px" />
         </div>
       </template>
       <template v-slot:no-data>
-        <div class="w-100 text-center" v-if="!isLoadingMore && !isLoading">
+        <div class="w-100 text-center"
+             v-if="!isLoadingMore && !isLoading">
           <h2>No data</h2>
         </div>
       </template>
@@ -251,8 +257,6 @@ import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
 import CommunicationsTeams from './communications-teams.vue'
 import StartTime from './start-time.vue'
-import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
-import workflowsMixin from 'src/plugins/mixins/workflows.mixin'
 import CommunicationsFilters from 'src/components/communications/communications-filters.vue'
 import CommunicationsOperations from './communications-operations.vue'
 import RingGroup from './ring-group.vue'
