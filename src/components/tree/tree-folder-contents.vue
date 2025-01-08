@@ -13,6 +13,7 @@
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
       :endpoint="endpoint"
+      :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
       data-testid="tree-folder-contents"
     />
   </div>
@@ -39,6 +40,10 @@ export default {
     endpoint: {
       type: String,
       default: '/api/v2/contact-folders'
+    },
+    hasShowInPublicFolderPermission: {
+      type: Boolean,
+      default: false
     }
   }
 }

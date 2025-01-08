@@ -88,6 +88,7 @@ import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
 import { aloaiMixin } from 'src/plugins/mixins'
+import * as AloAi from 'src/constants/aloai'
 
 export default {
   name: 'aloai-engagement-control-modal',
@@ -119,7 +120,8 @@ export default {
       bot_engagements: {},
       searchText: '',
       isLoading: true,
-      selectedBotId: null
+      selectedBotId: null,
+      AloAi
     }
   },
 
@@ -236,7 +238,10 @@ export default {
         if (this.bots.length > 0) {
           return this.bots
         }
-        const { data } = await talk2Api.V2.aloAiBot.getBots()
+        const { data } = await talk2Api.V2.aloAiBot.getBots({
+          enabled: true,
+          type: AloAi.TYPE_TEXT
+        })
         return data?.data ?? []
       } catch (error) {
         console.error('[fetchBots] error', error)

@@ -194,6 +194,7 @@ export default function () {
     pdViewCancelToken: null,
     bulkAddContactsNotification: {},
     redialedTasksCount: {},
-    tasksSentSmsTemplates: {}
+    tasksSentSmsTemplates: {},
+    redialedTask: {}
   }
 }

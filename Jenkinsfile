@@ -115,12 +115,15 @@ pipeline {
                             }
                         }
 
-                        stage('Save Cache') {
+                        stage('Save Cache (node_modules)') {
                             steps {
-                                // Save the cache via rsync to the cache directory
                                 sh '''
                                     mkdir -p ${ARTIFACTS_CACHE_FOLDER}
-                                    rsync -a node_modules ${ARTIFACTS_CACHE_FOLDER}
+                                    if [ -d "node_modules" ]; then
+                                        rsync -a node_modules ${ARTIFACTS_CACHE_FOLDER}
+                                    else
+                                        echo "node_modules directory not found, skipping cache"
+                                    fi
                                 '''
                             }
                         }

@@ -683,6 +683,24 @@ export default {
   },
 
   V2: {
+    contact: {
+      getConversationSummary (contactId, params) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary`, params)
+      },
+
+      getTextMessageSuggestions (contactId, params) {
+        if (!contactId) {
+          return window.axios.get(`/api/v2/contacts/text-message-suggestions`, params)
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/text-message-suggestions`, params)
+      }
+    },
+
     contacts: {
       get (id, sourceToken = null) {
         if (!id || id === 'undefined') {
@@ -911,7 +929,7 @@ export default {
 
     aloAiBot: {
       getBots (params = {}) {
-        return window.axios.get(`${suffixV1}aloai/bots`, { params })
+        return window.axios.get(`${suffixV1}aloai/bot`, { params })
       },
       getContactDisengagedBots (contactId) {
         return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
@@ -923,10 +941,10 @@ export default {
         return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-status`, { engagements })
       },
       enrollContacts (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/enroll-contacts`, params)
+        return window.axios.post(`${suffixV1}aloai/bot/${botId}/enroll-contacts`, params)
       },
       disenrollContact (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/disenroll-contact`, params)
+        return window.axios.post(`${suffixV1}aloai/bot/${botId}/disenroll-contact`, params)
       }
     }
   }

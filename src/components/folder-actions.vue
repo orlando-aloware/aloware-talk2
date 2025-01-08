@@ -76,7 +76,7 @@
               :id="'folder-submenu-child-' + id"
               class="submenu-icon"
               @click="{}">
-              <FolderArrowCloseIcon color="#62666E" />
+              <FolderArrowCloseIcon color="#62666E"/>
             </span>
           </template>
         </contact-menu-item>
@@ -125,7 +125,7 @@
 
 <script>
 import { createPopper } from '@popperjs/core'
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 import ContactMenu from './contacts/contact-menu.vue'
 import ContactMenuItem from './contacts/contact-menu-item.vue'
 import FolderIcon from 'components/icons/folder-2-icon'

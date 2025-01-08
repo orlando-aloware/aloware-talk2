@@ -17,19 +17,19 @@
                     data-testid="contacts-folder-destroy-submenu-btn"
                     @click="destroySubmenu">
               <plus-icon color="#256EFF"
-                          width="14"
-                          height="14"
-                          firstD="M7 1.5V12.5"
-                          secondD="M12.5 7H1.5"
-                          data-testid="contacts-folder-plus-icon"
-                          strokeWidth="1.5" />
+                         width="14"
+                         height="14"
+                         firstD="M7 1.5V12.5"
+                         secondD="M12.5 7H1.5"
+                         data-testid="contacts-folder-plus-icon"
+                         strokeWidth="1.5"/>
             </button>
 
             <b-popover triggers="click blur"
-                        placement="bottomright"
-                        boundary="window"
-                        custom-class="contact-popover"
-                        :target="folderId">
+                       placement="bottomright"
+                       boundary="window"
+                       custom-class="contact-popover"
+                       :target="folderId">
               <!-- v-if="$refs[folderId] !== undefined"> -->
               <contact-menu>
                 <contact-menu-item @click="onCreateFolderToggle($event)" data-testid="create-folder-toggle-menu-item">
@@ -42,8 +42,8 @@
                 </contact-menu-item>
 
                 <contact-menu-item v-if="isContactModuleType"
-                                    data-testid="create-list-menu-item"
-                                    @click="onCreateList($event)">
+                                   data-testid="create-list-menu-item"
+                                   @click="onCreateList($event)">
                   <template slot="icon">
                     <people-icon data-testid="contacts-people-icon"></people-icon>
                   </template>
@@ -52,9 +52,9 @@
                   </template>
                 </contact-menu-item>
                 <contact-menu-item v-else
-                                    data-testid="contacts-create-destroy-submenu"
-                                    @mouseover="createSubmenu"
-                                    @mouseleave="destroySubmenu">
+                                   data-testid="contacts-create-destroy-submenu"
+                                   @mouseover="createSubmenu"
+                                   @mouseleave="destroySubmenu">
                   <template slot="icon">
                     <people-icon></people-icon>
                   </template>
@@ -66,17 +66,17 @@
                           class="submenu-icon"
                           data-testid="contacts-folder-create-submenu-click"
                           @click="createSubmenu">
-                      <FolderArrowCloseIcon color="#62666E" />
+                      <FolderArrowCloseIcon color="#62666E"/>
                     </span>
                   </template>
                 </contact-menu-item>
 
                 <div class="folder-submenu-items extended"
-                      :id="'folder-submenu-items-' + rootFolderId"
-                      :class="{ 'd-flex': isMenuOpen }"
-                      data-testid="contacts-folder-create-submenu-mouseover"
-                      @mouseleave="{}"
-                      @mouseover="createSubmenu">
+                     :id="'folder-submenu-items-' + rootFolderId"
+                     :class="{ 'd-flex': isMenuOpen }"
+                     data-testid="contacts-folder-create-submenu-mouseover"
+                     @mouseleave="{}"
+                     @mouseover="createSubmenu">
 
                   <contact-menu-item style="padding:0 !important"
                                      data-testid="contacts-folder-create-from-existing-list"
@@ -128,38 +128,38 @@
         <template v-if="foldersLength && !isLoading">
           <template v-for="folder in folders[0].child_folders">
             <tree-folder :name="folder.name"
-                          :key="folder.id"
-                          :id="folder.id"
-                          :order="folder.order"
-                          :endpoint="foldersEndpoint"
-                          :hasEdit="folders[0].has_edit"
-                          :hasDelete="folders[0].has_delete"
-                          :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
-                          :folders="folder.child_folders"
-                          :lists="folder.lists"
-                          :layer="0"
-                          data-testid="create-tree-folder-component"
-                          v-if="folder.id !== removedFolder"/>
+                         :key="folder.id"
+                         :id="folder.id"
+                         :order="folder.order"
+                         :endpoint="foldersEndpoint"
+                         :hasEdit="folders[0].has_edit"
+                         :hasDelete="folders[0].has_delete"
+                         :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
+                         :folders="folder.child_folders"
+                         :lists="folder.lists"
+                         :layer="0"
+                         data-testid="create-tree-folder-component"
+                         v-if="folder.id !== removedFolder"/>
           </template>
           <tree-folder :name="folders[0].name"
-                        :id="folders[0].id"
-                        :order="folders[0].order"
-                        :hasEdit="folders[0].has_edit"
-                        :endpoint="foldersEndpoint"
-                        :hasDelete="folders[0].has_delete"
-                        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
-                        :isRootList="true"
-                        :folders="[]"
-                        :lists="folders[0].lists"
-                        :layer="0"
-                        :parent_id="null"
-                        v-if="folders[0].id !== removedFolder"
-                        data-testid="create-tree-folder-toggle"
-                        @blur="onCreateFolderToggle($event)"
-                        @cancel="onCreateFolderCancel"/>
+                       :id="folders[0].id"
+                       :order="folders[0].order"
+                       :hasEdit="folders[0].has_edit"
+                       :endpoint="foldersEndpoint"
+                       :hasDelete="folders[0].has_delete"
+                       :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
+                       :isRootList="true"
+                       :folders="[]"
+                       :lists="folders[0].lists"
+                       :layer="0"
+                       :parent_id="null"
+                       v-if="folders[0].id !== removedFolder"
+                       data-testid="create-tree-folder-toggle"
+                       @blur="onCreateFolderToggle($event)"
+                       @cancel="onCreateFolderCancel"/>
         </template>
         <div class="item-empty"
-              v-if="isFolderEmpty && !isLoading">
+             v-if="isFolderEmpty && !isLoading">
           <span class="fs-12 text-muted" data-testid="my-lists-without-contacts">
             You don't have any {{ isContactModuleType ? 'contact' : 'power dialer' }} list
           </span>
@@ -171,7 +171,7 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import TreeFolder from '../tree/tree-folder.vue'
 import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import ContactMenu from './contact-menu.vue'
@@ -263,9 +263,9 @@ export default {
     },
     isIntegrationEnabled () {
       return this.currentCompany &&
-          (this.currentCompany.hubspot_integration_enabled ||
-           this.currentCompany.zoho_integration_enabled ||
-           this.currentCompany.pipedrive_integration_enabled)
+        (this.currentCompany.hubspot_integration_enabled ||
+          this.currentCompany.zoho_integration_enabled ||
+          this.currentCompany.pipedrive_integration_enabled)
     }
   },
   mounted () {

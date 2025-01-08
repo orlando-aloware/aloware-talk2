@@ -108,7 +108,7 @@
               <add-user-icon width="14"
                              height="14"
                              color="#62666E"/>
-              Enroll to AloAI Bot
+              Enroll to AloAi Bot
             </b-dropdown-item>
           </b-dropdown>
         </div>
@@ -373,7 +373,7 @@ export default {
         return false
       }
 
-      // AloAI and Power Dialer disabled
+      // AloAi and Power Dialer disabled
       if (!this.shouldShowAloAi && !this.shouldShowPowerDialer) {
         return false
       }

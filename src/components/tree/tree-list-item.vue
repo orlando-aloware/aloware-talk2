@@ -24,13 +24,13 @@
             <template
               v-if="isContactsRoute">
               <contact-list-type-icon testIdSuffix='tree-list-item'
-                                      :type="type" />
+                                      :type="type"/>
             </template>
             <template
               v-else>
               <DialIcon
                 color="grey"
-                class="mr-1" />
+                class="mr-1"/>
             </template>
           </div>
           <div class="folder__name d-flex align-items-center">
@@ -52,7 +52,7 @@
             </span>
             <UnsavedIcon
               class="mr-1"
-              v-show="id == undefined" />
+              v-show="id == undefined"/>
           </div>
 
           <button
@@ -90,6 +90,12 @@
         </b-popover>
       </div>
     </router-link>
+
+    <convert-list-to-public-dialog :list-id="id"
+                                   :list-name="name"
+                                   v-model="convertToPublicDialog"
+                                   @closed="convertToPublicDialog = false"
+                                   @converted="onListConvertedToPublic"/>
   </div>
 </template>
 
@@ -106,6 +112,7 @@ import UnsavedIcon from 'components/icons/unsaved-icon'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { contactLists, contactsListFiltersMixin } from 'src/plugins/mixins'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
+import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog.vue'
 
 export default {
   components: {
@@ -114,7 +121,8 @@ export default {
     FolderOption,
     DialIcon,
     UnsavedIcon,
-    ListActions
+    ListActions,
+    ConvertListToPublicDialog
   },
 
   mixins: [
@@ -167,7 +175,8 @@ export default {
       isRenaming: false,
       folderExists: false,
       inputTimeout: null,
-      folderInterval: null
+      folderInterval: null,
+      convertToPublicDialog: false
     }
   },
 
@@ -285,19 +294,13 @@ export default {
     },
     onShowInPublicFolder () {
       this.$root.$emit('bv::hide::popover')
-      const params = { show_in_public_folder: true }
-      const id = this.id
+      this.convertToPublicDialog = true
+    },
+    onListConvertedToPublic () {
+      this.convertToPublicDialog = false
 
-      this.updateContactList(id, params)
-        .then((response) => {
-          this.$generalNotification('Contact list has been successfully converted to public')
-          this.reloadFolders()
-          this.loadPublicLists()
-        })
-        .catch((error) => {
-          const { message } = extractErrorMessage(error)
-          this.$generalNotification(message, 'error')
-        })
+      this.reloadFolders()
+      this.loadPublicLists()
     },
     createList (params) {
       this.$axios
@@ -317,7 +320,10 @@ export default {
           this.reloadFolders()
         })
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')
         })
@@ -345,17 +351,19 @@ export default {
             name: this.name,
             type: this.type
           })
-          this.setDataCount({ filters: {
-            0: {
-              filters: {
-                contact_lists: {
-                  operator: OPERATORS.IS_ANY_OF,
-                  value: [this.id]
-                }
-              },
-              is_conjunction: true
+          this.setDataCount({
+            filters: {
+              0: {
+                filters: {
+                  contact_lists: {
+                    operator: OPERATORS.IS_ANY_OF,
+                    value: [this.id]
+                  }
+                },
+                is_conjunction: true
+              }
             }
-          } })
+          })
         }
 
         if (this.type === ContactListTypes.DYNAMIC) {
@@ -386,7 +394,10 @@ export default {
     },
     pinRequest (id, isPinned) {
       if (isPinned) {
-        return this.$axios.post('/api/v2/contact-list-bookmark', { contact_list_id: id, order: id })
+        return this.$axios.post('/api/v2/contact-list-bookmark', {
+          contact_list_id: id,
+          order: id
+        })
       } else {
         return this.$axios.delete('/api/v2/contact-list-bookmark/' + id)
       }
@@ -416,7 +427,10 @@ export default {
       }
     },
     updateListName (name) {
-      const responseData = { data: null, message: '' }
+      const responseData = {
+        data: null,
+        message: ''
+      }
       if (this.isRenaming) return
       this.isRenaming = true
       if (!this.id) {
@@ -424,7 +438,10 @@ export default {
         return
       }
 
-      this.updateListRequest(this.id, { name, order: this.order })
+      this.updateListRequest(this.id, {
+        name,
+        order: this.order
+      })
         .then(response => {
           responseData.data = _.get(response.data, 'data', _.get(response, 'data', null))
           responseData.message = _.get(response.data, 'message', _.get(response, 'message', ''))
@@ -446,7 +463,10 @@ export default {
       return this.$axios
         .patch(this.listPath + id, params)
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')
         })
@@ -456,7 +476,10 @@ export default {
         .get(`${this.listPath}${id}`)
         .then((response) => response.data)
         .catch((error) => {
-          const { message, html } = extractErrorMessage(error)
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
           console.log(html)
           this.$generalNotification(message, 'error')
         })
@@ -466,7 +489,8 @@ export default {
         .get(`api/v2/contacts-list/${id}/items?per_page=1`)
     },
     onClickItem () {
-      this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {})
+      this.$router.push(`/contacts/list/${this.id}`).catch((_err) => {
+      })
     },
     onRemoveList () {
       if (!this.id) {
@@ -486,9 +510,15 @@ export default {
 
       this.removeListClose()
       setTimeout(() => {
-        this.removeListOpen({ id: this.id, name: this.name })
+        this.removeListOpen({
+          id: this.id,
+          name: this.name
+        })
       }, 10)
-      this.removeListOpen({ id: this.id, name: this.name })
+      this.removeListOpen({
+        id: this.id,
+        name: this.name
+      })
     },
     toggleSidebar (callback, event) {
       if (this.unsavedList) {
