@@ -230,12 +230,6 @@ export default {
     this.$VueEvent.listen('channel_filter_created', filter => {
       this.fetchSavedFilters = true
     })
-
-    // this.$VueEvent.listen('my_contacts_update_filter', () => {
-    //  this.filter = { ...this.appliedFilter.filter }
-    //  this.filter.my_contact = +this.inboxShowMyContacts
-    //  this.onApply(true)
-    // })
   },
 
   computed: {
