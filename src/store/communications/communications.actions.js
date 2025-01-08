@@ -47,6 +47,9 @@ export default {
   setIsLoadingCommunications: ({ commit }, isLoading) => {
     commit('SET_IS_LOADING_COMMUNICATIONS', isLoading)
   },
+  setIsLoadingCommunicationsCount: ({ commit }, isLoading) => {
+    commit('SET_IS_LOADING_COMMUNICATIONS_COUNT', isLoading)
+  },
   setLiveContacts: ({ commit }, contacts) => {
     commit('SET_LIVE_CONTACTS', contacts)
   },

@@ -34,6 +34,7 @@ export default {
       'appliedFilter',
       'channelClonedFilter',
       'isLoadingCommunications',
+      'isLoadingCommunicationsCount',
       'isGettingTasksList',
       'communications',
       'channelChangedFilterFields',
@@ -146,7 +147,6 @@ export default {
         rowsPerPage: 0,
         rowsNumber: this.communicationsCount
       },
-      isLoadingCommunicationsCount: false,
       fixedColumns: [
         'disposition_status2',
         'incoming_number',
@@ -208,6 +208,7 @@ export default {
       'setLoadingPendingTaskCount',
       'setIsInboxFiltersLoaded',
       'setIsLoadingCommunications',
+      'setIsLoadingCommunicationsCount',
       'gettingTasksList',
       'setTaskCount',
       'setPinnedViews',
@@ -970,7 +971,7 @@ export default {
       }
 
       this.countSource = this.cancelToken.source()
-      this.isLoadingCommunicationsCount = true
+      this.setIsLoadingCommunicationsCount(true)
 
       return talk2Api.V1.reports.communications.getCount({
         params: this.$jsonClone(params),
@@ -983,7 +984,7 @@ export default {
           console.error('Error fetching communications count:', thrown)
         })
         .finally(() => {
-          this.isLoadingCommunicationsCount = false
+          this.setIsLoadingCommunicationsCount(false)
         })
     },
 
