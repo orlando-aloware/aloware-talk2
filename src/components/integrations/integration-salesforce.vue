@@ -1,26 +1,14 @@
 <template>
-    <div class="integration-wrapper"
+    <div class="integration-wrapper integration-wrapper-generic"
         data-testid="integration-salesforce-wrapper">
         <q-card class="integration-card"
             data-testid="integration-salesforce-card"
             flat>
             <q-item class="p-0">
-                <q-item-section v-if="contactLink">
-                    <b-link target="_blank"
-                      data-testid="integration-salesforce-salesforce-link"
-                      :href="contactLink">
-                      <i class="fab fa-salesforce salesforce-icon"></i>
-                      <span class="integration-title"> Salesforce {{ salesforceModule }}</span>
-                    </b-link>
-                </q-item-section>
-                <q-item-section v-else>
-                    <a href="#"
-                      data-testid="integration-salesforce-salesforce-a-tag"
-                      onclick="return false;">
-                      <i class="fab fa-salesforce salesforce-icon"></i>
-                      <span class="integration-title"> Salesforce</span>
-                    </a>
-                </q-item-section>
+              <span class='integration-jit-card-header'>
+                <i class="fab fa-salesforce salesforce-icon integration-icon-in-header"></i>
+                <span class="integration-title">Salesforce {{ salesforceModule }}</span>
+              </span>
             </q-item>
 
             <q-separator data-testid="integration-salesforce-separator" />
@@ -28,6 +16,11 @@
             <q-card-section
                 data-testid="integration-salesforce-card-section-1"
                 v-if="integrationData">
+                <a class="external-contact-integration-link-icon color-primary"
+                   target="_blank"
+                   :href="contactLink">
+                  <i class="fa fa-external-link" aria-hidden="true"/>
+                </a>
                 <p class="mb-0"
                     data-testid="integration-salesforce-first-name"
                     v-if="integrationData.first_name !== undefined">
