@@ -60,6 +60,9 @@ export default {
   SET_INBOX_CLOSED_TASK_COUNT: (state, count) => {
     state.inboxTaskCounts = { ...state.inboxTaskCounts, closed: count }
   },
+  SET_IS_LOADING_COMMUNICATIONS: (state, isLoading) => {
+    state.isLoadingCommunications = isLoading
+  },
   SET_LIVE_CONTACTS: (state, contacts) => {
     state.liveContacts = contacts
   },

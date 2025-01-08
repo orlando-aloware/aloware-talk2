@@ -23,11 +23,10 @@
                       style="width: 80px" v-else />
         </div>
 
-        <hr
-          role="separator"
-          aria-orientation="vertical"
-          class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical"
-        />
+        <hr role="separator"
+            aria-orientation="vertical"
+            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical"
+        >
 
         <communications-filters class="ml-2 mr-3" />
 
@@ -46,7 +45,7 @@
              virtual-scroll
              :data="communications"
              :columns="columns"
-             :loading="isLoadingMore || isLoading"
+             :loading="isLoadingMore || isLoadingCommunications"
              :virtual-scroll-item-size="100"
              :virtual-scroll-sticky-size-start="100"
              :pagination="pagination"
@@ -197,7 +196,7 @@
       </template>
       <template v-slot:no-data>
         <div class="w-100 text-center"
-             v-if="!isLoadingMore && !isLoading">
+             v-if="!isLoadingMore && !isLoadingCommunications">
           <h2> No data </h2>
         </div>
       </template>

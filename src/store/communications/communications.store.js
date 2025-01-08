@@ -106,6 +106,7 @@ export default function () {
     appliedFilter: null,
     isLoadingOpenTaskCount: false,
     isLoadingPendingTaskCount: false,
+    isLoadingCommunications: false,
     inboxShowMyContacts: false,
     inboxShowUnreads: false,
     isInboxFiltersLoaded: true,

@@ -33,7 +33,7 @@ export default {
       'contacts',
       'appliedFilter',
       'channelClonedFilter',
-
+      'isLoadingCommunications',
       'isGettingTasksList',
       'communications',
       'channelChangedFilterFields',
@@ -140,7 +140,6 @@ export default {
       // lastPage: 1,
       maxPaginationPages: 5,
       // communicationsData: [],
-      isLoading: false,
       nextCursor: null,
       countSource: null,
       pagination: {
@@ -208,6 +207,7 @@ export default {
       'setLoadingOpenTaskCount',
       'setLoadingPendingTaskCount',
       'setIsInboxFiltersLoaded',
+      'setIsLoadingCommunications',
       'gettingTasksList',
       'setTaskCount',
       'setPinnedViews',
@@ -820,7 +820,7 @@ export default {
       // if (this.isLoading) {
       //  return
       // }
-      this.isLoading = true
+      this.setIsLoadingCommunications(true)
 
       if (!isLoadMore) {
         console.log('enter isLoadMore and clean data')
@@ -970,8 +970,7 @@ export default {
           this.$generalNotification(`An exception was encountered while fetching ${channelName}.`, 'error')
         })
         .finally(() => {
-          console.log('isLoading false')
-          this.isLoading = false
+          this.setIsLoadingCommunications(false)
           this.isLoadingMore = false
         })
     },

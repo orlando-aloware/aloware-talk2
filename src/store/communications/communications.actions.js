@@ -44,6 +44,9 @@ export default {
   setInboxPendingTaskCount: ({ commit }, count = 0) => {
     commit('SET_INBOX_PENDING_TASK_COUNT', count)
   },
+  setIsLoadingCommunications: ({ commit }, isLoading) => {
+    commit('SET_IS_LOADING_COMMUNICATIONS', isLoading)
+  },
   setLiveContacts: ({ commit }, contacts) => {
     commit('SET_LIVE_CONTACTS', contacts)
   },
