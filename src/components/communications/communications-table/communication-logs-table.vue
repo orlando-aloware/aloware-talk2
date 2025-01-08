@@ -229,8 +229,6 @@ import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
 import CommunicationsTeams from './communications-teams.vue'
 import StartTime from './start-time.vue'
-import ringGroupsMixin from 'src/plugins/mixins/ring-groups.mixin'
-import workflowsMixin from 'src/plugins/mixins/workflows.mixin'
 import CommunicationsOperations from './communications-operations.vue'
 import RingGroup from './ring-group.vue'
 import Disposition from './disposition.vue'
@@ -266,9 +264,7 @@ export default {
 
   mixins: [
     aclMixin,
-    communicationsMixin,
-    ringGroupsMixin,
-    workflowsMixin
+    communicationsMixin
   ],
 
   components: {

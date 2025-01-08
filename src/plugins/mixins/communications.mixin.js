@@ -12,9 +12,6 @@ import * as Filters from 'src/constants/filters'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import * as CommunicationDirection from 'src/constants/communication-direction'
-import * as CallbackStatus from 'src/constants/callback-status'
 import * as MentionType from 'src/constants/mention-type'
 
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
