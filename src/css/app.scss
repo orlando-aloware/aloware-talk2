@@ -14149,6 +14149,11 @@ h1.contact-list-name-label {
             &__counter {
               margin-left: 20px;
               color: $grey-90;
+
+              &--dnc {
+                color: $red-90;
+                margin-left: 5px;
+              }
             }
           }
 
@@ -15872,6 +15877,10 @@ hr {
     border-bottom-color: $grey-light11 !important;
     opacity: 0 !important;
   }
+}
+
+.text-decoration-none {
+  text-decoration: none !important;
 }
 
 .no-p-margin p {

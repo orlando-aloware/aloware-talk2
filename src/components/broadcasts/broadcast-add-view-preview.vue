@@ -124,8 +124,6 @@ export default {
       switch (true) {
         case !isEmpty(this.source.list):
           return this.source.list.name
-        case !isEmpty(this.source.filters):
-          return 'Custom filters'
         case !isEmpty(this.source.integration):
           return this.source.integration.list.name
         default:
