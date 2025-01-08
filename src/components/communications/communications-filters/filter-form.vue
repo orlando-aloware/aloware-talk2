@@ -87,6 +87,21 @@
                    md="6"
                    v-if="isInboxOrAllCallsChannel">
               <b-form-group class="form-label"
+                            label="Teams">
+                <team-selector :force-remove-missing-values="true"
+                               :multiple="true"
+                               :highlighted="isChanged('teams')"
+                               :generic-multiselect="false"
+                               data-testid="filter-form-team-selector"
+                               v-model="filter.teams"
+                               @change="eventPayload => onFilterChange(eventPayload, 'teams')" />
+              </b-form-group>
+            </b-col>
+
+            <b-col sm="12"
+                   md="6"
+                   v-if="isInboxOrAllCallsChannel">
+              <b-form-group class="form-label"
                             label="Type">
                 <communication-type-filter-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
                                                     :highlighted="isChanged('type')"
@@ -483,6 +498,7 @@
 <script>
 import LineSelector from 'components/generic-selectors/line-selector'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
+import TeamSelector from 'components/generic-selectors/team-selector'
 import TransferTypeSelector from 'components/generic-selectors/transfer-type-selector'
 import TalkTimeSelector from 'components/generic-selectors/talk-time-selector'
 import AnswerStatusSelector from 'components/generic-selectors/answer-status-selector'
@@ -536,6 +552,7 @@ export default {
     BroadcastSelector,
     DateRangePicker,
     CreatorTypeSelector,
+    TeamSelector,
     EntityTags
   },
 

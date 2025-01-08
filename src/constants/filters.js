@@ -30,6 +30,7 @@ export const DEFAULT_STATE = {
     campaigns: [],
     workflows: [],
     ring_groups: [],
+    teams: [],
     incoming_numbers: [],
     users: [],
     timezone: window.timezone,

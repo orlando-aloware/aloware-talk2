@@ -351,6 +351,7 @@ export default {
       loading: true,
       loadingCampaigns: false,
       loadingRingGroups: false,
+      loadingTeams: false,
       loadingUsers: false,
       loadingTags: false,
       loadingWorkflows: false,
@@ -1587,6 +1588,7 @@ export default {
         }
 
         this.getRingGroups()
+        this.getTeams()
         this.getBroadcasts()
         this.getTemplates()
         this.getCampaigns()
@@ -1721,6 +1723,24 @@ export default {
             return Promise.reject()
           })
       }
+    },
+
+    getTeams () {
+      if (!this.hasPermissionTo('list team')) {
+        return
+      }
+
+      this.loadingTeams = true
+
+      return this.$axios.get('/api/v2/teams/list', { mode: 'no-cors' })
+        .then(res => {
+          this.setTeams(res.data)
+          this.loadingTeams = false
+        }).catch(err => {
+          console.log('ERROR GETTING TEAMS', err)
+          console.log(err)
+          this.loadingTeams = false
+        })
     },
 
     getUsers () {
@@ -2629,6 +2649,7 @@ export default {
       'setCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
+      'setTeams',
       'setUsers',
       'setUsersIsLoading',
       'newTag',

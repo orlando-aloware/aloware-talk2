@@ -63,6 +63,7 @@ export default function (/* { ssrContext } */) {
       users: [],
       usersIsLoading: false,
       ringGroups: [],
+      teams: [],
       workflows: [],
       changelogs: [],
       broadcasts: [],
@@ -545,6 +546,10 @@ export default function (/* { ssrContext } */) {
 
       setRingGroups ({ commit }, ringGroups) {
         commit('SET_RING_GROUPS', ringGroups)
+      },
+
+      setTeams ({ commit }, teams) {
+        commit('SET_TEAMS', teams)
       },
 
       resetVuex ({ commit }, value) {
@@ -1314,6 +1319,10 @@ export default function (/* { ssrContext } */) {
 
       SET_RING_GROUPS (state, ringGroups) {
         state.ringGroups = ringGroups
+      },
+
+      SET_TEAMS (state, teams) {
+        state.teams = teams
       },
 
       RESET_VUEX ({ state }) {

@@ -174,6 +174,7 @@ export default {
       filterFields: [
         'campaigns',
         'ring_groups',
+        'teams',
         'direction',
         'answer_status',
         'min_talk_time',
