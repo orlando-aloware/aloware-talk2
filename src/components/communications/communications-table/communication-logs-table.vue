@@ -140,9 +140,8 @@
                            :row="props.row" />
             </div>
 
-            <div
-              data-testid="cold-transfer-row"
-              v-else-if="col.name === 'in_cold_transfer'"
+            <div data-testid="cold-transfer-row"
+                 v-else-if="col.name === 'in_cold_transfer'"
             >
               <span>{{ props.row.in_cold_transfer ? 'Yes' : 'No' }}</span>
             </div>
@@ -159,10 +158,9 @@
               <queue-resolution :row="props.row" />
             </div>
 
-            <div
-              data-testid="email-span"
-              class="break-word"
-              v-else-if="col.name === 'email'"
+            <div data-testid="email-span"
+                 class="break-word"
+                 v-else-if="col.name === 'email'"
             >
               <span>{{ props.row.contact?.email || '-' }}</span>
             </div>
