@@ -61,6 +61,27 @@
                              v-if="props.row[col.field]" />
               <span v-else>-</span>
             </div>
+            <div v-else-if="col.name === 'actions'">
+              <div class="d-flex justify-content-center context-menu">
+                <b-dropdown no-caret
+                            size="sm"
+                            center>
+                  <template #button-content>
+                    <ellipse-icon />
+                  </template>
+                  <b-dropdown-item dense
+                                   clickable
+                                   @click="onRenameList(props.row)">
+                    <span class=""><edit-pen-icon /> Rename</span>
+                  </b-dropdown-item>
+                  <b-dropdown-item dense
+                                   clickable
+                                   @click="onDeleteList(props.row)">
+                    <span class="text-danger"><delete-red-icon /> Delete</span>
+                  </b-dropdown-item>
+                </b-dropdown>
+              </div>
+            </div>
           </q-td>
         </q-tr>
       </template>
@@ -79,15 +100,24 @@
         </div>
       </template>
     </q-table>
+
+    <lists-rename-form :is-show="isOpenListForm"
+                  :editable-list="list"
+                  data-testid="lists-form"
+                  @closeListForm="closeListForm"
+                  @listUpdated="listUpdated"/>
   </div>
 </template>
 
 <script>
 import RelativeTime from 'src/components/relative-time.vue'
-import SearchInput from 'src/components/search-input'
 import { COLUMNS } from 'src/constants/lists/home-columns'
+import EllipseIcon from 'components/icons/ellipse-icon'
+import EditPenIcon from 'components/icons/edit-pen-icon.vue'
+import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
 import * as ContactListTypes from 'src/constants/lists/types'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import ListsRenameForm from 'src/components/lists/lists-rename-form'
 import { dataTableMixin } from 'src/plugins/mixins'
 
 export default {
@@ -106,7 +136,10 @@ export default {
 
   components: {
     RelativeTime,
-    SearchInput
+    EllipseIcon,
+    ListsRenameForm,
+    EditPenIcon,
+    DeleteRedIcon
   },
 
   data () {
@@ -123,7 +156,10 @@ export default {
         totalPages: 1,
         currentPage: 1
       },
-      listsData: []
+      listsData: [],
+
+      isOpenListForm: false,
+      list: null
     }
   },
 
@@ -203,13 +239,27 @@ export default {
 
   methods: {
     ...mapActions('listsModule', [
-      'fetchLists'
+      'fetchLists',
+      'deleteList'
     ]),
 
     ...mapMutations('listsModule', [
       'SET_SEARCH',
       'SET_LISTS_COUNT'
     ]),
+
+    openListForm () {
+      this.isOpenListForm = true
+    },
+
+    closeListForm () {
+      this.isOpenListForm = false
+
+      // Fix submit button label slight glitch upon closing
+      setTimeout(() => {
+        this.list = null
+      }, 200)
+    },
 
     getContactListType (contactList) {
       switch (contactList.type) {
@@ -278,6 +328,36 @@ export default {
           done()
         }
       }
+    },
+
+    onDeleteList (list) {
+      this.$bvModal.msgBoxConfirm('Are you sure you want to delete this contact list? This action is irreversible.', {
+        buttonSize: 'sm',
+        okTitle: 'Yes',
+        cancelTitle: 'No',
+        centered: true
+      }).then(confirm => {
+        if (confirm) {
+          // TO DO
+        }
+      })
+    },
+
+    onRenameList (list) {
+      this.list = list
+      this.openListForm()
+    },
+
+    listUpdated (list) {
+      const { id, name } = list
+
+      this.listsData = this.listsData.map(item => {
+        if (item.id === id) {
+          item.name = name
+        }
+
+        return item
+      })
     }
   }
 }

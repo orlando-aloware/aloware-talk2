@@ -27,5 +27,36 @@ export default {
       console.log(err)
       this._vm.$handleErrors(err.response)
     }
+  },
+
+  async deleteList ({ commit }, id) {
+    try {
+      const params = {
+        from_admin_list: true
+      }
+
+      await API.V2.contactList.delete(id, params)
+
+      return Promise.resolve()
+    } catch (err) {
+      console.log(err)
+      this._vm.$handleErrors(err.response)
+    }
+  },
+
+  async updateList ({ commit }, { id, data }) {
+    try {
+      const params = {
+        ...data,
+        from_admin_list: true
+      }
+
+      await API.V2.contactList.update(id, params)
+
+      return Promise.resolve()
+    } catch (err) {
+      console.log(err)
+      this._vm.$handleErrors(err.response)
+    }
   }
 }

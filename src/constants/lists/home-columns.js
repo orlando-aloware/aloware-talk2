@@ -76,8 +76,8 @@ export const COLUMNS = [
     draggable: true
   },
   {
-    name: '',
-    label: '',
+    name: 'actions',
+    label: 'Actions',
     field: 'actions',
     align: 'center',
     maxWidth: 50,
