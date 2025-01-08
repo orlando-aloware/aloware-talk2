@@ -2,7 +2,7 @@
   <div v-if="communication"
        data-testid="comm-details-wrapper">
     <b-row data-testid="comm-details-row">
-      <b-col :md="isWidget ? 12 : 4"
+      <b-col :md="isMobileView ? 12 : 4"
              sm="12"
              data-testid="comm-details-col"
              class="pl-0 pr-0">
@@ -11,14 +11,16 @@
                 bordered
                 class="communication-details-card bg-grey-1"
                 data-testid="comm-details-card">
-          <q-card-section class="pb-0" data-testid="comm-details-archive-card-section">
+          <q-card-section class="pb-0"
+                          data-testid="comm-details-archive-card-section"
+                          v-if="!mobileView">
             <div class="d-flex justify-content-between header">
               <div class="fs-14 mt-1 mr-1 header-title">
                 <b-button size="sm"
                           variant="light"
                           class="btn-white communication-back-button"
                           title="Go Back"
-                          v-if="isWidget && canGoBack"
+                          v-if="isMobileView && canGoBack"
                           data-testid="contact-details-navigation-btn-prev"
                           v-b-tooltip.hover
                           @click.prevent="goBack(false)">
@@ -56,7 +58,8 @@
           </q-card-section>
 
           <!--COMM TYPE-->
-          <q-card-section class="pt-0 comm-type-container" data-testid="comm-details-comm-type-card-section">
+          <q-card-section data-testid="comm-details-comm-type-card-section"
+                          :class="['comm-type-container', mobileView ? 'pt-4' : 'pt-0']">
             <div class="text-lt p-x d-inline-flex"
                  :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
               <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
@@ -974,7 +977,7 @@
           </q-card-section>
         </q-card>
       </b-col>
-      <b-col :md="isWidget ? 12 : 8"
+      <b-col :md="isMobileView ? 12 : 8"
              class="pr-0 ring-group-snapshot-wrapper"
              data-testid="comm-details-col"
              v-if="communication && communication.type === CommunicationTypes.CALL">
@@ -1084,6 +1087,11 @@ export default {
       required: false,
       default: false,
       type: Boolean
+    },
+
+    mobileView: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -1187,6 +1195,10 @@ export default {
       const sendAsMms = this.communication.metadata?.send_as_mms
 
       return sendAsMms ? 'Yes' : 'No'
+    },
+
+    isMobileView () {
+      return this.isWidget || this.mobileView
     }
   },
 
@@ -1197,7 +1209,7 @@ export default {
       }
     },
     getContactRouteLink (communication) {
-      if (this.isWidget) {
+      if (this.isMobileView) {
         return { name: 'Texting Widget (unknown-user)', params: { id: communication.contact.id } }
       }
 

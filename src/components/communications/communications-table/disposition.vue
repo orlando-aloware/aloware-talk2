@@ -1,16 +1,15 @@
 <template>
   <div>
-    <router-link target="_blank"
-                 class="text-decoration-none"
-                 :to="{ path: `/contacts/${row.contact_id}/communications/${row.id}` }"
-                 v-if="row.id && row.contact_id">
+    <span class="cursor-pointer"
+          v-if="row.id && row.contact_id"
+          @click="$emit('on-details', row)">
       <component :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
                  v-if="row.disposition_status2" />
 
       <q-tooltip>
         {{ dispositionTooltipData(row.disposition_status2, row.type, row.direction, row.callback_status) }}
       </q-tooltip>
-    </router-link>
+    </span>
 
     <component :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
                v-else />
