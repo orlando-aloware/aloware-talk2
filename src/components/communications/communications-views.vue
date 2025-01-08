@@ -112,7 +112,7 @@ export default {
     ]),
 
     ...mapGetters('communications', [
-      'allInboxFilters'
+      'allSavedFilters'
     ]),
 
     filteredViews () {
@@ -160,7 +160,7 @@ export default {
     editView (viewId) {
       this.$emit('closed')
 
-      const view = this.allInboxFilters.find(view => +view.id === +viewId)
+      const view = this.allSavedFilters.find(view => +view.id === +viewId)
       this.setSelectedFilter(view)
       this.setIsEditingView(true)
       this.setFilterDialogForView(true)

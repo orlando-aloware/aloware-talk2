@@ -1,7 +1,7 @@
 <template>
   <div data-testid="inbox-nav-item-wrapper">
     <hr class="nav-item-separator"
-        v-if="value === 'voicemails' || label === 'Channels'"/>
+        v-if="label === 'Channels'"/>
 
     <a class="inbox-nav-item mx-2 px-1"
        href="/"

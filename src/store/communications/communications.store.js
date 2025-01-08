@@ -44,12 +44,6 @@ export default function () {
         answerStatus: 'all'
       },
       {
-        label: 'Mentions',
-        value: 'mentions',
-        icon: 'mention',
-        disabled: false
-      },
-      {
         label: 'Voicemails',
         value: 'voicemails',
         icon: 'voicemail',
@@ -64,7 +58,14 @@ export default function () {
         disabled: false,
         type: 'call',
         answerStatus: 'recorded'
+      }
+      /* {
+        label: 'Mentions',
+        value: 'mentions',
+        icon: 'mention',
+        disabled: false
       },
+
       {
         label: 'My Personal Line',
         value: 'my-personal-line',
@@ -72,7 +73,7 @@ export default function () {
         disabled: false,
         type: 'all',
         answerStatus: 'all'
-      }
+      } */
     ],
     communications: [],
     communicationsCount: 0,
@@ -105,12 +106,15 @@ export default function () {
     appliedFilter: null,
     isLoadingOpenTaskCount: false,
     isLoadingPendingTaskCount: false,
-    inboxShowMyContacts: true,
+    isLoadingCommunications: false,
+    inboxShowMyContacts: false,
     inboxShowUnreads: false,
     isInboxFiltersLoaded: true,
     pinnedViews: [],
-    inboxPersonalFilters: [],
-    inboxCompanyFilters: [],
+    personalFilters: [],
+    companyFilters: [],
+    isDeletingFilter: false,
+    isUpdatingFilter: false,
     isEditingView: false,
     showViewsList: false,
     isInboxRefreshBtnLoading: false,

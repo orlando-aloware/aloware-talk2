@@ -33,7 +33,7 @@ export default {
       'contacts',
       'appliedFilter',
       'channelClonedFilter',
-
+      'isLoadingCommunications',
       'isGettingTasksList',
       'communications',
       'channelChangedFilterFields',
@@ -65,6 +65,13 @@ export default {
 
     statusText () {
       return this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase()
+    },
+
+    lastPage () {
+      if (!this.communicationsCount) {
+        return 1
+      }
+      return Math.ceil(this.communicationsCount / this.perPage)
     }
   },
 
@@ -130,10 +137,9 @@ export default {
         { value: 50, label: '50 Per Page' },
         { value: 100, label: '100 Per Page' }
       ],
-      lastPage: 1,
+      // lastPage: 1,
       maxPaginationPages: 5,
-      communicationsData: [],
-      isLoading: false,
+      // communicationsData: [],
       nextCursor: null,
       countSource: null,
       pagination: {
@@ -201,11 +207,13 @@ export default {
       'setLoadingOpenTaskCount',
       'setLoadingPendingTaskCount',
       'setIsInboxFiltersLoaded',
+      'setIsLoadingCommunications',
       'gettingTasksList',
       'setTaskCount',
       'setPinnedViews',
       'setContacts',
       'setCommunications',
+      'appendCommunications',
       'setCommunicationsCount',
       'setHasMoreCommunications'
     ]),
@@ -489,6 +497,7 @@ export default {
           'min_talk_time',
           'untagged_only',
           'exclude_automated_communications',
+          'not_disposed',
           'first_time_only'
         ]
 
@@ -783,10 +792,11 @@ export default {
     },
 
     resetCommunications () {
-      this.communicationsData = []
+      // this.communicationsData = []
+      this.setCommunications([])
       this.setCommunicationsCount(0)
       this.paginationPage = 1
-      this.lastPage = 1
+      // this.lastPage = 1
       this.setHasMoreCommunications(null)
     },
 
@@ -807,14 +817,11 @@ export default {
     },
 
     getCommunications (filters, callback, isLoadMore = false) {
-      if (this.isLoading) {
-        return
-      }
+      this.setIsLoadingCommunications(true)
 
       if (!isLoadMore) {
-        this.isLoading = true
         this.paginationPage = 1
-        this.communicationsData = []
+        this.setCommunications([])
       } else {
         this.isLoadingMore = true
       }
@@ -856,7 +863,7 @@ export default {
         has_appointments: 0,
         has_reminders: 0,
         contact_country: '',
-        changed: false,
+        changed: true,
         states_limit: { us: [], ca: [] },
         initial_line_only: 0,
         search_text: '',
@@ -869,18 +876,6 @@ export default {
       this.setIsInboxFiltersLoaded(true)
       this.gettingTasksList(true)
       this.communicationsListHasError = false
-
-      if (this.firstTimeLoading || !params.from_date || !params.to_date) {
-        const timezone = this.currentTimezone
-        const dateFormat = 'YYYY-MM-DD HH:mm:ss'
-        const fromDate = moment().tz(timezone).subtract(30, 'days').startOf('day').format(dateFormat)
-        const toDate = moment().tz(timezone).endOf('day').format(dateFormat)
-
-        params.from_date = fromDate
-        params.to_date = toDate
-
-        this.firstTimeLoading = false
-      }
 
       // payload specific for Mentions
       if (this.$route.params.channel === 'mentions') {
@@ -926,19 +921,18 @@ export default {
           if (response) {
             this.gettingTasksList(false)
             const data = response.data.data
-
+            console.log('data fetched', data)
             if (isLoadMore && data.length > 0) {
-              this.communicationsData.push(...data)
+              this.appendCommunications(data)
             } else {
               if (data.length > 0) {
-                this.communicationsData = data
+                this.setCommunications(data)
               }
             }
 
-            // this.setCommunications(data)
             // this.nextCursor = response.data.next_cursor
             this.currentPage = response.data.current_page
-            this.lastPage = Math.ceil(this.communicationsCount / this.perPage)
+
             this.setHasMoreCommunications(response.data.next_page_url)
             this.isLoaded = true
             this.pagination = _.clone(response.data)
@@ -965,7 +959,7 @@ export default {
           this.$generalNotification(`An exception was encountered while fetching ${channelName}.`, 'error')
         })
         .finally(() => {
-          this.isLoading = false
+          this.setIsLoadingCommunications(false)
           this.isLoadingMore = false
         })
     },
@@ -1028,8 +1022,6 @@ export default {
     this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
-    this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
-    this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
   },
 
   watch: {
@@ -1038,10 +1030,6 @@ export default {
       if (newVal === DEFAULT_COMMUNICATIONS_CHANNEL) {
         this.getCommunications(this.communicationFilters)
       }
-    },
-
-    communicationFilters: function (newVal) {
-      this.getCommunications(newVal)
     }
   }
 }

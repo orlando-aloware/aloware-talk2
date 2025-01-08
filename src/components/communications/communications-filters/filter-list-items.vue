@@ -62,7 +62,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters('inbox', ['selectedFilter'])
+    ...mapGetters('communications', ['selectedFilter'])
   },
 
   data () {

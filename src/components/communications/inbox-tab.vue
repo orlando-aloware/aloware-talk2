@@ -57,7 +57,7 @@
                        class="ml-1 fs-12"
                        variant="primary"
                        data-testid="inbox-tab-applied-filter-badge"
-                       v-b-modal:inbox-channel-filter-modal>
+                       v-b-modal:comms-channel-filter-modal>
                 {{ changedFilterFieldCount }}
               </b-badge>
             </div>
@@ -696,7 +696,7 @@ export default {
       this.firstTimeLoading = true
       this.resetFilter()
 
-      sessionStorage.setItem('date-selected', 'Last 30 Days')
+      sessionStorage.setItem('date-selected-comms', 'Last 30 Days')
       sessionStorage.removeItem('view-selected')
       this.setIsFirstLoad(true)
 

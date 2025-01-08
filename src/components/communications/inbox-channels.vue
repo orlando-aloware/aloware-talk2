@@ -46,7 +46,7 @@
                        variant="primary"
                        data-testid="inbox-channels-filter-badge"
                        v-if="hasChannelFilterChanges"
-                       v-b-modal:inbox-channel-filter-modal>
+                       v-b-modal:comms-channel-filter-modal>
                 {{ changedFilterFieldCount }}
               </b-badge>
             </div>
@@ -200,6 +200,7 @@ import {
   visibilityMixin,
   communicationsMixin
 } from 'src/plugins/mixins'
+import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 import talk2Api from 'src/plugins/api/api'
 import TaskList from 'components/inbox/channel-tasks/task-list'
 import * as Filters from 'src/constants/filters'
@@ -224,7 +225,8 @@ export default {
     aclMixin,
     dateMixin,
     visibilityMixin,
-    communicationsMixin
+    communicationsMixin,
+    communicationsDefaultFilterModelMixin
   ],
 
   components: {
@@ -379,131 +381,6 @@ export default {
 
     hasChannelFilterChanges () {
       return this.channelChangedFilterFields.length > 0
-    },
-
-    channelDefaultFilterModel () {
-      let defaultFilterModel = {
-        name: '',
-        type: ChannelType.CHANNEL_MESSAGES,
-        filter: [],
-        scope: 'user'
-      }
-
-      if (this.$route.params.channel === 'voicemails') {
-        defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
-        defaultFilterModel.filter = {
-          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-          direction: Filters.DEFAULT_STATE.filter.direction,
-          tags: Filters.DEFAULT_STATE.filter.tags,
-          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-          users: Filters.DEFAULT_STATE.filter.users,
-          workflows: Filters.DEFAULT_STATE.filter.workflows,
-          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-          from_date: Filters.DEFAULT_STATE.filter.from_date,
-          to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-          unread_only: Filters.DEFAULT_STATE.filter.unread_only,
-          has_international: Filters.DEFAULT_STATE.filter.has_international
-        }
-        return defaultFilterModel
-      }
-
-      if (['calls', 'recordings'].includes(this.$route.params.channel)) {
-        defaultFilterModel.type = ChannelType.CHANNEL_CALLS
-        defaultFilterModel.filter = {
-          campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-          ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
-          direction: Filters.DEFAULT_STATE.filter.direction,
-          answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-          min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
-          transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
-          callback_status: Filters.DEFAULT_STATE.filter.callback_status,
-          tags: Filters.DEFAULT_STATE.filter.tags,
-          call_dispositions: Filters.DEFAULT_STATE.filter.call_dispositions,
-          first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-          untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-          exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-          incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-          users: Filters.DEFAULT_STATE.filter.users,
-          workflows: Filters.DEFAULT_STATE.filter.workflows,
-          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-          from_date: Filters.DEFAULT_STATE.filter.from_date,
-          to_date: Filters.DEFAULT_STATE.filter.to_date,
-          my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-          unread_only: Filters.DEFAULT_STATE.filter.unread_only,
-          has_international: Filters.DEFAULT_STATE.filter.has_international
-        }
-
-        if (['recordings'].includes(this.$route.params.channel)) {
-          defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
-          defaultFilterModel.filter.answer_status = 'recorded'
-        }
-
-        return defaultFilterModel
-      }
-
-      if (this.$route.params.channel === 'mentions') {
-        defaultFilterModel.type = ChannelType.CHANNEL_MENTIONS
-        defaultFilterModel.filter = {
-          users: Filters.DEFAULT_STATE.filter.users,
-          contact_owner: Filters.DEFAULT_STATE.filter.contact_owner
-        }
-
-        return defaultFilterModel
-      }
-
-      if (this.$route.params.channel === 'all-communications') {
-        defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-        defaultFilterModel.filter = { ...Filters.DEFAULT_STATE.filter }
-
-        if (this.$route.query?.tagId) {
-          defaultFilterModel.filter.tags = [+this.$route.query.tagId]
-        }
-
-        if (this.$route.query?.broadcastIds) {
-          defaultFilterModel.filter.broadcasts = typeof this.$route.query.broadcastIds === 'string' ? [this.$route.query.broadcastIds] : this.$route.query.broadcastIds
-        }
-
-        return defaultFilterModel
-      }
-
-      if (this.activeChannel?.value === 'my-personal-line') {
-        defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-        defaultFilterModel.filter = {
-          ...Filters.DEFAULT_STATE.filter,
-          campaigns: [this.profile.campaign_id]
-        }
-
-        return defaultFilterModel
-      }
-
-      defaultFilterModel.type = ChannelType.CHANNEL_MESSAGES
-      defaultFilterModel.filter = {
-        campaigns: Filters.DEFAULT_STATE.filter.campaigns,
-        direction: Filters.DEFAULT_STATE.filter.direction,
-        answer_status: Filters.DEFAULT_STATE.filter.answer_status,
-        tags: Filters.DEFAULT_STATE.filter.tags,
-        first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
-        untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
-        exclude_automated_communications: Filters.DEFAULT_STATE.filter.exclude_automated_communications,
-        incoming_numbers: Filters.DEFAULT_STATE.filter.incoming_numbers,
-        users: Filters.DEFAULT_STATE.filter.users,
-        workflows: Filters.DEFAULT_STATE.filter.workflows,
-        broadcasts: Filters.DEFAULT_STATE.filter.broadcasts,
-        contact_owner: Filters.DEFAULT_STATE.filter.contact_owner,
-        from_date: Filters.DEFAULT_STATE.filter.from_date,
-        to_date: Filters.DEFAULT_STATE.filter.to_date,
-        my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-        unread_only: Filters.DEFAULT_STATE.filter.unread_only,
-        creator_type: Filters.DEFAULT_STATE.filter.creator_type,
-        has_international: Filters.DEFAULT_STATE.filter.has_international
-      }
-
-      return defaultFilterModel
     },
 
     changedFilterFieldCount () {
@@ -885,7 +762,7 @@ export default {
     },
 
     onResetFilters () {
-      sessionStorage.setItem('date-selected', 'Last 30 Days')
+      sessionStorage.setItem('date-selected-comms', 'Last 30 Days')
       this.firstTimeLoading = true
       this.resetFilters()
       this.setSelectedFilter(null)

@@ -7663,7 +7663,97 @@ table.datatable {
   }
 }
 
+#communications-nav-list {
+  .left-column-wrapper {
 
+    .filter-group-title {
+      font-size: 12px;
+      color: $grey-80;
+      margin-bottom: 10px;
+      font-weight: 400;
+    }
+
+    .filter-items {
+      margin: 5px 0;
+      padding: 7px 12px;
+      line-height: 1.2;
+      height: 30px;
+
+      span:not(.check-icon) {
+        font-size: 13px;
+        color: $grey-100;
+        width: 95%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        display: inline-block;
+      }
+
+      span.position-absolute.check-icon {
+        right: 10px;
+        top: 5px;
+      }
+
+      .b-dropdown {
+        height: 10px !important;
+        margin-top: 0 !important;
+        right: 0;
+
+        button {
+          margin-top: -1px;
+          background: none;
+          padding: 2px;
+          border: none !important;
+          display: none;
+          height: 20px !important;
+          font-size: 10px;
+        }
+
+        .dropdown-menu.show {
+          min-width: 5rem;
+
+          .dropdown-item {
+            padding: 0.25rem 1rem;
+          }
+        }
+      }
+
+      button:hover,
+      button:focus,
+      button:active {
+        border: none;
+      }
+    }
+
+    .filter-items:hover {
+      background: $grey-50;
+
+      button {
+        display: block;
+      }
+    }
+
+    .filter-items {
+      border-radius: 5px;
+    }
+
+    .filter-items.active {
+      background: $grey-60;
+    }
+
+    .filter-group-title,
+    .filter-type-description,
+    .empty-filter-placeholder {
+      //padding: 7px 12px;
+    }
+
+    .saved-filters {
+
+    }
+  }
+}
+
+#comms-channel-filter-modal,
 #inbox-channel-filter-modal {
   .modal-content {
     border-radius: 8px;
@@ -7848,6 +7938,8 @@ table.datatable {
 }
 
 @media (min-width: 992px) {
+  #comms-channel-filter-modal .modal-lg,
+  #comms-channel-filter-modal.modal-xl,
   #inbox-channel-filter-modal .modal-lg,
   #inbox-channel-filter-modal.modal-xl {
     max-width: 950px;

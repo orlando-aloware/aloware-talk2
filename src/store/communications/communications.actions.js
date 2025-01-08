@@ -8,6 +8,9 @@ export default {
   setCommunications: ({ commit }, communications) => {
     commit('SET_COMMUNICATIONS', communications)
   },
+  appendCommunications: ({ commit }, communications) => {
+    commit('APPEND_COMMUNICATIONS', communications)
+  },
   setCommunicationsCount: ({ commit }, count) => {
     commit('SET_COMMUNICATIONS_COUNT', count)
   },
@@ -40,6 +43,9 @@ export default {
   },
   setInboxPendingTaskCount: ({ commit }, count = 0) => {
     commit('SET_INBOX_PENDING_TASK_COUNT', count)
+  },
+  setIsLoadingCommunications: ({ commit }, isLoading) => {
+    commit('SET_IS_LOADING_COMMUNICATIONS', isLoading)
   },
   setLiveContacts: ({ commit }, contacts) => {
     commit('SET_LIVE_CONTACTS', contacts)
@@ -116,11 +122,17 @@ export default {
   setPinnedViews: ({ commit }, value) => {
     commit('SET_PINNED_VIEWS', value)
   },
-  setInboxPersonalFilters: ({ commit }, value) => {
-    commit('SET_INBOX_PERSONAL_FILTERS', value)
+  setPersonalFilters: ({ commit }, value) => {
+    commit('SET_PERSONAL_FILTERS', value)
   },
-  setInboxCompanyFilters: ({ commit }, value) => {
-    commit('SET_INBOX_COMPANY_FILTERS', value)
+  setCompanyFilters: ({ commit }, value) => {
+    commit('SET_COMPANY_FILTERS', value)
+  },
+  setIsDeletingFilter: ({ commit }, value) => {
+    commit('SET_IS_DELETING_FILTER', value)
+  },
+  setIsUpdatingFilter: ({ commit }, value) => {
+    commit('SET_IS_UPDATING_FILTER', value)
   },
   setIsEditingView: ({ commit }, value) => {
     commit('SET_IS_EDITING_VIEW', value)

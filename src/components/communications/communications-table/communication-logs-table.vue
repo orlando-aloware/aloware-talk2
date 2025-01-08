@@ -3,26 +3,38 @@
     <h3 class="title pl-3">
       {{ title }}
     </h3>
-    <div class="count  pl-3">
-      <strong v-if="!isLoadingCommunicationsCount">{{ communicationsCount }} Communications</strong>
-      <q-spinner-bars class="mr-1"
-                      color="primary"
-                      size="14px"
-                      v-else />
-    </div>
-    <div class="filters  pl-3">
+    <div class="filters pl-3">
       <div class="search">
         <search-input class="width-260"
                       limit-search-characters
                       :search="search"
                       :disabled="isLoadingDisabled"
                       data-testid="contacts-view-search-input"
-                      @search="onSearch" />
+                      @search="onSearch"
+        />
       </div>
-      <div class="setting pr-3">
-        <compact-btn variant="primary"
-                     :compact="false"
-                     @clicked="changeTableSettingsVisibility(true)">
+
+      <div class="setting pr-3 align-items-center">
+        <div class="small text-muted fs-13 text-right">
+          <template v-if="!isLoadingCommunicationsCount">
+            {{ communicationsCount }} Communications
+          </template>
+          <q-skeleton type="text"
+                      style="width: 80px" v-else />
+        </div>
+
+        <hr role="separator"
+            aria-orientation="vertical"
+            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical"
+        >
+
+        <communications-filters class="ml-2 mr-3" />
+
+        <compact-btn
+          variant="primary"
+          :compact="false"
+          @clicked="changeTableSettingsVisibility(true)"
+        >
           Table Settings
         </compact-btn>
       </div>
@@ -31,19 +43,20 @@
     <q-table class="communication-logs-table flex-grow-1"
              row-key="index"
              virtual-scroll
-             :data="communicationsData"
+             :data="communications"
              :columns="columns"
-             :loading="isLoadingMore || isLoading"
+             :loading="isLoadingMore || isLoadingCommunications"
              :virtual-scroll-item-size="100"
              :virtual-scroll-sticky-size-start="100"
              :pagination="pagination"
              :rows-per-page-options="[0]"
-             @virtual-scroll="onScroll">
+             @virtual-scroll="onScroll"
+    >
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td :props="props"
-                :key="col.name"
-                v-for="col in props.cols">
+                v-for="col in props.cols"
+                :key="col.name">
             <div v-if="col.name === 'disposition_status2'">
               <disposition :row="props.row" />
             </div>
@@ -72,7 +85,7 @@
               <wait-time :row="props.row" />
             </div>
 
-            <div v-else-if="col.name ==='hold_time'">
+            <div v-else-if="col.name === 'hold_time'">
               <hold-time :row="props.row" />
             </div>
 
@@ -113,7 +126,7 @@
             </div>
 
             <div v-else-if="col.name === 'attempting_users'">
-              <attempting-users :row="props.row"/>
+              <attempting-users :row="props.row" />
             </div>
 
             <div v-else-if="col.name === 'transfer_prior_user_ids'">
@@ -127,7 +140,8 @@
             </div>
 
             <div data-testid="cold-transfer-row"
-                 v-else-if="col.name === 'in_cold_transfer'">
+                 v-else-if="col.name === 'in_cold_transfer'"
+            >
               <span>{{ props.row.in_cold_transfer ? 'Yes' : 'No' }}</span>
             </div>
 
@@ -144,8 +158,9 @@
             </div>
 
             <div data-testid="email-span"
-                  class="break-word"
-                  v-else-if="col.name === 'email'">
+                 class="break-word"
+                 v-else-if="col.name === 'email'"
+            >
               <span>{{ props.row.contact?.email || '-' }}</span>
             </div>
 
@@ -154,7 +169,7 @@
             </div>
 
             <template v-else-if="col.name === 'tags'">
-              <communications-tags :communication="props.row"/>
+              <communications-tags :communication="props.row" />
             </template>
 
             <div v-else-if="col.name === 'notes'">
@@ -168,7 +183,7 @@
             <div v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
                                          @archived="removeCommunication"
-                                         @terminated="removeCommunication"/>
+                                         @terminated="removeCommunication" />
             </div>
           </q-td>
         </q-tr>
@@ -181,7 +196,7 @@
       </template>
       <template v-slot:no-data>
         <div class="w-100 text-center"
-             v-if="!isLoadingMore && !isLoading">
+             v-if="!isLoadingMore && !isLoadingCommunications">
           <h2> No data </h2>
         </div>
       </template>
@@ -229,6 +244,7 @@ import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
 import CommunicationsTeams from './communications-teams.vue'
 import StartTime from './start-time.vue'
+import CommunicationsFilters from 'src/components/communications/communications-filters.vue'
 import CommunicationsOperations from './communications-operations.vue'
 import RingGroup from './ring-group.vue'
 import Disposition from './disposition.vue'
@@ -270,6 +286,7 @@ export default {
   components: {
     SearchInput,
     CompactBtn,
+    CommunicationsFilters,
     CommunicationsOperations,
     CommunicationTableSettings,
     CommunicationsTags,
@@ -392,7 +409,8 @@ export default {
           name: 'line',
           align: 'left',
           style: 'width: 100px'
-        }, {
+        },
+        {
           label: 'User',
           name: 'user_id',
           align: 'left',
@@ -570,7 +588,10 @@ export default {
     onSearch (value) {
       this.searchQuery = value
       this.paginationPage = 1
-      this.getCommunications(this.communicationFilters)
+
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     },
 
     changeTableSettingsVisibility (value) {
@@ -594,8 +615,13 @@ export default {
         return
       }
 
-      const lastIndex = this.communicationsData.length - 1
-      if (!this.isLoadingMore && this.paginationPage < this.lastPage && to === lastIndex) {
+      const lastIndex = this.communications.length - 1
+
+      if (
+        !this.isLoadingMore &&
+        this.paginationPage < this.lastPage &&
+        to === lastIndex
+      ) {
         await this.loadMoreCommunications()
         ref.refresh()
       }
@@ -665,7 +691,9 @@ export default {
 
   mounted () {
     if (this.hasPermissionTo('list communication')) {
-      this.getCommunications(this.communicationFilters)
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     }
   }
 }

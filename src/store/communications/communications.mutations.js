@@ -18,6 +18,9 @@ export default {
   SET_COMMUNICATIONS_CURRENT_PAGE: (state, page) => {
     state.communicationsCurrentPage = page
   },
+  APPEND_COMMUNICATIONS: (state, communications) => {
+    state.communications = state.communications.concat(communications)
+  },
   GETTING_TASKS_LIST: (state, isGetting) => {
     state.isGettingTasksList = isGetting
   },
@@ -56,6 +59,9 @@ export default {
   },
   SET_INBOX_CLOSED_TASK_COUNT: (state, count) => {
     state.inboxTaskCounts = { ...state.inboxTaskCounts, closed: count }
+  },
+  SET_IS_LOADING_COMMUNICATIONS: (state, isLoading) => {
+    state.isLoadingCommunications = isLoading
   },
   SET_LIVE_CONTACTS: (state, contacts) => {
     state.liveContacts = contacts
@@ -210,11 +216,17 @@ export default {
   SET_PINNED_VIEWS (state, value) {
     state.pinnedViews = value
   },
-  SET_INBOX_PERSONAL_FILTERS (state, value) {
-    state.inboxPersonalFilters = value
+  SET_PERSONAL_FILTERS (state, value) {
+    state.personalFilters = value
   },
-  SET_INBOX_COMPANY_FILTERS (state, value) {
-    state.inboxCompanyFilters = value
+  SET_COMPANY_FILTERS (state, value) {
+    state.companyFilters = value
+  },
+  SET_IS_DELETING_FILTER (state, value) {
+    state.isDeletingFilter = value
+  },
+  SET_IS_UPDATING_FILTER (state, value) {
+    state.isUpdatingFilter = value
   },
   SET_IS_EDITING_VIEW (state, value) {
     state.isEditingView = value
