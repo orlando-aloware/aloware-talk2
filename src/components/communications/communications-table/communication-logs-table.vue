@@ -182,11 +182,9 @@
             </template>
 
             <div v-else-if="col.name === 'operations'">
-              <communications-operations
-                :row="props.row"
-                @archived="removeCommunication"
-                @terminated="removeCommunication"
-              />
+              <communications-operations :row="props.row"
+                                         @archived="removeCommunication"
+                                         @terminated="removeCommunication" />
             </div>
           </q-td>
         </q-tr>
@@ -200,14 +198,13 @@
       <template v-slot:no-data>
         <div class="w-100 text-center"
              v-if="!isLoadingMore && !isLoading">
-          <h2>No data</h2>
+          <h2> No data </h2>
         </div>
       </template>
     </q-table>
 
     <div class="d-flex align-items-center justify-content-center border-top flex-grow-0 overflow-x-hidden pt-3"
-         v-if="paginated"
-    >
+         v-if="paginated">
       <q-pagination class="table-pagination communication-logs-table-pagination"
                     padding="0 5px"
                     boundary-links
@@ -219,8 +216,7 @@
                     :ellipses="false"
                     :boundary-numbers="false"
                     v-model="paginationPage"
-                    @input="updatePaginationButtons"
-      />
+                    @input="updatePaginationButtons" />
       <q-select class="q-select-pager communication-logs-table-per-page-select"
                 option-value="value"
                 option-label="label"
@@ -230,8 +226,7 @@
                 data-testid="datatable-per-page-select"
                 :options="perPageOptions"
                 :display-value="`${perPage} per page`"
-                v-model="perPage"
-      />
+                v-model="perPage" />
     </div>
 
     <communication-table-settings :is-open="showColumnHeadersModal"
