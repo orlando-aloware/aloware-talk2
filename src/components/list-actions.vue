@@ -62,22 +62,23 @@
       </template>
     </contact-menu-item>
 
-    <contact-menu-item v-if="hasDelete"
-                       @click="$emit('remove')" >
-      <template slot="icon">
-        <trash-icon></trash-icon>
-      </template>
-      <template slot="title">
-        <span>{{ id === undefined ? 'Discard' : 'Delete'}}</span>
-      </template>
-    </contact-menu-item>
-    <contact-menu-item v-if="hasShowInPublicFolderPermission"
-                       @click="$emit('showInPublicFolder')" >
+    <contact-menu-item v-if="hasShowInPublicFolderPermission && isContactsRoute"
+                       @click="$emit('showInPublicFolder')">
       <template slot="icon">
         <eye-icon></eye-icon>
       </template>
       <template slot="title">
         <span>Convert to Public</span>
+      </template>
+    </contact-menu-item>
+
+    <contact-menu-item v-if="hasDelete"
+                       @click="$emit('remove')">
+      <template slot="icon">
+        <trash-icon></trash-icon>
+      </template>
+      <template slot="title">
+        <span>{{ id === undefined ? 'Discard' : 'Delete' }}</span>
       </template>
     </contact-menu-item>
   </contact-menu>
@@ -147,7 +148,7 @@ export default {
     },
     hasShowInPublicFolderPermission: {
       type: Boolean,
-      required: true
+      default: false
     },
     isPinned: {
       type: Boolean

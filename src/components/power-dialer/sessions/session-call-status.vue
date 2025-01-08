@@ -521,8 +521,7 @@ export default {
       loadingHold: false,
       loadingUnhold: false,
       isRedialClicked: false,
-      isProcessingDNC: false,
-      redialedTask: {}
+      isProcessingDNC: false
     }
   },
 
@@ -536,7 +535,8 @@ export default {
       'sessionPaused',
       'activeTask',
       'hubspot',
-      'redialedTasksCount'
+      'redialedTasksCount',
+      'redialedTask'
     ]),
 
     ...mapState([
@@ -883,6 +883,10 @@ export default {
 
       // now should redial if call is not successfully answered
       return !this.dialer.callSuccessfullyAnswered
+    },
+
+    isOnPowerDialerSessionRoute () {
+      return this.$route?.meta?.id === 'power-dialer-session'
     }
   },
 
@@ -999,6 +1003,11 @@ export default {
         this.wrapUpPaused
 
       this.countdownInterval = setInterval(() => {
+        // if paused, we should not continue the countdown
+        if (this.sessionPaused) {
+          return
+        }
+
         // if status in wrap-up and has wrap-up seconds but wrap up is paused due to
         // forced call or contact disposition, we should not continue the countdown
         if (this.wrapUpSeconds !== -1 && this.dialer.currentStatus === 'WRAP_UP' &&
@@ -1008,7 +1017,8 @@ export default {
 
         // end countdown if previously in wrap-up status and paused due to forced
         // call and contact disposition and status changed and is no longer in wrap-up
-        if (wasInWrapUpStatusAndPaused && this.dialer.currentStatus !== 'WRAP_UP') {
+        // and countdown type is wrap-up (so it doesn't skip warm-up period)
+        if (wasInWrapUpStatusAndPaused && this.dialer.currentStatus !== 'WRAP_UP' && this.wrapUp) {
           this.countdownTimer = 0
         }
 
@@ -1584,6 +1594,10 @@ export default {
       this.redialedTask = this.$jsonClone(this.activeTask)
       this.redialedTask.redialed_now = redial
       this.verifyAgentOnCall = true
+
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('pauseWrapUp', true)
+      }
 
       this.redialTask(this.activeTask, redial, forcedRedial).then(() => {
         // hang-up call if still in a call

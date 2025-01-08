@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { kycMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { kycMixin } from 'src/plugins/mixins'
 import * as KycLogs from '../../constants/kyc-logs'
 import { mapState } from 'vuex'
 
@@ -23,8 +23,7 @@ export default {
   name: 'block-tooltip',
 
   mixins: [
-    kycMixin,
-    simpsocialMixin
+    kycMixin
   ],
 
   components: {
@@ -80,12 +79,8 @@ export default {
       const link = `${process.env.API_URL}/account?tab=compliance&open_register_business_information=true`
       let message = ''
 
-      if (this.task === 'text' && this.isTrial) {
-        return 'Your account is in trial, according to regulations you cannot send outbound messages without registration. Please convert to a subscription and register to use messaging services.'
-      }
-
       switch (status) {
-        case KycLogs.KYC_STATUS_NONE:
+        case KycLogs.KYC_STATUS_NONE || KycLogs.KYC_STATUS_APPROVED:
           message = ''
           break
         case KycLogs.KYC_STATUS_REJECTED:

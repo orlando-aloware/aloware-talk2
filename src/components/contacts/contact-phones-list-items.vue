@@ -13,7 +13,11 @@
         <b-badge class="badge-phone-info mr-1"
                  :variant="$options.filters.fixLrnTypeBadge(phone.lrn_type)"
                  data-testid="contact-phones-list-items-lrn-badge"
-                 v-if="(phone.lrn_type || phone.lrn_type === 0) && $options.filters.validLrnType(phone.lrn_type)">
+                 v-if="(phone.lrn_type || phone.lrn_type === 0) && $options.filters.validLrnType(phone.lrn_type)"
+                 :href="$options.filters.getUrlToLrnInfo(phone.lrn_type)">
+          <q-tooltip v-if="phone.lrn_type === LRN_NOT_PERFORMED">
+            This contact exceeds the 1000-contact limit included in trial.
+          </q-tooltip>
           {{ phone.lrn_type | fixLrnType }}
         </b-badge>
 
@@ -110,6 +114,7 @@ import TextIcon from 'components/icons/text-icon'
 import CallIcon from 'components/icons/call-icon'
 import FaxIcon from 'components/icons/fax-icon'
 import TrashIcon from 'components/icons/trash-icon'
+import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
 
 export default {
   name: 'contact-phones-list-items',
@@ -128,6 +133,12 @@ export default {
     phones: {
       type: Array,
       required: true
+    }
+  },
+
+  data () {
+    return {
+      LRN_NOT_PERFORMED
     }
   },
 

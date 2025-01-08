@@ -157,7 +157,7 @@
                            id="summary"
                            data-testid="comm-summary-section"
                            ref="summaryArea">
-                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED"
+                    <div v-if="communication.call_summary"
                          style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
                       <q-btn color="text-dark-greenish"
                              class="btn btn-inline px-1 py-0"
@@ -190,53 +190,82 @@
                         </copy-icon>
                       </q-btn>
                     </div>
-                    <div class="summary-status-container">
-                      <div v-if="!summary_status">
-                        <generate-summary-button class="mr-2"
-                                                 data-testid="comm-details-generate-summary-button"
-                                                 :is-generating="isGenerating"
-                                                 :communication="communication"
-                                                 v-if="fileUuid && isMigrated"
-                                                 @updateGenerating="updateGenerating">
-                        </generate-summary-button>
+                    <div class="ai-effect-container mt-2">
+                      <div class="ai-effect-gradient"></div>
+                      <div class="ai-effect-blur"></div>
+                      <div class="ai-effect-content p-2">
+                        <div class="flex items-center justify-between"
+                            :class="[ communication.call_summary ? 'mb-2' : '']">
+                          <div class="flex items-center gap-2">
+                            <h3 class="ai-effect-gradient-text"
+                                @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
+                              Powered by AloAi
+                              <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
+                                (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
+                              </template>
+                              <sparkle-icon width="16" height="16" color="#9333EA"/>
+                            </h3>
+                          </div>
+                          <div class="transcription-summary-container">
+                            <span class="transcription-message text-decoration-none"
+                                  v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED">
+                              <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization pending</span>
+                              <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in progress</span>
+                            </span>
+                          </div>
+                        </div>
+                        <div class="text-left-align"
+                            v-if="communication.call_summary">
+                            <div v-if="communication.call_summary"
+                                class="call_summary"
+                                v-html="parseMarkdown(communication.call_summary)">
+                            </div>
+                        </div>
+                        <div class="summary-status-container">
+                          <div v-if="!communication.call_summary_status">
+                            <generate-summary-button class="mr-2"
+                                                    data-testid="comm-details-generate-summary-button"
+                                                    :is-generating="isGenerating"
+                                                    :communication="communication"
+                                                    v-if="fileUuid && isMigrated"
+                                                    @updateGenerating="updateGenerating">
+                            </generate-summary-button>
+                          </div>
+                          <div v-else-if="communication.call_summary_status === SummaryStatus.STATUS_FAILED"
+                              class="status-message">
+                            <q-icon name="error" color="red" size="md" />
+                            <div>Summary generation failed. Please try again later. </div>
+                            <br>
+                            <generate-summary-button class="mr-2"
+                                                    data-testid="comm-details-generate-summary-button"
+                                                    :is-generating="isGenerating"
+                                                    :communication="communication"
+                                                    v-if="fileUuid && isMigrated"
+                                                    @updateGenerating="updateGenerating">
+                            </generate-summary-button>
+                          </div>
+                          <div v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING || communication.call_summary_status === SummaryStatus.STATUS_QUEUED"
+                              class="status-message">
+                            <q-icon name="hourglass_empty" color="blue" size="md" />
+                            <span>Your summary is being processed. Please wait...</span>
+                          </div>
+                        </div>
+                        <div v-if="communication.call_summary || communication.call_summary_status === SummaryStatus.STATUS_COMPLETED"
+                             class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                          <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
+                          <img
+                            class="clickable-icon"
+                            :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
+                            @click="submitFeedback('upvote')"
+                          />
+                          <span class="mx-1"></span>
+                          <img
+                            class="clickable-icon"
+                            :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
+                            @click="submitFeedback('downvote')"
+                          />
+                        </div>
                       </div>
-                      <div v-else-if="summary_status === SummaryStatus.STATUS_FAILED"
-                           class="status-message">
-                        <q-icon name="error" color="red" size="md" />
-                        <div>Summary generation failed. Please try again later.</div>
-                        <br>
-                        <generate-summary-button class="mr-2"
-                                                 data-testid="comm-details-generate-summary-button"
-                                                 :is-generating="isGenerating"
-                                                 :communication="communication"
-                                                 v-if="fileUuid && isMigrated"
-                                                 @updateGenerating="updateGenerating">
-                        </generate-summary-button>
-                      </div>
-                      <div v-else-if="summary_status === SummaryStatus.STATUS_PROCESSING || summary_status === SummaryStatus.STATUS_QUEUED"
-                           class="status-message">
-                        <q-icon name="hourglass_empty" color="blue" size="md" />
-                        <span>Your summary is being processed. Please wait...</span>
-                      </div>
-                    </div>
-                    <div v-if="custom_summary || summary_status === SummaryStatus.STATUS_COMPLETED"
-                         class="custom-summary"
-                         v-html="parseMarkdown(custom_summary)">
-                    </div>
-                    <div v-if="custom_summary ||summary_status === SummaryStatus.STATUS_COMPLETED"
-                         class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
-                      <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
-                      <img
-                        class="clickable-icon"
-                        :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
-                        @click="submitFeedback('upvote')"
-                      />
-                      <span class="mx-1"></span>
-                      <img
-                        class="clickable-icon"
-                        :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
-                        @click="submitFeedback('downvote')"
-                      />
                     </div>
                   </section>
                 </q-tab-panel>
@@ -246,6 +275,8 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+    <aloai-promotion-dialog :dialogVisible="showInfoBox"
+                            @update:dialogVisible="showInfoBox = $event" />
   </div>
 </template>
 
@@ -270,9 +301,12 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as FeedbackConstants from 'src/constants/feedback-types'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as SummaryStatus from 'src/constants/summary-status'
+import * as TranscriptionStatus from 'src/constants/transcription-status'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
 import CopyIcon from 'components/icons/copy-icon'
 import GenerateSummaryButton from 'components/generate-summary-button'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
 
 export default {
   name: 'TranscriptionModal',
@@ -293,7 +327,9 @@ export default {
     ConversationSection,
     DownloadIcon,
     CopyIcon,
-    GenerateSummaryButton
+    GenerateSummaryButton,
+    SparkleIcon,
+    AloaiPromotionDialog
   },
 
   props: {
@@ -340,9 +376,7 @@ export default {
       talk_time_analysis: [],
       messages: [],
       summary_engine: null,
-      custom_summary: null,
       summary_prompt: null,
-      summary_status: null,
       feedback: null,
       upvoteActive: false,
       downvoteActive: false,
@@ -363,7 +397,11 @@ export default {
       },
       UploadedFileTypes,
       isEmpty,
-      isGenerating: false
+      isGenerating: false,
+      showInfoBox: false,
+      TranscriptionStatus,
+      SummaryStatus,
+      CommunicationTypes
     }
   },
 
@@ -399,14 +437,6 @@ export default {
           }
         ]
       }
-    },
-
-    SummaryStatus () {
-      return SummaryStatus
-    },
-
-    CommunicationTypes () {
-      return CommunicationTypes
     },
 
     formattedMessages () {
@@ -483,9 +513,7 @@ export default {
       this.sentiment_analysis = data.sentiment_analysis_summary
       this.talk_time_analysis = data.talk_time_analysis
       this.summary_engine = data.summary_engine
-      this.custom_summary = data.custom_summary
       this.summary_prompt = data.summary_prompt
-      this.summary_status = data.summary_status
       this.feedback = data.feedback
       this.upvoteActive = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
       this.downvoteActive = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
@@ -551,10 +579,10 @@ export default {
      * @returns {void}
      */
     onDownload () {
-      if (!this.custom_summary) return
+      if (!this.communication.call_summary) return
 
       // Create a Blob with the custom summary content
-      const blob = new Blob([this.custom_summary], { type: 'text/plain' })
+      const blob = new Blob([this.communication.call_summary], { type: 'text/plain' })
       const url = URL.createObjectURL(blob)
 
       // Create a temporary link to initiate the download
@@ -576,9 +604,9 @@ export default {
      * @returns {void}
      */
     onCopy () {
-      if (!this.custom_summary) return
+      if (!this.communication.call_summary) return
 
-      navigator.clipboard.writeText(this.custom_summary)
+      navigator.clipboard.writeText(this.communication.call_summary)
         .then(() => {
           this.$generalNotification('Summary copied to clipboard')
         })

@@ -49,7 +49,7 @@
                       collapsible
                       :list-items="smsTemplates"
                       :display-count="4"
-                      :forced="requireSmsSending"
+                      :forced="isHighlightedSmsTemplate"
                       :is-empty="isSmsTemplatesEmpty"
                       v-if="sessionSettings.min_redials > 0 && sessionSettings.force_sms"
                       @on-selected-item="onSelectedSmsTemplate"/>
@@ -305,7 +305,7 @@ export default {
       if (Array.isArray(successfulCallDispositionsIds) && !successfulCallDispositionsIds.includes(this.callDisposition)) {
         this.$refs.smsTemplatesSelector.enable()
 
-        if (this.requireSmsSending) {
+        if (this.isForcedSmsSending) {
           // pause wrap up and wait for SMS selection
           this.$VueEvent.fire('pauseWrapUp', true)
         }
@@ -335,8 +335,6 @@ export default {
     },
 
     onSelectedSmsTemplate (item) {
-      this.tasksSentSmsTemplates[this.activeTask.id] = item.id
-
       const message = {
         body: item.body,
         contact_id: this.contact.id,
@@ -356,6 +354,11 @@ export default {
           this.$refs['smsTemplatesSelector'].disable()
           this.$refs['smsTemplatesSelector'].hideLoading()
         }).finally(() => {
+          this.tasksSentSmsTemplates[this.activeTask.id] = item.id
+
+          // force state reload
+          this.tasksSentSmsTemplates = this.$jsonClone(this.tasksSentSmsTemplates)
+
           // sms send, proceed to next task
           this.$VueEvent.fire('pauseWrapUp', false)
         })

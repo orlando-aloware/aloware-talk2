@@ -80,9 +80,13 @@ export const REJECTION_REASON_MESSAGING_DISABLED = 39
 export const REJECTION_REASON_CALL_TO_SELF_NUMBER = 40
 // A text was rejected by our system because line and contact phone number are the same.
 export const REJECTION_REASON_SMS_TO_SELF_NUMBER = 41
-// A call/SMS was rejected to send by our system because trial limit is exceeded
-export const REJECTION_REASON_TRIAL_LIMIT_EXCEEDED = 42
+// A call was rejected to send by our system because trial limit is exceeded
+export const REJECTION_REASON_TRIAL_CALLS_LIMIT_EXCEEDED = 42
 // Rejected to send by our system because provider allows only one attachment
 export const REJECTION_REASON_PROVIDER_ALLOWS_ONLY_ONE_ATTACHMENT = 43
 // A MMS was rejected to send by our system because incoming number is not MMS capable
 export const REJECTION_REASON_NOT_MULTIMEDIA_MESSAGING_ENABLED = 44
+// Rejected to send by our system because it's an emergency number
+export const REJECTION_REASON_EMERGENCY_NUMBER = 45
+// Rejected to send calls by our system because of kyc restriction
+export const REJECTION_REASON_KYC_CALLS_OUTBOUND_RESTRICTION = 46

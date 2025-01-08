@@ -2,7 +2,7 @@
   <div class="message-options" data-testid="message-composer-o">
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
-            data-testid="add-gif-image-butto "
+            data-testid="add-gif-image-button"
             :disabled="isTextingDisabled || !canAddMoreAttachments">
       <q-menu content-class="mx-height-500"
               ref="giphyMenu"
@@ -15,14 +15,14 @@
 
       <gif-icon></gif-icon>
       <q-tooltip data-testid="add-gif-image-tooltip">
-        Add Gif image
+        Add GIF image
       </q-tooltip>
     </b-link>
 
     <b-link v-if="messageComposer.mode === 'sms'"
             href="#"
             data-testid="sms-upload-attachment-link"
-            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments">
+            :disabled="!hasSelectedLine || isTextingDisabled || !canAddMoreAttachments">
       <q-menu ref="attachmentMenu"
               data-testid="sms-upload-attachment-menu"
               :offset="[0,5]">
@@ -34,7 +34,7 @@
       </q-menu>
       <attachment-icon data-testid="message-composer-attachment-icon"></attachment-icon>
       <q-tooltip data-testid="message-composer-add-tooltip">
-        {{  !selectedLine ? 'Please select line before adding attachments' : 'Add attachments' }}
+        {{ !hasSelectedLine ? 'Please select a line before adding attachments' : 'Add attachments' }}
       </q-tooltip>
     </b-link>
 
@@ -79,7 +79,7 @@
 
     <b-link href="#"
             data-testid="add-contact-card-link"
-            :disabled="!selectedLine || isTextingDisabled || !canAddMoreAttachments"
+            :disabled="!hasSelectedLine || isTextingDisabled || !canAddMoreAttachments"
             v-if="messageComposer.mode === 'sms'">
       <q-menu content-class="mx-height-500 width-300"
               ref="contactCardMenu"
@@ -94,7 +94,26 @@
 
       <contact-card-icon></contact-card-icon>
       <q-tooltip data-testid="add-contact-card-tooltip">
-        {{  !selectedLine ? 'Please select line before send contact card' : 'Send contact card' }}
+        {{ !hasSelectedLine ? 'Please select a line before sending the contact card' : 'Send contact card' }}
+      </q-tooltip>
+    </b-link>
+
+    <b-link v-if="messageComposer.mode === 'sms' && isDemoCompany"
+            href="#"
+            data-testid="add-suggested-text-messages-button"
+            :disabled="isTextingDisabled">
+      <q-menu content-class="mx-height-500 width-380 ai-effect-container"
+              ref="suggestedTextMessagesMenu"
+              data-testid="add-suggested-text-messages-menu"
+              anchor="bottom left"
+              self="top left"
+              :offset="[0,5]">
+        <text-message-suggestions :contact="contact" @selected="onTextMessageSuggestionSelected" @loaded="onTextMessageSuggestionsLoaded"></text-message-suggestions>
+      </q-menu>
+
+      <sparkle-icon width="18" height="18" color="#9333EA"/>
+      <q-tooltip data-testid="add-suggested-text-messages-tooltip">
+        AloAi-crafted message suggestions based on past interactions with the contact
       </q-tooltip>
     </b-link>
 
@@ -149,10 +168,12 @@ import Variables from 'components/message-composer/options/variables'
 import ContactCard from 'components/message-composer/options/contact-card.vue'
 import VariableIcon from 'components/icons/variable-icon'
 import { mapGetters, mapState } from 'vuex'
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, userMixin, simpsocialMixin } from 'src/plugins/mixins'
 import SimpsocialInventoryIcon from 'components/icons/simpsocial-inventory-icon'
 import SimpsocialCreditApplicationIcon from 'components/icons/simpsocial-credit-application-icon'
 import talk2Api from 'src/plugins/api/api'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import TextMessageSuggestions from 'components/message-composer/options/text-message-suggestions.vue'
 
 export default {
   name: 'message-composer-options',
@@ -174,6 +195,8 @@ export default {
   },
 
   components: {
+    TextMessageSuggestions,
+    SparkleIcon,
     SimpsocialCreditApplicationIcon,
     SimpsocialInventoryIcon,
     VariableIcon,
@@ -191,6 +214,7 @@ export default {
 
   mixins: [
     aclMixin,
+    userMixin,
     simpsocialMixin
   ],
 
@@ -212,6 +236,10 @@ export default {
       'contact'
     ]),
 
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    },
+
     isTextingDisabled () {
       return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled
     },
@@ -224,6 +252,10 @@ export default {
       const hasGif = this.messageComposer.sms.gif_url !== ''
 
       return ((hasGif ? 1 : 0) + this.messageComposer.sms.attachments.length) < this.maxAttachments
+    },
+
+    hasSelectedLine () {
+      return this.selectedLine?.id
     }
   },
 
@@ -231,6 +263,15 @@ export default {
     onGifSelected (gif) {
       this.$emit('gifSelected', gif)
       this.$refs.giphyMenu.hide()
+    },
+
+    onTextMessageSuggestionSelected (suggestion) {
+      this.$emit('textMessageSuggestionSelected', suggestion)
+      this.$refs.suggestedTextMessagesMenu.hide()
+    },
+
+    onTextMessageSuggestionsLoaded () {
+      this.$refs.suggestedTextMessagesMenu.updatePosition()
     },
 
     onAttachmentUploaded (files) {

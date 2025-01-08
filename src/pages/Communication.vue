@@ -44,6 +44,7 @@
 
 <script>
 
+import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
 import CommunicationDetails from 'components/communication-details'
 
@@ -84,6 +85,17 @@ export default {
     if (this.$route.name === 'Communication' && this.$route.params.communicationId) {
       this.communicationId = this.$route.params.communicationId
     }
+
+    this.$VueEvent.listen('update_communication', (data) => {
+      if (this.communication && this.communication.id === data.id) {
+        data = _.merge(this.communication, data)
+        this.communication = data
+      }
+    })
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('update_communication')
   },
 
   watch: {

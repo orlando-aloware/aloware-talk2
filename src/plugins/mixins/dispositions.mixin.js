@@ -23,11 +23,23 @@ export default {
       return !contact ? _.get(this.dialer, 'callFishing.contact', null) : contact
     },
 
-    isNotDisposed () {
-      const isForceCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition && !this.isCallDisposed
-      const isForceContactDisposition = this.currentCompany && this.currentCompany.force_contact_disposition && !this.isContactDisposed
+    isForcedRedialEnabled () {
+      return this.sessionSettings?.min_redials > 0
+    },
 
-      return isForceCallDisposition || isForceContactDisposition
+    isForcedCallDisposition () {
+      return this.currentCompany?.force_call_disposition || this.isForcedRedialEnabled
+    },
+
+    isForcedContactDisposition () {
+      return this.currentCompany?.force_contact_disposition
+    },
+
+    isNotDisposed () {
+      const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
+      const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
+
+      return isForceCallDisposition || isForceContactDisposition || this.isForcedSmsSending
     },
 
     isHighlightedCallDisposition () {
@@ -37,7 +49,7 @@ export default {
 
       const isForcedCallDisposition = this.currentCompany && this.currentCompany.force_call_disposition
 
-      return isForcedCallDisposition && !this.isCallDisposed
+      return (isForcedCallDisposition || this.isForcedRedialEnabled) && !this.isCallDisposed
     },
 
     isHighlightedContactDisposition () {
@@ -55,6 +67,14 @@ export default {
       return isForcedContactDisposition && !this.isContactDisposed
     },
 
+    isHighlightedSmsTemplate () {
+      if (!this.isCallDisposed) {
+        return false
+      }
+
+      return this.isForcedSmsSending
+    },
+
     hasContactDisposition () {
       return this.dialer.contact &&
         (this.dialer.contact.disposition_status_id || this.dialer.contact.disposition_status_id === 0)
@@ -63,6 +83,10 @@ export default {
     hasCallDisposition () {
       return this.dialer.communication &&
         (this.dialer.communication.call_disposition_id || this.dialer.communication.call_disposition_id === 0)
+    },
+
+    callDisposition () {
+      return this.dialer.communication?.call_disposition_id
     },
 
     checkForceDisposition () {
@@ -74,13 +98,30 @@ export default {
       return shouldForceContactDisposition || shouldForceCallDisposition
     },
 
-    requireSmsSending () {
+    isOnPowerDialerSessionRoute () {
+      return this.$route?.meta?.id === 'power-dialer-session'
+    },
+
+    isForcedSmsSending () {
       if (!this.activeTask) {
         return false
       }
 
-      // if forcing to send_sms and sms template is not sent yet
-      return Boolean(this.sessionSettings.force_sms) && !this.tasksSentSmsTemplates[this.activeTask.id]
+      if (!this.isOnPowerDialerSessionRoute) {
+        return false
+      }
+
+      // selected call disposition is a successful call disposition
+      const successfulCallDispositionsIds = this.sessionSettings?.successful_call_disposition_ids
+      const successfulCallDispositionSelected = successfulCallDispositionsIds?.includes(this.callDisposition)
+
+      // if force redial is enabled, force sms sending if the
+      // selected call disposition is not one of the successful call dispositions
+      // and the sms template has not been sent yet
+      return this.isForcedRedialEnabled &&
+        this.sessionSettings?.force_sms &&
+        !successfulCallDispositionSelected &&
+        !this.tasksSentSmsTemplates[this.activeTask.id]
     }
   },
 

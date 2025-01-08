@@ -329,7 +329,7 @@
                            v-if="shouldShowAloAi"
                            @click="openAloAiBotContactsEnrollmentModal('add-contact-list')">
             <add-user-icon width="14" height="14" color="#62666E" />
-            Enroll List in AloAI Text Bot
+            Enroll List in AloAi Text Bot
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
@@ -1151,7 +1151,8 @@ export default {
         this.defaultIds.includes(this.id) ||
         this.isUpdatingList ||
         !this.listContactsLoaded ||
-        this.list.show_in_public_folder
+        this.list.show_in_public_folder ||
+        this.list.type === this.ContactListTypes.DYNAMIC_REMOTE_LIST
     },
 
     simpsocialMessengerIframeLink () {
@@ -1240,7 +1241,7 @@ export default {
         return
       }
 
-      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('fetchContacts', { clear: true })
       this.$generalNotification(`Contact list was synced`, 'success')
     }
 
@@ -1250,7 +1251,7 @@ export default {
       }
 
       // even if it failed, some changes may occur, so we need to update the list
-      this.$VueEvent.fire('fetchContacts')
+      this.$VueEvent.fire('fetchContacts', { clear: true })
       this.$generalNotification(
         'An error prevented the list from being synced. Please try again later.',
         'error'
