@@ -20,7 +20,8 @@
             {{ communicationsCount }} Communications
           </template>
           <q-skeleton type="text"
-                      style="width: 80px" v-else />
+                      style="width: 80px"
+                      v-else />
         </div>
 
         <hr role="separator"

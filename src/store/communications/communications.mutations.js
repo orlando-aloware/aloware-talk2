@@ -63,6 +63,9 @@ export default {
   SET_IS_LOADING_COMMUNICATIONS: (state, isLoading) => {
     state.isLoadingCommunications = isLoading
   },
+  SET_IS_LOADING_COMMUNICATIONS_COUNT: (state, isLoading) => {
+    state.isLoadingCommunicationsCount = isLoading
+  },
   SET_LIVE_CONTACTS: (state, contacts) => {
     state.liveContacts = contacts
   },
