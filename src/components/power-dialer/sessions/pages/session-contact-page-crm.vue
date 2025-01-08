@@ -47,7 +47,7 @@ export default {
     ...mapState('contacts', ['contact']),
 
     hubspotLink () {
-      return this.getHubspotContactLink(this.contact, this.usePopup)
+      return this.getHubspotContactLink(this.contact, !this.usePopup)
     },
 
     test () {
@@ -146,8 +146,8 @@ export default {
     contact: {
       deep: true,
       handler (newValue, oldValue) {
-        const oldHubspotLink = this.getHubspotContactLink(oldValue, this.usePopup)
-        const newHubspotLink = this.getHubspotContactLink(newValue, this.usePopup)
+        const oldHubspotLink = this.getHubspotContactLink(oldValue, !this.usePopup)
+        const newHubspotLink = this.getHubspotContactLink(newValue, !this.usePopup)
 
         // if it's the same contact (contact was immediately redialed)
         // but hubspot link is gone, reuse the old contact.

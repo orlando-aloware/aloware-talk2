@@ -20,26 +20,25 @@ export default {
   },
 
   methods: {
-    getHubspotContactBaseLink () {
-      if (this.currentCompany &&
-        this.currentCompany.hubspot_integration_enabled &&
-        this.currentCompany.hubspot_marketing_portal_id) {
-        return `https://${this.companyDomain}/embed/${this.currentCompany.hubspot_marketing_portal_id}/0-1/`
-      }
-
-      return false
-    },
-
-    getHubspotContactLink (contact, usePopup) {
-      if (usePopup) {
+    getHubspotContactLink (contact, useEmbed) {
+      if (!useEmbed) {
         return contact?.integration_data?.hubspot?.link
       }
 
-      if (!this.getHubspotContactBaseLink()) {
-        return false
+      // Convert to an embed link
+      const contactLink = contact?.integration_data?.hubspot?.link
+
+      if (!contactLink) {
+        return null
       }
 
-      return this.getHubspotContactBaseLink() + contact?.integration_data?.hubspot?.contact_id
+      // Get the parts
+      const parts = contactLink.match(/(https:\/\/app.hubspot.com)\/contacts\/(\d+)\/record\/0-1\/(\d+)/)
+      if (!parts || parts.length < 4) {
+        return null
+      }
+
+      return `${parts[1]}/embed/${parts[2]}/0-1/${parts[3]}`
     }
   }
 }
