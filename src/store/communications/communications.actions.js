@@ -8,6 +8,9 @@ export default {
   setCommunications: ({ commit }, communications) => {
     commit('SET_COMMUNICATIONS', communications)
   },
+  setCommunicationsCount: ({ commit }, count) => {
+    commit('SET_COMMUNICATIONS_COUNT', count)
+  },
   setCommunicationsCurrentPage: ({ commit }, page) => {
     commit('SET_COMMUNICATIONS_CURRENT_PAGE', page)
   },
@@ -127,5 +130,8 @@ export default {
   },
   setIsInboxRefreshBtnLoading: ({ commit }, value = false) => {
     commit('SET_IS_INBOX_REFRESH_BTN_LOADING', value)
+  },
+  setInboxFilters: ({ commit }, filters) => {
+    commit('SET_INBOX_FILTERS', filters)
   }
 }

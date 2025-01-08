@@ -4,8 +4,8 @@
         data-testid="comm-terminate-comm-button"
         v-if="show"
         @click="dialog">
-    <power-icon height="22"
-                width="22"/>
+    <power-icon :height="iconHeight"
+                :width="iconWidth"/>
     <q-tooltip data-testid="comm-terminate-comm-button-tooltip">
       Terminate
     </q-tooltip>
@@ -18,6 +18,7 @@ import PowerIcon from 'src/components/icons/power-icon.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import { DISPOSITION_STATUS_INPROGRESS_NEW } from 'src/constants/communication-disposition-status'
 import { isLiveCall, isParkedCall } from 'src/plugins/helpers/functions'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'terminate-communication-button',
@@ -34,6 +35,16 @@ export default {
     communication: {
       type: Object,
       required: true
+    },
+
+    iconHeight: {
+      type: [Number, String],
+      default: 22
+    },
+
+    iconWidth: {
+      type: [Number, String],
+      default: 22
     }
   },
 
@@ -46,12 +57,9 @@ export default {
     },
 
     show () {
-      // live and parked calls must be DISPOSITION_STATUS_INPROGRESS_NEW
-      if (this.isLiveOrParkedCall) {
-        return this.hasRole('Company Admin') && this.communication.disposition_status2 === DISPOSITION_STATUS_INPROGRESS_NEW
-      }
-
-      return this.hasRole('Company Admin')
+      return this.hasRole('Company Admin') &&
+        this.communication.type === CommunicationTypes.CALL &&
+        this.communication.disposition_status2 === DISPOSITION_STATUS_INPROGRESS_NEW
     },
 
     isLiveOrParkedCall () {
@@ -61,7 +69,8 @@ export default {
 
   data: () => ({
     loading: false,
-    DISPOSITION_STATUS_INPROGRESS_NEW
+    DISPOSITION_STATUS_INPROGRESS_NEW,
+    CommunicationTypes
   }),
 
   methods: {
@@ -97,6 +106,7 @@ export default {
         .then(() => {
           this.$generalNotification('Communication terminated successfully.', 'success')
           this.loading = false
+          this.$emit('terminated', this.communication.id)
         })
         .catch(err => {
           this.loading = false

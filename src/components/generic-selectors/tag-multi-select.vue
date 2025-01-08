@@ -293,13 +293,18 @@ export default {
       required: false,
       type: String,
       default: ''
+    },
+
+    startEditing: {
+      type: Boolean,
+      default: false
     }
   },
 
   data () {
     return {
       search: '',
-      isEdit: false,
+      isEdit: this.startEditing,
       loadingTags: false,
       selectedValues: [],
       selectedValuesObjects: [],

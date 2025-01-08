@@ -29,12 +29,9 @@
           </div>
         </div>
       </div>
-      <div class="inbox-side__right border-left d-flex align-items-start flex-column"
+      <div class="inbox-side__right border-left d-flex align-items-start flex-column no-max-width"
       :class="{'inbox-side__right--opened': isInboxTaskOpened }">
-
-      <div class="d-flex justify-content-center mx-auto pt-5">
-        <h1>Communications Table: {{ channelName }}</h1>
-      </div>
+        <CommunicationLogsTable class="flex-grow-1"/>
       <!-- TODO: purge this and all unused components
         Inbox Tab (Inbox/Inbox View) UI
         <inbox-tab :search-text="searchText"
@@ -67,6 +64,7 @@ import BackButton from 'components/back-button'
 // import CommunicationsToggleFilters from 'components/communications/communications-toggle-filters.vue'
 import Profile from 'components/profile'
 import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
+import CommunicationLogsTable from './communications-table/communication-logs-table.vue'
 
 export default {
   name: 'communications-side',
@@ -76,7 +74,8 @@ export default {
     // InboxTab,
     // InboxChannels,
     CommunicationsNavList,
-    Profile
+    Profile,
+    CommunicationLogsTable
     // CommunicationsToggleFilters
   },
 
@@ -123,7 +122,7 @@ export default {
       const path = this.$route.path.split('/')
       const name = _.get(path, '[2]', 'Communications').replace('-', ' ')
 
-      if (this.isMobile && this.$q.screen.lt.md && name === 'all communications') {
+      if (this.isMobile && this.$q.screen.lt.md && name === DEFAULT_COMMUNICATIONS_CHANNEL) {
         return 'All comms'
       }
 

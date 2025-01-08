@@ -26,7 +26,7 @@
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
-                label="Views"
+                label="Saved Filters"
                 data-testid="inbox-nav-list-nav-item"
                 :group="true">
         <template #action-icon>
@@ -52,7 +52,7 @@
 
         <div class="py-3 text-center text-13 text-word-wrap"
              v-if="pinnedViews.length < 1">
-          <span data-testid="inbox-nav-list-no-pinned-views">No Pinned Views</span>
+          <span data-testid="inbox-nav-list-no-pinned-views">No Pinned Filters</span>
         </div>
 
       <communications-views target="#edit-views-icon"

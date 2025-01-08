@@ -1,17 +1,21 @@
-import { mapActions, mapState, mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import moment from 'moment'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import { isEmpty } from 'lodash'
+import _, { isEmpty } from 'lodash'
 import { RELATIONS as CONTACT_RELATIONS } from 'src/constants/contacts-list-relations'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import { DATE_OPERATORS } from 'src/constants/contacts-date-filter-operators'
+
 import * as Filters from 'src/constants/filters'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+
+import * as MentionType from 'src/constants/mention-type'
+
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
-import moment from 'moment'
 import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 
 export default {
@@ -28,14 +32,32 @@ export default {
       'pinnedViews',
       'contacts',
       'appliedFilter',
-      'channelClonedFilter'
+      'channelClonedFilter',
+
+      'isGettingTasksList',
+      'communications',
+      'channelChangedFilterFields',
+      'selectedFilter',
+      'isFilterDialogForView'
     ]),
 
     ...mapState('auth', ['profile']),
 
-    ...mapState(['currentTimezone']),
+    ...mapState(['currentTimezone', 'campaigns']),
 
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
+
+    ...mapGetters('communications', [
+      'communicationsCount',
+      'inboxFilters'
+    ]),
+
+    communicationFilters () {
+      return {
+        ...this.inboxFilters,
+        search_text: this.searchQuery
+      }
+    },
 
     nextPage () {
       return this.contactsCurrentPage + 1
@@ -101,6 +123,38 @@ export default {
       source: null,
       cancelTokenPinnedViews: null,
       sourcePinnedViews: null,
+      paginationPage: 1,
+
+      perPageOptions: [
+        { value: 25, label: '25 Per Page' },
+        { value: 50, label: '50 Per Page' },
+        { value: 100, label: '100 Per Page' }
+      ],
+      lastPage: 1,
+      maxPaginationPages: 5,
+      communicationsData: [],
+      isLoading: false,
+      nextCursor: null,
+      countSource: null,
+      pagination: {
+        rowsPerPage: 0,
+        rowsNumber: this.communicationsCount
+      },
+      isLoadingCommunicationsCount: false,
+      fixedColumns: [
+        'disposition_status2',
+        'incoming_number',
+        'ring_group',
+        'created_at',
+        'talk_time',
+        'duration',
+        'contact',
+        'user_id',
+        'operations'
+      ],
+      searchQuery: '',
+      mentionType: MentionType.TYPE_RECEIVED,
+
       communicationInProgressStatuses: [
         CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW,
         CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
@@ -150,7 +204,10 @@ export default {
       'gettingTasksList',
       'setTaskCount',
       'setPinnedViews',
-      'setContacts'
+      'setContacts',
+      'setCommunications',
+      'setCommunicationsCount',
+      'setHasMoreCommunications'
     ]),
 
     getNoneLiveCallContactTasks (contacts) {
@@ -723,6 +780,246 @@ export default {
       }
 
       return { from_date: fromDate, to_date: toDate }
+    },
+
+    resetCommunications () {
+      this.communicationsData = []
+      this.setCommunicationsCount(0)
+      this.paginationPage = 1
+      this.lastPage = 1
+      this.setHasMoreCommunications(null)
+    },
+
+    getCommunicationType () {
+      switch (this.$route.params.channel) {
+        case DEFAULT_COMMUNICATIONS_CHANNEL:
+        case 'my-personal-line':
+          return 'all'
+        case 'calls':
+        case 'voicemails':
+        case 'recordings':
+          return 'call'
+        case 'messages':
+          return 'sms'
+        default:
+          return this.$route.params.channel
+      }
+    },
+
+    getCommunications (filters, callback, isLoadMore = false) {
+      if (this.isLoading) {
+        return
+      }
+
+      if (!isLoadMore) {
+        this.isLoading = true
+        this.paginationPage = 1
+        this.communicationsData = []
+      } else {
+        this.isLoadingMore = true
+      }
+
+      // let params = this.$jsonClone(filters)
+      let params = {
+        from_date: '',
+        to_date: '',
+        page: 1,
+        per_page: 25,
+        order: 'desc',
+        date_field: 'last_engagement_at',
+        type: this.getCommunicationType(),
+        direction: 'all',
+        report_type: 'date_v_campaign',
+        chart_period: 'day',
+        answer_status: 'all',
+        export_type: 'json',
+        min_talk_time: 0,
+        first_time_only: 0,
+        untagged_only: 0,
+        exclude_automated_communications: 0,
+        has_untagged_call: 0,
+        not_disposed: 0,
+        is_blocked: 0,
+        dnc_option: 1,
+        has_unread: 0,
+        is_new_lead: 0,
+        has_scheduled_messages: 0,
+        no_scheduled_messages: 0,
+        enrolled_in_sequence: 0,
+        not_enrolled_in_sequence: 0,
+        unassigned_leads: 0,
+        should_follow_the_sun: 0,
+        not_contacted: 0,
+        not_responded: 0,
+        responded: 0,
+        text_authorized: 0,
+        has_appointments: 0,
+        has_reminders: 0,
+        contact_country: '',
+        changed: false,
+        states_limit: { us: [], ca: [] },
+        initial_line_only: 0,
+        search_text: '',
+        search_fields: ['lead_number', 'contact.name'],
+        has_international: 0,
+        ...this.$jsonClone(filters)
+      }
+
+      let api = talk2Api.V1.reports.communications
+      this.setIsInboxFiltersLoaded(true)
+      this.gettingTasksList(true)
+      this.communicationsListHasError = false
+
+      if (this.firstTimeLoading || !params.from_date || !params.to_date) {
+        const timezone = this.currentTimezone
+        const dateFormat = 'YYYY-MM-DD HH:mm:ss'
+        const fromDate = moment().tz(timezone).subtract(30, 'days').startOf('day').format(dateFormat)
+        const toDate = moment().tz(timezone).endOf('day').format(dateFormat)
+
+        params.from_date = fromDate
+        params.to_date = toDate
+
+        this.firstTimeLoading = false
+      }
+
+      // payload specific for Mentions
+      if (this.$route.params.channel === 'mentions') {
+        api = talk2Api.V2.mentions
+        params = {
+          ...params,
+          direction: this.mentionType,
+          page: params.page || 1,
+          per_page: params.per_page || 20,
+          mentioner_user_id: params.mentioner_user_id,
+          mentioned_user_id: params.mentioned_user_id,
+          search_fields: params.search_fields,
+          search_text: params.search_text
+        }
+      }
+
+      if (this.$route.params.channel !== 'mentions') {
+        params = { ...params, order: this.sorting.order }
+      } else {
+        params = { ...params, order_by: this.sorting.order }
+      }
+
+      params.page = this.paginationPage
+      params.per_page = this.perPage
+      params = this.removeUnnecessaryParameters(params)
+
+      if (this.source?.cancel) {
+        this.source.cancel('Loading of communication operation is canceled by the user.')
+      }
+
+      this.source = this.cancelToken.source()
+
+      if (this.paginationPage === 1) {
+        this.getCommunicationsCount(params)
+      }
+
+      return api.get({
+        params: params,
+        cancelToken: this.source.token,
+        headers: { 'requested-from': 'api' }
+      })
+        .then(response => {
+          if (response) {
+            this.gettingTasksList(false)
+            const data = response.data.data
+
+            if (isLoadMore && data.length > 0) {
+              this.communicationsData.push(...data)
+            } else {
+              if (data.length > 0) {
+                this.communicationsData = data
+              }
+            }
+
+            // this.setCommunications(data)
+            // this.nextCursor = response.data.next_cursor
+            this.currentPage = response.data.current_page
+            this.lastPage = Math.ceil(this.communicationsCount / this.perPage)
+            this.setHasMoreCommunications(response.data.next_page_url)
+            this.isLoaded = true
+            this.pagination = _.clone(response.data)
+            this.pagination.rowsNumber = this.communicationsCount
+            delete this.pagination.data
+            this.paginationPage = this.pagination.current_page
+
+            if (typeof callback !== 'undefined') {
+              callback()
+            }
+          }
+        })
+        .catch(thrown => {
+          if (window.axios.isCancel(thrown) && thrown) {
+            console.log('Request canceled', thrown.message)
+            return
+          }
+
+          this.gettingTasksList(false)
+          this.communicationsListHasError = true
+          const channelName = this.$route.params.channel !== 'mentions'
+            ? 'communications'
+            : 'mentions'
+          this.$generalNotification(`An exception was encountered while fetching ${channelName}.`, 'error')
+        })
+        .finally(() => {
+          this.isLoading = false
+          this.isLoadingMore = false
+        })
+    },
+
+    getCommunicationsCount (params) {
+      if (this.countSource) {
+        this.countSource.cancel('Fetching communications count operation is canceled by the user.')
+      }
+
+      this.countSource = this.cancelToken.source()
+      this.isLoadingCommunicationsCount = true
+
+      return talk2Api.V1.reports.communications.getCount({
+        params: this.$jsonClone(params),
+        cancelToken: this.countSource.token
+      })
+        .then(response => {
+          this.setCommunicationsCount(response.data)
+        })
+        .catch(thrown => {
+          console.error('Error fetching communications count:', thrown)
+        })
+        .finally(() => {
+          this.isLoadingCommunicationsCount = false
+        })
+    },
+
+    removeUnnecessaryParameters (params) {
+      if (this.$route.params.channel === 'messages') {
+        delete params.report_type
+        delete params.chart_period
+        delete params.min_talk_time
+        delete params.changed
+      }
+
+      const callsChannels = ['calls', 'recordings', 'voicemails']
+
+      if (callsChannels.includes(this.$route.params.channel)) {
+        delete params.report_type
+        delete params.chart_period
+        delete params.has_unread
+        delete params.text_authorized
+        delete params.changed
+      }
+
+      if (this.$route.params.channel === 'voicemails') {
+        delete params.min_talk_time
+      }
+
+      return params
+    },
+
+    getCampaignName (campaignId) {
+      return this.campaigns.find(campaign => campaign.id === campaignId)?.name
     }
   },
 
@@ -733,5 +1030,18 @@ export default {
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
     this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
     this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+  },
+
+  watch: {
+    '$route.params.channel': function (newVal) {
+      this.resetCommunications()
+      if (newVal === DEFAULT_COMMUNICATIONS_CHANNEL) {
+        this.getCommunications(this.communicationFilters)
+      }
+    },
+
+    communicationFilters: function (newVal) {
+      this.getCommunications(newVal)
+    }
   }
 }

@@ -17,6 +17,7 @@
                         :is-filter="isFilter"
                         :dense="dense"
                         :placeholder="placeholder"
+                        :start-editing="startEditing"
                         @values-updated="handleSaveTagsOrFilteringTags">
         <template v-slot:button
                   v-if="useAddIcon">
@@ -47,6 +48,7 @@
                         :is-filter="isFilter"
                         :dense="dense"
                         :placeholder="placeholder"
+                        :start-editing="startEditing"
                         @values-updated="handleSaveTagsOrFilteringTags">
       </tag-multi-select>
     </b-card>
@@ -158,6 +160,11 @@ export default {
       required: false,
       type: String,
       default: 'Type at least 3 characters'
+    },
+
+    startEditing: {
+      type: Boolean,
+      default: false
     }
   },
 
