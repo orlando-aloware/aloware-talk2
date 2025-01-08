@@ -113,7 +113,7 @@ export default {
     ]),
 
     hubspotLink () {
-      return this.getHubspotContactLink(this.contact)
+      return this.getHubspotContactLink(this.contact, true)
     },
 
     zohoLink () {
