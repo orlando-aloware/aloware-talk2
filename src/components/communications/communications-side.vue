@@ -36,23 +36,6 @@
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
         <CommunicationLogsTable class="flex-grow-1"
                                 data-testid="communications-side-communications-table" />
-      <!-- TODO: purge this and all unused components
-        Inbox Tab (Inbox/Inbox View) UI
-        <inbox-tab :search-text="searchText"
-                   v-if="!activeChannel || activeChannel.value === DEFAULT_COMMUNICATIONS_CHANNEL || activeChannel.value.indexOf('view') !== -1"
-                   data-testid="inbox-side-inbox-tab"
-                   @itemSelected="onItemSelected" />
-
-        Channels (Communications) UI
-        <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
-                        :filter-type="activeChannel?.type"
-                        :answer-status="activeChannel?.answerStatus"
-                        :channel="activeChannel?.value"
-                        :search-text="searchText"
-                        :sort="sort"
-                        data-testid="inbox-side-inbox-channels"
-                        v-if="activeChannel && ![DEFAULT_COMMUNICATIONS_CHANNEL].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
-                        -->
       </div>
     </div>
   </div>
@@ -62,10 +45,7 @@
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import CommunicationsNavList from 'components/communications/inbox-nav/communications-nav-list'
-// import InboxChannels from 'components/communications/inbox-channels'
-// import InboxTab from 'components/communications/inbox-tab.vue'
 import BackButton from 'components/back-button'
-// import CommunicationsToggleFilters from 'components/communications/communications-toggle-filters.vue'
 import Profile from 'components/profile'
 import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 import CommunicationLogsTable from './communications-table/communication-logs-table.vue'
@@ -75,12 +55,9 @@ export default {
 
   components: {
     BackButton,
-    // InboxTab,
-    // InboxChannels,
     CommunicationsNavList,
     Profile,
     CommunicationLogsTable
-    // CommunicationsToggleFilters
   },
 
   data () {

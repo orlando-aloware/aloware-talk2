@@ -2,9 +2,9 @@
   <div class="h-100"
        v-if="authenticated">
     <div class="inbox animate__animated animate__fadeIn position-relative">
-      <communications-side ref="communications-side"
-                  :class="inboxSideClasses"
-                  @itemSelected="onItemSelected" />
+      <communications-side :class="inboxSideClasses"
+                           ref="communications-side"
+                           @itemSelected="onItemSelected" />
 
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
