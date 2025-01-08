@@ -2,12 +2,8 @@
   <div class="row full-height">
     <div class="col-12 p-0">
       <div class="hubspot-iframe-container">
-        <iframe class="hubspot-crm-iframe"
-                :src="hubspotLink"
-                frameborder="0"
-                id="hubspot-crm"
-                v-if="hubspotLink">
-        </iframe>
+        The CRM will display in a popup. <br />
+        <a href="#" @click.prevent="openHubspotLink">Click here to manually open the CRM.</a>
       </div>
     </div>
   </div>
@@ -21,6 +17,12 @@ import { isEmpty } from 'lodash'
 
 export default {
   name: 'SessionContactPageCrm',
+
+  mounted () {
+    if (!isEmpty(this.hubspotLink)) {
+      this.openHubspotLink()
+    }
+  },
 
   mixins: [
     hubspotIntegrationMixin
@@ -45,6 +47,11 @@ export default {
       'setContact',
       'setContactClone'
     ]),
+
+    openHubspotLink () {
+      // Open it in a window.open popup.  Name the ppup so we can close it later and prevent multiple popups.
+      window.open(this.hubspotLink, 'hubspot-crm', 'width=1200,height=800')
+    },
 
     getMappedUrlParams (params) {
       const agentName = this.profile.name
@@ -130,9 +137,22 @@ export default {
         if (oldValue?.id === newValue?.id && isEmpty(newHubspotLink) && !isEmpty(oldHubspotLink)) {
           this.setContact(oldValue)
           this.setContactClone(oldValue)
+          this.openHubspotLink()
         }
       }
     }
   }
 }
 </script>
+
+<style scoped>
+.hubspot-iframe-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 1.5rem;
+  color: #000;
+  text-align: center;
+}
+</style>
