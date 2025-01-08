@@ -879,7 +879,6 @@ export default {
     const viewId = sessionStorage.getItem('view-selected')
 
     if (this.isFirstLoad && !viewId) {
-      console.log('isFirstLoad')
       this.setIsFirstLoad(false)
       sessionStorage.setItem('date-selected-comms', this.defaultDateRangeBasedOnCompanyPreferences)
 
@@ -960,7 +959,6 @@ export default {
 
     reset (newVal) {
       if (newVal) {
-        console.log('reset dates')
         this.dateRange.startDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0]
         this.dateRange.endDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1]
         this.filter.from_date = this.dateRange.startDate

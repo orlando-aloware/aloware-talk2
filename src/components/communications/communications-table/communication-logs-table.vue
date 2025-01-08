@@ -616,11 +616,7 @@ export default {
       }
 
       const lastIndex = this.communications.length - 1
-      console.log('is loading more:', this.isLoadingMore)
-      console.log('pagination page:', this.paginationPage)
-      console.log('last page:', this.lastPage)
-      console.log('to:', to)
-      console.log('last index:', lastIndex)
+
       if (
         !this.isLoadingMore &&
         this.paginationPage < this.lastPage &&

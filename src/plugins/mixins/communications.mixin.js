@@ -817,23 +817,16 @@ export default {
     },
 
     getCommunications (filters, callback, isLoadMore = false) {
-      // if (this.isLoading) {
-      //  return
-      // }
       this.setIsLoadingCommunications(true)
 
       if (!isLoadMore) {
-        console.log('enter isLoadMore and clean data')
         this.paginationPage = 1
         this.setCommunications([])
-        // this.communicationsData = []
       } else {
         this.isLoadingMore = true
       }
 
       // let params = this.$jsonClone(filters)
-      console.log('getCommunications')
-      console.log('received filters', filters)
       let params = {
         from_date: '',
         to_date: '',
@@ -930,13 +923,9 @@ export default {
             const data = response.data.data
             console.log('data fetched', data)
             if (isLoadMore && data.length > 0) {
-              console.log('first if')
-              // this.communicationsData.push(...data)
               this.appendCommunications(data)
             } else {
               if (data.length > 0) {
-                console.log('second if')
-                // this.communicationsData = [...data]
                 this.setCommunications(data)
               }
             }
@@ -1033,8 +1022,6 @@ export default {
     this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
-    // this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
-    // this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
   },
 
   watch: {
@@ -1044,11 +1031,5 @@ export default {
         this.getCommunications(this.communicationFilters)
       }
     }
-    /* TODO: this triggers 6 times on each filtering, but is the only wait the table is updated inmediatly yet */
-    // communicationFilters: debounce(function (newVal) {
-    //  this.resetCommunications()
-    //  this.getCommunications(newVal)
-    // }, 800)
-
   }
 }
