@@ -102,6 +102,21 @@
                    md="6"
                    v-if="isInboxOrAllCallsChannel">
               <b-form-group class="form-label"
+                            label="Contact Lists">
+                <contact-list-selector :force-remove-missing-values="true"
+                                       :multiple="true"
+                                       :highlighted="isChanged('contact_lists')"
+                                       :generic-multiselect="false"
+                                       data-testid="filter-form-team-selector"
+                                       v-model="filter.contact_lists"
+                                       @change="eventPayload => onFilterChange(eventPayload, 'contact_lists')" />
+              </b-form-group>
+            </b-col>
+
+            <b-col sm="12"
+                   md="6"
+                   v-if="isInboxOrAllCallsChannel">
+              <b-form-group class="form-label"
                             label="Type">
                 <communication-type-filter-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
                                                     :highlighted="isChanged('type')"
@@ -499,6 +514,7 @@
 import LineSelector from 'components/generic-selectors/line-selector'
 import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
 import TeamSelector from 'components/generic-selectors/team-selector'
+import ContactListSelector from 'components/generic-selectors/contact-list-selector'
 import TransferTypeSelector from 'components/generic-selectors/transfer-type-selector'
 import TalkTimeSelector from 'components/generic-selectors/talk-time-selector'
 import AnswerStatusSelector from 'components/generic-selectors/answer-status-selector'
@@ -553,6 +569,7 @@ export default {
     DateRangePicker,
     CreatorTypeSelector,
     TeamSelector,
+    ContactListSelector,
     EntityTags
   },
 

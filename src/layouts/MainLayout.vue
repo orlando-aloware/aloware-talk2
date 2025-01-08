@@ -352,6 +352,7 @@ export default {
       loadingCampaigns: false,
       loadingRingGroups: false,
       loadingTeams: false,
+      loadingContactLists: false,
       loadingUsers: false,
       loadingTags: false,
       loadingWorkflows: false,
@@ -1589,6 +1590,7 @@ export default {
 
         this.getRingGroups()
         this.getTeams()
+        this.getContactLists()
         this.getBroadcasts()
         this.getTemplates()
         this.getCampaigns()
@@ -1740,6 +1742,27 @@ export default {
           console.log('ERROR GETTING TEAMS', err)
           console.log(err)
           this.loadingTeams = false
+        })
+    },
+
+    getContactLists () {
+      this.loadingContactLists = true
+
+      return this.$axios
+        .get('/api/v2/contacts-list/dashboard-filter', {
+          mode: 'no-cors'
+        })
+        .then((res) => {
+          this.setContactLists(res.data)
+          this.loadingContactLists = false
+
+          return Promise.resolve()
+        })
+        .catch((err) => {
+          console.log(err)
+          this.loadingContactLists = false
+
+          return Promise.reject()
         })
     },
 
@@ -2650,6 +2673,7 @@ export default {
       'setCampaignsIsLoading',
       'setRingGroups',
       'setTeams',
+      'setContactLists',
       'setUsers',
       'setUsersIsLoading',
       'newTag',

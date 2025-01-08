@@ -175,6 +175,7 @@ export default {
         'campaigns',
         'ring_groups',
         'teams',
+        'contact_lists',
         'direction',
         'answer_status',
         'min_talk_time',

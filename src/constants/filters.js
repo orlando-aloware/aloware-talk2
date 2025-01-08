@@ -28,6 +28,7 @@ export const DEFAULT_STATE = {
     lrn_types: [],
     tags: [],
     campaigns: [],
+    contact_lists: [],
     workflows: [],
     ring_groups: [],
     teams: [],
