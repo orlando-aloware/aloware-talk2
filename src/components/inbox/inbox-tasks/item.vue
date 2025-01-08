@@ -35,6 +35,9 @@
           {{ contactName }}
         </q-tooltip>
       </div>
+      <div class="task-item-body comm-label text-grey-90 mt-1">
+        {{ contact.phone_number | fixPhone('NATIONAL', true, false, true) }}
+      </div>
       <div class="d-grid grid-2-col task-item-body"
            v-if="contact.last_communication">
         <div class="pr-2">
