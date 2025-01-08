@@ -207,45 +207,40 @@
       </template>
     </q-table>
 
-    <div
-      class="d-flex align-items-center justify-content-center border-top flex-grow-0 overflow-x-hidden pt-3"
-      v-if="paginated"
+    <div class="d-flex align-items-center justify-content-center border-top flex-grow-0 overflow-x-hidden pt-3"
+         v-if="paginated"
     >
-      <q-pagination
-        class="table-pagination communication-logs-table-pagination"
-        padding="0 5px"
-        boundary-links
-        direction-links
-        dense
-        data-testid="datatable-pagination"
-        :max="lastPage"
-        :max-pages="maxPaginationPages"
-        :ellipses="false"
-        :boundary-numbers="false"
-        v-model="paginationPage"
-        @input="updatePaginationButtons"
+      <q-pagination class="table-pagination communication-logs-table-pagination"
+                    padding="0 5px"
+                    boundary-links
+                    direction-links
+                    dense
+                    data-testid="datatable-pagination"
+                    :max="lastPage"
+                    :max-pages="maxPaginationPages"
+                    :ellipses="false"
+                    :boundary-numbers="false"
+                    v-model="paginationPage"
+                    @input="updatePaginationButtons"
       />
-      <q-select
-        class="q-select-pager communication-logs-table-per-page-select"
-        option-value="value"
-        option-label="label"
-        outlined
-        dense
-        emit-value
-        data-testid="datatable-per-page-select"
-        :options="perPageOptions"
-        :display-value="`${perPage} per page`"
-        v-model="perPage"
+      <q-select class="q-select-pager communication-logs-table-per-page-select"
+                option-value="value"
+                option-label="label"
+                outlined
+                dense
+                emit-value
+                data-testid="datatable-per-page-select"
+                :options="perPageOptions"
+                :display-value="`${perPage} per page`"
+                v-model="perPage"
       />
     </div>
 
-    <communication-table-settings
-      :is-open="showColumnHeadersModal"
-      :available-fields="tableFields"
-      :current-columns="columns"
-      @update:columns="updateColumns"
-      @update:is-open="changeTableSettingsVisibility"
-    />
+    <communication-table-settings :is-open="showColumnHeadersModal"
+                                  :available-fields="tableFields"
+                                  :current-columns="columns"
+                                  @update:columns="updateColumns"
+                                  @update:is-open="changeTableSettingsVisibility" />
   </div>
 </template>
 
@@ -291,7 +286,10 @@ export default {
     }
   },
 
-  mixins: [aclMixin, communicationsMixin],
+  mixins: [
+    aclMixin,
+    communicationsMixin
+  ],
 
   components: {
     SearchInput,
@@ -613,12 +611,9 @@ export default {
       this.$nextTick(() => {
         const allButtons = this.$el.querySelectorAll('.q-pagination button')
 
-        allButtons.forEach((button) => {
+        allButtons.forEach(button => {
           const pageNumber = button.innerText
-          button.setAttribute(
-            'data-testid',
-            'datatable-pagination-page-' + pageNumber
-          )
+          button.setAttribute('data-testid', 'datatable-pagination-page-' + pageNumber)
         })
       })
     },
@@ -666,10 +661,7 @@ export default {
 
     saveColumns (columns) {
       try {
-        localStorage.setItem(
-          'communication-logs-columns',
-          JSON.stringify(columns)
-        )
+        localStorage.setItem('communication-logs-columns', JSON.stringify(columns))
       } catch (error) {
         console.error('Error saving columns to localStorage:', error)
       }
@@ -684,8 +676,8 @@ export default {
 
         const columns = JSON.parse(savedColumns)
 
-        const hasAllFixedColumns = this.fixedColumns.every((name) =>
-          columns.some((col) => col.name === name)
+        const hasAllFixedColumns = this.fixedColumns.every(name =>
+          columns.some(col => col.name === name)
         )
 
         return hasAllFixedColumns ? columns : this.columns
@@ -695,9 +687,7 @@ export default {
     },
 
     removeCommunication (communicationId) {
-      const index = this.communicationsData.findIndex(
-        (communication) => communication.id === communicationId
-      )
+      const index = this.communicationsData.findIndex(communication => communication.id === communicationId)
 
       if (index) {
         this.communicationsData.splice(index, 1)
