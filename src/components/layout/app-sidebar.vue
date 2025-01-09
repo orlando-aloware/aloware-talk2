@@ -30,12 +30,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Communications</span>
+        <span class="font-weight-bold text-sm">{{inboxMenuTitle}}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        Communications
+        {{inboxMenuTitle}}
       </span>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
@@ -51,12 +51,55 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Communications</span>
+        <span class="font-weight-bold text-sm">{{inboxMenuTitle}}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        Communications
+        {{inboxMenuTitle}}
+      </span>
+    </q-btn>
+
+    <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
+           :ripple="false"
+           icon="img:app-icons/menu/communications_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           data-testid="communication-active-sidebar-btn"
+           v-show="isActive('Communications')"
+           v-if="hasNewCommunicationsFeatureEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">{{COMMUNICATIONS_MENU_TITLE}}</span>
+      </q-tooltip>
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        {{COMMUNICATIONS_MENU_TITLE}}
+      </span>
+    </q-btn>
+    <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
+           :ripple="false"
+           icon="img:app-icons/menu/communications_gray.svg"
+           align="left"
+           padding="10px 20px"
+           class="nav-icons w-100"
+           data-testid="communication-no-active-sidebar-btn"
+           v-show="!isActive('Communications')"
+           v-if="hasNewCommunicationsFeatureEnabled"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">{{COMMUNICATIONS_MENU_TITLE}}</span>
+      </q-tooltip>
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        {{COMMUNICATIONS_MENU_TITLE}}
       </span>
     </q-btn>
 
@@ -841,7 +884,8 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import { broadcastsMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { broadcastsMixin, kycMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE, COMMUNICATIONS_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-sidebar',
@@ -867,7 +911,8 @@ export default {
   mixins: [
     simpsocialMixin,
     kycMixin,
-    broadcastsMixin
+    broadcastsMixin,
+    userMixin
   ],
 
   computed: {
@@ -911,13 +956,21 @@ export default {
 
     sidebarIcon () {
       return this.isSidebarExpanded ? 'unfold_less' : 'unfold_more'
+    },
+    /*
+      WAT-1105: when the feature not corresponds inbox remains as communications
+    */
+    inboxMenuTitle () {
+      return this.hasNewCommunicationsFeatureEnabled ? INBOXES_MENU_TITLE : COMMUNICATIONS_MENU_TITLE
     }
 
   },
 
   data () {
     return {
-      modeIcon: 'img:app-icons/menu/mode_gray.svg'
+      modeIcon: 'img:app-icons/menu/mode_gray.svg',
+      COMMUNICATIONS_MENU_TITLE,
+      DEFAULT_COMMUNICATIONS_ROUTE_PATH
     }
   },
 
@@ -928,6 +981,11 @@ export default {
       }
 
       if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
+        return true
+      }
+
+      // if the route name includes Communications and name is Communications
+      if (this.$route.name.includes('Communications') && name === 'Communications') {
         return true
       }
 

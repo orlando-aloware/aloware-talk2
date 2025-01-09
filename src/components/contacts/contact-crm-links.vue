@@ -1,14 +1,26 @@
 <template>
-  <div class="contact-crm-integrations-wrapper contact-integration-wrapper" data-testid="contact-crm-links-wrapper">
-    <b-link class="md-btn md-raised white integrations-link d-flex"
-            target="_blank"
-            :href="integration.link"
-            :key="integration.name"
-            data-testid="contact-crm-link"
-            v-for="integration in activeCrmIntegrations">
-      <div class="integrations-logo mr-3" :style="`background: url('integrations/${integration.logo}') no-repeat center center`"></div>
-      <span class="integration-title">{{ integration.label }}</span>
-    </b-link>
+  <div data-testid='contact-crm-links-wrapper'>
+    <div class='integration-wrapper integration-wrapper-generic'
+         :key='integration.name'
+         v-for='integration in activeCrmIntegrations'>
+      <q-card class='integration-card'
+              data-testid='integration-salesforce-card'
+              flat>
+        <q-item class='p-0'>
+                <span class='integration-jit-card-header'>
+                  <span class='integrations-logo integration-icon-in-header'
+                        :class='integration.name + "-icon"'
+                        :style="`background: url('integrations/${integration.logo}') no-repeat center center`"></span>
+                  <span class='integration-title'>{{ integration.label }}</span>
+                </span>
+          <a class='external-contact-integration-link-icon color-primary'
+             target='_blank'
+             :href='integration.link'>
+            <i class='fa fa-external-link' aria-hidden='true' />
+          </a>
+        </q-item>
+      </q-card>
+    </div>
   </div>
 </template>
 

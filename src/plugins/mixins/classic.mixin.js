@@ -4,6 +4,10 @@ export default {
       return process.env.API_URL + `/lines/${campaignId}/settings`
     },
 
+    getCampaignActivityURL (campaignId) {
+      return process.env.API_URL + `/lines/${campaignId}/activity`
+    },
+
     getRingGroupURL (ringGroupId) {
       return process.env.API_URL + `/ring-groups/dialog/${ringGroupId}`
     },

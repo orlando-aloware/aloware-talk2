@@ -24,7 +24,7 @@ export default {
       return {
         'btn': true,
         'btn-sm': true,
-        'compact-button': true,
+        'compact-button': this.compact,
         'btn-primary': this.variant === 'primary',
         'btn-success': this.variant === 'success',
         'btn-secondary': this.variant === 'secondary',
@@ -74,6 +74,11 @@ export default {
       required: false,
       type: String,
       default: ''
+    },
+    compact: {
+      required: false,
+      type: Boolean,
+      default: true
     }
   },
   methods: {

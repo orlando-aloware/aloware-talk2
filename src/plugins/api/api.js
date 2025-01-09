@@ -272,6 +272,18 @@ export default {
       }
     },
 
+    filters: {
+      async get ({ isOnCompany } = {}) {
+        const { data = [] } = await window.axios.get(`${suffixV1}filter`)
+
+        if (isOnCompany) {
+          return data.filter(filter => filter.is_on_company)
+        }
+
+        return data
+      }
+    },
+
     ringGroups: {
       get () {
         return window.axios.get(`${suffixV1}ring-group`)
@@ -429,6 +441,10 @@ export default {
       communications: {
         get (params) {
           return window.axios.get(`${suffixV1}reports/communications`, params)
+        },
+
+        getCount (params) {
+          return window.axios.get(`${suffixV1}reports/communications/count`, params)
         }
       }
     },
@@ -932,7 +948,7 @@ export default {
 
     aloAiBot: {
       getBots (params = {}) {
-        return window.axios.get(`${suffixV1}aloai/bots`, { params })
+        return window.axios.get(`${suffixV1}aloai/bot`, { params })
       },
       getContactDisengagedBots (contactId) {
         return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
@@ -944,10 +960,10 @@ export default {
         return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-status`, { engagements })
       },
       enrollContacts (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/enroll-contacts`, params)
+        return window.axios.post(`${suffixV1}aloai/bot/${botId}/enroll-contacts`, params)
       },
       disenrollContact (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/disenroll-contact`, params)
+        return window.axios.post(`${suffixV1}aloai/bot/${botId}/disenroll-contact`, params)
       }
     }
   }
