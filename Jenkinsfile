@@ -169,18 +169,9 @@ pipeline {
                             }
                         }
 
-                        stage('Deploy Cloudfront Distribution for Talk2/Dev2') {
+                        stage('Deploy Talk2/Dev2') {
                             when { not { branch 'master' } } // TODO: This should be active only for develop
                             steps {
-                                sshagent(credentials: ['jenkins-github-creds']) {
-                                    echo '==> Clone GitOps Repo'
-                                    sh("""
-                                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                                    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-                                    git clone git@github.com:${GITHUB_ORG}/${TERRAFORM_REPO}.git
-                                """)
-                                }
-
                                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                                 script {
