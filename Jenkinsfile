@@ -164,16 +164,6 @@ pipeline {
                                         sh "terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
-                                    sh "yarn upload-s3"
-                                }
-                            }
-                        }
-
-                        stage('Deploy Talk2/Dev2') {
-                            when { not { branch 'master' } } // TODO: This should be active only for develop
-                            steps {
-                                sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
-
                                 script {
                                     def workspaceName = 'pr-dev2'
                                     def subDomain = 'pr-dev2.talk'
@@ -185,12 +175,12 @@ pipeline {
                                         terraform fmt
                                     '''
 
-                                        try {
-                                            sh "terraform workspace new ${workspaceName}"
+                                    try {
+                                        sh "terraform workspace new ${workspaceName}"
                                     } catch (Exception e) {
-                                            echo 'The workspace already exists, running TF Commands...'
-                                            sh "terraform workspace select ${workspaceName}"
-                                        }
+                                        echo 'The workspace already exists, running TF Commands...'
+                                        sh "terraform workspace select ${workspaceName}"
+                                    }
 
                                         sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
@@ -199,6 +189,7 @@ pipeline {
                                 }
                             }
                         }
+
                     }
                 }
 
