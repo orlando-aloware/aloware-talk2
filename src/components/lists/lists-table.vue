@@ -306,6 +306,20 @@ export default {
         })
     },
 
+    async removeList (list) {
+      await this.deleteList(list.id)
+        .then(() => {
+          this.SET_LISTS_COUNT(this.listsCount - 1)
+          this.listsData = this.listsData.filter(item => item.id !== list.id)
+
+          this.$generalNotification(`${list.name} list has been successfully deleted.`)
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$generalNotification('Something went wrong while deleting list.', 'error')
+        })
+    },
+
     async onScroll ({ to, ref }) {
       const lastIndex = this.listsData.length - 1
       if (!this.isLoadingMore && this.pagination.currentPage < this.pagination.totalPages && to === lastIndex) {
@@ -338,7 +352,7 @@ export default {
         centered: true
       }).then(confirm => {
         if (confirm) {
-          // TO DO
+          this.removeList(list)
         }
       })
     },
