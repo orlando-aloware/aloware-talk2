@@ -531,7 +531,7 @@ body,
   line-height: 16px;
 }
 
-.tag-text {
+.tag-text, .list-text {
   font-weight: normal;
   font-size: $f-size-body-sm;
   letter-spacing: -0.0025em;
@@ -539,7 +539,7 @@ body,
 }
 
 .details-contact-tags {
-  .tag-text {
+  .tag-text, .list-text {
     max-width: 177px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -547,7 +547,7 @@ body,
   }
 }
 
-.tag-items {
+.tag-items, .list-items {
   padding: 1px 5px;
   border-radius: 5px !important;
 }
@@ -579,11 +579,11 @@ body,
   }
 
   .q-field > .q-field {
-    .tag-items {
+    .tag-items, .list-items {
       max-width: 230px;
     }
 
-    .tag-text {
+    .tag-text, .list-text {
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
@@ -594,8 +594,8 @@ body,
     max-height: 160px;
     height: 100%;
 
-    .tag-items {
-      .tag-text {
+    .tag-items, .list-items {
+      .tag-text, .list-text {
         padding-left: 4px;
       }
     }
@@ -608,12 +608,12 @@ body,
     }
 
     .select-group {
-      .tag-text {
+      .tag-text, .list-text {
         @include font-size($f-size-h5, 600, true);
       }
     }
 
-    .tag-items {
+    .tag-items, .list-items {
       .is-dot {
         top: 43%;
         left: -8px;
@@ -2443,7 +2443,7 @@ i.option-separator {
   }
 }
 
-.tags-wrapper {
+.tags-wrapper, .lists-wrapper {
   .badge-tag {
     background: transparent;
     font-weight: 500;
@@ -2503,7 +2503,7 @@ i.option-separator {
   }
 }
 
-.tags-filter-wrapper {
+.tags-filter-wrapper, .lists-filter-wrapper {
   .card-body {
     padding: 0 !important;
   }
@@ -15494,7 +15494,7 @@ thead.conflicted-contact-thead-class tr th {
   line-height: 1.5;
 }
 
-.scrollable-tags-area {
+.scrollable-tags-area, .scrollable-lists-area {
   overflow-y: auto;
 }
 
