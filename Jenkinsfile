@@ -183,8 +183,8 @@ pipeline {
                                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                                 script {
-                                    def workspaceName = 'pr-talk2'
-                                    def subDomain = 'pr-talk2.talk'
+                                    def workspaceName = 'pr-dev2'
+                                    def subDomain = 'pr-dev2.talk'
 
                                     dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                                         sh '''
@@ -193,14 +193,14 @@ pipeline {
                                         terraform fmt
                                     '''
 
-                                        try {
+                                      try {
                                             sh "terraform workspace new ${workspaceName}"
-                                    } catch (Exception e) {
+                                      } catch (Exception e) {
                                             echo 'The workspace already exists, running TF Commands...'
                                             sh "terraform workspace select ${workspaceName}"
                                         }
 
-                                        sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                                      sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
                                     sh "yarn upload-s3"
