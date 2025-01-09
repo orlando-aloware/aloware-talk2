@@ -22,7 +22,7 @@ pipeline {
         DEVELOP_SAFE_JOB_NAME = "${JOB_NAME.split('/')[0]}-develop"
         DEVELOP_CACHE_FOLDER = "${HOME}/.jenkins-cache/${DEVELOP_SAFE_JOB_NAME}"
         TALK_URL = "${env.GIT_BRANCH.toLowerCase().contains('pr') ? "${env.GIT_BRANCH.toLowerCase()}.talk" : 'talk'}.${DEV_DOMAIN}"
-        TALK2_URL = "talk2.${DEV_DOMAIN}"
+        TALK2_URL = "dev2.talk.${DEV_DOMAIN}"
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -175,8 +175,8 @@ pipeline {
                                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                                 script {
-                                    def branchName = env.GIT_BRANCH.toLowerCase()
-                                    def subDomain = 'talk2'
+                                    def workspaceName = 'dev2-talk'
+                                    def subDomain = 'dev2.talk'
 
                                     dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                                         sh '''
@@ -186,10 +186,10 @@ pipeline {
                                     '''
 
                                         try {
-                                            sh "terraform workspace new ${branchName}"
+                                            sh "terraform workspace new ${workspaceName}"
                                     } catch (Exception e) {
                                             echo 'The workspace already exists, running TF Commands...'
-                                            sh "terraform workspace select ${branchName}"
+                                            sh "terraform workspace select ${workspaceName}"
                                         }
 
                                         sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
