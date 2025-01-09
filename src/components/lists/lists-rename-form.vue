@@ -179,35 +179,30 @@ export default {
 
     saveList () {
       this.$v.$touch()
-      let xhr = null
-      let msg = ''
 
-      if (this.editableList) {
-        this.loading = true
+      if (!this.editableList) {
+        return
+      }
 
-        const params = {
+      this.loading = true
+
+      this.updateList({
+        id: this.editableList.id,
+        data: {
           name: this.list.name
         }
-
-        xhr = this.updateList({
-          id: this.editableList.id,
-          data: params
+      })
+        .then(() => {
+          this.loading = false
+          this.$generalNotification(this.list.name + ' list updated successfully')
+          this.$emit('listUpdated', { id: this.editableList.id, name: this.list.name })
+          this.closeListForm()
         })
-        msg = this.list.name + ' list updated successfully'
-
-        xhr
-          .then(() => {
-            this.loading = false
-            this.$generalNotification(msg)
-            this.$emit('listUpdated', { id: this.editableList.id, name: this.list.name })
-            this.closeListForm()
-          })
-          .catch(err => {
-            this.$handleErrors(err.response)
-            this.loading = false
-            console.log(err)
-          })
-      }
+        .catch(err => {
+          this.$handleErrors(err.response)
+          this.loading = false
+          console.log(err)
+        })
     }
   }
 }
