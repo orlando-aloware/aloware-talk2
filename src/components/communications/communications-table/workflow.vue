@@ -8,6 +8,10 @@
        :href="getWorkflowURL(value)"
        v-else-if="value">
       {{ workflow.name || '-' }}
+
+      <q-tooltip>
+        Click to go to sequence page
+      </q-tooltip>
     </a>
     <span v-else>
       -
