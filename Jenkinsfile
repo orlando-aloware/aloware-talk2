@@ -184,7 +184,7 @@ pipeline {
 
                                 script {
                                     def workspaceName = 'pr-talk2'
-                                    def subDomain = 'pr-dev2.talk'
+                                    def subDomain = 'pr-talk2.talk'
 
                                     dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                                         sh '''
