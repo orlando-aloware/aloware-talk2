@@ -169,12 +169,21 @@ pipeline {
                             }
                         }
 
-                        stage('Deploy Talk2/Dev2') {
-                            when { not { branch 'master' } } // TODO: This should be active only for develop
+                        stage('Build Talk2 Assets for Dev2') {
+                            when { not { branch 'master' } }
                             steps {
                                 // Set the api URL to https://app2.alodev.org
                                 sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
 
+                                nvm("${NODE_VERSION}") {
+                                    sh 'quasar build --debug'
+                                }
+                            }
+                        }
+
+                        stage('Deploy Talk2/Dev2') {
+                            when { not { branch 'master' } } // TODO: This should be active only for develop
+                            steps {
                                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                                 script {
