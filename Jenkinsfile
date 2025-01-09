@@ -22,7 +22,7 @@ pipeline {
         DEVELOP_SAFE_JOB_NAME = "${JOB_NAME.split('/')[0]}-develop"
         DEVELOP_CACHE_FOLDER = "${HOME}/.jenkins-cache/${DEVELOP_SAFE_JOB_NAME}"
         TALK_URL = "${env.GIT_BRANCH.toLowerCase().contains('pr') ? "${env.GIT_BRANCH.toLowerCase()}.talk" : 'talk'}.${DEV_DOMAIN}"
-        TALK2_URL = "pr-dev2.talk.${DEV_DOMAIN}"
+        TALK2_URL = "talk2.${DEV_DOMAIN}"
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -187,8 +187,8 @@ pipeline {
                                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                                 script {
-                                    def workspaceName = 'pr-dev2'
-                                    def subDomain = 'pr-dev2.talk'
+                                    def workspaceName = 'talk2'
+                                    def subDomain = 'talk2'
 
                                     dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
                                         sh '''
