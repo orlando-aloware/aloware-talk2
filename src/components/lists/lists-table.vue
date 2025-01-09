@@ -102,10 +102,10 @@
     </q-table>
 
     <lists-rename-form :is-show="isOpenListForm"
-                  :editable-list="list"
-                  data-testid="lists-form"
-                  @closeListForm="closeListForm"
-                  @listUpdated="listUpdated"/>
+                       :editable-list="list"
+                       data-testid="lists-form"
+                       @closeListForm="closeListForm"
+                       @listUpdated="listUpdated"/>
   </div>
 </template>
 
@@ -115,7 +115,7 @@ import { COLUMNS } from 'src/constants/lists/home-columns'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import EditPenIcon from 'components/icons/edit-pen-icon.vue'
 import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
-import * as ContactListTypes from 'src/constants/lists/types'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
 import { dataTableMixin } from 'src/plugins/mixins'
@@ -263,9 +263,9 @@ export default {
 
     getContactListType (contactList) {
       switch (contactList.type) {
-        case ContactListTypes.STATIC_LIST:
+        case ContactListTypes.STATIC:
           return 'Static'
-        case ContactListTypes.DYNAMIC_LIST:
+        case ContactListTypes.DYNAMIC:
           return 'Dynamic'
         case ContactListTypes.DYNAMIC_REMOTE_LIST:
           return 'Integration Dynamic'
@@ -306,8 +306,8 @@ export default {
         })
     },
 
-    async removeList (list) {
-      await this.deleteList(list.id)
+    removeList (list) {
+      this.deleteList(list.id)
         .then(() => {
           this.SET_LISTS_COUNT(this.listsCount - 1)
           this.listsData = this.listsData.filter(item => item.id !== list.id)

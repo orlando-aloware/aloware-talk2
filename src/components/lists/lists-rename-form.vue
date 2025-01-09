@@ -27,8 +27,8 @@
                     :state="validateState('name')">
         <b-form-input placeholder="Enter list name"
                       data-testid="lists-edit-modal-input-name"
-                      v-model="$v.list.name.$model"
-                      required />
+                      required
+                      v-model="$v.list.name.$model"/>
       </b-form-group>
     </b-form>
 
