@@ -172,14 +172,6 @@ pipeline {
                         stage('Deploy Talk2/Dev2') {
                             when { not { branch 'master' } } // TODO: This should be active only for develop
                             steps {
-                                sshagent(credentials: ['jenkins-github-creds']) {
-                                    echo '==> Clone GitOps Repo'
-                                    sh("""
-                                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                                    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-                                """)
-                                }
-
                                 sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
 
                                 script {
@@ -203,7 +195,7 @@ pipeline {
                                       sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
-                                    sh "yarn upload-s3"
+                                    sh "yarn upload-s3-dev2"
                                 }
                             }
                         }
