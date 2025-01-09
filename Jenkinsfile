@@ -22,6 +22,7 @@ pipeline {
         DEVELOP_SAFE_JOB_NAME = "${JOB_NAME.split('/')[0]}-develop"
         DEVELOP_CACHE_FOLDER = "${HOME}/.jenkins-cache/${DEVELOP_SAFE_JOB_NAME}"
         TALK_URL = "${env.GIT_BRANCH.toLowerCase().contains('pr') ? "${env.GIT_BRANCH.toLowerCase()}.talk" : 'talk'}.${DEV_DOMAIN}"
+        TALK2_URL = "talk2.${DEV_DOMAIN}"
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -161,6 +162,46 @@ pipeline {
                                         }
 
                                         sh "terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                                    }
+
+                                    sh "yarn upload-s3"
+                                }
+                            }
+                        }
+
+                        stage('Deploy Cloudfront Distribution for Talk2/Dev2') {
+                            when { not { branch 'master' } } // TODO: This should be active only for develop
+                            steps {
+                                sshagent(credentials: ['jenkins-github-creds']) {
+                                    echo '==> Clone GitOps Repo'
+                                    sh("""
+                                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                                    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+                                    git clone git@github.com:${GITHUB_ORG}/${TERRAFORM_REPO}.git
+                                """)
+                                }
+
+                                sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
+
+                                script {
+                                    def branchName = env.GIT_BRANCH.toLowerCase()
+                                    def subDomain = 'talk2'
+
+                                    dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
+                                        sh '''
+                                        terraform init; \
+                                        terraform validate; \
+                                        terraform fmt
+                                    '''
+
+                                        try {
+                                            sh "terraform workspace new ${branchName}"
+                                    } catch (Exception e) {
+                                            echo 'The workspace already exists, running TF Commands...'
+                                            sh "terraform workspace select ${branchName}"
+                                        }
+
+                                        sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
                                     sh "yarn upload-s3"
