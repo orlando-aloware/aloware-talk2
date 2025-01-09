@@ -8,6 +8,7 @@ import { getField, updateField } from 'vuex-map-fields'
 import auth from './auth'
 import cache from './cache'
 import carrierFee from './carrier-fee'
+import communications from './communications'
 import contacts from './contacts'
 import inbox from './inbox'
 import stats from './stats'
@@ -38,6 +39,7 @@ export default function (/* { ssrContext } */) {
     modules: {
       auth,
       carrierFee,
+      communications,
       contacts,
       inbox,
       stats,
@@ -61,6 +63,8 @@ export default function (/* { ssrContext } */) {
       users: [],
       usersIsLoading: false,
       ringGroups: [],
+      teams: [],
+      contactLists: [],
       workflows: [],
       changelogs: [],
       broadcasts: [],
@@ -543,6 +547,14 @@ export default function (/* { ssrContext } */) {
 
       setRingGroups ({ commit }, ringGroups) {
         commit('SET_RING_GROUPS', ringGroups)
+      },
+
+      setTeams ({ commit }, teams) {
+        commit('SET_TEAMS', teams)
+      },
+
+      setContactLists ({ commit }, contactLists) {
+        commit('SET_CONTACT_LISTS', contactLists)
       },
 
       resetVuex ({ commit }, value) {
@@ -1312,6 +1324,14 @@ export default function (/* { ssrContext } */) {
 
       SET_RING_GROUPS (state, ringGroups) {
         state.ringGroups = ringGroups
+      },
+
+      SET_TEAMS (state, teams) {
+        state.teams = teams
+      },
+
+      SET_CONTACT_LISTS (state, contactLists) {
+        state.contactLists = contactLists
       },
 
       RESET_VUEX ({ state }) {

@@ -4,6 +4,7 @@ const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
 const ResetPassword = () => import('pages/ResetPassword.vue')
 const Inbox = () => import('pages/Inbox.vue')
+const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
 const Contact = () => import('src/pages/contacts/Contact.vue')
 const Contacts = () => import('src/pages/contacts/Contacts.vue')
 const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
@@ -36,6 +37,20 @@ const AccountRegistration = () => import('pages/account-registration/AccountRegi
 const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
 const AloAi = () => import('pages/AloAi.vue')
 const Apps = () => import('pages/Apps.vue')
+
+export const COMMUNICATIONS_BASE_PATH = 'communications'
+export const DEFAULT_COMMUNICATIONS_CHANNEL = 'all'
+export const DEFAULT_COMMUNICATIONS_ROUTE_PATH = `/${COMMUNICATIONS_BASE_PATH}/${DEFAULT_COMMUNICATIONS_CHANNEL}`
+
+export const DEFAULT_COMMUNICATIONS_ROUTE_NAME = 'Communications'
+export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications View'
+export const COMMUNICATIONS_CHANNELS_ROUTE_NAME = 'Communications Channel'
+export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Channel Task Status'
+
+// NO difference in the titles for Inboxes on mobile
+export const INBOXES_MENU_TITLE = 'Inboxes'
+export const COMMUNICATIONS_MENU_TITLE = 'Communications'
+export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comm.’s'
 
 const routes = [
   {
@@ -73,7 +88,7 @@ const routes = [
         name: 'Inbox',
         component: Inbox,
         meta: {
-          title: 'Communications'
+          title: INBOXES_MENU_TITLE
         },
         children: [
           {
@@ -81,7 +96,7 @@ const routes = [
             name: 'Inbox Contact Task',
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -89,7 +104,7 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -97,7 +112,7 @@ const routes = [
             name: 'Inbox Contact',
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -105,7 +120,7 @@ const routes = [
             name: 'Inbox Contact Communication',
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -113,7 +128,7 @@ const routes = [
             name: 'Inbox Channel',
             component: Inbox,
             meta: {
-              title: 'Communications'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -121,7 +136,7 @@ const routes = [
             name: 'Inbox View',
             component: Inbox,
             meta: {
-              title: 'Communications'
+              title: INBOXES_MENU_TITLE
             }
           },
           {
@@ -129,7 +144,41 @@ const routes = [
             name: 'Inbox View Contact Task',
             component: Contact,
             meta: {
-              title: 'Communications'
+              title: INBOXES_MENU_TITLE
+            }
+          }
+        ]
+      },
+      {
+        path: COMMUNICATIONS_BASE_PATH,
+        name: DEFAULT_COMMUNICATIONS_ROUTE_NAME,
+        component: CommunicationsView,
+        meta: {
+          title: COMMUNICATIONS_MENU_TITLE
+        },
+        children: [
+          {
+            path: ':channel',
+            name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
+            component: CommunicationsView,
+            meta: {
+              title: COMMUNICATIONS_MENU_TITLE
+            }
+          },
+          {
+            path: 'view/:viewId/:status',
+            name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
+            component: CommunicationsView,
+            meta: {
+              title: COMMUNICATIONS_MENU_TITLE
+            }
+          },
+          {
+            path: ':channel/:status',
+            name: COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME,
+            component: Contact,
+            meta: {
+              title: COMMUNICATIONS_MENU_TITLE
             }
           }
         ]
