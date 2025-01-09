@@ -88,12 +88,12 @@ pipeline {
                                         sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                                     }
 
-                                    // If the API_URL_OVERWRITE is set, we will replace the API_URL in the .env file
+                                    // If the API_URL_OVERWRITE is set, we will replace the API_URL and API_REPORTING_URL in the .env file
                                     if (env.API_URL_OVERWRITE) {
                                         sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
+                                        sh "sed -i 's|API_REPORTING_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
                                     }
 
-                                // println "${text}"
                                 }
                             }
                         }
@@ -170,10 +170,12 @@ pipeline {
                         }
 
                         stage('Build Talk2 Assets for Dev2') {
-                            when { not { branch 'master' } }
+                            when { not { branch 'master' } } // TODO: This should be active only for develop
                             steps {
-                                // Set the api URL to https://app2.alodev.org
+                                // Set the API_URL to https://app2.alodev.org
                                 sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
+                                // Set the API_REPORTING_URL to https://app2.alodev.org
+                                sh "sed -i 's|API_URL=.*|API_REPORTING_URL=https://app2.alodev.org|' .env"
 
                                 nvm("${NODE_VERSION}") {
                                     sh 'quasar build --debug'
@@ -181,11 +183,9 @@ pipeline {
                             }
                         }
 
-                        stage('Deploy Talk2/Dev2') {
+                        stage('Deploy Talk2 for Dev2') {
                             when { not { branch 'master' } } // TODO: This should be active only for develop
                             steps {
-                                sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
-
                                 script {
                                     def workspaceName = 'talk2'
                                     def subDomain = 'talk2'
