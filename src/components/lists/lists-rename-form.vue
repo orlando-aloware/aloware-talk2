@@ -161,7 +161,6 @@ export default {
       this.$nextTick(() => {
         document.querySelector('.close-edit-modal-footer-class > .btn-primary').setAttribute('data-testid', 'lists-close-edit-modal-confirm-button')
         document.querySelector('.close-edit-modal-footer-class > .btn-secondary').setAttribute('data-testid', 'lists-close-edit-modal-cancel-button')
-        console.log('Button', document.querySelector('.close-edit-modal-footer-class > .btn-primary'))
       })
     },
 
@@ -180,11 +179,12 @@ export default {
 
     saveList () {
       this.$v.$touch()
-      this.loading = true
       let xhr = null
       let msg = ''
 
       if (this.editableList) {
+        this.loading = true
+
         const params = {
           name: this.list.name
         }
@@ -194,20 +194,20 @@ export default {
           data: params
         })
         msg = this.list.name + ' list updated successfully'
-      }
 
-      xhr
-        .then(() => {
-          this.loading = false
-          this.$generalNotification(msg)
-          this.$emit('listUpdated', { id: this.editableList.id, name: this.list.name })
-          this.closeListForm()
-        })
-        .catch(err => {
-          this.$handleErrors(err.response)
-          this.loading = false
-          console.log(err)
-        })
+        xhr
+          .then(() => {
+            this.loading = false
+            this.$generalNotification(msg)
+            this.$emit('listUpdated', { id: this.editableList.id, name: this.list.name })
+            this.closeListForm()
+          })
+          .catch(err => {
+            this.$handleErrors(err.response)
+            this.loading = false
+            console.log(err)
+          })
+      }
     }
   }
 }

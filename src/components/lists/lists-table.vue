@@ -151,13 +151,11 @@ export default {
       pagination: {
         rowsPerPage: 0,
         rowsNumber: this.listsCount,
-
         perPage: 30,
         totalPages: 1,
         currentPage: 1
       },
       listsData: [],
-
       isOpenListForm: false,
       list: null
     }
