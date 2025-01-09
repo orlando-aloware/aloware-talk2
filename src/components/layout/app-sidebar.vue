@@ -154,6 +154,7 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Lists')"
+           v-if="isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -164,7 +165,7 @@
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        LML
+        Lists
       </span>
     </q-btn>
     <q-btn :to="{ path: '/lists' }"
@@ -174,6 +175,7 @@
            padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('Lists')"
+           v-if="isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -184,7 +186,7 @@
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        LML
+        Lists
       </span>
     </q-btn>
 
