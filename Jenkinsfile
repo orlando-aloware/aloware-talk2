@@ -91,7 +91,7 @@ pipeline {
                                     // If the API_URL_OVERWRITE is set, we will replace the API_URL and API_REPORTING_URL in the .env file
                                     if (env.API_URL_OVERWRITE) {
                                         sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
-                                        sh "sed -i 's|API_REPORTING_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
+                                        sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env"
                                     }
 
                                 }
@@ -175,7 +175,7 @@ pipeline {
                                 // Set the API_URL to https://app2.alodev.org
                                 sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
                                 // Set the API_REPORTING_URL to https://app2.alodev.org
-                                sh "sed -i 's|API_URL=.*|API_REPORTING_URL=https://app2.alodev.org|' .env"
+                                sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=https://app2.alodev.org|' .env"
 
                                 nvm("${NODE_VERSION}") {
                                     sh 'quasar build --debug'
