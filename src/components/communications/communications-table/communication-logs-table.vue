@@ -59,7 +59,8 @@
                 v-for="col in props.cols"
                 :key="col.name">
             <div v-if="col.name === 'disposition_status2'">
-              <disposition :row="props.row" />
+              <disposition :row="props.row"
+                           @on-details="onCommunicationDetails"/>
             </div>
             <div v-else-if="col.name === 'incoming_number'">
               <div v-if="props.row?.campaign_id">
@@ -203,6 +204,9 @@
       </template>
     </q-table>
 
+    <communications-details-sidebar :communication="sidebarCommunication"
+                                    v-model="showCommunicationSidebar"/>
+
     <div class="d-flex align-items-center justify-content-center border-top flex-grow-0 overflow-x-hidden pt-3"
          v-if="paginated">
       <q-pagination class="table-pagination communication-logs-table-pagination"
@@ -268,6 +272,7 @@ import QueueResolution from './queue-resolution.vue'
 import CreatorType from './creator-type.vue'
 import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
+import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -313,7 +318,8 @@ export default {
     QueueResolution,
     CreatorType,
     CsatScore,
-    WallboardCallsNote
+    WallboardCallsNote,
+    CommunicationsDetailsSidebar
   },
 
   data () {
@@ -576,7 +582,9 @@ export default {
         'user_id',
         'operations'
       ],
-      expandedTeams: {}
+      expandedTeams: {},
+      showCommunicationSidebar: false,
+      sidebarCommunication: {}
     }
   },
 
@@ -681,6 +689,11 @@ export default {
       if (index) {
         this.communicationsData.splice(index, 1)
       }
+    },
+
+    onCommunicationDetails (communication) {
+      this.sidebarCommunication = communication
+      this.showCommunicationSidebar = true
     }
   },
 

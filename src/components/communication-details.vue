@@ -2,7 +2,7 @@
   <div v-if="communication"
        data-testid="comm-details-wrapper">
     <b-row data-testid="comm-details-row">
-      <b-col :md="isMobileView ? 12 : 4"
+      <b-col :md="isWidget || mobileView ? 12 : 4"
              sm="12"
              data-testid="comm-details-col"
              class="pl-0 pr-0">
@@ -20,7 +20,7 @@
                           variant="light"
                           class="btn-white communication-back-button"
                           title="Go Back"
-                          v-if="isMobileView && canGoBack"
+                          v-if="isWidget && canGoBack"
                           data-testid="contact-details-navigation-btn-prev"
                           v-b-tooltip.hover
                           @click.prevent="goBack(false)">
@@ -977,7 +977,7 @@
           </q-card-section>
         </q-card>
       </b-col>
-      <b-col :md="isMobileView ? 12 : 8"
+      <b-col :md="isWidget || mobileView ? 12 : 8"
              class="pr-0 ring-group-snapshot-wrapper"
              data-testid="comm-details-col"
              v-if="communication && communication.type === CommunicationTypes.CALL">
@@ -1195,10 +1195,6 @@ export default {
       const sendAsMms = this.communication.metadata?.send_as_mms
 
       return sendAsMms ? 'Yes' : 'No'
-    },
-
-    isMobileView () {
-      return this.isWidget || this.mobileView
     }
   },
 
@@ -1209,7 +1205,7 @@ export default {
       }
     },
     getContactRouteLink (communication) {
-      if (this.isMobileView) {
+      if (this.isWidget) {
         return { name: 'Texting Widget (unknown-user)', params: { id: communication.contact.id } }
       }
 

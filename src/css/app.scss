@@ -16351,3 +16351,10 @@ hr {
   }
 }
 
+.communication-details-sidebar {
+  .b-sidebar {
+    top: 60px;
+    height: calc(100vh - 60px)
+  }
+}
+
