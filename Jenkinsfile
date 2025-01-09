@@ -169,8 +169,10 @@ pipeline {
                             }
                         }
 
+                        // Start build talk2 pointing to app2.alodev.org if is the develop branch
+
                         stage('Build Talk2 Assets for Dev2') {
-                            when { not { branch 'master' } } // TODO: This should be active only for develop
+                            when { branch 'develop' }
                             steps {
                                 // Set the API_URL to https://app2.alodev.org
                                 sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
@@ -184,7 +186,7 @@ pipeline {
                         }
 
                         stage('Deploy Talk2 for Dev2') {
-                            when { not { branch 'master' } } // TODO: This should be active only for develop
+                            when { branch 'develop' }
                             steps {
                                 script {
                                     def workspaceName = 'talk2'
