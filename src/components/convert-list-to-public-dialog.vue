@@ -54,6 +54,11 @@ export default {
     listName: {
       type: String,
       required: true
+    },
+
+    fromAdminList: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -63,7 +68,10 @@ export default {
     },
 
     onConvertToPublic () {
-      const params = { show_in_public_folder: true }
+      const params = {
+        show_in_public_folder: true,
+        ...(this.fromAdminList ? { from_admin_list: true } : {})
+      }
 
       API.V2.contactList.update(this.listId, params)
         .then((response) => {

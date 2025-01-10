@@ -63,23 +63,123 @@
             </div>
             <div v-else-if="col.name === 'actions'">
               <div class="d-flex justify-content-center context-menu">
-                <b-dropdown no-caret
-                            size="sm"
-                            center>
-                  <template #button-content>
-                    <ellipse-icon />
-                  </template>
-                  <b-dropdown-item dense
-                                   clickable
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-rename-button"
                                    @click="onRenameList(props.row)">
-                    <span class=""><edit-pen-icon /> Rename</span>
-                  </b-dropdown-item>
-                  <b-dropdown-item dense
-                                   clickable
+                    <pencil-icon height="16"
+                                width="16"
+                                color="#62666E"/>
+                    <q-tooltip>
+                      Rename this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-duplicate-button"
+                        @click="onDuplicateList(props.row)">
+                    <duplicate-icon height="16"
+                               width="16"
+                               color="#62666E"/>
+                    <q-tooltip>
+                      Duplicate this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-export-button"
+                        @click="onMoveList(props.row)">
+                    <move-icon height="16"
+                               width="16"
+                               color="#62666E"/>
+                    <q-tooltip>
+                      Move this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-import-button"
+                        @click="onPinList(props.row)">
+                    <pin-icon height="16"
+                               width="16"
+                               color="#62666E"/>
+                    <q-tooltip>
+                      Pin this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1"
+                     v-if="hasShowInPublicFolderPermission">
+                  <span class="cursor-pointer"
+                        data-testid="lists-show-button"
+                        @click="onShowInPublicFolderList(props.row)">
+                    <eye-icon height="16"
+                               width="16"
+                               color="#62666E"/>
+                    <q-tooltip>
+                      Convert this list to public
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-edit-button"
+                        @click="onEnrollContactsToSequence(props.row)">
+                    <add-user-icon height="16"
+                                   width="16"
+                                   color="#62666E"/>
+                    <q-tooltip>
+                      Enroll contacts to sequence
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-view-button"
+                        @click="onAddListToPowerDialer(props.row)">
+                    <add-call-icon height="16"
+                                   width="16"
+                                   color="#62666E"/>
+                    <q-tooltip>
+                      Add this list to Power Dialer
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-delete-button"
                                    @click="onDeleteList(props.row)">
-                    <span class="text-danger"><delete-red-icon /> Delete</span>
-                  </b-dropdown-item>
-                </b-dropdown>
+                    <trash-icon height="16"
+                                    width="16"
+                                    color="#62666E"/>
+                    <q-tooltip>
+                      Delete this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-duplicate-button"
+                        @click="onAddContactsToList(props.row)">
+                    <logout-icon height="16"
+                               width="16"
+                               color="#62666E"/>
+                    <q-tooltip>
+                      Add Contacts to this list
+                    </q-tooltip>
+                  </span>
+                </div>
               </div>
             </div>
           </q-td>
@@ -112,13 +212,21 @@
 <script>
 import RelativeTime from 'src/components/relative-time.vue'
 import { COLUMNS } from 'src/constants/lists/home-columns'
-import EllipseIcon from 'components/icons/ellipse-icon'
-import EditPenIcon from 'components/icons/edit-pen-icon.vue'
-import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
+import PencilIcon from 'components/icons/pencil-icon.vue'
+import DuplicateIcon from 'components/icons/duplicate-icon.vue'
+import TrashIcon from 'components/icons/trash-icon.vue'
+import MoveIcon from 'components/icons/move-icon-2.vue'
+import PinIcon from 'components/icons/pin-icon.vue'
+import EyeIcon from 'components/icons/eye-icon.vue'
+import AddCallIcon from 'components/icons/add-call-icon.vue'
+import AddUserIcon from 'components/icons/add-user-icon-2.vue'
+import LogoutIcon from 'components/icons/logout-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
-import { dataTableMixin } from 'src/plugins/mixins'
+import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog.vue'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'ListsTable',
@@ -131,15 +239,23 @@ export default {
   },
 
   mixins: [
+    aclMixin,
     dataTableMixin
   ],
 
   components: {
     RelativeTime,
-    EllipseIcon,
     ListsRenameForm,
-    EditPenIcon,
-    DeleteRedIcon
+    ConvertListToPublicDialog,
+    PencilIcon,
+    TrashIcon,
+    DuplicateIcon,
+    MoveIcon,
+    PinIcon,
+    EyeIcon,
+    AddCallIcon,
+    AddUserIcon,
+    LogoutIcon
   },
 
   data () {
@@ -175,6 +291,10 @@ export default {
       lists: 'getLists',
       listsCount: 'getListsCount'
     }),
+
+    hasShowInPublicFolderPermission () {
+      return this.isBillingAdminOrAdminOrSupervisor
+    },
 
     columnsByViewport () {
       return {

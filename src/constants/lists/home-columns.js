@@ -26,6 +26,7 @@ export const COLUMNS = [
     label: 'Date Created',
     field: 'created_at',
     align: 'center',
+    sortable: true,
     draggable: true
   },
   {
@@ -50,6 +51,7 @@ export const COLUMNS = [
     label: 'Show in Public Folder',
     field: 'show_in_public_folder',
     align: 'center',
+    sortable: true,
     draggable: true
   },
   {
@@ -73,6 +75,7 @@ export const COLUMNS = [
     label: 'Imported At',
     field: 'imported_at',
     align: 'center',
+    sortable: true,
     draggable: true
   },
   {
