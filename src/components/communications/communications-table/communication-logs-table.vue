@@ -206,6 +206,7 @@
 
             <div v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
+                                         @on-details="onCommunicationDetails"
                                          @archived="removeCommunication"
                                          @terminated="removeCommunication" />
             </div>

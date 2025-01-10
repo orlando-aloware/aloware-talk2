@@ -6,8 +6,10 @@
     <call-communication-button class="operation-button mx-1"
                                :communication="row" />
 
-    <details-communication-button class="operation-button mx-1"
-                                  :communication="row" />
+    <details-communication-button event-only
+                                  class="operation-button mx-1"
+                                  :communication="row"
+                                  @on-details="$emit('on-details', $event)"/>
 
     <archive-communication-button class="operation-button mx-1"
                                   :communication="row"
