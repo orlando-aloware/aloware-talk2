@@ -145,83 +145,87 @@ pipeline {
                             }
                         }
 
-                        parallel(
-                            "Build Talk Assets for Dev": {
-                                stage('Deploy New Dev-Env Cloudfront Distribution') {
-                                    when { not { branch 'master' } }
-                                    steps {
-                                        script {
-                                            def branchName = env.GIT_BRANCH.toLowerCase()
-                                            def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
+                        parallel{
+                            stage('Build Talk Assets for Dev') {
+                                stages {
+                                    stage('Deploy New Dev-Env Cloudfront Distribution') {
+                                        when { not { branch 'master' } }
+                                        steps {
+                                            script {
+                                                def branchName = env.GIT_BRANCH.toLowerCase()
+                                                def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
 
-                                            dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
-                                                sh '''
-                                                terraform init; \
-                                                terraform validate; \
-                                                terraform fmt
-                                            '''
+                                                dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
+                                                    sh '''
+                                                    terraform init; \
+                                                    terraform validate; \
+                                                    terraform fmt
+                                                '''
+
+                                                    try {
+                                                        sh "terraform workspace new ${branchName}"
+                                                } catch (Exception e) {
+                                                        echo 'The workspace already exists, running TF Commands...'
+                                                        sh "terraform workspace select ${branchName}"
+                                                    }
+
+                                                    sh "terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                                                }
+
+                                                sh "yarn upload-s3"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            stage('Build Talk2 Assets for Dev2') {
+                                stages {
+                                    stage('Build Talk2 Assets for Dev2') {
+                                        when { not { branch 'master' } }
+                                        steps {
+                                            // Set the API_URL to https://app2.alodev.org
+                                            sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
+                                            // Set the API_REPORTING_URL to https://app2.alodev.org
+                                            sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=https://app2.alodev.org|' .env"
+
+                                            nvm("${NODE_VERSION}") {
+                                                sh 'quasar build --debug'
+                                            }
+                                        }
+                                    }
+
+                                    stage('Deploy Talk2 for Dev2') {
+                                        when { not { branch 'master' } }
+                                        steps {
+                                            script {
+                                                def workspaceName = 'talk2'
+                                                def subDomain = 'talk2'
+
+                                                dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
+                                                    sh '''
+                                                    terraform init; \
+                                                    terraform validate; \
+                                                    terraform fmt
+                                                '''
 
                                                 try {
-                                                    sh "terraform workspace new ${branchName}"
-                                            } catch (Exception e) {
-                                                    echo 'The workspace already exists, running TF Commands...'
-                                                    sh "terraform workspace select ${branchName}"
+                                                        sh "terraform workspace new ${workspaceName}"
+                                                } catch (Exception e) {
+                                                        echo 'The workspace already exists, running TF Commands...'
+                                                        sh "terraform workspace select ${workspaceName}"
+                                                    }
+
+                                                sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                                 }
 
-                                                sh "terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                                                sh "yarn upload-s3-dev2"
                                             }
-
-                                            sh "yarn upload-s3"
-                                        }
-                                    }
-                                }
-                            },
-
-                            "Build Talk2 Assets for Dev2": {
-                                stage('Build Talk2 Assets for Dev2') {
-                                    when { not { branch 'master' } }
-                                    steps {
-                                        // Set the API_URL to https://app2.alodev.org
-                                        sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
-                                        // Set the API_REPORTING_URL to https://app2.alodev.org
-                                        sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=https://app2.alodev.org|' .env"
-
-                                        nvm("${NODE_VERSION}") {
-                                            sh 'quasar build --debug'
-                                        }
-                                    }
-                                }
-
-                                stage('Deploy Talk2 for Dev2') {
-                                    when { not { branch 'master' } }
-                                    steps {
-                                        script {
-                                            def workspaceName = 'talk2'
-                                            def subDomain = 'talk2'
-
-                                            dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
-                                                sh '''
-                                                terraform init; \
-                                                terraform validate; \
-                                                terraform fmt
-                                            '''
-
-                                            try {
-                                                    sh "terraform workspace new ${workspaceName}"
-                                            } catch (Exception e) {
-                                                    echo 'The workspace already exists, running TF Commands...'
-                                                    sh "terraform workspace select ${workspaceName}"
-                                                }
-
-                                            sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
-                                            }
-
-                                            sh "yarn upload-s3-dev2"
                                         }
                                     }
                                 }
                             } // End of Build Talk2 Assets for Dev
-                        )
+                        } // End of parallel
                     }
                 }
 
