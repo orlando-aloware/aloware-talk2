@@ -111,18 +111,17 @@
             <b-form-row class="mt-2">
               <b-col md="12">
                 <b-form-group
-                  label="Tags (Optional)"
+                  label="Lists (Optional)"
                   class="form-label">
-                  <entity-tags data-testid="contact-create-tag-selector"
+                  <entity-lists data-testid="contact-create-list-selector"
                                entity="contact"
                                entity-type="contacts"
-                               placeholder="Type to search tags"
+                               placeholder="Type to search lists"
                                :dense="true"
-                               :category="TagCategories.CAT_CONTACTS"
                                :is-filter="true"
-                               :filter-values="contact.tag_ids"
-                               :filter-values-objects="appliedTags"
-                               @filter="onTagsSelected"/>
+                               :filter-values="contact.list_ids"
+                               :filter-values-objects="appliedLists"
+                               @filter="onListsSelected"/>
                 </b-form-group>
               </b-col>
             </b-form-row>
@@ -162,9 +161,8 @@ import { mapState } from 'vuex'
 import { formValidationMixin } from 'src/plugins/mixins'
 import LineSelector from 'components/generic-selectors/line-selector'
 import UserSelector from 'components/generic-selectors/user-selector'
-import EntityTags from 'components/generic-selectors/entity-tags'
+import EntityLists from 'components/generic-selectors/entity-lists'
 import talk2Api from 'src/plugins/api/api'
-import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 
 import { required, maxLength, email } from 'vuelidate/lib/validators'
 export default {
@@ -182,7 +180,7 @@ export default {
   components: {
     UserSelector,
     LineSelector,
-    EntityTags
+    EntityLists
   },
 
   computed: {
@@ -225,13 +223,12 @@ export default {
         email: '',
         initial_campaign_id: null,
         user_id: null,
-        tag_ids: []
+        list_ids: []
       },
       isCreating: false,
       isDupeContact: false,
       createdContact: null,
-      appliedTags: [],
-      TagCategories
+      appliedLists: []
     }
   },
 
@@ -254,10 +251,10 @@ export default {
         email: '',
         initial_campaign_id: null,
         user_id: null,
-        tag_ids: []
+        list_ids: []
       }
 
-      this.appliedTags = []
+      this.appliedLists = []
       this.isDupeContact = false
       this.$v.contact.$reset()
     },
@@ -300,9 +297,9 @@ export default {
       this.contact.user_id = userId
     },
 
-    onTagsSelected (tags, tagsObjects) {
-      this.contact.tag_ids = tags
-      this.appliedTags = tagsObjects
+    onListsSelected (lists, listsObjects) {
+      this.contact.list_ids = lists
+      this.appliedLists = listsObjects
     },
     notifyForExistingContact (contact) {
       const h = this.$createElement

@@ -1,0 +1,511 @@
+<template>
+  <div class="generic-multi-select">
+    <h4 class="mb-1"
+        v-if="label">
+      {{ label | ucwords }}
+    </h4>
+    <q-field class="edit-wrapper w-100"
+             :class="{ 'mt-2': label }"
+             outlined
+             stack-label
+             :dense="dense"
+             v-if="isEdit || isFilter"
+             @focus="onEdit"
+             @blur="handleBlur">
+      <q-field class="w-100"
+               outlined
+               stack-label
+               :dense="dense">
+        <template v-slot:control>
+          <div :class="{ 'with-value': dense && formattedListsValues?.length }">
+            <div class="w-100 text-break"
+                 :key="item?.id"
+                 v-for="item in formattedListsValues">
+              <div class="border border-half-rounded d-inline-flex align-items-stretch mr-1 mb-1 list-items">
+                <div class="dot-wrapper d-flex align-items-center position-absolute">
+                  <q-badge class="is-dot"
+                           rounded
+                           :style="{ background: item?.color }"
+                           v-if="typeof item?.color !== 'undefined'">
+                  </q-badge>
+                </div>
+                <div class="list-text"
+                     :class="[typeof item?.color !== 'undefined' ? 'ml-2' : '']">
+                  {{ item?.name }}
+                </div>
+                <div class="custom__remove d-flex align-items-center"
+                     role="button"
+                     @click="remove(item?.id)">
+                  <remove-tag-icon class="ml-1 remove-tag-icon"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <q-input class="input-text-sm no-after-border w-100 mb-0 mt-1"
+                   ref="search"
+                   borderless
+                   input-class="input-text-sm"
+                   :placeholder="inputPlaceholder"
+                   :debounce="1100"
+                   :dense="dense"
+                   v-model="search">
+          </q-input>
+        </template>
+
+        <template v-slot:append>
+          <q-icon class="q-select__dropdown-icon q-icon notranslate cursor-pointer"
+                  name="expand_less"
+                  v-if="isEdit"/>
+          <q-icon class="q-select__dropdown-icon q-icon notranslate cursor-pointer"
+                  name="expand_more"
+                  v-else/>
+        </template>
+
+        <template v-slot:hint>
+          <div class="q-field__bottom row items-start q-field__bottom--animated">
+            <div class="q-field__messages col">
+              <div>Type at least 3 characters</div>
+            </div>
+          </div>
+        </template>
+      </q-field>
+      <div class="dropdown-select scrollable-lists-area mt-2 ml-2 mx-0 w-100"
+           :style="height && !loadingLists ? `height: ${height}px !important` : ''"
+           v-if="shouldShowList">
+        <div v-if="!optionsIsGrouped">
+          <q-infinite-scroll ref="infiniteScroll"
+                             scroll-target=".scrollable-lists-area"
+                             :offset="offsetHeight"
+                             :initial-index="1"
+                             v-if="isEdit"
+                             @load="getLists">
+            <div class="mr-1"
+                 :class="{ 'hidden': isEmptyData || !isEdit }">
+              <div role="button"
+                   class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
+                   :key="item?.id"
+                   v-for="item in filteredOptions"
+                   @click="onSelectOption(item)">
+                <span :style="{ color: (typeof item?.color !== 'undefined' ? item?.color : null) }"
+                      class="d-inline-flex align-items-start mr-1 mb-1 list-items text-break position-relative">
+                  <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
+                           rounded
+                           :style="{ background: item?.color }"
+                           v-if="typeof item?.color !== 'undefined'">
+                  </q-badge>
+                  <span class="list-text text-grey-100">{{ item?.name }}</span>
+                </span>
+                <div>
+                  <check-o-icon color="#256EFF"
+                                width="12"
+                                height="8"
+                                v-if="isSelected(item?.id)"/>
+                </div>
+              </div>
+            </div>
+          </q-infinite-scroll>
+          <div class="text-center w-100"
+               v-if="search.length && isEmptyData && !loadingLists">
+            <span>No options to select</span>
+          </div>
+          <div class="row justify-center q-my-md"
+               v-else-if="loadingLists">
+            <q-spinner-dots color="primary"
+                            size="20px" />
+          </div>
+        </div>
+        <div v-else>
+          <q-infinite-scroll ref="infiniteScroll"
+                             scroll-target=".scrollable-lists-area"
+                             :offset="offsetHeight"
+                             :initial-index="1"
+                             v-if="isEdit"
+                             @load="getLists">
+            <div class="mr-1"
+                 :class="{ 'hidden': isEmptyData || !isEdit }"
+                 :key="`title-${index}`"
+                 v-for="(item, index) in searchList">
+              <div class="select-group w-100 d-flex justify-content-between py-2 align-items-center mb-1"
+                   :class="[index !== 0 && item?.children?.length ? 'border-top' : '']"
+                   v-if="item?.title">
+                <span class="d-inline-flex align-items-center text-grey-100 w-100"
+                      v-if="item?.children.length">
+                  <span class="list-text">{{ item?.title }}</span>
+                </span>
+              </div>
+              <div role="button"
+                   class="select-option w-100 d-flex justify-content-between p-2 align-items-center"
+                   :key="`child-${child?.id}`"
+                   v-for="child in item?.children"
+                   @click="onSelectOption(child)">
+                <span class="d-inline-flex align-items-start mr-1 mb-1 list-items text-break position-relative"
+                      v-if="typeof child?.color !== 'undefined'">
+                  <q-badge class="is-dot ml-2 mr-1 pr-1 position-absolute"
+                           rounded
+                           :style="{ background: child?.color }"
+                           v-if="typeof child?.color !== 'undefined'">
+                  </q-badge>
+                  <span class="list-text text-grey-100">{{ child?.name }}</span>
+                </span>
+                <check-o-icon color="#256EFF"
+                              width="12"
+                              height="8"
+                              v-if="isSelected(child?.id)"/>
+              </div>
+            </div>
+          </q-infinite-scroll>
+          <div class="text-center w-100"
+               v-if="search.length && isEmptyData && !loadingLists">
+            <span>No options to select</span>
+          </div>
+          <div class="row justify-center q-my-md"
+               v-else-if="loadingLists">
+            <q-spinner-dots color="primary"
+                            size="20px" />
+          </div>
+        </div>
+      </div>
+      <div class="text-center w-100"
+           v-else-if="!isFilter">
+        <span>No options to select</span>
+      </div>
+    </q-field>
+    <div class="list-wrapper"
+         v-else>
+      <div class="selected-items-wrapper">
+        <div class="d-inline-block"
+             :key="item?.id"
+             v-for="item in formattedListsValues">
+          <span class="border border-half-rounded d-inline-flex align-items-start mr-1 mb-1 list-items text-break position-relative">
+            <q-badge class="is-dot"
+                     rounded
+                     :style="{ background: item?.color }"
+                     v-if="typeof item?.color !== 'undefined'">
+            </q-badge>
+            <span class="-text"
+                  :class="[typeof item?.color !== 'undefined' ? 'ml-2' : '']">{{ item?.name }}</span>
+          </span>
+        </div>
+      </div>
+      <div class="w-100 mt-1"
+           v-if="canEdit && !isFilter">
+        <b-link href="#"
+                class="custom-link text-decoration-none btn-list-edit d-flex align-items-center"
+                @click="onEdit">
+          <slot name="button">
+            <pencil-o-icon/>
+            <span class="ml-1">
+              {{ buttonText | ucwords }}
+            </span>
+          </slot>
+        </b-link>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { isEmpty, sortBy, union } from 'lodash'
+import PencilOIcon from 'components/icons/pencil-o-icon'
+import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import CheckOIcon from 'components/icons/check-o-icon'
+
+export default {
+  name: 'contacts-list-multi-select',
+  components: {
+    CheckOIcon,
+    PencilOIcon,
+    RemoveTagIcon
+  },
+  props: {
+    label: {
+      required: false,
+      type: String,
+      default: ''
+    },
+
+    buttonText: {
+      required: false,
+      type: String,
+      default: ''
+    },
+
+    values: {
+      required: false,
+      type: Array,
+      default: () => []
+    },
+
+    options: {
+      required: true,
+      type: Array,
+      default: () => []
+    },
+
+    current: {
+      required: false,
+      type: Array,
+      default: () => []
+    },
+
+    canEdit: {
+      required: false,
+      type: Boolean,
+      default: true
+    },
+
+    optionsIsGrouped: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+
+    height: {
+      required: false,
+      type: Number
+    },
+
+    threshold: {
+      type: Number,
+      default: 3,
+      required: false
+    },
+
+    isFilter: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+
+    dense: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+
+    placeholder: {
+      required: false,
+      type: String,
+      default: ''
+    }
+  },
+
+  data () {
+    return {
+      search: '',
+      isEdit: false,
+      loadingLists: false,
+      selectedValues: [],
+      selectedValuesObjects: [],
+      searchList: [
+        {
+          title: null,
+          children: []
+        }
+      ],
+      page: 1,
+      hasMorePages: true
+    }
+  },
+
+  computed: {
+    formattedListsValues () {
+      if (this.isEmptyData) {
+        return this.current || []
+      }
+
+      return this.selectedValuesObjects
+    },
+
+    filteredOptions () {
+      if (!this.loadingLists && this.searchList[0].children.length) {
+        return this.searchList
+      }
+
+      this.getLists()
+      return []
+    },
+
+    isEmptyData () {
+      return !this.searchList[0].children.length
+    },
+
+    shouldShowList () {
+      return this.isEdit
+    },
+
+    inputPlaceholder () {
+      if (this.placeholder) {
+        return this.placeholder
+      }
+
+      return this.isFilter ? 'Type at least 3 characters' : 'Type to search'
+    },
+
+    offsetHeight () {
+      return this.height - 20
+    }
+  },
+
+  mounted () {
+    this.selectedValues = this.values
+  },
+
+  methods: {
+    isSelected (id) {
+      if (isEmpty(this.selectedValues)) {
+        return false
+      }
+
+      return this.selectedValues.includes(id)
+    },
+
+    onSelectOption (item) {
+      const selectedValues = this.selectedValues?.length ? [...this.selectedValues, item?.id] : [item?.id]
+
+      if (this.isSelected(item?.id)) {
+        this.remove(item?.id)
+        return
+      }
+
+      if (!this.isFilter) {
+        this.selectedValues.push(item?.id)
+      }
+
+      this.selectedValuesObjects.push(item)
+      this.$emit('lists-values-updated', selectedValues, this.selectedValuesObjects)
+      this.$nextTick(() => {
+        if (typeof this.$refs.search !== 'undefined') {
+          this.$refs.search.focus()
+        }
+      })
+    },
+
+    handleBlur () {
+      this.isEdit = false
+    },
+
+    onEdit () {
+      this.isEdit = true
+
+      if (!this.isEmptyData) {
+        return
+      }
+
+      this.$nextTick(() => {
+        this.$refs.search.focus()
+        if (this.isFilter) {
+          this.$refs.infiniteScroll.trigger()
+        }
+      })
+    },
+
+    remove (id) {
+      const found = { data: this.selectedValues.find(value => value === id) }
+      found.data = found.data ? this.selectedValues.indexOf(found.data) : null
+      if (found.data !== null && found.data !== -1) {
+        this.selectedValues.splice(found.data, 1)
+      }
+
+      this.selectedValuesObjects = this.selectedValuesObjects.filter(list => list.id !== id)
+      this.$emit('lists-values-updated', this.selectedValues, this.selectedValuesObjects)
+    },
+
+    filterPublicList (lists) {
+      const filteredMappedLists = []
+
+      for (const list of lists) {
+        filteredMappedLists.push({
+          id: list?.id,
+          name: list?.name,
+          color: null
+        })
+      }
+
+      filteredMappedLists.sort((a, b) => a.name.localeCompare(b.name))
+
+      return filteredMappedLists
+    },
+
+    mergeWithoutDuplicatingAndSortAlphabetically (array1, array2) {
+      return array1.concat(array2).filter((item, index, self) => index === self.findIndex(t => t.id === item?.id)).sort((a, b) => a.name.localeCompare(b.name))
+    },
+
+    getLists (page, done) {
+      if (!this.hasMorePages) {
+        return
+      }
+
+      const params = {
+        size: 50,
+        search: this.search,
+        page: this.page
+      }
+
+      this.loadingLists = true
+
+      this.$axios.get('api/v2/contacts-list/public', { params }).then(res => {
+        const lists = res.data?.data
+
+        const publicLists = this.filterPublicList(lists)
+
+        this.searchList[0].children = sortBy(union(this.searchList[0].children, publicLists))
+
+        this.hasMorePages = res.data.current_page < res.data.last_page
+        this.page++
+
+        if (this.hasMorePages) {
+          done && done()
+        }
+      }).catch(err => {
+        console.error(err)
+      }).finally(() => {
+        this.loadingLists = false
+      })
+    },
+
+    resetInfiniteScroll () {
+      this.isEdit = false
+
+      this.$nextTick(() => {
+        this.isEdit = true
+
+        this.$nextTick(() => {
+          this.$refs.search.focus()
+          this.$refs.infiniteScroll.reset(0)
+          this.$refs.infiniteScroll.trigger()
+        })
+      })
+    },
+
+    resetLists () {
+      this.page = 1
+      this.hasMorePages = true
+      this.searchList[0].children = []
+      this.resetInfiniteScroll()
+    }
+  },
+
+  watch: {
+    values: {
+      deep: true,
+      handler () {
+        this.selectedValues = this.values
+      }
+    },
+    current: {
+      deep: true,
+      handler () {
+        this.selectedValuesObjects = this.current
+      },
+      immediate: true
+    },
+    search: function (newValue) {
+      if ((newValue && newValue.length >= this.threshold) || !newValue.length) {
+        this.resetLists()
+      }
+    }
+  }
+}
+</script>
