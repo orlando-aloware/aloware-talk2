@@ -345,17 +345,6 @@ export default {
       cancelToken: null,
       paginated: false,
       showColumnHeadersModal: false,
-      fixedColumns: [
-        'disposition_status2',
-        'incoming_number',
-        'ring_group',
-        'created_at',
-        'talk_time',
-        'duration',
-        'contact',
-        'user_id',
-        'operations'
-      ],
       expandedTeams: {},
       showCommunicationSidebar: false,
       sidebarCommunication: {}
