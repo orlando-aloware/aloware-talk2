@@ -45,13 +45,13 @@
               <label class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
                      :for="`engage-control-bot-${bot.id}`">
                 <div class="row">
-                  <div class="col-2 p-0 text-center d-flex items-center justify-between">
+                  <div class="col-3 p-0 text-center d-flex items-center justify-between">
                     <!-- Bot Use Case Label -->
-                    <q-badge class="w-100 custom-badge-margin" :color="useCaseColor(bot.use_case)">
-                      <span class="w-100">{{ formatUseCase(bot.use_case) }}</span>
+                    <q-badge class="w-100" :color="directionColor(bot.direction)">
+                      <span class="w-100">{{ formatDirection(bot.direction) }}</span>
                     </q-badge>
                   </div>
-                  <div class="col-10">
+                  <div class="col-9">
                     <span>{{ bot.name }}</span>
                   </div>
                 </div>
@@ -269,6 +269,6 @@ export default {
   overflow-y: auto;
 }
 .custom-badge-margin {
-  margin-bottom: 1px
+  margin-bottom: 0px
 }
 </style>
