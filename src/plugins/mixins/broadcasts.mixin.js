@@ -68,7 +68,7 @@ export default {
     },
 
     sendLongMessagesAsMms () {
-      return this.selectedCampaign?.send_long_messages_as_mms
+      return this.selectedCampaign?.send_long_messages_as_mms || (this.selectedCampaign?.id && this.currentCompany.send_long_messages_as_mms)
     },
 
     shouldApplyMmsRate () {
