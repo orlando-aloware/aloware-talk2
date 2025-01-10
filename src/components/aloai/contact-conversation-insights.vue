@@ -87,6 +87,31 @@
             </section>
 
             <!-- Footer -->
+
+            <!-- Action buttons container -->
+            <div class="d-flex gap-2 mb-2">
+              <b-button class="flex-grow-1"
+                        size="sm"
+                        variant="light"
+                        tabindex="0"
+                        @click="copyToClipboard">
+                📋 Copy
+              </b-button>
+
+              <b-button class="flex-grow-1"
+                        size="sm"
+                        variant="dark"
+                        tabindex="0"
+                        :disabled="isAddingNote"
+                        @click="createNote">
+                <q-spinner-bars v-if="isAddingNote"
+                                color="white">
+                </q-spinner-bars>
+                {{ isAddingNote ? 'Adding Note...' : '📝 Add Note' }}
+              </b-button>
+            </div>
+
+            <!-- Regenerate Insights -->
             <b-button class="text-white"
                       size="sm"
                       variant="primary"
@@ -117,6 +142,7 @@
         <b-button class="expand-toggle"
                   variant="light"
                   size="sm"
+                  v-if="insightsLoaded"
                   pill
                   @click="onExpanded">
           <i class="material-icons icon">{{ isExpanded ? 'expand_less' : 'expand_more' }}</i>
@@ -127,12 +153,14 @@
 </template>
 
 <script>
-import { marked } from 'marked'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
+import { marked } from 'marked'
 import { QSpinnerBars } from 'quasar'
+import * as CommunicationTypes from 'src/constants/communication-types'
 import talk2Api from 'src/plugins/api/api'
-import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'ContactConversationInsights',
@@ -164,7 +192,9 @@ export default {
 
     isContactAndRouteValid () {
       return this.isContactValid && this.isRouteMatch
-    }
+    },
+
+    ...mapState('auth', ['profile'])
   },
 
   data () {
@@ -172,7 +202,8 @@ export default {
       insights: null,
       isExpanded: false,
       insightsLoaded: false,
-      isGenerating: false
+      isGenerating: false,
+      isAddingNote: false
     }
   },
 
@@ -215,7 +246,149 @@ export default {
     parseMarkdown (text) {
       const rawHtml = marked(text)
       return DOMPurify.sanitize(rawHtml)
-    }
+    },
+
+    /**
+     * Copies the insights content to clipboard
+     */
+    copyToClipboard () {
+      const sections = []
+
+      if (this.insights?.summary?.introduction) {
+        sections.push(`Introduction:\n${this.insights.summary.introduction}`)
+      }
+
+      if (this.insights?.summary?.key_topics?.length) {
+        sections.push(`Key Topics:\n${this.insights.summary.key_topics.join('\n')}`)
+      }
+
+      if (this.insights?.summary?.outcome) {
+        sections.push(`Outcome:\n${this.insights.summary.outcome}`)
+      }
+
+      if (this.insights?.summary?.follow_up_actions) {
+        const actions = []
+        if (this.insights.summary.follow_up_actions.agents?.length) {
+          actions.push('Agents:')
+          this.insights.summary.follow_up_actions.agents.forEach(action => {
+            actions.push(`- ${action.name}: ${action.action}`)
+          })
+        }
+        if (this.insights.summary.follow_up_actions.contact?.length) {
+          actions.push('Contact:')
+          this.insights.summary.follow_up_actions.contact.forEach(action => {
+            actions.push(`- ${action.name}: ${action.action}`)
+          })
+        }
+        if (actions.length) {
+          sections.push(`Follow-up Actions:\n${actions.join('\n')}`)
+        }
+      }
+
+      if (this.insights?.summary?.coaching_opportunities?.length) {
+        const opportunities = ['Coaching Opportunities:']
+        this.insights.summary.coaching_opportunities.forEach(opp => {
+          if (opp.agent && opp.opportunity) {
+            opportunities.push(`- ${opp.agent}: ${opp.opportunity}`)
+          }
+        })
+        sections.push(opportunities.join('\n'))
+      }
+
+      const content = sections.join('\n\n')
+      navigator.clipboard.writeText(content)
+        .then(() => {
+          this.$q.notify({
+            message: 'Content copied to clipboard!',
+            color: 'positive',
+            position: 'top',
+            timeout: 2000
+          })
+        })
+        .catch(err => {
+          console.error('Failed to copy content:', err)
+          this.$q.notify({
+            message: 'Failed to copy content',
+            color: 'negative',
+            position: 'top',
+            timeout: 2000
+          })
+        })
+    },
+
+    /**
+     * Creates a note from the insights content
+     */
+    createNote () {
+      this.isAddingNote = true
+      const sections = []
+
+      if (this.insights?.summary?.introduction) {
+        sections.push(`**Introduction:**\n${this.insights.summary.introduction}`)
+      }
+
+      if (this.insights?.summary?.key_topics?.length) {
+        sections.push(`**Key Topics:**\n${this.insights.summary.key_topics.map(topic => `• ${topic}`).join('\n')}`)
+      }
+
+      if (this.insights?.summary?.outcome) {
+        sections.push(`**Outcome:**\n${this.insights.summary.outcome}`)
+      }
+
+      if (this.insights?.summary?.follow_up_actions) {
+        const actions = []
+        if (this.insights.summary.follow_up_actions.agents?.length) {
+          actions.push('**Agents:**')
+          this.insights.summary.follow_up_actions.agents.forEach(action => {
+            actions.push(`• ${action.name}: ${action.action}`)
+          })
+        }
+        if (this.insights.summary.follow_up_actions.contact?.length) {
+          actions.push('**Contact:**')
+          this.insights.summary.follow_up_actions.contact.forEach(action => {
+            actions.push(`• ${action.name}: ${action.action}`)
+          })
+        }
+        if (actions.length) {
+          sections.push(`**Follow-up Actions:**\n${actions.join('\n')}`)
+        }
+      }
+
+      if (this.insights?.summary?.coaching_opportunities?.length) {
+        const opportunities = ['**Coaching Opportunities:**']
+        this.insights.summary.coaching_opportunities.forEach(opp => {
+          if (opp.agent && opp.opportunity) {
+            opportunities.push(`• ${opp.agent}: ${opp.opportunity}`)
+          }
+        })
+        sections.push(opportunities.join('\n'))
+      }
+
+      const content = sections.join('\n\n')
+
+      // Create and send the note
+      const message = {
+        time: null,
+        date: null,
+        timezone: this.profile.timezone,
+        body: content,
+        type: CommunicationTypes.NOTE
+      }
+
+      talk2Api.V1.contact.addEngagement(this.contact.id, message)
+        .then(response => {
+          this.$generalNotification('Note has been added.')
+        })
+        .catch(error => {
+          console.error(error)
+          this.$handleErrors(error.response)
+        })
+        .finally(() => {
+          this.isAddingNote = false
+        })
+    },
+
+    ...mapActions('contacts', ['setMessageComposerNoteBody', 'resetMessageComposerNote'])
   },
 
   watch: {
