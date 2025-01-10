@@ -456,7 +456,7 @@ export default {
 
     onResetFilter () {
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
-      const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.filterModel.filter
+      const useFilter = this.selectedFilter /* && (this.isFilterDialogForView && this.isEditingView) */ ? this.selectedFilter.filter : this.filterModel.filter
 
       this.reset = true
       sessionStorage.removeItem('date-selected-comms')

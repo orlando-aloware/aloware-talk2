@@ -904,6 +904,7 @@ export default {
       params = this.removeUnnecessaryParameters(params)
 
       if (this.source?.cancel) {
+        debugger
         this.source.cancel('Loading of communication operation is canceled by the user.')
       }
 
@@ -1020,7 +1021,7 @@ export default {
 
   created () {
     this.cancelToken = window.axios.CancelToken
-    this.source = this.cancelToken.source()
+    // this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
   },

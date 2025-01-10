@@ -236,7 +236,7 @@ export default {
 
   mounted () {
     this.listeners.pinnedViewsEvents = () => {
-      this.getPinnedViews()
+      // this.getPinnedViews()
     }
 
     this.listeners.openInboxViewPopup = () => {
@@ -336,7 +336,7 @@ export default {
       }).catch(err => {
         //  properly reload contacts if redirected or navigation clicked to the same "inbox" route
         if (this.$route.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME || this.$route.params.channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
-          this.loadContactTasks()
+          // this.loadContactTasks()
         }
 
         console.log(err)
@@ -376,7 +376,7 @@ export default {
       this.resetChannelChangedFilterFields()
 
       this.setAppliedFilter(this.selectedFilter)
-      this.loadContactTasks()
+      // this.loadContactTasks()
 
       this.$router.push({
         name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
