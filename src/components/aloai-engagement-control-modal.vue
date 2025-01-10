@@ -268,7 +268,4 @@ export default {
   max-height: 300px;
   overflow-y: auto;
 }
-.custom-badge-margin {
-  margin-bottom: 0px
-}
 </style>
