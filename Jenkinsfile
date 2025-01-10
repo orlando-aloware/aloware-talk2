@@ -145,7 +145,7 @@ pipeline {
                             }
                         }
 
-                        parallel() {
+                        parallel(
                             "Build Talk Assets for Dev" {
                                 stage('Deploy New Dev-Env Cloudfront Distribution') {
                                     when { not { branch 'master' } }
@@ -176,7 +176,7 @@ pipeline {
                                     }
                                 }
                             } // End of Build Talk Assets for Dev
-                            , // Start of Build Talk2 Assets for Dev
+
                             "Build Talk2 Assets for Dev2" {
                                 stage('Build Talk2 Assets for Dev2') {
                                     when { not { branch 'master' } }
@@ -221,7 +221,7 @@ pipeline {
                                     }
                                 }
                             } // End of Build Talk2 Assets for Dev
-                        }
+                        )
                     }
                 }
 
