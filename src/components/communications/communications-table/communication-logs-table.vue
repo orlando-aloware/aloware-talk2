@@ -63,15 +63,9 @@
                            :style="col.columnStyle"
                            @on-details="onCommunicationDetails"/>
             </div>
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'incoming_number'">
-              <div class="ellipse"
-                   v-if="props.row?.campaign_id">
-                {{ getCampaignName(props.row?.campaign_id) }}
-              </div>
-              <div>
-                {{ col.value | fixPhone('NATIONAL', true) }}
-              </div>
+            <div v-else-if="col.name === 'incoming_number'">
+              <incoming-number :value="col.value"
+                               :campaign-id="props.row.campaign_id"/>
             </div>
 
             <div :style="col.columnStyle"
@@ -139,13 +133,7 @@
               <location :row="props.row" />
             </div>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'line'">
-              <lines :value="props.row.campaign_id" />
-            </div>
-
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'attempting_users'">
+            <div v-else-if="col.name === 'attempting_users'">
               <attempting-users :row="props.row" />
             </div>
 
@@ -286,7 +274,7 @@ import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
 import Resolution from './resolution.vue'
 import Location from './location.vue'
-import Lines from './lines.vue'
+import IncomingNumber from './incoming-number.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
 import TransferType from './transfer-type.vue'
@@ -334,7 +322,7 @@ export default {
     Workflow,
     Resolution,
     Location,
-    Lines,
+    IncomingNumber,
     AttemptingUsers,
     Transferred,
     TransferType,
