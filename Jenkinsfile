@@ -175,7 +175,7 @@ pipeline {
                                         }
                                     }
                                 }
-                            } // End of Build Talk Assets for Dev
+                            },
 
                             "Build Talk2 Assets for Dev2" {
                                 stage('Build Talk2 Assets for Dev2') {
