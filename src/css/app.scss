@@ -11484,14 +11484,12 @@ screen and (max-width: 956px) {
 }
 
 .message-composer-send-button {
-  height: 32px;
   text-transform: none !important;
   border-radius: 6px !important;
 
   span.q-btn__wrapper {
     span.q-btn__content {
       padding: 0 12px;
-      margin-top: -2px;
       font-weight: 600;
     }
   }
