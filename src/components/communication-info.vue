@@ -9,8 +9,8 @@
             v-if="communication.type === CommunicationTypes.NOTE">
       <q-item>
         <q-item-section>
-          <p class="text-left mb-0"
-             v-html="$options.filters.nl2br(parseBody)">
+          <p class="text-left mb-0 communication-body"
+             v-html="parseBodyContent(communication.body)">
           </p>
         </q-item-section>
       </q-item>
@@ -265,7 +265,7 @@
               <div v-if="communication.body">
                 <div class="fs-13 text-muted mb-2 line-height-15"
                      v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
-                     v-html="$options.filters.nl2br(parseBody)"
+                     v-html="parseBodyContent(communication.body)"
                      v-linkify:options="{ target: '_blank' }">
                 </div>
                 <div class="font-weight-light-bold my-2"
@@ -279,7 +279,7 @@
                 <span class="text-muted"
                       v-else
                       v-linkify:options="{ target: '_blank' }">
-                  <span v-html="parseBody"></span>
+                  <span v-html="parseBodyContent(communication.body)"></span>
                 </span>
               </div>
             </template>
@@ -656,13 +656,14 @@
                   </label>
                   <div class="d-flex align-items-center w-100 mb-2 border-bottom"
                        v-if="showAudio(communication)">
-                    <communication-audio :communication="communication"
+                    <communication-audio class="mb-2"
+                                         data-testid="communication-info-call-recording-audio"
+                                         v-if="activeName"
+                                         :communication="communication"
                                          :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                          :uniqueId="communication.id + '1'"
-                                         class="mb-2"
-                                         data-testid="communication-info-call-recording-audio"
-                                         v-if="activeName">
+                                         @audio-file-updated="handleAudioFileUpdated">
                     </communication-audio>
                   </div>
                   <div class="form-control-label w-100 mb-2 pb-2 border-bottom" data-testid="communication-info-no-call-recording"
@@ -679,13 +680,14 @@
                   </label>
                   <div class="d-flex flex-row align-items-center w-100 mb-2 border-bottom"
                        v-if="communication.has_voicemail">
-                    <communication-audio :communication="communication"
+                    <communication-audio class="mb-2"
+                                         data-testid="communication-info-voicemail-audio"
+                                         :communication="communication"
                                          :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                          :uniqueId="communication.id + '2'"
-                                         class="mb-2"
-                                         data-testid="communication-info-voicemail-audio"
-                                         v-if="activeName">
+                                         v-if="activeName"
+                                         @audio-file-updated="handleAudioFileUpdated">
                     </communication-audio>
                   </div>
                   <div class="form-control-label w-100 mb-2 pb-2 border-bottom" data-testid="communication-info-no-voicemail"
@@ -818,13 +820,14 @@
            :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
            v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
         <div class="d-flex align-items-center w-100">
-          <communication-audio :communication="communication"
+          <communication-audio class="mb-2"
+                               data-testid="communication-info-call-recording-audio"
                                ref="callRecording"
+                               :communication="communication"
                                :contact="contact"
                                :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                :uniqueId="communication.id + '1'"
-                               class="mb-2"
-                               data-testid="communication-info-call-recording-audio">
+                               @audio-file-updated="handleAudioFileUpdated">
           </communication-audio>
         </div>
       </div>
@@ -838,7 +841,8 @@
                                :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                :uniqueId="communication.id + '2'"
                                class="mb-2"
-                               data-testid="communication-info-voicemail-audio">
+                               data-testid="communication-info-voicemail-audio"
+                               @audio-file-updated="handleAudioFileUpdated">
           </communication-audio>
         </div>
       </div>
@@ -852,7 +856,7 @@
     </div>
 
     <div class="ai-effect-container mt-2"
-         v-if="CommunicationTypes.CALL && showAudio(communication) && communication.has_transcription">
+         v-if="isAloaiDialogVisible">
       <div class="ai-effect-gradient"></div>
       <div class="ai-effect-blur"></div>
       <div class="ai-effect-content p-2">
@@ -886,6 +890,16 @@
             </span>
           </div>
         </div>
+        <div class="text-left-align text-15"
+             v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
+          <div>Transcription generation failed. Please try again later. </div>
+          <generate-transcription-button class="mr-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated">
+          </generate-transcription-button>
+        </div>
         <div class="text-left-align text-13"
              v-if="communication.call_summary">
           <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
@@ -898,44 +912,45 @@
 </template>
 
 <script>
-import _ from 'lodash'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
-import SmsReminders from './sms-reminders'
-import TargetUsersTree from './target-users-tree'
-import ChevronRight from 'components/icons/contact-activity/chevron-right'
+import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
+import CallDispositionSelector from 'components/call-disposition-selector'
 import CommunicationAudio from 'components/communication-audio'
 import CommunicationNote from 'components/communication-note'
-import CallDispositionSelector from 'components/call-disposition-selector'
-import CalendarIcon from 'components/icons/calendar-icon'
-import * as AnswerTypes from '../constants/answer-types'
-import * as CommunicationCurrentStatus from '../constants/communication-current-status'
-import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
-import * as CommunicationTypes from '../constants/communication-types'
-import * as CommunicationDirections from '../constants/communication-direction'
-import * as UploadedFileTypes from '../constants/uploaded-file-types'
-import * as CommunicationRejectionReasons from '../constants/communication-rejection-reasons'
-import * as CommunicationCallbackStatus from '../constants/callback-status'
-import * as TranscriptionStatus from '../constants/transcription-status'
-import * as SummaryStatus from '../constants/summary-status'
-import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import CancelCallIcon from 'components/icons/cancel-call-icon'
+import ExpandableHtmlViewer from 'components/communication/ExpandableHtmlViewer.vue'
+import TranscriptionModal from 'components/communication/transcription-modal.vue'
+import DownloadButton from 'components/download-button'
+import GenerateTranscriptionButton from 'components/generate-transcription-button'
+import EntityTags from 'components/generic-selectors/entity-tags'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
-import ParkedCallIcon from 'components/icons/parked-call-icon'
-import ParkCallIcon from 'components/icons/park-call-icon'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import CalendarIcon from 'components/icons/calendar-icon'
+import CancelCallIcon from 'components/icons/cancel-call-icon'
+import ChevronRight from 'components/icons/contact-activity/chevron-right'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
-import DownloadButton from 'components/download-button'
-import API from 'src/plugins/api/api'
-import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
-import EntityTags from 'components/generic-selectors/entity-tags'
-import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
-import { marked } from 'marked'
 import DOMPurify from 'dompurify'
-import TranscriptionModal from 'components/communication/transcription-modal.vue'
-import ExpandableHtmlViewer from 'components/communication/ExpandableHtmlViewer.vue'
-import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
+import _ from 'lodash'
+import { marked } from 'marked'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
+import API from 'src/plugins/api/api'
+import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+import * as AnswerTypes from '../constants/answer-types'
+import * as CommunicationCallbackStatus from '../constants/callback-status'
+import * as CommunicationCurrentStatus from '../constants/communication-current-status'
+import * as CommunicationDirections from '../constants/communication-direction'
+import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
+import * as CommunicationRejectionReasons from '../constants/communication-rejection-reasons'
+import * as CommunicationTypes from '../constants/communication-types'
+import * as SummaryStatus from '../constants/summary-status'
+import * as TranscriptionStatus from '../constants/transcription-status'
+import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import SmsReminders from './sms-reminders'
+import TargetUsersTree from './target-users-tree'
 
 export default {
   name: 'communication-info',
@@ -973,7 +988,8 @@ export default {
     TargetUsersTree,
     DownloadButton,
     EntityTags,
-    AloaiPromotionDialog
+    AloaiPromotionDialog,
+    GenerateTranscriptionButton
   },
 
   props: {
@@ -1030,6 +1046,8 @@ export default {
       isHangingUp: false,
       isParking: false,
       showInfoBox: false,
+      fileUuid: null,
+      isMigrated: false,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -1114,6 +1132,20 @@ export default {
       }
 
       return this.communication.body
+    },
+
+    isAloaiDialogVisible () {
+      const allowedStatuses = [
+        TranscriptionStatus.STATUS_PROCESSING,
+        TranscriptionStatus.STATUS_COMPLETED,
+        TranscriptionStatus.STATUS_ERROR
+      ]
+
+      return (
+        this.CommunicationTypes.CALL &&
+        this.showAudio(this.communication) &&
+        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+      )
     }
   },
 
@@ -1281,10 +1313,33 @@ export default {
       return DOMPurify.sanitize(rawHtml)
     },
 
+    handleAudioFileUpdated ({ fileUuid, isMigrated }) {
+      this.fileUuid = fileUuid
+      this.isMigrated = isMigrated
+    },
+
     fetchSmartTranscriptionData () {
       if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
         this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
       }
+    },
+
+    parseBodyContent (body) {
+      if (!body) return ''
+
+      // Check if content appears to contain markdown
+      const hasMarkdown = /[*#`_~]/.test(body) // Basic markdown character detection
+
+      if (hasMarkdown) {
+        // Ensure line breaks are preserved before markdown conversion
+        const textWithBreaks = body.replace(/\n/g, '\n\n')
+        // Convert markdown to HTML and sanitize
+        const rawHtml = marked(textWithBreaks)
+        return DOMPurify.sanitize(rawHtml)
+      }
+
+      // If no markdown, just use nl2br filter
+      return this.$options.filters.nl2br(this.parseMentionToView(body))
     }
   },
 
@@ -1303,3 +1358,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.communication-body :deep(p) {
+  margin-bottom: 8px;
+}
+
+.communication-body :deep(p:last-child) {
+  margin-bottom: 0;
+}
+</style>

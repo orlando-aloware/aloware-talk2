@@ -1,12 +1,15 @@
 <template>
   <div class="row full-height">
     <div class="col-12 p-0">
-      <div class="hubspot-iframe-container">
+      <div class="hubspot-iframe-container" v-if="usePopup && hubspotLink">
+        The CRM will display in a popup. <br />
+        <a href="#" @click.prevent="openHubspotLink">Click here to manually open the CRM.</a>
+      </div>
+      <div class="hubspot-iframe-container" v-if="!usePopup && hubspotLink">
         <iframe class="hubspot-crm-iframe"
                 :src="hubspotLink"
                 frameborder="0"
-                id="hubspot-crm"
-                v-if="hubspotLink">
+                id="hubspot-crm">
         </iframe>
       </div>
     </div>
@@ -22,6 +25,19 @@ import { isEmpty } from 'lodash'
 export default {
   name: 'SessionContactPageCrm',
 
+  props: {
+    usePopup: {
+      type: Boolean,
+      default: true
+    }
+  },
+
+  mounted () {
+    if (this.usePopup && !isEmpty(this.hubspotLink)) {
+      this.openHubspotLink()
+    }
+  },
+
   mixins: [
     hubspotIntegrationMixin
   ],
@@ -31,7 +47,7 @@ export default {
     ...mapState('contacts', ['contact']),
 
     hubspotLink () {
-      return this.getHubspotContactLink(this.contact)
+      return this.getHubspotContactLink(this.contact, !this.usePopup)
     },
 
     test () {
@@ -45,6 +61,14 @@ export default {
       'setContact',
       'setContactClone'
     ]),
+
+    openHubspotLink () {
+      if (isEmpty(this.hubspotLink)) {
+        return
+      }
+
+      window.open(this.hubspotLink, 'hubspot-crm', 'width=1200,height=800')
+    },
 
     getMappedUrlParams (params) {
       const agentName = this.profile.name
@@ -122,8 +146,8 @@ export default {
     contact: {
       deep: true,
       handler (newValue, oldValue) {
-        const oldHubspotLink = this.getHubspotContactLink(oldValue)
-        const newHubspotLink = this.getHubspotContactLink(newValue)
+        const oldHubspotLink = this.getHubspotContactLink(oldValue, !this.usePopup)
+        const newHubspotLink = this.getHubspotContactLink(newValue, !this.usePopup)
 
         // if it's the same contact (contact was immediately redialed)
         // but hubspot link is gone, reuse the old contact.
@@ -131,8 +155,24 @@ export default {
           this.setContact(oldValue)
           this.setContactClone(oldValue)
         }
+
+        if (this.usePopup) {
+          this.openHubspotLink()
+        }
       }
     }
   }
 }
 </script>
+
+<style scoped>
+.hubspot-iframe-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 1.5rem;
+  color: #000;
+  text-align: center;
+}
+</style>

@@ -4,7 +4,7 @@
             data-testid="integration-hubspot-card"
             flat>
       <q-item class="p-0">
-        <span class='hubspot-jit-card-header'>
+        <span class='integration-jit-card-header'>
           <i class="fab fa-hubspot hubspot-icon"></i>
           <span class="integration-title">HubSpot</span>
         </span>

@@ -20,17 +20,11 @@ export default {
   },
 
   methods: {
-    getHubspotContactBaseLink () {
-      if (this.currentCompany &&
-        this.currentCompany.hubspot_integration_enabled &&
-        this.currentCompany.hubspot_marketing_portal_id) {
-        return `https://${this.companyDomain}/contacts/${this.currentCompany.hubspot_marketing_portal_id}/`
+    getHubspotContactLink (contact, useEmbed) {
+      if (useEmbed) {
+        return contact?.integration_data?.hubspot?.embed_link
       }
 
-      return false
-    },
-
-    getHubspotContactLink (contact) {
       return contact?.integration_data?.hubspot?.link
     }
   }
