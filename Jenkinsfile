@@ -146,7 +146,7 @@ pipeline {
                         }
 
                         parallel(
-                            "Build Talk Assets for Dev" {
+                            "Build Talk Assets for Dev": {
                                 stage('Deploy New Dev-Env Cloudfront Distribution') {
                                     when { not { branch 'master' } }
                                     steps {
@@ -177,7 +177,7 @@ pipeline {
                                 }
                             },
 
-                            "Build Talk2 Assets for Dev2" {
+                            "Build Talk2 Assets for Dev2": {
                                 stage('Build Talk2 Assets for Dev2') {
                                     when { not { branch 'master' } }
                                     steps {
