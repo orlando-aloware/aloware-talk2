@@ -224,15 +224,15 @@
       </b-card-body>
     </b-card>
 
-    <!-- Add this at the end of the template, before the closing </div> tag -->
-    <q-drawer
-      v-model="showQuestionDrawer"
-      side="right"
-      overlay
-      bordered
-      :width="346"
+    <div
+      class="custom-drawer"
+      :class="{ 'is-open': showQuestionDrawer }"
+      :style="{
+        top: drawerTopPosition,
+        height: `calc(100vh - ${drawerTopPosition})`
+      }"
     >
-      <div class="drawer-content d-flex flex-column h-100">
+      <div class="drawer-content d-flex flex-column">
         <!-- Fixed Header -->
         <div class="drawer-header">
           <div class="d-flex justify-content-between align-items-center">
@@ -279,24 +279,23 @@
         <!-- Fixed Input Container -->
         <div class="chat-input-container">
           <div class="input-wrapper ai-effect-gradient-input">
-            <sparkle-icon
-              width="16"
-              height="16"
-              color="#9333EA"
-              class="prepend-icon"
-            />
-            <input
+            <textarea
               v-model="userQuestion"
-              type="text"
-              placeholder="Ask anything about this conversation"
-              @keyup.enter="sendQuestion"
-            />
+              :placeholder="placeholder"
+              @keyup.enter.exact.prevent="sendQuestion"
+              @input="autoResize"
+              ref="textarea"
+              rows="1"
+            ></textarea>
             <button
               class="send-button"
               :disabled="isAsking"
               @click="sendQuestion"
             >
-              <i class="material-icons" v-if="!isAsking">send</i>
+              <i
+                class="material-icons"
+                v-if="!isAsking"
+              >send</i>
               <q-spinner-dots
                 v-else
                 size="1em"
@@ -305,7 +304,7 @@
           </div>
         </div>
       </div>
-    </q-drawer>
+    </div>
   </div>
 </template>
 
@@ -364,7 +363,9 @@ export default {
       showQuestionDrawer: false,
       userQuestion: '',
       chatMessages: [],
-      isAsking: false
+      isAsking: false,
+      drawerTopPosition: '0px',
+      placeholder: 'Ask anything about this conversation'
     }
   },
 
@@ -372,6 +373,12 @@ export default {
     if (this.contact && this.contact.id) {
       await this.getData()
     }
+    this.updateDrawerPosition()
+    window.addEventListener('resize', this.updateDrawerPosition)
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateDrawerPosition)
   },
 
   methods: {
@@ -576,9 +583,14 @@ export default {
         stamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       })
 
-      this.scrollToBottom() // Scroll after user message
+      this.scrollToBottom()
       this.isAsking = true
       this.userQuestion = ''
+
+      // Reset textarea height
+      if (this.$refs.textarea) {
+        this.$refs.textarea.style.height = '40px' // Reset to initial height
+      }
 
       // Add loading message
       const loadingMessageIndex = this.chatMessages.length
@@ -624,6 +636,27 @@ export default {
         })
       } finally {
         this.isAsking = false
+      }
+    },
+
+    updateDrawerPosition () {
+      if (window.innerWidth < 1085) {
+        this.drawerTopPosition = '0px'
+        return
+      }
+
+      const header = document.querySelector('.q-header')
+      if (header) {
+        const headerHeight = header.offsetHeight
+        this.drawerTopPosition = `${headerHeight}px`
+      }
+    },
+
+    autoResize (event) {
+      const textarea = this.$refs.textarea
+      if (textarea) {
+        textarea.style.height = 'auto'
+        textarea.style.height = textarea.scrollHeight + 'px'
       }
     },
 
@@ -742,19 +775,31 @@ export default {
   color: #666;
 }
 
-.q-drawer {
-  background: transparent !important;
-  backdrop-filter: blur(10px);
+.custom-drawer {
+  position: fixed;
+  right: -346px;
+  width: 346px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  z-index: 2000;
 }
 
-.q-drawer .drawer-content {
+.custom-drawer.is-open {
+  right: 0;
+}
+
+.drawer-content {
+  position: relative;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   height: 100%;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
+/* Update existing drawer styles to work with new implementation */
 .drawer-header {
   background: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid rgba(147, 51, 234, 0.1);
@@ -762,10 +807,10 @@ export default {
   top: 0;
   z-index: 2000;
   backdrop-filter: blur(10px);
+  padding: 0 16px;
 
   > div {
     height: 44px;
-    padding: 0 20px;
   }
 }
 
@@ -814,17 +859,19 @@ export default {
   margin: 0 8px;
 }
 
-input {
+textarea {
   flex: 1;
   border: none;
   background: transparent;
+  padding: 8px;
   font-size: 14px;
   color: #000;
   outline: none;
-}
-
-input::placeholder {
-  color: rgba(0, 0, 0, 0.5);
+  resize: none;
+  max-height: 150px;
+  min-height: 40px;
+  line-height: 1.5;
+  overflow-y: auto;
 }
 
 .send-button {
@@ -839,6 +886,7 @@ input::placeholder {
   opacity: 0.8;
   transition: all 0.3s ease;
   border-radius: 50%;
+  margin: 0;
 }
 
 .send-button:hover {
@@ -849,5 +897,10 @@ input::placeholder {
 .send-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+textarea::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+  opacity: 1; /* Firefox */
 }
 </style>
