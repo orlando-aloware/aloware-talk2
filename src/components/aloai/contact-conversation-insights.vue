@@ -224,15 +224,15 @@
       </b-card-body>
     </b-card>
 
-    <!-- Add this at the end of the template, before the closing </div> tag -->
-    <q-drawer
-      v-model="showQuestionDrawer"
-      side="right"
-      overlay
-      bordered
-      :width="346"
+    <div
+      class="custom-drawer"
+      :class="{ 'is-open': showQuestionDrawer }"
+      :style="{
+        top: drawerTopPosition,
+        height: `calc(100vh - ${drawerTopPosition})`
+      }"
     >
-      <div class="drawer-content d-flex flex-column h-100">
+      <div class="drawer-content d-flex flex-column">
         <!-- Fixed Header -->
         <div class="drawer-header">
           <div class="d-flex justify-content-between align-items-center">
@@ -296,7 +296,10 @@
               :disabled="isAsking"
               @click="sendQuestion"
             >
-              <i class="material-icons" v-if="!isAsking">send</i>
+              <i
+                class="material-icons"
+                v-if="!isAsking"
+              >send</i>
               <q-spinner-dots
                 v-else
                 size="1em"
@@ -305,7 +308,7 @@
           </div>
         </div>
       </div>
-    </q-drawer>
+    </div>
   </div>
 </template>
 
@@ -364,7 +367,8 @@ export default {
       showQuestionDrawer: false,
       userQuestion: '',
       chatMessages: [],
-      isAsking: false
+      isAsking: false,
+      drawerTopPosition: '0px'
     }
   },
 
@@ -372,6 +376,12 @@ export default {
     if (this.contact && this.contact.id) {
       await this.getData()
     }
+    this.updateDrawerPosition()
+    window.addEventListener('resize', this.updateDrawerPosition)
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.updateDrawerPosition)
   },
 
   methods: {
@@ -627,6 +637,19 @@ export default {
       }
     },
 
+    updateDrawerPosition () {
+      if (window.innerWidth < 1085) {
+        this.drawerTopPosition = '0px'
+        return
+      }
+
+      const header = document.querySelector('.q-header')
+      if (header) {
+        const headerHeight = header.offsetHeight
+        this.drawerTopPosition = `${headerHeight}px`
+      }
+    },
+
     ...mapActions('contacts', ['setMessageComposerNoteBody', 'resetMessageComposerNote'])
   },
 
@@ -742,19 +765,31 @@ export default {
   color: #666;
 }
 
-.q-drawer {
-  background: transparent !important;
-  backdrop-filter: blur(10px);
+.custom-drawer {
+  position: fixed;
+  right: -346px;
+  width: 346px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease;
+  z-index: 2000;
 }
 
-.q-drawer .drawer-content {
+.custom-drawer.is-open {
+  right: 0;
+}
+
+.drawer-content {
+  position: relative;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   height: 100%;
   display: flex;
   flex-direction: column;
+  z-index: 1;
 }
 
+/* Update existing drawer styles to work with new implementation */
 .drawer-header {
   background: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid rgba(147, 51, 234, 0.1);
@@ -762,10 +797,10 @@ export default {
   top: 0;
   z-index: 2000;
   backdrop-filter: blur(10px);
+  padding: 0 16px;
 
   > div {
     height: 44px;
-    padding: 0 20px;
   }
 }
 
