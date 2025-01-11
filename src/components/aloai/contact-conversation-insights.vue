@@ -279,18 +279,14 @@
         <!-- Fixed Input Container -->
         <div class="chat-input-container">
           <div class="input-wrapper ai-effect-gradient-input">
-            <sparkle-icon
-              width="16"
-              height="16"
-              color="#9333EA"
-              class="prepend-icon"
-            />
-            <input
+            <textarea
               v-model="userQuestion"
-              type="text"
-              placeholder="Ask anything about this conversation"
-              @keyup.enter="sendQuestion"
-            />
+              :placeholder="placeholder"
+              @keyup.enter.exact.prevent="sendQuestion"
+              @input="autoResize"
+              ref="textarea"
+              rows="1"
+            ></textarea>
             <button
               class="send-button"
               :disabled="isAsking"
@@ -368,7 +364,8 @@ export default {
       userQuestion: '',
       chatMessages: [],
       isAsking: false,
-      drawerTopPosition: '0px'
+      drawerTopPosition: '0px',
+      placeholder: 'Ask anything about this conversation'
     }
   },
 
@@ -586,9 +583,14 @@ export default {
         stamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       })
 
-      this.scrollToBottom() // Scroll after user message
+      this.scrollToBottom()
       this.isAsking = true
       this.userQuestion = ''
+
+      // Reset textarea height
+      if (this.$refs.textarea) {
+        this.$refs.textarea.style.height = '40px' // Reset to initial height
+      }
 
       // Add loading message
       const loadingMessageIndex = this.chatMessages.length
@@ -647,6 +649,14 @@ export default {
       if (header) {
         const headerHeight = header.offsetHeight
         this.drawerTopPosition = `${headerHeight}px`
+      }
+    },
+
+    autoResize (event) {
+      const textarea = this.$refs.textarea
+      if (textarea) {
+        textarea.style.height = 'auto'
+        textarea.style.height = textarea.scrollHeight + 'px'
       }
     },
 
@@ -849,17 +859,19 @@ export default {
   margin: 0 8px;
 }
 
-input {
+textarea {
   flex: 1;
   border: none;
   background: transparent;
+  padding: 8px;
   font-size: 14px;
   color: #000;
   outline: none;
-}
-
-input::placeholder {
-  color: rgba(0, 0, 0, 0.5);
+  resize: none;
+  max-height: 150px;
+  min-height: 40px;
+  line-height: 1.5;
+  overflow-y: auto;
 }
 
 .send-button {
@@ -874,6 +886,7 @@ input::placeholder {
   opacity: 0.8;
   transition: all 0.3s ease;
   border-radius: 50%;
+  margin: 0;
 }
 
 .send-button:hover {
@@ -884,5 +897,10 @@ input::placeholder {
 .send-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+textarea::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+  opacity: 1; /* Firefox */
 }
 </style>
