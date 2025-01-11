@@ -15775,6 +15775,29 @@ hr {
   }
 }
 
+.q-message-text-content {
+  line-height: 1.5;
+  font-size: 13px;
+
+  ul, ol {
+    padding-inline-start: 16px;
+  }
+
+  p {
+    margin: 0 0 px;
+  }
+
+  a {
+    font-weight: 600;
+  }
+}
+
+/* Gradient input */
+.ai-effect-gradient-input {
+  border: 1px solid transparent;
+  background: linear-gradient(white, white) padding-box, linear-gradient(to bottom right, #60A5FA, #A855F7, #EC4899) border-box;
+}
+
 .ai-info-box {
   position: absolute;
   top: 125px;

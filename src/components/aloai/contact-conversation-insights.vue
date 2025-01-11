@@ -1,86 +1,133 @@
 <template>
   <div class="w-100">
-    <b-card class="ai-effect-container w-100"
-            no-body>
+    <b-card
+      class="ai-effect-container w-100"
+      no-body
+    >
       <div class="ai-effect-gradient"></div>
       <div class="ai-effect-blur"></div>
       <b-card-body class="ai-effect-content">
         <div class="w-100">
-          <h4 class="ai-effect-gradient-text"
-              @click="onExpanded">
+          <h4
+            class="ai-effect-gradient-text"
+            @click="onExpanded"
+          >
             AloAi Conversation Insights
-            <sparkle-icon width="16" height="16" color="#9333EA"/>
+            <sparkle-icon
+              width="16"
+              height="16"
+              color="#9333EA"
+            />
           </h4>
         </div>
         <div :class="`information-container mt-3 mb-4 ${autoHeightClass}`">
-          <div class="card-text"
-               v-if="insightsLoaded">
+          <div
+            class="card-text"
+            v-if="insightsLoaded"
+          >
             <!-- Introduction -->
-            <section class="summary-section"
-                     v-if="insights?.summary?.introduction">
+            <section
+              class="summary-section"
+              v-if="insights?.summary?.introduction"
+            >
               <h3 class="section-title">Introduction</h3>
-              <p class="section-content"
-                 v-html="parseMarkdown(insights.summary.introduction)">
+              <p
+                class="section-content"
+                v-html="parseMarkdown(insights.summary.introduction)"
+              >
               </p>
             </section>
 
             <!-- Key Topics -->
-            <section class="summary-section"
-                     v-if="insights?.summary?.key_topics?.length > 0">
+            <section
+              class="summary-section"
+              v-if="insights?.summary?.key_topics?.length > 0"
+            >
               <h3 class="section-title">Key Topics</h3>
               <ul class="topics-list">
-                <li v-for="(topic, index) in insights.summary.key_topics"
-                    :key="index"
-                    v-html="parseMarkdown(topic)">
+                <li
+                  v-for="(topic, index) in insights.summary.key_topics"
+                  :key="index"
+                  v-html="parseMarkdown(topic)"
+                >
                 </li>
               </ul>
             </section>
 
             <!-- Outcome -->
-            <section class="summary-section"
-                     v-if="insights?.summary?.outcome">
+            <section
+              class="summary-section"
+              v-if="insights?.summary?.outcome"
+            >
               <h3 class="section-title">Outcome</h3>
-              <p class="section-content"
-                 v-html="parseMarkdown(insights.summary.outcome)">
+              <p
+                class="section-content"
+                v-html="parseMarkdown(insights.summary.outcome)"
+              >
               </p>
             </section>
 
             <!-- Follow-up Actions -->
-            <section class="summary-section"
-                     v-if="insights?.summary?.follow_up_actions?.agents?.length > 0 || insights?.summary?.follow_up_actions?.contact?.length > 0">
+            <section
+              class="summary-section"
+              v-if="insights?.summary?.follow_up_actions?.agents?.length > 0 || insights?.summary?.follow_up_actions?.contact?.length > 0"
+            >
               <h3 class="section-title">Follow-up Actions</h3>
-              <div class="follow-up-column"
-                   v-if="insights?.summary?.follow_up_actions?.agents?.length > 0">
+              <div
+                class="follow-up-column"
+                v-if="insights?.summary?.follow_up_actions?.agents?.length > 0"
+              >
                 <h4 class="column-title">Agents</h4>
                 <ul class="action-list">
-                  <li v-for="(action, index) in insights.summary.follow_up_actions.agents" :key="index">
+                  <li
+                    v-for="(action, index) in insights.summary.follow_up_actions.agents"
+                    :key="index"
+                  >
                     <strong>{{ action.name }}:</strong>
-                    <div class="no-p-margin" v-html="parseMarkdown(action.action)"></div>
+                    <div
+                      class="no-p-margin"
+                      v-html="parseMarkdown(action.action)"
+                    ></div>
                   </li>
                 </ul>
               </div>
-              <div class="follow-up-column"
-                   v-if="insights?.summary?.follow_up_actions?.contact?.length > 0">
+              <div
+                class="follow-up-column"
+                v-if="insights?.summary?.follow_up_actions?.contact?.length > 0"
+              >
                 <h4 class="column-title">Contact</h4>
                 <ul class="action-list">
-                  <li v-for="(action, index) in insights.summary.follow_up_actions.contact" :key="index">
+                  <li
+                    v-for="(action, index) in insights.summary.follow_up_actions.contact"
+                    :key="index"
+                  >
                     <strong>{{ action.name }}:</strong>
-                    <div class="no-p-margin" v-html="parseMarkdown(action.action)"></div>
+                    <div
+                      class="no-p-margin"
+                      v-html="parseMarkdown(action.action)"
+                    ></div>
                   </li>
                 </ul>
               </div>
             </section>
 
             <!-- Coaching Opportunities -->
-            <section class="summary-section"
-                     v-if="insights?.summary?.coaching_opportunities?.length > 0">
+            <section
+              class="summary-section"
+              v-if="insights?.summary?.coaching_opportunities?.length > 0"
+            >
               <h3 class="section-title">Coaching Opportunities</h3>
               <ul class="topics-list">
-                <li v-for="(opportunity, index) in insights.summary.coaching_opportunities"
-                    :key="index">
+                <li
+                  v-for="(opportunity, index) in insights.summary.coaching_opportunities"
+                  :key="index"
+                >
                   <template v-if="opportunity.agent && opportunity.opportunity">
                     <strong>{{ opportunity.agent }}:</strong>
-                    <div class="no-p-margin" v-html="parseMarkdown(opportunity.opportunity)"></div>
+                    <div
+                      class="no-p-margin"
+                      v-html="parseMarkdown(opportunity.opportunity)"
+                    ></div>
                   </template>
                 </li>
               </ul>
@@ -90,48 +137,73 @@
 
             <!-- Action buttons container -->
             <div class="d-flex gap-2 mb-2">
-              <b-button class="flex-grow-1"
-                        size="sm"
-                        variant="light"
-                        tabindex="0"
-                        @click="copyToClipboard">
+              <b-button
+                class="flex-grow-1"
+                size="sm"
+                variant="light"
+                tabindex="0"
+                @click="copyToClipboard"
+              >
                 📋 Copy
               </b-button>
 
-              <b-button class="flex-grow-1"
-                        size="sm"
-                        variant="dark"
-                        tabindex="0"
-                        :disabled="isAddingNote"
-                        @click="createNote">
-                <q-spinner-bars v-if="isAddingNote"
-                                color="white">
+              <b-button
+                class="flex-grow-1"
+                size="sm"
+                variant="dark"
+                tabindex="0"
+                :disabled="isAddingNote"
+                @click="createNote"
+              >
+                <q-spinner-bars
+                  v-if="isAddingNote"
+                  color="white"
+                >
                 </q-spinner-bars>
                 {{ isAddingNote ? 'Adding Note...' : '📝 Add Note' }}
               </b-button>
             </div>
 
+            <!-- Add this before the Regenerate Insights button, around line 115 -->
+            <b-button
+              class="text-white mb-2"
+              size="sm"
+              variant="primary"
+              tabindex="0"
+              block
+              @click="showQuestionDrawer = true"
+            >
+              🤖 Ask Question from AloAi
+            </b-button>
+
             <!-- Regenerate Insights -->
-            <b-button class="text-white"
-                      size="sm"
-                      variant="primary"
-                      tabindex="0"
-                      block
-                      :disabled="isGenerating"
-                      @click="handleRegenerate">
+            <b-button
+              size="sm"
+              variant="warning"
+              tabindex="0"
+              block
+              :disabled="isGenerating"
+              @click="handleRegenerate"
+            >
               {{ !isGenerating ? '🧙‍♂️️🪄 Regenerate Insights' : '' }}
-              <q-spinner-bars v-if="isGenerating"
-                              color="white">
+              <q-spinner-bars
+                v-if="isGenerating"
+                color="white"
+              >
               </q-spinner-bars>
             </b-button>
 
-            <div class="timestamp"
-                 v-if="insights?.updated_at">
+            <div
+              class="timestamp"
+              v-if="insights?.updated_at"
+            >
               Last updated: {{ insights.updated_at | fixDateTime }}
             </div>
           </div>
-          <div class="text-center"
-               v-else>
+          <div
+            class="text-center"
+            v-else
+          >
             <q-spinner-bars
               color="primary"
               size="2em"
@@ -139,16 +211,101 @@
           </div>
         </div>
 
-        <b-button class="expand-toggle"
-                  variant="light"
-                  size="sm"
-                  v-if="insightsLoaded"
-                  pill
-                  @click="onExpanded">
+        <b-button
+          class="expand-toggle"
+          variant="light"
+          size="sm"
+          v-if="insightsLoaded"
+          pill
+          @click="onExpanded"
+        >
           <i class="material-icons icon">{{ isExpanded ? 'expand_less' : 'expand_more' }}</i>
         </b-button>
       </b-card-body>
     </b-card>
+
+    <!-- Add this at the end of the template, before the closing </div> tag -->
+    <q-drawer
+      v-model="showQuestionDrawer"
+      side="right"
+      overlay
+      bordered
+      :width="346"
+    >
+      <div class="drawer-content d-flex flex-column h-100">
+        <!-- Fixed Header -->
+        <div class="drawer-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="ai-effect-gradient-text m-0">
+              <sparkle-icon
+                width="16"
+                height="16"
+                color="#9333EA"
+              />
+              Ask AloAi
+            </h4>
+            <b-button
+              variant="light"
+              size="sm"
+              @click="showQuestionDrawer = false"
+            >
+              <i class="material-icons">close</i>
+            </b-button>
+          </div>
+        </div>
+
+        <!-- Scrollable Chat Container -->
+        <div class="chat-container flex-grow-1 p-2">
+          <q-chat-message
+            v-for="(message, index) in chatMessages"
+            :key="index"
+            :text="[message.text]"
+            :sent="message.sent"
+            :name="message.name"
+            :bg-color="message.sent ? 'primary' : 'grey-3'"
+            :text-color="message.sent ? 'white' : 'black'"
+            :stamp="message.stamp"
+            size="12"
+          >
+            <template
+              v-if="message.isLoading"
+              v-slot:stamp
+            >
+              <q-spinner-dots size="2em" />
+            </template>
+          </q-chat-message>
+        </div>
+
+        <!-- Fixed Input Container -->
+        <div class="chat-input-container">
+          <div class="input-wrapper ai-effect-gradient-input">
+            <sparkle-icon
+              width="16"
+              height="16"
+              color="#9333EA"
+              class="prepend-icon"
+            />
+            <input
+              v-model="userQuestion"
+              type="text"
+              placeholder="Ask anything about this conversation"
+              @keyup.enter="sendQuestion"
+            />
+            <button
+              class="send-button"
+              :disabled="isAsking"
+              @click="sendQuestion"
+            >
+              <i class="material-icons" v-if="!isAsking">send</i>
+              <q-spinner-dots
+                v-else
+                size="1em"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    </q-drawer>
   </div>
 </template>
 
@@ -203,7 +360,11 @@ export default {
       isExpanded: false,
       insightsLoaded: false,
       isGenerating: false,
-      isAddingNote: false
+      isAddingNote: false,
+      showQuestionDrawer: false,
+      userQuestion: '',
+      chatMessages: [],
+      isAsking: false
     }
   },
 
@@ -244,7 +405,14 @@ export default {
      * @returns {string}
      */
     parseMarkdown (text) {
-      const rawHtml = marked(text)
+      let renderer = new marked.Renderer()
+      renderer.link = function (href, title, text) {
+        var link = marked.Renderer.prototype.link.apply(this, arguments)
+        return link.replace('<a', "<a target='_blank'")
+      }
+
+      // Use the custom renderer with marked
+      const rawHtml = marked(text, { renderer })
       return DOMPurify.sanitize(rawHtml)
     },
 
@@ -388,6 +556,77 @@ export default {
         })
     },
 
+    scrollToBottom () {
+      const chatContainer = this.$el.querySelector('.chat-container')
+      if (chatContainer) {
+        setTimeout(() => {
+          chatContainer.scrollTop = chatContainer.scrollHeight
+        }, 100) // Small delay to ensure content is rendered
+      }
+    },
+
+    async sendQuestion () {
+      if (!this.userQuestion.trim()) return
+
+      const question = this.userQuestion.trim()
+      this.chatMessages.push({
+        text: question,
+        sent: true,
+        name: 'You',
+        stamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      })
+
+      this.scrollToBottom() // Scroll after user message
+      this.isAsking = true
+      this.userQuestion = ''
+
+      // Add loading message
+      const loadingMessageIndex = this.chatMessages.length
+      this.chatMessages.push({
+        text: '',
+        sent: false,
+        name: 'AloAi',
+        isLoading: true
+      })
+
+      this.scrollToBottom() // Scroll to show loading message
+
+      try {
+        const response = await talk2Api.V2.contact.askQuestion(this.contact.id, {
+          params: {
+            question
+          }
+        })
+
+        // Process the response - handle both array and string cases
+        const processedText = Array.isArray(response.data.response)
+          ? response.data.response.map(item => this.parseMarkdown(item))
+          : [this.parseMarkdown(response.data.response)]
+
+        // Replace loading message with actual response
+        this.chatMessages.splice(loadingMessageIndex, 1, {
+          text: processedText,
+          sent: false,
+          name: 'AloAi',
+          stamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        })
+
+        this.scrollToBottom() // Scroll after response received
+      } catch (error) {
+        // Remove loading message on error
+        this.chatMessages.splice(loadingMessageIndex, 1)
+        console.error('Failed to get answer:', error)
+        this.$q.notify({
+          message: 'Failed to get answer',
+          color: 'negative',
+          position: 'top',
+          timeout: 2000
+        })
+      } finally {
+        this.isAsking = false
+      }
+    },
+
     ...mapActions('contacts', ['setMessageComposerNoteBody', 'resetMessageComposerNote'])
   },
 
@@ -397,7 +636,14 @@ export default {
         this.insightsLoaded = false
         this.getData()
       }
-    }, 500)
+    }, 500),
+
+    showQuestionDrawer (newValue) {
+      if (!newValue) {
+        // Reset input when drawer closes
+        this.userQuestion = ''
+      }
+    }
   }
 }
 </script>
@@ -494,5 +740,114 @@ export default {
   font-size: 12px;
   text-align: center;
   color: #666;
+}
+
+.q-drawer {
+  background: transparent !important;
+  backdrop-filter: blur(10px);
+}
+
+.q-drawer .drawer-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-header {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(147, 51, 234, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+  backdrop-filter: blur(10px);
+
+  > div {
+    height: 44px;
+    padding: 0 20px;
+  }
+}
+
+.chat-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 1rem;
+  scroll-behavior: smooth;
+  margin-top: 1px;
+}
+
+.chat-input-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-top: 1px solid rgba(147, 51, 234, 0.1);
+  position: sticky;
+  bottom: 0;
+  z-index: 2000;
+  backdrop-filter: blur(10px);
+  padding: 16px;
+}
+
+.ai-effect-gradient-input {
+  width: 100%;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+}
+
+.input-wrapper:hover {
+  border-color: rgba(147, 51, 234, 0.4);
+}
+
+.input-wrapper:focus-within {
+  border-color: rgba(147, 51, 234, 0.6);
+  box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1);
+}
+
+.prepend-icon {
+  margin: 0 8px;
+}
+
+input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #000;
+  outline: none;
+}
+
+input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #9333EA;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+}
+
+.send-button:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
