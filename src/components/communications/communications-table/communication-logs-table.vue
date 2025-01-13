@@ -159,13 +159,6 @@
               <queue-resolution :row="props.row" />
             </div>
 
-<!--            <div data-testid="email-span"-->
-<!--                 class="break-word"-->
-<!--                 v-else-if="col.name === 'email'"-->
-<!--            >-->
-<!--              <span>{{ props.row.contact?.email || '-' }}</span>-->
-<!--            </div>-->
-
             <div v-else-if="col.name === 'creator_type'">
               <creator-type :row="props.row" />
             </div>

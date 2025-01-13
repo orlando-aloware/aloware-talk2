@@ -75,19 +75,19 @@ export const ALL_COLUMNS = [
     label: 'Contact',
     name: 'contact',
     align: 'left',
-    headerStyle: 'min-width: 110px'
+    headerStyle: 'min-width: 200px'
   },
   {
     label: 'Location',
     name: 'lead_location',
     align: 'left',
-    headerStyle: 'min-width: 100px'
+    headerStyle: 'min-width: 150px'
   },
   {
     label: 'Lines',
     name: 'line',
     align: 'left',
-    headerStyle: 'min-width: 100px'
+    headerStyle: 'min-width: 150px'
   },
   {
     label: 'User',
@@ -134,12 +134,6 @@ export const ALL_COLUMNS = [
   {
     label: 'Queue Resolution',
     name: 'queue_resolution2',
-    align: 'left',
-    headerStyle: 'min-width: 100px'
-  },
-  {
-    label: 'Email',
-    name: 'email',
     align: 'left',
     headerStyle: 'min-width: 100px'
   },
