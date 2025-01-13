@@ -235,25 +235,7 @@ export default {
   },
 
   mounted () {
-    this.listeners.pinnedViewsEvents = () => {
-      // this.getPinnedViews()
-    }
 
-    this.listeners.openInboxViewPopup = () => {
-      this.setShowViewsList(true)
-    }
-
-    this.listeners.deletedFilter = (filter) => {
-      const view = this.pinnedViews.find(view => +view.filter_id === +filter.id)
-      if (view) {
-        this.unpinView(view.id)
-      }
-    }
-
-    this.$VueEvent.listen('viewPinned', this.listeners.pinnedViewsEvents)
-    this.$VueEvent.listen('viewUnpinned', this.listeners.pinnedViewsEvents)
-    this.$VueEvent.listen('openInboxViewPopup', this.listeners.openInboxViewPopup)
-    this.$VueEvent.listen('filter_deleted', this.listeners.deletedFilter)
   },
 
   methods: {
@@ -334,6 +316,7 @@ export default {
       }).catch(err => {
         //  properly reload contacts if redirected or navigation clicked to the same "inbox" route
         if (this.$route.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME || this.$route.params.channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
+          // TODO: commmented for now, remove if verified that's not needed
           // this.loadContactTasks()
         }
 
@@ -403,6 +386,8 @@ export default {
       this.resetChannelChangedFilterFields()
 
       this.setAppliedFilter(this.selectedFilter)
+
+      // TODO: commmented for now, remove if verified that's not needed
       // this.loadContactTasks()
 
       this.$router.push({

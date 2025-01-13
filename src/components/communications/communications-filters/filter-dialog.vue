@@ -419,7 +419,6 @@ export default {
 
     onShow () {
       this.setShowViewsList(false)
-      this.toggleFilterDialogWithFilters(true)
       this.fetchSavedFilters = true
       this.filterFields = Object.keys(this.loadedDefaultFilterModel.filter)
 
@@ -436,6 +435,12 @@ export default {
         this.filter = { ...this.channelClonedFilter }
       } else {
         this.filter = _.pick(this.value, this.filterFields)
+      }
+
+      // no need to re-set the channel cloned filters
+      // when we're populating the dialog with the current filters
+      if (!this.isFilterDialogShowFilters) {
+        this.setChannelClonedFilter(this.filter)
       }
 
       // fill in the value for the newly added filter in case it's not yet included

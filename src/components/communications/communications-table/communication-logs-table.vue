@@ -699,7 +699,7 @@ export default {
 
   created () {
     this.cancelToken = this.$axios.CancelToken
-    // this.source = this.cancelToken.source()
+    this.source = this.cancelToken.source()
     this.columns = this.getSavedColumns()
   },
 
