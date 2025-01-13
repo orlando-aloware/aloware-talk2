@@ -159,12 +159,12 @@
               <queue-resolution :row="props.row" />
             </div>
 
-            <div data-testid="email-span"
-                 class="break-word"
-                 v-else-if="col.name === 'email'"
-            >
-              <span>{{ props.row.contact?.email || '-' }}</span>
-            </div>
+<!--            <div data-testid="email-span"-->
+<!--                 class="break-word"-->
+<!--                 v-else-if="col.name === 'email'"-->
+<!--            >-->
+<!--              <span>{{ props.row.contact?.email || '-' }}</span>-->
+<!--            </div>-->
 
             <div v-else-if="col.name === 'creator_type'">
               <creator-type :row="props.row" />
@@ -175,7 +175,8 @@
             </template>
 
             <div v-else-if="col.name === 'notes'">
-              <wallboard-calls-note :communication="props.row" />
+              <wallboard-calls-note style="width: 200px; white-space: normal;"
+                                    :communication="props.row" />
             </div>
 
             <template v-else-if="col.name === 'csat_score'">
@@ -273,6 +274,7 @@ import CreatorType from './creator-type.vue'
 import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
+import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -326,246 +328,8 @@ export default {
     return {
       search: '',
       isLoadingDisabled: false,
-      tableFields: [
-        {
-          label: '',
-          name: 'disposition_status2',
-          align: 'center',
-          style: 'width: 105px'
-        },
-        {
-          label: 'Number',
-          name: 'incoming_number',
-          align: 'left',
-          style: 'width: 150px'
-        },
-        {
-          label: 'Team',
-          name: 'teams',
-          align: 'left',
-          style: 'width: 180px'
-        },
-        {
-          label: 'Ring Group',
-          name: 'ring_group',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Sequence',
-          name: 'workflow',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Broadcast',
-          name: 'broadcast',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Start Time',
-          name: 'created_at',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Talk Time',
-          name: 'talk_time',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Wait Time',
-          name: 'wait_time',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Hold Time',
-          name: 'hold_time',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Duration',
-          name: 'duration',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Resolution',
-          name: 'resolution2',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Contact',
-          name: 'contact',
-          align: 'left',
-          style: 'width: 110px'
-        },
-        {
-          label: 'Location',
-          name: 'lead_location',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Lines',
-          name: 'line',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'User',
-          name: 'user_id',
-          align: 'left',
-          style: 'width: 150px'
-        },
-        {
-          label: 'Attempting',
-          name: 'attempting_users',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Transferred From',
-          name: 'transfer_prior_user_ids',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Transferred To',
-          name: 'transfer_target_user_ids',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Cold Transferred?',
-          name: 'in_cold_transfer',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Transfer Type',
-          name: 'transfer_type',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Callback Status',
-          name: 'callback_status',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Queue Resolution',
-          name: 'queue_resolution2',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Email',
-          name: 'email',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Creator Type',
-          name: 'creator_type',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Tags',
-          name: 'tags',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Notes',
-          name: 'notes',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'CSAT Score',
-          name: 'csat_score',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Operations',
-          name: 'operations',
-          align: 'center',
-          style: 'width: 100px'
-        }
-      ],
-      columns: [
-        {
-          name: 'disposition_status2',
-          field: 'disposition_status2',
-          label: '',
-          align: 'center',
-          style: 'width: 105px'
-        },
-        {
-          label: 'Number',
-          name: 'incoming_number',
-          field: 'incoming_number',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Ring Group',
-          name: 'ring_group',
-          field: 'ring_group',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Start Time',
-          name: 'created_at',
-          field: 'created_at',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Talk Time',
-          name: 'talk_time',
-          field: 'talk_time',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Duration',
-          name: 'duration',
-          field: 'duration',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Contact',
-          name: 'contact',
-          field: 'lead_number',
-          align: 'left',
-          style: 'width: 150px'
-        },
-        {
-          label: 'User',
-          name: 'user_id',
-          field: 'user_id',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Operations',
-          name: 'operations',
-          align: 'center',
-          style: 'width: 100px'
-        }
-      ],
+      tableFields: ALL_COLUMNS,
+      columns: DEFAULT_COLUMNS,
       searchFields: ['lead_number', 'contact.name'],
       source: null,
       cancelToken: null,
