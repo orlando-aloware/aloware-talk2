@@ -314,12 +314,6 @@ export default {
           status: InboxTaskStatus.DEFAULT_STATUS
         }
       }).catch(err => {
-        //  properly reload contacts if redirected or navigation clicked to the same "inbox" route
-        if (this.$route.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME || this.$route.params.channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
-          // TODO: commmented for now, remove if verified that's not needed
-          // this.loadContactTasks()
-        }
-
         console.log(err)
         this.$handleErrors(err.response)
       })
@@ -386,9 +380,6 @@ export default {
       this.resetChannelChangedFilterFields()
 
       this.setAppliedFilter(this.selectedFilter)
-
-      // TODO: commmented for now, remove if verified that's not needed
-      // this.loadContactTasks()
 
       this.$router.push({
         name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
