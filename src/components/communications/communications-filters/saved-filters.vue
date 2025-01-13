@@ -24,34 +24,6 @@
                          @filterDelete="(e) => onDeleteFilter(e, item)"
       />
     </div>
-    <h5 class="text-uppercase filter-group-title mt-4">
-      Company Filters
-    </h5>
-
-    <div class="saved-filters">
-      <q-skeleton type="rect"
-                  data-testid="filter-dialog-skeleton"
-                  v-if="isGettingFilters" />
-      <p class="text-muted fs-12 empty-filter-placeholder pl-2"
-         v-show="!isGettingFilters"
-         v-if="companyFilters.length < 1">
-        None
-      </p>
-      <div class="filter-items cursor-pointer"
-           :class="getFilterItemClass(item)"
-           data-testid="filter-dialog-select-filter"
-           v-for="item in companyFilters"
-           :key="item.id"
-           @click="() => $emit('filterSelected', item)">
-        <span>
-          <q-tooltip anchor="top middle"
-                     self="center middle">
-            {{ item.name }}
-          </q-tooltip>
-          {{ item.name }}
-        </span>
-      </div>
-    </div>
   </div>
 </template>
 <script>

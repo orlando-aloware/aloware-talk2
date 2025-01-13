@@ -235,25 +235,7 @@ export default {
   },
 
   mounted () {
-    this.listeners.pinnedViewsEvents = () => {
-      this.getPinnedViews()
-    }
 
-    this.listeners.openInboxViewPopup = () => {
-      this.setShowViewsList(true)
-    }
-
-    this.listeners.deletedFilter = (filter) => {
-      const view = this.pinnedViews.find(view => +view.filter_id === +filter.id)
-      if (view) {
-        this.unpinView(view.id)
-      }
-    }
-
-    this.$VueEvent.listen('viewPinned', this.listeners.pinnedViewsEvents)
-    this.$VueEvent.listen('viewUnpinned', this.listeners.pinnedViewsEvents)
-    this.$VueEvent.listen('openInboxViewPopup', this.listeners.openInboxViewPopup)
-    this.$VueEvent.listen('filter_deleted', this.listeners.deletedFilter)
   },
 
   methods: {
@@ -263,6 +245,7 @@ export default {
       'resetChannelChangedFilterFields',
       'setAppliedFilter',
       'setInbox',
+      'setInboxFilters',
       'setChannelClonedFilter',
       'setFilterDialogForView',
       'setShowViewsList',
@@ -300,9 +283,6 @@ export default {
         this.onSelectView(view.filter)
         return
       }
-
-      this.setIsFirstLoad(true)
-
       if (!this.activeChannel) {
         return
       }
@@ -334,13 +314,12 @@ export default {
           status: InboxTaskStatus.DEFAULT_STATUS
         }
       }).catch(err => {
-        //  properly reload contacts if redirected or navigation clicked to the same "inbox" route
-        if (this.$route.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME || this.$route.params.channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
-          this.loadContactTasks()
-        }
-
         console.log(err)
         this.$handleErrors(err.response)
+      })
+
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
       })
     },
 
@@ -353,8 +332,33 @@ export default {
     },
 
     async onSelectSavedFilter (filter) {
+      let personalFilterObject = filter.filter
+
       await this.setSelectedFilter(filter)
       this.toggleFilterDialog(true)
+
+      this.setIsFirstLoad(false)
+
+      const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
+
+      personalFilterObject.from_date = formattedDates.from_date
+      personalFilterObject.to_date = formattedDates.to_date
+
+      // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+      // set the range to the key of the range
+      let inRange = false
+      for (const range in this.ranges) {
+        const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
+        if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
+          sessionStorage.setItem('date-selected-comms', range)
+          inRange = true
+          break
+        }
+      }
+
+      if (!inRange) {
+        sessionStorage.setItem('date-selected-comms', 'custom')
+      }
     },
 
     onSelectView (filter) {
@@ -376,7 +380,6 @@ export default {
       this.resetChannelChangedFilterFields()
 
       this.setAppliedFilter(this.selectedFilter)
-      this.loadContactTasks()
 
       this.$router.push({
         name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
@@ -401,11 +404,13 @@ export default {
 
     resetFilter () {
       this.fetchInboxTaskCounts()
-      this.filter = { ...this.defaultFilterModel.filter }
+      this.filter = { ...this.channelDefaultFilterModel.filter }
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
       this.setSelectedFilter(null)
       this.setAppliedFilter(null)
+      this.setIsFirstLoad(true)
+      this.setInboxFilters(this.filter)
     }
   },
 

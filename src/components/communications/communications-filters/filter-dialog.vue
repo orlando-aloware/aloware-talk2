@@ -437,16 +437,16 @@ export default {
         this.filter = _.pick(this.value, this.filterFields)
       }
 
-      // fill in the value for the newly added filter in case it's not yet included
-      // in the existing saved set to properly display in its respective select component
-      if (!this.filter.hasOwnProperty('dynamic_engagement_date_range')) {
-        this.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
-      }
-
       // no need to re-set the channel cloned filters
       // when we're populating the dialog with the current filters
       if (!this.isFilterDialogShowFilters) {
         this.setChannelClonedFilter(this.filter)
+      }
+
+      // fill in the value for the newly added filter in case it's not yet included
+      // in the existing saved set to properly display in its respective select component
+      if (!this.filter.hasOwnProperty('dynamic_engagement_date_range')) {
+        this.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
       }
     },
 
@@ -456,7 +456,7 @@ export default {
 
     onResetFilter () {
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
-      const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.filterModel.filter
+      const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.filterModel.filter
 
       this.reset = true
       sessionStorage.removeItem('date-selected-comms')
@@ -489,6 +489,7 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'has_unread',
+        'unread_only',
         'has_international'
       ]
       const excludeProps = [
@@ -687,8 +688,7 @@ export default {
         not_disposed: +this.filter.not_disposed,
         first_time_only: +this.filter.first_time_only,
         exclude_automated_communications: +this.filter.exclude_automated_communications,
-        my_contact: +this.filter.my_contact,
-        has_unread: +this.filter.unread_only
+        unread_only: +this.filter.unread_only
       }
     },
 
