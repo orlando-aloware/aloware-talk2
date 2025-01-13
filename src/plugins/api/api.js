@@ -1,7 +1,7 @@
 const suffixV1 = '/api/v1/'
 const suffixV2 = '/api/v2/'
-import qs from 'qs'
 import _ from 'lodash'
+import qs from 'qs'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 const exportCommunications = async (contactId) => {
@@ -706,6 +706,14 @@ export default {
         }
 
         return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary`, params)
+      },
+
+      askQuestion (contactId, params) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary/ask`, params)
       },
 
       getTextMessageSuggestions (contactId, params) {
