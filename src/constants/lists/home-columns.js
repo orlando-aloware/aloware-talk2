@@ -22,6 +22,13 @@ export const COLUMNS = [
     resizable: true
   },
   {
+    name: 'owner_name',
+    label: 'Owner',
+    field: 'owner_name',
+    align: 'left',
+    sortable: true
+  },
+  {
     name: 'date_created',
     label: 'Date Created',
     field: 'created_at',

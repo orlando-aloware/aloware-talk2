@@ -30,6 +30,9 @@
             <div v-if="col.name === 'name'">
               {{ props.row.name }}
             </div>
+            <div v-if="col.name === 'owner_name'">
+              {{ props.row.owner_name }}
+            </div>
             <div v-else-if="col.name === 'date_created'">
               <relative-time humanized
                              :from-time="props.row[col.field]" />
@@ -116,7 +119,7 @@
                 </div>
 
                 <div class="operation-button mx-1"
-                     v-if="hasShowInPublicFolderPermission">
+                     v-if="!props.row.show_in_public_folder && hasShowInPublicFolderPermission">
                   <span class="cursor-pointer"
                         data-testid="lists-show-button"
                         @click="onShowInPublicFolderList(props.row)">
@@ -206,6 +209,14 @@
                        data-testid="lists-form"
                        @closeListForm="closeListForm"
                        @listUpdated="listUpdated"/>
+
+    <convert-list-to-public-dialog :list-id="list.id"
+                                   :list-name="list.name"
+                                   :from-admin-list="true"
+                                   v-model="convertToPublicDialog"
+                                   v-if="list"
+                                   @closed="convertToPublicDialog = false"
+                                   @converted="onListConvertedToPublic"/>
   </div>
 </template>
 
@@ -273,7 +284,9 @@ export default {
       },
       listsData: [],
       isOpenListForm: false,
-      list: null
+      list: null,
+
+      convertToPublicDialog: false
     }
   },
 
@@ -309,13 +322,14 @@ export default {
         ],
         smallDesktop: [
           'name',
+          'owner_name',
           'no_of_contacts',
-          'import_status',
           'type',
           'actions'
         ],
         mediumDesktop: [
           'name',
+          'owner_name',
           'date_created',
           'no_of_contacts',
           'type',
@@ -326,6 +340,7 @@ export default {
         ],
         largeDesktop: [
           'name',
+          'owner_name',
           'date_created',
           'no_of_contacts',
           'type',
@@ -337,6 +352,7 @@ export default {
         ],
         extraLargeDesktop: [
           'name',
+          'owner_name',
           'date_created',
           'no_of_contacts',
           'type',
@@ -486,6 +502,61 @@ export default {
       this.listsData = this.listsData.map(item => {
         if (item.id === id) {
           item.name = name
+        }
+
+        return item
+      })
+    },
+
+    onDuplicateList (list) {
+      this.list = list
+      this.duplicateList({
+        id: list.id,
+        type: list.type,
+        from_admin_list: true
+      })
+    },
+
+    duplicateList (params) {
+      this.$axios
+        .post(`/api/v2/contacts-list/${this.list.id}/duplicate`, params)
+        .then(async (response) => {
+          const message = response.data.message
+          this.$generalNotification(message)
+          await this.refreshLists()
+        })
+        .catch((error) => {
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+        })
+    },
+
+    async refreshLists () {
+      this.listsData = []
+      this.SET_LISTS_COUNT(0)
+      await this.getLists()
+      this.calculateTotalPages()
+      this.pagination.currentPage = 1
+      this.listsData = this.lists
+    },
+
+    onShowInPublicFolderList (list) {
+      this.list = list
+      this.convertToPublicDialog = true
+    },
+
+    onListConvertedToPublic () {
+      this.convertToPublicDialog = false
+
+      const { id } = this.list
+
+      this.listsData = this.listsData.map(item => {
+        if (item.id === id) {
+          item.show_in_public_folder = true
         }
 
         return item
