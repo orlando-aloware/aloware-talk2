@@ -489,6 +489,7 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'has_unread',
+        'unread_only',
         'has_international'
       ]
       const excludeProps = [
@@ -687,8 +688,7 @@ export default {
         not_disposed: +this.filter.not_disposed,
         first_time_only: +this.filter.first_time_only,
         exclude_automated_communications: +this.filter.exclude_automated_communications,
-        my_contact: +this.filter.my_contact,
-        has_unread: +this.filter.unread_only
+        unread_only: +this.filter.unread_only
       }
     },
 

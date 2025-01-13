@@ -80,10 +80,10 @@ export default {
     }
 
     if (channel === DEFAULT_COMMUNICATIONS_CHANNEL) {
-      console.log('setting the default filter model for all comms')
       defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
       defaultFilterModel.filter = {
         ...Filters.DEFAULT_STATE.filter,
+        unread_only: 0,
         changed: true
       }
 
