@@ -355,8 +355,33 @@ export default {
     },
 
     async onSelectSavedFilter (filter) {
+      let personalFilterObject = filter.filter
+
       await this.setSelectedFilter(filter)
       this.toggleFilterDialog(true)
+
+      this.setIsFirstLoad(false)
+
+      const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
+
+      personalFilterObject.from_date = formattedDates.from_date
+      personalFilterObject.to_date = formattedDates.to_date
+
+      // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+      // set the range to the key of the range
+      let inRange = false
+      for (const range in this.ranges) {
+        const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
+        if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
+          sessionStorage.setItem('date-selected-comms', range)
+          inRange = true
+          break
+        }
+      }
+
+      if (!inRange) {
+        sessionStorage.setItem('date-selected-comms', 'custom')
+      }
     },
 
     onSelectView (filter) {

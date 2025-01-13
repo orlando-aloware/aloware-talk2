@@ -24,6 +24,9 @@
                          @filterDelete="(e) => onDeleteFilter(e, item)"
       />
     </div>
+
+    <!-- TODO: company filters needs to be implemented in the talk2 way
+
     <h5 class="text-uppercase filter-group-title mt-4">
       Company Filters
     </h5>
@@ -52,6 +55,7 @@
         </span>
       </div>
     </div>
+    -->
   </div>
 </template>
 <script>
