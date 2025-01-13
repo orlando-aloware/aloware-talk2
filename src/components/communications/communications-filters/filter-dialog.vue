@@ -419,6 +419,7 @@ export default {
 
     onShow () {
       this.setShowViewsList(false)
+      this.toggleFilterDialogWithFilters(true)
       this.fetchSavedFilters = true
       this.filterFields = Object.keys(this.loadedDefaultFilterModel.filter)
 
@@ -441,12 +442,6 @@ export default {
       // in the existing saved set to properly display in its respective select component
       if (!this.filter.hasOwnProperty('dynamic_engagement_date_range')) {
         this.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
-      }
-
-      // no need to re-set the channel cloned filters
-      // when we're populating the dialog with the current filters
-      if (!this.isFilterDialogShowFilters) {
-        this.setChannelClonedFilter(this.filter)
       }
     },
 

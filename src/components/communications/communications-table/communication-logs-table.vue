@@ -599,7 +599,6 @@ export default {
       this.paginationPage = 1
 
       this.$nextTick(() => {
-        debugger
         this.getCommunications(this.communicationFilters)
       })
     },
@@ -626,11 +625,11 @@ export default {
       }
 
       const lastIndex = this.communications.length - 1
-
       if (
         !this.isLoadingMore &&
         this.paginationPage < this.lastPage &&
-        to === lastIndex
+        to === lastIndex &&
+        to > 0
       ) {
         await this.loadMoreCommunications()
         ref.refresh()

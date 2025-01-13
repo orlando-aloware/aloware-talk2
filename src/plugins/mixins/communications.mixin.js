@@ -138,9 +138,7 @@ export default {
         { value: 50, label: '50 Per Page' },
         { value: 100, label: '100 Per Page' }
       ],
-      // lastPage: 1,
       maxPaginationPages: 5,
-      // communicationsData: [],
       nextCursor: null,
       countSource: null,
       pagination: {
@@ -793,11 +791,9 @@ export default {
     },
 
     resetCommunications () {
-      // this.communicationsData = []
       this.setCommunications([])
       this.setCommunicationsCount(0)
       this.paginationPage = 1
-      // this.lastPage = 1
       this.setHasMoreCommunications(null)
     },
 
@@ -902,11 +898,6 @@ export default {
       params.page = this.paginationPage
       params.per_page = this.perPage
       params = this.removeUnnecessaryParameters(params)
-
-      if (this.source?.cancel) {
-        debugger
-        this.source.cancel('Loading of communication operation is canceled by the user.')
-      }
 
       this.source = this.cancelToken.source()
 
@@ -1021,7 +1012,7 @@ export default {
 
   created () {
     this.cancelToken = window.axios.CancelToken
-    // this.source = this.cancelToken.source()
+    this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
   },
