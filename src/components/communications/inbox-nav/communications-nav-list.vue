@@ -84,7 +84,7 @@ import { communicationsRoutesMixin, communicationsMixin, userMixin } from 'src/p
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME, COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME, DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME, COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME, DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 
 export default {
   name: 'communications-nav-list',
@@ -380,7 +380,6 @@ export default {
       this.resetChannelChangedFilterFields()
 
       this.setAppliedFilter(this.selectedFilter)
-
       this.$router.push({
         name: COMMUNICATIONS_VIEWS_ROUTE_NAME,
         params: {
