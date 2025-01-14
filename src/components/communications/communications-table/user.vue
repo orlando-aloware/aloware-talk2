@@ -1,5 +1,6 @@
 <template>
-  <div data-testid="user-row">
+  <div class="ellipse"
+       data-testid="user-row">
     <span v-if="isAgent && value">
       {{ getUserName(getUser(value)) }}
     </span>

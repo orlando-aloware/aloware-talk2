@@ -1,10 +1,12 @@
 <template>
   <div class="d-flex flex-column"
        data-testid="user-row">
-    <span v-if="isAgent && value">
+    <span class="ellipse"
+          v-if="isAgent && value">
       {{ workflow.name || '-' }}
     </span>
-    <a target='_blank'
+    <a class="ellipse"
+       target='_blank'
        :href="getWorkflowURL(value)"
        v-else-if="value">
       {{ workflow.name || '-' }}

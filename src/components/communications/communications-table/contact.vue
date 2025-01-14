@@ -1,7 +1,8 @@
 <template>
   <div class="d-flex flex-column"
        data-testid="duration-row">
-    <div v-if="row.contact">
+    <div class="ellipse"
+         v-if="row.contact">
       <router-link class="text-primary"
                    target='_blank'
                    :to="{ path: `/contacts/${row.contact.id}`}">

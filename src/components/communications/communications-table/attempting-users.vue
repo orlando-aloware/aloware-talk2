@@ -1,5 +1,6 @@
 <template>
-  <div data-testid="attempting-users-row"
+  <div class="ellipse"
+       data-testid="attempting-users-row"
        v-if="row.attempting_users?.length > 0">
     <target-users-tree :communication="row"
                        :show-label="false"/>
