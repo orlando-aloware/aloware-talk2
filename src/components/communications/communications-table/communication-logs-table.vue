@@ -56,14 +56,17 @@
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td :props="props"
-                v-for="col in props.cols"
-                :key="col.name">
+                :key="col.name"
+                v-for="col in props.cols">
             <div v-if="col.name === 'disposition_status2'">
               <disposition :row="props.row"
+                           :style="col.columnStyle"
                            @on-details="onCommunicationDetails"/>
             </div>
-            <div v-else-if="col.name === 'incoming_number'">
-              <div v-if="props.row?.campaign_id">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'incoming_number'">
+              <div class="ellipse"
+                   v-if="props.row?.campaign_id">
                 {{ getCampaignName(props.row?.campaign_id) }}
               </div>
               <div>
@@ -71,110 +74,135 @@
               </div>
             </div>
 
-            <div v-else-if="col.name === 'ring_group'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'ring_group'">
               <ring-group :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'created_at'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'created_at'">
               <start-time :row="props.row"
                           :value="col.value" />
             </div>
-            <div v-else-if="col.name === 'talk_time'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'talk_time'">
               <talk-time :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'wait_time'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'wait_time'">
               <wait-time :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'hold_time'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'hold_time'">
               <hold-time :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'contact'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'contact'">
               <contact :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'user_id'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'user_id'">
               <user :value="col.value" />
             </div>
 
-            <div v-else-if="col.name === 'teams'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'teams'">
               <communications-teams :teams="col.value" />
             </div>
 
-            <div v-else-if="col.name === 'broadcast'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'broadcast'">
               <broadcast :value="props.row.broadcast_id" />
             </div>
 
-            <div v-else-if="col.name === 'workflow'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'workflow'">
               <workflow :value="props.row.workflow_id" />
             </div>
 
-            <div v-else-if="col.name === 'duration'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'duration'">
               <duration :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'resolution2'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'resolution2'">
               <resolution :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'lead_location'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'lead_location'">
               <location :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'line'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'line'">
               <lines :value="props.row.campaign_id" />
             </div>
 
-            <div v-else-if="col.name === 'attempting_users'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'attempting_users'">
               <attempting-users :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'transfer_prior_user_ids'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'transfer_prior_user_ids'">
               <transferred prop="transfer_prior_user_ids"
                            :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'transfer_target_user_ids'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'transfer_target_user_ids'">
               <transferred prop="transfer_target_user_ids"
                            :row="props.row" />
             </div>
 
             <div data-testid="cold-transfer-row"
-                 v-else-if="col.name === 'in_cold_transfer'"
-            >
+                 :style="col.columnStyle"
+                 v-else-if="col.name === 'in_cold_transfer'">
               <span>{{ props.row.in_cold_transfer ? 'Yes' : 'No' }}</span>
             </div>
 
-            <div v-else-if="col.name === 'transfer_type'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'transfer_type'">
               <transfer-type :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'callback_status'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'callback_status'">
               <callback-status :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'queue_resolution2'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'queue_resolution2'">
               <queue-resolution :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'creator_type'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'creator_type'">
               <creator-type :row="props.row" />
             </div>
 
-            <template v-else-if="col.name === 'tags'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'tags'">
               <communications-tags :communication="props.row" />
-            </template>
+            </div>
 
-            <div v-else-if="col.name === 'notes'">
-              <wallboard-calls-note style="width: 200px; white-space: normal;"
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'notes'">
+              <wallboard-calls-note ellipse
+                                    :style="col.columnStyle"
                                     :communication="props.row" />
             </div>
 
-            <template v-else-if="col.name === 'csat_score'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'csat_score'">
               <csat-score :row="props.row" />
-            </template>
+            </div>
 
             <div v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
