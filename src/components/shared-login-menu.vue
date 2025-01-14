@@ -121,7 +121,7 @@ export default {
     },
 
     isAiEngineEnabled () {
-      return (this.currentCompany?.transcription_settings?.call_transcription_enabled &&
+      return (!this.isSimpSocial && this.currentCompany?.transcription_settings?.call_transcription_enabled &&
              (this.currentCompany?.used_transcription_min < this.currentCompany?.plan?.included_transcription_min || !this.currentCompany?.transcription_settings?.overusage_restriction_enabled))
     },
 

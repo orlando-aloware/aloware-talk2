@@ -922,7 +922,7 @@
           <a href="https://aloware.com/solutions/ai-voice-analytics"
             target="_blank"
             class="text-primary font-weight-bold">
-            Learn more.
+            Learn more
           </a>
         </div>
       </div>
@@ -1165,7 +1165,8 @@ export default {
       return (
         this.communication.type === CommunicationTypes.CALL &&
         this.showAudio(this.communication) &&
-        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status)) &&
+        !this.isSimpSocial
       )
     },
 
@@ -1173,7 +1174,8 @@ export default {
       return this.currentCompany?.transcription_enabled &&
       this.communication.type === CommunicationTypes.CALL &&
       this.showAudio(this.communication) &&
-      !this.currentCompany?.transcription_settings?.call_transcription_enabled
+      !this.currentCompany?.transcription_settings?.call_transcription_enabled &&
+      !this.isSimpSocial
     }
   },
 
