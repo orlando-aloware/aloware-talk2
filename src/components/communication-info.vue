@@ -907,7 +907,7 @@
       </div>
     </div>
     <div class="ai-effect-container mt-2"
-         v-else-if="currentCompany?.transcription_enabled">
+         v-else-if="isAvaPromotionDialogVisible">
       <div class="ai-effect-gradient"></div>
       <div class="ai-effect-blur"></div>
       <div class="ai-effect-content p-2">
@@ -1164,10 +1164,17 @@ export default {
       ]
 
       return (
-        this.CommunicationTypes.CALL &&
+        this.communication.type === CommunicationTypes.CALL &&
         this.showAudio(this.communication) &&
         (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
       )
+    },
+
+    isAvaPromotionDialogVisible () {
+      currentCompany?.transcription_enabled &&
+      this.communication.type === CommunicationTypes.CALL
+      this.showAudio(this.communication) &&
+      !this.currentCompany?.transcription_settings?.call_transcription_enabled
     }
   },
 
