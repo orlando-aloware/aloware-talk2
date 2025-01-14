@@ -1,7 +1,7 @@
 
 <template>
   <div class="d-flex flex-column">
-    <span>{{ value | fixFullDateUTCRelative }}</span>
+    <span>{{ value | fixFullDateTime }}</span>
     <div class="d-flex align-items-center text-xs"
          data-testid="start-time-row"
          v-if="row.call_disposition_id">
@@ -57,9 +57,11 @@ import { callDispositionMixin } from 'src/plugins/mixins'
 import CommunicationAudio from 'components/communication-audio.vue'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import TranscriptionModal from 'components/communication/transcription-modal.vue'
+import { fixFullDateTime } from 'src/plugins/filters/datetime.filters'
 
 export default {
   name: 'StartTime',
+  methods: { fixFullDateTime },
 
   mixins: [callDispositionMixin],
 
