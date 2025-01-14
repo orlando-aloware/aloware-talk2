@@ -113,7 +113,7 @@
                                width="16"
                                color="#62666E"/>
                     <q-tooltip>
-                      Pin this list
+                      {{ pinnedLists.includes(props.row.id) ? 'Unpin this list' : 'Pin this list' }}
                     </q-tooltip>
                   </span>
                 </div>
@@ -217,6 +217,12 @@
                                    v-if="list"
                                    @closed="convertToPublicDialog = false"
                                    @converted="onListConvertedToPublic"/>
+
+    <move-dialog />
+
+    <tag-contacts-workflow-enroller :is-show="showAddToSequence"
+                                    :list="list"
+                                    @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
   </div>
 </template>
 
@@ -235,7 +241,8 @@ import LogoutIcon from 'components/icons/logout-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
-import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog.vue'
+import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
 
@@ -266,7 +273,8 @@ export default {
     EyeIcon,
     AddCallIcon,
     AddUserIcon,
-    LogoutIcon
+    LogoutIcon,
+    TagContactsWorkflowEnroller
   },
 
   data () {
@@ -286,7 +294,9 @@ export default {
       isOpenListForm: false,
       list: null,
 
-      convertToPublicDialog: false
+      convertToPublicDialog: false,
+      pinnedLists: [],
+      showAddToSequence: false
     }
   },
 
@@ -294,9 +304,13 @@ export default {
     await this.getLists()
     this.calculateTotalPages()
     this.listsData = this.lists
+    await this.getPinnedLists()
   },
 
   computed: {
+    ...mapGetters('contacts', [
+      'pinned'
+    ]),
     ...mapState('listsModule', [
       'isListsLoading'
     ]),
@@ -368,10 +382,20 @@ export default {
     fixedColumns () {
       const allColumns = this.$jsonClone(this.COLUMNS)
       return this.getResponsiveColumns(allColumns, this.columnsByViewport)
+    },
+
+    isPinned () {
+      return Array.isArray(this.pinnedLists)
+        ? this.pinnedLists.includes(this.list.id)
+        : false
     }
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'listPinToggled'
+    ]),
+
     ...mapActions('listsModule', [
       'fetchLists',
       'deleteList'
@@ -561,6 +585,51 @@ export default {
 
         return item
       })
+    },
+
+    getPinnedLists () {
+      this.pinnedLists = []
+      this.$axios.get('/api/v2/contact-list-bookmark')
+        .then((response) => response.data)
+        .then((data) => {
+          for (let i = 0; i < data.length; i++) {
+            this.pinnedLists.push(data[i].contact_list_id)
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$generalNotification('Unable to load lists please try again.', 'error')
+        })
+    },
+
+    onPinList (list) {
+      this.list = list
+      const isPinned = !this.isPinned
+
+      this.pinRequest(this.list.id, isPinned).finally(() => {
+        this.getPinnedLists()
+        this.$generalNotification((isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.'))
+      })
+    },
+
+    pinRequest (id, isPinned) {
+      if (isPinned) {
+        return this.$axios.post('/api/v2/contact-list-bookmark', {
+          contact_list_id: id,
+          order: id
+        })
+      } else {
+        return this.$axios.delete('/api/v2/contact-list-bookmark/' + id)
+      }
+    },
+
+    onEnrollContactsToSequence (list) { // openAddToSequence
+      this.list = list
+      this.showAddToSequence = true
+    },
+
+    closeAddToSequence () {
+      this.showAddToSequence = false
     }
   }
 }
