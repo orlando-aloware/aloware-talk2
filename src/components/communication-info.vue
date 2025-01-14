@@ -891,7 +891,7 @@
           </div>
         </div>
         <div class="text-left-align text-15"
-             v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
+             v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR && fileUuid && isMigrated">
           <div>Transcription generation failed. Please try again later. </div>
           <generate-transcription-button class="mr-2"
                                          variant="button"
@@ -1171,8 +1171,8 @@ export default {
     },
 
     isAvaPromotionDialogVisible () {
-      this.currentCompany?.transcription_enabled &&
-      this.communication.type === CommunicationTypes.CALL
+      return this.currentCompany?.transcription_enabled &&
+      this.communication.type === CommunicationTypes.CALL &&
       this.showAudio(this.communication) &&
       !this.currentCompany?.transcription_settings?.call_transcription_enabled
     }
