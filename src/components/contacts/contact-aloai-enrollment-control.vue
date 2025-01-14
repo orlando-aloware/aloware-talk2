@@ -20,7 +20,7 @@
 
       <b-card-text class="fs-14 mt-2">
         <span v-if="hasBotEnrollments">Currently enrolled to:</span>
-        <span v-else>Enroll this contact to any of your Sales Bots and let them do the work for you!</span>
+        <span v-else>Enroll this contact to any of your Outbound Text Bots and let them do the work for you!</span>
       </b-card-text>
 
       <b-card-text
@@ -43,10 +43,10 @@
           <!-- Bot Use Case Badge -->
           <p class="mb-0 text-muted fs-13 mt-1">
             <q-badge
-              :color="useCaseColor(displayedBot?.use_case)"
+              :color="directionColor(displayedBot?.direction)"
               class="mr-1"
             >
-              <span>{{ formatUseCase(displayedBot?.use_case) }}</span>
+              <span>{{ formatDirection(displayedBot?.direction) }}</span>
             </q-badge>
           </p>
         </b-media>

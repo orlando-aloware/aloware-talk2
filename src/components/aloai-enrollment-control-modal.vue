@@ -13,7 +13,7 @@
         AloAi Text Bot Enrollment
       </h1>
       <div class="text-center">
-        Select the Sales Bot you want to initiate a conversation with this contact.
+        Select the Outbound Text Bot you want to initiate a conversation with this contact.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search placeholder="Search bot"
@@ -44,7 +44,7 @@
                 class="ml-1"
                 color="green-6"
               >
-                <span>Enrolled</span>
+                <span class="custom-badge-margin-text">Enrolled</span>
               </q-badge>
             </b-form-radio>
           </label>
@@ -94,7 +94,7 @@ export default {
     },
     // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
     filteredSalesBots () {
-      let bots = this.bots.filter((bot) => bot.use_case === AloAi.USE_CASE_SALES)
+      let bots = this.bots.filter((bot) => bot.direction === AloAi.DIRECTION_OUTBOUND)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -277,5 +277,8 @@ export default {
 .aloai-enrollment-control-bots-list {
   max-height: 300px;
   overflow-y: auto;
+}
+.custom-badge-margin-text {
+  margin-top: 1px;
 }
 </style>

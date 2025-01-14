@@ -3,25 +3,22 @@ import * as AloAi from '../../constants/aloai'
 
 export default _.merge({
   methods: {
-    formatUseCase (useCase) {
-      switch (useCase) {
-        case AloAi.USE_CASE_SALES:
-          return 'Sales'
-        case AloAi.USE_CASE_QUESTION_AND_ANSWER:
-          return 'Q&A'
-        case AloAi.USE_CASE_SUPPORT:
-          return 'Support'
+    formatDirection (direction) {
+      switch (direction) {
+        case AloAi.DIRECTION_INBOUND:
+          return 'Inbound'
+        case AloAi.DIRECTION_OUTBOUND:
+          return 'Outbound'
         default:
           return 'Unknown'
       }
     },
-    useCaseColor (status) {
+    directionColor (direction) {
       return (
         {
-          [AloAi.USE_CASE_SALES]: 'green-6',
-          [AloAi.USE_CASE_SUPPORT]: 'blue-gray-6',
-          [AloAi.USE_CASE_QUESTION_AND_ANSWER]: 'orange-6'
-        }[status] || 'black'
+          [AloAi.DIRECTION_INBOUND]: 'blue-6',
+          [AloAi.DIRECTION_OUTBOUND]: 'green-6'
+        }[direction] || 'black'
       )
     }
   }
