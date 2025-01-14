@@ -128,7 +128,7 @@ export default {
     avaPromotionButtonLabel () {
       return this.isAiEngineEnabled
         ? 'AI Engine Ready'
-        : `AI Engine<span style="color: #fa003f; font-weight: bold;">Off</span>`
+        : `AI Engine<span class="font-weight-bold" style="color: #fa003f;">Off</span>`
     }
   },
 

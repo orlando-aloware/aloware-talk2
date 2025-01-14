@@ -891,7 +891,7 @@
           </div>
         </div>
         <div class="text-left-align text-15"
-             v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR && fileUuid && isMigrated">
+             v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
           <div>Transcription generation failed. Please try again later. </div>
           <generate-transcription-button class="mr-2"
                                          variant="button"
