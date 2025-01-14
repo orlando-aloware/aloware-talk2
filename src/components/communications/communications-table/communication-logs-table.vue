@@ -100,12 +100,8 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'user_id'">
-              <user :value="col.value" />
-            </div>
-
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'teams'">
-              <communications-teams :teams="col.value" />
+              <user :value="col.value"
+                    :row="props.row"/>
             </div>
 
             <div :style="col.columnStyle"
@@ -258,7 +254,6 @@ import SearchInput from 'components/search-input'
 import CompactBtn from 'components/compact-btn'
 import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
-import CommunicationsTeams from './communications-teams.vue'
 import StartTime from './start-time.vue'
 import CommunicationsFilters from 'src/components/communications/communications-filters.vue'
 import CommunicationsOperations from './communications-operations.vue'
@@ -308,7 +303,6 @@ export default {
     CommunicationsOperations,
     CommunicationTableSettings,
     CommunicationsTags,
-    CommunicationsTeams,
     RingGroup,
     Disposition,
     StartTime,
@@ -345,7 +339,6 @@ export default {
       cancelToken: null,
       paginated: false,
       showColumnHeadersModal: false,
-      expandedTeams: {},
       showCommunicationSidebar: false,
       sidebarCommunication: {}
     }
