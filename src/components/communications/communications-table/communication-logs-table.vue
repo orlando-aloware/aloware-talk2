@@ -489,11 +489,11 @@ export default {
   },
 
   mounted () {
-    if (this.hasPermissionTo('list communication')) {
+    /* if (this.hasPermissionTo('list communication')) {
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
-    }
+    } */
   }
 }
 </script>

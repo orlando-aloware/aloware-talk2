@@ -34,8 +34,8 @@ export default function () {
         disabled: false,
         type: 'call',
         answerStatus: 'all'
-      },
-      {
+      }
+      /* {
         label: 'Messages',
         value: 'messages',
         icon: 'message',
@@ -59,7 +59,7 @@ export default function () {
         type: 'call',
         answerStatus: 'recorded'
       }
-      /* {
+       {
         label: 'Mentions',
         value: 'mentions',
         icon: 'mention',

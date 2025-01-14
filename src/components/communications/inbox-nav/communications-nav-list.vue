@@ -154,7 +154,7 @@ export default {
         WAT-1105: the channels and view are being moved to this communications menu
         but for now we will only being displayed the communications logs
       */
-      if (this.hasNewCommunicationsFeatureEnabled) { return this.navListItems.filter(item => item.default) } // only shows the default "communications logs"
+      // if (this.hasNewCommunicationsFeatureEnabled) { return this.navListItems.filter(item => item.default) } // only shows the default "communications logs"
 
       if (this.profile?.campaign_id) {
         return this.navListItems

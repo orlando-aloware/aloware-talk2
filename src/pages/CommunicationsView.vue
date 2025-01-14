@@ -183,6 +183,15 @@ export default {
       this.setChannel(isNotInboxRouteName)
     },
 
+    '$route.params.channel': function (newVal) {
+      this.resetCommunications()
+      console.log('entering here, for changing to channel', newVal)
+      // if (newVal === DEFAULT_COMMUNICATIONS_CHANNEL) {
+
+      this.getCommunications(this.communicationFilters)
+      // }
+    },
+
     isLoadedPinnedViews (value) {
       if (value && this.$route.name === COMMUNICATIONS_VIEWS_ROUTE_NAME) {
         this.setChannel()

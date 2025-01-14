@@ -1015,14 +1015,5 @@ export default {
     this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
-  },
-
-  watch: {
-    '$route.params.channel': function (newVal) {
-      this.resetCommunications()
-      if (newVal === DEFAULT_COMMUNICATIONS_CHANNEL) {
-        this.getCommunications(this.communicationFilters)
-      }
-    }
   }
 }
