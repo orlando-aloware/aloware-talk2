@@ -1,11 +1,10 @@
 <template>
   <div class="d-flex flex-column"
        data-testid="user-row">
-    <router-link target='_blank'
-                 :to="{ path: `/broadcasts/${value}` }"
-                 v-if="broadcast.id">
+    <span class="ellipse"
+          v-if="broadcast.id">
       {{ broadcast.name || '-' }}
-    </router-link>
+    </span>
     <span v-else>
       -
     </span>
