@@ -197,6 +197,7 @@ export default {
         'creator_type',
         'dynamic_engagement_date_range',
         'has_unread',
+        'unread_only',
         'has_international',
         'type'
       ],
@@ -207,6 +208,7 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'my_contact',
+        'unread_only',
         'has_unread',
         'has_international'
       ],

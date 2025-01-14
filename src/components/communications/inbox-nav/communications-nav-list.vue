@@ -243,6 +243,7 @@ export default {
       'setActiveChannel',
       'setSelectedFilter',
       'resetChannelChangedFilterFields',
+      'toggleFilterDialogWithFilters',
       'setAppliedFilter',
       'setInbox',
       'setInboxFilters',
@@ -257,7 +258,6 @@ export default {
     onItemClicked (nextActive) {
       this.onCloseViewsList()
       this.resetFilter()
-      this.setIsFirstLoad(true)
 
       this.active = nextActive
       const isView = nextActive.indexOf('view') !== -1
@@ -302,7 +302,6 @@ export default {
           console.log(err)
           this.$handleErrors(err.response)
         })
-
         return
       }
 
@@ -402,14 +401,15 @@ export default {
     },
 
     resetFilter () {
-      this.fetchInboxTaskCounts()
-      this.filter = { ...this.channelDefaultFilterModel.filter }
-      this.setChannelClonedFilter(this.filter)
+      const filter = { ...this.channelDefaultFilterModel.filter }
+
+      this.setChannelClonedFilter(filter)
       this.resetChannelChangedFilterFields()
       this.setSelectedFilter(null)
       this.setAppliedFilter(null)
+      this.toggleFilterDialogWithFilters(true)
       this.setIsFirstLoad(true)
-      this.setInboxFilters(this.filter)
+      this.setInboxFilters(filter)
     }
   },
 
