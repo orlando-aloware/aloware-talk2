@@ -1171,7 +1171,7 @@ export default {
     },
 
     isAvaPromotionDialogVisible () {
-      currentCompany?.transcription_enabled &&
+      this.currentCompany?.transcription_enabled &&
       this.communication.type === CommunicationTypes.CALL
       this.showAudio(this.communication) &&
       !this.currentCompany?.transcription_settings?.call_transcription_enabled
