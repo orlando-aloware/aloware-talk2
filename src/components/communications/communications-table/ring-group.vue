@@ -1,5 +1,6 @@
 <template>
-  <div data-testid="ring-group-row">
+  <div class="ellipse"
+       data-testid="ring-group-row">
     <span v-if="isAgent && row.ring_group_id">
       {{ ringGroup.name }}
     </span>

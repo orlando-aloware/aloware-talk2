@@ -1,10 +1,14 @@
 <template>
   <div class="d-flex flex-column"
        data-testid="user-row">
-    <router-link target='_blank'
-                 :to="{ path: `/broadcasts/${value}` }"
+    <router-link class="ellipse"
+                 target='_blank'
+                 :to="broadcastActivityParams"
                  v-if="broadcast.id">
       {{ broadcast.name || '-' }}
+      <q-tooltip>
+        Click to see Broadcast activity's page
+      </q-tooltip>
     </router-link>
     <span v-else>
       -
@@ -30,6 +34,18 @@ export default {
 
     broadcast () {
       return this.broadcasts.find(broadcast => broadcast.id === this.value) || {}
+    },
+
+    broadcastActivityParams () {
+      return {
+        name: 'Inbox Channel',
+        params: {
+          channel: 'all-communications'
+        },
+        query: {
+          broadcastIds: this.value
+        }
+      }
     }
   }
 }

@@ -181,7 +181,8 @@ export default {
               name: field.name,
               field: field.name,
               align: field.align,
-              style: field.style
+              headerStyle: field.headerStyle,
+              columnStyle: field.columnStyle
             }
           }
           return null
@@ -198,7 +199,8 @@ export default {
               name: field.name,
               field: field.name,
               align: field.align,
-              style: field.style
+              headerStyle: field.headerStyle,
+              columnStyle: field.columnStyle
             }
           }
           return null
@@ -216,7 +218,8 @@ export default {
               name: field.name,
               field: field.name,
               align: field.align,
-              style: field.style
+              headerStyle: field.headerStyle,
+              columnStyle: field.columnStyle
             }
           }
           return null
