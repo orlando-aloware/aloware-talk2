@@ -906,6 +906,28 @@
         </div>
       </div>
     </div>
+    <div class="ai-effect-container mt-2"
+         v-else-if="currentCompany?.transcription_enabled">
+      <div class="ai-effect-gradient"></div>
+      <div class="ai-effect-blur"></div>
+      <div class="ai-effect-content p-2">
+        <div class="flex items-center gap-2">
+          <h3 class="ai-effect-gradient-text">
+            Powered by AloAi
+            <sparkle-icon width="16" height="16" color="#9333EA"/>
+          </h3>
+        </div>
+        <div class="text-left-align text-15 font-weight-light-bold my-2">
+          Unlock AloAi's power – Boost productivity.
+          <br>
+          <a href="https://aloware.com/solutions/ai-voice-analytics"
+            target="_blank"
+            class="text-primary font-weight-bold">
+            Learn more!
+          </a>
+        </div>
+      </div>
+    </div>
     <aloai-promotion-dialog :dialogVisible="showInfoBox"
                             @update:dialogVisible="showInfoBox = $event" />
   </div>
