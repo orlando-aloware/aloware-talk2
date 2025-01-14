@@ -2,7 +2,8 @@
   <div class="d-flex flex-column"
        data-testid="transferred-from-row">
     <div v-if="!isAgent && row[prop]?.length">
-      <router-link :key="index"
+      <router-link class="ellipse"
+                   :key="index"
                    :to="{ path: getUserActivityURL(userId) }"
                    v-for="(userId, index) in row[prop]">
         {{ getUserName(getUser(userId)) }}
@@ -10,7 +11,7 @@
     </div>
 
     <div v-else-if="row[prop]?.length">
-      <span class="text-blue cursor-pointer"
+      <span class="text-blue cursor-pointer ellipse"
             :key="index"
             v-for="(userId, index) in row[prop]">
           {{ getUserName(getUser(userId)) }}
