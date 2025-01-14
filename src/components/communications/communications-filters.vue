@@ -31,7 +31,7 @@
                    v-model="filter"
                    @createNewFilter="onCreateNewFilter"
                    @applyFilter="onApplyFilter"
-                   @onResetFilter="resetFilters" />
+                   @onResetFilter="onResetFilters" />
 
     <create-filter-dialog :filter-model="newFilterModel"
                           data-testid="comms-channels-create-filter-dialog"
@@ -121,7 +121,7 @@ export default {
     },
 
     hasChannelFilterChanges () {
-      return this.channelChangedFilterFields.length > 0
+      return this.changedFilterFieldCount > 0
     }
 
   },
@@ -249,14 +249,9 @@ export default {
     },
 
     onResetFilters () {
-      sessionStorage.removeItem('date-selected-comms')
-      // TODO: reset filters
-      this.resetFilters()
-      this.setSelectedFilter(null)
-    },
-
-    resetFilters () {
       // this.filter = _.clone(Filters.DEFAULT_STATE.filter)
+      sessionStorage.removeItem('date-selected-comms')
+
       this.filter = { ...this.channelDefaultFilterModel.filter }
 
       this.filter.per_page = 20
@@ -288,10 +283,10 @@ export default {
 
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
+      this.setSelectedFilter(null)
       this.setCommunications([])
       this.setIsFirstLoad(true)
       this.setAppliedFilter(null)
-      this.setInboxFilters(null)
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
@@ -307,6 +302,10 @@ export default {
       deep: true,
       immediate: true
     }
+  },
+
+  beforeDestroy () {
+    this.onResetFilters()
   }
 }
 </script>
