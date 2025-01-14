@@ -1,12 +1,13 @@
 <template>
   <div v-if="profile && canSwitchApps"
        class="bridge-menu-wrapper">
-    <q-btn v-if="showAloAiPromotionButton"
+    <q-btn v-if="showAvaPromotionButton"
            outline
            class="q-btn-standard q-mr-md"
+           :style="{ border: !isAiEngineEnabled ? '2px solid #fa003f' : '' }"
            @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
-      <sparkle-icon width="16" height="16" color="#9333EA"/>
-      <span>{{ aiEngineButtonTitle }}</span>
+      <sparkle-icon width="16" height="16" :color="isAiEngineEnabled ? '#9333EA' : '#fa003f'"/>
+      <span v-html="avaPromotionButtonLabel"></span>
     </q-btn>
     <q-btn v-if="isAdmin || isSupervisor"
            outline
@@ -103,7 +104,7 @@ export default {
       return false
     },
 
-    showAloAiPromotionButton () {
+    showAvaPromotionButton () {
       return this.currentCompany?.transcription_enabled && this.screenWidth >= 1200
     },
 
@@ -119,11 +120,15 @@ export default {
       return `${this.getClassicURL(this.isSimpSocial)}?from_talk_2=1&token=${storage.local.getItem('shared_cookie')}`
     },
 
-    aiEngineButtonTitle () {
-      return (this.currentCompany?.transcription_settings?.call_transcription_enabled &&
+    isAiEngineEnabled () {
+      return (!this.isSimpSocial && this.currentCompany?.transcription_settings?.call_transcription_enabled &&
              (this.currentCompany?.used_transcription_min < this.currentCompany?.plan?.included_transcription_min || !this.currentCompany?.transcription_settings?.overusage_restriction_enabled))
+    },
+
+    avaPromotionButtonLabel () {
+      return this.isAiEngineEnabled
         ? 'AI Engine Ready'
-        : 'AI Engine Off'
+        : `AI Engine<span class="font-weight-bold" style="color: #fa003f;">Off</span>`
     }
   },
 

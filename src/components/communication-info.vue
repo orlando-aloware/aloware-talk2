@@ -906,6 +906,27 @@
         </div>
       </div>
     </div>
+    <div class="ai-effect-container mt-2"
+         v-else-if="isAvaPromotionDialogVisible">
+      <div class="ai-effect-gradient"></div>
+      <div class="ai-effect-blur"></div>
+      <div class="ai-effect-content p-2">
+        <div class="flex items-center gap-2">
+          <h3 class="ai-effect-gradient-text">
+            Powered by AloAi
+            <sparkle-icon width="16" height="16" color="#9333EA"/>
+          </h3>
+        </div>
+        <div class="text-left-align text-15 font-weight-light-bold my-2">
+          Get call transcriptions, executive summaries, and action items by AloAi.
+          <a href="https://aloware.com/solutions/ai-voice-analytics"
+            target="_blank"
+            class="text-primary font-weight-bold">
+            Learn more
+          </a>
+        </div>
+      </div>
+    </div>
     <aloai-promotion-dialog :dialogVisible="showInfoBox"
                             @update:dialogVisible="showInfoBox = $event" />
   </div>
@@ -1142,10 +1163,19 @@ export default {
       ]
 
       return (
-        this.CommunicationTypes.CALL &&
+        this.communication.type === CommunicationTypes.CALL &&
         this.showAudio(this.communication) &&
-        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status)) &&
+        !this.isSimpSocial
       )
+    },
+
+    isAvaPromotionDialogVisible () {
+      return this.currentCompany?.transcription_enabled &&
+      this.communication.type === CommunicationTypes.CALL &&
+      this.showAudio(this.communication) &&
+      !this.currentCompany?.transcription_settings?.call_transcription_enabled &&
+      !this.isSimpSocial
     }
   },
 
