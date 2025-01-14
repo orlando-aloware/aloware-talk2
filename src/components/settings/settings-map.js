@@ -348,36 +348,6 @@ const SettingsMap = {
     hash_keyword: 'notify-when-reminder-is-assigned',
     visible: true
   },
-
-  'account_level_notifications': {
-    title: 'Account Level Notifications (Admins Only)',
-    description: 'Account Level Notifications',
-    route: '/settings/notification',
-    hash_keyword: 'account-level-notifications',
-    tag: 'account-level-notifications',
-    visible: true
-  },
-  'enabled_integration_reports': {
-    title: 'Sync Reports',
-    description: 'Sync Reports',
-    route: '/settings/notification',
-    hash_keyword: 'sync-reports',
-    visible: true
-  },
-  'enabled_account_reports': {
-    title: 'Account Reports',
-    description: 'Account Reports',
-    route: '/settings/notification',
-    hash_keyword: 'account-reports',
-    visible: true
-  },
-  'enabled_other_reports': {
-    title: 'Other Reports',
-    description: 'Other Reports',
-    route: '/settings/notification',
-    hash_keyword: 'other-reports',
-    visible: true
-  },
   'reminders_options': {
     title: 'Event Notifications',
     description: 'Notify this user for appointment or reminder events.',
