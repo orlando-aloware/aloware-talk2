@@ -44,8 +44,8 @@ export const ALL_COLUMNS = [
     label: 'Start Time',
     name: 'created_at',
     align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   },
   {
     label: 'Talk Time',
@@ -225,8 +225,8 @@ export const DEFAULT_COLUMNS = [
     name: 'created_at',
     field: 'created_at',
     align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   },
   {
     label: 'Talk Time',
