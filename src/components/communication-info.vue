@@ -918,12 +918,11 @@
           </h3>
         </div>
         <div class="text-left-align text-15 font-weight-light-bold my-2">
-          Unlock AloAi's power – Boost productivity.
-          <br>
+          Get call transcriptions, executive summaries, and action items by AloAi.
           <a href="https://aloware.com/solutions/ai-voice-analytics"
             target="_blank"
             class="text-primary font-weight-bold">
-            Learn more!
+            Learn more.
           </a>
         </div>
       </div>
