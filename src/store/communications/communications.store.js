@@ -34,14 +34,6 @@ export default function () {
         disabled: false,
         type: 'call',
         answerStatus: 'all'
-      }
-      /* {
-        label: 'Messages',
-        value: 'messages',
-        icon: 'message',
-        disabled: false,
-        type: 'sms',
-        answerStatus: 'all'
       },
       {
         label: 'Voicemails',
@@ -50,6 +42,14 @@ export default function () {
         disabled: false,
         type: 'call',
         answerStatus: 'voicemail'
+      }
+      /* {
+        label: 'Messages',
+        value: 'messages',
+        icon: 'message',
+        disabled: false,
+        type: 'sms',
+        answerStatus: 'all'
       },
       {
         label: 'Call Recordings',

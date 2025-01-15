@@ -185,10 +185,6 @@ export default {
       }
     },
 
-    onItemSelected (routeData) {
-      this.$emit('itemSelected', routeData)
-    },
-
     togglePageHeader () {
       if (this.isShowPageHeader) {
         this.setShowContactsHeader(true)
@@ -201,12 +197,6 @@ export default {
 
   watch: {
     $route (to, from) {
-      // TODO: make this as route level please!
-      if (to.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME) {
-        const channel = this.navListItems.find(item => item.value === DEFAULT_COMMUNICATIONS_CHANNEL)
-        this.setActiveChannel(channel)
-      }
-
       this.togglePageHeader()
     },
 

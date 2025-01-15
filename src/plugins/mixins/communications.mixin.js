@@ -798,7 +798,7 @@ export default {
     },
 
     getCommunicationType () {
-      switch (this.$route.params.channel) {
+      switch (this.activeChannel.value) {
         case DEFAULT_COMMUNICATIONS_CHANNEL:
         case 'my-personal-line':
           return 'all'
@@ -809,7 +809,7 @@ export default {
         case 'messages':
           return 'sms'
         default:
-          return this.$route.params.channel
+          return this.activeChannel
       }
     },
 
@@ -824,6 +824,8 @@ export default {
       }
 
       // let params = this.$jsonClone(filters)
+      console.log('active channel in the mixin', this.activeChannel)
+      console.log('communication type', this.getCommunicationType())
       let params = {
         from_date: '',
         to_date: '',
@@ -905,6 +907,8 @@ export default {
         this.getCommunicationsCount(params)
       }
 
+      console.log('params for query', params)
+
       return api.get({
         params: params,
         cancelToken: this.source.token,
@@ -912,7 +916,7 @@ export default {
       })
         .then(response => {
           if (response) {
-            this.gettingTasksList(false)
+            // this.gettingTasksList(false)
             const data = response.data.data
             console.log('data fetched', data)
             if (isLoadMore && data.length > 0) {
@@ -944,7 +948,7 @@ export default {
             return
           }
 
-          this.gettingTasksList(false)
+          // this.gettingTasksList(false)
           this.communicationsListHasError = true
           const channelName = this.$route.params.channel !== 'mentions'
             ? 'communications'
