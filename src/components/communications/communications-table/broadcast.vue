@@ -10,7 +10,8 @@
         Click to see Broadcast activity's page
       </q-tooltip>
     </router-link>
-    <span v-else-if="broadcast.id">
+    <span class="ellipse"
+          v-else-if="broadcast.id">
       {{ broadcast.name || '-' }}
     </span>
     <span v-else>
