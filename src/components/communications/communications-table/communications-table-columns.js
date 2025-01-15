@@ -104,7 +104,7 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 250px'
   },
   {
-    label: 'Attempting',
+    label: 'Attempted Users',
     name: 'attempting_users',
     align: 'left',
     headerStyle: 'min-width: 250px',

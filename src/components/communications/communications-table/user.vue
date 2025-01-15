@@ -3,11 +3,11 @@
        data-testid="user-row">
     <i class="fa-solid fa-users text-primary mr-1"
        :id="`teams-${_uid}`"
-       v-if="row?.teams.length" />
+       v-if="row.teams?.length" />
 
     <b-popover triggers="hover"
                :target="`teams-${_uid}`"
-               v-if="row?.teams.length">
+               v-if="row.teams?.length">
       <span class="d-block mb-1 small">
         <strong>Teams of this user:</strong>
       </span>
