@@ -113,21 +113,26 @@
                                width="16"
                                color="#62666E"/>
                     <q-tooltip>
-                      {{ pinnedLists.includes(props.row.id) ? 'Unpin this list' : 'Pin this list' }}
+                      {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
                     </q-tooltip>
                   </span>
                 </div>
 
                 <div class="operation-button mx-1"
-                     v-if="!props.row.show_in_public_folder && hasShowInPublicFolderPermission">
+                     v-if="hasShowInPublicFolderPermission">
                   <span class="cursor-pointer"
                         data-testid="lists-show-button"
                         @click="onShowInPublicFolderList(props.row)">
                     <eye-icon height="16"
                                width="16"
-                               color="#62666E"/>
+                              color="#62666E"
+                              v-if="!props.row.show_in_public_folder"/>
+                    <eye-off-icon height="16"
+                                  width="16"
+                                  color="#62666E"
+                                  v-else/>
                     <q-tooltip>
-                      Convert this list to public
+                      Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
                     </q-tooltip>
                   </span>
                 </div>
@@ -136,7 +141,7 @@
                   <span class="cursor-pointer"
                         data-testid="lists-edit-button"
                         @click="onEnrollContactsToSequence(props.row)">
-                    <add-user-icon height="16"
+                    <add-sequence-icon height="16"
                                    width="16"
                                    color="#62666E"/>
                     <q-tooltip>
@@ -212,17 +217,26 @@
 
     <convert-list-to-public-dialog :list-id="list.id"
                                    :list-name="list.name"
+                                   :list-show-in-public-folder="list.show_in_public_folder"
                                    :from-admin-list="true"
                                    v-model="convertToPublicDialog"
                                    v-if="list"
                                    @closed="convertToPublicDialog = false"
                                    @converted="onListConvertedToPublic"/>
 
-    <move-dialog />
-
     <tag-contacts-workflow-enroller :is-show="showAddToSequence"
                                     :list="list"
                                     @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
+
+    <power-dialer-add-modal :params="attachedParams()"
+                            :contact-list="list"
+                            :mode="addToPowerDialerMode"
+                            :show-in-contacts-page="true"
+                            :selected-all-count="list.no_of_contacts"
+                            :is-manual-selection="addToPowerDialerIsManualSelection"
+                            v-if="openPDModal"
+                            @hidden="openPDModal = false">
+      </power-dialer-add-modal>
   </div>
 </template>
 
@@ -232,17 +246,18 @@ import { COLUMNS } from 'src/constants/lists/home-columns'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
 import TrashIcon from 'components/icons/trash-icon.vue'
-import MoveIcon from 'components/icons/move-icon-2.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
 import EyeIcon from 'components/icons/eye-icon.vue'
+import EyeOffIcon from 'components/icons/eye-off-icon'
 import AddCallIcon from 'components/icons/add-call-icon.vue'
-import AddUserIcon from 'components/icons/add-user-icon-2.vue'
-import LogoutIcon from 'components/icons/logout-icon'
+import AddSequenceIcon from 'components/icons/add-sequence-icon'
+import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
 import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
 
@@ -268,13 +283,14 @@ export default {
     PencilIcon,
     TrashIcon,
     DuplicateIcon,
-    MoveIcon,
     PinIcon,
     EyeIcon,
+    EyeOffIcon,
     AddCallIcon,
-    AddUserIcon,
-    LogoutIcon,
-    TagContactsWorkflowEnroller
+    AddSequenceIcon,
+    ArrowRightIcon,
+    TagContactsWorkflowEnroller,
+    PowerDialerAddModal
   },
 
   data () {
@@ -296,7 +312,10 @@ export default {
 
       convertToPublicDialog: false,
       pinnedLists: [],
-      showAddToSequence: false
+      showAddToSequence: false,
+      openPDModal: false,
+      addToPowerDialerMode: 'add',
+      addToPowerDialerIsManualSelection: false
     }
   },
 
@@ -393,7 +412,8 @@ export default {
 
   methods: {
     ...mapActions('contacts', [
-      'listPinToggled'
+      'listPinToggled',
+      'addPowerDialerOpen'
     ]),
 
     ...mapActions('listsModule', [
@@ -576,11 +596,11 @@ export default {
     onListConvertedToPublic () {
       this.convertToPublicDialog = false
 
-      const { id } = this.list
+      const { id, show_in_public_folder: showInPublicFolder } = this.list
 
       this.listsData = this.listsData.map(item => {
         if (item.id === id) {
-          item.show_in_public_folder = true
+          item.show_in_public_folder = !showInPublicFolder
         }
 
         return item
@@ -630,6 +650,26 @@ export default {
 
     closeAddToSequence () {
       this.showAddToSequence = false
+    },
+
+    onAddListToPowerDialer (list) {
+      this.list = list
+      this.addToPowerDialerList(true)
+    },
+
+    addToPowerDialerList (isManualSelection = false) {
+      this.openPDModal = true
+      this.addPowerDialerOpen(true)
+      this.addToPowerDialerMode = 'add-contact-list'
+      this.addToPowerDialerIsManualSelection = isManualSelection
+    },
+
+    attachedParams () {
+      return {
+        list_id: this.list.id,
+        selected_all: true,
+        contact_ids: []
+      }
     }
   }
 }
