@@ -4,12 +4,16 @@
     <router-link class="ellipse"
                  target='_blank'
                  :to="broadcastActivityParams"
-                 v-if="broadcast.id">
+                 v-if="canUseBroadcast && broadcast.id">
       {{ broadcast.name || '-' }}
       <q-tooltip>
         Click to see Broadcast activity's page
       </q-tooltip>
     </router-link>
+    <span class="ellipse"
+          v-else-if="broadcast.id">
+      {{ broadcast.name || '-' }}
+    </span>
     <span v-else>
       -
     </span>
@@ -18,9 +22,14 @@
 
 <script>
 import { mapState } from 'vuex'
+import { broadcastsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'Broadcast',
+
+  mixins: [
+    broadcastsMixin
+  ],
 
   props: {
     value: {
