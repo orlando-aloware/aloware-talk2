@@ -90,13 +90,6 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 250px'
   },
   {
-    label: 'Lines',
-    name: 'line',
-    align: 'left',
-    headerStyle: 'min-width: 150px',
-    columnStyle: 'width: 150px'
-  },
-  {
     label: 'User',
     name: 'user_id',
     align: 'left',
