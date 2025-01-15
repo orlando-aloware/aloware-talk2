@@ -124,11 +124,6 @@
               <resolution :row="props.row" />
             </div>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'lead_location'">
-              <location :row="props.row" />
-            </div>
-
             <div v-else-if="col.name === 'attempting_users'">
               <attempting-users :row="props.row" />
             </div>
@@ -268,7 +263,6 @@ import User from './user.vue'
 import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
 import Resolution from './resolution.vue'
-import Location from './location.vue'
 import IncomingNumber from './incoming-number.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
@@ -315,7 +309,6 @@ export default {
     Broadcast,
     Workflow,
     Resolution,
-    Location,
     IncomingNumber,
     AttemptingUsers,
     Transferred,
