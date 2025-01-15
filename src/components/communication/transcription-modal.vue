@@ -131,11 +131,11 @@
                       align="left"
                       class="bg-white text-black border-bottom"
                       content-class="flex-nowrap">
-                <q-tab name="transcription"
-                       label="Transcription"/>
                 <q-tab name="summary"
                        label="Summary"
                        :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
+                <q-tab name="transcription"
+                       label="Transcription"/>
               </q-tabs>
               <q-tab-panels v-model="tabName">
                 <q-tab-panel class="p-0"
