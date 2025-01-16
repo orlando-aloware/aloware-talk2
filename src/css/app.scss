@@ -16029,8 +16029,9 @@ hr {
     }
 
     thead tr:first-child th {
-      top: -16px; // padding height
-      z-index: 1;
+      //top: -16px; // padding height
+      top: 0;
+      z-index: 3;
     }
 
     tr:first-child th:last-child {
@@ -16091,6 +16092,10 @@ hr {
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .q-table__linear-progress {
+      color: #256eff !important;
     }
   }
 

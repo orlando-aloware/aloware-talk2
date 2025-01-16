@@ -48,8 +48,7 @@
              :virtual-scroll-sticky-size-start="100"
              :pagination="pagination"
              :rows-per-page-options="[0]"
-             @virtual-scroll="onScroll"
-    >
+             @virtual-scroll="onScroll">
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td :props="props"
