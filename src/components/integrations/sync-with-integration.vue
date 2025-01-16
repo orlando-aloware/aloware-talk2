@@ -32,6 +32,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   simpsocialMixin
 } from 'src/plugins/mixins'
+import { SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'sync-with-integration',
@@ -69,7 +70,7 @@ export default {
       let apiCall
 
       switch (this.integration_name) {
-        case 'salesforce':
+        case SALESFORCE_INTEGRATION:
           apiCall = talk2Api.V1.contact.syncSalesforce(this.contact_id)
           break
         default:
@@ -79,12 +80,12 @@ export default {
       }
 
       apiCall.then(async _ => {
-        this.isSyncing = false
         await this.$emit('sync-complete')
       }).catch(e => {
         console.warn(e)
-        this.isSyncing = false
         this.$generalNotification('An error occurred during synchronization.', 'error')
+      }).finally(_ => {
+        this.isSyncing = false
       })
     }
   }

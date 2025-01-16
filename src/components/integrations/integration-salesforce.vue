@@ -86,7 +86,7 @@
                     <span class="data-value">{{ integrationData.other_phone }}</span>
                 </p>
             </q-card-section>
-          <sync-with-integration integration_name='salesforce'
+          <sync-with-integration :integration_name='integrationName()'
                                  :contact_id='contact.id'
                                  @sync-complete="afterSyncComplete"/>
         </q-card>
@@ -99,6 +99,7 @@ import {
   integrationMixin
 } from 'src/plugins/mixins'
 import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
+import { SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'integration-salesforce',
@@ -154,10 +155,13 @@ export default {
   },
 
   methods: {
+    integrationName () {
+      return SALESFORCE_INTEGRATION
+    },
     getData () {
       this.contactIntegrationDataLoaded = false
 
-      return this.getIntegrationData(this.contact, 'salesforce')
+      return this.getIntegrationData(this.contact, SALESFORCE_INTEGRATION)
         .then(response => {
           if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
             this.integrationData = response.data
