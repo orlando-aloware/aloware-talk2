@@ -10,8 +10,7 @@
                       :search="search"
                       :disabled="isLoadingDisabled"
                       data-testid="contacts-view-search-input"
-                      @search="onSearch"
-        />
+                      @search="onSearch" />
       </div>
 
       <div class="setting pr-3 align-items-center">
@@ -26,16 +25,13 @@
 
         <hr role="separator"
             aria-orientation="vertical"
-            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical"
-        >
+            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
 
         <communications-filters class="ml-2 mr-3" />
 
-        <compact-btn
-          variant="primary"
-          :compact="false"
-          @clicked="changeTableSettingsVisibility(true)"
-        >
+        <compact-btn variant="primary"
+                     :compact="false"
+                     @clicked="changeTableSettingsVisibility(true)">
           Table Settings
         </compact-btn>
       </div>
@@ -44,6 +40,7 @@
     <q-table class="communication-logs-table flex-grow-1"
              row-key="index"
              virtual-scroll
+             hide-bottom
              :data="communications"
              :columns="columns"
              :loading="isLoadingMore || isLoadingCommunications"
@@ -191,18 +188,6 @@
             </div>
           </q-td>
         </q-tr>
-      </template>
-      <template v-slot:loading>
-        <div class="d-flex justify-center">
-          <q-spinner-bars color="primary"
-                          size="30px" />
-        </div>
-      </template>
-      <template v-slot:no-data>
-        <div class="w-100 text-center"
-             v-if="!isLoadingMore && !isLoadingCommunications">
-          <h2> No data </h2>
-        </div>
       </template>
     </q-table>
 
