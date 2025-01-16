@@ -444,7 +444,7 @@ export default {
         },
 
         getCount (params) {
-          return window.axios.get(`${suffixV1}reports/communications/count`, params)
+          return window.axios.get(`${process.env.API_REPORTING_URL}${suffixV1}reports/communications/count`, params)
         }
       }
     },
