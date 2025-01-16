@@ -1,4 +1,4 @@
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 const DEFAULT_CHANNEL = {
   label: 'Communications Logs',
@@ -29,7 +29,7 @@ export default function () {
       },
       {
         label: 'Calls',
-        value: 'calls',
+        value: CALLS_CHANNEL,
         icon: 'call',
         disabled: false,
         type: 'call',
@@ -37,7 +37,7 @@ export default function () {
       },
       {
         label: 'Voicemails',
-        value: 'voicemails',
+        value: VOICEMAILS_CHANNEL,
         icon: 'voicemail',
         disabled: false,
         type: 'call',

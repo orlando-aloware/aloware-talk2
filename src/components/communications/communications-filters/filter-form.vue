@@ -535,7 +535,7 @@ import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { communicationsRoutesMixin, userMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import moment from 'moment'
-import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, VOICEMAILS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 import companyTimezoneMixin from 'src/plugins/mixins/company-timezone.mixin'
 
 const RANGE_1_DAY = 'Today'
@@ -660,14 +660,14 @@ export default {
     },
 
     isInboxOrAllCallsChannel () {
-      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', DEFAULT_COMMUNICATIONS_CHANNEL, 'view', 'my-personal-line']
+      const nonSmsChannels = ['inbox', CALLS_CHANNEL, 'recordings', VOICEMAILS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'view', 'my-personal-line']
 
       return this.isInboxOrInboxViews ||
         nonSmsChannels.includes(this.$route.params.channel)
     },
 
     isCallsOnlyChannel () {
-      const callsChannels = ['calls', DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
+      const callsChannels = [CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
 
       if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
         return this.isInboxOrInboxViews || callsChannels.includes(this.$route.params.channel)
@@ -677,7 +677,7 @@ export default {
     },
 
     isCallsAndRecordingsChannel () {
-      const allCallsChannels = ['calls', 'recordings', DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
+      const allCallsChannels = [CALLS_CHANNEL, 'recordings', DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
 
       if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
         return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)

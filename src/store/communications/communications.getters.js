@@ -1,6 +1,6 @@
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 export default {
   selectedFilter: (state) => state.selectedFilter,
@@ -26,7 +26,7 @@ export default {
       scope: 'user'
     }
 
-    if (channel === 'voicemails') {
+    if (channel === VOICEMAILS_CHANNEL) {
       defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
       defaultFilterModel.filter = {
         campaigns: Filters.DEFAULT_STATE.filter.campaigns,
@@ -53,7 +53,7 @@ export default {
       return defaultFilterModel
     }
 
-    if (['calls', 'recordings'].includes(channel)) {
+    if ([CALLS_CHANNEL, 'recordings'].includes(channel)) {
       defaultFilterModel.type = ChannelType.CHANNEL_CALLS
       defaultFilterModel.filter = {
         campaigns: Filters.DEFAULT_STATE.filter.campaigns,

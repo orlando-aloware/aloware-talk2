@@ -46,7 +46,7 @@ import CompactBtn from 'src/components/compact-btn'
 import FilterDialog from 'components/communications/communications-filters/filter-dialog'
 import CreateFilterDialog from 'components/communications/communications-filters/create-filter-dialog'
 
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 import { communicationsMixin } from 'src/plugins/mixins'
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
@@ -98,7 +98,8 @@ export default {
       if (this.activeChannel?.value) {
         return this.activeChannel?.value
       }
-      return 'calls'
+      // TODO: maybe should be all instead, just check
+      return CALLS_CHANNEL
     },
     changedFilterFieldCount () {
       const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
