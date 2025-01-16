@@ -278,19 +278,6 @@ export default _.merge({
     },
 
     /**
-     * Decides if the Calendar should be shown.
-     *
-     * @return {boolean}
-     */
-    shouldShowCalendar () {
-      if (this.currentCompany.calendar_enabled) {
-        return true
-      }
-
-      return false
-    },
-
-    /**
      * Decides if the PowerDialer should be shown.
      *
      * @return {boolean}

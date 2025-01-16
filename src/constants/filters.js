@@ -28,8 +28,10 @@ export const DEFAULT_STATE = {
     lrn_types: [],
     tags: [],
     campaigns: [],
+    contact_lists: [],
     workflows: [],
     ring_groups: [],
+    teams: [],
     incoming_numbers: [],
     users: [],
     timezone: window.timezone,
@@ -46,7 +48,8 @@ export const DEFAULT_STATE = {
     contact_owner: [],
     creator_type: null,
     dynamic_engagement_date_range: 0,
-    has_international: 0
+    has_international: 0,
+    not_disposed: 0
   }
 }
 

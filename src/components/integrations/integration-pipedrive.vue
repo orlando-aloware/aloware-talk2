@@ -1,38 +1,23 @@
 <template>
-  <div class="integration-wrapper" data-testid="integration-pipedrive-wrapper">
+  <div class="integration-wrapper integration-wrapper-generic" data-testid="integration-pipedrive-wrapper">
     <q-card class="integration-card"
             data-testid="integration-pipedrive-card"
             flat>
       <q-item class="p-0">
-        <q-item-section data-testid="integration-pipedrive-section-1" v-if="contactLink">
-          <b-link target="_blank"
-                  data-testid="integration-pipedrive-contact-link"
-                  :href="contactLink">
-            <table data-testid="integration-pipedrive-table-1">
-              <tr data-testid="integration-pipedrive-row-1">
-                <td data-testid="integration-pipedrive-column-1-1"><img class="pipedrive-btn" /></td>
-                <td data-testid="integration-pipedrive-column-1-2"><span class="integration-title">Pipedrive</span></td>
-              </tr>
-            </table>
-          </b-link>
-        </q-item-section>
-        <q-item-section data-testid="integration-pipedrive-section-2" v-else>
-          <a href="#"
-             data-testid="integration-pipedrive-link"
-             onclick="return false;">
-              <table data-testid="integration-pipedrive-table-2">
-                <tr data-testid="integration-pipedrive-row-2">
-                  <td data-testid="integration-pipedrive-column-2-1"><img class="pipedrive-btn" /></td>
-                  <td data-testid="integration-pipedrive-column-2-2"><span class="integration-title">Pipedrive</span></td>
-                </tr>
-              </table>
-          </a>
-        </q-item-section>
+        <span class='integration-jit-card-header'>
+          <i class="pipedrive-btn integration-icon-in-header"></i>
+          <span class="integration-title">Pipedrive</span>
+        </span>
       </q-item>
 
       <q-separator data-testid="integration-pipedrive-separator"/>
 
       <q-card-section v-if="integrationData && integrationData.contact_details" data-testid="integration-pipedrive-card-section-1">
+        <a class="external-contact-integration-link-icon color-primary"
+           target="_blank"
+           :href="contactLink">
+          <i class="fa fa-external-link" aria-hidden="true"/>
+        </a>
         <p class="mb-0"
            data-testid="integration-pipedrive-name"
            v-if="integrationData.contact_details.name !== undefined">

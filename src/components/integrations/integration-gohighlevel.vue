@@ -1,38 +1,23 @@
 <template>
-  <div class="integration-wrapper" data-testid="integration-gohighlevel-wrapper">
+  <div class="integration-wrapper integration-wrapper-generic" data-testid="integration-gohighlevel-wrapper">
     <q-card class="integration-card"
             data-testid="integration-gohighlevel-card"
             flat>
       <q-item class="p-0">
-        <q-item-section v-if="contactLink">
-          <b-link target="_blank"
-                  data-testid="integration-gohighlevel-contact-link"
-                  :href="contactLink">
-            <table data-testid="integration-gohighlevel-table-1">
-              <tr data-testid="integration-gohighlevel-table-1-row">
-                <td data-testid="integration-gohighlevel-table-1-column-1"><img class="gohighlevel-btn" /></td>
-                <td data-testid="integration-gohighlevel-table-1-column-2"><span class="integration-title">HighLevel</span></td>
-              </tr>
-            </table>
-          </b-link>
-        </q-item-section>
-        <q-item-section v-else>
-          <a href="#"
-             data-testid="integration-gohighlevel-link"
-             onclick="return false;">
-              <table data-testid="integration-gohighlevel-table-2">
-                <tr data-testid="integration-gohighlevel-table-2-row">
-                  <td data-testid="integration-gohighlevel-table-2-column-1"><img class="gohighlevel-btn" /></td>
-                  <td data-testid="integration-gohighlevel-table-2-column-2"><span class="integration-title">HighLevel</span></td>
-                </tr>
-              </table>
-          </a>
-        </q-item-section>
+        <span class='integration-jit-card-header'>
+          <i class="gohighlevel-btn integration-icon-in-header"></i>
+          <span class="integration-title">HighLevel</span>
+        </span>
       </q-item>
 
       <q-separator data-testid="integration-gohighlevel-separator"/>
 
       <q-card-section v-if="integrationData && integrationData.contact_details" data-testid="integration-gohighlevel-card-section-1">
+        <a class="external-contact-integration-link-icon color-primary"
+           target="_blank"
+           :href="contactLink">
+          <i class="fa fa-external-link" aria-hidden="true"/>
+        </a>
         <p class="mb-0"
            data-testid="integration-gohighlevel-first-name"
            v-if="integrationData.contact_details.contact.firstName !== undefined">

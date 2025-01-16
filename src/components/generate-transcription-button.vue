@@ -8,7 +8,7 @@
       v-if="variant === 'button'"
       :disabled="isGenerating(communication.id)"
       @click="handleGenerateTranscription">
-      <sparkle-icon width="20" height="20" color="white" />
+      <sparkle-icon width="20" height="20" color="white"/>
       <span v-if="isGenerating(communication.id)">Generating Transcription...</span>
       <span v-else>Generate Transcription</span>
     </b-button>
@@ -26,7 +26,7 @@
       v-else-if="variant === 'icon'"
       :disabled="isGenerating(communication.id)"
       @click="handleGenerateTranscription">
-      <sparkle-icon width="16" height="16" color="#007bff" />
+      <sparkle-icon width="16" height="16" color="#007bff"/>
     </q-btn>
 
     <q-tooltip v-if="isGenerating(communication.id)">
@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import talk2Api from 'src/plugins/api/api'
 import { communicationInfoMixin } from 'src/plugins/mixins'
@@ -76,12 +76,12 @@ export default {
 
     isTranscriptionAllowed () {
       return this.communication.is_eligible_for_transcribe &&
-             this.showAudio(this.communication) &&
-             ![TranscriptionStatus.STATUS_CREATED,
-               TranscriptionStatus.STATUS_PROCESSING,
-               TranscriptionStatus.STATUS_COMPLETED,
-               TranscriptionStatus.STATUS_PARSED
-             ].includes(this.communication.call_transcription_status)
+        this.showAudio(this.communication) &&
+        ![TranscriptionStatus.STATUS_CREATED,
+          TranscriptionStatus.STATUS_PROCESSING,
+          TranscriptionStatus.STATUS_COMPLETED,
+          TranscriptionStatus.STATUS_PARSED
+        ].includes(this.communication.call_transcription_status)
     }
   },
 
@@ -91,24 +91,31 @@ export default {
     /**
      * Handles the transcription generation process.
      */
-    async handleGenerateTranscription () {
+    handleGenerateTranscription () {
       const communicationId = this.communication.id
       this.$generalNotification('Transcription generation started.', 'success')
-      this.setGeneratingStatus({ communicationId, status: true })
-      try {
-        await talk2Api.V1.transcription.generateTranscription(communicationId)
-      } catch (error) {
+      this.setGeneratingStatus({
+        communicationId,
+        status: true
+      })
+      return talk2Api.V1.transcription.generateTranscription(communicationId).catch((error) => {
         const errorMessage = error.response?.data?.message || 'Failed to start transcription generation.'
         this.$generalNotification(errorMessage, 'error')
-        this.setGeneratingStatus({ communicationId, status: false })
-      }
+        this.setGeneratingStatus({
+          communicationId,
+          status: false
+        })
+      })
     }
   },
 
   watch: {
     'communication.call_transcription_status': function (newStatus) {
       if (newStatus === TranscriptionStatus.STATUS_ERROR) {
-        this.setGeneratingStatus({ communicationId: this.communication.id, status: false })
+        this.setGeneratingStatus({
+          communicationId: this.communication.id,
+          status: false
+        })
       }
     }
   }

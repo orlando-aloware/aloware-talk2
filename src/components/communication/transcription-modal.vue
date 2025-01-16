@@ -1,5 +1,10 @@
 <template>
   <div data-testid="transcription-modal-wrapper">
+    <span v-if="noButton"
+          @click="fetchSmartTranscriptionData">
+      {{ buttonText }}
+    </span>
+
     <q-btn icon="chat"
            color="primary"
            flat
@@ -7,6 +12,7 @@
            dense
            :size="buttonSize"
            data-testid="comm-transcription-modal-single-btn"
+           v-else
            @click="fetchSmartTranscriptionData">
       <q-tooltip>
         <span>
@@ -125,26 +131,13 @@
                       align="left"
                       class="bg-white text-black border-bottom"
                       content-class="flex-nowrap">
-                <q-tab name="transcription"
-                       label="Transcription"/>
                 <q-tab name="summary"
                        label="Summary"
                        :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
+                <q-tab name="transcription"
+                       label="Transcription"/>
               </q-tabs>
               <q-tab-panels v-model="tabName">
-                <q-tab-panel class="p-0"
-                             name="transcription">
-                  <conversation-section :communication="communication"
-                                        :contact="contact"
-                                        :messages="messages"
-                                        :formatted-messages="formattedMessages"
-                                        :is-empty="isEmpty"
-                                        ref="conversationSection"
-                                        data-testid="comm-transcription-modal-conversation-section"
-                                        @seek-audio="handleSeekAudio">
-                  </conversation-section>
-                </q-tab-panel>
-
                 <q-tab-panel class="p-0"
                              name="summary">
                   <section class="transcription chat-area"
@@ -263,6 +256,19 @@
                     </div>
                   </section>
                 </q-tab-panel>
+
+                <q-tab-panel class="p-0"
+                             name="transcription">
+                  <conversation-section :communication="communication"
+                                        :contact="contact"
+                                        :messages="messages"
+                                        :formatted-messages="formattedMessages"
+                                        :is-empty="isEmpty"
+                                        ref="conversationSection"
+                                        data-testid="comm-transcription-modal-conversation-section"
+                                        @seek-audio="handleSeekAudio">
+                  </conversation-section>
+                </q-tab-panel>
               </q-tab-panels>
             </div>
           </div>
@@ -342,6 +348,10 @@ export default {
     buttonSize: {
       type: String,
       default: 'sm'
+    },
+    noButton: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -554,6 +564,10 @@ export default {
      * @returns {void}
      */
     checkAndShowTranscriptionModal () {
+      if (this.currentCompany?.transcription_settings?.summarization_enabled) {
+        this.tabName = 'summary'
+      }
+
       const urlParams = new URLSearchParams(window.location.search)
       const showTranscription = urlParams.get('showTranscription')
 

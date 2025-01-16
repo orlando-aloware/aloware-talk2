@@ -20,22 +20,12 @@ export default {
   },
 
   methods: {
-    getHubspotContactBaseLink () {
-      if (this.currentCompany &&
-        this.currentCompany.hubspot_integration_enabled &&
-        this.currentCompany.hubspot_marketing_portal_id) {
-        return `https://${this.companyDomain}/embed/${this.currentCompany.hubspot_marketing_portal_id}/0-1/`
+    getHubspotContactLink (contact, useEmbed) {
+      if (useEmbed) {
+        return contact?.integration_data?.hubspot?.embed_link
       }
 
-      return false
-    },
-
-    getHubspotContactLink (contact) {
-      if (!this.getHubspotContactBaseLink()) {
-        return false
-      }
-
-      return this.getHubspotContactBaseLink() + contact?.integration_data?.hubspot?.contact_id
+      return contact?.integration_data?.hubspot?.link
     }
   }
 }
