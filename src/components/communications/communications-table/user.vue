@@ -12,8 +12,8 @@
         <strong>Teams of this user:</strong>
       </span>
       <span class="d-block mb-1"
-            v-for="team in row.teams"
-            :key="`team_${team}`">
+            :key="`team_${team}`"
+            v-for="team in row.teams">
         <span class="small">
           {{ team }}
         </span>

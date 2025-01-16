@@ -57,11 +57,9 @@ import { callDispositionMixin } from 'src/plugins/mixins'
 import CommunicationAudio from 'components/communication-audio.vue'
 import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import TranscriptionModal from 'components/communication/transcription-modal.vue'
-import { fixFullDateTime } from 'src/plugins/filters/datetime.filters'
 
 export default {
   name: 'StartTime',
-  methods: { fixFullDateTime },
 
   mixins: [callDispositionMixin],
 
