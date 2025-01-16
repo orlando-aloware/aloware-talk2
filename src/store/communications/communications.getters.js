@@ -5,7 +5,6 @@ import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
 export default {
   selectedFilter: (state) => state.selectedFilter,
   hasMoreContacts: (state) => state.hasMoreContacts,
-  hasMoreCommunications: (state) => state.hasMoreCommunications,
   getOpenTaskCount: (state) => state.taskCounts.open,
   allSavedFilters: (state) => [...state.personalFilters, ...state.inboxCompanyFilters],
   communicationsCount: (state) => state.communicationsCount,
@@ -45,7 +44,11 @@ export default {
         to_date: Filters.DEFAULT_STATE.filter.to_date,
         my_contact: Filters.DEFAULT_STATE.filter.my_contact,
         unread_only: Filters.DEFAULT_STATE.filter.unread_only,
-        has_international: Filters.DEFAULT_STATE.filter.has_international
+        has_international: Filters.DEFAULT_STATE.filter.has_international,
+        teams: Filters.DEFAULT_STATE.filter.teams,
+        contact_lists: Filters.DEFAULT_STATE.filter.contact_lists,
+        answer_status: answerStatus,
+        type: 'call'
       }
       return defaultFilterModel
     }
@@ -83,12 +86,6 @@ export default {
         defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
         defaultFilterModel.filter.answer_status = 'recorded'
       }
-
-      if (channel === 'voicemail') {
-        defaultFilterModel.type = ChannelType.CHANNEL_VOICEMAILS
-        defaultFilterModel.filter.answer_status = answerStatus
-      }
-
       return defaultFilterModel
     }
 
