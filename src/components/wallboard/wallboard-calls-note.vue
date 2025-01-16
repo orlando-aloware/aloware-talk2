@@ -2,7 +2,7 @@
   <div>
     <div class="align-items-center"
          v-if="!isEditingNote">
-      <div class="notes mt-1"
+      <div :class="['notes', 'mt-1', { 'ellipse': ellipse }]"
            v-html="$options.filters.nl2br(communication.notes)"/>
       <a href="#"
          class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
@@ -39,6 +39,11 @@ export default {
     communication: {
       type: Object,
       required: true
+    },
+
+    ellipse: {
+      type: Boolean,
+      default: false
     }
   },
 

@@ -17,12 +17,12 @@
               :pending-count="pendingCount"
               :disabled="item.disabled"
               :tooltip="item.tooltip"
-              v-for="item in inboxChannels"
+              v-for="item in inboxesToShow"
               @click="onItemClicked" />
 
     <hr>
 
-    <div v-if="isCompanyPartOfAlowareDemoCompanies(profile.company_id) || isInboxViewsEnabledCompany">
+    <div v-if="shouldShowViewsUnderChannels">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -137,19 +137,31 @@ export default {
       return !this.$q.screen.lt.md || isMobileInboxRoutes
     },
 
-    inboxChannels () {
-      if (this.profile?.campaign_id) {
-        return this.navListItems
-      }
+    inboxesToShow () {
+      /*
+        WAT-1105: FOR the code freeze happening on 01-08-25 we keep the channels on the inbox
+      */
+      return this.navListItems
 
-      // hard-coded disabling my-personal-line channel
-      const channels = this.navListItems
-      let index = channels.findIndex(channel => channel.value === 'my-personal-line')
-      if (channels[index]) {
-        channels[index].disabled = true
-        channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
-      }
-      return channels
+      /*
+        WAT-1105: the channels and view are being moved to communications menu
+        so should not being displayed here if the feature is active
+      */
+      // return this.hasNewCommunicationsFeatureEnabled
+      //   ? this.navListItems.filter(item => item.default)// only shows the default "inbox"
+      //   : this.navListItems
+    },
+
+    shouldShowViewsUnderChannels () {
+      /*
+        WAT-1105: FOR the code freeze happening on 01-08-25 we keep views on the inbox
+        confirm what to do with the views after that
+      */
+      // if (this.hasNewCommunicationsFeatureEnabled) {
+      //  return false
+      // }
+
+      return (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany)
     }
   },
 

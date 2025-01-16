@@ -6,11 +6,17 @@
     <div class="flex-grow-1">
       <router-link :to="`${linkPath}${resource.id}`"
                    v-slot="{ href, route, navigate }">
-        <a class="d-flex align-items-center item contact-name text-bold"
+        <a class="d-flex align-items-center item contact-name text-bold text-decoration-none"
            :href="href"
            @click="navigate">
           <template v-if="name">
             <div class="ellipse">{{ name | ucwords }}</div>
+            <b-badge variant="danger"
+                     class="badge-phone-info ml-2"
+                     data-testid="contacts-view-contact-dnc-badge"
+                     v-if="dncBadge && resource.is_dnc">
+              DNC
+            </b-badge>
           </template>
           <template v-else>No Name</template>
         </a>
@@ -36,6 +42,10 @@ export default {
       type: String,
       required: false,
       default: '/'
+    },
+    dncBadge: {
+      type: Boolean,
+      default: false
     }
   },
 

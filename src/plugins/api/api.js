@@ -272,6 +272,18 @@ export default {
       }
     },
 
+    filters: {
+      async get ({ isOnCompany } = {}) {
+        const { data = [] } = await window.axios.get(`${suffixV1}filter`)
+
+        if (isOnCompany) {
+          return data.filter(filter => filter.is_on_company)
+        }
+
+        return data
+      }
+    },
+
     ringGroups: {
       get () {
         return window.axios.get(`${suffixV1}ring-group`)
@@ -429,6 +441,10 @@ export default {
       communications: {
         get (params) {
           return window.axios.get(`${suffixV1}reports/communications`, params)
+        },
+
+        getCount (params) {
+          return window.axios.get(`${suffixV1}reports/communications/count`, params)
         }
       }
     },
@@ -488,19 +504,11 @@ export default {
 
       // Generate transcription for the communication
       generateTranscription (communicationId) {
-        if (!communicationId) {
-          return null
-        }
-
         return window.axios.post(`${suffixV1}transcription/communication/${communicationId}`)
       },
 
       // Generate summary for the transcription
       generateSummary (communicationId) {
-        if (!communicationId) {
-          return null
-        }
-
         return window.axios.post(
           `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )

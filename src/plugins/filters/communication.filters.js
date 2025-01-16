@@ -1,6 +1,7 @@
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CallbackStatus from '../../constants/callback-status'
+import * as CommunicationResolution from 'src/constants/communication-resolution'
 import * as CommunicationTransferTypes from '../../constants/communication-transfer-types'
 import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS, LRN_NOT_PERFORMED } from 'src/constants/lrn-types'
 import { ALL_CREATOR_TYPES } from 'src/constants/creator-types'
@@ -263,6 +264,40 @@ const translateCallbackStatusText = (callbackStatus) => {
   }
 }
 
+const translateResolutionText = (status) => {
+  switch (status) {
+    // Normal call
+    case CommunicationResolution.RESOLUTION_NORMAL_NEW:
+      return CommunicationResolution.RESOLUTION_NORMAL
+      // call that went to the queue and had to wait.
+    case CommunicationResolution.RESOLUTION_QUEUE_NEW:
+      return CommunicationResolution.RESOLUTION_QUEUE
+      // When caller left a voicemail.
+    case CommunicationResolution.RESOLUTION_VOICEMAIL_NEW:
+      return CommunicationResolution.RESOLUTION_VOICEMAIL
+      // When call goes to forwarded phone number
+    case CommunicationResolution.RESOLUTION_FORWARD_NEW:
+      return CommunicationResolution.RESOLUTION_FORWARD
+      // When caller requested a callback
+    case CommunicationResolution.RESOLUTION_CALLBACK_REQUESTED_NEW:
+      return CommunicationResolution.RESOLUTION_CALLBACK_REQUESTED
+      // When we are processing a callback
+    case CommunicationResolution.RESOLUTION_CALLBACK_INITIATED_NEW:
+      return CommunicationResolution.RESOLUTION_CALLBACK_INITIATED
+      // ?
+    case CommunicationResolution.RESOLUTION_HUNT_GROUP_NEW:
+      return CommunicationResolution.RESOLUTION_HUNT_GROUP
+    case CommunicationResolution.RESOLUTION_VOICEMAIL_DROP_NEW:
+      return CommunicationResolution.RESOLUTION_VOICEMAIL_DROP
+    case CommunicationResolution.RESOLUTION_MAX_WAIT_NEW:
+      return CommunicationResolution.RESOLUTION_MAX_WAIT
+    case CommunicationResolution.RESOLUTION_MACHINE_DETECTED_NEW:
+      return CommunicationResolution.RESOLUTION_MACHINE_DETECTED
+    default:
+      return 'N/A'
+  }
+}
+
 export default ({ Vue }) => {
   const filters = {
     fixCommDirection,
@@ -274,7 +309,8 @@ export default ({ Vue }) => {
     fixLrnTypeBadge,
     translateCreatorType,
     translateTransferTypeText,
-    translateCallbackStatusText
+    translateCallbackStatusText,
+    translateResolutionText
   }
   Object.keys(filters).map(k => Vue.filter(k, filters[k]))
 }

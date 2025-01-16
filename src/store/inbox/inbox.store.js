@@ -1,3 +1,11 @@
+const DEFAULT_CHANNEL = {
+  label: 'Inbox',
+  value: 'inbox',
+  icon: 'inbox',
+  disabled: false,
+  default: true
+}
+
 export default function () {
   return {
     selectedContactId: null,
@@ -6,19 +14,9 @@ export default function () {
     isFetchingContacts: false,
     isChannelFilterOpen: false,
     isSearcherOpen: false,
-    activeChannel: {
-      label: 'Inbox',
-      value: 'inbox',
-      icon: 'inbox',
-      disabled: false
-    },
+    activeChannel: DEFAULT_CHANNEL,
     navListItems: [
-      {
-        label: 'Inbox',
-        value: 'inbox',
-        icon: 'inbox',
-        disabled: false
-      },
+      DEFAULT_CHANNEL,
       {
         label: 'Channels',
         group: true,
