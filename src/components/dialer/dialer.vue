@@ -1229,6 +1229,9 @@ export default {
 
       this.$axios.post('/api/v1/dialer/merge-calls', params).then(res => {
         this.setShouldIntroduce(false)
+        setTimeout(() => {
+          this.forceRefreshCommunication()
+        }, 500)
         console.log('Merge successful.')
       }).catch(err => {
         console.log(err)
@@ -1248,6 +1251,9 @@ export default {
       }).then(res => {
         this.setShouldIntroduce(false)
         this.setAddedParty()
+        setTimeout(() => {
+          this.forceRefreshCommunication()
+        }, 500)
         console.log('Third party has been dropped out of this call.')
       }).catch(err => {
         console.log(err)
@@ -1279,6 +1285,9 @@ export default {
       }
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
+        setTimeout(() => {
+          this.forceRefreshCommunication()
+        }, 500)
         console.log('Transfer is in progress')
       }).catch(err => {
         console.log(err)
@@ -1330,6 +1339,9 @@ export default {
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
         this.setShouldIntroduce(params.introduce)
+        setTimeout(() => {
+          this.forceRefreshCommunication()
+        }, 500)
         console.log((params.introduce) ? 'Introduce is in progress.' : 'Add is in progress.')
       }).catch(err => {
         this.setAddedParty()
