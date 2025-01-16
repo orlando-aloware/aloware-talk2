@@ -1,7 +1,6 @@
 <template>
   <div class="position-relative h-100">
-    <div v-if="shouldShowCalendar"
-         class="calendar d-flex h-100 flex-column">
+    <div class="calendar d-flex h-100 flex-column">
       <b-overlay class="h-100 w-100 position-absolute"
                  rounded="sm"
                  :show="loading"
@@ -161,15 +160,6 @@
                          :current-date="currentDate"
                          v-model="isEventsModalOpen"
                          @open-event-modal="openEventModal" />
-
-    <upgrade-now-page image-link="/assets/images/Calendar.svg"
-                      text="Simplify your appointment scheduling and receive timely reminders with Calendar"
-                      extra-text="Upgrade today to unlock this feature"
-                      title-text="Calendar"
-                      kb-link="https://support.aloware.com/en/articles/9034189-the-aloware-talk-calendar"
-                      class="mt-5"
-                      v-if="!shouldShowCalendar && shouldShowUpgradeNow && !isSimpSocial">
-    </upgrade-now-page>
   </div>
 </template>
 
@@ -181,7 +171,6 @@ import Filters from '../../components/calendar/calendar-filters.vue'
 import Helper from '../../components/calendar/calendar-helper.vue'
 import Manager from '../../components/calendar/calendar-event-manager.vue'
 import Scheduler from '../../components/calendar/calendar-scheduler.vue'
-import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import CalendarEventList from 'components/calendar/calendar-event-list.vue'
 import moment from 'moment'
 import { mapActions, mapState } from 'vuex'
@@ -206,7 +195,6 @@ export default {
     Helper,
     Manager,
     Scheduler,
-    UpgradeNowPage,
     CalendarEventList
   },
 

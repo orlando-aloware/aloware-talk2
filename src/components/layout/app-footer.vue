@@ -100,8 +100,7 @@
         <q-route-tab name="calendar-disabled"
                      content-class="tab-icons xs-text text-grey-5"
                      :ripple="false"
-                     no-caps
-                     v-if="!profile.calendar_enabled">
+                     no-caps>
           <span class="tab-icon"
                 @click="toggleProFeatureDialog(true)">
             <q-badge floating
@@ -112,23 +111,6 @@
           </span>
           Calendar
         </q-route-tab>
-        <q-route-tab name="calendar"
-                   to="/calendar"
-                   :content-class="tab === 'calendar' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'calendar'"
-                   no-caps
-                   exact
-                   v-else>
-        <span class="tab-icon">
-          <q-badge floating
-                   rounded
-                   color="orange">
-          </q-badge>
-          <calendar-mobile-icon :color="tab === 'calendar' ? '#256EFF' : '#A3A3A3'"/>
-        </span>
-        Calendar
-      </q-route-tab>
       </template>
       <q-route-tab name="stats"
                    to="/stats"

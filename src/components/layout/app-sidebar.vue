@@ -235,7 +235,7 @@
            align="left"
            padding="none"
            class="nav-icons w-100"
-           v-show="isActive('Calendar') && profile.calendar_enabled"
+           v-show="isActive('Calendar')"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -255,7 +255,7 @@
            align="left"
            padding="10px 20px"
            class="nav-icons w-100"
-           v-show="(!isActive('Calendar') && profile.calendar_enabled) || !profile.calendar_enabled"
+           v-show="!isActive('Calendar')"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
