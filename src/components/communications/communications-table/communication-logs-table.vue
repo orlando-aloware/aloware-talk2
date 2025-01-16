@@ -59,6 +59,7 @@
                            :style="col.columnStyle"
                            @on-details="onCommunicationDetails"/>
             </div>
+
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'incoming_number'">
               <incoming-number :value="col.value"
