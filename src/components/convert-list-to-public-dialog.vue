@@ -58,7 +58,8 @@ export default {
 
     listShowInPublicFolder: {
       type: Boolean,
-      required: true
+      required: false,
+      default: false
     },
 
     fromAdminList: {

@@ -107,7 +107,7 @@
 
                 <div class="operation-button mx-1">
                   <span class="cursor-pointer"
-                        data-testid="lists-import-button"
+                        data-testid="lists-pin-button"
                         @click="onPinList(props.row)">
                     <pin-icon height="16"
                                width="16"
@@ -139,7 +139,7 @@
 
                 <div class="operation-button mx-1">
                   <span class="cursor-pointer"
-                        data-testid="lists-edit-button"
+                        data-testid="lists-enroll-sequence-button"
                         @click="onEnrollContactsToSequence(props.row)">
                     <add-sequence-icon height="16"
                                    width="16"
@@ -152,7 +152,7 @@
 
                 <div class="operation-button mx-1">
                   <span class="cursor-pointer"
-                        data-testid="lists-view-button"
+                        data-testid="lists-add-power-dialer-button"
                         @click="onAddListToPowerDialer(props.row)">
                     <add-call-icon height="16"
                                    width="16"
@@ -179,12 +179,12 @@
                 <div class="operation-button mx-1">
                   <span class="cursor-pointer"
                         data-testid="lists-duplicate-button"
-                        @click="onAddContactsToList(props.row)">
-                    <logout-icon height="16"
+                        @click="openAssignContacts(props.row)">
+                    <arrow-right-icon height="16"
                                width="16"
                                color="#62666E"/>
                     <q-tooltip>
-                      Add Contacts to this list
+                      Assign Contacts
                     </q-tooltip>
                   </span>
                 </div>
@@ -237,6 +237,12 @@
                             v-if="openPDModal"
                             @hidden="openPDModal = false">
       </power-dialer-add-modal>
+
+      <assign-contacts-modal :is-show="showAssignContacts"
+                             :list="list"
+                             @closeAssignContactsModal="closeAssignContacts" />
+
+      <move-dialog />
   </div>
 </template>
 
@@ -252,12 +258,15 @@ import EyeOffIcon from 'components/icons/eye-off-icon'
 import AddCallIcon from 'components/icons/add-call-icon.vue'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import ArrowRightIcon from 'components/icons/arrow-right-icon'
+import MoveIcon from 'components/icons/move-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
 import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import AssignContactsModal from 'src/components/assign-contacts-modal'
+import MoveDialog from 'src/components/move-dialog'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
 
@@ -290,7 +299,10 @@ export default {
     AddSequenceIcon,
     ArrowRightIcon,
     TagContactsWorkflowEnroller,
-    PowerDialerAddModal
+    PowerDialerAddModal,
+    AssignContactsModal,
+    MoveIcon,
+    MoveDialog
   },
 
   data () {
@@ -315,7 +327,8 @@ export default {
       showAddToSequence: false,
       openPDModal: false,
       addToPowerDialerMode: 'add',
-      addToPowerDialerIsManualSelection: false
+      addToPowerDialerIsManualSelection: false,
+      showAssignContacts: false
     }
   },
 
@@ -328,7 +341,8 @@ export default {
 
   computed: {
     ...mapGetters('contacts', [
-      'pinned'
+      'pinned',
+      'moveDialog'
     ]),
     ...mapState('listsModule', [
       'isListsLoading'
@@ -670,6 +684,15 @@ export default {
         selected_all: true,
         contact_ids: []
       }
+    },
+
+    openAssignContacts (list) {
+      this.list = list
+      this.showAssignContacts = true
+    },
+
+    closeAssignContacts () {
+      this.showAssignContacts = false
     }
   }
 }
