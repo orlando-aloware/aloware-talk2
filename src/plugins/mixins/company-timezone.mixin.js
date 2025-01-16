@@ -29,5 +29,14 @@ export default {
     companyTimezone () {
       return window.moment().tz(this.currentCompany.timezone)
     }
+  },
+
+  methods: {
+    dateInCompanyTimezone (dt, format = 'MMM D, YYYY h:mm a z') {
+      if (!dt) {
+        return '-'
+      }
+      return window.moment.utc(dt).tz(this.currentCompany.timezone, true).format(format)
+    }
   }
 }

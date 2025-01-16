@@ -2,7 +2,7 @@
   <div v-if="communication"
        data-testid="comm-details-wrapper">
     <b-row data-testid="comm-details-row">
-      <b-col :md="isWidget ? 12 : 4"
+      <b-col :md="isWidget || mobileView ? 12 : 4"
              sm="12"
              data-testid="comm-details-col"
              class="pl-0 pr-0">
@@ -11,7 +11,9 @@
                 bordered
                 class="communication-details-card bg-grey-1"
                 data-testid="comm-details-card">
-          <q-card-section class="pb-0" data-testid="comm-details-archive-card-section">
+          <q-card-section class="pb-0"
+                          data-testid="comm-details-archive-card-section"
+                          v-if="!mobileView">
             <div class="d-flex justify-content-between header">
               <div class="fs-14 mt-1 mr-1 header-title">
                 <b-button size="sm"
@@ -36,7 +38,7 @@
                 </generate-transcription-button>
                 <div class="flex items-center mr-1 h-100"
                      data-testid="comm-transcription-modal-btn"
-                     v-if="!communication.transcription_is_deleted && communication.metadata?.transcription_info?.summary"
+                     v-if="!communication.transcription_is_deleted && communication.has_transcription"
                      @click="fetchSmartTranscriptionData()">
                   <span class="text-blue cursor-pointer">
                     Show Transcription
@@ -56,7 +58,8 @@
           </q-card-section>
 
           <!--COMM TYPE-->
-          <q-card-section class="pt-0 comm-type-container" data-testid="comm-details-comm-type-card-section">
+          <q-card-section data-testid="comm-details-comm-type-card-section"
+                          :class="['comm-type-container', mobileView ? 'pt-4' : 'pt-0']">
             <div class="text-lt p-x d-inline-flex"
                  :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
               <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
@@ -974,7 +977,7 @@
           </q-card-section>
         </q-card>
       </b-col>
-      <b-col :md="isWidget ? 12 : 8"
+      <b-col :md="isWidget || mobileView ? 12 : 8"
              class="pr-0 ring-group-snapshot-wrapper"
              data-testid="comm-details-col"
              v-if="communication && communication.type === CommunicationTypes.CALL">
@@ -1084,6 +1087,11 @@ export default {
       required: false,
       default: false,
       type: Boolean
+    },
+
+    mobileView: {
+      type: Boolean,
+      default: false
     }
   },
 

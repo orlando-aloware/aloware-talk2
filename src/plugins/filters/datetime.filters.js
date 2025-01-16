@@ -424,17 +424,30 @@ export const humanizeDuration = (duration) => {
 /**
  * Fix duration humanize
  * @param {string} datetime
+ * @param {?string} currentTimezone
  * @returns {string}
  */
-export const fixDurationHumanize = (datetime) => {
+export const fixDurationHumanize = (datetime, currentTimezone = null) => {
   if (datetime === undefined) {
     return '-'
   }
 
-  const now = window.timezone ? window.moment.utc(new Date()).tz(window.timezone) : window.moment.utc(new Date())
-  const end = window.timezone ? window.moment.utc(datetime).tz(window.timezone) : window.moment.utc(datetime)
+  if (!currentTimezone) {
+    currentTimezone = window.timezone
+  }
 
-  return window.moment.duration(window.moment.duration(now.diff(end)).asSeconds(), 'seconds').humanize()
+  const now = moment.utc()
+  const dt = moment.utc(datetime)
+
+  if (now.diff(dt) < 24 * 60 * 60 * 1000) {
+    return dt.tz(currentTimezone).fromNow()
+  }
+
+  if (currentTimezone === 'Asia/Manila') {
+    return `${moment.utc(dt).tz(currentTimezone).format('MMM D, YYYY h:mma')} MNL`
+  }
+
+  return dt.tz(currentTimezone).format('MMM D, YYYY h:mma z')
 }
 
 /**

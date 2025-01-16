@@ -14,7 +14,11 @@
          v-if="!loading">
       Contacts Preview
       <span class="contacts-preview__header__counter">
-        {{ contactsLength }} {{ contactsLength === 1 ? 'Contact' : 'Contacts' }}
+        {{ contactsCount }} {{ contactsCount === 1 ? 'Contact' : 'Contacts' }}
+      </span>
+      <span class="contacts-preview__header__counter contacts-preview__header__counter--dnc"
+            v-if="dncContactsCount > 0">
+        ({{ dncContactsCount }} DNC)
       </span>
     </div>
 
@@ -31,7 +35,8 @@
           <template v-for="column in columns">
             <td :key="column.name"
                 v-if="column.name === 'name'">
-              <name-wrapper link-path="/contacts/"
+              <name-wrapper dnc-badge
+                            link-path="/contacts/"
                             :resource="contact" />
             </td>
 
@@ -63,6 +68,8 @@
 import API from 'src/plugins/api/api'
 import NameWrapper from 'src/components/name-wrapper.vue'
 import Datatable from 'src/components/datatable.vue'
+import { DNC_OPTION_CONTACTS_WITH_DNC } from 'src/constants/contact-filter-dnc-options.vue'
+import { BOOLEAN_OPERATORS } from 'src/constants/contacts-boolean-filter-operators'
 import { isEmpty, parseInt, debounce } from 'lodash'
 
 export default {
@@ -115,15 +122,13 @@ export default {
     },
 
     isValid () {
-      return this.contactsLength > 0 && !this.loading
+      return this.contactsCount > 0 && !this.loading
     },
 
     noContactsPlaceholder () {
       switch (true) {
         case !isEmpty(this.list):
           return 'No contacts found on the current list'
-        case !isEmpty(this.filters):
-          return 'No contacts found based on the current filters'
         case !isEmpty(this.integration):
           return 'Contacts preview isn\'t available for integrations'
         default:
@@ -142,25 +147,20 @@ export default {
   data: () => ({
     loading: false,
     contacts: [],
-    contactsLength: 0,
+    contactsCount: 0,
+    dncContactsCount: 0,
     defaultFilters: {
       page: 1,
       per_page: 25,
       sort: 'last_engagement_at',
       order: 'desc',
-      force_slave: 1,
-      filters: {
-        dnc_option: {
-          value: 5, // only contacts without dnc
-          operator: 1 // is equal to
-        }
-      }
+      force_slave: 1
     },
     currentFilters: {}
   }),
 
   created () {
-    if (!this.list && !this.filters) {
+    if (!this.list) {
       throw new Error('A list or filters are required to preview the contacts')
     }
 
@@ -174,10 +174,6 @@ export default {
       switch (true) {
         case !isEmpty(this.list):
           this.setContactsListFilter()
-          this.loadContacts()
-          break
-        case !isEmpty(this.filters):
-          this.setContactsFilters()
           this.loadContacts()
           break
         case !isEmpty(this.integration) && this.integration.name === 'HubSpot':
@@ -205,13 +201,8 @@ export default {
         })
     },
 
-    getContactsCount () {
-      return API.V2.contacts.counts(this.allFilters)
-        .then(({ data }) => {
-          this.contactsLength = parseInt(data.count)
-
-          return Promise.resolve()
-        })
+    getContactsCount (filters = {}) {
+      return API.V2.contacts.counts({ ...filters, ...this.allFilters })
         .catch(err => {
           this.$handleErrors(err.response)
         })
@@ -226,11 +217,25 @@ export default {
       // load count
       const countsPromise = this.getContactsCount()
 
+      // load count with DNC
+      const countsDncPromise = this.getContactsCount({
+        filters: {
+          dnc_option: {
+            value: DNC_OPTION_CONTACTS_WITH_DNC,
+            operator: BOOLEAN_OPERATORS.IS_EQUAL_TO
+          }
+        }
+      })
+
       Promise.all([
         contactsPromise,
-        countsPromise
+        countsPromise,
+        countsDncPromise
       ])
-        .then(() => {
+        .then((promises) => {
+          this.contactsCount = parseInt(promises[1].data.count)
+          this.dncContactsCount = parseInt(promises[2].data.count)
+
           this.loading = false
         })
     },
@@ -247,14 +252,10 @@ export default {
       }
     },
 
-    setContactsFilters () {
-      this.currentFilters.filter_groups = this.filters
-    },
-
     async setIntegrationHubspot () {
       this.loading = true
 
-      this.contactsLength = parseInt(this.integration.list.additionalProperties.hs_list_size)
+      this.contactsCount = parseInt(this.integration.list.additionalProperties.hs_list_size)
 
       // run this to get a preview contact
       await this.getContacts()
@@ -265,13 +266,6 @@ export default {
 
   watch: {
     list: {
-      deep: true,
-      handler () {
-        this.init()
-      }
-    },
-
-    filters: {
       deep: true,
       handler () {
         this.init()
@@ -289,10 +283,17 @@ export default {
       this.$emit('input', state)
     },
 
-    contactsLength: {
+    contactsCount: {
       immediate: true,
-      handler (count) {
-        this.$emit('contacts-length', count)
+      handler () {
+        this.$emit('contacts-count', (this.contactsCount - this.dncContactsCount))
+      }
+    },
+
+    dncContactsCount: {
+      immediate: true,
+      handler () {
+        this.$emit('contacts-count', (this.contactsCount - this.dncContactsCount))
       }
     }
   },

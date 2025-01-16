@@ -45,13 +45,13 @@
               <label class="label mb-0 text-weight-bold flex-grow-1 cursor-pointer pr-4"
                      :for="`engage-control-bot-${bot.id}`">
                 <div class="row">
-                  <div class="col-2 p-0 text-center d-flex items-center justify-between">
+                  <div class="col-3 p-0 text-center d-flex items-center justify-between">
                     <!-- Bot Use Case Label -->
-                    <q-badge class="w-100 custom-badge-margin" :color="useCaseColor(bot.use_case)">
-                      <span class="w-100">{{ formatUseCase(bot.use_case) }}</span>
+                    <q-badge class="w-100" :color="directionColor(bot.direction)">
+                      <span class="w-100">{{ formatDirection(bot.direction) }}</span>
                     </q-badge>
                   </div>
-                  <div class="col-10">
+                  <div class="col-9">
                     <span>{{ bot.name }}</span>
                   </div>
                 </div>
@@ -88,6 +88,7 @@ import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
 import { isEmpty } from 'lodash'
 import { aloaiMixin } from 'src/plugins/mixins'
+import * as AloAi from 'src/constants/aloai'
 
 export default {
   name: 'aloai-engagement-control-modal',
@@ -119,7 +120,8 @@ export default {
       bot_engagements: {},
       searchText: '',
       isLoading: true,
-      selectedBotId: null
+      selectedBotId: null,
+      AloAi
     }
   },
 
@@ -236,7 +238,10 @@ export default {
         if (this.bots.length > 0) {
           return this.bots
         }
-        const { data } = await talk2Api.V2.aloAiBot.getBots()
+        const { data } = await talk2Api.V2.aloAiBot.getBots({
+          enabled: true,
+          type: AloAi.TYPE_TEXT
+        })
         return data?.data ?? []
       } catch (error) {
         console.error('[fetchBots] error', error)
@@ -262,8 +267,5 @@ export default {
 .aloai-engagement-control-bots-list {
   max-height: 300px;
   overflow-y: auto;
-}
-.custom-badge-margin {
-  margin-bottom: 1px
 }
 </style>

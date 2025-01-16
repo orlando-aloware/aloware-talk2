@@ -64,12 +64,6 @@ export default {
           logo: 'zoho-icon.svg'
         },
         {
-          name: 'helpscout',
-          label: 'Help Scout',
-          link: this.helpscoutLink,
-          logo: 'help-scout-icon.png'
-        },
-        {
           name: 'guesty',
           label: 'Guesty',
           link: this.guestyLink,
@@ -142,19 +136,6 @@ export default {
         this.contact.integration_data.zoho &&
         this.contact.integration_data.zoho.lead_link) {
         return this.contact.integration_data.zoho.lead_link
-      }
-
-      return false
-    },
-    helpscoutLink () {
-      if (this.currentCompany &&
-        this.currentCompany.helpscout_integration_enabled &&
-        this.contact &&
-        this.contact.integration_data &&
-        this.contact.integration_data.helpscout &&
-        this.contact.integration_data.helpscout.customer_id &&
-        this.currentCompany.helpscout_mailbox_id) {
-        return `https://secure.helpscout.net/customer/${this.contact.integration_data.helpscout.customer_id}/${this.currentCompany.helpscout_mailbox_id}`
       }
 
       return false

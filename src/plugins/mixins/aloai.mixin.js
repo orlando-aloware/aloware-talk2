@@ -1,27 +1,24 @@
 import _ from 'lodash'
-import { AloAiUseCases } from '../../constants/aloai'
+import * as AloAi from '../../constants/aloai'
 
 export default _.merge({
   methods: {
-    formatUseCase (useCase) {
-      switch (useCase) {
-        case AloAiUseCases.SALES:
-          return 'Sales'
-        case AloAiUseCases.QUESTION_AND_ANSWER:
-          return 'Q&A'
-        case AloAiUseCases.SUPPORT:
-          return 'Support'
+    formatDirection (direction) {
+      switch (direction) {
+        case AloAi.DIRECTION_INBOUND:
+          return 'Inbound'
+        case AloAi.DIRECTION_OUTBOUND:
+          return 'Outbound'
         default:
           return 'Unknown'
       }
     },
-    useCaseColor (status) {
+    directionColor (direction) {
       return (
         {
-          [AloAiUseCases.SALES]: 'green-6',
-          [AloAiUseCases.SUPPORT]: 'blue-gray-6',
-          [AloAiUseCases.QUESTION_AND_ANSWER]: 'orange-6'
-        }[status] || 'black'
+          [AloAi.DIRECTION_INBOUND]: 'blue-6',
+          [AloAi.DIRECTION_OUTBOUND]: 'green-6'
+        }[direction] || 'black'
       )
     }
   }

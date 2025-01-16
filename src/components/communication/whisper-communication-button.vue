@@ -1,16 +1,14 @@
 <template>
-  <div>
-    <span class="cursor-pointer"
-          data-testid="comm-whisper-button-whisper-span"
-          @click="dialog"
-          v-if="userCanBargeAndWhisper(communication)">
-      <ear-icon height="22"
-                width="22"/>
-      <q-tooltip>
-        Whisper
-      </q-tooltip>
-    </span>
-  </div>
+  <span class="cursor-pointer"
+        data-testid="comm-whisper-button-whisper-span"
+        @click="dialog"
+        v-if="userCanBargeAndWhisper(communication)">
+    <ear-icon :height="iconHeight"
+              :width="iconWidth"/>
+    <q-tooltip>
+      Whisper
+    </q-tooltip>
+  </span>
 </template>
 
 <script>
@@ -41,6 +39,16 @@ export default {
       type: Boolean,
       default: true,
       required: false
+    },
+
+    iconHeight: {
+      type: [Number, String],
+      default: 22
+    },
+
+    iconWidth: {
+      type: [Number, String],
+      default: 22
     }
   },
 
@@ -62,20 +70,6 @@ export default {
       this.$VueEvent.fire('make_new_call', {
         phone_number: `whisper:${this.communication.id}`
       })
-    },
-
-    openKnowledgeBaseLink () {
-      window.open('https://support.aloware.com/en/articles/9034191-introducing-aloware-wallboard-your-real-time-communication-metrics-dashboard', '_blank')
-    },
-
-    checkClick () {
-      let defaultLink = (this.isModGen) ? 'https://moderategeni.us/aloware-info' : 'https://aloware.com/get-demo/'
-
-      if (this.defaultClick) {
-        window.open(defaultLink, '_blank')
-      } else {
-        this.$emit('click')
-      }
     }
   }
 }

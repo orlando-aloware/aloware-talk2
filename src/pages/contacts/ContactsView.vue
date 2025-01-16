@@ -511,25 +511,7 @@
                 </template>
 
                 <template v-if="Array.isArray(contact.tags) && contact.tags.length">
-                  <div class="d-flex align-items-center contact-tags-item popover-items"
-                       :id="`pt-${index}-${colIndx}`"
-                       v-if="contact.id"
-                       @mouseenter="onMouseOverPopover('Tags', `pt-${index}-${colIndx}`, index, column.name, $event)">
-                    <span>
-                      <i class="fa fa-circle"
-                         :style="`color: ${contact.tags[0].color};font-size:36%;position: relative; top: -3px;`" />
-                      <span v-if="contact.tags.length > 1">
-                        {{ contact.tags[0].name | truncate(17) }}
-                      </span>
-                      <span v-else>
-                        {{ contact.tags[0].name | truncate(27) }}
-                      </span>
-                    </span>
-                    <span class="ml-1 text-grey-7"
-                          v-if="contact.tags.length > 1">
-                      +{{ (contact.tags.length - 1) }} more
-                    </span>
-                  </div>
+                  <tags-cell-list :tags="contact.tags" />
                 </template>
               </td>
 
@@ -826,6 +808,7 @@ import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 import AlAlert from 'components/alert/index.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
+import TagsCellList from 'components/tags/tags-cell-list.vue'
 
 export default {
   name: 'contacts-view',
@@ -868,7 +851,8 @@ export default {
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
     EnrollContactsToAloaiModal,
-    AssignContactsModal
+    AssignContactsModal,
+    TagsCellList
   },
 
   props: {

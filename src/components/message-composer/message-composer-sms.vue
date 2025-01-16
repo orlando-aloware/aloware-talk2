@@ -13,7 +13,7 @@
              @dragover.prevent
              @drop.prevent="onDrop"
              @paste="onPaste">
-            <div class="mb-2 d-inline-flex media-preview-wrapper">
+            <div class="d-inline-flex media-preview-wrapper">
                 <div v-for="(file, index) in filesOnQueue"
                      :key="index"
                      class="media-preview">
@@ -142,7 +142,6 @@
                       </b-button>
                     </div>
                 </div>
-
             </div>
             <div id="message-sms-input">
               <q-input class="q-input-composer"
@@ -206,6 +205,7 @@
                                       data-testid="sms-message-composer-options"
                                       @gifSelected="gifSelected"
                                       @attachmentUploaded="attachmentUploaded"
+                                      @textMessageSuggestionSelected="textMessageSuggestionSelected"
                                       @templateSelected="templateSelected"
                                       @variableSelected="variableSelected"/>
             <div class="d-flex items-end">
@@ -634,6 +634,10 @@ export default {
 
     getPreviewLink (uuid) {
       return process.env.API_URL + '/static/uploaded_file/' + uuid
+    },
+
+    textMessageSuggestionSelected (suggestion) {
+      this.setMessageComposerSmsBody((this.messageComposer.sms.body ? this.messageComposer.sms.body + ' ' : '') + suggestion)
     },
 
     templateSelected (template) {

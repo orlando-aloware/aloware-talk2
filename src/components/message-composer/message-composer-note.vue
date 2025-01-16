@@ -66,13 +66,13 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
-import At from 'vue-at'
 import Avatar from 'components/avatar'
-import { mentionsMixin } from 'src/plugins/mixins'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { mentionsMixin } from 'src/plugins/mixins'
+import At from 'vue-at'
 
 export default {
   name: 'message-composer-note',

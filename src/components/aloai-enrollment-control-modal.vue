@@ -13,7 +13,7 @@
         AloAi Text Bot Enrollment
       </h1>
       <div class="text-center">
-        Select the Sales Bot you want to initiate a conversation with this contact.
+        Select the Outbound Text Bot you want to initiate a conversation with this contact.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search placeholder="Search bot"
@@ -44,7 +44,7 @@
                 class="ml-1"
                 color="green-6"
               >
-                <span>Enrolled</span>
+                <span class="custom-badge-margin-text">Enrolled</span>
               </q-badge>
             </b-form-radio>
           </label>
@@ -71,7 +71,7 @@
 import talk2Api from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
-import { AloAiUseCases } from 'src/constants/aloai'
+import * as AloAi from 'src/constants/aloai'
 import { isEmpty } from 'lodash'
 
 export default {
@@ -94,7 +94,7 @@ export default {
     },
     // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
     filteredSalesBots () {
-      let bots = this.bots.filter((bot) => bot.enabled && bot.use_case === AloAiUseCases.SALES)
+      let bots = this.bots.filter((bot) => bot.direction === AloAi.DIRECTION_OUTBOUND)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -116,7 +116,7 @@ export default {
       searchText: '',
       isLoading: true,
       selectedBotId: null,
-      AloAiUseCases
+      AloAi
     }
   },
 
@@ -237,7 +237,10 @@ export default {
         if (this.bots.length > 0) {
           return this.bots
         }
-        const { data } = await talk2Api.V2.aloAiBot.getBots()
+        const { data } = await talk2Api.V2.aloAiBot.getBots({
+          enabled: true,
+          type: AloAi.TYPE_TEXT
+        })
         return data?.data ?? []
       } catch (error) {
         console.error('[fetchBots] error', error)
@@ -274,5 +277,8 @@ export default {
 .aloai-enrollment-control-bots-list {
   max-height: 300px;
   overflow-y: auto;
+}
+.custom-badge-margin-text {
+  margin-top: 1px;
 }
 </style>

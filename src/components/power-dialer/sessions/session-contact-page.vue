@@ -20,6 +20,11 @@
 
           <q-tab-panel class="p-0"
                        name="CRM View">
+            <SessionContactPageCrm :usePopup="false" />
+          </q-tab-panel>
+
+          <q-tab-panel class="p-0"
+                       name="CRM Popup">
             <SessionContactPageCrm />
           </q-tab-panel>
         </q-tab-panels>

@@ -15,10 +15,6 @@ const integrations = [
     value: 'hubspot_integration_enabled'
   },
   {
-    name: 'HelpScout',
-    value: 'helpscout_integration_enabled'
-  },
-  {
     name: 'Zoho',
     value: 'zoho_integration_enabled'
   },

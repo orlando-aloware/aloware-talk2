@@ -211,106 +211,6 @@
         </b-col>
       </b-form-row>
 
-      <b-form-row v-if="hasAdminRole"
-                  class="mt-4"
-                  :id="`${SettingsMap.account_level_notifications.hash_keyword}-container`">
-        <b-col sm="12" md="12">
-          <div>
-            <h5 class="form-label">Account Level Notifications (Admins Only)</h5>
-            <p class="form-helper-text">Receive daily emails for account activity:</p>
-          </div>
-
-          <b-form-group label=""
-                        v-if="isBillingAdmin">
-            <b-form-checkbox switch
-                             v-model="user.enabled_billing_warnings"
-                             :value="true"
-                             :unchecked-value="false"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'enabled_billing_warnings')">
-              Billing Warnings
-            </b-form-checkbox>
-            <div class="account-level-notification-tooltip-wrapper">
-              <information-circle-icon color="#2F80ED">
-              </information-circle-icon>
-              <q-tooltip anchor="center start"
-                         self="center left"
-                         :offset="[-20, 10]">
-                Only enabled for billing admins
-              </q-tooltip>
-            </div>
-          </b-form-group>
-
-          <b-form-group label="" :id="`${SettingsMap.enabled_integration_reports.hash_keyword}-container`">
-            <b-form-checkbox switch
-                             v-model="user.enabled_integration_reports"
-                             :value="true"
-                             :unchecked-value="false"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'enabled_integration_reports')">
-              Integration Reports
-            </b-form-checkbox>
-            <div class="account-level-notification-tooltip-wrapper">
-              <information-circle-icon color="#2F80ED">
-              </information-circle-icon>
-              <q-tooltip anchor="center start"
-                         self="center left"
-                         :offset="[-20, 10]">
-                <p class="font-weight-bold">Integration Reports include:</p>
-                <p class="mt-1 mb-0">- Push/Pull Users Sync</p>
-                <p class="mt-0 mb-0">- Contacts Sync</p>
-                <p class="mt-0 mb-0">- Contact Dispositions Sync</p>
-                <p class="mt-0 mb-0">- Call Disposition Sync</p>
-                <p class="mt-0 mb-0">- Failed Integration Connection Status</p>
-              </q-tooltip>
-            </div>
-          </b-form-group>
-
-          <b-form-group label="" :id="`${SettingsMap.enabled_account_reports.hash_keyword}-container`">
-            <b-form-checkbox switch
-                             v-model="user.enabled_account_reports"
-                             :value="true"
-                             :unchecked-value="false"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'enabled_account_reports')">
-              Account Reports
-            </b-form-checkbox>
-            <div class="account-level-notification-tooltip-wrapper">
-              <information-circle-icon color="#2F80ED">
-              </information-circle-icon>
-              <q-tooltip anchor="center start"
-                         self="center left"
-                         :offset="[-20, 10]">
-                <p class="font-weight-bold">Account Reports include:</p>
-                <p class="mt-1 mb-0">- Daily Activity Reports</p>
-                <p class="mt-0 mb-0">- Daily Inbound SMS Report</p>
-                <p class="mt-0 mb-0">- Daily Outbound SMS Report</p>
-                <p class="mt-0 mb-0">- Daily Spending Report</p>
-              </q-tooltip>
-            </div>
-          </b-form-group>
-
-          <b-form-group label="" :id="`${SettingsMap.enabled_other_reports.hash_keyword}-container`">
-            <b-form-checkbox switch
-                             v-model="user.enabled_other_reports"
-                             :value="true"
-                             :unchecked-value="false"
-                             @change="eventPayload => onUpdateFields(eventPayload, 'enabled_other_reports')">
-              Other Notifications
-            </b-form-checkbox>
-            <div class="account-level-notification-tooltip-wrapper">
-              <information-circle-icon color="#2F80ED">
-              </information-circle-icon>
-              <q-tooltip anchor="center start"
-                         self="center left"
-                         :offset="[-20, 10]">
-                <p class="font-weight-bold">Other Notifications:</p>
-                <p class="mt-1 mb-0">- Imports/Exports Reports</p>
-                <p class="mt-0 pt-0">- Webhook Failure Reports</p>
-              </q-tooltip>
-            </div>
-          </b-form-group>
-
-        </b-col>
-      </b-form-row>
-
       <b-form-row class="mt-4" :id="`${SettingsMap.reminders_options.hash_keyword}-container`">
         <b-col sm="12"
                md="12">
@@ -383,14 +283,13 @@ import { mapActions } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { aclMixin, settingsMixin, kycMixin } from 'src/plugins/mixins'
 import { required } from 'vuelidate/lib/validators'
-import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'notification-settings',
 
   mixins: [aclMixin, settingsMixin, kycMixin],
 
-  components: { InformationCircleIcon, LineSelector },
+  components: { LineSelector },
 
   props: {
     user: {

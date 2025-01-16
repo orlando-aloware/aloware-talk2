@@ -1,7 +1,7 @@
 const suffixV1 = '/api/v1/'
 const suffixV2 = '/api/v2/'
-import qs from 'qs'
 import _ from 'lodash'
+import qs from 'qs'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 const exportCommunications = async (contactId) => {
@@ -276,6 +276,18 @@ export default {
       }
     },
 
+    filters: {
+      async get ({ isOnCompany } = {}) {
+        const { data = [] } = await window.axios.get(`${suffixV1}filter`)
+
+        if (isOnCompany) {
+          return data.filter(filter => filter.is_on_company)
+        }
+
+        return data
+      }
+    },
+
     ringGroups: {
       get () {
         return window.axios.get(`${suffixV1}ring-group`)
@@ -433,6 +445,10 @@ export default {
       communications: {
         get (params) {
           return window.axios.get(`${suffixV1}reports/communications`, params)
+        },
+
+        getCount (params) {
+          return window.axios.get(`${suffixV1}reports/communications/count`, params)
         }
       }
     },
@@ -492,19 +508,11 @@ export default {
 
       // Generate transcription for the communication
       generateTranscription (communicationId) {
-        if (!communicationId) {
-          return null
-        }
-
         return window.axios.post(`${suffixV1}transcription/communication/${communicationId}`)
       },
 
       // Generate summary for the transcription
       generateSummary (communicationId) {
-        if (!communicationId) {
-          return null
-        }
-
         return window.axios.post(
           `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )
@@ -694,6 +702,22 @@ export default {
         }
 
         return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary`, params)
+      },
+
+      askQuestion (contactId, params) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary/ask`, params)
+      },
+
+      getTextMessageSuggestions (contactId, params) {
+        if (!contactId) {
+          return window.axios.get(`/api/v2/contacts/text-message-suggestions`, params)
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/text-message-suggestions`, params)
       }
     },
 
@@ -925,7 +949,7 @@ export default {
 
     aloAiBot: {
       getBots (params = {}) {
-        return window.axios.get(`${suffixV1}aloai/bots`, { params })
+        return window.axios.get(`${suffixV1}aloai/bot`, { params })
       },
       getContactDisengagedBots (contactId) {
         return window.axios.get(`${suffixV1}aloai/contacts/${contactId}/disengaged-bots`)
@@ -937,10 +961,10 @@ export default {
         return window.axios.post(`${suffixV1}aloai/contacts/${contactId}/engagement-status`, { engagements })
       },
       enrollContacts (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/enroll-contacts`, params)
+        return window.axios.post(`${suffixV1}aloai/bot/${botId}/enroll-contacts`, params)
       },
       disenrollContact (botId, params) {
-        return window.axios.post(`${suffixV1}aloai/${botId}/disenroll-contact`, params)
+        return window.axios.post(`${suffixV1}aloai/bot/${botId}/disenroll-contact`, params)
       }
     }
   }
