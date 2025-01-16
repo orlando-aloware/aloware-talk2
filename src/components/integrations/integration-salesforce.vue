@@ -159,7 +159,6 @@ export default {
 
       return this.getIntegrationData(this.contact, 'salesforce')
         .then(response => {
-          console.warn(response.data, Object.keys(response.data).length, Object.keys(response.data))
           if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
             this.integrationData = response.data
           } else {
