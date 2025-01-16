@@ -32,7 +32,6 @@ import talk2Api from 'src/plugins/api/api'
 import {
   simpsocialMixin
 } from 'src/plugins/mixins'
-import Integer from 'vuelidate/lib/validators/integer'
 
 export default {
   name: 'sync-with-integration',
@@ -49,7 +48,7 @@ export default {
       required: true
     },
     contact_id: {
-      type: Integer,
+      type: Number,
       required: true
     }
   },
@@ -82,7 +81,6 @@ export default {
       apiCall.then(async _ => {
         this.isSyncing = false
         await this.$emit('sync-complete')
-        this.$generalNotification('Contact synchronization has been scheduled. The updated contact page will reload shortly.')
       }).catch(e => {
         console.warn(e)
         this.isSyncing = false

@@ -88,7 +88,7 @@
             </q-card-section>
           <sync-with-integration integration_name='salesforce'
                                  :contact_id='contact.id'
-                                 @sync-complete="getData"/>
+                                 @sync-complete="afterSyncComplete"/>
         </q-card>
     </div>
   </template>
@@ -159,8 +159,20 @@ export default {
 
       return this.getIntegrationData(this.contact, 'salesforce')
         .then(response => {
-          this.integrationData = response.data
+          console.warn(response.data, Object.keys(response.data).length, Object.keys(response.data))
+          if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
+            this.integrationData = response.data
+          } else {
+            this.integrationData = null
+          }
+
           this.contactIntegrationDataLoaded = true
+        })
+    },
+    afterSyncComplete () {
+      this.getData()
+        .then(() => {
+          this.$generalNotification('Contact has been successfully synced.')
         })
     }
   }
