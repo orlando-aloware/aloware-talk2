@@ -13,13 +13,6 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 150px'
   },
   {
-    label: 'Team',
-    name: 'teams',
-    align: 'left',
-    headerStyle: 'min-width: 180px',
-    columnStyle: 'width: 180px'
-  },
-  {
     label: 'Ring Group',
     name: 'ring_group',
     align: 'left',
