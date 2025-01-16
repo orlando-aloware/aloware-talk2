@@ -59,7 +59,8 @@
                            :style="col.columnStyle"
                            @on-details="onCommunicationDetails"/>
             </div>
-            <div v-else-if="col.name === 'incoming_number'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'incoming_number'">
               <incoming-number :value="col.value"
                                :campaign-id="props.row.campaign_id"/>
             </div>
