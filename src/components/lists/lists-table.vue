@@ -69,7 +69,7 @@
                 <div class="operation-button mx-1">
                   <span class="cursor-pointer"
                         data-testid="lists-rename-button"
-                                   @click="onRenameList(props.row)">
+                        @click="onRenameList(props.row)">
                     <pencil-icon height="16"
                                 width="16"
                                 color="#62666E"/>
@@ -92,9 +92,11 @@
                   </span>
                 </div>
 
-                <div class="operation-button mx-1">
+                <div class="operation-button mx-1"
+                     :data-popper-target="'list-' + props.row.id">
                   <span class="cursor-pointer"
-                        data-testid="lists-export-button"
+                        data-testid="lists-move-button"
+                        data-action="move-item"
                         @click="onMoveList(props.row)">
                     <move-icon height="16"
                                width="16"
@@ -124,7 +126,7 @@
                         data-testid="lists-show-button"
                         @click="onShowInPublicFolderList(props.row)">
                     <eye-icon height="16"
-                               width="16"
+                              width="16"
                               color="#62666E"
                               v-if="!props.row.show_in_public_folder"/>
                     <eye-off-icon height="16"
@@ -166,7 +168,7 @@
                 <div class="operation-button mx-1">
                   <span class="cursor-pointer"
                         data-testid="lists-delete-button"
-                                   @click="onDeleteList(props.row)">
+                        @click="onDeleteList(props.row)">
                     <trash-icon height="16"
                                     width="16"
                                     color="#62666E"/>
@@ -427,7 +429,8 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'listPinToggled',
-      'addPowerDialerOpen'
+      'addPowerDialerOpen',
+      'openMoveDialog'
     ]),
 
     ...mapActions('listsModule', [
@@ -693,6 +696,15 @@ export default {
 
     closeAssignContacts () {
       this.showAssignContacts = false
+    },
+
+    onMoveList (list) {
+      console.log('onMoveList list', list)
+      this.list = list
+      this.openMoveDialog({
+        id: list.id,
+        type: 'list'
+      })
     }
   }
 }
