@@ -917,7 +917,7 @@
             <sparkle-icon width="16" height="16" color="#9333EA"/>
           </h3>
         </div>
-        <div class="text-left-align text-15 font-weight-light-bold my-2">
+        <div class="text-left-align text-13 font-weight-light-bold my-2">
           Get call transcriptions, executive summaries, and action items by AloAi.
           <a href="https://aloware.com/solutions/ai-voice-analytics"
             target="_blank"
