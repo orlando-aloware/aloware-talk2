@@ -1,11 +1,11 @@
 // Event name constants
-export const RTT_EVENT = 'rtt'
-export const MOS_EVENT = 'mos'
-export const JITTER_EVENT = 'jitter'
+export const RTT_EVENT = 'high-rtt'
+export const MOS_EVENT = 'low-mos'
+export const JITTER_EVENT = 'high-jitter'
 export const HIGH_PACKET_LOSS_EVENT = 'high-packet-loss'
 export const HIGH_PACKETS_LOST_FRACTION_EVENT = 'high-packets-lost-fraction'
-export const BYTES_RECEIVED_EVENT = 'bytesReceived'
-export const BYTES_SENT_EVENT = 'bytesSent'
+export const BYTES_RECEIVED_EVENT = 'low-bytes-received'
+export const BYTES_SENT_EVENT = 'low-bytes-sent'
 
 export const networkIssues = {
   [RTT_EVENT]: {
@@ -24,9 +24,9 @@ export const networkIssues = {
     trigger: 'Mean Opinion Score (MOS) < 3.5 for 3 out of last 5 samples',
     details: 'Mean Opinion Score (MOS) is a measure of the overall network conditions that affect call quality.',
     bucketing: [
-      { min: 0, max: 2.4 },
-      { min: 2.5, max: 2.9 },
-      { min: 3.0, max: 3.4 },
+      { min: 0, max: 2.5 },
+      { min: 2.5, max: 3.0 },
+      { min: 3.0, max: 3.5 },
       { min: 3.5, max: 5.0 }
     ]
   },
@@ -36,9 +36,9 @@ export const networkIssues = {
     details: 'Jitter is the measure of variability at which packets arrive at the SDK sensors. High jitter can result in audio quality problems.',
     bucketing: [
       { min: 40, max: Infinity },
-      { min: 36, max: 40 },
+      { min: 35, max: 40 },
       { min: 30, max: 35 },
-      { min: 0, max: 29 }
+      { min: 0, max: 30 }
     ]
   },
   [HIGH_PACKET_LOSS_EVENT]: {

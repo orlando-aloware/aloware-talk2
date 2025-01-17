@@ -15,92 +15,116 @@
                       v-if="showNetworkLogs"
       >
         <div :key="callIssueIndex"
-             v-for="(callIssue, callIssueIndex) in mapCallIssues">
+             v-for="(callIssue, callIssueIndex) in callIssues">
           <q-card class="ring-group-snapshot-card mb-2 text-15"
                   flat
                   bordered
-                  v-if="networkIssues[callIssue.data.name] || networkIssues[callIssue.event_name]"
+                  v-if="networkIssues[callIssue.event_name]"
           >
             <div class="text-left m-4 ">
               <h5 class="mr-1">Agent:</h5>
               {{ user?.full_name ?? '-' }}<br/>
-              <div v-if="callIssue.data.name === RTT_EVENT">
-                <network-signal-strength :value-issue="callIssue.data.avg"
-                                         :issue="networkIssues[callIssue.data.name]"
-                                         :title="networkIssues[callIssue.data.name].trigger"
+              <div v-if="callIssue.event_name === RTT_EVENT">
+                <network-signal-strength :value-issue="callIssue.avg"
+                                         :issue="networkIssues[callIssue.event_name]"
+                                         :counter="callIssue.count"
+                                         :title="networkIssues[callIssue.event_name].trigger"
                 />
-                <h5 class="mr-1">Max outbound Latency:</h5>
-                {{ callIssue.data.max }} ms<br/>
                 <h5 class="mr-1">Avg outbound Latency:</h5>
-                {{ callIssue.data.avg }} ms
+                {{ callIssue.avg }} ms
+                <br/>
+                <h5 class="mr-1">Occurrences:</h5>
+                {{ callIssue.count }} times
                 <br/><br/>
 
-                {{ networkIssues[callIssue.data.name].details }}
+                {{ networkIssues[callIssue.event_name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === MOS_EVENT">
-                <network-signal-strength :value-issue="callIssue.data.avg"
-                                         :issue="networkIssues[callIssue.data.name]"
-                                         :title="networkIssues[callIssue.data.name].trigger"
+              <div v-else-if="callIssue.event_name === MOS_EVENT">
+                <network-signal-strength :value-issue="callIssue.avg"
+                                         :issue="networkIssues[callIssue.event_name]"
+                                         :counter="callIssue.count"
+                                         :title="networkIssues[callIssue.event_name].trigger"
                 />
                 <h5 class="mr-1">Outbound MOS:</h5>
-                {{ callIssue.data.avg }}
+                {{ callIssue.avg }}
+                <br/>
+                <h5 class="mr-1">Occurrences:</h5>
+                {{ callIssue.count }} times
                 <br/><br/>
 
-                {{ networkIssues[callIssue.data.name].details }}
+                {{ networkIssues[callIssue.event_name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === JITTER_EVENT">
-                <network-signal-strength :value-issue="callIssue.data.max"
-                                         :issue="networkIssues[callIssue.data.name]"
-                                         :title="networkIssues[callIssue.data.name].trigger"
+              <div v-else-if="callIssue.event_name === JITTER_EVENT">
+                <network-signal-strength :value-issue="callIssue.avg"
+                                         :issue="networkIssues[callIssue.event_name]"
+                                         :counter="callIssue.count"
+                                         :title="networkIssues[callIssue.event_name].trigger"
                 />
-                <h5 class="mr-1">Max inbound Jitter:</h5>
-                {{ callIssue.data.max }} ms<br/>
                 <h5 class="mr-1">Avg inbound Jitter:</h5>
-                {{ callIssue.data.avg }} ms
+                {{ callIssue.avg }} ms
+                <br/>
+                <h5 class="mr-1">Occurrences:</h5>
+                {{ callIssue.count }} times
                 <br/><br/>
 
-                {{ networkIssues[callIssue.data.name].details }}
+                {{ networkIssues[callIssue.event_name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === BYTES_RECEIVED_EVENT">
-                <network-signal-strength :value-issue="callIssue.data.min"
-                                         :issue="networkIssues[callIssue.data.name]"
-                                         :title="networkIssues[callIssue.data.name].trigger"
+              <div v-else-if="callIssue.event_name === BYTES_RECEIVED_EVENT">
+                <network-signal-strength :value-issue="callIssue.avg"
+                                         :issue="networkIssues[callIssue.event_name]"
+                                         :counter="callIssue.count"
+                                         :title="networkIssues[callIssue.event_name].trigger"
                 />
                 <h5 class="mr-1">Bytes received:</h5>
-                {{ callIssue.data.avg }}
+                {{ callIssue.avg }}
+                <br/>
+                <h5 class="mr-1">Occurrences:</h5>
+                {{ callIssue.count }} times
                 <br/><br/>
 
-                {{ networkIssues[callIssue.data.name].details }}
+                {{ networkIssues[callIssue.event_name].details }}
               </div>
-              <div v-else-if="callIssue.data.name === BYTES_SENT_EVENT">
-                <network-signal-strength :value-issue="callIssue.data.min"
-                                         :issue="networkIssues[callIssue.data.name]"
-                                         :title="networkIssues[callIssue.data.name].trigger"
+              <div v-else-if="callIssue.event_name === BYTES_SENT_EVENT">
+                <network-signal-strength :value-issue="callIssue.avg"
+                                         :issue="networkIssues[callIssue.event_name]"
+                                         :counter="callIssue.count"
+                                         :title="networkIssues[callIssue.event_name].trigger"
                 />
                 <h5 class="mr-1">Bytes sent:</h5>
-                {{ callIssue.data.avg }}
+                {{ callIssue.avg }}
+                <br/>
+                <h5 class="mr-1">Occurrences:</h5>
+                {{ callIssue.count }} times
                 <br/><br/>
 
-                {{ networkIssues[callIssue.data.name].details }}
+                {{ networkIssues[callIssue.event_name].details }}
               </div>
               <div v-else-if="callIssue.event_name === HIGH_PACKET_LOSS_EVENT">
-                <network-signal-strength :value-issue="callIssue.data.avg"
+                <network-signal-strength :value-issue="callIssue.avg"
                                          :issue="networkIssues[callIssue.event_name]"
+                                         :counter="callIssue.count"
                                          :title="networkIssues[callIssue.event_name].trigger"
                 />
                 <h5 class="mr-1">Inbound Packet Loss: </h5>
-                {{ callIssue.data.avg }}%
+                {{ callIssue.avg }}%
+                <br/>
+                <h5 class="mr-1">Occurrences:</h5>
+                {{ callIssue.count }} times
                 <br/><br/>
 
                 {{ networkIssues[callIssue.event_name].details }}
               </div>
               <div v-else-if="callIssue.event_name === HIGH_PACKETS_LOST_FRACTION_EVENT">
-                <network-signal-strength :value-issue="callIssue.data.avg"
+                <network-signal-strength :value-issue="callIssue.avg"
                                          :issue="networkIssues[callIssue.event_name]"
+                                         :counter="callIssue.count"
                                          :title="networkIssues[callIssue.event_name].trigger"
                 />
                 <h5 class="mr-1">Inbound Packet Loss Fraction: </h5>
-                {{ callIssue.data.avg }}%
+                {{ callIssue.avg }}%
+                <br/>
+                <h5 class="mr-1">Occurrences:</h5>
+                {{ callIssue.count }} times
                 <br/><br/>
 
                 {{ networkIssues[callIssue.event_name].details }}
@@ -148,48 +172,8 @@ export default {
       networkIssues
     }
   },
-  methods: {
-    calculateAvgMetrics (threshold, values) {
-      // If no threshold or values, return 'N/A'
-      if (!threshold || !values || values.length === 0) return 'N/A'
 
-      values = values.filter((value) => {
-        if (threshold.name === 'max' || threshold.name === 'maxAverage') {
-          return value > threshold.value
-        } else if (threshold.name === 'min' || threshold.name === 'minAverage') {
-          return value < threshold.value
-        }
-      })
-      const sum = values.reduce((accum, current) => accum + current, 0)
-
-      return parseFloat((sum / values.length).toFixed(2))
-    }
-  },
   computed: {
-    mapCallIssues () {
-      return this.callIssues.map(issue => {
-        // Ensure issue.data exists and handle missing fields
-        const data = issue.data || {}
-
-        // Check if values is a valid array, otherwise default to empty
-        const values = Array.isArray(data.values) ? data.values : []
-
-        // If no values, thresholds, or data, handle it gracefully
-        const max = values.length ? Math.max(...values).toFixed(2) : 'N/A'
-        const min = values.length ? Math.min(...values).toFixed(2) : 'N/A'
-        const avg = values.length && data.threshold ? this.calculateAvgMetrics(data.threshold, values) : 'N/A'
-
-        return {
-          ...issue,
-          data: {
-            ...issue.data,
-            max: max,
-            min: min,
-            avg: avg
-          }
-        }
-      })
-    },
     showNetworkLogs () {
       return this.callIssues?.length > 0
     }
