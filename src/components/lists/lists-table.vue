@@ -699,7 +699,6 @@ export default {
     },
 
     onMoveList (list) {
-      console.log('onMoveList list', list)
       this.list = list
       this.openMoveDialog({
         id: list.id,
