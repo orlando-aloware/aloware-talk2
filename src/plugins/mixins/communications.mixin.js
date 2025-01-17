@@ -906,7 +906,7 @@ export default {
           if (response) {
             this.gettingTasksList(false)
             const data = response.data.data
-            console.log('data fetched', data)
+
             if (isLoadMore && data.length > 0) {
               this.appendCommunications(data)
             } else {

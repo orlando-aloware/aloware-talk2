@@ -260,6 +260,7 @@ import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
 import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
+import { mapState } from 'vuex'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -305,6 +306,12 @@ export default {
     CsatScore,
     WallboardCallsNote,
     CommunicationsDetailsSidebar
+  },
+
+  computed: {
+    ...mapState('communications', [
+      'hasMoreCommunications'
+    ])
   },
 
   data () {
@@ -360,9 +367,10 @@ export default {
       }
 
       const lastIndex = this.communications.length - 1
+
       if (
         !this.isLoadingMore &&
-        this.paginationPage < this.lastPage &&
+        this.hasMoreCommunications &&
         to === lastIndex &&
         to > 0
       ) {
@@ -372,7 +380,7 @@ export default {
     },
 
     async loadMoreCommunications (done) {
-      if (!this.isLoadingMore && this.paginationPage < this.lastPage) {
+      if (!this.isLoadingMore && this.hasMoreCommunications) {
         this.paginationPage += 1
         await this.getCommunications(this.communicationFilters, undefined, true)
 
