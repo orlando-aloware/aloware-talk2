@@ -917,7 +917,7 @@
             <sparkle-icon width="16" height="16" color="#9333EA"/>
           </h3>
         </div>
-        <div class="text-left-align text-15 font-weight-light-bold my-2">
+        <div class="text-left-align text-13 font-weight-light-bold my-2">
           Get call transcriptions, executive summaries, and action items by AloAi.
           <a href="https://aloware.com/solutions/ai-voice-analytics"
             target="_blank"
@@ -1178,10 +1178,10 @@ export default {
         this.showAudio(this.communication) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions
-          !this.current_company?.transcription_settings?.call_transcription_enabled ||
+          !this.currentCompany?.transcription_settings?.call_transcription_enabled ||
           (
-            this.current_company?.used_transcription_min >= this.current_company?.plan?.included_transcription_min &&
-            this.current_company?.transcription_settings?.overusage_restriction_enabled
+            this.currentCompany?.used_transcription_min >= this.currentCompany?.plan?.included_transcription_min &&
+            this.currentCompany?.transcription_settings?.overusage_restriction_enabled
           )
         )
       )
