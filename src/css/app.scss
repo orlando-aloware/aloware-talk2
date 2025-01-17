@@ -16097,6 +16097,15 @@ hr {
     .q-table__linear-progress {
       color: #256eff !important;
     }
+
+    &--no-data {
+      left: 0;
+      position: absolute;
+      width: 100%;
+      margin-top: 300px;
+      text-align: center;
+      z-index: 0;
+    }
   }
 
   .title {

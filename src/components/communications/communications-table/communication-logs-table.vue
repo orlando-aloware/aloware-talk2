@@ -192,6 +192,11 @@
       </template>
     </q-table>
 
+    <div class="communication-logs-table--no-data h5"
+         v-if="!communications.length && !isLoadingMore && !isLoadingCommunications">
+      No communications found based on the current filters
+    </div>
+
     <communications-details-sidebar :communication="sidebarCommunication"
                                     v-model="showCommunicationSidebar"/>
 
