@@ -1178,10 +1178,10 @@ export default {
         this.showAudio(this.communication) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions
-          !this.current_company?.transcription_settings?.call_transcription_enabled ||
+          !this.currentCompany?.transcription_settings?.call_transcription_enabled ||
           (
-            this.current_company?.used_transcription_min >= this.current_company?.plan?.included_transcription_min &&
-            this.current_company?.transcription_settings?.overusage_restriction_enabled
+            this.currentCompany?.used_transcription_min >= this.currentCompany?.plan?.included_transcription_min &&
+            this.currentCompany?.transcription_settings?.overusage_restriction_enabled
           )
         )
       )
