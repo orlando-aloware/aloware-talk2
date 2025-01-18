@@ -303,7 +303,7 @@
                   <div class="d-flex align-items-center">
                     <ready-icon v-if="!shouldIntroduce" />
                     <waiting-icon v-else />
-                    <span class="ml-2 text-size-xxl _600 text-grey-100">{{ contactName | truncate(15) }}</span>
+                    <span class="ml-2 text-14 _600 text-grey-100">{{ contactName | truncate(18) }}</span>
                   </div>
                 </q-item-label>
                 <q-btn class="d-flex align-items-center justify-content-between merge-btn"
@@ -329,7 +329,7 @@
                               @click="openExpansion('members')">
                   <div class="d-flex align-items-center">
                     <ready-icon />
-                    <span class="ml-2 text-size-xxl _600 text-grey-100">{{ addedParty.name | truncate(15) }}</span>
+                    <span class="ml-2 text-14 _600 text-grey-100">{{ addedParty.name | truncate(18) }}</span>
                   </div>
                   <div class="mt-1">
                     <span class="add-status"
