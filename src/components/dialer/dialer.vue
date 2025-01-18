@@ -119,9 +119,9 @@ export default {
 
         const communication = this.dialer?.communication
         const isGreetingNew = communication?.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
-        const user = this.getUser(this.dialer.communication.added_user_id)
+        const user = communication?.added_user
 
-        if (user.name && !isGreetingNew) {
+        if (user && !isGreetingNew) {
           this.setAddedParty(user)
         }
 
@@ -564,6 +564,14 @@ export default {
         }
 
         this.setDialerCommunication(res.data)
+
+        const communication = this.dialer.communication
+        const isGreetingNew = communication.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+        const user = communication.added_user
+
+        if (user && !isGreetingNew) {
+          this.setAddedParty(user)
+        }
 
         // if in power dialer session, we must match the active task (contact)'s id
         // with the communication's contact id
