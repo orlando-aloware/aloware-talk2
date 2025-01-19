@@ -962,6 +962,12 @@ export default {
       disenrollContact (botId, params) {
         return window.axios.post(`${suffixV1}aloai/bot/${botId}/disenroll-contact`, params)
       }
+    },
+
+    companies: {
+      toggleFeature (companyId, feature) {
+        return window.axios.put(`${suffixV2}companies/${companyId}/features/${feature}`)
+      }
     }
   }
 }

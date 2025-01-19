@@ -61,6 +61,33 @@
       </label>
     </div>
 
+    <div class="d-flex align-items-center ml-3" v-if="showNewInboxToggle">
+      <b-form-checkbox class="mt-1 cursor-pointer"
+                      size="sm"
+                      switch
+                      data-testid="inbox-new-experience-checkbox"
+                      :class="toggleFiltersClass"
+                      :disabled="isTogglingNewInbox"
+                      v-model="newInboxEnabled"
+                      @change="toggleNewInbox">
+        <q-tooltip content-class="bg-grey-10 text-white"
+                  anchor="bottom left"
+                  self="top middle">
+          Toggle New Inbox Experience
+        </q-tooltip>
+      </b-form-checkbox>
+      <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
+             :class="[toggleFiltersClass, { 'text-danger': newInboxEnabled }]"
+             data-testid="inbox-new-experience-label">
+        <template v-if="newInboxEnabled">
+          Roll back to old inbox
+        </template>
+        <template v-else>
+          Try new inbox experience
+        </template>
+      </label>
+    </div>
+
   </div>
 </template>
 
@@ -70,6 +97,7 @@ import { inboxRoutesMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
+import api from 'src/plugins/api/api'
 
 export default {
   name: 'inbox-toggle-filters',
@@ -95,7 +123,8 @@ export default {
       inboxShowMyContactsFilter: false,
       inboxShowUnreadsFilter: false,
       MOBILE_LARGE_WIDTH,
-      EXTRA_SMALL_MOBILE_WIDTH
+      EXTRA_SMALL_MOBILE_WIDTH,
+      isTogglingNewInbox: false
     }
   },
 
@@ -108,6 +137,7 @@ export default {
       'isFetchingContacts',
       'isInboxRefreshBtnLoading'
     ]),
+    ...mapState('cache', ['currentCompany']),
 
     isShown () {
       return (this.$route?.meta?.title === 'Inboxes' && this.$route.params.channel !== 'mentions')
@@ -123,6 +153,19 @@ export default {
 
     refreshButtonLabel () {
       return this.$q.screen.width < MOBILE_LARGE_WIDTH ? '' : 'Refresh'
+    },
+
+    newInboxEnabled: {
+      get () {
+        return this.currentCompany?.new_inbox || false
+      },
+      set () {
+        // Handled by toggleNewInbox method
+      }
+    },
+
+    showNewInboxToggle () {
+      return this.isShown
     }
   },
 
@@ -132,6 +175,7 @@ export default {
       'setInboxShowUnreads',
       'setIsInboxRefreshBtnLoading'
     ]),
+    ...mapActions('cache', ['setCurrentCompany']),
 
     myContactsFilterChange () {
       if (!this.isInboxFiltersLoaded || this.isGettingTasksList || this.isFetchingContacts) {
@@ -171,6 +215,42 @@ export default {
     refreshInbox () {
       this.setIsInboxRefreshBtnLoading(true)
       this.$VueEvent.fire('fetchInbox')
+    },
+
+    async toggleNewInbox () {
+      try {
+        this.isTogglingNewInbox = true
+        const response = await api.V2.companies.toggleFeature(
+          this.currentCompany.id,
+          'inbox'
+        )
+
+        if (response.data.success) {
+          await this.setCurrentCompany({
+            ...this.currentCompany,
+            new_inbox: response.data.enabled
+          })
+
+          this.$q.notify({
+            type: 'positive',
+            message: response.data.enabled
+              ? 'New inbox experience enabled'
+              : 'Rolled back to classic inbox',
+            position: 'top'
+          })
+
+          this.refreshInbox()
+        }
+      } catch (error) {
+        console.error('Failed to toggle new inbox:', error)
+        this.$q.notify({
+          type: 'negative',
+          message: 'Failed to update inbox preference',
+          position: 'top'
+        })
+      } finally {
+        this.isTogglingNewInbox = false
+      }
     }
   },
 
@@ -202,3 +282,7 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+// Add any additional styles if needed
+</style>
