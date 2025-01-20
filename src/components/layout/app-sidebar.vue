@@ -149,7 +149,7 @@
 
     <q-btn :to="{ path: '/lists' }"
            :ripple="false"
-           icon="img:app-icons/menu/power_dialer_active.svg"
+           icon="img:app-icons/menu/lists_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
@@ -170,7 +170,7 @@
     </q-btn>
     <q-btn :to="{ path: '/lists' }"
            :ripple="false"
-           icon="img:app-icons/menu/power_dialer_gray.svg"
+           icon="img:app-icons/menu/lists_gray.svg"
            align="left"
            padding="10px 20px"
            class="nav-icons w-100"
