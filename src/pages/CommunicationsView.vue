@@ -172,7 +172,6 @@ export default {
 
     window.addEventListener('resize', this.onWindowResize)
 
-    console.log('mounted...')
     this.$nextTick(() => {
       this.getCommunications(this.communicationFilters)
     })
@@ -196,13 +195,9 @@ export default {
       this.resetChannelChangedFilterFields()
       this.setInboxFilters(filter)
 
-      console.log('entering here, for changing to channel', newVal)
-      // if (newVal === DEFAULT_COMMUNICATIONS_CHANNEL) {
-
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
-      // }
     },
 
     isLoadedPinnedViews (value) {

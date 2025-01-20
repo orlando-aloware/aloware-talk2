@@ -6,7 +6,7 @@ import * as CommunicationAccessTypes from 'src/constants/communication-access-ty
 import * as ContactAccessTypes from 'src/constants/contact-access-types'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
-import { STATUS_ABANDONED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_UNANSWERED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
+import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_ABANDONED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_UNANSWERED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
 
 export default {
   data () {
@@ -49,7 +49,7 @@ export default {
     checkCommunicationMatchesFilters (filter, communication, forInbox = false) {
       // if answer status filter is other than all
       if (filter.answer_status !== undefined &&
-        filter.answer_status !== 'all') {
+        filter.answer_status !== ANY_COMMUNICATION_ANSWER_STATUS) {
         // handle live & hold as a special case
         if ([STATUS_LIVE, STATUS_HOLD, STATUS_QUEUED].includes(filter.answer_status) &&
           communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
@@ -207,21 +207,21 @@ export default {
       }
       // if type of communication filter is selected
       if (filter.type !== undefined &&
-        filter.type !== 'all') {
+        filter.type !== CommunicationTypes.ANY_COMMUNICATION_TYPE) {
         // check type of communication matches the type of communication filter
-        if (filter.type === 'call' &&
+        if (filter.type === CommunicationTypes.CALL_TYPE &&
           communication.type !== CommunicationTypes.CALL) {
           return false
         }
-        if (filter.type === 'sms' &&
+        if (filter.type === CommunicationTypes.SMS_TYPE &&
           communication.type !== CommunicationTypes.SMS) {
           return false
         }
-        if (filter.type === 'email' &&
+        if (filter.type === CommunicationTypes.EMAIL_TYPE &&
           communication.type !== CommunicationTypes.EMAIL) {
           return false
         }
-        if (filter.type === 'fax' &&
+        if (filter.type === CommunicationTypes.FAX_TYPE &&
           communication.type !== CommunicationTypes.FAX) {
           return false
         }

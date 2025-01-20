@@ -150,24 +150,7 @@ export default {
     },
 
     communicationsChannels () {
-      /*
-        WAT-1105: the channels and view are being moved to this communications menu
-        but for now we will only being displayed the communications logs
-      */
-      // if (this.hasNewCommunicationsFeatureEnabled) { return this.navListItems.filter(item => item.default) } // only shows the default "communications logs"
-
-      if (this.profile?.campaign_id) {
-        return this.navListItems
-      }
-
-      // hard-coded disabling my-personal-line channel
-      const channels = this.navListItems
-      let index = channels.findIndex(channel => channel.value === 'my-personal-line')
-      if (channels[index]) {
-        channels[index].disabled = true
-        channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
-      }
-      return channels
+      return this.navListItems
     },
 
     filterTypeForGetSavedFilters () {

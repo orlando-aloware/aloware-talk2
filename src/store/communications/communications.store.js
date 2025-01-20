@@ -1,10 +1,12 @@
-import { STATUS_RECORDED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
+import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_RECORDED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
+import { ANY_COMMUNICATION_TYPE, CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
 import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 const DEFAULT_CHANNEL = {
   label: 'Communications Logs',
   value: DEFAULT_COMMUNICATIONS_CHANNEL,
   icon: 'all-communications',
+  type: ANY_COMMUNICATION_TYPE,
   disabled: false,
   default: true
 }
@@ -33,15 +35,15 @@ export default function () {
         value: CALLS_CHANNEL,
         icon: 'call',
         disabled: false,
-        type: 'call',
-        answerStatus: 'all'
+        type: CALL_TYPE,
+        answerStatus: ANY_COMMUNICATION_ANSWER_STATUS
       },
       {
         label: 'Voicemails',
         value: VOICEMAILS_CHANNEL,
         icon: 'voicemail',
         disabled: false,
-        type: 'call',
+        type: CALL_TYPE,
         answerStatus: STATUS_VOICEMAIL
       },
       {
@@ -49,7 +51,7 @@ export default function () {
         value: RECORDINGS_CHANNEL,
         icon: 'record',
         disabled: false,
-        type: 'call',
+        type: CALL_TYPE,
         answerStatus: STATUS_RECORDED
       },
       {
@@ -57,8 +59,8 @@ export default function () {
         value: MESSAGES_CHANNEL,
         icon: 'message',
         disabled: false,
-        type: 'sms',
-        answerStatus: 'all'
+        type: SMS_TYPE,
+        answerStatus: ANY_COMMUNICATION_ANSWER_STATUS
       }
       /*
        {

@@ -98,7 +98,6 @@ export default {
       if (this.activeChannel?.value) {
         return this.activeChannel?.value
       }
-      // TODO: maybe should be all instead, just check
       return CALLS_CHANNEL
     },
     changedFilterFieldCount () {

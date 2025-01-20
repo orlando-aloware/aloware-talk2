@@ -21,6 +21,7 @@ export const STATUS_UNANSWERED = 'unanswered' // The call was not answered
 export const STATUS_LIVE = 'live' // The call is live
 export const STATUS_HOLD = 'hold' // The call is on hold
 export const STATUS_DEADEND = 'deadend' // The call is deadend
+export const ANY_COMMUNICATION_ANSWER_STATUS = 'all'
 export const STATUS_SMS_RECEIVED = 'received' // A SMS is received by our system.
 export const STATUS_SMS_SENT = 'sent' // A SMS is sent to the system.
 export const STATUS_SMS_DELIVERED = 'delivered' // A SMS is delivered.

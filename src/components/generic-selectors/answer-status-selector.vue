@@ -45,7 +45,7 @@
 
 <script>
 
-import { STATUS_ABANDONED, STATUS_ANSWERED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_VOICEMAIL, STATUS_UNANSWERED } from 'src/constants/communication-status'
+import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_ABANDONED, STATUS_ANSWERED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_VOICEMAIL, STATUS_UNANSWERED } from 'src/constants/communication-status'
 
 export default {
   name: 'answer-status-selector',
@@ -53,7 +53,7 @@ export default {
   props: {
     value: {
       type: String,
-      default: 'all'
+      default: ANY_COMMUNICATION_ANSWER_STATUS
     },
     multiple: {
       type: Boolean,
@@ -96,7 +96,7 @@ export default {
     },
     optionsArray () {
       return [
-        { value: 'all', label: 'All' },
+        { value: ANY_COMMUNICATION_ANSWER_STATUS, label: 'All' },
         { value: STATUS_LIVE, label: 'Live' },
         { value: STATUS_ANSWERED, label: 'Answered' },
         { value: STATUS_UNANSWERED, label: 'Unanswered' },
@@ -149,7 +149,7 @@ export default {
     },
 
     answerStatus (val) {
-      this.$emit('select', this.answerStatus ? this.answerStatus : 'all')
+      this.$emit('select', this.answerStatus ? this.answerStatus : ANY_COMMUNICATION_ANSWER_STATUS)
     }
   }
 }

@@ -13,12 +13,6 @@ export default {
   channelDefaultFilterModel (state) {
     const { value: channel, answerStatus, type } = state.activeChannel || {}
 
-    console.log('starting to set the default filter model')
-
-    console.log('the selected channel is:', channel)
-    console.log('the selected answer status is:', answerStatus)
-    console.log('the selected type is:', type)
-
     let defaultFilterModel = {
       name: '',
       type: ChannelType.CHANNEL_MESSAGES,
@@ -97,7 +91,7 @@ export default {
         ...Filters.DEFAULT_STATE.filter,
         changed: true,
         unread_only: 0,
-        type: 'all'
+        type
       }
 
       return defaultFilterModel
@@ -132,7 +126,7 @@ export default {
       creator_type: Filters.DEFAULT_STATE.filter.creator_type,
       has_international: Filters.DEFAULT_STATE.filter.has_international,
       answer_status: answerStatus,
-      type: 'sms',
+      type,
       unread_only: 0
     }
 

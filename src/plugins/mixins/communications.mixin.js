@@ -17,6 +17,7 @@ import * as MentionType from 'src/constants/mention-type'
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
 import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
 
 export default {
   mixins: [userMixin],
@@ -805,11 +806,11 @@ export default {
         case CALLS_CHANNEL:
         case VOICEMAILS_CHANNEL:
         case RECORDINGS_CHANNEL:
-          return 'call'
+          return CALL_TYPE
         case MESSAGES_CHANNEL:
-          return 'sms'
+          return SMS_TYPE
         default:
-          return this.activeChannel
+          return this.activeChannel.type
       }
     },
 
@@ -823,9 +824,6 @@ export default {
         this.isLoadingMore = true
       }
 
-      // let params = this.$jsonClone(filters)
-      console.log('active channel in the mixin', this.activeChannel)
-      console.log('communication type', this.getCommunicationType())
       let params = {
         from_date: '',
         to_date: '',
@@ -907,8 +905,6 @@ export default {
         this.getCommunicationsCount(params)
       }
 
-      console.log('params for query', params)
-
       return api.get({
         params: params,
         cancelToken: this.source.token,
@@ -916,9 +912,8 @@ export default {
       })
         .then(response => {
           if (response) {
-            // this.gettingTasksList(false)
             const data = response.data.data
-            console.log('data fetched', data)
+
             if (isLoadMore && data.length > 0) {
               this.appendCommunications(data)
             } else {
@@ -948,7 +943,6 @@ export default {
             return
           }
 
-          // this.gettingTasksList(false)
           this.communicationsListHasError = true
           const channelName = this.$route.params.channel !== 'mentions'
             ? 'communications'
