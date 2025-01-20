@@ -89,12 +89,6 @@ export default {
     contact: {
       type: Object,
       required: true
-    },
-
-    dialerMode: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
 

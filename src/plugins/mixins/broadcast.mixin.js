@@ -57,10 +57,10 @@ export default {
       this.broadcastListen()
 
       // This is a stress test for soketi server, should be removed in the future
-      // if (broadcastDriver === 'pusher') {
-      //   window.secondEchoDriver = this.initEcho('soketi')
-      //   this.broadcastListenSecondDriver()
-      // }
+      if (broadcastDriver === 'pusher') {
+        window.secondEchoDriver = this.initEcho('soketi')
+        this.broadcastListenSecondDriver()
+      }
 
       // If error to connect, try to connect with other driver as fallback
       window.Echo.connector.pusher.connection.unbind('error')
