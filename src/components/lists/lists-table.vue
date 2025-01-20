@@ -170,8 +170,8 @@
                         data-testid="lists-delete-button"
                         @click="onDeleteList(props.row)">
                     <trash-icon height="16"
-                                    width="16"
-                                    color="#62666E"/>
+                                width="16"
+                                color="#62666E"/>
                     <q-tooltip>
                       Delete this list
                     </q-tooltip>
@@ -183,8 +183,8 @@
                         data-testid="lists-duplicate-button"
                         @click="openAssignContacts(props.row)">
                     <arrow-right-icon height="16"
-                               width="16"
-                               color="#62666E"/>
+                                      width="16"
+                                      color="#62666E"/>
                     <q-tooltip>
                       Assign Contacts
                     </q-tooltip>
@@ -249,8 +249,14 @@
 </template>
 
 <script>
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import ListsRenameForm from 'src/components/lists/lists-rename-form'
+import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import AssignContactsModal from 'src/components/assign-contacts-modal'
+import MoveDialog from 'src/components/move-dialog'
 import RelativeTime from 'src/components/relative-time.vue'
-import { COLUMNS } from 'src/constants/lists/home-columns'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
 import TrashIcon from 'components/icons/trash-icon.vue'
@@ -262,13 +268,7 @@ import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import ListsRenameForm from 'src/components/lists/lists-rename-form'
-import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
-import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
-import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
-import AssignContactsModal from 'src/components/assign-contacts-modal'
-import MoveDialog from 'src/components/move-dialog'
+import { COLUMNS, columnsByViewportConfig } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
 
@@ -288,31 +288,30 @@ export default {
   ],
 
   components: {
-    RelativeTime,
-    ListsRenameForm,
-    ConvertListToPublicDialog,
-    PencilIcon,
-    TrashIcon,
-    DuplicateIcon,
-    PinIcon,
-    EyeIcon,
-    EyeOffIcon,
     AddCallIcon,
     AddSequenceIcon,
     ArrowRightIcon,
-    TagContactsWorkflowEnroller,
-    PowerDialerAddModal,
-    AssignContactsModal,
+    DuplicateIcon,
+    EyeIcon,
+    EyeOffIcon,
     MoveIcon,
-    MoveDialog
+    PencilIcon,
+    PinIcon,
+    TrashIcon,
+    AssignContactsModal,
+    ConvertListToPublicDialog,
+    ListsRenameForm,
+    MoveDialog,
+    PowerDialerAddModal,
+    TagContactsWorkflowEnroller,
+    RelativeTime
   },
 
   data () {
     return {
-      loading: false,
-      COLUMNS,
-      isLoadingMore: false,
       isLoading: false,
+      isLoadingMore: false,
+      loading: false,
       pagination: {
         rowsPerPage: 0,
         rowsNumber: this.listsCount,
@@ -321,24 +320,17 @@ export default {
         currentPage: 1
       },
       listsData: [],
-      isOpenListForm: false,
       list: null,
-
+      isOpenListForm: false,
       convertToPublicDialog: false,
       pinnedLists: [],
       showAddToSequence: false,
+      showAssignContacts: false,
       openPDModal: false,
       addToPowerDialerMode: 'add',
       addToPowerDialerIsManualSelection: false,
-      showAssignContacts: false
+      COLUMNS
     }
-  },
-
-  async mounted () {
-    await this.getLists()
-    this.calculateTotalPages()
-    this.listsData = this.lists
-    await this.getPinnedLists()
   },
 
   computed: {
@@ -359,59 +351,7 @@ export default {
     },
 
     columnsByViewport () {
-      return {
-        mobile: [
-          'name',
-          'actions'
-        ],
-        tablet: [
-          'name',
-          'no_of_contacts',
-          'actions'
-        ],
-        smallDesktop: [
-          'name',
-          'owner_name',
-          'no_of_contacts',
-          'type',
-          'actions'
-        ],
-        mediumDesktop: [
-          'name',
-          'owner_name',
-          'date_created',
-          'no_of_contacts',
-          'type',
-          'show_in_public_folder',
-          'source',
-          'import_status',
-          'actions'
-        ],
-        largeDesktop: [
-          'name',
-          'owner_name',
-          'date_created',
-          'no_of_contacts',
-          'type',
-          'show_in_public_folder',
-          'source',
-          'import_status',
-          'imported_at',
-          'actions'
-        ],
-        extraLargeDesktop: [
-          'name',
-          'owner_name',
-          'date_created',
-          'no_of_contacts',
-          'type',
-          'show_in_public_folder',
-          'source',
-          'import_status',
-          'imported_at',
-          'actions'
-        ]
-      }
+      return columnsByViewportConfig
     },
 
     fixedColumns () {
@@ -420,9 +360,7 @@ export default {
     },
 
     isPinned () {
-      return Array.isArray(this.pinnedLists)
-        ? this.pinnedLists.includes(this.list.id)
-        : false
+      return Array.isArray(this.pinnedLists) ? this.pinnedLists.includes(this.list.id) : false
     }
   },
 
@@ -443,46 +381,29 @@ export default {
       'SET_LISTS_COUNT'
     ]),
 
-    openListForm () {
-      this.isOpenListForm = true
+    async initializeLists () {
+      await this.getLists()
+      this.calculateTotalPages()
+      this.listsData = this.lists
+      await this.getPinnedLists()
     },
 
-    closeListForm () {
-      this.isOpenListForm = false
+    async getLists (isLoadMore = false) {
+      if (this.isLoading) return
 
-      // Fix submit button label slight glitch upon closing
-      setTimeout(() => {
-        this.list = null
-      }, 200)
-    },
+      this.setLoadingState(isLoadMore)
 
-    getContactListType (contactList) {
-      switch (contactList.type) {
-        case ContactListTypes.STATIC:
-          return 'Static'
-        case ContactListTypes.DYNAMIC:
-          return 'Dynamic'
-        case ContactListTypes.DYNAMIC_REMOTE_LIST:
-          return 'Integration Dynamic'
-        default:
-          return 'Unknown'
+      try {
+        await this.fetchLists({
+          page: this.pagination.currentPage,
+          perPage: this.pagination.perPage
+        })
+      } finally {
+        this.resetLoadingState()
       }
     },
 
-    calculateTotalPages () {
-      if (this.lists?.length === 0) {
-        this.pagination.totalPages = 1
-        return
-      }
-
-      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage)
-    },
-
-    getLists (isLoadMore = false) {
-      if (this.isLoading) {
-        return
-      }
-
+    setLoadingState (isLoadMore) {
       if (!isLoadMore) {
         this.isLoading = true
         this.pagination.currentPage = 1
@@ -490,15 +411,40 @@ export default {
       } else {
         this.isLoadingMore = true
       }
+    },
 
-      return this.fetchLists({
-        page: this.pagination.currentPage,
-        perPage: this.pagination.perPage
-      })
-        .finally(() => {
-          this.isLoading = false
-          this.isLoadingMore = false
-        })
+    resetLoadingState () {
+      this.isLoading = false
+      this.isLoadingMore = false
+    },
+
+    async loadMoreLists (done) {
+      if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
+        if (typeof done === 'function') {
+          done()
+        }
+        return
+      }
+
+      this.pagination.currentPage += 1
+      await this.getLists(true)
+      this.listsData.push(...this.lists)
+
+      if (typeof done === 'function') {
+        done()
+      }
+    },
+
+    calculateTotalPages () {
+      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage) || 1
+    },
+
+    refreshLists: async function () {
+      this.listsData = []
+      this.SET_LISTS_COUNT(0)
+      await this.getLists()
+      this.calculateTotalPages()
+      this.listsData = this.lists
     },
 
     removeList (list) {
@@ -506,11 +452,10 @@ export default {
         .then(() => {
           this.SET_LISTS_COUNT(this.listsCount - 1)
           this.listsData = this.listsData.filter(item => item.id !== list.id)
-
           this.$generalNotification(`${list.name} list has been successfully deleted.`)
         })
-        .catch((err) => {
-          console.log(err)
+        .catch(err => {
+          console.error(err)
           this.$generalNotification('Something went wrong while deleting list.', 'error')
         })
     },
@@ -523,50 +468,33 @@ export default {
       }
     },
 
-    async loadMoreLists (done) {
-      if (!this.isLoadingMore && this.pagination.currentPage < this.pagination.totalPages) {
-        this.pagination.currentPage += 1
-        await this.getLists(true)
-        this.listsData.push(...this.lists)
-
-        if (typeof done === 'function') {
-          done()
-        }
-      } else {
-        if (typeof done === 'function') {
-          done()
-        }
-      }
+    openListForm () {
+      this.isOpenListForm = true
     },
 
-    onDeleteList (list) {
-      this.$bvModal.msgBoxConfirm('Are you sure you want to delete this contact list? This action is irreversible.', {
-        buttonSize: 'sm',
-        okTitle: 'Yes',
-        cancelTitle: 'No',
-        centered: true
-      }).then(confirm => {
-        if (confirm) {
-          this.removeList(list)
-        }
-      })
+    closeListForm () {
+      this.isOpenListForm = false
+      setTimeout(() => (this.list = null), 200) // Fix UI glitch
+    },
+
+    listUpdated (list) {
+      this.listsData = this.listsData.map(item =>
+        item.id === list.id ? { ...item, name: list.name } : item
+      )
+    },
+
+    openAssignContacts (list) {
+      this.list = list
+      this.showAssignContacts = true
+    },
+
+    closeAssignContacts () {
+      this.showAssignContacts = false
     },
 
     onRenameList (list) {
       this.list = list
       this.openListForm()
-    },
-
-    listUpdated (list) {
-      const { id, name } = list
-
-      this.listsData = this.listsData.map(item => {
-        if (item.id === id) {
-          item.name = name
-        }
-
-        return item
-      })
     },
 
     onDuplicateList (list) {
@@ -578,65 +506,40 @@ export default {
       })
     },
 
-    duplicateList (params) {
-      this.$axios
-        .post(`/api/v2/contacts-list/${this.list.id}/duplicate`, params)
-        .then(async (response) => {
-          const message = response.data.message
-          this.$generalNotification(message)
-          await this.refreshLists()
-        })
-        .catch((error) => {
-          const {
-            message,
-            html
-          } = extractErrorMessage(error)
-          console.log(html)
-          this.$generalNotification(message, 'error')
-        })
+    async duplicateList (params) {
+      try {
+        const response = await this.$axios.post(`/api/v2/contacts-list/${this.list.id}/duplicate`, params)
+        this.$generalNotification(response.data.message)
+        await this.refreshLists()
+      } catch (error) {
+        const { message } = extractErrorMessage(error)
+        console.error(error)
+        this.$generalNotification(message, 'error')
+      }
     },
 
-    async refreshLists () {
-      this.listsData = []
-      this.SET_LISTS_COUNT(0)
-      await this.getLists()
-      this.calculateTotalPages()
-      this.pagination.currentPage = 1
-      this.listsData = this.lists
-    },
-
-    onShowInPublicFolderList (list) {
-      this.list = list
-      this.convertToPublicDialog = true
-    },
-
-    onListConvertedToPublic () {
-      this.convertToPublicDialog = false
-
-      const { id, show_in_public_folder: showInPublicFolder } = this.list
-
-      this.listsData = this.listsData.map(item => {
-        if (item.id === id) {
-          item.show_in_public_folder = !showInPublicFolder
-        }
-
-        return item
-      })
-    },
-
-    getPinnedLists () {
-      this.pinnedLists = []
-      this.$axios.get('/api/v2/contact-list-bookmark')
-        .then((response) => response.data)
-        .then((data) => {
-          for (let i = 0; i < data.length; i++) {
-            this.pinnedLists.push(data[i].contact_list_id)
+    onDeleteList (list) {
+      this.$bvModal
+        .msgBoxConfirm(
+          'Are you sure you want to delete this contact list? This action is irreversible.',
+          {
+            buttonSize: 'sm',
+            okTitle: 'Yes',
+            cancelTitle: 'No',
+            centered: true
           }
-        })
-        .catch((err) => {
-          console.log(err)
-          this.$generalNotification('Unable to load lists please try again.', 'error')
-        })
+        )
+        .then(confirm => confirm && this.removeList(list))
+    },
+
+    async getPinnedLists () {
+      try {
+        const { data } = await this.$axios.get('/api/v2/contact-list-bookmark')
+        this.pinnedLists = data.map(item => item.contact_list_id)
+      } catch (err) {
+        console.error(err)
+        this.$generalNotification('Unable to load lists, please try again.', 'error')
+      }
     },
 
     onPinList (list) {
@@ -645,22 +548,17 @@ export default {
 
       this.pinRequest(this.list.id, isPinned).finally(() => {
         this.getPinnedLists()
-        this.$generalNotification((isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.'))
+        this.$generalNotification(isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.')
       })
     },
 
     pinRequest (id, isPinned) {
-      if (isPinned) {
-        return this.$axios.post('/api/v2/contact-list-bookmark', {
-          contact_list_id: id,
-          order: id
-        })
-      } else {
-        return this.$axios.delete('/api/v2/contact-list-bookmark/' + id)
-      }
+      return isPinned
+        ? this.$axios.post('/api/v2/contact-list-bookmark', { contact_list_id: id, order: id })
+        : this.$axios.delete(`/api/v2/contact-list-bookmark/${id}`)
     },
 
-    onEnrollContactsToSequence (list) { // openAddToSequence
+    onEnrollContactsToSequence (list) {
       this.list = list
       this.showAddToSequence = true
     },
@@ -689,22 +587,40 @@ export default {
       }
     },
 
-    openAssignContacts (list) {
-      this.list = list
-      this.showAssignContacts = true
-    },
-
-    closeAssignContacts () {
-      this.showAssignContacts = false
-    },
-
     onMoveList (list) {
       this.list = list
-      this.openMoveDialog({
-        id: list.id,
-        type: 'list'
-      })
+      this.openMoveDialog({ id: list.id, type: 'list' })
+    },
+
+    onShowInPublicFolderList (list) {
+      this.list = list
+      this.convertToPublicDialog = true
+    },
+
+    onListConvertedToPublic () {
+      const { id, show_in_public_folder: showInPublicFolder } = this.list
+      this.listsData = this.listsData.map(item =>
+        item.id === id ? { ...item, show_in_public_folder: !showInPublicFolder } : item
+      )
+      this.convertToPublicDialog = false
+    },
+
+    getContactListType (contactList) {
+      switch (contactList.type) {
+        case ContactListTypes.STATIC:
+          return 'Static'
+        case ContactListTypes.DYNAMIC:
+          return 'Dynamic'
+        case ContactListTypes.DYNAMIC_REMOTE_LIST:
+          return 'Integration Dynamic'
+        default:
+          return 'Unknown'
+      }
     }
+  },
+
+  async mounted () {
+    await this.initializeLists()
   }
 }
 </script>

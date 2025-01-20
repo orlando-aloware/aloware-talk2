@@ -95,3 +95,57 @@ export const COLUMNS = [
     stickyRight: true
   }
 ]
+
+export const columnsByViewportConfig = {
+  mobile: [
+    'name',
+    'actions'
+  ],
+  tablet: [
+    'name',
+    'no_of_contacts',
+    'actions'
+  ],
+  smallDesktop: [
+    'name',
+    'owner_name',
+    'no_of_contacts',
+    'type',
+    'actions'
+  ],
+  mediumDesktop: [
+    'name',
+    'owner_name',
+    'date_created',
+    'no_of_contacts',
+    'type',
+    'show_in_public_folder',
+    'source',
+    'import_status',
+    'actions'
+  ],
+  largeDesktop: [
+    'name',
+    'owner_name',
+    'date_created',
+    'no_of_contacts',
+    'type',
+    'show_in_public_folder',
+    'source',
+    'import_status',
+    'imported_at',
+    'actions'
+  ],
+  extraLargeDesktop: [
+    'name',
+    'owner_name',
+    'date_created',
+    'no_of_contacts',
+    'type',
+    'show_in_public_folder',
+    'source',
+    'import_status',
+    'imported_at',
+    'actions'
+  ]
+}
