@@ -298,7 +298,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-// Add any additional styles if needed
-</style>
