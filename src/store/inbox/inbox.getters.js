@@ -3,5 +3,6 @@ export default {
   hasMoreContacts: (state) => state.hasMoreContacts,
   hasMoreCommunications: (state) => state.hasMoreCommunications,
   getOpenTaskCount: (state) => state.taskCounts.open,
-  allInboxFilters: (state) => [...state.inboxPersonalFilters, ...state.inboxCompanyFilters]
+  allInboxFilters: (state) => [...state.inboxPersonalFilters, ...state.inboxCompanyFilters],
+  isNewInboxEnabled: state => state.newInboxEnabled
 }

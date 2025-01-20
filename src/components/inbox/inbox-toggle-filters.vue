@@ -68,22 +68,21 @@
                       data-testid="inbox-new-experience-checkbox"
                       :class="toggleFiltersClass"
                       :disabled="isTogglingNewInbox"
-                      v-model="newInboxEnabled"
-                      @change="toggleNewInbox">
+                      v-model="newInboxEnabled">
         <q-tooltip content-class="bg-grey-10 text-white"
                   anchor="bottom left"
                   self="top middle">
           Toggle New Inbox Experience
         </q-tooltip>
       </b-form-checkbox>
-      <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-             :class="[toggleFiltersClass, { 'text-danger': newInboxEnabled }]"
+      <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
+             :class="[toggleFiltersClass, { 'text-new': !newInboxEnabled }]"
              data-testid="inbox-new-experience-label">
         <template v-if="newInboxEnabled">
-          Roll back to old inbox
+          New inbox enabled
         </template>
         <template v-else>
-          Try new inbox experience
+          Try the new inbox ✨ experience (beta)
         </template>
       </label>
     </div>
@@ -92,12 +91,15 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import VueCookies from 'vue-cookies'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import { inboxRoutesMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
-import api from 'src/plugins/api/api'
+
+const COOKIE_NEW_INBOX = 'new_inbox_enabled'
+const COOKIE_EXPIRES = 3650
 
 export default {
   name: 'inbox-toggle-filters',
@@ -138,6 +140,7 @@ export default {
       'isInboxRefreshBtnLoading'
     ]),
     ...mapState('cache', ['currentCompany']),
+    ...mapGetters('inbox', ['isNewInboxEnabled']),
 
     isShown () {
       return (this.$route?.meta?.title === 'Inboxes' && this.$route.params.channel !== 'mentions')
@@ -157,10 +160,12 @@ export default {
 
     newInboxEnabled: {
       get () {
-        return this.currentCompany?.new_inbox || false
+        return this.isNewInboxEnabled
       },
-      set () {
-        // Handled by toggleNewInbox method
+      set (value) {
+        if (value !== this.isNewInboxEnabled) {
+          this.handleNewInboxToggle()
+        }
       }
     },
 
@@ -173,7 +178,9 @@ export default {
     ...mapActions('inbox', [
       'setInboxShowMyContacts',
       'setInboxShowUnreads',
-      'setIsInboxRefreshBtnLoading'
+      'setIsInboxRefreshBtnLoading',
+      'toggleNewInbox',
+      'initNewInbox'
     ]),
     ...mapActions('cache', ['setCurrentCompany']),
 
@@ -217,29 +224,29 @@ export default {
       this.$VueEvent.fire('fetchInbox')
     },
 
-    async toggleNewInbox () {
+    async handleNewInboxToggle () {
       try {
+        this.$cookies = VueCookies
         this.isTogglingNewInbox = true
-        const response = await api.V2.companies.toggleFeature(
-          this.currentCompany.id,
-          'inbox'
-        )
+        const result = await this.toggleNewInbox()
 
-        if (response.data.success) {
-          await this.setCurrentCompany({
-            ...this.currentCompany,
-            new_inbox: response.data.enabled
-          })
+        if (result.success) {
+          // Handle cookie storage
+          if (result.enabled) {
+            this.$cookies.set(COOKIE_NEW_INBOX, 'true', COOKIE_EXPIRES)
+          } else {
+            this.$cookies.remove(COOKIE_NEW_INBOX)
+          }
 
           this.$q.notify({
-            type: 'positive',
-            message: response.data.enabled
+            type: result.enabled ? 'positive' : 'negative',
+            message: result.enabled
               ? 'New inbox experience enabled'
               : 'Rolled back to classic inbox',
             position: 'top'
           })
 
-          this.refreshInbox()
+          // this.refreshInbox()
         }
       } catch (error) {
         console.error('Failed to toggle new inbox:', error)
@@ -277,8 +284,14 @@ export default {
   },
 
   created () {
+    this.$cookies = VueCookies
+
     this.inboxShowMyContactsFilter = this.inboxShowMyContacts
     this.inboxShowUnreadsFilter = this.inboxShowUnreads
+
+    // Initialize from cookie
+    const enabled = this.$cookies.get(COOKIE_NEW_INBOX) === 'true'
+    this.initNewInbox(enabled)
   }
 }
 </script>
