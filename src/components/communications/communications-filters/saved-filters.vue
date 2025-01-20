@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="saved-communications-filters">
     <h5 class="text-uppercase filter-group-title"
         data-testid="filter-dialog-personal-filter-title">
       Personal Filters
@@ -9,12 +9,14 @@
                   data-testid="filter-dialog-skeleton"
                   v-if="isGettingFilters" />
       <template v-else>
-      <p class="text-muted fs-12 empty-filter-placeholder pl-2"
+      <div class="filter-items no-data"
          data-testid="filter-dialog-none-p"
          v-if="personalFilters.length < 1"
       >
-        None
-      </p>
+        <span>
+          None
+        </span>
+      </div>
       <filter-list-items :filter="item"
                          data-testid="filter-dialog-filter-list-items"
                          v-for="item in personalFilters"
