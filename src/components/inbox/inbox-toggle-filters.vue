@@ -23,14 +23,14 @@
           <q-tooltip content-class="bg-grey-10 text-white"
                     anchor="bottom left"
                     self="top middle">
-            Toggle New Inbox Experience
+            Toggle New Inbox ⚡ (beta) Experience
           </q-tooltip>
         </b-form-checkbox>
         <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-              :class="[toggleFiltersClass, { 'text-new': !newInboxEnabled }]"
+              :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled, 'text-new': !newInboxEnabled }]"
               data-testid="inbox-new-experience-label">
           <template v-if="newInboxEnabled">
-            New inbox enabled
+            New inbox ⚡ (beta) enabled
           </template>
           <template v-else>
             Enable new inbox ⚡ (beta)
@@ -103,6 +103,7 @@ import { inboxRoutesMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
+import { INBOXES_MENU_TITLE } from 'src/router/routes'
 
 const COOKIE_NEW_INBOX = 'new_inbox_enabled'
 const COOKIE_EXPIRES = 3650
@@ -149,7 +150,7 @@ export default {
     ...mapGetters('inbox', ['isNewInboxEnabled']),
 
     isShown () {
-      return (this.$route?.meta?.title === 'Inboxes' && this.$route.params.channel !== 'mentions')
+      return (this.$route?.meta?.title === INBOXES_MENU_TITLE && this.$route.params.channel !== 'mentions')
     },
 
     toggleFiltersClass () {

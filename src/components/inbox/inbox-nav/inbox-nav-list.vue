@@ -22,7 +22,7 @@
 
     <hr>
 
-    <div v-if="shouldShowViewsUnderChannels">
+    <div v-if="shouldShowViewsUnderChannels && !isNewInboxEnabled">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -124,7 +124,9 @@ export default {
     ]),
 
     ...mapGetters('inbox', [
-      'allInboxFilters'
+      'allInboxFilters',
+      'isNewInboxEnabled',
+      'getNavListItems'
     ]),
 
     ...mapGetters('auth', [
@@ -141,7 +143,7 @@ export default {
       /*
         WAT-1105: FOR the code freeze happening on 01-08-25 we keep the channels on the inbox
       */
-      return this.navListItems
+      return this.getNavListItems
 
       /*
         WAT-1105: the channels and view are being moved to communications menu

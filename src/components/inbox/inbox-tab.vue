@@ -1,5 +1,7 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column" data-testid="inbox-tab-wrapper">
+      <inbox-channel-toggle
+        v-if="isNewInboxEnabled"/>
       <calls-header :openCount="taskCounts.open"
                     :pendingCount="taskCounts.pending"
                     :commCampaigns="[]"
@@ -233,7 +235,7 @@ import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import {
   aclMixin,
@@ -253,6 +255,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import InboxChannelToggle from './inbox-channel-toggle.vue'
 
 export default {
   name: 'inbox-tab',
@@ -274,7 +277,8 @@ export default {
     InboxSearcher,
     FilterIcon,
     InboxTaskList,
-    CallsHeader
+    CallsHeader,
+    InboxChannelToggle
   },
 
   computed: {
@@ -308,6 +312,10 @@ export default {
     ...mapState('contacts', [
       'contact',
       'isContactMixinUsed'
+    ]),
+
+    ...mapGetters('inbox', [
+      'isNewInboxEnabled'
     ]),
 
     statusToggleColor () {

@@ -25,6 +25,7 @@
             <mobile-live-call-bar v-if="!mobilePhoneDrawer && !suspended"
                                   @shown="onShowMobileLiveCallBar"/>
             <app-header v-if="isShowAppHeader"
+                        :page-title="pageTitle"
                         @toggleSidebar="toggleSidebar"/>
           </q-header>
           <q-page-container ref="page-container"
@@ -230,7 +231,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
@@ -297,6 +298,7 @@ import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
 import { FINISHED } from 'src/constants/export-status'
+import { NEW_INBOX_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'MyLayout',
@@ -474,10 +476,16 @@ export default {
       return this.currentCompany?.trial_status
     },
 
-    pageClass () {
-      const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
+    pageTitle () {
+      const route = this.$route
+      if (route.meta?.isInbox && this.isNewInboxEnabled) {
+        return NEW_INBOX_MENU_TITLE
+      }
+      return route.meta?.title || ''
+    },
 
-      return pageSlug.replace(/ /g, '_') + '-page'
+    pageClass () {
+      return _.get(this.$route, 'meta.title', '').toLowerCase()
     },
 
     isMobilePhoneClosed () {
@@ -613,7 +621,9 @@ export default {
       } else {
         return 64
       }
-    }
+    },
+
+    ...mapGetters('inbox', ['isNewInboxEnabled'])
   },
 
   created () {
