@@ -175,6 +175,10 @@ export default {
         return window.axios.post(`${suffixV1}contact/${id}/sync-hubspot`)
       },
 
+      syncSalesforce (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-salesforce`)
+      },
+
       syncPipedrive (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-pipedrive`)
       },
