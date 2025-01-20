@@ -1,67 +1,71 @@
 <template>
-  <div class="d-inline-flex align-items-center"
+  <div class="d-inline-flex align-items-center justify-content-between w-100"
        v-if="isShown"
        data-testid="inbox-toggle-filters-wrapper">
-    <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center mr-1"
-                 :disabled="isInboxRefreshBtnLoading"
-                 data-testid="inbox-toggle-filters-compact-btn"
-                 @clicked="refreshInbox">
-      <refresh-icon :class="$q.screen.width < MOBILE_LARGE_WIDTH ? 'm-0': ''" data-testid="inbox-toggle-filters-refresh-icon"/>
-      {{ refreshButtonLabel }}
-    </compact-btn>
+    <!-- Left side group -->
+    <div class="d-flex align-items-center">
+      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center mr-1"
+                   :disabled="isInboxRefreshBtnLoading"
+                   data-testid="inbox-toggle-filters-compact-btn"
+                   @clicked="refreshInbox">
+        <refresh-icon :class="$q.screen.width < MOBILE_LARGE_WIDTH ? 'm-0': ''" data-testid="inbox-toggle-filters-refresh-icon"/>
+        {{ refreshButtonLabel }}
+      </compact-btn>
 
-    <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
-                     size="sm"
-                     switch
-                     data-testid="inbox-my-contacts-filter-form-checkbox"
-                     :class="toggleFiltersClass"
-                     :disabled="toggleFiltersEnabled"
-                     v-model="inboxShowMyContactsFilter">
-      <q-tooltip content-class="bg-grey-10 text-white"
-                 anchor="bottom left"
-                 self="top middle">
-        Toggle My Contacts
-      </q-tooltip>
-    </b-form-checkbox>
-    <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-          :class="toggleFiltersClass"
-          data-testid="inbox-my-contacts-filter-my-contacts-label"
-          @click="myContactsFilterChange">
-      <span class="label-my-contacts"
-            :class="{ hidden: $q.screen.width < 390 }"
-            v-if="$q.screen.width > 300">
-        My Contacts
-      </span>
-    </label>
-
-    <div class="d-flex align-items-center ml-2"
-         v-if="shouldShowUnreadsToggle">
       <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                        size="sm"
                        switch
-                       data-testid="inbox-unreads-filter-form-checkbox"
+                       data-testid="inbox-my-contacts-filter-form-checkbox"
                        :class="toggleFiltersClass"
                        :disabled="toggleFiltersEnabled"
-                       v-model="inboxShowUnreadsFilter">
+                       v-model="inboxShowMyContactsFilter">
         <q-tooltip content-class="bg-grey-10 text-white"
                    anchor="bottom left"
                    self="top middle">
-          Toggle Unreads
+          Toggle My Contacts
         </q-tooltip>
       </b-form-checkbox>
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-             :class="toggleFiltersClass"
-             data-testid="inbox-unreads-filter-my-contacts-label"
-             @click="unreadsFilterChange">
+            :class="toggleFiltersClass"
+            data-testid="inbox-my-contacts-filter-my-contacts-label"
+            @click="myContactsFilterChange">
         <span class="label-my-contacts"
-              :class="{ hidden: $q.screen.width < EXTRA_SMALL_MOBILE_WIDTH }"
+              :class="{ hidden: $q.screen.width < 390 }"
               v-if="$q.screen.width > 300">
-          Unreads
+          My Contacts
         </span>
       </label>
+
+      <div class="d-flex align-items-center ml-2"
+           v-if="shouldShowUnreadsToggle">
+        <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
+                         size="sm"
+                         switch
+                         data-testid="inbox-unreads-filter-form-checkbox"
+                         :class="toggleFiltersClass"
+                         :disabled="toggleFiltersEnabled"
+                         v-model="inboxShowUnreadsFilter">
+          <q-tooltip content-class="bg-grey-10 text-white"
+                     anchor="bottom left"
+                     self="top middle">
+            Toggle Unreads
+          </q-tooltip>
+        </b-form-checkbox>
+        <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
+               :class="toggleFiltersClass"
+               data-testid="inbox-unreads-filter-my-contacts-label"
+               @click="unreadsFilterChange">
+          <span class="label-my-contacts"
+                :class="{ hidden: $q.screen.width < EXTRA_SMALL_MOBILE_WIDTH }"
+                v-if="$q.screen.width > 300">
+            Unreads
+          </span>
+        </label>
+      </div>
     </div>
 
-    <div class="d-flex align-items-center ml-3" v-if="showNewInboxToggle">
+    <!-- Right side - New Inbox toggle -->
+    <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
       <b-form-checkbox class="mt-1 cursor-pointer"
                       size="sm"
                       switch
@@ -82,11 +86,10 @@
           New inbox enabled
         </template>
         <template v-else>
-          Try the new inbox ✨ experience (beta)
+          New inbox ⚡ (beta)
         </template>
       </label>
     </div>
-
   </div>
 </template>
 
@@ -239,7 +242,7 @@ export default {
           }
 
           this.$q.notify({
-            type: result.enabled ? 'positive' : 'negative',
+            type: 'positive',
             message: result.enabled
               ? 'New inbox experience enabled'
               : 'Rolled back to classic inbox',
