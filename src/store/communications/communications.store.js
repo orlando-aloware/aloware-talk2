@@ -1,6 +1,6 @@
-import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_RECORDED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
+import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_VOICEMAIL } from 'src/constants/communication-status'
 import { ANY_COMMUNICATION_TYPE, CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
-import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 const DEFAULT_CHANNEL = {
   label: 'Communications Logs',
@@ -39,45 +39,21 @@ export default function () {
         answerStatus: ANY_COMMUNICATION_ANSWER_STATUS
       },
       {
-        label: 'Voicemails',
-        value: VOICEMAILS_CHANNEL,
-        icon: 'voicemail',
-        disabled: false,
-        type: CALL_TYPE,
-        answerStatus: STATUS_VOICEMAIL
-      },
-      {
-        label: 'Call Recordings',
-        value: RECORDINGS_CHANNEL,
-        icon: 'record',
-        disabled: false,
-        type: CALL_TYPE,
-        answerStatus: STATUS_RECORDED
-      },
-      {
         label: 'Messages',
         value: MESSAGES_CHANNEL,
         icon: 'message',
         disabled: false,
         type: SMS_TYPE,
         answerStatus: ANY_COMMUNICATION_ANSWER_STATUS
-      }
-      /*
-       {
-        label: 'Mentions',
-        value: 'mentions',
-        icon: 'mention',
-        disabled: false
       },
-
       {
-        label: 'My Personal Line',
-        value: 'my-personal-line',
-        icon: 'person',
+        label: 'Voicemails',
+        value: VOICEMAILS_CHANNEL,
+        icon: 'voicemail',
         disabled: false,
-        type: 'all',
-        answerStatus: 'all'
-      } */
+        type: CALL_TYPE,
+        answerStatus: STATUS_VOICEMAIL
+      }
     ],
     communications: [],
     communicationsCount: 0,
