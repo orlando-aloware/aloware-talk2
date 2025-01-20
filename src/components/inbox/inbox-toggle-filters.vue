@@ -1,5 +1,5 @@
 <template>
-  <div class="d-inline-flex align-items-center justify-content-between w-100"
+  <div class="d-inline-flex align-items-center flex-grow-1"
        v-if="isShown"
        data-testid="inbox-toggle-filters-wrapper">
     <!-- Left side group -->
@@ -12,13 +12,41 @@
         {{ refreshButtonLabel }}
       </compact-btn>
 
+      <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
+        <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
+                        size="sm"
+                        switch
+                        data-testid="inbox-new-experience-checkbox"
+                        :class="toggleFiltersClass"
+                        :disabled="isTogglingNewInbox"
+                        v-model="newInboxEnabled">
+          <q-tooltip content-class="bg-grey-10 text-white"
+                    anchor="bottom left"
+                    self="top middle">
+            Toggle New Inbox Experience
+          </q-tooltip>
+        </b-form-checkbox>
+        <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
+              :class="[toggleFiltersClass, { 'text-new': !newInboxEnabled }]"
+              data-testid="inbox-new-experience-label">
+          <template v-if="newInboxEnabled">
+            New inbox enabled
+          </template>
+          <template v-else>
+            Enable new inbox ⚡ (beta)
+          </template>
+        </label>
+      </div>
+    </div>
+
       <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                        size="sm"
                        switch
                        data-testid="inbox-my-contacts-filter-form-checkbox"
                        :class="toggleFiltersClass"
                        :disabled="toggleFiltersEnabled"
-                       v-model="inboxShowMyContactsFilter">
+                       v-model="inboxShowMyContactsFilter"
+                       v-if="!isNewInboxEnabled">
         <q-tooltip content-class="bg-grey-10 text-white"
                    anchor="bottom left"
                    self="top middle">
@@ -28,7 +56,8 @@
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
             :class="toggleFiltersClass"
             data-testid="inbox-my-contacts-filter-my-contacts-label"
-            @click="myContactsFilterChange">
+            @click="myContactsFilterChange"
+            v-if="!isNewInboxEnabled">
         <span class="label-my-contacts"
               :class="{ hidden: $q.screen.width < 390 }"
               v-if="$q.screen.width > 300">
@@ -44,7 +73,8 @@
                          data-testid="inbox-unreads-filter-form-checkbox"
                          :class="toggleFiltersClass"
                          :disabled="toggleFiltersEnabled"
-                         v-model="inboxShowUnreadsFilter">
+                         v-model="inboxShowUnreadsFilter"
+                         v-if="!isNewInboxEnabled">
           <q-tooltip content-class="bg-grey-10 text-white"
                      anchor="bottom left"
                      self="top middle">
@@ -54,7 +84,8 @@
         <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
                :class="toggleFiltersClass"
                data-testid="inbox-unreads-filter-my-contacts-label"
-               @click="unreadsFilterChange">
+               @click="unreadsFilterChange"
+               v-if="!isNewInboxEnabled">
           <span class="label-my-contacts"
                 :class="{ hidden: $q.screen.width < EXTRA_SMALL_MOBILE_WIDTH }"
                 v-if="$q.screen.width > 300">
@@ -63,34 +94,6 @@
         </label>
       </div>
     </div>
-
-    <!-- Right side - New Inbox toggle -->
-    <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
-      <b-form-checkbox class="mt-1 cursor-pointer"
-                      size="sm"
-                      switch
-                      data-testid="inbox-new-experience-checkbox"
-                      :class="toggleFiltersClass"
-                      :disabled="isTogglingNewInbox"
-                      v-model="newInboxEnabled">
-        <q-tooltip content-class="bg-grey-10 text-white"
-                  anchor="bottom left"
-                  self="top middle">
-          Toggle New Inbox Experience
-        </q-tooltip>
-      </b-form-checkbox>
-      <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-             :class="[toggleFiltersClass, { 'text-new': !newInboxEnabled }]"
-             data-testid="inbox-new-experience-label">
-        <template v-if="newInboxEnabled">
-          New inbox enabled
-        </template>
-        <template v-else>
-          New inbox ⚡ (beta)
-        </template>
-      </label>
-    </div>
-  </div>
 </template>
 
 <script>

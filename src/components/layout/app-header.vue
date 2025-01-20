@@ -1,7 +1,7 @@
 <template>
   <q-toolbar class="page-header"
              :class="{ 'pl-2 pr-2': !noPadding }">
-    <div class="d-flex h-100 align-items-center">
+    <div class="d-flex h-100 align-items-center flex-grow-1">
       <back-button class="mobile-back-btn-global-header"
                    v-if="['Contact', 'Settings Tab'].includes($route.name)"
                    @click="navigateBack"/>
@@ -12,8 +12,8 @@
           <i class="fa fa-chevron-left" />
         </button>
       </router-link>
-      <h1 v-if="isMainTitle">{{ mainTitle }}</h1>
-      <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
+      <h1 v-if="isMainTitle" class="flex-grow-2">{{ mainTitle }}</h1>
+      <h1 v-if="forcePageTitle" class="flex-grow-2">{{ forcePageTitle }}</h1>
       <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ settingsTabHeaderName }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
