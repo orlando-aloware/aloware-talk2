@@ -44,6 +44,9 @@
 </template>
 
 <script>
+
+import { STATUS_ABANDONED, STATUS_ANSWERED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_VOICEMAIL, STATUS_UNANSWERED } from 'src/constants/communication-status'
+
 export default {
   name: 'answer-status-selector',
 
@@ -94,17 +97,17 @@ export default {
     optionsArray () {
       return [
         { value: 'all', label: 'All' },
-        { value: 'live', label: 'Live' },
-        { value: 'answered', label: 'Answered' },
-        { value: 'unanswered', label: 'Unanswered' },
-        { value: 'missed', label: 'Missed' },
-        { value: 'abandoned', label: 'Abandoned' },
-        { value: 'voicemail', label: 'Voicemail' },
-        { value: 'in-progress', label: 'In Progress' },
-        { value: 'failed', label: 'Failed' },
-        { value: 'queued', label: 'Queued' },
-        { value: 'hold', label: 'Hold' },
-        { value: 'deadend', label: 'Dead-end' }
+        { value: STATUS_LIVE, label: 'Live' },
+        { value: STATUS_ANSWERED, label: 'Answered' },
+        { value: STATUS_UNANSWERED, label: 'Unanswered' },
+        { value: STATUS_MISSED, label: 'Missed' },
+        { value: STATUS_ABANDONED, label: 'Abandoned' },
+        { value: STATUS_VOICEMAIL, label: 'Voicemail' },
+        { value: STATUS_INPROGRESS, label: 'In Progress' },
+        { value: STATUS_FAILED, label: 'Failed' },
+        { value: STATUS_QUEUED, label: 'Queued' },
+        { value: STATUS_HOLD, label: 'Hold' },
+        { value: STATUS_DEADEND, label: 'Dead-end' }
       ]
     }
   },

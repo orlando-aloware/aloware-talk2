@@ -28,7 +28,7 @@
     <saved-filters class="px-2 left-column-wrapper"
                    :fetch-filters="fetchSavedFilters"
                    :filter-type="filterTypeForGetSavedFilters"
-                   @filters-fetched="fetchSavedFilters = false"
+                   @filters-fetched="()=> fetchSavedFilters = false"
                    @filterSelected="(item) => onSelectSavedFilter(item)"
     />
 
@@ -231,7 +231,7 @@ export default {
 
   created () {
     this.initializeDateRanges()
-    this.fetchSavedFilters = true
+    //  this.fetchSavedFilters = true
   },
 
   mounted () {
@@ -433,6 +433,18 @@ export default {
         this.$emit('active', activeChannel)
         this.$emit('update:value', val)
       }
+    },
+
+    activeChannel: {
+      handler (val) {
+        this.fetchSavedFilters = true
+        setTimeout(() => {
+          this.fetchSavedFilters = false
+        }, 1000)
+      },
+      immediate: true,
+      deep: true
+
     },
 
     isFilterDialogShown (state) {

@@ -1,6 +1,6 @@
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
-import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 export default {
   selectedFilter: (state) => state.selectedFilter,
@@ -11,11 +11,13 @@ export default {
   inboxFilters: (state) => state.inboxFilters,
 
   channelDefaultFilterModel (state) {
-    const { value: channel, answerStatus } = state.activeChannel || {}
+    const { value: channel, answerStatus, type } = state.activeChannel || {}
 
     console.log('starting to set the default filter model')
 
     console.log('the selected channel is:', channel)
+    console.log('the selected answer status is:', answerStatus)
+    console.log('the selected type is:', type)
 
     let defaultFilterModel = {
       name: '',
@@ -48,12 +50,12 @@ export default {
         contact_lists: Filters.DEFAULT_STATE.filter.contact_lists,
         answer_status: answerStatus,
         unread_only: 0,
-        type: 'call'
+        type
       }
       return defaultFilterModel
     }
 
-    if ([CALLS_CHANNEL, 'recordings'].includes(channel)) {
+    if ([CALLS_CHANNEL, RECORDINGS_CHANNEL].includes(channel)) {
       defaultFilterModel.type = ChannelType.CHANNEL_CALLS
       defaultFilterModel.filter = {
         campaigns: Filters.DEFAULT_STATE.filter.campaigns,
@@ -79,12 +81,12 @@ export default {
         teams: Filters.DEFAULT_STATE.filter.teams,
         contact_lists: Filters.DEFAULT_STATE.filter.contact_lists,
         unread_only: 0,
-        type: 'call'
+        type
       }
 
-      if (['recordings'].includes(channel)) {
+      if ([RECORDINGS_CHANNEL].includes(channel)) {
         defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
-        defaultFilterModel.filter.answer_status = 'recorded'
+        defaultFilterModel.filter.answer_status = answerStatus
       }
       return defaultFilterModel
     }
@@ -93,8 +95,8 @@ export default {
       defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
       defaultFilterModel.filter = {
         ...Filters.DEFAULT_STATE.filter,
-        unread_only: 0,
         changed: true,
+        unread_only: 0,
         type: 'all'
       }
 
@@ -115,7 +117,6 @@ export default {
     defaultFilterModel.filter = {
       campaigns: Filters.DEFAULT_STATE.filter.campaigns,
       direction: Filters.DEFAULT_STATE.filter.direction,
-      answer_status: Filters.DEFAULT_STATE.filter.answer_status,
       tags: Filters.DEFAULT_STATE.filter.tags,
       first_time_only: Filters.DEFAULT_STATE.filter.first_time_only,
       untagged_only: Filters.DEFAULT_STATE.filter.untagged_only,
@@ -128,9 +129,11 @@ export default {
       from_date: Filters.DEFAULT_STATE.filter.from_date,
       to_date: Filters.DEFAULT_STATE.filter.to_date,
       my_contact: Filters.DEFAULT_STATE.filter.my_contact,
-      unread_only: Filters.DEFAULT_STATE.filter.unread_only,
       creator_type: Filters.DEFAULT_STATE.filter.creator_type,
-      has_international: Filters.DEFAULT_STATE.filter.has_international
+      has_international: Filters.DEFAULT_STATE.filter.has_international,
+      answer_status: answerStatus,
+      type: 'sms',
+      unread_only: 0
     }
 
     return defaultFilterModel

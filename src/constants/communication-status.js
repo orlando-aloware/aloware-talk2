@@ -1,3 +1,6 @@
+import { CURRENT_STATUS_VOICEMAIL } from './communication-current-status'
+import { DISPOSITION_STATUS_ABANDONED, DISPOSITION_STATUS_MISSED } from './communication-disposition-status'
+
 export const STATUS_INITIATED = 'initiated' // The call is initiated
 export const STATUS_RINGING = 'ringing' // The call is currently ringing (relative to us)
 export const STATUS_QUEUED = 'queued' // The call is ready and waiting in line before going out. (from us to outside world)
@@ -10,6 +13,14 @@ export const STATUS_NOANSWER = 'no-answer' // The call ended without being answe
 export const STATUS_ANSWERED = 'answered' // The call is answered
 export const STATUS_CANCELED = 'canceled' // The call was canceled via the REST API while queued or ringing.
 export const STATUS_TIMEOUT = 'timeout' // The call rang enough but nobody answered it.
+export const STATUS_VOICEMAIL = CURRENT_STATUS_VOICEMAIL // The call hit our voicemail
+export const STATUS_MISSED = DISPOSITION_STATUS_MISSED // The call was missed
+export const STATUS_ABANDONED = DISPOSITION_STATUS_ABANDONED // The call was abandoned
+export const STATUS_RECORDED = 'recorded' // The call was recorded
+export const STATUS_UNANSWERED = 'unanswered' // The call was not answered
+export const STATUS_LIVE = 'live' // The call is live
+export const STATUS_HOLD = 'hold' // The call is on hold
+export const STATUS_DEADEND = 'deadend' // The call is deadend
 export const STATUS_SMS_RECEIVED = 'received' // A SMS is received by our system.
 export const STATUS_SMS_SENT = 'sent' // A SMS is sent to the system.
 export const STATUS_SMS_DELIVERED = 'delivered' // A SMS is delivered.

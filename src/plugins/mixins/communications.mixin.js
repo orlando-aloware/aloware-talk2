@@ -16,7 +16,7 @@ import * as MentionType from 'src/constants/mention-type'
 
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
-import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 export default {
   mixins: [userMixin],
@@ -804,9 +804,9 @@ export default {
           return 'all'
         case CALLS_CHANNEL:
         case VOICEMAILS_CHANNEL:
-        case 'recordings':
+        case RECORDINGS_CHANNEL:
           return 'call'
-        case 'messages':
+        case MESSAGES_CHANNEL:
           return 'sms'
         default:
           return this.activeChannel
@@ -985,14 +985,14 @@ export default {
     },
 
     removeUnnecessaryParameters (params) {
-      if (this.$route.params.channel === 'messages') {
+      if (this.$route.params.channel === MESSAGES_CHANNEL) {
         delete params.report_type
         delete params.chart_period
         delete params.min_talk_time
         delete params.changed
       }
 
-      const callsChannels = [CALLS_CHANNEL, 'recordings', VOICEMAILS_CHANNEL]
+      const callsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL]
 
       if (callsChannels.includes(this.$route.params.channel)) {
         delete params.report_type

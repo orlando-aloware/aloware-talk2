@@ -217,10 +217,6 @@ export default {
       */
       this.filter = filter
 
-      if (this.$route.params.channel === 'recordings') {
-        this.filter.answer_status = 'recorded'
-      }
-
       // channel cloned filter are the current filter settings populated in the filter dialog form
       // especially when there is no applied or selected filter.
       this.setChannelClonedFilter(this.filter)

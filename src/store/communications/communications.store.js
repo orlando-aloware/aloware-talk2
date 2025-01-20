@@ -1,4 +1,5 @@
-import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { STATUS_RECORDED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 const DEFAULT_CHANNEL = {
   label: 'Communications Logs',
@@ -41,24 +42,25 @@ export default function () {
         icon: 'voicemail',
         disabled: false,
         type: 'call',
-        answerStatus: 'voicemail'
-      }
-      /* {
+        answerStatus: STATUS_VOICEMAIL
+      },
+      {
+        label: 'Call Recordings',
+        value: RECORDINGS_CHANNEL,
+        icon: 'record',
+        disabled: false,
+        type: 'call',
+        answerStatus: STATUS_RECORDED
+      },
+      {
         label: 'Messages',
-        value: 'messages',
+        value: MESSAGES_CHANNEL,
         icon: 'message',
         disabled: false,
         type: 'sms',
         answerStatus: 'all'
-      },
-      {
-        label: 'Call Recordings',
-        value: 'recordings',
-        icon: 'record',
-        disabled: false,
-        type: 'call',
-        answerStatus: 'recorded'
       }
+      /*
        {
         label: 'Mentions',
         value: 'mentions',

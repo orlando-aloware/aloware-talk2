@@ -8,9 +8,9 @@
       <q-skeleton type="rect"
                   data-testid="filter-dialog-skeleton"
                   v-if="isGettingFilters" />
+      <template v-else>
       <p class="text-muted fs-12 empty-filter-placeholder pl-2"
          data-testid="filter-dialog-none-p"
-         v-show="!isGettingFilters"
          v-if="personalFilters.length < 1"
       >
         None
@@ -23,6 +23,7 @@
                          @filterRename="onRenameFilter"
                          @filterDelete="(e) => onDeleteFilter(e, item)"
       />
+      </template>
     </div>
   </div>
 </template>

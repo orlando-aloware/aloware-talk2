@@ -6,6 +6,7 @@ import * as CommunicationAccessTypes from 'src/constants/communication-access-ty
 import * as ContactAccessTypes from 'src/constants/contact-access-types'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
+import { STATUS_ABANDONED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_UNANSWERED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
 
 export default {
   data () {
@@ -50,7 +51,7 @@ export default {
       if (filter.answer_status !== undefined &&
         filter.answer_status !== 'all') {
         // handle live & hold as a special case
-        if (['live', 'hold', 'queued'].includes(filter.answer_status) &&
+        if ([STATUS_LIVE, STATUS_HOLD, STATUS_QUEUED].includes(filter.answer_status) &&
           communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
           return false
         }
@@ -59,7 +60,7 @@ export default {
           communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW) {
           return false
         }
-        if (filter.answer_status === 'unanswered' &&
+        if (filter.answer_status === STATUS_UNANSWERED &&
           ![
             CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW,
             CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW,
@@ -67,15 +68,15 @@ export default {
           ].includes(communication.disposition_status2)) {
           return false
         }
-        if (filter.answer_status === 'missed' &&
+        if (filter.answer_status === STATUS_MISSED &&
           communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW) {
           return false
         }
-        if (filter.answer_status === 'abandoned' &&
+        if (filter.answer_status === STATUS_ABANDONED &&
           communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW) {
           return false
         }
-        if (filter.answer_status === 'voicemail' &&
+        if (filter.answer_status === STATUS_VOICEMAIL &&
           ![
             CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW,
             CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW,
@@ -83,15 +84,15 @@ export default {
           ].includes(communication.disposition_status2)) {
           return false
         }
-        if (filter.answer_status === 'in-progress' &&
+        if (filter.answer_status === STATUS_INPROGRESS &&
           communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
           return false
         }
-        if (filter.answer_status === 'failed' &&
+        if (filter.answer_status === STATUS_FAILED &&
           communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_FAILED_NEW) {
           return false
         }
-        if (filter.answer_status === 'deadend' &&
+        if (filter.answer_status === STATUS_DEADEND &&
           communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_DEADEND_NEW) {
           return false
         }
