@@ -128,7 +128,9 @@ export default {
     },
 
     salesforceModule () {
-      if (this.integrationData) return this.integrationData.type.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
+      if (this.integrationData?.type) {
+        return this.integrationData.type.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
+      }
 
       return null
     }
