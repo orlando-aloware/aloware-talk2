@@ -34,8 +34,8 @@
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column no-max-width"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
-        <CommunicationLogsTable class="flex-grow-1"
-                                data-testid="communications-side-communications-table" />
+        <communication-logs-table class="flex-grow-1"
+                                  data-testid="communications-side-communications-table" />
       </div>
     </div>
   </div>

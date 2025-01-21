@@ -146,14 +146,6 @@ export default {
         rowsNumber: this.communicationsCount
       },
       fixedColumns: [
-        'disposition_status2',
-        'incoming_number',
-        'ring_group',
-        'created_at',
-        'talk_time',
-        'duration',
-        'contact',
-        'user_id',
         'operations'
       ],
       searchQuery: '',
