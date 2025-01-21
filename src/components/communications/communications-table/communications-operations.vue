@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex justify-content-center context-menu">
+  <div class="d-flex justify-content-end context-menu">
     <reply-communication-button class="operation-button mx-1"
                                 :communication="row" />
 
