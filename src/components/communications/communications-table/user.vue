@@ -30,18 +30,13 @@ export default {
     value: {
       type: Number,
       required: false
-    },
-
-    row: {
-      type: Object,
-      required: true
     }
   },
 
   methods: {
     filter () {
       this.$emit('on-filter', {
-        type: 'user',
+        type: 'users',
         value: this.value
       })
     }

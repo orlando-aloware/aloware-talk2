@@ -140,16 +140,16 @@ export default {
     this.filter = _.clone(this.channelDefaultFilterModel.filter)
 
     this.$VueEvent.listen('filter-communications', data => {
+      console.log(data)
       // ex: data = { type: 'users', value: 1 }
       switch (data.type) {
         case 'users':
           this.filterByUser(data.value)
           break
-        case 'campaign':
-          this.filterByCampaign(data.value)
-          break
+        // case 'campaign':
+        //   this.filterByCampaign(data.value)
+        //   break
       }
-      // this.channelChangedFilterFields
     })
   },
   methods: {
@@ -299,8 +299,28 @@ export default {
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
-    }
+    },
 
+    filterByUser (userId) {
+      // const index = this.filters.users.findIndex(item => item.property === 'users')
+
+      if (!this.filter.users.length) {
+        this.filter.users.push(userId)
+      } else {
+        this.filter.users = [userId]
+      }
+
+      // this.filter = { ...this.channelDefaultFilterModel.filter }
+      // this.setChannelClonedFilter(this.filter)
+      // this.resetChannelChangedFilterFields()
+      // this.setSelectedFilter(null)
+      this.setCommunications([])
+      // this.setIsFirstLoad(true)
+      // this.setAppliedFilter(null)
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
+    }
   },
 
   watch: {
