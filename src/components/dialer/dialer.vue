@@ -108,10 +108,6 @@ export default {
 
   created () {
     this.dialerListeners.updateCommunication = (data) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
-        return
-      }
-
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
