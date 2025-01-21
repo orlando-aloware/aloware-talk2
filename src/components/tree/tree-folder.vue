@@ -71,6 +71,7 @@
       :endpoint="endpoint"
       :layer="layer + 1"
       :parent_id="id"
+      :user-id="userId"
       data-testid="tree-folder-creating-input"
       @blur="onCloseFolder"
       @cancel="onCreateFolderCancel"
@@ -203,6 +204,10 @@ export default {
     endpoint: {
       type: String,
       default: '/api/v2/contact-folders'
+    },
+
+    userId: {
+      type: Number
     }
   },
 
@@ -331,7 +336,17 @@ export default {
       if (this.isRenaming) return
       this.isRenaming = true
 
-      return this.updateFolderRequest(this.id, { name, order: this.order, parent_id: this.parentId }).then(response => {
+      const params = {
+        name,
+        order: this.order,
+        parent_id: this.parentId
+      }
+
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
+      return this.updateFolderRequest(this.id, params).then(response => {
         this.$generalNotification('Folder updated.')
         this.reloadFolders()
       }).finally(() => {
@@ -356,8 +371,13 @@ export default {
     },
 
     reloadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
       return this.$axios
-        .get(this.endpoint)
+        .get(this.endpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

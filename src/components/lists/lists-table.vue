@@ -1,22 +1,40 @@
 <template>
-  <div class="lists-container flex-grow-1 d-flex flex-column">
-    <h3 class="title pl-3">
-      {{ title }}
-    </h3>
-    <div class="count  pl-3">
-      <strong v-if="!isLoading">{{ listsCount }} Lists</strong>
-      <q-spinner-bars class="mr-1"
-                      color="primary"
-                      size="14px"
-                      v-else />
-    </div>
+  <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+    <lists-folders-management />
 
+  <div class="lists-container flex-grow-1 d-flex flex-column">
+
+    <div>
+      <div class="d-flex items-start">
+        <div class="pl-3">
+          <h3 class="title">{{ title }}</h3>
+          <div class="count">
+            <strong v-if="!isLoading && !isListsLoading">{{ listsCount }} Lists</strong>
+            <q-spinner-bars class="mr-1"
+                            color="primary"
+                            size="14px"
+                            v-else />
+          </div>
+        </div>
+        <div class="pl-4 ml-4 border-left">
+          <div>
+            <h4>Filters</h4>
+            <div>
+              Show in Public Folder
+              <q-toggle size="md"
+                        val="md"
+                        v-model="showInPublicFolder" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <q-table class="lists-table flex-grow-1"
              row-key="index"
              virtual-scroll
              :data="listsData"
              :columns="fixedColumns"
-             :loading="isLoadingMore || isLoading"
+             :loading="isLoadingMore || isLoading || isListsLoading"
              :virtual-scroll-item-size="100"
              :virtual-scroll-sticky-size-start="100"
              :pagination="pagination"
@@ -246,6 +264,8 @@
 
       <move-dialog />
   </div>
+
+  </div>
 </template>
 
 <script>
@@ -271,6 +291,7 @@ import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
+import ListsFoldersManagement from './lists-folders-management'
 
 export default {
   name: 'ListsTable',
@@ -304,7 +325,8 @@ export default {
     MoveDialog,
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
-    RelativeTime
+    RelativeTime,
+    ListsFoldersManagement
   },
 
   data () {
@@ -329,7 +351,10 @@ export default {
       openPDModal: false,
       addToPowerDialerMode: 'add',
       addToPowerDialerIsManualSelection: false,
-      COLUMNS
+      COLUMNS,
+
+      // Filters
+      showInPublicFolder: false
     }
   },
 
@@ -361,6 +386,10 @@ export default {
 
     isPinned () {
       return Array.isArray(this.pinnedLists) ? this.pinnedLists.includes(this.list.id) : false
+    },
+
+    userId () {
+      return this.$route.query.user_id
     }
   },
 
@@ -388,19 +417,58 @@ export default {
       await this.getPinnedLists()
     },
 
-    async getLists (isLoadMore = false) {
-      if (this.isLoading) return
+    getContactListType (contactList) {
+      switch (contactList.type) {
+        case ContactListTypes.STATIC:
+          return 'Static'
+        case ContactListTypes.DYNAMIC:
+          return 'Dynamic'
+        case ContactListTypes.DYNAMIC_REMOTE_LIST:
+          return 'Integration Dynamic'
+        default:
+          return 'Unknown'
+      }
+    },
+
+    calculateTotalPages () {
+      if (this.lists?.length === 0) {
+        this.pagination.totalPages = 1
+        return
+      }
+
+      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage)
+    },
+
+    getLists (isLoadMore = false) {
+      if (this.isLoading) {
+        return
+      }
 
       this.setLoadingState(isLoadMore)
 
-      try {
-        await this.fetchLists({
-          page: this.pagination.currentPage,
-          perPage: this.pagination.perPage
-        })
-      } finally {
-        this.resetLoadingState()
+      if (!isLoadMore) {
+        this.isLoading = true
+        this.pagination.currentPage = 1
+        this.listsData = []
+      } else {
+        this.isLoadingMore = true
       }
+
+      const filters = {
+        // ...(state.search && { search: state.search }),
+        ...(this.userId && { user_id: this.userId }),
+        private_only: !this.showInPublicFolder
+      }
+
+      return this.fetchLists({
+        page: this.pagination.currentPage,
+        perPage: this.pagination.perPage,
+        filters
+      })
+        .finally(() => {
+          this.isLoading = false
+          this.isLoadingMore = false
+        })
     },
 
     setLoadingState (isLoadMore) {
@@ -411,40 +479,6 @@ export default {
       } else {
         this.isLoadingMore = true
       }
-    },
-
-    resetLoadingState () {
-      this.isLoading = false
-      this.isLoadingMore = false
-    },
-
-    async loadMoreLists (done) {
-      if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
-        if (typeof done === 'function') {
-          done()
-        }
-        return
-      }
-
-      this.pagination.currentPage += 1
-      await this.getLists(true)
-      this.listsData.push(...this.lists)
-
-      if (typeof done === 'function') {
-        done()
-      }
-    },
-
-    calculateTotalPages () {
-      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage) || 1
-    },
-
-    refreshLists: async function () {
-      this.listsData = []
-      this.SET_LISTS_COUNT(0)
-      await this.getLists()
-      this.calculateTotalPages()
-      this.listsData = this.lists
     },
 
     removeList (list) {
@@ -516,6 +550,15 @@ export default {
         console.error(error)
         this.$generalNotification(message, 'error')
       }
+    },
+
+    async refreshLists () {
+      this.listsData = []
+      this.SET_LISTS_COUNT(0)
+      await this.getLists()
+      this.calculateTotalPages()
+      this.pagination.currentPage = 1
+      this.listsData = this.lists
     },
 
     onDeleteList (list) {
@@ -603,24 +646,17 @@ export default {
         item.id === id ? { ...item, show_in_public_folder: !showInPublicFolder } : item
       )
       this.convertToPublicDialog = false
-    },
-
-    getContactListType (contactList) {
-      switch (contactList.type) {
-        case ContactListTypes.STATIC:
-          return 'Static'
-        case ContactListTypes.DYNAMIC:
-          return 'Dynamic'
-        case ContactListTypes.DYNAMIC_REMOTE_LIST:
-          return 'Integration Dynamic'
-        default:
-          return 'Unknown'
-      }
     }
   },
 
   async mounted () {
     await this.initializeLists()
+  },
+
+  watch: {
+    userId () {
+      this.refreshLists()
+    }
   }
 }
 </script>

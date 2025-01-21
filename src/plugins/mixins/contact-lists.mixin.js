@@ -46,7 +46,7 @@ export default {
   },
   computed: {
     isContactsRoute () {
-      return this.$route.meta.title === 'Contacts'
+      return this.$route.meta.title === 'Contacts' || this.$route.meta.title === 'Lists Management Utility'
     },
     foldersPath () {
       return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
