@@ -2,8 +2,8 @@
   <div class="h-100"
        v-if="authenticated">
     <div class="inbox animate__animated animate__fadeIn position-relative">
-      <communications-side :class="inboxSideClasses"
-                           ref="communications-side" />
+      <communications-side ref="communications-side"
+                           :class="inboxSideClasses" />
 
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
@@ -25,11 +25,8 @@ import {
   visibilityMixin,
   userMixin
 } from 'src/plugins/mixins'
-
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
-
 import Contact from 'pages/contacts/Contact'
-
 import { COMMUNICATIONS_VIEWS_ROUTE_NAME, DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 
 export default {
@@ -82,7 +79,6 @@ export default {
       title: 'Communications',
       contactId: null,
       miniState: true,
-      // firstLoad: true,
       mobileContactScreenRoutes: [
         'Communications Contact',
         'Communications Contact Task',

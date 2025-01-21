@@ -24,21 +24,7 @@ export default {
 
     /*
       WAT-1105:
-        > For Aloware demo companies:
-            - new Communications menu is enabled showing the communications logs table
-
-            - first code freeze: 08-01-2025
-              - channels and views still present in inbox menu, no in communications
-
-            - second code freeze: 22-01-2025
-              - channels present only Communications menus
-
-        > For all other companies:
-          - first code freeze: 08-01-2025
-            - new Communications menu not shown
-            - Inbox menu has no changes, that means is named still "Communications" and shows the channels and view
-
-          - second code freeze: 22-01-2025
+          - second code freeze: 01-22-2025
             - new Communications menu general available
             - channels only present in Communications menu
     */

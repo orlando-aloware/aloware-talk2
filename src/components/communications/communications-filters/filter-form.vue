@@ -113,7 +113,9 @@
               </b-form-group>
             </b-col>
 
-            <b-col sm="12" md="6" v-if="isAllComms" >
+            <b-col sm="12"
+                   md="6"
+                   v-if="isAllComms">
               <b-form-group class="form-label"
                             label="Type">
                 <communication-type-filter-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -453,7 +455,8 @@
                                @change="eventPayload => onFilterChange(eventPayload, 'users')" />
               </b-form-group>
             </b-col>
-            <b-col sm="12" md="6" >
+            <b-col sm="12"
+                   md="6">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector :force-remove-missing-values="true"
@@ -466,7 +469,7 @@
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6" >
+                   md="6">
               <b-form-group class="form-label"
                             label="Contact Owners">
                 <user-selector custom-placeholder="Select Contact Owners"

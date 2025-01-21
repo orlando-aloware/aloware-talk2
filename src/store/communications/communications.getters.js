@@ -16,9 +16,7 @@ export default {
     let defaultFilterModel = {
       name: '',
       type: ChannelType.CHANNEL_MESSAGES,
-      filter: {
-
-      },
+      filter: {},
       scope: 'user'
     }
 

@@ -214,7 +214,6 @@ export default {
 
   created () {
     this.initializeDateRanges()
-    //  this.fetchSavedFilters = true
   },
 
   mounted () {
