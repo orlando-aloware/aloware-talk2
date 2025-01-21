@@ -28,6 +28,17 @@
           </div>
         </div>
       </div>
+
+      <div class="filters  pl-3">
+        <div class="search">
+          <search-input class="width-260"
+                        limit-search-characters
+                        :search="search"
+                        :disabled="isLoadingDisabled"
+                        data-testid="lists-search-input"
+                        @search="onSearch" />
+        </div>
+      </div>
     </div>
     <q-table class="lists-table flex-grow-1"
              row-key="index"
@@ -46,7 +57,11 @@
                 :key="col.name"
                 v-for="col in props.cols">
             <div v-if="col.name === 'name'">
-              {{ props.row.name }}
+              <router-link class="d-flex align-items-center item contact-name"
+                                 data-testid="lists-view-list-name-link"
+                                 :to="`/contacts/list/${props.row.id}${props.row.show_in_public_folder ? '?type=public' : ''}`">
+                {{ props.row.name }}
+              </router-link>
             </div>
             <div v-if="col.name === 'owner_name'">
               {{ props.row.owner_name }}
@@ -84,6 +99,19 @@
             </div>
             <div v-else-if="col.name === 'actions'">
               <div class="d-flex justify-content-center context-menu">
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-edit-button"
+                        @click="onEditList(props.row)">
+                    <pencil-o-icon height="16"
+                                width="16"
+                                color="#62666E"/>
+                    <q-tooltip>
+                      Edit this List
+                    </q-tooltip>
+                  </span>
+                </div>
+
                 <div class="operation-button mx-1">
                   <span class="cursor-pointer"
                         data-testid="lists-rename-button"
@@ -270,6 +298,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import SearchInput from 'src/components/search-input'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
 import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
@@ -278,6 +307,7 @@ import AssignContactsModal from 'src/components/assign-contacts-modal'
 import MoveDialog from 'src/components/move-dialog'
 import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
+import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
 import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
@@ -317,6 +347,7 @@ export default {
     EyeOffIcon,
     MoveIcon,
     PencilIcon,
+    PencilOIcon,
     PinIcon,
     TrashIcon,
     AssignContactsModal,
@@ -331,6 +362,8 @@ export default {
 
   data () {
     return {
+      search: '',
+      isLoadingDisabled: false,
       isLoading: false,
       isLoadingMore: false,
       loading: false,
@@ -439,7 +472,7 @@ export default {
       this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage)
     },
 
-    getLists (isLoadMore = false) {
+    async getLists (isLoadMore = false) {
       if (this.isLoading) {
         return
       }
@@ -455,7 +488,7 @@ export default {
       }
 
       const filters = {
-        // ...(state.search && { search: state.search }),
+        ...(this.search && { search: this.search }),
         ...(this.userId && { user_id: this.userId }),
         private_only: !this.showInPublicFolder
       }
@@ -646,6 +679,17 @@ export default {
         item.id === id ? { ...item, show_in_public_folder: !showInPublicFolder } : item
       )
       this.convertToPublicDialog = false
+    },
+
+    async onSearch (value) {
+      this.SET_SEARCH(value)
+      this.search = value
+      await this.refreshLists()
+    },
+
+    onEditList (list) {
+      this.list = list
+      this.$router.push(`/contacts/list/${this.list.id}${this.list.show_in_public_folder ? '?type=public' : ''}`)
     }
   },
 
