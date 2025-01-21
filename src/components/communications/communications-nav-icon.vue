@@ -34,6 +34,10 @@ export default {
       type: String,
       required: true
     },
+    size: {
+      type: Number,
+      default: 24
+    },
     isActive: {
       type: Boolean,
       default: false
@@ -43,5 +47,7 @@ export default {
 </script>
 
 <template>
-  <component v-bind:is="icon"></component>
+  <component :height="size"
+             :width="size"
+             v-bind:is="icon" />
 </template>

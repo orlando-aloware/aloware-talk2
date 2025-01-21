@@ -21,7 +21,8 @@
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
-          <div class="inbox-side__nav h-100">
+          <div class="inbox-side__nav"
+               style="height: calc(100vh - 62px); overflow-y: auto;">
             <communications-nav-list data-testid="inbox-side-nav-list"
                                      :closed="closed"
                                      :open-count="inboxTaskCounts.open"

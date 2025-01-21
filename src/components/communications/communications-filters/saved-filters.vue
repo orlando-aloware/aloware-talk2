@@ -1,5 +1,5 @@
 <template>
-  <div class="saved-communications-filters">
+  <div class="saved-communications-filters d-flex flex-column">
     <h5 class="text-uppercase filter-group-title"
         data-testid="filter-dialog-personal-filter-title">
       Personal Filters
@@ -9,22 +9,50 @@
                   data-testid="filter-dialog-skeleton"
                   v-if="isGettingFilters" />
       <template v-else>
-      <div class="filter-items no-data"
-         data-testid="filter-dialog-none-p"
-         v-if="personalFilters.length < 1"
-      >
-        <span>
-          None
-        </span>
-      </div>
-      <filter-list-items :filter="item"
-                         data-testid="filter-dialog-filter-list-items"
-                         v-for="item in personalFilters"
-                         :key="item.id"
-                         @filterSelected="(item) => $emit('filterSelected', item)"
-                         @filterRename="onRenameFilter"
-                         @filterDelete="(e) => onDeleteFilter(e, item)"
-      />
+        <div class="filter-items no-data"
+             data-testid="filter-dialog-none-p"
+             v-if="personalFilters.length < 1"
+        >
+          <span>
+            None
+          </span>
+        </div>
+        <filter-list-items :filter="item"
+                           data-testid="filter-dialog-filter-list-items"
+                           v-for="item in personalFilters"
+                           :key="item.id"
+                           @filterSelected="(item) => $emit('filterSelected', item)"
+                           @filterRename="onRenameFilter"
+                           @filterDelete="(e) => onDeleteFilter(e, item)"
+        />
+      </template>
+    </div>
+
+    <h5 class="text-uppercase filter-group-title"
+        data-testid="filter-dialog-company-filter-title">
+      Company Filters
+    </h5>
+
+    <div class="saved-filters">
+      <q-skeleton type="rect"
+                  data-testid="filter-dialog-skeleton"
+                  v-if="isGettingFilters" />
+      <template v-else>
+        <div class="filter-items no-data"
+             data-testid="filter-dialog-none-p"
+             v-if="companyFilters.length < 1"
+        >
+          <span>
+            None
+          </span>
+        </div>
+        <filter-list-items :filter="item"
+                           data-testid="filter-dialog-filter-list-items"
+                           read-only
+                           v-for="item in companyFilters"
+                           :key="item.id"
+                           @filterSelected="(item) => $emit('filterSelected', item)"
+        />
       </template>
     </div>
   </div>
@@ -128,12 +156,22 @@ export default {
     async getFilters () {
       this.isGettingFilters = true
 
-      const personaFiltersResponse = await talk2Api.V2.inbox.filters.get({ type: this.filterType })
-      const companyFilters = await talk2Api.V1.filters.get({ isOnCompany: true })
-      const personalFilters = personaFiltersResponse.data.data.user || []
+      console.log('this.filterType', this.filterType)
 
-      this.setPersonalFilters(personalFilters)
-      this.setCompanyFilters(companyFilters)
+      const params = this.filterType === 7 ? {} : {
+        type: this.filterType
+      }
+
+      const filtersResponse = await talk2Api.V2.inbox.filters.get(params)
+      // const companyFilters = await talk2Api.V1.filters.get({ isOnCompany: true })
+
+      const personalFilters = filtersResponse.data?.data?.user || []
+      const companyFilters = filtersResponse.data?.data?.company || []
+
+      /* type=0 means is a type from classic, and also 6 is for inbox not compatible  */
+      this.setPersonalFilters(personalFilters.filter(({ type }) => ![0, 6].includes(type)))
+
+      this.setCompanyFilters(companyFilters.filter(({ type }) => ![0, 6].includes(type)))
 
       // Gather all tags IDs from, filter data, personal and company filters into a single list for display in select
       let tagsIds = []
