@@ -26,6 +26,10 @@
         :contact="contact"
         v-if="isSalesforceEnabled"/>
 
+    <integration-guesty data-testid='contact-integrations-guesty'
+                        :contact='contact'
+                        v-if='isGuestyEnabled'/>
+
     <contact-crm-links data-testid="contact-integrations-crm-links" :contact="contact"/>
   </b-card>
 </template>
@@ -37,6 +41,7 @@ import IntegrationPipedrive from 'src/components/integrations/integration-pipedr
 import ContactCrmLinks from 'components/contacts/contact-crm-links'
 import IntegrationGohighlevel from 'components/integrations/integration-gohighlevel.vue'
 import IntegrationSalesforce from 'components/integrations/integration-salesforce.vue'
+import IntegrationGuesty from 'components/integrations/integration-guesty.vue'
 
 export default {
   name: 'contact-integrations',
@@ -55,6 +60,7 @@ export default {
   },
 
   components: {
+    IntegrationGuesty,
     IntegrationGohighlevel,
     ContactCrmLinks,
     IntegrationHubspot,

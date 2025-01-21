@@ -32,7 +32,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   simpsocialMixin
 } from 'src/plugins/mixins'
-import { SALESFORCE_INTEGRATION } from 'src/constants/integrations'
+import { GUESTY_INTEGRATION, SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'sync-with-integration',
@@ -72,6 +72,9 @@ export default {
       switch (this.integration_name) {
         case SALESFORCE_INTEGRATION:
           apiCall = talk2Api.V1.contact.syncSalesforce(this.contact_id)
+          break
+        case GUESTY_INTEGRATION:
+          apiCall = talk2Api.V1.contact.syncGuesty(this.contact_id)
           break
         default:
           this.isSyncing = false

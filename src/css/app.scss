@@ -2596,6 +2596,13 @@ i.option-separator {
     position: relative;
     top: -3px;
   }
+  .guesty-icon {
+    content: url(/integrations/guesty-icon.png);
+    line-height: 48px;
+    width: 32px;
+    height: 32px;
+  }
+
   .salesforce-icon {
     font-size: 32px;
     margin-right: 10px;
