@@ -172,8 +172,7 @@ pipeline {
                         // Start build talk2 pointing to app2.alodev.org if is the develop branch
 
                         stage('Build Talk2 Assets for Dev2') {
-                            // when { branch 'develop' }
-                            when { not { branch 'master' } } // TODO: Remove this, this is temp to rebuild current talk2 endpoint
+                            when { branch 'develop' }
                             steps {
                                 // Set the API_URL to https://app2.alodev.org
                                 sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
@@ -187,8 +186,7 @@ pipeline {
                         }
 
                         stage('Deploy Talk2 for Dev2') {
-                            // when { branch 'develop' }
-                            when { not { branch 'master' } } // TODO: Remove this, this is temp to rebuild current talk2 endpoint
+                            when { branch 'develop' }
                             steps {
                                 script {
                                     def workspaceName = 'talk2'
