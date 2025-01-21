@@ -16423,12 +16423,12 @@ hr {
       z-index: 3;
     }
 
-    // td:last-child {
-    //   z-index: 1;
-    // }
+    td:last-child {
+      z-index: 1;
+    }
 
     td:last-child, th:last-child {
-      // position: sticky;
+      position: sticky;
       right: 0;
     }
 
@@ -16505,6 +16505,16 @@ hr {
       padding-top: 0 !important;
       padding-bottom: 0 !important;
       margin-bottom: 0 !important;
+    }
+
+    .operation-button {
+      border: solid 1px #D8D8D8;
+      border-radius: 6px;
+      height: 28px;
+      width: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 

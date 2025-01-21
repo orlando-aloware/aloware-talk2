@@ -30,6 +30,9 @@
             <div v-if="col.name === 'name'">
               {{ props.row.name }}
             </div>
+            <div v-if="col.name === 'owner_name'">
+              {{ props.row.owner_name }}
+            </div>
             <div v-else-if="col.name === 'date_created'">
               <relative-time humanized
                              :from-time="props.row[col.field]" />
@@ -63,23 +66,130 @@
             </div>
             <div v-else-if="col.name === 'actions'">
               <div class="d-flex justify-content-center context-menu">
-                <b-dropdown no-caret
-                            size="sm"
-                            center>
-                  <template #button-content>
-                    <ellipse-icon />
-                  </template>
-                  <b-dropdown-item dense
-                                   clickable
-                                   @click="onRenameList(props.row)">
-                    <span class=""><edit-pen-icon /> Rename</span>
-                  </b-dropdown-item>
-                  <b-dropdown-item dense
-                                   clickable
-                                   @click="onDeleteList(props.row)">
-                    <span class="text-danger"><delete-red-icon /> Delete</span>
-                  </b-dropdown-item>
-                </b-dropdown>
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-rename-button"
+                        @click="onRenameList(props.row)">
+                    <pencil-icon height="16"
+                                width="16"
+                                color="#62666E"/>
+                    <q-tooltip>
+                      Rename this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-duplicate-button"
+                        @click="onDuplicateList(props.row)">
+                    <duplicate-icon height="16"
+                               width="16"
+                               color="#62666E"/>
+                    <q-tooltip>
+                      Duplicate this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1"
+                     :data-popper-target="'list-' + props.row.id">
+                  <span class="cursor-pointer"
+                        data-testid="lists-move-button"
+                        data-action="move-item"
+                        @click="onMoveList(props.row)">
+                    <move-icon height="16"
+                               width="16"
+                               color="#62666E"/>
+                    <q-tooltip>
+                      Move this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-pin-button"
+                        @click="onPinList(props.row)">
+                    <pin-icon height="16"
+                               width="16"
+                               color="#62666E"/>
+                    <q-tooltip>
+                      {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1"
+                     v-if="hasShowInPublicFolderPermission">
+                  <span class="cursor-pointer"
+                        data-testid="lists-show-button"
+                        @click="onShowInPublicFolderList(props.row)">
+                    <eye-icon height="16"
+                              width="16"
+                              color="#62666E"
+                              v-if="!props.row.show_in_public_folder"/>
+                    <eye-off-icon height="16"
+                                  width="16"
+                                  color="#62666E"
+                                  v-else/>
+                    <q-tooltip>
+                      Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-enroll-sequence-button"
+                        @click="onEnrollContactsToSequence(props.row)">
+                    <add-sequence-icon height="16"
+                                   width="16"
+                                   color="#62666E"/>
+                    <q-tooltip>
+                      Enroll contacts to sequence
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-add-power-dialer-button"
+                        @click="onAddListToPowerDialer(props.row)">
+                    <add-call-icon height="16"
+                                   width="16"
+                                   color="#62666E"/>
+                    <q-tooltip>
+                      Add this list to Power Dialer
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-delete-button"
+                        @click="onDeleteList(props.row)">
+                    <trash-icon height="16"
+                                width="16"
+                                color="#62666E"/>
+                    <q-tooltip>
+                      Delete this list
+                    </q-tooltip>
+                  </span>
+                </div>
+
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-duplicate-button"
+                        @click="openAssignContacts(props.row)">
+                    <arrow-right-icon height="16"
+                                      width="16"
+                                      color="#62666E"/>
+                    <q-tooltip>
+                      Assign Contacts
+                    </q-tooltip>
+                  </span>
+                </div>
               </div>
             </div>
           </q-td>
@@ -106,19 +216,61 @@
                        data-testid="lists-form"
                        @closeListForm="closeListForm"
                        @listUpdated="listUpdated"/>
+
+    <convert-list-to-public-dialog :list-id="list.id"
+                                   :list-name="list.name"
+                                   :list-show-in-public-folder="list.show_in_public_folder"
+                                   :from-admin-list="true"
+                                   v-model="convertToPublicDialog"
+                                   v-if="list"
+                                   @closed="convertToPublicDialog = false"
+                                   @converted="onListConvertedToPublic"/>
+
+    <tag-contacts-workflow-enroller :is-show="showAddToSequence"
+                                    :list="list"
+                                    @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
+
+    <power-dialer-add-modal :params="attachedParams()"
+                            :contact-list="list"
+                            :mode="addToPowerDialerMode"
+                            :show-in-contacts-page="true"
+                            :selected-all-count="list.no_of_contacts"
+                            :is-manual-selection="addToPowerDialerIsManualSelection"
+                            v-if="openPDModal"
+                            @hidden="openPDModal = false">
+      </power-dialer-add-modal>
+
+      <assign-contacts-modal :is-show="showAssignContacts"
+                             :list="list"
+                             @closeAssignContactsModal="closeAssignContacts" />
+
+      <move-dialog />
   </div>
 </template>
 
 <script>
-import RelativeTime from 'src/components/relative-time.vue'
-import { COLUMNS } from 'src/constants/lists/home-columns'
-import EllipseIcon from 'components/icons/ellipse-icon'
-import EditPenIcon from 'components/icons/edit-pen-icon.vue'
-import DeleteRedIcon from 'components/icons/delete-red-icon.vue'
-import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
-import { dataTableMixin } from 'src/plugins/mixins'
+import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
+import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
+import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
+import AssignContactsModal from 'src/components/assign-contacts-modal'
+import MoveDialog from 'src/components/move-dialog'
+import RelativeTime from 'src/components/relative-time.vue'
+import PencilIcon from 'components/icons/pencil-icon.vue'
+import DuplicateIcon from 'components/icons/duplicate-icon.vue'
+import TrashIcon from 'components/icons/trash-icon.vue'
+import PinIcon from 'components/icons/pin-icon.vue'
+import EyeIcon from 'components/icons/eye-icon.vue'
+import EyeOffIcon from 'components/icons/eye-off-icon'
+import AddCallIcon from 'components/icons/add-call-icon.vue'
+import AddSequenceIcon from 'components/icons/add-sequence-icon'
+import ArrowRightIcon from 'components/icons/arrow-right-icon'
+import MoveIcon from 'components/icons/move-icon.vue'
+import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { COLUMNS, columnsByViewportConfig } from 'src/constants/lists/home-columns'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'ListsTable',
@@ -131,23 +283,35 @@ export default {
   },
 
   mixins: [
+    aclMixin,
     dataTableMixin
   ],
 
   components: {
-    RelativeTime,
-    EllipseIcon,
+    AddCallIcon,
+    AddSequenceIcon,
+    ArrowRightIcon,
+    DuplicateIcon,
+    EyeIcon,
+    EyeOffIcon,
+    MoveIcon,
+    PencilIcon,
+    PinIcon,
+    TrashIcon,
+    AssignContactsModal,
+    ConvertListToPublicDialog,
     ListsRenameForm,
-    EditPenIcon,
-    DeleteRedIcon
+    MoveDialog,
+    PowerDialerAddModal,
+    TagContactsWorkflowEnroller,
+    RelativeTime
   },
 
   data () {
     return {
-      loading: false,
-      COLUMNS,
-      isLoadingMore: false,
       isLoading: false,
+      isLoadingMore: false,
+      loading: false,
       pagination: {
         rowsPerPage: 0,
         rowsNumber: this.listsCount,
@@ -156,18 +320,24 @@ export default {
         currentPage: 1
       },
       listsData: [],
+      list: null,
       isOpenListForm: false,
-      list: null
+      convertToPublicDialog: false,
+      pinnedLists: [],
+      showAddToSequence: false,
+      showAssignContacts: false,
+      openPDModal: false,
+      addToPowerDialerMode: 'add',
+      addToPowerDialerIsManualSelection: false,
+      COLUMNS
     }
   },
 
-  async mounted () {
-    await this.getLists()
-    this.calculateTotalPages()
-    this.listsData = this.lists
-  },
-
   computed: {
+    ...mapGetters('contacts', [
+      'pinned',
+      'moveDialog'
+    ]),
     ...mapState('listsModule', [
       'isListsLoading'
     ]),
@@ -176,66 +346,31 @@ export default {
       listsCount: 'getListsCount'
     }),
 
+    hasShowInPublicFolderPermission () {
+      return this.isBillingAdminOrAdminOrSupervisor
+    },
+
     columnsByViewport () {
-      return {
-        mobile: [
-          'name',
-          'actions'
-        ],
-        tablet: [
-          'name',
-          'no_of_contacts',
-          'actions'
-        ],
-        smallDesktop: [
-          'name',
-          'no_of_contacts',
-          'import_status',
-          'type',
-          'actions'
-        ],
-        mediumDesktop: [
-          'name',
-          'date_created',
-          'no_of_contacts',
-          'type',
-          'show_in_public_folder',
-          'source',
-          'import_status',
-          'actions'
-        ],
-        largeDesktop: [
-          'name',
-          'date_created',
-          'no_of_contacts',
-          'type',
-          'show_in_public_folder',
-          'source',
-          'import_status',
-          'imported_at',
-          'actions'
-        ],
-        extraLargeDesktop: [
-          'name',
-          'date_created',
-          'no_of_contacts',
-          'type',
-          'show_in_public_folder',
-          'source',
-          'import_status',
-          'imported_at',
-          'actions'
-        ]
-      }
+      return columnsByViewportConfig
     },
 
     fixedColumns () {
       const allColumns = this.$jsonClone(this.COLUMNS)
       return this.getResponsiveColumns(allColumns, this.columnsByViewport)
+    },
+
+    isPinned () {
+      return Array.isArray(this.pinnedLists) ? this.pinnedLists.includes(this.list.id) : false
     }
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'listPinToggled',
+      'addPowerDialerOpen',
+      'openMoveDialog'
+    ]),
+
     ...mapActions('listsModule', [
       'fetchLists',
       'deleteList'
@@ -246,17 +381,228 @@ export default {
       'SET_LISTS_COUNT'
     ]),
 
+    async initializeLists () {
+      await this.getLists()
+      this.calculateTotalPages()
+      this.listsData = this.lists
+      await this.getPinnedLists()
+    },
+
+    async getLists (isLoadMore = false) {
+      if (this.isLoading) return
+
+      this.setLoadingState(isLoadMore)
+
+      try {
+        await this.fetchLists({
+          page: this.pagination.currentPage,
+          perPage: this.pagination.perPage
+        })
+      } finally {
+        this.resetLoadingState()
+      }
+    },
+
+    setLoadingState (isLoadMore) {
+      if (!isLoadMore) {
+        this.isLoading = true
+        this.pagination.currentPage = 1
+        this.listsData = []
+      } else {
+        this.isLoadingMore = true
+      }
+    },
+
+    resetLoadingState () {
+      this.isLoading = false
+      this.isLoadingMore = false
+    },
+
+    async loadMoreLists (done) {
+      if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
+        if (typeof done === 'function') {
+          done()
+        }
+        return
+      }
+
+      this.pagination.currentPage += 1
+      await this.getLists(true)
+      this.listsData.push(...this.lists)
+
+      if (typeof done === 'function') {
+        done()
+      }
+    },
+
+    calculateTotalPages () {
+      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage) || 1
+    },
+
+    refreshLists: async function () {
+      this.listsData = []
+      this.SET_LISTS_COUNT(0)
+      await this.getLists()
+      this.calculateTotalPages()
+      this.listsData = this.lists
+    },
+
+    removeList (list) {
+      this.deleteList(list.id)
+        .then(() => {
+          this.SET_LISTS_COUNT(this.listsCount - 1)
+          this.listsData = this.listsData.filter(item => item.id !== list.id)
+          this.$generalNotification(`${list.name} list has been successfully deleted.`)
+        })
+        .catch(err => {
+          console.error(err)
+          this.$generalNotification('Something went wrong while deleting list.', 'error')
+        })
+    },
+
+    async onScroll ({ to, ref }) {
+      const lastIndex = this.listsData.length - 1
+      if (!this.isLoadingMore && this.pagination.currentPage < this.pagination.totalPages && to === lastIndex) {
+        await this.loadMoreLists()
+        ref.refresh()
+      }
+    },
+
     openListForm () {
       this.isOpenListForm = true
     },
 
     closeListForm () {
       this.isOpenListForm = false
+      setTimeout(() => (this.list = null), 200) // Fix UI glitch
+    },
 
-      // Fix submit button label slight glitch upon closing
-      setTimeout(() => {
-        this.list = null
-      }, 200)
+    listUpdated (list) {
+      this.listsData = this.listsData.map(item =>
+        item.id === list.id ? { ...item, name: list.name } : item
+      )
+    },
+
+    openAssignContacts (list) {
+      this.list = list
+      this.showAssignContacts = true
+    },
+
+    closeAssignContacts () {
+      this.showAssignContacts = false
+    },
+
+    onRenameList (list) {
+      this.list = list
+      this.openListForm()
+    },
+
+    onDuplicateList (list) {
+      this.list = list
+      this.duplicateList({
+        id: list.id,
+        type: list.type,
+        from_admin_list: true
+      })
+    },
+
+    async duplicateList (params) {
+      try {
+        const response = await this.$axios.post(`/api/v2/contacts-list/${this.list.id}/duplicate`, params)
+        this.$generalNotification(response.data.message)
+        await this.refreshLists()
+      } catch (error) {
+        const { message } = extractErrorMessage(error)
+        console.error(error)
+        this.$generalNotification(message, 'error')
+      }
+    },
+
+    onDeleteList (list) {
+      this.$bvModal
+        .msgBoxConfirm(
+          'Are you sure you want to delete this contact list? This action is irreversible.',
+          {
+            buttonSize: 'sm',
+            okTitle: 'Yes',
+            cancelTitle: 'No',
+            centered: true
+          }
+        )
+        .then(confirm => confirm && this.removeList(list))
+    },
+
+    async getPinnedLists () {
+      try {
+        const { data } = await this.$axios.get('/api/v2/contact-list-bookmark')
+        this.pinnedLists = data.map(item => item.contact_list_id)
+      } catch (err) {
+        console.error(err)
+        this.$generalNotification('Unable to load lists, please try again.', 'error')
+      }
+    },
+
+    onPinList (list) {
+      this.list = list
+      const isPinned = !this.isPinned
+
+      this.pinRequest(this.list.id, isPinned).finally(() => {
+        this.getPinnedLists()
+        this.$generalNotification(isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.')
+      })
+    },
+
+    pinRequest (id, isPinned) {
+      return isPinned
+        ? this.$axios.post('/api/v2/contact-list-bookmark', { contact_list_id: id, order: id })
+        : this.$axios.delete(`/api/v2/contact-list-bookmark/${id}`)
+    },
+
+    onEnrollContactsToSequence (list) {
+      this.list = list
+      this.showAddToSequence = true
+    },
+
+    closeAddToSequence () {
+      this.showAddToSequence = false
+    },
+
+    onAddListToPowerDialer (list) {
+      this.list = list
+      this.addToPowerDialerList(true)
+    },
+
+    addToPowerDialerList (isManualSelection = false) {
+      this.openPDModal = true
+      this.addPowerDialerOpen(true)
+      this.addToPowerDialerMode = 'add-contact-list'
+      this.addToPowerDialerIsManualSelection = isManualSelection
+    },
+
+    attachedParams () {
+      return {
+        list_id: this.list.id,
+        selected_all: true,
+        contact_ids: []
+      }
+    },
+
+    onMoveList (list) {
+      this.list = list
+      this.openMoveDialog({ id: list.id, type: 'list' })
+    },
+
+    onShowInPublicFolderList (list) {
+      this.list = list
+      this.convertToPublicDialog = true
+    },
+
+    onListConvertedToPublic () {
+      const { id, show_in_public_folder: showInPublicFolder } = this.list
+      this.listsData = this.listsData.map(item =>
+        item.id === id ? { ...item, show_in_public_folder: !showInPublicFolder } : item
+      )
+      this.convertToPublicDialog = false
     },
 
     getContactListType (contactList) {
@@ -270,107 +616,11 @@ export default {
         default:
           return 'Unknown'
       }
-    },
-
-    calculateTotalPages () {
-      if (this.lists?.length === 0) {
-        this.pagination.totalPages = 1
-        return
-      }
-
-      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage)
-    },
-
-    getLists (isLoadMore = false) {
-      if (this.isLoading) {
-        return
-      }
-
-      if (!isLoadMore) {
-        this.isLoading = true
-        this.pagination.currentPage = 1
-        this.listsData = []
-      } else {
-        this.isLoadingMore = true
-      }
-
-      return this.fetchLists({
-        page: this.pagination.currentPage,
-        perPage: this.pagination.perPage
-      })
-        .finally(() => {
-          this.isLoading = false
-          this.isLoadingMore = false
-        })
-    },
-
-    removeList (list) {
-      this.deleteList(list.id)
-        .then(() => {
-          this.SET_LISTS_COUNT(this.listsCount - 1)
-          this.listsData = this.listsData.filter(item => item.id !== list.id)
-
-          this.$generalNotification(`${list.name} list has been successfully deleted.`)
-        })
-        .catch((err) => {
-          console.log(err)
-          this.$generalNotification('Something went wrong while deleting list.', 'error')
-        })
-    },
-
-    async onScroll ({ to, ref }) {
-      const lastIndex = this.listsData.length - 1
-      if (!this.isLoadingMore && this.pagination.currentPage < this.pagination.totalPages && to === lastIndex) {
-        await this.loadMoreLists()
-        ref.refresh()
-      }
-    },
-
-    async loadMoreLists (done) {
-      if (!this.isLoadingMore && this.pagination.currentPage < this.pagination.totalPages) {
-        this.pagination.currentPage += 1
-        await this.getLists(true)
-        this.listsData.push(...this.lists)
-
-        if (typeof done === 'function') {
-          done()
-        }
-      } else {
-        if (typeof done === 'function') {
-          done()
-        }
-      }
-    },
-
-    onDeleteList (list) {
-      this.$bvModal.msgBoxConfirm('Are you sure you want to delete this contact list? This action is irreversible.', {
-        buttonSize: 'sm',
-        okTitle: 'Yes',
-        cancelTitle: 'No',
-        centered: true
-      }).then(confirm => {
-        if (confirm) {
-          this.removeList(list)
-        }
-      })
-    },
-
-    onRenameList (list) {
-      this.list = list
-      this.openListForm()
-    },
-
-    listUpdated (list) {
-      const { id, name } = list
-
-      this.listsData = this.listsData.map(item => {
-        if (item.id === id) {
-          item.name = name
-        }
-
-        return item
-      })
     }
+  },
+
+  async mounted () {
+    await this.initializeLists()
   }
 }
 </script>

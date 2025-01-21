@@ -237,7 +237,8 @@ export default {
         evt.target &&
         !dialogContainsTarget &&
         !evt.target.classList.contains('contact-menu-item') &&
-        !evt.target.classList.contains('move-item')
+        !evt.target.classList.contains('move-item') &&
+        !evt.target.dataset.action?.includes('move-item')
       ) {
         this.closeMoveDialog()
         document.body.removeEventListener('click', this.handleClick)
@@ -260,6 +261,9 @@ export default {
   },
 
   mounted () {
+    if (this.folders?.length === 0) {
+      this.reloadFolders()
+    }
     this.loadDirectories()
   },
 
