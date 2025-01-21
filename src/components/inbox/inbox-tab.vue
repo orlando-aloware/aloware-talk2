@@ -9,7 +9,8 @@
                     :has-custom-left-content="true"
                     :is-search="isSearch"
                     data-testid="inbox-tab-calls-header"
-                    @sort="sortContactTasks">
+                    @sort="sortContactTasks"
+                    v-if="!isNewInboxEnabled">
         <template slot="customLeftContent">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isFetchingContacts"
