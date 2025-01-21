@@ -449,14 +449,6 @@ export default {
     this.cancelToken = this.$axios.CancelToken
     this.source = this.cancelToken.source()
     this.columns = this.getSavedColumns()
-  },
-
-  mounted () {
-    if (this.hasPermissionTo('list communication')) {
-      this.$nextTick(() => {
-        this.getCommunications(this.communicationFilters)
-      })
-    }
   }
 }
 </script>

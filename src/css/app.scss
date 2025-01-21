@@ -7678,10 +7678,13 @@ table.datatable {
   .left-column-wrapper {
 
     .filter-group-title {
-      font-size: 12px;
-      color: $grey-80;
-      margin-bottom: 10px;
-      font-weight: 400;
+      padding: 10px 5px 10px 7px !important;
+      color: #666666;
+      letter-spacing: 1px;
+      font-size: 10px;
+      font-weight: bold;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     .filter-items {
@@ -7691,9 +7694,9 @@ table.datatable {
       height: 30px;
 
       span:not(.check-icon) {
-        font-size: 13px;
-        color: $grey-100;
-        width: 95%;
+        font-size: 14px;
+        color: #666666;
+        line-height: 17px;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -7737,7 +7740,10 @@ table.datatable {
     }
 
     .filter-items:hover {
-      background: $grey-50;
+
+      &:not(.no-data) {
+        background: $grey-50;
+      }
 
       button {
         display: block;
@@ -7760,6 +7766,51 @@ table.datatable {
 
     .saved-filters {
 
+    }
+  }
+}
+
+
+#comms-channel-filter-modal {
+  .filter-group-title {
+    padding: 10px 5px 10px 7px !important;
+    color: #666666;
+    letter-spacing: 1px;
+    font-size: 10px;
+    font-weight: bold;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .filter-items {
+    span:not(.check-icon) {
+      font-size: 14px;
+      color: #666666;
+      line-height: 17px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      display: inline-block;
+    }
+  }
+}
+
+#inbox-channel-filter-modal {
+  .filter-group-title {
+    font-size: 12px;
+    color: $grey-80;
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+  .filter-items {
+    span:not(.check-icon) {
+      font-size: 13px;
+      color: $grey-100;
+      width: 95%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      display: inline-block;
     }
   }
 }
@@ -7803,28 +7854,13 @@ table.datatable {
       overflow: auto;
     }
 
-    .filter-group-title {
-      font-size: 12px;
-      color: $grey-80;
-      margin-bottom: 10px;
-      font-weight: 400;
-    }
+
 
     .filter-items {
       margin: 5px 0;
       padding: 7px 12px;
       line-height: 1.2;
       height: 30px;
-
-      span:not(.check-icon) {
-        font-size: 13px;
-        color: $grey-100;
-        width: 95%;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        display: inline-block;
-      }
 
       span.position-absolute.check-icon {
         right: 10px;
@@ -7863,7 +7899,9 @@ table.datatable {
     }
 
     .filter-items:hover {
-      background: $grey-50;
+      &:not(.no-data) {
+        background: $grey-50;
+      }
 
       button {
         display: block;
@@ -7876,16 +7914,6 @@ table.datatable {
 
     .filter-items.active {
       background: $grey-60;
-    }
-
-    .filter-group-title,
-    .filter-type-description,
-    .empty-filter-placeholder {
-      //padding: 7px 12px;
-    }
-
-    .saved-filters {
-
     }
   }
 

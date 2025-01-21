@@ -16,7 +16,8 @@ import * as MentionType from 'src/constants/mention-type'
 
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
 
 export default {
   mixins: [userMixin],
@@ -790,18 +791,18 @@ export default {
     },
 
     getCommunicationType () {
-      switch (this.$route.params.channel) {
+      switch (this.activeChannel.value) {
         case DEFAULT_COMMUNICATIONS_CHANNEL:
         case 'my-personal-line':
           return 'all'
-        case 'calls':
-        case 'voicemails':
-        case 'recordings':
-          return 'call'
-        case 'messages':
-          return 'sms'
+        case CALLS_CHANNEL:
+        case VOICEMAILS_CHANNEL:
+        case RECORDINGS_CHANNEL:
+          return CALL_TYPE
+        case MESSAGES_CHANNEL:
+          return SMS_TYPE
         default:
-          return this.$route.params.channel
+          return this.activeChannel.type
       }
     },
 
@@ -815,7 +816,6 @@ export default {
         this.isLoadingMore = true
       }
 
-      // let params = this.$jsonClone(filters)
       let params = {
         from_date: '',
         to_date: '',
@@ -904,7 +904,6 @@ export default {
       })
         .then(response => {
           if (response) {
-            this.gettingTasksList(false)
             const data = response.data.data
 
             if (isLoadMore && data.length > 0) {
@@ -936,7 +935,6 @@ export default {
             return
           }
 
-          this.gettingTasksList(false)
           this.communicationsListHasError = true
           const channelName = this.$route.params.channel !== 'mentions'
             ? 'communications'
@@ -973,14 +971,14 @@ export default {
     },
 
     removeUnnecessaryParameters (params) {
-      if (this.$route.params.channel === 'messages') {
+      if (this.$route.params.channel === MESSAGES_CHANNEL) {
         delete params.report_type
         delete params.chart_period
         delete params.min_talk_time
         delete params.changed
       }
 
-      const callsChannels = ['calls', 'recordings', 'voicemails']
+      const callsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL]
 
       if (callsChannels.includes(this.$route.params.channel)) {
         delete params.report_type
@@ -990,7 +988,7 @@ export default {
         delete params.changed
       }
 
-      if (this.$route.params.channel === 'voicemails') {
+      if (this.$route.params.channel === VOICEMAILS_CHANNEL) {
         delete params.min_talk_time
       }
 
@@ -1007,14 +1005,5 @@ export default {
     this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
-  },
-
-  watch: {
-    '$route.params.channel': function (newVal) {
-      this.resetCommunications()
-      if (newVal === DEFAULT_COMMUNICATIONS_CHANNEL) {
-        this.getCommunications(this.communicationFilters)
-      }
-    }
   }
 }

@@ -43,7 +43,7 @@
 </template>
 
 <script>
-
+import { ANY_COMMUNICATION_TYPE, CALL_TYPE, SMS_TYPE, EMAIL_TYPE, FAX_TYPE } from 'src/constants/communication-types'
 export default {
   name: 'CommunicationTypeFilterSelector',
 
@@ -97,11 +97,11 @@ export default {
     return {
       selectedValue: this.value,
       optsArray: [
-        { value: 'all', label: 'All' },
-        { value: 'call', label: 'Calls' },
-        { value: 'sms', label: 'Text Message' },
-        { value: 'email', label: 'Email' },
-        { value: 'fax', label: 'Fax' }
+        { value: ANY_COMMUNICATION_TYPE, label: 'All' },
+        { value: CALL_TYPE, label: 'Calls' },
+        { value: SMS_TYPE, label: 'Text Message' },
+        { value: EMAIL_TYPE, label: 'Email' },
+        { value: FAX_TYPE, label: 'Fax' }
       ],
       options: [],
       selectWidth: 0
@@ -135,7 +135,7 @@ export default {
     },
 
     selectedValue (val) {
-      this.$emit('select', this.selectedValue ? this.selectedValue : 'all')
+      this.$emit('select', this.selectedValue ? this.selectedValue : ANY_COMMUNICATION_TYPE)
     }
   }
 }
