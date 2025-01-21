@@ -905,6 +905,9 @@ export default {
       },
       async update (id, params) {
         return window.axios.put(`${suffixV2}contacts-list/${id}`, params)
+      },
+      delete (id, params) {
+        return window.axios.delete(`${suffixV2}contacts-list/${id}`, { params })
       }
     },
 

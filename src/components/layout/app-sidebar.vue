@@ -147,6 +147,49 @@
       </span>
     </q-btn>
 
+    <q-btn :to="{ path: '/lists' }"
+           :ripple="false"
+           icon="img:app-icons/menu/power_dialer_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           v-show="isActive('Lists')"
+           v-if="isDemoCompany"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">Lists</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        Lists
+      </span>
+    </q-btn>
+    <q-btn :to="{ path: '/lists' }"
+           :ripple="false"
+           icon="img:app-icons/menu/power_dialer_gray.svg"
+           align="left"
+           padding="10px 20px"
+           class="nav-icons w-100"
+           v-show="!isActive('Lists')"
+           v-if="isDemoCompany"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">LML</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        Lists
+      </span>
+    </q-btn>
+
     <q-btn :to="{ path: '/power-dialer' }"
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_active.svg"
