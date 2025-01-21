@@ -106,7 +106,8 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'user_id'">
-              <user :value="col.value" />
+              <user :value="col.value"
+                    @on-filter="onFilter"/>
             </div>
 
             <div :style="col.columnStyle"
@@ -384,6 +385,10 @@ export default {
     sort (sorts) {
       // Handle sorting logic here
       this.getCommunications(this.communicationFilters)
+    },
+
+    onFilter (data) {
+      this.$VueEvent.fire('filter-communications', data)
     },
 
     onSearch (value) {

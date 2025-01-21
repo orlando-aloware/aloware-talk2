@@ -138,6 +138,19 @@ export default {
   },
   mounted () {
     this.filter = _.clone(this.channelDefaultFilterModel.filter)
+
+    this.$VueEvent.listen('filter-communications', data => {
+      // ex: data = { type: 'users', value: 1 }
+      switch (data.type) {
+        case 'users':
+          this.filterByUser(data.value)
+          break
+        case 'campaign':
+          this.filterByCampaign(data.value)
+          break
+      }
+      // this.channelChangedFilterFields
+    })
   },
   methods: {
     ...mapActions(['setIsFirstLoad']),

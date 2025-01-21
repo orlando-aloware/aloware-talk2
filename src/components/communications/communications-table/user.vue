@@ -1,16 +1,13 @@
 <template>
   <div class="ellipse"
        data-testid="user-row">
-    <span v-if="isAgent && value">
-      {{ getUserName(getUser(value)) }}
-    </span>
-    <a target='_blank'
-       :href="getUserURL(value)"
-       v-else-if="value">
+    <a href="#"
+       v-if="value"
+       @click.prevent="filter">
       {{ getUserName(getUser(value)) }}
 
       <q-tooltip>
-        Click to go to user's page
+        Click to filter by this user
       </q-tooltip>
     </a>
     <span v-else>
@@ -20,21 +17,28 @@
 </template>
 
 <script>
-import { userMixin, aclMixin, classicMixin } from 'src/plugins/mixins'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'User',
 
   mixins: [
-    userMixin,
-    aclMixin,
-    classicMixin
+    userMixin
   ],
 
   props: {
     value: {
       type: Number,
       required: false
+    }
+  },
+
+  methods: {
+    filter () {
+      this.$emit('on-filter', {
+        type: 'user',
+        value: this.value
+      })
     }
   }
 }
