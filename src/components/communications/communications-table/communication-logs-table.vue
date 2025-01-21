@@ -10,8 +10,7 @@
                       :search="search"
                       :disabled="isLoadingDisabled"
                       data-testid="contacts-view-search-input"
-                      @search="onSearch"
-        />
+                      @search="onSearch" />
       </div>
 
       <div class="setting pr-3 align-items-center">
@@ -26,16 +25,13 @@
 
         <hr role="separator"
             aria-orientation="vertical"
-            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical"
-        >
+            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
 
         <communications-filters class="ml-2 mr-3" />
 
-        <compact-btn
-          variant="primary"
-          :compact="false"
-          @clicked="changeTableSettingsVisibility(true)"
-        >
+        <compact-btn variant="primary"
+                     :compact="false"
+                     @clicked="changeTableSettingsVisibility(true)">
           Table Settings
         </compact-btn>
       </div>
@@ -44,6 +40,7 @@
     <q-table class="communication-logs-table flex-grow-1"
              row-key="index"
              virtual-scroll
+             hide-bottom
              :data="communications"
              :columns="columns"
              :loading="isLoadingMore || isLoadingCommunications"
@@ -51,8 +48,7 @@
              :virtual-scroll-sticky-size-start="100"
              :pagination="pagination"
              :rows-per-page-options="[0]"
-             @virtual-scroll="onScroll"
-    >
+             @virtual-scroll="onScroll">
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td :props="props"
@@ -63,15 +59,11 @@
                            :style="col.columnStyle"
                            @on-details="onCommunicationDetails"/>
             </div>
+
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'incoming_number'">
-              <div class="ellipse"
-                   v-if="props.row?.campaign_id">
-                {{ getCampaignName(props.row?.campaign_id) }}
-              </div>
-              <div>
-                {{ col.value | fixPhone('NATIONAL', true) }}
-              </div>
+              <incoming-number :value="col.value"
+                               :campaign-id="props.row.campaign_id"/>
             </div>
 
             <div :style="col.columnStyle"
@@ -107,12 +99,8 @@
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'user_id'">
               <user :value="col.value"
+                    :row="props.row"
                     @on-filter="onFilter"/>
-            </div>
-
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'teams'">
-              <communications-teams :teams="col.value" />
             </div>
 
             <div :style="col.columnStyle"
@@ -135,18 +123,7 @@
               <resolution :row="props.row" />
             </div>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'lead_location'">
-              <location :row="props.row" />
-            </div>
-
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'line'">
-              <lines :value="props.row.campaign_id" />
-            </div>
-
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'attempting_users'">
+            <div v-else-if="col.name === 'attempting_users'">
               <attempting-users :row="props.row" />
             </div>
 
@@ -207,25 +184,19 @@
 
             <div v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
+                                         @on-details="onCommunicationDetails"
                                          @archived="removeCommunication"
                                          @terminated="removeCommunication" />
             </div>
           </q-td>
         </q-tr>
       </template>
-      <template v-slot:loading>
-        <div class="d-flex justify-center">
-          <q-spinner-bars color="primary"
-                          size="30px" />
-        </div>
-      </template>
-      <template v-slot:no-data>
-        <div class="w-100 text-center"
-             v-if="!isLoadingMore && !isLoadingCommunications">
-          <h2> No data </h2>
-        </div>
-      </template>
     </q-table>
+
+    <div class="communication-logs-table--no-data h5"
+         v-if="!communications.length && !isLoadingMore && !isLoadingCommunications">
+      No communications found based on the current filters
+    </div>
 
     <communications-details-sidebar :communication="sidebarCommunication"
                                     v-model="showCommunicationSidebar"/>
@@ -270,7 +241,6 @@ import SearchInput from 'components/search-input'
 import CompactBtn from 'components/compact-btn'
 import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
-import CommunicationsTeams from './communications-teams.vue'
 import StartTime from './start-time.vue'
 import CommunicationsFilters from 'src/components/communications/communications-filters.vue'
 import CommunicationsOperations from './communications-operations.vue'
@@ -285,8 +255,7 @@ import User from './user.vue'
 import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
 import Resolution from './resolution.vue'
-import Location from './location.vue'
-import Lines from './lines.vue'
+import IncomingNumber from './incoming-number.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
 import TransferType from './transfer-type.vue'
@@ -321,7 +290,6 @@ export default {
     CommunicationsOperations,
     CommunicationTableSettings,
     CommunicationsTags,
-    CommunicationsTeams,
     RingGroup,
     Disposition,
     StartTime,
@@ -334,8 +302,7 @@ export default {
     Broadcast,
     Workflow,
     Resolution,
-    Location,
-    Lines,
+    IncomingNumber,
     AttemptingUsers,
     Transferred,
     TransferType,
@@ -364,18 +331,6 @@ export default {
       cancelToken: null,
       paginated: false,
       showColumnHeadersModal: false,
-      fixedColumns: [
-        'disposition_status2',
-        'incoming_number',
-        'ring_group',
-        'created_at',
-        'talk_time',
-        'duration',
-        'contact',
-        'user_id',
-        'operations'
-      ],
-      expandedTeams: {},
       showCommunicationSidebar: false,
       sidebarCommunication: {}
     }
@@ -499,14 +454,6 @@ export default {
     this.cancelToken = this.$axios.CancelToken
     this.source = this.cancelToken.source()
     this.columns = this.getSavedColumns()
-  },
-
-  mounted () {
-    if (this.hasPermissionTo('list communication')) {
-      this.$nextTick(() => {
-        this.getCommunications(this.communicationFilters)
-      })
-    }
   }
 }
 </script>

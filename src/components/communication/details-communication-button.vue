@@ -27,11 +27,21 @@ export default {
     communication: {
       type: Object,
       required: true
+    },
+
+    eventOnly: {
+      type: Boolean,
+      default: false
     }
   },
 
   methods: {
     seeDetails () {
+      if (this.eventOnly) {
+        this.$emit('on-details', this.communication)
+        return
+      }
+
       window.open(`/contacts/${this.communication.contact_id}/communications/${this.communication.id}`, '_blank')
     }
   }

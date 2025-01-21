@@ -30,6 +30,11 @@ export default {
     value: {
       type: Number,
       required: false
+    },
+
+    row: {
+      type: Object,
+      required: true
     }
   },
 

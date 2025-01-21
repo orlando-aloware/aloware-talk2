@@ -1,11 +1,12 @@
 <template>
-  <div data-testid="line-row">
-    <span v-if="isAgent && value">
+  <div class="d-flex flex-column"
+       data-testid="line-row">
+    <span v-if="isAgent && campaignId">
       {{ campaign.name || '-' }}
     </span>
     <a target='_blank'
-       :href="getCampaignActivityURL(value)"
-       v-else-if="value">
+       :href="getCampaignActivityURL(campaignId)"
+       v-else-if="campaignId">
       {{ campaign.name || '-' }}
 
       <q-tooltip>
@@ -15,6 +16,9 @@
     <span v-else>
       -
     </span>
+    <span>
+      {{ value | fixPhone('NATIONAL', true) }}
+    </span>
   </div>
 </template>
 
@@ -23,7 +27,7 @@ import { aclMixin, classicMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
 export default {
-  name: 'Lines',
+  name: 'IncomingNumber',
 
   mixins: [
     aclMixin,
@@ -32,6 +36,11 @@ export default {
 
   props: {
     value: {
+      type: String,
+      required: false
+    },
+
+    campaignId: {
       type: Number,
       required: false
     }
@@ -41,7 +50,7 @@ export default {
     ...mapState(['campaigns']),
 
     campaign () {
-      return this.campaigns.find(campaign => campaign.id === this.value) || {}
+      return this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
     }
   }
 }
