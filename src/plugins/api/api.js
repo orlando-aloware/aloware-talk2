@@ -183,6 +183,10 @@ export default {
         return window.axios.post(`${suffixV1}contact/${id}/sync-guesty`)
       },
 
+      syncZoho (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-zoho`)
+      },
+
       syncPipedrive (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-pipedrive`)
       },
