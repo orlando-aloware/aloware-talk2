@@ -69,13 +69,6 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 100px'
   },
   {
-    label: 'Resolution',
-    name: 'resolution2',
-    align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
-  },
-  {
     label: 'Contact',
     name: 'contact',
     align: 'left',
