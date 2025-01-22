@@ -31,8 +31,6 @@
 
 <script>
 import UserSelector from 'components/generic-selectors/user-selector.vue'
-// import TreeFolder from '../tree/tree-folder.vue'
-// import TreeFolderCreate from '../tree/tree-folder-create.vue'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 import ContactsFolders from 'components/contacts/contacts-folders.vue'
 
@@ -41,8 +39,6 @@ export default {
 
   components: {
     UserSelector,
-    // TreeFolder,
-    // TreeFolderCreate,
     ContactsSidebarLoader,
     ContactsFolders
   },
@@ -119,7 +115,6 @@ export default {
 
     loadFolders () {
       this.isLoading = true
-      // this.setMyListsLoaded(false)
       this.$axios
         .get(`${this.foldersEndpoint}?user_id=${this.userId}`)
         .then((response) => {
@@ -132,25 +127,15 @@ export default {
             'Unable to load folders please try again.',
             'error'
           )
-          // this.setMyListsLoaded(true)
           this.isLoading = false
         })
         .finally(() => {
           this.isLoading = false
-          // this.setMyListsLoaded(true)
         })
     },
 
     onCreateFolderCancel () {
       //
-    }
-  },
-
-  watch: {
-    userId () {
-      // if (this.userId) {
-      //   this.loadFolders()
-      // }
     }
   }
 }
