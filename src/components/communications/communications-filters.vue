@@ -140,7 +140,6 @@ export default {
     this.filter = _.clone(this.channelDefaultFilterModel.filter)
 
     this.$VueEvent.listen('filter-communications', data => {
-      console.log(data)
       // ex: data = { type: 'users', value: 1 }
       switch (data.type) {
         case 'users':
@@ -176,7 +175,8 @@ export default {
       'setIsEditingView',
       'setSelectedFilter',
       'toggleFilterDialog',
-      'toggleFilterModelForm'
+      'toggleFilterModelForm',
+      'updateChannelChangedFilterFields'
     ]),
     onClickAppliedFilterButton () {
       this.setFilterDialogForView(false)
@@ -302,21 +302,20 @@ export default {
     },
 
     filterByUser (userId) {
-      // const index = this.filters.users.findIndex(item => item.property === 'users')
+      // update channel filters
+      this.updateChannelChangedFilterFields({
+        name: 'users',
+        value: [userId]
+      })
 
-      if (!this.filter.users.length) {
-        this.filter.users.push(userId)
-      } else {
-        this.filter.users = [userId]
+      // update current filters
+      this.filter = {
+        ...this.filter,
+        users: [userId]
       }
 
-      // this.filter = { ...this.channelDefaultFilterModel.filter }
-      // this.setChannelClonedFilter(this.filter)
-      // this.resetChannelChangedFilterFields()
-      // this.setSelectedFilter(null)
-      this.setCommunications([])
-      // this.setIsFirstLoad(true)
-      // this.setAppliedFilter(null)
+      // refresh data
+      this.setChannelClonedFilter(this.filter)
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
