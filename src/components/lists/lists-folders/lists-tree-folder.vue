@@ -110,7 +110,7 @@
           :target="folderId">
           <folder-actions
             :id="id"
-            :hasCreate="false"
+            :hasCreateList="false"
             :hasEdit="hasEdit"
             :hasDelete="hasDelete"
             @create="onCreateFolder"

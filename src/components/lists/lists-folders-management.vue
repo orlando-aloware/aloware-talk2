@@ -90,7 +90,7 @@ export default {
     ]),
 
     userId () {
-      if (this.$route.query.user_id) {
+      if (this.$route.query.user_id && this.isAdmin) {
         return +this.$route.query.user_id
       }
 

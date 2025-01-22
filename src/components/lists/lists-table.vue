@@ -404,11 +404,11 @@ export default {
     },
 
     userId () {
-      if (!this.$route.query.user_id) {
-        return +this.profile.id
+      if (this.$route.query.user_id && this.isAdmin) {
+        return +this.$route.query.user_id
       }
 
-      return +this.$route.query.user_id
+      return this.profile.id
     },
 
     folderId () {

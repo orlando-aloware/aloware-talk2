@@ -12,8 +12,7 @@
 
     <contact-menu-item
       @mouseover="createSubmenu"
-      @mouseleave="destroySubmenu"
-      v-if="hasCreate">
+      @mouseleave="destroySubmenu">
       <template slot="icon">
         <plus-icon color="#62666E"></plus-icon>
       </template>
@@ -52,7 +51,7 @@
 
       <template v-if="isContactsRoute">
         <contact-menu-item
-          v-if="hasEdit"
+          v-if="hasEdit && hasCreateList"
           @click="$emit('createlist')">
           <template slot="icon">
             <people-icon color="#62666E"></people-icon>
@@ -156,9 +155,9 @@ export default {
     id: {
       type: Number
     },
-    hasCreate: {
+    hasCreateList: {
       type: Boolean,
-      default: false
+      default: true
     },
     hasEdit: {
       type: Number
@@ -179,7 +178,7 @@ export default {
       'folders'
     ]),
     isContactsRoute () {
-      return this.$route.meta.title === 'Contacts'
+      return this.$route.meta.title === 'Contacts' || this.$route.meta.title === 'Lists Management Utility'
     },
     foldersEndpoint () {
       return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
