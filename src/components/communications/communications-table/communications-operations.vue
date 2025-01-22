@@ -1,13 +1,15 @@
 <template>
-  <div class="d-flex justify-content-center context-menu">
+  <div class="d-flex justify-content-end context-menu">
     <reply-communication-button class="operation-button mx-1"
                                 :communication="row" />
 
     <call-communication-button class="operation-button mx-1"
                                :communication="row" />
 
-    <details-communication-button class="operation-button mx-1"
-                                  :communication="row" />
+    <details-communication-button event-only
+                                  class="operation-button mx-1"
+                                  :communication="row"
+                                  @on-details="$emit('on-details', $event)"/>
 
     <archive-communication-button class="operation-button mx-1"
                                   :communication="row"

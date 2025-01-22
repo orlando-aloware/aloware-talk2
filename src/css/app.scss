@@ -2596,6 +2596,13 @@ i.option-separator {
     position: relative;
     top: -3px;
   }
+  .guesty-icon {
+    content: url(/integrations/guesty-icon.png);
+    line-height: 48px;
+    width: 32px;
+    height: 32px;
+  }
+
   .salesforce-icon {
     font-size: 32px;
     margin-right: 10px;
@@ -7671,10 +7678,13 @@ table.datatable {
   .left-column-wrapper {
 
     .filter-group-title {
-      font-size: 12px;
-      color: $grey-80;
-      margin-bottom: 10px;
-      font-weight: 400;
+      padding: 10px 5px 10px 7px !important;
+      color: #666666;
+      letter-spacing: 1px;
+      font-size: 10px;
+      font-weight: bold;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
     .filter-items {
@@ -7684,9 +7694,9 @@ table.datatable {
       height: 30px;
 
       span:not(.check-icon) {
-        font-size: 13px;
-        color: $grey-100;
-        width: 95%;
+        font-size: 14px;
+        color: #666666;
+        line-height: 17px;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -7730,7 +7740,10 @@ table.datatable {
     }
 
     .filter-items:hover {
-      background: $grey-50;
+
+      &:not(.no-data) {
+        background: $grey-50;
+      }
 
       button {
         display: block;
@@ -7753,6 +7766,51 @@ table.datatable {
 
     .saved-filters {
 
+    }
+  }
+}
+
+
+#comms-channel-filter-modal {
+  .filter-group-title {
+    padding: 10px 5px 10px 7px !important;
+    color: #666666;
+    letter-spacing: 1px;
+    font-size: 10px;
+    font-weight: bold;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .filter-items {
+    span:not(.check-icon) {
+      font-size: 14px;
+      color: #666666;
+      line-height: 17px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      display: inline-block;
+    }
+  }
+}
+
+#inbox-channel-filter-modal {
+  .filter-group-title {
+    font-size: 12px;
+    color: $grey-80;
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+  .filter-items {
+    span:not(.check-icon) {
+      font-size: 13px;
+      color: $grey-100;
+      width: 95%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      display: inline-block;
     }
   }
 }
@@ -7796,28 +7854,13 @@ table.datatable {
       overflow: auto;
     }
 
-    .filter-group-title {
-      font-size: 12px;
-      color: $grey-80;
-      margin-bottom: 10px;
-      font-weight: 400;
-    }
+
 
     .filter-items {
       margin: 5px 0;
       padding: 7px 12px;
       line-height: 1.2;
       height: 30px;
-
-      span:not(.check-icon) {
-        font-size: 13px;
-        color: $grey-100;
-        width: 95%;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        display: inline-block;
-      }
 
       span.position-absolute.check-icon {
         right: 10px;
@@ -7856,7 +7899,9 @@ table.datatable {
     }
 
     .filter-items:hover {
-      background: $grey-50;
+      &:not(.no-data) {
+        background: $grey-50;
+      }
 
       button {
         display: block;
@@ -7869,16 +7914,6 @@ table.datatable {
 
     .filter-items.active {
       background: $grey-60;
-    }
-
-    .filter-group-title,
-    .filter-type-description,
-    .empty-filter-placeholder {
-      //padding: 7px 12px;
-    }
-
-    .saved-filters {
-
     }
   }
 
@@ -16011,6 +16046,7 @@ hr {
 
   .communication-logs-table {
     margin-top: 20px;
+    max-height: calc(100% - 110px);
 
     td:last-child {
       background-color: #fff !important;
@@ -16028,8 +16064,8 @@ hr {
     }
 
     thead tr:first-child th {
-      top: -16px; // padding height
-      z-index: 1;
+      top: 0;
+      z-index: 3;
     }
 
     tr:first-child th:last-child {
@@ -16057,56 +16093,18 @@ hr {
       }
     }
 
-    @media screen and (min-height: 1281px) {
-      max-height: 82vh;
-    }
-
-    @media screen and (min-height: 1080px) and (max-height: 1280px) {
-      max-height: 76vh;
-    }
-
-    @media screen and (min-height: 900px) and (max-height: 1079px) {
-      max-height: 75vh;
-    }
-
-    @media screen and (min-height: 701px) and (max-height: 900px) {
-      max-height: 70vh;
-    }
-
-    @media screen and (min-height: 601px) and (max-height: 700px) {
-      max-height: 50vh;
-    }
-
-    @media screen and (min-height: 551px) and (max-height: 600px) {
-      max-height: 50vh;
-    }
-
-    @media screen and (max-height: 550px) {
-      max-height: 40vh;
-    }
-
-    ::-webkit-scrollbar-track {
-      background-color: #f5f5f5;
-      border-radius: 4px;
+    ::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
     }
 
     ::-webkit-scrollbar-thumb {
       background-color: #888;
       border-radius: 4px;
-    }
 
-    ::-webkit-scrollbar-track-horizontal {
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb-horizontal {
-      background-color: #888;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb-horizontal:hover {
-      background-color: #555;
+      &:hover {
+        background-color: #555;
+      }
     }
 
     &-pagination {
@@ -16128,6 +16126,19 @@ hr {
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    .q-table__linear-progress {
+      color: #256eff !important;
+    }
+
+    &--no-data {
+      left: 0;
+      position: absolute;
+      width: 100%;
+      margin-top: 300px;
+      text-align: center;
+      z-index: 0;
     }
   }
 

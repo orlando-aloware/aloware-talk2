@@ -13,13 +13,6 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 150px'
   },
   {
-    label: 'Team',
-    name: 'teams',
-    align: 'left',
-    headerStyle: 'min-width: 180px',
-    columnStyle: 'width: 180px'
-  },
-  {
     label: 'Ring Group',
     name: 'ring_group',
     align: 'left',
@@ -44,8 +37,8 @@ export const ALL_COLUMNS = [
     label: 'Start Time',
     name: 'created_at',
     align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   },
   {
     label: 'Talk Time',
@@ -90,20 +83,6 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 250px'
   },
   {
-    label: 'Location',
-    name: 'lead_location',
-    align: 'left',
-    headerStyle: 'min-width: 150px',
-    columnStyle: 'width: 150px'
-  },
-  {
-    label: 'Lines',
-    name: 'line',
-    align: 'left',
-    headerStyle: 'min-width: 150px',
-    columnStyle: 'width: 150px'
-  },
-  {
     label: 'User',
     name: 'user_id',
     align: 'left',
@@ -111,7 +90,7 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 250px'
   },
   {
-    label: 'Attempting',
+    label: 'Attempted Users',
     name: 'attempting_users',
     align: 'left',
     headerStyle: 'min-width: 250px',
@@ -225,8 +204,8 @@ export const DEFAULT_COLUMNS = [
     name: 'created_at',
     field: 'created_at',
     align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   },
   {
     label: 'Talk Time',

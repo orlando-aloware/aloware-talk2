@@ -17,6 +17,9 @@
         && [CallbackStatus.CALLBACK_STATUS_INITIATED, CallbackStatus.CALLBACK_STATUS_REQUESTED].includes(row.callback_status)">
         Callback {{ getVisibleCallbackStatus(row) }}
       </span>
+      <span v-else-if="row.type === CommunicationTypes.SMS">
+        -
+      </span>
       <span v-else>
         {{ getVisibleStatus(row) }}
       </span>

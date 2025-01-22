@@ -135,7 +135,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as Filters from 'src/constants/filters'
 import { communicationsMixin } from 'src/plugins/mixins'
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 export default {
   name: 'FilterDialog',
@@ -265,11 +265,11 @@ export default {
     },
 
     channelFilterName () {
-      if (this.$route.params.channel === 'messages') {
+      if (this.$route.params.channel === MESSAGES_CHANNEL) {
         return 'Messages Filters'
       }
 
-      if (this.$route.params.channel === 'voicemails') {
+      if (this.$route.params.channel === VOICEMAILS_CHANNEL) {
         return 'Voice Messages Filters'
       }
 

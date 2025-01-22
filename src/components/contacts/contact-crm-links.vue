@@ -64,12 +64,6 @@ export default {
           logo: 'zoho-icon.svg'
         },
         {
-          name: 'guesty',
-          label: 'Guesty',
-          link: this.guestyLink,
-          logo: 'guesty-icon.png'
-        },
-        {
           name: 'custom_link_builder',
           label: 'Custom Link',
           link: this.contact?.custom_link,
@@ -136,18 +130,6 @@ export default {
         this.contact.integration_data.zoho &&
         this.contact.integration_data.zoho.lead_link) {
         return this.contact.integration_data.zoho.lead_link
-      }
-
-      return false
-    },
-    guestyLink () {
-      if (this.currentCompany &&
-        this.currentCompany.guesty_integration_enabled &&
-        this.contact &&
-        this.contact.integration_data &&
-        this.contact.integration_data.guesty &&
-        this.contact.integration_data.guesty.guest_id) {
-        return `https://app.guesty.com/people/contact/${this.contact.integration_data.guesty.guest_id}/profile`
       }
 
       return false

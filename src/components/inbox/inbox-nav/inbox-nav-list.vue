@@ -141,27 +141,18 @@ export default {
 
     inboxesToShow () {
       /*
-        WAT-1105: FOR the code freeze happening on 01-08-25 we keep the channels on the inbox
-      */
-      return this.getNavListItems
-
-      /*
         WAT-1105: the channels and view are being moved to communications menu
         so should not being displayed here if the feature is active
       */
-      // return this.hasNewCommunicationsFeatureEnabled
-      //   ? this.navListItems.filter(item => item.default)// only shows the default "inbox"
-      //   : this.navListItems
+      return this.hasNewCommunicationsFeatureEnabled
+        ? this.getNavListItems.filter(item => item.default)// only shows the default "inbox"
+        : this.getNavListItems
     },
 
     shouldShowViewsUnderChannels () {
-      /*
-        WAT-1105: FOR the code freeze happening on 01-08-25 we keep views on the inbox
-        confirm what to do with the views after that
-      */
-      // if (this.hasNewCommunicationsFeatureEnabled) {
-      //  return false
-      // }
+      if (this.hasNewCommunicationsFeatureEnabled) {
+        return false
+      }
 
       return (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany)
     }
