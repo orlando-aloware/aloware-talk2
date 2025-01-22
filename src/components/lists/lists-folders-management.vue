@@ -44,6 +44,8 @@
           :user-id="userId" />
 
         <contacts-sidebar-loader v-if="isLoading" />
+
+        <remove-folder-dialog v-if="isAdmin"/>
       </div>
     </div>
   </div>
@@ -55,6 +57,7 @@ import UserSelector from 'components/generic-selectors/user-selector'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 import ListsFolders from 'components/lists/lists-folders/lists-folders'
 import NavItem from 'components/lists/lists-nav-item'
+import RemoveFolderDialog from 'components/remove-folder.vue'
 import { aclMixin } from 'src/plugins/mixins'
 
 export default {
@@ -64,7 +67,8 @@ export default {
     UserSelector,
     ContactsSidebarLoader,
     ListsFolders,
-    NavItem
+    NavItem,
+    RemoveFolderDialog
   },
 
   props: {

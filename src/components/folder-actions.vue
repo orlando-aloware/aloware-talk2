@@ -12,7 +12,8 @@
 
     <contact-menu-item
       @mouseover="createSubmenu"
-      @mouseleave="destroySubmenu">
+      @mouseleave="destroySubmenu"
+      v-if="hasCreate">
       <template slot="icon">
         <plus-icon color="#62666E"></plus-icon>
       </template>
@@ -154,6 +155,10 @@ export default {
   props: {
     id: {
       type: Number
+    },
+    hasCreate: {
+      type: Boolean,
+      default: false
     },
     hasEdit: {
       type: Number

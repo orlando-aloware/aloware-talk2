@@ -12,7 +12,9 @@
                :key="folder.id"
                v-for="(folder, index) in foldersPath">
             <a href="#" @click="(ev) => selectFolder(folder.id, ev)">
-              <div class="title-breadcrumb d-flex align-items-center">{{ folder.name  }}</div>
+              <div class="title-breadcrumb d-flex align-items-center">
+                {{ folder.name == 'Root' ? 'Root Folder' : folder.name }}
+              </div>
             </a>
             <slash-icon class="title-slash d-flex align-items-center" v-if="(index + 1) < foldersPath.length"/>
           </div>
@@ -443,14 +445,6 @@ export default {
 
       this.setLoadingState(isLoadMore)
 
-      if (!isLoadMore) {
-        this.isLoading = true
-        this.pagination.currentPage = 1
-        this.listsData = []
-      } else {
-        this.isLoadingMore = true
-      }
-
       const filters = {
         // ...(state.search && { search: state.search }),
         ...(this.userId && { user_id: this.userId }),
@@ -462,17 +456,20 @@ export default {
         delete filters.folderId
       }
 
-      return this.fetchLists({
-        page: this.pagination.currentPage,
-        perPage: this.pagination.perPage,
-        isPublic: this.isPublic,
-        filters
-      })
-        .finally(() => {
-          this.foldersPath = this.generatefoldersPath(this.folders[0])
-          this.isLoading = false
-          this.isLoadingMore = false
+      try {
+        await this.fetchLists({
+          page: this.pagination.currentPage,
+          perPage: this.pagination.perPage,
+          isPublic: this.isPublic,
+          filters
         })
+      } catch (err) {
+        console.error('error', err)
+      } finally {
+        this.foldersPath = this.generatefoldersPath(this.folders[0])
+        this.isLoading = false
+        this.isLoadingMore = false
+      }
     },
 
     setLoadingState (isLoadMore) {
@@ -511,7 +508,7 @@ export default {
       this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage) || 1
     },
 
-    refreshLists: async function () {
+    async refreshLists () {
       this.listsData = []
       this.SET_LISTS_COUNT(0)
       await this.getLists()
@@ -679,8 +676,8 @@ export default {
 
     onFolderSelected ({ id }) {
       const query = Object.assign({}, this.$route.query)
-      query['folder_id'] = id
-      this.$router.push({ query })
+      query.folder_id = id
+      this.$router.replace({ query })
     },
 
     getContactListType (contactList) {
@@ -722,7 +719,7 @@ export default {
 
     selectFolder (folderId, event) {
       event.preventDefault()
-      this.onFolderSelected(folderId)
+      this.onFolderSelected({ id: folderId })
     }
   },
 

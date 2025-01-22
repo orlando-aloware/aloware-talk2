@@ -40,8 +40,8 @@
           </div>
 
           <b-badge v-if="!isEditing"
-                 variant="secondary"
-                 pill>
+                 variant="light"
+                 class="folder-list-count-badge flex-shrink-0 ml-1">
             {{ lists.length }}
           </b-badge>
 
@@ -60,7 +60,7 @@
         </div>
 
         <button
-          class="folder__option btn btn-link p-0 shadow-0"
+          class="folder__option btn btn-link p-0 shadow-0 flex-shrink-0"
           :class="{ 'folder__option--hide': isEditing }"
           :data-popper-target="folderId"
           :id="folderId"
@@ -110,6 +110,7 @@
           :target="folderId">
           <folder-actions
             :id="id"
+            :hasCreate="false"
             :hasEdit="hasEdit"
             :hasDelete="hasDelete"
             @create="onCreateFolder"
@@ -225,7 +226,7 @@ export default {
     },
 
     isOpen () {
-      return this.defaultIsOpen ?? this.opened.has(this.id)
+      return this.defaultIsOpen || this.opened.has(this.id)
     },
 
     isSelected () {
@@ -401,3 +402,12 @@ export default {
   }
 }
 </script>
+
+<style>
+.folder-list-count-badge {
+  width: 20px;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: center;
+}
+</style>
