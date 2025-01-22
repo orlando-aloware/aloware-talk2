@@ -42,7 +42,7 @@
           <b-badge v-if="!isEditing"
                  variant="light"
                  class="folder-list-count-badge flex-shrink-0 ml-1">
-            {{ lists.length }}
+            {{ listCount }}
           </b-badge>
 
           <!-- Renaming Folders -->
@@ -239,6 +239,11 @@ export default {
     folderId () {
       const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-option-${module}-${this.id}`
+    },
+
+    listCount () {
+      const isPublic = this.$route.query.isPublic === '1'
+      return this.lists.filter((item) => item.show_in_public_folder === isPublic).length
     }
   },
 
