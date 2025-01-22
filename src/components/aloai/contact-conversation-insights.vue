@@ -173,7 +173,13 @@
               block
               @click="showQuestionDrawer = true"
             >
-              🤖 Ask Question from AloAi
+              <sparkle-icon
+                width="16"
+                height="16"
+                color="#ffffff"
+                class="mr-1"
+              />
+              Ask AloAi
             </b-button>
 
             <!-- Regenerate Insights -->
@@ -273,19 +279,56 @@
             >
               <q-spinner-dots size="2em" />
             </template>
+            <template
+              v-else
+              v-slot:stamp
+            >
+              <div class="d-flex align-items-center gap-2">
+                <span>{{ message.stamp }}</span>
+                <q-btn
+                  flat
+                  dense
+                  round
+                  size="xs"
+                  icon="content_copy"
+                  @click.stop="copyText(message.text)"
+                >
+                  <q-tooltip>Copy text</q-tooltip>
+                </q-btn>
+              </div>
+            </template>
           </q-chat-message>
         </div>
 
         <!-- Fixed Input Container -->
         <div class="chat-input-container">
+          <div
+            v-if="showSuggestions"
+            class="suggestions-container"
+          >
+            <div class="suggestions-title">Suggested questions</div>
+            <div class="suggestions-content">
+              <div
+                v-for="(question, index) in suggestedQuestions"
+                :key="index"
+                class="suggestion-item"
+                @click="selectSuggestion(question)"
+              >
+                {{ question }}
+              </div>
+            </div>
+          </div>
           <div class="input-wrapper ai-effect-gradient-input">
             <textarea
               v-model="userQuestion"
               :placeholder="placeholder"
-              @keyup.enter.exact.prevent="sendQuestion"
+              @keydown.enter.exact.prevent="sendQuestion"
               @input="autoResize"
+              @focus="onFocus"
+              @blur="onBlur"
               ref="textarea"
               rows="1"
+              :disabled="isAsking"
             ></textarea>
             <button
               class="send-button"
@@ -365,7 +408,23 @@ export default {
       chatMessages: [],
       isAsking: false,
       drawerTopPosition: '0px',
-      placeholder: 'Ask anything about this conversation'
+      placeholder: 'Ask anything about this conversation',
+      showSuggestions: false,
+      suggestedQuestions: [
+        'What are the main topics discussed across all conversations?',
+        'What are the recurring pain points mentioned by the customer?',
+        'Has the customer\'s sentiment changed over time?',
+        'What commitments or promises have been made in these conversations?',
+        'What are the key objections raised across different conversations?',
+        'Summarize the pricing discussions across all conversations.',
+        'What are the next steps or action items from recent conversations?',
+        'How has the customer\'s requirements evolved over time?',
+        'What competitors have been mentioned across conversations?',
+        'What features or solutions has the customer shown most interest in?',
+        'Have there been any escalations or urgent issues mentioned?',
+        'What is the overall timeline of engagement with this customer?',
+        'Generate a follow-up email.'
+      ]
     }
   },
 
@@ -660,6 +719,51 @@ export default {
       }
     },
 
+    copyText (text) {
+      // Remove HTML tags from the text
+      const tempDiv = document.createElement('div')
+      tempDiv.innerHTML = text
+      const plainText = tempDiv.textContent || tempDiv.innerText
+
+      navigator.clipboard.writeText(plainText).then(() => {
+        this.$q.notify({
+          message: 'Text copied to clipboard',
+          color: 'positive',
+          position: 'top',
+          timeout: 2000
+        })
+      }).catch(err => {
+        console.error('Failed to copy text:', err)
+        this.$q.notify({
+          message: 'Failed to copy text',
+          color: 'negative',
+          position: 'top',
+          timeout: 2000
+        })
+      })
+    },
+
+    onFocus () {
+      this.showSuggestions = true
+    },
+
+    onBlur () {
+      // Small delay to allow clicking on suggestions
+      setTimeout(() => {
+        this.showSuggestions = false
+      }, 200)
+    },
+
+    selectSuggestion (question) {
+      this.userQuestion = question
+      this.showSuggestions = false
+      this.$refs.textarea.focus()
+      // Add a small delay to ensure the value is updated
+      this.$nextTick(() => {
+        this.autoResize()
+      })
+    },
+
     ...mapActions('contacts', ['setMessageComposerNoteBody', 'resetMessageComposerNote'])
   },
 
@@ -824,13 +928,77 @@ export default {
 }
 
 .chat-input-container {
-  background: rgba(255, 255, 255, 0.95);
-  border-top: 1px solid rgba(147, 51, 234, 0.1);
-  position: sticky;
-  bottom: 0;
-  z-index: 2000;
+  padding: 0 16px 16px 16px;
+  position: relative;
+}
+
+.suggestions-container {
+  position: absolute;
+  bottom: 100%;
+  left: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255);
   backdrop-filter: blur(10px);
-  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  margin-bottom: 8px;
+  z-index: 1000;
+  max-height: 300px;
+  overflow: hidden;
+}
+
+.suggestions-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 16px 16px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  background: inherit;
+  backdrop-filter: blur(10px);
+  margin: 0;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.suggestions-content {
+  padding: 0 16px 16px;
+  max-height: 232px; /* 300px - title height - paddings */
+  overflow-y: auto;
+}
+
+/* Add custom scrollbar styling */
+.suggestions-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.suggestions-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions-content::-webkit-scrollbar-thumb {
+  background-color: rgba(147, 51, 234, 0.2);
+  border-radius: 4px;
+}
+
+.suggestions-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(147, 51, 234, 0.4);
+}
+
+.suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #374151;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.suggestion-item:hover {
+  background-color: rgba(147, 51, 234, 0.1);
+  color: #9333EA;
 }
 
 .ai-effect-gradient-input {
@@ -844,6 +1012,8 @@ export default {
   border-radius: 8px;
   transition: all 0.3s ease;
   padding: 4px 8px;
+  border: 1px solid rgba(147, 51, 234, 0.2);
+  background: transparent;
 }
 
 .input-wrapper:hover {
