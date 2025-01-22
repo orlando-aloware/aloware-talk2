@@ -14,6 +14,7 @@
         :hasDelete="hasDelete"
         :endpoint="endpoint"
         :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
+        :user-id="userId"
         data-testid="tree-folder-contents"
       />
     </div>
@@ -44,6 +45,9 @@ export default {
     hasShowInPublicFolderPermission: {
       type: Boolean,
       default: false
+    },
+    userId: {
+      type: Number
     }
   }
 }

@@ -125,7 +125,8 @@ export default {
         this.createFolderRequest({
           name: this.text,
           order: this.orderKey,
-          parent_id: this.parent_id
+          parent_id: this.parent_id,
+          ...(this.userId ? { user_id: this.userId } : {})
         })
       ]).finally(() => {
         this.$emit('blur')

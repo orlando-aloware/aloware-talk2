@@ -261,7 +261,7 @@
                               :list="list"
                               @closeAssignContactsModal="closeAssignContacts" />
 
-        <move-dialog />
+        <move-dialog :user-id="userId"/>
     </div>
 
   </div>
@@ -466,7 +466,6 @@ export default {
       } catch (err) {
         console.error('error', err)
       } finally {
-        this.foldersPath = this.generatefoldersPath(this.folders[0])
         this.isLoading = false
         this.isLoadingMore = false
       }
@@ -738,6 +737,11 @@ export default {
   watch: {
     '$route.query': function () {
       this.refreshLists()
+    },
+    folders () {
+      if (this.folders?.length) {
+        this.foldersPath = this.generatefoldersPath(this.folders[0])
+      }
     }
   }
 }

@@ -83,6 +83,7 @@
           :layer="layer + 1"
           :endpoint="endpoint"
           :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
+          :user-id="userId"
           data-testid="tree-folder-contents"
         ></tree-folder-contents>
       </div>
