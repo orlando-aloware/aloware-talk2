@@ -1,7 +1,7 @@
 import API from 'src/plugins/api/api'
 
 export default {
-  async fetchLists ({ commit, state }, { page, perPage }) {
+  async fetchLists ({ commit, state }, { page, perPage, isPublic, filters }) {
     try {
       if (state.isListsLoading) {
         return
@@ -12,10 +12,12 @@ export default {
       const params = {
         page: page || 1,
         size: perPage || 10,
-        ...(state.search && { search: state.search })
+        ...(state.search && { search: state.search }),
+        ...filters
       }
 
-      const res = await API.V2.contactList.get(params)
+      const res = isPublic ? await API.V2.contactList.public(params)
+        : await API.V2.contactList.get(params)
 
       commit('SET_LISTS', res.data.data)
       commit('SET_LISTS_COUNT', res.data.total)
