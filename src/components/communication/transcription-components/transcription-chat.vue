@@ -192,24 +192,30 @@
                                     />
                                     Play
                                 </q-btn>
+                            </div>
+                        </div>
+                        <template
+                            v-if="message.isLoading"
+                            v-slot:stamp
+                        >
+                            <q-spinner-dots size="2em" />
+                        </template>
+                        <template
+                            v-else
+                            v-slot:stamp
+                        >
+                            <div class="d-flex align-items-center gap-2">
+                                <span>{{ message.stamp }}</span>
                                 <q-btn
                                     flat
                                     dense
                                     round
-                                    size="sm"
+                                    size="xs"
                                     icon="content_copy"
                                     @click.stop="copyText(message.text)"
                                 >
                                     <q-tooltip>Copy text</q-tooltip>
                                 </q-btn>
-                            </div>
-                        </div>
-                        <template
-                            v-if="!message.sent"
-                            v-slot:stamp
-                        >
-                            <div class="d-flex align-items-center gap-2">
-                                <span>{{ message.stamp }}</span>
                             </div>
                         </template>
                     </q-chat-message>
