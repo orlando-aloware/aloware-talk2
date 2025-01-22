@@ -437,7 +437,6 @@ export default {
       await this.getLists()
       this.calculateTotalPages()
       this.listsData = this.lists
-      // this.getPinnedLists()
     },
 
     async getLists (isLoadMore = false) {
@@ -617,7 +616,6 @@ export default {
       const isPinned = !this.isPinned
 
       this.pinRequest(this.list.id, isPinned).finally(() => {
-        // this.getPinnedLists()
         this.$generalNotification(isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.')
       })
     },
