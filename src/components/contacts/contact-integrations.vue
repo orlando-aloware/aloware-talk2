@@ -30,6 +30,10 @@
                         :contact='contact'
                         v-if='isGuestyEnabled'/>
 
+    <integration-zoho data-testid='contact-integrations-zoho'
+                        :contact='contact'
+                        v-if='isZohoEnabled'/>
+
     <contact-crm-links data-testid="contact-integrations-crm-links" :contact="contact"/>
   </b-card>
 </template>
@@ -42,6 +46,7 @@ import ContactCrmLinks from 'components/contacts/contact-crm-links'
 import IntegrationGohighlevel from 'components/integrations/integration-gohighlevel.vue'
 import IntegrationSalesforce from 'components/integrations/integration-salesforce.vue'
 import IntegrationGuesty from 'components/integrations/integration-guesty.vue'
+import IntegrationZoho from 'components/integrations/integration-zoho.vue'
 
 export default {
   name: 'contact-integrations',
@@ -60,6 +65,7 @@ export default {
   },
 
   components: {
+    IntegrationZoho,
     IntegrationGuesty,
     IntegrationGohighlevel,
     ContactCrmLinks,

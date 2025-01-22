@@ -52,18 +52,6 @@ export default {
           logo: 'bats-icon.png'
         },
         {
-          name: 'zoho',
-          label: 'ZohoCRM Contact',
-          link: this.zohoContactLink,
-          logo: 'zoho-icon.svg'
-        },
-        {
-          name: 'zoho',
-          label: 'ZohoCRM Lead',
-          link: this.zohoLeadLink,
-          logo: 'zoho-icon.svg'
-        },
-        {
           name: 'custom_link_builder',
           label: 'Custom Link',
           link: this.contact?.custom_link,
@@ -73,19 +61,6 @@ export default {
     },
     activeCrmIntegrations () {
       return this.integrations.filter(integration => integration.link)
-    },
-    pipedriveLink () {
-      if (this.currentCompany &&
-        this.currentCompany.pipedrive_integration_enabled &&
-        this.contact &&
-        this.contact.integration_data &&
-        this.contact.integration_data.pipedrive &&
-        this.contact.integration_data.pipedrive.person_id &&
-        this.currentCompany.pipedrive_company_domain) {
-        return `https://${this.currentCompany.pipedrive_company_domain}.pipedrive.com/person/${this.contact.integration_data.pipedrive.person_id}`
-      }
-
-      return false
     },
     batsLink () {
       // @custom for Direct Auto
@@ -106,30 +81,6 @@ export default {
         this.contact &&
         this.contact.first_name) {
         return `https://dashboard.stripe.com/test/search?query=${this.contact.first_name}`
-      }
-
-      return false
-    },
-    zohoContactLink () {
-      if (this.currentCompany &&
-        this.currentCompany.zoho_integration_enabled &&
-        this.contact &&
-        this.contact.integration_data &&
-        this.contact.integration_data.zoho &&
-        this.contact.integration_data.zoho.contact_link) {
-        return this.contact.integration_data.zoho.contact_link
-      }
-
-      return false
-    },
-    zohoLeadLink () {
-      if (this.currentCompany &&
-        this.currentCompany.zoho_integration_enabled &&
-        this.contact &&
-        this.contact.integration_data &&
-        this.contact.integration_data.zoho &&
-        this.contact.integration_data.zoho.lead_link) {
-        return this.contact.integration_data.zoho.lead_link
       }
 
       return false
