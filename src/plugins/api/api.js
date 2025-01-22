@@ -490,6 +490,14 @@ export default {
 
       reportIssue (id, data) {
         return window.axios.post(`${suffixV1}communications/${id}/report-issue`, data)
+      },
+
+      askQuestion (communicationId, params) {
+        if (!communicationId) {
+          return null
+        }
+
+        return window.axios.get(`${suffixV1}communication/${communicationId}/transcription/ask`, params)
       }
     },
 
@@ -714,16 +722,6 @@ export default {
         }
 
         return window.axios.get(`/api/v2/contacts/${contactId}/text-message-suggestions`, params)
-      }
-    },
-
-    communication: {
-      askQuestion (communicationId, params) {
-        if (!communicationId) {
-          return null
-        }
-
-        return window.axios.get(`/api/v1/communication/${communicationId}/transcription/ask`, params)
       }
     },
 

@@ -328,7 +328,7 @@ export default {
       })
 
       // Make API call to get answer
-      talk2Api.V2.communication.askQuestion(this.communication.id, {
+      talk2Api.V1.communication.askQuestion(this.communication.id, {
         params: {
           question
         }
