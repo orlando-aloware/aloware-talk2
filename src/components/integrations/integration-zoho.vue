@@ -56,6 +56,13 @@
                     <span class="data-value">{{ integrationData.Email }}</span>
                 </p>
                 <p class="mb-0"
+                   data-testid="integration-zoho-owner"
+                   v-if="integrationData?.Owner?.name">
+                  <span class="data-icon-label">Owner: </span>
+                  <span class="data-value">
+                    {{ integrationData.Owner.name }}</span>
+                </p>
+                <p class="mb-0"
                     data-testid="integration-zoho-phone"
                     v-if="integrationData.Phone">
                     <span class="data-icon-label">Phone: </span>
