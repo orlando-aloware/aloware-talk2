@@ -164,7 +164,7 @@ pipeline {
                                         sh "terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
-                                    sh "yarn upload-s3"
+                                    sh "yarn upload-s3-dev1"
                                 }
                             }
                         }
