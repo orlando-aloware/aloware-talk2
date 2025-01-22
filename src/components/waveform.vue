@@ -74,11 +74,11 @@
 </template>
 
 <script>
-import { aclMixin } from 'src/plugins/mixins'
+import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as WaveformPlaybackSpeedOptions from 'src/constants/waveform-playback-speed-options'
+import { aclMixin } from 'src/plugins/mixins'
 import Hover from 'wavesurfer.js/dist/plugins/hover.esm.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
-import * as CommunicationDirection from 'src/constants/communication-direction'
 
 const regions = RegionsPlugin.create({
   regions: []
@@ -274,6 +274,12 @@ export default {
       this.playing = !this.playing
       if (this.player) {
         this.player.playPause()
+      }
+    },
+    play () {
+      if (this.player) {
+        this.playing = true
+        this.player.play()
       }
     },
     seekAudio (startTime) {
