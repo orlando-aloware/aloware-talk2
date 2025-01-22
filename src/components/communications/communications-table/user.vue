@@ -37,7 +37,7 @@ export default {
     filter () {
       this.$emit('on-filter', {
         type: 'users',
-        value: this.value
+        value: [this.value]
       })
     }
   }

@@ -63,7 +63,8 @@
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'incoming_number'">
               <incoming-number :value="col.value"
-                               :campaign-id="props.row.campaign_id"/>
+                               :campaign-id="props.row.campaign_id"
+                               @on-filter="onFilter"/>
             </div>
 
             <div :style="col.columnStyle"

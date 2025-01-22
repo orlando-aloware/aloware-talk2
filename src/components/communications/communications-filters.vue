@@ -141,14 +141,22 @@ export default {
 
     this.$VueEvent.listen('filter-communications', data => {
       // ex: data = { type: 'users', value: 1 }
-      switch (data.type) {
-        case 'users':
-          this.filterByUser(data.value)
-          break
-        // case 'campaign':
-        //   this.filterByCampaign(data.value)
-        //   break
+      this.updateChannelChangedFilterFields({
+        name: data.type,
+        value: data.value
+      })
+
+      // update current filters
+      this.filter = {
+        ...this.filter,
+        [data.type]: data.value
       }
+
+      // refresh data
+      this.setChannelClonedFilter(this.filter)
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     })
   },
   methods: {
@@ -296,26 +304,6 @@ export default {
       this.setCommunications([])
       this.setIsFirstLoad(true)
       this.setAppliedFilter(null)
-      this.$nextTick(() => {
-        this.getCommunications(this.communicationFilters)
-      })
-    },
-
-    filterByUser (userId) {
-      // update channel filters
-      this.updateChannelChangedFilterFields({
-        name: 'users',
-        value: [userId]
-      })
-
-      // update current filters
-      this.filter = {
-        ...this.filter,
-        users: [userId]
-      }
-
-      // refresh data
-      this.setChannelClonedFilter(this.filter)
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
