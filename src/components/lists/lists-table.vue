@@ -1,22 +1,62 @@
 <template>
-  <div class="lists-container flex-grow-1 d-flex flex-column">
-    <h3 class="title pl-3">
-      {{ title }}
-    </h3>
-    <div class="count  pl-3">
-      <strong v-if="!isLoading">{{ listsCount }} Lists</strong>
-      <q-spinner-bars class="mr-1"
-                      color="primary"
-                      size="14px"
-                      v-else />
-    </div>
+  <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+    <lists-folders-management />
 
+  <div class="lists-container flex-grow-1 d-flex flex-column">
+
+    <div>
+      <div class="d-flex items-start">
+        <div class="pl-3">
+          <h3 class="title">{{ title }}</h3>
+          <div class="count">
+            <strong v-if="!isLoading && !isListsLoading">{{ listsCount }} Lists</strong>
+            <q-spinner-bars class="mr-1"
+                            color="primary"
+                            size="14px"
+                            v-else />
+          </div>
+        </div>
+        <div class="pl-4 ml-4 border-left">
+          <div>
+            <h4>Filters</h4>
+            <div>
+              Show in Public Folder
+              <q-toggle size="md"
+                        val="md"
+                        v-model="showInPublicFolder" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters  pl-3">
+        <div class="search">
+          <search-input class="width-260"
+                        limit-search-characters
+                        :search="search"
+                        :disabled="isLoadingDisabled"
+                        data-testid="lists-search-input"
+                        @search="onSearch" />
+        </div>
+
+        <div class="setting pr-3 align-items-center">
+          <compact-btn variant="success"
+                       class="mr-2"
+                       data-testid="create-list-menu-item"
+                       @clicked="onCreateList($event)">
+            <plus-icon class="mr-1"
+                       color="white"/>
+            Add List
+          </compact-btn>
+        </div>
+      </div>
+    </div>
     <q-table class="lists-table flex-grow-1"
              row-key="index"
              virtual-scroll
              :data="listsData"
              :columns="fixedColumns"
-             :loading="isLoadingMore || isLoading"
+             :loading="isLoadingMore || isLoading || isListsLoading"
              :virtual-scroll-item-size="100"
              :virtual-scroll-sticky-size-start="100"
              :pagination="pagination"
@@ -28,7 +68,11 @@
                 :key="col.name"
                 v-for="col in props.cols">
             <div v-if="col.name === 'name'">
-              {{ props.row.name }}
+              <router-link class="d-flex align-items-center item contact-name"
+                                 data-testid="lists-view-list-name-link"
+                                 :to="`/contacts/list/${props.row.id}${props.row.show_in_public_folder ? '?type=public' : ''}`">
+                {{ props.row.name }}
+              </router-link>
             </div>
             <div v-if="col.name === 'owner_name'">
               {{ props.row.owner_name }}
@@ -66,6 +110,19 @@
             </div>
             <div v-else-if="col.name === 'actions'">
               <div class="d-flex justify-content-center context-menu">
+                <div class="operation-button mx-1">
+                  <span class="cursor-pointer"
+                        data-testid="lists-edit-button"
+                        @click="onEditList(props.row)">
+                    <pencil-o-icon height="16"
+                                width="16"
+                                color="#62666E"/>
+                    <q-tooltip>
+                      Edit this List
+                    </q-tooltip>
+                  </span>
+                </div>
+
                 <div class="operation-button mx-1">
                   <span class="cursor-pointer"
                         data-testid="lists-rename-button"
@@ -245,19 +302,27 @@
                              @closeAssignContactsModal="closeAssignContacts" />
 
       <move-dialog />
+
+      <create-list-modal />
+  </div>
+
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import SearchInput from 'src/components/search-input'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
 import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import AssignContactsModal from 'src/components/assign-contacts-modal'
 import MoveDialog from 'src/components/move-dialog'
+import CreateListModal from 'components/create-list-modal.vue'
+import CompactBtn from 'src/components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
+import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
 import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
@@ -267,10 +332,12 @@ import AddCallIcon from 'components/icons/add-call-icon.vue'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
+import PlusIcon from 'components/icons/plus-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
+import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
+import ListsFoldersManagement from './lists-folders-management'
 
 export default {
   name: 'ListsTable',
@@ -284,7 +351,8 @@ export default {
 
   mixins: [
     aclMixin,
-    dataTableMixin
+    dataTableMixin,
+    mainViewMixin
   ],
 
   components: {
@@ -296,19 +364,27 @@ export default {
     EyeOffIcon,
     MoveIcon,
     PencilIcon,
+    PencilOIcon,
     PinIcon,
     TrashIcon,
+    PlusIcon,
+    SearchInput,
     AssignContactsModal,
     ConvertListToPublicDialog,
     ListsRenameForm,
     MoveDialog,
+    CreateListModal,
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
-    RelativeTime
+    RelativeTime,
+    CompactBtn,
+    ListsFoldersManagement
   },
 
   data () {
     return {
+      search: '',
+      isLoadingDisabled: false,
       isLoading: false,
       isLoadingMore: false,
       loading: false,
@@ -321,6 +397,7 @@ export default {
       },
       listsData: [],
       list: null,
+      isUnsavedListModalShown: false,
       isOpenListForm: false,
       convertToPublicDialog: false,
       pinnedLists: [],
@@ -329,17 +406,24 @@ export default {
       openPDModal: false,
       addToPowerDialerMode: 'add',
       addToPowerDialerIsManualSelection: false,
-      COLUMNS
+      COLUMNS,
+
+      // Filters
+      showInPublicFolder: false
     }
   },
 
   computed: {
     ...mapGetters('contacts', [
       'pinned',
-      'moveDialog'
+      'moveDialog',
+      'isAllContactsSelected'
     ]),
     ...mapState('listsModule', [
       'isListsLoading'
+    ]),
+    ...mapState('contacts', [
+      'unsavedList'
     ]),
     ...mapGetters('listsModule', {
       lists: 'getLists',
@@ -361,6 +445,10 @@ export default {
 
     isPinned () {
       return Array.isArray(this.pinnedLists) ? this.pinnedLists.includes(this.list.id) : false
+    },
+
+    userId () {
+      return this.$route.query.user_id
     }
   },
 
@@ -368,7 +456,9 @@ export default {
     ...mapActions('contacts', [
       'listPinToggled',
       'addPowerDialerOpen',
-      'openMoveDialog'
+      'openMoveDialog',
+      'createListOpen',
+      'setUnsavedList'
     ]),
 
     ...mapActions('listsModule', [
@@ -388,19 +478,58 @@ export default {
       await this.getPinnedLists()
     },
 
+    getContactListType (contactList) {
+      switch (contactList.type) {
+        case ContactListTypes.STATIC:
+          return 'Static'
+        case ContactListTypes.DYNAMIC:
+          return 'Dynamic'
+        case ContactListTypes.DYNAMIC_REMOTE_LIST:
+          return 'Integration Dynamic'
+        default:
+          return 'Unknown'
+      }
+    },
+
+    calculateTotalPages () {
+      if (this.lists?.length === 0) {
+        this.pagination.totalPages = 1
+        return
+      }
+
+      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage)
+    },
+
     async getLists (isLoadMore = false) {
-      if (this.isLoading) return
+      if (this.isLoading) {
+        return
+      }
 
       this.setLoadingState(isLoadMore)
 
-      try {
-        await this.fetchLists({
-          page: this.pagination.currentPage,
-          perPage: this.pagination.perPage
-        })
-      } finally {
-        this.resetLoadingState()
+      if (!isLoadMore) {
+        this.isLoading = true
+        this.pagination.currentPage = 1
+        this.listsData = []
+      } else {
+        this.isLoadingMore = true
       }
+
+      const filters = {
+        ...(this.search && { search: this.search }),
+        ...(this.userId && { user_id: this.userId }),
+        private_only: !this.showInPublicFolder
+      }
+
+      return this.fetchLists({
+        page: this.pagination.currentPage,
+        perPage: this.pagination.perPage,
+        filters
+      })
+        .finally(() => {
+          this.isLoading = false
+          this.isLoadingMore = false
+        })
     },
 
     setLoadingState (isLoadMore) {
@@ -411,40 +540,6 @@ export default {
       } else {
         this.isLoadingMore = true
       }
-    },
-
-    resetLoadingState () {
-      this.isLoading = false
-      this.isLoadingMore = false
-    },
-
-    async loadMoreLists (done) {
-      if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
-        if (typeof done === 'function') {
-          done()
-        }
-        return
-      }
-
-      this.pagination.currentPage += 1
-      await this.getLists(true)
-      this.listsData.push(...this.lists)
-
-      if (typeof done === 'function') {
-        done()
-      }
-    },
-
-    calculateTotalPages () {
-      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage) || 1
-    },
-
-    refreshLists: async function () {
-      this.listsData = []
-      this.SET_LISTS_COUNT(0)
-      await this.getLists()
-      this.calculateTotalPages()
-      this.listsData = this.lists
     },
 
     removeList (list) {
@@ -516,6 +611,15 @@ export default {
         console.error(error)
         this.$generalNotification(message, 'error')
       }
+    },
+
+    async refreshLists () {
+      this.listsData = []
+      this.SET_LISTS_COUNT(0)
+      await this.getLists()
+      this.calculateTotalPages()
+      this.pagination.currentPage = 1
+      this.listsData = this.lists
     },
 
     onDeleteList (list) {
@@ -605,22 +709,78 @@ export default {
       this.convertToPublicDialog = false
     },
 
-    getContactListType (contactList) {
-      switch (contactList.type) {
-        case ContactListTypes.STATIC:
-          return 'Static'
-        case ContactListTypes.DYNAMIC:
-          return 'Dynamic'
-        case ContactListTypes.DYNAMIC_REMOTE_LIST:
-          return 'Integration Dynamic'
-        default:
-          return 'Unknown'
+    async onSearch (value) {
+      this.SET_SEARCH(value)
+      this.search = value
+      await this.refreshLists()
+    },
+
+    onEditList (list) {
+      this.list = list
+      this.$router.push(`/contacts/list/${this.list.id}${this.list.show_in_public_folder ? '?type=public' : ''}`)
+    },
+
+    async loadMoreLists (done) {
+      if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
+        if (typeof done === 'function') {
+          done()
+        }
+        return
+      }
+
+      this.pagination.currentPage += 1
+      await this.getLists(true)
+      this.listsData.push(...this.lists)
+
+      if (typeof done === 'function') {
+        done()
+      }
+    },
+
+    onCreateList (event) {
+      if (event) {
+        event.preventDefault()
+      }
+
+      this.showUnsavedListDialog(() => {
+        this.createListOpen({
+          contact_folder_id: null
+        })
+      })
+    },
+
+    showUnsavedListDialog (callback) {
+      if (this.unsavedList && !this.isUnsavedListModalShown) {
+        this.isUnsavedListModalShown = true
+        this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.setUnsavedList(null)
+            callback()
+          }
+
+          this.isUnsavedListModalShown = false
+        })
+      }
+
+      if (!this.unsavedList) {
+        callback()
       }
     }
   },
 
   async mounted () {
     await this.initializeLists()
+  },
+
+  watch: {
+    userId () {
+      this.refreshLists()
+    }
   }
 }
 </script>

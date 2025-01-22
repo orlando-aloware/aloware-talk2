@@ -1,7 +1,7 @@
 import API from 'src/plugins/api/api'
 
 export default {
-  async fetchLists ({ commit, state }, { page, perPage }) {
+  async fetchLists ({ commit, state }, { page, perPage, filters }) {
     try {
       if (state.isListsLoading) {
         return
@@ -12,7 +12,7 @@ export default {
       const params = {
         page: page || 1,
         size: perPage || 10,
-        ...(state.search && { search: state.search })
+        ...filters
       }
 
       const res = await API.V2.contactList.get(params)

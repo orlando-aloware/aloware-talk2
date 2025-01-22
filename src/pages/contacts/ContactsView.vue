@@ -55,6 +55,19 @@
       </compact-btn>
     </template>
 
+    <template slot="options"
+              v-if="!isNaN(list.id) && typeof list.id === 'string'">
+      <compact-btn variant="primary"
+                   class="ml-1"
+                   data-testid="contacts-view-back-to-lists-button"
+                   @clicked="onBackToListsRedirect">
+        <chevron-left width="18px"
+                      height="18px"
+                      icon-color="white"/>
+        Back to Lists
+      </compact-btn>
+    </template>
+
     <template slot="actions"
               v-if="!simpleTable">
       <al-alert class='w-100 align-items-center'
@@ -785,6 +798,7 @@ import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mob
 import AddUserIcon from 'components/icons/add-user-icon'
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
+import ChevronLeft from 'components/icons/contacts/chevron-left'
 import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
@@ -841,6 +855,7 @@ export default {
     EllipseIcon,
     SlashIcon,
     CloseIcon,
+    ChevronLeft,
     ContactCreateModal,
     ContactsFilters,
     BulkActionMenu,
@@ -1961,6 +1976,10 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
+    },
+
+    onBackToListsRedirect () {
+      this.$router.push('/lists')
     }
   },
 
