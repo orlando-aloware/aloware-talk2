@@ -1,19 +1,23 @@
 <template>
   <div data-testid="transcription-modal-wrapper">
-    <span v-if="noButton"
-          @click="fetchSmartTranscriptionData">
+    <span
+      v-if="noButton"
+      @click="fetchSmartTranscriptionData"
+    >
       {{ buttonText }}
     </span>
 
-    <q-btn icon="chat"
-           color="primary"
-           flat
-           round
-           dense
-           :size="buttonSize"
-           data-testid="comm-transcription-modal-single-btn"
-           v-else
-           @click="fetchSmartTranscriptionData">
+    <q-btn
+      icon="chat"
+      color="primary"
+      flat
+      round
+      dense
+      :size="buttonSize"
+      data-testid="comm-transcription-modal-single-btn"
+      v-else
+      @click="fetchSmartTranscriptionData"
+    >
       <q-tooltip>
         <span>
           {{ buttonText }}
@@ -22,19 +26,30 @@
     </q-btn>
 
     <!-- AloAi Voice Analytics modal. -->
-    <q-dialog v-model="show_form"
-              data-testid="comm-transcription-modal-dialog">
+    <q-dialog
+      v-model="show_form"
+      data-testid="comm-transcription-modal-dialog"
+    >
       <q-card class="transcription w-100 max-w-85">
         <q-card-section class="row items-center no-wrap px-4">
           <!--COMM TYPE-->
-          <q-card-section class="comm-type-container" data-testid="comm-details-comm-type-card-section">
-            <div class="text-h6 d-inline-flex align-items-center"
-                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']">
-              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
-                         v-if="communication.disposition_status2">
+          <q-card-section
+            class="comm-type-container"
+            data-testid="comm-details-comm-type-card-section"
+          >
+            <div
+              class="text-h6 d-inline-flex align-items-center"
+              :class="[!communication.duration ? 'flex-grow-1 text-left' : '']"
+            >
+              <component
+                :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
+                v-if="communication.disposition_status2"
+              >
               </component>
               <div class="comm-type-wrapper pl-3">
-                <span v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
+                <span
+                  v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
+                >
                   {{ communication.direction | fixCommDirection }}
                 </span>
                 {{ communication.type | fixCommType }}
@@ -50,130 +65,187 @@
           </q-card-section>
 
           <q-space></q-space>
-          <q-btn icon="close"
-                 flat
-                 round
-                 data-testid="comm-transcription-modal-close-dialog-btn"
-                 @click="handleClose">
+          <q-btn
+            icon="close"
+            flat
+            round
+            data-testid="comm-transcription-modal-close-dialog-btn"
+            @click="handleClose"
+          >
           </q-btn>
         </q-card-section>
 
         <q-card-section class="q-pt-none px-4">
-          <div class="mx-3 py-2"
-               v-if="remoteUrl && !isLoading">
+          <div
+            class="mx-3 py-2"
+            v-if="remoteUrl && !isLoading"
+          >
             <div class="d-flex flex-row align-items-center">
-              <waveform :remote-url="remoteUrl"
-                        :unique-id="communication.id"
-                        :height="40"
-                        :split-channels="splitChannels"
-                        :communication="communication"
-                        :messages="messages"
-                        data-testid="comm-transcription-modal-waveform"
-                        ref="waveformComponent"
-                        @time-update="updateCurrentTime">
+              <waveform
+                :remote-url="remoteUrl"
+                :unique-id="communication.id"
+                :height="40"
+                :split-channels="splitChannels"
+                :communication="communication"
+                :messages="messages"
+                data-testid="comm-transcription-modal-waveform"
+                ref="waveformComponent"
+                @time-update="updateCurrentTime"
+              >
               </waveform>
-              <download-button v-if="fileUuid"
-                               data-testid="communication-audio-download-button"
-                               is-simple
-                               :communication-id="communication.id"
-                               :filename="filename"
-                               :file-mime-type="mimeType"
-                               :file-uuid="fileUuid"/>
+              <download-button
+                v-if="fileUuid"
+                data-testid="communication-audio-download-button"
+                is-simple
+                :communication-id="communication.id"
+                :filename="filename"
+                :file-mime-type="mimeType"
+                :file-uuid="fileUuid"
+              />
             </div>
             <div class="d-flex flex-row align-items-center mt-2">
-              <talk-time-analysis-section :communication="communication"
-                                          :contact="contact"
-                                          :talk_time_analysis="talk_time_analysis"
-                                          :speakers="speakers"
-                                          :is-empty="isEmpty"
-                                          data-testid="comm-transcription-modal-talk-time-analysis-section"/>
+              <talk-time-analysis-section
+                :communication="communication"
+                :contact="contact"
+                :talk_time_analysis="talk_time_analysis"
+                :speakers="speakers"
+                :is-empty="isEmpty"
+                data-testid="comm-transcription-modal-talk-time-analysis-section"
+              />
 
-              <sentiment-analysis-section :sentiment_analysis="sentiment_analysis"
-                                          :sentiment-chip-colors="sentimentChipColors"
-                                          :is-empty="isEmpty"
-                                          :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
-                                          class="ml-2"
-                                          data-testid="comm-transcription-modal-sentiment-analysis-section"/>
+              <sentiment-analysis-section
+                :sentiment_analysis="sentiment_analysis"
+                :sentiment-chip-colors="sentimentChipColors"
+                :is-empty="isEmpty"
+                :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
+                class="ml-2"
+                data-testid="comm-transcription-modal-sentiment-analysis-section"
+              />
             </div>
           </div>
 
-          <div class="row py-4"
-               v-if="!isLoading">
-            <div id="reference-column"
-                 class="col-6 pt-10">
-              <categories-section :categories="iab_categories"
-                                  :is-empty="isEmpty"
-                                  data-testid="comm-transcription-modal-category-section"/>
+          <div
+            class="row py-4"
+            v-if="!isLoading"
+          >
+            <div
+              id="reference-column"
+              class="col-6 pt-10"
+            >
+              <categories-section
+                :categories="iab_categories"
+                :is-empty="isEmpty"
+                data-testid="comm-transcription-modal-category-section"
+              />
 
-              <highlights-section :highlights="highlights"
-                                  :speakers="speakers"
-                                  :is-empty="isEmpty"
-                                  data-testid="comm-transcription-modal-highlights-section"/>
+              <highlights-section
+                :highlights="highlights"
+                :speakers="speakers"
+                :is-empty="isEmpty"
+                data-testid="comm-transcription-modal-highlights-section"
+              />
 
-              <entities-section :entities="entities"
-                                :entity-types="entity_types"
-                                :speakers="speakers"
-                                :is-empty="isEmpty"
-                                data-testid="comm-transcription-modal-entities-section"/>
+              <entities-section
+                :entities="entities"
+                :entity-types="entity_types"
+                :speakers="speakers"
+                :is-empty="isEmpty"
+                data-testid="comm-transcription-modal-entities-section"
+              />
 
-              <custom-keywords-section :custom-keywords="custom_keywords"
-                                       :speakers="speakers"
-                                       :is-empty="isEmpty"
-                                       data-testid="comm-transcription-modal-custom-keywords-section"/>
+              <custom-keywords-section
+                :custom-keywords="custom_keywords"
+                :speakers="speakers"
+                :is-empty="isEmpty"
+                data-testid="comm-transcription-modal-custom-keywords-section"
+              />
             </div>
 
             <div class="col-6">
-              <q-tabs v-model="tabName"
-                      no-caps
-                      inline-label
-                      dense
-                      :mobile-arrows="false"
-                      align="left"
-                      class="bg-white text-black border-bottom"
-                      content-class="flex-nowrap">
-                <q-tab name="summary"
-                       label="Summary"
-                       :disable="!currentCompany?.transcription_settings?.summarization_enabled"/>
-                <q-tab name="transcription"
-                       label="Transcription"/>
+              <q-tabs
+                v-model="tabName"
+                no-caps
+                inline-label
+                dense
+                :mobile-arrows="false"
+                align="left"
+                class="bg-white text-black border-bottom"
+                content-class="flex-nowrap"
+              >
+                <q-tab
+                  name="summary"
+                  label="Summary"
+                  :disable="!currentCompany?.transcription_settings?.summarization_enabled"
+                />
+                <q-tab
+                  name="transcription"
+                  label="Transcription"
+                />
+                <q-tab name="ask_aloai">
+                  <template v-slot:default>
+                    <div class="flex items-center">
+                      Ask from AloAi
+                      <sparkle-icon
+                        width="16"
+                        height="16"
+                        color="#9333EA"
+                        class="ml-1"
+                      />
+                    </div>
+                  </template>
+                </q-tab>
               </q-tabs>
               <q-tab-panels v-model="tabName">
-                <q-tab-panel class="p-0"
-                             name="summary">
-                  <section class="transcription chat-area"
-                           id="summary"
-                           data-testid="comm-summary-section"
-                           ref="summaryArea">
-                    <div v-if="communication.call_summary"
-                         style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;">
-                      <q-btn color="text-dark-greenish"
-                             class="btn btn-inline px-1 py-0"
-                             title="Download Summary"
-                             flat
-                             rounded
-                             dense
-                             no-caps
-                             data-testid="download-button-download-btn"
-                             @click="onDownload()">
-                        <download-icon height="20"
-                                       width="20"
-                                       data-testid="download-button-download-icon">
+                <q-tab-panel
+                  class="p-0"
+                  name="summary"
+                >
+                  <section
+                    class="transcription chat-area"
+                    id="summary"
+                    data-testid="comm-summary-section"
+                    ref="summaryArea"
+                  >
+                    <div
+                      v-if="communication.call_summary"
+                      style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;"
+                    >
+                      <q-btn
+                        color="text-dark-greenish"
+                        class="btn btn-inline px-1 py-0"
+                        title="Download Summary"
+                        flat
+                        rounded
+                        dense
+                        no-caps
+                        data-testid="download-button-download-btn"
+                        @click="onDownload()"
+                      >
+                        <download-icon
+                          height="20"
+                          width="20"
+                          data-testid="download-button-download-icon"
+                        >
                         </download-icon>
                       </q-btn>
-                      <q-btn color="text-dark-greenish"
-                             class="btn btn-inline px-1 py-0"
-                             title="Copy Summary"
-                             v-if="!isWidget"
-                             flat
-                             rounded
-                             dense
-                             no-caps
-                             data-testid="copy-button-copy-btn"
-                             @click="onCopy()">
-                        <copy-icon height="20"
-                                   width="20"
-                                   color="#007bff"
-                                   data-testid="copy-button-copy-icon">
+                      <q-btn
+                        color="text-dark-greenish"
+                        class="btn btn-inline px-1 py-0"
+                        title="Copy Summary"
+                        v-if="!isWidget"
+                        flat
+                        rounded
+                        dense
+                        no-caps
+                        data-testid="copy-button-copy-btn"
+                        @click="onCopy()"
+                      >
+                        <copy-icon
+                          height="20"
+                          width="20"
+                          color="#007bff"
+                          data-testid="copy-button-copy-icon"
+                        >
                         </copy-icon>
                       </q-btn>
                     </div>
@@ -181,64 +253,102 @@
                       <div class="ai-effect-gradient"></div>
                       <div class="ai-effect-blur"></div>
                       <div class="ai-effect-content p-2">
-                        <div class="flex items-center justify-between"
-                            :class="[ communication.call_summary ? 'mb-2' : '']">
+                        <div
+                          class="flex items-center justify-between"
+                          :class="[ communication.call_summary ? 'mb-2' : '']"
+                        >
                           <div class="flex items-center gap-2">
-                            <h3 class="ai-effect-gradient-text"
-                                @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
+                            <h3
+                              class="ai-effect-gradient-text"
+                              @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null"
+                            >
                               Powered by AloAi
-                              <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
+                              <template
+                                v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial"
+                              >
                                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
                               </template>
-                              <sparkle-icon width="16" height="16" color="#9333EA"/>
+                              <sparkle-icon
+                                width="16"
+                                height="16"
+                                color="#9333EA"
+                              />
                             </h3>
                           </div>
                           <div class="transcription-summary-container">
-                            <span class="transcription-message text-decoration-none"
-                                  v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED">
-                              <span v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization pending</span>
-                              <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in progress</span>
+                            <span
+                              class="transcription-message text-decoration-none"
+                              v-if="currentCompany?.transcription_settings?.summarization_enabled && communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED"
+                            >
+                              <span
+                                v-if="communication.call_summary_status === SummaryStatus.STATUS_QUEUED">Summarization
+                                pending</span>
+                              <span
+                                v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization
+                                in progress</span>
                             </span>
                           </div>
                         </div>
-                        <div class="text-left-align"
-                            v-if="communication.call_summary">
-                            <div v-if="communication.call_summary"
-                                class="call_summary"
-                                v-html="parseMarkdown(communication.call_summary)">
-                            </div>
+                        <div
+                          class="text-left-align"
+                          v-if="communication.call_summary"
+                        >
+                          <div
+                            v-if="communication.call_summary"
+                            class="call_summary"
+                            v-html="parseMarkdown(communication.call_summary)"
+                          >
+                          </div>
                         </div>
                         <div class="summary-status-container">
                           <div v-if="!communication.call_summary_status">
-                            <generate-summary-button class="mr-2"
-                                                    data-testid="comm-details-generate-summary-button"
-                                                    :is-generating="isGenerating"
-                                                    :communication="communication"
-                                                    v-if="fileUuid && isMigrated"
-                                                    @updateGenerating="updateGenerating">
+                            <generate-summary-button
+                              class="mr-2"
+                              data-testid="comm-details-generate-summary-button"
+                              :is-generating="isGenerating"
+                              :communication="communication"
+                              v-if="fileUuid && isMigrated"
+                              @updateGenerating="updateGenerating"
+                            >
                             </generate-summary-button>
                           </div>
-                          <div v-else-if="communication.call_summary_status === SummaryStatus.STATUS_FAILED"
-                              class="status-message">
-                            <q-icon name="error" color="red" size="md" />
+                          <div
+                            v-else-if="communication.call_summary_status === SummaryStatus.STATUS_FAILED"
+                            class="status-message"
+                          >
+                            <q-icon
+                              name="error"
+                              color="red"
+                              size="md"
+                            />
                             <div>Summary generation failed. Please try again later. </div>
                             <br>
-                            <generate-summary-button class="mr-2"
-                                                    data-testid="comm-details-generate-summary-button"
-                                                    :is-generating="isGenerating"
-                                                    :communication="communication"
-                                                    v-if="fileUuid && isMigrated"
-                                                    @updateGenerating="updateGenerating">
+                            <generate-summary-button
+                              class="mr-2"
+                              data-testid="comm-details-generate-summary-button"
+                              :is-generating="isGenerating"
+                              :communication="communication"
+                              v-if="fileUuid && isMigrated"
+                              @updateGenerating="updateGenerating"
+                            >
                             </generate-summary-button>
                           </div>
-                          <div v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING || communication.call_summary_status === SummaryStatus.STATUS_QUEUED"
-                              class="status-message">
-                            <q-icon name="hourglass_empty" color="blue" size="md" />
+                          <div
+                            v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING || communication.call_summary_status === SummaryStatus.STATUS_QUEUED"
+                            class="status-message"
+                          >
+                            <q-icon
+                              name="hourglass_empty"
+                              color="blue"
+                              size="md"
+                            />
                             <span>Your summary is being processed. Please wait...</span>
                           </div>
                         </div>
-                        <div v-if="communication.call_summary || communication.call_summary_status === SummaryStatus.STATUS_COMPLETED"
-                             class="summary-feedback-section mt-2 d-flex justify-end align-items-center">
+                        <div
+                          v-if="communication.call_summary || communication.call_summary_status === SummaryStatus.STATUS_COMPLETED"
+                          class="summary-feedback-section mt-2 d-flex justify-end align-items-center"
+                        >
                           <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                           <img
                             class="clickable-icon"
@@ -257,17 +367,31 @@
                   </section>
                 </q-tab-panel>
 
-                <q-tab-panel class="p-0"
-                             name="transcription">
-                  <conversation-section :communication="communication"
-                                        :contact="contact"
-                                        :messages="messages"
-                                        :formatted-messages="formattedMessages"
-                                        :is-empty="isEmpty"
-                                        ref="conversationSection"
-                                        data-testid="comm-transcription-modal-conversation-section"
-                                        @seek-audio="handleSeekAudio">
+                <q-tab-panel
+                  class="p-0"
+                  name="transcription"
+                >
+                  <conversation-section
+                    :communication="communication"
+                    :contact="contact"
+                    :messages="messages"
+                    :formatted-messages="formattedMessages"
+                    :is-empty="isEmpty"
+                    ref="conversationSection"
+                    data-testid="comm-transcription-modal-conversation-section"
+                    @seek-audio="handleSeekAudio"
+                  >
                   </conversation-section>
+                </q-tab-panel>
+
+                <q-tab-panel
+                  class="p-0"
+                  name="ask_aloai"
+                >
+                  <transcription-chat
+                    :communication="communication"
+                    @seek-audio="handleSeekAudio"
+                  />
                 </q-tab-panel>
               </q-tab-panels>
             </div>
@@ -275,38 +399,41 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <aloai-promotion-dialog :dialogVisible="showInfoBox"
-                            @update:dialogVisible="showInfoBox = $event" />
+    <aloai-promotion-dialog
+      :dialogVisible="showInfoBox"
+      @update:dialogVisible="showInfoBox = $event"
+    />
   </div>
 </template>
 
 <script>
-import Waveform from 'components/waveform'
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
-import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import { isEmpty } from 'lodash'
-import CategoriesSection from './transcription-components/categories-section'
-import HighlightsSection from './transcription-components/highlights-section'
-import EntitiesSection from './transcription-components/entities-section'
-import CustomKeywordsSection from './transcription-components/custom-keywords-section'
-import SentimentAnalysisSection from './transcription-components/sentiment-analysis-section'
-import TalkTimeAnalysisSection from './transcription-components/talk-time-analysis-section'
-import ConversationSection from './transcription-components/conversation-section'
+import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
 import DownloadButton from 'components/download-button.vue'
-import { communicationInfoMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
-import * as CommunicationTypes from 'src/constants/communication-types'
-import * as FeedbackConstants from 'src/constants/feedback-types'
-import * as CommunicationDirection from 'src/constants/communication-direction'
-import * as SummaryStatus from 'src/constants/summary-status'
-import * as TranscriptionStatus from 'src/constants/transcription-status'
-import DownloadIcon from 'components/icons/contact-activity/download-icon'
-import CopyIcon from 'components/icons/copy-icon'
 import GenerateSummaryButton from 'components/generate-summary-button'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
-import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
+import DownloadIcon from 'components/icons/contact-activity/download-icon'
+import CopyIcon from 'components/icons/copy-icon'
+import Waveform from 'components/waveform'
+import DOMPurify from 'dompurify'
+import { isEmpty } from 'lodash'
+import { marked } from 'marked'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import * as FeedbackConstants from 'src/constants/feedback-types'
+import * as SummaryStatus from 'src/constants/summary-status'
+import * as TranscriptionStatus from 'src/constants/transcription-status'
+import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
+import talk2Api from 'src/plugins/api/api'
+import { communicationInfoMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+import CategoriesSection from './transcription-components/categories-section'
+import ConversationSection from './transcription-components/conversation-section'
+import CustomKeywordsSection from './transcription-components/custom-keywords-section'
+import EntitiesSection from './transcription-components/entities-section'
+import HighlightsSection from './transcription-components/highlights-section'
+import SentimentAnalysisSection from './transcription-components/sentiment-analysis-section'
+import TalkTimeAnalysisSection from './transcription-components/talk-time-analysis-section'
+import TranscriptionChat from './transcription-components/transcription-chat.vue'
 
 export default {
   name: 'TranscriptionModal',
@@ -329,7 +456,8 @@ export default {
     CopyIcon,
     GenerateSummaryButton,
     SparkleIcon,
-    AloaiPromotionDialog
+    AloaiPromotionDialog,
+    TranscriptionChat
   },
 
   props: {
@@ -727,6 +855,116 @@ export default {
 
     handleSeekAudio (startTime) {
       this.$refs.waveformComponent.seekAudio(startTime)
+      this.$refs.waveformComponent.play()
+    },
+
+    scrollToBottom () {
+      const chatContainer = this.$el.querySelector('.chat-container')
+      if (chatContainer) {
+        setTimeout(() => {
+          chatContainer.scrollTop = chatContainer.scrollHeight
+        }, 100) // Small delay to ensure content is rendered
+      }
+    },
+
+    sendQuestion () {
+      if (!this.userQuestion.trim() || this.isAsking) return
+
+      const question = this.userQuestion.trim()
+      this.chatMessages.push({
+        text: question,
+        sent: true,
+        name: 'You',
+        stamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      })
+
+      this.scrollToBottom()
+      this.userQuestion = ''
+      this.isAsking = true
+
+      // Reset textarea height
+      if (this.$refs.textarea) {
+        this.$refs.textarea.style.height = '40px'
+      }
+
+      // Add loading message
+      const loadingMessageIndex = this.chatMessages.length
+      this.chatMessages.push({
+        text: '',
+        sent: false,
+        name: 'AloAi',
+        isLoading: true
+      })
+
+      // Make API call to get answer
+      talk2Api.V2.communication.askQuestion(this.communication.id, {
+        params: {
+          question
+        }
+      })
+        .then(response => {
+          let messages = []
+          const { response: data } = response.data
+
+          if (Array.isArray(data)) {
+            // Handle array of answers with timestamps
+            messages = data.map(item => ({
+              text: this.parseMarkdown(item.answer),
+              sent: false,
+              name: 'AloAi',
+              stamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              hasTimestamp: !!(item.start && item.end),
+              start: item.start,
+              end: item.end
+            }))
+          } else if (typeof data === 'object') {
+            // Handle single answer with optional timestamps
+            messages = [{
+              text: this.parseMarkdown(data.answer),
+              sent: false,
+              name: 'AloAi',
+              stamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              hasTimestamp: !!(data.start && data.end),
+              start: data.start,
+              end: data.end
+            }]
+          } else {
+            // Handle string response (no timestamps)
+            messages = [{
+              text: this.parseMarkdown(data),
+              sent: false,
+              name: 'AloAi',
+              stamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              hasTimestamp: false
+            }]
+          }
+
+          // Replace loading message with actual response(s)
+          this.chatMessages.splice(loadingMessageIndex, 1, ...messages)
+          this.scrollToBottom()
+        })
+        .catch(error => {
+          // Remove loading message on error
+          this.chatMessages.splice(loadingMessageIndex, 1)
+          console.error('Failed to get answer:', error)
+          this.$q.notify({
+            message: 'Failed to get answer',
+            color: 'negative',
+            position: 'top',
+            timeout: 2000
+          })
+        })
+        .finally(() => {
+          this.isAsking = false
+        })
+    },
+
+    autoResize () {
+      const textarea = this.$refs.textarea
+      if (textarea) {
+        textarea.style.height = 'auto'
+        textarea.style.height = textarea.scrollHeight + 'px'
+      }
     }
   },
 
@@ -740,6 +978,12 @@ export default {
     feedback (newValue) {
       this.upvoteActive = newValue === FeedbackConstants.FEEDBACK_UPVOTE
       this.downvoteActive = newValue === FeedbackConstants.FEEDBACK_DOWNVOTE
+    },
+
+    show_form (newVal) {
+      if (newVal) {
+        this.checkAndShowTranscriptionModal()
+      }
     }
   }
 }
@@ -761,5 +1005,103 @@ export default {
 
 .clickable-icon {
   cursor: pointer;
+}
+
+.chat-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 1rem;
+  scroll-behavior: smooth;
+  margin-top: 1px;
+  max-height: 400px;
+}
+
+.chat-input-container {
+  background: rgba(255, 255, 255, 0.95);
+  position: relative;
+  z-index: 2000;
+  backdrop-filter: blur(10px);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  padding: 4px 8px;
+  border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.input-wrapper:hover {
+  border-color: rgba(147, 51, 234, 0.4);
+}
+
+.input-wrapper:focus-within {
+  border-color: rgba(147, 51, 234, 0.6);
+  box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.1);
+}
+
+textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  font-size: 14px;
+  color: #000;
+  outline: none;
+  resize: none;
+  max-height: 150px;
+  min-height: 40px;
+  line-height: 1.5;
+  overflow-y: auto;
+}
+
+.send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  color: #9333EA;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  margin: 0;
+}
+
+.send-button:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+textarea::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+  opacity: 1;
+}
+
+.seek-button {
+  display: block;
+}
+
+:deep(.q-btn__wrapper) {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+:deep(.q-message-text) {
+  width: 100%;
+}
+
+:deep(.q-message-text > div) {
+  margin-bottom: 0;
 }
 </style>

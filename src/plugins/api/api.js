@@ -717,6 +717,16 @@ export default {
       }
     },
 
+    communication: {
+      askQuestion (communicationId, params) {
+        if (!communicationId) {
+          return null
+        }
+
+        return window.axios.get(`/api/v1/communication/${communicationId}/transcription/ask`, params)
+      }
+    },
+
     contacts: {
       get (id, sourceToken = null) {
         if (!id || id === 'undefined') {
@@ -888,6 +898,7 @@ export default {
       }
 
     },
+
     contactList: {
       get (params) {
         return window.axios.get(`${suffixV2}contacts-list`, { params })
