@@ -23,43 +23,43 @@
                 </a>
                 <p class="mb-0"
                     data-testid="integration-zoho-first-name"
-                    v-if="integrationData.first_name !== undefined">
+                    v-if="integrationData.First_Name !== undefined">
                     <span class="data-icon-label">First Name: </span>
                     <span class="data-value">
                       <q-tooltip
                         anchor="top middle"
                         self="center middle"
                       >
-                        {{ integrationData.first_name }}
+                        {{ integrationData.First_Name }}
                       </q-tooltip>
-                      {{ integrationData.first_name }}
+                      {{ integrationData.First_Name }}
                     </span>
                 </p>
                 <p class="mb-0"
                     data-testid="integration-zoho-last-name"
-                    v-if="integrationData.last_name !== undefined">
+                    v-if="integrationData.Last_Name !== undefined">
                     <span class="data-icon-label">Last Name: </span>
                     <span class="data-value">
                       <q-tooltip
                         anchor="top middle"
                         self="center middle"
                       >
-                        {{ integrationData.last_name }}
+                        {{ integrationData.Last_Name }}
                       </q-tooltip>
-                      {{ integrationData.last_name }}
+                      {{ integrationData.Last_Name }}
                     </span>
                 </p>
                 <p class="mb-0"
                     data-testid="integration-zoho-email"
-                    v-if="integrationData.email">
+                    v-if="integrationData.Email">
                     <span class="data-icon-label">Email: </span>
-                    <span class="data-value">{{ integrationData.email }}</span>
+                    <span class="data-value">{{ integrationData.Email }}</span>
                 </p>
                 <p class="mb-0"
                     data-testid="integration-zoho-phone"
-                    v-if="integrationData.phone">
+                    v-if="integrationData.Phone">
                     <span class="data-icon-label">Phone: </span>
-                    <span class="data-value">{{ integrationData.phone }}</span>
+                    <span class="data-value">{{ integrationData.Phone }}</span>
                 </p>
             </q-card-section>
           <sync-with-integration :integration_name='integrationName()'
@@ -110,7 +110,7 @@ export default {
     },
 
     zohoModule () {
-      if (this.integrationData) return this.integrationData.type.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
+      if (this.integrationData) return this.integrationData.module.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
 
       return null
     }
