@@ -138,6 +138,26 @@ export default {
   },
   mounted () {
     this.filter = _.clone(this.channelDefaultFilterModel.filter)
+
+    this.$VueEvent.listen('filter-communications', data => {
+      // ex: data = { type: 'users', value: 1 }
+      this.updateChannelChangedFilterFields({
+        name: data.type,
+        value: data.value
+      })
+
+      // update current filters
+      this.filter = {
+        ...this.filter,
+        [data.type]: data.value
+      }
+
+      // refresh data
+      this.setChannelClonedFilter(this.filter)
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
+    })
   },
   methods: {
     ...mapActions(['setIsFirstLoad']),
@@ -163,7 +183,8 @@ export default {
       'setIsEditingView',
       'setSelectedFilter',
       'toggleFilterDialog',
-      'toggleFilterModelForm'
+      'toggleFilterModelForm',
+      'updateChannelChangedFilterFields'
     ]),
     onClickAppliedFilterButton () {
       this.setFilterDialogForView(false)
@@ -287,7 +308,6 @@ export default {
         this.getCommunications(this.communicationFilters)
       })
     }
-
   },
 
   watch: {

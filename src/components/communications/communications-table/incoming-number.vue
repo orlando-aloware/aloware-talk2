@@ -1,16 +1,14 @@
 <template>
   <div class="d-flex flex-column"
        data-testid="line-row">
-    <span v-if="isAgent && campaignId">
-      {{ campaign.name || '-' }}
-    </span>
     <a target='_blank'
-       :href="getCampaignActivityURL(campaignId)"
-       v-else-if="campaignId">
+       href="#"
+       v-if="campaignId"
+       @click.prevent="filter">
       {{ campaign.name || '-' }}
 
       <q-tooltip>
-        Click to see line's activity
+        Click to filter by this line
       </q-tooltip>
     </a>
     <span v-else>
@@ -23,16 +21,10 @@
 </template>
 
 <script>
-import { aclMixin, classicMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
 export default {
   name: 'IncomingNumber',
-
-  mixins: [
-    aclMixin,
-    classicMixin
-  ],
 
   props: {
     value: {
@@ -51,6 +43,15 @@ export default {
 
     campaign () {
       return this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
+    }
+  },
+
+  methods: {
+    filter () {
+      this.$emit('on-filter', {
+        type: 'campaigns',
+        value: [this.campaignId]
+      })
     }
   }
 }
