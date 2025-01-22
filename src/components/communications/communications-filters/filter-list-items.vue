@@ -3,9 +3,8 @@
        v-bind:class="{ 'active' : selectedFilter && selectedFilter.id === filter.id && !isRenaming }"
        data-testid="filter-list-items-wrapper"
        @click="onItemSelect">
-    <span v-if="!isRenaming">
+    <span v-if="!isRenaming" >
       <icon :icon="mapIcon(filter.type)"
-            class=""
             :size="16"
             :is-active="false" />
       <q-tooltip anchor="top middle"
@@ -49,7 +48,6 @@
 import { mapGetters } from 'vuex'
 import PencilIcon from 'components/icons/pencil-icon'
 import TrashOIcon from 'components/icons/trash-o-icon'
-import talk2Api from 'src/plugins/api/api'
 import Icon from '../communications-nav-icon.vue'
 
 export default {
@@ -93,13 +91,6 @@ export default {
     mapIcon (type) {
       return this.iconMap[type]
     },
-    updateFilter () {
-      this.isUpdating = true
-      return talk2Api.V2.inbox.filters.update(this.selectedFilter.id, { ...this.filterModel, name: this.selectedFilter.name, scope: this.selectedFilter.scope }).then(res => {
-        this.setSelectedFilter(res.data.filter)
-        this.isUpdating = false
-      })
-    },
 
     onItemSelect () {
       this.$emit('filterSelected', this.filter)
@@ -120,16 +111,10 @@ export default {
     },
 
     onInputBlur (evt) {
-      if (evt.target.value !== '') {
-        this.filter.name = evt.target.value
-        this.$emit('filterRename', this.filter)
+      this.$nextTick(() => {
+        evt.target.value = this.selectedFilter.name
         this.isRenaming = false
-      } else {
-        this.$nextTick(() => {
-          evt.target.value = this.selectedFilter.name
-          this.isRenaming = false
-        })
-      }
+      })
     },
     onKeyDown (evt) {
       if (evt.keyCode === 13) {

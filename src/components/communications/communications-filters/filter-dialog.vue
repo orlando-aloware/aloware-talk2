@@ -286,9 +286,13 @@ export default {
       if (this.reset) {
         return false
       }
-
+      console.log('filterIdentifier', filterIdentifier)
+      console.log('this.filter', this.filter)
       for (const field of this.filterFields) {
         if (JSON.stringify(this.filter[field]) !== JSON.stringify(filterIdentifier[field])) {
+          console.log('the filter has detected changes: ' + field)
+          console.log('this.filter[field]: ' + this.filter[field])
+          console.log('filterIdentifier[field]: ' + filterIdentifier[field])
           return true
         }
       }
@@ -428,7 +432,15 @@ export default {
       if (this.isFilterDialogForView && !this.isEditingView) {
         this.filter = { ...this.loadedDefaultFilterModel.filter }
       } else if (this.selectedFilter) {
+        console.log('the problem is here !')
+        let personalFilterObject = this.selectedFilter.filter
+
         this.filter = { ...this.selectedFilter.filter }
+
+        this.filter = {
+          ...this.filterModel.filter,
+          ..._.pick(personalFilterObject, this.filterFields)
+        }
       } else if (this.appliedFilter) {
         this.filter = { ...this.appliedFilter.filter }
       } else if (this.isFilterDialogShowFilters) {

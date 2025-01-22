@@ -34,6 +34,7 @@
                    @onResetFilter="onResetFilters" />
 
     <create-filter-dialog :filter-model="newFilterModel"
+                          :disable-filter-type="!isAdmin"
                           data-testid="comms-channels-create-filter-dialog"
                           @created="afterCreatedNewFilter" />
   </div>

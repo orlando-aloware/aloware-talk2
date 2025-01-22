@@ -48,10 +48,12 @@
         </div>
         <filter-list-items :filter="item"
                            data-testid="filter-dialog-filter-list-items"
-                           read-only
+                           :read-only="!isAdmin"
                            v-for="item in companyFilters"
                            :key="item.id"
                            @filterSelected="(item) => $emit('filterSelected', item)"
+                           @filterRename="onRenameFilter"
+                           @filterDelete="(e) => onDeleteFilter(e, item)"
         />
       </template>
     </div>
@@ -59,9 +61,8 @@
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
-
+import { aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
-
 import FilterListItems from 'components/communications/communications-filters/filter-list-items'
 
 export default {
@@ -69,6 +70,7 @@ export default {
   components: {
     FilterListItems
   },
+  mixins: [aclMixin],
   props: {
     filterType: {
       type: Number,
@@ -158,7 +160,7 @@ export default {
 
       console.log('this.filterType', this.filterType)
 
-      const params = this.filterType === 7 ? {} : {
+      const params = /* this.filterType === 7 ? {} : */ {
         type: this.filterType
       }
 
