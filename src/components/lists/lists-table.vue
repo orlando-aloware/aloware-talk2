@@ -38,6 +38,17 @@
                         data-testid="lists-search-input"
                         @search="onSearch" />
         </div>
+
+        <div class="setting pr-3 align-items-center">
+          <compact-btn variant="success"
+                       class="mr-2"
+                       data-testid="create-list-menu-item"
+                       @clicked="onCreateList($event)">
+            <plus-icon class="mr-1"
+                       color="white"/>
+            Add List
+          </compact-btn>
+        </div>
       </div>
     </div>
     <q-table class="lists-table flex-grow-1"
@@ -291,6 +302,8 @@
                              @closeAssignContactsModal="closeAssignContacts" />
 
       <move-dialog />
+
+      <create-list-modal />
   </div>
 
   </div>
@@ -305,6 +318,8 @@ import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-e
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import AssignContactsModal from 'src/components/assign-contacts-modal'
 import MoveDialog from 'src/components/move-dialog'
+import CreateListModal from 'components/create-list-modal.vue'
+import CompactBtn from 'src/components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
@@ -317,10 +332,11 @@ import AddCallIcon from 'components/icons/add-call-icon.vue'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
+import PlusIcon from 'components/icons/plus-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
+import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
 import ListsFoldersManagement from './lists-folders-management'
 
 export default {
@@ -335,7 +351,8 @@ export default {
 
   mixins: [
     aclMixin,
-    dataTableMixin
+    dataTableMixin,
+    mainViewMixin
   ],
 
   components: {
@@ -350,13 +367,17 @@ export default {
     PencilOIcon,
     PinIcon,
     TrashIcon,
+    PlusIcon,
+    SearchInput,
     AssignContactsModal,
     ConvertListToPublicDialog,
     ListsRenameForm,
     MoveDialog,
+    CreateListModal,
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
     RelativeTime,
+    CompactBtn,
     ListsFoldersManagement
   },
 
@@ -376,6 +397,7 @@ export default {
       },
       listsData: [],
       list: null,
+      isUnsavedListModalShown: false,
       isOpenListForm: false,
       convertToPublicDialog: false,
       pinnedLists: [],
@@ -394,10 +416,14 @@ export default {
   computed: {
     ...mapGetters('contacts', [
       'pinned',
-      'moveDialog'
+      'moveDialog',
+      'isAllContactsSelected'
     ]),
     ...mapState('listsModule', [
       'isListsLoading'
+    ]),
+    ...mapState('contacts', [
+      'unsavedList'
     ]),
     ...mapGetters('listsModule', {
       lists: 'getLists',
@@ -430,7 +456,9 @@ export default {
     ...mapActions('contacts', [
       'listPinToggled',
       'addPowerDialerOpen',
-      'openMoveDialog'
+      'openMoveDialog',
+      'createListOpen',
+      'setUnsavedList'
     ]),
 
     ...mapActions('listsModule', [
@@ -690,6 +718,58 @@ export default {
     onEditList (list) {
       this.list = list
       this.$router.push(`/contacts/list/${this.list.id}${this.list.show_in_public_folder ? '?type=public' : ''}`)
+    },
+
+    async loadMoreLists (done) {
+      if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
+        if (typeof done === 'function') {
+          done()
+        }
+        return
+      }
+
+      this.pagination.currentPage += 1
+      await this.getLists(true)
+      this.listsData.push(...this.lists)
+
+      if (typeof done === 'function') {
+        done()
+      }
+    },
+
+    onCreateList (event) {
+      if (event) {
+        event.preventDefault()
+      }
+
+      this.showUnsavedListDialog(() => {
+        this.createListOpen({
+          contact_folder_id: null
+        })
+      })
+    },
+
+    showUnsavedListDialog (callback) {
+      if (this.unsavedList && !this.isUnsavedListModalShown) {
+        this.isUnsavedListModalShown = true
+        this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.setUnsavedList(null)
+            callback()
+          }
+
+          this.isUnsavedListModalShown = false
+        })
+      }
+
+      if (!this.unsavedList) {
+        callback()
+      }
     }
   },
 
