@@ -78,8 +78,6 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import TreeFolder from 'components/lists/lists-folders/lists-tree-folder.vue'
 import TreeFolderCreate from 'components/tree/tree-folder-create.vue'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
-// import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import pdList from 'src/plugins/mixins/power-dialer-list'
 import aclMixin from 'src/plugins/mixins/acl.mixin'
 import { createPopper } from '@popperjs/core'
 
@@ -93,7 +91,7 @@ export default {
       type: Number
     }
   },
-  mixins: [pdList, aclMixin],
+  mixins: [aclMixin],
   components: {
     ContactsSidebarLoader,
     TreeFolder,
@@ -135,22 +133,8 @@ export default {
     folderId () {
       return this.isContacts ? 'bs-folder-options' : 'pd-folder-options'
     },
-    routeName () {
-      return this.$route.name
-    },
-    routePath () {
-      if (this.isPD) {
-        return 'Power Dialer'
-      } else if (this.isContact) {
-        return 'Contacts'
-      }
-      return ''
-    },
-    isPD () {
-      return this.routeName === 'Power Dialer' && !this.isContactModuleType
-    },
     isContact () {
-      return this.routeName === 'Contacts' && this.isContactModuleType
+      return this.isContactModuleType
     },
     hasShowInPublicFolderPermission () {
       return this.isBillingAdminOrAdminOrSupervisor
@@ -184,8 +168,6 @@ export default {
   methods: {
     ...mapActions('contacts', [
       'foldersLoaded',
-      'createListOpen',
-      'createPdListOpen',
       'setActiveFolder',
       'setMyListsLoaded',
       'setUnsavedList'
@@ -225,38 +207,6 @@ export default {
         this.isCreatingFolder = !this.isCreatingFolder
       })
     },
-    onCreateList (event) {
-      if (event) {
-        event.preventDefault()
-      }
-
-      this.showUnsavedListDialog(() => {
-        this.createListOpen({
-          contact_folder_id: null
-        })
-      })
-    },
-    onCreateFromExistingList (data) {
-      // this.TOGGLE_CREATE_FROM_EXISTING_LIST(true)
-      this.destroySubmenu()
-      this.createPdListOpen({
-        id: '',
-        type: 'list'
-      })
-      this.$root.$emit('bv::hide::popover')
-    },
-    onCreateByManualSelection () {
-      this.destroySubmenu()
-      this.createListOpen({
-        contact_folder_id: null
-      })
-    },
-
-    onCreateFromIntegration () {
-      this.destroySubmenu()
-      this.$emit('openIntegrationListsImportDialog')
-    },
-
     onCreateFolderCancel () {
       this.isCreatingFolder = false
     },
@@ -304,12 +254,6 @@ export default {
     }
   },
   watch: {
-    routeName (val) {
-      if (val === this.routePath) {
-        this.initResources()
-      }
-    },
-
     userId () {
       this.initResources()
     }

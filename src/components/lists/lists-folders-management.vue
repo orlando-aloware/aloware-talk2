@@ -17,9 +17,9 @@
       <nav-item badge-value="20"
                 badge-color="danger"
                 data-testid="inbox-nav-list-nav-item"
-                :label="privateListsLabel"
                 value="private"
                 class="mt-2"
+                :label="privateListsLabel"
                 :is-active="!isPublicLists"
                 :closed="false"
                 :badge="true"
@@ -30,18 +30,16 @@
 
       <div class="mt-2 pt-2 border-top"
            v-if="!isPublicLists">
-        <div class="p-2" v-if="isAdmin">
+        <div class="p-2"
+             v-if="isAdmin">
           <p class="text-muted custom-input-label mb-0">User</p>
-          <user-selector
-            :generic-styling="false"
-            v-model="userId"
-            @change="setUserId"
-          />
+          <user-selector :generic-styling="false"
+                         v-model="userId"
+                         @change="setUserId" />
         </div>
 
-        <lists-folders
-          :is-contact-module-type="isContactModuleType"
-          :user-id="userId" />
+        <lists-folders :is-contact-module-type="isContactModuleType"
+                       :user-id="userId" />
 
         <contacts-sidebar-loader v-if="isLoading" />
 

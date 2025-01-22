@@ -66,6 +66,9 @@ export default {
     endpoint: {
       type: String,
       default: '/api/v2/contact-folders'
+    },
+    userId: {
+      type: Number
     }
   },
   data () {
@@ -130,8 +133,13 @@ export default {
       })
     },
     reloadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
       return this.$axios
-        .get(this.endpoint)
+        .get(this.endpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

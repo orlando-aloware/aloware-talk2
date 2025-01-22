@@ -12,6 +12,7 @@ export default {
       const params = {
         page: page || 1,
         size: perPage || 10,
+        private_only: !isPublic,
         ...(state.search && { search: state.search }),
         ...filters
       }
