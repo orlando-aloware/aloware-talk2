@@ -173,7 +173,13 @@
               block
               @click="showQuestionDrawer = true"
             >
-              🤖 Ask Question from AloAi
+              <sparkle-icon
+                width="16"
+                height="16"
+                color="#ffffff"
+                class="mr-1"
+              />
+              Ask AloAi
             </b-button>
 
             <!-- Regenerate Insights -->

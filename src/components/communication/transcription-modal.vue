@@ -184,13 +184,15 @@
                 <q-tab name="ask_aloai">
                   <template v-slot:default>
                     <div class="flex items-center">
-                      Ask from AloAi
-                      <sparkle-icon
-                        width="16"
-                        height="16"
-                        color="#9333EA"
-                        class="ml-1"
-                      />
+                      <span class="ai-effect-gradient-text font-weight-bold">
+                        <sparkle-icon
+                          width="16"
+                          height="16"
+                          color="#9333EA"
+                          class="mr-1"
+                        />
+                        Ask AloAi
+                      </span>
                     </div>
                   </template>
                 </q-tab>

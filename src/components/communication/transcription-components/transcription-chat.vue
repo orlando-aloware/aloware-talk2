@@ -588,7 +588,7 @@ textarea::placeholder {
   margin-top: 8px;
   z-index: 1000;
   max-height: 300px;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .suggestions-title {
@@ -609,6 +609,26 @@ textarea::placeholder {
 
 .suggestions-content {
   padding: 0 16px 16px;
+  max-height: 232px; /* 300px - title height - paddings */
+  overflow-y: auto;
+}
+
+/* Add custom scrollbar styling */
+.suggestions-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.suggestions-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.suggestions-content::-webkit-scrollbar-thumb {
+  background-color: rgba(147, 51, 234, 0.2);
+  border-radius: 4px;
+}
+
+.suggestions-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(147, 51, 234, 0.4);
 }
 
 .suggestion-item {
