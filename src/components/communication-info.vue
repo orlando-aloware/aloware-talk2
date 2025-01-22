@@ -1181,10 +1181,15 @@ export default {
       ]
 
       return (
+        !this.isSimpSocial &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.showAudio(this.communication) &&
-        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status)) &&
-        !this.isSimpSocial
+        (
+          this.communication.has_voicemail ||
+          (
+            this.showAudio(this.communication) &&
+            (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+          )
+        )
       )
     },
 
@@ -1193,7 +1198,7 @@ export default {
         !this.isSimpSocial && // Exclude SimpSocial
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.showAudio(this.communication) &&
+        (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions
           !this.currentCompany?.transcription_settings?.call_transcription_enabled ||
