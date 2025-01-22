@@ -104,7 +104,7 @@ export default {
     },
 
     privateListsLabel () {
-      return this.isAdmin ? 'User Lists' : 'My Lists'
+      return this.isAdmin ? 'Private Lists' : 'My Lists'
     },
 
     isFolderEmpty () {

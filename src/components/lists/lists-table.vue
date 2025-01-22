@@ -437,7 +437,7 @@ export default {
       await this.getLists()
       this.calculateTotalPages()
       this.listsData = this.lists
-      await this.getPinnedLists()
+      // this.getPinnedLists()
     },
 
     async getLists (isLoadMore = false) {
@@ -530,6 +530,8 @@ export default {
     },
 
     async onScroll ({ to, ref }) {
+      if (this.isLoading) return
+
       const lastIndex = this.listsData.length - 1
       if (!this.isLoadingMore && this.pagination.currentPage < this.pagination.totalPages && to === lastIndex) {
         await this.loadMoreLists()
@@ -607,7 +609,7 @@ export default {
         this.pinnedLists = data.map(item => item.contact_list_id)
       } catch (err) {
         console.error(err)
-        this.$generalNotification('Unable to load lists, please try again.', 'error')
+        this.$generalNotification('Unable to load pinned lists, please try again.', 'error')
       }
     },
 
@@ -616,7 +618,7 @@ export default {
       const isPinned = !this.isPinned
 
       this.pinRequest(this.list.id, isPinned).finally(() => {
-        this.getPinnedLists()
+        // this.getPinnedLists()
         this.$generalNotification(isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.')
       })
     },
@@ -677,7 +679,7 @@ export default {
     onFolderSelected ({ id }) {
       const query = Object.assign({}, this.$route.query)
       query.folder_id = id
-      this.$router.replace({ query })
+      this.$router.replace({ query }).catch(() => {})
     },
 
     getContactListType (contactList) {
@@ -734,15 +736,7 @@ export default {
   },
 
   watch: {
-    userId () {
-      this.refreshLists()
-    },
-
-    folderId () {
-      this.refreshLists()
-    },
-
-    isPublic () {
+    '$route.query': function () {
       this.refreshLists()
     }
   }

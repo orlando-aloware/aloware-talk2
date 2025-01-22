@@ -9,7 +9,7 @@
         <q-item-section>
           <div class="folders__header d-flex align-items-center list--header pb-0">
             <div class="header__header__title font-weight-bold flex-grow-1">
-              <span v-if="isContactModuleType">{{ isAdmin ? 'User' : 'My' }} Folders</span>
+              <span v-if="isContactModuleType">{{ title }}</span>
               <span v-else class="px-3">Power Dialer Lists</span>
             </div>
           </div>
@@ -155,11 +155,13 @@ export default {
     hasShowInPublicFolderPermission () {
       return this.isBillingAdminOrAdminOrSupervisor
     },
-    isIntegrationEnabled () {
-      return this.currentCompany &&
-          (this.currentCompany.hubspot_integration_enabled ||
-            this.currentCompany.zoho_integration_enabled ||
-            this.currentCompany.pipedrive_integration_enabled)
+
+    title () {
+      if (this.isAdmin && this.userId !== this.profile.id) {
+        return 'User Folders'
+      }
+
+      return 'My Folders'
     }
   },
   mounted () {
