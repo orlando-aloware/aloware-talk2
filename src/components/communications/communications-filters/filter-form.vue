@@ -593,6 +593,7 @@ export default {
     ...mapState('communications', [
       'channelChangedFilterFields',
       'isFilterDialogShown',
+      'selectedFilter',
       'isFilterModelFormShown',
       'isFilterDialogForView',
       'inboxShowMyContacts'
@@ -867,12 +868,6 @@ export default {
 
     this.rangePicker = this.$refs.picker
     this.selectedTags = this.getTagsObjectsByIds(this.filter?.tags)
-
-    setTimeout(() => {
-      if (this.inboxShowMyContacts) {
-        this.filter.my_contact = 1
-      }
-    }, 500)
   },
 
   watch: {
@@ -934,7 +929,7 @@ export default {
     },
 
     reset (newVal) {
-      if (newVal) {
+      if (newVal && !this.selectedFilter) {
         this.dateRange.startDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0]
         this.dateRange.endDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1]
         this.filter.from_date = this.dateRange.startDate

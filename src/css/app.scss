@@ -7694,8 +7694,9 @@ table.datatable {
     }
 
     .filter-items {
-      margin: 5px 0;
-      padding: 7px 12px;
+      color: #666666;
+      margin: 7px 0;
+      padding: 5px 12px;
       line-height: 1.2;
       height: 30px;
 
@@ -7789,6 +7790,8 @@ table.datatable {
   }
 
   .filter-items {
+      margin: 7px 0;
+      padding: 5px 12px;
     span:not(.check-icon) {
       font-size: 14px;
       color: #666666;
@@ -13144,6 +13147,10 @@ h1.contact-list-name-label {
 
 .overflow-x-hidden {
   overflow-x: hidden;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
 }
 
 .h-93 {

@@ -853,6 +853,7 @@ export default {
         has_reminders: 0,
         contact_country: '',
         changed: true,
+        /* TODO: this is not being added in the filter, verify also affect to https://aloware.atlassian.net/browse/WAT-1166 */
         states_limit: { us: [], ca: [] },
         initial_line_only: 0,
         search_text: '',
