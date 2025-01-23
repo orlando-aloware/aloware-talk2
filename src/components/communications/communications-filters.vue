@@ -48,12 +48,13 @@ import FilterDialog from 'components/communications/communications-filters/filte
 import CreateFilterDialog from 'components/communications/communications-filters/create-filter-dialog'
 
 import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
-import { communicationsMixin } from 'src/plugins/mixins'
+import { aclMixin, communicationsMixin } from 'src/plugins/mixins'
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
 export default {
   name: 'CommunicationsFilters',
   mixins: [
+    aclMixin,
     communicationsMixin,
     communicationsDefaultFilterModelMixin
   //  visibilityMixin

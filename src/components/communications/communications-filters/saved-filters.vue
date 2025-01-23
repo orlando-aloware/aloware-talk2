@@ -157,10 +157,7 @@ export default {
 
     async getFilters () {
       this.isGettingFilters = true
-
-      console.log('this.filterType', this.filterType)
-
-      const params = /* this.filterType === 7 ? {} : */ {
+      const params = {
         type: this.filterType
       }
 
@@ -170,10 +167,8 @@ export default {
       const personalFilters = filtersResponse.data?.data?.user || []
       const companyFilters = filtersResponse.data?.data?.company || []
 
-      /* type=0 means is a type from classic, and also 6 is for inbox not compatible  */
-      this.setPersonalFilters(personalFilters.filter(({ type }) => ![0, 6].includes(type)))
-
-      this.setCompanyFilters(companyFilters.filter(({ type }) => ![0, 6].includes(type)))
+      this.setPersonalFilters(personalFilters)
+      this.setCompanyFilters(companyFilters)
 
       // Gather all tags IDs from, filter data, personal and company filters into a single list for display in select
       let tagsIds = []
