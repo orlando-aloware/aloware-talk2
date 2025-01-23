@@ -46,10 +46,13 @@ export default {
   },
   computed: {
     isContactsRoute () {
-      return this.$route.meta.title === 'Contacts' || this.$route.meta.title === 'Lists Management Utility'
+      return this.$route.meta.title === 'Contacts'
+    },
+    isListsManagementRoute () {
+      return this.$route.meta.title === 'Lists Management Utility'
     },
     foldersPath () {
-      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
+      return (this.isContactsRoute || this.isListsManagementRoute) ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     }
   },
   methods: {

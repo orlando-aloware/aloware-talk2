@@ -155,10 +155,6 @@ export default {
       this.$router.replace({ query })
     },
 
-    onCreateFolderCancel () {
-      //
-    },
-
     togglePublicLists (enabled) {
       if (enabled) {
         this.updateQueryParam('publicLists', 1, true)

@@ -49,7 +49,7 @@
         </template>
       </contact-menu-item>
 
-      <template v-if="isContactsRoute">
+      <template v-if="isContactsRoute || isListsManagementRoute">
         <contact-menu-item
           v-if="hasEdit && hasCreateList"
           @click="$emit('createlist')">
@@ -178,10 +178,13 @@ export default {
       'folders'
     ]),
     isContactsRoute () {
-      return this.$route.meta.title === 'Contacts' || this.$route.meta.title === 'Lists Management Utility'
+      return this.$route.meta.title === 'Contacts'
+    },
+    isListsManagementRoute () {
+      return this.$route.meta.title === 'Lists Management Utility'
     },
     foldersEndpoint () {
-      return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
+      return (this.isContactsRoute || this.isListsManagementRoute) ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'
     }
   },
   methods: {

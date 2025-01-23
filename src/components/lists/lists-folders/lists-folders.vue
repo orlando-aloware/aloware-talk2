@@ -28,7 +28,6 @@
       </template>
       <div :class="`folders ${isContactModuleType ? 'border-top' : ''}`">
         <div class="folders__content">
-          <!-- <p @click="isLoading = !isLoading">-- {{ isLoading }}</p> -->
           <tree-folder-create :layer="0"
                               :parent_id="null"
                               :endpoint="foldersEndpoint"
