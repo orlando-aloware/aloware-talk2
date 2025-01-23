@@ -162,7 +162,6 @@ export default {
       }
 
       const filtersResponse = await talk2Api.V2.inbox.filters.get(params)
-      // const companyFilters = await talk2Api.V1.filters.get({ isOnCompany: true })
 
       const personalFilters = filtersResponse.data?.data?.user || []
       const companyFilters = filtersResponse.data?.data?.company || []
