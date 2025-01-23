@@ -45,16 +45,6 @@ export default {
 
     statusText () {
       return this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase()
-    },
-
-    inboxObjects () {
-      return this.inboxes.map(inbox => ({
-        default: this.inboxes.indexOf(inbox) === 0 ? true : (inbox.default || false),
-        disabled: false,
-        icon: 'inbox',
-        label: inbox.name || '',
-        value: inbox.id || 0
-      }))
     }
   },
 

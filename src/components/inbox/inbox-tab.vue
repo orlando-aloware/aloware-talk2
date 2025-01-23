@@ -259,7 +259,7 @@ import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import InboxChannelToggle from './inbox-channel-toggle.vue'
 
 export default {
-  name: 'inbox-tab',
+  name: 'InboxTab',
 
   mixins: [
     aclMixin,

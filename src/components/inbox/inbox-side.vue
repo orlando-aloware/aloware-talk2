@@ -17,14 +17,21 @@
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
           <div class="inbox-side__nav h-100">
-            <inbox-nav-list :closed="closed"
-                            :openCount="inboxTaskCounts.open"
-                            :pendingCount="inboxTaskCounts.pending"
-                            :value.sync="active"
-                            v-model="active"
-                            data-testid="inbox-side-nav-list"
-                            @active="newActive"
-                            @toInbox="navigateToInbox">
+            <inbox-new-nav-list
+              v-if="isNewInboxEnabled"
+              data-testid="inbox-side-new-nav-list"
+              @inbox-selected="handleInboxSelected"
+            />
+            <inbox-nav-list
+              v-else
+              :closed="closed"
+              :openCount="inboxTaskCounts.open"
+              :pendingCount="inboxTaskCounts.pending"
+              :value.sync="active"
+              v-model="active"
+              data-testid="inbox-side-nav-list"
+              @active="newActive"
+              @toInbox="navigateToInbox">
             </inbox-nav-list>
           </div>
         </div>
@@ -53,8 +60,9 @@
 
 <script>
 import _ from 'lodash'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState, mapGetters } from 'vuex'
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
+import InboxNewNavList from 'components/inbox/inbox-new-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
 import BackButton from 'components/back-button'
@@ -69,6 +77,7 @@ export default {
     InboxTab,
     InboxChannels,
     InboxNavList,
+    InboxNewNavList,
     Profile,
     InboxToggleFilters
   },
@@ -95,6 +104,10 @@ export default {
       'taskCounts',
       'inboxTaskCounts',
       'navListItems'
+    ]),
+
+    ...mapGetters('inbox', [
+      'isNewInboxEnabled'
     ]),
 
     ...mapState(['isMobile']),
@@ -219,6 +232,16 @@ export default {
       }
 
       this.setShowContactsHeader(false)
+    },
+
+    handleInboxSelected (inboxId) {
+      this.active = `inbox-${inboxId}`
+      this.setActiveChannel({
+        label: 'Inbox',
+        value: `inbox-${inboxId}`,
+        icon: 'inbox',
+        disabled: false
+      })
     }
   },
 
