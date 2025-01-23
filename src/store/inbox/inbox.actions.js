@@ -138,5 +138,8 @@ export default {
   },
   initNewInbox: ({ commit }, enabled) => {
     commit('SET_NEW_INBOX', enabled)
+  },
+  setInboxesFirstPage: ({ commit }, inboxesFirstPage) => {
+    commit('SET_INBOXES_FIRST_PAGE', inboxesFirstPage)
   }
 }

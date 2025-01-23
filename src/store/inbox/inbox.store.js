@@ -119,6 +119,7 @@ export default function () {
     isEditingView: false,
     showViewsList: false,
     isInboxRefreshBtnLoading: false,
-    newInboxEnabled: false
+    newInboxEnabled: false,
+    inboxesFirstPage: []
   }
 }

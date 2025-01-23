@@ -27,7 +27,8 @@ export default {
       'pinnedViews',
       'contacts',
       'appliedFilter',
-      'channelClonedFilter'
+      'channelClonedFilter',
+      'inboxesFirstPage'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -36,12 +37,24 @@ export default {
 
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
 
+    ...mapGetters('inbox', ['getInboxesFirstPage']),
+
     nextPage () {
       return this.contactsCurrentPage + 1
     },
 
     statusText () {
       return this.$options.filters.fixTaskStatusName(this.currentTask).toLowerCase()
+    },
+
+    inboxObjects () {
+      return this.inboxes.map(inbox => ({
+        default: this.inboxes.indexOf(inbox) === 0 ? true : (inbox.default || false),
+        disabled: false,
+        icon: 'inbox',
+        label: inbox.name || '',
+        value: inbox.id || 0
+      }))
     }
   },
 
@@ -127,7 +140,8 @@ export default {
         filter: Filters.EXCERPT,
         scope: 'user'
       },
-      ranges: {}
+      ranges: {},
+      inboxes: []
     }
   },
 
@@ -149,7 +163,8 @@ export default {
       'gettingTasksList',
       'setTaskCount',
       'setPinnedViews',
-      'setContacts'
+      'setContacts',
+      'setInboxesFirstPage'
     ]),
 
     getNoneLiveCallContactTasks (contacts) {
@@ -722,6 +737,23 @@ export default {
       }
 
       return { from_date: fromDate, to_date: toDate }
+    },
+
+    async fetchInboxes (page = 1) {
+      if (page !== 1) {
+        this.inboxes = await talk2Api.V2.inbox.inboxes.get({ page }).then(res => res.data.data)
+      }
+
+      const inboxes = this.getInboxesFirstPage
+
+      if (inboxes.length) {
+        this.inboxes = inboxes
+      }
+
+      const firstPage = await talk2Api.V2.inbox.inboxes.get({ page })
+      this.setInboxesFirstPage(firstPage.data.data)
+
+      this.inboxes = this.getInboxesFirstPage
     }
   },
 

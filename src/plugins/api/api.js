@@ -955,6 +955,13 @@ export default {
         delete (filterId) {
           return window.axios.delete(`${suffixV2}filters/${filterId}`)
         }
+      },
+
+      inboxes: {
+        async get ({ page = 1, perPage = 15 } = {}) {
+          const params = { per_page: perPage, page }
+          return window.axios.get(`${suffixV2}inboxes`, { params })
+        }
       }
     },
 
