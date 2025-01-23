@@ -611,6 +611,9 @@ export default {
       type: Object,
       required: false
     },
+    type: {
+      default: null
+    },
     buttonText: {
       type: String,
       default: 'Show Transcription'
@@ -751,9 +754,7 @@ export default {
       // Fetch communication recording url.
       let options = {
         params: {
-          type: this.communication.voicemail_is_migrated && this.communication.voicemail_url
-            ? this.UploadedFileTypes.TYPE_CALL_VOICEMAIL
-            : this.UploadedFileTypes.TYPE_CALL_RECORDING
+          type: this.type || this.UploadedFileTypes.TYPE_CALL_RECORDING
         }
       }
 

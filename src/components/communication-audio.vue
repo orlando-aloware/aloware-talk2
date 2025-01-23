@@ -24,6 +24,7 @@
             ref="transcriptionModal"
             :communication="communication"
             :contact="contact"
+            :type="type"
             :single-button="true"/>
           <generate-transcription-button class="mr-2"
                                          variant="icon"
