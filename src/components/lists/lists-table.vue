@@ -870,10 +870,14 @@ export default {
 
   watch: {
     '$route.query': function () {
+      this.SET_SEARCH('')
+      this.search = ''
       this.refreshLists()
       this.refreshFoldersPath()
     },
     folders () {
+      this.SET_SEARCH('')
+      this.search = ''
       this.refreshFoldersPath()
     }
   }
