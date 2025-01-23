@@ -1,144 +1,129 @@
 <template>
-  <div class="tree-folder"
-       :data-layer="layer">
-    <div
-      v-if="!isRootList"
-      class="folder d-flex align-items-center"
-      :class="{ 'folder--selected': isSelected }"
-    >
+    <div class="tree-folder"
+         :data-layer="layer">
       <div
-        class="folder__indent"
-        :style="indentStyle"
-        data-testid="tree-folder-indent-toggle"
-        @click="onToggleFolder"
-      ></div>
-      <div class="folder__arrow d-flex align-items-center">
-        <div v-if="lists.length > 0 || folders.length > 0"
-             data-testid="tree-folder-arrow-toggle"
-             @click="onToggleFolder">
-          <folder-arrow-open-icon v-if="isOpen"
-                                  data-testid="tree-folder-open-icon"
-                                  color="#62666E"></folder-arrow-open-icon>
-          <folder-arrow-close-icon v-else
-                                   data-testid="tree-folder-close-icon"
-                                   color="#62666E"></folder-arrow-close-icon>
-        </div>
-      </div>
-      <div class="folder__icon d-flex align-items-center"
-           data-testid="tree-folder-icon-toggle"
-           @click="onToggleFolder">
-        <folder-icon color="#62666E"></folder-icon>
-      </div>
-
-      <div class="folder__name-wrapper flex-grow-1 d-flex align-items-center">
-        <div
-          v-if="!isEditing"
-          class="folder__name"
-          data-testid="tree-folder-name-toggle"
-          @click="onToggleFolder">
-          {{ name }}
-        </div>
-
-        <!-- Renaming Folders -->
-        <input
-          v-if="isEditing"
-          autofocus
-          class="folder__input d-inline"
-          type="text"
-          :id="'folder-input-' + id"
-          :value="name"
-          :disabled="isRenaming"
-          data-testid="tree-folder-renaming-input"
-          @blur="onInputBlur"
-          @keydown="onKeyDown" />
-      </div>
-
-      <button
-        class="folder__option btn btn-link p-0 shadow-0"
-        :class="{ 'folder__option--hide': isEditing }"
-        :data-popper-target="folderId"
-        :id="folderId"
-        :ref="folderId"
-        data-testid="tree-folder-option-btn"
+        v-if="!isRootList"
+        class="folder d-flex align-items-center"
+        :class="{ 'folder--selected': isSelected }"
       >
-        <folder-option></folder-option>
-      </button>
-    </div>
+        <div
+          class="folder__indent"
+          :style="indentStyle"
+          data-testid="tree-folder-indent-toggle"
+          @click="onToggleFolder"
+        ></div>
+        <div class="folder__arrow d-flex align-items-center">
+          <div v-if="folders.length > 0"
+               data-testid="tree-folder-arrow-toggle"
+               @click="onToggleFolder">
+            <folder-arrow-open-icon v-if="isOpen"
+                                    data-testid="tree-folder-open-icon"
+                                    color="#62666E"></folder-arrow-open-icon>
+            <folder-arrow-close-icon v-else
+                                     data-testid="tree-folder-close-icon"
+                                     color="#62666E"></folder-arrow-close-icon>
+          </div>
+        </div>
+        <div class="folder__icon d-flex align-items-center"
+             data-testid="tree-folder-icon-toggle"
+             @click="onToggleFolder">
+          <folder-icon color="#62666E"></folder-icon>
+        </div>
 
-    <!-- Creating Folders -->
-    <tree-folder-create
-      v-if="isCreatingFolder"
-      :endpoint="endpoint"
-      :layer="layer + 1"
-      :parent_id="id"
-      :user-id="userId"
-      data-testid="tree-folder-creating-input"
-      @blur="onCloseFolder"
-      @cancel="onCreateFolderCancel"
-    />
+        <div class="folder__name-wrapper flex-grow-1 d-flex align-items-center">
+          <div
+            v-if="!isEditing"
+            class="folder__name"
+            data-testid="tree-folder-name-toggle"
+            @click="onToggleFolder">
+            {{ name }}
+          </div>
 
-    <div
-      v-if="isOpen && !isRootList"
-      class="animated"
-      v-bind:class="{ animate__fadeIn: isOpen, animate__fadeOut: !isOpen }"
-    >
-      <tree-folder-contents
-        :folders="folders"
-        :hasEdit="hasEdit"
-        :hasDelete="hasDelete"
-        :layer="layer + 1"
-        :endpoint="endpoint"
-        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
-        data-testid="tree-folder-contents"
-      ></tree-folder-contents>
-      <tree-list-contents
-        :lists="lists"
-        :layer="layer + 1"
-        :hasEdit="hasEdit"
-        :hasDelete="hasDelete"
-        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
-        :endpoint="endpoint"
-        :folder-id="id"
-        data-testid="tree-list-contents-1"
-      ></tree-list-contents>
-    </div>
+          <b-badge v-if="!isEditing"
+                 variant="light"
+                 class="folder-list-count-badge flex-shrink-0 ml-1">
+            {{ listCount }}
+          </b-badge>
 
-    <tree-list-contents
-      v-if="isRootList"
-      :lists="lists"
-      :layer="layer + 1"
-      :hasEdit="hasEdit"
-      :hasDelete="hasDelete"
-      :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
-      :isRootList="isRootList"
-      :endpoint="endpoint"
-      :folder-id="id"
-      data-testid="tree-list-contents-2"
-    ></tree-list-contents>
+          <!-- Renaming Folders -->
+          <input
+            v-if="isEditing"
+            autofocus
+            class="folder__input d-inline"
+            type="text"
+            :id="'folder-input-' + id"
+            :value="name"
+            :disabled="isRenaming"
+            data-testid="tree-folder-renaming-input"
+            @blur="onInputBlur"
+            @keydown="onKeyDown" />
+        </div>
 
-    <template
-      v-if="isReferenceExists">
-      <b-popover
-        triggers="click blur"
-        placement="bottomright"
-        boundary="window"
-        custom-class="contact-popover"
-        data-testid="create-edit-remove-popover"
-        :target="folderId">
-        <folder-actions
-          :id="id"
+        <button
+          class="folder__option btn btn-link p-0 shadow-0 flex-shrink-0"
+          :class="{ 'folder__option--hide': isEditing }"
+          :data-popper-target="folderId"
+          :id="folderId"
+          :ref="folderId"
+          data-testid="tree-folder-option-btn"
+        >
+          <folder-option></folder-option>
+        </button>
+      </div>
+
+      <div
+        v-if="isOpen && !isRootList"
+        class="animated"
+        v-bind:class="{ animate__fadeIn: isOpen, animate__fadeOut: !isOpen }"
+      >
+        <tree-folder-contents
+          :folders="folders"
           :hasEdit="hasEdit"
           :hasDelete="hasDelete"
-          @create="onCreateFolder"
-          @edit="onEditFolder"
-          @remove="onRemoveFolder"
-          @move="onMove"
-          @createlist="onCreateList"
-        />
-      </b-popover>
-    </template>
-  </div>
-</template>
+          :layer="layer + 1"
+          :endpoint="endpoint"
+          :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
+          :user-id="userId"
+          data-testid="tree-folder-contents"
+        ></tree-folder-contents>
+      </div>
+
+      <!-- Creating Folders -->
+      <tree-folder-create
+        v-if="isCreatingFolder"
+        :endpoint="endpoint"
+        :layer="layer + 1"
+        :parent_id="id"
+        :user-id="userId"
+        data-testid="tree-folder-creating-input"
+        @blur="onCloseFolder"
+        @cancel="onCreateFolderCancel"
+      />
+
+      <template
+        v-if="isReferenceExists">
+        <b-popover
+          triggers="click blur"
+          placement="bottomright"
+          boundary="window"
+          custom-class="contact-popover"
+          data-testid="create-edit-remove-popover"
+          :target="folderId">
+          <folder-actions
+            :id="id"
+            :hasCreateList="false"
+            :hasEdit="hasEdit"
+            :hasDelete="hasDelete"
+            @create="onCreateFolder"
+            @edit="onEditFolder"
+            @remove="onRemoveFolder"
+            @move="onMove"
+            @createlist="onCreateList"
+          />
+        </b-popover>
+      </template>
+    </div>
+  </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
@@ -146,8 +131,8 @@ import FolderIcon from 'components/icons/folder-icon.vue'
 import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon.vue'
 import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
-import FolderActions from '../folder-actions.vue'
-import TreeFolderCreate from './tree-folder-create.vue'
+import FolderActions from 'components/folder-actions.vue'
+import TreeFolderCreate from 'components/tree/tree-folder-create.vue'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 
 export default {
@@ -215,8 +200,7 @@ export default {
     FolderIcon,
     FolderArrowOpenIcon,
     FolderArrowCloseIcon,
-    treeFolderContents: () => import('./tree-folder-contents.vue'),
-    treeListContents: () => import('./tree-list-contents.vue'),
+    treeFolderContents: () => import('./lists-tree-folder-contents.vue'),
     FolderOption,
     FolderActions,
     TreeFolderCreate
@@ -228,7 +212,8 @@ export default {
       isEditing: false,
       isRenaming: false,
       inputTimeout: null,
-      isReferenceExists: false
+      isReferenceExists: false,
+      defaultIsOpen: true
     }
   },
 
@@ -242,19 +227,24 @@ export default {
     },
 
     isOpen () {
-      return this.opened.has(this.id)
+      return this.defaultIsOpen || this.opened.has(this.id)
     },
 
     isSelected () {
       return (
         (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
-        (this.createList.open && this.createList.folderId === this.id)
+          (this.createList.open && this.createList.folderId === this.id)
       )
     },
 
     folderId () {
       const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
       return `folder-option-${module}-${this.id}`
+    },
+
+    listCount () {
+      const isPublic = this.$route.query.isPublic === '1'
+      return this.lists.filter((item) => item.show_in_public_folder === isPublic).length
     }
   },
 
@@ -407,6 +397,8 @@ export default {
     },
 
     onToggleFolder () {
+      this.$VueEvent.fire('lists-management-folder-click', { id: this.id })
+      this.defaultIsOpen = false
       this.toggleFolder(this.id)
     }
   },
@@ -416,3 +408,12 @@ export default {
   }
 }
 </script>
+
+<style>
+.folder-list-count-badge {
+  width: 20px;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: center;
+}
+</style>

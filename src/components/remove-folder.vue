@@ -44,6 +44,9 @@ export default {
     isContactModuleType: {
       type: Boolean,
       default: true
+    },
+    userId: {
+      type: Number
     }
   },
   components: {
@@ -110,7 +113,11 @@ export default {
     },
     reloadFoldersRequest () {
       if (this.isContactModuleType) {
-        return talk2Api.V2.contactFolders.list()
+        const params = {}
+        if (this.userId) {
+          params.user_id = this.userId
+        }
+        return talk2Api.V2.contactFolders.list(params)
           .then((response) => response.data)
           .then(this.foldersLoaded)
           .catch((_err) => {

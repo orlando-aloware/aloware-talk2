@@ -51,6 +51,9 @@ export default {
     isContactModuleType: {
       type: Boolean,
       default: true
+    },
+    userId: {
+      type: Number
     }
   },
 
@@ -142,8 +145,12 @@ export default {
       this.$generalNotification(message, 'error')
     },
     reloadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
       return this.$axios
-        .get(this.fetchFoldersEndpoint)
+        .get(this.fetchFoldersEndpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
@@ -237,7 +244,8 @@ export default {
         evt.target &&
         !dialogContainsTarget &&
         !evt.target.classList.contains('contact-menu-item') &&
-        !evt.target.classList.contains('move-item')
+        !evt.target.classList.contains('move-item') &&
+        !evt.target.dataset.action?.includes('move-item')
       ) {
         this.closeMoveDialog()
         document.body.removeEventListener('click', this.handleClick)
@@ -260,6 +268,9 @@ export default {
   },
 
   mounted () {
+    if (this.folders?.length === 0) {
+      this.reloadFolders()
+    }
     this.loadDirectories()
   },
 

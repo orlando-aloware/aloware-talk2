@@ -10,6 +10,7 @@ const Contacts = () => import('src/pages/contacts/Contacts.vue')
 const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
 const ContactsAddView = () => import('src/pages/contacts/ContactsAddView.vue')
 const Dialer = () => import('pages/widgets/Dialer.vue')
+const Lists = () => import('pages/lists/Lists.vue')
 const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
 const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
@@ -245,6 +246,15 @@ const routes = [
         component: Contacts,
         meta: {
           title: 'Contact'
+        }
+      },
+      {
+        path: 'lists',
+        name: 'Lists',
+        component: Lists,
+        meta: {
+          title: 'Lists Management Utility',
+          id: 'lists'
         }
       },
       {
