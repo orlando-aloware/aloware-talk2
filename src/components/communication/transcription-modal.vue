@@ -751,7 +751,9 @@ export default {
       // Fetch communication recording url.
       let options = {
         params: {
-          type: this.UploadedFileTypes.TYPE_CALL_RECORDING
+          type: this.communication.voicemail_is_migrated && this.communication.voicemail_url
+            ? this.UploadedFileTypes.TYPE_CALL_VOICEMAIL
+            : this.UploadedFileTypes.TYPE_CALL_RECORDING
         }
       }
 
