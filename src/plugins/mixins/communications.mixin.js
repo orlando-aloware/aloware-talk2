@@ -40,7 +40,9 @@ export default {
       'communications',
       'channelChangedFilterFields',
       'selectedFilter',
-      'isFilterDialogForView'
+      'isFilterDialogForView',
+      'paginationPage',
+      'isLoadingMore'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -121,7 +123,6 @@ export default {
         sort: 'last_engagement_at',
         order: 'desc'
       },
-      isLoadingMore: false,
       isLoaded: false,
       taskListHasError: false,
       page: 1,
@@ -132,7 +133,6 @@ export default {
       source: null,
       cancelTokenPinnedViews: null,
       sourcePinnedViews: null,
-      paginationPage: 1,
 
       perPageOptions: [
         { value: 25, label: '25 Per Page' },
@@ -207,7 +207,9 @@ export default {
       'setCommunications',
       'appendCommunications',
       'setCommunicationsCount',
-      'setHasMoreCommunications'
+      'setHasMoreCommunications',
+      'setPaginationPage',
+      'setIsLoadingMore'
     ]),
 
     getNoneLiveCallContactTasks (contacts) {
@@ -284,7 +286,7 @@ export default {
             this.setPendingTaskCount(response.data.data.length)
             this.setInboxPendingTaskCount(response.data.data.length)
           }
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
           this.isLoaded = true
           this.setIsInboxFiltersLoaded(this.isLoaded)
         })
@@ -308,7 +310,7 @@ export default {
 
     loadMoreContactTasks () {
       this.isLoaded = false
-      this.isLoadingMore = true
+      this.setIsLoadingMore(true)
 
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
@@ -316,7 +318,7 @@ export default {
           this.setContactsCurrentPage(response.data.current_page)
           this.setHasMoreContacts(response.data.next_page_url)
 
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
           this.isLoaded = true
         })
         .catch(() => {
@@ -786,7 +788,7 @@ export default {
     resetCommunications () {
       this.setCommunications([])
       this.setCommunicationsCount(0)
-      this.paginationPage = 1
+      this.setPaginationPage(1)
       this.setHasMoreCommunications(null)
     },
 
@@ -809,11 +811,14 @@ export default {
     getCommunications (filters, callback, isLoadMore = false) {
       this.setIsLoadingCommunications(true)
 
+      let pageToGet
+
       if (!isLoadMore) {
-        this.paginationPage = 1
+        pageToGet = 1
         this.setCommunications([])
       } else {
-        this.isLoadingMore = true
+        pageToGet = this.paginationPage + 1
+        this.setIsLoadingMore(true)
       }
 
       let params = {
@@ -888,13 +893,13 @@ export default {
         params = { ...params, order_by: this.sorting.order }
       }
 
-      params.page = this.paginationPage
+      params.page = pageToGet
       params.per_page = this.perPage
       params = this.removeUnnecessaryParameters(params)
 
       this.source = this.cancelToken.source()
 
-      if (this.paginationPage === 1) {
+      if (pageToGet === 1) {
         this.getCommunicationsCount(params)
       }
 
@@ -923,7 +928,7 @@ export default {
             this.pagination = _.clone(response.data)
             this.pagination.rowsNumber = this.communicationsCount
             delete this.pagination.data
-            this.paginationPage = this.pagination.current_page
+            this.setPaginationPage(this.pagination.current_page)
 
             if (typeof callback !== 'undefined') {
               callback()
@@ -944,7 +949,7 @@ export default {
         })
         .finally(() => {
           this.setIsLoadingCommunications(false)
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
         })
     },
 

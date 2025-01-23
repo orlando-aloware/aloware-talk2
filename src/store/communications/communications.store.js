@@ -88,6 +88,8 @@ export default function () {
     isLoadingPendingTaskCount: false,
     isLoadingCommunications: false,
     isLoadingCommunicationsCount: false,
+    isLoadingMore: false,
+    paginationPage: 1,
     inboxShowMyContacts: false,
     inboxShowUnreads: false,
     isInboxFiltersLoaded: true,

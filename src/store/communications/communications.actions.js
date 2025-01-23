@@ -148,5 +148,11 @@ export default {
   },
   setInboxFilters: ({ commit }, filters) => {
     commit('SET_INBOX_FILTERS', filters)
+  },
+  setPaginationPage: ({ commit }, page = 1) => {
+    commit('SET_PAGINATION_PAGE', page)
+  },
+  setIsLoadingMore: ({ commit }, isLoading = false) => {
+    commit('SET_IS_LOADING_MORE', isLoading)
   }
 }
