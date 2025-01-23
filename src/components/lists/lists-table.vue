@@ -3,29 +3,56 @@
     <lists-folders-management />
 
     <div class="lists-container flex-grow-1 d-flex flex-column">
-
-      <h3 class="title pl-3"> {{ title  }} </h3>
-      <div class="count pl-3">
-        <div class="d-flex align-items-center"
-             v-if="!isPublic && !isLoading">
-          <div class="d-flex align-items-center title-path mb-2"
-               :key="folder.id"
-               v-for="(folder, index) in foldersPath">
-            <a href="#" @click="(ev) => selectFolder(folder.id, ev)">
-              <div class="title-breadcrumb d-flex align-items-center">
-                {{ folder.name == 'Root' ? 'Root Folder' : folder.name }}
+      <div class="d-flex justify-between items-start">
+        <div class="px-3">
+          <h3 class="title pl-3"> {{ title  }}</h3>
+          <div class="count pl-3">
+            <div class="d-flex align-items-center"
+                v-if="!isPublic && !isLoading">
+              <div class="d-flex align-items-center title-path mb-2"
+                  :key="folder.id"
+                  v-for="(folder, index) in foldersPath">
+                <a href="#" @click="(ev) => selectFolder(folder.id, ev)">
+                  <div class="title-breadcrumb d-flex align-items-center">
+                    {{ folder.name == 'Root' ? 'Root Folder' : folder.name }}
+                  </div>
+                </a>
+                <slash-icon class="title-slash d-flex align-items-center" v-if="(index + 1) < foldersPath.length"/>
               </div>
-            </a>
-            <slash-icon class="title-slash d-flex align-items-center" v-if="(index + 1) < foldersPath.length"/>
+            </div>
+
+            <strong v-if="!isLoading">{{ listsCount }} List(s)</strong>
+
+            <q-spinner-bars class="mr-1"
+                            color="primary"
+                            size="14px"
+                            v-else />
+        </div>
+        <div class="filters pl-3">
+          <div class="search">
+            <search-input class="width-260"
+                          data-testid="lists-search-input"
+                          limit-search-characters
+                          :search="search"
+                          :disabled="isLoadingDisabled"
+                          @search="onSearch" />
           </div>
         </div>
 
-        <strong v-if="!isLoading">{{ listsCount }} Lists</strong>
+      </div>
 
-        <q-spinner-bars class="mr-1"
-                        color="primary"
-                        size="14px"
-                        v-else />
+        <div class="d-flex justify-between">
+          <div class="setting pr-3 align-items-center">
+            <compact-btn variant="success"
+                         class="mr-2"
+                         data-testid="create-list-menu-item"
+                         @clicked="onCreateList($event)">
+              <plus-icon class="mr-1"
+                         color="white"/>
+              Add List
+            </compact-btn>
+          </div>
+        </div>
       </div>
 
       <q-table class="lists-table"
@@ -33,7 +60,7 @@
               virtual-scroll
               :data="listsData"
               :columns="fixedColumns"
-              :loading="isLoadingMore || isLoading"
+              :loading="isLoadingMore || isLoading || isListsLoading"
               :virtual-scroll-item-size="100"
               :virtual-scroll-sticky-size-start="100"
               :pagination="pagination"
@@ -45,7 +72,11 @@
                   :key="col.name"
                   v-for="col in props.cols">
               <div v-if="col.name === 'name'">
-                {{ props.row.name }}
+              <router-link class="d-flex align-items-center item contact-name"
+                                data-testid="lists-view-list-name-link"
+                                :to="`/contacts/list/${props.row.id}${props.row.show_in_public_folder ? '?type=public' : ''}`">
+                  {{ props.row.name }}
+              </router-link>
               </div>
               <div v-if="col.name === 'owner_name'">
                 {{ props.row.owner_name }}
@@ -83,7 +114,22 @@
               </div>
               <div v-else-if="col.name === 'actions'">
                 <div class="d-flex justify-content-center context-menu">
-                  <div class="operation-button mx-1">
+                  <div class="operation-button mx-1"
+                       v-if="!isPublic">
+                    <span class="cursor-pointer"
+                          data-testid="lists-edit-button"
+                          @click="onEditList(props.row)">
+                      <pencil-o-icon height="16"
+                                  width="16"
+                                  color="#62666E"/>
+                      <q-tooltip>
+                        Edit this List
+                      </q-tooltip>
+                    </span>
+                  </div>
+
+                  <div class="operation-button mx-1"
+                       v-if="!isPublic">
                     <span class="cursor-pointer"
                           data-testid="lists-rename-button"
                           @click="onRenameList(props.row)">
@@ -96,7 +142,8 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1">
+                  <div class="operation-button mx-1"
+                       v-if="!isPublic">
                     <span class="cursor-pointer"
                           data-testid="lists-duplicate-button"
                           @click="onDuplicateList(props.row)">
@@ -110,7 +157,8 @@
                   </div>
 
                   <div class="operation-button mx-1"
-                      :data-popper-target="'list-' + props.row.id">
+                      :data-popper-target="'list-' + props.row.id"
+                      v-if="!isPublic">
                     <span class="cursor-pointer"
                           data-testid="lists-move-button"
                           data-action="move-item"
@@ -124,7 +172,8 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1">
+                  <div class="operation-button mx-1"
+                       v-if="!isPublic">
                     <span class="cursor-pointer"
                           data-testid="lists-pin-button"
                           @click="onPinList(props.row)">
@@ -156,7 +205,8 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1">
+                  <div class="operation-button mx-1"
+                       v-if="!isPublic">
                     <span class="cursor-pointer"
                           data-testid="lists-enroll-sequence-button"
                           @click="onEnrollContactsToSequence(props.row)">
@@ -169,7 +219,8 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1">
+                  <div class="operation-button mx-1"
+                       v-if="!isPublic">
                     <span class="cursor-pointer"
                           data-testid="lists-add-power-dialer-button"
                           @click="onAddListToPowerDialer(props.row)">
@@ -182,7 +233,8 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1">
+                  <div class="operation-button mx-1"
+                       v-if="!isPublic">
                     <span class="cursor-pointer"
                           data-testid="lists-delete-button"
                           @click="onDeleteList(props.row)">
@@ -195,7 +247,8 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1">
+                  <div class="operation-button mx-1"
+                       v-if="!isPublic">
                     <span class="cursor-pointer"
                           data-testid="lists-duplicate-button"
                           @click="openAssignContacts(props.row)">
@@ -255,28 +308,33 @@
                               :is-manual-selection="addToPowerDialerIsManualSelection"
                               v-if="openPDModal"
                               @hidden="openPDModal = false">
-        </power-dialer-add-modal>
+      </power-dialer-add-modal>
 
-        <assign-contacts-modal :is-show="showAssignContacts"
-                              :list="list"
-                              @closeAssignContactsModal="closeAssignContacts" />
+      <assign-contacts-modal :is-show="showAssignContacts"
+                            :list="list"
+                            @closeAssignContactsModal="closeAssignContacts" />
 
-        <move-dialog :user-id="userId"/>
+      <move-dialog :user-id="userId"/>
+
+      <create-list-modal :user-id="userId" />
     </div>
-
   </div>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import SearchInput from 'src/components/search-input'
 import ListsRenameForm from 'src/components/lists/lists-rename-form'
 import ConvertListToPublicDialog from 'components/convert-list-to-public-dialog'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import AssignContactsModal from 'src/components/assign-contacts-modal'
 import MoveDialog from 'src/components/move-dialog'
+import CreateListModal from 'components/create-list-modal.vue'
+import CompactBtn from 'src/components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
+import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
 import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
@@ -286,10 +344,11 @@ import AddCallIcon from 'components/icons/add-call-icon.vue'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
+import PlusIcon from 'components/icons/plus-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
-import { aclMixin, dataTableMixin } from 'src/plugins/mixins'
+import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
 import ListsFoldersManagement from './lists-folders-management'
 import SlashIcon from 'components/icons/slash-icon'
 
@@ -298,7 +357,8 @@ export default {
 
   mixins: [
     aclMixin,
-    dataTableMixin
+    dataTableMixin,
+    mainViewMixin
   ],
 
   components: {
@@ -310,21 +370,28 @@ export default {
     EyeOffIcon,
     MoveIcon,
     PencilIcon,
+    PencilOIcon,
     PinIcon,
     TrashIcon,
+    PlusIcon,
+    SearchInput,
     AssignContactsModal,
     ConvertListToPublicDialog,
     ListsRenameForm,
     MoveDialog,
+    CreateListModal,
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
     RelativeTime,
     ListsFoldersManagement,
-    SlashIcon
+    SlashIcon,
+    CompactBtn
   },
 
   data () {
     return {
+      search: '',
+      isLoadingDisabled: false,
       isLoading: false,
       isLoadingMore: false,
       loading: false,
@@ -337,6 +404,7 @@ export default {
       },
       listsData: [],
       list: null,
+      isUnsavedListModalShown: false,
       isOpenListForm: false,
       convertToPublicDialog: false,
       pinnedLists: [],
@@ -346,7 +414,10 @@ export default {
       addToPowerDialerMode: 'add',
       addToPowerDialerIsManualSelection: false,
       COLUMNS,
-      foldersPath: []
+      foldersPath: [],
+
+      // Filters
+      showInPublicFolder: false
     }
   },
 
@@ -354,13 +425,17 @@ export default {
     ...mapGetters('contacts', [
       'pinned',
       'folders',
-      'moveDialog'
+      'moveDialog',
+      'isAllContactsSelected'
     ]),
     ...mapState(['users']),
     ...mapState('listsModule', [
       'isListsLoading'
     ]),
 
+    ...mapState('contacts', [
+      'unsavedList'
+    ]),
     ...mapGetters('listsModule', {
       lists: 'getLists',
       listsCount: 'getListsCount'
@@ -420,7 +495,9 @@ export default {
     ...mapActions('contacts', [
       'listPinToggled',
       'addPowerDialerOpen',
-      'openMoveDialog'
+      'openMoveDialog',
+      'createListOpen',
+      'setUnsavedList'
     ]),
 
     ...mapActions('listsModule', [
@@ -439,13 +516,36 @@ export default {
       this.listsData = this.lists
     },
 
+    calculateTotalPages () {
+      if (this.lists?.length === 0) {
+        this.pagination.totalPages = 1
+        return
+      }
+
+      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage)
+    },
+
+    getContactListType (contactList) {
+      switch (contactList.type) {
+        case ContactListTypes.STATIC:
+          return 'Static'
+        case ContactListTypes.DYNAMIC:
+          return 'Dynamic'
+        case ContactListTypes.DYNAMIC_REMOTE_LIST:
+          return 'Integration Dynamic'
+        default:
+          return 'Unknown'
+      }
+    },
+
     async getLists (isLoadMore = false) {
-      if (this.isLoading) return
+      if (this.isLoading) {
+        return
+      }
 
       this.setLoadingState(isLoadMore)
 
       const filters = {
-        // ...(state.search && { search: state.search }),
         ...(this.userId && { user_id: this.userId }),
         ...(this.folderId && { folder_id: this.folderId })
       }
@@ -483,35 +583,6 @@ export default {
     resetLoadingState () {
       this.isLoading = false
       this.isLoadingMore = false
-    },
-
-    async loadMoreLists (done) {
-      if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
-        if (typeof done === 'function') {
-          done()
-        }
-        return
-      }
-
-      this.pagination.currentPage += 1
-      await this.getLists(true)
-      this.listsData.push(...this.lists)
-
-      if (typeof done === 'function') {
-        done()
-      }
-    },
-
-    calculateTotalPages () {
-      this.pagination.totalPages = Math.ceil(this.listsCount / this.pagination.perPage) || 1
-    },
-
-    async refreshLists () {
-      this.listsData = []
-      this.SET_LISTS_COUNT(0)
-      await this.getLists()
-      this.calculateTotalPages()
-      this.listsData = this.lists
     },
 
     removeList (list) {
@@ -585,6 +656,15 @@ export default {
         console.error(error)
         this.$generalNotification(message, 'error')
       }
+    },
+
+    async refreshLists () {
+      this.listsData = []
+      this.SET_LISTS_COUNT(0)
+      await this.getLists()
+      this.calculateTotalPages()
+      this.pagination.currentPage = 1
+      this.listsData = this.lists
     },
 
     onDeleteList (list) {
@@ -679,16 +759,66 @@ export default {
       this.$router.replace({ query }).catch(() => {})
     },
 
-    getContactListType (contactList) {
-      switch (contactList.type) {
-        case ContactListTypes.STATIC:
-          return 'Static'
-        case ContactListTypes.DYNAMIC:
-          return 'Dynamic'
-        case ContactListTypes.DYNAMIC_REMOTE_LIST:
-          return 'Integration Dynamic'
-        default:
-          return 'Unknown'
+    async onSearch (value) {
+      this.SET_SEARCH(value)
+      this.search = value
+      await this.refreshLists()
+    },
+
+    onEditList (list) {
+      this.list = list
+      this.$router.push(`/contacts/list/${this.list.id}${this.list.show_in_public_folder ? '?type=public' : ''}`)
+    },
+
+    async loadMoreLists (done) {
+      if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
+        if (typeof done === 'function') {
+          done()
+        }
+        return
+      }
+
+      this.pagination.currentPage += 1
+      await this.getLists(true)
+      this.listsData.push(...this.lists)
+
+      if (typeof done === 'function') {
+        done()
+      }
+    },
+
+    onCreateList (event) {
+      if (event) {
+        event.preventDefault()
+      }
+
+      this.showUnsavedListDialog(() => {
+        this.createListOpen({
+          contact_folder_id: null
+        })
+      })
+    },
+
+    showUnsavedListDialog (callback) {
+      if (this.unsavedList && !this.isUnsavedListModalShown) {
+        this.isUnsavedListModalShown = true
+        this.$bvModal.msgBoxConfirm('You have an unsaved contact list. This action may caused unsaved contact list data loss. Do you wish to continue?', {
+          buttonSize: 'sm',
+          okTitle: 'Yes',
+          cancelTitle: 'No',
+          centered: true
+        }).then(confirm => {
+          if (confirm) {
+            this.setUnsavedList(null)
+            callback()
+          }
+
+          this.isUnsavedListModalShown = false
+        })
+      }
+
+      if (!this.unsavedList) {
+        callback()
       }
     },
 
@@ -719,6 +849,12 @@ export default {
     selectFolder (folderId, event) {
       event.preventDefault()
       this.onFolderSelected({ id: folderId })
+    },
+
+    refreshFoldersPath () {
+      if (this.folders?.length) {
+        this.foldersPath = this.generatefoldersPath(this.folders[0])
+      }
     }
   },
 
@@ -735,11 +871,10 @@ export default {
   watch: {
     '$route.query': function () {
       this.refreshLists()
+      this.refreshFoldersPath()
     },
     folders () {
-      if (this.folders?.length) {
-        this.foldersPath = this.generatefoldersPath(this.folders[0])
-      }
+      this.refreshFoldersPath()
     }
   }
 }

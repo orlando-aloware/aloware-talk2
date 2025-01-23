@@ -9,7 +9,7 @@
       <q-item-section>
         <div class="folders__header d-flex align-items-center list--header pb-0">
           <div class="header__header__title font-weight-bold flex-grow-1">
-            <span v-if="isContactModuleType">My Lists</span>
+            <span v-if="isContactModuleType">{{ userId ? 'User' : 'My' }} Lists</span>
             <span v-else class="px-3">Power Dialer Lists</span>
             <button class="btn btn-link btn-sm tooltip-target mr-1"
                     :id="folderId"
@@ -121,6 +121,7 @@
         <tree-folder-create :layer="0"
                             :parent_id="null"
                             :endpoint="foldersEndpoint"
+                            :user-id="userId"
                             v-if="isCreatingFolder"
                             data-testid="contacts-create-folder-toggle"
                             @blur="onCreateFolderToggle($event)"
@@ -138,6 +139,7 @@
                          :folders="folder.child_folders"
                          :lists="folder.lists"
                          :layer="0"
+                         :user-id="userId"
                          data-testid="create-tree-folder-component"
                          v-if="folder.id !== removedFolder"/>
           </template>
@@ -153,6 +155,7 @@
                        :lists="folders[0].lists"
                        :layer="0"
                        :parent_id="null"
+                       :user-id="userId"
                        v-if="folders[0].id !== removedFolder"
                        data-testid="create-tree-folder-toggle"
                        @blur="onCreateFolderToggle($event)"
@@ -161,7 +164,7 @@
         <div class="item-empty"
              v-if="isFolderEmpty && !isLoading">
           <span class="fs-12 text-muted" data-testid="my-lists-without-contacts">
-            You don't have any {{ isContactModuleType ? 'contact' : 'power dialer' }} list
+            {{ userId ? 'This user doesn\'t' : 'You don\'t' }} have any {{ isContactModuleType ? 'contact' : 'power dialer' }} list
           </span>
         </div>
         <contacts-sidebar-loader v-if="isLoading"/>
@@ -191,6 +194,9 @@ export default {
     isContactModuleType: {
       type: Boolean,
       default: true
+    },
+    userId: {
+      type: Number
     }
   },
   mixins: [pdList, aclMixin],
@@ -236,7 +242,7 @@ export default {
       return this.rootFolder?.id
     },
     isContacts () {
-      return this.$route.name === 'Contacts' && this.isContactModuleType
+      return this.isContactModuleType
     },
     folderId () {
       return this.isContacts ? 'bs-folder-options' : 'pd-folder-options'
@@ -365,10 +371,15 @@ export default {
       this.isCreatingFolder = false
     },
     async loadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
       this.isLoading = true
       this.setMyListsLoaded(false)
       await this.$axios
-        .get(this.foldersEndpoint)
+        .get(this.foldersEndpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((err) => {
@@ -407,6 +418,10 @@ export default {
       if (val === this.routePath) {
         this.initResources()
       }
+    },
+
+    userId () {
+      this.initResources()
     }
   },
   beforeDestroy () {

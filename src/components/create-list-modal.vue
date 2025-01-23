@@ -256,6 +256,9 @@ export default {
     isDefault: {
       type: Boolean,
       default: true
+    },
+    userId: {
+      type: Number
     }
   },
 
@@ -654,8 +657,13 @@ export default {
     },
 
     loadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
       this.$axios
-        .get(this.foldersEndpoint)
+        .get(this.foldersEndpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

@@ -9,8 +9,19 @@
         <q-item-section>
           <div class="folders__header d-flex align-items-center list--header pb-0">
             <div class="header__header__title font-weight-bold flex-grow-1">
-              <span v-if="isContactModuleType">{{ title }}</span>
-              <span v-else class="px-3">Power Dialer Lists</span>
+              <span>{{ title }}</span>
+              <button class="btn btn-link btn-sm tooltip-target position-relative"
+                      :id="folderId"
+                      :ref="folderId"
+                      @click="onCreateFolderToggle">
+                <plus-icon color="#256EFF"
+                           width="14"
+                           height="14"
+                           firstD="M7 1.5V12.5"
+                           secondD="M12.5 7H1.5"
+                           data-testid="contacts-folder-plus-icon"
+                           strokeWidth="1.5"/>
+              </button>
             </div>
           </div>
         </q-item-section>
@@ -37,7 +48,7 @@
                            :hasDelete="folders[0].has_delete"
                            :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
                            :folders="folder.child_folders"
-                           :lists="[]"
+                           :lists="folder.lists"
                            :layer="0"
                            :user-id="userId"
                            data-testid="create-tree-folder-component"
@@ -52,7 +63,7 @@
                          :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
                          :isRootList="true"
                          :folders="[]"
-                         :lists="[]"
+                         :lists="folders[0].lists"
                          :layer="0"
                          :parent_id="null"
                          :user-id="userId"
@@ -80,6 +91,7 @@ import TreeFolderCreate from 'components/tree/tree-folder-create.vue'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
 import aclMixin from 'src/plugins/mixins/acl.mixin'
 import { createPopper } from '@popperjs/core'
+import PlusIcon from 'components/icons/plus-icon.vue'
 
 export default {
   props: {
@@ -95,7 +107,8 @@ export default {
   components: {
     ContactsSidebarLoader,
     TreeFolder,
-    TreeFolderCreate
+    TreeFolderCreate,
+    PlusIcon
   },
   computed: {
     ...mapState('contacts', [
