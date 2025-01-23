@@ -15920,6 +15920,15 @@ hr {
   }
 }
 
+/* Gradient text effect for inbox */
+.inbox-effect-gradient-text {
+  cursor: pointer;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+  background-image: linear-gradient(135deg, #B29477 0%, #8C6A5D 50%, #5A423A 100%) !important;
+}
+
 .q-message-text-content {
   line-height: 1.5;
   font-size: 13px;
@@ -16401,8 +16410,4 @@ hr {
     top: 60px;
     height: calc(100vh - 60px)
   }
-}
-
-.text-new {
-  color: #a855f7;
 }

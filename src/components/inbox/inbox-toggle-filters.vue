@@ -23,17 +23,17 @@
           <q-tooltip content-class="bg-grey-10 text-white"
                     anchor="bottom left"
                     self="top middle">
-            Toggle New Inbox ⚡ (beta) Experience
+                    <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />Toggle New Inbox
           </q-tooltip>
         </b-form-checkbox>
-        <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-              :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled, 'text-new': !newInboxEnabled }]"
+        <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14 inbox-effect-gradient-text"
+              :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled }]"
               data-testid="inbox-new-experience-label">
           <template v-if="newInboxEnabled">
-            New inbox ⚡ (beta) enabled
+            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />New Inbox enabled
           </template>
           <template v-else>
-            Enable new inbox ⚡ (beta)
+            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />Enable New Inbox
           </template>
         </label>
       </div>
@@ -45,8 +45,7 @@
                        data-testid="inbox-my-contacts-filter-form-checkbox"
                        :class="toggleFiltersClass"
                        :disabled="toggleFiltersEnabled"
-                       v-model="inboxShowMyContactsFilter"
-                       v-if="!isNewInboxEnabled">
+                       v-model="inboxShowMyContactsFilter">
         <q-tooltip content-class="bg-grey-10 text-white"
                    anchor="bottom left"
                    self="top middle">
@@ -56,8 +55,7 @@
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
             :class="toggleFiltersClass"
             data-testid="inbox-my-contacts-filter-my-contacts-label"
-            @click="myContactsFilterChange"
-            v-if="!isNewInboxEnabled">
+            @click="myContactsFilterChange">
         <span class="label-my-contacts"
               :class="{ hidden: $q.screen.width < 390 }"
               v-if="$q.screen.width > 300">
@@ -73,8 +71,7 @@
                          data-testid="inbox-unreads-filter-form-checkbox"
                          :class="toggleFiltersClass"
                          :disabled="toggleFiltersEnabled"
-                         v-model="inboxShowUnreadsFilter"
-                         v-if="!isNewInboxEnabled">
+                         v-model="inboxShowUnreadsFilter">
           <q-tooltip content-class="bg-grey-10 text-white"
                      anchor="bottom left"
                      self="top middle">
@@ -84,8 +81,7 @@
         <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
                :class="toggleFiltersClass"
                data-testid="inbox-unreads-filter-my-contacts-label"
-               @click="unreadsFilterChange"
-               v-if="!isNewInboxEnabled">
+               @click="unreadsFilterChange">
           <span class="label-my-contacts"
                 :class="{ hidden: $q.screen.width < EXTRA_SMALL_MOBILE_WIDTH }"
                 v-if="$q.screen.width > 300">
@@ -104,6 +100,7 @@ import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
 import { INBOXES_MENU_TITLE } from 'src/router/routes'
+import ZapBoldIcon from 'components/icons/inbox/zap-bold-icon'
 
 const COOKIE_NEW_INBOX = 'new_inbox_enabled'
 const COOKIE_EXPIRES = 3650
@@ -117,7 +114,8 @@ export default {
 
   components: {
     CompactBtn,
-    RefreshIcon
+    RefreshIcon,
+    ZapBoldIcon
   },
 
   props: {
