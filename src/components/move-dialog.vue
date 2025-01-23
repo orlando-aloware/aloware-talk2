@@ -51,6 +51,9 @@ export default {
     isContactModuleType: {
       type: Boolean,
       default: true
+    },
+    userId: {
+      type: Number
     }
   },
 
@@ -142,8 +145,12 @@ export default {
       this.$generalNotification(message, 'error')
     },
     reloadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
       return this.$axios
-        .get(this.fetchFoldersEndpoint)
+        .get(this.fetchFoldersEndpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

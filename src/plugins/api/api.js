@@ -791,8 +791,8 @@ export default {
     },
 
     contactFolders: {
-      list () {
-        return window.axios.get(`${suffixV2}contact-folders`)
+      list (params) {
+        return window.axios.get(`${suffixV2}contact-folders`, { params })
       },
 
       delete (id) {

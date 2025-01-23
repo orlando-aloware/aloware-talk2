@@ -1,38 +1,63 @@
 <template>
   <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar">
-    <div
-      class="mycard d-flex flex-column h-100 border-0 no-border-radius contacts-sidebar-card"
-    >
-      <div class="p-2">
-        <p>User</p>
-        <user-selector
-          clearable
-          :generic-styling="false"
-          v-model="userId"
-          @change="setUserId"
-        />
-      </div>
+    <div class="mycard d-flex flex-column h-100 border-0 no-border-radius contacts-sidebar-card">
+      <nav-item badge-value="20"
+                badge-color="danger"
+                data-testid="inbox-nav-list-nav-item"
+                label="Public Lists"
+                value="public"
+                class="mt-2"
+                :is-active="isPublicLists"
+                :closed="false"
+                :badge="true"
+                :open-count="1"
+                :pending-count="2"
+                :disabled="false"
+                @click="togglePublicLists(true)" />
+      <nav-item badge-value="20"
+                badge-color="danger"
+                data-testid="inbox-nav-list-nav-item"
+                value="private"
+                class="mt-2"
+                :label="privateListsLabel"
+                :is-active="!isPublicLists"
+                :closed="false"
+                :badge="true"
+                :open-count="1"
+                :pending-count="2"
+                :disabled="false"
+                @click="togglePublicLists(false)" />
 
-      <div class="item-empty" v-if="!this.userId">
-        <span class="fs-12 text-muted px-2">
-          Please select a user to view folders
-        </span>
-      </div>
-      <contacts-folders
-        :is-contact-module-type="isContactModuleType"
-        :user-id="userId"
-        v-else
-      />
+      <div class="mt-2 pt-2 border-top"
+           v-if="!isPublicLists">
+        <div class="p-2"
+             v-if="isAdmin">
+          <p class="text-muted custom-input-label mb-0">User</p>
+          <user-selector :generic-styling="false"
+                         v-model="userId"
+                         @change="setUserId" />
+        </div>
 
-      <contacts-sidebar-loader v-if="isLoading" />
+        <lists-folders :is-contact-module-type="isContactModuleType"
+                       :user-id="userId" />
+
+        <contacts-sidebar-loader v-if="isLoading" />
+
+        <remove-folder-dialog :user-id="userId"
+                              v-if="isAdmin"/>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import UserSelector from 'components/generic-selectors/user-selector.vue'
+import { mapState } from 'vuex'
+import UserSelector from 'components/generic-selectors/user-selector'
 import ContactsSidebarLoader from 'components/contacts/contacts-sidebar-loader'
-import ContactsFolders from 'components/contacts/contacts-folders.vue'
+import ListsFolders from 'components/lists/lists-folders/lists-folders'
+import NavItem from 'components/lists/lists-nav-item'
+import RemoveFolderDialog from 'components/remove-folder.vue'
+import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'lists-folders-management',
@@ -40,7 +65,9 @@ export default {
   components: {
     UserSelector,
     ContactsSidebarLoader,
-    ContactsFolders
+    ListsFolders,
+    NavItem,
+    RemoveFolderDialog
   },
 
   props: {
@@ -50,15 +77,33 @@ export default {
     }
   },
 
+  mixins: [
+    aclMixin
+  ],
+
   computed: {
+    ...mapState('auth', ['profile']),
+
+    ...mapState('contacts', [
+      'folders'
+    ]),
+
+    userId () {
+      if (this.$route.query.user_id && this.isAdmin) {
+        return +this.$route.query.user_id
+      }
+
+      return this.profile.id
+    },
+
     foldersEndpoint () {
       return this.isContactModuleType
         ? '/api/v2/contact-folders'
         : '/api/v2/power-dialer-folders'
     },
 
-    hasShowInPublicFolderPermission () {
-      return true
+    privateListsLabel () {
+      return this.isAdmin ? 'Private Lists' : 'My Lists'
     },
 
     isFolderEmpty () {
@@ -70,72 +115,56 @@ export default {
 
     foldersLength () {
       return this.folders?.length
+    },
+
+    isPublicLists () {
+      return this.$route.query.publicLists === '1'
     }
   },
 
   data () {
     return {
       isLoading: false,
-      userId: null,
-      folders: [],
       removedFolder: null,
       isCreatingFolder: false
     }
   },
 
-  mounted () {
-    if (this.$route.query.user_id) {
-      this.userId = +this.$route.query.user_id
-    }
-  },
-
   methods: {
     setUserId (userId) {
-      this.userId = userId
-
-      if (userId) {
-        this.updateQueryParam('user_id', userId)
-      } else {
-        this.removeQueryParam('user_id')
-      }
+      this.updateQueryParam('user_id', userId, true)
     },
 
-    updateQueryParam (key, value) {
+    updateQueryParam (key, value, removeOthers = false) {
+      if (removeOthers) {
+        const query = {
+          [key]: value
+        }
+        this.$router.replace({ query })
+        return
+      }
+
       const query = Object.assign({}, this.$route.query)
       query[key] = value
-      this.$router.push({ query })
+      this.$router.replace({ query })
     },
 
     removeQueryParam (key) {
       const query = Object.assign({}, this.$route.query)
       delete query[key]
-
       this.$router.replace({ query })
-    },
-
-    loadFolders () {
-      this.isLoading = true
-      this.$axios
-        .get(`${this.foldersEndpoint}?user_id=${this.userId}`)
-        .then((response) => {
-          this.folders = response.data
-        })
-        .catch((err) => {
-          this.folders = []
-          console.error(err)
-          this.$generalNotification(
-            'Unable to load folders please try again.',
-            'error'
-          )
-          this.isLoading = false
-        })
-        .finally(() => {
-          this.isLoading = false
-        })
     },
 
     onCreateFolderCancel () {
       //
+    },
+
+    togglePublicLists (enabled) {
+      if (enabled) {
+        this.updateQueryParam('publicLists', 1, true)
+      } else {
+        this.removeQueryParam('publicLists')
+      }
     }
   }
 }

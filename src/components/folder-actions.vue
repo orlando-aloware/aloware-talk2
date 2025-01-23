@@ -51,7 +51,7 @@
 
       <template v-if="isContactsRoute">
         <contact-menu-item
-          v-if="hasEdit"
+          v-if="hasEdit && hasCreateList"
           @click="$emit('createlist')">
           <template slot="icon">
             <people-icon color="#62666E"></people-icon>
@@ -155,6 +155,10 @@ export default {
     id: {
       type: Number
     },
+    hasCreateList: {
+      type: Boolean,
+      default: true
+    },
     hasEdit: {
       type: Number
     },
@@ -174,7 +178,7 @@ export default {
       'folders'
     ]),
     isContactsRoute () {
-      return this.$route.meta.title === 'Contacts'
+      return this.$route.meta.title === 'Contacts' || this.$route.meta.title === 'Lists Management Utility'
     },
     foldersEndpoint () {
       return this.isContactsRoute ? '/api/v2/contact-folders' : '/api/v2/power-dialer-folders'

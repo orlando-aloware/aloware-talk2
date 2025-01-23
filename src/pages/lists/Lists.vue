@@ -1,6 +1,5 @@
 <template>
-  <lists-table :title="'Lists'"
-               v-if="isDemoCompany"/>
+  <lists-table v-if="isDemoCompany"/>
 </template>
 
 <script>
