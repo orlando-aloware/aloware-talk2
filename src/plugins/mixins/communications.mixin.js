@@ -949,6 +949,8 @@ export default {
     },
 
     getCommunicationsCount (params) {
+      // TODO: remove this after the new inbox is implemented and all the communication-related calls from talk2 are not "special" requests
+      params.source = 'communication-logs'
       if (this.countSource) {
         this.countSource.cancel('Fetching communications count operation is canceled by the user.')
       }
