@@ -59,7 +59,9 @@ export default {
     return {
       loading: false,
       currentPage: 0,
-      selectedInboxId: null
+      selectedInboxId: null,
+      perPage: 50,
+      hasMorePages: true
     }
   },
 
@@ -76,22 +78,29 @@ export default {
     ...mapActions('inbox', ['setInboxesFirstPage']),
 
     async loadMoreInboxes () {
-      if (this.loading) return
+      if (this.loading || !this.hasMorePages) return
 
       this.loading = true
       try {
         const nextPage = this.currentPage + 1
         const response = await talk2Api.V2.inbox.inboxes.get({
-          page: nextPage
+          page: nextPage,
+          per_page: this.perPage
         })
 
-        if (response.data.data.length) {
+        const newInboxes = response.data.data
+
+        if (newInboxes.length) {
           if (nextPage === 1) {
-            this.setInboxesFirstPage(response.data.data)
+            this.setInboxesFirstPage(newInboxes)
           } else {
-            this.setInboxesFirstPage([...this.inboxes, ...response.data.data])
+            this.setInboxesFirstPage([...this.inboxes, ...newInboxes])
           }
           this.currentPage = nextPage
+
+          this.hasMorePages = newInboxes.length === this.perPage
+        } else {
+          this.hasMorePages = false
         }
       } catch (error) {
         console.error('Error loading inboxes:', error)
@@ -105,7 +114,7 @@ export default {
       const isNearBottom =
         verticalPosition + verticalContainerSize + bottomThreshold >= verticalSize
 
-      if (isNearBottom && !this.loading) {
+      if (isNearBottom && !this.loading && this.hasMorePages) {
         this.loadMoreInboxes()
       }
     },
@@ -117,7 +126,12 @@ export default {
   },
 
   async created () {
-    await this.loadMoreInboxes()
+    if (!this.inboxes.length) {
+      await this.loadMoreInboxes()
+    } else {
+      this.currentPage = 1
+      this.hasMorePages = this.inboxes.length === this.perPage
+    }
   }
 }
 </script>
