@@ -3,7 +3,7 @@ import { ANY_COMMUNICATION_TYPE, CALL_TYPE, SMS_TYPE } from 'src/constants/commu
 import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 const DEFAULT_CHANNEL = {
-  label: 'Communications Logs',
+  label: 'Communication Logs',
   value: DEFAULT_COMMUNICATIONS_CHANNEL,
   icon: 'all-communications',
   type: ANY_COMMUNICATION_TYPE,
