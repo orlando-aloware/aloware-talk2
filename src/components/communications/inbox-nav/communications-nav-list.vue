@@ -1,9 +1,10 @@
 <template>
-  <div class="inbox-nav-list h-100 overflow-x-hidden"
+  <div class="inbox-nav-list d-flex flex-column overflow-x-auto mb-1"
        data-testid="inbox-nav-list-wrapper"
        :class="{'inbox-nav-list--closed': closed}"
        id="communications-nav-list"
   >
+    <!--   -->
     <nav-item badge-value="20"
               badge-color="danger"
               data-testid="inbox-nav-list-nav-item"
@@ -22,10 +23,10 @@
               :key="item.name"
               @click="onItemClicked" />
 
-    <hr>
+    <hr class="nav-item-separator">
 
     <!-- filters -->
-    <saved-filters class="px-2 left-column-wrapper"
+    <saved-filters class="px-2 left-column-wrapper "
                    :fetch-filters="fetchSavedFilters"
                    :filter-type="filterTypeForGetSavedFilters"
                    @filters-fetched="()=> fetchSavedFilters = false"

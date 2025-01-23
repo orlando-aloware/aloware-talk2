@@ -22,6 +22,7 @@ pipeline {
         DEVELOP_SAFE_JOB_NAME = "${JOB_NAME.split('/')[0]}-develop"
         DEVELOP_CACHE_FOLDER = "${HOME}/.jenkins-cache/${DEVELOP_SAFE_JOB_NAME}"
         TALK_URL = "${env.GIT_BRANCH.toLowerCase().contains('pr') ? "${env.GIT_BRANCH.toLowerCase()}.talk" : 'talk'}.${DEV_DOMAIN}"
+        TALK2_URL = "talk2.${DEV_DOMAIN}"
 
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
@@ -87,12 +88,12 @@ pipeline {
                                         sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
                                     }
 
-                                    // If the API_URL_OVERWRITE is set, we will replace the API_URL in the .env file
+                                    // If the API_URL_OVERWRITE is set, we will replace the API_URL and API_REPORTING_URL in the .env file
                                     if (env.API_URL_OVERWRITE) {
                                         sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
+                                        sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env"
                                     }
 
-                                // println "${text}"
                                 }
                             }
                         }
@@ -163,7 +164,52 @@ pipeline {
                                         sh "terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
                                     }
 
-                                    sh "yarn upload-s3"
+                                    sh "yarn upload-s3-dev1"
+                                }
+                            }
+                        }
+
+                        // Start build talk2 pointing to app2.alodev.org if is the develop branch
+
+                        stage('Build Talk2 Assets for Dev2') {
+                            when { branch 'develop' }
+                            steps {
+                                // Set the API_URL to https://app2.alodev.org
+                                sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
+                                // Set the API_REPORTING_URL to https://app2.alodev.org
+                                sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=https://app2.alodev.org|' .env"
+
+                                nvm("${NODE_VERSION}") {
+                                    sh 'quasar build --debug'
+                                }
+                            }
+                        }
+
+                        stage('Deploy Talk2 for Dev2') {
+                            when { branch 'develop' }
+                            steps {
+                                script {
+                                    def workspaceName = 'talk2'
+                                    def subDomain = 'talk2'
+
+                                    dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
+                                        sh '''
+                                        terraform init; \
+                                        terraform validate; \
+                                        terraform fmt
+                                    '''
+
+                                      try {
+                                            sh "terraform workspace new ${workspaceName}"
+                                      } catch (Exception e) {
+                                            echo 'The workspace already exists, running TF Commands...'
+                                            sh "terraform workspace select ${workspaceName}"
+                                        }
+
+                                      sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                                    }
+
+                                    sh "yarn upload-s3-dev2"
                                 }
                             }
                         }

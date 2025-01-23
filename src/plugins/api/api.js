@@ -183,6 +183,10 @@ export default {
         return window.axios.post(`${suffixV1}contact/${id}/sync-guesty`)
       },
 
+      syncZoho (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-zoho`)
+      },
+
       syncPipedrive (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-pipedrive`)
       },
@@ -498,6 +502,14 @@ export default {
 
       reportIssue (id, data) {
         return window.axios.post(`${suffixV1}communications/${id}/report-issue`, data)
+      },
+
+      askQuestion (communicationId, params) {
+        if (!communicationId) {
+          return null
+        }
+
+        return window.axios.get(`${suffixV1}communication/${communicationId}/transcription/ask`, params)
       }
     },
 
@@ -896,6 +908,7 @@ export default {
       }
 
     },
+
     contactList: {
       get (params) {
         return window.axios.get(`${suffixV2}contacts-list`, { params })

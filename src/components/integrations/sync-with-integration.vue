@@ -32,7 +32,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   simpsocialMixin
 } from 'src/plugins/mixins'
-import { GUESTY_INTEGRATION, SALESFORCE_INTEGRATION } from 'src/constants/integrations'
+import { GUESTY_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'sync-with-integration',
@@ -75,6 +75,9 @@ export default {
           break
         case GUESTY_INTEGRATION:
           apiCall = talk2Api.V1.contact.syncGuesty(this.contact_id)
+          break
+        case ZOHO_INTEGRATION:
+          apiCall = talk2Api.V1.contact.syncZoho(this.contact_id)
           break
         default:
           this.isSyncing = false

@@ -37,8 +37,8 @@ export const ALL_COLUMNS = [
     label: 'Start Time',
     name: 'created_at',
     align: 'left',
-    headerStyle: 'min-width: 150px',
-    columnStyle: 'width: 150px'
+    headerStyle: 'min-width: 200px',
+    columnStyle: 'width: 200px'
   },
   {
     label: 'Talk Time',
@@ -64,13 +64,6 @@ export const ALL_COLUMNS = [
   {
     label: 'Duration',
     name: 'duration',
-    align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
-  },
-  {
-    label: 'Resolution',
-    name: 'resolution2',
     align: 'left',
     headerStyle: 'min-width: 100px',
     columnStyle: 'width: 100px'
@@ -204,8 +197,8 @@ export const DEFAULT_COLUMNS = [
     name: 'created_at',
     field: 'created_at',
     align: 'left',
-    headerStyle: 'min-width: 150px',
-    columnStyle: 'width: 150px'
+    headerStyle: 'min-width: 200px',
+    columnStyle: 'width: 200px'
   },
   {
     label: 'Talk Time',

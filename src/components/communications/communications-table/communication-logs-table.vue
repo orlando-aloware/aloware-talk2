@@ -63,7 +63,8 @@
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'incoming_number'">
               <incoming-number :value="col.value"
-                               :campaign-id="props.row.campaign_id"/>
+                               :campaign-id="props.row.campaign_id"
+                               @on-filter="onFilter"/>
             </div>
 
             <div :style="col.columnStyle"
@@ -99,7 +100,7 @@
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'user_id'">
               <user :value="col.value"
-                    :row="props.row"/>
+                    @on-filter="onFilter"/>
             </div>
 
             <div :style="col.columnStyle"
@@ -115,11 +116,6 @@
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'duration'">
               <duration :row="props.row" />
-            </div>
-
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'resolution2'">
-              <resolution :row="props.row" />
             </div>
 
             <div v-else-if="col.name === 'attempting_users'">
@@ -253,7 +249,6 @@ import Contact from './contact.vue'
 import User from './user.vue'
 import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
-import Resolution from './resolution.vue'
 import IncomingNumber from './incoming-number.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
@@ -300,7 +295,6 @@ export default {
     User,
     Broadcast,
     Workflow,
-    Resolution,
     IncomingNumber,
     AttemptingUsers,
     Transferred,
@@ -339,6 +333,10 @@ export default {
     sort (sorts) {
       // Handle sorting logic here
       this.getCommunications(this.communicationFilters)
+    },
+
+    onFilter (data) {
+      this.$VueEvent.fire('filter-communications', data)
     },
 
     onSearch (value) {

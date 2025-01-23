@@ -34,6 +34,7 @@
                    @onResetFilter="onResetFilters" />
 
     <create-filter-dialog :filter-model="newFilterModel"
+                          :disable-filter-type="!isAdmin"
                           data-testid="comms-channels-create-filter-dialog"
                           @created="afterCreatedNewFilter" />
   </div>
@@ -47,12 +48,13 @@ import FilterDialog from 'components/communications/communications-filters/filte
 import CreateFilterDialog from 'components/communications/communications-filters/create-filter-dialog'
 
 import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
-import { communicationsMixin } from 'src/plugins/mixins'
+import { aclMixin, communicationsMixin } from 'src/plugins/mixins'
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
 export default {
   name: 'CommunicationsFilters',
   mixins: [
+    aclMixin,
     communicationsMixin,
     communicationsDefaultFilterModelMixin
   //  visibilityMixin
@@ -138,6 +140,26 @@ export default {
   },
   mounted () {
     this.filter = _.clone(this.channelDefaultFilterModel.filter)
+
+    this.$VueEvent.listen('filter-communications', data => {
+      // ex: data = { type: 'users', value: 1 }
+      this.updateChannelChangedFilterFields({
+        name: data.type,
+        value: data.value
+      })
+
+      // update current filters
+      this.filter = {
+        ...this.filter,
+        [data.type]: data.value
+      }
+
+      // refresh data
+      this.setChannelClonedFilter(this.filter)
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
+    })
   },
   methods: {
     ...mapActions(['setIsFirstLoad']),
@@ -163,7 +185,8 @@ export default {
       'setIsEditingView',
       'setSelectedFilter',
       'toggleFilterDialog',
-      'toggleFilterModelForm'
+      'toggleFilterModelForm',
+      'updateChannelChangedFilterFields'
     ]),
     onClickAppliedFilterButton () {
       this.setFilterDialogForView(false)
@@ -287,7 +310,6 @@ export default {
         this.getCommunications(this.communicationFilters)
       })
     }
-
   },
 
   watch: {

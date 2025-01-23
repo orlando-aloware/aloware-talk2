@@ -428,7 +428,16 @@ export default {
       if (this.isFilterDialogForView && !this.isEditingView) {
         this.filter = { ...this.loadedDefaultFilterModel.filter }
       } else if (this.selectedFilter) {
+        let personalFilterObject = this.selectedFilter.filter
+
         this.filter = { ...this.selectedFilter.filter }
+
+        this.filter = {
+          ...this.filterModel.filter,
+          ..._.pick(personalFilterObject, this.filterFields)
+        }
+        sessionStorage.removeItem('date-selected-comms')
+        this.setIsFirstLoad(true)
       } else if (this.appliedFilter) {
         this.filter = { ...this.appliedFilter.filter }
       } else if (this.isFilterDialogShowFilters) {

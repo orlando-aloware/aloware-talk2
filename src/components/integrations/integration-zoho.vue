@@ -1,20 +1,20 @@
 <template>
     <div class="integration-wrapper integration-wrapper-generic"
-        data-testid="integration-salesforce-wrapper">
+        data-testid="integration-zoho-wrapper">
         <q-card class="integration-card"
-            data-testid="integration-salesforce-card"
+            data-testid="integration-zoho-card"
             flat>
             <q-item class="p-0">
               <span class='integration-jit-card-header'>
-                <i class="fab fa-salesforce salesforce-icon integration-icon-in-header"></i>
-                <span class="integration-title">Salesforce {{ salesforceModule }}</span>
+                <i class="fab fa-zoho zoho-icon integration-icon-in-header"></i>
+                <span class="integration-title">ZohoCRM {{ zohoModule }}</span>
               </span>
             </q-item>
 
-            <q-separator data-testid="integration-salesforce-separator" />
+            <q-separator data-testid="integration-zoho-separator" />
 
             <q-card-section
-                data-testid="integration-salesforce-card-section-1"
+                data-testid="integration-zoho-card-section-1"
                 v-if="integrationData">
                 <a class="external-contact-integration-link-icon color-primary"
                    target="_blank"
@@ -22,68 +22,51 @@
                   <i class="fa fa-external-link" aria-hidden="true"/>
                 </a>
                 <p class="mb-0"
-                    data-testid="integration-salesforce-first-name"
-                    v-if="integrationData.first_name !== undefined">
+                    data-testid="integration-zoho-first-name"
+                    v-if="integrationData.First_Name !== undefined">
                     <span class="data-icon-label">First Name: </span>
                     <span class="data-value">
                       <q-tooltip
                         anchor="top middle"
                         self="center middle"
                       >
-                        {{ integrationData.first_name }}
+                        {{ integrationData.First_Name }}
                       </q-tooltip>
-                      {{ integrationData.first_name }}
+                      {{ integrationData.First_Name }}
                     </span>
                 </p>
                 <p class="mb-0"
-                    data-testid="integration-salesforce-last-name"
-                    v-if="integrationData.last_name !== undefined">
+                    data-testid="integration-zoho-last-name"
+                    v-if="integrationData.Last_Name !== undefined">
                     <span class="data-icon-label">Last Name: </span>
                     <span class="data-value">
                       <q-tooltip
                         anchor="top middle"
                         self="center middle"
                       >
-                        {{ integrationData.last_name }}
+                        {{ integrationData.Last_Name }}
                       </q-tooltip>
-                      {{ integrationData.last_name }}
+                      {{ integrationData.Last_Name }}
                     </span>
                 </p>
                 <p class="mb-0"
-                    data-testid="integration-salesforce-email"
-                    v-if="integrationData.email">
+                    data-testid="integration-zoho-email"
+                    v-if="integrationData.Email">
                     <span class="data-icon-label">Email: </span>
-                    <span class="data-value">{{ integrationData.email }}</span>
+                    <span class="data-value">{{ integrationData.Email }}</span>
                 </p>
                 <p class="mb-0"
-                    data-testid="integration-salesforce-phone"
-                    v-if="integrationData.phone">
+                   data-testid="integration-zoho-owner"
+                   v-if="integrationData?.Owner?.name">
+                  <span class="data-icon-label">Owner: </span>
+                  <span class="data-value">
+                    {{ integrationData.Owner.name }}</span>
+                </p>
+                <p class="mb-0"
+                    data-testid="integration-zoho-phone"
+                    v-if="integrationData.Phone">
                     <span class="data-icon-label">Phone: </span>
-                    <span class="data-value">{{ integrationData.phone }}</span>
-                </p>
-                <p class="mb-0"
-                    data-testid="integration-salesforce-phone"
-                    v-if="integrationData.fax">
-                    <span class="data-icon-label">Fax: </span>
-                    <span class="data-value">{{ integrationData.fax }}</span>
-                </p>
-                <p class="mb-0"
-                    data-testid="integration-salesforce-phone"
-                    v-if="integrationData.mobile_phone">
-                    <span class="data-icon-label">Mobile Phone: </span>
-                    <span class="data-value">{{ integrationData.mobile_phone }}</span>
-                </p>
-                <p class="mb-0"
-                    data-testid="integration-salesforce-phone"
-                    v-if="integrationData.home_phone">
-                    <span class="data-icon-label">Home Phone: </span>
-                    <span class="data-value">{{ integrationData.home_phone }}</span>
-                </p>
-                <p class="mb-0"
-                    data-testid="integration-salesforce-phone"
-                    v-if="integrationData.other_phone">
-                    <span class="data-icon-label">Other Phone: </span>
-                    <span class="data-value">{{ integrationData.other_phone }}</span>
+                    <span class="data-value">{{ integrationData.Phone }}</span>
                 </p>
             </q-card-section>
           <sync-with-integration :integration_name='integrationName()'
@@ -99,10 +82,10 @@ import {
   integrationMixin
 } from 'src/plugins/mixins'
 import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
-import { SALESFORCE_INTEGRATION } from 'src/constants/integrations'
+import { ZOHO_INTEGRATION } from 'src/constants/integrations'
 
 export default {
-  name: 'integration-salesforce',
+  name: 'integration-zoho',
   components: { SyncWithIntegration },
 
   mixins: [
@@ -133,10 +116,8 @@ export default {
       return this.integrationData.link
     },
 
-    salesforceModule () {
-      if (this.integrationData?.type) {
-        return this.integrationData.type.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
-      }
+    zohoModule () {
+      if (this.integrationData) return this.integrationData.module.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
 
       return null
     }
@@ -158,12 +139,12 @@ export default {
 
   methods: {
     integrationName () {
-      return SALESFORCE_INTEGRATION
+      return ZOHO_INTEGRATION
     },
     getData () {
       this.contactIntegrationDataLoaded = false
 
-      return this.getIntegrationData(this.contact, SALESFORCE_INTEGRATION)
+      return this.getIntegrationData(this.contact, ZOHO_INTEGRATION)
         .then(response => {
           if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
             this.integrationData = response.data
