@@ -900,6 +900,16 @@
                                          v-if="fileUuid && isMigrated">
           </generate-transcription-button>
         </div>
+        <div class="text-left-align text-15"
+             v-else-if="currentCompany?.transcription_settings?.call_transcription_enabled && !communication?.call_transcription_status">
+          <div>Click on the button to generate a transcription of this call. </div>
+          <generate-transcription-button class="mr-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated">
+          </generate-transcription-button>
+        </div>
         <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
           <div class="summary-container">
@@ -1182,13 +1192,13 @@ export default {
 
       return (
         !this.isSimpSocial &&
+        this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
+        (this.communication.has_voicemail || this.showAudio(this.communication)) &&
         (
-          this.communication.has_voicemail ||
-          (
-            this.showAudio(this.communication) &&
-            (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
-          )
+          // If transcription does not exist, or transcription exists and is in allowed status
+          (!this.communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
+          (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
         )
       )
     },
