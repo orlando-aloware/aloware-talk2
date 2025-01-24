@@ -16060,10 +16060,6 @@ hr {
     margin-top: 20px;
     max-height: calc(100% - 110px);
 
-    td:last-child {
-      background-color: #fff !important;
-    }
-
     tr th {
       position: sticky;
       z-index: 2;
@@ -16082,6 +16078,14 @@ hr {
 
     tr:first-child th:last-child {
       z-index: 3;
+    }
+
+    tr:nth-of-type(odd) {
+      background-color: $light-grey;
+    }
+
+    tr:hover {
+      background-color: $light-blue;
     }
 
     td:last-child {
