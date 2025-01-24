@@ -163,7 +163,8 @@ export const ALL_COLUMNS = [
     label: 'Operations',
     name: 'operations',
     align: 'center',
-    headerStyle: 'min-width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   }
 ]
 
@@ -236,6 +237,7 @@ export const DEFAULT_COLUMNS = [
     label: 'Operations',
     name: 'operations',
     align: 'center',
-    headerStyle: 'min-width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   }
 ]

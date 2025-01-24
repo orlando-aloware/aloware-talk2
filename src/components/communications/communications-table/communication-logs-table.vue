@@ -118,7 +118,8 @@
               <duration :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'attempting_users'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'attempting_users'">
               <attempting-users :row="props.row" />
             </div>
 
@@ -177,7 +178,8 @@
               <csat-score :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'operations'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
                                          @on-details="onCommunicationDetails"
                                          @archived="removeCommunication"
