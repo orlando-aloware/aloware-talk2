@@ -316,7 +316,8 @@
 
       <move-dialog :user-id="userId"/>
 
-      <create-list-modal :user-id="userId" />
+      <create-list-modal from="lists"
+                         :user-id="userId" />
     </div>
   </div>
 </template>

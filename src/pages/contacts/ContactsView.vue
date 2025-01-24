@@ -1204,6 +1204,11 @@ export default {
   },
 
   mounted () {
+    if (localStorage.getItem('unsavedList') !== null) {
+      this.setUnsavedList(JSON.parse(localStorage.getItem('unsavedList')))
+      localStorage.removeItem('unsavedList')
+    }
+
     // clear the selected contacts
     this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
 
