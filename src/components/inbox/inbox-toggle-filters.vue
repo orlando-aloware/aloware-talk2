@@ -30,10 +30,12 @@
               :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled }]"
               data-testid="inbox-new-experience-label">
           <template v-if="newInboxEnabled">
-            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />New Inbox enabled
+            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
+            <strong>Enable New Inbox</strong>
           </template>
           <template v-else>
-            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />Enable New Inbox
+            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
+            <strong>New Inbox disabled</strong>
           </template>
         </label>
       </div>
