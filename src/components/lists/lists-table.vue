@@ -1,6 +1,6 @@
 <template>
   <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
-    <lists-folders-management />
+    <lists-folders-management :is-loading="isLoading || isLoadingMore" />
 
     <div class="lists-container flex-grow-1 d-flex flex-column">
       <div class="d-flex justify-between items-start">
@@ -114,8 +114,7 @@
               </div>
               <div v-else-if="col.name === 'actions'">
                 <div class="d-flex justify-content-center context-menu">
-                  <div class="operation-button mx-1"
-                       v-if="!isPublic">
+                  <div class="operation-button mx-1">
                     <span class="cursor-pointer"
                           data-testid="lists-edit-button"
                           @click="onEditList(props.row)">
@@ -128,8 +127,7 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1"
-                       v-if="!isPublic">
+                  <div class="operation-button mx-1">
                     <span class="cursor-pointer"
                           data-testid="lists-rename-button"
                           @click="onRenameList(props.row)">
@@ -142,8 +140,7 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1"
-                       v-if="!isPublic">
+                  <div class="operation-button mx-1">
                     <span class="cursor-pointer"
                           data-testid="lists-duplicate-button"
                           @click="onDuplicateList(props.row)">
@@ -172,8 +169,7 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1"
-                       v-if="!isPublic">
+                  <div class="operation-button mx-1">
                     <span class="cursor-pointer"
                           data-testid="lists-pin-button"
                           @click="onPinList(props.row)">
@@ -205,8 +201,7 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1"
-                       v-if="!isPublic">
+                  <div class="operation-button mx-1">
                     <span class="cursor-pointer"
                           data-testid="lists-enroll-sequence-button"
                           @click="onEnrollContactsToSequence(props.row)">
@@ -219,8 +214,7 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1"
-                       v-if="!isPublic">
+                  <div class="operation-button mx-1">
                     <span class="cursor-pointer"
                           data-testid="lists-add-power-dialer-button"
                           @click="onAddListToPowerDialer(props.row)">
@@ -233,8 +227,7 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1"
-                       v-if="!isPublic">
+                  <div class="operation-button mx-1">
                     <span class="cursor-pointer"
                           data-testid="lists-delete-button"
                           @click="onDeleteList(props.row)">
@@ -247,8 +240,7 @@
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1"
-                       v-if="!isPublic">
+                  <div class="operation-button mx-1">
                     <span class="cursor-pointer"
                           data-testid="lists-duplicate-button"
                           @click="openAssignContacts(props.row)">
@@ -497,7 +489,8 @@ export default {
       'addPowerDialerOpen',
       'openMoveDialog',
       'createListOpen',
-      'setUnsavedList'
+      'setUnsavedList',
+      'setCurrentListFilters'
     ]),
 
     ...mapActions('listsModule', [
@@ -793,9 +786,12 @@ export default {
       }
 
       this.showUnsavedListDialog(() => {
-        this.createListOpen({
-          contact_folder_id: null
-        })
+        const params = {}
+        if (this.folderId) {
+          params.contact_folder_id = this.folderId
+        }
+
+        this.createListOpen(params)
       })
     },
 
@@ -875,6 +871,11 @@ export default {
     },
     folders () {
       this.refreshFoldersPath()
+    },
+    list () {
+      if (this.list) {
+        this.setCurrentListFilters(this.list.filters)
+      }
     }
   }
 }

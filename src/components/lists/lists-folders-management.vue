@@ -12,7 +12,7 @@
                 :badge="true"
                 :open-count="1"
                 :pending-count="2"
-                :disabled="false"
+                :disabled="isLoading"
                 @click="togglePublicLists(true)" />
       <nav-item badge-value="20"
                 badge-color="danger"
@@ -25,7 +25,7 @@
                 :badge="true"
                 :open-count="1"
                 :pending-count="2"
-                :disabled="false"
+                :disabled="isLoading"
                 @click="togglePublicLists(false)" />
 
       <div class="mt-2 pt-2 border-top"
@@ -34,6 +34,7 @@
              v-if="isAdmin">
           <p class="text-muted custom-input-label mb-0">User</p>
           <user-selector :generic-styling="false"
+                         :disabled="isLoading"
                          v-model="userId"
                          @change="setUserId" />
         </div>
@@ -74,6 +75,11 @@ export default {
     isContactModuleType: {
       type: Boolean,
       default: true
+    },
+
+    isLoading: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -123,11 +129,7 @@ export default {
   },
 
   data () {
-    return {
-      isLoading: false,
-      removedFolder: null,
-      isCreatingFolder: false
-    }
+    return {}
   },
 
   methods: {
