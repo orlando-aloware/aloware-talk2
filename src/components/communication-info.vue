@@ -869,18 +869,7 @@
               <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
               </template>
-              <sparkle-icon width="16"
-                           height="16"
-                           color="#9333EA"
-                           class="cursor-pointer"
-                           v-if="communication.call_summary"
-                           :loading="isRegenerating"
-                           @click="onRegenerateSummary"
-                           data-testid="regenerate-summary-sparkle">
-                <q-tooltip>
-                  Click to regenerate summary
-                </q-tooltip>
-              </sparkle-icon>
+              <sparkle-icon width="16" height="16" color="#9333EA"/>
             </h3>
           </div>
           <div class="transcription-summary-container">
@@ -911,9 +900,26 @@
                                          v-if="fileUuid && isMigrated">
           </generate-transcription-button>
         </div>
-        <div class="text-left-align text-13"
+        <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
-          <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+          <div class="summary-container">
+            <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+            <q-btn flat
+                   dense
+                   class="regenerate-btn"
+                   @click="onRegenerateSummary"
+                   :loading="isRegenerating"
+                   :disable="isRegenerating">
+              <sparkle-icon width="14"
+                           height="14"
+                           color="#9333EA"
+                           class="cursor-pointer"
+                           data-testid="regenerate-summary-sparkle"/>
+              <q-tooltip>
+                Regenerate summary
+              </q-tooltip>
+            </q-btn>
+          </div>
         </div>
       </div>
     </div>
@@ -1399,11 +1405,7 @@ export default {
       this.isRegenerating = true
       this.$generalNotification('Regenerating summary...')
 
-      API.V1.transcription.regenerateSummary(this.communication.id)
-        .then(res => {
-          this.communication.call_summary = res.data.summary
-          this.$generalNotification('Summary regenerated successfully')
-        })
+      API.V1.transcription.generateSummary(this.communication.id)
         .catch(err => {
           console.error('Failed to regenerate summary:', err)
           this.$generalNotification('Failed to regenerate summary', 'error')
@@ -1437,5 +1439,36 @@ export default {
 
 .communication-body :deep(p:last-child) {
   margin-bottom: 0;
+}
+
+.summary-container {
+  position: relative;
+}
+
+.regenerate-btn {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  min-height: 24px;
+  width: 24px;
+  padding: 0;
+  margin: 0;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.regenerate-btn:hover {
+  border-radius: 50%;
+  background: #f5f5f5;
+  transform: scale(1.1);
+}
+
+.regenerate-btn :deep(.q-btn__wrapper) {
+  padding: 2px;
+  min-height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
