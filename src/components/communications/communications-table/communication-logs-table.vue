@@ -452,3 +452,11 @@ export default {
   }
 }
 </script>
+
+<style>
+.q-tooltip {
+  background-color: #000;
+  color: #fff;
+  font-size: 13px;
+}
+</style>
