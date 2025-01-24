@@ -44,8 +44,8 @@
              :data="communications"
              :columns="columns"
              :loading="isLoadingMore || isLoadingCommunications"
-             :virtual-scroll-item-size="100"
-             :virtual-scroll-sticky-size-start="100"
+             :virtual-scroll-item-size="80"
+             :virtual-scroll-sticky-size-start="48"
              :pagination="pagination"
              :rows-per-page-options="[0]"
              @virtual-scroll="onScroll">
@@ -341,7 +341,6 @@ export default {
 
     onSearch (value) {
       this.searchQuery = value
-      this.paginationPage = 1
 
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
@@ -364,36 +363,26 @@ export default {
       })
     },
 
-    async onScroll ({ to, ref }) {
-      if (this.paginated) {
+    async onScroll ({ index, ref }) {
+      if (this.isLoadingCommunications || this.isLoadingMore) {
         return
       }
 
       const lastIndex = this.communications.length - 1
 
       if (
-        !this.isLoadingMore &&
         this.hasMoreCommunications &&
-        to === lastIndex &&
-        to > 0
+        index === lastIndex &&
+        index > 0
       ) {
         await this.loadMoreCommunications()
         ref.refresh()
       }
     },
 
-    async loadMoreCommunications (done) {
-      if (!this.isLoadingMore && this.hasMoreCommunications) {
-        this.paginationPage += 1
+    async loadMoreCommunications () {
+      if (this.hasMoreCommunications && !this.isLoadingMore && !this.isLoadingCommunications) {
         await this.getCommunications(this.communicationFilters, undefined, true)
-
-        if (typeof done === 'function') {
-          done()
-        }
-      } else {
-        if (typeof done === 'function') {
-          done()
-        }
       }
     },
 
