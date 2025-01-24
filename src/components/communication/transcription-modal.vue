@@ -250,6 +250,26 @@
                         >
                         </copy-icon>
                       </q-btn>
+                      <q-btn
+                        color="text-dark-greenish"
+                        class="btn btn-inline px-1 py-0"
+                        title="Regenerate Summary"
+                        flat
+                        rounded
+                        dense
+                        no-caps
+                        :loading="isRegenerating"
+                        data-testid="regenerate-summary-btn"
+                        @click="onRegenerateSummary"
+                      >
+                        <sparkle-icon
+                          height="20"
+                          width="20"
+                          color="#007bff"
+                          data-testid="regenerate-summary-icon"
+                        >
+                        </sparkle-icon>
+                      </q-btn>
                     </div>
                     <div class="ai-effect-container mt-2">
                       <div class="ai-effect-gradient"></div>
@@ -510,6 +530,7 @@ export default {
       feedback: null,
       upvoteActive: false,
       downvoteActive: false,
+      isRegenerating: false,
       sentiments: [
         'POSITIVE',
         'NEUTRAL',
@@ -967,6 +988,26 @@ export default {
         textarea.style.height = 'auto'
         textarea.style.height = textarea.scrollHeight + 'px'
       }
+    },
+
+    onRegenerateSummary () {
+      if (this.isRegenerating) return
+
+      this.isRegenerating = true
+      this.$generalNotification('Regenerating summary...')
+
+      talk2Api.V1.transcription.regenerateSummary(this.communication.id)
+        .then(res => {
+          this.setSmartTranscriptionData(res.data)
+          this.$generalNotification('Summary regenerated successfully')
+        })
+        .catch(err => {
+          console.error('Failed to regenerate summary:', err)
+          this.$generalNotification('Failed to regenerate summary', 'error')
+        })
+        .finally(() => {
+          this.isRegenerating = false
+        })
     }
   },
 

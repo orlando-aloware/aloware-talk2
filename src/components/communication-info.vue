@@ -869,7 +869,18 @@
               <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
               </template>
-              <sparkle-icon width="16" height="16" color="#9333EA"/>
+              <sparkle-icon width="16"
+                           height="16"
+                           color="#9333EA"
+                           class="cursor-pointer"
+                           v-if="communication.call_summary"
+                           :loading="isRegenerating"
+                           @click="onRegenerateSummary"
+                           data-testid="regenerate-summary-sparkle">
+                <q-tooltip>
+                  Click to regenerate summary
+                </q-tooltip>
+              </sparkle-icon>
             </h3>
           </div>
           <div class="transcription-summary-container">
@@ -1069,6 +1080,7 @@ export default {
       showInfoBox: false,
       fileUuid: null,
       isMigrated: false,
+      isRegenerating: false,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -1379,6 +1391,26 @@ export default {
 
       // If no markdown, just use nl2br filter
       return this.$options.filters.nl2br(this.parseMentionToView(body))
+    },
+
+    onRegenerateSummary () {
+      if (this.isRegenerating) return
+
+      this.isRegenerating = true
+      this.$generalNotification('Regenerating summary...')
+
+      API.V1.transcription.regenerateSummary(this.communication.id)
+        .then(res => {
+          this.communication.call_summary = res.data.summary
+          this.$generalNotification('Summary regenerated successfully')
+        })
+        .catch(err => {
+          console.error('Failed to regenerate summary:', err)
+          this.$generalNotification('Failed to regenerate summary', 'error')
+        })
+        .finally(() => {
+          this.isRegenerating = false
+        })
     }
   },
 
