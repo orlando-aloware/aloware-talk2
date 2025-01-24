@@ -1,7 +1,7 @@
 <template>
   <div class="filter-wrapper d-flex align-items-center"
        :class="filterWrapperClass">
-    <compact-btn customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+    <compact-btn custom-class="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                  borderless
                  variant="outlined-light"
                  data-testid="inbox-channels-apply-filters"
@@ -17,7 +17,7 @@
       {{ changedFilterFieldCount }}
     </b-badge>
 
-    <compact-btn customClass="ml-auto s-14 _500 position-relative primary not-focusable"
+    <compact-btn custom-class="ml-auto s-14 _500 position-relative primary not-focusable"
                  borderless
                  variant="outlined-light"
                  data-testid="comms-channels-reset-filters-btn"
@@ -26,11 +26,11 @@
       <i class="fa fa-times" />
     </compact-btn>
 
-    <filter-dialog :filter-model="channelDefaultFilterModel"
-                   data-testid="comms-channels-filter-dialog"
+    <filter-dialog data-testid="comms-channels-filter-dialog"
+                   :filter-model="channelDefaultFilterModel"
                    v-model="filter"
-                   @createNewFilter="onCreateNewFilter"
                    @applyFilter="onApplyFilter"
+                   @createNewFilter="onCreateNewFilter"
                    @onResetFilter="onResetFilters" />
 
     <create-filter-dialog :filter-model="newFilterModel"

@@ -29,8 +29,8 @@
     <saved-filters class="px-2 left-column-wrapper "
                    :fetch-filters="fetchSavedFilters"
                    :filter-type="filterTypeForGetSavedFilters"
-                   @filters-fetched="()=> fetchSavedFilters = false"
                    @filterSelected="(item) => onSelectSavedFilter(item)"
+                   @filters-fetched="()=> fetchSavedFilters = false"
     />
 
     <div v-if="shouldShowViewsUnderChannels">
@@ -203,7 +203,10 @@ export default {
         'first_time_only',
         'exclude_automated_communications',
         'untagged_only',
-        'my_contact'
+        'has_unread',
+        'my_contact',
+        'unread_only',
+        'has_international'
       ],
       listeners: {
         pinnedViewsEvents: null,
@@ -233,7 +236,8 @@ export default {
       'setChannelClonedFilter',
       'setFilterDialogForView',
       'setShowViewsList',
-      'toggleFilterDialog'
+      'toggleFilterDialog',
+      'updateChannelChangedFilterFields'
     ]),
 
     ...mapActions(['setIsFirstLoad']),
@@ -319,10 +323,10 @@ export default {
     },
 
     async onSelectSavedFilter (filter) {
+      // Skip showing filter dialog
       let personalFilterObject = filter.filter
 
-      await this.setSelectedFilter(filter)
-      this.toggleFilterDialog(true)
+      this.setSelectedFilter(filter)
 
       this.setIsFirstLoad(false)
 
@@ -346,6 +350,65 @@ export default {
       if (!inRange) {
         sessionStorage.setItem('date-selected-comms', 'custom')
       }
+
+      // Reset any existing filter changes
+      this.resetChannelChangedFilterFields()
+      // reset channel cloned filter to the default filter
+      this.setChannelClonedFilter(this.channelDefaultFilterModel.filter)
+
+      // Update channel changed filter fields for each property in the filter
+      const excludeProps = ['changed', 'per_page', 'cursor']
+      const loadedDefaultFilterModel = this.channelDefaultFilterModel
+
+      for (const item in personalFilterObject) {
+        const hasField = loadedDefaultFilterModel.filter.hasOwnProperty(item)
+
+        // for boolean fields change tracking
+        if (this.booleanFields.includes(item) &&
+          +personalFilterObject[item] !== +loadedDefaultFilterModel.filter[item] &&
+          hasField) {
+          this.updateChannelChangedFilterFields({
+            name: item,
+            value: +personalFilterObject[item]
+          })
+
+          continue
+        }
+
+        // for non-boolean fields change tracking
+        const filterItem = JSON.stringify(personalFilterObject[item])
+        const loadedFilterItem = JSON.stringify(loadedDefaultFilterModel.filter[item])
+
+        let toDateUpdated = false
+
+        // Special handling for from_date and to_date
+        if (item === 'to_date') {
+          if (filterItem && loadedFilterItem && filterItem === loadedFilterItem) {
+            toDateUpdated = true
+            this.updateChannelChangedFilterFields({
+              name: item,
+              value: personalFilterObject[item][item]
+            })
+          }
+        }
+
+        // Update other filter fields
+        if (!this.booleanFields.includes(item) && filterItem !== loadedFilterItem && hasField && !excludeProps.includes(item) && !toDateUpdated) {
+          this.updateChannelChangedFilterFields({
+            name: item,
+            value: personalFilterObject[item]
+          })
+        }
+      }
+
+      // Apply the filter
+      this.setAppliedFilter(filter)
+      this.setChannelClonedFilter(personalFilterObject)
+
+      // Get communications with the new filter
+      this.$nextTick(() => {
+        this.getCommunications(personalFilterObject)
+      })
     },
 
     onSelectView (filter) {
@@ -432,7 +495,6 @@ export default {
       },
       immediate: true,
       deep: true
-
     },
 
     isFilterDialogShown (state) {
