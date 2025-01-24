@@ -259,6 +259,11 @@ export default {
     },
     userId: {
       type: Number
+    },
+    from: {
+      type: String,
+      default: 'contacts',
+      required: false
     }
   },
 
@@ -639,6 +644,9 @@ export default {
       }
 
       this.setUnsavedList(data)
+      if (this.from === 'lists') {
+        localStorage.setItem('unsavedList', JSON.stringify(data))
+      }
       this.isLoading = false
       this.createListClose()
 

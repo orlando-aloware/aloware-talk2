@@ -308,7 +308,8 @@
 
       <move-dialog :user-id="userId"/>
 
-      <create-list-modal :user-id="userId" />
+      <create-list-modal from="lists"
+                         :user-id="userId" />
     </div>
   </div>
 </template>
@@ -866,10 +867,14 @@ export default {
 
   watch: {
     '$route.query': function () {
+      this.SET_SEARCH('')
+      this.search = ''
       this.refreshLists()
       this.refreshFoldersPath()
     },
     folders () {
+      this.SET_SEARCH('')
+      this.search = ''
       this.refreshFoldersPath()
     },
     list () {
