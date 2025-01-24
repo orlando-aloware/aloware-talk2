@@ -996,11 +996,7 @@ export default {
       this.isRegenerating = true
       this.$generalNotification('Regenerating summary...')
 
-      talk2Api.V1.transcription.regenerateSummary(this.communication.id)
-        .then(res => {
-          this.setSmartTranscriptionData(res.data)
-          this.$generalNotification('Summary regenerated successfully')
-        })
+      talk2Api.V1.transcription.generateSummary(this.communication.id)
         .catch(err => {
           console.error('Failed to regenerate summary:', err)
           this.$generalNotification('Failed to regenerate summary', 'error')
