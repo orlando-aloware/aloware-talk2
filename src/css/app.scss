@@ -16084,6 +16084,10 @@ hr {
       background-color: $light-grey;
     }
 
+    tr:nth-of-type(even) {
+      background-color: #fff;
+    }
+
     tr:hover {
       background-color: $light-blue;
     }

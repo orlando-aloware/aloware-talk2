@@ -6,6 +6,7 @@
       <router-link class="text-primary"
                    target='_blank'
                    :to="{ path: `/contacts/${row.contact.id}`}">
+        <external-link-icon color="#1976D2"/>
         {{ row.contact.name | fixContactName }}
 
         <q-tooltip>
@@ -21,8 +22,14 @@
 </template>
 
 <script>
+import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
+
 export default {
   name: 'Contact',
+
+  components: {
+    ExternalLinkIcon
+  },
 
   props: {
     row: {

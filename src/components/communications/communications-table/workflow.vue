@@ -9,6 +9,7 @@
        target='_blank'
        :href="getWorkflowURL(value)"
        v-else-if="value">
+      <external-link-icon color="#1976D2"/>
       {{ workflow.name || '-' }}
 
       <q-tooltip>
@@ -24,9 +25,14 @@
 <script>
 import { aclMixin, classicMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 
 export default {
   name: 'Workflow',
+
+  components: {
+    ExternalLinkIcon
+  },
 
   mixins: [
     aclMixin,

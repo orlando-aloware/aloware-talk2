@@ -5,7 +5,9 @@
                  target='_blank'
                  :to="broadcastActivityParams"
                  v-if="canUseBroadcast && broadcast.id">
+      <external-link-icon color="#1976D2"/>
       {{ broadcast.name || '-' }}
+
       <q-tooltip>
         Click to see Broadcast activity's page
       </q-tooltip>
@@ -23,9 +25,14 @@
 <script>
 import { mapState } from 'vuex'
 import { broadcastsMixin } from 'src/plugins/mixins'
+import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 
 export default {
   name: 'Broadcast',
+
+  components: {
+    ExternalLinkIcon
+  },
 
   mixins: [
     broadcastsMixin
