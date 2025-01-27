@@ -77,8 +77,9 @@
         <div class="d-flex justify-content-end mt-sm-3 px-3">
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
-                         :disabled="!filterHasChanges"
                          data-testid="filter-dialog-reset-compact-btn"
+                         :disabled="!filterHasChanges"
+                         v-if="!selectedFilter"
                          @clicked="onResetFilter">
               <q-tooltip anchor="top middle"
                          self="center middle"
@@ -466,6 +467,10 @@ export default {
     },
 
     onResetFilter () {
+      this.setSelectedFilter(null)
+
+      this.filter = { ...this.filterModel.filter }
+
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
       const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.filterModel.filter
 
@@ -482,6 +487,9 @@ export default {
 
         this.filter[item] = useFilter[item]
       }
+
+      // First apply the filter to populate values
+      this.applyFilter()
     },
 
     onApply (skipChangedFields = false) {
@@ -584,21 +592,13 @@ export default {
         this.setAppliedFilter(filter)
         this.setChannelClonedFilter(filter.filter)
       }
-
-      // add the communication type and answer_status filters
-      // const communicationType = _.get(this.value, 'type', null)
-      const communicationAnswerStatus = _.get(this.value, 'answer_status', null)
       const finalFilters = {
         ...this.filter
       }
 
-      // if (communicationType) {
-      //  finalFilters.type = communicationType
-      // }
-
-      if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.filterModel.type) &&
-        communicationAnswerStatus) {
-        finalFilters.answer_status = communicationAnswerStatus
+      if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.filterModel.type)) {
+        finalFilters.type = this.filterModel.filter.type
+        finalFilters.answer_status = this.filterModel.filter.answer_status
       }
 
       this.$emit('applyFilter', finalFilters)
@@ -611,42 +611,42 @@ export default {
     },
 
     onSelectFilter (personalFilter) {
-      console.log('onSelectFilter called')
       this.setSelectedFilter(personalFilter)
-      if (!personalFilter) {
-        this.filter = { ...this.filterModel.filter }
-      } else {
-        // combine default filter values with the selected one
-        let personalFilterObject = personalFilter.filter
-        this.filter = {
-          ...this.filterModel.filter,
-          ..._.pick(personalFilterObject, this.filterFields)
-        }
-        this.setIsFirstLoad(false)
 
-        const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
+      // combine default filter values with the selected one
+      const personalFilterObject = personalFilter.filter
+      this.filter = {
+        ...this.filterModel.filter,
+        ..._.pick(personalFilterObject, this.filterFields)
+      }
+      this.setIsFirstLoad(false)
 
-        personalFilterObject.from_date = formattedDates.from_date
-        personalFilterObject.to_date = formattedDates.to_date
+      const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
 
-        // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
-        // set the range to the key of the range
-        let inRange = false
-        for (const range in this.ranges) {
-          const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
-          if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
-            sessionStorage.setItem('date-selected-comms', range)
-            inRange = true
-            break
-          }
-        }
+      personalFilterObject.from_date = formattedDates.from_date
+      personalFilterObject.to_date = formattedDates.to_date
 
-        if (!inRange) {
-          sessionStorage.setItem('date-selected-comms', 'custom')
+      // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+      // set the range to the key of the range
+      let inRange = false
+
+      for (const range in this.ranges) {
+        const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
+        if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
+          sessionStorage.setItem('date-selected-comms', range)
+          inRange = true
+          break
         }
       }
 
+      if (!inRange) {
+        sessionStorage.setItem('date-selected-comms', 'custom')
+      }
+
+      // First apply the filter to populate values
       this.applyFilter()
+      // Then call onApply to handle filter application
+      this.onApply()
     },
 
     updateFilter (filter, params) {
@@ -656,10 +656,6 @@ export default {
           ...params,
           scope: scope
         }
-      }
-
-      if (this.loadedDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
-        params.type = ChannelType.CHANNEL_CALLS
       }
 
       return talk2Api.V2.inbox.filters.update(filter.id, params).then(res => {
@@ -695,11 +691,11 @@ export default {
 
       this.filter = {
         ...this.filter,
-        untagged_only: +this.filter.untagged_only,
-        not_disposed: +this.filter.not_disposed,
         first_time_only: +this.filter.first_time_only,
+        untagged_only: +this.filter.untagged_only,
         exclude_automated_communications: +this.filter.exclude_automated_communications,
-        unread_only: +this.filter.unread_only
+        unread_only: +this.filter.unread_only,
+        not_disposed: +this.filter.not_disposed
       }
     },
 
@@ -728,7 +724,6 @@ export default {
 
     setToNewFilter () {
       this.onResetFilter()
-      this.onSelectFilter(null)
       this.setAppliedFilter(null)
     }
   },
