@@ -168,6 +168,10 @@ export default {
         this.getCommunications(this.communicationFilters)
       })
     })
+
+    this.$VueEvent.listen('reset-communications-filters', () => {
+      this.onResetFilters()
+    })
   },
   methods: {
     ...mapActions(['setIsFirstLoad']),
@@ -327,11 +331,21 @@ export default {
       },
       deep: true,
       immediate: true
+    },
+
+    channelDefaultFilterModel: {
+      handler (newVal) {
+        this.filter = this.filter = { ...newVal.filter }
+      },
+      deep: true,
+      immediate: true
     }
   },
 
   beforeDestroy () {
     this.onResetFilters()
+    this.$VueEvent.unlisten('filter-communications')
+    this.$VueEvent.unlisten('reset-communications-filters')
   }
 }
 </script>

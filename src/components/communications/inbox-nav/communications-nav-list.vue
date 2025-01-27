@@ -85,7 +85,7 @@ import { communicationsRoutesMixin, communicationsMixin, userMixin } from 'src/p
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME, COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME, DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME } from 'src/router/routes'
 
 export default {
   name: 'communications-nav-list',
@@ -283,34 +283,18 @@ export default {
       const channel = this.navListItems.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 
-      // redirect page to Channel
-      if (this.active !== DEFAULT_COMMUNICATIONS_CHANNEL) {
-        this.$router.push({
-          name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
-          params: {
-            channel: this.active
-          }
-        }).catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
-        })
-        return
-      }
-
-      // redirect page to Inbox
       this.$router.push({
-        name: COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME,
+        name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
         params: {
-          channel: this.active,
-          status: InboxTaskStatus.DEFAULT_STATUS
+          channel: this.active
         }
       }).catch(err => {
         console.log(err)
         this.$handleErrors(err.response)
-      })
 
-      this.$nextTick(() => {
-        this.getCommunications(this.communicationFilters)
+        this.$nextTick(() => {
+          this.getCommunications(this.communicationFilters)
+        })
       })
     },
 
@@ -452,15 +436,9 @@ export default {
     },
 
     resetFilter () {
-      const filter = { ...this.channelDefaultFilterModel.filter }
-
-      this.setChannelClonedFilter(filter)
-      this.resetChannelChangedFilterFields()
-      this.setSelectedFilter(null)
-      this.setAppliedFilter(null)
       this.toggleFilterDialogWithFilters(true)
-      this.setIsFirstLoad(true)
-      this.setInboxFilters(filter)
+
+      this.$VueEvent.fire('reset-communications-filters')
     }
   },
 
