@@ -143,6 +143,14 @@ export default {
 
     this.$VueEvent.listen('filter-communications', data => {
       // ex: data = { type: 'users', value: 1 }
+      const current = typeof this.channelClonedFilter[data.type] === 'object' ? JSON.stringify(this.channelClonedFilter[data.type]) : this.channelClonedFilter[data.type]
+      const attempt = typeof data.value === 'object' ? JSON.stringify(data.value) : data.value
+
+      // do nothing when the same filter is being applied
+      if (current === attempt) {
+        return
+      }
+
       this.updateChannelChangedFilterFields({
         name: data.type,
         value: data.value

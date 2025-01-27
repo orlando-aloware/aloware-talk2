@@ -239,6 +239,11 @@ export default {
     ...mapActions(['setIsFirstLoad']),
 
     onItemClicked (nextActive) {
+      // avoid redundant navigation
+      if (nextActive === this.activeChannel.value) {
+        return
+      }
+
       this.onCloseViewsList()
       this.resetFilter()
 
