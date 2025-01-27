@@ -1,6 +1,6 @@
 <template>
   <div class="w-100" data-testid="comm-audio-wrapper">
-    <div v-if="!isDeleted && hasAudio">
+    <div v-if="!isDeleted && hasAudio && (type !== UploadedFileTypes.TYPE_CALL_RECORDING || !communication?.has_voicemail)">
       <div class="audio-player p-2">
         <div class="d-flex flex-row align-items-center w-100"
              v-if="remoteUrl">
