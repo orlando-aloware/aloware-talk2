@@ -344,8 +344,8 @@ export default {
 
   beforeDestroy () {
     this.onResetFilters()
-    this.$VueEvent.unlisten('filter-communications')
-    this.$VueEvent.unlisten('reset-communications-filters')
+    this.$VueEvent.stop('filter-communications')
+    this.$VueEvent.stop('reset-communications-filters')
   }
 }
 </script>

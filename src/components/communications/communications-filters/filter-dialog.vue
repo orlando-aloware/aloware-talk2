@@ -77,9 +77,9 @@
         <div class="d-flex justify-content-end mt-sm-3 px-3">
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
-                          v-if="!selectedFilter"
-                         :disabled="!filterHasChanges"
                          data-testid="filter-dialog-reset-compact-btn"
+                         :disabled="!filterHasChanges"
+                         v-if="!selectedFilter"
                          @clicked="onResetFilter">
               <q-tooltip anchor="top middle"
                          self="center middle"
@@ -614,7 +614,7 @@ export default {
       this.setSelectedFilter(personalFilter)
 
       // combine default filter values with the selected one
-      let personalFilterObject = personalFilter.filter
+      const personalFilterObject = personalFilter.filter
       this.filter = {
         ...this.filterModel.filter,
         ..._.pick(personalFilterObject, this.filterFields)

@@ -341,16 +341,15 @@ export default {
       this.setChannelClonedFilter(this.channelDefaultFilterModel.filter)
 
       // Update channel changed filter fields for each property in the filter
-      const excludeProps = ['changed', 'per_page', 'cursor']
       const loadedDefaultFilterModel = this.channelDefaultFilterModel
 
       for (const item in personalFilterObject) {
-        const hasField = loadedDefaultFilterModel.filter.hasOwnProperty(item)
+        const defaultModelHasField = loadedDefaultFilterModel.filter.hasOwnProperty(item)
 
         // for boolean fields change tracking
         if (this.booleanFields.includes(item) &&
           +personalFilterObject[item] !== +loadedDefaultFilterModel.filter[item] &&
-          hasField) {
+          defaultModelHasField) {
           this.updateChannelChangedFilterFields({
             name: item,
             value: +personalFilterObject[item]
@@ -363,21 +362,14 @@ export default {
         const filterItem = JSON.stringify(personalFilterObject[item])
         const loadedFilterItem = JSON.stringify(loadedDefaultFilterModel.filter[item])
 
-        let toDateUpdated = false
-
-        // Special handling for from_date and to_date
-        if (item === 'to_date') {
-          if (filterItem && loadedFilterItem && filterItem === loadedFilterItem) {
-            toDateUpdated = true
-            this.updateChannelChangedFilterFields({
-              name: item,
-              value: personalFilterObject[item][item]
-            })
-          }
-        }
-
-        // Update other filter fields
-        if (!this.booleanFields.includes(item) && filterItem !== loadedFilterItem && hasField && !excludeProps.includes(item) && !toDateUpdated) {
+        // Special handling for date
+        if (item === 'to_date' && filterItem && loadedFilterItem && filterItem === loadedFilterItem) {
+          this.updateChannelChangedFilterFields({
+            name: item,
+            value: personalFilterObject[item][item]
+          })
+        } else if (defaultModelHasField) {
+          // Update other filter fields
           this.updateChannelChangedFilterFields({
             name: item,
             value: personalFilterObject[item]
