@@ -46,7 +46,7 @@ export default {
         return
       }
 
-      this.$bvModal.msgBoxConfirm('Deleting the communication will remove it from all reports and plots. Continue?', {
+      this.$bvModal.msgBoxConfirm('Deleting this communication will remove it from all reports and graphs. Do you want to proceed?', {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',
