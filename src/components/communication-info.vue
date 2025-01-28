@@ -873,11 +873,11 @@
             </h3>
           </div>
           <div class="transcription-summary-container">
-            <span class="transcription-link text-decoration-none"
-              @click="fetchSmartTranscriptionData()"
+            <a class="transcription-link text-decoration-none"
+              @click.prevent="fetchSmartTranscriptionData()"
               v-if="communication.has_transcription">
               Show transcription
-            </span>
+            </a>
             <span class="transcription-message text-decoration-none"
                   v-else>
               <span v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_PROCESSING">Transcription in progress</span>
