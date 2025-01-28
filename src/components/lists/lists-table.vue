@@ -118,10 +118,10 @@
                     <span class="cursor-pointer"
                           data-testid="lists-edit-button"
                           @click="onEditList(props.row)">
-                      <pencil-o-icon height="16"
-                                  width="16"
+                      <pencil-o-icon height="20"
+                                  width="20"
                                   color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Edit this List
                       </q-tooltip>
                     </span>
@@ -131,10 +131,10 @@
                     <span class="cursor-pointer"
                           data-testid="lists-rename-button"
                           @click="onRenameList(props.row)">
-                      <pencil-icon height="16"
-                                  width="16"
+                      <pencil-icon height="20"
+                                  width="20"
                                   color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Rename this list
                       </q-tooltip>
                     </span>
@@ -144,10 +144,10 @@
                     <span class="cursor-pointer"
                           data-testid="lists-duplicate-button"
                           @click="onDuplicateList(props.row)">
-                      <duplicate-icon height="16"
-                                width="16"
+                      <duplicate-icon height="20"
+                                width="20"
                                 color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Duplicate this list
                       </q-tooltip>
                     </span>
@@ -160,10 +160,10 @@
                           data-testid="lists-move-button"
                           data-action="move-item"
                           @click="onMoveList(props.row)">
-                      <move-icon height="16"
-                                width="16"
+                      <move-icon height="20"
+                                width="20"
                                 color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Move this list
                       </q-tooltip>
                     </span>
@@ -173,10 +173,10 @@
                     <span class="cursor-pointer"
                           data-testid="lists-pin-button"
                           @click="onPinList(props.row)">
-                      <pin-icon height="16"
-                                width="16"
+                      <pin-icon height="20"
+                                width="20"
                                 color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
                       </q-tooltip>
                     </span>
@@ -187,15 +187,15 @@
                     <span class="cursor-pointer"
                           data-testid="lists-show-button"
                           @click="onShowInPublicFolderList(props.row)">
-                      <eye-icon height="16"
-                                width="16"
+                      <eye-icon height="20"
+                                width="20"
                                 color="#62666E"
                                 v-if="!props.row.show_in_public_folder"/>
-                      <eye-off-icon height="16"
-                                    width="16"
+                      <eye-off-icon height="20"
+                                    width="20"
                                     color="#62666E"
                                     v-else/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
                       </q-tooltip>
                     </span>
@@ -205,10 +205,10 @@
                     <span class="cursor-pointer"
                           data-testid="lists-enroll-sequence-button"
                           @click="onEnrollContactsToSequence(props.row)">
-                      <add-sequence-icon height="16"
-                                    width="16"
+                      <add-sequence-icon height="20"
+                                    width="20"
                                     color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Enroll contacts to sequence
                       </q-tooltip>
                     </span>
@@ -218,10 +218,10 @@
                     <span class="cursor-pointer"
                           data-testid="lists-add-power-dialer-button"
                           @click="onAddListToPowerDialer(props.row)">
-                      <add-call-icon height="16"
-                                    width="16"
+                      <add-call-icon height="20"
+                                    width="20"
                                     color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Add this list to Power Dialer
                       </q-tooltip>
                     </span>
@@ -231,10 +231,10 @@
                     <span class="cursor-pointer"
                           data-testid="lists-delete-button"
                           @click="onDeleteList(props.row)">
-                      <trash-icon height="16"
-                                  width="16"
+                      <trash-icon height="20"
+                                  width="20"
                                   color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Delete this list
                       </q-tooltip>
                     </span>
@@ -244,10 +244,10 @@
                     <span class="cursor-pointer"
                           data-testid="lists-duplicate-button"
                           @click="openAssignContacts(props.row)">
-                      <arrow-right-icon height="16"
-                                        width="16"
+                      <arrow-right-icon height="20"
+                                        width="20"
                                         color="#62666E"/>
-                      <q-tooltip>
+                      <q-tooltip content-class="bg-primary text-white">
                         Assign Contacts
                       </q-tooltip>
                     </span>
@@ -446,6 +446,7 @@ export default {
 
     fixedColumns () {
       const allColumns = this.$jsonClone(this.COLUMNS)
+
       return this.getResponsiveColumns(allColumns, this.columnsByViewport)
         .filter((col) => this.isColumnVisible(col.field))
     },
