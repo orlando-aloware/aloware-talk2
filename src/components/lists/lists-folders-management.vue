@@ -44,8 +44,7 @@
 
         <contacts-sidebar-loader v-if="isLoading" />
 
-        <remove-folder-dialog :user-id="userId"
-                              v-if="isAdmin"/>
+        <remove-folder-dialog :user-id="userId" />
       </div>
     </div>
   </div>
