@@ -215,6 +215,24 @@
                       <q-btn
                         color="text-dark-greenish"
                         class="btn btn-inline px-1 py-0"
+                        title="Edit Summary"
+                        flat
+                        rounded
+                        dense
+                        no-caps
+                        data-testid="update-summary-btn"
+                        @click="startEditing"
+                      >
+                        <pencil-o-icon
+                          width="20"
+                          height="20"
+                          data-testid="contact-phones-list-items-edit-icon"
+                          color="#007bff">
+                        </pencil-o-icon>
+                      </q-btn>
+                      <q-btn
+                        color="text-dark-greenish"
+                        class="btn btn-inline px-1 py-0"
                         title="Download Summary"
                         flat
                         rounded
@@ -282,7 +300,7 @@
                           <div class="flex items-center gap-2">
                             <h3
                               class="ai-effect-gradient-text"
-                              @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null"
+                              @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (show_promotion_box = true) : null"
                             >
                               Powered by AloAi
                               <template
@@ -318,8 +336,93 @@
                           <div
                             v-if="communication.call_summary"
                             class="call_summary"
-                            v-html="parseMarkdown(communication.call_summary)"
                           >
+                            <div v-if="!is_editing_summary" class="call_summary"
+                                 v-html="parseMarkdown(communication.call_summary)">
+                            </div>
+
+                            <div v-else class="edit-mode">
+                              <div class="toolbar">
+                                <q-btn
+                                  flat
+                                  dense
+                                  round
+                                  icon="format_bold"
+                                  title="Bold"
+                                  color="primary"
+                                  @click="applyFormatting('**')"
+                                />
+                                <q-btn
+                                  flat
+                                  dense
+                                  round
+                                  icon="format_italic"
+                                  title="Italic"
+                                  color="primary"
+                                  @click="applyFormatting('*')"
+                                />
+                                <q-btn
+                                  flat
+                                  dense
+                                  round
+                                  icon="format_underline"
+                                  title="Underline"
+                                  color="primary"
+                                  @click="applyFormatting('__')"
+                                />
+                                <q-btn
+                                  flat
+                                  dense
+                                  round
+                                  icon="format_list_bulleted"
+                                  title="Bullet List"
+                                  color="primary"
+                                  @click="applyList('- ')"
+                                />
+                                <q-btn
+                                  flat
+                                  dense
+                                  round
+                                  icon="format_list_numbered"
+                                  title="Numbered List"
+                                  color="primary"
+                                  @click="applyList('1. ')"
+                                />
+                                <q-btn
+                                  flat
+                                  dense
+                                  round
+                                  icon="code"
+                                  title="Code Block"
+                                  color="primary"
+                                  @click="applyBlockFormatting('```')"
+                                />
+                              </div>
+                              <textarea
+                                ref="textarea"
+                                class="markdown-editor"
+                                placeholder="Edit the summary here..."
+                                rows="10"
+                                v-model="edited_call_summary"
+                              ></textarea>
+                              <div class="row justify-end q-gutter-sm mt-2">
+                                <q-btn
+                                  flat
+                                  label="Cancel"
+                                  color="grey-7"
+                                  @click="cancelEditing"
+                                  data-testid="cancel-editing-btn"
+                                />
+                                <q-btn
+                                  unelevated
+                                  label="Save Changes"
+                                  color="primary"
+                                  :loading="is_saving_summary"
+                                  @click="saveSummary"
+                                  data-testid="save-summary-btn"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                         <div class="summary-status-container">
@@ -374,13 +477,13 @@
                           <span class="evaluation-text pr-2">Please evaluate the accuracy of this summary.</span>
                           <img
                             class="clickable-icon"
-                            :src="upvoteActive ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
+                            :src="upvote_active ? 'app-icons/menu/thumb-up-green.svg' : 'app-icons/menu/thumb-up-outline.svg'"
                             @click="submitFeedback('upvote')"
                           />
                           <span class="mx-1"></span>
                           <img
                             class="clickable-icon"
-                            :src="downvoteActive ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
+                            :src="downvote_active ? 'app-icons/menu/thumb-down-red.svg' : 'app-icons/menu/thumb-down-outline.svg'"
                             @click="submitFeedback('downvote')"
                           />
                         </div>
@@ -422,8 +525,8 @@
       </q-card>
     </q-dialog>
     <aloai-promotion-dialog
-      :dialogVisible="showInfoBox"
-      @update:dialogVisible="showInfoBox = $event"
+      :dialogVisible="show_promotion_box"
+      @update:dialogVisible="show_promotion_box = $event"
     />
   </div>
 </template>
@@ -435,6 +538,7 @@ import GenerateSummaryButton from 'components/generate-summary-button'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
 import CopyIcon from 'components/icons/copy-icon'
+import PencilOIcon from 'components/icons/pencil-o-icon'
 import Waveform from 'components/waveform'
 import DOMPurify from 'dompurify'
 import { isEmpty } from 'lodash'
@@ -476,6 +580,7 @@ export default {
     ConversationSection,
     DownloadIcon,
     CopyIcon,
+    PencilOIcon,
     GenerateSummaryButton,
     SparkleIcon,
     AloaiPromotionDialog,
@@ -528,8 +633,8 @@ export default {
       summary_engine: null,
       summary_prompt: null,
       feedback: null,
-      upvoteActive: false,
-      downvoteActive: false,
+      upvote_active: false,
+      downvote_active: false,
       isRegenerating: false,
       sentiments: [
         'POSITIVE',
@@ -549,10 +654,13 @@ export default {
       UploadedFileTypes,
       isEmpty,
       isGenerating: false,
-      showInfoBox: false,
+      show_promotion_box: false,
       TranscriptionStatus,
       SummaryStatus,
-      CommunicationTypes
+      CommunicationTypes,
+      is_editing_summary: false,
+      is_saving_summary: false,
+      edited_call_summary: ''
     }
   },
 
@@ -666,8 +774,8 @@ export default {
       this.summary_engine = data.summary_engine
       this.summary_prompt = data.summary_prompt
       this.feedback = data.feedback
-      this.upvoteActive = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
-      this.downvoteActive = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
+      this.upvote_active = this.feedback === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvote_active = this.feedback === FeedbackConstants.FEEDBACK_DOWNVOTE
     },
 
     /**
@@ -866,8 +974,8 @@ export default {
       talk2Api.V1.transcription.submitSummaryFeedback(this.communication.id, feedbackValue)
         .then(() => {
           this.feedback = feedbackValue
-          this.upvoteActive = type === 'upvote'
-          this.downvoteActive = type === 'downvote'
+          this.upvote_active = type === 'upvote'
+          this.downvote_active = type === 'downvote'
           this.$generalNotification('Feedback received. Thank you!')
         })
         .catch(err => {
@@ -1004,6 +1112,127 @@ export default {
         .finally(() => {
           this.isRegenerating = false
         })
+    },
+
+    startEditing () {
+      this.edited_call_summary = this.communication.call_summary
+      this.is_editing_summary = true
+    },
+
+    cancelEditing () {
+      this.is_editing_summary = false
+      this.edited_call_summary = ''
+    },
+
+    // Apply inline formatting like bold, italic, underline
+    applyFormatting (format) {
+      const textarea = this.$refs.textarea
+      if (!textarea) return
+
+      const { selectionStart, selectionEnd, value } = textarea
+      const selectedText = value.slice(selectionStart, selectionEnd)
+
+      const formattedText = format === '__'
+        ? `<u>${selectedText}</u>`
+        : `${format}${selectedText}${format}`
+
+      this.edited_call_summary =
+        value.slice(0, selectionStart) +
+        formattedText +
+        value.slice(selectionEnd)
+
+      this.$nextTick(() => {
+        textarea.focus()
+        textarea.setSelectionRange(
+          selectionStart + format.length,
+          selectionEnd + format.length
+        )
+      })
+    },
+
+    // Apply list formatting (bullet or numbered)
+    applyList (prefix) {
+      const textarea = this.$refs.textarea
+      if (!textarea) return
+
+      const { selectionStart, selectionEnd, value } = textarea
+
+      const selectedText = value.slice(selectionStart, selectionEnd)
+      const lines = selectedText.split('\n')
+
+      // Check if all lines are already prefixed
+      const allPrefixed = lines.every((line) => line.startsWith(prefix))
+
+      const toggledLines = lines.map((line) =>
+        allPrefixed ? line.slice(prefix.length) : `${prefix}${line}`
+      )
+
+      // Update the summary with the modified text
+      this.edited_call_summary =
+        value.slice(0, selectionStart) +
+        toggledLines.join('\n') +
+        value.slice(selectionEnd)
+
+      this.$nextTick(() => {
+        textarea.focus()
+        textarea.setSelectionRange(
+          selectionStart,
+          selectionEnd + (allPrefixed ? -prefix.length * lines.length : prefix.length * lines.length)
+        )
+      })
+    },
+
+    // Apply block formatting like code blocks
+    applyBlockFormatting (blockFormat) {
+      const textarea = this.$refs.textarea
+      const { selectionStart, selectionEnd, value } = textarea
+      const selectedText = value.slice(selectionStart, selectionEnd)
+
+      const formattedText = `\n${blockFormat}\n${selectedText}\n${blockFormat}\n`
+      this.edited_call_summary =
+        value.slice(0, selectionStart) +
+        formattedText +
+        value.slice(selectionEnd)
+
+      this.$nextTick(() => {
+        textarea.focus()
+        textarea.setSelectionRange(
+          selectionStart + blockFormat.length + 2,
+          selectionEnd + blockFormat.length + 2
+        )
+      })
+    },
+
+    async saveSummary () {
+      if (this.is_saving_summary) return
+
+      this.is_saving_summary = true // Indicate the save process has started
+      try {
+        // Sanitize the edited summary before saving
+        const sanitizedSummary = DOMPurify.sanitize(this.edited_call_summary)
+
+        const response = await talk2Api.V1.transcription.updateSummary(
+          this.communication.id,
+          sanitizedSummary // Save sanitized content
+        )
+
+        this.communication.call_summary = DOMPurify.sanitize(response.data.summary) // Update the summary with sanitized content
+        this.is_editing_summary = false
+        this.$q.notify({
+          message: 'Summary updated successfully!',
+          color: 'positive',
+          position: 'top'
+        })
+      } catch (err) {
+        console.error('Failed to update summary:', err)
+        this.$q.notify({
+          message: 'Failed to update summary',
+          color: 'negative',
+          position: 'top'
+        })
+      } finally {
+        this.is_saving_summary = false // Reset save state
+      }
     }
   },
 
@@ -1015,8 +1244,8 @@ export default {
     },
 
     feedback (newValue) {
-      this.upvoteActive = newValue === FeedbackConstants.FEEDBACK_UPVOTE
-      this.downvoteActive = newValue === FeedbackConstants.FEEDBACK_DOWNVOTE
+      this.upvote_active = newValue === FeedbackConstants.FEEDBACK_UPVOTE
+      this.downvote_active = newValue === FeedbackConstants.FEEDBACK_DOWNVOTE
     },
 
     show_form (newVal) {
@@ -1143,4 +1372,23 @@ textarea::placeholder {
 :deep(.q-message-text > div) {
   margin-bottom: 0;
 }
+
+.markdown-editor {
+  width: 100%;
+  min-height: 200px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: vertical;
+  font-family: 'Arial', sans-serif;
+}
+
+.toolbar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
 </style>
