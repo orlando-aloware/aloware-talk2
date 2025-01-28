@@ -939,8 +939,9 @@ export default {
      * @returns {string}
      */
     parseMarkdown (summaryText) {
-      const rawHtml = marked(summaryText)
-      return DOMPurify.sanitize(rawHtml)
+      // Sanitize after markdown parsing
+      const rawHtml = DOMPurify.sanitize(marked(summaryText))
+      return rawHtml
     },
 
     getMessageClasses (speaker) {
@@ -1078,12 +1079,7 @@ export default {
           // Remove loading message on error
           this.chatMessages.splice(loadingMessageIndex, 1)
           console.error('Failed to get answer:', error)
-          this.$q.notify({
-            message: 'Failed to get answer',
-            color: 'negative',
-            position: 'top',
-            timeout: 2000
-          })
+          this.$generalNotification('Failed to get answer', 'error')
         })
         .finally(() => {
           this.isAsking = false
@@ -1203,36 +1199,27 @@ export default {
       })
     },
 
-    async saveSummary () {
+    saveSummary () {
       if (this.is_saving_summary) return
+      this.is_saving_summary = true
 
-      this.is_saving_summary = true // Indicate the save process has started
-      try {
-        // Sanitize the edited summary before saving
-        const sanitizedSummary = DOMPurify.sanitize(this.edited_call_summary)
+      // Sanitize the edited summary before saving
+      const sanitizedSummary = DOMPurify.sanitize(this.edited_call_summary)
 
-        const response = await talk2Api.V1.transcription.updateSummary(
-          this.communication.id,
-          sanitizedSummary // Save sanitized content
-        )
-
-        this.communication.call_summary = DOMPurify.sanitize(response.data.summary) // Update the summary with sanitized content
-        this.is_editing_summary = false
-        this.$q.notify({
-          message: 'Summary updated successfully!',
-          color: 'positive',
-          position: 'top'
+      talk2Api.V1.transcription
+        .updateSummary(this.communication.id, sanitizedSummary) // Save sanitized content
+        .then((response) => {
+          this.communication.call_summary = DOMPurify.sanitize(response.data.summary) // Update the summary with sanitized content
+          this.is_editing_summary = false
+          this.$generalNotification('Summary updated successfully!')
         })
-      } catch (err) {
-        console.error('Failed to update summary:', err)
-        this.$q.notify({
-          message: 'Failed to update summary',
-          color: 'negative',
-          position: 'top'
+        .catch((err) => {
+          console.error('Failed to update summary:', err)
+          this.$generalNotification('Failed to update summary!', 'error')
         })
-      } finally {
-        this.is_saving_summary = false // Reset save state
-      }
+        .finally(() => {
+          this.is_saving_summary = false // Reset save state
+        })
     }
   },
 
@@ -1389,6 +1376,7 @@ textarea::placeholder {
   display: flex;
   gap: 4px;
   margin-bottom: 4px;
+  justify-content: flex-end;
 }
 
 </style>
