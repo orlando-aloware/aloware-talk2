@@ -445,13 +445,6 @@ export default {
     fixedColumns () {
       const allColumns = this.$jsonClone(this.COLUMNS)
 
-      if (!this.isPublic) {
-        return this.getResponsiveColumns(
-          allColumns.filter(col => col.name !== 'owner_name'),
-          this.columnsByViewport
-        )
-      }
-
       return this.getResponsiveColumns(allColumns, this.columnsByViewport)
     },
 
