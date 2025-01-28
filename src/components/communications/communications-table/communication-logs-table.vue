@@ -419,13 +419,13 @@ export default {
           return this.columns
         }
 
-        const columns = JSON.parse(savedColumns)
+        // use ALL_COLUMNS as base, removing and sorting based on it
+        const columns = [...ALL_COLUMNS]
+        const savedColumnsNames = JSON.parse(savedColumns).map(column => column.name)
 
-        const hasAllFixedColumns = this.fixedColumns.every(name =>
-          columns.some(col => col.name === name)
-        )
-
-        return hasAllFixedColumns ? columns : this.columns
+        return columns
+          .filter(column => savedColumnsNames.includes(column.name))
+          .sort((a, b) => savedColumnsNames.indexOf(a.name) - savedColumnsNames.indexOf(b.name))
       } catch (error) {
         return this.columns
       }
