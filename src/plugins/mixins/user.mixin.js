@@ -26,6 +26,14 @@ export default {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     },
 
+    shouldSeeExperimentalAiFeatures () {
+      return this.isDemoCompany || this.currentCompany?.plan?.ai_enabled === true
+    },
+
+    shouldSeeExperimentalXproAiFeatures () {
+      return (this.shouldSeeExperimentalAiFeatures && this.currentCompany?.plan?.use_case === 'xPro') || this.isDemoCompany
+    },
+
     /*
       WAT-1105:
           - second code freeze: 01-22-2025

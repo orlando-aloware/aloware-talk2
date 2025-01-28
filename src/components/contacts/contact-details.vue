@@ -25,7 +25,7 @@
                                v-if="isSimpSocial"/>
           <contact-conversation-insights :contact="contact"
                                          data-testid="contact-conversation-insights"
-                                         v-if="!isSimpSocial && contact && isDemoCompany"/>
+                                         v-if="!isSimpSocial && contact && shouldSeeExperimentalXproAiFeatures"/>
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
