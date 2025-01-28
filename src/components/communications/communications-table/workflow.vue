@@ -7,14 +7,16 @@
     </span>
     <a class="ellipse"
        target='_blank'
+       :id="`comm-sequence-${_uid}`"
        :href="getWorkflowURL(value)"
        v-else-if="value">
       <external-link-icon color="#1976D2"/>
       {{ workflow.name || '-' }}
 
-      <q-tooltip>
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-sequence-${_uid}`">
         Click to go to sequence page
-      </q-tooltip>
+      </b-tooltip>
     </a>
     <span v-else>
       -

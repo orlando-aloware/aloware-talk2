@@ -4,12 +4,14 @@
     <a target='_blank'
        href="#"
        v-if="campaignId"
+       :id="`comm-number-${_uid}`"
        @click.prevent="filter">
       {{ campaign.name || '-' }}
 
-      <q-tooltip>
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-number-${_uid}`">
         Click to filter by this line
-      </q-tooltip>
+      </b-tooltip>
     </a>
     <span v-else>
       -

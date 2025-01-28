@@ -5,13 +5,15 @@
          v-if="row.contact">
       <router-link class="text-primary"
                    target='_blank'
+                   :id="`comm-contact-${_uid}`"
                    :to="{ path: `/contacts/${row.contact.id}`}">
         <external-link-icon color="#1976D2"/>
         {{ row.contact.name | fixContactName }}
 
-        <q-tooltip>
+        <b-tooltip custom-class="communication-logs-table__tooltip"
+                   :target="`comm-contact-${_uid}`">
           Click to go to contact's page
-        </q-tooltip>
+        </b-tooltip>
       </router-link>
     </div>
 
