@@ -56,7 +56,7 @@
     </template>
 
     <template slot="options"
-              v-if="!isNaN(list.id) && typeof list.id === 'string'">
+              v-if="isDemoCompany && !isNaN(list.id) && typeof list.id === 'string'">
       <compact-btn variant="primary"
                    class="ml-1"
                    data-testid="contacts-view-back-to-lists-button"
@@ -809,7 +809,8 @@ import {
   viewMixin,
   contactsListFiltersMixin,
   simpsocialMixin,
-  kycMixin
+  kycMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
@@ -834,7 +835,8 @@ export default {
     viewMixin,
     contactsListFiltersMixin,
     simpsocialMixin,
-    kycMixin
+    kycMixin,
+    userMixin
   ],
 
   components: {
@@ -1200,6 +1202,10 @@ export default {
     // Disable List actions if no list is selected or if there no records
     isListActionDisabled () {
       return !this.isContactListSelected || !this.totalRows
+    },
+
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   },
 
