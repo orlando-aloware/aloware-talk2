@@ -22,7 +22,7 @@
                 <q-tooltip anchor="top middle"
                            data-testid="contact-public-list-tooltip"
                            self="center middle">
-                  These are the contact list your admin shares with you.
+                  These are the contact lists shared with you by your admin
                 </q-tooltip>
               </q-icon>
             </div>
