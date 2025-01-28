@@ -135,6 +135,7 @@ export default {
           this.reloadFolders()
           this.isMoving = false
           this.$generalNotification('You have successfully moved a list!', 'success')
+          this.$emit('onListMoved')
         })
         .catch(this.handleRequestError)
         .finally(this.closeMoveDialog)
@@ -142,6 +143,7 @@ export default {
     handleRequestError (err) {
       const { message, html } = extractErrorMessage(err)
       console.log(html)
+      this.isMoving = false
       this.$generalNotification(message, 'error')
     },
     reloadFolders () {

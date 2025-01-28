@@ -306,7 +306,8 @@
                             :list="list"
                             @closeAssignContactsModal="closeAssignContacts" />
 
-      <move-dialog :user-id="userId"/>
+      <move-dialog :user-id="userId"
+                   @onListMoved="onListMoved"/>
 
       <create-list-modal from="lists"
                          :user-id="userId" />
@@ -587,6 +588,8 @@ export default {
           this.SET_LISTS_COUNT(this.listsCount - 1)
           this.listsData = this.listsData.filter(item => item.id !== list.id)
           this.$generalNotification(`${list.name} list has been successfully deleted.`)
+          // Refresh folders
+          this.$VueEvent.fire('fetchContactsLists')
         })
         .catch(err => {
           console.error(err)
@@ -863,6 +866,10 @@ export default {
         default:
           return true
       }
+    },
+
+    onListMoved () {
+      this.refreshLists()
     }
   },
 
