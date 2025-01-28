@@ -78,7 +78,7 @@
                   {{ props.row.name }}
               </router-link>
               </div>
-              <div v-if="col.name === 'owner_name'">
+              <div v-if="col.name === 'owner_name' && isColumnVisible(col.name)">
                 {{ props.row.owner_name }}
               </div>
               <div v-else-if="col.name === 'date_created'">
@@ -445,6 +445,7 @@ export default {
     fixedColumns () {
       const allColumns = this.$jsonClone(this.COLUMNS)
       return this.getResponsiveColumns(allColumns, this.columnsByViewport)
+        .filter((col) => this.isColumnVisible(col.field))
     },
 
     isPinned () {
@@ -851,6 +852,15 @@ export default {
     refreshFoldersPath () {
       if (this.folders?.length) {
         this.foldersPath = this.generatefoldersPath(this.folders[0])
+      }
+    },
+
+    isColumnVisible (field) {
+      switch (field) {
+        case 'owner_name':
+          return this.isPublic
+        default:
+          return true
       }
     }
   },
