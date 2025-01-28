@@ -16245,6 +16245,30 @@ hr {
   }
 }
 
+.communication-logs-table__tooltip {
+  .tooltip-inner {
+    background-color: #000 !important;
+    color: #fff !important;
+    font-size: 13px !important;
+  }
+}
+
+.communication-logs-table__popover {
+  background-color: #000;
+  color: #fff;
+  font-size: 13px;
+  word-break: break-word;
+  white-space: pre-line;
+
+  .arrow::before, .arrow::after {
+    border-right-color: #000;
+  }
+
+  .popover-body {
+    color: #fff;
+  }
+}
+
 .column-headers-modal {
   width: 900px !important;
   max-width: 90vw !important;

@@ -8,6 +8,7 @@
            v-html="$options.filters.nl2br(communication.body)"/>
 
       <b-popover triggers="hover focus"
+                 custom-class="communication-logs-table__popover"
                  :target="`comm-body-${_uid}`">
         {{ communication.body }}
       </b-popover>
