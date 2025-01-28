@@ -13,6 +13,13 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 150px'
   },
   {
+    label: 'Message Body',
+    name: 'body',
+    align: 'left',
+    headerStyle: 'min-width: 300px',
+    columnStyle: 'width: 300px'
+  },
+  {
     label: 'Ring Group',
     name: 'ring_group',
     align: 'left',
@@ -163,7 +170,8 @@ export const ALL_COLUMNS = [
     label: 'Operations',
     name: 'operations',
     align: 'center',
-    headerStyle: 'min-width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   }
 ]
 
@@ -236,6 +244,7 @@ export const DEFAULT_COLUMNS = [
     label: 'Operations',
     name: 'operations',
     align: 'center',
-    headerStyle: 'min-width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   }
 ]

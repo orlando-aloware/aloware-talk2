@@ -1,17 +1,21 @@
 <template>
   <div>
     <span class="cursor-pointer"
+          :id="`comm-disposition-${_uid}`"
           v-if="row.id && row.contact_id"
           @click="$emit('on-details', row)">
-      <component :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
+      <component class="disposition-icon"
+                 :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
                  v-if="row.disposition_status2" />
 
-      <q-tooltip>
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-disposition-${_uid}`">
         {{ dispositionTooltipData(row.disposition_status2, row.type, row.direction, row.callback_status) }}
-      </q-tooltip>
+      </b-tooltip>
     </span>
 
-    <component :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
+    <component class="disposition-icon"
+               :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
                v-else />
   </div>
 </template>

@@ -16060,10 +16060,6 @@ hr {
     margin-top: 20px;
     max-height: calc(100% - 110px);
 
-    td:last-child {
-      background-color: #fff !important;
-    }
-
     tr th {
       position: sticky;
       z-index: 2;
@@ -16082,6 +16078,18 @@ hr {
 
     tr:first-child th:last-child {
       z-index: 3;
+    }
+
+    tr:nth-of-type(odd) {
+      background-color: $light-grey;
+    }
+
+    tr:nth-of-type(even) {
+      background-color: #fff;
+    }
+
+    tr:hover {
+      background-color: $light-blue;
     }
 
     td:last-child {
@@ -16128,6 +16136,14 @@ hr {
       padding-top: 0 !important;
       padding-bottom: 0 !important;
       margin-bottom: 0 !important;
+    }
+
+    .disposition-icon {
+      border-radius: 50%;
+      background-color: rgba(#00BF4A, 0.1);
+      width: 42px;
+      height: 42px;
+      padding: 6px;
     }
 
     .operation-button {
@@ -16226,6 +16242,30 @@ hr {
 
   .q-table__control {
     display: none !important;
+  }
+}
+
+.communication-logs-table__tooltip {
+  .tooltip-inner {
+    background-color: #000 !important;
+    color: #fff !important;
+    font-size: 13px !important;
+  }
+}
+
+.communication-logs-table__popover {
+  background-color: #000;
+  color: #fff;
+  font-size: 13px;
+  word-break: break-word;
+  white-space: pre-line;
+
+  .arrow::before, .arrow::after {
+    border-right-color: #000;
+  }
+
+  .popover-body {
+    color: #fff;
   }
 }
 

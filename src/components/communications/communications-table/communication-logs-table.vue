@@ -68,6 +68,12 @@
             </div>
 
             <div :style="col.columnStyle"
+                 v-else-if="col.name === 'body'">
+              <message-body :style="col.columnStyle"
+                            :communication="props.row" />
+            </div>
+
+            <div :style="col.columnStyle"
                  v-else-if="col.name === 'ring_group'">
               <ring-group :row="props.row" />
             </div>
@@ -118,7 +124,8 @@
               <duration :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'attempting_users'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'attempting_users'">
               <attempting-users :row="props.row" />
             </div>
 
@@ -177,7 +184,8 @@
               <csat-score :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'operations'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
                                          @on-details="onCommunicationDetails"
                                          @archived="removeCommunication"
@@ -250,6 +258,7 @@ import User from './user.vue'
 import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
 import IncomingNumber from './incoming-number.vue'
+import MessageBody from './message-body.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
 import TransferType from './transfer-type.vue'
@@ -296,6 +305,7 @@ export default {
     Broadcast,
     Workflow,
     IncomingNumber,
+    MessageBody,
     AttemptingUsers,
     Transferred,
     TransferType,
@@ -409,13 +419,13 @@ export default {
           return this.columns
         }
 
-        const columns = JSON.parse(savedColumns)
+        // use ALL_COLUMNS as base, removing and sorting based on it
+        const columns = [...ALL_COLUMNS]
+        const savedColumnsNames = JSON.parse(savedColumns).map(column => column.name)
 
-        const hasAllFixedColumns = this.fixedColumns.every(name =>
-          columns.some(col => col.name === name)
-        )
-
-        return hasAllFixedColumns ? columns : this.columns
+        return columns
+          .filter(column => savedColumnsNames.includes(column.name))
+          .sort((a, b) => savedColumnsNames.indexOf(a.name) - savedColumnsNames.indexOf(b.name))
       } catch (error) {
         return this.columns
       }

@@ -2,13 +2,15 @@
   <div class="ellipse"
        data-testid="user-row">
     <a href="#"
+       :id="`comm-user-${_uid}`"
        v-if="value"
        @click.prevent="filter">
       {{ getUserName(getUser(value)) }}
 
-      <q-tooltip>
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-user-${_uid}`">
         Click to filter by this user
-      </q-tooltip>
+      </b-tooltip>
     </a>
     <span v-else>
       -

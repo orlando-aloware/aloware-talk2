@@ -422,13 +422,13 @@
                    v-if="isACallTypeChannel || isMessagesOnlyChannel">
               <b-form-group class="form-label">
                 <template v-slot:label>
-                  <span data-testid="filter-form-communication-owners-row">Communication Owners</span>
+                  <span data-testid="filter-form-communication-owners-row">Users</span>
                   <span class="pl-1">
                     <information-circle-icon color="#2F80ED" />
                     <q-tooltip anchor="top middle"
                                self="center middle">
                       <div class="text-13">
-                        <p class="font-weight-bold">Who is the communication owner?</p>
+                        <p class="font-weight-bold">Who is the user?</p>
                         <p class="font-weight-bold mb-0">For outbound communication:</p>
                         <p class="mb-0">Calls, SMS, fax & emails:</p>
                         <p><ul><li>The agent that sent the communication</li></ul></p>
@@ -443,7 +443,7 @@
                     </q-tooltip>
                   </span>
                 </template>
-                <user-selector custom-placeholder="Select Communication Owners"
+                <user-selector custom-placeholder="Select Users"
                                :force-remove-missing-values="true"
                                :generic-styling="false"
                                :multiple="true"
