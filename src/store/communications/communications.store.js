@@ -101,6 +101,7 @@ export default function () {
     isEditingView: false,
     showViewsList: false,
     isInboxRefreshBtnLoading: false,
-    inboxFilters: {}
+    inboxFilters: {},
+    searchQuery: ''
   }
 }

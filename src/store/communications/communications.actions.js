@@ -154,5 +154,8 @@ export default {
   },
   setIsLoadingMore: ({ commit }, isLoading = false) => {
     commit('SET_IS_LOADING_MORE', isLoading)
+  },
+  setSearchQuery: ({ commit }, query) => {
+    commit('SET_SEARCH_QUERY', query)
   }
 }

@@ -248,5 +248,8 @@ export default {
   },
   SET_IS_LOADING_MORE: (state, isLoading) => {
     state.isLoadingMore = isLoading
+  },
+  SET_SEARCH_QUERY: (state, query) => {
+    state.searchQuery = query
   }
 }
