@@ -141,3 +141,16 @@ export const columnsByViewportConfig = {
     'actions'
   ]
 }
+
+export const COLUMN_NAMES = {
+  name: 'name',
+  owner_name: 'owner_name',
+  date_created: 'date_created',
+  no_of_contacts: 'no_of_contacts',
+  type: 'type',
+  show_in_public_folder: 'show_in_public_folder',
+  source: 'source',
+  import_status: 'import_status',
+  imported_at: 'imported_at',
+  actions: 'actions'
+}

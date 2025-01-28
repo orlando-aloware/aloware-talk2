@@ -53,23 +53,6 @@
                            data-testid="create-tree-folder-component"
                            v-if="folder.id !== removedFolder"/>
             </template>
-            <tree-folder :name="folders[0].name"
-                         :id="folders[0].id"
-                         :order="folders[0].order"
-                         :hasEdit="folders[0].has_edit"
-                         :endpoint="foldersEndpoint"
-                         :hasDelete="folders[0].has_delete"
-                         :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
-                         :isRootList="true"
-                         :folders="[]"
-                         :lists="folders[0].lists"
-                         :layer="0"
-                         :parent_id="null"
-                         :user-id="userId"
-                         v-if="folders[0].id !== removedFolder"
-                         data-testid="create-tree-folder-toggle"
-                         @blur="onCreateFolderToggle($event)"
-                         @cancel="onCreateFolderCancel"/>
           </template>
           <div class="item-empty"
                v-if="isFolderEmpty && !isLoading">

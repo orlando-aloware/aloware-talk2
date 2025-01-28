@@ -11,6 +11,7 @@
     </contact-menu-item>
 
     <contact-menu-item
+      v-if="hasCreateFolder"
       @mouseover="createSubmenu"
       @mouseleave="destroySubmenu">
       <template slot="icon">
@@ -38,17 +39,6 @@
       @mouseleave="destroySubmenu"
       @mouseover="createSubmenu"
     >
-      <contact-menu-item
-        @click="$emit('create')" v-if="hasEdit"
-        @mouseover="isChildMenuOpen = false">
-        <template slot="icon">
-          <folder-icon color="#62666E"></folder-icon>
-        </template>
-        <template slot="title">
-          <span>Folder</span>
-        </template>
-      </contact-menu-item>
-
       <template v-if="isContactsRoute || isListsManagementRoute">
         <contact-menu-item
           v-if="hasEdit && hasCreateList"
@@ -128,7 +118,6 @@ import { createPopper } from '@popperjs/core'
 import { mapActions, mapMutations, mapState } from 'vuex'
 import ContactMenu from './contacts/contact-menu.vue'
 import ContactMenuItem from './contacts/contact-menu-item.vue'
-import FolderIcon from 'components/icons/folder-2-icon'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import MoveIcon from 'components/icons/move-icon.vue'
 import TrashIcon from 'components/icons/trash-icon.vue'
@@ -142,7 +131,6 @@ export default {
   components: {
     ContactMenu,
     ContactMenuItem,
-    FolderIcon,
     PencilIcon,
     TrashIcon,
     MoveIcon,
@@ -154,6 +142,10 @@ export default {
   props: {
     id: {
       type: Number
+    },
+    hasCreateFolder: {
+      type: Boolean,
+      default: true
     },
     hasCreateList: {
       type: Boolean,
