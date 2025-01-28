@@ -71,48 +71,48 @@
             <q-td :props="props"
                   :key="col.name"
                   v-for="col in props.cols">
-              <div v-if="col.name === 'name'">
+              <div v-if="col.name === COLUMN_NAMES.name">
               <router-link class="d-flex align-items-center item contact-name"
                                 data-testid="lists-view-list-name-link"
                                 :to="`/contacts/list/${props.row.id}${props.row.show_in_public_folder ? '?type=public' : ''}`">
                   {{ props.row.name }}
               </router-link>
               </div>
-              <div v-if="col.name === 'owner_name' && isColumnVisible(col.name)">
+              <div v-if="col.name === COLUMN_NAMES.owner_name && isColumnVisible(col.name)">
                 {{ props.row.owner_name }}
               </div>
-              <div v-else-if="col.name === 'date_created'">
+              <div v-else-if="col.name === COLUMN_NAMES.date_created">
                 <relative-time humanized
                               :from-time="props.row[col.field]" />
               </div>
-              <div v-else-if="col.name === 'no_of_contacts'">
+              <div v-else-if="col.name === COLUMN_NAMES.no_of_contacts">
                 {{ props.row.no_of_contacts }}
               </div>
-              <div v-else-if="col.name === 'type'">
+              <div v-else-if="col.name === COLUMN_NAMES.type">
                 {{ getContactListType(props.row) }}
               </div>
-              <div v-else-if="col.name === 'show_in_public_folder'">
+              <div v-else-if="col.name === COLUMN_NAMES.show_in_public_folder">
                 {{ props.row.show_in_public_folder }}
               </div>
-              <div v-else-if="col.name === 'source'">
+              <div v-else-if="col.name === COLUMN_NAMES.source">
                 <span v-if="props.row.source_name">
                   {{ props.row.source_name | ucwords }}
                 </span>
                 <span v-else>-</span>
               </div>
-              <div v-else-if="col.name === 'import_status'">
+              <div v-else-if="col.name === COLUMN_NAMES.import_status">
                 <span v-if="props.row.import_status_name">
                   {{ props.row.import_status_name | ucwords }}
                 </span>
                 <span v-else>-</span>
               </div>
-              <div v-else-if="col.name === 'imported_at'">
+              <div v-else-if="col.name === COLUMN_NAMES.imported_at">
                 <relative-time humanized
                               :from-time="props.row[col.field]"
                               v-if="props.row[col.field]" />
                 <span v-else>-</span>
               </div>
-              <div v-else-if="col.name === 'actions'">
+              <div v-else-if="col.name === COLUMN_NAMES.actions">
                 <div class="d-flex justify-content-center context-menu">
                   <div class="operation-button mx-1">
                     <span class="cursor-pointer"
@@ -339,7 +339,7 @@ import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
-import { COLUMNS, columnsByViewportConfig } from 'src/constants/lists/home-columns'
+import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
 import ListsFoldersManagement from './lists-folders-management'
@@ -407,6 +407,7 @@ export default {
       addToPowerDialerMode: 'add',
       addToPowerDialerIsManualSelection: false,
       COLUMNS,
+      COLUMN_NAMES,
       foldersPath: [],
 
       // Filters
@@ -857,7 +858,7 @@ export default {
 
     isColumnVisible (field) {
       switch (field) {
-        case 'owner_name':
+        case this.COLUMN_NAMES.owner_name:
           return this.isPublic
         default:
           return true
