@@ -13,6 +13,13 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 150px'
   },
   {
+    label: 'Message Body',
+    name: 'body',
+    align: 'left',
+    headerStyle: 'min-width: 300px',
+    columnStyle: 'width: 300px'
+  },
+  {
     label: 'Ring Group',
     name: 'ring_group',
     align: 'left',

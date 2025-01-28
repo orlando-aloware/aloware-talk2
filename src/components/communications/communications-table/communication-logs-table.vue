@@ -68,6 +68,12 @@
             </div>
 
             <div :style="col.columnStyle"
+                 v-else-if="col.name === 'body'">
+              <message-body :style="col.columnStyle"
+                            :communication="props.row" />
+            </div>
+
+            <div :style="col.columnStyle"
                  v-else-if="col.name === 'ring_group'">
               <ring-group :row="props.row" />
             </div>
@@ -252,6 +258,7 @@ import User from './user.vue'
 import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
 import IncomingNumber from './incoming-number.vue'
+import MessageBody from './message-body.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
 import TransferType from './transfer-type.vue'
@@ -298,6 +305,7 @@ export default {
     Broadcast,
     Workflow,
     IncomingNumber,
+    MessageBody,
     AttemptingUsers,
     Transferred,
     TransferType,
