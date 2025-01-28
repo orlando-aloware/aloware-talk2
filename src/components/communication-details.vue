@@ -1,6 +1,7 @@
 <template>
   <div v-if="communication"
        data-testid="comm-details-wrapper">
+    Details: {{communication.id}}
     <b-row data-testid="comm-details-row">
       <b-col :md="isWidget || mobileView ? 12 : 4"
              sm="12"
@@ -1074,6 +1075,7 @@ export default {
 
   props: {
     communication: {
+      type: Object,
       required: true
     },
 
@@ -1263,7 +1265,7 @@ export default {
     },
 
     onArchive () {
-      this.$bvModal.msgBoxConfirm('Deleting the communication will remove it from all reports and plots. Continue?', {
+      this.$bvModal.msgBoxConfirm('Deleting this communication will remove it from all reports and graphs. Do you want to proceed?', {
         title: 'Delete Communication',
         size: 'sm',
         buttonSize: 'sm',
