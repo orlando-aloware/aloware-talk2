@@ -42,7 +42,8 @@ export default {
       'selectedFilter',
       'isFilterDialogForView',
       'paginationPage',
-      'isLoadingMore'
+      'isLoadingMore',
+      'searchQuery'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -149,7 +150,6 @@ export default {
       fixedColumns: [
         'operations'
       ],
-      searchQuery: '',
       mentionType: MentionType.TYPE_RECEIVED,
 
       communicationInProgressStatuses: [
@@ -858,7 +858,6 @@ export default {
         has_reminders: 0,
         contact_country: '',
         changed: true,
-        /* TODO: this is not being added in the filter, verify also affect to https://aloware.atlassian.net/browse/WAT-1166 */
         states_limit: { us: [], ca: [] },
         initial_line_only: 0,
         search_text: '',

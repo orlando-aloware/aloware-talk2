@@ -7,7 +7,7 @@
       <div class="search">
         <search-input class="width-260"
                       limit-search-characters
-                      :search="search"
+                      :search="searchQuery"
                       :disabled="isLoadingDisabled"
                       data-testid="contacts-view-search-input"
                       @search="onSearch" />
@@ -260,7 +260,7 @@ import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
 import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -315,7 +315,6 @@ export default {
 
   data () {
     return {
-      search: '',
       isLoadingDisabled: false,
       tableFields: ALL_COLUMNS,
       columns: DEFAULT_COLUMNS,
@@ -330,6 +329,10 @@ export default {
   },
 
   methods: {
+    ...mapActions('communications', [
+      'setSearchQuery'
+    ]),
+
     sort (sorts) {
       // Handle sorting logic here
       this.getCommunications(this.communicationFilters)
@@ -340,7 +343,7 @@ export default {
     },
 
     onSearch (value) {
-      this.searchQuery = value
+      this.setSearchQuery(value)
 
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
