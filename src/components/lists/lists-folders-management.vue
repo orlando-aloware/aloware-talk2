@@ -153,15 +153,21 @@ export default {
 
     removeQueryParam (key) {
       const query = Object.assign({}, this.$route.query)
-      delete query[key]
-      this.$router.replace({ query })
+      if (Array.isArray(key)) {
+        for (const k of key) {
+          delete query[k]
+        }
+      } else {
+        delete query[key]
+      }
+      this.$router.replace({ query }).catch(() => {})
     },
 
     togglePublicLists (enabled) {
       if (enabled) {
         this.updateQueryParam('publicLists', 1, true)
       } else {
-        this.removeQueryParam('publicLists')
+        this.removeQueryParam(['publicLists', 'folder_id'])
       }
     }
   }
