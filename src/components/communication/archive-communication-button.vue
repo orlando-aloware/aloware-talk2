@@ -3,18 +3,18 @@
         data-testid="comm-archive-button"
         v-if="hasPermissionTo('archive communication')"
         @click="dialog">
-    <archive-icon height="16"
-                  width="16"
-                  color="#62666E"/>
+    <trash-icon height="16"
+                width="16"
+                color="#62666E"/>
 
     <q-tooltip>
-      Archive
+      Delete
     </q-tooltip>
   </span>
 </template>
 
 <script>
-import ArchiveIcon from 'components/icons/archive-icon.vue'
+import TrashIcon from 'components/icons/trash-icon.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import API from 'src/plugins/api/api'
 
@@ -26,7 +26,7 @@ export default {
   ],
 
   components: {
-    ArchiveIcon
+    TrashIcon
   },
 
   props: {
@@ -46,7 +46,7 @@ export default {
         return
       }
 
-      this.$bvModal.msgBoxConfirm('Archiving the communication will remove it from all reports and plots. Continue?', {
+      this.$bvModal.msgBoxConfirm('Deleting the communication will remove it from all reports and plots. Continue?', {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',
@@ -63,7 +63,7 @@ export default {
 
       API.V1.communication.delete(this.communication.id)
         .then(() => {
-          this.$generalNotification('Communication archived successfully.', 'success')
+          this.$generalNotification('Communication deleted successfully.', 'success')
           this.loading = false
           this.$emit('archived', this.communication.id)
         })
