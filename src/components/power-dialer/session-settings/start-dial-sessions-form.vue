@@ -42,7 +42,8 @@
         </div>
       </div>
 
-      <div class="row" v-if="!isDemoCompany">
+      <div class="row"
+           v-if="!isDemoCompany">
         <div class="col-12 mb-4">
           <div class="flex justify-content-between d-items-center">
             <div :class="disableField('force_redial') ? 'opacity-05' : ''">
@@ -374,10 +375,6 @@ export default {
           })
       ]
       return options
-    },
-
-    isDemoCompany () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   },
 

@@ -579,10 +579,6 @@ export default {
         ? 'h-auto' : ''
     },
 
-    isDemoCompany () {
-      return Object.values(process.env.DEMO_COMPANY_IDS).includes(this.currentCompany.id)
-    },
-
     shouldShowKycFillDialog () {
       return this.isAuthenticated &&
              this.isIntroVideoVisible === null &&

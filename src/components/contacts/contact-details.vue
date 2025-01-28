@@ -190,10 +190,6 @@ export default {
         this.currentCompany.aloai_enabled &&
         this.contact && !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
-    },
-
-    isDemoCompany () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   },
 

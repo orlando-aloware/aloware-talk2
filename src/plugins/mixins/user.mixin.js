@@ -22,6 +22,10 @@ export default {
       return localStorage.getItem('impersonate') === 'true'
     },
 
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    },
+
     /*
       WAT-1105:
           - second code freeze: 01-22-2025
