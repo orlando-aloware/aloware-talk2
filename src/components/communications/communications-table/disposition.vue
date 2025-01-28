@@ -3,8 +3,7 @@
     <span class="cursor-pointer"
           v-if="row.id && row.contact_id"
           @click="$emit('on-details', row)">
-      <component height="32"
-                 width="32"
+      <component class="disposition-icon"
                  :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
                  v-if="row.disposition_status2" />
 
@@ -13,8 +12,7 @@
       </q-tooltip>
     </span>
 
-    <component height="32"
-               width="32"
+    <component class="disposition-icon"
                :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
                v-else />
   </div>
