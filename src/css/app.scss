@@ -16141,10 +16141,36 @@ hr {
 
     .disposition-icon {
       border-radius: 50%;
-      background-color: rgba(#00BF4A, 0.1);
       width: 42px;
       height: 42px;
       padding: 6px;
+
+      &[class*="completed"],
+      &[class*="answered"] {
+        background-color: rgba(#00BF4A, 0.1);
+      }
+
+      &[class*="missed"],
+      &[class*="failed"],
+      &[class*="voicemail"]{
+        background-color: rgba(#FA003F, 0.1);
+      }
+
+      &[class*="abandoned"] {
+        background-color: rgba(#9C27BB, 0.1);
+      }
+
+      &[class*="inprogress"] {
+        background-color: rgba(#4450C0, 0.1);
+      }
+
+      &[class*="callback-pending"] {
+        background-color: rgba(156,39,187, 0.1);
+      }
+
+      &[class*="deadend"] {
+        background-color: rgba(#F6D047, 0.1);
+      }
     }
 
     .operation-button {
