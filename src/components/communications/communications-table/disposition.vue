@@ -4,8 +4,8 @@
           :id="`comm-disposition-${_uid}`"
           v-if="row.id && row.contact_id"
           @click="$emit('on-details', row)">
-      <component class="disposition-icon"
-                 :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
+      <component :class="['disposition-icon', `disposition-icon--${icon}`]"
+                 :is="icon"
                  v-if="row.disposition_status2" />
 
       <b-tooltip custom-class="communication-logs-table__tooltip"
@@ -14,8 +14,8 @@
       </b-tooltip>
     </span>
 
-    <component class="disposition-icon"
-               :is="stateToIcon(row.disposition_status2, row.type, row.direction, row.callback_status)"
+    <component :class="['disposition-icon', `disposition-icon--${icon}`]"
+               :is="icon"
                v-else />
   </div>
 </template>
@@ -34,6 +34,12 @@ export default {
     row: {
       type: Object,
       required: true
+    }
+  },
+
+  computed: {
+    icon () {
+      return this.stateToIcon(this.row.disposition_status2, this.row.type, this.row.direction, this.row.callback_status)
     }
   }
 }
