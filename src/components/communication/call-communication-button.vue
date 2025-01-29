@@ -1,13 +1,19 @@
 <template>
   <span class="cursor-pointer"
         data-testid="comm-call-back-button"
+        :id="`action-call-${_uid}`"
         v-if="communication.contact && communication.type !== CommunicationTypes.EMAIL"
         @click="callContact">
     <call-o-icon height="16"
                  width="16"
                  color="#62666E"/>
 
-    <q-tooltip>
+    <b-tooltip custom-class="communication-logs-table__tooltip"
+               :target="`action-call-${_uid}`"
+               v-if="blackTooltip">
+      Call Back
+    </b-tooltip>
+    <q-tooltip v-else>
       Call Back
     </q-tooltip>
   </span>
@@ -35,6 +41,11 @@ export default {
     communication: {
       type: Object,
       required: true
+    },
+
+    blackTooltip: {
+      type: Boolean,
+      default: false
     }
   },
 
