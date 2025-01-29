@@ -54,6 +54,10 @@ export default {
     },
     userId: {
       type: Number
+    },
+    fromAdminList: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -129,7 +133,8 @@ export default {
       this.isMoving = true
       return this.$axios
         .patch(`${this.fetchFoldersListEndpoint}/${this.moveDialog.id}`, {
-          contact_folder_id: this.moveDialog.target
+          contact_folder_id: this.moveDialog.target,
+          ...(this.fromAdminList ? { from_admin_list: true } : {})
         })
         .then(() => {
           this.reloadFolders()
