@@ -120,6 +120,14 @@ export default {
 
       if (this.usedMinutes >= this.includedMinutes) {
         if (this.overusageRestrictionEnabled) {
+          // If the plan is not an AI plan, hide cost-related and plan-specific messages.
+          if (!this.currentCompany?.plan?.ai_plan) {
+            return {
+              title: `You’ve used all ${this.includedMinutes} trial minutes, but don’t worry! You can easily purchase additional transcription minutes by reaching out to our CSM team, you can upgrade your plan to include more minutes and unlock additional features.`,
+              message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
+            }
+          }
+          // If the plan is an AI plan, show cost-related messages.
           return {
             title: `You’ve used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
             message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
