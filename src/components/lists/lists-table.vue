@@ -307,7 +307,7 @@
                             @closeAssignContactsModal="closeAssignContacts" />
 
       <move-dialog :user-id="userId"
-                   :fromAdminList="true"
+                   :from-admin-list="true"
                    @onListMoved="onListMoved"/>
 
       <create-list-modal from="lists"
