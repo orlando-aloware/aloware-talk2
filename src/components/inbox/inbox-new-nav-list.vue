@@ -66,8 +66,8 @@ export default {
   },
 
   computed: {
-    ...mapState('inbox', ['inboxesFirstPage']),
-    ...mapGetters('inbox', ['getInboxesFirstPage']),
+    ...mapState('eInbox', ['inboxesFirstPage']),
+    ...mapGetters('eInbox', ['getInboxesFirstPage']),
 
     inboxes () {
       return this.getInboxesFirstPage
@@ -75,7 +75,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('inbox', ['setInboxesFirstPage']),
+    ...mapActions('eInbox', ['setInboxesFirstPage']),
 
     async loadMoreInboxes () {
       if (this.loading || !this.hasMorePages) return

@@ -106,7 +106,7 @@ export default {
       'navListItems'
     ]),
 
-    ...mapGetters('inbox', [
+    ...mapGetters('eInbox', [
       'isNewInboxEnabled'
     ]),
 

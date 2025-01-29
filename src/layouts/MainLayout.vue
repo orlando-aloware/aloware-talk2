@@ -623,7 +623,7 @@ export default {
       }
     },
 
-    ...mapGetters('inbox', ['isNewInboxEnabled'])
+    ...mapGetters('eInbox', ['isNewInboxEnabled'])
   },
 
   created () {

@@ -315,7 +315,7 @@ export default {
       'isContactMixinUsed'
     ]),
 
-    ...mapGetters('inbox', [
+    ...mapGetters('eInbox', [
       'isNewInboxEnabled'
     ]),
 

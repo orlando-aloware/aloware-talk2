@@ -221,11 +221,5 @@ export default {
   },
   SET_IS_INBOX_REFRESH_BTN_LOADING (state, value) {
     state.isInboxRefreshBtnLoading = value
-  },
-  SET_NEW_INBOX (state, enabled) {
-    state.newInboxEnabled = enabled
-  },
-  SET_INBOXES_FIRST_PAGE (state, inboxesFirstPage) {
-    state.inboxesFirstPage = inboxesFirstPage
   }
 }

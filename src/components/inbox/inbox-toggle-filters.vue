@@ -31,11 +31,11 @@
               data-testid="inbox-new-experience-label">
           <template v-if="newInboxEnabled">
             <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
-            <strong>Enable New Inbox</strong>
+            <strong>New Inbox Enabled</strong>
           </template>
           <template v-else>
             <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
-            <strong>New Inbox disabled</strong>
+            <strong>New Inbox Disabled</strong>
           </template>
         </label>
       </div>
@@ -147,7 +147,8 @@ export default {
       'isInboxRefreshBtnLoading'
     ]),
     ...mapState('cache', ['currentCompany']),
-    ...mapGetters('inbox', ['isNewInboxEnabled']),
+
+    ...mapGetters('eInbox', ['isNewInboxEnabled']),
 
     isShown () {
       return (this.$route?.meta?.title === INBOXES_MENU_TITLE && this.$route.params.channel !== 'mentions')
@@ -185,10 +186,14 @@ export default {
     ...mapActions('inbox', [
       'setInboxShowMyContacts',
       'setInboxShowUnreads',
-      'setIsInboxRefreshBtnLoading',
+      'setIsInboxRefreshBtnLoading'
+    ]),
+
+    ...mapActions('eInbox', [
       'toggleNewInbox',
       'initNewInbox'
     ]),
+
     ...mapActions('cache', ['setCurrentCompany']),
 
     myContactsFilterChange () {

@@ -11,6 +11,7 @@ import carrierFee from './carrier-fee'
 import communications from './communications'
 import contacts from './contacts'
 import inbox from './inbox'
+import eInbox from './e-inbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import transcriptions from './transcriptions'
@@ -42,6 +43,7 @@ export default function (/* { ssrContext } */) {
       communications,
       contacts,
       inbox,
+      eInbox,
       stats,
       powerDialer,
       transcriptions,

@@ -84,6 +84,7 @@ export default {
 
   mixins: [
     inboxRoutesMixin,
+    // eInboxMixin,
     inboxMixin,
     userMixin
   ],
@@ -124,7 +125,10 @@ export default {
     ]),
 
     ...mapGetters('inbox', [
-      'allInboxFilters',
+      'allInboxFilters'
+    ]),
+
+    ...mapGetters('eInbox', [
       'isNewInboxEnabled',
       'getNavListItems'
     ]),
@@ -217,7 +221,7 @@ export default {
     }
 
     if (this.isNewInboxEnabled) {
-      this.fetchInboxes()
+      // this.fetchInboxes()
     }
   },
 

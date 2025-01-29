@@ -153,8 +153,7 @@ export default {
       'gettingTasksList',
       'setTaskCount',
       'setPinnedViews',
-      'setContacts',
-      'setInboxesFirstPage'
+      'setContacts'
     ]),
 
     getNoneLiveCallContactTasks (contacts) {
@@ -729,30 +728,13 @@ export default {
       return { from_date: fromDate, to_date: toDate }
     },
 
-    async fetchInboxes (page = 1) {
-      if (page !== 1) {
-        this.inboxes = await talk2Api.V2.inbox.inboxes.get({ page }).then(res => res.data.data)
-      }
-
-      const inboxes = this.getInboxesFirstPage
-
-      if (inboxes.length) {
-        this.inboxes = inboxes
-      }
-
-      const firstPage = await talk2Api.V2.inbox.inboxes.get({ page })
-      this.setInboxesFirstPage(firstPage.data.data)
-
-      this.inboxes = this.getInboxesFirstPage
+    created () {
+      this.cancelToken = window.axios.CancelToken
+      this.source = this.cancelToken.source()
+      this.cancelTokenPinnedViews = window.axios.CancelToken
+      this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
+      this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
+      this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
     }
-  },
-
-  created () {
-    this.cancelToken = window.axios.CancelToken
-    this.source = this.cancelToken.source()
-    this.cancelTokenPinnedViews = window.axios.CancelToken
-    this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
-    this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
-    this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
   }
 }
