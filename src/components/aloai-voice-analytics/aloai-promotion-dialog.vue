@@ -129,14 +129,14 @@ export default {
           }
           // If the plan is an AI plan, show cost-related messages.
           return {
-            title: `You’ve used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
-            message: `To keep benefiting from uninterrupted service, you also have the option to upgrade your plan for more included minutes and additional features.`
+            title: `You’ve reached the ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
+            message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
           }
         }
 
         return {
-          title: `You’ve reached the ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. However, with Overusage Billing Restriction disabled, you can continue using the service seamlessly. Additional transcription minutes will be charged at just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
-          message: `To ensure uninterrupted access and additional benefits, consider upgrading your plan for more included minutes and enhanced features.`
+          title: `You’ve used all ${this.includedMinutes} minutes included in your AloAi Voice Analytics plan. But don’t worry — you can continue using the service! After your free minutes, each transcription minute will cost just ${Math.round(Number(this.transcriptionRate) * 100)} cents/min.`,
+          message: `To maintain uninterrupted service, you can choose to enable the option to continue using the service beyond your included minutes. By enabling this option, you agree to be charged $${Number(this.transcriptionRate)} per additional transcription minute after hitting your limit. Alternatively, you may consider upgrading your plan to receive more included minutes and access additional features.`
         }
       }
 
