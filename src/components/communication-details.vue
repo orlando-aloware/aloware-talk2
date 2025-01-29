@@ -1,7 +1,6 @@
 <template>
   <div v-if="communication"
        data-testid="comm-details-wrapper">
-    Details: {{communication.id}}
     <b-row data-testid="comm-details-row">
       <b-col :md="isWidget || mobileView ? 12 : 4"
              sm="12"
@@ -986,7 +985,7 @@
                              :communication="communication"
                              :ring-group="usedRingGroup"
                              v-if="usedRingGroup"/>
-        <network-logs-display :call-issues="Object.values(communication?.call_quality_summary)"
+        <network-logs-display :call-issues="Object.values(communication?.call_quality_summary || {})"
                               :user="communication.user"/>
       </b-col>
     </b-row>
