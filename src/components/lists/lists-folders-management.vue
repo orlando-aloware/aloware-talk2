@@ -44,7 +44,8 @@
 
         <contacts-sidebar-loader v-if="isLoading" />
 
-        <remove-folder-dialog :user-id="userId" />
+        <remove-folder-dialog :user-id="userId"
+                              @folder-removed="onFolderRemoved" />
       </div>
     </div>
   </div>
@@ -167,6 +168,12 @@ export default {
         this.updateQueryParam('publicLists', 1, true)
       } else {
         this.removeQueryParam(['publicLists', 'folder_id'])
+      }
+    },
+
+    onFolderRemoved (id) {
+      if (id === +this.$route.query.folder_id) {
+        this.removeQueryParam('folder_id')
       }
     }
   }
