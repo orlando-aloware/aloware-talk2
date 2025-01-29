@@ -8,7 +8,7 @@
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          !Are you sure you want to remove
+          Are you sure you want to remove
           <span class="font-weight-bold">{{ folderToRemove.name }}</span
           >? Please be reminded that this will also delete its contents such as
           subfolders, lists and contacts.
