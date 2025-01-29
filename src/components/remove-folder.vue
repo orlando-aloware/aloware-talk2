@@ -97,6 +97,9 @@ export default {
     removeFolderRequest (id) {
       if (this.isContactModuleType) {
         return talk2Api.V2.contactFolders.delete(id)
+          .then(() => {
+            this.$emit('folder-removed', id)
+          })
           .catch((error) => {
             const { message, html } = extractErrorMessage(error)
             console.log(html)
