@@ -118,7 +118,8 @@
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.actions">
                 <div class="d-flex justify-content-center context-menu">
-                  <div class="operation-button mx-1">
+                  <div class="operation-button mx-1"
+                       v-if="showListLink">
                     <span class="cursor-pointer"
                           data-testid="lists-edit-button"
                           @click="onEditList(props.row)">
