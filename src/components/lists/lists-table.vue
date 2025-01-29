@@ -72,11 +72,15 @@
                   :key="col.name"
                   v-for="col in props.cols">
               <div v-if="col.name === COLUMN_NAMES.name">
-              <router-link class="d-flex align-items-center item contact-name"
-                                data-testid="lists-view-list-name-link"
-                                :to="`/contacts/list/${props.row.id}${props.row.show_in_public_folder ? '?type=public' : ''}`">
+                <router-link class="d-flex align-items-center item contact-name"
+                             data-testid="lists-view-list-name-link"
+                             :to="`/contacts/list/${props.row.id}${props.row.show_in_public_folder ? '?type=public' : ''}`"
+                             v-if="showListLink">
+                    {{ props.row.name }}
+                </router-link>
+                <span v-else>
                   {{ props.row.name }}
-              </router-link>
+                </span>
               </div>
               <div v-if="col.name === COLUMN_NAMES.owner_name && isColumnVisible(col.name)">
                 {{ props.row.owner_name }}
@@ -486,6 +490,10 @@ export default {
 
     folderId () {
       return +this.$route.query.folder_id
+    },
+
+    showListLink () {
+      return this.isPublic || this.userId === this.profile.id
     }
   },
 
