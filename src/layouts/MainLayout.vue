@@ -12,7 +12,7 @@
         <cancelled-account-modal v-else-if="isCancelledAccount"/>
         <trial-banner v-else-if="isTrial"/>
       </template>
-      <div class="h-100 d-flex"
+      <div class="h-100"
            :class="{ 'page': !isWidget }">
         <q-layout class="page-layout position-relative overflow-hidden-y h-100"
                   view="lHh Lpr lff"
