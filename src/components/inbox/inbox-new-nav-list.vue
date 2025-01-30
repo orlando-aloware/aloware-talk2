@@ -61,7 +61,6 @@ export default {
   data () {
     return {
       // loading: false,
-      currentPage: 0,
       perPage: 50,
       hasMorePages: true
     }
@@ -82,7 +81,10 @@ export default {
   },
 
   methods: {
-    ...mapActions('eInbox', ['setActiveInbox']),
+    ...mapActions('eInbox', [
+      'setActiveInbox',
+      'resetCommunications'
+    ]),
 
     onScroll ({ verticalPosition, verticalSize, verticalContainerSize }) {
       const bottomThreshold = 100
@@ -97,7 +99,9 @@ export default {
 
     onInboxSelect (inboxId) {
       this.setActiveInbox(inboxId)
-      // this.resetCommunications()
+      this.resetCommunications()
+      console.log('getting communications from: ', inboxId)
+      this.fetchCommunications(inboxId)
     }
   },
 
@@ -106,7 +110,11 @@ export default {
 
     // If there are inboxes, set the first one as active
     if (this.inboxes.length) {
-      this.setActiveInbox(this.inboxes[0].id)
+      const inboxId = this.inboxes[0].id
+      this.setActiveInbox(inboxId)
+      this.resetCommunications()
+      console.log('getting communications from: ', inboxId)
+      this.fetchCommunications(inboxId)
     }
   }
 }

@@ -8,7 +8,7 @@ const exportCommunications = async (contactId) => {
   return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
 }
 
-export default {
+const talk2Api = {
   V1: {
     contact: {
       createAxiosError (message, status) {
@@ -962,6 +962,13 @@ export default {
           const params = { per_page: perPage, page }
           return window.axios.get(`${suffixV2}inboxes`, { params })
         }
+      },
+
+      communications: {
+        get: ({ inboxId, page = 1, communicationType }) => {
+          const params = { per_page: 15, page, type: communicationType }
+          return window.axios.get(`${suffixV2}inboxes/${inboxId}/communications`, { params })
+        }
       }
     },
 
@@ -999,3 +1006,5 @@ export default {
     }
   }
 }
+
+export default talk2Api

@@ -1,7 +1,6 @@
 <template>
   <div class="channel-toggle-wrapper d-flex align-items-center w-100 p-0 m-0">
     <q-btn-toggle
-      v-model="selectedChannel"
       class="channel-toggle w-100"
       no-caps
       rounded
@@ -11,20 +10,45 @@
       text-color="grey-8"
       spread
       :options="[
-        {label: 'Calls', value: 'calls'},
-        {label: 'Messages', value: 'messages'}
+        {label: 'Calls', value: CALLS_TYPE},
+        {label: 'Messages', value: SMS_TYPE}
       ]"
+      :value="communicationType"
+      @input="onChange"
     />
   </div>
 </template>
 
 <script>
+import { CALLS_TYPE, SMS_TYPE } from 'src/store/e-inbox/e-inbox.store'
+import { mapActions, mapState } from 'vuex'
+import eInboxMixin from 'src/plugins/mixins/e-inbox.mixin'
+
 export default {
-  name: 'inbox-channel-toggle',
+  name: 'InboxChannelToggle',
+
+  mixins: [eInboxMixin],
 
   data () {
     return {
-      selectedChannel: 'calls'
+      CALLS_TYPE,
+      SMS_TYPE
+    }
+  },
+
+  computed: {
+    ...mapState('eInbox', ['communicationType', 'activeInbox'])
+  },
+
+  methods: {
+    ...mapActions('eInbox', ['setCommunicationType']),
+
+    onChange (value) {
+      this.setCommunicationType(value)
+      if (this.activeInbox) {
+        this.resetCommunications()
+        this.fetchCommunications(this.activeInbox)
+      }
     }
   }
 }
