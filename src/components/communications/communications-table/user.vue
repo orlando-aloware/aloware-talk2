@@ -1,11 +1,31 @@
 <template>
   <div class="ellipse"
        data-testid="user-row">
+    <i class="fa-solid fa-users text-primary mr-1"
+       :id="`teams-${_uid}`"
+       v-if="row.teams?.length" />
+
+    <b-popover triggers="hover click"
+               custom-class="communication-logs-table__popover"
+               :target="`teams-${_uid}`"
+               v-if="row.teams?.length">
+      <span class="d-block mb-1">
+        <strong class="text-white">Teams of this user:</strong>
+      </span>
+      <span class="d-block mb-1"
+            :key="`team_${team}`"
+            v-for="team in row.teams">
+        <span>
+          {{ team }}
+        </span>
+      </span>
+    </b-popover>
+
     <a href="#"
        :id="`comm-user-${_uid}`"
-       v-if="value"
+       v-if="row.user_id"
        @click.prevent="filter">
-      {{ getUserName(getUser(value)) }}
+      {{ getUserName(getUser(row.user_id)) }}
 
       <b-tooltip custom-class="communication-logs-table__tooltip"
                  :target="`comm-user-${_uid}`">
@@ -29,9 +49,9 @@ export default {
   ],
 
   props: {
-    value: {
-      type: Number,
-      required: false
+    row: {
+      type: Object,
+      required: true
     }
   },
 
@@ -39,7 +59,7 @@ export default {
     filter () {
       this.$emit('on-filter', {
         type: 'users',
-        value: [this.value]
+        value: [this.row.user_id]
       })
     }
   }

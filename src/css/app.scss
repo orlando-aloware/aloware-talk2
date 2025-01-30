@@ -16284,8 +16284,6 @@ hr {
   background-color: #000;
   color: #fff;
   font-size: 13px;
-  word-break: break-word;
-  white-space: pre-line;
 
   .arrow::before, .arrow::after {
     border-right-color: #000;
@@ -16293,7 +16291,15 @@ hr {
 
   .popover-body {
     color: #fff;
-    margin-top: -20px; // white-space fix trick
+  }
+
+  &--long-text {
+    white-space: pre-line;
+    word-break: break-word;
+
+    .popover-body {
+      margin-top: -20px;
+    }
   }
 }
 
