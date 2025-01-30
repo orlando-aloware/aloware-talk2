@@ -4,8 +4,10 @@
     <span v-if="isAgent && row.ring_group_id">
       {{ ringGroup.name }}
     </span>
-    <a target='_blank'
+    <a class="cursor-pointer"
+       target="_blank"
        :href="getRingGroupURL(row.ring_group_id)"
+       @click="handleRingGroupClick(row.ring_group_id, $event)"
        v-else-if="row.ring_group_id">
       <external-link-icon color="#1976D2"/>
       {{ ringGroup.name }}
@@ -23,6 +25,7 @@
 <script>
 import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 import { aclMixin, classicMixin } from 'src/plugins/mixins'
+import communicationsMixin from 'src/plugins/mixins/communications.mixin'
 import { mapState } from 'vuex'
 
 export default {
@@ -34,7 +37,8 @@ export default {
 
   mixins: [
     aclMixin,
-    classicMixin
+    classicMixin,
+    communicationsMixin
   ],
 
   props: {
@@ -49,6 +53,14 @@ export default {
 
     ringGroup () {
       return this.ringGroups.find(rg => rg.id === this.row.ring_group_id) || {}
+    }
+  },
+
+  methods: {
+    handleRingGroupClick (ringGroupId, e) {
+      const url = this.getRingGroupURL(ringGroupId)
+      // Only handle navigation in Electron, let browser handle it normally
+      this.handleElectronNavigation(e, url)
     }
   }
 }
