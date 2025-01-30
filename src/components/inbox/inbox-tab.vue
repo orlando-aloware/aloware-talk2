@@ -1,7 +1,5 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column" data-testid="inbox-tab-wrapper">
-      <inbox-channel-toggle
-        v-if="isNewInboxEnabled"/>
       <calls-header :openCount="taskCounts.open"
                     :pendingCount="taskCounts.pending"
                     :commCampaigns="[]"
@@ -256,7 +254,6 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
-import InboxChannelToggle from './inbox-channel-toggle.vue'
 
 export default {
   name: 'InboxTab',
@@ -278,8 +275,7 @@ export default {
     InboxSearcher,
     FilterIcon,
     InboxTaskList,
-    CallsHeader,
-    InboxChannelToggle
+    CallsHeader
   },
 
   computed: {

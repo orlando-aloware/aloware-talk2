@@ -75,7 +75,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('eInbox', ['setInboxesFirstPage']),
+    ...mapActions('eInbox', ['setInboxesFirstPage', 'setActiveInbox']),
 
     async loadMoreInboxes () {
       if (this.loading || !this.hasMorePages) return
@@ -121,7 +121,9 @@ export default {
 
     onInboxSelect (inboxId) {
       this.selectedInboxId = inboxId
-      this.$emit('inbox-selected', inboxId)
+      // this.$emit('inbox-selected', inboxId)
+
+      this.setActiveInbox(inboxId)
     }
   },
 

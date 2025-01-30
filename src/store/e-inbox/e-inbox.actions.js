@@ -12,5 +12,8 @@ export default {
   },
   setInboxesFirstPage: ({ commit }, inboxesFirstPage) => {
     commit('SET_INBOXES_FIRST_PAGE', inboxesFirstPage)
+  },
+  setActiveInbox: ({ commit }, inbox) => {
+    commit('SET_ACTIVE_INBOX', inbox)
   }
 }

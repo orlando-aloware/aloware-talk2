@@ -27,8 +27,7 @@ export default {
       'pinnedViews',
       'contacts',
       'appliedFilter',
-      'channelClonedFilter',
-      'inboxesFirstPage'
+      'channelClonedFilter'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -36,8 +35,6 @@ export default {
     ...mapState(['currentTimezone']),
 
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
-
-    ...mapGetters('inbox', ['getInboxesFirstPage']),
 
     nextPage () {
       return this.contactsCurrentPage + 1
@@ -130,8 +127,7 @@ export default {
         filter: Filters.EXCERPT,
         scope: 'user'
       },
-      ranges: {},
-      inboxes: []
+      ranges: {}
     }
   },
 
@@ -726,15 +722,15 @@ export default {
       }
 
       return { from_date: fromDate, to_date: toDate }
-    },
-
-    created () {
-      this.cancelToken = window.axios.CancelToken
-      this.source = this.cancelToken.source()
-      this.cancelTokenPinnedViews = window.axios.CancelToken
-      this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
-      this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
-      this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
     }
+  },
+
+  created () {
+    this.cancelToken = window.axios.CancelToken
+    this.source = this.cancelToken.source()
+    this.cancelTokenPinnedViews = window.axios.CancelToken
+    this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
+    this.defaultFilterModel.filter.from_date = moment().tz(this.currentTimezone).subtract(30, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss')
+    this.defaultFilterModel.filter.to_date = moment().tz(this.currentTimezone).endOf('day').format('YYYY-MM-DD HH:mm:ss')
   }
 }

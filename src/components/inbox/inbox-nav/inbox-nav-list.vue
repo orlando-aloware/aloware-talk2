@@ -22,7 +22,7 @@
 
     <hr>
 
-    <div v-if="shouldShowViewsUnderChannels && !isNewInboxEnabled">
+    <div v-if="shouldShowViewsUnderChannels">
       <nav-item class="nav-list-group-title d-flex justify-content-between"
                 icon=""
                 value=""
@@ -84,7 +84,6 @@ export default {
 
   mixins: [
     inboxRoutesMixin,
-    // eInboxMixin,
     inboxMixin,
     userMixin
   ],
@@ -128,11 +127,6 @@ export default {
       'allInboxFilters'
     ]),
 
-    ...mapGetters('eInbox', [
-      'isNewInboxEnabled',
-      'getNavListItems'
-    ]),
-
     ...mapGetters('auth', [
       'profile'
     ]),
@@ -149,8 +143,8 @@ export default {
         so should not being displayed here if the feature is active
       */
       return this.hasNewCommunicationsFeatureEnabled
-        ? this.getNavListItems.filter(item => item.default)// only shows the default "inbox"
-        : this.getNavListItems
+        ? this.navListItems.filter(item => item.default)// only shows the default "inbox"
+        : this.navListItems
     },
 
     shouldShowViewsUnderChannels () {
@@ -218,10 +212,6 @@ export default {
             this.onSelectView(filter)
           }
         })
-    }
-
-    if (this.isNewInboxEnabled) {
-      // this.fetchInboxes()
     }
   },
 
