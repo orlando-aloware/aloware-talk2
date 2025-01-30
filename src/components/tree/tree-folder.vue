@@ -13,7 +13,7 @@
         @click="onToggleFolder"
       ></div>
       <div class="folder__arrow d-flex align-items-center">
-        <div v-if="lists.length > 0"
+        <div v-if="lists.length > 0 || folders.length > 0"
              data-testid="tree-folder-arrow-toggle"
              @click="onToggleFolder">
           <folder-arrow-open-icon v-if="isOpen"
