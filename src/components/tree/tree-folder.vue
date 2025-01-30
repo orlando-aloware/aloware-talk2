@@ -82,6 +82,15 @@
       class="animated"
       v-bind:class="{ animate__fadeIn: isOpen, animate__fadeOut: !isOpen }"
     >
+      <tree-folder-contents
+        :folders="folders"
+        :hasEdit="hasEdit"
+        :hasDelete="hasDelete"
+        :layer="layer + 1"
+        :endpoint="endpoint"
+        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
+        data-testid="tree-folder-contents"
+      ></tree-folder-contents>
       <tree-list-contents
         :lists="lists"
         :layer="layer + 1"
@@ -206,6 +215,7 @@ export default {
     FolderIcon,
     FolderArrowOpenIcon,
     FolderArrowCloseIcon,
+    treeFolderContents: () => import('./tree-folder-contents.vue'),
     treeListContents: () => import('./tree-list-contents.vue'),
     FolderOption,
     FolderActions,
