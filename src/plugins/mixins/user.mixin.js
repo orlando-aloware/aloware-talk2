@@ -41,8 +41,7 @@ export default {
             - channels only present in Communications menu
     */
     hasNewCommunicationsFeatureEnabled () {
-      /* Making new Communications feature globally enabled */
-      return true
+      return this.currentCompany?.communication_logs_enabled || false
     }
   },
 
