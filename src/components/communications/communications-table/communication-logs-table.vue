@@ -62,7 +62,7 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'incoming_number'">
-              <incoming-number :value="col.value"
+              <incoming-number :row="props.row"
                                :campaign-id="props.row.campaign_id"
                                @on-filter="onFilter"/>
             </div>
@@ -80,8 +80,7 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'created_at'">
-              <start-time :row="props.row"
-                          :value="col.value" />
+              <start-time :row="props.row" />
             </div>
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'talk_time'">
