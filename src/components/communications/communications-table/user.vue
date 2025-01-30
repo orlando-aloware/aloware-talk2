@@ -5,7 +5,7 @@
        :id="`teams-${_uid}`"
        v-if="row.teams?.length" />
 
-    <b-popover triggers="hover click"
+    <b-popover triggers="hover"
                custom-class="communication-logs-table__popover"
                :target="`teams-${_uid}`"
                v-if="row.teams?.length">
