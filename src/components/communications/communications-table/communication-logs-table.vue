@@ -105,7 +105,7 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'user_id'">
-              <user :value="col.value"
+              <user :row="props.row"
                     @on-filter="onFilter"/>
             </div>
 
