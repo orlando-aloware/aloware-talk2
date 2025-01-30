@@ -112,9 +112,17 @@
                                        @change="eventPayload => onFilterChange(eventPayload, 'contact_lists')" />
               </b-form-group>
             </b-col>
+          </b-form-row>
+        </div>
 
+        <div v-if="!isFilterDialogForView">
+          <h5 class="mt-4 section-header">
+            Handling
+          </h5>
+          <b-form-row class="mt-2"
+                      data-testid="filter-form-handling-form-row">
             <b-col sm="12"
-                   md="6"
+                   md="4"
                    v-if="isAllComms">
               <b-form-group class="form-label"
                             label="Type">
@@ -126,17 +134,8 @@
                                                     @select="eventPayload => onFilterChange(eventPayload, 'type')" />
               </b-form-group>
             </b-col>
-          </b-form-row>
-        </div>
-
-        <div v-if="!isFilterDialogForView">
-          <h5 class="mt-4 section-header">
-            Handling
-          </h5>
-          <b-form-row class="mt-2"
-                      data-testid="filter-form-handling-form-row">
             <b-col sm="12"
-                   md="6">
+                   md="4">
               <b-form-group class="form-label"
                             label="Direction">
                 <communication-direction-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -148,7 +147,7 @@
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6"
+                   md="4"
                    v-if="isCallsOnlyChannel">
               <b-form-group class="form-label"
                             label="Answer Status">
