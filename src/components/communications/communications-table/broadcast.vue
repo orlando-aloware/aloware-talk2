@@ -1,11 +1,23 @@
 <template>
   <div class="d-flex flex-column"
        data-testid="user-row">
-    <router-link target='_blank'
-                 :to="{ path: `/broadcasts/${value}` }"
-                 v-if="broadcast.id">
+    <router-link class="ellipse"
+                 target='_blank'
+                 :id="`comm-broadcast-${_uid}`"
+                 :to="broadcastActivityParams"
+                 v-if="canUseBroadcast && broadcast.id">
+      <external-link-icon color="#1976D2"/>
       {{ broadcast.name || '-' }}
+
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-broadcast-${_uid}`">
+        Click to see Broadcast activity's page
+      </b-tooltip>
     </router-link>
+    <span class="ellipse"
+          v-else-if="broadcast.id">
+      {{ broadcast.name || '-' }}
+    </span>
     <span v-else>
       -
     </span>
@@ -14,9 +26,19 @@
 
 <script>
 import { mapState } from 'vuex'
+import { broadcastsMixin } from 'src/plugins/mixins'
+import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 
 export default {
   name: 'Broadcast',
+
+  components: {
+    ExternalLinkIcon
+  },
+
+  mixins: [
+    broadcastsMixin
+  ],
 
   props: {
     value: {
@@ -30,6 +52,18 @@ export default {
 
     broadcast () {
       return this.broadcasts.find(broadcast => broadcast.id === this.value) || {}
+    },
+
+    broadcastActivityParams () {
+      return {
+        name: 'Inbox Channel',
+        params: {
+          channel: 'all-communications'
+        },
+        query: {
+          broadcastIds: this.value
+        }
+      }
     }
   }
 }

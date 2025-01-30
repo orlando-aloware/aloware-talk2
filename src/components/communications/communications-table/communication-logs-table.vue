@@ -7,11 +7,10 @@
       <div class="search">
         <search-input class="width-260"
                       limit-search-characters
-                      :search="search"
+                      :search="searchQuery"
                       :disabled="isLoadingDisabled"
                       data-testid="contacts-view-search-input"
-                      @search="onSearch"
-        />
+                      @search="onSearch" />
       </div>
 
       <div class="setting pr-3 align-items-center">
@@ -26,16 +25,13 @@
 
         <hr role="separator"
             aria-orientation="vertical"
-            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical"
-        >
+            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
 
         <communications-filters class="ml-2 mr-3" />
 
-        <compact-btn
-          variant="primary"
-          :compact="false"
-          @clicked="changeTableSettingsVisibility(true)"
-        >
+        <compact-btn variant="primary"
+                     :compact="false"
+                     @clicked="changeTableSettingsVisibility(true)">
           Table Settings
         </compact-btn>
       </div>
@@ -44,165 +40,166 @@
     <q-table class="communication-logs-table flex-grow-1"
              row-key="index"
              virtual-scroll
+             hide-bottom
              :data="communications"
              :columns="columns"
              :loading="isLoadingMore || isLoadingCommunications"
-             :virtual-scroll-item-size="100"
-             :virtual-scroll-sticky-size-start="100"
+             :virtual-scroll-item-size="80"
+             :virtual-scroll-sticky-size-start="48"
              :pagination="pagination"
              :rows-per-page-options="[0]"
-             @virtual-scroll="onScroll"
-    >
+             @virtual-scroll="onScroll">
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td :props="props"
-                v-for="col in props.cols"
-                :key="col.name">
+                :key="col.name"
+                v-for="col in props.cols">
             <div v-if="col.name === 'disposition_status2'">
               <disposition :row="props.row"
+                           :style="col.columnStyle"
                            @on-details="onCommunicationDetails"/>
             </div>
-            <div v-else-if="col.name === 'incoming_number'">
-              <div v-if="props.row?.campaign_id">
-                {{ getCampaignName(props.row?.campaign_id) }}
-              </div>
-              <div>
-                {{ col.value | fixPhone('NATIONAL', true) }}
-              </div>
+
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'incoming_number'">
+              <incoming-number :value="col.value"
+                               :campaign-id="props.row.campaign_id"
+                               @on-filter="onFilter"/>
             </div>
 
-            <div v-else-if="col.name === 'ring_group'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'body'">
+              <message-body :style="col.columnStyle"
+                            :communication="props.row" />
+            </div>
+
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'ring_group'">
               <ring-group :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'created_at'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'created_at'">
               <start-time :row="props.row"
                           :value="col.value" />
             </div>
-            <div v-else-if="col.name === 'talk_time'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'talk_time'">
               <talk-time :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'wait_time'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'wait_time'">
               <wait-time :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'hold_time'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'hold_time'">
               <hold-time :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'contact'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'contact'">
               <contact :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'user_id'">
-              <user :value="col.value" />
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'user_id'">
+              <user :value="col.value"
+                    @on-filter="onFilter"/>
             </div>
 
-            <div v-else-if="col.name === 'teams'">
-              <communications-teams :teams="col.value" />
-            </div>
-
-            <div v-else-if="col.name === 'broadcast'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'broadcast'">
               <broadcast :value="props.row.broadcast_id" />
             </div>
 
-            <div v-else-if="col.name === 'workflow'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'workflow'">
               <workflow :value="props.row.workflow_id" />
             </div>
 
-            <div v-else-if="col.name === 'duration'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'duration'">
               <duration :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'resolution2'">
-              <resolution :row="props.row" />
-            </div>
-
-            <div v-else-if="col.name === 'lead_location'">
-              <location :row="props.row" />
-            </div>
-
-            <div v-else-if="col.name === 'line'">
-              <lines :value="props.row.campaign_id" />
-            </div>
-
-            <div v-else-if="col.name === 'attempting_users'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'attempting_users'">
               <attempting-users :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'transfer_prior_user_ids'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'transfer_prior_user_ids'">
               <transferred prop="transfer_prior_user_ids"
                            :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'transfer_target_user_ids'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'transfer_target_user_ids'">
               <transferred prop="transfer_target_user_ids"
                            :row="props.row" />
             </div>
 
             <div data-testid="cold-transfer-row"
-                 v-else-if="col.name === 'in_cold_transfer'"
-            >
+                 :style="col.columnStyle"
+                 v-else-if="col.name === 'in_cold_transfer'">
               <span>{{ props.row.in_cold_transfer ? 'Yes' : 'No' }}</span>
             </div>
 
-            <div v-else-if="col.name === 'transfer_type'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'transfer_type'">
               <transfer-type :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'callback_status'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'callback_status'">
               <callback-status :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'queue_resolution2'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'queue_resolution2'">
               <queue-resolution :row="props.row" />
             </div>
 
-            <div data-testid="email-span"
-                 class="break-word"
-                 v-else-if="col.name === 'email'"
-            >
-              <span>{{ props.row.contact?.email || '-' }}</span>
-            </div>
-
-            <div v-else-if="col.name === 'creator_type'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'creator_type'">
               <creator-type :row="props.row" />
             </div>
 
-            <template v-else-if="col.name === 'tags'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'tags'">
               <communications-tags :communication="props.row" />
-            </template>
-
-            <div v-else-if="col.name === 'notes'">
-              <wallboard-calls-note :communication="props.row" />
             </div>
 
-            <template v-else-if="col.name === 'csat_score'">
-              <csat-score :row="props.row" />
-            </template>
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'notes'">
+              <wallboard-calls-note ellipse
+                                    :style="col.columnStyle"
+                                    :communication="props.row" />
+            </div>
 
-            <div v-else-if="col.name === 'operations'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'csat_score'">
+              <csat-score :row="props.row" />
+            </div>
+
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
+                                         @on-details="onCommunicationDetails"
                                          @archived="removeCommunication"
                                          @terminated="removeCommunication" />
             </div>
           </q-td>
         </q-tr>
       </template>
-      <template v-slot:loading>
-        <div class="d-flex justify-center">
-          <q-spinner-bars color="primary"
-                          size="30px" />
-        </div>
-      </template>
-      <template v-slot:no-data>
-        <div class="w-100 text-center"
-             v-if="!isLoadingMore && !isLoadingCommunications">
-          <h2> No data </h2>
-        </div>
-      </template>
     </q-table>
+
+    <div class="communication-logs-table--no-data h5"
+         v-if="!communications.length && !isLoadingMore && !isLoadingCommunications">
+      No communications found based on the current filters
+    </div>
 
     <communications-details-sidebar :communication="sidebarCommunication"
                                     v-model="showCommunicationSidebar"/>
@@ -247,7 +244,6 @@ import SearchInput from 'components/search-input'
 import CompactBtn from 'components/compact-btn'
 import CommunicationTableSettings from './communication-table-settings.vue'
 import CommunicationsTags from './communications-tags.vue'
-import CommunicationsTeams from './communications-teams.vue'
 import StartTime from './start-time.vue'
 import CommunicationsFilters from 'src/components/communications/communications-filters.vue'
 import CommunicationsOperations from './communications-operations.vue'
@@ -261,9 +257,8 @@ import Contact from './contact.vue'
 import User from './user.vue'
 import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
-import Resolution from './resolution.vue'
-import Location from './location.vue'
-import Lines from './lines.vue'
+import IncomingNumber from './incoming-number.vue'
+import MessageBody from './message-body.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
 import TransferType from './transfer-type.vue'
@@ -273,6 +268,8 @@ import CreatorType from './creator-type.vue'
 import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
+import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -296,7 +293,6 @@ export default {
     CommunicationsOperations,
     CommunicationTableSettings,
     CommunicationsTags,
-    CommunicationsTeams,
     RingGroup,
     Disposition,
     StartTime,
@@ -308,9 +304,8 @@ export default {
     User,
     Broadcast,
     Workflow,
-    Resolution,
-    Location,
-    Lines,
+    IncomingNumber,
+    MessageBody,
     AttemptingUsers,
     Transferred,
     TransferType,
@@ -322,281 +317,43 @@ export default {
     CommunicationsDetailsSidebar
   },
 
+  computed: {
+    ...mapState('communications', [
+      'hasMoreCommunications'
+    ])
+  },
+
   data () {
     return {
-      search: '',
       isLoadingDisabled: false,
-      tableFields: [
-        {
-          label: '',
-          name: 'disposition_status2',
-          align: 'center',
-          style: 'width: 105px'
-        },
-        {
-          label: 'Number',
-          name: 'incoming_number',
-          align: 'left',
-          style: 'width: 150px'
-        },
-        {
-          label: 'Team',
-          name: 'teams',
-          align: 'left',
-          style: 'width: 180px'
-        },
-        {
-          label: 'Ring Group',
-          name: 'ring_group',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Sequence',
-          name: 'workflow',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Broadcast',
-          name: 'broadcast',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Start Time',
-          name: 'created_at',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Talk Time',
-          name: 'talk_time',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Wait Time',
-          name: 'wait_time',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Hold Time',
-          name: 'hold_time',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Duration',
-          name: 'duration',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Resolution',
-          name: 'resolution2',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Contact',
-          name: 'contact',
-          align: 'left',
-          style: 'width: 110px'
-        },
-        {
-          label: 'Location',
-          name: 'lead_location',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Lines',
-          name: 'line',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'User',
-          name: 'user_id',
-          align: 'left',
-          style: 'width: 150px'
-        },
-        {
-          label: 'Attempting',
-          name: 'attempting_users',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Transferred From',
-          name: 'transfer_prior_user_ids',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Transferred To',
-          name: 'transfer_target_user_ids',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Cold Transferred?',
-          name: 'in_cold_transfer',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Transfer Type',
-          name: 'transfer_type',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Callback Status',
-          name: 'callback_status',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Queue Resolution',
-          name: 'queue_resolution2',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Email',
-          name: 'email',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Creator Type',
-          name: 'creator_type',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Tags',
-          name: 'tags',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Notes',
-          name: 'notes',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'CSAT Score',
-          name: 'csat_score',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Operations',
-          name: 'operations',
-          align: 'center',
-          style: 'width: 100px'
-        }
-      ],
-      columns: [
-        {
-          name: 'disposition_status2',
-          field: 'disposition_status2',
-          label: '',
-          align: 'center',
-          style: 'width: 105px'
-        },
-        {
-          label: 'Number',
-          name: 'incoming_number',
-          field: 'incoming_number',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Ring Group',
-          name: 'ring_group',
-          field: 'ring_group',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Start Time',
-          name: 'created_at',
-          field: 'created_at',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Talk Time',
-          name: 'talk_time',
-          field: 'talk_time',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Duration',
-          name: 'duration',
-          field: 'duration',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Contact',
-          name: 'contact',
-          field: 'lead_number',
-          align: 'left',
-          style: 'width: 150px'
-        },
-        {
-          label: 'User',
-          name: 'user_id',
-          field: 'user_id',
-          align: 'left',
-          style: 'width: 100px'
-        },
-        {
-          label: 'Operations',
-          name: 'operations',
-          align: 'center',
-          style: 'width: 100px'
-        }
-      ],
+      tableFields: ALL_COLUMNS,
+      columns: DEFAULT_COLUMNS,
       searchFields: ['lead_number', 'contact.name'],
       source: null,
       cancelToken: null,
       paginated: false,
       showColumnHeadersModal: false,
-      fixedColumns: [
-        'disposition_status2',
-        'incoming_number',
-        'ring_group',
-        'created_at',
-        'talk_time',
-        'duration',
-        'contact',
-        'user_id',
-        'operations'
-      ],
-      expandedTeams: {},
       showCommunicationSidebar: false,
       sidebarCommunication: {}
     }
   },
 
   methods: {
+    ...mapActions('communications', [
+      'setSearchQuery'
+    ]),
+
     sort (sorts) {
       // Handle sorting logic here
       this.getCommunications(this.communicationFilters)
     },
 
+    onFilter (data) {
+      this.$VueEvent.fire('filter-communications', data)
+    },
+
     onSearch (value) {
-      this.searchQuery = value
-      this.paginationPage = 1
+      this.setSearchQuery(value)
 
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
@@ -619,35 +376,26 @@ export default {
       })
     },
 
-    async onScroll ({ to, ref }) {
-      if (this.paginated) {
+    async onScroll ({ index, ref }) {
+      if (this.isLoadingCommunications || this.isLoadingMore) {
         return
       }
 
       const lastIndex = this.communications.length - 1
 
       if (
-        !this.isLoadingMore &&
-        this.paginationPage < this.lastPage &&
-        to === lastIndex
+        this.hasMoreCommunications &&
+        index === lastIndex &&
+        index > 0
       ) {
         await this.loadMoreCommunications()
         ref.refresh()
       }
     },
 
-    async loadMoreCommunications (done) {
-      if (!this.isLoadingMore && this.paginationPage < this.lastPage) {
-        this.paginationPage += 1
+    async loadMoreCommunications () {
+      if (this.hasMoreCommunications && !this.isLoadingMore && !this.isLoadingCommunications) {
         await this.getCommunications(this.communicationFilters, undefined, true)
-
-        if (typeof done === 'function') {
-          done()
-        }
-      } else {
-        if (typeof done === 'function') {
-          done()
-        }
       }
     },
 
@@ -671,13 +419,13 @@ export default {
           return this.columns
         }
 
-        const columns = JSON.parse(savedColumns)
+        // use ALL_COLUMNS as base, removing and sorting based on it
+        const columns = [...ALL_COLUMNS]
+        const savedColumnsNames = JSON.parse(savedColumns).map(column => column.name)
 
-        const hasAllFixedColumns = this.fixedColumns.every(name =>
-          columns.some(col => col.name === name)
-        )
-
-        return hasAllFixedColumns ? columns : this.columns
+        return columns
+          .filter(column => savedColumnsNames.includes(column.name))
+          .sort((a, b) => savedColumnsNames.indexOf(a.name) - savedColumnsNames.indexOf(b.name))
       } catch (error) {
         return this.columns
       }
@@ -701,14 +449,6 @@ export default {
     this.cancelToken = this.$axios.CancelToken
     this.source = this.cancelToken.source()
     this.columns = this.getSavedColumns()
-  },
-
-  mounted () {
-    if (this.hasPermissionTo('list communication')) {
-      this.$nextTick(() => {
-        this.getCommunications(this.communicationFilters)
-      })
-    }
   }
 }
 </script>

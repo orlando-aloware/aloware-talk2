@@ -84,7 +84,7 @@ module.exports = function (/* ctx */) {
           }
         })
 
-        if (process.env.APP_ENV !== 'local') {
+        if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
           const SentryWebpackPlugin = require('@sentry/webpack-plugin')
           const sentryPluginInstance = new SentryWebpackPlugin({
             authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -260,10 +260,7 @@ module.exports = function (/* ctx */) {
       nodeIntegration: true,
 
       extendWebpack (cfg) {
-        // do something with Electron main process Webpack cfg
-        // chainWebpack also available besides this extendWebpack
-
-        if (process.env.APP_ENV !== 'local') {
+        if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
           const SentryWebpackPlugin = require('@sentry/webpack-plugin')
           const sentryPluginInstance = new SentryWebpackPlugin({
             authToken: process.env.SENTRY_AUTH_TOKEN,

@@ -108,10 +108,6 @@ export default {
 
   created () {
     this.dialerListeners.updateCommunication = (data) => {
-      if (!this.checkCommunicationMatchesUserAccessibility(data)) {
-        return
-      }
-
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
@@ -119,9 +115,9 @@ export default {
 
         const communication = this.dialer?.communication
         const isGreetingNew = communication?.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
-        const user = this.getUser(this.dialer.communication.added_user_id)
+        const user = communication?.added_user
 
-        if (user.name && !isGreetingNew) {
+        if (user && !isGreetingNew) {
           this.setAddedParty(user)
         }
 
@@ -564,6 +560,14 @@ export default {
         }
 
         this.setDialerCommunication(res.data)
+
+        const communication = this.dialer.communication
+        const isGreetingNew = communication.legc_uuid && communication.legc_status === CommunicationCurrentStatus.CURRENT_STATUS_GREETING_NEW
+        const user = communication.added_user
+
+        if (user && !isGreetingNew) {
+          this.setAddedParty(user)
+        }
 
         // if in power dialer session, we must match the active task (contact)'s id
         // with the communication's contact id
@@ -1229,6 +1233,9 @@ export default {
 
       this.$axios.post('/api/v1/dialer/merge-calls', params).then(res => {
         this.setShouldIntroduce(false)
+        setTimeout(() => {
+          this.forceRefreshCommunication()
+        }, 500)
         console.log('Merge successful.')
       }).catch(err => {
         console.log(err)
@@ -1248,6 +1255,9 @@ export default {
       }).then(res => {
         this.setShouldIntroduce(false)
         this.setAddedParty()
+        setTimeout(() => {
+          this.forceRefreshCommunication()
+        }, 500)
         console.log('Third party has been dropped out of this call.')
       }).catch(err => {
         console.log(err)
@@ -1279,6 +1289,9 @@ export default {
       }
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
+        setTimeout(() => {
+          this.forceRefreshCommunication()
+        }, 500)
         console.log('Transfer is in progress')
       }).catch(err => {
         console.log(err)
@@ -1330,6 +1343,9 @@ export default {
 
       this.$axios.post('/api/v1/dialer/conferencing-transfer', params).then(res => {
         this.setShouldIntroduce(params.introduce)
+        setTimeout(() => {
+          this.forceRefreshCommunication()
+        }, 500)
         console.log((params.introduce) ? 'Introduce is in progress.' : 'Add is in progress.')
       }).catch(err => {
         this.setAddedParty()
@@ -1443,7 +1459,7 @@ export default {
 
       // when communication is rejected by app, skip wrap-up
       if (this.dialer.communication?.rejected_by_app) {
-        this.backToDial('Talk-DialerListeners-EndWrapUp')
+        this.$VueEvent.fire('callEnded')
         return
       }
 

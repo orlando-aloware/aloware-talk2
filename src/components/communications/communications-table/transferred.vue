@@ -2,15 +2,23 @@
   <div class="d-flex flex-column"
        data-testid="transferred-from-row">
     <div v-if="!isAgent && row[prop]?.length">
-      <router-link :key="index"
+      <router-link class="ellipse"
+                   :id="`comm-attempt-${_uid}`"
+                   :key="index"
                    :to="{ path: getUserActivityURL(userId) }"
                    v-for="(userId, index) in row[prop]">
+        <external-link-icon color="#1976D2"/>
         {{ getUserName(getUser(userId)) }}
+
+        <b-tooltip custom-class="communication-logs-table__tooltip"
+                   :target="`comm-attempt-${_uid}`">
+          Click to go to user's page
+        </b-tooltip>
       </router-link>
     </div>
 
     <div v-else-if="row[prop]?.length">
-      <span class="text-blue cursor-pointer"
+      <span class="text-blue cursor-pointer ellipse"
             :key="index"
             v-for="(userId, index) in row[prop]">
           {{ getUserName(getUser(userId)) }}
@@ -25,9 +33,11 @@
 
 <script>
 import { userMixin, classicMixin, aclMixin } from 'src/plugins/mixins'
+import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 
 export default {
   name: 'Transferred',
+  components: { ExternalLinkIcon },
 
   mixins: [
     userMixin,

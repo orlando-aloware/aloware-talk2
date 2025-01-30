@@ -3,7 +3,7 @@
     <b-form class="inbox-channel-filter-form"
             data-testid="filter-form-quick-access-form">
       <b-container>
-        <div v-if="$route.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME || !isMentionsChannel || isFilterDialogForView">
+        <div>
           <h5 class="section-header">
             Quick Access
           </h5>
@@ -70,7 +70,7 @@
                       data-testid="filter-form-quick-access-form-row">
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxOrAllCallsChannel">
+                   v-if="isACallTypeChannel">
               <b-form-group class="form-label"
                             label="Ring Groups">
                 <ring-group-selector :force-remove-missing-values="true"
@@ -85,7 +85,7 @@
 
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxOrAllCallsChannel">
+                   v-if="isACallTypeChannel">
               <b-form-group class="form-label"
                             label="Teams">
                 <team-selector :force-remove-missing-values="true"
@@ -100,7 +100,7 @@
 
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxOrAllCallsChannel">
+                   v-if="isACallTypeChannel">
               <b-form-group class="form-label"
                             label="Contact Lists">
                 <contact-list-selector :force-remove-missing-values="true"
@@ -115,7 +115,7 @@
 
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxOrAllCallsChannel">
+                   v-if="isAllComms">
               <b-form-group class="form-label"
                             label="Type">
                 <communication-type-filter-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -129,7 +129,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="((isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel) && !isFilterDialogForView">
+        <div v-if="!isFilterDialogForView">
           <h5 class="mt-4 section-header">
             Handling
           </h5>
@@ -215,7 +215,7 @@
           </b-form-row>
         </div>
 
-        <div v-if="!isMentionsChannel || isFilterDialogForView">
+        <div>
           <h5 class="mt-4 section-header">
             Properties
           </h5>
@@ -406,8 +406,7 @@
           <b-form-row class="mt-2"
                       data-testid="filter-form-attributions-form-row">
             <b-col sm="12"
-                   md="6"
-                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel">
+                   md="6">
               <b-form-group class="form-label"
                             label="Line Phone Numbers">
                 <incoming-number-selector :multiple="true"
@@ -420,16 +419,16 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="isInboxOrAllCallsChannel || isMessagesOnlyChannel">
+                   v-if="isACallTypeChannel || isMessagesOnlyChannel">
               <b-form-group class="form-label">
                 <template v-slot:label>
-                  <span data-testid="filter-form-communication-owners-row">Communication Owners</span>
+                  <span data-testid="filter-form-communication-owners-row">Users</span>
                   <span class="pl-1">
                     <information-circle-icon color="#2F80ED" />
                     <q-tooltip anchor="top middle"
                                self="center middle">
                       <div class="text-13">
-                        <p class="font-weight-bold">Who is the communication owner?</p>
+                        <p class="font-weight-bold">Who is the user?</p>
                         <p class="font-weight-bold mb-0">For outbound communication:</p>
                         <p class="mb-0">Calls, SMS, fax & emails:</p>
                         <p><ul><li>The agent that sent the communication</li></ul></p>
@@ -444,12 +443,12 @@
                     </q-tooltip>
                   </span>
                 </template>
-                <user-selector custom-placeholder="Select Communication Owners"
+                <user-selector custom-placeholder="Select Users"
                                :force-remove-missing-values="true"
                                :generic-styling="false"
                                :multiple="true"
                                :use-chips="true"
-                               :with-unassigned="isInboxOrAllCallsChannel"
+                               :with-unassigned="isACallTypeChannel"
                                :highlighted="isChanged('users')"
                                data-testid="filter-form-user-selector"
                                v-model="filter.users"
@@ -457,8 +456,7 @@
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6"
-                   v-if="(isCompanyPartOfNewInboxFilters(profile.company_id) && !isMentionsChannel) || !isMentionsOrInboxChannel">
+                   md="6">
               <b-form-group class="form-label"
                             label="Sequences">
                 <sequence-selector :force-remove-missing-values="true"
@@ -471,8 +469,7 @@
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6"
-                   v-if="!isMentionsChannel || isFilterDialogForView">
+                   md="6">
               <b-form-group class="form-label"
                             label="Contact Owners">
                 <user-selector custom-placeholder="Select Contact Owners"
@@ -483,7 +480,7 @@
                                :highlighted="isChanged('contact_owner')"
                                :clearable="false"
                                :disable="disableContactOwner"
-                               :with-unassigned="isInboxOrAllCallsChannel"
+                               :with-unassigned="isACallTypeChannel"
                                data-testid="filter-form-user-selector"
                                v-model="filter.contact_owner"
                                @change="eventPayload => onFilterChange(eventPayload, 'contact_owner')" />
@@ -491,7 +488,7 @@
             </b-col>
             <b-col sm="12"
                    md="6"
-                   v-if="((isCompanyPartOfNewInboxFilters(profile.company_id) && isInbox) || isMessagesOnlyChannel) && !isFilterDialogForView">
+                   v-if="((isCompanyPartOfNewInboxFilters(profile.company_id)) || isMessagesOnlyChannel) && !isFilterDialogForView">
               <b-form-group class="form-label"
                             label="Broadcasts">
                 <broadcast-selector :multiple="true"
@@ -535,7 +532,7 @@ import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import { communicationsRoutesMixin, userMixin } from 'src/plugins/mixins'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import moment from 'moment'
-import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, VOICEMAILS_CHANNEL, RECORDINGS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 import companyTimezoneMixin from 'src/plugins/mixins/company-timezone.mixin'
 
 const RANGE_1_DAY = 'Today'
@@ -596,6 +593,7 @@ export default {
     ...mapState('communications', [
       'channelChangedFilterFields',
       'isFilterDialogShown',
+      'selectedFilter',
       'isFilterModelFormShown',
       'isFilterDialogForView',
       'inboxShowMyContacts'
@@ -644,40 +642,23 @@ export default {
       return this.rangePicker.$data.showCustomRangeCalendars
     },
 
-    isMentionsChannel () {
-      return this.$route.params.channel === 'mentions'
-    },
-
     isInbox () {
       return this.$route.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME || this.$route.params.channel === 'inbox'
     },
 
-    isMentionsOrInboxChannel () {
-      const nonCommunicationChannels = ['mentions', 'inbox', 'view']
-
-      return this.isInboxOrInboxViews ||
-        nonCommunicationChannels.includes(this.$route.params.channel)
-    },
-
-    isInboxOrAllCallsChannel () {
-      const nonSmsChannels = ['inbox', 'calls', 'recordings', 'voicemails', DEFAULT_COMMUNICATIONS_CHANNEL, 'view', 'my-personal-line']
-
-      return this.isInboxOrInboxViews ||
-        nonSmsChannels.includes(this.$route.params.channel)
+    isACallTypeChannel () {
+      const nonSmsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'view', 'my-personal-line']
+      return nonSmsChannels.includes(this.$route.params.channel)
     },
 
     isCallsOnlyChannel () {
-      const callsChannels = ['calls', DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
-
-      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
-        return this.isInboxOrInboxViews || callsChannels.includes(this.$route.params.channel)
-      }
+      const callsChannels = [CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
 
       return callsChannels.includes(this.$route.params.channel)
     },
 
     isCallsAndRecordingsChannel () {
-      const allCallsChannels = ['calls', 'recordings', DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
+      const allCallsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
 
       if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
         return this.isInboxOrInboxViews || allCallsChannels.includes(this.$route.params.channel)
@@ -687,11 +668,7 @@ export default {
     },
 
     isMessagesOnlyChannel () {
-      const smsChannels = ['messages', DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
-
-      if (this.isCompanyPartOfNewInboxFilters(this.profile.company_id)) {
-        smsChannels.push('inbox')
-      }
+      const smsChannels = [MESSAGES_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, 'my-personal-line']
 
       return smsChannels.includes(this.$route.params.channel)
     },
@@ -880,7 +857,10 @@ export default {
 
     if (this.isFirstLoad && !viewId) {
       this.setIsFirstLoad(false)
-      sessionStorage.setItem('date-selected-comms', this.defaultDateRangeBasedOnCompanyPreferences)
+
+      if (!this.selectedFilter) {
+        sessionStorage.setItem('date-selected-comms', this.defaultDateRangeBasedOnCompanyPreferences)
+      }
 
       this.dateRange.startDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0]
       this.dateRange.endDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1]
@@ -891,12 +871,6 @@ export default {
 
     this.rangePicker = this.$refs.picker
     this.selectedTags = this.getTagsObjectsByIds(this.filter?.tags)
-
-    setTimeout(() => {
-      if (this.inboxShowMyContacts) {
-        this.filter.my_contact = 1
-      }
-    }, 500)
   },
 
   watch: {
@@ -958,7 +932,7 @@ export default {
     },
 
     reset (newVal) {
-      if (newVal) {
+      if (newVal && !this.selectedFilter) {
         this.dateRange.startDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0]
         this.dateRange.endDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1]
         this.filter.from_date = this.dateRange.startDate

@@ -50,7 +50,7 @@
                           v-if="hasPermissionTo('archive communication')"
                           data-testid="comm-details-archive-button"
                           @click="onArchive">
-                  Archive
+                  Delete
                 </b-button>
               </div>
             </div>
@@ -985,7 +985,7 @@
                              :communication="communication"
                              :ring-group="usedRingGroup"
                              v-if="usedRingGroup"/>
-        <network-logs-display :call-issues="communication.call_quality_events"
+        <network-logs-display :call-issues="Object.values(communication?.call_quality_summary || {})"
                               :user="communication.user"/>
       </b-col>
     </b-row>
@@ -1074,6 +1074,7 @@ export default {
 
   props: {
     communication: {
+      type: Object,
       required: true
     },
 
@@ -1263,8 +1264,8 @@ export default {
     },
 
     onArchive () {
-      this.$bvModal.msgBoxConfirm('Archiving communication will remove it from all reports and plots. Continue?', {
-        title: 'Archive Communication',
+      this.$bvModal.msgBoxConfirm('Deleting this communication will remove it from all reports and graphs. Do you want to proceed?', {
+        title: 'Delete Communication',
         size: 'sm',
         buttonSize: 'sm',
         okVariant: 'warning',
@@ -1285,7 +1286,7 @@ export default {
 
     onDelete () {
       talk2Api.V1.communication.delete(this.communication.id).then(() => {
-        this.$generalNotification('Communication has been successfully archived.', 'success')
+        this.$generalNotification('Communication has been successfully deleted.', 'success')
         this.$VueEvent.fire('delete_communication', { id: this.communication.id })
 
         this.$router.push({

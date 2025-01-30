@@ -13,7 +13,7 @@
         @click="onToggleFolder"
       ></div>
       <div class="folder__arrow d-flex align-items-center">
-        <div v-if="lists.length > 0 || folders.length > 0"
+        <div v-if="lists.length > 0"
              data-testid="tree-folder-arrow-toggle"
              @click="onToggleFolder">
           <folder-arrow-open-icon v-if="isOpen"
@@ -71,6 +71,7 @@
       :endpoint="endpoint"
       :layer="layer + 1"
       :parent_id="id"
+      :user-id="userId"
       data-testid="tree-folder-creating-input"
       @blur="onCloseFolder"
       @cancel="onCreateFolderCancel"
@@ -81,15 +82,6 @@
       class="animated"
       v-bind:class="{ animate__fadeIn: isOpen, animate__fadeOut: !isOpen }"
     >
-      <tree-folder-contents
-        :folders="folders"
-        :hasEdit="hasEdit"
-        :hasDelete="hasDelete"
-        :layer="layer + 1"
-        :endpoint="endpoint"
-        :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
-        data-testid="tree-folder-contents"
-      ></tree-folder-contents>
       <tree-list-contents
         :lists="lists"
         :layer="layer + 1"
@@ -203,6 +195,10 @@ export default {
     endpoint: {
       type: String,
       default: '/api/v2/contact-folders'
+    },
+
+    userId: {
+      type: Number
     }
   },
 
@@ -210,7 +206,6 @@ export default {
     FolderIcon,
     FolderArrowOpenIcon,
     FolderArrowCloseIcon,
-    treeFolderContents: () => import('./tree-folder-contents.vue'),
     treeListContents: () => import('./tree-list-contents.vue'),
     FolderOption,
     FolderActions,
@@ -331,7 +326,17 @@ export default {
       if (this.isRenaming) return
       this.isRenaming = true
 
-      return this.updateFolderRequest(this.id, { name, order: this.order, parent_id: this.parentId }).then(response => {
+      const params = {
+        name,
+        order: this.order,
+        parent_id: this.parentId
+      }
+
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
+      return this.updateFolderRequest(this.id, params).then(response => {
         this.$generalNotification('Folder updated.')
         this.reloadFolders()
       }).finally(() => {
@@ -356,8 +361,13 @@ export default {
     },
 
     reloadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
       return this.$axios
-        .get(this.endpoint)
+        .get(this.endpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import Icon from './communications-nav-icon.vue'
+import Icon from '../communications-nav-icon.vue'
 import { mapState, mapGetters } from 'vuex'
 
 export default {

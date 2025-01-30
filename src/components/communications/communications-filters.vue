@@ -1,7 +1,7 @@
 <template>
   <div class="filter-wrapper d-flex align-items-center"
        :class="filterWrapperClass">
-    <compact-btn customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+    <compact-btn custom-class="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                  borderless
                  variant="outlined-light"
                  data-testid="inbox-channels-apply-filters"
@@ -17,7 +17,7 @@
       {{ changedFilterFieldCount }}
     </b-badge>
 
-    <compact-btn customClass="ml-auto s-14 _500 position-relative primary not-focusable"
+    <compact-btn custom-class="ml-auto s-14 _500 position-relative primary not-focusable"
                  borderless
                  variant="outlined-light"
                  data-testid="comms-channels-reset-filters-btn"
@@ -26,14 +26,15 @@
       <i class="fa fa-times" />
     </compact-btn>
 
-    <filter-dialog :filter-model="channelDefaultFilterModel"
-                   data-testid="comms-channels-filter-dialog"
+    <filter-dialog data-testid="comms-channels-filter-dialog"
+                   :filter-model="channelDefaultFilterModel"
                    v-model="filter"
-                   @createNewFilter="onCreateNewFilter"
                    @applyFilter="onApplyFilter"
-                   @onResetFilter="resetFilters" />
+                   @createNewFilter="onCreateNewFilter"
+                   @onResetFilter="onResetFilters" />
 
     <create-filter-dialog :filter-model="newFilterModel"
+                          :disable-filter-type="!isAdmin"
                           data-testid="comms-channels-create-filter-dialog"
                           @created="afterCreatedNewFilter" />
   </div>
@@ -46,13 +47,14 @@ import CompactBtn from 'src/components/compact-btn'
 import FilterDialog from 'components/communications/communications-filters/filter-dialog'
 import CreateFilterDialog from 'components/communications/communications-filters/create-filter-dialog'
 
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
-import { communicationsMixin } from 'src/plugins/mixins'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { aclMixin, communicationsMixin } from 'src/plugins/mixins'
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
 export default {
   name: 'CommunicationsFilters',
   mixins: [
+    aclMixin,
     communicationsMixin,
     communicationsDefaultFilterModelMixin
   //  visibilityMixin
@@ -98,7 +100,7 @@ export default {
       if (this.activeChannel?.value) {
         return this.activeChannel?.value
       }
-      return 'calls'
+      return CALLS_CHANNEL
     },
     changedFilterFieldCount () {
       const dateFieldIndex = this.channelChangedFilterFields.findIndex(item => ['from_date', 'to_date'].includes(item.property))
@@ -121,7 +123,7 @@ export default {
     },
 
     hasChannelFilterChanges () {
-      return this.channelChangedFilterFields.length > 0
+      return this.changedFilterFieldCount > 0
     }
 
   },
@@ -138,6 +140,38 @@ export default {
   },
   mounted () {
     this.filter = _.clone(this.channelDefaultFilterModel.filter)
+
+    this.$VueEvent.listen('filter-communications', data => {
+      // ex: data = { type: 'users', value: 1 }
+      const current = typeof this.channelClonedFilter[data.type] === 'object' ? JSON.stringify(this.channelClonedFilter[data.type]) : this.channelClonedFilter[data.type]
+      const attempt = typeof data.value === 'object' ? JSON.stringify(data.value) : data.value
+
+      // do nothing when the same filter is being applied
+      if (current === attempt) {
+        return
+      }
+
+      this.updateChannelChangedFilterFields({
+        name: data.type,
+        value: data.value
+      })
+
+      // update current filters
+      this.filter = {
+        ...this.filter,
+        [data.type]: data.value
+      }
+
+      // refresh data
+      this.setChannelClonedFilter(this.filter)
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
+    })
+
+    this.$VueEvent.listen('reset-communications-filters', () => {
+      this.onResetFilters()
+    })
   },
   methods: {
     ...mapActions(['setIsFirstLoad']),
@@ -163,7 +197,8 @@ export default {
       'setIsEditingView',
       'setSelectedFilter',
       'toggleFilterDialog',
-      'toggleFilterModelForm'
+      'toggleFilterModelForm',
+      'updateChannelChangedFilterFields'
     ]),
     onClickAppliedFilterButton () {
       this.setFilterDialogForView(false)
@@ -216,10 +251,6 @@ export default {
       */
       this.filter = filter
 
-      if (this.$route.params.channel === 'recordings') {
-        this.filter.answer_status = 'recorded'
-      }
-
       // channel cloned filter are the current filter settings populated in the filter dialog form
       // especially when there is no applied or selected filter.
       this.setChannelClonedFilter(this.filter)
@@ -249,14 +280,9 @@ export default {
     },
 
     onResetFilters () {
-      sessionStorage.removeItem('date-selected-comms')
-      // TODO: reset filters
-      this.resetFilters()
-      this.setSelectedFilter(null)
-    },
-
-    resetFilters () {
       // this.filter = _.clone(Filters.DEFAULT_STATE.filter)
+      sessionStorage.removeItem('date-selected-comms')
+
       this.filter = { ...this.channelDefaultFilterModel.filter }
 
       this.filter.per_page = 20
@@ -288,15 +314,14 @@ export default {
 
       this.setChannelClonedFilter(this.filter)
       this.resetChannelChangedFilterFields()
+      this.setSelectedFilter(null)
       this.setCommunications([])
       this.setIsFirstLoad(true)
       this.setAppliedFilter(null)
-      this.setInboxFilters(null)
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
     }
-
   },
 
   watch: {
@@ -306,7 +331,21 @@ export default {
       },
       deep: true,
       immediate: true
+    },
+
+    channelDefaultFilterModel: {
+      handler (newVal) {
+        this.filter = this.filter = { ...newVal.filter }
+      },
+      deep: true,
+      immediate: true
     }
+  },
+
+  beforeDestroy () {
+    this.onResetFilters()
+    this.$VueEvent.stop('filter-communications')
+    this.$VueEvent.stop('reset-communications-filters')
   }
 }
 </script>

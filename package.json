@@ -1,6 +1,6 @@
 {
   "name": "aloware-talk2",
-  "version": "1.61.0",
+  "version": "1.63.0",
   "description": "Aloware Agent Interface",
   "productName": "Talk",
   "author": "Aloware <support@aloware.com>",
@@ -22,7 +22,8 @@
     "deploy-win": "quasar build -d -m electron -T win -b builder -P always",
     "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always",
     "prepare": "husky",
-    "upload-s3": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; export TALK_URL=${TALK_URL:-talk.alodev.org}; s3-spa-upload ./dist/spa $TALK_URL -m s3-spa-upload.config.json'"
+    "upload-s3-dev1": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; export TALK_URL=${TALK_URL:-talk.alodev.org}; s3-spa-upload ./dist/spa $TALK_URL -m s3-spa-upload.config.json'",
+    "upload-s3-dev2": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; export TALK_URL=${TALK2_URL:-talk2.alodev.org}; s3-spa-upload ./dist/spa $TALK_URL -m s3-spa-upload.config.json'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-common-types": "6.6.0",

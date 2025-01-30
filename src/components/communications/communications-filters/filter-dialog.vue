@@ -77,8 +77,9 @@
         <div class="d-flex justify-content-end mt-sm-3 px-3">
           <div>
             <compact-btn class="mr-2 btn-outline-primary"
-                         :disabled="!filterHasChanges"
                          data-testid="filter-dialog-reset-compact-btn"
+                         :disabled="!filterHasChanges"
+                         v-if="!selectedFilter"
                          @clicked="onResetFilter">
               <q-tooltip anchor="top middle"
                          self="center middle"
@@ -135,7 +136,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import * as Filters from 'src/constants/filters'
 import { communicationsMixin } from 'src/plugins/mixins'
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 export default {
   name: 'FilterDialog',
@@ -197,6 +198,7 @@ export default {
         'creator_type',
         'dynamic_engagement_date_range',
         'has_unread',
+        'unread_only',
         'has_international',
         'type'
       ],
@@ -207,6 +209,7 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'my_contact',
+        'unread_only',
         'has_unread',
         'has_international'
       ],
@@ -263,11 +266,11 @@ export default {
     },
 
     channelFilterName () {
-      if (this.$route.params.channel === 'messages') {
+      if (this.$route.params.channel === MESSAGES_CHANNEL) {
         return 'Messages Filters'
       }
 
-      if (this.$route.params.channel === 'voicemails') {
+      if (this.$route.params.channel === VOICEMAILS_CHANNEL) {
         return 'Voice Messages Filters'
       }
 
@@ -426,7 +429,16 @@ export default {
       if (this.isFilterDialogForView && !this.isEditingView) {
         this.filter = { ...this.loadedDefaultFilterModel.filter }
       } else if (this.selectedFilter) {
+        let personalFilterObject = this.selectedFilter.filter
+
         this.filter = { ...this.selectedFilter.filter }
+
+        this.filter = {
+          ...this.filterModel.filter,
+          ..._.pick(personalFilterObject, this.filterFields)
+        }
+        sessionStorage.removeItem('date-selected-comms')
+        this.setIsFirstLoad(true)
       } else if (this.appliedFilter) {
         this.filter = { ...this.appliedFilter.filter }
       } else if (this.isFilterDialogShowFilters) {
@@ -437,16 +449,16 @@ export default {
         this.filter = _.pick(this.value, this.filterFields)
       }
 
-      // fill in the value for the newly added filter in case it's not yet included
-      // in the existing saved set to properly display in its respective select component
-      if (!this.filter.hasOwnProperty('dynamic_engagement_date_range')) {
-        this.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
-      }
-
       // no need to re-set the channel cloned filters
       // when we're populating the dialog with the current filters
       if (!this.isFilterDialogShowFilters) {
         this.setChannelClonedFilter(this.filter)
+      }
+
+      // fill in the value for the newly added filter in case it's not yet included
+      // in the existing saved set to properly display in its respective select component
+      if (!this.filter.hasOwnProperty('dynamic_engagement_date_range')) {
+        this.filter.dynamic_engagement_date_range = Filters.DEFAULT_STATE.filter.dynamic_engagement_date_range
       }
     },
 
@@ -455,8 +467,12 @@ export default {
     },
 
     onResetFilter () {
+      this.setSelectedFilter(null)
+
+      this.filter = { ...this.filterModel.filter }
+
       // if there's a selected filter, then use selected filter saved values, otherwise use channel's default filter
-      const useFilter = this.selectedFilter && (this.isFilterDialogForView && this.isEditingView) ? this.selectedFilter.filter : this.filterModel.filter
+      const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.filterModel.filter
 
       this.reset = true
       sessionStorage.removeItem('date-selected-comms')
@@ -471,6 +487,9 @@ export default {
 
         this.filter[item] = useFilter[item]
       }
+
+      // First apply the filter to populate values
+      this.applyFilter()
     },
 
     onApply (skipChangedFields = false) {
@@ -489,6 +508,7 @@ export default {
         'exclude_automated_communications',
         'untagged_only',
         'has_unread',
+        'unread_only',
         'has_international'
       ]
       const excludeProps = [
@@ -572,21 +592,13 @@ export default {
         this.setAppliedFilter(filter)
         this.setChannelClonedFilter(filter.filter)
       }
-
-      // add the communication type and answer_status filters
-      // const communicationType = _.get(this.value, 'type', null)
-      const communicationAnswerStatus = _.get(this.value, 'answer_status', null)
       const finalFilters = {
         ...this.filter
       }
 
-      // if (communicationType) {
-      //  finalFilters.type = communicationType
-      // }
-
-      if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.filterModel.type) &&
-        communicationAnswerStatus) {
-        finalFilters.answer_status = communicationAnswerStatus
+      if ([ChannelType.CHANNEL_RECORDINGS, ChannelType.CHANNEL_VOICEMAILS].includes(this.filterModel.type)) {
+        finalFilters.type = this.filterModel.filter.type
+        finalFilters.answer_status = this.filterModel.filter.answer_status
       }
 
       this.$emit('applyFilter', finalFilters)
@@ -599,42 +611,42 @@ export default {
     },
 
     onSelectFilter (personalFilter) {
-      console.log('onSelectFilter called')
       this.setSelectedFilter(personalFilter)
-      if (!personalFilter) {
-        this.filter = { ...this.filterModel.filter }
-      } else {
-        // combine default filter values with the selected one
-        let personalFilterObject = personalFilter.filter
-        this.filter = {
-          ...this.filterModel.filter,
-          ..._.pick(personalFilterObject, this.filterFields)
-        }
-        this.setIsFirstLoad(false)
 
-        const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
+      // combine default filter values with the selected one
+      const personalFilterObject = personalFilter.filter
+      this.filter = {
+        ...this.filterModel.filter,
+        ..._.pick(personalFilterObject, this.filterFields)
+      }
+      this.setIsFirstLoad(false)
 
-        personalFilterObject.from_date = formattedDates.from_date
-        personalFilterObject.to_date = formattedDates.to_date
+      const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
 
-        // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
-        // set the range to the key of the range
-        let inRange = false
-        for (const range in this.ranges) {
-          const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
-          if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
-            sessionStorage.setItem('date-selected-comms', range)
-            inRange = true
-            break
-          }
-        }
+      personalFilterObject.from_date = formattedDates.from_date
+      personalFilterObject.to_date = formattedDates.to_date
 
-        if (!inRange) {
-          sessionStorage.setItem('date-selected-comms', 'custom')
+      // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+      // set the range to the key of the range
+      let inRange = false
+
+      for (const range in this.ranges) {
+        const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
+        if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
+          sessionStorage.setItem('date-selected-comms', range)
+          inRange = true
+          break
         }
       }
 
+      if (!inRange) {
+        sessionStorage.setItem('date-selected-comms', 'custom')
+      }
+
+      // First apply the filter to populate values
       this.applyFilter()
+      // Then call onApply to handle filter application
+      this.onApply()
     },
 
     updateFilter (filter, params) {
@@ -644,10 +656,6 @@ export default {
           ...params,
           scope: scope
         }
-      }
-
-      if (this.loadedDefaultFilterModel.type === ChannelType.CHANNEL_RECORDINGS) {
-        params.type = ChannelType.CHANNEL_CALLS
       }
 
       return talk2Api.V2.inbox.filters.update(filter.id, params).then(res => {
@@ -683,12 +691,11 @@ export default {
 
       this.filter = {
         ...this.filter,
-        untagged_only: +this.filter.untagged_only,
-        not_disposed: +this.filter.not_disposed,
         first_time_only: +this.filter.first_time_only,
+        untagged_only: +this.filter.untagged_only,
         exclude_automated_communications: +this.filter.exclude_automated_communications,
-        my_contact: +this.filter.my_contact,
-        has_unread: +this.filter.unread_only
+        unread_only: +this.filter.unread_only,
+        not_disposed: +this.filter.not_disposed
       }
     },
 
@@ -717,7 +724,6 @@ export default {
 
     setToNewFilter () {
       this.onResetFilter()
-      this.onSelectFilter(null)
       this.setAppliedFilter(null)
     }
   },

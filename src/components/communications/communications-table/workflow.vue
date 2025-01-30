@@ -1,17 +1,22 @@
 <template>
   <div class="d-flex flex-column"
        data-testid="user-row">
-    <span v-if="isAgent && value">
+    <span class="ellipse"
+          v-if="isAgent && value">
       {{ workflow.name || '-' }}
     </span>
-    <a target='_blank'
+    <a class="ellipse"
+       target='_blank'
+       :id="`comm-sequence-${_uid}`"
        :href="getWorkflowURL(value)"
        v-else-if="value">
+      <external-link-icon color="#1976D2"/>
       {{ workflow.name || '-' }}
 
-      <q-tooltip>
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-sequence-${_uid}`">
         Click to go to sequence page
-      </q-tooltip>
+      </b-tooltip>
     </a>
     <span v-else>
       -
@@ -22,9 +27,14 @@
 <script>
 import { aclMixin, classicMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 
 export default {
   name: 'Workflow',
+
+  components: {
+    ExternalLinkIcon
+  },
 
   mixins: [
     aclMixin,

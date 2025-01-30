@@ -1,7 +1,7 @@
 
 <template>
   <div class="d-flex flex-column">
-    <span>{{ value | fixFullDateUTCRelative }}</span>
+    <span>{{ value | fixFullDateTime }}</span>
     <div class="d-flex align-items-center text-xs"
          data-testid="start-time-row"
          v-if="row.call_disposition_id">

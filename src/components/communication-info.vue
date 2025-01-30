@@ -9,8 +9,8 @@
             v-if="communication.type === CommunicationTypes.NOTE">
       <q-item>
         <q-item-section>
-          <p class="text-left mb-0"
-             v-html="$options.filters.nl2br(parseBody)">
+          <p class="text-left mb-0 communication-body"
+             v-html="parseBodyContent(communication.body)">
           </p>
         </q-item-section>
       </q-item>
@@ -265,7 +265,7 @@
               <div v-if="communication.body">
                 <div class="fs-13 text-muted mb-2 line-height-15"
                      v-if="![CommunicationTypes.SMS, CommunicationTypes.REMINDER, CommunicationTypes.APPOINTMENT].includes(communication.type)"
-                     v-html="$options.filters.nl2br(parseBody)"
+                     v-html="parseBodyContent(communication.body)"
                      v-linkify:options="{ target: '_blank' }">
                 </div>
                 <div class="font-weight-light-bold my-2"
@@ -279,7 +279,7 @@
                 <span class="text-muted"
                       v-else
                       v-linkify:options="{ target: '_blank' }">
-                  <span v-html="parseBody"></span>
+                  <span v-html="parseBodyContent(communication.body)"></span>
                 </span>
               </div>
             </template>
@@ -906,51 +906,72 @@
         </div>
       </div>
     </div>
+    <div class="ai-effect-container mt-2"
+         v-else-if="isAvaPromotionDialogVisible">
+      <div class="ai-effect-gradient"></div>
+      <div class="ai-effect-blur"></div>
+      <div class="ai-effect-content p-2">
+        <div class="flex items-center gap-2">
+          <h3 class="ai-effect-gradient-text">
+            Powered by AloAi
+            <sparkle-icon width="16" height="16" color="#9333EA"/>
+          </h3>
+        </div>
+        <div class="text-left-align text-13 font-weight-light-bold my-2">
+          Get call transcriptions, executive summaries, and action items by AloAi.
+          <a href="https://aloware.com/solutions/ai-voice-analytics"
+            target="_blank"
+            class="text-primary font-weight-bold">
+            Learn more
+          </a>
+        </div>
+      </div>
+    </div>
     <aloai-promotion-dialog :dialogVisible="showInfoBox"
                             @update:dialogVisible="showInfoBox = $event" />
   </div>
 </template>
 
 <script>
-import _ from 'lodash'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
-import SmsReminders from './sms-reminders'
-import TargetUsersTree from './target-users-tree'
-import ChevronRight from 'components/icons/contact-activity/chevron-right'
+import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
+import CallDispositionSelector from 'components/call-disposition-selector'
 import CommunicationAudio from 'components/communication-audio'
 import CommunicationNote from 'components/communication-note'
-import CallDispositionSelector from 'components/call-disposition-selector'
-import CalendarIcon from 'components/icons/calendar-icon'
-import * as AnswerTypes from '../constants/answer-types'
-import * as CommunicationCurrentStatus from '../constants/communication-current-status'
-import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
-import * as CommunicationTypes from '../constants/communication-types'
-import * as CommunicationDirections from '../constants/communication-direction'
-import * as UploadedFileTypes from '../constants/uploaded-file-types'
-import * as CommunicationRejectionReasons from '../constants/communication-rejection-reasons'
-import * as CommunicationCallbackStatus from '../constants/callback-status'
-import * as TranscriptionStatus from '../constants/transcription-status'
-import * as SummaryStatus from '../constants/summary-status'
-import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import CancelCallIcon from 'components/icons/cancel-call-icon'
+import ExpandableHtmlViewer from 'components/communication/ExpandableHtmlViewer.vue'
+import TranscriptionModal from 'components/communication/transcription-modal.vue'
+import DownloadButton from 'components/download-button'
+import GenerateTranscriptionButton from 'components/generate-transcription-button'
+import EntityTags from 'components/generic-selectors/entity-tags'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
-import ParkedCallIcon from 'components/icons/parked-call-icon'
-import ParkCallIcon from 'components/icons/park-call-icon'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import CalendarIcon from 'components/icons/calendar-icon'
+import CancelCallIcon from 'components/icons/cancel-call-icon'
+import ChevronRight from 'components/icons/contact-activity/chevron-right'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
-import DownloadButton from 'components/download-button'
-import API from 'src/plugins/api/api'
-import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
-import EntityTags from 'components/generic-selectors/entity-tags'
-import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
-import { marked } from 'marked'
 import DOMPurify from 'dompurify'
-import TranscriptionModal from 'components/communication/transcription-modal.vue'
-import ExpandableHtmlViewer from 'components/communication/ExpandableHtmlViewer.vue'
-import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
-import GenerateTranscriptionButton from 'components/generate-transcription-button'
+import _ from 'lodash'
+import { marked } from 'marked'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
+import API from 'src/plugins/api/api'
+import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
+import * as AnswerTypes from '../constants/answer-types'
+import * as CommunicationCallbackStatus from '../constants/callback-status'
+import * as CommunicationCurrentStatus from '../constants/communication-current-status'
+import * as CommunicationDirections from '../constants/communication-direction'
+import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
+import * as CommunicationRejectionReasons from '../constants/communication-rejection-reasons'
+import * as CommunicationTypes from '../constants/communication-types'
+import * as SummaryStatus from '../constants/summary-status'
+import * as TranscriptionStatus from '../constants/transcription-status'
+import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import SmsReminders from './sms-reminders'
+import TargetUsersTree from './target-users-tree'
 
 export default {
   name: 'communication-info',
@@ -1142,9 +1163,27 @@ export default {
       ]
 
       return (
-        this.CommunicationTypes.CALL &&
+        this.communication.type === CommunicationTypes.CALL &&
         this.showAudio(this.communication) &&
-        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status)) &&
+        !this.isSimpSocial
+      )
+    },
+
+    isAvaPromotionDialogVisible () {
+      return (
+        !this.isSimpSocial && // Exclude SimpSocial
+        this.currentCompany?.transcription_enabled &&
+        this.communication.type === CommunicationTypes.CALL &&
+        this.showAudio(this.communication) &&
+        (
+          // Either transcription is not enabled, or usage has exceeded limits with restrictions
+          !this.currentCompany?.transcription_settings?.call_transcription_enabled ||
+          (
+            this.currentCompany?.used_transcription_min >= this.currentCompany?.plan?.included_transcription_min &&
+            this.currentCompany?.transcription_settings?.overusage_restriction_enabled
+          )
+        )
       )
     }
   },
@@ -1322,6 +1361,24 @@ export default {
       if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
         this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
       }
+    },
+
+    parseBodyContent (body) {
+      if (!body) return ''
+
+      // Check if content appears to contain markdown
+      const hasMarkdown = /[*#`_~]/.test(body) // Basic markdown character detection
+
+      if (hasMarkdown) {
+        // Ensure line breaks are preserved before markdown conversion
+        const textWithBreaks = body.replace(/\n/g, '\n\n')
+        // Convert markdown to HTML and sanitize
+        const rawHtml = marked(textWithBreaks)
+        return DOMPurify.sanitize(rawHtml)
+      }
+
+      // If no markdown, just use nl2br filter
+      return this.$options.filters.nl2br(this.parseMentionToView(body))
     }
   },
 
@@ -1340,3 +1397,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.communication-body :deep(p) {
+  margin-bottom: 8px;
+}
+
+.communication-body :deep(p:last-child) {
+  margin-bottom: 0;
+}
+</style>

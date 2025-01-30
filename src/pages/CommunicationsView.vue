@@ -2,9 +2,8 @@
   <div class="h-100"
        v-if="authenticated">
     <div class="inbox animate__animated animate__fadeIn position-relative">
-      <communications-side :class="inboxSideClasses"
-                           ref="communications-side"
-                           @itemSelected="onItemSelected" />
+      <communications-side ref="communications-side"
+                           :class="inboxSideClasses" />
 
       <div class="inbox-details d-flex flex-grow-1"
            :class="{ 'mobile-contact-active' : isMobileContactActive }"
@@ -26,8 +25,8 @@ import {
   visibilityMixin,
   userMixin
 } from 'src/plugins/mixins'
+import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 import Contact from 'pages/contacts/Contact'
-
 import { COMMUNICATIONS_VIEWS_ROUTE_NAME, DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 
 export default {
@@ -37,6 +36,7 @@ export default {
     contactMixin,
     contactV2AttributesMixin,
     communicationsMixin,
+    communicationsDefaultFilterModelMixin,
     aclMixin,
     visibilityMixin,
     userMixin
@@ -93,7 +93,11 @@ export default {
       'setActiveChannel',
       'setTaskCount',
       'setShowViewsList',
-      'setIsInboxRefreshBtnLoading'
+      'setIsInboxRefreshBtnLoading',
+      'setChannelClonedFilter',
+      'setInboxFilters',
+      'resetChannelChangedFilterFields',
+      'setSearchQuery'
     ]),
 
     setChannel (routeChanged = false) {
@@ -122,11 +126,6 @@ export default {
       }
     },
 
-    onItemSelected (routeData) {
-      this.contactId = routeData.params.id
-      this.$router.push(routeData)
-    },
-
     onWindowResize () {
       this.setShowViewsList(false)
     }
@@ -137,23 +136,25 @@ export default {
       this.getPinnedViews()
     }
 
+    if (this.authenticated && this.$route.name !== COMMUNICATIONS_VIEWS_ROUTE_NAME) {
+      this.setChannel()
+      const filter = { ...this.channelDefaultFilterModel.filter }
+      this.setChannelClonedFilter(filter)
+      this.resetChannelChangedFilterFields()
+      this.setInboxFilters(filter)
+    }
+
     if (this.$route.query && this.$route.query.add_contact) {
       this.$VueEvent.fire('add_contact', {
         phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
       })
     }
   },
-
   mounted () {
     // when the user tries to access the channel directly but without a personal line
     if (this.$route.params?.channel === 'my-personal-line' && !this.profile.campaign_id) {
       this.$router.push({ name: DEFAULT_COMMUNICATIONS_ROUTE_NAME })
       return
-    }
-
-    if (this.authenticated && this.$route.name !== COMMUNICATIONS_VIEWS_ROUTE_NAME) {
-      this.setChannel()
-      this.fetchTaskCounts()
     }
 
     this.$VueEvent.listen('fetchCommunications', () => {
@@ -167,6 +168,10 @@ export default {
     })
 
     window.addEventListener('resize', this.onWindowResize)
+
+    this.$nextTick(() => {
+      this.getCommunications(this.communicationFilters)
+    })
   },
 
   unmounted () {
@@ -178,9 +183,19 @@ export default {
   },
 
   watch: {
-    '$route.name': function (value) {
-      const isNotInboxRouteName = !value.includes(DEFAULT_COMMUNICATIONS_ROUTE_NAME)
-      this.setChannel(isNotInboxRouteName)
+
+    '$route.params.channel': function (newVal) {
+      this.resetCommunications()
+      this.setChannel()
+      const filter = { ...this.channelDefaultFilterModel.filter }
+      this.setChannelClonedFilter(filter)
+      this.resetChannelChangedFilterFields()
+      this.setInboxFilters(filter)
+      this.setSearchQuery('')
+
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     },
 
     isLoadedPinnedViews (value) {

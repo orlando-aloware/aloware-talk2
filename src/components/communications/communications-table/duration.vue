@@ -8,7 +8,12 @@
 
     <div class="d-flex align-items-center justify-content-left"
          data-testid="status-div">
-      <span>{{ getVisibleStatus(row) }}</span>
+      <span v-if="row.type === CommunicationTypes.SMS">
+        -
+      </span>
+      <span v-else>
+        {{ getVisibleStatus(row) }}
+      </span>
     </div>
   </div>
 </template>

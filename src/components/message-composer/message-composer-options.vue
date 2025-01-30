@@ -98,7 +98,7 @@
       </q-tooltip>
     </b-link>
 
-    <b-link v-if="messageComposer.mode === 'sms' && isDemoCompany"
+    <b-link v-if="messageComposer.mode === 'sms' && shouldSeeExperimentalAiFeatures"
             href="#"
             data-testid="add-suggested-text-messages-button"
             :disabled="isTextingDisabled">
@@ -235,10 +235,6 @@ export default {
       'messageComposer',
       'contact'
     ]),
-
-    isDemoCompany () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
-    },
 
     isTextingDisabled () {
       return this.messageComposer.mode === 'sms' && !this.currentCompany.sms_enabled

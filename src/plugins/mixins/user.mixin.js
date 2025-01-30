@@ -22,24 +22,27 @@ export default {
       return localStorage.getItem('impersonate') === 'true'
     },
 
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    },
+
+    shouldSeeExperimentalAiFeatures () {
+      return this.isDemoCompany || this.currentCompany?.plan?.ai_enabled === true
+    },
+
+    shouldSeeExperimentalXproAiFeatures () {
+      return (this.shouldSeeExperimentalAiFeatures && this.currentCompany?.plan?.use_case === 'xPro') || this.isDemoCompany
+    },
+
     /*
       WAT-1105:
-        > For Aloware demo companies:
-            - new Communications menu is enabled showing the communications logs table
-
-            - first code freeze: 08-01-2025
-              - channels and views still present in inbox menu, no in communications
-
-            - second code freeze: 22-01-2025
-              - channels and view present only Communications menus
-
-        > For all other companies:
-            - new Communications menu not shown
-            - Inbox menu has no changes, that means is named still "Communications" and shows the channels and view
-
+          - second code freeze: 01-22-2025
+            - new Communications menu general available
+            - channels only present in Communications menu
     */
     hasNewCommunicationsFeatureEnabled () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id)
+      /* Making new Communications feature globally enabled */
+      return true
     }
   },
 

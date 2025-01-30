@@ -1,16 +1,16 @@
 <template>
-  <div data-testid="user-row">
-    <span v-if="isAgent && value">
-      {{ getUserName(getUser(value)) }}
-    </span>
-    <a target='_blank'
-       :href="getUserURL(value)"
-       v-else-if="value">
+  <div class="ellipse"
+       data-testid="user-row">
+    <a href="#"
+       :id="`comm-user-${_uid}`"
+       v-if="value"
+       @click.prevent="filter">
       {{ getUserName(getUser(value)) }}
 
-      <q-tooltip>
-        Click to go to user's page
-      </q-tooltip>
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-user-${_uid}`">
+        Click to filter by this user
+      </b-tooltip>
     </a>
     <span v-else>
       -
@@ -19,21 +19,28 @@
 </template>
 
 <script>
-import { userMixin, aclMixin, classicMixin } from 'src/plugins/mixins'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'User',
 
   mixins: [
-    userMixin,
-    aclMixin,
-    classicMixin
+    userMixin
   ],
 
   props: {
     value: {
       type: Number,
       required: false
+    }
+  },
+
+  methods: {
+    filter () {
+      this.$emit('on-filter', {
+        type: 'users',
+        value: [this.value]
+      })
     }
   }
 }

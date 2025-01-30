@@ -1,7 +1,7 @@
 const suffixV1 = '/api/v1/'
 const suffixV2 = '/api/v2/'
-import qs from 'qs'
 import _ from 'lodash'
+import qs from 'qs'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 const exportCommunications = async (contactId) => {
@@ -173,6 +173,18 @@ export default {
 
       syncHubspot (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-hubspot`)
+      },
+
+      syncSalesforce (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-salesforce`)
+      },
+
+      syncGuesty (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-guesty`)
+      },
+
+      syncZoho (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-zoho`)
       },
 
       syncPipedrive (id) {
@@ -444,7 +456,7 @@ export default {
         },
 
         getCount (params) {
-          return window.axios.get(`${suffixV1}reports/communications/count`, params)
+          return window.axios.get(`${process.env.API_REPORTING_URL}${suffixV1}reports/communications/count`, params)
         }
       }
     },
@@ -490,6 +502,14 @@ export default {
 
       reportIssue (id, data) {
         return window.axios.post(`${suffixV1}communications/${id}/report-issue`, data)
+      },
+
+      askQuestion (communicationId, params) {
+        if (!communicationId) {
+          return null
+        }
+
+        return window.axios.get(`${suffixV1}communication/${communicationId}/transcription/ask`, params)
       }
     },
 
@@ -504,19 +524,11 @@ export default {
 
       // Generate transcription for the communication
       generateTranscription (communicationId) {
-        if (!communicationId) {
-          return null
-        }
-
         return window.axios.post(`${suffixV1}transcription/communication/${communicationId}`)
       },
 
       // Generate summary for the transcription
       generateSummary (communicationId) {
-        if (!communicationId) {
-          return null
-        }
-
         return window.axios.post(
           `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )
@@ -708,6 +720,14 @@ export default {
         return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary`, params)
       },
 
+      askQuestion (contactId, params) {
+        if (!contactId) {
+          return null
+        }
+
+        return window.axios.get(`/api/v2/contacts/${contactId}/conversation-summary/ask`, params)
+      },
+
       getTextMessageSuggestions (contactId, params) {
         if (!contactId) {
           return window.axios.get(`/api/v2/contacts/text-message-suggestions`, params)
@@ -783,8 +803,8 @@ export default {
     },
 
     contactFolders: {
-      list () {
-        return window.axios.get(`${suffixV2}contact-folders`)
+      list (params) {
+        return window.axios.get(`${suffixV2}contact-folders`, { params })
       },
 
       delete (id) {
@@ -888,6 +908,7 @@ export default {
       }
 
     },
+
     contactList: {
       get (params) {
         return window.axios.get(`${suffixV2}contacts-list`, { params })
@@ -897,6 +918,9 @@ export default {
       },
       async update (id, params) {
         return window.axios.put(`${suffixV2}contacts-list/${id}`, params)
+      },
+      delete (id, params) {
+        return window.axios.delete(`${suffixV2}contacts-list/${id}`, { params })
       }
     },
 

@@ -86,6 +86,9 @@
                     <span class="data-value">{{ integrationData.other_phone }}</span>
                 </p>
             </q-card-section>
+          <sync-with-integration :integration_name='integrationName()'
+                                 :contact_id='contact.id'
+                                 @sync-complete="afterSyncComplete"/>
         </q-card>
     </div>
   </template>
@@ -95,9 +98,12 @@ import { mapState } from 'vuex'
 import {
   integrationMixin
 } from 'src/plugins/mixins'
+import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
+import { SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'integration-salesforce',
+  components: { SyncWithIntegration },
 
   mixins: [
     integrationMixin
@@ -128,7 +134,9 @@ export default {
     },
 
     salesforceModule () {
-      if (this.integrationData) return this.integrationData.type.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
+      if (this.integrationData?.type) {
+        return this.integrationData.type.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())
+      }
 
       return null
     }
@@ -149,13 +157,27 @@ export default {
   },
 
   methods: {
+    integrationName () {
+      return SALESFORCE_INTEGRATION
+    },
     getData () {
       this.contactIntegrationDataLoaded = false
 
-      return this.getIntegrationData(this.contact, 'salesforce')
+      return this.getIntegrationData(this.contact, SALESFORCE_INTEGRATION)
         .then(response => {
-          this.integrationData = response.data
+          if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
+            this.integrationData = response.data
+          } else {
+            this.integrationData = null
+          }
+
           this.contactIntegrationDataLoaded = true
+        })
+    },
+    afterSyncComplete () {
+      this.getData()
+        .then(() => {
+          this.$generalNotification('Contact has been successfully synced.')
         })
     }
   }

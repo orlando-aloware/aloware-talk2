@@ -1,9 +1,12 @@
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_VOICEMAIL } from 'src/constants/communication-status'
+import { ANY_COMMUNICATION_TYPE, CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 const DEFAULT_CHANNEL = {
-  label: 'Communications Logs',
+  label: 'Communication Logs',
   value: DEFAULT_COMMUNICATIONS_CHANNEL,
   icon: 'all-communications',
+  type: ANY_COMMUNICATION_TYPE,
   disabled: false,
   default: true
 }
@@ -29,51 +32,28 @@ export default function () {
       },
       {
         label: 'Calls',
-        value: 'calls',
+        value: CALLS_CHANNEL,
         icon: 'call',
         disabled: false,
-        type: 'call',
-        answerStatus: 'all'
+        type: CALL_TYPE,
+        answerStatus: ANY_COMMUNICATION_ANSWER_STATUS
       },
       {
         label: 'Messages',
-        value: 'messages',
+        value: MESSAGES_CHANNEL,
         icon: 'message',
         disabled: false,
-        type: 'sms',
-        answerStatus: 'all'
+        type: SMS_TYPE,
+        answerStatus: ANY_COMMUNICATION_ANSWER_STATUS
       },
       {
         label: 'Voicemails',
-        value: 'voicemails',
+        value: VOICEMAILS_CHANNEL,
         icon: 'voicemail',
         disabled: false,
-        type: 'call',
-        answerStatus: 'voicemail'
-      },
-      {
-        label: 'Call Recordings',
-        value: 'recordings',
-        icon: 'record',
-        disabled: false,
-        type: 'call',
-        answerStatus: 'recorded'
+        type: CALL_TYPE,
+        answerStatus: STATUS_VOICEMAIL
       }
-      /* {
-        label: 'Mentions',
-        value: 'mentions',
-        icon: 'mention',
-        disabled: false
-      },
-
-      {
-        label: 'My Personal Line',
-        value: 'my-personal-line',
-        icon: 'person',
-        disabled: false,
-        type: 'all',
-        answerStatus: 'all'
-      } */
     ],
     communications: [],
     communicationsCount: 0,
@@ -108,6 +88,8 @@ export default function () {
     isLoadingPendingTaskCount: false,
     isLoadingCommunications: false,
     isLoadingCommunicationsCount: false,
+    isLoadingMore: false,
+    paginationPage: 1,
     inboxShowMyContacts: false,
     inboxShowUnreads: false,
     isInboxFiltersLoaded: true,
@@ -119,6 +101,7 @@ export default function () {
     isEditingView: false,
     showViewsList: false,
     isInboxRefreshBtnLoading: false,
-    inboxFilters: {}
+    inboxFilters: {},
+    searchQuery: ''
   }
 }
