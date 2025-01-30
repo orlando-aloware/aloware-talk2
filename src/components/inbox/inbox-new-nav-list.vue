@@ -10,21 +10,21 @@
       @scroll="onScroll"
     >
       <inbox-new-nav-item
-        v-for="inbox in inboxes"
-        :key="inbox.id"
         :label="inbox.name"
         :value="inbox.id"
         :message-count="inbox.message_count"
-        :is-active="selectedInboxId === inbox.id"
+        :is-active="activeInbox === inbox.id"
+        v-for="inbox in inboxes"
+        :key="inbox.id"
         @click="onInboxSelect"
       />
 
       <div
-        v-if="loading"
-        :class="[loading ? 'py-5' : 'py-4', 'relative']"
+        v-if="isLoadingInboxes"
+        :class="[isLoadingInboxes ? 'py-5' : 'py-4', 'relative']"
       >
         <b-overlay
-          :show="loading"
+          :show="isLoadingInboxes"
           rounded="sm"
           variant="white"
           data-testid="inbox-new-nav-list-overlay"
@@ -44,10 +44,11 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import InboxNewNavItem from './inbox-new-nav-item'
-import talk2Api from 'src/plugins/api/api'
-
+// import talk2Api from 'src/plugins/api/api'
+// import { eInboxMixin } from 'src/plugins/mixins'
+import eInboxMixin from 'src/plugins/mixins/e-inbox.mixin'
 export default {
   name: 'InboxNewNavList',
 
@@ -55,59 +56,33 @@ export default {
     InboxNewNavItem
   },
 
+  mixins: [eInboxMixin],
+
   data () {
     return {
-      loading: false,
+      // loading: false,
       currentPage: 0,
-      selectedInboxId: null,
       perPage: 50,
       hasMorePages: true
     }
   },
 
   computed: {
-    ...mapState('eInbox', ['inboxesFirstPage']),
-    ...mapGetters('eInbox', ['getInboxesFirstPage']),
+    ...mapState('eInbox', [
+      'inboxes',
+      'activeInbox',
+      'isLoadingInboxes'
+    ])
+    // ...mapGetters('eInbox', ['getInboxesFirstPage'])
 
-    inboxes () {
+    /*
+      inboxes () {
       return this.getInboxesFirstPage
-    }
+    } */
   },
 
   methods: {
-    ...mapActions('eInbox', ['setInboxesFirstPage', 'setActiveInbox']),
-
-    async loadMoreInboxes () {
-      if (this.loading || !this.hasMorePages) return
-
-      this.loading = true
-      try {
-        const nextPage = this.currentPage + 1
-        const response = await talk2Api.V2.inbox.inboxes.get({
-          page: nextPage,
-          per_page: this.perPage
-        })
-
-        const newInboxes = response.data.data
-
-        if (newInboxes.length) {
-          if (nextPage === 1) {
-            this.setInboxesFirstPage(newInboxes)
-          } else {
-            this.setInboxesFirstPage([...this.inboxes, ...newInboxes])
-          }
-          this.currentPage = nextPage
-
-          this.hasMorePages = newInboxes.length === this.perPage
-        } else {
-          this.hasMorePages = false
-        }
-      } catch (error) {
-        console.error('Error loading inboxes:', error)
-      } finally {
-        this.loading = false
-      }
-    },
+    ...mapActions('eInbox', ['setActiveInbox']),
 
     onScroll ({ verticalPosition, verticalSize, verticalContainerSize }) {
       const bottomThreshold = 100
@@ -115,24 +90,23 @@ export default {
         verticalPosition + verticalContainerSize + bottomThreshold >= verticalSize
 
       if (isNearBottom && !this.loading && this.hasMorePages) {
-        this.loadMoreInboxes()
+        /* moved this to the mixin, need implement and test  */
+        /* this.loadMoreInboxes() */
       }
     },
 
     onInboxSelect (inboxId) {
-      this.selectedInboxId = inboxId
-      // this.$emit('inbox-selected', inboxId)
-
       this.setActiveInbox(inboxId)
+      // this.resetCommunications()
     }
   },
 
   async created () {
-    if (!this.inboxes.length) {
-      await this.loadMoreInboxes()
-    } else {
-      this.currentPage = 1
-      this.hasMorePages = this.inboxes.length === this.perPage
+    await this.fetchInboxes()
+
+    // If there are inboxes, set the first one as active
+    if (this.inboxes.length) {
+      this.setActiveInbox(this.inboxes[0].id)
     }
   }
 }

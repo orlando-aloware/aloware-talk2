@@ -10,10 +10,13 @@ export default {
   initNewInbox: ({ commit }, enabled) => {
     commit('SET_NEW_INBOX', enabled)
   },
-  setInboxesFirstPage: ({ commit }, inboxesFirstPage) => {
-    commit('SET_INBOXES_FIRST_PAGE', inboxesFirstPage)
+  setInboxes: ({ commit }, inboxes) => {
+    commit('SET_INBOXES', inboxes)
   },
   setActiveInbox: ({ commit }, inbox) => {
     commit('SET_ACTIVE_INBOX', inbox)
+  },
+  setIsLoadingInboxes: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_INBOXES', loading)
   }
 }
