@@ -519,6 +519,7 @@ export default {
     ]),
 
     async initializeLists () {
+      await this.getPinnedLists()
       await this.getLists()
       this.calculateTotalPages()
       this.listsData = this.lists
@@ -669,6 +670,7 @@ export default {
     },
 
     async refreshLists () {
+      await this.getPinnedLists()
       this.listsData = []
       this.SET_LISTS_COUNT(0)
       await this.getLists()
@@ -707,6 +709,11 @@ export default {
 
       this.pinRequest(this.list.id, isPinned).finally(() => {
         this.$generalNotification(isPinned ? 'Contact list has been successfully pinned.' : 'Contact list has been unpinned.')
+        if (isPinned) {
+          this.pinnedLists.push(this.list.id)
+        } else {
+          this.pinnedLists = this.pinnedLists.filter(item => item !== this.list.id)
+        }
       })
     },
 
