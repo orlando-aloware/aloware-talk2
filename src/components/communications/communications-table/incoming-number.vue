@@ -17,7 +17,7 @@
       -
     </span>
     <span>
-      {{ value | fixPhone('NATIONAL', true) }}
+      {{ row.incoming_number | fixPhone('NATIONAL', true) }}
     </span>
   </div>
 </template>
@@ -29,9 +29,9 @@ export default {
   name: 'IncomingNumber',
 
   props: {
-    value: {
-      type: String,
-      required: false
+    row: {
+      type: Object,
+      required: true
     },
 
     campaignId: {
