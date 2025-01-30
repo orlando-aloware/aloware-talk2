@@ -475,7 +475,7 @@
                   <div class="flex-grow-1">
                     <div v-if="contact.user_id">
                       <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
-                        {{ (getUserName(contact.user_id)) | ucwords }}
+                        {{ getUser(contact.user_id).name | ucwords }}
                       </div>
                     </div>
                     <div v-else>
