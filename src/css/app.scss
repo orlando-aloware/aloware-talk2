@@ -16103,6 +16103,10 @@ hr {
     td:last-child, th:last-child {
       position: sticky;
       right: 0;
+
+      @media (max-width: 575px) {
+        position: relative;
+      }
     }
 
     tbody {
