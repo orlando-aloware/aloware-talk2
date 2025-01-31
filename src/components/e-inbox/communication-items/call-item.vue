@@ -20,7 +20,7 @@
       <!-- Call details -->
       <div class="row no-wrap items-center q-mt-xs">
         <q-icon
-          :name="getCallIcon(comm.call_type)"
+          :name="getCallIcon(direction)"
           size="xs"
           :color="getCallColor(comm.call_status)"
           class="q-mr-xs"
@@ -41,6 +41,11 @@ export default {
     comm: {
       type: Object,
       required: true
+    },
+    direction: {
+      type: String,
+      required: true,
+      validator: value => ['inbound', 'outbound'].includes(value)
     }
   },
 
@@ -62,13 +67,8 @@ export default {
       return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
     },
 
-    getCallIcon (callType) {
-      switch (callType) {
-        case 'incoming': return 'call_received'
-        case 'outgoing': return 'call_made'
-        case 'missed': return 'call_missed'
-        default: return 'call'
-      }
+    getCallIcon (direction) {
+      return direction === 'inbound' ? 'call_received' : 'call_made'
     },
 
     getCallColor (status) {

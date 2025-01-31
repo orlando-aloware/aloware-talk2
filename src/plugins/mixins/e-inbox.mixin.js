@@ -25,7 +25,8 @@ export default {
       'appendCommunications',
       'setIsLoadingCommunications',
       'resetCommunications',
-      'setIsLoadingMoreCommunications'
+      'setIsLoadingMoreCommunications',
+      'setActiveInbox'
     ]),
 
     async fetchInboxes () {
@@ -35,10 +36,41 @@ export default {
 
         const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage })
         this.setInboxes(response.data)
+
+        // Check for inbox ID in route after loading inboxes
+        await this.handleRouteInbox()
       } catch (error) {
         console.error('Error fetching inboxes:', error)
       } finally {
         this.setIsLoadingInboxes(false)
+      }
+    },
+
+    async handleRouteInbox () {
+      const routeInboxId = this.$route.params.inboxId
+
+      if (this.inboxes.length) {
+        if (routeInboxId) {
+          // Handle specific inbox from route
+          const inbox = this.inboxes.find(inbox => inbox.id.toString() === routeInboxId.toString())
+          if (inbox) {
+            this.setActiveInbox(inbox.id)
+            this.resetCommunications()
+            await this.fetchCommunications(inbox.id)
+          } else {
+            // Handle case when inbox ID from route is not found
+            console.warn(`Inbox with ID ${routeInboxId} not found`)
+            this.$router.replace({ name: 'EInbox' })
+          }
+        } else {
+          // No inbox ID in route, set first inbox
+          const firstInbox = this.inboxes[0]
+          this.setActiveInbox(firstInbox.id)
+          this.resetCommunications()
+          await this.fetchCommunications(firstInbox.id)
+          // Update route to reflect selected inbox
+          this.$router.push(`/inboxes/${firstInbox.id}`)
+        }
       }
     },
 
@@ -115,5 +147,17 @@ export default {
         this.isLoadingInboxes = false
       }
     }, */
+  },
+
+  // Add route watcher to handle route changes
+  watch: {
+    '$route.params.inboxId': {
+      immediate: true,
+      handler (newInboxId) {
+        if (newInboxId && this.inboxes.length) {
+          this.handleRouteInbox()
+        }
+      }
+    }
   }
 }

@@ -251,16 +251,6 @@ export default {
       }
 
       this.setShowContactsHeader(false)
-    },
-
-    handleInboxSelected (inboxId) {
-      this.active = `inbox-${inboxId}`
-      this.setActiveChannel({
-        label: 'Inbox',
-        value: `inbox-${inboxId}`,
-        icon: 'inbox',
-        disabled: false
-      })
     }
   },
 

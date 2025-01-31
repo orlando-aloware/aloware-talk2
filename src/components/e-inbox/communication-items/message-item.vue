@@ -9,7 +9,15 @@
     <div class="message-content">
       <!-- Header: Sender and Time -->
       <div class="message-header">
-        <span class="sender text-weight-medium">{{ comm.sender || 'Unknown' }}</span>
+        <div class="sender-wrapper">
+          <span class="sender text-weight-medium">{{ comm.sender || 'Unknown' }}</span>
+          <q-icon
+            :name="direction === 'inbound' ? 'arrow_downward' : 'arrow_upward'"
+            :class="direction === 'inbound' ? 'text-green' : 'text-blue'"
+            size="xs"
+            class="q-ml-xs"
+          />
+        </div>
         <span class="time">{{ formatTime(comm.created_at) }}</span>
       </div>
       <!-- Message Body -->
@@ -28,6 +36,11 @@ export default {
     comm: {
       type: Object,
       required: true
+    },
+    direction: {
+      type: String,
+      required: true,
+      validator: value => ['inbound', 'outbound'].includes(value)
     }
   },
 
@@ -83,6 +96,11 @@ export default {
   gap: 12px;
   line-height: 1.2;
 
+  .sender-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
   .sender {
     font-size: 14px;
     color: rgba(0, 0, 0, 0.87);
@@ -108,5 +126,10 @@ export default {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.sender-wrapper {
+  display: flex;
+  align-items: center;
 }
 </style>

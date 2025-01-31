@@ -101,7 +101,7 @@ import { inboxRoutesMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
-import { INBOXES_MENU_TITLE } from 'src/router/routes'
+// import { INBOXES_MENU_TITLE } from 'src/router/routes'
 import ZapBoldIcon from 'components/icons/inbox/zap-bold-icon'
 
 const COOKIE_NEW_INBOX = 'new_inbox_enabled'
@@ -151,7 +151,9 @@ export default {
     ...mapGetters('eInbox', ['isNewInboxEnabled']),
 
     isShown () {
-      return (this.$route?.meta?.title === INBOXES_MENU_TITLE && this.$route.params.channel !== 'mentions')
+      const isInboxRoute = this.$route?.meta?.isInbox
+      const notMentionsChannel = this.$route.params.channel !== 'mentions'
+      return isInboxRoute && notMentionsChannel
     },
 
     toggleFiltersClass () {
@@ -246,8 +248,10 @@ export default {
           // Handle cookie storage
           if (result.enabled) {
             this.$cookies.set(COOKIE_NEW_INBOX, 'true', COOKIE_EXPIRES)
+            this.$router.push('/inboxes')
           } else {
             this.$cookies.remove(COOKIE_NEW_INBOX)
+            this.$router.push('/')
           }
 
           this.$q.notify({
@@ -257,8 +261,6 @@ export default {
               : 'Rolled back to classic inbox',
             position: 'top'
           })
-
-          // this.refreshInbox()
         }
       } catch (error) {
         console.error('Failed to toggle new inbox:', error)

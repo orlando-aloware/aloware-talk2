@@ -41,10 +41,12 @@
           <call-item
             v-if="comm.type === CALLS_TYPE"
             :comm="comm"
+            :direction="comm.direction"
           />
           <message-item
             v-else-if="comm.type === SMS_TYPE"
             :comm="comm"
+            :direction="comm.direction"
           />
         </div>
 
@@ -127,14 +129,7 @@ export default {
     },
 
     onCommunicationClick (communication) {
-      this.$router.push({
-        name: 'Inbox Contact',
-        params: {
-          channel: 'inbox',
-          id: communication.contact_id,
-          communicationId: communication.id
-        }
-      })
+      this.$router.push(`/inboxes/${this.activeInbox}/contacts/${communication.contact_id}/communications/${communication.id}`)
     }
   }
 }
