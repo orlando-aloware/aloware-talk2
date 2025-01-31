@@ -27,7 +27,7 @@ export default {
     },
 
     shouldSeeExperimentalAiFeatures () {
-      return this.isDemoCompany || this.currentCompany?.plan?.ai_enabled === true
+      return this.isDemoCompany || this.currentCompany?.plan?.ai_plan === true
     },
 
     shouldSeeExperimentalXproAiFeatures () {
