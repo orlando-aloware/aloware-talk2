@@ -19,6 +19,17 @@ import { userMixin } from 'src/plugins/mixins'
 import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 import { CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
 
+export function handleElectronNavigation (e, url) {
+  if (window && window.process && window.process.type === 'renderer') {
+    if (e) e.preventDefault()
+    // In Electron, navigate in the same window
+    this.$router.push(url)
+    return true
+  }
+  // In web browser, return false to let default behavior happen
+  return false
+}
+
 export default {
   mixins: [userMixin],
 
@@ -1004,6 +1015,10 @@ export default {
 
     getCampaignName (campaignId) {
       return this.campaigns.find(campaign => campaign.id === campaignId)?.name
+    },
+
+    handleElectronNavigation (e, url) {
+      return handleElectronNavigation.call(this, e, url)
     }
   },
 

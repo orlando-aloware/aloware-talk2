@@ -56,7 +56,7 @@ export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Ch
 // NO difference in the titles for Inboxes on mobile
 export const INBOXES_MENU_TITLE = 'Inboxes'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
-export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comm.’s'
+export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
 
 const routes = [
   {

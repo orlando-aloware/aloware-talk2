@@ -3,9 +3,9 @@
     <h3 class="title pl-3">
       {{ title }}
     </h3>
-    <div class="filters pl-3">
-      <div class="search">
-        <search-input class="width-260"
+    <div class="filters pl-3 d-flex flex-column flex-sm-row gap-3">
+      <div class="search flex-grow-1">
+        <search-input class="w-100"
                       limit-search-characters
                       :search="searchQuery"
                       :disabled="isLoadingDisabled"
@@ -13,8 +13,8 @@
                       @search="onSearch" />
       </div>
 
-      <div class="setting pr-3 align-items-center">
-        <div class="small text-muted fs-13 text-right">
+      <div class="setting d-flex align-items-center flex-column flex-sm-row w-100 w-sm-auto gap-3 align-items-sm-center">
+        <div class="small text-muted fs-13 order-1 order-sm-1">
           <template v-if="!isLoadingCommunicationsCount">
             {{ communicationsCount }} Communications
           </template>
@@ -23,17 +23,17 @@
                       v-else />
         </div>
 
-        <hr role="separator"
-            aria-orientation="vertical"
-            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
+        <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-3 order-0 order-sm-2 ml-sm-4">
+          <communications-filters />
+        </div>
 
-        <communications-filters class="ml-2 mr-3" />
-
-        <compact-btn variant="primary"
-                     :compact="false"
-                     @clicked="changeTableSettingsVisibility(true)">
-          Table Settings
-        </compact-btn>
+        <div class="d-flex align-items-center justify-content-center order-2 order-sm-3 ml-sm-4 mr-sm-2">
+          <compact-btn variant="primary"
+                       :compact="false"
+                       @clicked="changeTableSettingsVisibility(true)">
+            Table Settings
+          </compact-btn>
+        </div>
       </div>
     </div>
 

@@ -4,8 +4,9 @@
     <div class="ellipse"
          v-if="row.contact">
       <router-link class="text-primary"
-                   target='_blank'
                    :id="`comm-contact-${_uid}`"
+                   @click.native="handleContactClick"
+                   target="_blank"
                    :to="{ path: `/contacts/${row.contact.id}`}">
         <external-link-icon color="#1976D2"/>
         {{ row.contact.name | fixContactName }}
@@ -25,6 +26,7 @@
 
 <script>
 import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
+import communicationsMixin from 'src/plugins/mixins/communications.mixin'
 
 export default {
   name: 'Contact',
@@ -33,10 +35,22 @@ export default {
     ExternalLinkIcon
   },
 
+  mixins: [
+    communicationsMixin
+  ],
+
   props: {
     row: {
       type: Object,
       required: false
+    }
+  },
+
+  methods: {
+    handleContactClick (e) {
+      const url = `/contacts/${this.row.contact.id}`
+      // Only handle navigation in Electron, let browser handle it normally
+      this.handleElectronNavigation(e, url)
     }
   }
 }

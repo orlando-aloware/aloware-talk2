@@ -243,11 +243,7 @@ export default {
     ...mapActions(['setIsFirstLoad']),
 
     onItemClicked (nextActive) {
-      // avoid redundant navigation
-      if (nextActive === this.activeChannel.value) {
-        return
-      }
-
+      // Reset and close views
       this.onCloseViewsList()
       this.resetFilter()
 
@@ -275,11 +271,8 @@ export default {
         this.onSelectView(view.filter)
         return
       }
-      if (!this.activeChannel) {
-        return
-      }
 
-      this.active = nextActive
+      // Always update active channel and navigate, even if it's the same channel
       const channel = this.navListItems.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 
