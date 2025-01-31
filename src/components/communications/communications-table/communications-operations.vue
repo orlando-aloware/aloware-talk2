@@ -1,30 +1,39 @@
 <template>
-  <div class="d-flex justify-content-center context-menu">
-    <reply-communication-button class="operation-button mx-1"
+  <div class="d-flex justify-content-end context-menu">
+    <reply-communication-button black-tooltip
+                                class="operation-button mx-1"
                                 :communication="row" />
 
-    <call-communication-button class="operation-button mx-1"
+    <call-communication-button black-tooltip
+                               class="operation-button mx-1"
                                :communication="row" />
 
-    <details-communication-button class="operation-button mx-1"
-                                  :communication="row" />
+    <details-communication-button event-only
+                                  black-tooltip
+                                  class="operation-button mx-1"
+                                  :communication="row"
+                                  @on-details="$emit('on-details', $event)"/>
 
-    <archive-communication-button class="operation-button mx-1"
+    <archive-communication-button black-tooltip
+                                  class="operation-button mx-1"
                                   :communication="row"
                                   @archived="$emit('archived', $event)"/>
 
-    <terminate-communication-button class="operation-button mx-1"
+    <terminate-communication-button black-tooltip
+                                    class="operation-button mx-1"
                                     icon-height="16"
                                     icon-width="16"
                                     :communication="row"
                                     @terminated="$emit('terminated', $event)"/>
 
-    <barge-communication-button class="operation-button mx-1"
+    <barge-communication-button black-tooltip
+                                class="operation-button mx-1"
                                 icon-height="16"
                                 icon-width="16"
                                 :communication="row" />
 
-    <whisper-communication-button class="operation-button mx-1"
+    <whisper-communication-button black-tooltip
+                                  class="operation-button mx-1"
                                   icon-height="16"
                                   icon-width="16"
                                   :communication="row" />

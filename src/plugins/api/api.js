@@ -175,6 +175,18 @@ export default {
         return window.axios.post(`${suffixV1}contact/${id}/sync-hubspot`)
       },
 
+      syncSalesforce (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-salesforce`)
+      },
+
+      syncGuesty (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-guesty`)
+      },
+
+      syncZoho (id) {
+        return window.axios.post(`${suffixV1}contact/${id}/sync-zoho`)
+      },
+
       syncPipedrive (id) {
         return window.axios.post(`${suffixV1}contact/${id}/sync-pipedrive`)
       },
@@ -791,8 +803,8 @@ export default {
     },
 
     contactFolders: {
-      list () {
-        return window.axios.get(`${suffixV2}contact-folders`)
+      list (params) {
+        return window.axios.get(`${suffixV2}contact-folders`, { params })
       },
 
       delete (id) {
@@ -906,6 +918,9 @@ export default {
       },
       async update (id, params) {
         return window.axios.put(`${suffixV2}contacts-list/${id}`, params)
+      },
+      delete (id, params) {
+        return window.axios.delete(`${suffixV2}contacts-list/${id}`, { params })
       }
     },
 

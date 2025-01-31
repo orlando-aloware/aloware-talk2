@@ -1459,7 +1459,7 @@ export default {
 
       // when communication is rejected by app, skip wrap-up
       if (this.dialer.communication?.rejected_by_app) {
-        this.backToDial('Talk-DialerListeners-EndWrapUp')
+        this.$VueEvent.fire('callEnded')
         return
       }
 

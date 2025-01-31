@@ -1985,11 +1985,16 @@ export default {
       }
     }
 
+    this.phoneListeners.callEnded = () => {
+      this.onFinish()
+    }
+
     this.$VueEvent.listen('showLoadingPhone', this.phoneListeners.showLoadingPhone)
     this.$VueEvent.listen('togglePhone', this.phoneListeners.togglePhone)
     this.$VueEvent.listen('showPhone', this.phoneListeners.showPhone)
     this.$VueEvent.listen('hidePhone', this.phoneListeners.hidePhone)
     this.$VueEvent.listen('callDisconnected', this.phoneListeners.callDisconnected)
+    this.$VueEvent.listen('callEnded', this.phoneListeners.callEnded)
   },
 
   mounted () {

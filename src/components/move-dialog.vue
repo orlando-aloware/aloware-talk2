@@ -51,6 +51,13 @@ export default {
     isContactModuleType: {
       type: Boolean,
       default: true
+    },
+    userId: {
+      type: Number
+    },
+    fromAdminList: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -126,12 +133,14 @@ export default {
       this.isMoving = true
       return this.$axios
         .patch(`${this.fetchFoldersListEndpoint}/${this.moveDialog.id}`, {
-          contact_folder_id: this.moveDialog.target
+          contact_folder_id: this.moveDialog.target,
+          ...(this.fromAdminList ? { from_admin_list: true } : {})
         })
         .then(() => {
           this.reloadFolders()
           this.isMoving = false
           this.$generalNotification('You have successfully moved a list!', 'success')
+          this.$emit('onListMoved')
         })
         .catch(this.handleRequestError)
         .finally(this.closeMoveDialog)
@@ -139,11 +148,16 @@ export default {
     handleRequestError (err) {
       const { message, html } = extractErrorMessage(err)
       console.log(html)
+      this.isMoving = false
       this.$generalNotification(message, 'error')
     },
     reloadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
       return this.$axios
-        .get(this.fetchFoldersEndpoint)
+        .get(this.fetchFoldersEndpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {
@@ -237,7 +251,8 @@ export default {
         evt.target &&
         !dialogContainsTarget &&
         !evt.target.classList.contains('contact-menu-item') &&
-        !evt.target.classList.contains('move-item')
+        !evt.target.classList.contains('move-item') &&
+        !evt.target.dataset.action?.includes('move-item')
       ) {
         this.closeMoveDialog()
         document.body.removeEventListener('click', this.handleClick)
@@ -260,6 +275,9 @@ export default {
   },
 
   mounted () {
+    if (this.folders?.length === 0) {
+      this.reloadFolders()
+    }
     this.loadDirectories()
   },
 

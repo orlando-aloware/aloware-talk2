@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="saved-communications-filters d-flex flex-column">
     <h5 class="text-uppercase filter-group-title"
         data-testid="filter-dialog-personal-filter-title">
       Personal Filters
@@ -8,29 +8,61 @@
       <q-skeleton type="rect"
                   data-testid="filter-dialog-skeleton"
                   v-if="isGettingFilters" />
-      <p class="text-muted fs-12 empty-filter-placeholder pl-2"
-         data-testid="filter-dialog-none-p"
-         v-show="!isGettingFilters"
-         v-if="personalFilters.length < 1"
-      >
-        None
-      </p>
-      <filter-list-items :filter="item"
-                         data-testid="filter-dialog-filter-list-items"
-                         v-for="item in personalFilters"
-                         :key="item.id"
-                         @filterSelected="(item) => $emit('filterSelected', item)"
-                         @filterRename="onRenameFilter"
-                         @filterDelete="(e) => onDeleteFilter(e, item)"
-      />
+      <template v-else>
+        <div class="filter-items no-data"
+             data-testid="filter-dialog-none-p"
+             v-if="personalFilters.length < 1"
+        >
+          <span>
+            None
+          </span>
+        </div>
+        <filter-list-items :filter="item"
+                           data-testid="filter-dialog-filter-list-items"
+                           v-for="item in personalFilters"
+                           :key="item.id"
+                           @filterSelected="(item) => $emit('filterSelected', item)"
+                           @filterRename="onRenameFilter"
+                           @filterDelete="(e) => onDeleteFilter(e, item)"
+        />
+      </template>
+    </div>
+
+    <h5 class="text-uppercase filter-group-title"
+        data-testid="filter-dialog-company-filter-title">
+      Company Filters
+    </h5>
+
+    <div class="saved-filters">
+      <q-skeleton type="rect"
+                  data-testid="filter-dialog-skeleton"
+                  v-if="isGettingFilters" />
+      <template v-else>
+        <div class="filter-items no-data"
+             data-testid="filter-dialog-none-p"
+             v-if="companyFilters.length < 1"
+        >
+          <span>
+            None
+          </span>
+        </div>
+        <filter-list-items :filter="item"
+                           data-testid="filter-dialog-filter-list-items"
+                           :read-only="!isAdmin"
+                           v-for="item in companyFilters"
+                           :key="item.id"
+                           @filterSelected="(item) => $emit('filterSelected', item)"
+                           @filterRename="onRenameFilter"
+                           @filterDelete="(e) => onDeleteFilter(e, item)"
+        />
+      </template>
     </div>
   </div>
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
-
+import { aclMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
-
 import FilterListItems from 'components/communications/communications-filters/filter-list-items'
 
 export default {
@@ -38,6 +70,7 @@ export default {
   components: {
     FilterListItems
   },
+  mixins: [aclMixin],
   props: {
     filterType: {
       type: Number,
@@ -124,10 +157,14 @@ export default {
 
     async getFilters () {
       this.isGettingFilters = true
+      const params = {
+        type: this.filterType
+      }
 
-      const personaFiltersResponse = await talk2Api.V2.inbox.filters.get({ type: this.filterType })
-      const companyFilters = await talk2Api.V1.filters.get({ isOnCompany: true })
-      const personalFilters = personaFiltersResponse.data.data.user || []
+      const filtersResponse = await talk2Api.V2.inbox.filters.get(params)
+
+      const personalFilters = filtersResponse.data?.data?.user || []
+      const companyFilters = filtersResponse.data?.data?.company || []
 
       this.setPersonalFilters(personalFilters)
       this.setCompanyFilters(companyFilters)

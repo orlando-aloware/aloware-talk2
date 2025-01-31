@@ -54,7 +54,7 @@
                       dense
                       :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
                       :options="scopeOptions"
-                      :disable="true"
+                      :disable="disabledFilterType"
                       data-testid="create-filter-dialog-form-filter-select"
                       ref="filterTypeSelect"
                       v-model="filter.scope"
@@ -102,6 +102,11 @@ export default {
     filterModel: {
       type: Object,
       required: true
+    },
+
+    disabledFilterType: {
+      type: Boolean,
+      default: false
     }
   },
 

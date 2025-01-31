@@ -21,7 +21,8 @@
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
-          <div class="inbox-side__nav h-100">
+          <div class="inbox-side__nav"
+               style="height: calc(100vh - 62px); overflow-y: auto;">
             <communications-nav-list data-testid="inbox-side-nav-list"
                                      :closed="closed"
                                      :open-count="inboxTaskCounts.open"
@@ -34,8 +35,8 @@
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column no-max-width"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
-        <CommunicationLogsTable class="flex-grow-1"
-                                data-testid="communications-side-communications-table" />
+        <communication-logs-table class="flex-grow-1"
+                                  data-testid="communications-side-communications-table" />
       </div>
     </div>
   </div>
@@ -185,10 +186,6 @@ export default {
       }
     },
 
-    onItemSelected (routeData) {
-      this.$emit('itemSelected', routeData)
-    },
-
     togglePageHeader () {
       if (this.isShowPageHeader) {
         this.setShowContactsHeader(true)
@@ -201,12 +198,6 @@ export default {
 
   watch: {
     $route (to, from) {
-      // TODO: make this as route level please!
-      if (to.name === DEFAULT_COMMUNICATIONS_ROUTE_NAME) {
-        const channel = this.navListItems.find(item => item.value === DEFAULT_COMMUNICATIONS_CHANNEL)
-        this.setActiveChannel(channel)
-      }
-
       this.togglePageHeader()
     },
 

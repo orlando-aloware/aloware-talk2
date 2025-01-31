@@ -1,0 +1,386 @@
+<template>
+    <div class="tree-folder"
+         :data-layer="layer">
+      <div
+        v-if="!isRootList"
+        class="folder d-flex align-items-center"
+        :class="{ 'folder--selected': isSelected }"
+      >
+        <div
+          class="folder__indent"
+          :style="indentStyle"
+          data-testid="tree-folder-indent-toggle"
+          @click="onToggleFolder"
+        ></div>
+        <div class="folder__icon d-flex align-items-center"
+             data-testid="tree-folder-icon-toggle"
+             @click="onToggleFolder">
+          <folder-icon color="#62666E"></folder-icon>
+        </div>
+
+        <div class="folder__name-wrapper flex-grow-1 d-flex align-items-center">
+          <div
+            v-if="!isEditing"
+            class="folder__name"
+            data-testid="tree-folder-name-toggle"
+            @click="onToggleFolder">
+            {{ name }}
+          </div>
+
+          <b-badge v-if="!isEditing"
+                 variant="light"
+                 class="folder-list-count-badge flex-shrink-0 ml-1">
+            {{ listCount }}
+          </b-badge>
+
+          <!-- Renaming Folders -->
+          <input
+            v-if="isEditing"
+            autofocus
+            class="folder__input d-inline"
+            type="text"
+            :id="'folder-input-' + id"
+            :value="name"
+            :disabled="isRenaming"
+            data-testid="tree-folder-renaming-input"
+            @blur="onInputBlur"
+            @keydown="onKeyDown" />
+        </div>
+
+        <button
+          class="folder__option btn btn-link p-0 shadow-0 flex-shrink-0"
+          :class="{ 'folder__option--hide': isEditing }"
+          :data-popper-target="folderId"
+          :id="folderId"
+          :ref="folderId"
+          data-testid="tree-folder-option-btn"
+        >
+          <folder-option></folder-option>
+        </button>
+      </div>
+
+      <!-- Creating Folders -->
+      <tree-folder-create
+        v-if="isCreatingFolder"
+        :endpoint="endpoint"
+        :layer="layer + 1"
+        :parent_id="id"
+        :user-id="userId"
+        data-testid="tree-folder-creating-input"
+        @blur="onCloseFolder"
+        @cancel="onCreateFolderCancel"
+      />
+
+      <template
+        v-if="isReferenceExists">
+        <b-popover
+          triggers="click blur"
+          placement="bottomright"
+          boundary="window"
+          custom-class="contact-popover"
+          data-testid="create-edit-remove-popover"
+          :target="folderId">
+          <folder-actions
+            :id="id"
+            :hasCreateFolder="false"
+            :hasCreateList="false"
+            :hasEdit="hasEdit"
+            :hasDelete="hasDelete"
+            @create="onCreateFolder"
+            @edit="onEditFolder"
+            @remove="onRemoveFolder"
+            @move="onMove"
+            @createlist="onCreateList"
+          />
+        </b-popover>
+      </template>
+    </div>
+  </template>
+
+<script>
+import { mapActions, mapGetters } from 'vuex'
+import FolderIcon from 'components/icons/folder-icon.vue'
+import FolderOption from 'components/icons/folder-option.vue'
+import FolderActions from 'components/folder-actions.vue'
+import TreeFolderCreate from 'components/tree/tree-folder-create.vue'
+import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
+
+export default {
+  props: {
+    id: {
+      type: Number
+    },
+    parentId: {
+      type: [Number, null]
+    },
+
+    name: {
+      type: String
+    },
+
+    hasEdit: {
+      type: Number
+    },
+
+    hasDelete: {
+      type: Number
+    },
+
+    hasShowInPublicFolderPermission: {
+      type: Boolean
+    },
+
+    isRootList: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    folders: {
+      type: Array,
+      required: false
+    },
+
+    lists: {
+      type: Array,
+      required: false
+    },
+
+    layer: {
+      type: Number,
+      required: false,
+      default: 1
+    },
+
+    order: {
+      type: Number
+    },
+
+    endpoint: {
+      type: String,
+      default: '/api/v2/contact-folders'
+    },
+
+    userId: {
+      type: Number
+    }
+  },
+
+  components: {
+    FolderIcon,
+    FolderOption,
+    FolderActions,
+    TreeFolderCreate
+  },
+
+  data () {
+    return {
+      isCreatingFolder: false,
+      isEditing: false,
+      isRenaming: false,
+      inputTimeout: null,
+      isReferenceExists: false,
+      defaultIsOpen: true
+    }
+  },
+
+  computed: {
+    ...mapGetters('contacts', ['opened', 'moveDialog', 'createList']),
+
+    indentStyle () {
+      return {
+        flex: `0 0 ${this.layer * 10}px`
+      }
+    },
+
+    isOpen () {
+      return this.defaultIsOpen || this.opened.has(this.id)
+    },
+
+    isSelected () {
+      return (
+        (this.id === this.moveDialog.id && this.moveDialog.type === 'folder') ||
+          (this.createList.open && this.createList.folderId === this.id)
+      )
+    },
+
+    folderId () {
+      const module = this.$route.name === 'Contacts' ? 'contact' : 'power-dialer'
+      return `folder-option-${module}-${this.id}`
+    },
+
+    listCount () {
+      const isPublic = this.$route.query.isPublic === '1'
+      return this.lists.filter((item) => item.show_in_public_folder === isPublic).length
+    }
+  },
+
+  mounted () {
+    this.isReferenceExists = typeof this.$refs[this.folderId] !== 'undefined'
+  },
+
+  methods: {
+    ...mapActions('contacts', [
+      'toggleFolder',
+      'openFolder',
+      'closeFolder',
+      'removeFolderOpen',
+      'foldersLoaded',
+      'openMoveDialog',
+      'createListOpen'
+    ]),
+
+    onMove () {
+      this.$root.$emit('bv::hide::popover')
+      this.openMoveDialog({
+        id: this.id,
+        type: 'folder'
+      })
+    },
+
+    onCreateList () {
+      this.$root.$emit('bv::hide::popover')
+
+      this.createListOpen({
+        contact_folder_id: this.id
+      })
+
+      this.onToggleFolder()
+    },
+
+    onCreateFolderCancel () {
+      this.onCloseFolder()
+    },
+
+    onCloseFolder () {
+      this.isCreatingFolder = false
+    },
+
+    onKeyDown (evt) {
+      if (evt.keyCode === 13 && evt.target.value.length > 60) {
+        this.$generalNotification('Folder name should have up to 60 characters.', 'error')
+        return
+      }
+
+      if (evt.keyCode === 13) {
+        this.updateFolderName(evt.target.value)
+      } else if (evt.keyCode === 27) {
+        this.isEditing = false
+        evt.target.value = this.name
+      }
+    },
+
+    onInputBlur (evt) {
+      if (evt.target.value.length > 60) {
+        this.$generalNotification('Folder name should have up to 60 characters.', 'error')
+        this.isEditing = false
+        this.onCloseFolder()
+        evt.target.value = this.name
+        return
+      }
+
+      if (evt.target.value !== this.name && evt.target.value !== '') {
+        this.updateFolderName(evt.target.value)
+      } else {
+        this.$nextTick(() => {
+          evt.target.value = this.name
+          this.isEditing = false
+        })
+      }
+    },
+
+    updateFolderName (name) {
+      if (this.isRenaming) return
+      this.isRenaming = true
+
+      const params = {
+        name,
+        order: this.order,
+        parent_id: this.parentId
+      }
+
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
+      return this.updateFolderRequest(this.id, params).then(response => {
+        this.$generalNotification('Folder updated.')
+        this.reloadFolders()
+      }).finally(() => {
+        this.$nextTick(() => {
+          this.isEditing = false
+          this.isRenaming = false
+        })
+      })
+    },
+
+    updateFolderRequest (id, params) {
+      return this.$axios
+        .patch(`${this.endpoint}/${id}`, params)
+        .catch((error) => {
+          const {
+            message,
+            html
+          } = extractErrorMessage(error)
+          console.log(html)
+          this.$generalNotification(message, 'error')
+        })
+    },
+
+    reloadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
+      return this.$axios
+        .get(this.endpoint, { params })
+        .then((response) => response.data)
+        .then(this.foldersLoaded)
+        .catch((_err) => {
+          this.$generalNotification('Unable to load folders please try again.', 'error')
+        })
+    },
+
+    onCreateFolder () {
+      this.isCreatingFolder = true
+      this.openFolder(this.id)
+    },
+
+    onEditFolder () {
+      this.isEditing = true
+      this.inputTimeout = setTimeout(() => {
+        document.getElementById('folder-input-' + this.id).focus()
+      })
+    },
+
+    onRemoveFolder () {
+      this.$nextTick(() => {
+        this.removeFolderOpen({
+          id: this.id,
+          name: this.name
+        })
+      })
+    },
+
+    onToggleFolder () {
+      this.$VueEvent.fire('lists-management-folder-click', { id: this.id })
+      this.defaultIsOpen = false
+      this.toggleFolder(this.id)
+    }
+  },
+
+  beforeDestroy () {
+    clearTimeout(this.inputTimeout)
+  }
+}
+</script>
+
+<style>
+.folder-list-count-badge {
+  width: 20px;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: center;
+}
+</style>

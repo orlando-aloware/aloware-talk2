@@ -16,7 +16,19 @@ import * as MentionType from 'src/constants/mention-type'
 
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
-import { DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
+
+export function handleElectronNavigation (e, url) {
+  if (window && window.process && window.process.type === 'renderer') {
+    if (e) e.preventDefault()
+    // In Electron, navigate in the same window
+    this.$router.push(url)
+    return true
+  }
+  // In web browser, return false to let default behavior happen
+  return false
+}
 
 export default {
   mixins: [userMixin],
@@ -39,7 +51,10 @@ export default {
       'communications',
       'channelChangedFilterFields',
       'selectedFilter',
-      'isFilterDialogForView'
+      'isFilterDialogForView',
+      'paginationPage',
+      'isLoadingMore',
+      'searchQuery'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -120,7 +135,6 @@ export default {
         sort: 'last_engagement_at',
         order: 'desc'
       },
-      isLoadingMore: false,
       isLoaded: false,
       taskListHasError: false,
       page: 1,
@@ -131,7 +145,6 @@ export default {
       source: null,
       cancelTokenPinnedViews: null,
       sourcePinnedViews: null,
-      paginationPage: 1,
 
       perPageOptions: [
         { value: 25, label: '25 Per Page' },
@@ -146,17 +159,8 @@ export default {
         rowsNumber: this.communicationsCount
       },
       fixedColumns: [
-        'disposition_status2',
-        'incoming_number',
-        'ring_group',
-        'created_at',
-        'talk_time',
-        'duration',
-        'contact',
-        'user_id',
         'operations'
       ],
-      searchQuery: '',
       mentionType: MentionType.TYPE_RECEIVED,
 
       communicationInProgressStatuses: [
@@ -214,7 +218,9 @@ export default {
       'setCommunications',
       'appendCommunications',
       'setCommunicationsCount',
-      'setHasMoreCommunications'
+      'setHasMoreCommunications',
+      'setPaginationPage',
+      'setIsLoadingMore'
     ]),
 
     getNoneLiveCallContactTasks (contacts) {
@@ -291,7 +297,7 @@ export default {
             this.setPendingTaskCount(response.data.data.length)
             this.setInboxPendingTaskCount(response.data.data.length)
           }
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
           this.isLoaded = true
           this.setIsInboxFiltersLoaded(this.isLoaded)
         })
@@ -315,7 +321,7 @@ export default {
 
     loadMoreContactTasks () {
       this.isLoaded = false
-      this.isLoadingMore = true
+      this.setIsLoadingMore(true)
 
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
@@ -323,7 +329,7 @@ export default {
           this.setContactsCurrentPage(response.data.current_page)
           this.setHasMoreContacts(response.data.next_page_url)
 
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
           this.isLoaded = true
         })
         .catch(() => {
@@ -793,37 +799,39 @@ export default {
     resetCommunications () {
       this.setCommunications([])
       this.setCommunicationsCount(0)
-      this.paginationPage = 1
+      this.setPaginationPage(1)
       this.setHasMoreCommunications(null)
     },
 
     getCommunicationType () {
-      switch (this.$route.params.channel) {
+      switch (this.activeChannel.value) {
         case DEFAULT_COMMUNICATIONS_CHANNEL:
         case 'my-personal-line':
           return 'all'
-        case 'calls':
-        case 'voicemails':
-        case 'recordings':
-          return 'call'
-        case 'messages':
-          return 'sms'
+        case CALLS_CHANNEL:
+        case VOICEMAILS_CHANNEL:
+        case RECORDINGS_CHANNEL:
+          return CALL_TYPE
+        case MESSAGES_CHANNEL:
+          return SMS_TYPE
         default:
-          return this.$route.params.channel
+          return this.activeChannel.type
       }
     },
 
     getCommunications (filters, callback, isLoadMore = false) {
       this.setIsLoadingCommunications(true)
 
+      let pageToGet
+
       if (!isLoadMore) {
-        this.paginationPage = 1
+        pageToGet = 1
         this.setCommunications([])
       } else {
-        this.isLoadingMore = true
+        pageToGet = this.paginationPage + 1
+        this.setIsLoadingMore(true)
       }
 
-      // let params = this.$jsonClone(filters)
       let params = {
         from_date: '',
         to_date: '',
@@ -895,13 +903,13 @@ export default {
         params = { ...params, order_by: this.sorting.order }
       }
 
-      params.page = this.paginationPage
+      params.page = pageToGet
       params.per_page = this.perPage
       params = this.removeUnnecessaryParameters(params)
 
       this.source = this.cancelToken.source()
 
-      if (this.paginationPage === 1) {
+      if (pageToGet === 1) {
         this.getCommunicationsCount(params)
       }
 
@@ -912,7 +920,6 @@ export default {
       })
         .then(response => {
           if (response) {
-            this.gettingTasksList(false)
             const data = response.data.data
 
             if (isLoadMore && data.length > 0) {
@@ -931,7 +938,7 @@ export default {
             this.pagination = _.clone(response.data)
             this.pagination.rowsNumber = this.communicationsCount
             delete this.pagination.data
-            this.paginationPage = this.pagination.current_page
+            this.setPaginationPage(this.pagination.current_page)
 
             if (typeof callback !== 'undefined') {
               callback()
@@ -944,7 +951,6 @@ export default {
             return
           }
 
-          this.gettingTasksList(false)
           this.communicationsListHasError = true
           const channelName = this.$route.params.channel !== 'mentions'
             ? 'communications'
@@ -953,11 +959,13 @@ export default {
         })
         .finally(() => {
           this.setIsLoadingCommunications(false)
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
         })
     },
 
     getCommunicationsCount (params) {
+      // TODO: remove this after the new inbox is implemented and all the communication-related calls from talk2 are not "special" requests
+      params.source = 'communication-logs'
       if (this.countSource) {
         this.countSource.cancel('Fetching communications count operation is canceled by the user.')
       }
@@ -981,14 +989,14 @@ export default {
     },
 
     removeUnnecessaryParameters (params) {
-      if (this.$route.params.channel === 'messages') {
+      if (this.$route.params.channel === MESSAGES_CHANNEL) {
         delete params.report_type
         delete params.chart_period
         delete params.min_talk_time
         delete params.changed
       }
 
-      const callsChannels = ['calls', 'recordings', 'voicemails']
+      const callsChannels = [CALLS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL]
 
       if (callsChannels.includes(this.$route.params.channel)) {
         delete params.report_type
@@ -998,7 +1006,7 @@ export default {
         delete params.changed
       }
 
-      if (this.$route.params.channel === 'voicemails') {
+      if (this.$route.params.channel === VOICEMAILS_CHANNEL) {
         delete params.min_talk_time
       }
 
@@ -1007,6 +1015,10 @@ export default {
 
     getCampaignName (campaignId) {
       return this.campaigns.find(campaign => campaign.id === campaignId)?.name
+    },
+
+    handleElectronNavigation (e, url) {
+      return handleElectronNavigation.call(this, e, url)
     }
   },
 
@@ -1015,14 +1027,5 @@ export default {
     this.source = this.cancelToken.source()
     this.cancelTokenPinnedViews = window.axios.CancelToken
     this.sourcePinnedViews = this.cancelTokenPinnedViews.source()
-  },
-
-  watch: {
-    '$route.params.channel': function (newVal) {
-      this.resetCommunications()
-      if (newVal === DEFAULT_COMMUNICATIONS_CHANNEL) {
-        this.getCommunications(this.communicationFilters)
-      }
-    }
   }
 }

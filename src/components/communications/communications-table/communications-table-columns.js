@@ -13,11 +13,11 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 150px'
   },
   {
-    label: 'Team',
-    name: 'teams',
+    label: 'Message Body',
+    name: 'body',
     align: 'left',
-    headerStyle: 'min-width: 180px',
-    columnStyle: 'width: 180px'
+    headerStyle: 'min-width: 300px',
+    columnStyle: 'width: 300px'
   },
   {
     label: 'Ring Group',
@@ -44,8 +44,8 @@ export const ALL_COLUMNS = [
     label: 'Start Time',
     name: 'created_at',
     align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
+    headerStyle: 'min-width: 200px',
+    columnStyle: 'width: 200px'
   },
   {
     label: 'Talk Time',
@@ -76,32 +76,11 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 100px'
   },
   {
-    label: 'Resolution',
-    name: 'resolution2',
-    align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
-  },
-  {
     label: 'Contact',
     name: 'contact',
     align: 'left',
     headerStyle: 'min-width: 250px',
     columnStyle: 'width: 250px'
-  },
-  {
-    label: 'Location',
-    name: 'lead_location',
-    align: 'left',
-    headerStyle: 'min-width: 150px',
-    columnStyle: 'width: 150px'
-  },
-  {
-    label: 'Lines',
-    name: 'line',
-    align: 'left',
-    headerStyle: 'min-width: 150px',
-    columnStyle: 'width: 150px'
   },
   {
     label: 'User',
@@ -111,7 +90,7 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 250px'
   },
   {
-    label: 'Attempting',
+    label: 'Attempted Users',
     name: 'attempting_users',
     align: 'left',
     headerStyle: 'min-width: 250px',
@@ -191,7 +170,8 @@ export const ALL_COLUMNS = [
     label: 'Operations',
     name: 'operations',
     align: 'center',
-    headerStyle: 'min-width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   }
 ]
 
@@ -225,8 +205,8 @@ export const DEFAULT_COLUMNS = [
     name: 'created_at',
     field: 'created_at',
     align: 'left',
-    headerStyle: 'min-width: 100px',
-    columnStyle: 'width: 100px'
+    headerStyle: 'min-width: 200px',
+    columnStyle: 'width: 200px'
   },
   {
     label: 'Talk Time',
@@ -264,6 +244,7 @@ export const DEFAULT_COLUMNS = [
     label: 'Operations',
     name: 'operations',
     align: 'center',
-    headerStyle: 'min-width: 100px'
+    headerStyle: 'min-width: 150px',
+    columnStyle: 'width: 150px'
   }
 ]

@@ -1,9 +1,10 @@
 <template>
-  <div class="inbox-nav-list h-100 overflow-x-hidden"
+  <div class="inbox-nav-list d-flex flex-column overflow-x-auto mb-1"
        data-testid="inbox-nav-list-wrapper"
        :class="{'inbox-nav-list--closed': closed}"
        id="communications-nav-list"
   >
+    <!--   -->
     <nav-item badge-value="20"
               badge-color="danger"
               data-testid="inbox-nav-list-nav-item"
@@ -22,14 +23,14 @@
               :key="item.name"
               @click="onItemClicked" />
 
-    <hr>
+    <hr class="nav-item-separator">
 
     <!-- filters -->
-    <saved-filters class="px-2 left-column-wrapper"
+    <saved-filters class="px-2 left-column-wrapper "
                    :fetch-filters="fetchSavedFilters"
                    :filter-type="filterTypeForGetSavedFilters"
-                   @filters-fetched="fetchSavedFilters = false"
                    @filterSelected="(item) => onSelectSavedFilter(item)"
+                   @filters-fetched="()=> fetchSavedFilters = false"
     />
 
     <div v-if="shouldShowViewsUnderChannels">
@@ -84,7 +85,7 @@ import { communicationsRoutesMixin, communicationsMixin, userMixin } from 'src/p
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
 
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME, COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME, DEFAULT_COMMUNICATIONS_CHANNEL } from 'src/router/routes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME } from 'src/router/routes'
 
 export default {
   name: 'communications-nav-list',
@@ -150,24 +151,7 @@ export default {
     },
 
     communicationsChannels () {
-      /*
-        WAT-1105: the channels and view are being moved to this communications menu
-        but for now we will only being displayed the communications logs
-      */
-      if (this.hasNewCommunicationsFeatureEnabled) { return this.navListItems.filter(item => item.default) } // only shows the default "communications logs"
-
-      if (this.profile?.campaign_id) {
-        return this.navListItems
-      }
-
-      // hard-coded disabling my-personal-line channel
-      const channels = this.navListItems
-      let index = channels.findIndex(channel => channel.value === 'my-personal-line')
-      if (channels[index]) {
-        channels[index].disabled = true
-        channels[index].tooltip = 'No personal line has been set. Please review your user settings.'
-      }
-      return channels
+      return this.navListItems
     },
 
     filterTypeForGetSavedFilters () {
@@ -219,7 +203,10 @@ export default {
         'first_time_only',
         'exclude_automated_communications',
         'untagged_only',
-        'my_contact'
+        'has_unread',
+        'my_contact',
+        'unread_only',
+        'has_international'
       ],
       listeners: {
         pinnedViewsEvents: null,
@@ -231,7 +218,6 @@ export default {
 
   created () {
     this.initializeDateRanges()
-    this.fetchSavedFilters = true
   },
 
   mounted () {
@@ -250,12 +236,14 @@ export default {
       'setChannelClonedFilter',
       'setFilterDialogForView',
       'setShowViewsList',
-      'toggleFilterDialog'
+      'toggleFilterDialog',
+      'updateChannelChangedFilterFields'
     ]),
 
     ...mapActions(['setIsFirstLoad']),
 
     onItemClicked (nextActive) {
+      // Reset and close views
       this.onCloseViewsList()
       this.resetFilter()
 
@@ -283,42 +271,23 @@ export default {
         this.onSelectView(view.filter)
         return
       }
-      if (!this.activeChannel) {
-        return
-      }
 
-      this.active = nextActive
+      // Always update active channel and navigate, even if it's the same channel
       const channel = this.navListItems.find(item => item.value === nextActive)
       this.setActiveChannel(channel)
 
-      // redirect page to Channel
-      if (this.active !== DEFAULT_COMMUNICATIONS_CHANNEL) {
-        this.$router.push({
-          name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
-          params: {
-            channel: this.active
-          }
-        }).catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
-        })
-        return
-      }
-
-      // redirect page to Inbox
       this.$router.push({
-        name: COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME,
+        name: COMMUNICATIONS_CHANNELS_ROUTE_NAME,
         params: {
-          channel: this.active,
-          status: InboxTaskStatus.DEFAULT_STATUS
+          channel: this.active
         }
       }).catch(err => {
         console.log(err)
         this.$handleErrors(err.response)
-      })
 
-      this.$nextTick(() => {
-        this.getCommunications(this.communicationFilters)
+        this.$nextTick(() => {
+          this.getCommunications(this.communicationFilters)
+        })
       })
     },
 
@@ -331,10 +300,10 @@ export default {
     },
 
     async onSelectSavedFilter (filter) {
+      // Skip showing filter dialog
       let personalFilterObject = filter.filter
 
-      await this.setSelectedFilter(filter)
-      this.toggleFilterDialog(true)
+      this.setSelectedFilter(filter)
 
       this.setIsFirstLoad(false)
 
@@ -358,6 +327,57 @@ export default {
       if (!inRange) {
         sessionStorage.setItem('date-selected-comms', 'custom')
       }
+
+      // Reset any existing filter changes
+      this.resetChannelChangedFilterFields()
+      // reset channel cloned filter to the default filter
+      this.setChannelClonedFilter(this.channelDefaultFilterModel.filter)
+
+      // Update channel changed filter fields for each property in the filter
+      const loadedDefaultFilterModel = this.channelDefaultFilterModel
+
+      for (const item in personalFilterObject) {
+        const defaultModelHasField = loadedDefaultFilterModel.filter.hasOwnProperty(item)
+
+        // for boolean fields change tracking
+        if (this.booleanFields.includes(item) &&
+          +personalFilterObject[item] !== +loadedDefaultFilterModel.filter[item] &&
+          defaultModelHasField) {
+          this.updateChannelChangedFilterFields({
+            name: item,
+            value: +personalFilterObject[item]
+          })
+
+          continue
+        }
+
+        // for non-boolean fields change tracking
+        const filterItem = JSON.stringify(personalFilterObject[item])
+        const loadedFilterItem = JSON.stringify(loadedDefaultFilterModel.filter[item])
+
+        // Special handling for date
+        if (item === 'to_date' && filterItem && loadedFilterItem && filterItem === loadedFilterItem) {
+          this.updateChannelChangedFilterFields({
+            name: item,
+            value: personalFilterObject[item][item]
+          })
+        } else if (defaultModelHasField) {
+          // Update other filter fields
+          this.updateChannelChangedFilterFields({
+            name: item,
+            value: personalFilterObject[item]
+          })
+        }
+      }
+
+      // Apply the filter
+      this.setAppliedFilter(filter)
+      this.setChannelClonedFilter(personalFilterObject)
+
+      // Get communications with the new filter
+      this.$nextTick(() => {
+        this.getCommunications(personalFilterObject)
+      })
     },
 
     onSelectView (filter) {
@@ -401,15 +421,9 @@ export default {
     },
 
     resetFilter () {
-      const filter = { ...this.channelDefaultFilterModel.filter }
-
-      this.setChannelClonedFilter(filter)
-      this.resetChannelChangedFilterFields()
-      this.setSelectedFilter(null)
-      this.setAppliedFilter(null)
       this.toggleFilterDialogWithFilters(true)
-      this.setIsFirstLoad(true)
-      this.setInboxFilters(filter)
+
+      this.$VueEvent.fire('reset-communications-filters')
     }
   },
 
@@ -433,6 +447,17 @@ export default {
         this.$emit('active', activeChannel)
         this.$emit('update:value', val)
       }
+    },
+
+    activeChannel: {
+      handler (val) {
+        this.fetchSavedFilters = true
+        setTimeout(() => {
+          this.fetchSavedFilters = false
+        }, 1000)
+      },
+      immediate: true,
+      deep: true
     },
 
     isFilterDialogShown (state) {
