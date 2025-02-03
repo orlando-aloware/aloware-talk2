@@ -12,6 +12,18 @@
           data-testid="tree-folder-indent-toggle"
           @click="onToggleFolder"
         ></div>
+        <div class="folder__arrow d-flex align-items-center">
+          <div data-testid="tree-folder-arrow-toggle"
+               v-if="folders.length > 0"
+               @click="onToggleFolder">
+            <folder-arrow-open-icon data-testid="tree-folder-open-icon"
+                                    color="#62666E"
+                                    v-if="isOpen"></folder-arrow-open-icon>
+            <folder-arrow-close-icon data-testid="tree-folder-close-icon"
+                                     color="#62666E"
+                                     v-else></folder-arrow-close-icon>
+          </div>
+        </div>
         <div class="folder__icon d-flex align-items-center"
              data-testid="tree-folder-icon-toggle"
              @click="onToggleFolder">
@@ -71,6 +83,21 @@
         @cancel="onCreateFolderCancel"
       />
 
+      <div class="animated"
+           v-if="isOpen && !isRootList"
+           v-bind:class="{ animate__fadeIn: isOpen, animate__fadeOut: !isOpen }"
+      >
+        <tree-folder-contents
+          data-testid="tree-folder-contents"
+          :folders="folders"
+          :hasEdit="hasEdit"
+          :hasDelete="hasDelete"
+          :layer="layer + 1"
+          :endpoint="endpoint"
+          :has-show-in-public-folder-permission="hasShowInPublicFolderPermission"
+          :user-id="userId" />
+      </div>
+
       <template
         v-if="isReferenceExists">
         <b-popover
@@ -82,7 +109,6 @@
           :target="folderId">
           <folder-actions
             :id="id"
-            :hasCreateFolder="false"
             :hasCreateList="false"
             :hasEdit="hasEdit"
             :hasDelete="hasDelete"
@@ -100,6 +126,8 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import FolderIcon from 'components/icons/folder-icon.vue'
+import FolderArrowOpenIcon from 'components/icons/folder-arrow-open-icon.vue'
+import FolderArrowCloseIcon from 'components/icons/folder-arrow-close-icon.vue'
 import FolderOption from 'components/icons/folder-option.vue'
 import FolderActions from 'components/folder-actions.vue'
 import TreeFolderCreate from 'components/tree/tree-folder-create.vue'
@@ -168,6 +196,9 @@ export default {
 
   components: {
     FolderIcon,
+    FolderArrowOpenIcon,
+    FolderArrowCloseIcon,
+    treeFolderContents: () => import('./lists-tree-folder-contents.vue'),
     FolderOption,
     FolderActions,
     TreeFolderCreate
