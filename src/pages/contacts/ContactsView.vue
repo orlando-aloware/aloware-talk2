@@ -14,7 +14,7 @@
                        @click="toggleSidebar"/>
 
           <div class="d-flex align-items-center"
-               v-if="isFromListsManagement">
+               v-if="showUserBreadcrumbNav">
             <person-icon color="#62666E" class="mr-1" width="18" height="18"/>
             <router-link class="title-breadcrumb h-auto"
                          :to="buildListManagementLink()">
@@ -28,7 +28,7 @@
                  :key="`f-${index}`"
                  class="d-flex align-items-center title-path"
                  data-testid="contacts-view-folder-path">
-              <template v-if="isFromListsManagement">
+              <template v-if="isDemoCompany">
                 <router-link class="d-flex align-items-center title-path"
                              :to="buildListManagementLink(folder.id)">
                   <folder-icon color="#62666E" class="mr-1"></folder-icon>
@@ -1234,8 +1234,12 @@ export default {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     },
 
+    showUserBreadcrumbNav () {
+      return this.isDemoCompany && this.$route.params.userId
+    },
+
     isFromListsManagement () {
-      return this.$route.params.userId
+      return this.$route.meta.isFromListsManagement
     },
 
     listUsername () {
@@ -2028,7 +2032,7 @@ export default {
     },
 
     onBackToListsRedirect () {
-      this.$router.push(this.buildListManagementLink())
+      this.$router.push(this.buildListManagementLink(this.$route.params.folderId))
     },
 
     buildListManagementLink (folderId = null) {
@@ -2040,8 +2044,6 @@ export default {
 
       if (folderId) {
         path += `/folder/${folderId}`
-      } else if (this.$route.params.folderId) {
-        path += `/folder/${this.$route.params.folderId}`
       }
 
       return path

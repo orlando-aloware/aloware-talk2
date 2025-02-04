@@ -237,7 +237,8 @@ const routes = [
             path: 'user/:userId(\\d+)+/list/:id(\\d+)+',
             meta: {
               title: 'Contacts',
-              page: 'Contacts List'
+              page: 'Contacts List',
+              isFromListsManagement: true
             },
             component: ContactsView
           },
@@ -246,7 +247,8 @@ const routes = [
             path: 'user/:userId(\\d+)+/folder/:folderId(\\d+)+/list/:id(\\d+)+',
             meta: {
               title: 'Contacts',
-              page: 'Contacts List'
+              page: 'Contacts List',
+              isFromListsManagement: true
             },
             component: ContactsView
           },
