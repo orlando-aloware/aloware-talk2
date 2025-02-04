@@ -300,7 +300,7 @@
                           <div class="flex items-center gap-2">
                             <h3
                               class="ai-effect-gradient-text"
-                              @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (show_promotion_box = true) : null"
+                              @click="handlePromotionClick"
                             >
                               Powered by AloAi
                               <template
@@ -338,8 +338,7 @@
                             class="call_summary"
                           >
                             <div v-if="!is_editing_summary" class="call_summary"
-                                 v-html="parseMarkdown(communication.call_summary)">
-                            </div>
+                                 v-html="parseMarkdown(communication.call_summary)"/>
 
                             <div v-else class="edit-mode">
                               <div class="toolbar">
@@ -350,7 +349,7 @@
                                   icon="format_bold"
                                   title="Bold"
                                   color="primary"
-                                  @click="applyFormatting('**')"
+                                  @click="applyFormatting(TEXT_FORMATTING.TEXT.BOLD)"
                                 />
                                 <q-btn
                                   flat
@@ -359,7 +358,7 @@
                                   icon="format_italic"
                                   title="Italic"
                                   color="primary"
-                                  @click="applyFormatting('*')"
+                                  @click="applyFormatting(TEXT_FORMATTING.TEXT.ITALIC)"
                                 />
                                 <q-btn
                                   flat
@@ -368,7 +367,7 @@
                                   icon="format_underline"
                                   title="Underline"
                                   color="primary"
-                                  @click="applyFormatting('__')"
+                                  @click="applyFormatting(TEXT_FORMATTING.TEXT.UNDERLINE)"
                                 />
                                 <q-btn
                                   flat
@@ -377,7 +376,7 @@
                                   icon="format_list_bulleted"
                                   title="Bullet List"
                                   color="primary"
-                                  @click="applyList('- ')"
+                                  @click="applyList(TEXT_FORMATTING.LIST.BULLET)"
                                 />
                                 <q-btn
                                   flat
@@ -386,7 +385,7 @@
                                   icon="format_list_numbered"
                                   title="Numbered List"
                                   color="primary"
-                                  @click="applyList('1. ')"
+                                  @click="applyList(TEXT_FORMATTING.LIST.NUMBERED)"
                                 />
                                 <q-btn
                                   flat
@@ -395,7 +394,7 @@
                                   icon="code"
                                   title="Code Block"
                                   color="primary"
-                                  @click="applyBlockFormatting('```')"
+                                  @click="applyBlockFormatting(TEXT_FORMATTING.BLOCK.CODE)"
                                 />
                               </div>
                               <textarea
@@ -560,6 +559,22 @@ import HighlightsSection from './transcription-components/highlights-section'
 import SentimentAnalysisSection from './transcription-components/sentiment-analysis-section'
 import TalkTimeAnalysisSection from './transcription-components/talk-time-analysis-section'
 import TranscriptionChat from './transcription-components/transcription-chat.vue'
+
+// Text Formatting constants
+const TEXT_FORMATTING = {
+  TEXT: {
+    BOLD: '**',
+    ITALIC: '*',
+    UNDERLINE: '__'
+  },
+  LIST: {
+    BULLET: '- ',
+    NUMBERED: '1. '
+  },
+  BLOCK: {
+    CODE: '```'
+  }
+}
 
 export default {
   name: 'TranscriptionModal',
@@ -1128,7 +1143,7 @@ export default {
       const { selectionStart, selectionEnd, value } = textarea
       const selectedText = value.slice(selectionStart, selectionEnd)
 
-      const formattedText = format === '__'
+      const formattedText = format === TEXT_FORMATTING.TEXT.UNDERLINE
         ? `<u>${selectedText}</u>`
         : `${format}${selectedText}${format}`
 
@@ -1220,6 +1235,12 @@ export default {
         .finally(() => {
           this.is_saving_summary = false // Reset save state
         })
+    },
+
+    handlePromotionClick () {
+      if (this.currentCompany?.transcription_settings?.call_transcription_enabled) {
+        this.show_promotion_box = true
+      }
     }
   },
 
