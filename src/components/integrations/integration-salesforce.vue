@@ -100,6 +100,7 @@ import {
 } from 'src/plugins/mixins'
 import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
 import { SALESFORCE_INTEGRATION } from 'src/constants/integrations'
+import _ from 'lodash'
 
 export default {
   name: 'integration-salesforce',
@@ -139,8 +140,19 @@ export default {
       }
 
       return null
-    }
+    },
 
+    isContactValid () {
+      return this.contact && this.contact.id
+    },
+
+    isRouteMatch () {
+      return this.$route.params.id === this.contact.id.toString() || this.$route.name === 'Power Dialer'
+    },
+
+    isContactAndRouteValid () {
+      return this.isContactValid && this.isRouteMatch
+    }
   },
 
   async mounted () {
@@ -180,6 +192,15 @@ export default {
           this.$generalNotification('Contact has been successfully synced.')
         })
     }
+  },
+
+  watch: {
+    'contact.id': _.debounce(function () {
+      if (this.isContactAndRouteValid) {
+        this.contactIntegrationDataLoaded = false
+        this.getData()
+      }
+    }, 500)
   }
 }
 </script>
