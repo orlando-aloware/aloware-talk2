@@ -6,17 +6,39 @@
     <template slot="title"
               v-if="!simpleTable">
       <div class="d-flex flex-column">
-        <div class="pr-2 contacts__title d-flex align-items-center">
+
+        <div class="ml-2 pr-2 contacts__title d-flex align-items-center">
           <back-button class="p-0"
                        v-if="$q.screen.lt.md"
                        data-testid="contacts-view-back-button"
                        @click="toggleSidebar"/>
+
+          <div class="d-flex align-items-center"
+               v-if="isFromListsManagement">
+            <person-icon color="#62666E" class="mr-1" width="18" height="18"/>
+            <router-link class="title-breadcrumb h-auto"
+                         :to="buildListManagementLink()">
+              {{ listUsername }}
+            </router-link>
+            <slash-icon class="title-slash d-flex align-items-center ml-1 mr-2" />
+          </div>
+
           <div class="d-flex align-items-center">
-            <div v-for="(folderName, index) in folderPath"
+            <div v-for="(folder, index) in folderPath"
                  :key="`f-${index}`"
                  class="d-flex align-items-center title-path"
                  data-testid="contacts-view-folder-path">
-              <div class="title-breadcrumb d-flex align-items-center">{{ folderName }}</div>
+              <template v-if="isFromListsManagement">
+                <router-link class="d-flex align-items-center title-path"
+                             :to="buildListManagementLink(folder.id)">
+                  <folder-icon color="#62666E" class="mr-1"></folder-icon>
+                  <div class="title-breadcrumb d-flex align-items-center">{{ folder.name }}</div>
+                </router-link>
+              </template>
+              <template v-else>
+                <folder-icon color="#62666E" class="mr-1"></folder-icon>
+                <div class="title-breadcrumb d-flex align-items-center">{{ folder.name }}</div>
+              </template>
               <slash-icon class="title-slash d-flex align-items-center" />
             </div>
           </div>
@@ -824,6 +846,8 @@ import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 import AlAlert from 'components/alert/index.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 import TagsCellList from 'components/tags/tags-cell-list.vue'
+import FolderIcon from 'components/icons/folder-icon.vue'
+import PersonIcon from 'components/icons/person-icon'
 
 export default {
   name: 'contacts-view',
@@ -869,7 +893,9 @@ export default {
     TagContactsWorkflowEnroller,
     EnrollContactsToAloaiModal,
     AssignContactsModal,
-    TagsCellList
+    TagsCellList,
+    FolderIcon,
+    PersonIcon
   },
 
   props: {
@@ -1206,6 +1232,18 @@ export default {
 
     isDemoCompany () {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    },
+
+    isFromListsManagement () {
+      return this.$route.params.userId
+    },
+
+    listUsername () {
+      const user = this.users.find((u) => u.id === +this.$route.params.userId)
+      if (!user) {
+        return ''
+      }
+      return `${user.first_name} ${user.last_name}`.trim()
     }
   },
 
@@ -1826,7 +1864,7 @@ export default {
       const list = { data: null }
       for (item.data of folders) {
         if (level > 0) {
-          tempFolderNames.data.push(item.data.name)
+          tempFolderNames.data.push(item.data)
         } else {
           tempFolderNames.data = []
         }
@@ -1990,7 +2028,23 @@ export default {
     },
 
     onBackToListsRedirect () {
-      this.$router.push('/lists')
+      this.$router.push(this.buildListManagementLink())
+    },
+
+    buildListManagementLink (folderId = null) {
+      let path = '/lists/user'
+
+      if (this.$route.params.userId) {
+        path += `/${this.$route.params.userId}`
+      }
+
+      if (folderId) {
+        path += `/folder/${folderId}`
+      } else if (this.$route.params.folderId) {
+        path += `/folder/${this.$route.params.folderId}`
+      }
+
+      return path
     }
   },
 

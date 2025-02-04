@@ -234,6 +234,24 @@ const routes = [
           },
           {
             name: 'Contacts',
+            path: 'user/:userId(\\d+)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List'
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts',
+            path: 'user/:userId(\\d+)+/folder/:folderId(\\d+)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List'
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts',
             path: 'list/:id(\\d+)+/add',
             meta: { title: 'Contacts' },
             component: ContactsAddView
@@ -255,7 +273,45 @@ const routes = [
         meta: {
           title: 'Lists Management Utility',
           id: 'lists'
-        }
+        },
+        children: [
+          {
+            path: ':type(public|user)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/:userId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/:userId(\\d+)+/folder/:folderId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/folder/:folderId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          }
+        ]
       },
       {
         path: 'power-dialer',

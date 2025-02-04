@@ -36,7 +36,7 @@
           <user-selector :generic-styling="false"
                          :disabled="isLoading"
                          v-model="userId"
-                         @change="setUserId" />
+                         @change="onUserChanged" />
         </div>
 
         <lists-folders :is-contact-module-type="isContactModuleType"
@@ -95,8 +95,8 @@ export default {
     ]),
 
     userId () {
-      if (this.$route.query.user_id && this.isAdmin) {
-        return +this.$route.query.user_id
+      if (this.$route.params.userId && this.isAdmin) {
+        return +this.$route.params.userId
       }
 
       return this.profile.id
@@ -124,7 +124,7 @@ export default {
     },
 
     isPublicLists () {
-      return this.$route.query.publicLists === '1'
+      return this.$route.params.type === 'public'
     }
   },
 
@@ -133,47 +133,23 @@ export default {
   },
 
   methods: {
-    setUserId (userId) {
-      this.updateQueryParam('user_id', userId, true)
-    },
-
-    updateQueryParam (key, value, removeOthers = false) {
-      if (removeOthers) {
-        const query = {
-          [key]: value
-        }
-        this.$router.replace({ query })
-        return
-      }
-
-      const query = Object.assign({}, this.$route.query)
-      query[key] = value
-      this.$router.replace({ query })
-    },
-
-    removeQueryParam (key) {
-      const query = Object.assign({}, this.$route.query)
-      if (Array.isArray(key)) {
-        for (const k of key) {
-          delete query[k]
-        }
-      } else {
-        delete query[key]
-      }
-      this.$router.replace({ query }).catch(() => {})
+    onUserChanged (userId) {
+      this.$router.push(`/lists/user/${userId}`)
     },
 
     togglePublicLists (enabled) {
       if (enabled) {
-        this.updateQueryParam('publicLists', 1, true)
+        this.$router.replace('/lists/public').catch(() => {})
       } else {
-        this.removeQueryParam(['publicLists', 'folder_id'])
+        this.$router.replace('/lists/user').catch(() => {})
       }
     },
 
-    onFolderRemoved (id) {
-      if (id === +this.$route.query.folder_id) {
-        this.removeQueryParam('folder_id')
+    onFolderRemoved () {
+      if (this.$route.params.userId) {
+        this.$router.push('/lists/user')
+      } else {
+        this.$router.push(`/lists/user/${this.$route.params.userId}`)
       }
     }
   }
