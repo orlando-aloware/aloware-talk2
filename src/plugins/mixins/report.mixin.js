@@ -75,7 +75,7 @@ const DEFAULT_FILTER = {
   comm_sort_by: null,
   outbound_call_count_start: null,
   outbound_call_count_end: null,
-  transcription_keyword: null,
+  transcription_keywords: null,
   transcription_category: null
 }
 
