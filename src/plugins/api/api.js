@@ -532,6 +532,14 @@ export default {
         return window.axios.post(
           `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )
+      },
+
+      // Update transcription summary
+      updateSummary (communicationId, summary) {
+        return window.axios.post(
+          `${suffixV1}transcription/${communicationId}/update-summary`,
+          { summary }
+        )
       }
     },
 
