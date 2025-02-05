@@ -2036,7 +2036,7 @@ export default {
     },
 
     buildListManagementLink (folderId = null) {
-      let path = '/lists/user'
+      let path = '/lists-management/user'
 
       if (this.$route.params.userId) {
         path += `/${this.$route.params.userId}`

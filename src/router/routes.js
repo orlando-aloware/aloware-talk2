@@ -234,26 +234,6 @@ const routes = [
           },
           {
             name: 'Contacts',
-            path: 'user/:userId(\\d+)+/list/:id(\\d+)+',
-            meta: {
-              title: 'Contacts',
-              page: 'Contacts List',
-              isFromListsManagement: true
-            },
-            component: ContactsView
-          },
-          {
-            name: 'Contacts',
-            path: 'user/:userId(\\d+)+/folder/:folderId(\\d+)+/list/:id(\\d+)+',
-            meta: {
-              title: 'Contacts',
-              page: 'Contacts List',
-              isFromListsManagement: true
-            },
-            component: ContactsView
-          },
-          {
-            name: 'Contacts',
             path: 'list/:id(\\d+)+/add',
             meta: { title: 'Contacts' },
             component: ContactsAddView
@@ -269,7 +249,7 @@ const routes = [
         }
       },
       {
-        path: 'lists',
+        path: 'lists-management',
         name: 'Lists',
         component: Lists,
         meta: {
@@ -312,6 +292,35 @@ const routes = [
               title: 'Lists Management Utility',
               id: 'lists'
             }
+          }
+        ]
+      },
+      {
+        path: 'lists',
+        component: Contacts,
+        meta: {
+          title: 'Contacts'
+        },
+        children: [
+          {
+            name: 'Contacts',
+            path: 'user/:userId(\\d+)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List',
+              isFromListsManagement: true
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts',
+            path: 'user/:userId(\\d+)+/folder/:folderId(\\d+)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List',
+              isFromListsManagement: true
+            },
+            component: ContactsView
           }
         ]
       },

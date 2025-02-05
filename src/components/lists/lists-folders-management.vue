@@ -134,22 +134,22 @@ export default {
 
   methods: {
     onUserChanged (userId) {
-      this.$router.push(`/lists/user/${userId}`)
+      this.$router.push(`/lists-management/user/${userId}`)
     },
 
     togglePublicLists (enabled) {
       if (enabled) {
-        this.$router.replace('/lists/public').catch(() => {})
+        this.$router.replace('/lists-management/public').catch(() => {})
       } else {
-        this.$router.replace('/lists/user').catch(() => {})
+        this.$router.replace('/lists-management/user').catch(() => {})
       }
     },
 
     onFolderRemoved () {
       if (this.$route.params.userId) {
-        this.$router.push('/lists/user')
+        this.$router.push('/lists-management/user')
       } else {
-        this.$router.push(`/lists/user/${this.$route.params.userId}`)
+        this.$router.push(`/lists-management/user/${this.$route.params.userId}`)
       }
     }
   }

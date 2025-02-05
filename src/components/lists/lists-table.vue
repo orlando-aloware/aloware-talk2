@@ -784,7 +784,7 @@ export default {
     },
 
     buildFolderPath (id = null) {
-      let path = '/lists/user'
+      let path = '/lists-management/user'
 
       if (this.$route.params.userId) {
         path += `/${this.$route.params.userId}`
@@ -809,11 +809,7 @@ export default {
     },
 
     buildListLink (list) {
-      if (this.userId === this.profile.id) {
-        return `/contacts/list/${list.id}${this.isPublic ? '?type=public' : ''}`
-      }
-
-      let listLink = `/contacts/user/${this.userId}`
+      let listLink = `/lists/user/${this.userId}`
 
       if (this.folderId) {
         listLink += `/folder/${this.folderId}`

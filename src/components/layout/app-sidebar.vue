@@ -147,7 +147,7 @@
       </span>
     </q-btn>
 
-    <q-btn :to="{ path: '/lists' }"
+    <q-btn :to="{ path: '/lists-management' }"
            :ripple="false"
            icon="img:app-icons/menu/lists_active.svg"
            align="left"
@@ -168,7 +168,7 @@
         Lists
       </span>
     </q-btn>
-    <q-btn :to="{ path: '/lists' }"
+    <q-btn :to="{ path: '/lists-management' }"
            :ripple="false"
            icon="img:app-icons/menu/lists_gray.svg"
            align="left"
