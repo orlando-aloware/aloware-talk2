@@ -941,7 +941,6 @@ export default {
 
   watch: {
     '$route.params': function () {
-      console.log('WATCH route.params')
       this.SET_SEARCH('')
       this.search = ''
       this.refreshLists()
