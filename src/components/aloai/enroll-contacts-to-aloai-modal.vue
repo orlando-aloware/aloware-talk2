@@ -164,7 +164,7 @@ export default {
     },
     contactsCount () {
       if (this.mode === 'add-contact-list' && this.contactList) {
-        return this.contactList.contactCount ?? this.contactList.no_of_contacts
+        return this.contactList.contactCount ?? this.contactList.no_of_contacts ?? 0
       }
 
       if (this.isDatatableSelectedAll) {
