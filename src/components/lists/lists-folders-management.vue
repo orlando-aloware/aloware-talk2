@@ -146,11 +146,13 @@ export default {
     },
 
     onFolderRemoved () {
+      let path = '/lists-management/user'
+
       if (this.$route.params.userId) {
-        this.$router.push('/lists-management/user')
-      } else {
-        this.$router.push(`/lists-management/user/${this.$route.params.userId}`)
+        path += `/${this.$route.params.userId}`
       }
+
+      this.$router.push(path).catch(() => {})
     }
   }
 }
