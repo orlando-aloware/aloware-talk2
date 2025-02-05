@@ -612,9 +612,7 @@ export default {
       required: false
     },
     type: {
-      type: Number,
-      default: null,
-      required: false
+      required: true
     },
     buttonText: {
       type: String,
@@ -756,7 +754,7 @@ export default {
       // Fetch communication recording url.
       let options = {
         params: {
-          type: this.type || (this.communication?.has_voicemail ? this.UploadedFileTypes.TYPE_CALL_VOICEMAIL : this.UploadedFileTypes.TYPE_CALL_RECORDING)
+          type: this.type
         }
       }
 
