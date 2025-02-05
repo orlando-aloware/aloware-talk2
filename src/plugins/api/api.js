@@ -866,6 +866,13 @@ export default {
 
       splitListIntoSmallerLists (contactListId, params) {
         return window.axios.post(`${suffixV2}contacts-list/${contactListId}/split`, params)
+      },
+
+      changeOwner (contactListId, userId) {
+        const params = {
+          user_id: userId
+        }
+        return window.axios.patch(`${suffixV2}contacts-list/${contactListId}/change-owner`, params)
       }
     },
 
