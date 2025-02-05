@@ -134,7 +134,9 @@ export default {
 
   methods: {
     onUserChanged (userId) {
-      this.$router.push(`/lists-management/user/${userId}`)
+      if (userId) {
+        this.$router.push(`/lists-management/user/${userId}`)
+      }
     },
 
     togglePublicLists (enabled) {
