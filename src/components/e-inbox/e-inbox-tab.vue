@@ -1,30 +1,22 @@
 <template>
   <div class="e-inbox-tab d-flex flex-column w-100">
-    <inbox-channel-toggle />
+    <!-- <inbox-channel-toggle /> -->
 
     <!-- Communications List -->
-    <div
-      class="communications-list"
-      ref="communicationsList"
-      @scroll="onScroll"
-    >
+    <div class="communications-list"
+         ref="communicationsList"
+         @scroll="onScroll">
       <!-- Initial loading state -->
-      <div
-        v-if="isLoadingCommunications"
-        :class="[isLoadingCommunications ? 'py-5' : 'py-4', 'relative']"
-      >
-        <b-overlay
-          :show="isLoadingCommunications"
-          rounded="sm"
-          variant="white"
-          data-testid="communications-list-overlay"
-        >
+      <div :class="[isLoadingCommunications ? 'py-5' : 'py-4', 'relative']"
+           v-if="isLoadingCommunications">
+        <b-overlay rounded="sm"
+                   variant="white"
+                   data-testid="communications-list-overlay"
+                   :show="isLoadingCommunications">
           <template #overlay>
             <div class="text-center">
-              <q-spinner-bars
-                color="primary"
-                size="2em"
-              />
+              <q-spinner-bars color="primary"
+                              size="2em" />
             </div>
           </template>
         </b-overlay>
@@ -32,32 +24,29 @@
 
       <!-- Communications list -->
       <template v-else-if="communications.length">
-        <div
-          v-for="comm in communications"
-          :key="comm.id"
-          class="communication-item q-px-md q-py-sm"
-          @click="onCommunicationClick(comm)"
-        >
-          <call-item
-            v-if="comm.type === CALLS_TYPE"
-            :comm="comm"
-            :direction="comm.direction"
-          />
-          <message-item
-            v-else-if="comm.type === SMS_TYPE"
-            :comm="comm"
-            :direction="comm.direction"
-          />
+        <div :key="comm.id"
+             v-for="comm in communications"
+             @click="onCommunicationClick(comm)">
+          <inbox-task-item :contact="comm"
+                           :force-active="comm.id === activeContactId" />
+          <!-- <call-item :comm="comm"
+                     :direction="comm.direction"
+                     v-if="comm.last_communication_type === 'Call'" />
+          <message-item :comm="comm"
+                        :direction="comm.direction"
+                        v-else-if="comm.last_communication_type === 'SMS'" /> -->
         </div>
 
         <!-- Load more indicator -->
-        <div v-if="isLoadingMoreCommunications" class="text-center q-pa-sm">
+        <div class="text-center q-pa-sm"
+             v-if="isLoadingMoreCommunications">
           <q-spinner-dots color="primary" size="2em" />
         </div>
       </template>
 
       <!-- Empty state -->
-      <div v-else class="text-center q-pa-md text-grey">
+      <div class="text-center q-pa-md text-grey"
+           v-else>
         No communications found
       </div>
     </div>
@@ -65,29 +54,34 @@
 </template>
 
 <script>
-import InboxChannelToggle from './inbox-channel-toggle.vue'
-import CallItem from './communication-items/call-item.vue'
-import MessageItem from './communication-items/message-item.vue'
+// import InboxChannelToggle from './inbox-channel-toggle.vue'
+// import CallItem from './communication-items/call-item.vue'
+// import MessageItem from './communication-items/message-item.vue'
 import { mapState } from 'vuex'
 import eInboxMixin from 'src/plugins/mixins/e-inbox.mixin'
-import { CALLS_TYPE, SMS_TYPE } from 'src/store/e-inbox/e-inbox.store'
+// import { CALLS_TYPE, SMS_TYPE } from 'src/store/e-inbox/e-inbox.store'
 import { debounce } from 'lodash'
+import InboxTaskItem from 'src/components/inbox/inbox-tasks/item.vue'
 
 export default {
   name: 'EInboxTab',
 
   components: {
-    InboxChannelToggle,
-    CallItem,
-    MessageItem
+    // InboxChannelToggle,
+    // CallItem,
+    // MessageItem,
+    InboxTaskItem
   },
 
-  mixins: [eInboxMixin],
+  mixins: [
+    eInboxMixin
+  ],
 
   data () {
     return {
-      CALLS_TYPE,
-      SMS_TYPE
+      // CALLS_TYPE,
+      // SMS_TYPE,
+      activeContactId: null
     }
   },
 
@@ -120,16 +114,31 @@ export default {
 
     handleScroll (target) {
       const bottomThreshold = 100
-      const isNearBottom =
-        target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
+      const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
       if (isNearBottom && !this.isLoadingMoreCommunications && this.hasMoreCommunications) {
         this.loadMoreCommunications(this.activeInbox)
       }
     },
 
-    onCommunicationClick (communication) {
-      this.$router.push(`/inboxes/${this.activeInbox}/contacts/${communication.contact_id}/communications/${communication.id}`)
+    onCommunicationClick (contact) {
+      // avoid redundant navigation
+      if (this.activeContactId === contact.id) {
+        return
+      }
+
+      this.activeContactId = contact.id
+
+      this.$router.push(`/inboxes/${this.activeInbox}/contacts/${contact.id}/communications`)
+    }
+  },
+
+  watch: {
+    '$route.params.id': {
+      immediate: true,
+      handler (newV) {
+        this.activeContactId = newV ? parseInt(newV) : null
+      }
     }
   }
 }

@@ -85,7 +85,7 @@ export default {
           page: nextPage,
           communicationType
         })
-        console.log('response', response)
+
         this.setCommunications(response.data)
       } catch (error) {
         console.error('Error fetching communications:', error)

@@ -47,7 +47,8 @@
                        data-testid="inbox-my-contacts-filter-form-checkbox"
                        :class="toggleFiltersClass"
                        :disabled="toggleFiltersEnabled"
-                       v-model="inboxShowMyContactsFilter">
+                       v-model="inboxShowMyContactsFilter"
+                       v-if="!newInboxEnabled">
         <q-tooltip content-class="bg-grey-10 text-white"
                    anchor="bottom left"
                    self="top middle">
@@ -57,6 +58,7 @@
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
             :class="toggleFiltersClass"
             data-testid="inbox-my-contacts-filter-my-contacts-label"
+            v-if="!newInboxEnabled"
             @click="myContactsFilterChange">
         <span class="label-my-contacts"
               :class="{ hidden: $q.screen.width < 390 }"
@@ -66,7 +68,7 @@
       </label>
 
       <div class="d-flex align-items-center ml-2"
-           v-if="shouldShowUnreadsToggle">
+           v-if="shouldShowUnreadsToggle && !newInboxEnabled">
         <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                          size="sm"
                          switch
@@ -97,7 +99,7 @@
 <script>
 import VueCookies from 'vue-cookies'
 import { mapActions, mapState, mapGetters } from 'vuex'
-import { inboxRoutesMixin } from 'src/plugins/mixins'
+import { inboxRoutesMixin, userMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
@@ -111,7 +113,8 @@ export default {
   name: 'inbox-toggle-filters',
 
   mixins: [
-    inboxRoutesMixin
+    inboxRoutesMixin,
+    userMixin
   ],
 
   components: {
@@ -180,7 +183,7 @@ export default {
     },
 
     showNewInboxToggle () {
-      return this.isShown
+      return this.isShown && this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   },
 

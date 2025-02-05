@@ -966,7 +966,7 @@ const talk2Api = {
 
       communications: {
         get: ({ inboxId, page = 1, communicationType }) => {
-          const params = { per_page: 15, page, type: communicationType }
+          const params = { per_page: 25, page, type: communicationType }
           return window.axios.get(`${suffixV2}inboxes/${inboxId}/communications`, { params })
         }
       }
