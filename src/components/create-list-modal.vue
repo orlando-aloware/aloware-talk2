@@ -668,6 +668,8 @@ export default {
       const params = {}
       if (this.userId) {
         params.user_id = this.userId
+      } else if (this.$route.params.userId) {
+        params.user_id = this.$route.params.userId
       }
 
       this.$axios

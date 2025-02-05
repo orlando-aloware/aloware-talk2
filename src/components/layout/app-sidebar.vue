@@ -147,7 +147,7 @@
       </span>
     </q-btn>
 
-    <q-btn :to="{ path: '/lists' }"
+    <q-btn :to="{ path: '/lists-management' }"
            :ripple="false"
            icon="img:app-icons/menu/lists_active.svg"
            align="left"
@@ -168,7 +168,7 @@
         Lists
       </span>
     </q-btn>
-    <q-btn :to="{ path: '/lists' }"
+    <q-btn :to="{ path: '/lists-management' }"
            :ripple="false"
            icon="img:app-icons/menu/lists_gray.svg"
            align="left"
@@ -976,6 +976,11 @@ export default {
     isActive (name) {
       if (this.$route.name === 'Contact' && name === 'Contacts') {
         return true
+      }
+
+      // make Lists active when navigating from lists management
+      if (this.$route.meta?.isFromListsManagement) {
+        return name === 'Lists'
       }
 
       if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {

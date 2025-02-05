@@ -9,16 +9,24 @@
           <div class="count pl-3">
             <div class="d-flex align-items-center"
                 v-if="!isPublic && !isLoading">
-              <div class="d-flex align-items-center title-path mb-2"
-                  :key="folder.id"
-                  v-for="(folder, index) in foldersPath">
-                <a href="#" @click="(ev) => selectFolder(folder.id, ev)">
-                  <div class="title-breadcrumb d-flex align-items-center">
-                    {{ folder.name == 'Root' ? 'Root Folder' : folder.name }}
-                  </div>
-                </a>
-                <slash-icon class="title-slash d-flex align-items-center" v-if="(index + 1) < foldersPath.length"/>
+              <div class="d-flex align-items-center title-path mb-2">
+                <router-link :to="buildFolderPath()">
+                  <div class="title-breadcrumb d-flex align-items-center">All Folders</div>
+                </router-link>
+                <slash-icon class="title-slash d-flex align-items-center" v-if="foldersPath.length"/>
               </div>
+              <template v-if="folderId">
+                <div class="d-flex align-items-center title-path mb-2"
+                     :key="folder.id"
+                     v-for="(folder, index) in foldersPath">
+                  <router-link :to="buildFolderPath(folder.id)">
+                    <div class="title-breadcrumb d-flex align-items-center">
+                      {{ folder.name == 'Root' ? 'Root Folder' : folder.name }}
+                    </div>
+                  </router-link>
+                  <slash-icon class="title-slash d-flex align-items-center" v-if="(index + 1) < foldersPath.length"/>
+                </div>
+              </template>
             </div>
 
             <strong v-if="!isLoading">{{ listsCount }} List(s)</strong>
@@ -74,7 +82,7 @@
               <div v-if="col.name === COLUMN_NAMES.name">
                 <router-link class="d-flex align-items-center item contact-name"
                              data-testid="lists-view-list-name-link"
-                             :to="`/contacts/list/${props.row.id}${props.row.show_in_public_folder ? '?type=public' : ''}`"
+                             :to="buildListLink(props.row)"
                              v-if="showListLink">
                     {{ props.row.name }}
                 </router-link>
@@ -462,7 +470,7 @@ export default {
     },
 
     isPublic () {
-      return this.$route.query.publicLists === '1'
+      return this.$route.params.type === 'public'
     },
 
     title () {
@@ -482,19 +490,20 @@ export default {
     },
 
     userId () {
-      if (this.$route.query.user_id && this.isAdmin) {
-        return +this.$route.query.user_id
+      if (this.$route.params.userId && this.isAdmin) {
+        return +this.$route.params.userId
       }
 
       return this.profile.id
     },
 
     folderId () {
-      return +this.$route.query.folder_id
+      return +this.$route.params.folderId
     },
 
     showListLink () {
-      return this.isPublic || this.userId === this.profile.id
+      return true
+      // return this.isPublic || this.userId === this.profile.id
     }
   },
 
@@ -519,7 +528,7 @@ export default {
     ]),
 
     async initializeLists () {
-      await this.getPinnedLists()
+      this.getPinnedLists()
       await this.getLists()
       this.calculateTotalPages()
       this.listsData = this.lists
@@ -670,7 +679,7 @@ export default {
     },
 
     async refreshLists () {
-      await this.getPinnedLists()
+      this.getPinnedLists()
       this.listsData = []
       this.SET_LISTS_COUNT(0)
       await this.getLists()
@@ -771,9 +780,21 @@ export default {
     },
 
     onFolderSelected ({ id }) {
-      const query = Object.assign({}, this.$route.query)
-      query.folder_id = id
-      this.$router.replace({ query }).catch(() => {})
+      this.$router.push(this.buildFolderPath(id)).catch(() => {})
+    },
+
+    buildFolderPath (id = null) {
+      let path = '/lists-management/user'
+
+      if (this.$route.params.userId) {
+        path += `/${this.$route.params.userId}`
+      }
+
+      if (id) {
+        path += `/folder/${id}`
+      }
+
+      return path
     },
 
     async onSearch (value) {
@@ -784,7 +805,19 @@ export default {
 
     onEditList (list) {
       this.list = list
-      this.$router.push(`/contacts/list/${this.list.id}${this.list.show_in_public_folder ? '?type=public' : ''}`)
+      this.$router.push(this.buildListLink(list))
+    },
+
+    buildListLink (list) {
+      let listLink = `/lists/user/${this.userId}`
+
+      if (this.folderId) {
+        listLink += `/folder/${this.folderId}`
+      }
+
+      listLink += `/list/${list.id}`
+
+      return listLink
     },
 
     async loadMoreLists (done) {
@@ -843,8 +876,10 @@ export default {
     },
 
     generatefoldersPath (folder, folders = []) {
-      // Add the current folder's name to the path
-      folders.push(folder)
+      // Add the current folder's name to the path ignoring root
+      if (folder.parent_id) {
+        folders.push(folder)
+      }
 
       // Check if we've found the folder with the given ID
       if (folder.id === +this.folderId) {
@@ -866,11 +901,6 @@ export default {
       return null
     },
 
-    selectFolder (folderId, event) {
-      event.preventDefault()
-      this.onFolderSelected({ id: folderId })
-    },
-
     refreshFoldersPath () {
       if (this.folders?.length) {
         this.foldersPath = this.generatefoldersPath(this.folders[0])
@@ -888,11 +918,19 @@ export default {
 
     onListMoved () {
       this.refreshLists()
+    },
+
+    resetFolder () {
+      if (this.$route.params.userId) {
+        this.$router.push(`/lists/user/${this.$route.params.userId}`)
+      } else {
+        this.$router.push(`/lists/user`)
+      }
     }
   },
 
-  async mounted () {
-    await this.initializeLists()
+  mounted () {
+    this.initializeLists()
 
     this.$VueEvent.listen('lists-management-folder-click', this.onFolderSelected)
   },
@@ -902,7 +940,7 @@ export default {
   },
 
   watch: {
-    '$route.query': function () {
+    '$route.params': function () {
       this.SET_SEARCH('')
       this.search = ''
       this.refreshLists()
