@@ -265,6 +265,20 @@
                       </q-tooltip>
                     </span>
                   </div>
+
+                  <div class="operation-button ml-1"
+                       v-if="shouldShowAloAi">
+                    <span class="cursor-pointer"
+                          data-testid="lists-duplicate-button"
+                          @click="openAloAiBotContactsEnrollmentModal(props.row)">
+                      <add-user-icon height="20"
+                                     width="20"
+                                     color="#62666E" />
+                      <q-tooltip content-class="bg-primary text-white">
+                        Enroll List in AloAi Text Bot
+                      </q-tooltip>
+                    </span>
+                  </div>
                 </div>
               </div>
             </q-td>
@@ -315,6 +329,10 @@
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
 
+      <enroll-contacts-to-aloai-modal ref="enrollContactsToAloAiModal"
+                                      :params="attachedParams()"
+                                      :contactList="list" />
+
       <assign-contacts-modal :is-show="showAssignContacts"
                             :list="list"
                             @closeAssignContactsModal="closeAssignContacts" />
@@ -359,6 +377,8 @@ import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
 import ListsFoldersManagement from './lists-folders-management'
 import SlashIcon from 'components/icons/slash-icon'
+import AddUserIcon from 'components/icons/add-user-icon'
+import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 
 export default {
   name: 'ListsTable',
@@ -393,7 +413,9 @@ export default {
     RelativeTime,
     ListsFoldersManagement,
     SlashIcon,
-    CompactBtn
+    CompactBtn,
+    AddUserIcon,
+    EnrollContactsToAloaiModal
   },
 
   data () {
@@ -755,7 +777,7 @@ export default {
 
     attachedParams () {
       return {
-        list_id: this.list.id,
+        list_id: this.list?.id,
         selected_all: true,
         contact_ids: []
       }
@@ -925,6 +947,14 @@ export default {
         this.$router.push(`/lists/user/${this.$route.params.userId}`)
       } else {
         this.$router.push(`/lists/user`)
+      }
+    },
+
+    openAloAiBotContactsEnrollmentModal (list) {
+      this.list = list
+      if (this.$refs.enrollContactsToAloAiModal) {
+        this.$refs.enrollContactsToAloAiModal.isOpen = true
+        this.$refs.enrollContactsToAloAiModal.mode = 'add-contact-list'
       }
     }
   },
