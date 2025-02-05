@@ -681,12 +681,12 @@
                   <div class="d-flex flex-row align-items-center w-100 mb-2 border-bottom"
                        v-if="communication.has_voicemail">
                     <communication-audio class="mb-2"
+                                         ref="voicemailRecording"
                                          data-testid="communication-info-voicemail-audio"
                                          :communication="communication"
                                          :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                          :uniqueId="communication.id + '2'"
-                                         v-if="activeName"
                                          @audio-file-updated="handleAudioFileUpdated">
                     </communication-audio>
                   </div>
@@ -818,7 +818,7 @@
     <div v-show="!activeName">
       <div class="px-3 pt-2 border border-top-0 text-left"
            :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
-           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
+           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication)">
         <div class="d-flex align-items-center w-100">
           <communication-audio class="mb-2"
                                data-testid="communication-info-call-recording-audio"
@@ -836,12 +836,13 @@
            :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
            v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type) && communication.has_voicemail">
         <div class="d-flex flex-row align-items-center w-100">
-          <communication-audio :communication="communication"
+          <communication-audio class="mb-2"
+                               ref="voicemailRecording"
+                               data-testid="communication-info-voicemail-audio"
+                               :communication="communication"
                                :contact="contact"
                                :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                :uniqueId="communication.id + '2'"
-                               class="mb-2"
-                               data-testid="communication-info-voicemail-audio"
                                @audio-file-updated="handleAudioFileUpdated">
           </communication-audio>
         </div>
@@ -1390,8 +1391,9 @@ export default {
     },
 
     fetchSmartTranscriptionData () {
-      if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
-        this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
+      const audioRef = this.communication.has_voicemail ? this.$refs.voicemailRecording : this.$refs.callRecording
+      if (audioRef?.$refs?.transcriptionModal) {
+        audioRef.$refs.transcriptionModal.fetchSmartTranscriptionData()
       }
     },
 
