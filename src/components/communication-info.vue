@@ -874,7 +874,7 @@
           </div>
           <div class="transcription-summary-container">
             <a class="transcription-link text-decoration-none"
-              @click.prevent="fetchSmartTranscriptionData()"
+              @click="fetchSmartTranscriptionData"
               v-if="communication.has_transcription">
               Show transcription
             </a>
