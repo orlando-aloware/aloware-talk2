@@ -658,11 +658,11 @@
                        v-if="showAudio(communication)">
                     <communication-audio class="mb-2"
                                          data-testid="communication-info-call-recording-audio"
-                                         v-if="activeName"
                                          :communication="communication"
                                          :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                          :uniqueId="communication.id + '1'"
+                                         v-if="activeName"
                                          @audio-file-updated="handleAudioFileUpdated">
                     </communication-audio>
                   </div>
@@ -687,6 +687,7 @@
                                          :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                          :uniqueId="communication.id + '2'"
+                                         v-if="activeName"
                                          @audio-file-updated="handleAudioFileUpdated">
                     </communication-audio>
                   </div>
