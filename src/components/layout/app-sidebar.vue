@@ -978,6 +978,11 @@ export default {
         return true
       }
 
+      // make Lists active when navigating from lists management
+      if (this.$route.meta?.isFromListsManagement) {
+        return name === 'Lists'
+      }
+
       if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
         return true
       }
