@@ -528,7 +528,7 @@ export default {
     ]),
 
     async initializeLists () {
-      await this.getPinnedLists()
+      this.getPinnedLists()
       await this.getLists()
       this.calculateTotalPages()
       this.listsData = this.lists
@@ -679,7 +679,7 @@ export default {
     },
 
     async refreshLists () {
-      await this.getPinnedLists()
+      this.getPinnedLists()
       this.listsData = []
       this.SET_LISTS_COUNT(0)
       await this.getLists()
@@ -929,8 +929,8 @@ export default {
     }
   },
 
-  async mounted () {
-    await this.initializeLists()
+  mounted () {
+    this.initializeLists()
 
     this.$VueEvent.listen('lists-management-folder-click', this.onFolderSelected)
   },
@@ -940,7 +940,8 @@ export default {
   },
 
   watch: {
-    '$route.query': function () {
+    '$route.params': function () {
+      console.log('WATCH route.params')
       this.SET_SEARCH('')
       this.search = ''
       this.refreshLists()
