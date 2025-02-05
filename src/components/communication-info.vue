@@ -900,9 +900,26 @@
                                          v-if="fileUuid && isMigrated">
           </generate-transcription-button>
         </div>
-        <div class="text-left-align text-13"
+        <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
-          <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+          <div class="summary-container">
+            <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+            <q-btn flat
+                   dense
+                   class="regenerate-btn"
+                   @click="onRegenerateSummary"
+                   :loading="isRegenerating"
+                   :disable="isRegenerating">
+              <sparkle-icon width="14"
+                           height="14"
+                           color="#9333EA"
+                           class="cursor-pointer"
+                           data-testid="regenerate-summary-sparkle"/>
+              <q-tooltip>
+                Regenerate summary
+              </q-tooltip>
+            </q-btn>
+          </div>
         </div>
       </div>
     </div>
@@ -1069,6 +1086,7 @@ export default {
       showInfoBox: false,
       fileUuid: null,
       isMigrated: false,
+      isRegenerating: false,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -1379,6 +1397,22 @@ export default {
 
       // If no markdown, just use nl2br filter
       return this.$options.filters.nl2br(this.parseMentionToView(body))
+    },
+
+    onRegenerateSummary () {
+      if (this.isRegenerating) return
+
+      this.isRegenerating = true
+      this.$generalNotification('Regenerating summary...')
+
+      API.V1.transcription.generateSummary(this.communication.id)
+        .catch(err => {
+          console.error('Failed to regenerate summary:', err)
+          this.$generalNotification('Failed to regenerate summary', 'error')
+        })
+        .finally(() => {
+          this.isRegenerating = false
+        })
     }
   },
 
@@ -1405,5 +1439,36 @@ export default {
 
 .communication-body :deep(p:last-child) {
   margin-bottom: 0;
+}
+
+.summary-container {
+  position: relative;
+}
+
+.regenerate-btn {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  min-height: 24px;
+  width: 24px;
+  padding: 0;
+  margin: 0;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.regenerate-btn:hover {
+  border-radius: 50%;
+  background: #f5f5f5;
+  transform: scale(1.1);
+}
+
+.regenerate-btn :deep(.q-btn__wrapper) {
+  padding: 2px;
+  min-height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

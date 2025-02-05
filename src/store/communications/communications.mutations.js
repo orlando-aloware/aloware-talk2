@@ -242,5 +242,14 @@ export default {
   },
   SET_INBOX_FILTERS (state, filters) {
     state.inboxFilters = filters
+  },
+  SET_PAGINATION_PAGE: (state, page) => {
+    state.paginationPage = page
+  },
+  SET_IS_LOADING_MORE: (state, isLoading) => {
+    state.isLoadingMore = isLoading
+  },
+  SET_SEARCH_QUERY: (state, query) => {
+    state.searchQuery = query
   }
 }

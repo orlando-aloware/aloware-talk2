@@ -532,6 +532,14 @@ export default {
         return window.axios.post(
           `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )
+      },
+
+      // Update transcription summary
+      updateSummary (communicationId, summary) {
+        return window.axios.post(
+          `${suffixV1}transcription/${communicationId}/update-summary`,
+          { summary }
+        )
       }
     },
 
@@ -803,8 +811,8 @@ export default {
     },
 
     contactFolders: {
-      list () {
-        return window.axios.get(`${suffixV2}contact-folders`)
+      list (params) {
+        return window.axios.get(`${suffixV2}contact-folders`, { params })
       },
 
       delete (id) {
@@ -918,6 +926,9 @@ export default {
       },
       async update (id, params) {
         return window.axios.put(`${suffixV2}contacts-list/${id}`, params)
+      },
+      delete (id, params) {
+        return window.axios.delete(`${suffixV2}contacts-list/${id}`, { params })
       }
     },
 

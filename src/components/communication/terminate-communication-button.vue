@@ -1,12 +1,21 @@
 <template>
-  <span :class="classes"
+  <span data-testid="comm-terminate-comm-button"
+        :class="classes"
         :disabled="loading"
-        data-testid="comm-terminate-comm-button"
+        :id="`action-terminate-${_uid}`"
         v-if="show"
         @click="dialog">
     <power-icon :height="iconHeight"
                 :width="iconWidth"/>
-    <q-tooltip data-testid="comm-terminate-comm-button-tooltip">
+
+    <b-tooltip data-testid="comm-terminate-comm-button-tooltip"
+               custom-class="communication-logs-table__tooltip"
+               :target="`action-terminate-${_uid}`"
+               v-if="blackTooltip">
+      Terminate
+    </b-tooltip>
+    <q-tooltip data-testid="comm-terminate-comm-button-tooltip"
+               v-else>
       Terminate
     </q-tooltip>
   </span>
@@ -45,6 +54,11 @@ export default {
     iconWidth: {
       type: [Number, String],
       default: 22
+    },
+
+    blackTooltip: {
+      type: Boolean,
+      default: false
     }
   },
 

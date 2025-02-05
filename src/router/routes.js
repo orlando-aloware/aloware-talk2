@@ -9,6 +9,7 @@ const Contacts = () => import('src/pages/contacts/Contacts.vue')
 const ContactsView = () => import('src/pages/contacts/ContactsView.vue')
 const ContactsAddView = () => import('src/pages/contacts/ContactsAddView.vue')
 const Dialer = () => import('pages/widgets/Dialer.vue')
+const Lists = () => import('pages/lists/Lists.vue')
 const PowerDialer = () => import('pages/power-dialer/PowerDialer.vue')
 const PowerDialerView = () => import('pages/power-dialer/PowerDialerView.vue')
 const PowerDialerAddView = () => import('src/pages/power-dialer/PowerDialerAddView')
@@ -55,7 +56,7 @@ export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Ch
 export const INBOXES_MENU_TITLE = 'Inboxes'
 export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
-export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comm.s'
+export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
 
 const routes = [
   {
@@ -254,6 +255,82 @@ const routes = [
         meta: {
           title: 'Contact'
         }
+      },
+      {
+        path: 'lists-management',
+        name: 'Lists',
+        component: Lists,
+        meta: {
+          title: 'Lists Management Utility',
+          id: 'lists'
+        },
+        children: [
+          {
+            path: ':type(public|user)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/:userId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/:userId(\\d+)+/folder/:folderId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/folder/:folderId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          }
+        ]
+      },
+      {
+        path: 'lists',
+        component: Contacts,
+        meta: {
+          title: 'Contacts'
+        },
+        children: [
+          {
+            name: 'Contacts',
+            path: 'user/:userId(\\d+)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List',
+              isFromListsManagement: true
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts',
+            path: 'user/:userId(\\d+)+/folder/:folderId(\\d+)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List',
+              isFromListsManagement: true
+            },
+            component: ContactsView
+          }
+        ]
       },
       {
         path: 'power-dialer',

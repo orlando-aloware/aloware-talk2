@@ -1,7 +1,7 @@
 <template>
   <div class="filter-wrapper d-flex align-items-center"
        :class="filterWrapperClass">
-    <compact-btn customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
+    <compact-btn custom-class="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
                  borderless
                  variant="outlined-light"
                  data-testid="inbox-channels-apply-filters"
@@ -17,7 +17,7 @@
       {{ changedFilterFieldCount }}
     </b-badge>
 
-    <compact-btn customClass="ml-auto s-14 _500 position-relative primary not-focusable"
+    <compact-btn custom-class="ml-auto s-14 _500 position-relative primary not-focusable"
                  borderless
                  variant="outlined-light"
                  data-testid="comms-channels-reset-filters-btn"
@@ -26,11 +26,11 @@
       <i class="fa fa-times" />
     </compact-btn>
 
-    <filter-dialog :filter-model="channelDefaultFilterModel"
-                   data-testid="comms-channels-filter-dialog"
+    <filter-dialog data-testid="comms-channels-filter-dialog"
+                   :filter-model="channelDefaultFilterModel"
                    v-model="filter"
-                   @createNewFilter="onCreateNewFilter"
                    @applyFilter="onApplyFilter"
+                   @createNewFilter="onCreateNewFilter"
                    @onResetFilter="onResetFilters" />
 
     <create-filter-dialog :filter-model="newFilterModel"
@@ -143,6 +143,14 @@ export default {
 
     this.$VueEvent.listen('filter-communications', data => {
       // ex: data = { type: 'users', value: 1 }
+      const current = typeof this.channelClonedFilter[data.type] === 'object' ? JSON.stringify(this.channelClonedFilter[data.type]) : this.channelClonedFilter[data.type]
+      const attempt = typeof data.value === 'object' ? JSON.stringify(data.value) : data.value
+
+      // do nothing when the same filter is being applied
+      if (current === attempt) {
+        return
+      }
+
       this.updateChannelChangedFilterFields({
         name: data.type,
         value: data.value
@@ -159,6 +167,10 @@ export default {
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
+    })
+
+    this.$VueEvent.listen('reset-communications-filters', () => {
+      this.onResetFilters()
     })
   },
   methods: {
@@ -319,11 +331,21 @@ export default {
       },
       deep: true,
       immediate: true
+    },
+
+    channelDefaultFilterModel: {
+      handler (newVal) {
+        this.filter = this.filter = { ...newVal.filter }
+      },
+      deep: true,
+      immediate: true
     }
   },
 
   beforeDestroy () {
     this.onResetFilters()
+    this.$VueEvent.stop('filter-communications')
+    this.$VueEvent.stop('reset-communications-filters')
   }
 }
 </script>

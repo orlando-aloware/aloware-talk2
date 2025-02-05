@@ -463,7 +463,8 @@ import {
   visibilityMixin,
   viewMixin,
   avatarMixin,
-  addViewMixin
+  addViewMixin,
+  contactsListFiltersMixin
 } from 'src/plugins/mixins'
 import { isEqual, isEmpty, chunk, pickBy } from 'lodash'
 
@@ -542,7 +543,8 @@ export default {
     visibilityMixin,
     viewMixin,
     avatarMixin,
-    addViewMixin
+    addViewMixin,
+    contactsListFiltersMixin
   ],
 
   computed: {
@@ -705,6 +707,16 @@ export default {
         })
     },
 
+    refreshContacts () {
+      this.initiateUpdateContactsListFilter()
+      this.$VueEvent.fire('fetchContacts', {
+        fromRefresh: true,
+        clear: true,
+        skipCache: true
+      })
+      this.$VueEvent.fire('fetchContactsLists')
+    },
+
     processRequest (params, isChunked = false, chunkedContactIds = []) {
       if (chunkedContactIds.length > 0) {
         params.contacts = chunkedContactIds[0]
@@ -741,6 +753,8 @@ export default {
           this.clicked = false
           this.setSearch('')
           this.$generalNotification(res.data.message)
+
+          this.refreshContacts()
         })
         .catch((err) => {
           if (!isChunked) {

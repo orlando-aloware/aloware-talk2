@@ -4,18 +4,20 @@
     <a target='_blank'
        href="#"
        v-if="campaignId"
+       :id="`comm-number-${_uid}`"
        @click.prevent="filter">
       {{ campaign.name || '-' }}
 
-      <q-tooltip>
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-number-${_uid}`">
         Click to filter by this line
-      </q-tooltip>
+      </b-tooltip>
     </a>
     <span v-else>
       -
     </span>
     <span>
-      {{ value | fixPhone('NATIONAL', true) }}
+      {{ row.incoming_number | fixPhone('NATIONAL', true) }}
     </span>
   </div>
 </template>
@@ -27,9 +29,9 @@ export default {
   name: 'IncomingNumber',
 
   props: {
-    value: {
-      type: String,
-      required: false
+    row: {
+      type: Object,
+      required: true
     },
 
     campaignId: {

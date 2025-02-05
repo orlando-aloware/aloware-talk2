@@ -66,6 +66,9 @@ export default {
     endpoint: {
       type: String,
       default: '/api/v2/contact-folders'
+    },
+    userId: {
+      type: Number
     }
   },
   data () {
@@ -122,7 +125,8 @@ export default {
         this.createFolderRequest({
           name: this.text,
           order: this.orderKey,
-          parent_id: this.parent_id
+          parent_id: this.parent_id,
+          ...(this.userId ? { user_id: this.userId } : {})
         })
       ]).finally(() => {
         this.$emit('blur')
@@ -130,8 +134,13 @@ export default {
       })
     },
     reloadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      }
+
       return this.$axios
-        .get(this.endpoint)
+        .get(this.endpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

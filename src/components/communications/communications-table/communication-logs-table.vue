@@ -3,18 +3,18 @@
     <h3 class="title pl-3">
       {{ title }}
     </h3>
-    <div class="filters pl-3">
-      <div class="search">
-        <search-input class="width-260"
+    <div class="filters pl-3 d-flex flex-column flex-sm-row gap-3">
+      <div class="search flex-grow-1">
+        <search-input class="w-100"
                       limit-search-characters
-                      :search="search"
+                      :search="searchQuery"
                       :disabled="isLoadingDisabled"
                       data-testid="contacts-view-search-input"
                       @search="onSearch" />
       </div>
 
-      <div class="setting pr-3 align-items-center">
-        <div class="small text-muted fs-13 text-right">
+      <div class="setting d-flex align-items-center flex-column flex-sm-row w-100 w-sm-auto gap-3 align-items-sm-center">
+        <div class="small text-muted fs-13 order-1 order-sm-1">
           <template v-if="!isLoadingCommunicationsCount">
             {{ communicationsCount }} Communications
           </template>
@@ -23,17 +23,17 @@
                       v-else />
         </div>
 
-        <hr role="separator"
-            aria-orientation="vertical"
-            class="contacts-header-separator q-separator height-28margin-auto position-relative q-separator q-separator--vertical">
+        <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-3 order-0 order-sm-2 ml-sm-4">
+          <communications-filters />
+        </div>
 
-        <communications-filters class="ml-2 mr-3" />
-
-        <compact-btn variant="primary"
-                     :compact="false"
-                     @clicked="changeTableSettingsVisibility(true)">
-          Table Settings
-        </compact-btn>
+        <div class="d-flex align-items-center justify-content-center order-2 order-sm-3 ml-sm-4 mr-sm-2">
+          <compact-btn variant="primary"
+                       :compact="false"
+                       @clicked="changeTableSettingsVisibility(true)">
+            Table Settings
+          </compact-btn>
+        </div>
       </div>
     </div>
 
@@ -44,8 +44,8 @@
              :data="communications"
              :columns="columns"
              :loading="isLoadingMore || isLoadingCommunications"
-             :virtual-scroll-item-size="100"
-             :virtual-scroll-sticky-size-start="100"
+             :virtual-scroll-item-size="80"
+             :virtual-scroll-sticky-size-start="48"
              :pagination="pagination"
              :rows-per-page-options="[0]"
              @virtual-scroll="onScroll">
@@ -62,9 +62,15 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'incoming_number'">
-              <incoming-number :value="col.value"
+              <incoming-number :row="props.row"
                                :campaign-id="props.row.campaign_id"
                                @on-filter="onFilter"/>
+            </div>
+
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'body'">
+              <message-body :style="col.columnStyle"
+                            :communication="props.row" />
             </div>
 
             <div :style="col.columnStyle"
@@ -74,8 +80,7 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'created_at'">
-              <start-time :row="props.row"
-                          :value="col.value" />
+              <start-time :row="props.row" />
             </div>
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'talk_time'">
@@ -99,7 +104,7 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'user_id'">
-              <user :value="col.value"
+              <user :row="props.row"
                     @on-filter="onFilter"/>
             </div>
 
@@ -118,7 +123,8 @@
               <duration :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'attempting_users'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'attempting_users'">
               <attempting-users :row="props.row" />
             </div>
 
@@ -177,7 +183,8 @@
               <csat-score :row="props.row" />
             </div>
 
-            <div v-else-if="col.name === 'operations'">
+            <div :style="col.columnStyle"
+                 v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
                                          @on-details="onCommunicationDetails"
                                          @archived="removeCommunication"
@@ -250,6 +257,7 @@ import User from './user.vue'
 import Broadcast from './broadcast.vue'
 import Workflow from './workflow.vue'
 import IncomingNumber from './incoming-number.vue'
+import MessageBody from './message-body.vue'
 import AttemptingUsers from './attempting-users.vue'
 import Transferred from './transferred.vue'
 import TransferType from './transfer-type.vue'
@@ -260,7 +268,7 @@ import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
 import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -296,6 +304,7 @@ export default {
     Broadcast,
     Workflow,
     IncomingNumber,
+    MessageBody,
     AttemptingUsers,
     Transferred,
     TransferType,
@@ -315,7 +324,6 @@ export default {
 
   data () {
     return {
-      search: '',
       isLoadingDisabled: false,
       tableFields: ALL_COLUMNS,
       columns: DEFAULT_COLUMNS,
@@ -330,6 +338,10 @@ export default {
   },
 
   methods: {
+    ...mapActions('communications', [
+      'setSearchQuery'
+    ]),
+
     sort (sorts) {
       // Handle sorting logic here
       this.getCommunications(this.communicationFilters)
@@ -340,8 +352,7 @@ export default {
     },
 
     onSearch (value) {
-      this.searchQuery = value
-      this.paginationPage = 1
+      this.setSearchQuery(value)
 
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
@@ -364,36 +375,26 @@ export default {
       })
     },
 
-    async onScroll ({ to, ref }) {
-      if (this.paginated) {
+    async onScroll ({ index, ref }) {
+      if (this.isLoadingCommunications || this.isLoadingMore) {
         return
       }
 
       const lastIndex = this.communications.length - 1
 
       if (
-        !this.isLoadingMore &&
         this.hasMoreCommunications &&
-        to === lastIndex &&
-        to > 0
+        index === lastIndex &&
+        index > 0
       ) {
         await this.loadMoreCommunications()
         ref.refresh()
       }
     },
 
-    async loadMoreCommunications (done) {
-      if (!this.isLoadingMore && this.hasMoreCommunications) {
-        this.paginationPage += 1
+    async loadMoreCommunications () {
+      if (this.hasMoreCommunications && !this.isLoadingMore && !this.isLoadingCommunications) {
         await this.getCommunications(this.communicationFilters, undefined, true)
-
-        if (typeof done === 'function') {
-          done()
-        }
-      } else {
-        if (typeof done === 'function') {
-          done()
-        }
       }
     },
 
@@ -417,13 +418,13 @@ export default {
           return this.columns
         }
 
-        const columns = JSON.parse(savedColumns)
+        // use ALL_COLUMNS as base, removing and sorting based on it
+        const columns = [...ALL_COLUMNS]
+        const savedColumnsNames = JSON.parse(savedColumns).map(column => column.name)
 
-        const hasAllFixedColumns = this.fixedColumns.every(name =>
-          columns.some(col => col.name === name)
-        )
-
-        return hasAllFixedColumns ? columns : this.columns
+        return columns
+          .filter(column => savedColumnsNames.includes(column.name))
+          .sort((a, b) => savedColumnsNames.indexOf(a.name) - savedColumnsNames.indexOf(b.name))
       } catch (error) {
         return this.columns
       }

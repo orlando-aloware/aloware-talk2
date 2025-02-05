@@ -8,7 +8,7 @@
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          !Are you sure you want to remove
+          Are you sure you want to remove
           <span class="font-weight-bold">{{ folderToRemove.name }}</span
           >? Please be reminded that this will also delete its contents such as
           subfolders, lists and contacts.
@@ -44,6 +44,9 @@ export default {
     isContactModuleType: {
       type: Boolean,
       default: true
+    },
+    userId: {
+      type: Number
     }
   },
   components: {
@@ -94,6 +97,9 @@ export default {
     removeFolderRequest (id) {
       if (this.isContactModuleType) {
         return talk2Api.V2.contactFolders.delete(id)
+          .then(() => {
+            this.$emit('folder-removed', id)
+          })
           .catch((error) => {
             const { message, html } = extractErrorMessage(error)
             console.log(html)
@@ -110,7 +116,11 @@ export default {
     },
     reloadFoldersRequest () {
       if (this.isContactModuleType) {
-        return talk2Api.V2.contactFolders.list()
+        const params = {}
+        if (this.userId) {
+          params.user_id = this.userId
+        }
+        return talk2Api.V2.contactFolders.list(params)
           .then((response) => response.data)
           .then(this.foldersLoaded)
           .catch((_err) => {

@@ -256,6 +256,14 @@ export default {
     isDefault: {
       type: Boolean,
       default: true
+    },
+    userId: {
+      type: Number
+    },
+    from: {
+      type: String,
+      default: 'contacts',
+      required: false
     }
   },
 
@@ -636,6 +644,9 @@ export default {
       }
 
       this.setUnsavedList(data)
+      if (this.from === 'lists') {
+        localStorage.setItem('unsavedList', JSON.stringify(data))
+      }
       this.isLoading = false
       this.createListClose()
 
@@ -654,8 +665,15 @@ export default {
     },
 
     loadFolders () {
+      const params = {}
+      if (this.userId) {
+        params.user_id = this.userId
+      } else if (this.$route.params.userId) {
+        params.user_id = this.$route.params.userId
+      }
+
       this.$axios
-        .get(this.foldersEndpoint)
+        .get(this.foldersEndpoint, { params })
         .then((response) => response.data)
         .then(this.foldersLoaded)
         .catch((_err) => {

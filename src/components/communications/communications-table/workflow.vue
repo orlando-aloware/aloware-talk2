@@ -5,15 +5,19 @@
           v-if="isAgent && value">
       {{ workflow.name || '-' }}
     </span>
-    <a class="ellipse"
-       target='_blank'
+    <a class="ellipse cursor-pointer"
+       :id="`comm-sequence-${_uid}`"
+       target="_blank"
        :href="getWorkflowURL(value)"
+       @click="handleWorkflowClick"
        v-else-if="value">
+      <external-link-icon color="#1976D2"/>
       {{ workflow.name || '-' }}
 
-      <q-tooltip>
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-sequence-${_uid}`">
         Click to go to sequence page
-      </q-tooltip>
+      </b-tooltip>
     </a>
     <span v-else>
       -
@@ -23,14 +27,21 @@
 
 <script>
 import { aclMixin, classicMixin } from 'src/plugins/mixins'
+import communicationsMixin from 'src/plugins/mixins/communications.mixin'
 import { mapState } from 'vuex'
+import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 
 export default {
   name: 'Workflow',
 
+  components: {
+    ExternalLinkIcon
+  },
+
   mixins: [
     aclMixin,
-    classicMixin
+    classicMixin,
+    communicationsMixin
   ],
 
   props: {
@@ -45,6 +56,14 @@ export default {
 
     workflow () {
       return this.workflows.find(workflow => workflow.id === this.value) || {}
+    }
+  },
+
+  methods: {
+    handleWorkflowClick (e) {
+      const url = this.getWorkflowURL(this.value)
+      // Only handle navigation in Electron, let browser handle it normally
+      this.handleElectronNavigation(e, url)
     }
   }
 }
