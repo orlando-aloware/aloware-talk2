@@ -12,7 +12,7 @@
         <external-link-icon color="#1976D2"/>
         {{ getUserName(getUser(userId)) }}
 
-        <b-tooltip custom-class="communication-logs-table__tooltip"
+        <b-tooltip custom-class="talk-table__tooltip"
                    :target="`comm-attempt-${_uid}`">
           Click to go to user's page
         </b-tooltip>

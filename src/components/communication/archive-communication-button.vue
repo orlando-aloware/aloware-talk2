@@ -8,7 +8,7 @@
                 width="16"
                 color="#62666E"/>
 
-    <b-tooltip custom-class="communication-logs-table__tooltip"
+    <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-delete-${_uid}`"
                v-if="blackTooltip">
       Delete

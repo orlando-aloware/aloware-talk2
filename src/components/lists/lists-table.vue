@@ -2,7 +2,7 @@
   <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
     <lists-folders-management :is-loading="isLoading || isLoadingMore" />
 
-    <div class="lists-container flex-grow-1 d-flex flex-column">
+    <div class="talk-table-container flex-grow-1 d-flex flex-column">
       <div class="d-flex justify-between items-start">
         <div class="px-3">
           <h3 class="title pl-3"> {{ title  }}</h3>
@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <q-table class="lists-table"
+      <q-table class="talk-table"
               row-key="index"
               virtual-scroll
               :data="listsData"
@@ -82,13 +82,9 @@
               <div v-if="col.name === COLUMN_NAMES.name">
                 <router-link class="d-flex align-items-center item contact-name"
                              data-testid="lists-view-list-name-link"
-                             :to="buildListLink(props.row)"
-                             v-if="showListLink">
+                             :to="buildListLink(props.row)">
                     {{ props.row.name }}
                 </router-link>
-                <span v-else>
-                  {{ props.row.name }}
-                </span>
               </div>
               <div v-if="col.name === COLUMN_NAMES.owner_name && isColumnVisible(col.name)">
                 {{ props.row.owner_name }}
@@ -126,171 +122,223 @@
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.actions">
                 <div class="d-flex justify-content-center context-menu">
-                  <div class="operation-button mx-1"
-                       v-if="showListLink">
+                  <div class="operation-button">
                     <span class="cursor-pointer"
                           data-testid="lists-edit-button"
+                          :id="`edit-list-${props.row.id}`"
                           @click="onEditList(props.row)">
                       <pencil-o-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Edit this List
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-rename-button"
-                          @click="onRenameList(props.row)">
-                      <pencil-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Rename this list
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-duplicate-button"
-                          @click="onDuplicateList(props.row)">
-                      <duplicate-icon height="20"
-                                width="20"
-                                color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Duplicate this list
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button mx-1"
-                      :data-popper-target="'list-' + props.row.id"
-                      v-if="!isPublic">
-                    <span class="cursor-pointer"
-                          data-testid="lists-move-button"
-                          data-action="move-item"
-                          @click="onMoveList(props.row)">
-                      <move-icon height="20"
-                                width="20"
-                                color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Move this list
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button ml-1"
-                       v-if="isAdmin">
-                    <span class="cursor-pointer"
-                          data-testid="change-list-owner-button"
-                          @click="openChangeListOwnerModal(props.row)">
-                      <switch-icon height="18"
-                                   width="18"
-                                   color="#62666E" />
-                      <q-tooltip content-class="bg-primary text-white">
-                        Change List Owner
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-pin-button"
-                          @click="onPinList(props.row)">
-                      <pin-icon height="20"
-                                width="20"
-                                color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button mx-1"
-                      v-if="hasShowInPublicFolderPermission">
-                    <span class="cursor-pointer"
-                          data-testid="lists-show-button"
-                          @click="onShowInPublicFolderList(props.row)">
-                      <eye-icon height="20"
-                                width="20"
-                                color="#62666E"
-                                v-if="!props.row.show_in_public_folder"/>
-                      <eye-off-icon height="20"
-                                    width="20"
-                                    color="#62666E"
-                                    v-else/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-enroll-sequence-button"
-                          @click="onEnrollContactsToSequence(props.row)">
-                      <add-sequence-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Enroll contacts to sequence
-                      </q-tooltip>
+                      <b-tooltip custom-class="talk-table__tooltip"
+                                 placement="bottom"
+                                 :target="`edit-list-${props.row.id}`">
+                        Edit this List
+                      </b-tooltip>
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1">
+                  <div class="operation-button">
+                    <span class="cursor-pointer"
+                          data-testid="lists-enroll-sequence-button"
+                          :id="`enroll-sequence-${props.row.id}`"
+                          @click="onEnrollContactsToSequence(props.row)">
+                      <add-sequence-icon height="20"
+                                        width="20"
+                                        color="#62666E"/>
+                      <b-tooltip custom-class="talk-table__tooltip"
+                                 placement="bottom"
+                                 :target="`enroll-sequence-${props.row.id}`">
+                        Enroll contacts to sequence
+                      </b-tooltip>
+                    </span>
+                  </div>
+
+                  <div class="operation-button">
                     <span class="cursor-pointer"
                           data-testid="lists-add-power-dialer-button"
+                          :id="`add-power-dialer-${props.row.id}`"
                           @click="onAddListToPowerDialer(props.row)">
                       <add-call-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
+                      <b-tooltip custom-class="talk-table__tooltip"
+                                 placement="bottom"
+                                 :target="`add-power-dialer-${props.row.id}`">
                         Add this list to Power Dialer
-                      </q-tooltip>
+                      </b-tooltip>
                     </span>
                   </div>
 
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-delete-button"
-                          @click="onDeleteList(props.row)">
-                      <trash-icon height="20"
+                  <div class="accordion" :id="`accordion-${props.row.id}`">
+                    <div class="operation-button">
+                      <span class="cursor-pointer"
+                            data-testid="lists-rename-button"
+                            :id="`rename-list-${props.row.id}`"
+                            @click="onRenameList(props.row)">
+                        <pencil-icon height="20"
+                                    width="20"
+                                    color="#62666E"/>
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`rename-list-${props.row.id}`">
+                          Rename this list
+                        </b-tooltip>
+                      </span>
+                    </div>
+
+                    <div class="operation-button">
+                      <span class="cursor-pointer"
+                            data-testid="lists-duplicate-button"
+                            :id="`duplicate-list-${props.row.id}`"
+                            @click="onDuplicateList(props.row)">
+                        <duplicate-icon height="20"
                                   width="20"
                                   color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Delete this list
-                      </q-tooltip>
-                    </span>
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`duplicate-list-${props.row.id}`">
+                          Duplicate this list
+                        </b-tooltip>
+                      </span>
+                    </div>
+
+                    <div class="operation-button"
+                        :data-popper-target="'list-' + props.row.id"
+                        v-if="!isPublic">
+                      <span class="cursor-pointer"
+                            data-testid="lists-move-button"
+                            :id="`move-list-${props.row.id}`"
+                            data-action="move-item"
+                            @click="onMoveList(props.row)">
+                        <move-icon height="20"
+                                  width="20"
+                                  color="#62666E"/>
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`move-list-${props.row.id}`">
+                          Move this list
+                        </b-tooltip>
+                      </span>
+                    </div>
+
+                    <div class="operation-button"
+                        v-if="isAdmin">
+                      <span class="cursor-pointer"
+                            data-testid="change-list-owner-button"
+                            :id="`change-owner-${props.row.id}`"
+                            @click="openChangeListOwnerModal(props.row)">
+                        <switch-icon height="20"
+                                    width="20"
+                                    color="#62666E" />
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`change-owner-${props.row.id}`">
+                          Change List Owner
+                        </b-tooltip>
+                      </span>
+                    </div>
+
+                    <div class="operation-button">
+                      <span class="cursor-pointer"
+                            data-testid="lists-pin-button"
+                            :id="`pin-list-${props.row.id}`"
+                            @click="onPinList(props.row)">
+                        <pin-icon height="20"
+                                  width="20"
+                                  color="#62666E"/>
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`pin-list-${props.row.id}`">
+                          {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
+                        </b-tooltip>
+                      </span>
+                    </div>
+
+                    <div class="operation-button"
+                        v-if="hasShowInPublicFolderPermission">
+                      <span class="cursor-pointer"
+                            data-testid="lists-show-button"
+                            :id="`show-public-${props.row.id}`"
+                            @click="onShowInPublicFolderList(props.row)">
+                        <eye-icon height="20"
+                                  width="20"
+                                  color="#62666E"
+                                  v-if="!props.row.show_in_public_folder"/>
+                        <eye-off-icon height="20"
+                                      width="20"
+                                      color="#62666E"
+                                      v-else/>
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`show-public-${props.row.id}`">
+                          Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
+                        </b-tooltip>
+                      </span>
+                    </div>
+
+                    <div class="operation-button">
+                      <span class="cursor-pointer"
+                            data-testid="lists-delete-button"
+                            :id="`delete-list-${props.row.id}`"
+                            @click="onDeleteList(props.row)">
+                        <trash-icon height="20"
+                                    width="20"
+                                    color="#62666E"/>
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`delete-list-${props.row.id}`">
+                          Delete this list
+                        </b-tooltip>
+                      </span>
+                    </div>
+
+                    <div class="operation-button">
+                      <span class="cursor-pointer"
+                            data-testid="lists-assign-button"
+                            :id="`assign-contacts-${props.row.id}`"
+                            @click="openAssignContacts(props.row)">
+                        <arrow-right-icon height="20"
+                                          width="20"
+                                          color="#62666E"/>
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`assign-contacts-${props.row.id}`">
+                          Assign Contacts
+                        </b-tooltip>
+                      </span>
+                    </div>
+
+                    <div class="operation-button"
+                        v-if="shouldShowAloAi">
+                      <span class="cursor-pointer"
+                            data-testid="lists-aloai-button"
+                            :id="`aloai-enroll-${props.row.id}`"
+                            @click="openAloAiBotContactsEnrollmentModal(props.row)">
+                        <add-user-icon height="20"
+                                      width="20"
+                                      color="#62666E" />
+                        <b-tooltip custom-class="talk-table__tooltip"
+                                   placement="bottom"
+                                   :target="`aloai-enroll-${props.row.id}`">
+                          Enroll List in AloAi Text Bot
+                        </b-tooltip>
+                      </span>
+                    </div>
                   </div>
 
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-duplicate-button"
-                          @click="openAssignContacts(props.row)">
-                      <arrow-right-icon height="20"
+                  <div class="operation-button accordion-button" @click="toggleAccordion(props.row.id)">
+                    <span class="cursor-pointer" data-testid="lists-accordion-button"
+                          :id="`lists-accordion-button-${props.row.id}`">
+                      <caret-right-icon height="20"
                                         width="20"
-                                        color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Assign Contacts
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button ml-1"
-                       v-if="shouldShowAloAi">
-                    <span class="cursor-pointer"
-                          data-testid="lists-duplicate-button"
-                          @click="openAloAiBotContactsEnrollmentModal(props.row)">
-                      <add-user-icon height="20"
-                                     width="20"
-                                     color="#62666E" />
-                      <q-tooltip content-class="bg-primary text-white">
-                        Enroll List in AloAi Text Bot
-                      </q-tooltip>
+                                        :class="{ 'rotate-180': accordionStates[props.row.id] }"
+                                        color="#4caf50"/>
+                      <b-tooltip custom-class="talk-table__tooltip"
+                                 placement="bottom"
+                                 :target="`lists-accordion-button-${props.row.id}`">
+                        {{ accordionStates[props.row.id] ? 'Hide actions' : 'See more actions' }}
+                      </b-tooltip>
                     </span>
                   </div>
                 </div>
@@ -389,6 +437,7 @@ import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+import CaretRightIcon from 'components/icons/caret-right-icon.vue'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -437,7 +486,8 @@ export default {
     AddUserIcon,
     EnrollContactsToAloaiModal,
     SwitchIcon,
-    ChangeListOwnerModal
+    ChangeListOwnerModal,
+    CaretRightIcon
   },
 
   data () {
@@ -470,7 +520,8 @@ export default {
       foldersPath: [],
 
       // Filters
-      showInPublicFolder: false
+      showInPublicFolder: false,
+      accordionStates: {}
     }
   },
 
@@ -543,11 +594,6 @@ export default {
 
     folderId () {
       return +this.$route.params.folderId
-    },
-
-    showListLink () {
-      return true
-      // return this.isPublic || this.userId === this.profile.id
     }
   },
 
@@ -730,6 +776,7 @@ export default {
       this.calculateTotalPages()
       this.pagination.currentPage = 1
       this.listsData = this.lists
+      this.accordionStates = {}
     },
 
     onDeleteList (list) {
@@ -986,6 +1033,32 @@ export default {
 
     onListOwnerChanged () {
       this.refreshLists()
+    },
+
+    toggleAccordion (accordionId) {
+      const accordion = this.$el.querySelector('#accordion-' + accordionId)
+
+      if (!accordion) {
+        return
+      }
+
+      const buttons = accordion.querySelectorAll('.operation-button')
+      const buttonWidth = 29
+      const totalWidth = buttons.length * buttonWidth
+
+      if (!this.accordionStates[accordionId]) {
+        this.$set(this.accordionStates, accordionId, false)
+      }
+
+      if (this.accordionStates[accordionId]) {
+        accordion.style.width = '0'
+      } else {
+        accordion.style.width = `${totalWidth}px`
+        void accordion.offsetHeight
+        accordion.style.width = `${totalWidth}px`
+      }
+
+      this.$set(this.accordionStates, accordionId, !this.accordionStates[accordionId])
     }
   },
 

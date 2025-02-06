@@ -9,7 +9,7 @@
                 :width="iconWidth"/>
 
     <b-tooltip data-testid="comm-terminate-comm-button-tooltip"
-               custom-class="communication-logs-table__tooltip"
+               custom-class="talk-table__tooltip"
                :target="`action-terminate-${_uid}`"
                v-if="blackTooltip">
       Terminate

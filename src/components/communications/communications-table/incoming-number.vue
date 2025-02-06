@@ -8,7 +8,7 @@
        @click.prevent="filter">
       {{ campaign.name || '-' }}
 
-      <b-tooltip custom-class="communication-logs-table__tooltip"
+      <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-number-${_uid}`">
         Click to filter by this line
       </b-tooltip>
