@@ -48,7 +48,7 @@ export default {
 <style lang="scss" scoped>
 .inbox-nav-item {
   padding: 12px 16px;
-  border-radius: 10px 10px 0 0;
+  border-radius: 10px 0 0 10px;
   transition: all 0.2s ease;
 
   &:hover {
