@@ -21,7 +21,7 @@ export default {
     state.communicationType = communicationType
   },
   SET_COMMUNICATIONS (state, communications) {
-    state.communications = communications
+    state.communications = parseCommunications(communications)
   },
   SET_IS_LOADING_COMMUNICATIONS (state, loading) {
     state.isLoadingCommunications = loading
@@ -38,9 +38,33 @@ export default {
     state.hasMoreCommunications = true
   },
   APPEND_COMMUNICATIONS (state, communications) {
-    state.communications = [...state.communications, ...communications]
+    state.communications = [...state.communications, ...parseCommunications(communications)]
   },
   SET_IS_LOADING_MORE_COMMUNICATIONS (state, loading) {
     state.isLoadingMoreCommunications = loading
   }
+}
+
+/**
+ * Parses the communications array to add the last_communication object
+ *
+ * @param {Array} communications
+ * @returns {Array}
+ */
+const parseCommunications = (communications) => {
+  return communications.map(comm => {
+    // FIXME[Inbox]: manually setting last_communication object
+    if (comm.last_communication_type) {
+      comm.last_communication = {
+        disposition_status2: comm.last_communication_disposition_status2,
+        type: comm.last_communication_type,
+        direction: comm.last_communication_direction,
+        callback_status: comm.last_communication_callback_status,
+        campaign_id: comm.last_communication_campaign_id,
+        current_status2: comm.last_communication_current_status2,
+        body: comm.last_communication_body
+      }
+    }
+    return comm
+  })
 }
