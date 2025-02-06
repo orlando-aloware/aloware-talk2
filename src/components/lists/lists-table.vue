@@ -125,13 +125,14 @@
                   <div class="operation-button">
                     <span class="cursor-pointer"
                           data-testid="lists-edit-button"
-                          :id="`edit-list-${_uid}`"
+                          :id="`edit-list-${props.row.id}`"
                           @click="onEditList(props.row)">
                       <pencil-o-icon height="20"
                                     width="20"
                                     color="#62666E"/>
                       <b-tooltip custom-class="talk-table__tooltip"
-                                 :target="`edit-list-${_uid}`">
+                                 placement="bottom"
+                                 :target="`edit-list-${props.row.id}`">
                         Edit this List
                       </b-tooltip>
                     </span>
@@ -140,13 +141,14 @@
                   <div class="operation-button">
                     <span class="cursor-pointer"
                           data-testid="lists-enroll-sequence-button"
-                          :id="`enroll-sequence-${_uid}`"
+                          :id="`enroll-sequence-${props.row.id}`"
                           @click="onEnrollContactsToSequence(props.row)">
                       <add-sequence-icon height="20"
                                         width="20"
                                         color="#62666E"/>
                       <b-tooltip custom-class="talk-table__tooltip"
-                                 :target="`enroll-sequence-${_uid}`">
+                                 placement="bottom"
+                                 :target="`enroll-sequence-${props.row.id}`">
                         Enroll contacts to sequence
                       </b-tooltip>
                     </span>
@@ -155,13 +157,14 @@
                   <div class="operation-button">
                     <span class="cursor-pointer"
                           data-testid="lists-add-power-dialer-button"
-                          :id="`add-power-dialer-${_uid}`"
+                          :id="`add-power-dialer-${props.row.id}`"
                           @click="onAddListToPowerDialer(props.row)">
                       <add-call-icon height="20"
                                     width="20"
                                     color="#62666E"/>
                       <b-tooltip custom-class="talk-table__tooltip"
-                                 :target="`add-power-dialer-${_uid}`">
+                                 placement="bottom"
+                                 :target="`add-power-dialer-${props.row.id}`">
                         Add this list to Power Dialer
                       </b-tooltip>
                     </span>
@@ -171,13 +174,14 @@
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-rename-button"
-                            :id="`rename-list-${_uid}`"
+                            :id="`rename-list-${props.row.id}`"
                             @click="onRenameList(props.row)">
                         <pencil-icon height="20"
                                     width="20"
                                     color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`rename-list-${_uid}`">
+                                   placement="bottom"
+                                   :target="`rename-list-${props.row.id}`">
                           Rename this list
                         </b-tooltip>
                       </span>
@@ -186,13 +190,14 @@
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-duplicate-button"
-                            :id="`duplicate-list-${_uid}`"
+                            :id="`duplicate-list-${props.row.id}`"
                             @click="onDuplicateList(props.row)">
                         <duplicate-icon height="20"
                                   width="20"
                                   color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`duplicate-list-${_uid}`">
+                                   placement="bottom"
+                                   :target="`duplicate-list-${props.row.id}`">
                           Duplicate this list
                         </b-tooltip>
                       </span>
@@ -203,14 +208,15 @@
                         v-if="!isPublic">
                       <span class="cursor-pointer"
                             data-testid="lists-move-button"
-                            :id="`move-list-${_uid}`"
+                            :id="`move-list-${props.row.id}`"
                             data-action="move-item"
                             @click="onMoveList(props.row)">
                         <move-icon height="20"
                                   width="20"
                                   color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`move-list-${_uid}`">
+                                   placement="bottom"
+                                   :target="`move-list-${props.row.id}`">
                           Move this list
                         </b-tooltip>
                       </span>
@@ -220,13 +226,14 @@
                         v-if="isAdmin">
                       <span class="cursor-pointer"
                             data-testid="change-list-owner-button"
-                            :id="`change-owner-${_uid}`"
+                            :id="`change-owner-${props.row.id}`"
                             @click="openChangeListOwnerModal(props.row)">
                         <switch-icon height="20"
                                     width="20"
                                     color="#62666E" />
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`change-owner-${_uid}`">
+                                   placement="bottom"
+                                   :target="`change-owner-${props.row.id}`">
                           Change List Owner
                         </b-tooltip>
                       </span>
@@ -235,13 +242,14 @@
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-pin-button"
-                            :id="`pin-list-${_uid}`"
+                            :id="`pin-list-${props.row.id}`"
                             @click="onPinList(props.row)">
                         <pin-icon height="20"
                                   width="20"
                                   color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`pin-list-${_uid}`">
+                                   placement="bottom"
+                                   :target="`pin-list-${props.row.id}`">
                           {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
                         </b-tooltip>
                       </span>
@@ -251,7 +259,7 @@
                         v-if="hasShowInPublicFolderPermission">
                       <span class="cursor-pointer"
                             data-testid="lists-show-button"
-                            :id="`show-public-${_uid}`"
+                            :id="`show-public-${props.row.id}`"
                             @click="onShowInPublicFolderList(props.row)">
                         <eye-icon height="20"
                                   width="20"
@@ -262,7 +270,8 @@
                                       color="#62666E"
                                       v-else/>
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`show-public-${_uid}`">
+                                   placement="bottom"
+                                   :target="`show-public-${props.row.id}`">
                           Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
                         </b-tooltip>
                       </span>
@@ -271,13 +280,14 @@
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-delete-button"
-                            :id="`delete-list-${_uid}`"
+                            :id="`delete-list-${props.row.id}`"
                             @click="onDeleteList(props.row)">
                         <trash-icon height="20"
                                     width="20"
                                     color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`delete-list-${_uid}`">
+                                   placement="bottom"
+                                   :target="`delete-list-${props.row.id}`">
                           Delete this list
                         </b-tooltip>
                       </span>
@@ -286,13 +296,14 @@
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-assign-button"
-                            :id="`assign-contacts-${_uid}`"
+                            :id="`assign-contacts-${props.row.id}`"
                             @click="openAssignContacts(props.row)">
                         <arrow-right-icon height="20"
                                           width="20"
                                           color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`assign-contacts-${_uid}`">
+                                   placement="bottom"
+                                   :target="`assign-contacts-${props.row.id}`">
                           Assign Contacts
                         </b-tooltip>
                       </span>
@@ -302,13 +313,14 @@
                         v-if="shouldShowAloAi">
                       <span class="cursor-pointer"
                             data-testid="lists-aloai-button"
-                            :id="`aloai-enroll-${_uid}`"
+                            :id="`aloai-enroll-${props.row.id}`"
                             @click="openAloAiBotContactsEnrollmentModal(props.row)">
                         <add-user-icon height="20"
                                       width="20"
                                       color="#62666E" />
                         <b-tooltip custom-class="talk-table__tooltip"
-                                   :target="`aloai-enroll-${_uid}`">
+                                   placement="bottom"
+                                   :target="`aloai-enroll-${props.row.id}`">
                           Enroll List in AloAi Text Bot
                         </b-tooltip>
                       </span>
@@ -323,6 +335,7 @@
                                         :class="{ 'rotate-180': accordionStates[props.row.id] }"
                                         color="#4caf50"/>
                       <b-tooltip custom-class="talk-table__tooltip"
+                                 placement="bottom"
                                  :target="`lists-accordion-button-${props.row.id}`">
                         {{ accordionStates[props.row.id] ? 'Hide actions' : 'See more actions' }}
                       </b-tooltip>
@@ -1030,7 +1043,7 @@ export default {
       }
 
       const buttons = accordion.querySelectorAll('.operation-button')
-      const buttonWidth = 26
+      const buttonWidth = 29
       const totalWidth = buttons.length * buttonWidth
 
       if (!this.accordionStates[accordionId]) {

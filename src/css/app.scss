@@ -16189,6 +16189,7 @@ hr {
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-right: 1px;
 
       & span {
         margin: 0 2px;
@@ -16200,7 +16201,7 @@ hr {
       align-items: flex-start;
       justify-content: flex-start;
       width: 0;
-      height: 26px;
+      height: 28px;
       overflow: hidden;
       transition: width 0.3s ease;
     }
