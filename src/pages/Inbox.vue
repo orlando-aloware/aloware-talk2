@@ -81,7 +81,8 @@ export default {
         'Inbox Contact',
         'Inbox Contact Task',
         'Inbox View Contact Task',
-        'Inbox Contact Communication'
+        'Inbox Contact Communication',
+        'EInboxCommunicationDetail'
       ]
     }
   },

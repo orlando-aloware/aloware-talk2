@@ -1,4 +1,3 @@
-
 const MainLayout = () => import('layouts/MainLayout.vue')
 const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
@@ -53,8 +52,9 @@ export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications View'
 export const COMMUNICATIONS_CHANNELS_ROUTE_NAME = 'Communications Channel'
 export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Channel Task Status'
 
-// NO difference in the titles for Inboxes on mobile
+// Update the constants at the top
 export const INBOXES_MENU_TITLE = 'Inboxes'
+export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
 export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
 
@@ -94,15 +94,44 @@ const routes = [
         name: 'Inbox',
         component: Inbox,
         meta: {
-          title: INBOXES_MENU_TITLE
+          title: INBOXES_MENU_TITLE,
+          isInbox: true
         },
         children: [
+          {
+            path: 'einbox',
+            name: 'EInbox',
+            component: Inbox,
+            meta: {
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
+          {
+            path: 'einbox/:inboxId',
+            name: 'EInboxDetail',
+            component: Inbox,
+            meta: {
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
+          {
+            path: 'einbox/:inboxId/contacts/:id/communications',
+            name: 'EInboxCommunicationDetail',
+            component: Contact,
+            meta: {
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
           {
             path: 'channels/:channel/:status/contacts/:id',
             name: 'Inbox Contact Task',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -110,7 +139,8 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -118,7 +148,8 @@ const routes = [
             name: 'Inbox Contact',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -126,7 +157,8 @@ const routes = [
             name: 'Inbox Contact Communication',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -134,7 +166,8 @@ const routes = [
             name: 'Inbox Channel',
             component: Inbox,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -142,7 +175,8 @@ const routes = [
             name: 'Inbox View',
             component: Inbox,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -150,7 +184,8 @@ const routes = [
             name: 'Inbox View Contact Task',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           }
         ]

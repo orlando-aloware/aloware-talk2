@@ -1,7 +1,7 @@
 <template>
   <q-toolbar class="page-header"
              :class="{ 'pl-2 pr-2': !noPadding }">
-    <div class="d-flex h-100 align-items-center">
+    <div class="d-flex h-100 align-items-center flex-grow-1">
       <back-button class="mobile-back-btn-global-header"
                    v-if="['Contact', 'Settings Tab'].includes($route.name)"
                    @click="navigateBack"/>
@@ -12,8 +12,8 @@
           <i class="fa fa-chevron-left" />
         </button>
       </router-link>
-      <h1 v-if="isMainTitle">{{ mainTitle }}</h1>
-      <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
+      <h1 v-if="isMainTitle" class="flex-grow-2">{{ pageTitle || mainTitle }}</h1>
+      <h1 v-if="forcePageTitle" class="flex-grow-2">{{ pageTitle || forcePageTitle }}</h1>
       <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ settingsTabHeaderName }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
@@ -171,7 +171,6 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_MENU_TITLE, INBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-header',
@@ -222,6 +221,11 @@ export default {
     titleOnly: {
       type: Boolean,
       default: false
+    },
+
+    pageTitle: {
+      type: String,
+      default: ''
     }
   },
 
@@ -283,14 +287,7 @@ export default {
     },
 
     mainTitle () {
-      /*
-        WAT-1105: when the feature not corresponds inbox menu remains as communications
-      */
-      if (this.$route?.meta?.title === INBOXES_MENU_TITLE && !this.hasNewCommunicationsFeatureEnabled) {
-        return COMMUNICATIONS_MENU_TITLE
-      }
-
-      return this.$route.meta && this.$route.meta.title ? this.$route.meta.title : this.$route.name
+      return this.$route.meta?.title || ''
     },
 
     contactsRefreshIsDisabled () {
