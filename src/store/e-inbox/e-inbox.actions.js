@@ -28,7 +28,6 @@ export default {
     commit('SET_COMMUNICATION_TYPE', communicationType)
   },
   setCommunications: ({ commit }, data) => {
-    console.log('data in actions', data)
     commit('SET_COMMUNICATIONS', data.data)
     commit('SET_HAS_MORE_COMMUNICATIONS', data.next_page_url !== null)
     commit('SET_CURRENT_COMMUNICATIONS_PAGE', data.current_page)

@@ -35,7 +35,7 @@
           </template>
           <template v-else>
             <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
-            <strong>New Inbox Disabled</strong>
+            <strong>Enable the New Inbox experience</strong>
           </template>
         </label>
       </div>
