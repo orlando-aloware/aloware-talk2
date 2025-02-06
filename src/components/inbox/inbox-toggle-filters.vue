@@ -252,7 +252,7 @@ export default {
           // Handle cookie storage
           if (result.enabled) {
             this.$cookies.set(COOKIE_NEW_INBOX, 'true', COOKIE_EXPIRES)
-            this.$router.push('/inboxes')
+            this.$router.push('/einbox')
           } else {
             this.$cookies.remove(COOKIE_NEW_INBOX)
             this.$router.push('/')
