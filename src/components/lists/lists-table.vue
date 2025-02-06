@@ -2,7 +2,7 @@
   <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
     <lists-folders-management :is-loading="isLoading || isLoadingMore" />
 
-    <div class="lists-container flex-grow-1 d-flex flex-column">
+    <div class="talk-table-container flex-grow-1 d-flex flex-column">
       <div class="d-flex justify-between items-start">
         <div class="px-3">
           <h3 class="title pl-3"> {{ title  }}</h3>
@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <q-table class="lists-table"
+      <q-table class="talk-table"
               row-key="index"
               virtual-scroll
               :data="listsData"
