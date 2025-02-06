@@ -66,8 +66,6 @@ export default {
 
   data () {
     return {
-      // CALLS_TYPE,
-      // SMS_TYPE,
       activeContactId: null
     }
   },
