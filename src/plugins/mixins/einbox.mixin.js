@@ -1,0 +1,131 @@
+import { mapActions, mapState } from 'vuex'
+import talk2Api from 'src/plugins/api/api'
+
+export default {
+  computed: {
+    ...mapState('Einbox', [
+      'isLoadingInboxes',
+      'inboxes',
+      'currentInboxesPage',
+      'hasMoreInboxes',
+      'communications',
+      'communicationType',
+      'isLoadingCommunications',
+      'currentCommunicationsPage',
+      'hasMoreCommunications',
+      'isLoadingMoreCommunications'
+    ])
+  },
+
+  methods: {
+    ...mapActions('Einbox', [
+      'setInboxes',
+      'setIsLoadingInboxes',
+      'setCommunications',
+      'appendCommunications',
+      'setIsLoadingCommunications',
+      'resetCommunications',
+      'setIsLoadingMoreCommunications',
+      'setActiveInbox'
+    ]),
+
+    async fetchInboxes () {
+      try {
+        this.setIsLoadingInboxes(true)
+        const nextPage = 1
+
+        const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage })
+        this.setInboxes(response.data)
+
+        // Check for inbox ID in route after loading inboxes
+        await this.handleRouteInbox()
+      } catch (error) {
+        console.error('Error fetching inboxes:', error)
+      } finally {
+        this.setIsLoadingInboxes(false)
+      }
+    },
+
+    async handleRouteInbox () {
+      const routeInboxId = this.$route.params.inboxId
+
+      if (this.inboxes.length) {
+        if (routeInboxId) {
+          // Handle specific inbox from route
+          const inbox = this.inboxes.find(inbox => inbox.id.toString() === routeInboxId.toString())
+          if (inbox) {
+            this.setActiveInbox(inbox.id)
+            this.resetCommunications()
+            await this.fetchCommunications(inbox.id)
+          } else {
+            // Handle case when inbox ID from route is not found
+            console.warn(`Inbox with ID ${routeInboxId} not found`)
+            this.$router.replace({ name: 'EInbox' })
+          }
+        } else {
+          // No inbox ID in route, set first inbox
+          const firstInbox = this.inboxes[0]
+          this.setActiveInbox(firstInbox.id)
+          this.resetCommunications()
+          await this.fetchCommunications(firstInbox.id)
+          // Update route to reflect selected inbox
+          this.$router.push(`/einbox/${firstInbox.id}`)
+        }
+      }
+    },
+
+    async fetchCommunications (inboxId) {
+      try {
+        this.setIsLoadingCommunications(true)
+        const nextPage = 1
+        const communicationType = this.communicationType
+
+        const response = await talk2Api.V2.inbox.communications.get({
+          inboxId,
+          page: nextPage,
+          communicationType
+        })
+
+        this.setCommunications(response.data)
+      } catch (error) {
+        console.error('Error fetching communications:', error)
+      } finally {
+        this.setIsLoadingCommunications(false)
+      }
+    },
+
+    async loadMoreCommunications (inboxId) {
+      try {
+        if (this.isLoadingMoreCommunications || !this.hasMoreCommunications) return
+
+        this.setIsLoadingMoreCommunications(true)
+        const nextPage = this.currentCommunicationsPage + 1
+        const communicationType = this.communicationType
+
+        const response = await talk2Api.V2.inbox.communications.get({
+          inboxId,
+          page: nextPage,
+          communicationType
+        })
+
+        this.appendCommunications(response.data)
+      } catch (error) {
+        console.error('Error loading more communications:', error)
+      } finally {
+        this.setIsLoadingMoreCommunications(false)
+      }
+    }
+  },
+
+  // Add route watcher to handle route changes
+  watch: {
+    '$route.params.inboxId': {
+      immediate: true,
+      handler (newInboxId) {
+        if (newInboxId && this.inboxes.length) {
+          this.handleRouteInbox()
+        }
+      }
+    }
+  }
+}

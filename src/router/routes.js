@@ -99,6 +99,33 @@ const routes = [
         },
         children: [
           {
+            path: 'einbox',
+            name: 'EInbox',
+            component: Inbox,
+            meta: {
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
+          {
+            path: 'einbox/:inboxId',
+            name: 'EInboxDetail',
+            component: Inbox,
+            meta: {
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
+          {
+            path: 'einbox/:inboxId/contacts/:id/communications',
+            name: 'EInboxCommunicationDetail',
+            component: Contact,
+            meta: {
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
+          {
             path: 'channels/:channel/:status/contacts/:id',
             name: 'Inbox Contact Task',
             component: Contact,

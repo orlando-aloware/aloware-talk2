@@ -1,7 +1,5 @@
 <template>
     <div class="w-100 h-100 d-flex flex-column" data-testid="inbox-tab-wrapper">
-      <inbox-channel-toggle
-        v-if="isNewInboxEnabled"/>
       <calls-header :openCount="taskCounts.open"
                     :pendingCount="taskCounts.pending"
                     :commCampaigns="[]"
@@ -10,7 +8,7 @@
                     :is-search="isSearch"
                     data-testid="inbox-tab-calls-header"
                     @sort="sortContactTasks"
-                    v-if="!isNewInboxEnabled">
+                    v-if="!isEInboxEnabled">
         <template slot="customLeftContent">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isFetchingContacts"
@@ -256,7 +254,6 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
-import InboxChannelToggle from './inbox-channel-toggle.vue'
 
 export default {
   name: 'InboxTab',
@@ -278,8 +275,7 @@ export default {
     InboxSearcher,
     FilterIcon,
     InboxTaskList,
-    CallsHeader,
-    InboxChannelToggle
+    CallsHeader
   },
 
   computed: {
@@ -315,8 +311,8 @@ export default {
       'isContactMixinUsed'
     ]),
 
-    ...mapGetters('inbox', [
-      'isNewInboxEnabled'
+    ...mapGetters('Einbox', [
+      'isEInboxEnabled'
     ]),
 
     statusToggleColor () {

@@ -13,9 +13,10 @@
       </compact-btn>
 
       <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
-        <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
+        <b-form-checkbox class="mt-1 ml-2 cursor-pointer einbox-toggle"
                         size="sm"
                         switch
+                        id="EinboxToggle"
                         data-testid="inbox-new-experience-checkbox"
                         :class="toggleFiltersClass"
                         :disabled="isTogglingNewInbox"
@@ -31,11 +32,11 @@
               data-testid="inbox-new-experience-label">
           <template v-if="newInboxEnabled">
             <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
-            <strong>Enable New Inbox</strong>
+            <strong>New Inbox Experience Enabled</strong>
           </template>
           <template v-else>
             <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
-            <strong>New Inbox disabled</strong>
+            <strong>Enable the New Inbox experience</strong>
           </template>
         </label>
       </div>
@@ -47,7 +48,8 @@
                        data-testid="inbox-my-contacts-filter-form-checkbox"
                        :class="toggleFiltersClass"
                        :disabled="toggleFiltersEnabled"
-                       v-model="inboxShowMyContactsFilter">
+                       v-model="inboxShowMyContactsFilter"
+                       v-if="!newInboxEnabled">
         <q-tooltip content-class="bg-grey-10 text-white"
                    anchor="bottom left"
                    self="top middle">
@@ -57,6 +59,7 @@
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
             :class="toggleFiltersClass"
             data-testid="inbox-my-contacts-filter-my-contacts-label"
+            v-if="!newInboxEnabled"
             @click="myContactsFilterChange">
         <span class="label-my-contacts"
               :class="{ hidden: $q.screen.width < 390 }"
@@ -66,7 +69,7 @@
       </label>
 
       <div class="d-flex align-items-center ml-2"
-           v-if="shouldShowUnreadsToggle">
+           v-if="shouldShowUnreadsToggle && !newInboxEnabled">
         <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                          size="sm"
                          switch
@@ -97,11 +100,10 @@
 <script>
 import VueCookies from 'vue-cookies'
 import { mapActions, mapState, mapGetters } from 'vuex'
-import { inboxRoutesMixin } from 'src/plugins/mixins'
+import { inboxRoutesMixin, userMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
-import { INBOXES_MENU_TITLE } from 'src/router/routes'
 import ZapBoldIcon from 'components/icons/inbox/zap-bold-icon'
 
 const COOKIE_NEW_INBOX = 'new_inbox_enabled'
@@ -111,7 +113,8 @@ export default {
   name: 'inbox-toggle-filters',
 
   mixins: [
-    inboxRoutesMixin
+    inboxRoutesMixin,
+    userMixin
   ],
 
   components: {
@@ -147,10 +150,13 @@ export default {
       'isInboxRefreshBtnLoading'
     ]),
     ...mapState('cache', ['currentCompany']),
-    ...mapGetters('inbox', ['isNewInboxEnabled']),
+
+    ...mapGetters('Einbox', ['isEInboxEnabled']),
 
     isShown () {
-      return (this.$route?.meta?.title === INBOXES_MENU_TITLE && this.$route.params.channel !== 'mentions')
+      const isInboxRoute = this.$route?.meta?.isInbox
+      const notMentionsChannel = this.$route.params.channel !== 'mentions'
+      return isInboxRoute && notMentionsChannel
     },
 
     toggleFiltersClass () {
@@ -167,17 +173,17 @@ export default {
 
     newInboxEnabled: {
       get () {
-        return this.isNewInboxEnabled
+        return this.isEInboxEnabled
       },
       set (value) {
-        if (value !== this.isNewInboxEnabled) {
+        if (value !== this.isEInboxEnabled) {
           this.handleNewInboxToggle()
         }
       }
     },
 
     showNewInboxToggle () {
-      return this.isShown
+      return this.isShown && this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   },
 
@@ -185,10 +191,14 @@ export default {
     ...mapActions('inbox', [
       'setInboxShowMyContacts',
       'setInboxShowUnreads',
-      'setIsInboxRefreshBtnLoading',
+      'setIsInboxRefreshBtnLoading'
+    ]),
+
+    ...mapActions('Einbox', [
       'toggleNewInbox',
       'initNewInbox'
     ]),
+
     ...mapActions('cache', ['setCurrentCompany']),
 
     myContactsFilterChange () {
@@ -241,8 +251,10 @@ export default {
           // Handle cookie storage
           if (result.enabled) {
             this.$cookies.set(COOKIE_NEW_INBOX, 'true', COOKIE_EXPIRES)
+            this.$router.push('/einbox')
           } else {
             this.$cookies.remove(COOKIE_NEW_INBOX)
+            this.$router.push('/')
           }
 
           this.$q.notify({
@@ -252,8 +264,6 @@ export default {
               : 'Rolled back to classic inbox',
             position: 'top'
           })
-
-          // this.refreshInbox()
         }
       } catch (error) {
         console.error('Failed to toggle new inbox:', error)
@@ -302,3 +312,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .custom-switch.einbox-toggle .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #00BD50 !important;
+  }
+</style>

@@ -3,7 +3,7 @@
     class="inbox-nav-item d-flex align-items-center cursor-pointer"
     :class="{ 'inbox-nav-item--active': isActive }"
     @click="$emit('click', value)"
-    data-testid="inbox-new-nav-item"
+    data-testid="einbox-nav-item"
   >
     <div class="inbox-nav-item__content d-flex align-items-center justify-content-between w-100">
       <div class="d-flex align-items-center">
@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  name: 'InboxNewNavItem',
+  name: 'EinboxNavItem',
 
   props: {
     label: {
@@ -48,22 +48,25 @@ export default {
 <style lang="scss" scoped>
 .inbox-nav-item {
   padding: 12px 16px;
+  border-radius: 10px 0 0 10px;
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: #99EBAA;
+    color: #424242;
+
+    .inbox-nav-item__label {
+      color: #424242;
+    }
   }
 
   &--active {
-    background-color: #e3f2fd;
+    background-color: #00BD50;
+    color: #ffffff;
 
     .inbox-nav-item__label {
       font-weight: 600;
       color: var(--q-primary);
-    }
-
-    &:hover {
-      background-color: #e3f2fd;
     }
   }
 
