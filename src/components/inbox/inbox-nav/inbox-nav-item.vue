@@ -122,7 +122,8 @@ export default {
     },
 
     value: {
-      type: String,
+      // TODO: change to Number when the old inbox is deprecated
+      type: [String, Number],
       required: true
     },
 
