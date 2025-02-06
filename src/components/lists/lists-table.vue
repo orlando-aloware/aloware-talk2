@@ -132,6 +132,7 @@
                                     color="#62666E"/>
                       <b-tooltip custom-class="talk-table__tooltip"
                                  placement="bottom"
+                                 boundary="window"
                                  :target="`edit-list-${props.row.id}`">
                         Edit this List
                       </b-tooltip>
@@ -148,6 +149,7 @@
                                         color="#62666E"/>
                       <b-tooltip custom-class="talk-table__tooltip"
                                  placement="bottom"
+                                 boundary="window"
                                  :target="`enroll-sequence-${props.row.id}`">
                         Enroll contacts to sequence
                       </b-tooltip>
@@ -164,6 +166,7 @@
                                     color="#62666E"/>
                       <b-tooltip custom-class="talk-table__tooltip"
                                  placement="bottom"
+                                 boundary="window"
                                  :target="`add-power-dialer-${props.row.id}`">
                         Add this list to Power Dialer
                       </b-tooltip>
@@ -181,6 +184,7 @@
                                     color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`rename-list-${props.row.id}`">
                           Rename this list
                         </b-tooltip>
@@ -197,6 +201,7 @@
                                   color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`duplicate-list-${props.row.id}`">
                           Duplicate this list
                         </b-tooltip>
@@ -216,6 +221,7 @@
                                   color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`move-list-${props.row.id}`">
                           Move this list
                         </b-tooltip>
@@ -233,6 +239,7 @@
                                     color="#62666E" />
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`change-owner-${props.row.id}`">
                           Change List Owner
                         </b-tooltip>
@@ -249,6 +256,7 @@
                                   color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`pin-list-${props.row.id}`">
                           {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
                         </b-tooltip>
@@ -271,6 +279,7 @@
                                       v-else/>
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`show-public-${props.row.id}`">
                           Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
                         </b-tooltip>
@@ -287,6 +296,7 @@
                                     color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`delete-list-${props.row.id}`">
                           Delete this list
                         </b-tooltip>
@@ -303,6 +313,7 @@
                                           color="#62666E"/>
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`assign-contacts-${props.row.id}`">
                           Assign Contacts
                         </b-tooltip>
@@ -320,6 +331,7 @@
                                       color="#62666E" />
                         <b-tooltip custom-class="talk-table__tooltip"
                                    placement="bottom"
+                                   boundary="window"
                                    :target="`aloai-enroll-${props.row.id}`">
                           Enroll List in AloAi Text Bot
                         </b-tooltip>
@@ -336,6 +348,7 @@
                                         color="#4caf50"/>
                       <b-tooltip custom-class="talk-table__tooltip"
                                  placement="bottom"
+                                 boundary="window"
                                  :target="`lists-accordion-button-${props.row.id}`">
                         {{ accordionStates[props.row.id] ? 'Hide actions' : 'See more actions' }}
                       </b-tooltip>
