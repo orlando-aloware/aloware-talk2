@@ -480,7 +480,7 @@ export default {
 
     pageTitle () {
       const route = this.$route
-      if (route.meta?.isInbox && this.isNewInboxEnabled) {
+      if (route.meta?.isInbox && this.isEInboxEnabled) {
         return NEW_INBOX_MENU_TITLE
       }
       return route.meta?.title || ''
@@ -621,7 +621,7 @@ export default {
       }
     },
 
-    ...mapGetters('eInbox', ['isNewInboxEnabled'])
+    ...mapGetters('Einbox', ['isEInboxEnabled'])
   },
 
   created () {

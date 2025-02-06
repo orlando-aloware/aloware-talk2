@@ -24,7 +24,7 @@
         <div class="h-100">
           <div class="inbox-side__nav h-100">
             <inbox-new-nav-list data-testid="inbox-side-new-nav-list"
-                                v-if="isNewInboxEnabled" />
+                                v-if="isEInboxEnabled" />
 
             <inbox-nav-list data-testid="inbox-side-nav-list"
                             :closed="closed"
@@ -40,7 +40,7 @@
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
         <!--  -->
-        <e-inbox-tab v-if="isNewInboxEnabled" />
+        <einbox-tab v-if="isEInboxEnabled" />
 
         <template v-else>
           <!-- This is the only previous item shown in the inbox tab with the old experience -->
@@ -70,9 +70,9 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState, mapGetters } from 'vuex'
-/* NEW INBOX Components */
+/* Einbox Components */
 import InboxNewNavList from 'components/inbox/inbox-new-nav-list'
-import EInboxTab from 'components/e-inbox/e-inbox-tab'
+import einboxTab from '../einbox/einbox-tab.vue'
 
 /* OLD INBOX Components */
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
@@ -86,7 +86,7 @@ export default {
   name: 'inbox-side',
 
   components: {
-    EInboxTab,
+    einboxTab,
     BackButton,
     InboxTab,
     InboxChannels,
@@ -120,8 +120,8 @@ export default {
       'navListItems'
     ]),
 
-    ...mapGetters('eInbox', [
-      'isNewInboxEnabled'
+    ...mapGetters('Einbox', [
+      'isEInboxEnabled'
     ]),
 
     ...mapState(['isMobile']),

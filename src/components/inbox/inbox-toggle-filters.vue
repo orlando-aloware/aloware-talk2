@@ -151,7 +151,7 @@ export default {
     ]),
     ...mapState('cache', ['currentCompany']),
 
-    ...mapGetters('eInbox', ['isNewInboxEnabled']),
+    ...mapGetters('Einbox', ['isEInboxEnabled']),
 
     isShown () {
       const isInboxRoute = this.$route?.meta?.isInbox
@@ -173,10 +173,10 @@ export default {
 
     newInboxEnabled: {
       get () {
-        return this.isNewInboxEnabled
+        return this.isEInboxEnabled
       },
       set (value) {
-        if (value !== this.isNewInboxEnabled) {
+        if (value !== this.isEInboxEnabled) {
           this.handleNewInboxToggle()
         }
       }
@@ -194,7 +194,7 @@ export default {
       'setIsInboxRefreshBtnLoading'
     ]),
 
-    ...mapActions('eInbox', [
+    ...mapActions('Einbox', [
       'toggleNewInbox',
       'initNewInbox'
     ]),

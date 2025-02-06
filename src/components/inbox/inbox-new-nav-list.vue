@@ -47,8 +47,8 @@
 import { mapState, mapActions } from 'vuex'
 import InboxNewNavItem from './inbox-new-nav-item'
 // import talk2Api from 'src/plugins/api/api'
-// import { eInboxMixin } from 'src/plugins/mixins'
-import eInboxMixin from 'src/plugins/mixins/e-inbox.mixin'
+// import { EinboxMixin } from 'src/plugins/mixins'
+import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 export default {
   name: 'InboxNewNavList',
 
@@ -56,7 +56,7 @@ export default {
     InboxNewNavItem
   },
 
-  mixins: [eInboxMixin],
+  mixins: [EinboxMixin],
 
   data () {
     return {
@@ -67,12 +67,12 @@ export default {
   },
 
   computed: {
-    ...mapState('eInbox', [
+    ...mapState('Einbox', [
       'inboxes',
       'activeInbox',
       'isLoadingInboxes'
     ])
-    // ...mapGetters('eInbox', ['getInboxesFirstPage'])
+    // ...mapGetters('Einbox', ['getInboxesFirstPage'])
 
     /*
       inboxes () {
@@ -81,7 +81,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('eInbox', [
+    ...mapActions('Einbox', [
       'setActiveInbox',
       'resetCommunications'
     ]),

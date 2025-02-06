@@ -1,5 +1,5 @@
 <template>
-  <div class="e-inbox-tab d-flex flex-column w-100">
+  <div class="einbox-tab d-flex flex-column w-100">
     <!-- <inbox-channel-toggle /> -->
 
     <!-- Communications List -->
@@ -58,8 +58,8 @@
 // import CallItem from './communication-items/call-item.vue'
 // import MessageItem from './communication-items/message-item.vue'
 import { mapState } from 'vuex'
-import eInboxMixin from 'src/plugins/mixins/e-inbox.mixin'
-// import { CALLS_TYPE, SMS_TYPE } from 'src/store/e-inbox/e-inbox.store'
+import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
+// import { CALLS_TYPE, SMS_TYPE } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
 import InboxTaskItem from 'src/components/inbox/inbox-tasks/item.vue'
 
@@ -74,7 +74,7 @@ export default {
   },
 
   mixins: [
-    eInboxMixin
+    EinboxMixin
   ],
 
   data () {
@@ -86,7 +86,7 @@ export default {
   },
 
   computed: {
-    ...mapState('eInbox', [
+    ...mapState('Einbox', [
       'communications',
       'isLoadingCommunications',
       'isLoadingMoreCommunications',
@@ -145,7 +145,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.e-inbox-tab {
+.einbox-tab {
   height: 100%;
   background-color: white;
 }

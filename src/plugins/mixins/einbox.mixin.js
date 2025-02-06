@@ -3,7 +3,7 @@ import talk2Api from 'src/plugins/api/api'
 
 export default {
   computed: {
-    ...mapState('eInbox', [
+    ...mapState('Einbox', [
       'isLoadingInboxes',
       'inboxes',
       'currentInboxesPage',
@@ -18,7 +18,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('eInbox', [
+    ...mapActions('Einbox', [
       'setInboxes',
       'setIsLoadingInboxes',
       'setCommunications',

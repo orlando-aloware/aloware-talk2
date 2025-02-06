@@ -20,14 +20,14 @@
 </template>
 
 <script>
-import { CALLS_TYPE, SMS_TYPE } from 'src/store/e-inbox/e-inbox.store'
+import { CALLS_TYPE, SMS_TYPE } from 'src/store/einbox/einbox.store'
 import { mapActions, mapState } from 'vuex'
-import eInboxMixin from 'src/plugins/mixins/e-inbox.mixin'
+import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 
 export default {
   name: 'InboxChannelToggle',
 
-  mixins: [eInboxMixin],
+  mixins: [EinboxMixin],
 
   data () {
     return {
@@ -37,11 +37,11 @@ export default {
   },
 
   computed: {
-    ...mapState('eInbox', ['communicationType', 'activeInbox'])
+    ...mapState('Einbox', ['communicationType', 'activeInbox'])
   },
 
   methods: {
-    ...mapActions('eInbox', ['setCommunicationType']),
+    ...mapActions('Einbox', ['setCommunicationType']),
 
     onChange (value) {
       this.setCommunicationType(value)

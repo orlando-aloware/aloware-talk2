@@ -8,7 +8,7 @@
                     :is-search="isSearch"
                     data-testid="inbox-tab-calls-header"
                     @sort="sortContactTasks"
-                    v-if="!isNewInboxEnabled">
+                    v-if="!isEInboxEnabled">
         <template slot="customLeftContent">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isFetchingContacts"
@@ -311,8 +311,8 @@ export default {
       'isContactMixinUsed'
     ]),
 
-    ...mapGetters('eInbox', [
-      'isNewInboxEnabled'
+    ...mapGetters('Einbox', [
+      'isEInboxEnabled'
     ]),
 
     statusToggleColor () {
