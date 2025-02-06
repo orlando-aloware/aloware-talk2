@@ -48,22 +48,25 @@ export default {
 <style lang="scss" scoped>
 .inbox-nav-item {
   padding: 12px 16px;
+  border-radius: 10px 10px 0 0;
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: #B29477;
+    color: #ffffff;
+
+    .inbox-nav-item__label {
+      color: #ffffff;
+    }
   }
 
   &--active {
-    background-color: #e3f2fd;
+    background-color: #8C6A5D;
+    color: #ffffff;
 
     .inbox-nav-item__label {
       font-weight: 600;
       color: var(--q-primary);
-    }
-
-    &:hover {
-      background-color: #e3f2fd;
     }
   }
 

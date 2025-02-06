@@ -22,7 +22,7 @@
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
-          <div class="inbox-side__nav h-100">
+          <div class="inbox-side__nav h-100" :class="{ 'einbox-side__nav': isEInboxEnabled }">
             <einbox-nav-list data-testid="inbox-side-new-nav-list"
                                 v-if="isEInboxEnabled" />
 

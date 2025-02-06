@@ -124,7 +124,7 @@ export default {
 <style lang="scss" scoped>
 .einbox-nav-list {
   height: 100%;
-  background-color: white;
+  background-color: #F4F4F6;
   border-right: 1px solid #e0e0e0;
 
   &__scroll {
