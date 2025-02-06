@@ -16610,7 +16610,25 @@ hr {
       display: flex;
       align-items: center;
       justify-content: center;
+
+      & span {
+        margin: 0 2px;
+      }
     }
+
+    .accordion {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      width: 0;
+      height: 26px;
+      overflow: hidden;
+      transition: width 0.3s ease;
+    }
+  
+    .rotate-180 {
+      transform: rotate(180deg);
+    }  
   }
 
   .title {
