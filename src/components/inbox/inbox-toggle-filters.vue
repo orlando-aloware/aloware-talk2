@@ -13,9 +13,10 @@
       </compact-btn>
 
       <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
-        <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
+        <b-form-checkbox class="mt-1 ml-2 cursor-pointer einbox-toggle"
                         size="sm"
                         switch
+                        id="EinboxToggle"
                         data-testid="inbox-new-experience-checkbox"
                         :class="toggleFiltersClass"
                         :disabled="isTogglingNewInbox"
@@ -312,3 +313,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .custom-switch.einbox-toggle .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #00BD50 !important;
+  }
+</style>

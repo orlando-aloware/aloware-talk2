@@ -1,5 +1,5 @@
 <template>
-  <div class="message-item">
+  <div class="message-item" :class="{ active: isActive }">
     <!-- Status indicator -->
     <div class="status-dot-wrapper">
       <div class="status-dot" :class="{ unread: comm.status !== 'read' }" />
@@ -10,27 +10,38 @@
       <!-- Header: Sender and Time -->
       <div class="message-header">
         <div class="sender-wrapper">
-          <span class="sender text-weight-medium">{{ comm.sender || 'Unknown' }}</span>
+          <span class="sender text-weight-medium">{{ contactName }}</span>
           <q-icon
-            :name="direction === 'inbound' ? 'arrow_downward' : 'arrow_upward'"
-            :class="direction === 'inbound' ? 'text-green' : 'text-blue'"
+            :name="direction === 'Inbound' ? 'arrow_downward' : 'arrow_upward'"
+            :class="direction === 'Inbound' ? 'text-green' : 'text-blue'"
             size="xs"
             class="q-ml-xs"
           />
         </div>
-        <span class="time">{{ formatTime(comm.created_at) }}</span>
+        <span class="time">
+          <task-item-time :from-time="comm.last_communication_at"
+                        :update-interval="6000">
+          </task-item-time>
+        </span>
       </div>
+
       <!-- Message Body -->
       <div class="message-body">
-        {{ comm.body || 'No message content' }}
+        {{ comm.last_communication_body || '' }}
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import TaskItemTime from 'src/components/inbox/channel-tasks/task-item-time.vue'
+
 export default {
   name: 'MessageItem',
+
+  components: {
+    TaskItemTime
+  },
 
   props: {
     comm: {
@@ -40,7 +51,23 @@ export default {
     direction: {
       type: String,
       required: true,
-      validator: value => ['inbound', 'outbound'].includes(value)
+      validator: value => ['Inbound', 'Outbound'].includes(value)
+    },
+    isActive: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  computed: {
+    contactName () {
+      if (this.comm.first_name && this.comm.last_name) {
+        return this.comm.first_name + ' ' + this.comm.last_name
+      } else if (this.comm.first_name) {
+        return this.comm.first_name
+      } else {
+        return 'No Name'
+      }
     }
   },
 
@@ -65,6 +92,34 @@ export default {
   gap: 12px;
   padding: 8px 16px;
   min-height: 64px;
+  border-bottom: 1px solid #eeeeee;
+  cursor: pointer;
+
+  &.active {
+    background-color: #00BD50;
+    color: #ffffff;
+
+    .sender {
+      color: #ffffff;
+    }
+
+    .time, .message-body, .status-dot {
+      color: #eeeeee;
+    }
+  }
+
+  &:hover {
+    background-color: #99EBAA;
+    color: #000000;
+
+    .sender {
+      color: #000000;
+    }
+
+    .time, .message-body, .status-dot {
+      color: #333333;
+    }
+  }
 }
 
 .status-dot-wrapper {

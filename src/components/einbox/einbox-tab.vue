@@ -27,14 +27,10 @@
         <div :key="comm.id"
              v-for="comm in communications"
              @click="onCommunicationClick(comm)">
-          <inbox-task-item :contact="comm"
-                           :force-active="comm.id === activeContactId" />
-          <!-- <call-item :comm="comm"
-                     :direction="comm.direction"
-                     v-if="comm.last_communication_type === 'Call'" />
-          <message-item :comm="comm"
-                        :direction="comm.direction"
-                        v-else-if="comm.last_communication_type === 'SMS'" /> -->
+             <message-item :comm="comm"
+                        :direction="comm.last_communication_direction"
+                        :isActive="activeContactId === comm.id"
+              />
         </div>
 
         <!-- Load more indicator -->
@@ -54,23 +50,16 @@
 </template>
 
 <script>
-// import InboxChannelToggle from './inbox-channel-toggle.vue'
-// import CallItem from './communication-items/call-item.vue'
-// import MessageItem from './communication-items/message-item.vue'
+import MessageItem from './communication-items/message-item.vue'
 import { mapState } from 'vuex'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
-// import { CALLS_TYPE, SMS_TYPE } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
-import InboxTaskItem from 'src/components/inbox/inbox-tasks/item.vue'
 
 export default {
   name: 'EInboxTab',
 
   components: {
-    // InboxChannelToggle,
-    // CallItem,
-    // MessageItem,
-    InboxTaskItem
+    MessageItem
   },
 
   mixins: [

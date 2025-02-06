@@ -52,16 +52,16 @@ export default {
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #B29477;
-    color: #ffffff;
+    background-color: #99EBAA;
+    color: #424242;
 
     .inbox-nav-item__label {
-      color: #ffffff;
+      color: #424242;
     }
   }
 
   &--active {
-    background-color: #8C6A5D;
+    background-color: #00BD50;
     color: #ffffff;
 
     .inbox-nav-item__label {
