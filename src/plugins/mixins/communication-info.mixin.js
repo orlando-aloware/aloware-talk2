@@ -1,3 +1,5 @@
+import { mapState } from 'vuex'
+import * as TranscriptionStatus from 'src/constants/transcription-status'
 import * as CommunicationDirections from '../../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationTypes from '../../constants/communication-types'
@@ -6,6 +8,11 @@ import * as CallbackStatus from '../../constants/callback-status'
 import { head } from 'lodash'
 
 export default {
+
+  computed: {
+    ...mapState('cache', ['currentCompany'])
+  },
+
   methods: {
     stateToTextColor (dispositionStatus, type) {
       const color = { data: '' }
@@ -327,6 +334,20 @@ export default {
 
     showAudio (communication) {
       return communication.has_recording || communication.recording_is_deleted
+    },
+
+    isTranscriptionAllowed (communication) {
+      return (
+        this.currentCompany?.transcription_enabled &&
+        communication.type === CommunicationTypes.CALL &&
+        communication.is_eligible_for_transcribe &&
+        (communication.has_voicemail || this.showAudio(communication)) &&
+        (
+          (!communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
+          ![TranscriptionStatus.STATUS_CREATED, TranscriptionStatus.STATUS_PROCESSING, TranscriptionStatus.STATUS_COMPLETED, TranscriptionStatus.STATUS_PARSED]
+            .includes(communication.call_transcription_status)
+        )
+      )
     }
   }
 }

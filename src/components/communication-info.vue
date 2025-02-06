@@ -893,7 +893,7 @@
           </div>
         </div>
         <div class="text-left-align text-15"
-             v-if="communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
+             v-if="isTranscriptionAllowed(communication) && communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
           <div>Transcription generation failed. Please try again later. </div>
           <generate-transcription-button class="mr-2"
                                          variant="button"
@@ -903,7 +903,7 @@
           </generate-transcription-button>
         </div>
         <div class="text-left-align text-15"
-             v-else-if="currentCompany?.transcription_settings?.call_transcription_enabled && !communication?.call_transcription_status">
+             v-else-if="isTranscriptionAllowed(communication)">
           <div class="mr-2">Click on the button to generate a transcription of this call.</div>
           <generate-transcription-button class="mr-2"
                                          variant="button"
@@ -1195,6 +1195,8 @@ export default {
         !this.isSimpSocial &&
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
+        this.fileUuid && this.isMigrated &&
+        (this.isTranscriptionAllowed(this.communication) || this.communication.call_summary) && // Don't show empty AloAi dialog box
         (this.communication.has_voicemail || this.showAudio(this.communication)) &&
         (
           // If transcription does not exist, or transcription exists and is in allowed status
@@ -1209,6 +1211,7 @@ export default {
         !this.isSimpSocial && // Exclude SimpSocial
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
+        this.fileUuid && this.isMigrated &&
         (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions

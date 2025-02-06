@@ -678,7 +678,8 @@ export default {
       CommunicationTypes,
       is_editing_summary: false,
       is_saving_summary: false,
-      edited_call_summary: ''
+      edited_call_summary: '',
+      TEXT_FORMATTING
     }
   },
 

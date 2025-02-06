@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isTranscriptionAllowed">
+  <div v-if="isTranscriptionAllowed(communication)">
     <!-- Render as button -->
     <b-button
       variant="success"
@@ -41,7 +41,6 @@ import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import talk2Api from 'src/plugins/api/api'
 import { communicationInfoMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as TranscriptionStatus from 'src/constants/transcription-status'
-import * as CommunicationTypes from '../constants/communication-types'
 
 export default {
   name: 'generate-transcription-button',
@@ -73,25 +72,7 @@ export default {
   computed: {
     ...mapGetters('transcriptions', {
       isGenerating: 'isGenerating'
-    }),
-
-    isTranscriptionAllowed () {
-      return (
-        !this.isSimpSocial &&
-        this.currentCompany?.transcription_enabled &&
-        this.communication.type === CommunicationTypes.CALL &&
-        this.communication.is_eligible_for_transcribe &&
-        (this.communication.has_voicemail || this.showAudio(this.communication)) &&
-        (
-          (!this.communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
-          ![TranscriptionStatus.STATUS_CREATED,
-            TranscriptionStatus.STATUS_PROCESSING,
-            TranscriptionStatus.STATUS_COMPLETED,
-            TranscriptionStatus.STATUS_PARSED
-          ].includes(this.communication.call_transcription_status)
-        )
-      )
-    }
+    })
   },
 
   methods: {
