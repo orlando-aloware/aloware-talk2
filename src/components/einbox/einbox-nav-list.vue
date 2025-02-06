@@ -46,8 +46,6 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import EinboxNavItem from './einbox-nav-item.vue'
-// import talk2Api from 'src/plugins/api/api'
-// import { EinboxMixin } from 'src/plugins/mixins'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 export default {
   name: 'EinboxNavList',
@@ -72,12 +70,6 @@ export default {
       'activeInbox',
       'isLoadingInboxes'
     ])
-    // ...mapGetters('Einbox', ['getInboxesFirstPage'])
-
-    /*
-      inboxes () {
-      return this.getInboxesFirstPage
-    } */
   },
 
   methods: {
@@ -92,8 +84,6 @@ export default {
         verticalPosition + verticalContainerSize + bottomThreshold >= verticalSize
 
       if (isNearBottom && !this.loading && this.hasMorePages) {
-        /* moved this to the mixin, need implement and test  */
-        /* this.loadMoreInboxes() */
       }
     },
 
