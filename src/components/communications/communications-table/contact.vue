@@ -11,7 +11,7 @@
         <external-link-icon color="#1976D2"/>
         {{ row.contact.name | fixContactName }}
 
-        <b-tooltip custom-class="communication-logs-table__tooltip"
+        <b-tooltip custom-class="talk-table__tooltip"
                    :target="`comm-contact-${_uid}`">
           Click to go to contact's page
         </b-tooltip>

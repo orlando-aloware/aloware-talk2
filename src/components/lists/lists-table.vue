@@ -130,7 +130,7 @@
                       <pencil-o-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                      <b-tooltip custom-class="communication-logs-table__tooltip"
+                      <b-tooltip custom-class="talk-table__tooltip"
                                  :target="`edit-list-${_uid}`">
                         Edit this List
                       </b-tooltip>
@@ -145,7 +145,7 @@
                       <add-sequence-icon height="20"
                                         width="20"
                                         color="#62666E"/>
-                      <b-tooltip custom-class="communication-logs-table__tooltip"
+                      <b-tooltip custom-class="talk-table__tooltip"
                                  :target="`enroll-sequence-${_uid}`">
                         Enroll contacts to sequence
                       </b-tooltip>
@@ -160,7 +160,7 @@
                       <add-call-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                      <b-tooltip custom-class="communication-logs-table__tooltip"
+                      <b-tooltip custom-class="talk-table__tooltip"
                                  :target="`add-power-dialer-${_uid}`">
                         Add this list to Power Dialer
                       </b-tooltip>
@@ -176,7 +176,7 @@
                         <pencil-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`rename-list-${_uid}`">
                           Rename this list
                         </b-tooltip>
@@ -191,7 +191,7 @@
                         <duplicate-icon height="20"
                                   width="20"
                                   color="#62666E"/>
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`duplicate-list-${_uid}`">
                           Duplicate this list
                         </b-tooltip>
@@ -209,7 +209,7 @@
                         <move-icon height="20"
                                   width="20"
                                   color="#62666E"/>
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`move-list-${_uid}`">
                           Move this list
                         </b-tooltip>
@@ -225,7 +225,7 @@
                         <switch-icon height="20"
                                     width="20"
                                     color="#62666E" />
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`change-owner-${_uid}`">
                           Change List Owner
                         </b-tooltip>
@@ -240,7 +240,7 @@
                         <pin-icon height="20"
                                   width="20"
                                   color="#62666E"/>
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`pin-list-${_uid}`">
                           {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
                         </b-tooltip>
@@ -261,7 +261,7 @@
                                       width="20"
                                       color="#62666E"
                                       v-else/>
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`show-public-${_uid}`">
                           Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
                         </b-tooltip>
@@ -276,7 +276,7 @@
                         <trash-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`delete-list-${_uid}`">
                           Delete this list
                         </b-tooltip>
@@ -291,7 +291,7 @@
                         <arrow-right-icon height="20"
                                           width="20"
                                           color="#62666E"/>
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`assign-contacts-${_uid}`">
                           Assign Contacts
                         </b-tooltip>
@@ -307,7 +307,7 @@
                         <add-user-icon height="20"
                                       width="20"
                                       color="#62666E" />
-                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                        <b-tooltip custom-class="talk-table__tooltip"
                                    :target="`aloai-enroll-${_uid}`">
                           Enroll List in AloAi Text Bot
                         </b-tooltip>
@@ -321,8 +321,8 @@
                       <caret-right-icon height="20"
                                         width="20"
                                         :class="{ 'rotate-180': accordionStates[props.row.id] }"
-                                        color="#409444"/>
-                      <b-tooltip custom-class="communication-logs-table__tooltip"
+                                        color="#4caf50"/>
+                      <b-tooltip custom-class="talk-table__tooltip"
                                  :target="`lists-accordion-button-${props.row.id}`">
                         {{ accordionStates[props.row.id] ? 'Hide actions' : 'See more actions' }}
                       </b-tooltip>

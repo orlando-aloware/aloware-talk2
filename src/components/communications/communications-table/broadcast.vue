@@ -9,7 +9,7 @@
       <external-link-icon color="#1976D2"/>
       {{ broadcast.name || '-' }}
 
-      <b-tooltip custom-class="communication-logs-table__tooltip"
+      <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-broadcast-${_uid}`">
         Click to see Broadcast activity's page
       </b-tooltip>

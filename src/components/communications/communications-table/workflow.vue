@@ -14,7 +14,7 @@
       <external-link-icon color="#1976D2"/>
       {{ workflow.name || '-' }}
 
-      <b-tooltip custom-class="communication-logs-table__tooltip"
+      <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-sequence-${_uid}`">
         Click to go to sequence page
       </b-tooltip>
