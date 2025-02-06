@@ -125,66 +125,76 @@
                   <div class="operation-button">
                     <span class="cursor-pointer"
                           data-testid="lists-edit-button"
+                          :id="`edit-list-${_uid}`"
                           @click="onEditList(props.row)">
                       <pencil-o-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
+                                    width="20"
+                                    color="#62666E"/>
+                      <b-tooltip custom-class="communication-logs-table__tooltip"
+                                 :target="`edit-list-${_uid}`">
                         Edit this List
-                      </q-tooltip>
+                      </b-tooltip>
                     </span>
                   </div>
 
                   <div class="operation-button">
                     <span class="cursor-pointer"
                           data-testid="lists-enroll-sequence-button"
+                          :id="`enroll-sequence-${_uid}`"
                           @click="onEnrollContactsToSequence(props.row)">
                       <add-sequence-icon height="20"
-                                    width="20"
-                                    color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
+                                        width="20"
+                                        color="#62666E"/>
+                      <b-tooltip custom-class="communication-logs-table__tooltip"
+                                 :target="`enroll-sequence-${_uid}`">
                         Enroll contacts to sequence
-                      </q-tooltip>
+                      </b-tooltip>
                     </span>
                   </div>
 
                   <div class="operation-button">
                     <span class="cursor-pointer"
                           data-testid="lists-add-power-dialer-button"
+                          :id="`add-power-dialer-${_uid}`"
                           @click="onAddListToPowerDialer(props.row)">
                       <add-call-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
+                      <b-tooltip custom-class="communication-logs-table__tooltip"
+                                 :target="`add-power-dialer-${_uid}`">
                         Add this list to Power Dialer
-                      </q-tooltip>
+                      </b-tooltip>
                     </span>
                   </div>
 
-                  <div class="accordion">
+                  <div class="accordion" :id="`accordion-${props.row.id}`">
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-rename-button"
+                            :id="`rename-list-${_uid}`"
                             @click="onRenameList(props.row)">
                         <pencil-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`rename-list-${_uid}`">
                           Rename this list
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
 
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-duplicate-button"
+                            :id="`duplicate-list-${_uid}`"
                             @click="onDuplicateList(props.row)">
                         <duplicate-icon height="20"
                                   width="20"
                                   color="#62666E"/>
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`duplicate-list-${_uid}`">
                           Duplicate this list
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
 
@@ -193,14 +203,16 @@
                         v-if="!isPublic">
                       <span class="cursor-pointer"
                             data-testid="lists-move-button"
+                            :id="`move-list-${_uid}`"
                             data-action="move-item"
                             @click="onMoveList(props.row)">
                         <move-icon height="20"
                                   width="20"
                                   color="#62666E"/>
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`move-list-${_uid}`">
                           Move this list
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
 
@@ -208,26 +220,30 @@
                         v-if="isAdmin">
                       <span class="cursor-pointer"
                             data-testid="change-list-owner-button"
+                            :id="`change-owner-${_uid}`"
                             @click="openChangeListOwnerModal(props.row)">
                         <switch-icon height="20"
                                     width="20"
                                     color="#62666E" />
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`change-owner-${_uid}`">
                           Change List Owner
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
 
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-pin-button"
+                            :id="`pin-list-${_uid}`"
                             @click="onPinList(props.row)">
                         <pin-icon height="20"
                                   width="20"
                                   color="#62666E"/>
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`pin-list-${_uid}`">
                           {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
 
@@ -235,6 +251,7 @@
                         v-if="hasShowInPublicFolderPermission">
                       <span class="cursor-pointer"
                             data-testid="lists-show-button"
+                            :id="`show-public-${_uid}`"
                             @click="onShowInPublicFolderList(props.row)">
                         <eye-icon height="20"
                                   width="20"
@@ -244,59 +261,71 @@
                                       width="20"
                                       color="#62666E"
                                       v-else/>
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`show-public-${_uid}`">
                           Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
 
                     <div class="operation-button">
                       <span class="cursor-pointer"
                             data-testid="lists-delete-button"
+                            :id="`delete-list-${_uid}`"
                             @click="onDeleteList(props.row)">
                         <trash-icon height="20"
                                     width="20"
                                     color="#62666E"/>
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`delete-list-${_uid}`">
                           Delete this list
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
 
                     <div class="operation-button">
                       <span class="cursor-pointer"
-                            data-testid="lists-duplicate-button"
+                            data-testid="lists-assign-button"
+                            :id="`assign-contacts-${_uid}`"
                             @click="openAssignContacts(props.row)">
                         <arrow-right-icon height="20"
                                           width="20"
                                           color="#62666E"/>
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`assign-contacts-${_uid}`">
                           Assign Contacts
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
 
                     <div class="operation-button"
                         v-if="shouldShowAloAi">
                       <span class="cursor-pointer"
-                            data-testid="lists-duplicate-button"
+                            data-testid="lists-aloai-button"
+                            :id="`aloai-enroll-${_uid}`"
                             @click="openAloAiBotContactsEnrollmentModal(props.row)">
                         <add-user-icon height="20"
                                       width="20"
                                       color="#62666E" />
-                        <q-tooltip content-class="bg-primary text-white">
+                        <b-tooltip custom-class="communication-logs-table__tooltip"
+                                   :target="`aloai-enroll-${_uid}`">
                           Enroll List in AloAi Text Bot
-                        </q-tooltip>
+                        </b-tooltip>
                       </span>
                     </div>
                   </div>
 
-                  <div class="operation-button accordion-button" @click="toggleAccordion">
-                    <span class="cursor-pointer" data-testid="lists-accordion-button">
+                  <div class="operation-button accordion-button" @click="toggleAccordion(props.row.id)">
+                    <span class="cursor-pointer" data-testid="lists-accordion-button"
+                          :id="`lists-accordion-button-${props.row.id}`">
                       <caret-right-icon height="20"
                                         width="20"
-                                        :class="{ 'rotate-180': isAccordionOpen }"
-                                        color="#62666E"/>
+                                        :class="{ 'rotate-180': accordionStates[props.row.id] }"
+                                        color="#409444"/>
+                      <b-tooltip custom-class="communication-logs-table__tooltip"
+                                 :target="`lists-accordion-button-${props.row.id}`">
+                        {{ accordionStates[props.row.id] ? 'Hide actions' : 'See more actions' }}
+                      </b-tooltip>
                     </span>
                   </div>
                 </div>
@@ -479,7 +508,7 @@ export default {
 
       // Filters
       showInPublicFolder: false,
-      isAccordionOpen: false
+      accordionStates: {}
     }
   },
 
@@ -734,6 +763,7 @@ export default {
       this.calculateTotalPages()
       this.pagination.currentPage = 1
       this.listsData = this.lists
+      this.accordionStates = {}
     },
 
     onDeleteList (list) {
@@ -992,8 +1022,8 @@ export default {
       this.refreshLists()
     },
 
-    toggleAccordion () {
-      const accordion = this.$el.querySelector('.accordion')
+    toggleAccordion (accordionId) {
+      const accordion = this.$el.querySelector('#accordion-' + accordionId)
 
       if (!accordion) {
         return
@@ -1003,7 +1033,11 @@ export default {
       const buttonWidth = 26
       const totalWidth = buttons.length * buttonWidth
 
-      if (this.isAccordionOpen) {
+      if (!this.accordionStates[accordionId]) {
+        this.$set(this.accordionStates, accordionId, false)
+      }
+
+      if (this.accordionStates[accordionId]) {
         accordion.style.width = '0'
       } else {
         accordion.style.width = `${totalWidth}px`
@@ -1011,7 +1045,7 @@ export default {
         accordion.style.width = `${totalWidth}px`
       }
 
-      this.isAccordionOpen = !this.isAccordionOpen
+      this.$set(this.accordionStates, accordionId, !this.accordionStates[accordionId])
     }
   },
 
