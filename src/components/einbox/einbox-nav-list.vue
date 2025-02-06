@@ -1,15 +1,15 @@
 <template>
   <div
-    class="inbox-new-nav-list"
-    data-testid="inbox-new-nav-list"
+    class="einbox-nav-list"
+    data-testid="einbox-nav-list"
   >
     <q-scroll-area
       ref="scrollArea"
-      class="inbox-new-nav-list__scroll"
+      class="einbox-nav-list__scroll"
       :thumb-style="{ right: '2px', width: '4px', opacity: 0.6 }"
       @scroll="onScroll"
     >
-      <inbox-new-nav-item
+      <einbox-nav-item
         :label="inbox.name"
         :value="inbox.id"
         :message-count="inbox.message_count"
@@ -27,7 +27,7 @@
           :show="isLoadingInboxes"
           rounded="sm"
           variant="white"
-          data-testid="inbox-new-nav-list-overlay"
+          data-testid="einbox-nav-list-overlay"
         >
           <template #overlay>
             <div class="text-center">
@@ -45,15 +45,15 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import InboxNewNavItem from './inbox-new-nav-item'
+import EinboxNavItem from './einbox-nav-item.vue'
 // import talk2Api from 'src/plugins/api/api'
 // import { EinboxMixin } from 'src/plugins/mixins'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 export default {
-  name: 'InboxNewNavList',
+  name: 'EinboxNavList',
 
   components: {
-    InboxNewNavItem
+    EinboxNavItem
   },
 
   mixins: [EinboxMixin],
@@ -122,7 +122,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.inbox-new-nav-list {
+.einbox-nav-list {
   height: 100%;
   background-color: white;
   border-right: 1px solid #e0e0e0;

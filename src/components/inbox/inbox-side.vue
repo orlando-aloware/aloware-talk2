@@ -23,7 +23,7 @@
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
           <div class="inbox-side__nav h-100">
-            <inbox-new-nav-list data-testid="inbox-side-new-nav-list"
+            <einbox-nav-list data-testid="inbox-side-new-nav-list"
                                 v-if="isEInboxEnabled" />
 
             <inbox-nav-list data-testid="inbox-side-nav-list"
@@ -71,7 +71,7 @@
 import _ from 'lodash'
 import { mapActions, mapState, mapGetters } from 'vuex'
 /* Einbox Components */
-import InboxNewNavList from 'components/inbox/inbox-new-nav-list'
+import EinboxNavList from '../einbox/einbox-nav-list.vue'
 import einboxTab from '../einbox/einbox-tab.vue'
 
 /* OLD INBOX Components */
@@ -91,7 +91,7 @@ export default {
     InboxTab,
     InboxChannels,
     InboxNavList,
-    InboxNewNavList,
+    EinboxNavList,
     Profile,
     InboxToggleFilters
   },

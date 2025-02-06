@@ -3,7 +3,7 @@
     class="inbox-nav-item d-flex align-items-center cursor-pointer"
     :class="{ 'inbox-nav-item--active': isActive }"
     @click="$emit('click', value)"
-    data-testid="inbox-new-nav-item"
+    data-testid="einbox-nav-item"
   >
     <div class="inbox-nav-item__content d-flex align-items-center justify-content-between w-100">
       <div class="d-flex align-items-center">
@@ -22,7 +22,7 @@
 
 <script>
 export default {
-  name: 'InboxNewNavItem',
+  name: 'EinboxNavItem',
 
   props: {
     label: {
