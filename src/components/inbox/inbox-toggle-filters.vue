@@ -31,7 +31,7 @@
               data-testid="inbox-new-experience-label">
           <template v-if="newInboxEnabled">
             <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
-            <strong>New Inbox Enabled</strong>
+            <strong>New Inbox Experience Enabled</strong>
           </template>
           <template v-else>
             <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
