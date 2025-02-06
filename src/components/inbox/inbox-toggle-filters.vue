@@ -104,7 +104,6 @@ import { inboxRoutesMixin, userMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
-// import { INBOXES_MENU_TITLE } from 'src/router/routes'
 import ZapBoldIcon from 'components/icons/inbox/zap-bold-icon'
 
 const COOKIE_NEW_INBOX = 'new_inbox_enabled'
