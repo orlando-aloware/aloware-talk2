@@ -28,13 +28,14 @@
              v-for="comm in communications"
              @click="onCommunicationClick(comm)">
              <inbox-task-item :contact="comm"
-                           :force-active="comm.id === activeContactId" />
+                              :force-active="comm.id === activeContactId" />
         </div>
 
         <!-- Load more indicator -->
         <div class="text-center q-pa-sm"
              v-if="isLoadingMoreCommunications">
-          <q-spinner-dots color="primary" size="2em" />
+          <q-spinner-dots color="primary"
+                          size="2em" />
         </div>
       </template>
 

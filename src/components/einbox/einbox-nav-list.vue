@@ -1,40 +1,28 @@
 <template>
-  <div
-    class="einbox-nav-list"
-    data-testid="einbox-nav-list"
-  >
-    <q-scroll-area
-      ref="scrollArea"
-      class="einbox-nav-list__scroll"
-      :thumb-style="{ right: '2px', width: '4px', opacity: 0.6 }"
-      @scroll="onScroll"
-    >
-      <einbox-nav-item
-        :label="inbox.name"
-        :value="inbox.id"
-        :message-count="inbox.message_count"
-        :is-active="activeInbox === inbox.id"
-        v-for="inbox in inboxes"
-        :key="inbox.id"
-        @click="onInboxSelect"
-      />
+  <div class="einbox-nav-list"
+       data-testid="einbox-nav-list">
+    <q-scroll-area ref="scrollArea"
+                   class="einbox-nav-list__scroll"
+                   :thumb-style="{ right: '2px', width: '4px', opacity: 0.6 }"
+                   @scroll="onScroll">
+      <einbox-nav-item :label="inbox.name"
+                       :value="inbox.id"
+                       :message-count="inbox.message_count"
+                       :is-active="activeInbox === inbox.id"
+                       :key="inbox.id"
+                       v-for="inbox in inboxes"
+                       @click="onInboxSelect" />
 
-      <div
-        v-if="isLoadingInboxes"
-        :class="[isLoadingInboxes ? 'py-5' : 'py-4', 'relative']"
-      >
-        <b-overlay
-          :show="isLoadingInboxes"
-          rounded="sm"
-          variant="white"
-          data-testid="einbox-nav-list-overlay"
-        >
+      <div :class="[isLoadingInboxes ? 'py-5' : 'py-4', 'relative']"
+           v-if="isLoadingInboxes">
+        <b-overlay rounded="sm"
+                   variant="white"
+                   data-testid="einbox-nav-list-overlay"
+                   :show="isLoadingInboxes">
           <template #overlay>
             <div class="text-center">
-              <q-spinner-bars
-                color="primary"
-                size="2em"
-              />
+              <q-spinner-bars color="primary"
+                              size="2em"/>
             </div>
           </template>
         </b-overlay>
@@ -54,11 +42,12 @@ export default {
     EinboxNavItem
   },
 
-  mixins: [EinboxMixin],
+  mixins: [
+    EinboxMixin
+  ],
 
   data () {
     return {
-      // loading: false,
       perPage: 50,
       hasMorePages: true
     }
@@ -90,7 +79,6 @@ export default {
     onInboxSelect (inboxId) {
       this.setActiveInbox(inboxId)
       this.resetCommunications()
-      console.log('getting communications from: ', inboxId)
       this.fetchCommunications(inboxId)
       this.$router.push(`/einbox/${inboxId}`)
     }
