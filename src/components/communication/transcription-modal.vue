@@ -611,6 +611,9 @@ export default {
       type: Object,
       required: false
     },
+    type: {
+      required: true
+    },
     buttonText: {
       type: String,
       default: 'Show Transcription'
@@ -751,7 +754,7 @@ export default {
       // Fetch communication recording url.
       let options = {
         params: {
-          type: this.UploadedFileTypes.TYPE_CALL_RECORDING
+          type: this.type
         }
       }
 

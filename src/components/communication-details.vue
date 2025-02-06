@@ -48,12 +48,10 @@
                   v-if="fileUuid && isMigrated"
                 >
                 </generate-transcription-button>
-                <div
-                  class="flex items-center mr-1 h-100"
-                  data-testid="comm-transcription-modal-btn"
-                  v-if="!communication.transcription_is_deleted && communication.has_transcription"
-                  @click="fetchSmartTranscriptionData()"
-                >
+                <div class="flex items-center mr-1 h-100"
+                     data-testid="comm-transcription-modal-btn"
+                     v-if="!communication.transcription_is_deleted && communication.has_transcription"
+                     @click="fetchSmartTranscriptionData()">
                   <span class="text-blue cursor-pointer">
                     Show Transcription
                   </span>
