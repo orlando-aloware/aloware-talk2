@@ -129,7 +129,7 @@ export default {
 
       this.activeContactId = contact.id
 
-      this.$router.push(`/inboxes/${this.activeInbox}/contacts/${contact.id}/communications`)
+      this.$router.push(`/einbox/${this.activeInbox}/contacts/${contact.id}/communications`)
     }
   },
 

@@ -69,7 +69,7 @@ export default {
           this.resetCommunications()
           await this.fetchCommunications(firstInbox.id)
           // Update route to reflect selected inbox
-          this.$router.push(`/inboxes/${firstInbox.id}`)
+          this.$router.push(`/einbox/${firstInbox.id}`)
         }
       }
     },

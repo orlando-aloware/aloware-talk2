@@ -108,7 +108,7 @@ const routes = [
             }
           },
           {
-            path: 'inboxes/:inboxId',
+            path: 'einbox/:inboxId',
             name: 'EInboxDetail',
             component: Inbox,
             meta: {
@@ -117,7 +117,7 @@ const routes = [
             }
           },
           {
-            path: 'inboxes/:inboxId/contacts/:id/communications',
+            path: 'einbox/:inboxId/contacts/:id/communications',
             name: 'EInboxCommunicationDetail',
             component: Contact,
             meta: {

@@ -102,7 +102,7 @@ export default {
       this.resetCommunications()
       console.log('getting communications from: ', inboxId)
       this.fetchCommunications(inboxId)
-      this.$router.push(`/inboxes/${inboxId}`)
+      this.$router.push(`/einbox/${inboxId}`)
     }
   },
 
