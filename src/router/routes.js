@@ -99,7 +99,7 @@ const routes = [
         },
         children: [
           {
-            path: 'inboxes',
+            path: 'einbox',
             name: 'EInbox',
             component: Inbox,
             meta: {
