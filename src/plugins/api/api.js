@@ -532,6 +532,14 @@ const talk2Api = {
         return window.axios.post(
           `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )
+      },
+
+      // Update transcription summary
+      updateSummary (communicationId, summary) {
+        return window.axios.post(
+          `${suffixV1}transcription/${communicationId}/update-summary`,
+          { summary }
+        )
       }
     },
 
@@ -803,8 +811,8 @@ const talk2Api = {
     },
 
     contactFolders: {
-      list () {
-        return window.axios.get(`${suffixV2}contact-folders`)
+      list (params) {
+        return window.axios.get(`${suffixV2}contact-folders`, { params })
       },
 
       delete (id) {
@@ -858,6 +866,13 @@ const talk2Api = {
 
       splitListIntoSmallerLists (contactListId, params) {
         return window.axios.post(`${suffixV2}contacts-list/${contactListId}/split`, params)
+      },
+
+      changeOwner (contactListId, userId) {
+        const params = {
+          user_id: userId
+        }
+        return window.axios.patch(`${suffixV2}contacts-list/${contactListId}/change-owner`, params)
       }
     },
 
@@ -918,6 +933,9 @@ const talk2Api = {
       },
       async update (id, params) {
         return window.axios.put(`${suffixV2}contacts-list/${id}`, params)
+      },
+      delete (id, params) {
+        return window.axios.delete(`${suffixV2}contacts-list/${id}`, { params })
       }
     },
 

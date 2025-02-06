@@ -1,6 +1,6 @@
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
-import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
+import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 
 export default {
   selectedFilter: (state) => state.selectedFilter,
@@ -41,19 +41,19 @@ export default {
         teams: Filters.DEFAULT_STATE.filter.teams,
         contact_lists: Filters.DEFAULT_STATE.filter.contact_lists,
         answer_status: answerStatus,
+        not_disposed: Filters.DEFAULT_STATE.filter.not_disposed,
         unread_only: 0,
         type
       }
       return defaultFilterModel
     }
 
-    if ([CALLS_CHANNEL, RECORDINGS_CHANNEL].includes(channel)) {
+    if ([CALLS_CHANNEL].includes(channel)) {
       defaultFilterModel.type = ChannelType.CHANNEL_CALLS
       defaultFilterModel.filter = {
         campaigns: Filters.DEFAULT_STATE.filter.campaigns,
         ring_groups: Filters.DEFAULT_STATE.filter.ring_groups,
         direction: Filters.DEFAULT_STATE.filter.direction,
-        answer_status: Filters.DEFAULT_STATE.filter.answer_status,
         min_talk_time: Filters.DEFAULT_STATE.filter.min_talk_time,
         transfer_type: Filters.DEFAULT_STATE.filter.transfer_type,
         callback_status: Filters.DEFAULT_STATE.filter.callback_status,
@@ -72,13 +72,10 @@ export default {
         has_international: Filters.DEFAULT_STATE.filter.has_international,
         teams: Filters.DEFAULT_STATE.filter.teams,
         contact_lists: Filters.DEFAULT_STATE.filter.contact_lists,
+        not_disposed: Filters.DEFAULT_STATE.filter.not_disposed,
         unread_only: 0,
-        type
-      }
-
-      if ([RECORDINGS_CHANNEL].includes(channel)) {
-        defaultFilterModel.type = ChannelType.CHANNEL_RECORDINGS
-        defaultFilterModel.filter.answer_status = answerStatus
+        type,
+        answer_status: answerStatus
       }
       return defaultFilterModel
     }
@@ -90,16 +87,6 @@ export default {
         changed: true,
         unread_only: 0,
         type
-      }
-
-      return defaultFilterModel
-    }
-
-    if (channel === 'my-personal-line') {
-      defaultFilterModel.type = ChannelType.CHANNEL_ALL_COMMUNICATIONS
-      defaultFilterModel.filter = {
-        ...Filters.DEFAULT_STATE.filter,
-        campaigns: [this.profile.campaign_id]
       }
 
       return defaultFilterModel
@@ -124,6 +111,7 @@ export default {
       creator_type: Filters.DEFAULT_STATE.filter.creator_type,
       has_international: Filters.DEFAULT_STATE.filter.has_international,
       answer_status: answerStatus,
+      not_disposed: Filters.DEFAULT_STATE.filter.not_disposed,
       type,
       unread_only: 0
     }

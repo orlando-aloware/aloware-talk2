@@ -96,7 +96,8 @@ export default {
       'setIsInboxRefreshBtnLoading',
       'setChannelClonedFilter',
       'setInboxFilters',
-      'resetChannelChangedFilterFields'
+      'resetChannelChangedFilterFields',
+      'setSearchQuery'
     ]),
 
     setChannel (routeChanged = false) {
@@ -190,6 +191,7 @@ export default {
       this.setChannelClonedFilter(filter)
       this.resetChannelChangedFilterFields()
       this.setInboxFilters(filter)
+      this.setSearchQuery('')
 
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)

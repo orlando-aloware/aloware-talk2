@@ -22,6 +22,18 @@ export default {
       return localStorage.getItem('impersonate') === 'true'
     },
 
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    },
+
+    shouldSeeExperimentalAiFeatures () {
+      return this.isDemoCompany || this.currentCompany?.plan?.ai_plan === true
+    },
+
+    shouldSeeExperimentalXproAiFeatures () {
+      return (this.shouldSeeExperimentalAiFeatures && this.currentCompany?.plan?.use_case === 'xPro') || this.isDemoCompany
+    },
+
     /*
       WAT-1105:
           - second code freeze: 01-22-2025
@@ -29,8 +41,7 @@ export default {
             - channels only present in Communications menu
     */
     hasNewCommunicationsFeatureEnabled () {
-      /* Making new Communications feature globally enabled */
-      return true
+      return this.currentCompany?.communication_logs_enabled || false
     }
   },
 

@@ -1,12 +1,19 @@
 <template>
   <span class="cursor-pointer"
         data-testid="comm-barge-comm-button-dialog-click"
+        :id="`action-barge-${_uid}`"
         @click="dialog"
         v-if="userCanBargeAndWhisper(communication)">
     <volume-high-icon data-testid="comm-barge-comm-button-volume-high-icon-2"
                       :height="iconHeight"
                       :width="iconWidth"/>
-    <q-tooltip>
+
+    <b-tooltip custom-class="communication-logs-table__tooltip"
+               :target="`action-barge-${_uid}`"
+               v-if="blackTooltip">
+      Barge
+    </b-tooltip>
+    <q-tooltip v-else>
       Barge
     </q-tooltip>
   </span>
@@ -50,6 +57,11 @@ export default {
     iconWidth: {
       type: [Number, String],
       default: 22
+    },
+
+    blackTooltip: {
+      type: Boolean,
+      default: false
     }
   },
 

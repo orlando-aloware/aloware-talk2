@@ -103,6 +103,12 @@ export default {
       this.$emit('show-error', false)
       this.$emit('search', this.searchValue)
     }
+  },
+
+  watch: {
+    '$route.query': function () {
+      this.searchValue = ''
+    }
   }
 }
 </script>

@@ -112,9 +112,17 @@
                                        @change="eventPayload => onFilterChange(eventPayload, 'contact_lists')" />
               </b-form-group>
             </b-col>
+          </b-form-row>
+        </div>
 
+        <div v-if="!isFilterDialogForView">
+          <h5 class="mt-4 section-header">
+            Handling
+          </h5>
+          <b-form-row class="mt-2"
+                      data-testid="filter-form-handling-form-row">
             <b-col sm="12"
-                   md="6"
+                   md="4"
                    v-if="isAllComms">
               <b-form-group class="form-label"
                             label="Type">
@@ -126,17 +134,8 @@
                                                     @select="eventPayload => onFilterChange(eventPayload, 'type')" />
               </b-form-group>
             </b-col>
-          </b-form-row>
-        </div>
-
-        <div v-if="!isFilterDialogForView">
-          <h5 class="mt-4 section-header">
-            Handling
-          </h5>
-          <b-form-row class="mt-2"
-                      data-testid="filter-form-handling-form-row">
             <b-col sm="12"
-                   md="6">
+                   md="4">
               <b-form-group class="form-label"
                             label="Direction">
                 <communication-direction-selector custom-class="bottom-border__none highlighted-primary padding-left__none q-select-auto-width"
@@ -148,7 +147,7 @@
               </b-form-group>
             </b-col>
             <b-col sm="12"
-                   md="6"
+                   md="4"
                    v-if="isCallsOnlyChannel">
               <b-form-group class="form-label"
                             label="Answer Status">
@@ -422,13 +421,13 @@
                    v-if="isACallTypeChannel || isMessagesOnlyChannel">
               <b-form-group class="form-label">
                 <template v-slot:label>
-                  <span data-testid="filter-form-communication-owners-row">Communication Owners</span>
+                  <span data-testid="filter-form-communication-owners-row">Users</span>
                   <span class="pl-1">
                     <information-circle-icon color="#2F80ED" />
                     <q-tooltip anchor="top middle"
                                self="center middle">
                       <div class="text-13">
-                        <p class="font-weight-bold">Who is the communication owner?</p>
+                        <p class="font-weight-bold">Who is the user?</p>
                         <p class="font-weight-bold mb-0">For outbound communication:</p>
                         <p class="mb-0">Calls, SMS, fax & emails:</p>
                         <p><ul><li>The agent that sent the communication</li></ul></p>
@@ -443,7 +442,7 @@
                     </q-tooltip>
                   </span>
                 </template>
-                <user-selector custom-placeholder="Select Communication Owners"
+                <user-selector custom-placeholder="Select Users"
                                :force-remove-missing-values="true"
                                :generic-styling="false"
                                :multiple="true"
@@ -857,7 +856,10 @@ export default {
 
     if (this.isFirstLoad && !viewId) {
       this.setIsFirstLoad(false)
-      sessionStorage.setItem('date-selected-comms', this.defaultDateRangeBasedOnCompanyPreferences)
+
+      if (!this.selectedFilter) {
+        sessionStorage.setItem('date-selected-comms', this.defaultDateRangeBasedOnCompanyPreferences)
+      }
 
       this.dateRange.startDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0]
       this.dateRange.endDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1]

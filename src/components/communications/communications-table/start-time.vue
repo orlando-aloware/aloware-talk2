@@ -1,7 +1,7 @@
 
 <template>
   <div class="d-flex flex-column">
-    <span>{{ value | fixFullDateTime }}</span>
+    <span>{{ row.created_at | fixFullDateTime }}</span>
     <div class="d-flex align-items-center text-xs"
          data-testid="start-time-row"
          v-if="row.call_disposition_id">
@@ -47,6 +47,7 @@
                              data-testid="communication-audio-transcription-modal"
                              ref="transcriptionModal"
                              :communication="row"
+                             :type="row.has_voicemail ? UploadedFileTypes.TYPE_CALL_VOICEMAIL : UploadedFileTypes.TYPE_CALL_RECORDING"
                              :contact="row.contact" />
     </span>
   </div>
@@ -69,10 +70,6 @@ export default {
   },
 
   props: {
-    value: {
-      type: String,
-      required: false
-    },
     row: {
       type: Object,
       required: false

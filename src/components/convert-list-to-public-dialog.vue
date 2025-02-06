@@ -1,12 +1,12 @@
 <template>
-  <confirm-dialog title="Convert list to public"
+  <confirm-dialog :title="`Convert list to ${listShowInPublicFolder ? 'private' : 'public'}`"
                   :is-open="value"
                   id="convert-list-to-public-dialog"
                   @close="onCancel">
     <div slot="content">
       <div class="text-left">
         <div class="text-dark">
-          Are you sure you want to convert the list <strong>{{ listName }}</strong> to public?
+          Are you sure you want to convert the list <strong>{{ listName }}</strong> to {{ listShowInPublicFolder ? 'private' : 'public' }}?
         </div>
       </div>
     </div>
@@ -54,6 +54,17 @@ export default {
     listName: {
       type: String,
       required: true
+    },
+
+    listShowInPublicFolder: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    fromAdminList: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -63,11 +74,14 @@ export default {
     },
 
     onConvertToPublic () {
-      const params = { show_in_public_folder: true }
+      const params = {
+        show_in_public_folder: !this.listShowInPublicFolder,
+        ...(this.fromAdminList ? { from_admin_list: true } : {})
+      }
 
       API.V2.contactList.update(this.listId, params)
         .then((response) => {
-          this.$generalNotification('Contact list has been successfully converted to public')
+          this.$generalNotification(`Contact list has been successfully converted to ${this.listShowInPublicFolder ? 'private' : 'public'}`)
           this.$emit('converted')
         })
         .catch((error) => {

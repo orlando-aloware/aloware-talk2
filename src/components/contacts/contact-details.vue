@@ -25,7 +25,7 @@
                                v-if="isSimpSocial"/>
           <contact-conversation-insights :contact="contact"
                                          data-testid="contact-conversation-insights"
-                                         v-if="!isSimpSocial && contact && isDemoCompany"/>
+                                         v-if="!isSimpSocial && contact && shouldSeeExperimentalXproAiFeatures"/>
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
@@ -190,10 +190,6 @@ export default {
         this.currentCompany.aloai_enabled &&
         this.contact && !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
-    },
-
-    isDemoCompany () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
   },
 

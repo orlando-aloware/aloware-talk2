@@ -19,6 +19,17 @@ import { userMixin } from 'src/plugins/mixins'
 import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, RECORDINGS_CHANNEL, VOICEMAILS_CHANNEL } from 'src/router/routes'
 import { CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
 
+export function handleElectronNavigation (e, url) {
+  if (window && window.process && window.process.type === 'renderer') {
+    if (e) e.preventDefault()
+    // In Electron, navigate in the same window
+    this.$router.push(url)
+    return true
+  }
+  // In web browser, return false to let default behavior happen
+  return false
+}
+
 export default {
   mixins: [userMixin],
 
@@ -40,7 +51,10 @@ export default {
       'communications',
       'channelChangedFilterFields',
       'selectedFilter',
-      'isFilterDialogForView'
+      'isFilterDialogForView',
+      'paginationPage',
+      'isLoadingMore',
+      'searchQuery'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -121,7 +135,6 @@ export default {
         sort: 'last_engagement_at',
         order: 'desc'
       },
-      isLoadingMore: false,
       isLoaded: false,
       taskListHasError: false,
       page: 1,
@@ -132,7 +145,6 @@ export default {
       source: null,
       cancelTokenPinnedViews: null,
       sourcePinnedViews: null,
-      paginationPage: 1,
 
       perPageOptions: [
         { value: 25, label: '25 Per Page' },
@@ -149,7 +161,6 @@ export default {
       fixedColumns: [
         'operations'
       ],
-      searchQuery: '',
       mentionType: MentionType.TYPE_RECEIVED,
 
       communicationInProgressStatuses: [
@@ -207,7 +218,9 @@ export default {
       'setCommunications',
       'appendCommunications',
       'setCommunicationsCount',
-      'setHasMoreCommunications'
+      'setHasMoreCommunications',
+      'setPaginationPage',
+      'setIsLoadingMore'
     ]),
 
     getNoneLiveCallContactTasks (contacts) {
@@ -284,7 +297,7 @@ export default {
             this.setPendingTaskCount(response.data.data.length)
             this.setInboxPendingTaskCount(response.data.data.length)
           }
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
           this.isLoaded = true
           this.setIsInboxFiltersLoaded(this.isLoaded)
         })
@@ -308,7 +321,7 @@ export default {
 
     loadMoreContactTasks () {
       this.isLoaded = false
-      this.isLoadingMore = true
+      this.setIsLoadingMore(true)
 
       return this.getContactsByTaskStatus(this.currentTask)
         .then(response => {
@@ -316,7 +329,7 @@ export default {
           this.setContactsCurrentPage(response.data.current_page)
           this.setHasMoreContacts(response.data.next_page_url)
 
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
           this.isLoaded = true
         })
         .catch(() => {
@@ -786,7 +799,7 @@ export default {
     resetCommunications () {
       this.setCommunications([])
       this.setCommunicationsCount(0)
-      this.paginationPage = 1
+      this.setPaginationPage(1)
       this.setHasMoreCommunications(null)
     },
 
@@ -809,11 +822,14 @@ export default {
     getCommunications (filters, callback, isLoadMore = false) {
       this.setIsLoadingCommunications(true)
 
+      let pageToGet
+
       if (!isLoadMore) {
-        this.paginationPage = 1
+        pageToGet = 1
         this.setCommunications([])
       } else {
-        this.isLoadingMore = true
+        pageToGet = this.paginationPage + 1
+        this.setIsLoadingMore(true)
       }
 
       let params = {
@@ -853,7 +869,6 @@ export default {
         has_reminders: 0,
         contact_country: '',
         changed: true,
-        /* TODO: this is not being added in the filter, verify also affect to https://aloware.atlassian.net/browse/WAT-1166 */
         states_limit: { us: [], ca: [] },
         initial_line_only: 0,
         search_text: '',
@@ -888,13 +903,13 @@ export default {
         params = { ...params, order_by: this.sorting.order }
       }
 
-      params.page = this.paginationPage
+      params.page = pageToGet
       params.per_page = this.perPage
       params = this.removeUnnecessaryParameters(params)
 
       this.source = this.cancelToken.source()
 
-      if (this.paginationPage === 1) {
+      if (pageToGet === 1) {
         this.getCommunicationsCount(params)
       }
 
@@ -923,7 +938,7 @@ export default {
             this.pagination = _.clone(response.data)
             this.pagination.rowsNumber = this.communicationsCount
             delete this.pagination.data
-            this.paginationPage = this.pagination.current_page
+            this.setPaginationPage(this.pagination.current_page)
 
             if (typeof callback !== 'undefined') {
               callback()
@@ -944,11 +959,13 @@ export default {
         })
         .finally(() => {
           this.setIsLoadingCommunications(false)
-          this.isLoadingMore = false
+          this.setIsLoadingMore(false)
         })
     },
 
     getCommunicationsCount (params) {
+      // TODO: remove this after the new inbox is implemented and all the communication-related calls from talk2 are not "special" requests
+      params.source = 'communication-logs'
       if (this.countSource) {
         this.countSource.cancel('Fetching communications count operation is canceled by the user.')
       }
@@ -998,6 +1015,10 @@ export default {
 
     getCampaignName (campaignId) {
       return this.campaigns.find(campaign => campaign.id === campaignId)?.name
+    },
+
+    handleElectronNavigation (e, url) {
+      return handleElectronNavigation.call(this, e, url)
     }
   },
 

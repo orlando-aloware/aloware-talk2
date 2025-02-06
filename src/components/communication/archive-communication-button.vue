@@ -1,20 +1,26 @@
 <template>
   <span :class="[{ 'opacity-05 cursor-blocked': loading }, {'cursor-pointer': !loading }]"
         data-testid="comm-archive-button"
+        :id="`action-delete-${_uid}`"
         v-if="hasPermissionTo('archive communication')"
         @click="dialog">
-    <archive-icon height="16"
-                  width="16"
-                  color="#62666E"/>
+    <trash-icon height="16"
+                width="16"
+                color="#62666E"/>
 
-    <q-tooltip>
-      Archive
+    <b-tooltip custom-class="communication-logs-table__tooltip"
+               :target="`action-delete-${_uid}`"
+               v-if="blackTooltip">
+      Delete
+    </b-tooltip>
+    <q-tooltip v-else>
+      Delete
     </q-tooltip>
   </span>
 </template>
 
 <script>
-import ArchiveIcon from 'components/icons/archive-icon.vue'
+import TrashIcon from 'components/icons/trash-icon.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import API from 'src/plugins/api/api'
 
@@ -26,13 +32,18 @@ export default {
   ],
 
   components: {
-    ArchiveIcon
+    TrashIcon
   },
 
   props: {
     communication: {
       type: Object,
       required: true
+    },
+
+    blackTooltip: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -46,7 +57,7 @@ export default {
         return
       }
 
-      this.$bvModal.msgBoxConfirm('Archiving the communication will remove it from all reports and plots. Continue?', {
+      this.$bvModal.msgBoxConfirm('Deleting this communication will remove it from all reports and graphs. Do you want to proceed?', {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',
@@ -63,7 +74,7 @@ export default {
 
       API.V1.communication.delete(this.communication.id)
         .then(() => {
-          this.$generalNotification('Communication archived successfully.', 'success')
+          this.$generalNotification('Communication deleted successfully.', 'success')
           this.loading = false
           this.$emit('archived', this.communication.id)
         })

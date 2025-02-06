@@ -6,17 +6,39 @@
     <template slot="title"
               v-if="!simpleTable">
       <div class="d-flex flex-column">
-        <div class="pr-2 contacts__title d-flex align-items-center">
+
+        <div class="ml-2 pr-2 contacts__title d-flex align-items-center">
           <back-button class="p-0"
                        v-if="$q.screen.lt.md"
                        data-testid="contacts-view-back-button"
                        @click="toggleSidebar"/>
+
+          <div class="d-flex align-items-center"
+               v-if="showUserBreadcrumbNav">
+            <person-icon color="#62666E" class="mr-1" width="18" height="18"/>
+            <router-link class="title-breadcrumb h-auto"
+                         :to="buildListManagementLink()">
+              {{ listUsername }}
+            </router-link>
+            <slash-icon class="title-slash d-flex align-items-center ml-1 mr-2" />
+          </div>
+
           <div class="d-flex align-items-center">
-            <div v-for="(folderName, index) in folderPath"
+            <div v-for="(folder, index) in folderPath"
                  :key="`f-${index}`"
                  class="d-flex align-items-center title-path"
                  data-testid="contacts-view-folder-path">
-              <div class="title-breadcrumb d-flex align-items-center">{{ folderName }}</div>
+              <template v-if="isDemoCompany">
+                <router-link class="d-flex align-items-center title-path"
+                             :to="buildListManagementLink(folder.id)">
+                  <folder-icon color="#62666E" class="mr-1"></folder-icon>
+                  <div class="title-breadcrumb d-flex align-items-center">{{ folder.name }}</div>
+                </router-link>
+              </template>
+              <template v-else>
+                <folder-icon color="#62666E" class="mr-1"></folder-icon>
+                <div class="title-breadcrumb d-flex align-items-center">{{ folder.name }}</div>
+              </template>
               <slash-icon class="title-slash d-flex align-items-center" />
             </div>
           </div>
@@ -52,6 +74,19 @@
                    data-testid="contacts-view-add-filters-button"
                    @clicked="onFiltersClicked">
         <i class="fa fa-plus mr-2" /> Add Filters
+      </compact-btn>
+    </template>
+
+    <template slot="options"
+              v-if="isDemoCompany && !isNaN(list.id) && typeof list.id === 'string'">
+      <compact-btn variant="primary"
+                   class="ml-1"
+                   data-testid="contacts-view-back-to-lists-button"
+                   @clicked="onBackToListsRedirect">
+        <chevron-left width="18px"
+                      height="18px"
+                      icon-color="white"/>
+        Back to Lists
       </compact-btn>
     </template>
 
@@ -462,7 +497,7 @@
                   <div class="flex-grow-1">
                     <div v-if="contact.user_id">
                       <div :class="`ellipse ${column.draggable ? 'col-indented' : ''}`">
-                        {{ (getUserName(contact.user_id)) | ucwords }}
+                        {{ getUser(contact.user_id).name | ucwords }}
                       </div>
                     </div>
                     <div v-else>
@@ -785,6 +820,7 @@ import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mob
 import AddUserIcon from 'components/icons/add-user-icon'
 import ExportIcon from 'components/icons/export-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
+import ChevronLeft from 'components/icons/contacts/chevron-left'
 import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
@@ -795,7 +831,8 @@ import {
   viewMixin,
   contactsListFiltersMixin,
   simpsocialMixin,
-  kycMixin
+  kycMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
@@ -809,6 +846,8 @@ import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 import AlAlert from 'components/alert/index.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 import TagsCellList from 'components/tags/tags-cell-list.vue'
+import FolderIcon from 'components/icons/folder-icon.vue'
+import PersonIcon from 'components/icons/person-icon'
 
 export default {
   name: 'contacts-view',
@@ -820,7 +859,8 @@ export default {
     viewMixin,
     contactsListFiltersMixin,
     simpsocialMixin,
-    kycMixin
+    kycMixin,
+    userMixin
   ],
 
   components: {
@@ -841,6 +881,7 @@ export default {
     EllipseIcon,
     SlashIcon,
     CloseIcon,
+    ChevronLeft,
     ContactCreateModal,
     ContactsFilters,
     BulkActionMenu,
@@ -852,7 +893,9 @@ export default {
     TagContactsWorkflowEnroller,
     EnrollContactsToAloaiModal,
     AssignContactsModal,
-    TagsCellList
+    TagsCellList,
+    FolderIcon,
+    PersonIcon
   },
 
   props: {
@@ -1185,10 +1228,35 @@ export default {
     // Disable List actions if no list is selected or if there no records
     isListActionDisabled () {
       return !this.isContactListSelected || !this.totalRows
+    },
+
+    isDemoCompany () {
+      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    },
+
+    showUserBreadcrumbNav () {
+      return this.isDemoCompany && this.$route.params.userId
+    },
+
+    isFromListsManagement () {
+      return this.$route.meta.isFromListsManagement
+    },
+
+    listUsername () {
+      const user = this.users.find((u) => u.id === +this.$route.params.userId)
+      if (!user) {
+        return ''
+      }
+      return `${user.first_name} ${user.last_name}`.trim()
     }
   },
 
   mounted () {
+    if (localStorage.getItem('unsavedList') !== null) {
+      this.setUnsavedList(JSON.parse(localStorage.getItem('unsavedList')))
+      localStorage.removeItem('unsavedList')
+    }
+
     // clear the selected contacts
     this.$VueEvent.fire('setListSelectedContacts', { id: this.id, contacts: [] })
 
@@ -1800,7 +1868,7 @@ export default {
       const list = { data: null }
       for (item.data of folders) {
         if (level > 0) {
-          tempFolderNames.data.push(item.data.name)
+          tempFolderNames.data.push(item.data)
         } else {
           tempFolderNames.data = []
         }
@@ -1961,6 +2029,24 @@ export default {
       this.$router.push({
         name: 'Messenger'
       })
+    },
+
+    onBackToListsRedirect () {
+      this.$router.push(this.buildListManagementLink(this.$route.params.folderId))
+    },
+
+    buildListManagementLink (folderId = null) {
+      let path = '/lists-management/user'
+
+      if (this.$route.params.userId) {
+        path += `/${this.$route.params.userId}`
+      }
+
+      if (folderId) {
+        path += `/folder/${folderId}`
+      }
+
+      return path
     }
   },
 

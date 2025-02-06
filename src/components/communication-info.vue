@@ -658,11 +658,11 @@
                        v-if="showAudio(communication)">
                     <communication-audio class="mb-2"
                                          data-testid="communication-info-call-recording-audio"
-                                         v-if="activeName"
                                          :communication="communication"
                                          :contact="contact"
                                          :type="UploadedFileTypes.TYPE_CALL_RECORDING"
                                          :uniqueId="communication.id + '1'"
+                                         v-if="activeName"
                                          @audio-file-updated="handleAudioFileUpdated">
                     </communication-audio>
                   </div>
@@ -681,6 +681,7 @@
                   <div class="d-flex flex-row align-items-center w-100 mb-2 border-bottom"
                        v-if="communication.has_voicemail">
                     <communication-audio class="mb-2"
+                                         ref="voicemailRecording"
                                          data-testid="communication-info-voicemail-audio"
                                          :communication="communication"
                                          :contact="contact"
@@ -818,7 +819,7 @@
     <div v-show="!activeName">
       <div class="px-3 pt-2 border border-top-0 text-left"
            :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
-           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
+           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication)">
         <div class="d-flex align-items-center w-100">
           <communication-audio class="mb-2"
                                data-testid="communication-info-call-recording-audio"
@@ -836,12 +837,13 @@
            :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
            v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type) && communication.has_voicemail">
         <div class="d-flex flex-row align-items-center w-100">
-          <communication-audio :communication="communication"
+          <communication-audio class="mb-2"
+                               ref="voicemailRecording"
+                               data-testid="communication-info-voicemail-audio"
+                               :communication="communication"
                                :contact="contact"
                                :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                                :uniqueId="communication.id + '2'"
-                               class="mb-2"
-                               data-testid="communication-info-voicemail-audio"
                                @audio-file-updated="handleAudioFileUpdated">
           </communication-audio>
         </div>
@@ -874,7 +876,7 @@
           </div>
           <div class="transcription-summary-container">
             <a class="transcription-link text-decoration-none"
-              @click.prevent="fetchSmartTranscriptionData()"
+              @click="fetchSmartTranscriptionData"
               v-if="communication.has_transcription">
               Show transcription
             </a>
@@ -900,9 +902,35 @@
                                          v-if="fileUuid && isMigrated">
           </generate-transcription-button>
         </div>
-        <div class="text-left-align text-13"
+        <div class="text-left-align text-15"
+             v-else-if="currentCompany?.transcription_settings?.call_transcription_enabled && !communication?.call_transcription_status">
+          <div class="mr-2">Click on the button to generate a transcription of this call.</div>
+          <generate-transcription-button class="mr-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated"/>
+        </div>
+        <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
-          <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+          <div class="summary-container">
+            <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+            <q-btn flat
+                   dense
+                   class="regenerate-btn"
+                   @click="onRegenerateSummary"
+                   :loading="isRegenerating"
+                   :disable="isRegenerating">
+              <sparkle-icon width="14"
+                           height="14"
+                           color="#9333EA"
+                           class="cursor-pointer"
+                           data-testid="regenerate-summary-sparkle"/>
+              <q-tooltip>
+                Regenerate summary
+              </q-tooltip>
+            </q-btn>
+          </div>
         </div>
       </div>
     </div>
@@ -1069,6 +1097,7 @@ export default {
       showInfoBox: false,
       fileUuid: null,
       isMigrated: false,
+      isRegenerating: false,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -1163,10 +1192,15 @@ export default {
       ]
 
       return (
+        !this.isSimpSocial &&
+        this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.showAudio(this.communication) &&
-        (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status)) &&
-        !this.isSimpSocial
+        (this.communication.has_voicemail || this.showAudio(this.communication)) &&
+        (
+          // If transcription does not exist, or transcription exists and is in allowed status
+          (!this.communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
+          (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+        )
       )
     },
 
@@ -1175,7 +1209,7 @@ export default {
         !this.isSimpSocial && // Exclude SimpSocial
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.showAudio(this.communication) &&
+        (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions
           !this.currentCompany?.transcription_settings?.call_transcription_enabled ||
@@ -1358,8 +1392,9 @@ export default {
     },
 
     fetchSmartTranscriptionData () {
-      if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
-        this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
+      const audioRef = this.communication.has_voicemail ? this.$refs.voicemailRecording : this.$refs.callRecording
+      if (audioRef?.$refs?.transcriptionModal) {
+        audioRef.$refs.transcriptionModal.fetchSmartTranscriptionData()
       }
     },
 
@@ -1379,6 +1414,22 @@ export default {
 
       // If no markdown, just use nl2br filter
       return this.$options.filters.nl2br(this.parseMentionToView(body))
+    },
+
+    onRegenerateSummary () {
+      if (this.isRegenerating) return
+
+      this.isRegenerating = true
+      this.$generalNotification('Regenerating summary...')
+
+      API.V1.transcription.generateSummary(this.communication.id)
+        .catch(err => {
+          console.error('Failed to regenerate summary:', err)
+          this.$generalNotification('Failed to regenerate summary', 'error')
+        })
+        .finally(() => {
+          this.isRegenerating = false
+        })
     }
   },
 
@@ -1405,5 +1456,36 @@ export default {
 
 .communication-body :deep(p:last-child) {
   margin-bottom: 0;
+}
+
+.summary-container {
+  position: relative;
+}
+
+.regenerate-btn {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  min-height: 24px;
+  width: 24px;
+  padding: 0;
+  margin: 0;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.regenerate-btn:hover {
+  border-radius: 50%;
+  background: #f5f5f5;
+  transform: scale(1.1);
+}
+
+.regenerate-btn :deep(.q-btn__wrapper) {
+  padding: 2px;
+  min-height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

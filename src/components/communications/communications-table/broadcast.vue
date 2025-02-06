@@ -3,12 +3,16 @@
        data-testid="user-row">
     <router-link class="ellipse"
                  target='_blank'
+                 :id="`comm-broadcast-${_uid}`"
                  :to="broadcastActivityParams"
                  v-if="canUseBroadcast && broadcast.id">
+      <external-link-icon color="#1976D2"/>
       {{ broadcast.name || '-' }}
-      <q-tooltip>
+
+      <b-tooltip custom-class="communication-logs-table__tooltip"
+                 :target="`comm-broadcast-${_uid}`">
         Click to see Broadcast activity's page
-      </q-tooltip>
+      </b-tooltip>
     </router-link>
     <span class="ellipse"
           v-else-if="broadcast.id">
@@ -23,9 +27,14 @@
 <script>
 import { mapState } from 'vuex'
 import { broadcastsMixin } from 'src/plugins/mixins'
+import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 
 export default {
   name: 'Broadcast',
+
+  components: {
+    ExternalLinkIcon
+  },
 
   mixins: [
     broadcastsMixin
