@@ -1,6 +1,6 @@
 <template>
   <div class="w-100" data-testid="comm-audio-wrapper">
-    <div v-if="!isDeleted && hasAudio">
+    <div v-if="showAudioPlayer">
       <div class="audio-player p-2">
         <div class="d-flex flex-row align-items-center w-100"
              v-if="remoteUrl">
@@ -24,6 +24,7 @@
             ref="transcriptionModal"
             :communication="communication"
             :contact="contact"
+            :type="type"
             :single-button="true"/>
           <generate-transcription-button class="mr-2"
                                          variant="icon"
@@ -117,6 +118,14 @@ export default {
 
     title () {
       return 'Play ' + this.typeString
+    },
+
+    shouldShowVoicemail () {
+      return this.type !== this.UploadedFileTypes.TYPE_CALL_RECORDING || !this.communication?.has_voicemail
+    },
+
+    showAudioPlayer () {
+      return !this.isDeleted && this.hasAudio && this.shouldShowVoicemail
     }
   },
 

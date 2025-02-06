@@ -47,6 +47,7 @@
                              data-testid="communication-audio-transcription-modal"
                              ref="transcriptionModal"
                              :communication="row"
+                             :type="row.has_voicemail ? UploadedFileTypes.TYPE_CALL_VOICEMAIL : UploadedFileTypes.TYPE_CALL_RECORDING"
                              :contact="row.contact" />
     </span>
   </div>

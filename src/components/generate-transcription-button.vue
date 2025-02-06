@@ -39,8 +39,9 @@
 import { mapActions, mapGetters } from 'vuex'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import talk2Api from 'src/plugins/api/api'
-import { communicationInfoMixin } from 'src/plugins/mixins'
+import { communicationInfoMixin, simpsocialMixin } from 'src/plugins/mixins'
 import * as TranscriptionStatus from 'src/constants/transcription-status'
+import * as CommunicationTypes from '../constants/communication-types'
 
 export default {
   name: 'generate-transcription-button',
@@ -57,7 +58,7 @@ export default {
     }
   },
 
-  mixins: [communicationInfoMixin],
+  mixins: [communicationInfoMixin, simpsocialMixin],
 
   data () {
     return {
@@ -75,13 +76,21 @@ export default {
     }),
 
     isTranscriptionAllowed () {
-      return this.communication.is_eligible_for_transcribe &&
-        this.showAudio(this.communication) &&
-        ![TranscriptionStatus.STATUS_CREATED,
-          TranscriptionStatus.STATUS_PROCESSING,
-          TranscriptionStatus.STATUS_COMPLETED,
-          TranscriptionStatus.STATUS_PARSED
-        ].includes(this.communication.call_transcription_status)
+      return (
+        !this.isSimpSocial &&
+        this.currentCompany?.transcription_enabled &&
+        this.communication.type === CommunicationTypes.CALL &&
+        this.communication.is_eligible_for_transcribe &&
+        (this.communication.has_voicemail || this.showAudio(this.communication)) &&
+        (
+          (!this.communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
+          ![TranscriptionStatus.STATUS_CREATED,
+            TranscriptionStatus.STATUS_PROCESSING,
+            TranscriptionStatus.STATUS_COMPLETED,
+            TranscriptionStatus.STATUS_PARSED
+          ].includes(this.communication.call_transcription_status)
+        )
+      )
     }
   },
 
