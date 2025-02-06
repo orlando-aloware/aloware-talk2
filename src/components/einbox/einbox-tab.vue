@@ -27,10 +27,8 @@
         <div :key="comm.id"
              v-for="comm in communications"
              @click="onCommunicationClick(comm)">
-             <message-item :comm="comm"
-                        :direction="comm.last_communication_direction"
-                        :isActive="activeContactId === comm.id"
-              />
+             <inbox-task-item :contact="comm"
+                           :force-active="comm.id === activeContactId" />
         </div>
 
         <!-- Load more indicator -->
@@ -50,7 +48,7 @@
 </template>
 
 <script>
-import MessageItem from './communication-items/message-item.vue'
+import InboxTaskItem from 'src/components/inbox/inbox-tasks/item.vue'
 import { mapState } from 'vuex'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import { debounce } from 'lodash'
@@ -59,7 +57,7 @@ export default {
   name: 'EInboxTab',
 
   components: {
-    MessageItem
+    InboxTaskItem
   },
 
   mixins: [
