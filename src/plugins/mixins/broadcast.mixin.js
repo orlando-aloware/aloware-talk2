@@ -57,7 +57,7 @@ export default {
       this.broadcastListen()
 
       // This is a stress test for soketi server, should be removed in the future
-      if (broadcastDriver === 'pusher') {
+      if (broadcastDriver === 'pusher' && process.env.SOKETI_APP_KEY) {
         window.secondEchoDriver = this.initEcho('soketi')
         this.broadcastListenSecondDriver()
       }
