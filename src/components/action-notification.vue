@@ -96,7 +96,7 @@
         </div>
 
         <div class="d-flex justify-content-center align-items-center call-actions"
-             v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
+             v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !(dialer.call || agentStatus === AgentStatus.AGENT_STATUS_ON_CALL))">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -125,7 +125,7 @@
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
              :class="id === 'callFishing' && getSource ? 'mt-2' : ''"
-             v-if="id === 'callFishing' && dialer && dialer.call">
+             v-if="id === 'callFishing' && dialer && (dialer.call || agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -188,8 +188,10 @@ import {
   notificationQueueMixin,
   notificationMixin,
   visibilityMixin,
-  aclMixin
+  aclMixin,
+  agentMixin
 } from 'src/plugins/mixins'
+import * as AgentStatus from '../../constants/agent-status'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
@@ -205,7 +207,8 @@ export default {
     notificationQueueMixin,
     mentionsMixin,
     visibilityMixin,
-    aclMixin
+    aclMixin,
+    agentMixin
   ],
 
   components: {
@@ -235,7 +238,8 @@ export default {
       runningDateTime: null,
       runningDateTimeInterval: null,
       isValidNotification: false,
-      notificationListeners: {}
+      notificationListeners: {},
+      AgentStatus
     }
   },
 
