@@ -172,6 +172,23 @@
                       v-model="resources.force_sms" />
           </div>
         </div>
+
+        <div class="col-12 mb-4">
+          <div class="d-flex items-center justify-between">
+            <div :class="disableField('skip_redial_warmup_period') ? 'opacity-05' : ''">
+              <label class="label mb-1 text-weight-bold">
+                Skip Warm-Up for Redials
+              </label>
+              <div>Skip Warm-Up period when contact is being Redialed</div>
+            </div>
+            <q-toggle size="md"
+                      val="md"
+                      :true-value="1"
+                      :false-value="0"
+                      :disable="disableField('skip_redial_warmup_period')"
+                      v-model="resources.skip_redial_warmup_period" />
+          </div>
+        </div>
       </div>
 
       <div class="label mt-4 mb-1 text-weight-bold text-subtitle1 pl-3 py-2">
@@ -440,6 +457,10 @@ export default {
 
       if (powerDialerSettings.force_sms) {
         value.force_sms = 1
+      }
+
+      if (powerDialerSettings.skip_redial_warmup_period) {
+        value.skip_redial_warmup_period = 1
       }
 
       const settingsSuccessfulCallDispositionIds = powerDialerSettings.successful_call_disposition_ids
