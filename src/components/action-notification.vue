@@ -191,7 +191,7 @@ import {
   aclMixin,
   agentMixin
 } from 'src/plugins/mixins'
-import * as AgentStatus from '../../constants/agent-status'
+import * as AgentStatus from '../constants/agent-status'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
