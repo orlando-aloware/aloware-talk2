@@ -23,7 +23,7 @@
       <ul class="list-group list-group-flush scrollable-list mb-4">
         <li class="list-group-item list-group-item-action p-0"
             :key="`enroll-bot-${key}`"
-            v-for="(bot, key) in this.filteredSalesBots">
+            v-for="(bot, key) in this.filteredOutboundBots">
           <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
             <b-form-radio name="selected-bot"
                           :value="bot.id"
@@ -93,7 +93,7 @@ export default {
       )
     },
     // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
-    filteredSalesBots () {
+    filteredOutboundBots () {
       let bots = this.bots.filter((bot) => bot.direction === AloAi.DIRECTION_OUTBOUND)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
