@@ -48,7 +48,7 @@
         <template v-else>
           <div
             class="text-center py-2"
-            v-if="!this.filteredBots.length"
+            v-if="!this.filteredSalesBots.length"
           >
             No records to show.
           </div>
@@ -61,7 +61,7 @@
               <li
                 class="list-group-item list-group-item-action p-0"
                 :key="`enroll-bot-${key}`"
-                v-for="(bot, key) in this.filteredBots"
+                v-for="(bot, key) in this.filteredSalesBots"
               >
                 <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
                   <b-form-radio
@@ -151,8 +151,8 @@ export default {
       'search'
     ]),
     ...mapState(['isDatatableSelectedAll']),
-    filteredBots () {
-      let bots = this.bots
+    filteredSalesBots () {
+      let bots = this.bots.filter((bot) => bot.direction === AloAi.DIRECTION_OUTBOUND)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
