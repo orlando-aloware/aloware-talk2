@@ -17,6 +17,9 @@
         </b-tooltip>
       </router-link>
     </div>
+    <div v-else class="deleted">
+      Deleted Contact
+    </div>
 
     <div>
       {{ row.lead_number | fixPhone('NATIONAL', true) }}

@@ -4,9 +4,10 @@
     <a target='_blank'
        href="#"
        v-if="campaignId"
+       :class="{ 'deleted': !campaign.name }"
        :id="`comm-number-${_uid}`"
        @click.prevent="filter">
-      {{ campaign.name || '-' }}
+      {{ campaign.name || 'Deleted Line' }}
 
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-number-${_uid}`">
