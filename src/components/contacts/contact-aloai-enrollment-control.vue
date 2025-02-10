@@ -16,7 +16,7 @@
       v-if="profile?.company?.aloai_enabled"
       class="border-0 position-relative contact-about-wrapper"
     >
-      <h4>AloAi Text Bot Enrollment</h4>
+      <h4>AloAi Agent Enrollments</h4>
 
       <b-card-text class="fs-14 mt-2">
         <span v-if="hasBotEnrollments">Currently enrolled to:</span>
@@ -272,6 +272,12 @@ export default {
     },
     confirmDeletionMessage () {
       let name = this.contact.first_name || 'No Name'
+
+      // Add safety check for empty enrollments
+      if (!this.hasBotEnrollments || !this.displayedBot) {
+        return `Are you sure you want to remove <b>${name}</b> from this bot?`
+      }
+
       const enrollmentType = this.getEnrollmentTypeText(null, this.botEnrollments[this.activeBotIndex]?.type)
       return `Are you sure you want to remove <b>${name}</b> from <b>${this.displayedBot?.name}</b>'s ${enrollmentType} enrollment?`
     }
@@ -350,6 +356,11 @@ export default {
       this.$bvModal.hide('contact-disenroll-from-bot')
     },
     getEnrollmentTypeText (botId, type = null) {
+      // Add safety check for null/undefined type
+      if (!type) {
+        return ''
+      }
+
       if (type !== null) {
         switch (type) {
           case AloAi.ENROLLMENT_TYPE_TEXT:
@@ -361,18 +372,33 @@ export default {
         }
       }
 
+      // Add safety check for empty enrollments
+      if (!this.bot_enrollments) {
+        return ''
+      }
+
       const enrollment = this.bot_enrollments.find(
         enrollment => enrollment.aloai_bot_id === botId
       )
       return this.getEnrollmentTypeText(botId, enrollment?.type)
     },
     disenrollContact () {
+      // Add safety check for empty enrollments
+      if (!this.hasBotEnrollments || !this.displayedBot) {
+        this.closeDisenrollmentConfirmation()
+        return
+      }
+
       const currentEnrollment = this.botEnrollments[this.activeBotIndex]
+      if (!currentEnrollment) {
+        this.closeDisenrollmentConfirmation()
+        return
+      }
 
       talk2Api.V2.aloAiBot
         .disenrollContact(this.displayedBot.id, {
           contact_id: this.contact.id,
-          type: currentEnrollment.type // Add type to specify which enrollment to remove
+          type: currentEnrollment.type
         })
         .then(() => {
           const type = this.getEnrollmentTypeText(null, currentEnrollment.type)

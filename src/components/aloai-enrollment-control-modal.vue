@@ -208,7 +208,7 @@ export default {
       talk2Api.V2.aloAiBot
         .enrollContacts(bot.id, {
           contact_ids: [this.contact.id],
-          channel: channel
+          channel: channel === 'sms' ? AloAi.ENROLLMENT_TYPE_TEXT : AloAi.ENROLLMENT_TYPE_VOICE
         })
         .then(() => {
           this.bot_enrollments.push({

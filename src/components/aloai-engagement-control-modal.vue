@@ -157,40 +157,6 @@ export default {
           this.isBusy = false
         })
     },
-    onSubmitEnrollment (event) {
-      event.preventDefault()
-
-      if (!this.selectedBotId) {
-        this.$generalNotification(
-          'Please select a bot to enroll the contact.',
-          'error'
-        )
-        return
-      }
-
-      this.isBusy = true
-
-      talk2Api.V2.aloAiBot
-        .enrollContacts(this.selectedBotId, { contact_ids: [this.contact.id] })
-        .then(() => {
-          this.$generalNotification(
-            'Contact successfully enrolled to the selected AloAi Bot.'
-          )
-          this.onHidden()
-        })
-        .catch((error) => {
-          let errorMsg = 'Error while enrolling contact to AloAi Bot.'
-          if (error?.response.data?.message) {
-            errorMsg = error.response.data.message
-          }
-
-          this.$generalNotification(errorMsg, 'error')
-          console.error('[onSubmitEnrollment] error', error)
-        })
-        .finally(() => {
-          this.isBusy = false
-        })
-    },
     onHidden () {
       this.isOpen = false
       setTimeout(() => {
