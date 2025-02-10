@@ -16218,7 +16218,7 @@ hr {
       overflow: hidden;
       transition: width 0.3s ease;
     }
-  
+
     .rotate-180 {
       transform: rotate(180deg);
     }
@@ -16325,8 +16325,28 @@ hr {
   color: #fff;
   font-size: 13px;
 
-  .arrow::before, .arrow::after {
-    border-right-color: #000;
+  &[x-placement="bottom"] {
+    .arrow::before, .arrow::after {
+      border-bottom-color: #000;
+    }
+  }
+
+  &[x-placement="top"] {
+    .arrow::before, .arrow::after {
+      border-top-color: #000;
+    }
+  }
+
+  &[x-placement="left"] {
+    .arrow::before, .arrow::after {
+      border-left-color: #000;
+    }
+  }
+
+  &[x-placement="right"] {
+    .arrow::before, .arrow::after {
+      border-right-color: #000;
+    }
   }
 
   .popover-body {

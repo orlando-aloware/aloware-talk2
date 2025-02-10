@@ -1,57 +1,69 @@
 <template>
-  <div class="message-item" :class="{ active: isActive }">
-    <!-- Status indicator -->
-    <div class="status-dot-wrapper">
-      <div class="status-dot" :class="{ unread: comm.status !== 'read' }" />
+  <div :class="['message-item', { active: isActive }]">
+    <div class="message-item__avatar">
+      <div class="avatar position-relative"
+           role="button">
+        <b-badge class="avatar__unread-badge position-absolute"
+                 variant="danger"
+                 data-testid="inbox-tasks-item-badge"
+                 pill>
+          <span v-if="contact.unread_comms < 99">{{ contact.unread_comms }}</span>
+          <span v-else>99<sup>+</sup></span>
+        </b-badge>
+        <avatar width="34"
+                height="34"
+                :color-module-id="contact.id"
+                :name="contact.name">
+        </avatar>
+      </div>
     </div>
 
-    <!-- Main content -->
-    <div class="message-content">
-      <!-- Header: Sender and Time -->
-      <div class="message-header">
-        <div class="sender-wrapper">
-          <span class="sender text-weight-medium">{{ contactName }}</span>
-          <q-icon
-            :name="direction === 'Inbound' ? 'arrow_downward' : 'arrow_upward'"
-            :class="direction === 'Inbound' ? 'text-green' : 'text-blue'"
-            size="xs"
-            class="q-ml-xs"
-          />
-        </div>
-        <span class="time">
-          <task-item-time :from-time="comm.last_communication_at"
-                        :update-interval="6000">
-          </task-item-time>
-        </span>
-      </div>
+    <div class="message-item__contact-name">
+      <contact-name :name="contact.name" />
+    </div>
 
-      <!-- Message Body -->
-      <div class="message-body">
-        {{ comm.last_communication_body || '' }}
-      </div>
+    <div class="message-item__communication-type">
+      <last-communication :dispositionStatus2="contact.last_communication_disposition_status2"
+                          :type="contact.last_communication_type"
+                          :direction="contact.last_communication_direction"
+                          :callbackStatus="contact.last_communication_callback_status"
+                          :body="contact.last_communication_body"
+                          :totalUnreads="contact.unread_comms" />
+    </div>
+
+    <div class="message-item__time">
     </div>
   </div>
 </template>
 
 <script>
-import TaskItemTime from 'src/components/inbox/channel-tasks/task-item-time.vue'
+// import TaskItemTime from 'src/components/inbox/channel-tasks/task-item-time.vue'
+import Avatar from './avatar.vue'
+import ContactName from './contact-name.vue'
+import LastCommunication from './last-communication.vue'
+import { avatarMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'MessageItem',
 
+  mixins: [
+    avatarMixin
+  ],
+
   components: {
-    TaskItemTime
+    Avatar,
+    ContactName,
+    LastCommunication
   },
 
   props: {
-    comm: {
+    contact: {
       type: Object,
       required: true
     },
     direction: {
-      type: String,
-      required: true,
-      validator: value => ['Inbound', 'Outbound'].includes(value)
+      type: [String, Number],
+      required: true
     },
     isActive: {
       type: Boolean,
@@ -60,15 +72,15 @@ export default {
   },
 
   computed: {
-    contactName () {
-      if (this.comm.first_name && this.comm.last_name) {
-        return this.comm.first_name + ' ' + this.comm.last_name
-      } else if (this.comm.first_name) {
-        return this.comm.first_name
-      } else {
-        return 'No Name'
-      }
-    }
+    // contactName () {
+    //   if (this.comm.first_name && this.comm.last_name) {
+    //     return this.comm.first_name + ' ' + this.comm.last_name
+    //   } else if (this.comm.first_name) {
+    //     return this.comm.first_name
+    //   } else {
+    //     return 'No Name'
+    //   }
+    // }
   },
 
   methods: {
@@ -88,12 +100,44 @@ export default {
 <style lang="scss" scoped>
 .message-item {
   display: grid;
-  grid-template-columns: 20px 1fr;
-  gap: 12px;
+  grid-template-columns: 0.5fr 2.3fr 0.2fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 5px 5px;
+  grid-template-areas:
+    "message-item__avatar message-item__contact-name message-item__time"
+    "message-item__avatar message-item__communication-type message-item__time";
+
   padding: 8px 16px;
   min-height: 64px;
   border-bottom: 1px solid #eeeeee;
   cursor: pointer;
+
+  &__avatar {
+    grid-area: message-item__avatar;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .avatar {
+      &__unread-badge {
+        top: -2px;
+        right: -2px;
+        padding: 2px;
+        font-size: 9px;
+        font-weight: 500;
+      }
+    }
+  }
+  &__contact-name {
+    grid-area: message-item__contact-name;
+  }
+  &__communication-type {
+    grid-area: message-item__communication-type;
+  }
+  &__time {
+    grid-area: message-item__time;
+    background-color: yellow;
+  }
 
   &.active {
     background-color: #00BD50;
