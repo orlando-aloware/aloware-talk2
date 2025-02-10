@@ -12,13 +12,20 @@ export default {
       const params = {
         page: page || 1,
         size: perPage || 10,
-        private_only: !isPublic,
         ...(state.search && { search: state.search }),
         ...filters
       }
 
-      const res = isPublic ? await API.V2.contactList.public(params)
-        : await API.V2.contactList.get(params)
+      let res
+
+      if (typeof isPublic === 'boolean') {
+        params.private_only = !isPublic
+
+        res = isPublic ? await API.V2.contactList.public(params)
+          : await API.V2.contactList.get(params)
+      } else {
+        res = await API.V2.contactList.get(params)
+      }
 
       commit('SET_LISTS', res.data.data)
       commit('SET_LISTS_COUNT', res.data.total)

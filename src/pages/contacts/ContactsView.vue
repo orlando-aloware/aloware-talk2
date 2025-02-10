@@ -1235,7 +1235,7 @@ export default {
     },
 
     showUserBreadcrumbNav () {
-      return this.isDemoCompany && this.$route.params.userId
+      return this.isDemoCompany && (this.$route.params.userId || this.$route.params.type === 'public')
     },
 
     isFromListsManagement () {
@@ -1243,6 +1243,10 @@ export default {
     },
 
     listUsername () {
+      if (this.$route.params.type === 'public') {
+        return 'Public Lists'
+      }
+
       const user = this.users.find((u) => u.id === +this.$route.params.userId)
       if (!user) {
         return ''
@@ -1441,7 +1445,7 @@ export default {
 
     getListData (id) {
       return this.$axios
-        .get('/api/v2/contacts-list/' + id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
+        .get('/api/v2/contacts-list/' + id + (this.$route.params.type && this.$route.params.type === 'public' ? '?is_public_list=true' : ''))
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: id })
@@ -2036,7 +2040,13 @@ export default {
     },
 
     buildListManagementLink (folderId = null) {
-      let path = '/lists-management/user'
+      let path
+
+      if (this.$route.params.type === 'public') {
+        path = '/lists-management/public'
+      } else {
+        path = '/lists-management/user'
+      }
 
       if (this.$route.params.userId) {
         path += `/${this.$route.params.userId}`
