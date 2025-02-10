@@ -20,6 +20,19 @@ export default _.merge({
           [AloAi.DIRECTION_OUTBOUND]: 'green-6'
         }[direction] || 'black'
       )
+    },
+    getEnrollmentTypeLabel (type) {
+      switch (type) {
+        case AloAi.ENROLLMENT_TYPE_TEXT:
+          return 'SMS'
+        case AloAi.ENROLLMENT_TYPE_VOICE:
+          return 'Call'
+        default:
+          return 'Unknown'
+      }
+    },
+    getEnrollmentTypeColor (type) {
+      return 'black'
     }
   }
 })

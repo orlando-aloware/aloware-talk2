@@ -10,57 +10,95 @@
     <div class="p-2">
       <h1 data-testid="aloai-enrollment-control-modal-title"
           class="text-center mb-2">
-        AloAi Text Bot Enrollment
+        AloAi Bot Enrollment
       </h1>
       <div class="text-center">
-        Select the Outbound Text Bot you want to initiate a conversation with this contact.
+        Select the bot and channel you want to use to initiate a conversation with this contact.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search placeholder="Search bot"
                 data-testid="aloai-enrollment-control-modal-search"
                 @search="onSearch"/>
       </div>
+
       <ul class="list-group list-group-flush scrollable-list mb-4">
-        <li class="list-group-item list-group-item-action p-0"
+        <li class="list-group-item p-3"
             :key="`enroll-bot-${key}`"
-            v-for="(bot, key) in this.filteredOutboundBots">
-          <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
-            <b-form-radio name="selected-bot"
-                          :value="bot.id"
-                          v-model="selectedBotId">
-              {{ bot.name }}
-              <!-- Bot Enrolled Label -->
-              <b-popover
-                :target="`enrolled-badge-${bot.id}`"
-                triggers="hover"
-                placement="right"
-                delay="100"
+            v-for="(bot, key) in filteredOutboundBots">
+          <div class="d-flex flex-column">
+            <!-- Bot Header -->
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="mb-0 font-weight-bold">{{ bot.name }}</h5>
+              <div>
+                <!-- Show all enrollments for this bot -->
+                <template v-for="enrollment in getBotEnrollments(bot.id)">
+                  <q-badge
+                    :key="`enrolled-badge-${bot.id}-${enrollment.type}`"
+                    :id="`enrolled-badge-${bot.id}-${enrollment.type}`"
+                    color="green-6"
+                    class="mr-2"
+                  >
+                    <span class="custom-badge-margin-text">
+                      Enrolled ({{ getEnrollmentTypeText(bot.id, enrollment.type) }})
+                    </span>
+                  </q-badge>
+                </template>
+              </div>
+            </div>
+
+            <!-- Bot Description -->
+            <p class="text-muted small mb-2" v-if="bot.description">
+              {{ bot.description }}
+            </p>
+
+            <!-- Channel Selection and Enrollment -->
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <label class="mr-2 mb-0">Channel:</label>
+                <b-form-radio-group
+                  v-model="botChannels[bot.id]"
+                  buttons
+                  button-variant="outline-primary"
+                  size="sm"
+                >
+                  <!-- SMS Channel -->
+                  <b-form-radio
+                    v-if="canUseSMS(bot)"
+                    :value="'sms'"
+                  >
+                    SMS
+                  </b-form-radio>
+
+                  <!-- Call Channel -->
+                  <b-form-radio
+                    v-if="canUseCall(bot)"
+                    :value="'call'"
+                  >
+                    Call
+                  </b-form-radio>
+                </b-form-radio-group>
+              </div>
+
+              <button
+                class="btn btn-sm btn-primary"
+                @click="confirmEnrollment($event, bot)"
+                :disabled="!botChannels[bot.id] || busyBotId === bot.id"
               >
-                This contact is currently enrolled to this bot.
-              </b-popover>
-              <q-badge
-                v-if="isEnrolled(bot.id)"
-                :id="`enrolled-badge-${bot.id}`"
-                class="ml-1"
-                color="green-6"
-              >
-                <span class="custom-badge-margin-text">Enrolled</span>
-              </q-badge>
-            </b-form-radio>
-          </label>
+                {{ getEnrollButtonText(bot.id) }}
+                <q-tooltip v-if="!botChannels[bot.id]">
+                  Please select a channel to enroll this contact
+                </q-tooltip>
+              </button>
+            </div>
+          </div>
         </li>
       </ul>
-      <div class="d-flex items-center justify-center" style="gap: 15px">
-        <button class="btn btn-sm btn-outline-dark mr-2"
+
+      <div class="d-flex items-center justify-center">
+        <button class="btn btn-sm btn-outline-dark"
                 data-testid="aloai-enrollment-control-modal-close-button"
                 @click="onHidden">
-          Cancel
-        </button>
-        <button class="btn btn-sm bg-primary text-white mr-2"
-                data-testid="aloai-enrollment-control-modal-enroll-contact-button"
-                :disabled="isBusy"
-                @click="confirmEnrollment">
-          Enroll
+          Close
         </button>
       </div>
     </div>
@@ -72,12 +110,15 @@ import talk2Api from 'src/plugins/api/api'
 import { mapGetters } from 'vuex'
 import Search from 'src/components/search.vue'
 import * as AloAi from 'src/constants/aloai'
+import aloaiMixin from 'src/plugins/mixins/aloai.mixin'
 import { isEmpty } from 'lodash'
 
 export default {
   name: 'aloai-enrollment-control-modal',
 
   components: { Search },
+
+  mixins: [aloaiMixin],
 
   computed: {
     ...mapGetters('contacts', ['contact']),
@@ -109,6 +150,7 @@ export default {
   data () {
     return {
       isBusy: false,
+      busyBotId: null,
       isOpen: false,
       bots: [],
       bot_engagements: {},
@@ -116,7 +158,8 @@ export default {
       searchText: '',
       isLoading: true,
       selectedBotId: null,
-      AloAi
+      AloAi,
+      botChannels: {}
     }
   },
 
@@ -124,10 +167,10 @@ export default {
     onSearch (searchText) {
       this.searchText = searchText
     },
-    confirmEnrollment (event) {
+    confirmEnrollment (event, bot) {
       event.preventDefault()
       // If the contact is already enrolled, confirm we want to re-enroll
-      if (this.isEnrolled(this.selectedBotId)) {
+      if (this.isEnrolled(bot.id)) {
         this.$bvModal.msgBoxConfirm('Re-enrolling this contact will count as a new enrollment and charged accordingly. Continue?', {
           title: 'Warning',
           size: 'sm',
@@ -140,39 +183,47 @@ export default {
           centered: true
         }).then(confirm => {
           if (confirm) {
-            this.submitEnrollment()
+            this.submitEnrollment(bot)
           }
         }).catch(() => {
           // Do nothing
         })
       } else {
-        this.submitEnrollment()
+        this.submitEnrollment(bot)
       }
     },
-    submitEnrollment () {
-      if (!this.selectedBotId) {
+    submitEnrollment (bot) {
+      const channel = this.botChannels[bot.id]
+      if (!channel) {
         this.$generalNotification(
-          'Please select a bot to enroll the contact.',
+          'Please select a channel for enrollment.',
           'error'
         )
         return
       }
 
+      this.busyBotId = bot.id
       this.isBusy = true
 
       talk2Api.V2.aloAiBot
-        .enrollContacts(this.selectedBotId, { contact_ids: [this.contact.id] })
+        .enrollContacts(bot.id, {
+          contact_ids: [this.contact.id],
+          channel: channel
+        })
         .then(() => {
-          this.$generalNotification(
-            'Contact successfully enrolled to the selected AloAi Text Bot.'
-          )
-          // Give our Queue some time to enroll the contact
-          this.$emit('contactEnrolled')
+          this.bot_enrollments.push({
+            aloai_bot_id: bot.id,
+            enrollment_expired_at: new Date(Date.now() + (24 * 60 * 60 * 1000)),
+            type: channel === 'sms' ? AloAi.ENROLLMENT_TYPE_TEXT : AloAi.ENROLLMENT_TYPE_VOICE
+          })
 
-          this.onHidden()
+          this.$generalNotification(
+            `Contact successfully enrolled to ${bot.name} via ${channel.toUpperCase()}.`
+          )
+          this.$emit('contactEnrolled')
         })
         .catch((error) => {
-          let errorMsg = 'Error while enrolling contact to AloAi Text Bot.'
+          let errorMsg = 'Error while enrolling contact to AloAi Bot.'
           if (error?.response.data?.message) {
             errorMsg = error.response.data.message
           }
@@ -182,6 +233,7 @@ export default {
         })
         .finally(() => {
           this.isBusy = false
+          this.busyBotId = null
         })
     },
     onHidden () {
@@ -191,14 +243,20 @@ export default {
         this.isLoading = true
         this.searchText = ''
         this.selectedBotId = null
+        this.botChannels = {}
+        this.busyBotId = null
       }, 300)
     },
     onShown () {
-      this.load()
+      this.load().then(() => {
+        // Auto-select channels after bots are loaded
+        this.bots.forEach(bot => {
+          this.autoSelectChannel(bot)
+        })
+      })
     },
     isEnrolled (botId) {
-      // Search in the bot_enrollments object array if the contact is enrolled in the bot
-      return !!this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
+      return this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
     },
     async load () {
       this.isLoading = true
@@ -238,8 +296,7 @@ export default {
           return this.bots
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots({
-          enabled: true,
-          type: AloAi.TYPE_TEXT
+          enabled: true
         })
         return data?.data ?? []
       } catch (error) {
@@ -268,17 +325,137 @@ export default {
         console.error('[fetchContactBotEnrollments] error', error)
         return []
       }
+    },
+    canUseSMS (bot) {
+      return [AloAi.TYPE_TEXT, AloAi.TYPE_AGENT].includes(bot.type)
+    },
+    canUseCall (bot) {
+      return [AloAi.TYPE_VOICE, AloAi.TYPE_AGENT].includes(bot.type)
+    },
+    getChannelTooltip (bot, channel) {
+      if (channel === 'sms' && !this.canUseSMS(bot)) {
+        return 'This bot does not support SMS communications'
+      }
+
+      if (channel === 'call' && !this.canUseCall(bot)) {
+        return 'This bot does not support voice calls'
+      }
+
+      return '' // Return empty string for enabled channels
+    },
+    getAvailableChannels (bot) {
+      return [
+        {
+          text: 'SMS',
+          value: 'sms',
+          disabled: !this.canUseSMS(bot)
+        },
+        {
+          text: 'Call',
+          value: 'call',
+          disabled: !this.canUseCall(bot)
+        }
+      ]
+    },
+    formatDirection (direction) {
+      return direction === AloAi.DIRECTION_OUTBOUND ? 'Outbound' : 'Inbound'
+    },
+    getBotTypeLabel (type) {
+      switch (type) {
+        case AloAi.TYPE_TEXT:
+          return 'Text Bot'
+        case AloAi.TYPE_VOICE:
+          return 'Voice Bot'
+        case AloAi.TYPE_AGENT:
+          return 'Agent Bot'
+        default:
+          return 'Unknown'
+      }
+    },
+    getEnrollButtonText (botId) {
+      if (this.busyBotId === botId) {
+        return 'Enrolling...'
+      }
+      if (this.isEnrolled(botId)) {
+        return 'Re-enroll'
+      }
+      return 'Enroll'
+    },
+    getEnrollmentType (botId) {
+      const enrollment = this.bot_enrollments.find(
+        enrollment => enrollment.aloai_bot_id === botId
+      )
+      return enrollment?.type || null
+    },
+    getEnrollmentTypeText (botId, type = null) {
+      if (type !== null) {
+        switch (type) {
+          case AloAi.ENROLLMENT_TYPE_TEXT:
+            return 'SMS'
+          case AloAi.ENROLLMENT_TYPE_VOICE:
+            return 'Call'
+          default:
+            return ''
+        }
+      }
+
+      const enrollment = this.bot_enrollments.find(
+        enrollment => enrollment.aloai_bot_id === botId
+      )
+      return this.getEnrollmentTypeText(botId, enrollment?.type)
+    },
+    getEnrollmentTypeIcon (botId) {
+      const type = this.getEnrollmentType(botId)
+      switch (type) {
+        case AloAi.ENROLLMENT_TYPE_TEXT:
+          return 'chat' // or 'message' for SMS icon
+        case AloAi.ENROLLMENT_TYPE_VOICE:
+          return 'phone' // or 'call' for phone icon
+        default:
+          return 'check' // fallback icon
+      }
+    },
+    getBotEnrollments (botId) {
+      return this.bot_enrollments.filter(
+        enrollment => enrollment.aloai_bot_id === botId
+      )
+    },
+    autoSelectChannel (bot) {
+      const canSMS = this.canUseSMS(bot)
+      const canCall = this.canUseCall(bot)
+
+      // If only one channel is available, auto-select it
+      if (canSMS && !canCall) {
+        this.$set(this.botChannels, bot.id, 'sms')
+      } else if (!canSMS && canCall) {
+        this.$set(this.botChannels, bot.id, 'call')
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-.aloai-enrollment-control-bots-list {
-  max-height: 300px;
+.scrollable-list {
+  max-height: 400px;
   overflow-y: auto;
 }
+
 .custom-badge-margin-text {
   margin-top: 1px;
+}
+
+/* Style for disabled radio buttons */
+.btn-group-toggle .btn:disabled {
+  background-color: #e9ecef;
+  border-color: #e9ecef;
+  color: #6c757d;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.btn-group-toggle .btn:disabled:hover {
+  background-color: #e9ecef;
+  border-color: #e9ecef;
 }
 </style>

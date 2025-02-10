@@ -40,13 +40,22 @@
           <!-- Bot name -->
           <h5 class="mt-0">{{ displayedBot?.name }}</h5>
 
-          <!-- Bot Use Case Badge -->
+          <!-- Bot Type Badge -->
           <p class="mb-0 text-muted fs-13 mt-1">
+            <!-- Direction Badge -->
             <q-badge
               :color="directionColor(displayedBot?.direction)"
               class="mr-1"
             >
               <span>{{ formatDirection(displayedBot?.direction) }}</span>
+            </q-badge>
+
+            <!-- Type Badge -->
+            <q-badge
+              :color="getEnrollmentTypeColor(botEnrollments[activeBotIndex]?.type)"
+              class="mr-1"
+            >
+              <span>{{ getEnrollmentTypeLabel(botEnrollments[activeBotIndex]?.type) }}</span>
             </q-badge>
           </p>
         </b-media>
@@ -200,6 +209,7 @@ import AloaiEnrollmentControlModal from 'components/aloai-enrollment-control-mod
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapGetters } from 'vuex'
 import { aloaiMixin } from 'src/plugins/mixins'
+import * as AloAi from 'src/constants/aloai'
 import _ from 'lodash'
 
 export default {
@@ -221,7 +231,8 @@ export default {
       bots: [],
       botEnrollments: [],
       activeBotIndex: 0,
-      isBusy: false
+      isBusy: false,
+      AloAi
     }
   },
 
@@ -252,16 +263,12 @@ export default {
         return null
       }
 
-      // Filter bots using the botEnrollments aloai_bot_id
-      let enrolledBots = this.bots.filter((bot) => bot.id === this.botEnrollments.find(enrollment => enrollment.aloai_bot_id === bot.id)?.aloai_bot_id)
-
-      // Sanity check
-      if (_.isEmpty(enrolledBots)) {
-        console.warn('No bot found for the current enrollment')
+      const currentEnrollment = this.botEnrollments[this.activeBotIndex]
+      if (!currentEnrollment) {
         return null
       }
 
-      return enrolledBots[this.activeBotIndex]
+      return this.bots.find(bot => bot.id === currentEnrollment.aloai_bot_id)
     },
     confirmDeletionMessage () {
       let name = this.contact.first_name || 'No Name'
