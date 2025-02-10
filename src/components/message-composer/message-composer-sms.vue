@@ -155,8 +155,7 @@
                        data-testid="sms-message-body-input"
                        :disable="isSendTextInputDisabled"
                        @input="imposeCharactersLimit"
-                       @keydown="onKeyDown"
-                       @blur="onBlur">
+                       @keydown="onKeyDown">
               </q-input>
             </div>
 
@@ -553,12 +552,6 @@ export default {
                 this.currentCompany.url_shortener_enabled &&
                 !this.generatingShortUrl) {
         this.generateShortUrl()
-      }
-    },
-
-    onBlur () {
-      if (this.urlShortenerDialog) {
-
       }
     },
 
