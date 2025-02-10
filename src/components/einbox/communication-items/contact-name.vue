@@ -8,7 +8,8 @@
     <b-popover triggers="hover"
                custom-class="talk-table__popover"
                placement="bottom"
-               :target="`contact-name-${_uid}`">
+               :target="`contact-name-${_uid}`"
+               v-if="name.length >= 27">
       {{ name }}
     </b-popover>
   </div>
@@ -26,7 +27,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .contact-name {
   font-size: 14px;
   font-weight: 500;
