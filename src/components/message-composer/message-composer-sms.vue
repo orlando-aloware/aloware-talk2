@@ -535,26 +535,6 @@ export default {
       }
     },
 
-    processDetectLongUrl (detected) {
-      if (detected &&
-                !this.urlShortenerDontAsk && !this.isShortenedUrlRemembered) {
-        this.urlShortenerDialog = true
-      }
-
-      // generate the shortened URL if "Yes" selection is remembered
-      // in the URL shortener prompt ("Don't ask me again" checkbox is active
-      // and yes button is clicked) and there's no shortened URL generation
-      // that is in-progress.
-      if (detected &&
-                (this.urlShortenerDontAsk ||
-                    this.isShortenedUrlRemembered) &&
-                this.profile.url_shortener_enabled &&
-                this.currentCompany.url_shortener_enabled &&
-                !this.generatingShortUrl) {
-        this.generateShortUrl()
-      }
-    },
-
     formatMessage () {
       return {
         body: this.messageComposer.sms.body,
@@ -705,24 +685,6 @@ export default {
       return new Blob(byteArrays, { type: contentType })
     },
 
-    detectLongUrl () {
-      // check only the long URL if:
-      // - company is not white label
-      // - URL shortener is forced enabled in the company level and user level
-      // - dont ask flag is false (used for skipping the URL shortener prompt
-      //   to be able to send the message)
-      if (!this.urlShortenerDontAskUntilSend &&
-                this.currentCompany &&
-                !this.currentCompany.is_whitelabel &&
-                this.currentCompany.url_shortener_enabled &&
-                this.profile.url_shortener_enabled) {
-        const text = this.messageComposer.sms.body
-        const matches = text ? text.match(/\bhttps?:\/\/\S+/gi) : []
-        return matches ? matches.filter((url) => !url.includes(this.urlShortenerDomain)).length > 0 : false
-      }
-      return false
-    },
-
     closeUrlShortener () {
       this.urlShortenerDontAskUntilSend = true
       if (this.urlShortenerDontAsk &&
@@ -763,17 +725,6 @@ export default {
         Object.assign(this.profile, { url_shortener_enabled: false })
       )
       this.$generalNotification('URL Shortener disabled. To enable it again visit Settings > Personalization', 'success')
-    },
-
-    getDomains () {
-      talk2Api.V1.urlShortener.domains()
-        .then(({ data }) => {
-          this.urlShortenerDomain = data.domains
-          if (this.urlShortenerDomain.length > 0) {
-            this.urlShortenerDomain = this.urlShortenerDomain[0]
-          }
-        })
-      this.urlShortenerDialog = false
     },
 
     onInput (input) {
