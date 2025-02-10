@@ -28,19 +28,24 @@
                           :direction="contact.last_communication_direction"
                           :callbackStatus="contact.last_communication_callback_status"
                           :body="contact.last_communication_body"
-                          :totalUnreads="contact.unread_comms" />
+                          :totalUnreads="contact.unread_comms"
+                          v-if="contact.last_communication_type" />
     </div>
 
     <div class="message-item__time">
+      <last-communication-date :date="contact.last_communication_at"
+                               :lastCommunicationType="contact.last_communication_type"
+                               :lastCommunicationCurrentStatus="contact.last_communication_current_status2"
+                               v-if="contact.last_communication_at" />
     </div>
   </div>
 </template>
 
 <script>
-// import TaskItemTime from 'src/components/inbox/channel-tasks/task-item-time.vue'
 import Avatar from './avatar.vue'
 import ContactName from './contact-name.vue'
 import LastCommunication from './last-communication.vue'
+import LastCommunicationDate from './last-communication-date.vue'
 import { avatarMixin } from 'src/plugins/mixins'
 
 export default {
@@ -53,7 +58,8 @@ export default {
   components: {
     Avatar,
     ContactName,
-    LastCommunication
+    LastCommunication,
+    LastCommunicationDate
   },
 
   props: {
@@ -69,18 +75,6 @@ export default {
       type: Boolean,
       default: false
     }
-  },
-
-  computed: {
-    // contactName () {
-    //   if (this.comm.first_name && this.comm.last_name) {
-    //     return this.comm.first_name + ' ' + this.comm.last_name
-    //   } else if (this.comm.first_name) {
-    //     return this.comm.first_name
-    //   } else {
-    //     return 'No Name'
-    //   }
-    // }
   },
 
   methods: {
@@ -107,7 +101,7 @@ export default {
     "message-item__avatar message-item__contact-name message-item__time"
     "message-item__avatar message-item__communication-type message-item__time";
 
-  padding: 8px 16px;
+  padding: 8px 4px 8px 16px;
   min-height: 64px;
   border-bottom: 1px solid #eeeeee;
   cursor: pointer;
@@ -128,15 +122,17 @@ export default {
       }
     }
   }
+
   &__contact-name {
     grid-area: message-item__contact-name;
   }
+
   &__communication-type {
     grid-area: message-item__communication-type;
   }
+
   &__time {
     grid-area: message-item__time;
-    background-color: yellow;
   }
 
   &.active {
