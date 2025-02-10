@@ -128,7 +128,7 @@
             size="sm"
             data-testid="disenroll-single-bot-contact-button"
           >
-            <i class="fa fa-trash"/> Disenroll from Bot
+            <i class="fa fa-trash"/> Disenroll from {{ getEnrollmentTypeText(null, botEnrollments[activeBotIndex]?.type) }}
           </b-button>
         </div>
 
@@ -142,7 +142,7 @@
           block
           data-testid="disenroll-contact-button"
         >
-          <i class="fa fa-trash"/> Disenroll from Bot
+          <i class="fa fa-trash"/> Disenroll from {{ getEnrollmentTypeText(null, botEnrollments[activeBotIndex]?.type) }}
         </b-button>
       </b-card-text>
 
@@ -272,7 +272,8 @@ export default {
     },
     confirmDeletionMessage () {
       let name = this.contact.first_name || 'No Name'
-      return `Are you sure you want to remove <b>${name}</b> from <b>${this.displayedBot?.name}</b>?`
+      const enrollmentType = this.getEnrollmentTypeText(null, this.botEnrollments[this.activeBotIndex]?.type)
+      return `Are you sure you want to remove <b>${name}</b> from <b>${this.displayedBot?.name}</b>'s ${enrollmentType} enrollment?`
     }
   },
 
@@ -348,12 +349,35 @@ export default {
     closeDisenrollmentConfirmation () {
       this.$bvModal.hide('contact-disenroll-from-bot')
     },
+    getEnrollmentTypeText (botId, type = null) {
+      if (type !== null) {
+        switch (type) {
+          case AloAi.ENROLLMENT_TYPE_TEXT:
+            return 'SMS'
+          case AloAi.ENROLLMENT_TYPE_VOICE:
+            return 'Call'
+          default:
+            return ''
+        }
+      }
+
+      const enrollment = this.bot_enrollments.find(
+        enrollment => enrollment.aloai_bot_id === botId
+      )
+      return this.getEnrollmentTypeText(botId, enrollment?.type)
+    },
     disenrollContact () {
+      const currentEnrollment = this.botEnrollments[this.activeBotIndex]
+
       talk2Api.V2.aloAiBot
-        .disenrollContact(this.displayedBot.id, { contact_id: this.contact.id })
+        .disenrollContact(this.displayedBot.id, {
+          contact_id: this.contact.id,
+          type: currentEnrollment.type // Add type to specify which enrollment to remove
+        })
         .then(() => {
+          const type = this.getEnrollmentTypeText(null, currentEnrollment.type)
           this.$generalNotification(
-            'Contact successfully disenrolled from the selected AloAi Text Bot.'
+            `Contact successfully disenrolled from ${type} on ${this.displayedBot.name}.`
           )
 
           this.closeDisenrollmentConfirmation()
@@ -372,7 +396,7 @@ export default {
           }
 
           this.$generalNotification(errorMsg, 'error')
-          console.error('[submitEnrollment] error', error)
+          console.error('[disenrollContact] error', error)
         })
     },
     async fetchBots () {
