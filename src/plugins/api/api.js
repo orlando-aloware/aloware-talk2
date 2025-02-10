@@ -982,10 +982,10 @@ const talk2Api = {
         }
       },
 
-      communications: {
+      contacts: {
         get: ({ inboxId, page = 1, communicationType }) => {
           const params = { per_page: 25, page, type: communicationType }
-          return window.axios.get(`${suffixV2}inboxes/${inboxId}/communications`, { params })
+          return window.axios.get(`${suffixV2}inboxes/${inboxId}/contacts`, { params })
         }
       }
     },

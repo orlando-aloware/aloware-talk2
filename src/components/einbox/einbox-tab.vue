@@ -7,12 +7,12 @@
          ref="communicationsList"
          @scroll="onScroll">
       <!-- Initial loading state -->
-      <div :class="[isLoadingCommunications ? 'py-5' : 'py-4', 'relative']"
-           v-if="isLoadingCommunications">
+      <div :class="[isLoadingContacts ? 'py-5' : 'py-4', 'relative']"
+           v-if="isLoadingContacts">
         <b-overlay rounded="sm"
                    variant="white"
                    data-testid="communications-list-overlay"
-                   :show="isLoadingCommunications">
+                   :show="isLoadingContacts">
           <template #overlay>
             <div class="text-center">
               <q-spinner-bars color="primary"
@@ -22,18 +22,19 @@
         </b-overlay>
       </div>
 
-      <!-- Communications list -->
-      <template v-else-if="communications.length">
-        <div :key="comm.id"
-             v-for="comm in communications"
-             @click="onCommunicationClick(comm)">
-             <inbox-task-item :contact="comm"
-                              :force-active="comm.id === activeContactId" />
+      <!-- contacts list -->
+      <template v-else-if="contacts.length">
+        <div :key="contact.id"
+             v-for="contact in contacts"
+             @click="onItemClick(contact)">
+          <message-item :contact="contact"
+                        :direction="contact.last_communication_direction"
+                        :is-active="activeContactId === contact.id" />
         </div>
 
         <!-- Load more indicator -->
         <div class="text-center q-pa-sm"
-             v-if="isLoadingMoreCommunications">
+             v-if="isLoadingMoreContacts">
           <q-spinner-dots color="primary"
                           size="2em" />
         </div>
@@ -42,14 +43,14 @@
       <!-- Empty state -->
       <div class="text-center q-pa-md text-grey"
            v-else>
-        No communications found
+        No contacts found
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import InboxTaskItem from 'src/components/inbox/inbox-tasks/item.vue'
+import MessageItem from 'src/components/einbox/communication-items/message-item.vue'
 import { mapState } from 'vuex'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import { debounce } from 'lodash'
@@ -58,7 +59,7 @@ export default {
   name: 'EInboxTab',
 
   components: {
-    InboxTaskItem
+    MessageItem
   },
 
   mixins: [
@@ -73,10 +74,10 @@ export default {
 
   computed: {
     ...mapState('Einbox', [
-      'communications',
-      'isLoadingCommunications',
-      'isLoadingMoreCommunications',
-      'hasMoreCommunications',
+      'contacts',
+      'isLoadingContacts',
+      'isLoadingMoreContacts',
+      'hasMoreContacts',
       'activeInbox'
     ])
   },
@@ -102,12 +103,12 @@ export default {
       const bottomThreshold = 100
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
-      if (isNearBottom && !this.isLoadingMoreCommunications && this.hasMoreCommunications) {
-        this.loadMoreCommunications(this.activeInbox)
+      if (isNearBottom && !this.isLoadingMoreContacts && this.hasMoreContacts) {
+        this.loadMoreContactss(this.activeInbox)
       }
     },
 
-    onCommunicationClick (contact) {
+    onItemClick (contact) {
       // avoid redundant navigation
       if (this.activeContactId === contact.id) {
         return

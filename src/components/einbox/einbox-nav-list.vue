@@ -64,7 +64,7 @@ export default {
   methods: {
     ...mapActions('Einbox', [
       'setActiveInbox',
-      'resetCommunications'
+      'resetContacts'
     ]),
 
     onScroll ({ verticalPosition, verticalSize, verticalContainerSize }) {
@@ -78,8 +78,8 @@ export default {
 
     onInboxSelect (inboxId) {
       this.setActiveInbox(inboxId)
-      this.resetCommunications()
-      this.fetchCommunications(inboxId)
+      this.resetContacts()
+      this.fetchContacts(inboxId)
       this.$router.push(`/einbox/${inboxId}`)
     }
   },
@@ -91,9 +91,9 @@ export default {
     if (this.inboxes.length) {
       const inboxId = this.inboxes[0].id
       this.setActiveInbox(inboxId)
-      this.resetCommunications()
-      console.log('getting communications from: ', inboxId)
-      this.fetchCommunications(inboxId)
+      this.resetContacts()
+
+      this.fetchContacts(inboxId)
     }
   }
 }

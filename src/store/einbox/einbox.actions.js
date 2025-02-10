@@ -27,23 +27,23 @@ export default {
   setCommunicationType: ({ commit }, communicationType) => {
     commit('SET_COMMUNICATION_TYPE', communicationType)
   },
-  setCommunications: ({ commit }, data) => {
-    commit('SET_COMMUNICATIONS', data.data)
-    commit('SET_HAS_MORE_COMMUNICATIONS', data.next_page_url !== null)
-    commit('SET_CURRENT_COMMUNICATIONS_PAGE', data.current_page)
+  setContacts: ({ commit }, data) => {
+    commit('SET_CONTACTS', data.data)
+    commit('SET_HAS_MORE_CONTACTS', data.next_page_url !== null)
+    commit('SET_CURRENT_CONTACTS_PAGE', data.current_page)
   },
-  setIsLoadingCommunications: ({ commit }, loading) => {
-    commit('SET_IS_LOADING_COMMUNICATIONS', loading)
+  setIsLoadingContacts: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_CONTACTS', loading)
   },
-  resetCommunications: ({ commit }) => {
-    commit('RESET_COMMUNICATIONS_STATE')
+  resetContacts: ({ commit }) => {
+    commit('RESET_CONTACTS_STATE')
   },
-  appendCommunications: ({ commit }, data) => {
-    commit('APPEND_COMMUNICATIONS', data.data)
-    commit('SET_HAS_MORE_COMMUNICATIONS', data.next_page_url !== null)
-    commit('SET_CURRENT_COMMUNICATIONS_PAGE', data.current_page)
+  appendContacts: ({ commit }, data) => {
+    commit('APPEND_CONTACTS', data.data)
+    commit('SET_HAS_MORE_CONTACTS', data.next_page_url !== null)
+    commit('SET_CURRENT_CONTACTS_PAGE', data.current_page)
   },
-  setIsLoadingMoreCommunications: ({ commit }, loading) => {
-    commit('SET_IS_LOADING_MORE_COMMUNICATIONS', loading)
+  setIsLoadingMoreContacts: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_MORE_CONTACTS', loading)
   }
 }

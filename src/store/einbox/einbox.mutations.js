@@ -20,27 +20,27 @@ export default {
   SET_COMMUNICATION_TYPE (state, communicationType) {
     state.communicationType = communicationType
   },
-  SET_COMMUNICATIONS (state, communications) {
-    state.communications = communications
+  SET_CONTACTS (state, contacts) {
+    state.contacts = contacts
   },
-  SET_IS_LOADING_COMMUNICATIONS (state, loading) {
-    state.isLoadingCommunications = loading
+  SET_IS_LOADING_CONTACTS (state, loading) {
+    state.isLoadingContacts = loading
   },
-  SET_CURRENT_COMMUNICATIONS_PAGE (state, page) {
-    state.currentCommunicationsPage = page
+  SET_CURRENT_CONTACTS_PAGE (state, page) {
+    state.currentContactsPage = page
   },
-  SET_HAS_MORE_COMMUNICATIONS (state, hasMore) {
-    state.hasMoreCommunications = hasMore
+  SET_HAS_MORE_CONTACTS (state, hasMore) {
+    state.hasMoreContacts = hasMore
   },
-  RESET_COMMUNICATIONS_STATE (state) {
-    state.communications = []
-    state.currentCommunicationsPage = 0
-    state.hasMoreCommunications = true
+  RESET_CONTACTS_STATE (state) {
+    state.contacts = []
+    state.currentContactsPage = 0
+    state.hasMoreContacts = true
   },
-  APPEND_COMMUNICATIONS (state, communications) {
-    state.communications = [...state.communications, ...communications]
+  APPEND_CONTACTS (state, contacts) {
+    state.contacts = [...state.contacts, ...contacts]
   },
-  SET_IS_LOADING_MORE_COMMUNICATIONS (state, loading) {
-    state.isLoadingMoreCommunications = loading
+  SET_IS_LOADING_MORE_CONTACTS (state, loading) {
+    state.isLoadingMoreContacts = loading
   }
 }

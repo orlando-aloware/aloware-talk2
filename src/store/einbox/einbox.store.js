@@ -10,10 +10,10 @@ export default function () {
     currentInboxesPage: 0,
     hasMoreInboxes: true,
     communicationType: CALLS_TYPE,
-    communications: [],
-    isLoadingCommunications: false,
-    isLoadingMoreCommunications: false,
-    currentCommunicationsPage: 0,
-    hasMoreCommunications: true
+    contacts: [],
+    isLoadingContacts: false,
+    isLoadingMoreContacts: false,
+    currentContactsPage: 0,
+    hasMoreContacts: true
   }
 }
