@@ -1,42 +1,41 @@
 <template>
-  <div
-    class="inbox-nav-item d-flex align-items-center cursor-pointer"
-    :class="{ 'inbox-nav-item--active': isActive }"
-    @click="$emit('click', value)"
-    data-testid="einbox-nav-item"
-  >
+  <div data-testid="einbox-nav-item"
+       class="inbox-nav-item d-flex align-items-center cursor-pointer"
+       :class="{ 'inbox-nav-item--active': isActive }"
+       @click="$emit('click', value)">
     <div class="inbox-nav-item__content d-flex align-items-center justify-content-between w-100">
       <div class="d-flex align-items-center">
-        <q-icon name="inbox" size="20px" class="q-mr-sm" />
+        <q-icon name="inbox"
+                size="20px"
+                class="q-mr-sm" />
         <span class="inbox-nav-item__label">{{ label }}</span>
       </div>
-      <q-badge
-        v-if="messageCount > 0"
-        color="primary"
-        :label="messageCount"
-        class="inbox-nav-item__badge"
-      />
+      <q-badge color="primary"
+               class="inbox-nav-item__badge"
+               :label="messageCount"
+               v-if="messageCount > 0" />
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'EinboxNavItem',
-
   props: {
     label: {
       type: String,
       required: true
     },
+
     value: {
       type: [String, Number],
       required: true
     },
+
     messageCount: {
       type: Number,
       default: 0
     },
+
     isActive: {
       type: Boolean,
       default: false

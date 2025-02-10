@@ -8,12 +8,12 @@ export default {
       'inboxes',
       'currentInboxesPage',
       'hasMoreInboxes',
-      'contacts',
-      'communicationType',
-      'isLoadingContacts',
-      'currentContactsPage',
-      'hasMoreContacts',
-      'isLoadingMoreContacts'
+      'items',
+      'viewMode',
+      'isLoadingItems',
+      'currentItemsPage',
+      'hasMoreItems',
+      'isLoadingMoreItems'
     ])
   },
 
@@ -21,11 +21,11 @@ export default {
     ...mapActions('Einbox', [
       'setInboxes',
       'setIsLoadingInboxes',
-      'setContacts',
-      'appendContacts',
-      'setIsLoadingContacts',
-      'resetContacts',
-      'setIsLoadingMoreContacts',
+      'setItems',
+      'appendItems',
+      'setIsLoadingItems',
+      'resetItems',
+      'setIsLoadingMoreItems',
       'setActiveInbox'
     ]),
 
@@ -55,8 +55,8 @@ export default {
           const inbox = this.inboxes.find(inbox => inbox.id.toString() === routeInboxId.toString())
           if (inbox) {
             this.setActiveInbox(inbox.id)
-            this.resetContacts()
-            await this.fetchContacts(inbox.id)
+            this.resetItems()
+            await this.fetchItems(inbox.id)
           } else {
             // Handle case when inbox ID from route is not found
             console.warn(`Inbox with ID ${routeInboxId} not found`)
@@ -66,53 +66,51 @@ export default {
           // No inbox ID in route, set first inbox
           const firstInbox = this.inboxes[0]
           this.setActiveInbox(firstInbox.id)
-          this.resetContacts()
-          await this.fetchContacts(firstInbox.id)
+          this.resetItems()
+          await this.fetchItems(firstInbox.id)
           // Update route to reflect selected inbox
           this.$router.push(`/einbox/${firstInbox.id}`)
         }
       }
     },
 
-    async fetchContacts (inboxId) {
+    async fetchItems (inboxId) {
       try {
-        this.setIsLoadingContacts(true)
+        this.setIsLoadingItems(true)
         const nextPage = 1
-        const communicationType = this.communicationType
 
         const response = await talk2Api.V2.inbox.contacts.get({
           inboxId,
           page: nextPage,
-          communicationType
+          view_mode: this.viewMode
         })
 
-        this.setContacts(response.data)
+        this.setItems(response.data)
       } catch (error) {
         console.error('Error fetching contacts:', error)
       } finally {
-        this.setIsLoadingContacts(false)
+        this.setIsLoadingItems(false)
       }
     },
 
-    async loadMoreContacts (inboxId) {
+    async loadMoreItems (inboxId) {
       try {
-        if (this.isLoadingMoreContacts || !this.hasMoreContacts) return
+        if (this.isLoadingMoreItems || !this.hasMoreItems) return
 
-        this.setIsLoadingMoreContacts(true)
-        const nextPage = this.currentContactsPage + 1
-        const communicationType = this.communicationType
+        this.setIsLoadingMoreItems(true)
+        const nextPage = this.currentItemsPage + 1
 
         const response = await talk2Api.V2.inbox.contacts.get({
           inboxId,
           page: nextPage,
-          communicationType
+          view_mode: this.viewMode
         })
 
-        this.appendContacts(response.data)
+        this.appendItems(response.data)
       } catch (error) {
-        console.error('Error loading more contacts:', error)
+        console.error('Error loading more items:', error)
       } finally {
-        this.setIsLoadingMoreContacts(false)
+        this.setIsLoadingMoreItems(false)
       }
     }
   },

@@ -24,26 +24,26 @@ export default {
   setHasMoreInboxes: ({ commit }, hasMore) => {
     commit('SET_HAS_MORE_INBOXES', hasMore)
   },
-  setCommunicationType: ({ commit }, communicationType) => {
-    commit('SET_COMMUNICATION_TYPE', communicationType)
+  setViewMode: ({ commit }, viewMode) => {
+    commit('SET_VIEW_MODE', viewMode)
   },
-  setContacts: ({ commit }, data) => {
-    commit('SET_CONTACTS', data.data)
-    commit('SET_HAS_MORE_CONTACTS', data.next_page_url !== null)
-    commit('SET_CURRENT_CONTACTS_PAGE', data.current_page)
+  setItems: ({ commit }, data) => {
+    commit('SET_ITEMS', data.data)
+    commit('SET_HAS_MORE_ITEMS', data.next_page_url !== null)
+    commit('SET_CURRENT_ITEMS_PAGE', data.current_page)
   },
-  setIsLoadingContacts: ({ commit }, loading) => {
-    commit('SET_IS_LOADING_CONTACTS', loading)
+  setIsLoadingItems: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_ITEMS', loading)
   },
-  resetContacts: ({ commit }) => {
-    commit('RESET_CONTACTS_STATE')
+  resetItems: ({ commit }) => {
+    commit('RESET_ITEMS')
   },
-  appendContacts: ({ commit }, data) => {
-    commit('APPEND_CONTACTS', data.data)
-    commit('SET_HAS_MORE_CONTACTS', data.next_page_url !== null)
-    commit('SET_CURRENT_CONTACTS_PAGE', data.current_page)
+  appendItems: ({ commit }, data) => {
+    commit('APPEND_ITEMS', data.data)
+    commit('SET_HAS_MORE_ITEMS', data.next_page_url !== null)
+    commit('SET_CURRENT_ITEMS_PAGE', data.current_page)
   },
-  setIsLoadingMoreContacts: ({ commit }, loading) => {
-    commit('SET_IS_LOADING_MORE_CONTACTS', loading)
+  setIsLoadingMoreItems: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_MORE_ITEMS', loading)
   }
 }

@@ -1,53 +1,50 @@
 <template>
-  <div class="channel-toggle-wrapper d-flex align-items-center w-100 p-0 m-0">
-    <q-btn-toggle
-      class="channel-toggle w-100"
-      no-caps
-      rounded
-      unelevated
-      toggle-color="primary"
-      color="grey-3"
-      text-color="grey-8"
-      spread
-      :options="[
-        {label: 'Calls', value: CALLS_TYPE},
-        {label: 'Messages', value: SMS_TYPE}
-      ]"
-      :value="communicationType"
-      @input="onChange"
+  <div class="channel-toggle-wrapper d-flex align-items-center w-100 border-bottom">
+    <q-btn-toggle class="channel-toggle w-100"
+                  no-caps
+                  rounded
+                  unelevated
+                  toggle-color="primary"
+                  color="grey-3"
+                  text-color="grey-8"
+                  spread
+                  :options="options"
+                  :value="viewMode"
+                  @input="onChange"
     />
   </div>
 </template>
 
 <script>
-import { CALLS_TYPE, SMS_TYPE } from 'src/store/einbox/einbox.store'
-import { mapActions, mapState } from 'vuex'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
+import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
+import { mapActions, mapState } from 'vuex'
 
 export default {
-  name: 'InboxChannelToggle',
+  mixins: [
+    EinboxMixin
+  ],
 
-  mixins: [EinboxMixin],
+  computed: {
+    ...mapState('Einbox', ['viewMode', 'activeInbox']),
 
-  data () {
-    return {
-      CALLS_TYPE,
-      SMS_TYPE
+    options () {
+      return [
+        { label: 'Threaded', value: THREADED },
+        { label: 'Unthreaded', value: UNTHREADED }
+      ]
     }
   },
 
-  computed: {
-    ...mapState('Einbox', ['communicationType', 'activeInbox'])
-  },
-
   methods: {
-    ...mapActions('Einbox', ['setCommunicationType']),
+    ...mapActions('Einbox', ['setViewMode']),
 
     onChange (value) {
-      this.setCommunicationType(value)
+      this.setViewMode(value)
+
       if (this.activeInbox) {
-        this.resetCommunications()
-        this.fetchCommunications(this.activeInbox)
+        this.resetItems()
+        this.fetchItems(this.activeInbox)
       }
     }
   }

@@ -17,30 +17,30 @@ export default {
   SET_HAS_MORE_INBOXES (state, hasMore) {
     state.hasMoreInboxes = hasMore
   },
-  SET_COMMUNICATION_TYPE (state, communicationType) {
-    state.communicationType = communicationType
+  SET_VIEW_MODE (state, viewMode) {
+    state.viewMode = viewMode
   },
-  SET_CONTACTS (state, contacts) {
-    state.contacts = contacts
+  SET_ITEMS (state, items) {
+    state.items = items
   },
-  SET_IS_LOADING_CONTACTS (state, loading) {
-    state.isLoadingContacts = loading
+  SET_IS_LOADING_ITEMS (state, loading) {
+    state.isLoadingItems = loading
   },
-  SET_CURRENT_CONTACTS_PAGE (state, page) {
-    state.currentContactsPage = page
+  SET_CURRENT_ITEMS_PAGE (state, page) {
+    state.currentItemsPage = page
   },
-  SET_HAS_MORE_CONTACTS (state, hasMore) {
-    state.hasMoreContacts = hasMore
+  SET_HAS_MORE_ITEMS (state, hasMore) {
+    state.hasMoreItems = hasMore
   },
-  RESET_CONTACTS_STATE (state) {
-    state.contacts = []
-    state.currentContactsPage = 0
-    state.hasMoreContacts = true
+  RESET_ITEMS (state) {
+    state.items = []
+    state.currentItemsPage = 0
+    state.hasMoreItems = true
   },
-  APPEND_CONTACTS (state, contacts) {
-    state.contacts = [...state.contacts, ...contacts]
+  APPEND_ITEMS (state, items) {
+    state.items = [...state.items, ...items]
   },
-  SET_IS_LOADING_MORE_CONTACTS (state, loading) {
-    state.isLoadingMoreContacts = loading
+  SET_IS_LOADING_MORE_ITEMS (state, loading) {
+    state.isLoadingMoreItems = loading
   }
 }

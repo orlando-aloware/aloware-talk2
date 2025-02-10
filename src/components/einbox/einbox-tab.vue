@@ -1,18 +1,18 @@
 <template>
   <div class="einbox-tab d-flex flex-column w-100">
-    <!-- <inbox-channel-toggle /> -->
+    <inbox-channel-toggle />
 
     <!-- Communications List -->
     <div class="communications-list"
          ref="communicationsList"
          @scroll="onScroll">
       <!-- Initial loading state -->
-      <div :class="[isLoadingContacts ? 'py-5' : 'py-4', 'relative']"
-           v-if="isLoadingContacts">
+      <div :class="[isLoadingItems ? 'py-5' : 'py-4', 'relative']"
+           v-if="isLoadingItems">
         <b-overlay rounded="sm"
                    variant="white"
                    data-testid="communications-list-overlay"
-                   :show="isLoadingContacts">
+                   :show="isLoadingItems">
           <template #overlay>
             <div class="text-center">
               <q-spinner-bars color="primary"
@@ -23,9 +23,9 @@
       </div>
 
       <!-- contacts list -->
-      <template v-else-if="contacts.length">
+      <template v-else-if="items.length">
         <div :key="contact.id"
-             v-for="contact in contacts"
+             v-for="contact in items"
              @click="onItemClick(contact)">
           <message-item :contact="contact"
                         :direction="contact.last_communication_direction"
@@ -34,7 +34,7 @@
 
         <!-- Load more indicator -->
         <div class="text-center q-pa-sm"
-             v-if="isLoadingMoreContacts">
+             v-if="isLoadingMoreItems">
           <q-spinner-dots color="primary"
                           size="2em" />
         </div>
@@ -43,7 +43,7 @@
       <!-- Empty state -->
       <div class="text-center q-pa-md text-grey"
            v-else>
-        No contacts found
+        Empty Inbox
       </div>
     </div>
   </div>
@@ -51,15 +51,15 @@
 
 <script>
 import MessageItem from 'src/components/einbox/communication-items/message-item.vue'
-import { mapState } from 'vuex'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
+import InboxChannelToggle from './inbox-channel-toggle.vue'
+import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 
 export default {
-  name: 'EInboxTab',
-
   components: {
-    MessageItem
+    MessageItem,
+    InboxChannelToggle
   },
 
   mixins: [
@@ -74,10 +74,10 @@ export default {
 
   computed: {
     ...mapState('Einbox', [
-      'contacts',
-      'isLoadingContacts',
-      'isLoadingMoreContacts',
-      'hasMoreContacts',
+      'items',
+      'isLoadingItems',
+      'isLoadingMoreItems',
+      'hasMoreItems',
       'activeInbox'
     ])
   },
@@ -104,7 +104,7 @@ export default {
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
       if (isNearBottom && !this.isLoadingMoreContacts && this.hasMoreContacts) {
-        this.loadMoreContactss(this.activeInbox)
+        this.loadMoreItems(this.activeInbox)
       }
     },
 

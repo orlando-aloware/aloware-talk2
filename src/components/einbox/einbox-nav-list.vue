@@ -36,8 +36,6 @@ import { mapState, mapActions } from 'vuex'
 import EinboxNavItem from './einbox-nav-item.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 export default {
-  name: 'EinboxNavList',
-
   components: {
     EinboxNavItem
   },
@@ -64,7 +62,7 @@ export default {
   methods: {
     ...mapActions('Einbox', [
       'setActiveInbox',
-      'resetContacts'
+      'resetItems'
     ]),
 
     onScroll ({ verticalPosition, verticalSize, verticalContainerSize }) {
@@ -78,8 +76,8 @@ export default {
 
     onInboxSelect (inboxId) {
       this.setActiveInbox(inboxId)
-      this.resetContacts()
-      this.fetchContacts(inboxId)
+      this.resetItems()
+      this.fetchItems(inboxId)
       this.$router.push(`/einbox/${inboxId}`)
     }
   },
@@ -91,9 +89,8 @@ export default {
     if (this.inboxes.length) {
       const inboxId = this.inboxes[0].id
       this.setActiveInbox(inboxId)
-      this.resetContacts()
-
-      this.fetchContacts(inboxId)
+      this.resetItems()
+      this.fetchItems(inboxId)
     }
   }
 }
