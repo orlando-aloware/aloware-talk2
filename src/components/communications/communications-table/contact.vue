@@ -17,7 +17,8 @@
         </b-tooltip>
       </router-link>
     </div>
-    <div v-else class="deleted">
+    <div class="deleted"
+         v-else>
       Deleted Contact
     </div>
 
