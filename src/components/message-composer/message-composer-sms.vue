@@ -558,10 +558,8 @@ export default {
 
     onBlur () {
       if (this.urlShortenerDialog) {
-        return
-      }
 
-      this.processDetectLongUrl(this.detectLongUrl(this.messageComposer.sms.body))
+      }
     },
 
     formatMessage () {
@@ -583,13 +581,6 @@ export default {
     },
 
     onSend () {
-      const detected = this.detectLongUrl()
-      this.processDetectLongUrl(detected)
-
-      if (detected) {
-        return
-      }
-
       const message = this.formatMessage()
       this.$emit('message-sent', {
         ...this.messageSentFormatMessage(),
@@ -814,8 +805,6 @@ export default {
   },
 
   mounted () {
-    this.getDomains()
-
     if (this.resetOnLoad) {
       this.resetMessageComposerSms()
     }
