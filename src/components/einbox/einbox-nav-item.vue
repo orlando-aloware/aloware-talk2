@@ -7,13 +7,13 @@
       <div class="d-flex align-items-center">
         <q-icon name="inbox"
                 size="20px"
-                class="q-mr-sm" />
+                class="q-mr-sm inbox-nav-item__icon" />
         <span class="inbox-nav-item__label">{{ label }}</span>
       </div>
-      <q-badge color="primary"
+      <!-- <q-badge color="primary"
                class="inbox-nav-item__badge"
                :label="messageCount"
-               v-if="messageCount > 0" />
+               v-if="messageCount > 0" /> -->
     </div>
   </div>
 </template>
@@ -51,21 +51,15 @@ export default {
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #99EBAA;
-    color: #424242;
-
-    .inbox-nav-item__label {
-      color: #424242;
-    }
+    background-color: #4374B0;
   }
 
   &--active {
-    background-color: #00BD50;
-    color: #ffffff;
+    background-color: #256eff;
 
     .inbox-nav-item__label {
       font-weight: 600;
-      color: var(--q-primary);
+      color: #fff;
     }
   }
 
@@ -77,6 +71,10 @@ export default {
   &__badge {
     font-size: 12px;
     padding: 4px 8px;
+  }
+
+  &__icon {
+    color: #fff;
   }
 }
 </style>

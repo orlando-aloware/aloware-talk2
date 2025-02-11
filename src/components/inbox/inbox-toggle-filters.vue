@@ -31,11 +31,11 @@
               :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled }]"
               data-testid="inbox-new-experience-label">
           <template v-if="newInboxEnabled">
-            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
+            <zap-bold-icon class="ml-1" width="16" height="16" color="#256eff" />
             <strong>New Inbox Experience Enabled</strong>
           </template>
           <template v-else>
-            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
+            <zap-bold-icon class="ml-1" width="16" height="16" color="#256eff" />
             <strong>Enable the New Inbox experience</strong>
           </template>
         </label>
@@ -315,6 +315,6 @@ export default {
 
 <style>
   .custom-switch.einbox-toggle .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: #00BD50 !important;
+    background-color: #256eff !important;
   }
 </style>

@@ -2,16 +2,15 @@
   <div class="einbox-tab d-flex flex-column w-100">
     <inbox-channel-toggle />
 
-    <!-- Communications List -->
-    <div class="communications-list"
-         ref="communicationsList"
+    <!-- Items List -->
+    <div class="items-list"
          @scroll="onScroll">
       <!-- Initial loading state -->
       <div :class="[isLoadingItems ? 'py-5' : 'py-4', 'relative']"
            v-if="isLoadingItems">
         <b-overlay rounded="sm"
                    variant="white"
-                   data-testid="communications-list-overlay"
+                   data-testid="items-list-overlay"
                    :show="isLoadingItems">
           <template #overlay>
             <div class="text-center">
@@ -27,9 +26,13 @@
         <div :key="contact.id"
              v-for="contact in items"
              @click="onItemClick(contact)">
-          <message-item :contact="contact"
-                        :direction="contact.last_communication_direction"
-                        :is-active="activeContactId === contact.id" />
+          <threaded-item :contact="contact"
+                         :direction="contact.last_communication_direction"
+                         :is-active="activeContactId === contact.id"
+                         v-if="viewMode === THREADED" />
+          <span v-else>
+            To build...
+          </span>
         </div>
 
         <!-- Load more indicator -->
@@ -50,15 +53,16 @@
 </template>
 
 <script>
-import MessageItem from 'src/components/einbox/communication-items/message-item.vue'
+import ThreadedItem from 'src/components/einbox/communication-items/threaded-item.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import InboxChannelToggle from './inbox-channel-toggle.vue'
 import { mapState } from 'vuex'
+import { THREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
 
 export default {
   components: {
-    MessageItem,
+    ThreadedItem,
     InboxChannelToggle
   },
 
@@ -68,7 +72,8 @@ export default {
 
   data () {
     return {
-      activeContactId: null
+      activeContactId: null,
+      THREADED
     }
   },
 
@@ -78,7 +83,8 @@ export default {
       'isLoadingItems',
       'isLoadingMoreItems',
       'hasMoreItems',
-      'activeInbox'
+      'activeInbox',
+      'viewMode'
     ])
   },
 
@@ -137,18 +143,8 @@ export default {
   background-color: white;
 }
 
-.communications-list {
+.items-list {
   flex: 1;
   overflow-y: auto;
-
-  .communication-item {
-    border-bottom: 1px solid #eeeeee;
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: #f5f5f5;
-      cursor: pointer;
-    }
-  }
 }
 </style>
