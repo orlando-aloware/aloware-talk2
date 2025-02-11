@@ -3857,10 +3857,6 @@ i.option-separator {
   }
 }
 
-.einbox-side__nav {
-  padding: 0;
-}
-
 .inbox-details {
   border: solid 1px $grey-light3;
   border-top: 0;
@@ -15926,15 +15922,6 @@ hr {
   h3 {
     font-size: 13px;
   }
-}
-
-/* Gradient text effect for inbox */
-.inbox-effect-gradient-text {
-  cursor: pointer;
-  background-clip: text !important;
-  -webkit-background-clip: text !important;
-  color: transparent !important;
-  background-image: linear-gradient(135deg, #00BD50, #33D76B, #66E08A) !important;
 }
 
 .q-message-text-content {

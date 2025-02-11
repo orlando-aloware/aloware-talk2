@@ -7,8 +7,7 @@
                     :has-custom-left-content="true"
                     :is-search="isSearch"
                     data-testid="inbox-tab-calls-header"
-                    @sort="sortContactTasks"
-                    v-if="!isEInboxEnabled">
+                    @sort="sortContactTasks">
         <template slot="customLeftContent">
           <div class="channel-filter-actions-wrapper inbox-tab--filter ml-2 pr-1 d-inline-flex">
             <inbox-searcher :is-loading="isLoadingMore || isFetchingContacts"
@@ -234,7 +233,7 @@ import * as Filters from 'src/constants/filters'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import CallsHeader from 'components/inbox/calls/calls-header'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import InboxTaskList from 'components/inbox/inbox-tasks/list'
 import {
   aclMixin,
@@ -256,7 +255,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
-  name: 'InboxTab',
+  name: 'inbox-tab',
 
   mixins: [
     aclMixin,
@@ -309,10 +308,6 @@ export default {
     ...mapState('contacts', [
       'contact',
       'isContactMixinUsed'
-    ]),
-
-    ...mapGetters('Einbox', [
-      'isEInboxEnabled'
     ]),
 
     statusToggleColor () {
