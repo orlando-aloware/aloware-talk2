@@ -27,6 +27,13 @@ export const ALL_COLUMNS = [
     columnStyle: 'width: 200px'
   },
   {
+    name: 'inbox',
+    label: 'Inbox',
+    align: 'left',
+    headerStyle: 'min-width: 200px',
+    columnStyle: 'width: 200px'
+  },
+  {
     label: 'Sequence',
     name: 'workflow',
     align: 'left',
