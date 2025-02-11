@@ -103,7 +103,7 @@ export default {
       const bottomThreshold = 100
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
-      if (isNearBottom && !this.isLoadingMoreContacts && this.hasMoreContacts) {
+      if (isNearBottom && !this.isLoadingMoreItems && this.hasMoreItems) {
         this.loadMoreItems(this.activeInbox)
       }
     },

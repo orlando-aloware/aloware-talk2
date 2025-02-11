@@ -20,8 +20,7 @@ export default {
 
     name: {
       type: String,
-      required: false,
-      default: 'No Name'
+      required: true
     },
 
     colorModuleId: {

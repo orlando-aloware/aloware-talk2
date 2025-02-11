@@ -20,8 +20,7 @@ export default {
   props: {
     name: {
       type: String,
-      required: false,
-      default: 'No Name'
+      required: true
     }
   }
 }

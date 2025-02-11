@@ -13,13 +13,13 @@
         <avatar width="34"
                 height="34"
                 :color-module-id="contact.id"
-                :name="contact.name">
+                :name="contact.name || defaultEmptyName">
         </avatar>
       </div>
     </div>
 
     <div class="message-item__contact-name">
-      <contact-name :name="contact.name" />
+      <contact-name :name="contact.name || defaultEmptyName" />
     </div>
 
     <div class="message-item__communication-type">
@@ -67,13 +67,20 @@ export default {
       type: Object,
       required: true
     },
+
     direction: {
       type: [String, Number],
       required: true
     },
+
     isActive: {
       type: Boolean,
       default: false
+    },
+
+    defaultEmptyName: {
+      type: String,
+      default: 'No Name'
     }
   },
 
