@@ -869,22 +869,6 @@ export default {
       ]
     },
 
-    // v1 legacy redial (for non demo companies, should be deprecated once v2 redial is released)
-    shouldRedialLegacy () {
-      // force redial disabled
-      if (!this.sessionSettings.force_redial) {
-        return false
-      }
-
-      // task already redialed
-      if (this.redialedTasksCount[this.activeTask?.id] > 0) {
-        return false
-      }
-
-      // now should redial if call is not successfully answered
-      return !this.dialer.callSuccessfullyAnswered
-    },
-
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
     }
@@ -1413,14 +1397,6 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      // v1 legacy redial (for non demo companies, should be deprecated once v2 redial is released)
-      if (this.shouldRedialLegacy) {
-        this.incrementRedialedTaskCount(this.activeTask.id)
-        this.onRedial(false)
-        return
-      }
-
-      // v2 redial (for demo companies)
       if (this.redialRequired) {
         this.incrementRedialedTaskCount(this.activeTask.id)
 
