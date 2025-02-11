@@ -1200,10 +1200,6 @@ export default {
     },
 
     toggleListTypeFilter (type) {
-      // if (this.listTypeFilterSelected(type) && this.listTypesFilter.length === 1) {
-      //   return
-      // }
-
       if (this.listTypeFilterSelected(type)) {
         this.listTypesFilter = this.listTypesFilter.filter((item) => item !== type)
       } else {
