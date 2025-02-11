@@ -155,11 +155,11 @@
               <div v-else-if="col.name === COLUMN_NAMES.no_of_contacts">
                 {{ props.row.no_of_contacts }}
               </div>
+              <div v-else-if="col.name === COLUMN_NAMES.show_in_public_folder">
+                {{ props.row.show_in_public_folder ? 'Public' : 'Private' }}
+              </div>
               <div v-else-if="col.name === COLUMN_NAMES.type">
                 {{ getContactListType(props.row) }}
-              </div>
-              <div v-else-if="col.name === COLUMN_NAMES.show_in_public_folder">
-                {{ props.row.show_in_public_folder }}
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.source">
                 <span v-if="props.row.source_name">
@@ -675,11 +675,11 @@ export default {
     },
 
     textSearchFiltersTooltip () {
-      if (this.isPerformingTextSearch > 2) {
-        return null
+      if (this.isPerformingTextSearch) {
+        return { disabled: true }
       }
 
-      return { placement: 'bottom', title: 'Please enter a List Name in order to enable these filters', customClass: 'q-tooltip q-tooltip--style no-pointer-events' }
+      return { placement: 'bottom', title: 'Please enter a List Name in order to enable Search Filters', customClass: 'talk-table__tooltip no-pointer-events', boundary: 'window' }
     },
 
     isPerformingTextSearch () {
@@ -745,29 +745,26 @@ export default {
       this.setLoadingState(isLoadMore)
 
       const filters = {
+        private_only: !this.isPublic,
         ...(this.userId && { user_id: this.userId }),
         ...(this.folderId && { folder_id: this.folderId })
       }
 
-      const props = {
-        page: this.pagination.currentPage,
-        perPage: this.pagination.perPage,
-        isPublic: this.isPublic,
-        filters
-      }
-
+      // If performing text search, Global Search is enabled
+      // need to apply selected filters
       if (this.isPerformingTextSearch) {
-        // if searching for all lists (public + private) remove isPublic prop
+        delete filters.folder_id
+
+        // if searching for all lists (Global Search)
         if (this.textSearchPublicLists && this.textSearchPrivateLists) {
-          delete props.isPublic
-          if (this.isAdmin) {
-            delete filters.user_id
-          }
+          filters.global_search = true
         } else if (this.textSearchPublicLists) {
-          props.isPublic = true
+          filters.private_only = false
           delete filters.user_id
         } else if (this.textSearchPrivateLists) {
-          props.isPublic = false
+          filters.private_only = true
+
+          // admins are able to search through all users lists
           if (this.isAdmin) {
             delete filters.user_id
           }
@@ -778,7 +775,13 @@ export default {
         }
       } else if (this.isPublic) {
         delete filters.user_id
-        delete filters.folderId
+        delete filters.folder_id
+      }
+
+      const props = {
+        page: this.pagination.currentPage,
+        perPage: this.pagination.perPage,
+        filters
       }
 
       try {
@@ -1010,7 +1013,6 @@ export default {
     },
 
     buildListLink (list) {
-      console.log('list', list)
       let listLink
 
       if (list.show_in_public_folder) {
@@ -1119,6 +1121,8 @@ export default {
       switch (field) {
         case this.COLUMN_NAMES.owner_name:
           return this.isPublic || this.isPerformingTextSearch
+        case this.COLUMN_NAMES.show_in_public_folder:
+          return this.isPerformingTextSearch && this.textSearchPublicLists && this.textSearchPrivateLists
         default:
           return true
       }
