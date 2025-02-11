@@ -55,7 +55,7 @@ export default {
     },
 
     broadcastName () {
-      return Object.keys(this.broadcast).length > 0 ? (this.broadcast.name ? this.broadcast.name : 'Deleted Broadcast') : ''
+      return this.broadcast.name || ''
     },
 
     broadcastActivityParams () {
