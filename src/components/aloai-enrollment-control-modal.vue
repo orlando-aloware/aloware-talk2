@@ -10,10 +10,17 @@
     <div class="p-2">
       <h1 data-testid="aloai-enrollment-control-modal-title"
           class="text-center mb-2">
-        AloAi Bot Enrollment
+        AloAi Agent Enrollment
       </h1>
       <div class="text-center">
-        Select the bot and channel you want to use to initiate a conversation with this contact.
+        <template v-if="contactsCount === 1">
+          Select the bot and channel you want to use to initiate a conversation with this contact.
+        </template>
+        <template v-else>
+          Select the bot that you want to enroll at your <strong>
+            {{params?.selected_all ? contactsCount : `~${contactsCount}`}} contacts
+          </strong>.
+        </template>
       </div>
       <div class="w-75 my-2 mx-auto">
         <search placeholder="Search bot"
@@ -120,8 +127,42 @@ export default {
 
   mixins: [aloaiMixin],
 
+  props: {
+    params: {
+      type: Object,
+      default: () => ({})
+    },
+    contactList: {
+      type: Object,
+      default: null
+    },
+    checkedCount: {
+      type: Number,
+      default: 0
+    },
+    totalContactsCount: {
+      type: Number,
+      default: 0
+    }
+  },
+
   computed: {
     ...mapGetters('contacts', ['contact']),
+    contactsCount () {
+      // For single contact enrollment
+      if (this.contact?.id) {
+        return 1
+      }
+      // For "select all" case, use total contacts count
+      if (this.params?.selected_all) {
+        return this.totalContactsCount
+      }
+      // For multiple selected contacts case
+      if (this.params?.contact_ids?.length > 0) {
+        return this.params.contact_ids.length
+      }
+      return 0
+    },
     filteredBots () {
       let bots = this.bots
       if (!isEmpty(this.searchText)) {
@@ -205,20 +246,46 @@ export default {
       this.busyBotId = bot.id
       this.isBusy = true
 
+      // Construct enrollment data based on contact type
+      let enrollmentData = {
+        channel: channel === 'sms' ? AloAi.ENROLLMENT_TYPE_TEXT : AloAi.ENROLLMENT_TYPE_VOICE,
+        prevent_duplicates: true,
+        multiple_phone_numbers: false,
+        allow_international_phone_numbers: false
+      }
+
+      // For single contact
+      if (this.contact?.id) {
+        enrollmentData.contact_ids = [this.contact.id]
+      } else { // For multiple contacts
+        // For select all case
+        if (this.params?.selected_all) {
+          enrollmentData.selected_all = true
+          enrollmentData.contact_ids = []
+          if (this.params.list_id) {
+            enrollmentData.list_id = this.params.list_id
+          }
+        } else if (this.params?.contact_ids?.length > 0) { // For specific contacts case
+          enrollmentData.contact_ids = this.params.contact_ids
+          if (this.params.list_id) {
+            enrollmentData.list_id = this.params.list_id
+          }
+        }
+      }
+
       talk2Api.V2.aloAiBot
-        .enrollContacts(bot.id, {
-          contact_ids: [this.contact.id],
-          channel: channel === 'sms' ? AloAi.ENROLLMENT_TYPE_TEXT : AloAi.ENROLLMENT_TYPE_VOICE
-        })
+        .enrollContacts(bot.id, enrollmentData)
         .then(() => {
-          this.bot_enrollments.push({
-            aloai_bot_id: bot.id,
-            enrollment_expired_at: new Date(Date.now() + (24 * 60 * 60 * 1000)),
-            type: channel === 'sms' ? AloAi.ENROLLMENT_TYPE_TEXT : AloAi.ENROLLMENT_TYPE_VOICE
-          })
+          if (this.contact) {
+            this.bot_enrollments.push({
+              aloai_bot_id: bot.id,
+              enrollment_expired_at: new Date(Date.now() + (24 * 60 * 60 * 1000)),
+              type: channel === 'sms' ? AloAi.ENROLLMENT_TYPE_TEXT : AloAi.ENROLLMENT_TYPE_VOICE
+            })
+          }
 
           this.$generalNotification(
-            `Contact successfully enrolled to ${bot.name} via ${channel.toUpperCase()}.`
+            `Contact${this.contactsCount > 1 ? 's' : ''} successfully enrolled to ${bot.name} via ${channel.toUpperCase()}.`
           )
           this.$emit('contactEnrolled')
         })
@@ -306,6 +373,11 @@ export default {
     },
     async fetchContactDisengagedBots () {
       try {
+        // Only fetch disengaged bots if we have a specific contact
+        if (!this.contact?.id) {
+          return []
+        }
+
         const { data } = await talk2Api.V2.aloAiBot.getContactDisengagedBots(
           this.contact.id
         )
@@ -317,6 +389,11 @@ export default {
     },
     async fetchContactBotEnrollments () {
       try {
+        // Only fetch enrollments if we have a specific contact
+        if (!this.contact?.id) {
+          return []
+        }
+
         const { data } = await talk2Api.V2.aloAiBot.getContactBotEnrollments(
           this.contact.id
         )

@@ -782,11 +782,12 @@
       <tag-contacts-workflow-enroller :is-show="showAddToSequence"
                                       :list="selectedList"
                                       @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
-      <enroll-contacts-to-aloai-modal
+      <aloai-enrollment-control-modal
         ref="enrollContactsToAloAiModal"
         :params="attachedParams()"
-        :contactList="selectedList"
+        :contact-list="selectedList"
         :checked-count="selectedAllCount"
+        :total-contacts-count="totalRows"
       />
     <assign-contacts-modal :is-show="showAssignContacts"
                            :list="selectedList"
@@ -839,7 +840,7 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
-import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
+import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
 import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
@@ -891,7 +892,7 @@ export default {
     ImportContactsModal,
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
-    EnrollContactsToAloaiModal,
+    AloaiEnrollmentControlModal,
     AssignContactsModal,
     TagsCellList,
     FolderIcon,
@@ -1545,12 +1546,17 @@ export default {
     },
 
     attachedParams () {
+      // If "Select All" is checked, return with selected_all true and empty contact_ids
+      if (this.isDatatableSelectedAll) {
+        return {
+          selected_all: true,
+          contact_ids: [],
+          ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})
+        }
+      }
+
       // If there are no selected contacts and a contact list is selected
-      // all contacts in the list should be added to the power dialer
-      if (
-        this.checkedItemIds.length === 0 &&
-        this.isContactListSelected
-      ) {
+      if (this.checkedItemIds.length === 0 && this.isContactListSelected) {
         return {
           list_id: this.selectedList.id,
           selected_all: true,
@@ -1558,6 +1564,7 @@ export default {
         }
       }
 
+      // For specific selected contacts
       return {
         contact_ids: this.checkedItemIds,
         ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})
