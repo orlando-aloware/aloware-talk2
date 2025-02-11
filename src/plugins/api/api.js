@@ -8,7 +8,7 @@ const exportCommunications = async (contactId) => {
   return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
 }
 
-const talk2Api = {
+export default {
   V1: {
     contact: {
       createAxiosError (message, status) {
@@ -973,20 +973,6 @@ const talk2Api = {
         delete (filterId) {
           return window.axios.delete(`${suffixV2}filters/${filterId}`)
         }
-      },
-
-      inboxes: {
-        async get ({ page = 1, perPage = 15 } = {}) {
-          const params = { per_page: perPage, page }
-          return window.axios.get(`${suffixV2}inboxes`, { params })
-        }
-      },
-
-      communications: {
-        get: ({ inboxId, page = 1, communicationType }) => {
-          const params = { per_page: 25, page, type: communicationType }
-          return window.axios.get(`${suffixV2}inboxes/${inboxId}/communications`, { params })
-        }
       }
     },
 
@@ -1015,14 +1001,6 @@ const talk2Api = {
       disenrollContact (botId, params) {
         return window.axios.post(`${suffixV1}aloai/bot/${botId}/disenroll-contact`, params)
       }
-    },
-
-    companies: {
-      toggleFeature (companyId, feature) {
-        return window.axios.put(`${suffixV2}companies/${companyId}/features/${feature}`)
-      }
     }
   }
 }
-
-export default talk2Api
