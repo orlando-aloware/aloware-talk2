@@ -31,19 +31,78 @@
 
             <strong v-if="!isLoading">{{ listsCount }} List(s)</strong>
 
-            <q-spinner-bars class="mr-1"
+            <q-spinner-bars :class="`${isPublic ? 'my-1' : 'my-3'}`"
                             color="primary"
                             size="14px"
                             v-else />
         </div>
-        <div class="filters pl-3">
-          <div class="search">
-            <search-input class="width-260"
-                          data-testid="lists-search-input"
-                          limit-search-characters
-                          :search="search"
-                          :disabled="isLoadingDisabled"
-                          @search="onSearch" />
+        <div class="d-flex align-items-center mt-2">
+          <div class="filters pl-3 mt-0">
+            <div class="search">
+              <search-input class="width-260"
+                            data-testid="lists-search-input"
+                            limit-search-characters
+                            placeholder="Search List Name"
+                            :search="search"
+                            :search-on-input="true"
+                            @search="onSearch" />
+            </div>
+          </div>
+          <div class="ml-2">
+            <b-dropdown text="Search Filters"
+                        :disabled="!isPerformingTextSearch"
+                        right
+                        variant="light"
+                        class="calls__header__columns-dropdown m-2 b-compact-dropdown-button dropdown-white"
+                        size="lg"
+                        v-b-tooltip.hover="textSearchFiltersTooltip">
+              <b-overlay :show="isLoading">
+                <template #overlay>
+                  <q-spinner-bars color="primary"
+                                  size="30px" />
+                </template>
+                <h5 class="form-label relative-time m-2" style="width: 185px;">Visibility</h5>
+                <div class="px-2 py-1">
+                  <div class="d-flex align-items-center cursor-pointer w-100 text-sm mb-1"
+                      @click="toggleTextSearchPublicLists()">
+                    <input class="cursor-pointer"
+                          type="checkbox"
+                          :checked="textSearchPublicLists"
+                          value="Public"/>
+                    <div class="flex-grow-1 pl-2">
+                      Public Lists
+                    </div>
+                  </div>
+                </div>
+                <div class="px-2 py-1">
+                  <div class="d-flex align-items-center cursor-pointer w-100 text-sm mb-1"
+                      @click="toggleTextSearchPrivateLists()">
+                    <input class="cursor-pointer"
+                          type="checkbox"
+                          :checked="textSearchPrivateLists"
+                          value="Public"/>
+                    <div class="flex-grow-1 pl-2">
+                      {{ isAdmin ? 'Personal' : 'My' }} Lists
+                    </div>
+                  </div>
+                </div>
+                <h5 class="form-label relative-time m-2">Type</h5>
+                <div class="px-2 py-1"
+                    :key="option.value"
+                    v-for="option of listTypeOptions">
+                  <div class="d-flex align-items-center cursor-pointer w-100 text-sm mb-1"
+                      @click="toggleListTypeFilter(option.value)">
+                    <input class="cursor-pointer"
+                          type="checkbox"
+                          :checked="listTypeFilterSelected(option.value)"
+                          value="Public"/>
+                    <div class="flex-grow-1 pl-2">
+                      {{ option.label }}
+                    </div>
+                  </div>
+                </div>
+              </b-overlay>
+            </b-dropdown>
           </div>
         </div>
 
@@ -96,11 +155,11 @@
               <div v-else-if="col.name === COLUMN_NAMES.no_of_contacts">
                 {{ props.row.no_of_contacts }}
               </div>
+              <div v-else-if="col.name === COLUMN_NAMES.show_in_public_folder">
+                {{ props.row.show_in_public_folder ? 'Public' : 'Private' }}
+              </div>
               <div v-else-if="col.name === COLUMN_NAMES.type">
                 {{ getContactListType(props.row) }}
-              </div>
-              <div v-else-if="col.name === COLUMN_NAMES.show_in_public_folder">
-                {{ props.row.show_in_public_folder }}
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.source">
                 <span v-if="props.row.source_name">
@@ -506,7 +565,6 @@ export default {
   data () {
     return {
       search: '',
-      isLoadingDisabled: false,
       isLoading: false,
       isLoadingMore: false,
       loading: false,
@@ -531,10 +589,17 @@ export default {
       COLUMNS,
       COLUMN_NAMES,
       foldersPath: [],
+      accordionStates: {},
 
       // Filters
-      showInPublicFolder: false,
-      accordionStates: {}
+      textSearchPublicLists: false,
+      textSearchPrivateLists: false,
+      listTypesFilter: [ContactListTypes.STATIC, ContactListTypes.DYNAMIC, ContactListTypes.DYNAMIC_REMOTE_LIST],
+      listTypeOptions: [
+        { value: ContactListTypes.STATIC, label: 'Static' },
+        { value: ContactListTypes.DYNAMIC, label: 'Dynamic' },
+        { value: ContactListTypes.DYNAMIC_REMOTE_LIST, label: 'Integration Dynamic' }
+      ]
     }
   },
 
@@ -607,6 +672,18 @@ export default {
 
     folderId () {
       return +this.$route.params.folderId
+    },
+
+    textSearchFiltersTooltip () {
+      if (this.isPerformingTextSearch) {
+        return { disabled: true }
+      }
+
+      return { placement: 'bottom', title: 'Please enter a List Name in order to enable Search Filters', customClass: 'talk-table__tooltip no-pointer-events', boundary: 'window' }
+    },
+
+    isPerformingTextSearch () {
+      return this.search.length > 2
     }
   },
 
@@ -631,6 +708,7 @@ export default {
     ]),
 
     async initializeLists () {
+      this.resetSearchFilters()
       this.getPinnedLists()
       await this.getLists()
       this.calculateTotalPages()
@@ -667,22 +745,47 @@ export default {
       this.setLoadingState(isLoadMore)
 
       const filters = {
+        private_only: !this.isPublic,
         ...(this.userId && { user_id: this.userId }),
         ...(this.folderId && { folder_id: this.folderId })
       }
 
-      if (this.isPublic) {
+      // If performing text search, Global Search is enabled
+      // need to apply selected filters
+      if (this.isPerformingTextSearch) {
+        delete filters.folder_id
+
+        // if searching for all lists (Global Search)
+        if (this.textSearchPublicLists && this.textSearchPrivateLists) {
+          filters.global_search = true
+        } else if (this.textSearchPublicLists) {
+          filters.private_only = false
+          delete filters.user_id
+        } else if (this.textSearchPrivateLists) {
+          filters.private_only = true
+
+          // admins are able to search through all users lists
+          if (this.isAdmin) {
+            delete filters.user_id
+          }
+        }
+
+        if (this.listTypesFilter.length > 0) {
+          filters.list_types = this.listTypesFilter
+        }
+      } else if (this.isPublic) {
         delete filters.user_id
-        delete filters.folderId
+        delete filters.folder_id
+      }
+
+      const props = {
+        page: this.pagination.currentPage,
+        perPage: this.pagination.perPage,
+        filters
       }
 
       try {
-        await this.fetchLists({
-          page: this.pagination.currentPage,
-          perPage: this.pagination.perPage,
-          isPublic: this.isPublic,
-          filters
-        })
+        await this.fetchLists(props)
       } catch (err) {
         console.error('error', err)
       } finally {
@@ -910,9 +1013,15 @@ export default {
     },
 
     buildListLink (list) {
-      let listLink = `/lists/user/${this.userId}`
+      let listLink
 
-      if (this.folderId) {
+      if (list.show_in_public_folder) {
+        listLink = `/lists/public`
+      } else {
+        listLink = `/lists/user/${list.contact_folder_created_by}`
+      }
+
+      if (this.folderId && !this.isPerformingTextSearch) {
         listLink += `/folder/${this.folderId}`
       }
 
@@ -1011,7 +1120,9 @@ export default {
     isColumnVisible (field) {
       switch (field) {
         case this.COLUMN_NAMES.owner_name:
-          return this.isPublic
+          return this.isPublic || this.isPerformingTextSearch
+        case this.COLUMN_NAMES.show_in_public_folder:
+          return this.isPerformingTextSearch && this.textSearchPublicLists && this.textSearchPrivateLists
         default:
           return true
       }
@@ -1072,6 +1183,35 @@ export default {
       }
 
       this.$set(this.accordionStates, accordionId, !this.accordionStates[accordionId])
+    },
+
+    toggleTextSearchPublicLists () {
+      this.textSearchPublicLists = !this.textSearchPublicLists
+      this.refreshLists()
+    },
+
+    toggleTextSearchPrivateLists () {
+      this.textSearchPrivateLists = !this.textSearchPrivateLists
+      this.refreshLists()
+    },
+
+    listTypeFilterSelected (type) {
+      return this.listTypesFilter.includes(type)
+    },
+
+    toggleListTypeFilter (type) {
+      if (this.listTypeFilterSelected(type)) {
+        this.listTypesFilter = this.listTypesFilter.filter((item) => item !== type)
+      } else {
+        this.listTypesFilter.push(type)
+      }
+
+      this.refreshLists()
+    },
+
+    resetSearchFilters () {
+      this.textSearchPublicLists = this.isPublic
+      this.textSearchPrivateLists = !this.isPublic
     }
   },
 
@@ -1087,6 +1227,8 @@ export default {
 
   watch: {
     '$route.params': function () {
+      this.resetSearchFilters()
+
       this.SET_SEARCH('')
       this.search = ''
       this.refreshLists()
