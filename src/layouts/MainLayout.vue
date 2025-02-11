@@ -406,7 +406,8 @@ export default {
       MetricOptionGroups,
       AppDefaultLogin,
       isFirstLoading: true,
-      isSidebarExpanded: true
+      isSidebarExpanded: true,
+      loadingInboxes: false
     }
   },
 
@@ -1601,6 +1602,7 @@ export default {
 
         this.getRingGroups()
         this.getTeams()
+        this.getInboxes()
         this.getContactLists()
         this.getBroadcasts()
         this.getTemplates()
@@ -1754,6 +1756,18 @@ export default {
           console.log(err)
           this.loadingTeams = false
         })
+    },
+
+    async getInboxes () {
+      this.loadingInboxes = true
+      try {
+        const response = await this.$axios.get('/api/v2/inboxes/list', { mode: 'no-cors' })
+        this.setInboxes(response.data)
+      } catch (error) {
+        console.error('Error fetching inboxes:', error)
+      } finally {
+        this.loadingInboxes = false
+      }
     },
 
     getContactLists () {
@@ -2722,7 +2736,8 @@ export default {
       'setStatics',
       'setStaticsLoaded',
       'setIsWhiteLabel',
-      'setShowedKycReloadDialog'
+      'setShowedKycReloadDialog',
+      'setInboxes'
     ]),
     ...mapActions('contacts', [
       'resetSearch',

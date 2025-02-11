@@ -69,6 +69,7 @@ export default function (/* { ssrContext } */) {
       ringGroups: [],
       teams: [],
       contactLists: [],
+      inboxes: [],
       workflows: [],
       changelogs: [],
       broadcasts: [],
@@ -560,6 +561,10 @@ export default function (/* { ssrContext } */) {
 
       setTeams ({ commit }, teams) {
         commit('SET_TEAMS', teams)
+      },
+
+      setInboxes ({ commit }, inboxes) {
+        commit('SET_INBOXES', inboxes)
       },
 
       setContactLists ({ commit }, contactLists) {
@@ -1342,6 +1347,10 @@ export default function (/* { ssrContext } */) {
 
       SET_TEAMS (state, teams) {
         state.teams = teams
+      },
+
+      SET_INBOXES (state, inboxes) {
+        state.inboxes = inboxes
       },
 
       SET_CONTACT_LISTS (state, contactLists) {
