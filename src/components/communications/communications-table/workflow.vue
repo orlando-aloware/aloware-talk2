@@ -1,24 +1,24 @@
 <template>
   <div class="d-flex flex-column"
        data-testid="user-row">
-    <span class="ellipse"
-          v-if="isAgent && value">
-      {{ workflow.name || '-' }}
-    </span>
     <a class="ellipse cursor-pointer"
        :id="`comm-sequence-${_uid}`"
        target="_blank"
        :href="getWorkflowURL(value)"
        @click="handleWorkflowClick"
-       v-else-if="value">
+       v-if="value && workflowName !== ''">
       <external-link-icon color="#1976D2"/>
-      {{ workflow.name || '-' }}
+      {{ workflowName }}
 
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-sequence-${_uid}`">
         Click to go to sequence page
       </b-tooltip>
     </a>
+    <span class="ellipse"
+          v-else-if="(isAgent && value)">
+      {{ workflowName }}
+    </span>
     <span v-else>
       -
     </span>
@@ -56,6 +56,10 @@ export default {
 
     workflow () {
       return this.workflows.find(workflow => workflow.id === this.value) || {}
+    },
+
+    workflowName () {
+      return this.workflow.name || ''
     }
   },
 
