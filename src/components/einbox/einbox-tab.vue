@@ -23,29 +23,41 @@
 
       <!-- contacts list -->
       <template v-else-if="items.length">
-        <div :key="contact.id"
-             v-for="contact in items"
-             @click="onItemClick(contact)">
-          <communication :contact-id="contact.id"
-                         :contact-name="contact.name"
-                         :disposition-status="contact.last_communication_disposition_status2"
-                         :type="contact.last_communication_type"
-                         :direction="contact.last_communication_direction"
-                         :callback-status="contact.last_communication_callback_status"
-                         :body="contact.last_communication_body"
-                         :current-status="contact.last_communication_current_status2"
-                         :date="contact.last_communication_at"
-                         :total-unreads="contact.unread_comms"
-                         :is-active="activeContactId === contact.id"
+        <div :key="item.id"
+             v-for="item in items"
+             @click="onItemClick(item)">
+          <!-- Threaded view -->
+          <communication :contact-id="item.id"
+                         :contact-name="item.name"
+                         :disposition-status="item.last_communication_disposition_status2"
+                         :type="item.last_communication_type"
+                         :direction="item.last_communication_direction"
+                         :callback-status="item.last_communication_callback_status"
+                         :body="item.last_communication_body"
+                         :current-status="item.last_communication_current_status2"
+                         :date="item.last_communication_at"
+                         :total-unreads="item.unread_comms"
+                         :is-active="activeId === item.id"
                          v-if="viewMode === THREADED" />
-          <span v-else>
-            To build...
-          </span>
+
+          <!-- Unthreaded View -->
+          <communication :contact-id="item.contact_id"
+                         :contact-name="`${item.contact.first_name} ${item.contact.last_name}`"
+                         :disposition-status="item.disposition_status2"
+                         :type="item.type"
+                         :direction="item.direction"
+                         :callback-status="item.callback_status"
+                         :body="item.body"
+                         :current-status="item.current_status2"
+                         :date="item.created_at"
+                         :total-unreads="0"
+                         :is-active="activeId === item.id"
+          v-else-if="viewMode === UNTHREADED" />
         </div>
 
         <!-- Load more indicator -->
         <div class="text-center q-pa-sm"
-             v-if="isLoadingMoreItems">
+             v-if="isLoadingMoreItems || isLoadingItems">
           <q-spinner-dots color="primary"
                           size="2em" />
         </div>
@@ -65,7 +77,7 @@ import Communication from 'src/components/einbox/communication-items/communicati
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import InboxChannelToggle from './inbox-channel-toggle.vue'
 import { mapState } from 'vuex'
-import { THREADED } from 'src/store/einbox/einbox.store'
+import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
 
 export default {
@@ -80,8 +92,9 @@ export default {
 
   data () {
     return {
-      activeContactId: null,
-      THREADED
+      activeId: null,
+      THREADED,
+      UNTHREADED
     }
   },
 
@@ -122,15 +135,17 @@ export default {
       }
     },
 
-    onItemClick (contact) {
+    onItemClick (item) {
+      this.activeId = item.id
+      const contactId = this.viewMode === THREADED ? item.id : item.contact_id
+      const route = `/einbox/${this.activeInbox}/contacts/${contactId}/communications`
+
       // avoid redundant navigation
-      if (this.activeContactId === contact.id) {
+      if (route === this.$route.path) {
         return
       }
 
-      this.activeContactId = contact.id
-
-      this.$router.push(`/einbox/${this.activeInbox}/contacts/${contact.id}/communications`)
+      this.$router.push(route)
     }
   },
 
@@ -138,7 +153,9 @@ export default {
     '$route.params.id': {
       immediate: true,
       handler (newV) {
-        this.activeContactId = newV ? parseInt(newV) : null
+        if (this.viewMode === THREADED) {
+          this.activeId = newV ? parseInt(newV) : null
+        }
       }
     }
   }

@@ -6,7 +6,8 @@
         <b-badge class="avatar__unread-badge position-absolute"
                  variant="danger"
                  data-testid="inbox-tasks-item-badge"
-                 pill>
+                 pill
+                 v-if="totalUnreads > 0">
           <span v-if="totalUnreads < 99">{{ totalUnreads }}</span>
           <span v-else>99<sup>+</sup></span>
         </b-badge>
