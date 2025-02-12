@@ -10,8 +10,7 @@
                   spread
                   :options="options"
                   :value="viewMode"
-                  @input="onChange"
-    />
+                  @input="onChange" />
   </div>
 </template>
 

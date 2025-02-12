@@ -21,10 +21,10 @@
         </b-overlay>
       </div>
 
-      <!-- contacts list -->
+      <!-- items list -->
       <template v-else-if="items.length">
         <div :key="item.id"
-             v-for="item in items"
+             v-for="item in filteredItems"
              @click="onItemClick(item)">
           <!-- Threaded view -->
           <communication :contact-id="item.id"
@@ -42,7 +42,7 @@
 
           <!-- Unthreaded View -->
           <communication :contact-id="item.contact_id"
-                         :contact-name="`${item.contact.first_name} ${item.contact.last_name}`"
+                         :contact-name="getContactName(item.contact || {})"
                          :disposition-status="item.disposition_status2"
                          :type="item.type"
                          :direction="item.direction"
@@ -52,6 +52,7 @@
                          :date="item.created_at"
                          :total-unreads="0"
                          :is-active="activeId === item.id"
+                         :repeats="item.repeats"
           v-else-if="viewMode === UNTHREADED" />
         </div>
 
@@ -74,8 +75,8 @@
 
 <script>
 import Communication from 'src/components/einbox/communication-items/communication.vue'
-import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import InboxChannelToggle from './inbox-channel-toggle.vue'
+import { helperMixin, EinboxMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
@@ -87,7 +88,8 @@ export default {
   },
 
   mixins: [
-    EinboxMixin
+    EinboxMixin,
+    helperMixin
   ],
 
   data () {
@@ -106,7 +108,11 @@ export default {
       'hasMoreItems',
       'activeInbox',
       'viewMode'
-    ])
+    ]),
+
+    filteredItems () {
+      return this.items.filter(item => !item.hidden)
+    }
   },
 
   created () {
@@ -130,7 +136,7 @@ export default {
       const bottomThreshold = 100
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
-      if (isNearBottom && !this.isLoadingMoreItems && this.hasMoreItems) {
+      if (isNearBottom && !this.isLoadingMoreItems && !this.isLoadingItems && this.hasMoreItems) {
         this.loadMoreItems(this.activeInbox)
       }
     },
