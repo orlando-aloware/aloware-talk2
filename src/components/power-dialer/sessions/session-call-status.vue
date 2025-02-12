@@ -1022,6 +1022,11 @@ export default {
           this.countdownTimer = 0
         }
 
+        // skip warm-up period if set, if task is being redialed, and if is in warm-up period
+        if (this.sessionSettings.skip_redial_warmup_period && this.isRedialing && this.dialer.currentStatus !== 'WRAP_UP' && !this.wrapUp) {
+          this.countdownTimer = 0
+        }
+
         // reset next task loading flag
         if (this.loadingNext) {
           this.loadingNext = false

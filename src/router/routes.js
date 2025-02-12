@@ -356,6 +356,16 @@ const routes = [
               isFromListsManagement: true
             },
             component: ContactsView
+          },
+          {
+            name: 'Contacts',
+            path: ':type(public)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List',
+              isFromListsManagement: true
+            },
+            component: ContactsView
           }
         ]
       },

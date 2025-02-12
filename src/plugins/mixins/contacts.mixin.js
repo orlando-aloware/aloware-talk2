@@ -945,7 +945,7 @@ export default {
       this.listDataSource = this.listDataCancelToken.source()
 
       return this.$axios
-        .get('/api/v2/contacts-list/' + this.id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''), {
+        .get('/api/v2/contacts-list/' + this.id + (this.$route.params.type && this.$route.params.type === 'public' ? '?is_public_list=true' : ''), {
           cancelToken: this.listDataSource.token
         })
         .then((response) => response.data)
