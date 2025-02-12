@@ -16222,6 +16222,11 @@ hr {
       text-align: center;
       z-index: 0;
     }
+
+    .deleted, a.deleted {
+      color: #666666;
+      font-style: italic;
+    }
   }
 
   .title {

@@ -7,7 +7,7 @@
                  :to="broadcastActivityParams"
                  v-if="canUseBroadcast && broadcast.id">
       <external-link-icon color="#1976D2"/>
-      {{ broadcast.name || '-' }}
+      {{ broadcastName }}
 
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-broadcast-${_uid}`">
@@ -16,7 +16,7 @@
     </router-link>
     <span class="ellipse"
           v-else-if="broadcast.id">
-      {{ broadcast.name || '-' }}
+      {{ broadcastName }}
     </span>
     <span v-else>
       -
@@ -52,6 +52,10 @@ export default {
 
     broadcast () {
       return this.broadcasts.find(broadcast => broadcast.id === this.value) || {}
+    },
+
+    broadcastName () {
+      return this.broadcast.name || ''
     },
 
     broadcastActivityParams () {

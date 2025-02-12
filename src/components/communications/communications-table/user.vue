@@ -24,8 +24,9 @@
     <a href="#"
        :id="`comm-user-${_uid}`"
        v-if="row.user_id"
+       :class="{ 'deleted': userName === 'Deleted User' }"
        @click.prevent="filter">
-      {{ getUserName(getUser(row.user_id)) }}
+      {{ userName }}
 
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-user-${_uid}`">
@@ -61,6 +62,12 @@ export default {
         type: 'users',
         value: [this.row.user_id]
       })
+    }
+  },
+
+  computed: {
+    userName () {
+      return this.getUserName(this.getUser(this.row.user_id))
     }
   }
 }
