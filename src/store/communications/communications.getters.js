@@ -43,7 +43,8 @@ export default {
         answer_status: answerStatus,
         not_disposed: Filters.DEFAULT_STATE.filter.not_disposed,
         unread_only: 0,
-        type
+        type,
+        inboxes: Filters.DEFAULT_STATE.filter.inboxes || []
       }
       return defaultFilterModel
     }
@@ -75,7 +76,8 @@ export default {
         not_disposed: Filters.DEFAULT_STATE.filter.not_disposed,
         unread_only: 0,
         type,
-        answer_status: answerStatus
+        answer_status: answerStatus,
+        inboxes: Filters.DEFAULT_STATE.filter.inboxes || []
       }
       return defaultFilterModel
     }
@@ -86,7 +88,8 @@ export default {
         ...Filters.DEFAULT_STATE.filter,
         changed: true,
         unread_only: 0,
-        type
+        type,
+        inboxes: Filters.DEFAULT_STATE.filter.inboxes || []
       }
 
       return defaultFilterModel
@@ -113,7 +116,8 @@ export default {
       answer_status: answerStatus,
       not_disposed: Filters.DEFAULT_STATE.filter.not_disposed,
       type,
-      unread_only: 0
+      unread_only: 0,
+      inboxes: Filters.DEFAULT_STATE.filter.inboxes || []
     }
 
     return defaultFilterModel
