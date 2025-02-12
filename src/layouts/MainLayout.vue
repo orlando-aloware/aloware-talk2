@@ -1761,7 +1761,7 @@ export default {
     async getInboxes () {
       this.loadingInboxes = true
       try {
-        const response = await this.$axios.get('/api/v2/inboxes/list', { mode: 'no-cors' })
+        const response = await this.$axios.get('/api/v2/inboxes', { params: { no_pagination: 1 }, mode: 'no-cors' })
         this.setInboxes(response.data)
       } catch (error) {
         console.error('Error fetching inboxes:', error)
