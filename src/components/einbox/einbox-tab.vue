@@ -26,8 +26,16 @@
         <div :key="contact.id"
              v-for="contact in items"
              @click="onItemClick(contact)">
-          <threaded-item :contact="contact"
+          <communication :contact-id="contact.id"
+                         :contact-name="contact.name"
+                         :disposition-status="contact.last_communication_disposition_status2"
+                         :type="contact.last_communication_type"
                          :direction="contact.last_communication_direction"
+                         :callback-status="contact.last_communication_callback_status"
+                         :body="contact.last_communication_body"
+                         :current-status="contact.last_communication_current_status2"
+                         :date="contact.last_communication_at"
+                         :total-unreads="contact.unread_comms"
                          :is-active="activeContactId === contact.id"
                          v-if="viewMode === THREADED" />
           <span v-else>
@@ -53,7 +61,7 @@
 </template>
 
 <script>
-import ThreadedItem from 'src/components/einbox/communication-items/threaded-item.vue'
+import Communication from 'src/components/einbox/communication-items/communication.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import InboxChannelToggle from './inbox-channel-toggle.vue'
 import { mapState } from 'vuex'
@@ -62,7 +70,7 @@ import { debounce } from 'lodash'
 
 export default {
   components: {
-    ThreadedItem,
+    Communication,
     InboxChannelToggle
   },
 

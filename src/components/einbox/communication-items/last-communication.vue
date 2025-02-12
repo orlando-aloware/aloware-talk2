@@ -5,7 +5,7 @@
           <component height="18px"
                      width="18px"
                      data-testid="inbox-tasks-item-component"
-                     :is="stateToIcon(dispositionStatus2, type, direction, callbackStatus)">
+                     :is="stateToIcon(dispositionStatus, type, direction, callbackStatus)">
           </component>
         </div>
         <div class="comm-label text-grey-90 d-flex align-items-center">
@@ -50,7 +50,7 @@ export default {
   ],
 
   props: {
-    dispositionStatus2: {
+    dispositionStatus: {
       type: [Number, String],
       required: true
     },
