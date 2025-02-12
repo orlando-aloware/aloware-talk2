@@ -1,53 +1,54 @@
 <template>
-  <div class="w-100" data-testid="inbox-selector-wrapper">
-    <generic-multi-select :label="label"
-                          buttonText="Inboxes"
-                          :values="selectedId"
-                          :options="inboxesAlphabeticalOrder"
+  <div class="w-100"
+       data-testid="inbox-selector-wrapper">
+    <generic-multi-select buttonText="Inboxes"
+                          data-testid="inbox-selector-generic-multi-select"
                           :disable="disable"
+                          :label="label"
+                          :options="inboxesAlphabeticalOrder"
+                          :values="selectedId"
                           :canEdit="hasPermissionTo(['list inbox', 'view inbox'])"
                           v-if="genericMultiselect"
-                          data-testid="inbox-selector-generic-multi-select"
-                          @valuesUpdated="updateInboxes">
-    </generic-multi-select>
-    <q-select v-else
-              ref="inboxSelect"
-              options-selected-class="text-primary"
-              class="q-basic-selector"
+                          @valuesUpdated="updateInboxes" />
+    <q-select class="q-basic-selector"
               color="primary"
-              option-value="id"
-              option-label="name"
-              option-disable="enabled"
+              data-testid="inbox-selector-select"
+              dense
+              emit-value
               input-debounce="0"
+              map-options
+              option-disable="enabled"
+              option-label="name"
+              option-value="id"
+              options-selected-class="text-primary"
+              outlined
               style="word-break: break-all;"
               use-input
-              emit-value
-              map-options
-              outlined
-              dense
-              :clearable="clearable"
-              :use-chips="multiple"
-              :options="options"
-              :multiple="multiple"
-              :placeholder="placeholder"
-              :disable="disable"
+              ref="inboxSelect"
               :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '', isGenericSelectorStyle ? 'generic-selector': '']"
+              :clearable="clearable"
+              :disable="disable"
+              :multiple="multiple"
+              :options="options"
+              :placeholder="placeholder"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              :use-chips="multiple"
+              v-else
               v-model="selectedId"
-              data-testid="inbox-selector-select"
-              @popup-show="onShowMenu"
+              @blur="onBlur"
               @filter="filterFn"
               @focus="onFocus"
-              @blur="onBlur"
-              @input="onInput">
-      <template v-slot:prepend
-                v-if="prepend">
+              @input="onInput"
+              @popup-show="onShowMenu">
+      <template v-if="prepend"
+                v-slot:prepend>
         <span class="text-size-xs text-grey-80">{{ prepend }}</span>
       </template>
 
       <template v-slot:no-option>
         <q-item>
-          <q-item-section class="no-results text-grey" data-testid="inbox-selector-no-results-select">
+          <q-item-section class="no-results text-grey"
+                          data-testid="inbox-selector-no-results-select">
             No results
           </q-item-section>
         </q-item>
@@ -59,27 +60,27 @@
                 v-bind="scope.itemProps"
                 v-on="scope.itemEvents">
           <q-item-section>
-            <q-item-label v-html="scope.opt.name"/>
+            <q-item-label v-html="scope.opt.name" />
           </q-item-section>
         </q-item>
       </template>
 
       <template v-if="multiple"
                 v-slot:selected-item="scope">
-        <q-chip
-          dense
-          :tabindex="scope.tabindex"
-          color="white"
-          class="tag-selected-chip"
-          text-color="secondary"
-          data-testid="inbox-selector-chip"
+        <q-chip class="tag-selected-chip"
+                color="white"
+                data-testid="inbox-selector-chip"
+                dense
+                text-color="secondary"
+                :tabindex="scope.tabindex"
         >
           <span class="ml-3 mr-3 pr-1 pl-1">{{ scope.opt.name }}</span>
-          <div role="button" class="custom__remove d-flex align-items-center position-absolute r-0"
+          <div class="custom__remove d-flex align-items-center position-absolute r-0"
                data-testid="inbox-selector-remove-btn"
+               role="button"
                @click="scope.removeAtIndex(scope.index)">
-            <remove-tag-icon class="ml-1 remove-tag-icon" data-testid="inbox-selector-remove-tag-icon">
-            </remove-tag-icon>
+            <remove-tag-icon class="ml-1 remove-tag-icon"
+                             data-testid="inbox-selector-remove-tag-icon" />
           </div>
         </q-chip>
       </template>
@@ -95,8 +96,6 @@ import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
-  name: 'InboxSelector',
-
   mixins: [
     aclMixin,
     selectorMixin

@@ -1,13 +1,13 @@
 <template>
   <div class="d-flex align-items-center"
        data-testid="inbox-wrapper">
-    <span v-if="inbox"
-          class="text-truncate"
-          data-testid="inbox-name">
+    <span class="text-truncate"
+          data-testid="inbox-name"
+          v-if="inbox">
       {{ inbox.name }}
     </span>
-    <span v-else
-          data-testid="inbox-empty">
+    <span data-testid="inbox-empty"
+          v-else>
       -
     </span>
   </div>
@@ -17,8 +17,6 @@
 import { mapState } from 'vuex'
 
 export default {
-  name: 'Inbox',
-
   props: {
     inboxId: {
       type: [Number, String],

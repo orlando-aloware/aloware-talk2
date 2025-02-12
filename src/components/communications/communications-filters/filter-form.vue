@@ -117,14 +117,14 @@
                    md="6">
               <b-form-group class="form-label"
                             label="Inboxes">
-                <inbox-selector :force-remove-missing-values="true"
-                               :multiple="true"
-                               :use-chips="true"
-                               :highlighted="isChanged('inboxes')"
-                               :generic-multiselect="false"
-                               data-testid="filter-form-inbox-selector"
-                               v-model="filter.inboxes"
-                               @change="eventPayload => onFilterChange(eventPayload, 'inboxes')" />
+                <inbox-selector data-testid="filter-form-inbox-selector"
+                                :force-remove-missing-values="true"
+                                :multiple="true"
+                                :use-chips="true"
+                                :highlighted="isChanged('inboxes')"
+                                :generic-multiselect="false"
+                                v-model="filter.inboxes"
+                                @change="eventPayload => onFilterChange(eventPayload, 'inboxes')" />
               </b-form-group>
             </b-col>
           </b-form-row>
