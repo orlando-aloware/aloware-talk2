@@ -35,7 +35,7 @@ export default {
         return ''
       }
 
-      return `avatar-circle--color-${this.colorModuleId % 12}`
+      return `avatar-circle--color-${this.colorModuleId % 11}`
     }
   }
 }
@@ -104,11 +104,6 @@ export default {
   &--color-10 {
     color: #FF01A6;
     background-color: #FFE5F6;
-  }
-
-  &--color-11 {
-    color: #FF4801;
-    background-color: #FFE901;
   }
 }
 </style>
