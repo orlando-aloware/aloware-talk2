@@ -2,7 +2,7 @@
   <div class="contact-name"
        :id="`contact-name-${_uid}`">
     <div class="ellipse">
-      {{ name }}
+      {{ name }} {{ repeats ? `(${repeats + 1})` : '' }}
     </div>
 
     <b-popover triggers="hover"
@@ -21,6 +21,11 @@ export default {
     name: {
       type: String,
       required: true
+    },
+
+    repeats: {
+      type: Number,
+      required: false
     }
   }
 }

@@ -1,3 +1,5 @@
+import { THREADED } from './einbox.store'
+
 export default {
   SET_ACTIVE_INBOX (state, inbox) {
     state.activeInbox = inbox
@@ -21,7 +23,7 @@ export default {
     state.viewMode = viewMode
   },
   SET_ITEMS (state, items) {
-    state.items = items
+    state.items = state.viewMode === THREADED ? items : handleDuplicatedItems(items)
   },
   SET_IS_LOADING_ITEMS (state, loading) {
     state.isLoadingItems = loading
@@ -38,9 +40,69 @@ export default {
     state.hasMoreItems = true
   },
   APPEND_ITEMS (state, items) {
-    state.items = [...state.items, ...items]
+    const allItems = [...state.items, ...items]
+    state.items = state.viewMode === THREADED ? allItems : handleDuplicatedItems(allItems)
   },
   SET_IS_LOADING_MORE_ITEMS (state, loading) {
     state.isLoadingMoreItems = loading
   }
+}
+
+/**
+ * Handle sequenced-duplicated items for the unthreaded view
+ *
+ * @param {array} items
+ * @returns array
+ */
+function handleDuplicatedItems (items) {
+  // first unset all props previous set
+  items.forEach((item, index) => {
+    delete items[index].repeats
+    delete items[index].hidden
+  })
+
+  const found = []
+  const hidden = []
+
+  items.forEach((item, index) => {
+    const repeateds = !found.includes(item.contact_id)
+      ? findRepeateds(items, index)
+      : []
+
+    // try to find repeated comms for this contact
+    if (repeateds.length > 0) {
+      items[index].repeats = repeateds.length
+      found.push(items[index].contact_id)
+      hidden.push(...repeateds)
+    }
+
+    // mark repeated comms to dont appear
+    if (hidden.includes(item.id)) {
+      items[index].hidden = true
+    }
+  })
+
+  return items
+}
+
+/**
+ * Find repeated comms of a contact
+ *
+ * @param {array} items
+ * @param {number} startIndex
+ * @returns array
+ */
+function findRepeateds (items, startIndex) {
+  const repeateds = []
+  const contactId = items[startIndex].contact_id
+
+  for (let i = startIndex + 1; i < items.length; i++) {
+    if (items[i].contact_id !== contactId) {
+      break
+    }
+
+    repeateds.push(items[i].id)
+  }
+
+  return repeateds
 }

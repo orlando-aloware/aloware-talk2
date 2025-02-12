@@ -20,7 +20,8 @@
     </div>
 
     <div class="communication__contact-name">
-      <contact-name :name="contactName || defaultEmptyName" />
+      <contact-name :name="contactName || defaultEmptyName"
+                    :repeats="repeats" />
     </div>
 
     <div class="communication__communication-type">
@@ -115,6 +116,11 @@ export default {
     isActive: {
       type: Boolean,
       default: false
+    },
+
+    repeats: {
+      type: Number,
+      required: false
     },
 
     defaultEmptyName: {
