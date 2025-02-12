@@ -592,8 +592,8 @@ export default {
       accordionStates: {},
 
       // Filters
-      textSearchPublicLists: false,
-      textSearchPrivateLists: false,
+      textSearchPublicLists: true,
+      textSearchPrivateLists: true,
       listTypesFilter: [ContactListTypes.STATIC, ContactListTypes.DYNAMIC, ContactListTypes.DYNAMIC_REMOTE_LIST],
       listTypeOptions: [
         { value: ContactListTypes.STATIC, label: 'Static' },
@@ -1210,8 +1210,8 @@ export default {
     },
 
     resetSearchFilters () {
-      this.textSearchPublicLists = this.isPublic
-      this.textSearchPrivateLists = !this.isPublic
+      this.textSearchPublicLists = true
+      this.textSearchPrivateLists = true
     }
   },
 
