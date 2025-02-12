@@ -404,7 +404,7 @@
                       <caret-right-icon height="20"
                                         width="20"
                                         :class="{ 'rotate-180': accordionStates[props.row.id] }"
-                                        color="#4caf50"/>
+                                        color="#256eff"/>
                       <b-tooltip custom-class="talk-table__tooltip"
                                  placement="bottom"
                                  boundary="window"
