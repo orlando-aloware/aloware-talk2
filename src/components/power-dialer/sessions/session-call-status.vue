@@ -1420,15 +1420,12 @@ export default {
     async onNextTask (forceSkip = false, skipWrapUp = false) {
       // v1 legacy redial (for non demo companies, should be deprecated once v2 redial is released)
       if (this.shouldRedialLegacy) {
-        this.incrementRedialedTaskCount(this.activeTask.id)
         this.onRedial(false)
         return
       }
 
       // v2 redial (for demo companies)
       if (this.redialRequired) {
-        this.incrementRedialedTaskCount(this.activeTask.id)
-
         // redial immediately if immediate redial is ON or no tasks left
         const redialNow = this.sessionSettings.force_immediate_redial || this.powerDialerTasks.in_queue.length === 0
         this.onRedial(redialNow, true)
@@ -1577,6 +1574,8 @@ export default {
     async onRedial (redial, forcedRedial = false) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
+
+      this.incrementRedialedTaskCount(this.activeTask.id)
 
       let task = null
       if (redial) {
