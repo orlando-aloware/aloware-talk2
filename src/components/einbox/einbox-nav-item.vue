@@ -43,34 +43,40 @@ export default {
 <style lang="scss" scoped>
 .inbox-nav-item {
   padding: 12px 16px;
-  border-radius: 10px 0 0 10px;
+  border-radius: 10px;
   transition: all 0.2s ease;
+  max-width: 235px;
 
-  &:hover {
-    background-color: #4374B0;
-  }
-
-  &--active {
-    background-color: #256eff;
-
-    .inbox-nav-item__label {
-      font-weight: 600;
-      color: #fff;
-    }
-  }
+  // &:hover {
+  //   background-color: #4374B0;
+  // }
 
   &__label {
     font-size: 14px;
-    color: #424242;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  &__badge {
-    font-size: 12px;
-    padding: 4px 8px;
-  }
+  &--active {
+    background: #E9F0FF;
 
-  &__icon {
-    color: #fff;
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 2px;
+      background: linear-gradient(90deg, #7c3aed, #0ea5e9);
+      -webkit-mask: linear-gradient(white 0 0) content-box, linear-gradient(white 0 0);
+      mask: linear-gradient(white 0 0) content-box, linear-gradient(white 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      clip-path: inset(0 round 8px);
+      border-radius: 8px;
+    }
   }
 }
 </style>
