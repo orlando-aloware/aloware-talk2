@@ -404,10 +404,10 @@ export default {
       }
     },
     canUseSMS (bot) {
-      return [AloAi.TYPE_TEXT, AloAi.TYPE_AGENT].includes(bot.type)
+      return [AloAi.TYPE_TEXT].includes(bot.type)
     },
     canUseCall (bot) {
-      return [AloAi.TYPE_VOICE, AloAi.TYPE_AGENT].includes(bot.type)
+      return [AloAi.TYPE_VOICE].includes(bot.type)
     },
     getChannelTooltip (bot, channel) {
       if (channel === 'sms' && !this.canUseSMS(bot)) {
@@ -443,8 +443,6 @@ export default {
           return 'Text Bot'
         case AloAi.TYPE_VOICE:
           return 'Voice Bot'
-        case AloAi.TYPE_AGENT:
-          return 'Agent Bot'
         default:
           return 'Unknown'
       }
