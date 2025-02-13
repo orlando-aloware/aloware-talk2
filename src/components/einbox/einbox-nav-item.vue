@@ -10,10 +10,6 @@
                 class="q-mr-sm inbox-nav-item__icon" />
         <span class="inbox-nav-item__label">{{ label }}</span>
       </div>
-      <!-- <q-badge color="primary"
-               class="inbox-nav-item__badge"
-               :label="messageCount"
-               v-if="messageCount > 0" /> -->
     </div>
   </div>
 </template>
