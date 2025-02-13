@@ -191,7 +191,6 @@
                               boundary="window"
                               right
                               :popper-opts="{ positionFixed: true }"
-                              lazy
                               @hide="onHide"
                               @show="onShow">
                     <template #button-content>
