@@ -1,18 +1,17 @@
 <template>
   <div class="einbox-tab d-flex flex-column w-100">
-    <!-- <inbox-channel-toggle /> -->
+    <inbox-channel-toggle />
 
-    <!-- Communications List -->
-    <div class="communications-list"
-         ref="communicationsList"
+    <!-- Items List -->
+    <div class="items-list"
          @scroll="onScroll">
       <!-- Initial loading state -->
-      <div :class="[isLoadingCommunications ? 'py-5' : 'py-4', 'relative']"
-           v-if="isLoadingCommunications">
+      <div :class="[isLoadingItems ? 'py-5' : 'py-4', 'relative']"
+           v-if="isLoadingItems">
         <b-overlay rounded="sm"
                    variant="white"
-                   data-testid="communications-list-overlay"
-                   :show="isLoadingCommunications">
+                   data-testid="items-list-overlay"
+                   :show="isLoadingItems">
           <template #overlay>
             <div class="text-center">
               <q-spinner-bars color="primary"
@@ -22,62 +21,98 @@
         </b-overlay>
       </div>
 
-      <!-- Communications list -->
-      <template v-else-if="communications.length">
-        <div :key="comm.id"
-             v-for="comm in communications"
-             @click="onCommunicationClick(comm)">
-             <inbox-task-item :contact="comm"
-                           :force-active="comm.id === activeContactId" />
+      <!-- items list -->
+      <template v-else-if="items.length">
+        <div :key="item.id"
+             v-for="item in filteredItems"
+             @click="onItemClick(item)">
+          <!-- Threaded view -->
+          <communication :contact-id="item.id"
+                         :contact-name="item.name"
+                         :disposition-status="item.last_communication_disposition_status2"
+                         :type="item.last_communication_type"
+                         :direction="item.last_communication_direction"
+                         :callback-status="item.last_communication_callback_status"
+                         :body="item.last_communication_body"
+                         :current-status="item.last_communication_current_status2"
+                         :date="item.last_communication_at"
+                         :total-unreads="item.unread_comms"
+                         :is-active="activeId === item.id"
+                         v-if="viewMode === THREADED" />
+
+          <!-- Unthreaded View -->
+          <communication :contact-id="item.contact_id"
+                         :contact-name="getContactName(item.contact || {})"
+                         :disposition-status="item.disposition_status2"
+                         :type="item.type"
+                         :direction="item.direction"
+                         :callback-status="item.callback_status"
+                         :body="item.body"
+                         :current-status="item.current_status2"
+                         :date="item.created_at"
+                         :total-unreads="0"
+                         :is-active="activeId === item.id"
+                         :repeats="item.repeats"
+          v-else-if="viewMode === UNTHREADED" />
         </div>
 
         <!-- Load more indicator -->
         <div class="text-center q-pa-sm"
-             v-if="isLoadingMoreCommunications">
-          <q-spinner-dots color="primary" size="2em" />
+             v-if="isLoadingMoreItems || isLoadingItems">
+          <q-spinner-dots color="primary"
+                          size="2em" />
         </div>
       </template>
 
       <!-- Empty state -->
       <div class="text-center q-pa-md text-grey"
            v-else>
-        No communications found
+        Empty Inbox
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import InboxTaskItem from 'src/components/inbox/inbox-tasks/item.vue'
+import Communication from 'src/components/einbox/communication-items/communication.vue'
+import InboxChannelToggle from './inbox-channel-toggle.vue'
+import { helperMixin, EinboxMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
+import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
 
 export default {
-  name: 'EInboxTab',
-
   components: {
-    InboxTaskItem
+    Communication,
+    InboxChannelToggle
   },
 
   mixins: [
-    EinboxMixin
+    EinboxMixin,
+    helperMixin
   ],
 
   data () {
     return {
-      activeContactId: null
+      activeId: null,
+      THREADED,
+      UNTHREADED
     }
   },
 
   computed: {
     ...mapState('Einbox', [
-      'communications',
-      'isLoadingCommunications',
-      'isLoadingMoreCommunications',
-      'hasMoreCommunications',
-      'activeInbox'
-    ])
+      'items',
+      'isLoadingItems',
+      'isLoadingMoreItems',
+      'hasMoreItems',
+      'activeInbox',
+      'viewMode'
+    ]),
+
+    filteredItems () {
+      return this.items.filter(item => !item.hidden)
+    }
   },
 
   created () {
@@ -101,20 +136,22 @@ export default {
       const bottomThreshold = 100
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
-      if (isNearBottom && !this.isLoadingMoreCommunications && this.hasMoreCommunications) {
-        this.loadMoreCommunications(this.activeInbox)
+      if (isNearBottom && !this.isLoadingMoreItems && !this.isLoadingItems && this.hasMoreItems) {
+        this.loadMoreItems(this.activeInbox)
       }
     },
 
-    onCommunicationClick (contact) {
+    onItemClick (item) {
+      this.activeId = item.id
+      const contactId = this.viewMode === THREADED ? item.id : item.contact_id
+      const route = `/einbox/${this.activeInbox}/contacts/${contactId}/communications`
+
       // avoid redundant navigation
-      if (this.activeContactId === contact.id) {
+      if (route === this.$route.path) {
         return
       }
 
-      this.activeContactId = contact.id
-
-      this.$router.push(`/einbox/${this.activeInbox}/contacts/${contact.id}/communications`)
+      this.$router.push(route)
     }
   },
 
@@ -122,7 +159,9 @@ export default {
     '$route.params.id': {
       immediate: true,
       handler (newV) {
-        this.activeContactId = newV ? parseInt(newV) : null
+        if (this.viewMode === THREADED) {
+          this.activeId = newV ? parseInt(newV) : null
+        }
       }
     }
   }
@@ -135,18 +174,8 @@ export default {
   background-color: white;
 }
 
-.communications-list {
+.items-list {
   flex: 1;
   overflow-y: auto;
-
-  .communication-item {
-    border-bottom: 1px solid #eeeeee;
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: #f5f5f5;
-      cursor: pointer;
-    }
-  }
 }
 </style>

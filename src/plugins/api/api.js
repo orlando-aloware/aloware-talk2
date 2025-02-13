@@ -980,13 +980,6 @@ const talk2Api = {
           const params = { per_page: perPage, page }
           return window.axios.get(`${suffixV2}inboxes`, { params })
         }
-      },
-
-      communications: {
-        get: ({ inboxId, page = 1, communicationType }) => {
-          const params = { per_page: 25, page, type: communicationType }
-          return window.axios.get(`${suffixV2}inboxes/${inboxId}/communications`, { params })
-        }
       }
     },
 
@@ -1020,6 +1013,13 @@ const talk2Api = {
     companies: {
       toggleFeature (companyId, feature) {
         return window.axios.put(`${suffixV2}companies/${companyId}/features/${feature}`)
+      }
+    },
+
+    communications: {
+      threaded: ({ inboxId, perPage, page = 1 }) => {
+        const params = { inbox_id: inboxId, per_page: perPage, page }
+        return window.axios.get(`${suffixV2}communications/threaded`, { params })
       }
     }
   }

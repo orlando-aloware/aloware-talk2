@@ -1,5 +1,5 @@
-export const CALLS_TYPE = 1
-export const SMS_TYPE = 2
+export const THREADED = 1
+export const UNTHREADED = 2
 
 export default function () {
   return {
@@ -9,11 +9,11 @@ export default function () {
     isLoadingInboxes: false,
     currentInboxesPage: 0,
     hasMoreInboxes: true,
-    communicationType: CALLS_TYPE,
-    communications: [],
-    isLoadingCommunications: false,
-    isLoadingMoreCommunications: false,
-    currentCommunicationsPage: 0,
-    hasMoreCommunications: true
+    viewMode: THREADED,
+    items: [],
+    isLoadingItems: false,
+    isLoadingMoreItems: false,
+    currentItemsPage: 0,
+    hasMoreItems: true
   }
 }

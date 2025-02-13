@@ -1,3 +1,4 @@
+import { THREADED } from 'src/store/einbox/einbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
@@ -8,12 +9,12 @@ export default {
       'inboxes',
       'currentInboxesPage',
       'hasMoreInboxes',
-      'communications',
-      'communicationType',
-      'isLoadingCommunications',
-      'currentCommunicationsPage',
-      'hasMoreCommunications',
-      'isLoadingMoreCommunications'
+      'items',
+      'viewMode',
+      'isLoadingItems',
+      'currentItemsPage',
+      'hasMoreItems',
+      'isLoadingMoreItems'
     ])
   },
 
@@ -21,11 +22,11 @@ export default {
     ...mapActions('Einbox', [
       'setInboxes',
       'setIsLoadingInboxes',
-      'setCommunications',
-      'appendCommunications',
-      'setIsLoadingCommunications',
-      'resetCommunications',
-      'setIsLoadingMoreCommunications',
+      'setItems',
+      'appendItems',
+      'setIsLoadingItems',
+      'resetItems',
+      'setIsLoadingMoreItems',
       'setActiveInbox'
     ]),
 
@@ -55,8 +56,8 @@ export default {
           const inbox = this.inboxes.find(inbox => inbox.id.toString() === routeInboxId.toString())
           if (inbox) {
             this.setActiveInbox(inbox.id)
-            this.resetCommunications()
-            await this.fetchCommunications(inbox.id)
+            this.resetItems()
+            await this.fetchItems(inbox.id)
           } else {
             // Handle case when inbox ID from route is not found
             console.warn(`Inbox with ID ${routeInboxId} not found`)
@@ -66,54 +67,63 @@ export default {
           // No inbox ID in route, set first inbox
           const firstInbox = this.inboxes[0]
           this.setActiveInbox(firstInbox.id)
-          this.resetCommunications()
-          await this.fetchCommunications(firstInbox.id)
+          this.resetItems()
+          await this.fetchItems(firstInbox.id)
           // Update route to reflect selected inbox
           this.$router.push(`/einbox/${firstInbox.id}`)
         }
       }
     },
 
-    async fetchCommunications (inboxId) {
+    async fetchItems (inboxId) {
       try {
-        this.setIsLoadingCommunications(true)
-        const nextPage = 1
-        const communicationType = this.communicationType
+        this.setIsLoadingItems(true)
 
-        const response = await talk2Api.V2.inbox.communications.get({
-          inboxId,
-          page: nextPage,
-          communicationType
-        })
+        const response = await this.getItemsRequest(inboxId, 1)
 
-        this.setCommunications(response.data)
+        this.setItems(response.data)
       } catch (error) {
-        console.error('Error fetching communications:', error)
+        console.error('Error fetching contacts:', error)
       } finally {
-        this.setIsLoadingCommunications(false)
+        this.setIsLoadingItems(false)
       }
     },
 
-    async loadMoreCommunications (inboxId) {
+    async loadMoreItems (inboxId) {
       try {
-        if (this.isLoadingMoreCommunications || !this.hasMoreCommunications) return
+        if (this.isLoadingMoreItems || !this.hasMoreItems) return
 
-        this.setIsLoadingMoreCommunications(true)
-        const nextPage = this.currentCommunicationsPage + 1
-        const communicationType = this.communicationType
+        this.setIsLoadingMoreItems(true)
 
-        const response = await talk2Api.V2.inbox.communications.get({
+        const nextPage = this.currentItemsPage + 1
+        const response = await this.getItemsRequest(inboxId, nextPage)
+
+        this.appendItems(response.data)
+      } catch (error) {
+        console.error('Error loading more items:', error)
+      } finally {
+        this.setIsLoadingMoreItems(false)
+      }
+    },
+
+    getItemsRequest (inboxId, nextPage) {
+      // get the request based on the view mode (threaded or unthreaded)
+      if (this.viewMode === THREADED) {
+        return talk2Api.V2.communications.threaded({
           inboxId,
           page: nextPage,
-          communicationType
+          perPage: 100
         })
-
-        this.appendCommunications(response.data)
-      } catch (error) {
-        console.error('Error loading more communications:', error)
-      } finally {
-        this.setIsLoadingMoreCommunications(false)
       }
+
+      return talk2Api.V1.reports.communications.get({
+        params: {
+          inbox_id: inboxId,
+          page: nextPage,
+          per_page: 100
+        },
+        headers: { 'requested-from': 'api' }
+      })
     }
   },
 

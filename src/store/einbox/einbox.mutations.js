@@ -1,3 +1,5 @@
+import { THREADED } from './einbox.store'
+
 export default {
   SET_ACTIVE_INBOX (state, inbox) {
     state.activeInbox = inbox
@@ -17,54 +19,90 @@ export default {
   SET_HAS_MORE_INBOXES (state, hasMore) {
     state.hasMoreInboxes = hasMore
   },
-  SET_COMMUNICATION_TYPE (state, communicationType) {
-    state.communicationType = communicationType
+  SET_VIEW_MODE (state, viewMode) {
+    state.viewMode = viewMode
   },
-  SET_COMMUNICATIONS (state, communications) {
-    state.communications = parseCommunications(communications)
+  SET_ITEMS (state, items) {
+    state.items = state.viewMode === THREADED ? items : handleDuplicatedItems(items)
   },
-  SET_IS_LOADING_COMMUNICATIONS (state, loading) {
-    state.isLoadingCommunications = loading
+  SET_IS_LOADING_ITEMS (state, loading) {
+    state.isLoadingItems = loading
   },
-  SET_CURRENT_COMMUNICATIONS_PAGE (state, page) {
-    state.currentCommunicationsPage = page
+  SET_CURRENT_ITEMS_PAGE (state, page) {
+    state.currentItemsPage = page
   },
-  SET_HAS_MORE_COMMUNICATIONS (state, hasMore) {
-    state.hasMoreCommunications = hasMore
+  SET_HAS_MORE_ITEMS (state, hasMore) {
+    state.hasMoreItems = hasMore
   },
-  RESET_COMMUNICATIONS_STATE (state) {
-    state.communications = []
-    state.currentCommunicationsPage = 0
-    state.hasMoreCommunications = true
+  RESET_ITEMS (state) {
+    state.items = []
+    state.currentItemsPage = 0
+    state.hasMoreItems = true
   },
-  APPEND_COMMUNICATIONS (state, communications) {
-    state.communications = [...state.communications, ...parseCommunications(communications)]
+  APPEND_ITEMS (state, items) {
+    const allItems = [...state.items, ...items]
+    state.items = state.viewMode === THREADED ? allItems : handleDuplicatedItems(allItems)
   },
-  SET_IS_LOADING_MORE_COMMUNICATIONS (state, loading) {
-    state.isLoadingMoreCommunications = loading
+  SET_IS_LOADING_MORE_ITEMS (state, loading) {
+    state.isLoadingMoreItems = loading
   }
 }
 
 /**
- * Parses the communications array to add the last_communication object
+ * Handle sequenced-duplicated items for the unthreaded view
  *
- * @param {Array} communications
- * @returns {Array}
+ * @param {array} items
+ * @returns array
  */
-const parseCommunications = (communications) => {
-  return communications.map(comm => {
-    // FIXME[Inbox]: manually setting last_communication object
-    if (comm.last_communication_type) {
-      comm.last_communication = {
-        disposition_status2: comm.last_communication_disposition_status2,
-        type: comm.last_communication_type,
-        direction: comm.last_communication_direction,
-        callback_status: comm.last_communication_callback_status,
-        campaign_id: comm.last_communication_campaign_id,
-        current_status2: comm.last_communication_current_status2,
-        body: comm.last_communication_body
-      }
-    }
-    return comm
+function handleDuplicatedItems (items) {
+  // first unset all props previous set
+  items.forEach((item, index) => {
+    delete items[index].repeats
+    delete items[index].hidden
   })
+
+  const found = []
+  const hidden = []
+
+  items.forEach((item, index) => {
+    const repeateds = !found.includes(item.contact_id)
+      ? findRepeateds(items, index)
+      : []
+
+    // try to find repeated comms for this contact
+    if (repeateds.length > 0) {
+      items[index].repeats = repeateds.length
+      found.push(items[index].contact_id)
+      hidden.push(...repeateds)
+    }
+
+    // mark repeated comms to dont appear
+    if (hidden.includes(item.id)) {
+      items[index].hidden = true
+    }
+  })
+
+  return items
+}
+
+/**
+ * Find repeated comms of a contact
+ *
+ * @param {array} items
+ * @param {number} startIndex
+ * @returns array
+ */
+function findRepeateds (items, startIndex) {
+  const repeateds = []
+  const contactId = items[startIndex].contact_id
+
+  for (let i = startIndex + 1; i < items.length; i++) {
+    if (items[i].contact_id !== contactId) {
+      break
+    }
+
+    repeateds.push(items[i].id)
+  }
+
+  return repeateds
 }

@@ -15934,7 +15934,7 @@ hr {
   background-clip: text !important;
   -webkit-background-clip: text !important;
   color: transparent !important;
-  background-image: linear-gradient(135deg, #00BD50, #33D76B, #66E08A) !important;
+  background-image: linear-gradient(135deg, #9031B5, #256EFF, #0E8EBB) !important;
 }
 
 .q-message-text-content {
@@ -16218,7 +16218,7 @@ hr {
       overflow: hidden;
       transition: width 0.3s ease;
     }
-  
+
     .rotate-180 {
       transform: rotate(180deg);
     }
@@ -16330,8 +16330,28 @@ hr {
   color: #fff;
   font-size: 13px;
 
-  .arrow::before, .arrow::after {
-    border-right-color: #000;
+  &[x-placement="bottom"] {
+    .arrow::before, .arrow::after {
+      border-bottom-color: #000;
+    }
+  }
+
+  &[x-placement="top"] {
+    .arrow::before, .arrow::after {
+      border-top-color: #000;
+    }
+  }
+
+  &[x-placement="left"] {
+    .arrow::before, .arrow::after {
+      border-left-color: #000;
+    }
+  }
+
+  &[x-placement="right"] {
+    .arrow::before, .arrow::after {
+      border-right-color: #000;
+    }
   }
 
   .popover-body {

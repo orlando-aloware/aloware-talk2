@@ -8,34 +8,45 @@
                    :disabled="isInboxRefreshBtnLoading"
                    data-testid="inbox-toggle-filters-compact-btn"
                    @clicked="refreshInbox">
-        <refresh-icon :class="$q.screen.width < MOBILE_LARGE_WIDTH ? 'm-0': ''" data-testid="inbox-toggle-filters-refresh-icon"/>
+        <refresh-icon data-testid="inbox-toggle-filters-refresh-icon"
+                      :class="$q.screen.width < MOBILE_LARGE_WIDTH ? 'm-0': ''"/>
         {{ refreshButtonLabel }}
       </compact-btn>
 
       <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
         <b-form-checkbox class="mt-1 ml-2 cursor-pointer einbox-toggle"
-                        size="sm"
-                        switch
-                        id="EinboxToggle"
-                        data-testid="inbox-new-experience-checkbox"
-                        :class="toggleFiltersClass"
-                        :disabled="isTogglingNewInbox"
-                        v-model="newInboxEnabled">
+                         size="sm"
+                         switch
+                         id="EinboxToggle"
+                         data-testid="inbox-new-experience-checkbox"
+                         :class="toggleFiltersClass"
+                         :disabled="isTogglingNewInbox"
+                         v-model="newInboxEnabled">
           <q-tooltip content-class="bg-grey-10 text-white"
                     anchor="bottom left"
                     self="top middle">
-                    <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />Toggle New Inbox
+            <zap-bold-icon class="ml-1"
+                            width="16"
+                            height="16"
+                            color="#FFB020" />
+            Toggle New Inbox
           </q-tooltip>
         </b-form-checkbox>
         <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14 inbox-effect-gradient-text"
-              :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled }]"
-              data-testid="inbox-new-experience-label">
+               :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled }]"
+               data-testid="inbox-new-experience-label">
           <template v-if="newInboxEnabled">
-            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
+            <zap-bold-icon class="ml-1"
+                           width="16"
+                           height="16"
+                           color="#256eff" />
             <strong>New Inbox Experience Enabled</strong>
           </template>
           <template v-else>
-            <zap-bold-icon class="ml-1" width="16" height="16" color="#FFB020" />
+            <zap-bold-icon class="ml-1"
+                           width="16"
+                           height="16"
+                           color="#256eff" />
             <strong>Enable the New Inbox experience</strong>
           </template>
         </label>
@@ -57,10 +68,10 @@
         </q-tooltip>
       </b-form-checkbox>
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
-            :class="toggleFiltersClass"
-            data-testid="inbox-my-contacts-filter-my-contacts-label"
-            v-if="!newInboxEnabled"
-            @click="myContactsFilterChange">
+             :class="toggleFiltersClass"
+             data-testid="inbox-my-contacts-filter-my-contacts-label"
+             v-if="!newInboxEnabled"
+             @click="myContactsFilterChange">
         <span class="label-my-contacts"
               :class="{ hidden: $q.screen.width < 390 }"
               v-if="$q.screen.width > 300">
@@ -315,6 +326,6 @@ export default {
 
 <style>
   .custom-switch.einbox-toggle .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: #00BD50 !important;
+    background-color: #256eff !important;
   }
 </style>

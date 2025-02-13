@@ -24,26 +24,26 @@ export default {
   setHasMoreInboxes: ({ commit }, hasMore) => {
     commit('SET_HAS_MORE_INBOXES', hasMore)
   },
-  setCommunicationType: ({ commit }, communicationType) => {
-    commit('SET_COMMUNICATION_TYPE', communicationType)
+  setViewMode: ({ commit }, viewMode) => {
+    commit('SET_VIEW_MODE', viewMode)
   },
-  setCommunications: ({ commit }, data) => {
-    commit('SET_COMMUNICATIONS', data.data)
-    commit('SET_HAS_MORE_COMMUNICATIONS', data.next_page_url !== null)
-    commit('SET_CURRENT_COMMUNICATIONS_PAGE', data.current_page)
+  setItems: ({ commit }, data) => {
+    commit('SET_ITEMS', data.data)
+    commit('SET_HAS_MORE_ITEMS', data.next_page_url !== null)
+    commit('SET_CURRENT_ITEMS_PAGE', data.current_page)
   },
-  setIsLoadingCommunications: ({ commit }, loading) => {
-    commit('SET_IS_LOADING_COMMUNICATIONS', loading)
+  setIsLoadingItems: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_ITEMS', loading)
   },
-  resetCommunications: ({ commit }) => {
-    commit('RESET_COMMUNICATIONS_STATE')
+  resetItems: ({ commit }) => {
+    commit('RESET_ITEMS')
   },
-  appendCommunications: ({ commit }, data) => {
-    commit('APPEND_COMMUNICATIONS', data.data)
-    commit('SET_HAS_MORE_COMMUNICATIONS', data.next_page_url !== null)
-    commit('SET_CURRENT_COMMUNICATIONS_PAGE', data.current_page)
+  appendItems: ({ commit }, data) => {
+    commit('APPEND_ITEMS', data.data)
+    commit('SET_HAS_MORE_ITEMS', data.next_page_url !== null)
+    commit('SET_CURRENT_ITEMS_PAGE', data.current_page)
   },
-  setIsLoadingMoreCommunications: ({ commit }, loading) => {
-    commit('SET_IS_LOADING_MORE_COMMUNICATIONS', loading)
+  setIsLoadingMoreItems: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_MORE_ITEMS', loading)
   }
 }
