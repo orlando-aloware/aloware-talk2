@@ -4,10 +4,10 @@
     <a target='_blank'
        href="#"
        v-if="campaignId"
-       :class="{ 'deleted': !campaign.name }"
+       :class="{ 'deleted': !campaignName }"
        :id="`comm-number-${_uid}`"
        @click.prevent="filter">
-      {{ campaign.name || 'Deleted Line' }}
+      {{ campaignName }}
 
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-number-${_uid}`">
@@ -46,6 +46,10 @@ export default {
 
     campaign () {
       return this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
+    },
+
+    campaignName () {
+      return this.campaign.id && !this.campaign.name ? 'Deleted Line' : this.campaign.name
     }
   },
 
