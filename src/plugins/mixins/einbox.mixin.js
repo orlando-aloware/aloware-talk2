@@ -111,14 +111,16 @@ export default {
       if (this.viewMode === THREADED) {
         return talk2Api.V2.communications.threaded({
           inboxId,
-          page: nextPage
+          page: nextPage,
+          perPage: 100
         })
       }
 
       return talk2Api.V1.reports.communications.get({
         params: {
           inbox_id: inboxId,
-          page: nextPage
+          page: nextPage,
+          per_page: 100
         },
         headers: { 'requested-from': 'api' }
       })
