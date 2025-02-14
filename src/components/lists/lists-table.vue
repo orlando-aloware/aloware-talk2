@@ -180,239 +180,128 @@
                 <span v-else>-</span>
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.actions">
-                <div class="d-flex justify-content-center context-menu">
-                  <div class="operation-button">
-                    <span class="cursor-pointer"
-                          data-testid="lists-edit-button"
-                          :id="`edit-list-${props.row.id}`"
-                          @click="onEditList(props.row)">
-                      <pencil-o-icon height="20"
-                                    width="20"
-                                    color="#62666E"/>
-                      <b-tooltip custom-class="talk-table__tooltip"
-                                 placement="bottom"
-                                 boundary="window"
-                                 :target="`edit-list-${props.row.id}`">
-                        Edit this List
-                      </b-tooltip>
-                    </span>
-                  </div>
+                <div class="d-flex justify-content-center">
+                  <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+                              text="..."
+                              variant="light"
+                              no-caret
+                              data-testid="lists-options-dropdown"
+                              alt="List Options"
+                              title="List Options"
+                              boundary="window"
+                              right
+                              :popper-opts="{ positionFixed: true }"
+                              @hide="onHide"
+                              @show="onShow">
+                    <template #button-content>
+                      <ellipse-icon />
+                    </template>
 
-                  <div class="operation-button">
-                    <span class="cursor-pointer"
-                          data-testid="lists-enroll-sequence-button"
-                          :id="`enroll-sequence-${props.row.id}`"
-                          @click="onEnrollContactsToSequence(props.row)">
-                      <add-sequence-icon height="20"
-                                        width="20"
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-edit-option"
+                                     @click="onEditList(props.row)">
+                      <pencil-o-icon height="14"
+                                     width="14"
+                                     color="#62666E"/>
+                      Edit List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-rename-option"
+                                     @click="onRenameList(props.row)">
+                      <pencil-icon />
+                      Rename List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-duplicate-option"
+                                     @click="onDuplicateList(props.row)">
+                      <duplicate-icon />
+                      Duplicate List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="change-list-owner-option"
+                                     v-if="isAdmin"
+                                     @click="openChangeListOwnerModal(props.row)">
+                      <switch-icon />
+                      Change List Owner
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-show-option"
+                                     v-if="hasShowInPublicFolderPermission"
+                                     @click="onShowInPublicFolderList(props.row)">
+                      <template v-if="!props.row.show_in_public_folder">
+                        <eye-icon />
+                        Convert List to Public
+                      </template>
+                      <template v-else>
+                        <eye-off-icon />
+                        Convert List to Private
+                      </template>
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-add-to-powerdialer-option"
+                                     @click="onAddListToPowerDialer(props.row)">
+                      <power-dialer-mobile-icon width="14"
+                                                height="14"
+                                                color="#62666E"/>
+                      Add List to Power Dialer
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-add-to-sequence-option"
+                                     @click="onEnrollContactsToSequence(props.row)">
+                      <add-sequence-icon height="14"
+                                        width="14"
                                         color="#62666E"/>
-                      <b-tooltip custom-class="talk-table__tooltip"
-                                 placement="bottom"
-                                 boundary="window"
-                                 :target="`enroll-sequence-${props.row.id}`">
-                        Enroll contacts to sequence
-                      </b-tooltip>
-                    </span>
-                  </div>
+                      Add List to Sequence
+                    </b-dropdown-item>
 
-                  <div class="operation-button">
-                    <span class="cursor-pointer"
-                          data-testid="lists-add-power-dialer-button"
-                          :id="`add-power-dialer-${props.row.id}`"
-                          @click="onAddListToPowerDialer(props.row)">
-                      <add-call-icon height="20"
-                                    width="20"
-                                    color="#62666E"/>
-                      <b-tooltip custom-class="talk-table__tooltip"
-                                 placement="bottom"
-                                 boundary="window"
-                                 :target="`add-power-dialer-${props.row.id}`">
-                        Add this list to Power Dialer
-                      </b-tooltip>
-                    </span>
-                  </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-assign-option"
+                                     @click="openAssignContacts(props.row)">
+                      <power-dialer-mobile-icon width="14"
+                                                height="14"
+                                                color="#62666E"/>
+                      Assign Contact List
+                    </b-dropdown-item>
 
-                  <div class="accordion" :id="`accordion-${props.row.id}`">
-                    <div class="operation-button">
-                      <span class="cursor-pointer"
-                            data-testid="lists-rename-button"
-                            :id="`rename-list-${props.row.id}`"
-                            @click="onRenameList(props.row)">
-                        <pencil-icon height="20"
-                                    width="20"
-                                    color="#62666E"/>
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`rename-list-${props.row.id}`">
-                          Rename this list
-                        </b-tooltip>
-                      </span>
-                    </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-aloai-option"
+                                     v-if="shouldShowAloAi"
+                                     @click="openAloAiBotContactsEnrollmentModal(props.row)">
+                      <add-user-icon width="14"
+                                     height="14"
+                                     color="#62666E"/>
+                      Enroll List in AloAi Text Bot
+                    </b-dropdown-item>
 
-                    <div class="operation-button">
-                      <span class="cursor-pointer"
-                            data-testid="lists-duplicate-button"
-                            :id="`duplicate-list-${props.row.id}`"
-                            @click="onDuplicateList(props.row)">
-                        <duplicate-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`duplicate-list-${props.row.id}`">
-                          Duplicate this list
-                        </b-tooltip>
-                      </span>
-                    </div>
+                    <b-dropdown-item href="#"
+                                    data-testid="lists-move-option"
+                                    :data-popper-target="'list-' + props.row.id"
+                                    v-if="!isPublic"
+                                    @click.stop="onMoveList(props.row)">
+                      <move-icon />
+                      Move List
+                    </b-dropdown-item>
 
-                    <div class="operation-button"
-                        :data-popper-target="'list-' + props.row.id"
-                        v-if="!isPublic">
-                      <span class="cursor-pointer"
-                            data-testid="lists-move-button"
-                            :id="`move-list-${props.row.id}`"
-                            data-action="move-item"
-                            @click="onMoveList(props.row)">
-                        <move-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`move-list-${props.row.id}`">
-                          Move this list
-                        </b-tooltip>
-                      </span>
-                    </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-pin-option"
+                                     @click="onPinList(props.row)">
+                      <pin-icon />
+                      {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} List
+                    </b-dropdown-item>
 
-                    <div class="operation-button"
-                        v-if="isAdmin">
-                      <span class="cursor-pointer"
-                            data-testid="change-list-owner-button"
-                            :id="`change-owner-${props.row.id}`"
-                            @click="openChangeListOwnerModal(props.row)">
-                        <switch-icon height="20"
-                                    width="20"
-                                    color="#62666E" />
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`change-owner-${props.row.id}`">
-                          Change List Owner
-                        </b-tooltip>
-                      </span>
-                    </div>
-
-                    <div class="operation-button">
-                      <span class="cursor-pointer"
-                            data-testid="lists-pin-button"
-                            :id="`pin-list-${props.row.id}`"
-                            @click="onPinList(props.row)">
-                        <pin-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`pin-list-${props.row.id}`">
-                          {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
-                        </b-tooltip>
-                      </span>
-                    </div>
-
-                    <div class="operation-button"
-                        v-if="hasShowInPublicFolderPermission">
-                      <span class="cursor-pointer"
-                            data-testid="lists-show-button"
-                            :id="`show-public-${props.row.id}`"
-                            @click="onShowInPublicFolderList(props.row)">
-                        <eye-icon height="20"
-                                  width="20"
-                                  color="#62666E"
-                                  v-if="!props.row.show_in_public_folder"/>
-                        <eye-off-icon height="20"
-                                      width="20"
-                                      color="#62666E"
-                                      v-else/>
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`show-public-${props.row.id}`">
-                          Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
-                        </b-tooltip>
-                      </span>
-                    </div>
-
-                    <div class="operation-button">
-                      <span class="cursor-pointer"
-                            data-testid="lists-delete-button"
-                            :id="`delete-list-${props.row.id}`"
-                            @click="onDeleteList(props.row)">
-                        <trash-icon height="20"
-                                    width="20"
-                                    color="#62666E"/>
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`delete-list-${props.row.id}`">
-                          Delete this list
-                        </b-tooltip>
-                      </span>
-                    </div>
-
-                    <div class="operation-button">
-                      <span class="cursor-pointer"
-                            data-testid="lists-assign-button"
-                            :id="`assign-contacts-${props.row.id}`"
-                            @click="openAssignContacts(props.row)">
-                        <arrow-right-icon height="20"
-                                          width="20"
-                                          color="#62666E"/>
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`assign-contacts-${props.row.id}`">
-                          Assign Contacts
-                        </b-tooltip>
-                      </span>
-                    </div>
-
-                    <div class="operation-button"
-                        v-if="shouldShowAloAi">
-                      <span class="cursor-pointer"
-                            data-testid="lists-aloai-button"
-                            :id="`aloai-enroll-${props.row.id}`"
-                            @click="openAloAiBotContactsEnrollmentModal(props.row)">
-                        <add-user-icon height="20"
-                                      width="20"
-                                      color="#62666E" />
-                        <b-tooltip custom-class="talk-table__tooltip"
-                                   placement="bottom"
-                                   boundary="window"
-                                   :target="`aloai-enroll-${props.row.id}`">
-                          Enroll List in AloAi Text Bot
-                        </b-tooltip>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="operation-button accordion-button" @click="toggleAccordion(props.row.id)">
-                    <span class="cursor-pointer" data-testid="lists-accordion-button"
-                          :id="`lists-accordion-button-${props.row.id}`">
-                      <caret-right-icon height="20"
-                                        width="20"
-                                        :class="{ 'rotate-180': accordionStates[props.row.id] }"
-                                        color="#256eff"/>
-                      <b-tooltip custom-class="talk-table__tooltip"
-                                 placement="bottom"
-                                 boundary="window"
-                                 :target="`lists-accordion-button-${props.row.id}`">
-                        {{ accordionStates[props.row.id] ? 'Hide actions' : 'See more actions' }}
-                      </b-tooltip>
-                    </span>
-                  </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-delete-option"
+                                     @click="onDeleteList(props.row)">
+                      <delete-red-icon />
+                      <span class="text-danger">Delete</span>
+                    </b-dropdown-item>
+                  </b-dropdown>
                 </div>
               </div>
             </q-td>
@@ -500,16 +389,13 @@ import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
-import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
 import EyeIcon from 'components/icons/eye-icon.vue'
 import EyeOffIcon from 'components/icons/eye-off-icon'
-import AddCallIcon from 'components/icons/add-call-icon.vue'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
-import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
-import CaretRightIcon from 'components/icons/caret-right-icon.vue'
+import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
@@ -520,6 +406,8 @@ import AddUserIcon from 'components/icons/add-user-icon'
 import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 import SwitchIcon from 'components/icons/switch-icon'
 import ChangeListOwnerModal from './change-list-owner-modal.vue'
+import EllipseIcon from 'components/icons/ellipse-icon'
+import DeleteRedIcon from 'components/icons/delete-red-icon'
 
 export default {
   name: 'ListsTable',
@@ -531,9 +419,7 @@ export default {
   ],
 
   components: {
-    AddCallIcon,
     AddSequenceIcon,
-    ArrowRightIcon,
     DuplicateIcon,
     EyeIcon,
     EyeOffIcon,
@@ -541,7 +427,6 @@ export default {
     PencilIcon,
     PencilOIcon,
     PinIcon,
-    TrashIcon,
     PlusIcon,
     SearchInput,
     AssignContactsModal,
@@ -559,7 +444,9 @@ export default {
     EnrollContactsToAloaiModal,
     SwitchIcon,
     ChangeListOwnerModal,
-    CaretRightIcon
+    EllipseIcon,
+    PowerDialerMobileIcon,
+    DeleteRedIcon
   },
 
   data () {
@@ -589,7 +476,6 @@ export default {
       COLUMNS,
       COLUMN_NAMES,
       foldersPath: [],
-      accordionStates: {},
 
       // Filters
       textSearchPublicLists: true,
@@ -692,6 +578,7 @@ export default {
       'listPinToggled',
       'addPowerDialerOpen',
       'openMoveDialog',
+      'closeMoveDialog',
       'createListOpen',
       'setUnsavedList',
       'setCurrentListFilters'
@@ -892,7 +779,6 @@ export default {
       this.calculateTotalPages()
       this.pagination.currentPage = 1
       this.listsData = this.lists
-      this.accordionStates = {}
     },
 
     onDeleteList (list) {
@@ -1159,32 +1045,6 @@ export default {
       this.refreshLists()
     },
 
-    toggleAccordion (accordionId) {
-      const accordion = this.$el.querySelector('#accordion-' + accordionId)
-
-      if (!accordion) {
-        return
-      }
-
-      const buttons = accordion.querySelectorAll('.operation-button')
-      const buttonWidth = 29
-      const totalWidth = buttons.length * buttonWidth
-
-      if (!this.accordionStates[accordionId]) {
-        this.$set(this.accordionStates, accordionId, false)
-      }
-
-      if (this.accordionStates[accordionId]) {
-        accordion.style.width = '0'
-      } else {
-        accordion.style.width = `${totalWidth}px`
-        void accordion.offsetHeight
-        accordion.style.width = `${totalWidth}px`
-      }
-
-      this.$set(this.accordionStates, accordionId, !this.accordionStates[accordionId])
-    },
-
     toggleTextSearchPublicLists () {
       this.textSearchPublicLists = !this.textSearchPublicLists
       this.refreshLists()
@@ -1212,6 +1072,26 @@ export default {
     resetSearchFilters () {
       this.textSearchPublicLists = true
       this.textSearchPrivateLists = true
+    },
+
+    onShow ({ target }) {
+      if (this.moveDialog?.open) {
+        this.closeMoveDialog()
+      }
+
+      const el = target.closest('td')
+      el.style.zIndex = '4'
+    },
+
+    onHide (event) {
+      if (this.moveDialog?.open) {
+        event.preventDefault()
+        return
+      }
+
+      const { target } = event
+      const el = target.closest('td')
+      el.style.zIndex = '0'
     }
   },
 
