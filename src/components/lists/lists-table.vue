@@ -1127,9 +1127,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.talk-table-container .talk-table td:last-child {
-  /* z-index: 3; */
-}
-</style>
