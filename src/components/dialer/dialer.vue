@@ -1691,11 +1691,14 @@ export default {
         return
       }
 
-      console.log('answerCallFishing this.connection', this.connection)
-      console.log('answerCallFishing this.dialer.currentStatus', this.dialer.currentStatus)
-      console.log('answerCallFishing this.dialer.communication', this.dialer.communication)
-      console.log('answerCallFishing communication', communication)
-      console.log('answerCallFishing this.agentStatus', this.agentStatus)
+      console.log('answerCallFishing', {
+        connection: !!this.connection,
+        dialer_currentStatus: this.dialer.currentStatus,
+        dialer_communication_id: this.dialer.communication.id,
+        communication_idd: communication.id,
+        communication_campaignId: communication.campaignId,
+        agentStatus: this.agentStatus
+      })
 
       if (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
         this.connection.accept()
