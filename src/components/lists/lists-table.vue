@@ -207,6 +207,49 @@
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
+                                     data-testid="lists-rename-option"
+                                     @click="onRenameList(props.row)">
+                      <pencil-icon />
+                      Rename List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-duplicate-option"
+                                     @click="onDuplicateList(props.row)">
+                      <duplicate-icon />
+                      Duplicate List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="change-list-owner-option"
+                                     v-if="isAdmin"
+                                     @click="openChangeListOwnerModal(props.row)">
+                      <switch-icon />
+                      Change List Owner
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-show-option"
+                                     v-if="hasShowInPublicFolderPermission"
+                                     @click="onShowInPublicFolderList(props.row)">
+                      <template v-if="!props.row.show_in_public_folder">
+                        <eye-icon />
+                        Convert List to Public
+                      </template>
+                      <template v-else>
+                        <eye-off-icon />
+                        Convert List to Private
+                      </template>
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-delete-option"
+                                     @click="onDeleteList(props.row)">
+                      <delete-red-icon />
+                      <span class="text-danger">Delete</span>
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
                                      data-testid="lists-add-to-powerdialer-option"
                                      @click="onAddListToPowerDialer(props.row)">
                       <power-dialer-mobile-icon width="14"
@@ -244,20 +287,6 @@
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
-                                     data-testid="lists-rename-option"
-                                     @click="onRenameList(props.row)">
-                      <pencil-icon />
-                      Rename List
-                    </b-dropdown-item>
-
-                    <b-dropdown-item href="#"
-                                     data-testid="lists-duplicate-option"
-                                     @click="onDuplicateList(props.row)">
-                      <duplicate-icon />
-                      Duplicate List
-                    </b-dropdown-item>
-
-                    <b-dropdown-item href="#"
                                      data-testid="lists-move-option"
                                      v-if="!isPublic"
                                      @click="onMoveList(props.row)">
@@ -266,39 +295,10 @@
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
-                                     data-testid="change-list-owner-option"
-                                     v-if="isAdmin"
-                                     @click="openChangeListOwnerModal(props.row)">
-                      <switch-icon />
-                      Change List Owner
-                    </b-dropdown-item>
-
-                    <b-dropdown-item href="#"
                                      data-testid="lists-pin-option"
                                      @click="onPinList(props.row)">
                       <pin-icon />
                       {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} List
-                    </b-dropdown-item>
-
-                    <b-dropdown-item href="#"
-                                     data-testid="lists-show-option"
-                                     v-if="hasShowInPublicFolderPermission"
-                                     @click="onShowInPublicFolderList(props.row)">
-                      <template v-if="!props.row.show_in_public_folder">
-                        <eye-icon />
-                        Convert List to Public
-                      </template>
-                      <template v-else>
-                        <eye-off-icon />
-                        Convert List to Private
-                      </template>
-                    </b-dropdown-item>
-
-                    <b-dropdown-item href="#"
-                                     data-testid="lists-delete-option"
-                                     @click="onDeleteList(props.row)">
-                      <delete-red-icon />
-                      <span class="text-danger">Delete</span>
                     </b-dropdown-item>
                   </b-dropdown>
                 </div>
