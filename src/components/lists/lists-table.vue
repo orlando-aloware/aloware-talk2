@@ -243,13 +243,6 @@
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
-                                     data-testid="lists-delete-option"
-                                     @click="onDeleteList(props.row)">
-                      <delete-red-icon />
-                      <span class="text-danger">Delete</span>
-                    </b-dropdown-item>
-
-                    <b-dropdown-item href="#"
                                      data-testid="lists-add-to-powerdialer-option"
                                      @click="onAddListToPowerDialer(props.row)">
                       <power-dialer-mobile-icon width="14"
@@ -287,9 +280,10 @@
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
-                                     data-testid="lists-move-option"
-                                     v-if="!isPublic"
-                                     @click="onMoveList(props.row)">
+                                    data-testid="lists-move-option"
+                                    :data-popper-target="'list-' + props.row.id"
+                                    v-if="!isPublic"
+                                    @click.stop="onMoveList(props.row)">
                       <move-icon />
                       Move List
                     </b-dropdown-item>
@@ -299,6 +293,13 @@
                                      @click="onPinList(props.row)">
                       <pin-icon />
                       {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-delete-option"
+                                     @click="onDeleteList(props.row)">
+                      <delete-red-icon />
+                      <span class="text-danger">Delete</span>
                     </b-dropdown-item>
                   </b-dropdown>
                 </div>
@@ -577,6 +578,7 @@ export default {
       'listPinToggled',
       'addPowerDialerOpen',
       'openMoveDialog',
+      'closeMoveDialog',
       'createListOpen',
       'setUnsavedList',
       'setCurrentListFilters'
@@ -1073,16 +1075,22 @@ export default {
     },
 
     onShow ({ target }) {
-      console.log(target)
+      if (this.moveDialog?.open) {
+        this.closeMoveDialog()
+      }
+
       const el = target.closest('td')
-      console.log(el)
       el.style.zIndex = '4'
     },
 
-    onHide ({ target }) {
-      console.log(target)
+    onHide (event) {
+      if (this.moveDialog?.open) {
+        event.preventDefault()
+        return
+      }
+
+      const { target } = event
       const el = target.closest('td')
-      console.log(el)
       el.style.zIndex = '0'
     }
   },
