@@ -1695,7 +1695,7 @@ export default {
         connection: !!this.connection,
         dialer_currentStatus: this.dialer.currentStatus,
         dialer_communication_id: this.dialer.communication.id,
-        communication_idd: communication.id,
+        communication_id: communication.id,
         communication_campaignId: communication.campaignId,
         agentStatus: this.agentStatus
       })
