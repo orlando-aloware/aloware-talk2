@@ -153,7 +153,6 @@
 
           <q-btn class="height-32"
                  ripple
-                 round
                  no-caps
                  @click="answerCall"
                  v-if="dialer.currentStatus !== 'WRAP_UP' && agentStatus === AgentStatus.AGENT_STATUS_RINGING">
