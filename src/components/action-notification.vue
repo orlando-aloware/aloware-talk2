@@ -131,12 +131,11 @@
                  round
                  no-caps
                  @click="ignoreFishing">
-            <ignore-call-icon>
-              <q-tooltip anchor="top middle"
-                         self="center middle">
-                Ignore
-              </q-tooltip>
-            </ignore-call-icon>
+            <ignore-call-icon/>
+            <q-tooltip anchor="top middle"
+                        self="center middle">
+              Ignore
+            </q-tooltip>
           </q-btn>
 
           <q-btn class="height-32"
