@@ -685,14 +685,6 @@ export default {
       return 'sms'
     },
 
-    // answerCall2 () {
-    //   console.log('TEL-472 answerCall2')
-    //   console.log('TEL-472 dialer.currentStatus', this.dialer.currentStatus)
-    //   console.log('TEL-472 agentStatus', this.agentStatus)
-
-    //   this.answerCommunication()
-    // },
-
     answerCall () {
       if (this.dialer.currentStatus === 'WRAP_UP') {
         console.log('TEL-472 answerCall - Wrap up')
