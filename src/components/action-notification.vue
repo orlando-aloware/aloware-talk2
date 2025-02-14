@@ -151,12 +151,25 @@
             <accept-call-icon width="32" height="32"/>
           </q-btn>
 
+          <q-btn class="height-32"
+                 ripple
+                 round
+                 no-caps
+                 @click="answerCall"
+                 v-if="dialer.currentStatus !== 'WRAP_UP' && agentStatus === AgentStatus.AGENT_STATUS_RINGING">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Answer
+            </q-tooltip>
+            <accept-call-icon width="32" height="32"/>
+          </q-btn>
+
           <b-dropdown no-caret
                       :right="$q.screen.lt.lg"
                       :dropright="!$q.screen.lt.lg"
                       variant="transparent"
                       class="m-2 b-compact-dropdown-button text-bold height-32"
-                      v-if="dialer.currentStatus !== 'WRAP_UP'">
+                      v-else-if="dialer.currentStatus !== 'WRAP_UP'">
             <template #button-content>
               <accept-call-icon width="32" height="32"/>
             </template>
@@ -187,7 +200,8 @@ import {
   notificationQueueMixin,
   notificationMixin,
   visibilityMixin,
-  aclMixin
+  aclMixin,
+  agentMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -204,7 +218,8 @@ export default {
     notificationQueueMixin,
     mentionsMixin,
     visibilityMixin,
-    aclMixin
+    aclMixin,
+    agentMixin
   ],
 
   components: {
@@ -671,12 +686,22 @@ export default {
       return 'sms'
     },
 
+    // answerCall2 () {
+    //   console.log('TEL-472 answerCall2')
+    //   console.log('TEL-472 dialer.currentStatus', this.dialer.currentStatus)
+    //   console.log('TEL-472 agentStatus', this.agentStatus)
+
+    //   this.answerCommunication()
+    // },
+
     answerCall () {
       if (this.dialer.currentStatus === 'WRAP_UP') {
+        console.log('TEL-472 answerCall - Wrap up')
         this.$VueEvent.fire('endWrapUp')
       }
 
       if (this.id === 'callFishing') {
+        console.log('TEL-472 answerCall - Call fishing')
         this.answerCommunication()
         return
       }

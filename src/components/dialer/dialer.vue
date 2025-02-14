@@ -208,6 +208,7 @@ export default {
     }
 
     this.dialerListeners.answerCall = (communication = null) => {
+      console.log('dialerListeners.answerCall communication', communication)
       this.answerCall(communication)
       this.$closeActionNotification('incomingCall')
       this.$closeActionNotification('callFishing')
@@ -268,6 +269,7 @@ export default {
     }
 
     this.dialerListeners.answerCallFishing = (data) => {
+      console.log('dialerListeners.answerCallFishing', data)
       this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
     }
 
@@ -1689,7 +1691,17 @@ export default {
         return
       }
 
-      this.makeCall('call:' + communication.id, communication.campaignId)
+      console.log('answerCallFishing this.connection', this.connection)
+      console.log('answerCallFishing this.dialer.currentStatus', this.dialer.currentStatus)
+      console.log('answerCallFishing this.dialer.communication', this.dialer.communication)
+      console.log('answerCallFishing communication', communication)
+      console.log('answerCallFishing this.agentStatus', this.agentStatus)
+
+      if (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+        this.connection.accept()
+      } else {
+        this.makeCall('call:' + communication.id, communication.campaignId)
+      }
     },
 
     saveCallIssue (warningName, warningData) {
