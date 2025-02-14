@@ -47,9 +47,9 @@ export default {
   transition: all 0.2s ease;
   max-width: 235px;
 
-  // &:hover {
-  //   background-color: #4374B0;
-  // }
+  &:hover {
+    background-color: #E9F0FF;
+  }
 
   &__label {
     font-size: 14px;
@@ -60,7 +60,7 @@ export default {
   }
 
   &--active {
-    background: #E9F0FF;
+    background-color: #E9F0FF;
 
     &::before {
       content: "";

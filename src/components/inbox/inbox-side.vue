@@ -1,6 +1,6 @@
 <template>
-  <div class="inbox-wrapper border-right"
-       data-testid="inbox-side-wrapper">
+  <div data-testid="inbox-side-wrapper"
+       :class="['inbox-wrapper', 'border-right', { 'einbox-wrapper': isEInboxEnabled }]">
     <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
@@ -284,3 +284,23 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.einbox-wrapper {
+  padding: 7px;
+  background-color: #F9F9FB;
+
+  .inbox-side {
+    background-color: #F9F9FB;
+
+    &__left, &__right {
+      border-radius: 12px;
+    }
+
+    &__right {
+      margin-left: 7px;
+      border-left: none !important;
+    }
+  }
+}
+</style>
