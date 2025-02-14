@@ -133,7 +133,7 @@
                  @click="ignoreFishing">
             <ignore-call-icon/>
             <q-tooltip anchor="top middle"
-                        self="center middle">
+                       self="center middle">
               Ignore
             </q-tooltip>
           </q-btn>
@@ -687,12 +687,10 @@ export default {
 
     answerCall () {
       if (this.dialer.currentStatus === 'WRAP_UP') {
-        console.log('TEL-472 answerCall - Wrap up')
         this.$VueEvent.fire('endWrapUp')
       }
 
       if (this.id === 'callFishing') {
-        console.log('TEL-472 answerCall - Call fishing')
         this.answerCommunication()
         return
       }
