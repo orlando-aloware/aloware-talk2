@@ -13,7 +13,7 @@
         {{ refreshButtonLabel }}
       </compact-btn>
 
-      <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
+      <!-- <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
         <b-form-checkbox class="mt-1 ml-2 cursor-pointer einbox-toggle"
                          size="sm"
                          switch
@@ -50,7 +50,7 @@
             <strong>Enable the New Inbox experience</strong>
           </template>
         </label>
-      </div>
+      </div> -->
     </div>
 
       <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
@@ -59,8 +59,7 @@
                        data-testid="inbox-my-contacts-filter-form-checkbox"
                        :class="toggleFiltersClass"
                        :disabled="toggleFiltersEnabled"
-                       v-model="inboxShowMyContactsFilter"
-                       v-if="!newInboxEnabled">
+                       v-model="inboxShowMyContactsFilter">
         <q-tooltip content-class="bg-grey-10 text-white"
                    anchor="bottom left"
                    self="top middle">
@@ -70,7 +69,6 @@
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
              :class="toggleFiltersClass"
              data-testid="inbox-my-contacts-filter-my-contacts-label"
-             v-if="!newInboxEnabled"
              @click="myContactsFilterChange">
         <span class="label-my-contacts"
               :class="{ hidden: $q.screen.width < 390 }"
@@ -80,7 +78,7 @@
       </label>
 
       <div class="d-flex align-items-center ml-2"
-           v-if="shouldShowUnreadsToggle && !newInboxEnabled">
+           v-if="shouldShowUnreadsToggle">
         <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                          size="sm"
                          switch
@@ -110,15 +108,15 @@
 
 <script>
 import VueCookies from 'vue-cookies'
-import { mapActions, mapState, mapGetters } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import { inboxRoutesMixin, userMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
-import ZapBoldIcon from 'components/icons/inbox/zap-bold-icon'
+// import ZapBoldIcon from 'components/icons/inbox/zap-bold-icon'
 
-const COOKIE_NEW_INBOX = 'new_inbox_enabled'
-const COOKIE_EXPIRES = 3650
+// const COOKIE_NEW_INBOX = 'new_inbox_enabled'
+// const COOKIE_EXPIRES = 3650
 
 export default {
   name: 'inbox-toggle-filters',
@@ -130,8 +128,8 @@ export default {
 
   components: {
     CompactBtn,
-    RefreshIcon,
-    ZapBoldIcon
+    RefreshIcon
+    // ZapBoldIcon
   },
 
   props: {
@@ -162,8 +160,6 @@ export default {
     ]),
     ...mapState('cache', ['currentCompany']),
 
-    ...mapGetters('Einbox', ['isEInboxEnabled']),
-
     isShown () {
       const isInboxRoute = this.$route?.meta?.isInbox
       const notMentionsChannel = this.$route.params.channel !== 'mentions'
@@ -180,22 +176,22 @@ export default {
 
     refreshButtonLabel () {
       return this.$q.screen.width < MOBILE_LARGE_WIDTH ? '' : 'Refresh'
-    },
-
-    newInboxEnabled: {
-      get () {
-        return this.isEInboxEnabled
-      },
-      set (value) {
-        if (value !== this.isEInboxEnabled) {
-          this.handleNewInboxToggle()
-        }
-      }
-    },
-
-    showNewInboxToggle () {
-      return this.isShown && this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     }
+
+    // newInboxEnabled: {
+    //   get () {
+    //     return this.isEInboxEnabled
+    //   },
+    //   set (value) {
+    //     if (value !== this.isEInboxEnabled) {
+    //       this.handleNewInboxToggle()
+    //     }
+    //   }
+    // },
+
+    // showNewInboxToggle () {
+    //   return this.isShown && this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    // }
   },
 
   methods: {
@@ -205,10 +201,10 @@ export default {
       'setIsInboxRefreshBtnLoading'
     ]),
 
-    ...mapActions('Einbox', [
-      'toggleNewInbox',
-      'initNewInbox'
-    ]),
+    // ...mapActions('Einbox', [
+    //   'toggleNewInbox',
+    //   'initNewInbox'
+    // ]),
 
     ...mapActions('cache', ['setCurrentCompany']),
 
@@ -250,43 +246,42 @@ export default {
     refreshInbox () {
       this.setIsInboxRefreshBtnLoading(true)
       this.$VueEvent.fire('fetchInbox')
-    },
-
-    async handleNewInboxToggle () {
-      try {
-        this.$cookies = VueCookies
-        this.isTogglingNewInbox = true
-        const result = await this.toggleNewInbox()
-
-        if (result.success) {
-          // Handle cookie storage
-          if (result.enabled) {
-            this.$cookies.set(COOKIE_NEW_INBOX, 'true', COOKIE_EXPIRES)
-            this.$router.push('/einbox')
-          } else {
-            this.$cookies.remove(COOKIE_NEW_INBOX)
-            this.$router.push('/')
-          }
-
-          this.$q.notify({
-            type: 'positive',
-            message: result.enabled
-              ? 'New inbox experience enabled'
-              : 'Rolled back to classic inbox',
-            position: 'top'
-          })
-        }
-      } catch (error) {
-        console.error('Failed to toggle new inbox:', error)
-        this.$q.notify({
-          type: 'negative',
-          message: 'Failed to update inbox preference',
-          position: 'top'
-        })
-      } finally {
-        this.isTogglingNewInbox = false
-      }
     }
+    // async handleNewInboxToggle () {
+    //   try {
+    //     this.$cookies = VueCookies
+    //     this.isTogglingNewInbox = true
+    //     const result = await this.toggleNewInbox()
+
+    //     if (result.success) {
+    //       // Handle cookie storage
+    //       if (result.enabled) {
+    //         this.$cookies.set(COOKIE_NEW_INBOX, 'true', COOKIE_EXPIRES)
+    //         this.$router.push('/einbox')
+    //       } else {
+    //         this.$cookies.remove(COOKIE_NEW_INBOX)
+    //         this.$router.push('/')
+    //       }
+
+    //       this.$q.notify({
+    //         type: 'positive',
+    //         message: result.enabled
+    //           ? 'New inbox experience enabled'
+    //           : 'Rolled back to classic inbox',
+    //         position: 'top'
+    //       })
+    //     }
+    //   } catch (error) {
+    //     console.error('Failed to toggle new inbox:', error)
+    //     this.$q.notify({
+    //       type: 'negative',
+    //       message: 'Failed to update inbox preference',
+    //       position: 'top'
+    //     })
+    //   } finally {
+    //     this.isTogglingNewInbox = false
+    //   }
+    // }
   },
 
   watch: {
@@ -318,8 +313,8 @@ export default {
     this.inboxShowUnreadsFilter = this.inboxShowUnreads
 
     // Initialize from cookie
-    const enabled = this.$cookies.get(COOKIE_NEW_INBOX) === 'true'
-    this.initNewInbox(enabled)
+    // const enabled = this.$cookies.get(COOKIE_NEW_INBOX) === 'true'
+    // this.initNewInbox(enabled)
   }
 }
 </script>

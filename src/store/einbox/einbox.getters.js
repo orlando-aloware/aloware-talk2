@@ -1,5 +1,5 @@
 export default {
-  isEInboxEnabled: state => state.newInboxEnabled,
-  getNavListItems: state => state.newInboxEnabled ? [state.navListItems[0]] : state.navListItems,
+  // isEInboxEnabled: state => state.newInboxEnabled,
+  getNavListItems: state => [state.navListItems[0]],
   getInboxesFirstPage: state => state.inboxesFirstPage
 }

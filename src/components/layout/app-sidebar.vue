@@ -30,12 +30,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{inboxMenuTitle}}</span>
+        <span class="font-weight-bold text-sm">Inboxes</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        {{inboxMenuTitle}}
+        Inboxes
       </span>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
@@ -51,12 +51,55 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{inboxMenuTitle}}</span>
+        <span class="font-weight-bold text-sm">Inboxes</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        {{inboxMenuTitle}}
+        Inboxes
+      </span>
+    </q-btn>
+
+    <q-btn :to="{ name: 'EInbox' }"
+           :ripple="false"
+           icon="img:app-icons/menu/inbox_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           data-testid="communication-active-sidebar-btn"
+           v-show="isActive('EInbox')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">AI Inbox</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        AI Inbox
+      </span>
+    </q-btn>
+    <q-btn :to="{ name: 'EInbox' }"
+           :ripple="false"
+           icon="img:app-icons/menu/inbox_gray.svg"
+           align="left"
+           padding="10px 20px"
+           class="nav-icons w-100"
+           data-testid="communication-no-active-sidebar-btn"
+           v-show="!isActive('EInbox')"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">AI Inbox</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        AI Inbox
       </span>
     </q-btn>
 
@@ -852,6 +895,7 @@
         Settings
       </span>
     </q-btn>
+
     <div class="mt-auto w-100">
       <div class="width-40 margin-auto position-relative">
         <q-separator class="separator-blur mt-1"
@@ -984,6 +1028,10 @@ export default {
       }
 
       if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
+        return true
+      }
+
+      if (['EInboxDetail', 'EInboxCommunicationDetail'].includes(this.$route.name) && name === 'EInbox') {
         return true
       }
 
