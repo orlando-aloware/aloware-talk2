@@ -8,7 +8,6 @@ export const DEFAULT_SETTING_VALUES = {
   name: null,
   script_id: null,
   skip_outside_daytime_hours: 1,
-  force_redial: 0,
   min_redials: 0,
   force_immediate_redial: 0,
   successful_call_disposition_ids: [],
