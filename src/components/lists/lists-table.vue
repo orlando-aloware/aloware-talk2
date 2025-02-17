@@ -78,7 +78,7 @@
                      v-if="isAdmin">
                   <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer text-sm mb-0">
                     <b-form-checkbox value="personalLists"
-                                    v-model="visibilityFilters"
+                                     v-model="visibilityFilters"
                                     @change="onFilterChange">
                       All Personal Lists
                     </b-form-checkbox>
