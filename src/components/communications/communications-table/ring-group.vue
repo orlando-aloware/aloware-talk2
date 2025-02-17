@@ -1,21 +1,23 @@
 <template>
   <div class="ellipse"
        data-testid="ring-group-row">
-    <span v-if="isAgent && row.ring_group_id">
-      {{ ringGroup.name }}
-    </span>
     <a class="cursor-pointer"
        target="_blank"
        :href="getRingGroupURL(row.ring_group_id)"
        @click="handleRingGroupClick(row.ring_group_id, $event)"
-       v-else-if="row.ring_group_id">
+       v-if="row.ring_group_id && ringGroupName !== 'Deleted Ring Group'">
       <external-link-icon color="#1976D2"/>
-      {{ ringGroup.name }}
+      {{ ringGroupName }}
 
       <q-tooltip>
         Click to go to ring group's page
       </q-tooltip>
     </a>
+    <span
+      v-else-if="isAgent || row.ring_group_id"
+      :class="{ 'deleted': ringGroupName === 'Deleted Ring Group' }">
+      {{ ringGroupName }}
+    </span>
     <span v-else>
       -
     </span>
@@ -53,6 +55,10 @@ export default {
 
     ringGroup () {
       return this.ringGroups.find(rg => rg.id === this.row.ring_group_id) || {}
+    },
+
+    ringGroupName () {
+      return this.row.ring_group_id && !this.ringGroup.name ? 'Deleted Ring Group' : (this.ringGroup.name || '')
     }
   },
 

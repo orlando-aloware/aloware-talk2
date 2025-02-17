@@ -196,7 +196,7 @@ export default {
       const params = {
         ...this.params,
         'prevent_duplicates': true,
-        'multiple_phone_numbers': false,
+        'multiple_phone_numbers': true,
         'allow_international_phone_numbers': false,
         'own_contacts_only': this.showAddViewMyContacts
       }

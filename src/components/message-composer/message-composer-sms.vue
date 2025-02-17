@@ -173,6 +173,10 @@
                     </q-card-section>
 
                     <q-card-section class="q-pt-none" data-testid="url-shortened-question-section">
+                        <al-alert>
+                          <span class="text-dark"
+                                v-html="SHORTENER_DEPRECATION_MESSAGE" />
+                        </al-alert>
                         Do you want URLs to be shortened to <u>{{ urlShortenerDomain }}</u>?
                     </q-card-section>
 
@@ -273,7 +277,8 @@ import AudioPlaceholder from 'components/message-composer/file-placeholders/audi
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { kycMixin } from 'src/plugins/mixins'
-
+import AlAlert from 'components/alert/index.vue'
+import { SHORTENER_DEPRECATION_MESSAGE } from 'src/constants/deprecation-messages'
 export default {
   name: 'message-composer-sms',
 
@@ -288,7 +293,8 @@ export default {
     VideoPlaceholder,
     ImagePlaceholder,
     SmsTemplateModal,
-    ScheduledMessage
+    ScheduledMessage,
+    AlAlert
   },
 
   props: {
@@ -445,7 +451,8 @@ export default {
         'text/directory',
         'application/pdf',
         'application/vcard'
-      ]
+      ],
+      SHORTENER_DEPRECATION_MESSAGE
     }
   },
 

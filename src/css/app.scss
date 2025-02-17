@@ -696,7 +696,7 @@ body,
   border-bottom: 1px solid #EBEBEB;
   width: auto;
   height: 62px;
-  z-index: 1;
+  z-index: 4;
 
   & .q-item {
     padding: 0;
@@ -16221,6 +16221,16 @@ hr {
       margin-top: 300px;
       text-align: center;
       z-index: 0;
+    }
+
+    .deleted, a.deleted {
+      color: #666666;
+      font-style: italic;
+    }
+
+    .contact-name {
+      font-weight: 500;
+      color: #256eff;
     }
   }
 
