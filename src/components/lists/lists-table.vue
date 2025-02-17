@@ -69,7 +69,7 @@
                 </b-form-group>
                 <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
                   <b-form-checkbox value="myLists"
-                                  v-model="visibilityFilters"
+                                   v-model="visibilityFilters"
                                   @change="onFilterChange">
                     {{ isAdmin ? 'Personal' : 'My' }} Lists
                   </b-form-checkbox>
