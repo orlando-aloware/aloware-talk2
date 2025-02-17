@@ -9132,6 +9132,16 @@ span.mention {
     margin-right: 5px;
   }
 
+  .title-breadcrumb-link {
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    height: 19px;
+    margin-right: 5px;
+    color: #256eff;
+  }
+
   .title-path:not(:last-child) {
     .title-slash {
       height: 19px;
