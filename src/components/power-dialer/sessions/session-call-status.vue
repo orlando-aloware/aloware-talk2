@@ -1402,13 +1402,6 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      // v1 legacy redial (for non demo companies, should be deprecated once v2 redial is released)
-      if (this.shouldRedialLegacy) {
-        this.onRedial(false)
-        return
-      }
-
-      // v2 redial (for demo companies)
       if (this.redialRequired) {
         // redial immediately if immediate redial is ON or no tasks left
         const redialNow = this.sessionSettings.force_immediate_redial || this.powerDialerTasks.in_queue.length === 0
