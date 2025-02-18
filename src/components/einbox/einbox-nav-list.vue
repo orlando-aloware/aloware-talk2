@@ -75,6 +75,11 @@ export default {
     },
 
     onInboxSelect (inboxId) {
+      // avoid redundant navigation
+      if (inboxId === this.activeInbox) {
+        return
+      }
+
       this.setActiveInbox(inboxId)
       this.resetItems()
       this.fetchItems(inboxId)
