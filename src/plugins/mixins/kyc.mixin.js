@@ -35,6 +35,9 @@ export default _.merge({
         return true
       }
 
+      console.log('shouldAllowSmsTraffic !selectedLine.is_10_dlc', !selectedLine.is_10_dlc)
+      console.log('shouldAllowSmsTraffic this.isCanadaLine(selectedLine)', this.isCanadaLine(selectedLine))
+
       /**
        * Allow sms traffic on Dialer and Contact text Composer component
        */
@@ -49,6 +52,13 @@ export default _.merge({
       if (this.isCanadaLine(selectedLine)) {
         /**
          * 3 - 10DLC Canada lines -> Allow messaging
+         */
+        return true
+      }
+
+      if (this.isGBLine(selectedLine)) {
+        /**
+         * 4 - 10DLC GB - Britain (UK) lines -> Allow messaging
          */
         return true
       }
@@ -74,6 +84,10 @@ export default _.merge({
 
     isCanadaLine (selectedLine) {
       return selectedLine?.incoming_numbers?.filter(number => number.country === 'CA').length > 0
+    },
+
+    isGBLine (selectedLine) {
+      return selectedLine?.incoming_numbers?.filter(number => number.country === 'GB').length > 0
     }
   }
 })
