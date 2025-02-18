@@ -12,6 +12,7 @@ export const DEFAULT_SETTING_VALUES = {
   force_immediate_redial: 0,
   successful_call_disposition_ids: [],
   force_sms: 0,
+  skip_redial_warmup_period: 0,
   user_id: null,
   warmup_period_in_seconds: 0,
   order: 1,
