@@ -1,6 +1,6 @@
 <template>
-  <div class="channel-toggle-wrapper d-flex align-items-center w-100 border-bottom">
-    <q-btn-toggle class="channel-toggle w-100"
+  <div class="channel-toggle-wrapper d-flex align-items-center border-bottom">
+    <q-btn-toggle class="channel-toggle"
                   no-caps
                   rounded
                   unelevated
@@ -25,7 +25,10 @@ export default {
   ],
 
   computed: {
-    ...mapState('Einbox', ['viewMode', 'activeInbox']),
+    ...mapState('Einbox', [
+      'viewMode',
+      'activeInbox'
+    ]),
 
     options () {
       return [
@@ -53,8 +56,11 @@ export default {
 <style lang="scss">
 .channel-toggle-wrapper {
   padding: 8px 16px;
+  width: 100%;
 
   .channel-toggle {
+    width: 100%;
+
     .q-btn {
       min-height: 28px;
       padding: 2px 24px;

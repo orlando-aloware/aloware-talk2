@@ -1,5 +1,5 @@
 <template>
-  <div class="einbox-tab d-flex flex-column w-100">
+  <div class="einbox-tab d-flex flex-column">
     <inbox-channel-toggle />
 
     <!-- Items List -->
@@ -171,6 +171,7 @@ export default {
 <style lang="scss" scoped>
 .einbox-tab {
   height: 100%;
+  width: 100%;
   background-color: white;
 }
 

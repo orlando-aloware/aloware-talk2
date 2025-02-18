@@ -1,9 +1,8 @@
 <template>
   <div data-testid="einbox-nav-item"
-       class="inbox-nav-item d-flex align-items-center cursor-pointer"
-       :class="{ 'inbox-nav-item--active': isActive }"
+       :class="['inbox-nav-item', 'd-flex', 'align-items-center', { 'inbox-nav-item--active': isActive }]"
        @click="$emit('click', value)">
-    <div class="inbox-nav-item__content d-flex align-items-center justify-content-between w-100">
+    <div class="inbox-nav-item__content d-flex align-items-center justify-content-between">
       <div class="d-flex align-items-center">
         <q-icon name="inbox"
                 size="20px"
@@ -46,6 +45,7 @@ export default {
   border-radius: 10px;
   transition: all 0.2s ease;
   max-width: 235px;
+  cursor: pointer;
 
   &:hover {
     background-color: #E9F0FF;
@@ -57,6 +57,10 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  &__content {
+    width: 100%;
   }
 
   &--active {

@@ -34,8 +34,9 @@ export default {
       try {
         this.setIsLoadingInboxes(true)
         const nextPage = 1
+        const perPage = 100
 
-        const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage })
+        const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage, perPage })
         this.setInboxes(response.data)
 
         // Check for inbox ID in route after loading inboxes

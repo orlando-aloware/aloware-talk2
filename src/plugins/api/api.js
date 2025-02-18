@@ -976,7 +976,7 @@ const talk2Api = {
       },
 
       inboxes: {
-        async get ({ page = 1, perPage = 15 } = {}) {
+        async get ({ page = 1, perPage = 100 } = {}) {
           const params = { per_page: perPage, page }
           return window.axios.get(`${suffixV2}inboxes`, { params })
         }
