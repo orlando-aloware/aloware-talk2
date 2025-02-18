@@ -12,47 +12,10 @@
                       :class="$q.screen.width < MOBILE_LARGE_WIDTH ? 'm-0': ''"/>
         {{ refreshButtonLabel }}
       </compact-btn>
-
-      <!-- <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
-        <b-form-checkbox class="mt-1 ml-2 cursor-pointer einbox-toggle"
-                         size="sm"
-                         switch
-                         id="EinboxToggle"
-                         data-testid="inbox-new-experience-checkbox"
-                         :class="toggleFiltersClass"
-                         :disabled="isTogglingNewInbox"
-                         v-model="newInboxEnabled">
-          <q-tooltip content-class="bg-grey-10 text-white"
-                    anchor="bottom left"
-                    self="top middle">
-            <zap-bold-icon class="ml-1"
-                            width="16"
-                            height="16"
-                            color="#FFB020" />
-            Toggle New Inbox
-          </q-tooltip>
-        </b-form-checkbox>
-        <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14 inbox-effect-gradient-text"
-               :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled }]"
-               data-testid="inbox-new-experience-label">
-          <template v-if="newInboxEnabled">
-            <zap-bold-icon class="ml-1"
-                           width="16"
-                           height="16"
-                           color="#256eff" />
-            <strong>New Inbox Experience Enabled</strong>
-          </template>
-          <template v-else>
-            <zap-bold-icon class="ml-1"
-                           width="16"
-                           height="16"
-                           color="#256eff" />
-            <strong>Enable the New Inbox experience</strong>
-          </template>
-        </label>
-      </div> -->
     </div>
 
+    <div class="d-flex align-items-center"
+         v-if="!isNewInbox">
       <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                        size="sm"
                        switch
@@ -104,32 +67,29 @@
         </label>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
 import VueCookies from 'vue-cookies'
 import { mapActions, mapState } from 'vuex'
-import { inboxRoutesMixin, userMixin } from 'src/plugins/mixins'
+import { inboxRoutesMixin, userMixin, EinboxMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
-// import ZapBoldIcon from 'components/icons/inbox/zap-bold-icon'
-
-// const COOKIE_NEW_INBOX = 'new_inbox_enabled'
-// const COOKIE_EXPIRES = 3650
 
 export default {
   name: 'inbox-toggle-filters',
 
   mixins: [
     inboxRoutesMixin,
-    userMixin
+    userMixin,
+    EinboxMixin
   ],
 
   components: {
     CompactBtn,
     RefreshIcon
-    // ZapBoldIcon
   },
 
   props: {
@@ -158,6 +118,7 @@ export default {
       'isFetchingContacts',
       'isInboxRefreshBtnLoading'
     ]),
+    ...mapState('Einbox', ['activeInbox']),
     ...mapState('cache', ['currentCompany']),
 
     isShown () {
@@ -176,22 +137,11 @@ export default {
 
     refreshButtonLabel () {
       return this.$q.screen.width < MOBILE_LARGE_WIDTH ? '' : 'Refresh'
+    },
+
+    isNewInbox () {
+      return this.$route.path.substring(0, 7) === '/einbox'
     }
-
-    // newInboxEnabled: {
-    //   get () {
-    //     return this.isEInboxEnabled
-    //   },
-    //   set (value) {
-    //     if (value !== this.isEInboxEnabled) {
-    //       this.handleNewInboxToggle()
-    //     }
-    //   }
-    // },
-
-    // showNewInboxToggle () {
-    //   return this.isShown && this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
-    // }
   },
 
   methods: {
@@ -201,10 +151,9 @@ export default {
       'setIsInboxRefreshBtnLoading'
     ]),
 
-    // ...mapActions('Einbox', [
-    //   'toggleNewInbox',
-    //   'initNewInbox'
-    // ]),
+    ...mapActions('Einbox', [
+      'resetItems'
+    ]),
 
     ...mapActions('cache', ['setCurrentCompany']),
 
@@ -243,45 +192,18 @@ export default {
       this.inboxShowUnreadsFilter = !this.inboxShowUnreadsFilter
     },
 
-    refreshInbox () {
+    async refreshInbox () {
       this.setIsInboxRefreshBtnLoading(true)
-      this.$VueEvent.fire('fetchInbox')
+
+      if (this.isNewInbox) {
+        this.resetItems()
+        await this.fetchItems(this.activeInbox)
+
+        this.setIsInboxRefreshBtnLoading(false)
+      } else {
+        this.$VueEvent.fire('fetchInbox')
+      }
     }
-    // async handleNewInboxToggle () {
-    //   try {
-    //     this.$cookies = VueCookies
-    //     this.isTogglingNewInbox = true
-    //     const result = await this.toggleNewInbox()
-
-    //     if (result.success) {
-    //       // Handle cookie storage
-    //       if (result.enabled) {
-    //         this.$cookies.set(COOKIE_NEW_INBOX, 'true', COOKIE_EXPIRES)
-    //         this.$router.push('/einbox')
-    //       } else {
-    //         this.$cookies.remove(COOKIE_NEW_INBOX)
-    //         this.$router.push('/')
-    //       }
-
-    //       this.$q.notify({
-    //         type: 'positive',
-    //         message: result.enabled
-    //           ? 'New inbox experience enabled'
-    //           : 'Rolled back to classic inbox',
-    //         position: 'top'
-    //       })
-    //     }
-    //   } catch (error) {
-    //     console.error('Failed to toggle new inbox:', error)
-    //     this.$q.notify({
-    //       type: 'negative',
-    //       message: 'Failed to update inbox preference',
-    //       position: 'top'
-    //     })
-    //   } finally {
-    //     this.isTogglingNewInbox = false
-    //   }
-    // }
   },
 
   watch: {
@@ -311,10 +233,6 @@ export default {
 
     this.inboxShowMyContactsFilter = this.inboxShowMyContacts
     this.inboxShowUnreadsFilter = this.inboxShowUnreads
-
-    // Initialize from cookie
-    // const enabled = this.$cookies.get(COOKIE_NEW_INBOX) === 'true'
-    // this.initNewInbox(enabled)
   }
 }
 </script>
