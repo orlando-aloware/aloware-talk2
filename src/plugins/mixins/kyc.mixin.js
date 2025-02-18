@@ -35,9 +35,6 @@ export default _.merge({
         return true
       }
 
-      console.log('shouldAllowSmsTraffic !selectedLine.is_10_dlc', !selectedLine.is_10_dlc)
-      console.log('shouldAllowSmsTraffic this.isCanadaLine(selectedLine)', this.isCanadaLine(selectedLine))
-
       /**
        * Allow sms traffic on Dialer and Contact text Composer component
        */
