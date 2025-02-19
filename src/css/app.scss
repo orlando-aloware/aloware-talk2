@@ -16519,10 +16519,10 @@ hr {
 .communication-details-sidebar {
   .b-sidebar {
     top: 60px;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 110px); // Mobile default: 60px for top + 50px for bottom
 
-    @media (max-width: 784px) {
-      height: calc(100vh - 110px); // 60px for top + 50px for bottom
+    @media (min-width: 785px) {
+      height: calc(100vh - 60px); // Desktop: only account for top bar
     }
   }
 }
