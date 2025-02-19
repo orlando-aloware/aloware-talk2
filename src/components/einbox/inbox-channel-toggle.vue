@@ -32,8 +32,16 @@ export default {
 
     options () {
       return [
-        { label: 'Threaded', value: THREADED },
-        { label: 'Unthreaded', value: UNTHREADED }
+        {
+          label: 'Threaded',
+          value: THREADED,
+          text: 'View all messages and calls grouped by contact, making it easy to follow conversations in one place'
+        },
+        {
+          label: 'Unthreaded',
+          value: UNTHREADED,
+          text: 'See all messages and calls in chronological order, essentially a communication log'
+        }
       ]
     }
   },
