@@ -11,7 +11,6 @@ import carrierFee from './carrier-fee'
 import communications from './communications'
 import contacts from './contacts'
 import inbox from './inbox'
-import Einbox from './einbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import transcriptions from './transcriptions'
@@ -44,7 +43,6 @@ export default function (/* { ssrContext } */) {
       communications,
       contacts,
       inbox,
-      Einbox,
       stats,
       powerDialer,
       transcriptions,
@@ -109,8 +107,7 @@ export default function (/* { ssrContext } */) {
         error: {
           message: '',
           code: null
-        },
-        callSuccessfullyAnswered: false
+        }
       },
       warnings: [],
       shouldIntroduce: false,
@@ -412,10 +409,6 @@ export default function (/* { ssrContext } */) {
 
       setDialerError ({ commit }, error) {
         commit('SET_DIALER_ERROR', error)
-      },
-
-      setDialerCallSuccessfullyAnswered ({ commit }, status) {
-        commit('SET_DIALER_CALL_SUCCESSFULLY_ANSWERED', status)
       },
 
       setOldAgentStatus ({ commit }, status) {
@@ -1081,10 +1074,6 @@ export default function (/* { ssrContext } */) {
       SET_DIALER_ERROR (state, error) {
         state.dialer.error.message = error.message
         state.dialer.error.code = error.code
-      },
-
-      SET_DIALER_CALL_SUCCESSFULLY_ANSWERED (state, status) {
-        state.dialer.callSuccessfullyAnswered = status
       },
 
       SET_OLD_AGENT_STATUS (state, status) {

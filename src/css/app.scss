@@ -696,7 +696,7 @@ body,
   border-bottom: 1px solid #EBEBEB;
   width: auto;
   height: 62px;
-  z-index: 1;
+  z-index: 4;
 
   & .q-item {
     padding: 0;
@@ -3855,10 +3855,6 @@ i.option-separator {
       white-space: nowrap;
     }
   }
-}
-
-.einbox-side__nav {
-  padding: 0;
 }
 
 .inbox-details {
@@ -9134,6 +9130,16 @@ span.mention {
   .title-breadcrumb {
     height: 19px;
     margin-right: 5px;
+  }
+
+  .title-breadcrumb-link {
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    height: 19px;
+    margin-right: 5px;
+    color: #256eff;
   }
 
   .title-path:not(:last-child) {
@@ -15928,15 +15934,6 @@ hr {
   }
 }
 
-/* Gradient text effect for inbox */
-.inbox-effect-gradient-text {
-  cursor: pointer;
-  background-clip: text !important;
-  -webkit-background-clip: text !important;
-  color: transparent !important;
-  background-image: linear-gradient(135deg, #00BD50, #33D76B, #66E08A) !important;
-}
-
 .q-message-text-content {
   line-height: 1.5;
   font-size: 13px;
@@ -16234,6 +16231,16 @@ hr {
       margin-top: 300px;
       text-align: center;
       z-index: 0;
+    }
+
+    .deleted, a.deleted {
+      color: #666666;
+      font-style: italic;
+    }
+
+    .contact-name {
+      font-weight: 500;
+      color: #256eff;
     }
   }
 

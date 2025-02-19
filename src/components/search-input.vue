@@ -54,6 +54,11 @@ export default {
     limitSearchCharacters: {
       type: Boolean,
       default: false
+    },
+
+    searchOnInput: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -83,9 +88,15 @@ export default {
     }, 500),
 
     onInput () {
-      if (!this.searchValue || this.searchValue.trim().length > 2) {
+      const hasMinimumLength = this.searchValue?.trim().length > 2
+
+      if (!this.searchValue || hasMinimumLength) {
         this.hasError = false
         this.$emit('show-error', this.hasError)
+      }
+
+      if (hasMinimumLength && this.searchOnInput) {
+        this.onSearch()
       }
     },
 
