@@ -1356,17 +1356,20 @@
       </b-col>
       <b-col
         :md="isWidget || mobileView ? 12 : 8"
-        class="pr-0 ring-group-snapshot-wrapper"
+        class="ring-group-snapshot-wrapper"
+        :class="isWidget || mobileView ? 'px-0 mt-0' : 'pr-0'"
         data-testid="comm-details-col"
         v-if="communication && communication.type === CommunicationTypes.CALL"
       >
         <ring-group-snapshot
           data-testid="comm-details-ring-group-snapshot"
+          :class="isWidget || mobileView ? 'my-1' : 'mb-1'"
           :communication="communication"
           :ring-group="usedRingGroup"
           v-if="usedRingGroup"
         />
         <network-logs-display
+          class="no-gutters mb-1"
           :call-issues="Object.values(communication?.call_quality_summary || {})"
           :user="communication.user"
         />
