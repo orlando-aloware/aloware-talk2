@@ -112,7 +112,7 @@
 
         <div class="d-flex justify-between">
           <div class="setting pr-3 align-items-center">
-            <compact-btn variant="success"
+            <compact-btn variant="primary"
                          class="mr-2"
                          data-testid="create-list-menu-item"
                          @clicked="onCreateList($event)">
