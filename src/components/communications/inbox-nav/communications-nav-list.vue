@@ -160,14 +160,9 @@ export default {
         : this.channelDefaultFilterModel.type
     },
 
+    /* TODO: this could be removed when "VIEWS" code will be removed deprecation-ref=1 */
     shouldShowViewsUnderChannels () {
-      /* WAT-1105: the channels and view are being moved to communications menu
-        so should not being displayed here if the feature is active */
-      if (this.hasNewCommunicationsFeatureEnabled) {
-        return false
-      }
-
-      return (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany)
+      return false
     }
   },
 
