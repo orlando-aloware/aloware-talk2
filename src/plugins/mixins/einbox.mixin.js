@@ -22,6 +22,7 @@ export default {
     ...mapActions('Einbox', [
       'setInboxes',
       'setIsLoadingInboxes',
+      'appendInboxes',
       'setItems',
       'appendItems',
       'setIsLoadingItems',
@@ -43,6 +44,26 @@ export default {
         await this.handleRouteInbox()
       } catch (error) {
         console.error('Error fetching inboxes:', error)
+      } finally {
+        this.setIsLoadingInboxes(false)
+      }
+    },
+
+    async loadMoreInboxes () {
+      try {
+        if (this.isLoadingInboxes || !this.hasMoreInboxes) {
+          return
+        }
+
+        this.setIsLoadingInboxes(true)
+
+        const perPage = 100
+        const nextPage = this.currentInboxesPage + 1
+        const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage, perPage })
+
+        this.appendInboxes(response.data)
+      } catch (error) {
+        console.error('Error loading more inboxes:', error)
       } finally {
         this.setIsLoadingInboxes(false)
       }

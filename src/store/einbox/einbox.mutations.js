@@ -16,6 +16,9 @@ export default {
   SET_HAS_MORE_INBOXES (state, hasMore) {
     state.hasMoreInboxes = hasMore
   },
+  APPEND_INBOXES (state, inboxes) {
+    state.inboxes = [ ...state.inboxes, ...inboxes ]
+  },
   SET_VIEW_MODE (state, viewMode) {
     state.viewMode = viewMode
   },

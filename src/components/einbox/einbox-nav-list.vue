@@ -35,6 +35,8 @@
 import { mapState, mapActions } from 'vuex'
 import EinboxNavItem from './einbox-nav-item.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
+import { debounce } from 'lodash'
+
 export default {
   components: {
     EinboxNavItem
@@ -47,7 +49,8 @@ export default {
   data () {
     return {
       perPage: 50,
-      hasMorePages: true
+      hasMorePages: true,
+      loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300)
     }
   },
 
@@ -67,10 +70,10 @@ export default {
 
     onScroll ({ verticalPosition, verticalSize, verticalContainerSize }) {
       const bottomThreshold = 100
-      const isNearBottom =
-        verticalPosition + verticalContainerSize + bottomThreshold >= verticalSize
+      const isNearBottom = verticalPosition + verticalContainerSize + bottomThreshold >= verticalSize
 
       if (isNearBottom && !this.loading && this.hasMorePages) {
+        this.loadMoreInboxesDebounced()
       }
     },
 
