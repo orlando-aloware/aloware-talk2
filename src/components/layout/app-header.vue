@@ -21,25 +21,9 @@
       <inbox-channel-navigation v-if="(['Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)) && !titleOnly" />
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading"
-                   v-if="$route.name === 'Stats' && !titleOnly"
-                   @clicked="refreshMetricGroup">
-        <refresh-icon :class="hideRefreshLabelClass"/>
-        {{ refreshButtonLabel }}
-      </compact-btn>
-
-      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading || (contactsRefreshIsDisabled && isInPowerDialerListPage)"
-                   v-if="isContactsPage"
-                   @clicked="refreshContacts">
-        <refresh-icon :class="hideRefreshLabelClass"/>
-        {{ refreshButtonLabel }}
-      </compact-btn>
-
-      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading"
-                   v-if="isInPowerDialerListPage"
-                   @clicked="refreshPowerDialerListItems">
+                   :disabled="isRefreshDisabled"
+                   v-if="shouldShowRefreshButton"
+                   @clicked="handleRefresh">
         <refresh-icon :class="hideRefreshLabelClass"/>
         {{ refreshButtonLabel }}
       </compact-btn>
@@ -356,6 +340,10 @@ export default {
       return this.$route.path.includes('channels') && !this.$route.path.includes('inbox')
     },
 
+    isStatsPage () {
+      return this.$route.name === 'Stats'
+    },
+
     isContactsPage () {
       return this.$route.name === 'Contacts' || (this.$route.name === 'Power Dialer' && ['power-dialer-add-queue-list', 'power-dialer-add-list'].includes(this.$route.meta?.id))
     },
@@ -393,6 +381,25 @@ export default {
 
     isMobileTransitionWidth () {
       return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH
+    },
+
+    shouldShowRefreshButton () {
+      return this.isStatsPage ||
+             this.isContactsPage ||
+             this.isInPowerDialerListPage
+    },
+
+    isRefreshDisabled () {
+      if (this.isStatsPage) {
+        return this.loading
+      }
+      if (this.isContactsPage) {
+        return this.loading || (this.contactsRefreshIsDisabled && this.isInPowerDialerListPage)
+      }
+      if (this.isInPowerDialerListPage) {
+        return this.loading
+      }
+      return false
     }
   },
 
@@ -469,6 +476,16 @@ export default {
 
       if (e) {
         e.preventDefault()
+      }
+    },
+
+    handleRefresh () {
+      if (this.isStatsPage) {
+        this.refreshMetricGroup()
+      } else if (this.isContactsPage) {
+        this.refreshContacts()
+      } else if (this.isInPowerDialerListPage) {
+        this.refreshPowerDialerListItems()
       }
     },
 
