@@ -3,7 +3,7 @@
     <inbox-channel-toggle />
 
     <!-- Items List -->
-    <div class="items-list"
+    <div class="items-list blue-scroll"
          @scroll="onScroll">
       <!-- Initial loading state -->
       <div :class="[isLoadingItems ? 'py-5' : 'py-4', 'relative']"
@@ -173,6 +173,7 @@ export default {
   height: 100%;
   width: 100%;
   background-color: white;
+  border-radius: inherit;
 }
 
 .items-list {

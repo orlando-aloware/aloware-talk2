@@ -1,10 +1,8 @@
 <template>
   <div class="einbox-nav-list"
        data-testid="einbox-nav-list">
-    <q-scroll-area ref="scrollArea"
-                   class="einbox-nav-list__scroll"
-                   :thumb-style="{ right: '2px', width: '4px', opacity: 0.6 }"
-                   @scroll="onScroll">
+    <div class="einbox-nav-list__scroll blue-scroll"
+         @scroll="onScroll">
       <einbox-nav-item :label="inbox.name"
                        :value="inbox.id"
                        :message-count="inbox.message_count"
@@ -27,7 +25,7 @@
           </template>
         </b-overlay>
       </div>
-    </q-scroll-area>
+    </div>
   </div>
 </template>
 
@@ -109,10 +107,11 @@ export default {
   height: 100%;
   background-color: #fff;
   color: #000;
-  padding: 7px;
 
   &__scroll {
     height: 100%;
+    padding: 7px;
+    overflow-y: auto;
   }
 }
 </style>

@@ -4,7 +4,7 @@
     <div class="einbox-side__left">
         <einbox-nav-list data-testid="einbox-nav-list" />
     </div>
-    <div class="inbox-side__right border-left d-flex align-items-start flex-column">
+    <div class="einbox-side__right border-left d-flex align-items-start flex-column">
       <einbox-tab data-testid="einbox-tab"/>
     </div>
   </div>
@@ -37,15 +37,11 @@ export default {
     max-width: 250px;
     width: 100%;
     overflow: hidden;
-  }
-
-  &__left, &__right {
-    border-radius: 12px;
+    border-radius: 12px 0px 0px 12px;
   }
 
   &__right {
-    margin-left: 7px;
-    border-left: none !important;
+    border-radius: 0px 12px 0px 0px;
   }
 }
 </style>

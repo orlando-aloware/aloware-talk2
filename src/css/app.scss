@@ -3857,10 +3857,6 @@ i.option-separator {
   }
 }
 
-.einbox-side__nav {
-  padding: 0;
-}
-
 .inbox-details {
   border: solid 1px $grey-light3;
   border-top: 0;
@@ -16541,3 +16537,13 @@ hr {
   }
 }
 
+.blue-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: all 0.2s ease;
+
+  &:hover {
+    scrollbar-color: $blue transparent;
+    padding-right: 0px;
+  }
+}
