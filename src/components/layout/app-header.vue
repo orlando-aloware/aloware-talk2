@@ -156,7 +156,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_MENU_TITLE, INBOXES_MENU_TITLE } from 'src/router/routes'
+import { COMMUNICATIONS_MENU_TITLE, INBOXES_MENU_TITLE, COMMUNICATIONS_CHANNELS_ROUTE_NAME } from 'src/router/routes'
 
 export default {
   name: 'app-header',
@@ -355,7 +355,7 @@ export default {
     },
 
     isCommunicationsPage () {
-      return this.$route.name === 'Communications Channel'
+      return this.$route.name === COMMUNICATIONS_CHANNELS_ROUTE_NAME
     },
 
     settingsTabHeaderName () {
