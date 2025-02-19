@@ -131,7 +131,8 @@ import {
   goBackMixin,
   contactsListFiltersMixin,
   userMixin,
-  kycMixin
+  kycMixin,
+  communicationsMixin
 } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -167,7 +168,8 @@ export default {
     goBackMixin,
     contactsListFiltersMixin,
     userMixin,
-    kycMixin
+    kycMixin,
+    communicationsMixin
   ],
 
   components: {
@@ -352,6 +354,10 @@ export default {
       return this.$route.name === 'Power Dialer' && !['power-dialer-session', 'power-dialer-add-list', 'power-dialer-add-queue-list'].includes(this.$route.meta?.id)
     },
 
+    isCommunicationsPage () {
+      return this.$route.name === 'Communications Channel'
+    },
+
     settingsTabHeaderName () {
       if (!['Settings Tab'].includes(this.$route.name)) {
         return this.$route.name
@@ -386,7 +392,8 @@ export default {
     shouldShowRefreshButton () {
       return this.isStatsPage ||
              this.isContactsPage ||
-             this.isInPowerDialerListPage
+             this.isInPowerDialerListPage ||
+             this.isCommunicationsPage
     },
 
     isRefreshDisabled () {
@@ -397,6 +404,9 @@ export default {
         return this.loading || (this.contactsRefreshIsDisabled && this.isInPowerDialerListPage)
       }
       if (this.isInPowerDialerListPage) {
+        return this.loading
+      }
+      if (this.isCommunicationsPage) {
         return this.loading
       }
       return false
@@ -486,6 +496,9 @@ export default {
         this.refreshContacts()
       } else if (this.isInPowerDialerListPage) {
         this.refreshPowerDialerListItems()
+      } else if (this.isCommunicationsPage) {
+        this.resetCommunications()
+        this.getCommunications(this.communicationFilters)
       }
     },
 
