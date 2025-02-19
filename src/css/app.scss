@@ -16215,7 +16215,7 @@ hr {
       overflow: hidden;
       transition: width 0.3s ease;
     }
-  
+
     .rotate-180 {
       transform: rotate(180deg);
     }
@@ -16519,7 +16519,11 @@ hr {
 .communication-details-sidebar {
   .b-sidebar {
     top: 60px;
-    height: calc(100vh - 60px)
+    height: calc(100vh - 60px);
+
+    @media (max-width: 784px) {
+      height: calc(100vh - 110px); // 60px for top + 50px for bottom
+    }
   }
 }
 
