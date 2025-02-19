@@ -74,17 +74,17 @@
           <!--COMM TYPE-->
           <q-card-section
             data-testid="comm-details-comm-type-card-section"
-            :class="['comm-type-container', mobileView ? 'pt-4' : 'pt-0']"
+            :class="[
+              'comm-type-container',
+              mobileView ? 'pt-4' : 'pt-0',
+              commTypeAsHeader ? 'sticky-header' : ''
+            ]"
           >
-            <div
-              class="text-lt p-x d-inline-flex"
-              :class="[!communication.duration ? 'flex-grow-1 text-left' : '']"
+            <div class="text-lt p-x d-flex"
+                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']"
             >
-              <component
-                :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
-                v-if="communication.disposition_status2"
-              >
-              </component>
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
+                         v-if="communication.disposition_status2" />
               <div class="comm-type-wrapper">
                 <span
                   v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
@@ -93,6 +93,14 @@
                 </span>
                 {{ communication.type | fixCommType }}
               </div>
+              <span class="cursor-pointer ml-auto"
+                    v-if="closable"
+                    @click="$emit('close')">
+                <close-icon icon-color="#62666E" />
+                <q-tooltip>
+                  Close
+                </q-tooltip>
+              </span>
             </div>
           </q-card-section>
 
@@ -341,7 +349,6 @@
                       <q-tooltip
                         anchor="top middle"
                         self="bottom middle"
-                        max-width="150px"
                       >
                         Click for more info
                       </q-tooltip>
@@ -1412,6 +1419,7 @@ import NetworkLogsDisplay from 'components/network-logs/network-logs-display'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import RingGroupSnapshot from 'components/ring-group-snapshot'
 import TranscriptionModal from 'src/components/communication/transcription-modal'
+import CloseIcon from 'components/icons/close-icon.vue'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 
 export default {
@@ -1430,7 +1438,8 @@ export default {
     DownloadButton,
     TranscriptionModal,
     EntityTags,
-    GenerateTranscriptionButton
+    GenerateTranscriptionButton,
+    CloseIcon
   },
 
   mixins: [
@@ -1459,6 +1468,16 @@ export default {
   },
 
   props: {
+    closable: {
+      type: Boolean,
+      default: false
+    },
+
+    commTypeAsHeader: {
+      type: Boolean,
+      default: false
+    },
+
     communication: {
       type: Object,
       required: true
