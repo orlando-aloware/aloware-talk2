@@ -1195,7 +1195,7 @@ export default {
         !this.isSimpSocial &&
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrat &&
+        this.fileUuid && this.isMigrated &&
         (this.isTranscriptionAllowed(this.communication) || this.communication.call_summary) && // Don't show empty AloAi dialog box
         (this.communication.has_voicemail || this.showAudio(this.communication)) &&
         (
