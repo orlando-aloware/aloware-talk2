@@ -1195,7 +1195,6 @@ export default {
         !this.isSimpSocial &&
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrated &&
         (this.isTranscriptionAllowed(this.communication) || this.communication.call_summary) && // Don't show empty AloAi dialog box
         (this.communication.has_voicemail || this.showAudio(this.communication)) &&
         (
@@ -1211,7 +1210,6 @@ export default {
         !this.isSimpSocial && // Exclude SimpSocial
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrated &&
         (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions

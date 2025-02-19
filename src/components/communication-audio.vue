@@ -120,12 +120,8 @@ export default {
       return 'Play ' + this.typeString
     },
 
-    shouldShowVoicemail () {
-      return this.type !== this.UploadedFileTypes.TYPE_CALL_RECORDING || !this.communication?.has_voicemail
-    },
-
     showAudioPlayer () {
-      return !this.isDeleted && this.hasAudio && this.shouldShowVoicemail
+      return !this.isDeleted && this.hasAudio
     }
   },
 
