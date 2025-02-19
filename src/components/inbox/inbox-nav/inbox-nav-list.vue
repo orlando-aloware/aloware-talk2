@@ -141,12 +141,9 @@ export default {
       return this.navListItems
     },
 
+    /* TODO: this could be removed when "VIEWS" code will be removed deprecation-ref=1 */
     shouldShowViewsUnderChannels () {
-      if (this.hasNewCommunicationsFeatureEnabled) {
-        return false
-      }
-
-      return (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany)
+      return false
     }
   },
 

@@ -171,7 +171,6 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_MENU_TITLE, INBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-header',
@@ -283,13 +282,6 @@ export default {
     },
 
     mainTitle () {
-      /*
-        WAT-1105: when the feature not corresponds inbox menu remains as communications
-      */
-      if (this.$route?.meta?.title === INBOXES_MENU_TITLE && !this.hasNewCommunicationsFeatureEnabled) {
-        return COMMUNICATIONS_MENU_TITLE
-      }
-
       return this.$route.meta && this.$route.meta.title ? this.$route.meta.title : this.$route.name
     },
 

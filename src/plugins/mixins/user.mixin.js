@@ -32,16 +32,6 @@ export default {
 
     shouldSeeExperimentalXproAiFeatures () {
       return (this.shouldSeeExperimentalAiFeatures && this.currentCompany?.plan?.use_case === 'xPro') || this.isDemoCompany
-    },
-
-    /*
-      WAT-1105:
-          - second code freeze: 01-22-2025
-            - new Communications menu general available
-            - channels only present in Communications menu
-    */
-    hasNewCommunicationsFeatureEnabled () {
-      return this.currentCompany?.communication_logs_enabled || false
     }
   },
 
