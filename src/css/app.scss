@@ -12079,10 +12079,6 @@ screen and (max-width: 956px) {
     padding-left: 0 !important;
     margin-top: 10px;
   }
-
-  .communication-details-card {
-    margin-top: 60px;
-  }
 }
 
 @media (min-width: 401px) {
@@ -16523,6 +16519,19 @@ hr {
 
     @media (min-width: 785px) {
       height: calc(100vh - 60px); // Desktop: only account for top bar
+    }
+  }
+
+  .communication-details-card {
+    .comm-type-container {
+      &.sticky-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        margin-bottom: .25rem;
+        border-bottom: 1px solid #EBEBEB;
+      }
     }
   }
 }
