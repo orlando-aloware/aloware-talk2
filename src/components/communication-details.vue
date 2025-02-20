@@ -1159,6 +1159,7 @@
                   <communication-audio
                     class="mb-2"
                     data-testid="comm-details-vm-comm-audio"
+                    ref="voicemailRecording"
                     :communication="communication"
                     :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                     :uniqueId="communication.id + '2'"
@@ -1606,8 +1607,9 @@ export default {
 
   methods: {
     fetchSmartTranscriptionData () {
-      if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
-        this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
+      const audioRef = this.communication.has_voicemail ? this.$refs.voicemailRecording : this.$refs.callRecording
+      if (audioRef?.$refs?.transcriptionModal) {
+        audioRef.$refs.transcriptionModal.fetchSmartTranscriptionData()
       }
     },
     getContactRouteLink (communication) {
