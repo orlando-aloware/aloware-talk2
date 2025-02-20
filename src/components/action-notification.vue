@@ -697,6 +697,7 @@ export default {
     },
 
     answerCommunication (shouldPark = false, shouldHangup = false) {
+      console.log('answerCommunication')
       const data = {
         communication: {
           id: this.communicationId,
@@ -710,6 +711,21 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
+
+      if (!this.dialer.communication && this.AgentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+        this.$axios.post('/api/v1/profile/get-live-calls').then(res => {
+          this.dialer.communication = res.data[0]
+          console.log('live call :) ', res.data[0])
+          this.answerCallFishing(data)
+        }).catch((err) => {
+          console.log(err)
+        })
+      } else {
+        this.answerCallFishing(data)
+      }
+    },
+
+    answerCallFishing (data) {
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
       this.setShowPhone(true)

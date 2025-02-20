@@ -81,8 +81,8 @@ export default {
     ]),
 
     isNotInProgressCall () {
-      return !this.dialer.call || !this.dialer.communication ||
-        !['connected', 'open'].includes(this.dialer.call.state)
+      return (!this.dialer.call || !this.dialer.communication ||
+        !['connected', 'open'].includes(this.dialer.call.state)) && this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL
     },
 
     hasNoParkedAndInprogressCall () {
@@ -845,11 +845,16 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
         if (this.dialer.communication) {
-          this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+          console.log('dialer communication', this.dialer.communication)
+          if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
+            this.setDialerParkedCall(this.dialer.communication)
+          } else {
+            this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+            console.log('Call ended1', call, this.dialer.parkedCall, this.dialer.call)
+            this.removeUnownedLiveContactTask()
+          }
         }
 
-        console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-        this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
@@ -1081,7 +1086,9 @@ export default {
     },
 
     parkCall () {
+      console.log('park call')
       if (this.isNotInProgressCall) {
+        console.log('return park call')
         return
       }
 
@@ -1646,6 +1653,7 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+      console.log('answer call fishing')
       this.setShowIncomingCallNotification(false)
 
       if (this.shouldPushPhoneRoute) {
@@ -1659,12 +1667,14 @@ export default {
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
+        console.log('parkCallCombo 1')
         this.parkCallCombo(true, false, communication)
         return
       }
 
       // park the in-progress call and unpark the parked call
       if (shouldPark && parkedCall) {
+        console.log('parkCallCombo 2 ')
         this.parkCallCombo(false, true, parkedCall)
         return
       }
