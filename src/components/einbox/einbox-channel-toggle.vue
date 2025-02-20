@@ -10,7 +10,26 @@
                   spread
                   :options="options"
                   :value="viewMode"
-                  @input="onChange" />
+                  @input="onChange">
+      <template #[option.slot]
+                v-for="option in options">
+        <div class="d-flex align-items-center"
+             :key="option.slot">
+          <span>{{ option.text }}</span>
+
+          <information-circle-icon height="16"
+                                   width="16"
+                                   class="ml-1"
+                                   :color="viewMode === option.value ? '#fff' : '#616161'"
+                                   :id="`einbox-channel-${option.slot}`"/>
+
+          <b-tooltip custom-class="talk-table__tooltip"
+                     :target="`einbox-channel-${option.slot}`">
+            {{ option.description }}
+          </b-tooltip>
+        </div>
+      </template>
+    </q-btn-toggle>
   </div>
 </template>
 
@@ -18,11 +37,16 @@
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { mapActions, mapState } from 'vuex'
+import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 
 export default {
   mixins: [
     EinboxMixin
   ],
+
+  components: {
+    InformationCircleIcon
+  },
 
   computed: {
     ...mapState('Einbox', [
@@ -33,14 +57,16 @@ export default {
     options () {
       return [
         {
-          label: 'Threaded',
+          text: 'Threaded',
+          slot: 'one',
           value: THREADED,
-          text: 'View all messages and calls grouped by contact, making it easy to follow conversations in one place'
+          description: 'View all messages and calls grouped by contact, making it easy to follow conversations in one place'
         },
         {
-          label: 'Unthreaded',
+          text: 'Unthreaded',
+          slot: 'two',
           value: UNTHREADED,
-          text: 'See all messages and calls in chronological order, essentially a communication log'
+          description: 'See all messages and calls in chronological order, essentially a communication log'
         }
       ]
     }

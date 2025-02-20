@@ -1,6 +1,6 @@
 <template>
   <div class="einbox-tab d-flex flex-column">
-    <inbox-channel-toggle />
+    <einbox-channel-toggle />
 
     <!-- Items List -->
     <div class="items-list blue-scroll"
@@ -75,7 +75,7 @@
 
 <script>
 import Communication from 'src/components/einbox/communication-items/communication.vue'
-import InboxChannelToggle from './inbox-channel-toggle.vue'
+import EinboxChannelToggle from './einbox-channel-toggle.vue'
 import { helperMixin, EinboxMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
@@ -84,7 +84,7 @@ import { debounce } from 'lodash'
 export default {
   components: {
     Communication,
-    InboxChannelToggle
+    EinboxChannelToggle
   },
 
   mixins: [
