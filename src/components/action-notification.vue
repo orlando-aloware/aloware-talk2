@@ -712,7 +712,7 @@ export default {
         shouldHangup: shouldHangup
       }
 
-      if (!this.dialer.communication && this.AgentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+      if (!this.dialer.communication && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.$axios.post('/api/v1/profile/get-live-calls').then(res => {
           this.dialer.communication = res.data[0]
           console.log('live call :) ', res.data[0])
