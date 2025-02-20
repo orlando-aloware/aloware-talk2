@@ -1184,34 +1184,31 @@ export default {
       return this.communication.body
     },
 
-    isAloaiDialogVisible () {
-      const allowedStatuses = [
-        TranscriptionStatus.STATUS_PROCESSING,
-        TranscriptionStatus.STATUS_COMPLETED,
-        TranscriptionStatus.STATUS_ERROR
-      ]
-
+    conditionForShowPoweredByAloAiBox () {
       return (
         !this.isSimpSocial &&
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrated &&
-        (this.isTranscriptionAllowed(this.communication) || this.communication.call_summary) && // Don't show empty AloAi dialog box
+        this.fileUuid && this.isMigrated
+      )
+    },
+
+    isAloaiDialogVisible () {
+      return (
+        this.conditionForShowPoweredByAloAiBox &&
+        (this.communication.is_eligible_for_transcribe || this.communication.call_summary) && // Don't show empty AloAi dialog box
         (this.communication.has_voicemail || this.showAudio(this.communication)) &&
         (
-          // If transcription does not exist, or transcription exists and is in allowed status
+          // If transcription does not exist for this call, or transcription has status
           (!this.communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
-          (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+          this.communication.call_transcription_status
         )
       )
     },
 
     isAvaPromotionDialogVisible () {
       return (
-        !this.isSimpSocial && // Exclude SimpSocial
-        this.currentCompany?.transcription_enabled &&
-        this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrated &&
+        this.conditionForShowPoweredByAloAiBox &&
         (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions
