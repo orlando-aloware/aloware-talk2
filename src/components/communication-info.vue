@@ -649,7 +649,7 @@
                  v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <div class="form-group row mb-0">
                 <div class="w-100"
-                     v-if="communication.type === CommunicationTypes.CALL">
+                     v-if="communication.type === CommunicationTypes.CALL && !communication.has_voicemail">
                   <label class="form-control-label"
                          v-if="showAudio(communication)">
                     Call Recording
@@ -819,7 +819,7 @@
     <div v-show="!activeName">
       <div class="px-3 pt-2 border border-top-0 text-left"
            :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
-           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication)">
+           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
         <div class="d-flex align-items-center w-100">
           <communication-audio class="mb-2"
                                data-testid="communication-info-call-recording-audio"
@@ -892,20 +892,20 @@
             </span>
           </div>
         </div>
-        <div class="text-left-align text-15"
+        <div class="text-left-align text-13"
              v-if="isTranscriptionAllowed(communication) && communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
-          <div>Transcription generation failed. Please try again later. </div>
-          <generate-transcription-button class="mr-2"
+          <div>Transcription generation failed. Please try again later.</div>
+          <generate-transcription-button class="mt-2"
                                          variant="button"
                                          data-testid="comm-details-generate-transcription-button"
                                          :communication="communication"
                                          v-if="fileUuid && isMigrated">
           </generate-transcription-button>
         </div>
-        <div class="text-left-align text-15"
+        <div class="text-left-align text-13"
              v-else-if="isTranscriptionAllowed(communication)">
-          <div class="mr-2">Click on the button to generate a transcription of this call.</div>
-          <generate-transcription-button class="mr-2"
+          <div>Click on the button to generate a transcription of this call.</div>
+          <generate-transcription-button class="mt-2"
                                          variant="button"
                                          data-testid="comm-details-generate-transcription-button"
                                          :communication="communication"

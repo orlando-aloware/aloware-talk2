@@ -273,7 +273,6 @@ import AudioPlaceholder from 'components/message-composer/file-placeholders/audi
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { kycMixin } from 'src/plugins/mixins'
-
 export default {
   name: 'message-composer-sms',
 
