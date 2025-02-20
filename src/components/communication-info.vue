@@ -867,11 +867,11 @@
           <div class="flex items-center gap-2">
             <h3 class="ai-effect-gradient-text"
                 @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
+              <sparkle-icon width="16" height="16" color="#9333EA"/>
               Powered by AloAi
               <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
               </template>
-              <sparkle-icon width="16" height="16" color="#9333EA"/>
             </h3>
           </div>
           <div class="transcription-summary-container">
@@ -941,8 +941,8 @@
       <div class="ai-effect-content p-2">
         <div class="flex items-center gap-2">
           <h3 class="ai-effect-gradient-text">
-            Powered by AloAi
             <sparkle-icon width="16" height="16" color="#9333EA"/>
+            Powered by AloAi
           </h3>
         </div>
         <div class="text-left-align text-13 font-weight-light-bold my-2">

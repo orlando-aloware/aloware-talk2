@@ -12,12 +12,12 @@
             class="ai-effect-gradient-text"
             @click="onExpanded"
           >
-            AloAi Conversation Insights
             <sparkle-icon
               width="16"
               height="16"
               color="#9333EA"
             />
+            AloAi Conversation Insights
           </h4>
         </div>
         <div :class="`information-container mt-3 mb-4 ${autoHeightClass}`">
