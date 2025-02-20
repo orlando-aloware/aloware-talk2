@@ -1,6 +1,6 @@
 <template>
   <div class="last-communication-date">
-    <span class="time-passed text-grey-90 mr-2"
+    <span class="time-passed text-grey-90"
           role="button"
           :id="`last-comm-date-${_uid}`">
       <span class="text-nowrap"

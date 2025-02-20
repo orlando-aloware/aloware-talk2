@@ -39,9 +39,6 @@ export default {
 
         const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage, perPage })
         this.setInboxes(response.data)
-
-        // Check for inbox ID in route after loading inboxes
-        await this.handleRouteInbox()
       } catch (error) {
         console.error('Error fetching inboxes:', error)
       } finally {
@@ -69,36 +66,12 @@ export default {
       }
     },
 
-    async handleRouteInbox () {
-      const routeInboxId = this.$route.params.inboxId
-
-      if (this.inboxes.length) {
-        if (routeInboxId) {
-          // Handle specific inbox from route
-          const inbox = this.inboxes.find(inbox => inbox.id.toString() === routeInboxId.toString())
-          if (inbox) {
-            this.setActiveInbox(inbox.id)
-            this.resetItems()
-            await this.fetchItems(inbox.id)
-          } else {
-            // Handle case when inbox ID from route is not found
-            console.warn(`Inbox with ID ${routeInboxId} not found`)
-            this.$router.replace({ name: 'EInbox' })
-          }
-        } else {
-          // No inbox ID in route, set first inbox
-          const firstInbox = this.inboxes[0]
-          this.setActiveInbox(firstInbox.id)
-          this.resetItems()
-          await this.fetchItems(firstInbox.id)
-          // Update route to reflect selected inbox
-          this.$router.push(`/einbox/${firstInbox.id}`)
-        }
-      }
-    },
-
     async fetchItems (inboxId) {
       try {
+        if (this.isLoadingItems) {
+          return
+        }
+
         this.setIsLoadingItems(true)
 
         const response = await this.getItemsRequest(inboxId, 1)
@@ -146,18 +119,6 @@ export default {
         },
         headers: { 'requested-from': 'api' }
       })
-    }
-  },
-
-  // Add route watcher to handle route changes
-  watch: {
-    '$route.params.inboxId': {
-      immediate: true,
-      handler (newInboxId) {
-        if (newInboxId && this.inboxes.length) {
-          this.handleRouteInbox()
-        }
-      }
     }
   }
 }
