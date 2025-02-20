@@ -845,7 +845,7 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
         if (this.dialer.communication) {
-          console.log('dialer communication', this.dialer.communication, this.dialer.communication.current_status2, CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW, this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW)
+          console.log('dialer communication', this.dialer.communication, this.dialer.communication.current_status2, this.dialer.communication.conference_status, CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW, this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW)
           if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
             this.setDialerParkedCall(this.dialer.communication)
           } else {
