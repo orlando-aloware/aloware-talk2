@@ -16,14 +16,27 @@
 <script>
 import Contact from 'pages/contacts/Contact'
 import EInboxSide from 'components/einbox/einbox-side'
+import { userMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'EInbox',
 
+  mixins: [
+    userMixin
+  ],
+
   components: {
     Contact,
     EInboxSide
+  },
+
+  data () {
+    return {
+      mobileContactScreenRoutes: [
+        'EInboxCommunicationDetail'
+      ]
+    }
   },
 
   computed: {
@@ -47,11 +60,10 @@ export default {
     }
   },
 
-  data () {
-    return {
-      mobileContactScreenRoutes: [
-        'EInboxCommunicationDetail'
-      ]
+  mounted () {
+    // block direct access from non demo companies
+    if (!this.isDemoCompany) {
+      this.$router.push({ name: 'Inbox' })
     }
   },
 

@@ -68,6 +68,7 @@
            class="nav-icons w-100"
            data-testid="communication-active-sidebar-btn"
            v-show="isActive('EInbox')"
+           v-if="isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -89,6 +90,7 @@
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
            v-show="!isActive('EInbox')"
+           v-if="isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
