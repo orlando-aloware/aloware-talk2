@@ -35,6 +35,7 @@
           <p class="text-muted custom-input-label mb-0">User</p>
           <user-selector :generic-styling="false"
                          :disabled="isLoading"
+                         :show-answer-type="false"
                          v-model="userId"
                          @change="onUserChanged" />
         </div>
@@ -109,7 +110,7 @@ export default {
     },
 
     privateListsLabel () {
-      return this.isAdmin ? 'Private Lists' : 'My Lists'
+      return this.isAdmin ? 'Personal Lists' : 'My Lists'
     },
 
     isFolderEmpty () {
