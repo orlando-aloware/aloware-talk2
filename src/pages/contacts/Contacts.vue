@@ -3,7 +3,7 @@
        v-if="authenticated">
     <div class="pt-0 pl-0 pr-0 mb-0 h-100 bordered-right contacts-left-sidebar"
          :class="sidebarClass"
-         v-show="$route.name === 'Contacts'">
+         v-show="$route.name === 'Contacts' && !$route.params.userId">
       <contacts-sidebar v-if="$route.name === 'Contacts'"/>
     </div>
     <contact-list-sidebar ref="contactListSidebar"

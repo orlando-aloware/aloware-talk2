@@ -7,7 +7,7 @@
     <ear-icon :height="iconHeight"
               :width="iconWidth"/>
 
-    <b-tooltip custom-class="communication-logs-table__tooltip"
+    <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-whisper-${_uid}`"
                v-if="blackTooltip">
       Whisper

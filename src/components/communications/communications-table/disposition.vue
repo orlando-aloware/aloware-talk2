@@ -8,7 +8,7 @@
                  :is="icon"
                  v-if="row.disposition_status2" />
 
-      <b-tooltip custom-class="communication-logs-table__tooltip"
+      <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-disposition-${_uid}`">
         {{ dispositionTooltipData(row.disposition_status2, row.type, row.direction, row.callback_status) }}
       </b-tooltip>

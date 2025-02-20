@@ -332,7 +332,6 @@ import StartDialSessionsForm from './start-dial-sessions-form'
 import PhoneIcon from 'components/icons/call-icon'
 import CheckIcon from 'components/icons/check-o-icon'
 import { DEFAULT_SETTING_VALUES } from 'src/constants/power-dialer/forms'
-import { POWER_DIALER_ORDER } from 'src/constants/power-dialer/power-dialer'
 import * as AgentStatus from 'src/constants/agent-status'
 import SettingIcon from 'components/icons/setting-o-icon'
 import { isEmpty, isEqual } from 'lodash'
@@ -434,22 +433,7 @@ export default {
         return this.selectedItem
       }
 
-      return {
-        call_disposition_ids: [],
-        campaign_id: null,
-        company_id: null,
-        contact_disposition_ids: [],
-        is_company_scope: 0,
-        metric_options: [],
-        name: null,
-        script_id: null,
-        skip_outside_daytime_hours: 1,
-        successful_call_disposition_ids: [],
-        user_id: null,
-        warmup_period_in_seconds: 0,
-        order: POWER_DIALER_ORDER.default,
-        vm_drop_ids: []
-      }
+      return this.defaultValues
     },
 
     isSaveButtonDisabled () {
@@ -771,21 +755,7 @@ export default {
     },
 
     resetDefaults (isExistingList = true) {
-      const params = {
-        call_disposition_ids: [],
-        campaign_id: null,
-        company_id: null,
-        contact_disposition_ids: [],
-        is_company_scope: null,
-        metric_options: [],
-        name: null,
-        script_id: null,
-        skip_outside_daytime_hours: 1,
-        user_id: null,
-        warmup_period_in_seconds: 0,
-        order: POWER_DIALER_ORDER.default,
-        vm_drop_ids: []
-      }
+      const params = { ...DEFAULT_SETTING_VALUES }
 
       if (this.sessionSettings?.id && isExistingList) {
         params.id = this.sessionSettings.id

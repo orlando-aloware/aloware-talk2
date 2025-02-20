@@ -1,5 +1,5 @@
 <template>
-  <div class="communication-logs-container flex-grow-1 d-flex flex-column">
+  <div class="talk-table-container flex-grow-1 d-flex flex-column">
     <h3 class="title pl-3">
       {{ title }}
     </h3>
@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <q-table class="communication-logs-table flex-grow-1"
+    <q-table class="talk-table flex-grow-1"
              row-key="index"
              virtual-scroll
              hide-bottom
@@ -195,7 +195,7 @@
       </template>
     </q-table>
 
-    <div class="communication-logs-table--no-data h5"
+    <div class="talk-table--no-data h5"
          v-if="!communications.length && !isLoadingMore && !isLoadingCommunications">
       No communications found based on the current filters
     </div>
@@ -205,7 +205,7 @@
 
     <div class="d-flex align-items-center justify-content-center border-top flex-grow-0 overflow-x-hidden pt-3"
          v-if="paginated">
-      <q-pagination class="table-pagination communication-logs-table-pagination"
+      <q-pagination class="table-pagination talk-table-pagination"
                     padding="0 5px"
                     boundary-links
                     direction-links
@@ -217,7 +217,7 @@
                     :boundary-numbers="false"
                     v-model="paginationPage"
                     @input="updatePaginationButtons" />
-      <q-select class="q-select-pager communication-logs-table-per-page-select"
+      <q-select class="q-select-pager talk-table-per-page-select"
                 option-value="value"
                 option-label="label"
                 outlined

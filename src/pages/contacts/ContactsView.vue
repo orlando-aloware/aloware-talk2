@@ -6,36 +6,70 @@
     <template slot="title"
               v-if="!simpleTable">
       <div class="d-flex flex-column">
-        <div class="pr-2 contacts__title d-flex align-items-center">
+        <div class="ml-2 pr-2 contacts__title d-flex flex-wrap align-items-center">
+          <div v-if="isDemoCompany && !isNaN(list.id) && typeof list.id === 'string'">
+            <compact-btn variant="primary"
+                        class="mr-3"
+                        data-testid="contacts-view-back-to-lists-button"
+                        @clicked="onBackToListsRedirect">
+              <chevron-left width="18px"
+                            height="18px"
+                            icon-color="white"/>
+              Back to Lists
+            </compact-btn>
+          </div>
           <back-button class="p-0"
-                       v-if="$q.screen.lt.md"
+                       v-else-if="$q.screen.lt.md"
                        data-testid="contacts-view-back-button"
                        @click="toggleSidebar"/>
+
+          <div class="d-flex align-items-center"
+               v-if="showUserBreadcrumbNav">
+            <person-icon color="#62666E" class="mr-1" width="18" height="18"/>
+            <router-link class="title-breadcrumb-link h-auto"
+                         :to="buildListManagementLink()">
+              {{ listUsername }}
+            </router-link>
+            <slash-icon class="title-slash d-flex align-items-center ml-1 mr-2" />
+          </div>
+
           <div class="d-flex align-items-center">
-            <div v-for="(folderName, index) in folderPath"
+            <div v-for="(folder, index) in folderPath"
                  :key="`f-${index}`"
                  class="d-flex align-items-center title-path"
                  data-testid="contacts-view-folder-path">
-              <div class="title-breadcrumb d-flex align-items-center">{{ folderName }}</div>
+              <template v-if="isDemoCompany">
+                <router-link class="d-flex align-items-center title-path"
+                             :to="buildListManagementLink(folder.id)">
+                  <folder-icon color="#62666E" class="mr-1"></folder-icon>
+                  <div class="title-breadcrumb-link d-flex align-items-center">{{ folder.name }}</div>
+                </router-link>
+              </template>
+              <template v-else>
+                <folder-icon color="#62666E" class="mr-1"></folder-icon>
+                <div class="title-breadcrumb d-flex align-items-center">{{ folder.name }}</div>
+              </template>
               <slash-icon class="title-slash d-flex align-items-center" />
             </div>
           </div>
-          <contact-list-type-icon class="mr-3"
-                                  testIdSuffix='contacts-view'
-                                  :type="list.type" />
           <div class="d-flex align-items-center">
-            <span :class="`list-name ${isUnsavedList ? 'text-grey-30' : ''}`">
-              {{ list.name || (isUnsavedList ? unsavedList.name : '') }}
-              <q-chip class="m-0 p-0"
-                      text-color="white"
-                      color="grey-80"
-                      style="margin-left:10px !important;"
-                      size="sm"
-                      data-testid="contacts-view-unsaved-chip"
-                      v-if="isUnsavedList">
-                Unsaved
-              </q-chip>
-            </span>
+            <contact-list-type-icon class="mr-3"
+                                    testIdSuffix='contacts-view'
+                                    :type="list.type" />
+            <div class="d-flex align-items-center">
+              <span :class="`list-name ${isUnsavedList ? 'text-grey-30' : ''}`">
+                {{ list.name || (isUnsavedList ? unsavedList.name : '') }}
+                <q-chip class="m-0 p-0"
+                        text-color="white"
+                        color="grey-80"
+                        style="margin-left:10px !important;"
+                        size="sm"
+                        data-testid="contacts-view-unsaved-chip"
+                        v-if="isUnsavedList">
+                  Unsaved
+                </q-chip>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -52,19 +86,6 @@
                    data-testid="contacts-view-add-filters-button"
                    @clicked="onFiltersClicked">
         <i class="fa fa-plus mr-2" /> Add Filters
-      </compact-btn>
-    </template>
-
-    <template slot="options"
-              v-if="isDemoCompany && !isNaN(list.id) && typeof list.id === 'string'">
-      <compact-btn variant="primary"
-                   class="ml-1"
-                   data-testid="contacts-view-back-to-lists-button"
-                   @clicked="onBackToListsRedirect">
-        <chevron-left width="18px"
-                      height="18px"
-                      icon-color="white"/>
-        Back to Lists
       </compact-btn>
     </template>
 
@@ -824,6 +845,8 @@ import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 import AlAlert from 'components/alert/index.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
 import TagsCellList from 'components/tags/tags-cell-list.vue'
+import FolderIcon from 'components/icons/folder-icon.vue'
+import PersonIcon from 'components/icons/person-icon'
 
 export default {
   name: 'contacts-view',
@@ -869,7 +892,9 @@ export default {
     TagContactsWorkflowEnroller,
     EnrollContactsToAloaiModal,
     AssignContactsModal,
-    TagsCellList
+    TagsCellList,
+    FolderIcon,
+    PersonIcon
   },
 
   props: {
@@ -1206,6 +1231,26 @@ export default {
 
     isDemoCompany () {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    },
+
+    showUserBreadcrumbNav () {
+      return this.isDemoCompany && (this.$route.params.userId || this.$route.params.type === 'public')
+    },
+
+    isFromListsManagement () {
+      return this.$route.meta.isFromListsManagement
+    },
+
+    listUsername () {
+      if (this.$route.params.type === 'public') {
+        return 'Public Lists'
+      }
+
+      const user = this.users.find((u) => u.id === +this.$route.params.userId)
+      if (!user) {
+        return ''
+      }
+      return `${user.first_name} ${user.last_name}`.trim()
     }
   },
 
@@ -1399,7 +1444,7 @@ export default {
 
     getListData (id) {
       return this.$axios
-        .get('/api/v2/contacts-list/' + id + (this.$route.query.type && this.$route.query.type === 'public' ? '?is_public_list=true' : ''))
+        .get('/api/v2/contacts-list/' + id + (this.$route.params.type && this.$route.params.type === 'public' ? '?is_public_list=true' : ''))
         .then((response) => response.data)
         .then((response) => {
           this.listLoaded({ ...response, id: id })
@@ -1826,7 +1871,7 @@ export default {
       const list = { data: null }
       for (item.data of folders) {
         if (level > 0) {
-          tempFolderNames.data.push(item.data.name)
+          tempFolderNames.data.push(item.data)
         } else {
           tempFolderNames.data = []
         }
@@ -1990,7 +2035,27 @@ export default {
     },
 
     onBackToListsRedirect () {
-      this.$router.push('/lists')
+      this.$router.push(this.buildListManagementLink(this.$route.params.folderId))
+    },
+
+    buildListManagementLink (folderId = null) {
+      let path
+
+      if (this.$route.params.type === 'public') {
+        path = '/lists-management/public'
+      } else {
+        path = '/lists-management/user'
+      }
+
+      if (this.$route.params.userId) {
+        path += `/${this.$route.params.userId}`
+      }
+
+      if (folderId) {
+        path += `/folder/${folderId}`
+      }
+
+      return path
     }
   },
 

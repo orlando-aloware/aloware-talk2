@@ -3,6 +3,7 @@ const suffixV2 = '/api/v2/'
 import _ from 'lodash'
 import qs from 'qs'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
+import * as AloAi from 'src/constants/aloai'
 
 const exportCommunications = async (contactId) => {
   return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
@@ -532,6 +533,14 @@ export default {
         return window.axios.post(
           `${suffixV1}transcription/communication/${communicationId}/generate-summary`
         )
+      },
+
+      // Update transcription summary
+      updateSummary (communicationId, summary) {
+        return window.axios.post(
+          `${suffixV1}transcription/${communicationId}/update-summary`,
+          { summary }
+        )
       }
     },
 
@@ -858,6 +867,13 @@ export default {
 
       splitListIntoSmallerLists (contactListId, params) {
         return window.axios.post(`${suffixV2}contacts-list/${contactListId}/split`, params)
+      },
+
+      changeOwner (contactListId, userId) {
+        const params = {
+          user_id: userId
+        }
+        return window.axios.patch(`${suffixV2}contacts-list/${contactListId}/change-owner`, params)
       }
     },
 
@@ -969,6 +985,14 @@ export default {
 
     aloAiBot: {
       getBots (params = {}) {
+        // Convert params to query string
+        if (params.direction) {
+          params.direction = params.direction === AloAi.DIRECTION_OUTBOUND ? 'outbound' : 'inbound'
+        }
+
+        if (params.type) {
+          params.type = params.type === AloAi.TYPE_TEXT ? 'text' : 'voice'
+        }
         return window.axios.get(`${suffixV1}aloai/bot`, { params })
       },
       getContactDisengagedBots (contactId) {

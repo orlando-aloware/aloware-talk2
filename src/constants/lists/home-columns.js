@@ -54,6 +54,15 @@ export const COLUMNS = [
     resizable: true
   },
   {
+    name: 'show_in_public_folder',
+    label: 'Visibility',
+    field: 'show_in_public_folder',
+    align: 'center',
+    sortable: true,
+    draggable: true,
+    resizable: true
+  },
+  {
     name: 'source',
     label: 'Source',
     field: 'source_name',

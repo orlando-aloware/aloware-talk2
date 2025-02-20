@@ -696,7 +696,7 @@ body,
   border-bottom: 1px solid #EBEBEB;
   width: auto;
   height: 62px;
-  z-index: 1;
+  z-index: 4;
 
   & .q-item {
     padding: 0;
@@ -9132,6 +9132,16 @@ span.mention {
     margin-right: 5px;
   }
 
+  .title-breadcrumb-link {
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    height: 19px;
+    margin-right: 5px;
+    color: #256eff;
+  }
+
   .title-path:not(:last-child) {
     .title-slash {
       height: 19px;
@@ -12068,10 +12078,6 @@ screen and (max-width: 956px) {
   .ring-group-snapshot-wrapper {
     padding-left: 0 !important;
     margin-top: 10px;
-  }
-
-  .communication-details-card {
-    margin-top: 60px;
   }
 }
 
@@ -16053,14 +16059,14 @@ hr {
   margin-bottom: 0px !important;
 }
 
-.communication-logs-container {
+.talk-table-container {
   padding: 24px 0 0 0;
   flex: 1;
   min-width: 0;
   width: inherit;
   overflow-y: auto;
 
-  .communication-logs-table {
+  .talk-table {
     margin-top: 20px;
     max-height: calc(100% - 110px);
 
@@ -16189,6 +16195,25 @@ hr {
       display: flex;
       align-items: center;
       justify-content: center;
+      margin-right: 1px;
+
+      & span {
+        margin: 0 2px;
+      }
+    }
+
+    .accordion {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      width: 0;
+      height: 28px;
+      overflow: hidden;
+      transition: width 0.3s ease;
+    }
+
+    .rotate-180 {
+      transform: rotate(180deg);
     }
 
     .q-table__linear-progress {
@@ -16202,6 +16227,16 @@ hr {
       margin-top: 300px;
       text-align: center;
       z-index: 0;
+    }
+
+    .deleted, a.deleted {
+      color: #666666;
+      font-style: italic;
+    }
+
+    .contact-name {
+      font-weight: 500;
+      color: #256eff;
     }
   }
 
@@ -16280,7 +16315,7 @@ hr {
   }
 }
 
-.communication-logs-table__tooltip {
+.talk-table__tooltip {
   .tooltip-inner {
     background-color: #000 !important;
     color: #fff !important;
@@ -16288,7 +16323,7 @@ hr {
   }
 }
 
-.communication-logs-table__popover {
+.talk-table__popover {
   background-color: #000;
   color: #fff;
   font-size: 13px;
@@ -16480,190 +16515,24 @@ hr {
 .communication-details-sidebar {
   .b-sidebar {
     top: 60px;
-    height: calc(100vh - 60px)
-  }
-}
+    height: calc(100vh - 110px); // Mobile default: 60px for top + 50px for bottom
 
-.lists-container {
-  padding: 24px 0 0 0;
-  flex: 1;
-  min-width: 0;
-  width: inherit;
-  overflow-y: auto;
-
-  .lists-table {
-    margin-top: 20px;
-
-    td:last-child {
-      background-color: #fff !important;
-    }
-
-    tr th {
-      position: sticky;
-      z-index: 2;
-      background: #fff;
-    }
-
-    thead tr:last-child th {
-      top: 48px;
-      z-index: 3;
-    }
-
-    thead tr:first-child th {
-      top: -16px; // padding height
-      z-index: 1;
-    }
-
-    tr:first-child th:last-child {
-      z-index: 3;
-    }
-
-    td:last-child {
-      z-index: 1;
-    }
-
-    td:last-child, th:last-child {
-      position: sticky;
-      right: 0;
-    }
-
-    tbody {
-      scroll-margin-top: 48px;
-    }
-
-    td {
-      padding: 16px;
-
-      & *.d-flex {
-        row-gap: 8px;
-      }
-    }
-
-    @media screen and (min-height: 1281px) {
-      max-height: 87vh;
-    }
-
-    @media screen and (min-height: 1080px) and (max-height: 1280px) {
-      max-height: 81vh;
-    }
-
-    @media screen and (min-height: 900px) and (max-height: 1079px) {
-      max-height: 80vh;
-    }
-
-    @media screen and (min-height: 701px) and (max-height: 900px) {
-      max-height: 75vh;
-    }
-
-    @media screen and (min-height: 601px) and (max-height: 700px) {
-      max-height: 55vh;
-    }
-
-    @media screen and (min-height: 551px) and (max-height: 600px) {
-      max-height: 55vh;
-    }
-
-    @media screen and (max-height: 550px) {
-      max-height: 45vh;
-    }
-
-    ::-webkit-scrollbar-track {
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background-color: #888;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-track-horizontal {
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb-horizontal {
-      background-color: #888;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb-horizontal:hover {
-      background-color: #555;
-    }
-
-    &-pagination {
-      margin-bottom: 24px !important;
-      margin-right: 8px !important;
-    }
-
-    &-per-page-select {
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
-    }
-
-    .operation-button {
-      border: solid 1px #D8D8D8;
-      border-radius: 6px;
-      height: 28px;
-      width: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    @media (min-width: 785px) {
+      height: calc(100vh - 60px); // Desktop: only account for top bar
     }
   }
 
-  .title {
-    font-size: 20px;
-    font-weight: 700;
-  }
-
-  .count {
-    font-size: 14px;
-    font-weight: 400;
-  }
-
-  .filters {
-    margin-top: 14px;
-    display: flex;
-    align-items: center;
-    width: 100%;
-
-    .search {
-      width: 50%;
-    }
-
-    .setting {
-      display: flex;
-      justify-content: flex-end;
-      width: 50%;
-    }
-  }
-
-  .status-icon {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-
-    i {
-      font-size: 20px;
-
-      &.material-icons {
-        &.text-indigo-500 { color: #6366f1; }
-        &.text-green-500 { color: #22c55e; }
-        &.text-purple-500 { color: #a855f7; }
-        &.text-red-500 { color: #ef4444; }
-        &.text-red-A400 { color: #ff1744; }
-        &.text-orange-500 { color: #f97316; }
+  .communication-details-card {
+    .comm-type-container {
+      &.sticky-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        margin-bottom: .25rem;
+        border-bottom: 1px solid #EBEBEB;
       }
     }
   }
-
-  .q-table__card {
-    box-shadow: none !important;
-  }
-
-  .q-table__control {
-    display: none !important;
-  }
 }
+

@@ -48,7 +48,7 @@
         <template v-else>
           <div
             class="text-center py-2"
-            v-if="!this.filteredBots.length"
+            v-if="!this.filteredOutboundBots.length"
           >
             No records to show.
           </div>
@@ -61,7 +61,7 @@
               <li
                 class="list-group-item list-group-item-action p-0"
                 :key="`enroll-bot-${key}`"
-                v-for="(bot, key) in this.filteredBots"
+                v-for="(bot, key) in this.filteredOutboundBots"
               >
                 <label class="d-block font-weight-bold p-2 mb-0 cursor-pointer">
                   <b-form-radio
@@ -151,8 +151,8 @@ export default {
       'search'
     ]),
     ...mapState(['isDatatableSelectedAll']),
-    filteredBots () {
-      let bots = this.bots
+    filteredOutboundBots () {
+      let bots = this.bots.filter((bot) => bot.direction === AloAi.DIRECTION_OUTBOUND)
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -164,7 +164,7 @@ export default {
     },
     contactsCount () {
       if (this.mode === 'add-contact-list' && this.contactList) {
-        return this.contactList.contactCount
+        return this.contactList.contactCount ?? this.contactList.no_of_contacts ?? 0
       }
 
       if (this.isDatatableSelectedAll) {
@@ -196,7 +196,7 @@ export default {
       const params = {
         ...this.params,
         'prevent_duplicates': true,
-        'multiple_phone_numbers': false,
+        'multiple_phone_numbers': true,
         'allow_international_phone_numbers': false,
         'own_contacts_only': this.showAddViewMyContacts
       }

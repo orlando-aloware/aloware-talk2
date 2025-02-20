@@ -8,7 +8,7 @@
                       :height="iconHeight"
                       :width="iconWidth"/>
 
-    <b-tooltip custom-class="communication-logs-table__tooltip"
+    <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-barge-${_uid}`"
                v-if="blackTooltip">
       Barge

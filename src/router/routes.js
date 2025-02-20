@@ -249,13 +249,90 @@ const routes = [
         }
       },
       {
-        path: 'lists',
+        path: 'lists-management',
         name: 'Lists',
         component: Lists,
         meta: {
           title: 'Lists Management Utility',
           id: 'lists'
-        }
+        },
+        children: [
+          {
+            path: ':type(public|user)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/:userId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/:userId(\\d+)+/folder/:folderId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          },
+          {
+            path: ':type(user)+/folder/:folderId(\\d+)+',
+            name: 'Lists',
+            component: Lists,
+            meta: {
+              title: 'Lists Management Utility',
+              id: 'lists'
+            }
+          }
+        ]
+      },
+      {
+        path: 'lists',
+        component: Contacts,
+        meta: {
+          title: 'Contacts'
+        },
+        children: [
+          {
+            name: 'Contacts',
+            path: 'user/:userId(\\d+)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List',
+              isFromListsManagement: true
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts',
+            path: 'user/:userId(\\d+)+/folder/:folderId(\\d+)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List',
+              isFromListsManagement: true
+            },
+            component: ContactsView
+          },
+          {
+            name: 'Contacts',
+            path: ':type(public)+/list/:id(\\d+)+',
+            meta: {
+              title: 'Contacts',
+              page: 'Contacts List',
+              isFromListsManagement: true
+            },
+            component: ContactsView
+          }
+        ]
       },
       {
         path: 'power-dialer',

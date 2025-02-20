@@ -6,7 +6,7 @@
        v-if="row.teams?.length" />
 
     <b-popover triggers="hover"
-               custom-class="communication-logs-table__popover"
+               custom-class="talk-table__popover"
                :target="`teams-${_uid}`"
                v-if="row.teams?.length">
       <span class="d-block mb-1">
@@ -24,10 +24,11 @@
     <a href="#"
        :id="`comm-user-${_uid}`"
        v-if="row.user_id"
+       :class="{ 'deleted': userName === 'Deleted User' }"
        @click.prevent="filter">
-      {{ getUserName(getUser(row.user_id)) }}
+      {{ userName }}
 
-      <b-tooltip custom-class="communication-logs-table__tooltip"
+      <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-user-${_uid}`">
         Click to filter by this user
       </b-tooltip>
@@ -61,6 +62,12 @@ export default {
         type: 'users',
         value: [this.row.user_id]
       })
+    }
+  },
+
+  computed: {
+    userName () {
+      return this.getUserName(this.getUser(this.row.user_id))
     }
   }
 }

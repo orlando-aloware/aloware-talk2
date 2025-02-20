@@ -2,48 +2,117 @@
   <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
     <lists-folders-management :is-loading="isLoading || isLoadingMore" />
 
-    <div class="lists-container flex-grow-1 d-flex flex-column">
+    <div class="talk-table-container flex-grow-1 d-flex flex-column">
       <div class="d-flex justify-between items-start">
         <div class="px-3">
           <h3 class="title pl-3"> {{ title  }}</h3>
           <div class="count pl-3">
             <div class="d-flex align-items-center"
                 v-if="!isPublic && !isLoading">
-              <div class="d-flex align-items-center title-path mb-2"
-                  :key="folder.id"
-                  v-for="(folder, index) in foldersPath">
-                <a href="#" @click="(ev) => selectFolder(folder.id, ev)">
-                  <div class="title-breadcrumb d-flex align-items-center">
-                    {{ folder.name == 'Root' ? 'Root Folder' : folder.name }}
-                  </div>
-                </a>
-                <slash-icon class="title-slash d-flex align-items-center" v-if="(index + 1) < foldersPath.length"/>
+              <div class="d-flex align-items-center title-path mb-2">
+                <router-link :to="buildFolderPath()">
+                  <div class="title-breadcrumb-link d-flex align-items-center">All Folders</div>
+                </router-link>
+                <slash-icon class="title-slash d-flex align-items-center" v-if="foldersPath.length"/>
               </div>
+              <template v-if="folderId">
+                <div class="d-flex align-items-center title-path mb-2"
+                     :key="folder.id"
+                     v-for="(folder, index) in foldersPath">
+                  <router-link :to="buildFolderPath(folder.id)">
+                    <div class="title-breadcrumb-link d-flex align-items-center">
+                      {{ folder.name == 'Root' ? 'Root Folder' : folder.name }}
+                    </div>
+                  </router-link>
+                  <slash-icon class="title-slash d-flex align-items-center" v-if="(index + 1) < foldersPath.length"/>
+                </div>
+              </template>
             </div>
 
             <strong v-if="!isLoading">{{ listsCount }} List(s)</strong>
 
-            <q-spinner-bars class="mr-1"
+            <q-spinner-bars :class="`${isPublic ? 'my-1' : 'my-3'}`"
                             color="primary"
                             size="14px"
                             v-else />
         </div>
-        <div class="filters pl-3">
-          <div class="search">
-            <search-input class="width-260"
-                          data-testid="lists-search-input"
-                          limit-search-characters
-                          :search="search"
-                          :disabled="isLoadingDisabled"
-                          @search="onSearch" />
+        <div class="d-flex align-items-center mt-2">
+          <div class="filters pl-3 mt-0">
+            <div class="search">
+              <search-input class="width-260"
+                            data-testid="lists-search-input"
+                            limit-search-characters
+                            placeholder="Search List Name"
+                            :search="search"
+                            :search-on-input="true"
+                            @search="onSearch" />
+            </div>
+          </div>
+          <div class="ml-2">
+            <b-dropdown text="Search Filters"
+                        right
+                        variant="light"
+                        class="calls__header__columns-dropdown m-2 b-compact-dropdown-button dropdown-white"
+                        size="lg">
+              <b-overlay :show="isLoading">
+                <template #overlay>
+                  <q-spinner-bars color="primary"
+                                  size="30px" />
+                </template>
+                <h5 class="form-label relative-time m-2" style="width: 185px;">Visibility</h5>
+                <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+                  <b-form-checkbox value="publicLists"
+                                  v-model="visibilityFilters"
+                                  @change="onFilterChange">
+                    Public Lists
+                  </b-form-checkbox>
+                </b-form-group>
+                <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+                  <b-form-checkbox value="myLists"
+                                   v-model="visibilityFilters"
+                                  @change="onFilterChange">
+                    {{ isAdmin ? 'Personal' : 'My' }} Lists
+                  </b-form-checkbox>
+                </b-form-group>
+                <div class="d-flex align-items-center cursor-pointer"
+                     v-if="isAdmin">
+                  <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer text-sm mb-0">
+                    <b-form-checkbox value="personalLists"
+                                     v-model="visibilityFilters"
+                                    @change="onFilterChange">
+                      All Personal Lists
+                    </b-form-checkbox>
+                  </b-form-group>
+                  <information-circle-icon id="personal-lists-tooltip"
+                                           color="#2F80ED"/>
+                  <b-tooltip custom-class="talk-table__tooltip"
+                             placement="bottom"
+                             boundary="window"
+                             target="personal-lists-tooltip">
+                    Search through all users Personal Lists
+                  </b-tooltip>
+                </div>
+
+                <h5 class="form-label relative-time m-2">Type</h5>
+                <div :key="option.value"
+                     v-for="option of listTypeOptions">
+                  <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+                    <b-form-checkbox :value="option.value"
+                                     v-model="listTypesFilter"
+                                     @change="onFilterChange">
+                      {{ option.label }}
+                    </b-form-checkbox>
+                  </b-form-group>
+                </div>
+              </b-overlay>
+            </b-dropdown>
           </div>
         </div>
-
       </div>
 
         <div class="d-flex justify-between">
           <div class="setting pr-3 align-items-center">
-            <compact-btn variant="success"
+            <compact-btn variant="primary"
                          class="mr-2"
                          data-testid="create-list-menu-item"
                          @clicked="onCreateList($event)">
@@ -55,7 +124,7 @@
         </div>
       </div>
 
-      <q-table class="lists-table"
+      <q-table class="talk-table"
               row-key="index"
               virtual-scroll
               :data="listsData"
@@ -74,13 +143,9 @@
               <div v-if="col.name === COLUMN_NAMES.name">
                 <router-link class="d-flex align-items-center item contact-name"
                              data-testid="lists-view-list-name-link"
-                             :to="`/contacts/list/${props.row.id}${props.row.show_in_public_folder ? '?type=public' : ''}`"
-                             v-if="showListLink">
+                             :to="buildListLink(props.row)">
                     {{ props.row.name }}
                 </router-link>
-                <span v-else>
-                  {{ props.row.name }}
-                </span>
               </div>
               <div v-if="col.name === COLUMN_NAMES.owner_name && isColumnVisible(col.name)">
                 {{ props.row.owner_name }}
@@ -92,11 +157,11 @@
               <div v-else-if="col.name === COLUMN_NAMES.no_of_contacts">
                 {{ props.row.no_of_contacts }}
               </div>
+              <div v-else-if="col.name === COLUMN_NAMES.show_in_public_folder">
+                {{ props.row.show_in_public_folder ? 'Public' : 'Private' }}
+              </div>
               <div v-else-if="col.name === COLUMN_NAMES.type">
                 {{ getContactListType(props.row) }}
-              </div>
-              <div v-else-if="col.name === COLUMN_NAMES.show_in_public_folder">
-                {{ props.row.show_in_public_folder }}
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.source">
                 <span v-if="props.row.source_name">
@@ -117,146 +182,128 @@
                 <span v-else>-</span>
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.actions">
-                <div class="d-flex justify-content-center context-menu">
-                  <div class="operation-button mx-1"
-                       v-if="showListLink">
-                    <span class="cursor-pointer"
-                          data-testid="lists-edit-button"
-                          @click="onEditList(props.row)">
-                      <pencil-o-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Edit this List
-                      </q-tooltip>
-                    </span>
-                  </div>
+                <div class="d-flex justify-content-center">
+                  <b-dropdown class="m-2 b-compact-dropdown-button text-bold dropdown-white contacts-options-dropdown"
+                              text="..."
+                              variant="light"
+                              no-caret
+                              data-testid="lists-options-dropdown"
+                              alt="List Options"
+                              title="List Options"
+                              boundary="window"
+                              right
+                              :popper-opts="{ positionFixed: true }"
+                              @hide="onHide"
+                              @show="onShow">
+                    <template #button-content>
+                      <ellipse-icon />
+                    </template>
 
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-rename-button"
-                          @click="onRenameList(props.row)">
-                      <pencil-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Rename this list
-                      </q-tooltip>
-                    </span>
-                  </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-edit-option"
+                                     @click="onEditList(props.row)">
+                      <pencil-o-icon height="14"
+                                     width="14"
+                                     color="#62666E"/>
+                      Edit List
+                    </b-dropdown-item>
 
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-duplicate-button"
-                          @click="onDuplicateList(props.row)">
-                      <duplicate-icon height="20"
-                                width="20"
-                                color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Duplicate this list
-                      </q-tooltip>
-                    </span>
-                  </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-rename-option"
+                                     @click="onRenameList(props.row)">
+                      <pencil-icon />
+                      Rename List
+                    </b-dropdown-item>
 
-                  <div class="operation-button mx-1"
-                      :data-popper-target="'list-' + props.row.id"
-                      v-if="!isPublic">
-                    <span class="cursor-pointer"
-                          data-testid="lists-move-button"
-                          data-action="move-item"
-                          @click="onMoveList(props.row)">
-                      <move-icon height="20"
-                                width="20"
-                                color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Move this list
-                      </q-tooltip>
-                    </span>
-                  </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-duplicate-option"
+                                     @click="onDuplicateList(props.row)">
+                      <duplicate-icon />
+                      Duplicate List
+                    </b-dropdown-item>
 
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-pin-button"
-                          @click="onPinList(props.row)">
-                      <pin-icon height="20"
-                                width="20"
-                                color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} this list
-                      </q-tooltip>
-                    </span>
-                  </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="change-list-owner-option"
+                                     v-if="isAdmin"
+                                     @click="openChangeListOwnerModal(props.row)">
+                      <switch-icon />
+                      Change List Owner
+                    </b-dropdown-item>
 
-                  <div class="operation-button mx-1"
-                      v-if="hasShowInPublicFolderPermission">
-                    <span class="cursor-pointer"
-                          data-testid="lists-show-button"
-                          @click="onShowInPublicFolderList(props.row)">
-                      <eye-icon height="20"
-                                width="20"
-                                color="#62666E"
-                                v-if="!props.row.show_in_public_folder"/>
-                      <eye-off-icon height="20"
-                                    width="20"
-                                    color="#62666E"
-                                    v-else/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Convert this list to {{ props.row.show_in_public_folder ? 'private' : 'public' }}
-                      </q-tooltip>
-                    </span>
-                  </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-show-option"
+                                     v-if="hasShowInPublicFolderPermission"
+                                     @click="onShowInPublicFolderList(props.row)">
+                      <template v-if="!props.row.show_in_public_folder">
+                        <eye-icon />
+                        Convert List to Public
+                      </template>
+                      <template v-else>
+                        <eye-off-icon />
+                        Convert List to Private
+                      </template>
+                    </b-dropdown-item>
 
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-enroll-sequence-button"
-                          @click="onEnrollContactsToSequence(props.row)">
-                      <add-sequence-icon height="20"
-                                    width="20"
-                                    color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Enroll contacts to sequence
-                      </q-tooltip>
-                    </span>
-                  </div>
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-add-to-powerdialer-option"
+                                     @click="onAddListToPowerDialer(props.row)">
+                      <power-dialer-mobile-icon width="14"
+                                                height="14"
+                                                color="#62666E"/>
+                      Add List to Power Dialer
+                    </b-dropdown-item>
 
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-add-power-dialer-button"
-                          @click="onAddListToPowerDialer(props.row)">
-                      <add-call-icon height="20"
-                                    width="20"
-                                    color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Add this list to Power Dialer
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-delete-button"
-                          @click="onDeleteList(props.row)">
-                      <trash-icon height="20"
-                                  width="20"
-                                  color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Delete this list
-                      </q-tooltip>
-                    </span>
-                  </div>
-
-                  <div class="operation-button mx-1">
-                    <span class="cursor-pointer"
-                          data-testid="lists-duplicate-button"
-                          @click="openAssignContacts(props.row)">
-                      <arrow-right-icon height="20"
-                                        width="20"
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-add-to-sequence-option"
+                                     @click="onEnrollContactsToSequence(props.row)">
+                      <add-sequence-icon height="14"
+                                        width="14"
                                         color="#62666E"/>
-                      <q-tooltip content-class="bg-primary text-white">
-                        Assign Contacts
-                      </q-tooltip>
-                    </span>
-                  </div>
+                      Add List to Sequence
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-assign-option"
+                                     @click="openAssignContacts(props.row)">
+                      <power-dialer-mobile-icon width="14"
+                                                height="14"
+                                                color="#62666E"/>
+                      Assign Contact List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-aloai-option"
+                                     v-if="shouldShowAloAi"
+                                     @click="openAloAiBotContactsEnrollmentModal(props.row)">
+                      <add-user-icon width="14"
+                                     height="14"
+                                     color="#62666E"/>
+                      Enroll List in AloAi Text Bot
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                    data-testid="lists-move-option"
+                                    :data-popper-target="'list-' + props.row.id"
+                                    v-if="!props.row.show_in_public_folder"
+                                    @click.stop="onMoveList(props.row)">
+                      <move-icon />
+                      Move List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-pin-option"
+                                     @click="onPinList(props.row)">
+                      <pin-icon />
+                      {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} List
+                    </b-dropdown-item>
+
+                    <b-dropdown-item href="#"
+                                     data-testid="lists-delete-option"
+                                     @click="onDeleteList(props.row)">
+                      <delete-red-icon />
+                      <span class="text-danger">Delete</span>
+                    </b-dropdown-item>
+                  </b-dropdown>
                 </div>
               </div>
             </q-td>
@@ -307,6 +354,10 @@
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
 
+      <enroll-contacts-to-aloai-modal ref="enrollContactsToAloAiModal"
+                                      :params="attachedParams()"
+                                      :contactList="list" />
+
       <assign-contacts-modal :is-show="showAssignContacts"
                             :list="list"
                             @closeAssignContactsModal="closeAssignContacts" />
@@ -317,6 +368,10 @@
 
       <create-list-modal from="lists"
                          :user-id="userId" />
+
+      <change-list-owner-modal ref="changeListOwnerModal"
+                               :contactList="list"
+                               @listOwnerChanged="onListOwnerChanged"/>
     </div>
   </div>
 </template>
@@ -336,21 +391,26 @@ import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import DuplicateIcon from 'components/icons/duplicate-icon.vue'
-import TrashIcon from 'components/icons/trash-icon.vue'
 import PinIcon from 'components/icons/pin-icon.vue'
 import EyeIcon from 'components/icons/eye-icon.vue'
 import EyeOffIcon from 'components/icons/eye-off-icon'
-import AddCallIcon from 'components/icons/add-call-icon.vue'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
-import ArrowRightIcon from 'components/icons/arrow-right-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
 import ListsFoldersManagement from './lists-folders-management'
 import SlashIcon from 'components/icons/slash-icon'
+import AddUserIcon from 'components/icons/add-user-icon'
+import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
+import SwitchIcon from 'components/icons/switch-icon'
+import ChangeListOwnerModal from './change-list-owner-modal.vue'
+import EllipseIcon from 'components/icons/ellipse-icon'
+import DeleteRedIcon from 'components/icons/delete-red-icon'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 
 export default {
   name: 'ListsTable',
@@ -362,9 +422,7 @@ export default {
   ],
 
   components: {
-    AddCallIcon,
     AddSequenceIcon,
-    ArrowRightIcon,
     DuplicateIcon,
     EyeIcon,
     EyeOffIcon,
@@ -372,7 +430,6 @@ export default {
     PencilIcon,
     PencilOIcon,
     PinIcon,
-    TrashIcon,
     PlusIcon,
     SearchInput,
     AssignContactsModal,
@@ -385,13 +442,20 @@ export default {
     RelativeTime,
     ListsFoldersManagement,
     SlashIcon,
-    CompactBtn
+    CompactBtn,
+    AddUserIcon,
+    EnrollContactsToAloaiModal,
+    SwitchIcon,
+    ChangeListOwnerModal,
+    EllipseIcon,
+    PowerDialerMobileIcon,
+    DeleteRedIcon,
+    InformationCircleIcon
   },
 
   data () {
     return {
       search: '',
-      isLoadingDisabled: false,
       isLoading: false,
       isLoadingMore: false,
       loading: false,
@@ -418,7 +482,13 @@ export default {
       foldersPath: [],
 
       // Filters
-      showInPublicFolder: false
+      visibilityFilters: [],
+      listTypesFilter: [ContactListTypes.STATIC, ContactListTypes.DYNAMIC, ContactListTypes.DYNAMIC_REMOTE_LIST],
+      listTypeOptions: [
+        { value: ContactListTypes.STATIC, label: 'Static' },
+        { value: ContactListTypes.DYNAMIC, label: 'Dynamic' },
+        { value: ContactListTypes.DYNAMIC_REMOTE_LIST, label: 'Integration Dynamic' }
+      ]
     }
   },
 
@@ -462,7 +532,7 @@ export default {
     },
 
     isPublic () {
-      return this.$route.query.publicLists === '1'
+      return this.$route.params.type === 'public'
     },
 
     title () {
@@ -482,19 +552,31 @@ export default {
     },
 
     userId () {
-      if (this.$route.query.user_id && this.isAdmin) {
-        return +this.$route.query.user_id
+      if (this.$route.params.userId && this.isAdmin) {
+        return +this.$route.params.userId
       }
 
       return this.profile.id
     },
 
     folderId () {
-      return +this.$route.query.folder_id
+      return +this.$route.params.folderId
     },
 
-    showListLink () {
-      return this.isPublic || this.userId === this.profile.id
+    publicListsFilterSelected () {
+      return this.visibilityFilters.includes('publicLists')
+    },
+
+    myListsFilterSelected () {
+      return this.visibilityFilters.includes('myLists')
+    },
+
+    personalListsFilterSelected () {
+      return this.isAdmin && this.visibilityFilters.includes('personalLists')
+    },
+
+    isGlobalSearch () {
+      return this.publicListsFilterSelected && (this.myListsFilterSelected || this.personalListsFilterSelected)
     }
   },
 
@@ -503,6 +585,7 @@ export default {
       'listPinToggled',
       'addPowerDialerOpen',
       'openMoveDialog',
+      'closeMoveDialog',
       'createListOpen',
       'setUnsavedList',
       'setCurrentListFilters'
@@ -519,7 +602,10 @@ export default {
     ]),
 
     async initializeLists () {
-      await this.getPinnedLists()
+      this.SET_SEARCH('')
+      this.search = ''
+      this.resetSearchFilters()
+      this.getPinnedLists()
       await this.getLists()
       this.calculateTotalPages()
       this.listsData = this.lists
@@ -559,18 +645,42 @@ export default {
         ...(this.folderId && { folder_id: this.folderId })
       }
 
-      if (this.isPublic) {
+      if (this.myListsFilterSelected) {
+        filters.private_only = true
+      }
+
+      if (this.personalListsFilterSelected) {
+        filters.private_only = true
         delete filters.user_id
-        delete filters.folderId
+        delete filters.folder_id
+      }
+
+      if (this.publicListsFilterSelected) {
+        if (filters.private_only) {
+          delete filters.private_only
+        } else {
+          filters.private_only = false
+          delete filters.user_id
+          delete filters.folder_id
+        }
+      }
+
+      if (this.isGlobalSearch) {
+        filters.global_search = true
+      }
+
+      if (this.listTypesFilter.length > 0) {
+        filters.list_types = this.listTypesFilter
+      }
+
+      const props = {
+        page: this.pagination.currentPage,
+        perPage: this.pagination.perPage,
+        filters
       }
 
       try {
-        await this.fetchLists({
-          page: this.pagination.currentPage,
-          perPage: this.pagination.perPage,
-          isPublic: this.isPublic,
-          filters
-        })
+        await this.fetchLists(props)
       } catch (err) {
         console.error('error', err)
       } finally {
@@ -670,7 +780,7 @@ export default {
     },
 
     async refreshLists () {
-      await this.getPinnedLists()
+      this.getPinnedLists()
       this.listsData = []
       this.SET_LISTS_COUNT(0)
       await this.getLists()
@@ -746,7 +856,7 @@ export default {
 
     attachedParams () {
       return {
-        list_id: this.list.id,
+        list_id: this.list?.id,
         selected_all: true,
         contact_ids: []
       }
@@ -763,17 +873,26 @@ export default {
     },
 
     onListConvertedToPublic () {
-      const { id, show_in_public_folder: showInPublicFolder } = this.list
-      this.listsData = this.listsData.map(item =>
-        item.id === id ? { ...item, show_in_public_folder: !showInPublicFolder } : item
-      )
       this.convertToPublicDialog = false
+      this.refreshLists()
     },
 
     onFolderSelected ({ id }) {
-      const query = Object.assign({}, this.$route.query)
-      query.folder_id = id
-      this.$router.replace({ query }).catch(() => {})
+      this.$router.push(this.buildFolderPath(id)).catch(() => {})
+    },
+
+    buildFolderPath (id = null) {
+      let path = '/lists-management/user'
+
+      if (this.$route.params.userId) {
+        path += `/${this.$route.params.userId}`
+      }
+
+      if (id) {
+        path += `/folder/${id}`
+      }
+
+      return path
     },
 
     async onSearch (value) {
@@ -784,7 +903,25 @@ export default {
 
     onEditList (list) {
       this.list = list
-      this.$router.push(`/contacts/list/${this.list.id}${this.list.show_in_public_folder ? '?type=public' : ''}`)
+      this.$router.push(this.buildListLink(list))
+    },
+
+    buildListLink (list) {
+      let listLink
+
+      if (list.show_in_public_folder) {
+        listLink = `/lists/public`
+      } else {
+        listLink = `/lists/user/${list.contact_folder_created_by}`
+      }
+
+      if (this.folderId) {
+        listLink += `/folder/${this.folderId}`
+      }
+
+      listLink += `/list/${list.id}`
+
+      return listLink
     },
 
     async loadMoreLists (done) {
@@ -843,8 +980,10 @@ export default {
     },
 
     generatefoldersPath (folder, folders = []) {
-      // Add the current folder's name to the path
-      folders.push(folder)
+      // Add the current folder's name to the path ignoring root
+      if (folder.parent_id) {
+        folders.push(folder)
+      }
 
       // Check if we've found the folder with the given ID
       if (folder.id === +this.folderId) {
@@ -866,11 +1005,6 @@ export default {
       return null
     },
 
-    selectFolder (folderId, event) {
-      event.preventDefault()
-      this.onFolderSelected({ id: folderId })
-    },
-
     refreshFoldersPath () {
       if (this.folders?.length) {
         this.foldersPath = this.generatefoldersPath(this.folders[0])
@@ -880,7 +1014,9 @@ export default {
     isColumnVisible (field) {
       switch (field) {
         case this.COLUMN_NAMES.owner_name:
-          return this.isPublic
+          return this.isPublic || this.personalListsFilterSelected
+        case this.COLUMN_NAMES.show_in_public_folder:
+          return this.isGlobalSearch
         default:
           return true
       }
@@ -888,11 +1024,70 @@ export default {
 
     onListMoved () {
       this.refreshLists()
+    },
+
+    resetFolder () {
+      if (this.$route.params.userId) {
+        this.$router.push(`/lists/user/${this.$route.params.userId}`)
+      } else {
+        this.$router.push(`/lists/user`)
+      }
+    },
+
+    openAloAiBotContactsEnrollmentModal (list) {
+      this.list = list
+      if (this.$refs.enrollContactsToAloAiModal) {
+        this.$refs.enrollContactsToAloAiModal.isOpen = true
+        this.$refs.enrollContactsToAloAiModal.mode = 'add-contact-list'
+      }
+    },
+
+    openChangeListOwnerModal (list) {
+      this.list = list
+      if (this.$refs.changeListOwnerModal) {
+        this.$refs.changeListOwnerModal.isOpen = true
+      }
+    },
+
+    onListOwnerChanged () {
+      this.refreshLists()
+    },
+
+    listTypeFilterSelected (type) {
+      return this.listTypesFilter.includes(type)
+    },
+
+    resetSearchFilters () {
+      this.visibilityFilters = this.isPublic ? ['publicLists'] : ['myLists']
+    },
+
+    onShow ({ target }) {
+      if (this.moveDialog?.open) {
+        this.closeMoveDialog()
+      }
+
+      const el = target.closest('td')
+      el.style.zIndex = '4'
+    },
+
+    onHide (event) {
+      if (this.moveDialog?.open) {
+        event.preventDefault()
+        return
+      }
+
+      const { target } = event
+      const el = target.closest('td')
+      el.style.zIndex = '0'
+    },
+
+    onFilterChange () {
+      this.refreshLists()
     }
   },
 
-  async mounted () {
-    await this.initializeLists()
+  mounted () {
+    this.initializeLists()
 
     this.$VueEvent.listen('lists-management-folder-click', this.onFolderSelected)
   },
@@ -902,7 +1097,9 @@ export default {
   },
 
   watch: {
-    '$route.query': function () {
+    '$route.params': function () {
+      this.resetSearchFilters()
+
       this.SET_SEARCH('')
       this.search = ''
       this.refreshLists()
@@ -917,6 +1114,9 @@ export default {
       if (this.list) {
         this.setCurrentListFilters(this.list.filters)
       }
+    },
+    userId () {
+      this.resetSearchFilters()
     }
   }
 }
