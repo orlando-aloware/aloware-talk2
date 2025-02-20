@@ -850,7 +850,7 @@ export default {
             this.setDialerParkedCall(this.dialer.communication)
           } else {
             this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-            console.log('Call ended1', call, this.dialer.parkedCall, this.dialer.call)
+            console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
             this.removeUnownedLiveContactTask()
           }
         }
