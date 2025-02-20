@@ -269,23 +269,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.einbox-wrapper {
-  padding: 7px;
-  background-color: #F9F9FB;
-
-  .inbox-side {
-    background-color: #F9F9FB;
-
-    &__left, &__right {
-      border-radius: 12px;
-    }
-
-    &__right {
-      margin-left: 7px;
-      border-left: none !important;
-    }
-  }
-}
-</style>

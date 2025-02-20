@@ -4,7 +4,6 @@ export const UNTHREADED = 2
 export default function () {
   return {
     activeInbox: null,
-    // newInboxEnabled: false, // FIXME: demo companies
     inboxes: [],
     isLoadingInboxes: false,
     currentInboxesPage: 0,
