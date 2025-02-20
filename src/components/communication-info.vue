@@ -892,25 +892,6 @@
             </span>
           </div>
         </div>
-        <div class="text-left-align text-13"
-             v-if="isTranscriptionAllowed(communication) && communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
-          <div>Transcription generation failed. Please try again later.</div>
-          <generate-transcription-button class="mt-2"
-                                         variant="button"
-                                         data-testid="comm-details-generate-transcription-button"
-                                         :communication="communication"
-                                         v-if="fileUuid && isMigrated">
-          </generate-transcription-button>
-        </div>
-        <div class="text-left-align text-13"
-             v-else-if="isTranscriptionAllowed(communication)">
-          <div>Click on the button to generate a transcription of this call.</div>
-          <generate-transcription-button class="mt-2"
-                                         variant="button"
-                                         data-testid="comm-details-generate-transcription-button"
-                                         :communication="communication"
-                                         v-if="fileUuid && isMigrated"/>
-        </div>
         <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
           <div class="summary-container">
@@ -931,6 +912,29 @@
               </q-tooltip>
             </q-btn>
           </div>
+        </div>
+        <div class="text-left-align text-13 relative"
+             v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED && communication.call_summary === ''">
+          <div>Transcription cannot be generated for this communication.</div>
+        </div>
+        <div class="text-left-align text-13"
+             v-else-if="isTranscriptionAllowed(communication) && communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
+          <div>Transcription generation failed. Please try again later.</div>
+          <generate-transcription-button class="mt-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated">
+          </generate-transcription-button>
+        </div>
+        <div class="text-left-align text-13"
+             v-else-if="isTranscriptionAllowed(communication)">
+          <div>Click on the button to generate a transcription of this call.</div>
+          <generate-transcription-button class="mt-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated"/>
         </div>
       </div>
     </div>

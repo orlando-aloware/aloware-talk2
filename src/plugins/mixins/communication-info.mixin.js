@@ -341,6 +341,8 @@ export default {
         this.currentCompany?.transcription_enabled &&
         communication.type === CommunicationTypes.CALL &&
         communication.is_eligible_for_transcribe &&
+        // Don't show generate transcription button if the transcription is already parsed and is empty
+        !(communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED && communication.metadata['transcription_info']['summary'] === '') &&
         (communication.has_voicemail || this.showAudio(communication)) &&
         (
           (!communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
