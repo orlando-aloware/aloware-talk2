@@ -208,16 +208,13 @@ export default {
       },
       integrationData: null,
       contactIntegrationDataLoaded: false,
-      showDuplicates: false,
-      isFetchingIntegrationData: false
+      showDuplicates: false
     }
   },
 
   async mounted () {
     if (this.contact && this.contact.id) {
-      this.isFetchingIntegrationData = true
       await this.getData()
-      this.isFetchingIntegrationData = false
     }
   },
 
