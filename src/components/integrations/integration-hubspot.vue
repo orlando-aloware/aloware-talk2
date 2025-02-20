@@ -6,7 +6,7 @@
       <q-item class="p-0">
         <span class='integration-jit-card-header'>
           <i class="fab fa-hubspot hubspot-icon"></i>
-          <span class="integration-title">HubSpot</span>
+          <span class="integration-title">HubSpot Test</span>
         </span>
       </q-item>
       <q-separator data-testid="integration-hubspot-separator" />
