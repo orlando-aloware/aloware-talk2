@@ -111,16 +111,29 @@
       </div>
 
         <div class="d-flex justify-between">
-          <div class="setting pr-3 align-items-center">
-            <compact-btn variant="primary"
-                         class="mr-2"
-                         data-testid="create-list-menu-item"
-                         @clicked="onCreateList($event)">
-              <plus-icon class="mr-1"
-                         color="white"/>
-              Add List
-            </compact-btn>
-          </div>
+          <b-dropdown variant="primary"
+                      class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                      toggle-class="add-list-toggle-btn py-0 my-0 d-flex align-items-center"
+                      right
+                      no-caret>
+            <template class="add-list-toggle-btn"
+                      #button-content>
+              <div class="add-list-toggle-btn d-flex align-items-center">
+                Add List
+              </div>
+              <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
+            </template>
+            <b-dropdown-item href="#"
+                            @click="onCreateList">
+              <plus-icon />
+              Create new List
+            </b-dropdown-item>
+            <b-dropdown-item href="#"
+                            @click="openImportContactsModal">
+              <csv-icon />
+              Import from CSV
+            </b-dropdown-item>
+          </b-dropdown>
         </div>
       </div>
 
@@ -372,6 +385,8 @@
       <change-list-owner-modal ref="changeListOwnerModal"
                                :contactList="list"
                                @listOwnerChanged="onListOwnerChanged"/>
+
+      <import-contacts-modal ref="importContacts" @importStarted="onImportStarted" />
     </div>
   </div>
 </template>
@@ -386,7 +401,6 @@ import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-mo
 import AssignContactsModal from 'src/components/assign-contacts-modal'
 import MoveDialog from 'src/components/move-dialog'
 import CreateListModal from 'components/create-list-modal.vue'
-import CompactBtn from 'src/components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
@@ -397,6 +411,7 @@ import EyeOffIcon from 'components/icons/eye-off-icon'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+import CsvIcon from 'components/icons/csv-icon.vue'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
@@ -411,6 +426,7 @@ import ChangeListOwnerModal from './change-list-owner-modal.vue'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 
 export default {
   name: 'ListsTable',
@@ -431,6 +447,7 @@ export default {
     PencilOIcon,
     PinIcon,
     PlusIcon,
+    CsvIcon,
     SearchInput,
     AssignContactsModal,
     ConvertListToPublicDialog,
@@ -442,7 +459,6 @@ export default {
     RelativeTime,
     ListsFoldersManagement,
     SlashIcon,
-    CompactBtn,
     AddUserIcon,
     EnrollContactsToAloaiModal,
     SwitchIcon,
@@ -450,7 +466,8 @@ export default {
     EllipseIcon,
     PowerDialerMobileIcon,
     DeleteRedIcon,
-    InformationCircleIcon
+    InformationCircleIcon,
+    ImportContactsModal
   },
 
   data () {
@@ -1083,6 +1100,20 @@ export default {
 
     onFilterChange () {
       this.refreshLists()
+    },
+
+    openImportContactsModal () {
+      if (this.$refs.importContacts) {
+        this.$refs.importContacts.open()
+      }
+    },
+
+    onImportStarted () {
+      if (this.isPublic) {
+        this.$router.push('/lists-management/user')
+      } else {
+        this.refreshLists()
+      }
     }
   },
 
@@ -1121,3 +1152,9 @@ export default {
   }
 }
 </script>
+<style>
+.add-list-toggle-btn {
+  font-size: 12px;
+  font-weight: 400;
+}
+</style>
