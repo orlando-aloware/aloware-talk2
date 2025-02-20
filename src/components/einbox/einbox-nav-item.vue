@@ -4,9 +4,9 @@
        @click="$emit('click', value)">
     <div class="inbox-nav-item__content d-flex align-items-center justify-content-between">
       <div class="d-flex align-items-center">
-        <q-icon name="inbox"
-                size="20px"
-                class="q-mr-sm inbox-nav-item__icon" />
+        <ring-group-icon class="inbox-nav-item__icon mr-1"
+                         width="24"
+                         height="24" />
         <span class="inbox-nav-item__label">{{ label }}</span>
       </div>
     </div>
@@ -14,6 +14,8 @@
 </template>
 
 <script>
+import RingGroupIcon from 'src/components/icons/ring-group-icon.vue'
+
 export default {
   props: {
     label: {
@@ -35,6 +37,10 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+
+  components: {
+    RingGroupIcon
   }
 }
 </script>
@@ -61,6 +67,10 @@ export default {
 
   &__content {
     width: 100%;
+  }
+
+  &__icon {
+    font-size: 20px;
   }
 
   &--active {
