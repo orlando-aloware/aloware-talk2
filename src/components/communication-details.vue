@@ -74,17 +74,17 @@
           <!--COMM TYPE-->
           <q-card-section
             data-testid="comm-details-comm-type-card-section"
-            :class="['comm-type-container', mobileView ? 'pt-4' : 'pt-0']"
+            :class="[
+              'comm-type-container',
+              mobileView ? 'pt-4' : 'pt-0',
+              commTypeAsHeader ? 'sticky-header' : ''
+            ]"
           >
-            <div
-              class="text-lt p-x d-inline-flex"
-              :class="[!communication.duration ? 'flex-grow-1 text-left' : '']"
+            <div class="text-lt p-x d-flex"
+                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']"
             >
-              <component
-                :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
-                v-if="communication.disposition_status2"
-              >
-              </component>
+              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
+                         v-if="communication.disposition_status2" />
               <div class="comm-type-wrapper">
                 <span
                   v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
@@ -93,6 +93,14 @@
                 </span>
                 {{ communication.type | fixCommType }}
               </div>
+              <span class="cursor-pointer ml-auto"
+                    v-if="closable"
+                    @click="$emit('close')">
+                <close-icon icon-color="#62666E" />
+                <q-tooltip>
+                  Close
+                </q-tooltip>
+              </span>
             </div>
           </q-card-section>
 
@@ -341,7 +349,6 @@
                       <q-tooltip
                         anchor="top middle"
                         self="bottom middle"
-                        max-width="150px"
                       >
                         Click for more info
                       </q-tooltip>
@@ -1152,6 +1159,7 @@
                   <communication-audio
                     class="mb-2"
                     data-testid="comm-details-vm-comm-audio"
+                    ref="voicemailRecording"
                     :communication="communication"
                     :type="UploadedFileTypes.TYPE_CALL_VOICEMAIL"
                     :uniqueId="communication.id + '2'"
@@ -1356,17 +1364,20 @@
       </b-col>
       <b-col
         :md="isWidget || mobileView ? 12 : 8"
-        class="pr-0 ring-group-snapshot-wrapper"
+        class="ring-group-snapshot-wrapper"
+        :class="isWidget || mobileView ? 'px-0 mt-0' : 'pr-0'"
         data-testid="comm-details-col"
         v-if="communication && communication.type === CommunicationTypes.CALL"
       >
         <ring-group-snapshot
           data-testid="comm-details-ring-group-snapshot"
+          :class="isWidget || mobileView ? 'my-1' : 'mb-1'"
           :communication="communication"
           :ring-group="usedRingGroup"
           v-if="usedRingGroup"
         />
         <network-logs-display
+          class="no-gutters mb-1"
           :call-issues="Object.values(communication?.call_quality_summary || {})"
           :user="communication.user"
         />
@@ -1409,6 +1420,7 @@ import NetworkLogsDisplay from 'components/network-logs/network-logs-display'
 import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
 import RingGroupSnapshot from 'components/ring-group-snapshot'
 import TranscriptionModal from 'src/components/communication/transcription-modal'
+import CloseIcon from 'components/icons/close-icon.vue'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 
 export default {
@@ -1427,7 +1439,8 @@ export default {
     DownloadButton,
     TranscriptionModal,
     EntityTags,
-    GenerateTranscriptionButton
+    GenerateTranscriptionButton,
+    CloseIcon
   },
 
   mixins: [
@@ -1456,6 +1469,16 @@ export default {
   },
 
   props: {
+    closable: {
+      type: Boolean,
+      default: false
+    },
+
+    commTypeAsHeader: {
+      type: Boolean,
+      default: false
+    },
+
     communication: {
       type: Object,
       required: true
@@ -1584,8 +1607,9 @@ export default {
 
   methods: {
     fetchSmartTranscriptionData () {
-      if (this.$refs?.callRecording?.$refs?.transcriptionModal) {
-        this.$refs.callRecording.$refs.transcriptionModal.fetchSmartTranscriptionData()
+      const audioRef = this.communication.has_voicemail ? this.$refs.voicemailRecording : this.$refs.callRecording
+      if (audioRef?.$refs?.transcriptionModal) {
+        audioRef.$refs.transcriptionModal.fetchSmartTranscriptionData()
       }
     },
     getContactRouteLink (communication) {
