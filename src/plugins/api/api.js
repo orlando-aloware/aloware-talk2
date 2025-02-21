@@ -1027,8 +1027,8 @@ const talk2Api = {
 
     communications: {
       threaded: ({ inboxId, perPage, page = 1 }) => {
-        const params = { inbox_id: inboxId, per_page: perPage, page }
-        return window.axios.get(`${suffixV2}communications/threaded`, { params })
+        const params = { inbox_id: inboxId, per_page: perPage, page, inbox_type: 'threaded' }
+        return window.axios.get(`${suffixV1}reports/communications`, { params })
       }
     }
   }
