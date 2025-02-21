@@ -27,6 +27,7 @@
         <q-separator v-if='hasDuplicates' />
         <integration-hubspot-one-contact v-if='integrationData'
                                          :integration-data="integrationData"
+                                         :lifecycle-stages-options="lifecycleStagesOptions"
                                          is-primary />
         <!-- End Duplicate Contacts Section -->
         <!-- Start Sync Button -->
@@ -104,7 +105,7 @@
             <div v-for="duplicate in this.integrationData.duplicates"
                  :key="duplicate.id">
               <q-separator data-testid="integration-hubspot-separator" />
-              <integration-hubspot-one-contact :integrationData="duplicate"/>
+              <integration-hubspot-one-contact :integrationData="duplicate" :lifecycle-stages-options="lifecycleStagesOptions"/>
             </div>
           </div>
           <b-button size="sm"
@@ -194,6 +195,12 @@ export default {
       return 'This contact has other matches with the same number' +
         (values.length > 1 ? 's' : '') +
         (values.length ? `: ${values.join(', ')}` : '')
+    },
+
+    lifecycleStagesOptions () {
+      // transform from an object to a multi-dimensional array so that the order of the stages are preserved
+      // example: [['Subscriber', 'subscriber'], ['Lead', 'lead'], ['Customer', 'customer']]
+      return this.integrationData ? Object.entries(this.integrationData.lifecycle_stages) : []
     }
   },
 

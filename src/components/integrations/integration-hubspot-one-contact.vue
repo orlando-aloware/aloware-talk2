@@ -38,10 +38,30 @@
          data-testid='integration-hubspot-owner'
          v-if='integrationData.hubspot_owner'>
         <span class='data-icon-label'>Owner: </span>
-        <span
-          class='data-value'>{{ integrationData.hubspot_owner.firstName + ' ' + integrationData.hubspot_owner.lastName
-          }}</span>
+        <span class='data-value'>
+          {{ integrationData.hubspot_owner.firstName + ' ' + integrationData.hubspot_owner.lastName}}
+        </span>
       </p>
+      <!-- Start Lifecycle Stage Section -->
+      <div class='mt-1 row justify-between align-center'
+          @mouseover='showLifecycleStageEditButton = true'
+          @mouseleave='showLifecycleStageEditButton = false'
+          data-testid='integration-hubspot-lifecycle-stage'
+        >
+        <p class="row">
+          <span class='data-icon-label'>Lifecycle Stage: </span>
+          <span class='ml-1 text-weight-medium'>
+            {{ currentLifecycleStage }}
+          </span>
+        </p>
+        <div class="clickable">
+          <pencil-o-icon v-if='showLifecycleStageEditButton' />
+          <q-tooltip anchor="top middle" self="center middle">
+            Update Lifecycle Stage
+          </q-tooltip>
+        </div>
+      </div>
+      <!-- End Lifecycle Stage Section -->
     </q-card-section>
 
     <q-card-section class='pt-0'
@@ -103,12 +123,16 @@
 import {
   hubspotIntegrationMixin
 } from 'src/plugins/mixins'
+import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 
 export default {
   name: 'integration-hubspot-one-contact',
   mixins: [
     hubspotIntegrationMixin
   ],
+  components: {
+    PencilOIcon
+  },
   props: {
     integrationData: {
       type: Object,
@@ -117,6 +141,15 @@ export default {
     isPrimary: {
       type: Boolean,
       default: false
+    },
+    lifecycleStagesOptions: {
+      type: Array,
+      required: true
+    }
+  },
+  data () {
+    return {
+      showLifecycleStageEditButton: false
     }
   },
   computed: {
@@ -132,8 +165,16 @@ export default {
       const firstname = this.integrationData.properties.firstname ? this.integrationData.properties.firstname : ''
       const lastname = this.integrationData.properties.lastname ? this.integrationData.properties.lastname : ''
       return `${firstname} ${lastname}`.trim()
+    },
+    currentLifecycleStage () {
+      const current = this.lifecycleStagesOptions.find(stage => stage[1] === this.integrationData.properties.lifecyclestage)
+      return current ? current[0] : 'None'
     }
   }
 }
-
 </script>
+<style scoped>
+.clickable {
+  cursor: pointer;
+}
+</style>
