@@ -79,6 +79,7 @@ import * as WaveformPlaybackSpeedOptions from 'src/constants/waveform-playback-s
 import { aclMixin } from 'src/plugins/mixins'
 import Hover from 'wavesurfer.js/dist/plugins/hover.esm.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 const regions = RegionsPlugin.create({
   regions: []
@@ -227,7 +228,12 @@ export default {
           let color = message.speaker === 'AGENT' ? 'rgb(200, 0, 200)' : 'rgb(0, 200, 200)'
 
           if (this.communication?.direction === CommunicationDirection.INBOUND && message.speaker === 'CONTACT') {
-            channelIdx = 0
+            // if the communication is a voicemail, we show the contact on the second channel
+            if (this.communication?.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
+              channelIdx = 1
+            } else {
+              channelIdx = 0
+            }
           }
 
           if (this.communication?.direction === CommunicationDirection.INBOUND && message.speaker === 'AGENT') {
