@@ -76,15 +76,18 @@ export default {
     },
 
     onInboxSelect (inboxId) {
-      // avoid redundant navigation
       if (inboxId === this.activeInbox) {
         return
       }
 
-      this.setActiveInbox(inboxId)
+      this.setActiveInbox(parseInt(inboxId))
       this.resetItems()
       this.fetchItems(inboxId)
-      this.$router.push(`/einbox/${inboxId}`)
+
+      // avoid redundant navigation
+      if (this.$route.path !== `/einbox/${inboxId}`) {
+        this.$router.push(`/einbox/${inboxId}`)
+      }
     }
   },
 
@@ -98,6 +101,15 @@ export default {
       this.setActiveInbox(inboxId)
       this.resetItems()
       this.fetchItems(inboxId)
+    }
+  },
+
+  watch: {
+    '$route.params.inboxId' (inboxId) {
+      // console.log(inboxId, this.activeInbox, inboxId === this.activeInbox)
+      if (parseInt(inboxId) !== this.activeInbox) {
+        this.onInboxSelect(inboxId)
+      }
     }
   }
 }
