@@ -28,7 +28,7 @@
              @click="onItemClick(item)">
           <!-- Threaded view -->
           <communication :contact-id="item.id"
-                         :contact-name="item.name"
+                         :contact-name="item.contact.name"
                          :disposition-status="item.last_communication_disposition_status2"
                          :type="item.last_communication_type"
                          :direction="item.last_communication_direction"
