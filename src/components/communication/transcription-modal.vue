@@ -303,17 +303,17 @@
                               class="ai-effect-gradient-text"
                               @click="handlePromotionClick"
                             >
+                              <sparkle-icon
+                                width="16"
+                                height="16"
+                                color="#9333EA"
+                              />
                               Powered by AloAi
                               <template
                                 v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial"
                               >
                                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
                               </template>
-                              <sparkle-icon
-                                width="16"
-                                height="16"
-                                color="#9333EA"
-                              />
                             </h3>
                           </div>
                           <div class="transcription-summary-container">
