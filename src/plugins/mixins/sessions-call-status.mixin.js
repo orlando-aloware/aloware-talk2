@@ -189,7 +189,7 @@ export default {
 
     // If task is being redialed, either by forced redials or manual redial
     isRedialing () {
-      return this.redialedTasksCount[this.activeTask?.id] > 0 || this.activeTask?.redialed
+      return this.redialedTasksCount[this.activeTask?.id] > 0
     }
   },
 

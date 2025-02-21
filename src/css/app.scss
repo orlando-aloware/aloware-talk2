@@ -9132,6 +9132,16 @@ span.mention {
     margin-right: 5px;
   }
 
+  .title-breadcrumb-link {
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    height: 19px;
+    margin-right: 5px;
+    color: #256eff;
+  }
+
   .title-path:not(:last-child) {
     .title-slash {
       height: 19px;
@@ -12068,10 +12078,6 @@ screen and (max-width: 956px) {
   .ring-group-snapshot-wrapper {
     padding-left: 0 !important;
     margin-top: 10px;
-  }
-
-  .communication-details-card {
-    margin-top: 60px;
   }
 }
 
@@ -16236,6 +16242,11 @@ hr {
       color: #666666;
       font-style: italic;
     }
+
+    .contact-name {
+      font-weight: 500;
+      color: #256eff;
+    }
   }
 
   .title {
@@ -16539,7 +16550,24 @@ hr {
 .communication-details-sidebar {
   .b-sidebar {
     top: 60px;
-    height: calc(100vh - 60px)
+    height: calc(100vh - 110px); // Mobile default: 60px for top + 50px for bottom
+
+    @media (min-width: 785px) {
+      height: calc(100vh - 60px); // Desktop: only account for top bar
+    }
+  }
+
+  .communication-details-card {
+    .comm-type-container {
+      &.sticky-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        margin-bottom: .25rem;
+        border-bottom: 1px solid #EBEBEB;
+      }
+    }
   }
 }
 

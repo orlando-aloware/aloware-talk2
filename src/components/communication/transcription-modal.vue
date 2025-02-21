@@ -212,7 +212,8 @@
                       v-if="communication.call_summary"
                       style="display: flex; justify-content: flex-end; gap: 4px; margin-top: -8px;"
                     >
-                      <q-btn
+                      <!-- Hide edit summary button for now [PLA-424] -->
+                      <!-- <q-btn
                         color="text-dark-greenish"
                         class="btn btn-inline px-1 py-0"
                         title="Edit Summary"
@@ -229,7 +230,7 @@
                           data-testid="contact-phones-list-items-edit-icon"
                           color="#007bff">
                         </pencil-o-icon>
-                      </q-btn>
+                      </q-btn> -->
                       <q-btn
                         color="text-dark-greenish"
                         class="btn btn-inline px-1 py-0"
