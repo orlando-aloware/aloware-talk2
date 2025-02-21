@@ -62,7 +62,7 @@
 
     <q-btn :to="{ name: 'EInbox' }"
            :ripple="false"
-           icon="img:app-icons/menu/inbox_active.svg"
+           icon="img:app-icons/menu/ring_group_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
@@ -81,12 +81,27 @@
             v-if="isSidebarExpanded">
         AI Inbox
       </span>
+
+      <!-- Temporary helper -->
+      <div class="ml-auto mr-3"
+           v-if="isSidebarExpanded">
+        <information-circle-icon height="20"
+                                 width="20"
+                                 color="#FFF"
+                                 id="einbox-helper-icon" />
+         <b-tooltip custom-class="talk-table__tooltip talk-table__tooltip--md"
+                    placement="right"
+                    boundary="#einbox-helper-icon"
+                    target="einbox-helper-icon">
+          {{ EINBOX_TOOLTIP_TEXT }}
+        </b-tooltip>
+      </div>
     </q-btn>
     <q-btn :to="{ name: 'EInbox' }"
            :ripple="false"
-           icon="img:app-icons/menu/inbox_gray.svg"
+           icon="img:app-icons/menu/ring_group_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 0px 10px 20px"
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
            v-show="!isActive('EInbox')"
@@ -103,6 +118,21 @@
             v-if="isSidebarExpanded">
         AI Inbox
       </span>
+
+      <!-- Temporary helper -->
+      <div class="ml-auto mr-3"
+           v-if="isSidebarExpanded">
+        <information-circle-icon height="20"
+                                 width="20"
+                                 color="#9797AE"
+                                 id="einbox-helper-icon-gray" />
+         <b-tooltip custom-class="talk-table__tooltip talk-table__tooltip--md"
+                    placement="right"
+                    boundary="#einbox-helper-icon-gray"
+                    target="einbox-helper-icon-gray">
+          {{ EINBOX_TOOLTIP_TEXT }}
+        </b-tooltip>
+      </div>
     </q-btn>
 
     <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
@@ -934,9 +964,16 @@ import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 import { broadcastsMixin, kycMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE, COMMUNICATIONS_MENU_TITLE } from 'src/router/routes'
+import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+
+const EINBOX_TOOLTIP_TEXT = 'AI Inbox is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
 
 export default {
   name: 'app-sidebar',
+
+  components: {
+    InformationCircleIcon
+  },
 
   props: {
     isSidebarExpanded: {
@@ -1014,7 +1051,8 @@ export default {
     return {
       modeIcon: 'img:app-icons/menu/mode_gray.svg',
       COMMUNICATIONS_MENU_TITLE,
-      DEFAULT_COMMUNICATIONS_ROUTE_PATH
+      DEFAULT_COMMUNICATIONS_ROUTE_PATH,
+      EINBOX_TOOLTIP_TEXT
     }
   },
 

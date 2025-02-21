@@ -16319,6 +16319,12 @@ hr {
     color: #fff !important;
     font-size: 13px !important;
   }
+
+  &--md {
+    .tooltip-inner {
+      max-width: 350px;
+    }
+  }
 }
 
 .talk-table__popover {
