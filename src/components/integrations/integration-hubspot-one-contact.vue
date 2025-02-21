@@ -38,9 +38,9 @@
          data-testid='integration-hubspot-owner'
          v-if='integrationData.hubspot_owner'>
         <span class='data-icon-label'>Owner: </span>
-        <span class='data-value'>
-          {{ integrationData.hubspot_owner.firstName + ' ' + integrationData.hubspot_owner.lastName}}
-        </span>
+        <span
+          class='data-value'>{{ integrationData.hubspot_owner.firstName + ' ' + integrationData.hubspot_owner.lastName
+          }}</span>
       </p>
       <!-- Start Lifecycle Stage Section -->
       <div class='mt-1 row justify-between align-center'
@@ -48,14 +48,14 @@
           @mouseleave='showLifecycleStageEditButton = false'
           data-testid='integration-hubspot-lifecycle-stage'
         >
-        <p class="row">
+        <p class="row mb-0">
           <span class='data-icon-label'>Lifecycle Stage: </span>
           <span class='ml-1 text-weight-medium'>
             {{ currentLifecycleStage }}
           </span>
         </p>
-        <div class="clickable">
-          <pencil-o-icon v-if='showLifecycleStageEditButton' />
+        <div class="clickable" v-if='showLifecycleStageEditButton'>
+          <pencil-o-icon />
           <q-tooltip anchor="top middle" self="center middle">
             Update Lifecycle Stage
           </q-tooltip>
@@ -130,9 +130,6 @@ export default {
   mixins: [
     hubspotIntegrationMixin
   ],
-  components: {
-    PencilOIcon
-  },
   props: {
     integrationData: {
       type: Object,
@@ -146,6 +143,9 @@ export default {
       type: Array,
       required: true
     }
+  },
+  components: {
+    PencilOIcon
   },
   data () {
     return {
@@ -166,13 +166,16 @@ export default {
       const lastname = this.integrationData.properties.lastname ? this.integrationData.properties.lastname : ''
       return `${firstname} ${lastname}`.trim()
     },
+
     currentLifecycleStage () {
       const current = this.lifecycleStagesOptions.find(stage => stage[1] === this.integrationData.properties.lifecyclestage)
       return current ? current[0] : 'None'
     }
   }
 }
+
 </script>
+
 <style scoped>
 .clickable {
   cursor: pointer;
