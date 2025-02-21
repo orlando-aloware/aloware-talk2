@@ -93,7 +93,8 @@ export default {
 
     // If there are inboxes, set the first one as active
     if (this.inboxes.length) {
-      const inboxId = this.inboxes[0].id
+      const inboxId = parseInt(this.$route.params.inboxId) || this.inboxes[0].id
+
       this.setActiveInbox(inboxId)
       this.resetItems()
       this.fetchItems(inboxId)
