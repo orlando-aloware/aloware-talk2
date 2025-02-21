@@ -1,10 +1,12 @@
 <template>
   <div class="integration-wrapper" data-testid="integration-hubspot-wrapper">
-    <q-card class="integration-card"
-            data-testid="integration-hubspot-card"
-            flat>
+    <q-card
+      class="integration-card"
+      data-testid="integration-hubspot-card"
+      flat
+    >
       <q-item class="p-0">
-        <span class='integration-jit-card-header'>
+        <span class="integration-jit-card-header">
           <i class="fab fa-hubspot hubspot-icon"></i>
           <span class="integration-title">HubSpot</span>
         </span>
@@ -20,39 +22,60 @@
       <!-- Start JIT Card Main Content -->
       <template v-if="contactIntegrationDataLoaded">
         <!-- Start Duplicate Contacts Section -->
-        <q-card-section class='duplicateContactPhoneNumberMessage'
-                        v-if='hasDuplicates'>
+        <q-card-section
+          class="duplicateContactPhoneNumberMessage"
+          v-if="hasDuplicates"
+        >
           {{ duplicatePhoneNumbersDescription }}
         </q-card-section>
-        <q-separator v-if='hasDuplicates' />
-        <integration-hubspot-one-contact v-if='integrationData'
-                                         :integration-data="integrationData"
-                                         is-primary />
+        <q-separator v-if="hasDuplicates" />
+        <integration-hubspot-one-contact
+          v-if="integrationData"
+          :integration-data="integrationData"
+          is-primary
+        />
         <!-- End Duplicate Contacts Section -->
         <!-- Start Sync Button -->
         <q-card-section data-testid="integration-hubspot-card-section-3">
           <b-row>
-            <b-button class="text-white"
-                      size="sm"
-                      variant="primary"
-                      tabindex="0"
-                      block
-                      data-testid="integration-hubspot-sync-button"
-                      @click="syncHubspot">
+            <b-button
+              class="text-white"
+              size="sm"
+              variant="primary"
+              tabindex="0"
+              block
+              data-testid="integration-hubspot-sync-button"
+              @click="syncHubspot"
+            >
               <i class="fa fa-sync-alt" v-if="!isSyncing"></i>
-              <q-spinner-bars v-if="isSyncing"
-                              data-testid="integration-hubspot-sync-spinner"
-                              color="white">
+              <q-spinner-bars
+                v-if="isSyncing"
+                data-testid="integration-hubspot-sync-spinner"
+                color="white"
+              >
               </q-spinner-bars>
               {{ isSyncing ? 'Syncing...' : 'Sync with HubSpot' }}
-              <q-tooltip anchor="center start"
-                         self="center left"
-                         data-testid="integration-hubspot-sync-tooltip"
-                         :offset="[-220, 10]">
-                <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and HubSpot.</p>
-                <p class="font-weight-bold">You'll want to click on this button if:</p>
-                <p class="mt-1 mb-0">- The contact was recently merged in HubSpot with another contact.</p>
-                <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and HubSpot data on this contact.</p>
+              <q-tooltip
+                anchor="center start"
+                self="center left"
+                data-testid="integration-hubspot-sync-tooltip"
+                :offset="[-220, 10]"
+              >
+                <p class="font-weight-bold mb-0">
+                  Click on this button to sync the data for this contact between
+                  {{ whiteLabelName }} and HubSpot.
+                </p>
+                <p class="font-weight-bold">
+                  You'll want to click on this button if:
+                </p>
+                <p class="mt-1 mb-0">
+                  - The contact was recently merged in HubSpot with another
+                  contact.
+                </p>
+                <p class="mt-0 mb-0">
+                  - You notice any inconsistencies between
+                  {{ whiteLabelName }} and HubSpot data on this contact.
+                </p>
               </q-tooltip>
             </b-button>
           </b-row>
@@ -61,37 +84,50 @@
         <!-- Start Workflow Section -->
         <q-card-section
           data-testid="integration-hubspot-card-section-4"
-          v-if="integrationData && integrationData.properties && integrationData.properties.email && false">
+          v-if="
+            integrationData &&
+            integrationData.properties &&
+            integrationData.properties.email &&
+            false
+          "
+        >
           <b-row>
-            <b-button class="text-white btn-block"
-                      size="sm"
-                      variant="primary"
-                      tabindex="0"
-                      data-testid="integration-hubspot-enroll-button"
-                      @click="onEnrollToWorkflow">
+            <b-button
+              class="text-white btn-block"
+              size="sm"
+              variant="primary"
+              tabindex="0"
+              data-testid="integration-hubspot-enroll-button"
+              @click="onEnrollToWorkflow"
+            >
               <i class="fa fa-user-plus"></i>
               Enroll to Workflow
             </b-button>
           </b-row>
         </q-card-section>
-        <q-menu content-class="mx-height-300"
-                ref="templatesMenu"
-                no-parent-event
-                no-focus
-                data-testid="hubspot-workflow-popover"
-                :offset="[366, -105]"
-                v-model="showWorkflowSelectorForm">
+        <q-menu
+          content-class="mx-height-300"
+          ref="templatesMenu"
+          no-parent-event
+          no-focus
+          data-testid="hubspot-workflow-popover"
+          :offset="[366, -105]"
+          v-model="showWorkflowSelectorForm"
+        >
           <div class="no-wrap q-pa-md">
-            <workflow-selector data-testid="integration-hubspot-workflow-selector"
-                               @onWorkflowSelected="onWorkflowSelected"/>
-            <b-button class="btn-block"
-                      size="sm"
-                      variant="primary"
-                      data-testid="integration-hubspot-enroll-button"
-                      :disabled="isEnrolling || !isWorkflowValid"
-                      @click.prevent="enrollToWorkflow">
-              <q-spinner-bars v-if="isEnrolling"
-                              color="white">
+            <workflow-selector
+              data-testid="integration-hubspot-workflow-selector"
+              @onWorkflowSelected="onWorkflowSelected"
+            />
+            <b-button
+              class="btn-block"
+              size="sm"
+              variant="primary"
+              data-testid="integration-hubspot-enroll-button"
+              :disabled="isEnrolling || !isWorkflowValid"
+              @click.prevent="enrollToWorkflow"
+            >
+              <q-spinner-bars v-if="isEnrolling" color="white">
               </q-spinner-bars>
               {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
             </b-button>
@@ -99,19 +135,23 @@
         </q-menu>
         <!-- End Workflow Section -->
         <!-- Start Duplicate Contacts Section -->
-        <div v-if='hasDuplicates'>
+        <div v-if="hasDuplicates">
           <div v-if="showDuplicates">
-            <div v-for="duplicate in this.integrationData.duplicates"
-                 :key="duplicate.id">
+            <div
+              v-for="duplicate in this.integrationData.duplicates"
+              :key="duplicate.id"
+            >
               <q-separator data-testid="integration-hubspot-separator" />
-              <integration-hubspot-one-contact :integrationData="duplicate"/>
+              <integration-hubspot-one-contact :integrationData="duplicate" />
             </div>
           </div>
-          <b-button size="sm"
-                    variant="link"
-                    tabindex="0"
-                    block
-                    @click="toggleDuplicates">
+          <b-button
+            size="sm"
+            variant="link"
+            tabindex="0"
+            block
+            @click="toggleDuplicates"
+          >
             {{ showDuplicates ? 'See less matches' : 'See all matches' }}
           </b-button>
         </div>
@@ -139,11 +179,7 @@ export default {
 
   components: { IntegrationHubspotOneContact, WorkflowSelector },
 
-  mixins: [
-    hubspotIntegrationMixin,
-    integrationMixin,
-    simpsocialMixin
-  ],
+  mixins: [hubspotIntegrationMixin, integrationMixin, simpsocialMixin],
 
   props: {
     contact: {
@@ -172,7 +208,10 @@ export default {
     },
 
     isRouteMatch () {
-      return this.$route.params.id === this.contact.id.toString() || this.$route.name === 'Power Dialer'
+      return (
+        this.$route.params.id === this.contact.id.toString() ||
+        this.$route.name === 'Power Dialer'
+      )
     },
 
     isContactAndRouteValid () {
@@ -180,7 +219,11 @@ export default {
     },
 
     hasDuplicates () {
-      return this.integrationData && this.integrationData.duplicates && this.integrationData.duplicates.length > 0
+      return (
+        this.integrationData &&
+        this.integrationData.duplicates &&
+        this.integrationData.duplicates.length > 0
+      )
     },
 
     duplicatePhoneNumbersDescription () {
@@ -188,12 +231,19 @@ export default {
         return ''
       }
 
-      const values = [...new Set(this.integrationData.duplicates
-        .flatMap(item => [...new Set(item.duplicated_by.map(item => item.value))]))]
+      const values = [
+        ...new Set(
+          this.integrationData.duplicates.flatMap((item) => [
+            ...new Set(item.duplicated_by.map((item) => item.value))
+          ])
+        )
+      ]
 
-      return 'This contact has other matches with the same number' +
+      return (
+        'This contact has other matches with the same number' +
         (values.length > 1 ? 's' : '') +
         (values.length ? `: ${values.join(', ')}` : '')
+      )
     }
   },
 
@@ -222,11 +272,12 @@ export default {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
     getData () {
-      return this.getIntegrationData(this.contact, 'hubspot')
-        .then(response => {
+      return this.getIntegrationData(this.contact, 'hubspot').then(
+        (response) => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true
-        })
+        }
+      )
     },
 
     onWorkflowSelected (workflowId) {
@@ -239,20 +290,28 @@ export default {
 
     enrollToWorkflow () {
       this.isEnrolling = true
-      this.workflow.email = this.integrationData.properties.email ? this.integrationData.properties.email : ''
-      return talk2Api.V1.integrations.hubspot.enrollToWorkflow(this.workflow).then(response => {
-        this.resetWorkflowEnrollment()
-        // emit on parent if there's a need to do after workflow enrollment
-        this.$emit('enrolledToWorkflow', this.workflow)
-        this.$root.$emit('bv::hide::popover', 'hubspot-workflow-popover')
-        this.$generalNotification('Contact has been successfully enrolled to the workflow.')
-      }).catch(err => {
-        console.log(err)
-        this.$handleErrors(err.response)
-      }).finally(() => {
-        this.isEnrolling = false
-        this.showWorkflowSelectorForm = false
-      })
+      this.workflow.email = this.integrationData.properties.email
+        ? this.integrationData.properties.email
+        : ''
+      return talk2Api.V1.integrations.hubspot
+        .enrollToWorkflow(this.workflow)
+        .then((response) => {
+          this.resetWorkflowEnrollment()
+          // emit on parent if there's a need to do after workflow enrollment
+          this.$emit('enrolledToWorkflow', this.workflow)
+          this.$root.$emit('bv::hide::popover', 'hubspot-workflow-popover')
+          this.$generalNotification(
+            'Contact has been successfully enrolled to the workflow.'
+          )
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$handleErrors(err.response)
+        })
+        .finally(() => {
+          this.isEnrolling = false
+          this.showWorkflowSelectorForm = false
+        })
     },
 
     onEnrollToWorkflow () {
@@ -261,7 +320,7 @@ export default {
 
     syncHubspot (showAlert = true) {
       this.isSyncing = true
-      talk2Api.V1.contact.syncHubspot(this.contact.id).then(response => {
+      talk2Api.V1.contact.syncHubspot(this.contact.id).then((response) => {
         this.isSyncing = false
         this.getData()
 
