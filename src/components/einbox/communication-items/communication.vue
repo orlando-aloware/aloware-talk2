@@ -134,7 +134,7 @@ export default {
 <style lang="scss" scoped>
 .communication {
   display: grid;
-  grid-template-columns: 0.5fr 2.3fr 0.2fr;
+  grid-template-columns: 0.5fr 2.2fr 0.3fr;
   grid-template-rows: 1fr 1fr;
   gap: 5px 5px;
   grid-template-areas:

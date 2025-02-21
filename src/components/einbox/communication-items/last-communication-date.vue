@@ -3,7 +3,11 @@
     <span class="time-passed text-grey-90"
           role="button"
           :id="`last-comm-date-${_uid}`">
+      <q-skeleton type="text"
+                  width="20px"
+                  v-if="!dateTimePassed" />
       <span class="text-nowrap"
+            v-else
             v-html="dateTimePassed" />
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`last-comm-date-${_uid}`">
