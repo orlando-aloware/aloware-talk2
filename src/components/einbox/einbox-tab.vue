@@ -37,7 +37,7 @@
                          :current-status="item.last_communication_current_status2"
                          :date="item.last_communication_at"
                          :total-unreads="item.unread_comms"
-                         :is-active="activeId === item.id"
+                         :is-active="activeId === item.contact_id"
                          v-if="viewMode === THREADED" />
 
           <!-- Unthreaded View -->
@@ -142,9 +142,8 @@ export default {
     },
 
     onItemClick (item) {
-      this.activeId = item.id
-      const contactId = this.viewMode === THREADED ? item.id : item.contact_id
-      const route = `/einbox/${this.activeInbox}/contacts/${contactId}/communications`
+      this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
+      const route = `/einbox/${this.activeInbox}/contacts/${item.contact_id}/communications`
 
       // avoid redundant navigation
       if (route === this.$route.path) {
