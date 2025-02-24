@@ -26,23 +26,8 @@
         <div :key="item.id"
              v-for="item in filteredItems"
              @click="onItemClick(item)">
-          <!-- Threaded view -->
-          <communication :contact-id="item.id"
-                         :contact-name="item.contact.name"
-                         :disposition-status="item.last_communication_disposition_status2"
-                         :type="item.last_communication_type"
-                         :direction="item.last_communication_direction"
-                         :callback-status="item.last_communication_callback_status"
-                         :body="item.last_communication_body"
-                         :current-status="item.last_communication_current_status2"
-                         :date="item.last_communication_at"
-                         :total-unreads="item.unread_comms"
-                         :is-active="activeId === item.contact_id"
-                         v-if="viewMode === THREADED" />
-
-          <!-- Unthreaded View -->
           <communication :contact-id="item.contact_id"
-                         :contact-name="getContactName(item.contact || {})"
+                         :contact-name="item.contact.name"
                          :disposition-status="item.disposition_status2"
                          :type="item.type"
                          :direction="item.direction"
@@ -50,10 +35,9 @@
                          :body="item.body"
                          :current-status="item.current_status2"
                          :date="item.created_at"
-                         :total-unreads="0"
-                         :is-active="activeId === item.id"
-                         :repeats="item.repeats"
-          v-else-if="viewMode === UNTHREADED" />
+                         :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
+                         :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
+                         :repeats="viewMode === UNTHREADED ? item.repeats : null" />
         </div>
 
         <!-- Load more indicator -->
