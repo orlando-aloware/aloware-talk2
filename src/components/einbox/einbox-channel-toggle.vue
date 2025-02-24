@@ -20,7 +20,7 @@
           <information-circle-icon height="16"
                                    width="16"
                                    class="ml-1"
-                                   :color="viewMode === option.value ? '#fff' : '#616161'"
+                                   :color="viewMode === option.value ? '#fff' : '#256eff'"
                                    :id="`einbox-channel-${option.slot}`"/>
 
           <b-tooltip custom-class="talk-table__tooltip"
@@ -102,8 +102,8 @@ export default {
       font-weight: 500;
     }
 
-    .q-btn--active {
-      font-weight: 600;
+    .q-btn[aria-pressed="false"] {
+      color: #256eff !important;
     }
   }
 }

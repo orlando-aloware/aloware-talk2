@@ -141,7 +141,7 @@ export default {
     "communication__avatar communication__contact-name communication__time"
     "communication__avatar communication__communication-type communication__time";
 
-  padding: 8px 4px 8px 16px;
+  padding: 8px 0px 8px 16px;
   min-height: 64px;
   border-bottom: 1px solid #eeeeee;
   cursor: pointer;
