@@ -61,18 +61,14 @@ function handleDuplicatedItems (items) {
     delete items[index].hidden
   })
 
-  const found = []
   const hidden = []
 
   items.forEach((item, index) => {
-    const repeateds = !found.includes(item.contact_id)
-      ? findRepeateds(items, index)
-      : []
+    const repeateds = findRepeateds(items, index)
 
     // try to find repeated comms for this contact
     if (repeateds.length > 0) {
       items[index].repeats = repeateds.length
-      found.push(items[index].contact_id)
       hidden.push(...repeateds)
     }
 
