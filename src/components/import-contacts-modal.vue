@@ -124,9 +124,13 @@
               Organizations that contact phone numbers whose owners have
               requested DNC status may run the risk of legal action.
             </li>
-            <li>
-              To help avoid legal action, scrub all contact lists before you
-              import them using a DNC Checking Service.
+            <li>To avoid compliance risks, we recommend reviewing your contact
+              lists before importing them.
+                <span v-if="!isSimpSocial">For more information, refer to our
+                  <a href="https://support.aloware.com/en/articles/9032126-understanding-the-dnc-do-not-call-list" target="_blank">
+                    DNC Knowledge Base article
+                  </a>.
+                </span>
             </li>
           </ul>
         </div>
@@ -324,7 +328,8 @@
          v-if="currentStep === STEPS.SETTINGS">
       <b-overlay :show="loading" class="w-100">
         <b-form ref="settingsForm"
-                class="d-flex justify-center">
+                class="d-flex justify-center"
+                @submit.prevent>
           <b-col class="settings-form-wrapper"
                  sm="12"
                  md="6">
@@ -336,9 +341,7 @@
                 <b-form-input type="text"
                               placeholder="Name of the new List"
                               v-model.trim="$v.settings.listName.$model"
-                              @input="
-                                (eventPayload) => onUpdateFields(eventPayload, 'listName')
-                              " />
+                              @input="(eventPayload) => onUpdateFields(eventPayload, 'listName')" />
               </b-form-group>
 
               <b-form-invalid-feedback v-if="!$v.settings.listName.required">
@@ -418,8 +421,7 @@
         <i class="fas fa-file-import fa-4x text-grey-90 mb-4"></i>
 
         <p>
-          This might take a moment, <br />You can close this window and track
-          the import progress on your newly created List
+          This might take a moment, you can close this window.<br />We'll notify you when the import is complete.
         </p>
       </div>
     </div>
@@ -466,6 +468,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   simpsocialMixin,
@@ -504,10 +507,26 @@ export default {
     InformationCircleIcon
   },
 
+  props: {
+    userId: {
+      type: Number,
+      required: false
+    },
+
+    folderId: {
+      type: Number,
+      required: false
+    }
+  },
+
   computed: {
     ...mapGetters({
       attributeDictionaries: 'getAttributeDictionaries'
     }),
+
+    ...mapFields('listsModule', [
+      'listsImportedFromCsv'
+    ]),
 
     importParseCsvUrl () {
       return talk2Api.V1.importWizard.parseUrl
@@ -733,8 +752,12 @@ export default {
       this.isDncAgreed = false
       this.loading = false
       this.done = []
-      // this.uploading = false
-      // this.uploadError = ''
+      this.settings.listName = ''
+      this.settings.updateExisting = false
+      this.settings.saveUnknownColumnAsNotes = false
+      this.settings.cascadeContacts = false
+      this.uploading = false
+      this.$v.$reset()
     },
 
     onUpdateFields (value, prop) {
@@ -874,12 +897,8 @@ export default {
 
       this.loading = true
 
-      // this.errors.clearAll()
-
       this.importModel.is_import_contact_list = true
-      this.importModel.start_from_zero = true // this.start_from_zero
-      // this.importModel.split_tag = this.split_tag.action
-      // this.importModel.page_size = this.split_tag.selected
+      this.importModel.start_from_zero = this.noFirstColumn
 
       const data = {
         ...this.importModel,
@@ -890,10 +909,22 @@ export default {
         show_in_public_folder: false
       }
 
+      if (this.userId) {
+        data.user_id = this.userId
+      }
+
+      if (this.folderId) {
+        data.contact_folder_id = this.folderId
+      }
+
       talk2Api.V1.importWizard
         .startImport(this.importModel.id, data)
         .then((res) => {
           this.importModel = res.data.import
+
+          if (res.data.contact_list) {
+            this.listsImportedFromCsv.push(res.data.contact_list)
+          }
 
           this.onNextStep(STEPS.FINISHED)
 

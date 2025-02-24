@@ -386,7 +386,10 @@
                                :contactList="list"
                                @listOwnerChanged="onListOwnerChanged"/>
 
-      <import-contacts-modal ref="importContacts" @importStarted="onImportStarted" />
+      <import-contacts-modal ref="importContacts"
+                             :user-id="userId"
+                             :folder-id="folderId"
+                             @importStarted="onImportStarted" />
     </div>
   </div>
 </template>
@@ -516,18 +519,22 @@ export default {
       'moveDialog',
       'isAllContactsSelected'
     ]),
+
+    ...mapGetters('listsModule', {
+      lists: 'getLists',
+      listsCount: 'getListsCount'
+    }),
+
     ...mapState(['users']),
+
     ...mapState('listsModule', [
-      'isListsLoading'
+      'isListsLoading',
+      'listsImportedFromCsv'
     ]),
 
     ...mapState('contacts', [
       'unsavedList'
     ]),
-    ...mapGetters('listsModule', {
-      lists: 'getLists',
-      listsCount: 'getListsCount'
-    }),
 
     hasShowInPublicFolderPermission () {
       return this.isBillingAdminOrAdminOrSupervisor
@@ -577,7 +584,11 @@ export default {
     },
 
     folderId () {
-      return +this.$route.params.folderId
+      if (this.$route.params.folderId) {
+        return +this.$route.params.folderId
+      }
+
+      return null
     },
 
     publicListsFilterSelected () {
@@ -1114,6 +1125,25 @@ export default {
       } else {
         this.refreshLists()
       }
+    },
+
+    listCsvImportFinished (event) {
+      if (!event?.contact_list) {
+        return
+      }
+
+      // notify user if is one of the Lists he imported
+      const list = this.listsImportedFromCsv.find((c) => c.id === event.contact_list.id)
+      if (!list) {
+        return
+      }
+
+      const listName = event.contact_list.name
+      this.$generalNotification(`Contacts successfully imported into ${listName}`)
+
+      if (!this.isPublic) {
+        this.refreshLists()
+      }
     }
   },
 
@@ -1121,10 +1151,12 @@ export default {
     this.initializeLists()
 
     this.$VueEvent.listen('lists-management-folder-click', this.onFolderSelected)
+    this.$VueEvent.listen('contact_list_import_csv', this.listCsvImportFinished)
   },
 
   beforeDestroy () {
     this.$VueEvent.stop('lists-management-folder-click', this.onFolderSelected)
+    this.$VueEvent.stop('contact_list_import_csv')
   },
 
   watch: {
