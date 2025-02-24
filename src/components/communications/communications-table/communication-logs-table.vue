@@ -79,11 +79,6 @@
             </div>
 
             <div :style="col.columnStyle"
-                 v-else-if="col.name === 'inbox'">
-              <inbox :inbox-id="props.row.inbox_id" />
-            </div>
-
-            <div :style="col.columnStyle"
                  v-else-if="col.name === 'created_at'">
               <start-time :row="props.row" />
             </div>
@@ -252,7 +247,6 @@ import StartTime from './start-time.vue'
 import CommunicationsFilters from 'src/components/communications/communications-filters.vue'
 import CommunicationsOperations from './communications-operations.vue'
 import RingGroup from './ring-group.vue'
-import Inbox from './inbox'
 import Disposition from './disposition.vue'
 import TalkTime from './talk-time.vue'
 import Duration from './duration.vue'
@@ -319,8 +313,7 @@ export default {
     CreatorType,
     CsatScore,
     WallboardCallsNote,
-    CommunicationsDetailsSidebar,
-    Inbox
+    CommunicationsDetailsSidebar
   },
 
   computed: {
