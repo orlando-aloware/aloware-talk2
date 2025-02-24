@@ -3,6 +3,10 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
+  data: () => ({
+    abortController: null
+  }),
+
   computed: {
     ...mapState('Einbox', [
       'isLoadingInboxes',
@@ -78,7 +82,7 @@ export default {
 
         this.setItems(response.data)
       } catch (error) {
-        console.error('Error fetching contacts:', error)
+        console.error('Error fetching items:', error)
       } finally {
         this.setIsLoadingItems(false)
       }
@@ -102,12 +106,22 @@ export default {
     },
 
     getItemsRequest (inboxId, nextPage) {
-      // get the request based on the view mode (threaded or unthreaded)
+      // abort current ongoign request
+      if (this.abortController) {
+        this.abortController.abort()
+      }
+
+      this.abortController = new AbortController()
+
       if (this.viewMode === THREADED) {
         return talk2Api.V2.communications.threaded({
-          inboxId,
-          page: nextPage,
-          perPage: 100
+          params: {
+            inbox_id: inboxId,
+            page: nextPage,
+            per_page: 100,
+            inbox_type: 'threaded'
+          },
+          signal: this.abortController.signal
         })
       }
 
@@ -117,7 +131,8 @@ export default {
           page: nextPage,
           per_page: 100
         },
-        headers: { 'requested-from': 'api' }
+        headers: { 'requested-from': 'api' },
+        signal: this.abortController.signal
       })
     }
   }
