@@ -205,8 +205,7 @@ export default {
           return this.bots
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots({
-          enabled: true,
-          type: AloAi.TYPE_TEXT
+          enabled: true
         })
         return data?.data ?? []
       } catch (error) {

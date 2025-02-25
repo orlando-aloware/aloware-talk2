@@ -307,7 +307,8 @@ export default {
       this.load()
     },
     isEnrolled (botId) {
-      return this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
+      // Search in the bot_enrollments object array if the contact is enrolled in the bot
+      return !!this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
     },
     async load () {
       this.isLoading = true
@@ -357,7 +358,7 @@ export default {
     },
     async fetchContactDisengagedBots () {
       try {
-        // Only fetch disengaged bots if we have a specific contact
+        // Only fetch disengaged bots if we have a single contact
         if (!this.contact?.id) {
           return []
         }
@@ -373,7 +374,7 @@ export default {
     },
     async fetchContactBotEnrollments () {
       try {
-        // Only fetch enrollments if we have a specific contact
+        // Only fetch enrollments if we have a single contact
         if (!this.contact?.id) {
           return []
         }
@@ -387,16 +388,6 @@ export default {
         return []
       }
     },
-    getBotTypeLabel (type) {
-      switch (type) {
-        case AloAi.TYPE_TEXT:
-          return 'Text Agent'
-        case AloAi.TYPE_VOICE:
-          return 'Voice Agent'
-        default:
-          return 'Unknown'
-      }
-    },
     getEnrollButtonText (botId) {
       if (this.busyBotId === botId) {
         return 'Enrolling...'
@@ -405,23 +396,6 @@ export default {
         return 'Re-enroll'
       }
       return 'Enroll'
-    },
-    getEnrollmentType (botId) {
-      const enrollment = this.bot_enrollments.find(
-        enrollment => enrollment.aloai_bot_id === botId
-      )
-      return enrollment?.type || null
-    },
-    getEnrollmentTypeIcon (botId) {
-      const type = this.getEnrollmentType(botId)
-      switch (type) {
-        case AloAi.ENROLLMENT_TYPE_TEXT:
-          return 'chat' // or 'message' for SMS icon
-        case AloAi.ENROLLMENT_TYPE_VOICE:
-          return 'phone' // or 'call' for phone icon
-        default:
-          return 'check' // fallback icon
-      }
     },
     getBotEnrollments (botId) {
       return this.bot_enrollments.filter(
@@ -437,22 +411,7 @@ export default {
   max-height: 400px;
   overflow-y: auto;
 }
-
 .custom-badge-margin-text {
   margin-top: 1px;
-}
-
-/* Style for disabled radio buttons */
-.btn-group-toggle .btn:disabled {
-  background-color: #e9ecef;
-  border-color: #e9ecef;
-  color: #6c757d;
-  opacity: 1;
-  cursor: not-allowed;
-}
-
-.btn-group-toggle .btn:disabled:hover {
-  background-color: #e9ecef;
-  border-color: #e9ecef;
 }
 </style>

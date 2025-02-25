@@ -52,10 +52,10 @@
 
             <!-- Type Badge -->
             <q-badge
-              :color="getEnrollmentTypeColor(botEnrollments[activeBotIndex]?.type)"
+              color="black"
               class="mr-1"
             >
-              <span>{{ getEnrollmentTypeLabel(botEnrollments[activeBotIndex]?.type) }}</span>
+              <span>{{ getAgentTypeLabel(displayedBot?.type) }}</span>
             </q-badge>
           </p>
         </b-media>

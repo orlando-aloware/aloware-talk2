@@ -21,18 +21,15 @@ export default _.merge({
         }[direction] || 'black'
       )
     },
-    getEnrollmentTypeLabel (type) {
+    getAgentTypeLabel (type) {
       switch (type) {
-        case AloAi.ENROLLMENT_TYPE_TEXT:
-          return 'SMS'
-        case AloAi.ENROLLMENT_TYPE_VOICE:
-          return 'Call'
+        case AloAi.TYPE_TEXT:
+          return 'Text'
+        case AloAi.TYPE_VOICE:
+          return 'Voice'
         default:
           return 'Unknown'
       }
-    },
-    getEnrollmentTypeColor (type) {
-      return 'black'
     }
   }
 })
