@@ -351,6 +351,20 @@ export default {
 
         getList (params) {
           return window.axios.get(`${suffixV1}integration/hubspot/lists`, params)
+        },
+
+        /**
+         * @param {string|number} contactId
+         * @param {string} lifecycleStage
+         * @param {boolean} resetRequired
+         * @returns {Promise<axios.AxiosResponse<any>>}
+         */
+        updateLifecycleStage (contactId, lifecycleStage, resetRequired = false) {
+          return window.axios.patch(`${suffixV1}integration/hubspot/lifecycle-stage`, {
+            contact_id: contactId,
+            lifecycle_stage: lifecycleStage,
+            reset_required: resetRequired
+          })
         }
       },
 

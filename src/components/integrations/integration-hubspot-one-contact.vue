@@ -5,7 +5,7 @@
       <a class="external-contact-integration-link-icon color-primary"
          target='_blank'
          :href="integrationData.link">
-        <i class="fa fa-external-link" aria-hidden="true"/>
+        <i class="fa fa-external-link" aria-hidden="true" />
       </a>
       <p class='mb-0 text-bold' v-if='isPrimary && hasDuplicates'>
         Primary
@@ -44,22 +44,24 @@
       </p>
       <!-- Start Lifecycle Stage Section -->
       <div class='row justify-between align-center relative'
-          @mouseover='showLifecycleStageEditButton = true'
-          @mouseleave='showLifecycleStageEditButton = false'
-          data-testid='integration-hubspot-lifecycle-stage'
-        >
+           @mouseover='showLifecycleStageEditButton = true'
+           @mouseleave='showLifecycleStageEditButton = false'
+           data-testid='integration-hubspot-lifecycle-stage'
+      >
         <p class='mb-0' style="white-space: nowrap; overflow: hidden;">
           <span class='data-icon-label'>Lifecycle Stage: </span>
           <span class='data-value'>
             {{ truncatedDisplayedLifecycleStage }}
           </span>
           <!-- Start Tooltip for full text lifecycle stage if truncated -->
-          <q-tooltip v-if="truncatedDisplayedLifecycleStage !== displayedLifecycleStage" anchor='top middle' self='center middle'>
-              {{ displayedLifecycleStage }}
+          <q-tooltip v-if="truncatedDisplayedLifecycleStage !== displayedLifecycleStage" anchor='top middle'
+                     self='center middle'>
+            {{ displayedLifecycleStage }}
           </q-tooltip>
           <!-- End Tooltip for full text lifecycle stage if truncated -->
         </p>
-        <div v-if='canUpdateLifecycleStage && showLifecycleStageEditButton && isPrimary' class="absolute" style="right: 10px; bottom: 18px;">
+        <div v-if='canUpdateLifecycleStage && showLifecycleStageEditButton && isPrimary' class="absolute"
+             style="right: 10px; bottom: 18px;">
           <b-link class='clickable' @click='onShowEditLifecycleStageMenu'>
             <pencil-o-icon />
             <q-tooltip anchor='top middle' self='center middle'>
@@ -78,35 +80,36 @@
           <div class='row no-wrap q-pa-md'>
             <b-form data-testid='edit-lifecycle-stage-form' @submit.prevent='onSubmit'>
               <b-form-group label="Update Lifecycle Stage">
-                <b-form-select v-model='selectedLifecycleStage' :options='lifecycleStagesOptionsWithClear'></b-form-select>
+                <b-form-select v-model='selectedLifecycleStage'
+                               :options='lifecycleStagesOptionsWithClear'></b-form-select>
               </b-form-group>
               <div class='d-flex justify-content-between'>
-                  <b-button type='button'
-                            size='sm'
-                            variant='light'
-                            data-testid='edit-lifecycle-stage-form-cancel-button'
-                            @click='onCancelLifecycleStageMenu'>
-                    Cancel
-                  </b-button>
-                  <b-button type='button'
-                            size='sm'
-                            variant='primary'
-                            data-testid='edit-lifecycle-stage-form-save-button'
-                            :disabled='lifecycleStageIsSubmitting'
-                            @click='onSubmitLifecycleStageMenu'>
-                    <template v-if="lifecycleStageIsSubmitting">
-                      <b-spinner small label='Small Spinner' type='grow' class='mr-1'></b-spinner>
-                      <span class='mx-1'>Saving...</span>
-                    </template>
-                    <template v-else>
-                      <span>Save</span>
-                    </template>
-                  </b-button>
+                <b-button type='button'
+                          size='sm'
+                          variant='light'
+                          data-testid='edit-lifecycle-stage-form-cancel-button'
+                          @click='onCancelLifecycleStageMenu'>
+                  Cancel
+                </b-button>
+                <b-button type='button'
+                          size='sm'
+                          variant='primary'
+                          data-testid='edit-lifecycle-stage-form-save-button'
+                          :disabled='lifecycleStageIsSubmitting'
+                          @click='onSubmitLifecycleStageMenu'>
+                  <template v-if="lifecycleStageIsSubmitting">
+                    <b-spinner small label='Small Spinner' type='grow' class='mr-1'></b-spinner>
+                    <span class='mx-1'>Saving...</span>
+                  </template>
+                  <template v-else>
+                    <span>Save</span>
+                  </template>
+                </b-button>
               </div>
             </b-form>
           </div>
         </q-menu>
-      <!-- End Lifecycle Stage Menu -->
+        <!-- End Lifecycle Stage Menu -->
       </template>
       <!-- End Lifecycle Stage Section -->
     </q-card-section>
@@ -167,10 +170,9 @@
   </div>
 </template>
 <script>
-import {
-  hubspotIntegrationMixin
-} from 'src/plugins/mixins'
+import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'integration-hubspot-one-contact',
@@ -188,6 +190,10 @@ export default {
     },
     lifecycleStagesOptions: {
       type: Array,
+      required: true
+    },
+    contactId: {
+      type: [String, Number],
       required: true
     }
   },
@@ -248,15 +254,31 @@ export default {
       this.selectedLifecycleStage = this.previouslySelectedLifecycleStage
     },
 
-    onSubmitLifecycleStageMenu () {
+    async onSubmitLifecycleStageMenu () {
       this.lifecycleStageIsSubmitting = true
-      setTimeout(() => {
-        this.lifecycleStageIsSubmitting = false
-        this.showEditLifecycleStageMenu = false
-        this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === this.selectedLifecycleStage)?.text || 'None'
-        this.$generalNotification('HubSpot Lifecycle Stage has been updated.')
-        console.log('onSubmitLifecycleStageMenu', 'submitting: ' + this.selectedLifecycleStage)
-      }, 1000)
+
+      // @TODO add the reset logic
+      const response = await talk2Api.V1.integrations.hubspot.updateLifecycleStage(this.contactId, this.selectedLifecycleStage, false)
+
+      if (response.status !== 200) {
+        this.$generalNotification('Unable to update Lifecycle stage', 'error')
+      } else {
+        this.$generalNotification('Lifecycle Stage updated successfully.')
+      }
+
+      this.lifecycleStageIsSubmitting = false
+      this.showEditLifecycleStageMenu = false
+
+      // Update the displayed text in the JIT card based on the selected lifecycle stage
+      this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === this.selectedLifecycleStage)?.text || 'None'
+    }
+  },
+
+  watch: {
+    'integrationData.properties.lifecyclestage': function (newValue) {
+      // Update the displayed text in the JIT card when the integration data changes from the parent component
+      this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === newValue)?.text || 'None'
+      this.selectedLifecycleStage = newValue
     }
   }
 }

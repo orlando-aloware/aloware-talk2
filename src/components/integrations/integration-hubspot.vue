@@ -26,9 +26,10 @@
         </q-card-section>
         <q-separator v-if='hasDuplicates' />
         <integration-hubspot-one-contact v-if='integrationData'
+                                         is-primary
                                          :integration-data="integrationData"
                                          :lifecycle-stages-options="lifecycleStagesOptions"
-                                         is-primary />
+                                         :contact-id="contact.id" />
         <!-- End Duplicate Contacts Section -->
         <!-- Start Sync Button -->
         <q-card-section data-testid="integration-hubspot-card-section-3">
@@ -105,7 +106,11 @@
             <div v-for="duplicate in this.integrationData.duplicates"
                  :key="duplicate.id">
               <q-separator data-testid="integration-hubspot-separator" />
-              <integration-hubspot-one-contact :integrationData="duplicate" :lifecycle-stages-options="lifecycleStagesOptions"/>
+              <integration-hubspot-one-contact
+                :integrationData="duplicate"
+                :lifecycle-stages-options="lifecycleStagesOptions"
+                :contact-id="contact.id"
+              />
             </div>
           </div>
           <b-button size="sm"
@@ -235,6 +240,8 @@ export default {
         .then(response => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true
+
+          console.log('integrationData', this.integrationData)
         })
     },
 
