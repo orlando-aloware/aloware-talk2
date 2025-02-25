@@ -240,8 +240,6 @@ export default {
         .then(response => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true
-
-          console.log('integrationData', this.integrationData)
         })
     },
 
@@ -275,16 +273,15 @@ export default {
       this.showWorkflowSelectorForm = true
     },
 
-    syncHubspot (showAlert = true) {
+    async syncHubspot (showAlert = true) {
       this.isSyncing = true
-      talk2Api.V1.contact.syncHubspot(this.contact.id).then(response => {
-        this.isSyncing = false
-        this.getData()
+      await talk2Api.V1.contact.syncHubspot(this.contact.id)
+      await this.getData()
+      this.isSyncing = false
 
-        if (showAlert) {
-          this.$generalNotification('Contact has been successfully synced.')
-        }
-      })
+      if (showAlert) {
+        this.$generalNotification('Contact has been successfully synced.')
+      }
     },
 
     toggleDuplicates () {

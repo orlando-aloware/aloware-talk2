@@ -354,17 +354,26 @@ export default {
         },
 
         /**
+         * Update a contact's Lifecycle Stage in HubSpot
+         *
          * @param {string|number} contactId
          * @param {string} lifecycleStage
          * @param {boolean} resetRequired
-         * @returns {Promise<axios.AxiosResponse<any>>}
+         * @returns {axios.AxiosResponse<{success: string}|{error: string}>}
          */
-        updateLifecycleStage (contactId, lifecycleStage, resetRequired = false) {
-          return window.axios.patch(`${suffixV1}integration/hubspot/lifecycle-stage`, {
-            contact_id: contactId,
-            lifecycle_stage: lifecycleStage,
-            reset_required: resetRequired
-          })
+        async updateLifecycleStage (contactId, lifecycleStage, resetRequired = false) {
+          let response = null
+          try {
+            response = await window.axios.patch(`${suffixV1}integration/hubspot/lifecycle-stage`, {
+              contact_id: contactId,
+              lifecycle_stage: lifecycleStage,
+              reset_required: resetRequired
+            })
+          } catch (error) {
+            response = error.response
+          }
+
+          return response
         }
       },
 

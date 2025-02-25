@@ -257,20 +257,33 @@ export default {
     async onSubmitLifecycleStageMenu () {
       this.lifecycleStageIsSubmitting = true
 
-      // @TODO add the reset logic
-      const response = await talk2Api.V1.integrations.hubspot.updateLifecycleStage(this.contactId, this.selectedLifecycleStage, false)
+      const response = await talk2Api.V1.integrations.hubspot.updateLifecycleStage(
+        this.contactId,
+        this.selectedLifecycleStage,
+        this.isMovingBackwardsInLifecycle()
+      )
 
       if (response.status !== 200) {
-        this.$generalNotification('Unable to update Lifecycle stage', 'error')
+        // Revert to the previous stage if there is an error from the back-end
+        this.selectedLifecycleStage = this.previouslySelectedLifecycleStage
+        this.$generalNotification(response.data.error, 'error')
       } else {
-        this.$generalNotification('Lifecycle Stage updated successfully.')
+        // Update the displayed text in the JIT card based on the selected lifecycle stage
+        this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === this.selectedLifecycleStage)?.text || 'None'
+        this.$generalNotification(response.data.success, 'success')
       }
 
       this.lifecycleStageIsSubmitting = false
       this.showEditLifecycleStageMenu = false
+    },
 
-      // Update the displayed text in the JIT card based on the selected lifecycle stage
-      this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === this.selectedLifecycleStage)?.text || 'None'
+    isMovingBackwardsInLifecycle () {
+      if (!this.previouslySelectedLifecycleStage || !this.selectedLifecycleStage) return false
+
+      const previousIndex = this.lifecycleStagesOptions.findIndex(stage => stage.value === this.previouslySelectedLifecycleStage)
+      const currentIndex = this.lifecycleStagesOptions.findIndex(stage => stage.value === this.selectedLifecycleStage)
+
+      return currentIndex < previousIndex
     }
   },
 
