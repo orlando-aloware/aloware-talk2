@@ -49,11 +49,17 @@
             </div>
           </div>
           <div class="ml-2">
-            <b-dropdown text="Search Filters"
+            <b-dropdown variant="primary"
+                        class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                        toggle-class="dropdown-btn-text py-0 my-0 d-flex align-items-center"
                         right
-                        variant="light"
-                        class="calls__header__columns-dropdown m-2 b-compact-dropdown-button dropdown-white"
-                        size="lg">
+                        no-caret>
+              <template #button-content>
+                <div class="dropdown-btn-text d-flex align-items-center">
+                  Search Filters
+                </div>
+                <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
+              </template>
               <b-overlay :show="isLoading">
                 <template #overlay>
                   <q-spinner-bars color="primary"
@@ -113,12 +119,11 @@
         <div class="d-flex justify-between">
           <b-dropdown variant="primary"
                       class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
-                      toggle-class="add-list-toggle-btn py-0 my-0 d-flex align-items-center"
+                      toggle-class="dropdown-btn-text py-0 my-0 d-flex align-items-center"
                       right
                       no-caret>
-            <template class="add-list-toggle-btn"
-                      #button-content>
-              <div class="add-list-toggle-btn d-flex align-items-center">
+            <template #button-content>
+              <div class="dropdown-btn-text d-flex align-items-center">
                 Add List
               </div>
               <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
@@ -1185,7 +1190,7 @@ export default {
 }
 </script>
 <style>
-.add-list-toggle-btn {
+.dropdown-btn-text {
   font-size: 12px;
   font-weight: 400;
 }
