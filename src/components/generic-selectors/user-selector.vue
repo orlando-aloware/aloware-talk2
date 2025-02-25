@@ -56,7 +56,7 @@
                         v-if="!scope.opt.is_destination">
             <div class="break-all"
                  v-if="scope.opt.email">
-              {{ scope.opt.email }} - {{ getLabel(scope.opt) }}
+              {{ scope.opt.email }} {{ showAnswerType ? ' - ' + getLabel(scope.opt) : '' }}
             </div>
           </q-item-label>
           <q-item-label caption
@@ -201,6 +201,11 @@ export default {
     customPlaceholder: {
       type: String,
       default: ''
+    },
+
+    showAnswerType: {
+      type: Boolean,
+      default: true
     }
   },
 

@@ -696,7 +696,7 @@ body,
   border-bottom: 1px solid #EBEBEB;
   width: auto;
   height: 62px;
-  z-index: 1;
+  z-index: 4;
 
   & .q-item {
     padding: 0;
@@ -3855,10 +3855,6 @@ i.option-separator {
       white-space: nowrap;
     }
   }
-}
-
-.einbox-side__nav {
-  padding: 0;
 }
 
 .inbox-details {
@@ -9136,6 +9132,16 @@ span.mention {
     margin-right: 5px;
   }
 
+  .title-breadcrumb-link {
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    height: 19px;
+    margin-right: 5px;
+    color: #256eff;
+  }
+
   .title-path:not(:last-child) {
     .title-slash {
       height: 19px;
@@ -12072,10 +12078,6 @@ screen and (max-width: 956px) {
   .ring-group-snapshot-wrapper {
     padding-left: 0 !important;
     margin-top: 10px;
-  }
-
-  .communication-details-card {
-    margin-top: 60px;
   }
 }
 
@@ -15928,15 +15930,6 @@ hr {
   }
 }
 
-/* Gradient text effect for inbox */
-.inbox-effect-gradient-text {
-  cursor: pointer;
-  background-clip: text !important;
-  -webkit-background-clip: text !important;
-  color: transparent !important;
-  background-image: linear-gradient(135deg, #00BD50, #33D76B, #66E08A) !important;
-}
-
 .q-message-text-content {
   line-height: 1.5;
   font-size: 13px;
@@ -16218,7 +16211,7 @@ hr {
       overflow: hidden;
       transition: width 0.3s ease;
     }
-  
+
     .rotate-180 {
       transform: rotate(180deg);
     }
@@ -16234,6 +16227,16 @@ hr {
       margin-top: 300px;
       text-align: center;
       z-index: 0;
+    }
+
+    .deleted, a.deleted {
+      color: #666666;
+      font-style: italic;
+    }
+
+    .contact-name {
+      font-weight: 500;
+      color: #256eff;
     }
   }
 
@@ -16512,7 +16515,24 @@ hr {
 .communication-details-sidebar {
   .b-sidebar {
     top: 60px;
-    height: calc(100vh - 60px)
+    height: calc(100vh - 110px); // Mobile default: 60px for top + 50px for bottom
+
+    @media (min-width: 785px) {
+      height: calc(100vh - 60px); // Desktop: only account for top bar
+    }
+  }
+
+  .communication-details-card {
+    .comm-type-container {
+      &.sticky-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        margin-bottom: .25rem;
+        border-bottom: 1px solid #EBEBEB;
+      }
+    }
   }
 }
 

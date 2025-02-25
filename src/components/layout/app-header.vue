@@ -1,7 +1,7 @@
 <template>
   <q-toolbar class="page-header"
              :class="{ 'pl-2 pr-2': !noPadding }">
-    <div class="d-flex h-100 align-items-center flex-grow-1">
+    <div class="d-flex h-100 align-items-center">
       <back-button class="mobile-back-btn-global-header"
                    v-if="['Contact', 'Settings Tab'].includes($route.name)"
                    @click="navigateBack"/>
@@ -12,8 +12,8 @@
           <i class="fa fa-chevron-left" />
         </button>
       </router-link>
-      <h1 v-if="isMainTitle" class="flex-grow-2">{{ pageTitle || mainTitle }}</h1>
-      <h1 v-if="forcePageTitle" class="flex-grow-2">{{ pageTitle || forcePageTitle }}</h1>
+      <h1 v-if="isMainTitle">{{ mainTitle }}</h1>
+      <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
       <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ settingsTabHeaderName }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
@@ -21,25 +21,9 @@
       <inbox-channel-navigation v-if="(['Inbox Contact', 'Inbox Contact Communication', 'Inbox Channel'].includes($route.name) || ['/channels/mentions/received', '/channels/mentions/sent'].includes($route.path)) && !titleOnly" />
 
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading"
-                   v-if="$route.name === 'Stats' && !titleOnly"
-                   @clicked="refreshMetricGroup">
-        <refresh-icon :class="hideRefreshLabelClass"/>
-        {{ refreshButtonLabel }}
-      </compact-btn>
-
-      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading || (contactsRefreshIsDisabled && isInPowerDialerListPage)"
-                   v-if="isContactsPage"
-                   @clicked="refreshContacts">
-        <refresh-icon :class="hideRefreshLabelClass"/>
-        {{ refreshButtonLabel }}
-      </compact-btn>
-
-      <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center"
-                   :disabled="loading"
-                   v-if="isInPowerDialerListPage"
-                   @clicked="refreshPowerDialerListItems">
+                   :disabled="isRefreshDisabled"
+                   v-if="shouldShowRefreshButton"
+                   @clicked="handleRefresh">
         <refresh-icon :class="hideRefreshLabelClass"/>
         {{ refreshButtonLabel }}
       </compact-btn>
@@ -147,7 +131,8 @@ import {
   goBackMixin,
   contactsListFiltersMixin,
   userMixin,
-  kycMixin
+  kycMixin,
+  communicationsMixin
 } from 'src/plugins/mixins'
 import DialerForm from 'components/dialer/dialer-form'
 import ActiveCall from 'components/dialer/active-call'
@@ -171,6 +156,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME } from 'src/router/routes'
 
 export default {
   name: 'app-header',
@@ -182,7 +168,8 @@ export default {
     goBackMixin,
     contactsListFiltersMixin,
     userMixin,
-    kycMixin
+    kycMixin,
+    communicationsMixin
   ],
 
   components: {
@@ -221,11 +208,6 @@ export default {
     titleOnly: {
       type: Boolean,
       default: false
-    },
-
-    pageTitle: {
-      type: String,
-      default: ''
     }
   },
 
@@ -287,7 +269,7 @@ export default {
     },
 
     mainTitle () {
-      return this.$route.meta?.title || ''
+      return this.$route.meta && this.$route.meta.title ? this.$route.meta.title : this.$route.name
     },
 
     contactsRefreshIsDisabled () {
@@ -353,12 +335,20 @@ export default {
       return this.$route.path.includes('channels') && !this.$route.path.includes('inbox')
     },
 
+    isStatsPage () {
+      return this.$route.name === 'Stats'
+    },
+
     isContactsPage () {
       return this.$route.name === 'Contacts' || (this.$route.name === 'Power Dialer' && ['power-dialer-add-queue-list', 'power-dialer-add-list'].includes(this.$route.meta?.id))
     },
 
     isInPowerDialerListPage () {
       return this.$route.name === 'Power Dialer' && !['power-dialer-session', 'power-dialer-add-list', 'power-dialer-add-queue-list'].includes(this.$route.meta?.id)
+    },
+
+    isCommunicationsPage () {
+      return this.$route.name === COMMUNICATIONS_CHANNELS_ROUTE_NAME
     },
 
     settingsTabHeaderName () {
@@ -390,6 +380,29 @@ export default {
 
     isMobileTransitionWidth () {
       return this.$q.screen.width < MOBILE_HEADER_TRANSITION_WIDTH
+    },
+
+    shouldShowRefreshButton () {
+      return this.isStatsPage ||
+             this.isContactsPage ||
+             this.isInPowerDialerListPage ||
+             this.isCommunicationsPage
+    },
+
+    isRefreshDisabled () {
+      if (this.isStatsPage) {
+        return this.loading
+      }
+      if (this.isContactsPage) {
+        return this.loading || (this.contactsRefreshIsDisabled && this.isInPowerDialerListPage)
+      }
+      if (this.isInPowerDialerListPage) {
+        return this.loading
+      }
+      if (this.isCommunicationsPage) {
+        return this.loading
+      }
+      return false
     }
   },
 
@@ -466,6 +479,19 @@ export default {
 
       if (e) {
         e.preventDefault()
+      }
+    },
+
+    handleRefresh () {
+      if (this.isStatsPage) {
+        this.refreshMetricGroup()
+      } else if (this.isContactsPage) {
+        this.refreshContacts()
+      } else if (this.isInPowerDialerListPage) {
+        this.refreshPowerDialerListItems()
+      } else if (this.isCommunicationsPage) {
+        this.resetCommunications()
+        this.getCommunications(this.communicationFilters)
       }
     },
 

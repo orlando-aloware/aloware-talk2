@@ -869,22 +869,6 @@ export default {
       ]
     },
 
-    // v1 legacy redial (for non demo companies, should be deprecated once v2 redial is released)
-    shouldRedialLegacy () {
-      // force redial disabled
-      if (!this.sessionSettings.force_redial) {
-        return false
-      }
-
-      // task already redialed
-      if (this.redialedTasksCount[this.activeTask?.id] > 0) {
-        return false
-      }
-
-      // now should redial if call is not successfully answered
-      return !this.dialer.callSuccessfullyAnswered
-    },
-
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
     }
@@ -1019,6 +1003,11 @@ export default {
         // call and contact disposition and status changed and is no longer in wrap-up
         // and countdown type is wrap-up (so it doesn't skip warm-up period)
         if (wasInWrapUpStatusAndPaused && this.dialer.currentStatus !== 'WRAP_UP' && this.wrapUp) {
+          this.countdownTimer = 0
+        }
+
+        // skip warm-up period if set, if task is being redialed, and if is in warm-up period
+        if (this.sessionSettings.skip_redial_warmup_period && this.isRedialing && this.dialer.currentStatus !== 'WRAP_UP' && !this.wrapUp) {
           this.countdownTimer = 0
         }
 
@@ -1413,17 +1402,7 @@ export default {
     },
 
     async onNextTask (forceSkip = false, skipWrapUp = false) {
-      // v1 legacy redial (for non demo companies, should be deprecated once v2 redial is released)
-      if (this.shouldRedialLegacy) {
-        this.incrementRedialedTaskCount(this.activeTask.id)
-        this.onRedial(false)
-        return
-      }
-
-      // v2 redial (for demo companies)
       if (this.redialRequired) {
-        this.incrementRedialedTaskCount(this.activeTask.id)
-
         // redial immediately if immediate redial is ON or no tasks left
         const redialNow = this.sessionSettings.force_immediate_redial || this.powerDialerTasks.in_queue.length === 0
         this.onRedial(redialNow, true)
@@ -1572,6 +1551,8 @@ export default {
     async onRedial (redial, forcedRedial = false) {
       this.isRedialClicked = true
       this.onPhoneExpansionReset()
+
+      this.incrementRedialedTaskCount(this.activeTask.id)
 
       let task = null
       if (redial) {
