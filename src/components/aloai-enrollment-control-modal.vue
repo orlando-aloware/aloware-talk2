@@ -52,7 +52,14 @@
             <!-- Bot Header -->
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h5 class="mb-0 font-weight-bold">{{ bot.name }}</h5>
-              <div>
+              <div class="d-flex align-items-center">
+                <!-- Add bot type badge -->
+                <q-badge
+                  color="black"
+                  class="mr-1"
+                >
+                  <span>{{ getAgentTypeLabel(bot.type) }}</span>
+                </q-badge>
                 <!-- Show single enrollment badge if bot is enrolled -->
                 <q-badge
                   v-if="isEnrolled(bot.id)"
@@ -409,6 +416,16 @@ export default {
       return this.bot_enrollments.filter(
         enrollment => enrollment.aloai_bot_id === botId
       )
+    },
+    getAgentTypeLabel (type) {
+      switch (type) {
+        case AloAi.TYPE_VOICE:
+          return 'Voice'
+        case AloAi.TYPE_TEXT:
+          return 'Text'
+        default:
+          return ''
+      }
     }
   }
 }
