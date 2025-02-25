@@ -281,8 +281,7 @@ export default {
         .then(() => {
           if (this.contact) {
             this.bot_enrollments.push({
-              aloai_bot_id: bot.id,
-              enrollment_expired_at: new Date(Date.now() + (24 * 60 * 60 * 1000))
+              aloai_bot_id: bot.id
             })
           }
 
