@@ -1189,7 +1189,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 .dropdown-btn-text {
   font-size: 12px;
   font-weight: 400;
