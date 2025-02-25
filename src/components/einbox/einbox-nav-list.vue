@@ -96,7 +96,7 @@ export default {
 
     // If there are inboxes, set the first one as active
     if (this.inboxes.length) {
-      const inboxId = parseInt(this.$route.params.inboxId) || this.inboxes[0].id
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.inboxes[0].id
 
       this.setActiveInbox(inboxId)
       this.resetItems()
@@ -106,9 +106,8 @@ export default {
 
   watch: {
     '$route.params.inboxId' (inboxId) {
-      // console.log(inboxId, this.activeInbox, inboxId === this.activeInbox)
-      if (parseInt(inboxId) !== this.activeInbox) {
-        this.onInboxSelect(inboxId)
+      if (!inboxId && this.inboxes.length) {
+        this.onInboxSelect(this.inboxes[0].id) // use the same behavior as created method
       }
     }
   }
