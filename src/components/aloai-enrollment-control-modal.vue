@@ -58,7 +58,6 @@
                   v-if="isEnrolled(bot.id)"
                   :id="`enrolled-badge-${bot.id}`"
                   color="green-6"
-                  class="mr-2"
                 >
                   <span class="custom-badge-margin-text">
                     Enrolled
@@ -73,10 +72,17 @@
             </p>
 
             <div class="d-flex justify-content-between align-items-center">
+              <q-tooltip
+                v-if="!bot_engagements[bot.id]"
+                anchor="top middle"
+                self="center middle"
+              >
+                Contact cannot be enrolled because it's disengaged from this AloAi Agent
+              </q-tooltip>
               <button
                 class="btn btn-sm btn-primary"
                 @click="confirmEnrollment($event, bot)"
-                :disabled="busyBotId === bot.id"
+                :disabled="busyBotId === bot.id || !bot_engagements[bot.id]"
               >
                 {{ getEnrollButtonText(bot.id) }}
               </button>
