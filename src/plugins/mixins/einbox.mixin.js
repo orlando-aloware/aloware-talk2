@@ -72,19 +72,19 @@ export default {
 
     async fetchItems (inboxId) {
       try {
-        if (this.isLoadingItems) {
-          return
-        }
-
         this.setIsLoadingItems(true)
 
         const response = await this.getItemsRequest(inboxId, 1)
 
         this.setItems(response.data)
+        this.setIsLoadingItems(false)
       } catch (error) {
         console.error('Error fetching items:', error)
-      } finally {
-        this.setIsLoadingItems(false)
+
+        // dont cancel loading animation is requested was forced canceled
+        if (error.name !== 'CanceledError') {
+          this.setIsLoadingItems(false)
+        }
       }
     },
 
