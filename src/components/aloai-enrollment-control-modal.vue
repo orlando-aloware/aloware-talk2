@@ -181,10 +181,8 @@ export default {
       let bots = this.bots.filter((bot) => bot.direction === AloAi.DIRECTION_OUTBOUND)
 
       // Filter by bot type
-      if (this.selectedBotType !== 'all') {
-        bots = bots.filter((bot) =>
-          this.selectedBotType === 'voice' ? bot.type === AloAi.TYPE_VOICE : bot.type === AloAi.TYPE_TEXT
-        )
+      if (this.selectedBotType !== AloAi.TYPE_ALL) {
+        bots = bots.filter((bot) => bot.type === this.selectedBotType)
       }
 
       if (!isEmpty(this.searchText)) {
@@ -209,11 +207,11 @@ export default {
       searchText: '',
       isLoading: true,
       selectedBotId: null,
-      selectedBotType: 'all',
+      selectedBotType: AloAi.TYPE_ALL,
       botTypeOptions: [
-        { label: 'All', value: 'all' },
-        { label: 'Voice', value: 'voice' },
-        { label: 'Text', value: 'text' }
+        { label: 'All', value: AloAi.TYPE_ALL },
+        { label: 'Voice', value: AloAi.TYPE_VOICE },
+        { label: 'Text', value: AloAi.TYPE_TEXT }
       ],
       AloAi
     }
@@ -314,7 +312,7 @@ export default {
         this.isLoading = true
         this.searchText = ''
         this.selectedBotId = null
-        this.selectedBotType = 'all'
+        this.selectedBotType = AloAi.TYPE_ALL
         this.busyBotId = null
       }, 300)
     },
