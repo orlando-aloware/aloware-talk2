@@ -758,6 +758,7 @@ export default {
       this.settings.cascadeContacts = false
       this.uploading = false
       this.$v.$reset()
+      this.fieldErrors = {}
     },
 
     onUpdateFields (value, prop) {
