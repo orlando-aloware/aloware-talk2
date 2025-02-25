@@ -205,7 +205,7 @@ export default {
     lifecycleStagesOptions () {
       // transform from an object to a list of objects with label and value properties
       // example: [{ label: 'Subscriber', value: 'subscriber' }, { label: 'Lead', value: 'lead' }, { label: 'Customer', value: 'customer' }]
-      return this.integrationData
+      return this.integrationData?.lifecycle_stages
         ? Object.entries(this.integrationData.lifecycle_stages).map(([text, value]) => ({ text, value }))
         : []
     }

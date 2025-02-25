@@ -204,9 +204,9 @@ export default {
     return {
       showLifecycleStageEditButton: false,
       showEditLifecycleStageMenu: false,
-      selectedLifecycleStage: this.integrationData.properties.lifecyclestage || null,
+      selectedLifecycleStage: this.integrationData?.properties?.lifecyclestage || null,
       previouslySelectedLifecycleStage: null,
-      displayedLifecycleStage: this.lifecycleStagesOptions.find(stage => stage.value === this.integrationData.properties.lifecyclestage)?.text || 'None',
+      displayedLifecycleStage: this.lifecycleStagesOptions.find(stage => stage.value === this.integrationData?.properties?.lifecyclestage)?.text || 'None',
       lifecycleStageIsSubmitting: false
     }
   },
