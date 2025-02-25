@@ -17,7 +17,7 @@
         Enroll Contacts to AloAi Agent
       </h1>
       <div class="text-center">
-        Select the agent that you want to enroll at your
+        Select the agent that you want to enroll your
         <strong>~{{this.contactsCount}} contacts</strong>.
       </div>
       <div class="w-75 my-2 mx-auto">

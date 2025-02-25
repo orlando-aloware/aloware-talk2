@@ -14,10 +14,10 @@
       </h1>
       <div class="text-center">
         <template v-if="contactsCount === 1">
-          Select the agent and channel you want to use to initiate a conversation with this contact.
+          Select the agent you want to use to initiate a conversation with this contact.
         </template>
         <template v-else>
-          Select the agent that you want to enroll at your <strong>
+          Select the agent that you want to enroll your <strong>
             {{params?.selected_all ? contactsCount : `~${contactsCount}`}} contacts
           </strong>.
         </template>
@@ -74,43 +74,13 @@
               {{ bot.description }}
             </p>
 
-            <!-- Channel Selection and Enrollment -->
             <div class="d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center">
-                <label class="mr-2 mb-0">Channel:</label>
-                <b-form-radio-group
-                  v-model="botChannels[bot.id]"
-                  buttons
-                  button-variant="outline-primary"
-                  size="sm"
-                >
-                  <!-- SMS Channel -->
-                  <b-form-radio
-                    v-if="canUseSMS(bot)"
-                    :value="'sms'"
-                  >
-                    SMS
-                  </b-form-radio>
-
-                  <!-- Call Channel -->
-                  <b-form-radio
-                    v-if="canUseCall(bot)"
-                    :value="'call'"
-                  >
-                    Call
-                  </b-form-radio>
-                </b-form-radio-group>
-              </div>
-
               <button
                 class="btn btn-sm btn-primary"
                 @click="confirmEnrollment($event, bot)"
-                :disabled="!botChannels[bot.id] || busyBotId === bot.id"
+                :disabled="busyBotId === bot.id"
               >
                 {{ getEnrollButtonText(bot.id) }}
-                <q-tooltip v-if="!botChannels[bot.id]">
-                  Please select a channel to enroll this contact
-                </q-tooltip>
               </button>
             </div>
           </div>
@@ -118,9 +88,10 @@
       </ul>
 
       <div class="d-flex items-center justify-center">
-        <button class="btn btn-sm btn-outline-dark"
-                data-testid="aloai-enrollment-control-modal-close-button"
-                @click="onHidden">
+        <button
+          class="btn btn-sm btn-outline-dark"
+          data-testid="aloai-enrollment-control-modal-close-button"
+          @click="onHidden">
           Close
         </button>
       </div>
@@ -229,8 +200,7 @@ export default {
         { label: 'Voice', value: 'voice' },
         { label: 'Text', value: 'text' }
       ],
-      AloAi,
-      botChannels: {}
+      AloAi
     }
   },
 
@@ -264,21 +234,11 @@ export default {
       }
     },
     submitEnrollment (bot) {
-      const channel = this.botChannels[bot.id]
-      if (!channel) {
-        this.$generalNotification(
-          'Please select a channel for enrollment.',
-          'error'
-        )
-        return
-      }
-
       this.busyBotId = bot.id
       this.isBusy = true
 
       // Construct enrollment data based on contact type
       let enrollmentData = {
-        channel: channel === 'sms' ? AloAi.ENROLLMENT_TYPE_TEXT : AloAi.ENROLLMENT_TYPE_VOICE,
         prevent_duplicates: true,
         multiple_phone_numbers: false,
         allow_international_phone_numbers: false
@@ -309,8 +269,7 @@ export default {
           if (this.contact) {
             this.bot_enrollments.push({
               aloai_bot_id: bot.id,
-              enrollment_expired_at: new Date(Date.now() + (24 * 60 * 60 * 1000)),
-              type: channel === 'sms' ? AloAi.ENROLLMENT_TYPE_TEXT : AloAi.ENROLLMENT_TYPE_VOICE
+              enrollment_expired_at: new Date(Date.now() + (24 * 60 * 60 * 1000))
             })
           }
 
@@ -341,17 +300,11 @@ export default {
         this.searchText = ''
         this.selectedBotId = null
         this.selectedBotType = 'all'
-        this.botChannels = {}
         this.busyBotId = null
       }, 300)
     },
     onShown () {
-      this.load().then(() => {
-        // Auto-select channels after bots are loaded
-        this.bots.forEach(bot => {
-          this.autoSelectChannel(bot)
-        })
-      })
+      this.load()
     },
     isEnrolled (botId) {
       return this.bot_enrollments.some((enrollment) => enrollment.aloai_bot_id === botId)
@@ -434,46 +387,12 @@ export default {
         return []
       }
     },
-    canUseSMS (bot) {
-      return [AloAi.TYPE_TEXT].includes(bot.type)
-    },
-    canUseCall (bot) {
-      return [AloAi.TYPE_VOICE].includes(bot.type)
-    },
-    getChannelTooltip (bot, channel) {
-      if (channel === 'sms' && !this.canUseSMS(bot)) {
-        return 'This bot does not support SMS communications'
-      }
-
-      if (channel === 'call' && !this.canUseCall(bot)) {
-        return 'This bot does not support voice calls'
-      }
-
-      return '' // Return empty string for enabled channels
-    },
-    getAvailableChannels (bot) {
-      return [
-        {
-          text: 'SMS',
-          value: 'sms',
-          disabled: !this.canUseSMS(bot)
-        },
-        {
-          text: 'Call',
-          value: 'call',
-          disabled: !this.canUseCall(bot)
-        }
-      ]
-    },
-    formatDirection (direction) {
-      return direction === AloAi.DIRECTION_OUTBOUND ? 'Outbound' : 'Inbound'
-    },
     getBotTypeLabel (type) {
       switch (type) {
         case AloAi.TYPE_TEXT:
-          return 'Text Bot'
+          return 'Text Agent'
         case AloAi.TYPE_VOICE:
-          return 'Voice Bot'
+          return 'Voice Agent'
         default:
           return 'Unknown'
       }
@@ -508,17 +427,6 @@ export default {
       return this.bot_enrollments.filter(
         enrollment => enrollment.aloai_bot_id === botId
       )
-    },
-    autoSelectChannel (bot) {
-      const canSMS = this.canUseSMS(bot)
-      const canCall = this.canUseCall(bot)
-
-      // If only one channel is available, auto-select it
-      if (canSMS && !canCall) {
-        this.$set(this.botChannels, bot.id, 'sms')
-      } else if (!canSMS && canCall) {
-        this.$set(this.botChannels, bot.id, 'call')
-      }
     }
   }
 }

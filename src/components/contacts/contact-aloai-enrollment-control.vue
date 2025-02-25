@@ -161,8 +161,8 @@
             height="22"
             width="22"
           />
-          <span v-if="!hasBotEnrollments">Enroll to Agent</span>
-          <span v-else>Enroll to more Agents</span>
+          <span v-if="!hasBotEnrollments">Enroll to agent</span>
+          <span v-else>Enroll to more agents</span>
         </b-button>
       </div>
 
