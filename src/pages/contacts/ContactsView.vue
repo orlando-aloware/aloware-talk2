@@ -787,6 +787,7 @@
         :contact-list="selectedList"
         :checked-count="selectedAllCount"
         :total-contacts-count="totalRows"
+        :multiple-phone-numbers="true"
       />
     <assign-contacts-modal :is-show="showAssignContacts"
                            :list="selectedList"

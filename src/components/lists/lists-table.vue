@@ -358,7 +358,8 @@
         ref="enrollContactsToAloAiModal"
         :params="attachedParams()"
         :contact-list="list"
-        :total-contacts-count="list?.no_of_contacts" />
+        :total-contacts-count="list?.no_of_contacts"
+        :multiple-phone-numbers="true" />
 
       <assign-contacts-modal :is-show="showAssignContacts"
                             :list="list"

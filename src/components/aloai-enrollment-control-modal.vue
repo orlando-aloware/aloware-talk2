@@ -134,6 +134,10 @@ export default {
     totalContactsCount: {
       type: Number,
       default: 0
+    },
+    multiplePhoneNumbers: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -244,7 +248,7 @@ export default {
       // Construct enrollment data based on contact type
       let enrollmentData = {
         prevent_duplicates: true,
-        multiple_phone_numbers: false,
+        multiple_phone_numbers: this.multiplePhoneNumbers,
         allow_international_phone_numbers: false
       }
 
