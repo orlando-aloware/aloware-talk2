@@ -1434,10 +1434,6 @@ export default {
         .finally(() => {
           this.isRegenerating = false
         })
-    },
-
-    isEmptyParsedTranscription (communication) {
-      return communication.call_summary && communication.call_summary.trim() === ''
     }
   },
 
