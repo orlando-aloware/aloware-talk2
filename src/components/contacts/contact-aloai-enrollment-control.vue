@@ -20,7 +20,7 @@
 
       <b-card-text class="fs-14 mt-2">
         <span v-if="hasBotEnrollments">Currently enrolled to:</span>
-        <span v-else>Enroll this contact to any of your Outbound Text Bots and let them do the work for you!</span>
+        <span v-else>Enroll this contact to any of your Outbound Agents and let them do the work for you!</span>
       </b-card-text>
 
       <b-card-text
@@ -128,7 +128,7 @@
             size="sm"
             data-testid="disenroll-single-bot-contact-button"
           >
-            <i class="fa fa-trash"/> Disenroll from {{ getEnrollmentTypeText(null, botEnrollments[activeBotIndex]?.type) }}
+            <i class="fa fa-trash"/> Disenroll from agent
           </b-button>
         </div>
 
@@ -142,7 +142,7 @@
           block
           data-testid="disenroll-contact-button"
         >
-          <i class="fa fa-trash"/> Disenroll from {{ getEnrollmentTypeText(null, botEnrollments[activeBotIndex]?.type) }}
+          <i class="fa fa-trash"/> Disenroll from agent
         </b-button>
       </b-card-text>
 
@@ -161,8 +161,8 @@
             height="22"
             width="22"
           />
-          <span v-if="!hasBotEnrollments">Enroll to Bot</span>
-          <span v-else>Enroll to more Bots</span>
+          <span v-if="!hasBotEnrollments">Enroll to Agent</span>
+          <span v-else>Enroll to more Agents</span>
         </b-button>
       </div>
 
@@ -174,7 +174,7 @@
 
     <confirm-dialog
       id="contact-disenroll-from-bot"
-      title="Disenroll Contact from AloAi Text Bot"
+      title="Disenroll Contact from AloAi Agent"
       @close="closeDisenrollmentConfirmation"
     >
       <div slot="content">
@@ -275,11 +275,10 @@ export default {
 
       // Add safety check for empty enrollments
       if (!this.hasBotEnrollments || !this.displayedBot) {
-        return `Are you sure you want to remove <b>${name}</b> from this bot?`
+        return `Are you sure you want to remove <b>${name}</b> from this agent?`
       }
 
-      const enrollmentType = this.getEnrollmentTypeText(null, this.botEnrollments[this.activeBotIndex]?.type)
-      return `Are you sure you want to remove <b>${name}</b> from <b>${this.displayedBot?.name}</b>'s ${enrollmentType} enrollment?`
+      return `Are you sure you want to disenroll <b>${name}</b> from <b>${this.displayedBot?.name}</b>?`
     }
   },
 
@@ -401,9 +400,8 @@ export default {
           type: currentEnrollment.type
         })
         .then(() => {
-          const type = this.getEnrollmentTypeText(null, currentEnrollment.type)
           this.$generalNotification(
-            `Contact successfully disenrolled from ${type} on ${this.displayedBot.name}.`
+            `Contact successfully disenrolled from AloAi Agent: ${this.displayedBot.name}.`
           )
 
           this.closeDisenrollmentConfirmation()
@@ -416,7 +414,7 @@ export default {
           }, 2000)
         })
         .catch((error) => {
-          let errorMsg = 'Error while disenrolling contact from AloAi Text Bot.'
+          let errorMsg = `Error while disenrolling contact from AloAi Agent: ${this.displayedBot.name}.`
           if (error?.response?.data?.message) {
             errorMsg = error.response.data.message
           }

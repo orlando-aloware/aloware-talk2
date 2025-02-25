@@ -14,15 +14,15 @@
         data-testid="enroll-contacts-to-aloai-modal-title"
         class="text-center mb-2"
       >
-        Enroll Contacts to AloAi Bot
+        Enroll Contacts to AloAi Agent
       </h1>
       <div class="text-center">
-        Select the bot that you want to enroll at your
+        Select the agent that you want to enroll at your
         <strong>~{{this.contactsCount}} contacts</strong>.
       </div>
       <div class="w-75 my-2 mx-auto">
         <search
-          placeholder="Search bot"
+          placeholder="Search agent"
           data-testid="enroll-contacts-to-aloai-modal-search"
           @search="onSearch"
         />
@@ -226,12 +226,12 @@ export default {
         .enrollContacts(this.selectedBotId, params)
         .then(() => {
           this.$generalNotification(
-            'Contacts successfully enrolled to the selected AloAi Bot.'
+            `We are enrolling you contact${this.contactsCount > 1 ? 's' : ''} into AloAi Agent: ${this.selectedBotId}.`
           )
           this.onHidden()
         })
         .catch((error) => {
-          let errorMsg = 'Error while enrolling contacts to AloAi Bot.'
+          let errorMsg = `Error while enrolling contact${this.contactsCount > 1 ? 's' : ''} into AloAi Agent: ${this.selectedBotId}.`
           if (error?.response.data?.message) {
             errorMsg = error.response.data.message
           }
@@ -263,7 +263,7 @@ export default {
         this.isLoading = false
         this.isBusy = false
       } catch (error) {
-        this.$generalNotification('Error while fetching AloAi Bots.', 'error')
+        this.$generalNotification('Error while fetching AloAi Agents.', 'error')
         console.error('[loadBots] error', error)
         this.isLoading = false
         this.isBusy = false
@@ -276,8 +276,7 @@ export default {
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots({
           enabled: true,
-          direction: AloAi.DIRECTION_OUTBOUND,
-          type: AloAi.TYPE_TEXT
+          direction: AloAi.DIRECTION_OUTBOUND
         })
         return data?.data ?? []
       } catch (error) {

@@ -10,13 +10,13 @@
     <div class="p-2">
       <h1 data-testid="aloai-engagement-control-modal-title"
           class="text-center mb-2">
-        AloAi Text Bot Engagement
+        AloAi Agent Engagement
       </h1>
       <div class="text-center">
-        Manage the bots that you want your contact to interact with. If a bot is disabled, it will no longer respond to this contact.
+        Manage the agents that you want your contact to interact with. If an agent is disabled, it will no longer respond to this contact.
       </div>
       <div class="w-75 my-2 mx-auto">
-        <search placeholder="Search bot"
+        <search placeholder="Search agent"
                 data-testid="aloai-engagement-control-modal-search"
                 @search="onSearch"/>
       </div>
@@ -193,7 +193,7 @@ export default {
         this.isLoading = false
         this.isBusy = false
       } catch (error) {
-        this.$generalNotification('Error while fetching AloAi Bots.', 'error')
+        this.$generalNotification('Error while fetching AloAi Agents.', 'error')
         console.error('[loadBots] error', error)
         this.isLoading = false
         this.isBusy = false

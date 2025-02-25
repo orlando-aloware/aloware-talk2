@@ -274,11 +274,11 @@
                     <b-dropdown-item href="#"
                                      data-testid="lists-aloai-option"
                                      v-if="shouldShowAloAi"
-                                     @click="openAloAiBotContactsEnrollmentModal(props.row)">
+                                     @click="openAloAiAgentContactsEnrollmentModal(props.row)">
                       <add-user-icon width="14"
                                      height="14"
                                      color="#62666E"/>
-                      Enroll List in AloAi Text Bot
+                      Enroll List in AloAi Agent
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"

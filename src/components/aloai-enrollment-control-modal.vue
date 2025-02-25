@@ -14,16 +14,32 @@
       </h1>
       <div class="text-center">
         <template v-if="contactsCount === 1">
-          Select the bot and channel you want to use to initiate a conversation with this contact.
+          Select the agent and channel you want to use to initiate a conversation with this contact.
         </template>
         <template v-else>
-          Select the bot that you want to enroll at your <strong>
+          Select the agent that you want to enroll at your <strong>
             {{params?.selected_all ? contactsCount : `~${contactsCount}`}} contacts
           </strong>.
         </template>
       </div>
+
+      <!-- AloAi Agent Type selector -->
+      <div class="w-75 mx-auto mb-2 mt-2">
+        <q-select
+          v-model="selectedBotType"
+          :options="botTypeOptions"
+          dense
+          outlined
+          emit-value
+          map-options
+          options-dense
+          class="bot-type-select"
+          data-testid="bot-type-filter"
+        />
+      </div>
+
       <div class="w-75 my-2 mx-auto">
-        <search placeholder="Search bot"
+        <search placeholder="Search agent"
                 data-testid="aloai-enrollment-control-modal-search"
                 @search="onSearch"/>
       </div>
@@ -46,7 +62,7 @@
                     class="mr-2"
                   >
                     <span class="custom-badge-margin-text">
-                      Enrolled ({{ getEnrollmentTypeText(bot.id, enrollment.type) }})
+                      Enrolled
                     </span>
                   </q-badge>
                 </template>
@@ -177,6 +193,14 @@ export default {
     // Retrieve only sales bots (Sales bot has a defined opener and can start conversations)
     filteredOutboundBots () {
       let bots = this.bots.filter((bot) => bot.direction === AloAi.DIRECTION_OUTBOUND)
+
+      // Filter by bot type
+      if (this.selectedBotType !== 'all') {
+        bots = bots.filter((bot) =>
+          this.selectedBotType === 'voice' ? bot.type === AloAi.TYPE_VOICE : bot.type === AloAi.TYPE_TEXT
+        )
+      }
+
       if (!isEmpty(this.searchText)) {
         bots = bots.filter((bot) =>
           bot.name.toLowerCase().includes(this.searchText.toLowerCase())
@@ -199,6 +223,12 @@ export default {
       searchText: '',
       isLoading: true,
       selectedBotId: null,
+      selectedBotType: 'all',
+      botTypeOptions: [
+        { label: 'All', value: 'all' },
+        { label: 'Voice', value: 'voice' },
+        { label: 'Text', value: 'text' }
+      ],
       AloAi,
       botChannels: {}
     }
@@ -285,12 +315,12 @@ export default {
           }
 
           this.$generalNotification(
-            `Contact${this.contactsCount > 1 ? 's' : ''} successfully enrolled to ${bot.name} via ${channel.toUpperCase()}.`
+            `We are enrolling you contact${this.contactsCount > 1 ? 's' : ''} into AloAi Agent: ${bot.name}}.`
           )
           this.$emit('contactEnrolled')
         })
         .catch((error) => {
-          let errorMsg = 'Error while enrolling contact to AloAi Bot.'
+          let errorMsg = `Error while enrolling contact${this.contactsCount > 1 ? 's' : ''} to AloAi Agent: ${bot.name}.`
           if (error?.response.data?.message) {
             errorMsg = error.response.data.message
           }
@@ -310,6 +340,7 @@ export default {
         this.isLoading = true
         this.searchText = ''
         this.selectedBotId = null
+        this.selectedBotType = 'all'
         this.botChannels = {}
         this.busyBotId = null
       }, 300)
@@ -351,7 +382,7 @@ export default {
         this.isLoading = false
         this.isBusy = false
       } catch (error) {
-        this.$generalNotification('Error while fetching AloAi Bots.', 'error')
+        this.$generalNotification('Error while fetching AloAi Agents.', 'error')
         console.error('[loadBots] error', error)
         this.isLoading = false
         this.isBusy = false
@@ -461,23 +492,6 @@ export default {
         enrollment => enrollment.aloai_bot_id === botId
       )
       return enrollment?.type || null
-    },
-    getEnrollmentTypeText (botId, type = null) {
-      if (type !== null) {
-        switch (type) {
-          case AloAi.ENROLLMENT_TYPE_TEXT:
-            return 'SMS'
-          case AloAi.ENROLLMENT_TYPE_VOICE:
-            return 'Call'
-          default:
-            return ''
-        }
-      }
-
-      const enrollment = this.bot_enrollments.find(
-        enrollment => enrollment.aloai_bot_id === botId
-      )
-      return this.getEnrollmentTypeText(botId, enrollment?.type)
     },
     getEnrollmentTypeIcon (botId) {
       const type = this.getEnrollmentType(botId)
