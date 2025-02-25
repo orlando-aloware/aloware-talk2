@@ -53,19 +53,17 @@
             <div class="d-flex justify-content-between align-items-center mb-2">
               <h5 class="mb-0 font-weight-bold">{{ bot.name }}</h5>
               <div>
-                <!-- Show all enrollments for this bot -->
-                <template v-for="enrollment in getBotEnrollments(bot.id)">
-                  <q-badge
-                    :key="`enrolled-badge-${bot.id}-${enrollment.type}`"
-                    :id="`enrolled-badge-${bot.id}-${enrollment.type}`"
-                    color="green-6"
-                    class="mr-2"
-                  >
-                    <span class="custom-badge-margin-text">
-                      Enrolled
-                    </span>
-                  </q-badge>
-                </template>
+                <!-- Show single enrollment badge if bot is enrolled -->
+                <q-badge
+                  v-if="isEnrolled(bot.id)"
+                  :id="`enrolled-badge-${bot.id}`"
+                  color="green-6"
+                  class="mr-2"
+                >
+                  <span class="custom-badge-margin-text">
+                    Enrolled
+                  </span>
+                </q-badge>
               </div>
             </div>
 
@@ -274,7 +272,7 @@ export default {
           }
 
           this.$generalNotification(
-            `We are enrolling you contact${this.contactsCount > 1 ? 's' : ''} into AloAi Agent: ${bot.name}}.`
+            `We are enrolling your contact${this.contactsCount > 1 ? 's' : ''} into AloAi Agent: ${bot.name}.`
           )
           this.$emit('contactEnrolled')
         })
