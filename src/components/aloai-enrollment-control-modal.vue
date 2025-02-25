@@ -181,7 +181,7 @@ export default {
       let bots = this.bots.filter((bot) => bot.direction === AloAi.DIRECTION_OUTBOUND)
 
       // Filter by bot type
-      if (this.selectedBotType !== AloAi.TYPE_ALL) {
+      if (this.selectedBotType !== AloAi.ALL) {
         bots = bots.filter((bot) => bot.type === this.selectedBotType)
       }
 
@@ -207,9 +207,9 @@ export default {
       searchText: '',
       isLoading: true,
       selectedBotId: null,
-      selectedBotType: AloAi.TYPE_ALL,
+      selectedBotType: AloAi.ALL,
       botTypeOptions: [
-        { label: 'All', value: AloAi.TYPE_ALL },
+        { label: 'All', value: AloAi.ALL },
         { label: 'Voice', value: AloAi.TYPE_VOICE },
         { label: 'Text', value: AloAi.TYPE_TEXT }
       ],
@@ -311,7 +311,7 @@ export default {
         this.isLoading = true
         this.searchText = ''
         this.selectedBotId = null
-        this.selectedBotType = AloAi.TYPE_ALL
+        this.selectedBotType = AloAi.ALL
         this.busyBotId = null
       }, 300)
     },
@@ -413,16 +413,6 @@ export default {
       return this.bot_enrollments.filter(
         enrollment => enrollment.aloai_bot_id === botId
       )
-    },
-    getAgentTypeLabel (type) {
-      switch (type) {
-        case AloAi.TYPE_VOICE:
-          return 'Voice'
-        case AloAi.TYPE_TEXT:
-          return 'Text'
-        default:
-          return ''
-      }
     }
   }
 }

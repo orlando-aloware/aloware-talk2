@@ -1,5 +1,5 @@
 // Types
-export const TYPE_ALL = 'all'
+export const ALL = 'all'
 export const TYPE_TEXT = 1
 export const TYPE_VOICE = 2
 
