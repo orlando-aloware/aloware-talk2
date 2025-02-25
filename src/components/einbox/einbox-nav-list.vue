@@ -98,9 +98,7 @@ export default {
     if (this.inboxes.length) {
       const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.inboxes[0].id
 
-      this.setActiveInbox(inboxId)
-      this.resetItems()
-      this.fetchItems(inboxId)
+      this.onInboxSelect(inboxId)
     }
   },
 
@@ -110,6 +108,10 @@ export default {
         this.onInboxSelect(this.inboxes[0].id) // use the same behavior as created method
       }
     }
+  },
+
+  beforeDestroy () {
+    this.setActiveInbox(null)
   }
 }
 </script>
