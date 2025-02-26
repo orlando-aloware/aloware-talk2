@@ -6,7 +6,7 @@
       <einbox-nav-item :label="inbox.name"
                        :value="inbox.id"
                        :message-count="inbox.message_count"
-                       :is-active="activeInbox === inbox.id"
+                       :is-active="activeInboxId === inbox.id"
                        :key="inbox.id"
                        v-for="inbox in inboxes"
                        @click="onInboxSelect" />
@@ -55,14 +55,14 @@ export default {
   computed: {
     ...mapState('Einbox', [
       'inboxes',
-      'activeInbox',
+      'activeInboxId',
       'isLoadingInboxes'
     ])
   },
 
   methods: {
     ...mapActions('Einbox', [
-      'setActiveInbox',
+      'setActiveInboxId',
       'resetItems'
     ]),
 
@@ -76,11 +76,11 @@ export default {
     },
 
     onInboxSelect (inboxId) {
-      if (inboxId === this.activeInbox) {
+      if (inboxId === this.activeInboxId) {
         return
       }
 
-      this.setActiveInbox(parseInt(inboxId))
+      this.setActiveInboxId(parseInt(inboxId))
       this.resetItems()
       this.fetchItems(inboxId)
 
@@ -111,7 +111,7 @@ export default {
   },
 
   beforeDestroy () {
-    this.setActiveInbox(null)
+    this.setActiveInboxId(null)
   }
 }
 </script>

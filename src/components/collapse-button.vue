@@ -1,29 +1,26 @@
 <template>
-  <button class="collapse-button btn btn-default btn-sm"
-          :style="{ top: `${offset.top}px`, right: `${offset.right}px` }"
-          :id="`btn-collapse-${_uid}`"
-          @click="toggle">
-    <chevron-right-icon class="collapse-button__icon"
-                        color="#62666E"
-                        :width="16"
-                        :height="16"
-                        :style="{ transform: value ? 'rotate(-180deg)' : null }"/>
+  <span class="collapse-button"
+        :id="`btn-collapse-${_uid}`"
+        @click="toggle">
+    <collapse-icon color="#256eff"
+                   :width="18"
+                   :height="18"/>
     <b-tooltip custom-class="talk-table__tooltip"
                ref="tooltip"
                :target="`btn-collapse-${_uid}`">
-      Collapse
+      {{ value ? 'Expand' : 'Collapse' }}
     </b-tooltip>
-  </button>
+  </span>
 </template>
 
 <script>
-import ChevronRightIcon from 'src/components/icons/chevron-right-icon.vue'
+import CollapseIcon from 'src/components/icons/collapse-icon.vue'
 
 export default {
   name: 'collapse-button',
 
   components: {
-    ChevronRightIcon
+    CollapseIcon
   },
 
   props: {
@@ -35,25 +32,6 @@ export default {
     target: {
       type: HTMLElement,
       required: true
-    },
-
-    offset: {
-      top: {
-        type: [String, Number],
-        required: false,
-        default: 0
-      },
-      right: {
-        type: [String, Number],
-        required: false,
-        default: 0
-      }
-    },
-
-    minWidth: {
-      type: [String, Number],
-      required: false,
-      default: 20
     }
   },
 
@@ -63,11 +41,11 @@ export default {
 
   methods: {
     toggle () {
-      const width = this.target.clientWidth - this.minWidth
-
-      this.target.style.transform = this.value
-        ? null
-        : `translateX(-${width}px)`
+      if (this.value) {
+        this.target.classList.remove('no-max-width')
+      } else {
+        this.target.classList.add('no-max-width')
+      }
 
       this.$emit('input', !this.value)
       this.$refs.tooltip.$emit('close')
@@ -76,27 +54,19 @@ export default {
     prepareTarget () {
       // force a transition to have animation
       if (!this.target.style.transition) {
-        this.target.style.transition = 'transform 1s ease-in-out'
+        this.target.style.transition = 'all .5s ease-in-out'
       }
     }
   }
 }
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .collapse-button {
-  position: absolute;
-  color: #EBEBEB;
-  background-color: #FFF;
-  border: solid 1px #EBEBEB;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
+  cursor: pointer;
+}
 
-  &__icon {
-    transition: transform 1s ease-in-out;
-  }
+.no-max-width {
+  max-width: 0px !important;
 }
 </style>

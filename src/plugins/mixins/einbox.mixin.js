@@ -31,8 +31,7 @@ export default {
       'appendItems',
       'setIsLoadingItems',
       'resetItems',
-      'setIsLoadingMoreItems',
-      'setActiveInbox'
+      'setIsLoadingMoreItems'
     ]),
 
     async fetchInboxes () {

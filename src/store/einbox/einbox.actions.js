@@ -4,6 +4,9 @@ export default {
     commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
     commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
   },
+  setActiveInboxId: ({ commit }, inboxId) => {
+    commit('SET_ACTIVE_INBOX_ID', inboxId)
+  },
   setActiveInbox: ({ commit }, inbox) => {
     commit('SET_ACTIVE_INBOX', inbox)
   },

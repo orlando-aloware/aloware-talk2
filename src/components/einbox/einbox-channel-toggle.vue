@@ -51,7 +51,7 @@ export default {
   computed: {
     ...mapState('Einbox', [
       'viewMode',
-      'activeInbox'
+      'activeInboxId'
     ]),
 
     options () {
@@ -78,9 +78,9 @@ export default {
     onChange (value) {
       this.setViewMode(value)
 
-      if (this.activeInbox) {
+      if (this.activeInboxId) {
         this.resetItems()
-        this.fetchItems(this.activeInbox)
+        this.fetchItems(this.activeInboxId)
       }
     }
   }

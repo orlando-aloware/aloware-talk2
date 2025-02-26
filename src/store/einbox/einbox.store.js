@@ -3,7 +3,8 @@ export const UNTHREADED = 2
 
 export default function () {
   return {
-    activeInbox: null,
+    activeInboxId: null,
+    activeInbox: {},
     inboxes: [],
     isLoadingInboxes: false,
     currentInboxesPage: 0,

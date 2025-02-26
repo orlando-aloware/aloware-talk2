@@ -185,10 +185,6 @@ export default {
       'setCommunications'
     ]),
 
-    ...mapActions('eInbox', [
-      'setActiveInbox'
-    ]),
-
     ...mapActions(['resetVuex']),
 
     toggle () {

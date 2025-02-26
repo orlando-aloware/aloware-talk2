@@ -118,7 +118,7 @@ export default {
       'isFetchingContacts',
       'isInboxRefreshBtnLoading'
     ]),
-    ...mapState('Einbox', ['activeInbox']),
+    ...mapState('Einbox', ['activeInboxId']),
     ...mapState('cache', ['currentCompany']),
 
     isShown () {
@@ -197,7 +197,7 @@ export default {
 
       if (this.isNewInbox) {
         this.resetItems()
-        await this.fetchItems(this.activeInbox)
+        await this.fetchItems(this.activeInboxId)
 
         this.setIsInboxRefreshBtnLoading(false)
       } else {

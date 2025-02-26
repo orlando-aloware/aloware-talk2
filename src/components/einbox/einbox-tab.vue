@@ -1,5 +1,21 @@
 <template>
-  <div class="einbox-tab d-flex flex-column">
+  <div class="einbox-tab">
+    <div class="einbox-tab__header border-bottom">
+      <collapse-button class="einbox-tab__header__collapse-button"
+                       :target="collapseTarget"
+                       v-model="collapsed"
+                       v-if="collapseTarget"/>
+
+      <label class="einbox-tab__header__label ellipse"
+             v-if="activeInbox.name">
+        {{ activeInbox.name }}
+      </label>
+      <q-skeleton type=text
+                  width="200px"
+                  height="40px"
+                  v-else/>
+    </div>
+
     <einbox-channel-toggle />
 
     <!-- Items List -->
@@ -60,7 +76,8 @@
 <script>
 import Communication from 'src/components/einbox/communication-items/communication.vue'
 import EinboxChannelToggle from './einbox-channel-toggle.vue'
-import { helperMixin, EinboxMixin } from 'src/plugins/mixins'
+import CollapseButton from 'src/components/collapse-button.vue'
+import { EinboxMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
@@ -68,17 +85,25 @@ import { debounce } from 'lodash'
 export default {
   components: {
     Communication,
-    EinboxChannelToggle
+    EinboxChannelToggle,
+    CollapseButton
   },
 
   mixins: [
-    EinboxMixin,
-    helperMixin
+    EinboxMixin
   ],
+
+  props: {
+    collapseTarget: {
+      type: HTMLElement,
+      default: null
+    }
+  },
 
   data () {
     return {
       activeId: null,
+      collapsed: false,
       THREADED,
       UNTHREADED
     }
@@ -90,6 +115,7 @@ export default {
       'isLoadingItems',
       'isLoadingMoreItems',
       'hasMoreItems',
+      'activeInboxId',
       'activeInbox',
       'viewMode'
     ]),
@@ -121,13 +147,13 @@ export default {
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
       if (isNearBottom && !this.isLoadingMoreItems && !this.isLoadingItems && this.hasMoreItems) {
-        this.loadMoreItems(this.activeInbox)
+        this.loadMoreItems(this.activeInboxId)
       }
     },
 
     onItemClick (item) {
       this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
-      const route = `/einbox/${this.activeInbox}/contacts/${item.contact_id}/communications`
+      const route = `/einbox/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
       // avoid redundant navigation
       if (route === this.$route.path) {
@@ -153,14 +179,29 @@ export default {
 
 <style lang="scss" scoped>
 .einbox-tab {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
   background-color: white;
   border-radius: inherit;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+
+    &__label {
+      margin: 0 0 0 10px;
+      font-weight: 500;
+      font-size: 16px;
+    }
+  }
 }
 
 .items-list {
   flex: 1;
   overflow-y: auto;
+  width: 100%;
 }
 </style>

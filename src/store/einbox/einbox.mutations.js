@@ -1,6 +1,9 @@
 import { THREADED } from './einbox.store'
 
 export default {
+  SET_ACTIVE_INBOX_ID (state, inbox) {
+    state.activeInboxId = inbox
+  },
   SET_ACTIVE_INBOX (state, inbox) {
     state.activeInbox = inbox
   },
