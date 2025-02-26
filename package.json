@@ -22,9 +22,7 @@
     "deploy-win": "quasar build -d -m electron -T win -b builder -P always",
     "deploy-win32": "quasar build -d -m electron -T win32 -b builder -P always",
     "prepare": "husky",
-    "upload-s3-prod": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; export TALK_URL=${TALK_URL:-talk.aloware.com}; s3-spa-upload ./dist/spa $TALK_URL -m s3-spa-upload.config.json'",
-    "upload-s3-dev1": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; export TALK_URL=${TALK_URL:-talk.alodev.org}; s3-spa-upload ./dist/spa $TALK_URL -m s3-spa-upload.config.json'",
-    "upload-s3-dev2": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; export TALK_URL=${TALK2_URL:-talk2.alodev.org}; s3-spa-upload ./dist/spa $TALK_URL -m s3-spa-upload.config.json'"
+    "upload-s3": "bash -c 'export AWS_PROFILE=${AWS_PROFILE:-default}; export AWS_REGION=${AWS_REGION:-us-west-2}; export WORKSPACE=${WORKSPACE:-.}; if [ \"$ENV\" = \"prod\" ]; then export TALK_URL=${TALK_URL:-talk.aloware.com}; s3-spa-upload ./dist/spa $TALK_URL -m s3-spa-upload.config.json; elif [ \"$ENV\" = \"dev1\" ]; then export TALK_URL=${TALK_URL:-talk.alodev.org}; s3-spa-upload ./dev1/spa $TALK_URL -m s3-spa-upload.config.json; elif [ \"$ENV\" = \"dev2\" ]; then export TALK_URL=${TALK2_URL:-talk2.alodev.org}; s3-spa-upload ./dev2/spa $TALK_URL -m s3-spa-upload.config.json; elif [ \"$ENV\" = \"staging\" ]; then export TALK_URL=${STAGING_URL:-talk.alostaging.com}; s3-spa-upload ./staging/spa $TALK_URL -m s3-spa-upload.config.json; else echo \"Unknown environment: $ENV\"; exit 1; fi'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-common-types": "6.6.0",

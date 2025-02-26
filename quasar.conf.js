@@ -7,9 +7,24 @@
 // https://quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-env node */
 
-module.exports = function (/* ctx */) {
+module.exports = function (ctx) {
   const DotEnv = require('dotenv')
-  const parsedEnv = DotEnv.config().parsed
+  const envFile = (() => {
+    switch (process.env.NODE_ENV) {
+      case 'production':
+        return '.env'
+      case 'staging':
+        return '.env.staging'
+      case 'dev1':
+        return '.env.dev1'
+      case 'dev2':
+        return '.env.dev2'
+      default:
+        return '.env'
+    }
+  })()
+
+  const parsedEnv = DotEnv.config({ path: envFile }).parsed
 
   if (typeof parsedEnv === 'object' &&
     !Array.isArray(parsedEnv) &&
@@ -55,9 +70,12 @@ module.exports = function (/* ctx */) {
     build: {
       vueRouterMode: 'history',
       devtool: 'source-map',
-
       transpile: true,
-
+      
+      env: {
+        ...parsedEnv
+      },
+      
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
       // Applies only if "transpile" is set to true.
@@ -71,6 +89,8 @@ module.exports = function (/* ctx */) {
 
       // Options below are automatically set depending on the env, set them if you want to override
       // extractCSS: false,
+
+      distDir: `${process.env.NODE_ENV || 'dist'}/spa`,
 
       // https://quasar.dev/quasar-cli/handling-webpack
       extendWebpack (cfg) {
