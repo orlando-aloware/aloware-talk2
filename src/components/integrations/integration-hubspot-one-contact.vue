@@ -39,7 +39,7 @@
          v-if='integrationData.hubspot_owner'>
         <span class='data-icon-label'>Owner: </span>
         <span
-          class="data-value">{{ integrationData.hubspot_owner.firstName + ' ' + integrationData.hubspot_owner.lastName
+          class='data-value'>{{ integrationData.hubspot_owner.firstName + ' ' + integrationData.hubspot_owner.lastName
           }}</span>
       </p>
       <!-- Start Lifecycle Stage Section -->
