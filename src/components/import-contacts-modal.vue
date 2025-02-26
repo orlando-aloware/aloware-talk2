@@ -15,9 +15,7 @@
            }">
         <div class="import-steps__item__inner">
           <div class="import-steps__item__number"
-               :class="{
-                 'animated animate__bounceIn': currentStep === STEPS.DNC_AGREEMENT
-               }">
+               :class="{'animated animate__bounceIn': currentStep === STEPS.DNC_AGREEMENT}">
             1
           </div>
           <div class="import-steps__item__title">DNC Agreement</div>
@@ -31,9 +29,7 @@
            }">
         <div class="import-steps__item__inner">
           <div class="import-steps__item__number"
-               :class="{
-                 'animated animate__bounceIn': currentStep === STEPS.CSV_UPLOAD
-               }">
+               :class="{'animated animate__bounceIn': currentStep === STEPS.CSV_UPLOAD}">
             2
           </div>
           <div class="import-steps__item__title">Upload CSV</div>
@@ -47,9 +43,7 @@
            }">
         <div class="import-steps__item__inner">
           <div class="import-steps__item__number"
-               :class="{
-                'animated animate__bounceIn': currentStep === STEPS.SELECT_COLUMNS
-              }">
+               :class="{'animated animate__bounceIn': currentStep === STEPS.SELECT_COLUMNS}">
             3
           </div>
           <div class="import-steps__item__title">Select Columns</div>
@@ -63,9 +57,7 @@
            }">
         <div class="import-steps__item__inner">
           <div class="import-steps__item__number"
-               :class="{
-                 'animated animate__bounceIn': currentStep === STEPS.REVIEW_DATA
-               }">
+               :class="{'animated animate__bounceIn': currentStep === STEPS.REVIEW_DATA}">
             4
           </div>
           <div class="import-steps__item__title">Review Data</div>
@@ -79,9 +71,7 @@
            }">
         <div class="import-steps__item__inner">
           <div class="import-steps__item__number"
-               :class="{
-                 'animated animate__bounceIn': currentStep === STEPS.SETTINGS
-                }">
+               :class="{'animated animate__bounceIn': currentStep === STEPS.SETTINGS}">
             5
           </div>
           <div class="import-steps__item__title">Settings</div>
@@ -95,9 +85,7 @@
            }">
         <div class="import-steps__item__inner">
           <div class="import-steps__item__number"
-               :class="{
-                 'animated animate__bounceIn': currentStep === STEPS.FINISHED
-               }">
+               :class="{'animated animate__bounceIn': currentStep === STEPS.FINISHED}">
             6
           </div>
           <div class="import-steps__item__title">Finish</div>
@@ -124,13 +112,15 @@
               Organizations that contact phone numbers whose owners have
               requested DNC status may run the risk of legal action.
             </li>
-            <li>To avoid compliance risks, we recommend reviewing your contact
+            <li>
+              To avoid compliance risks, we recommend reviewing your contact
               lists before importing them.
-                <span v-if="!isSimpSocial">For more information, refer to our
-                  <a href="https://support.aloware.com/en/articles/9032126-understanding-the-dnc-do-not-call-list" target="_blank">
-                    DNC Knowledge Base article
-                  </a>.
-                </span>
+              <span v-if="!isSimpSocial">
+                For more information, refer to our
+                <a href="https://support.aloware.com/en/articles/9032126-understanding-the-dnc-do-not-call-list" target="_blank">
+                  DNC Knowledge Base article
+                </a>.
+              </span>
             </li>
           </ul>
         </div>
@@ -201,30 +191,6 @@
               <th></th>
               <th :key="`th-${th}`"
                   v-for="(th, i) in tableHeader">
-                <!-- <el-select
-                    v-model="tableHeaderValue[i]"
-                    placeholder="Select proper column type"
-                    class="select-table-header"
-                    filterable
-                    clearable
-                    :data-testid="'colum-type-selector-' + i"
-                    @change="tableHeaderChange">
-                    <template v-if="contactFields.length">
-                      <el-option-group
-                        v-for="cf in contactFields"
-                        :key="cf.group_name"
-                        :label="cf.group_name">
-                        <el-option
-                          v-for="field in cf.fields"
-                          :key="field.value"
-                          :label="field.label"
-                          :value="field.value"
-                          :disabled="checkHeaderMap(field.value)">
-                        </el-option>
-                      </el-option-group>
-                    </template>
-                  </el-select> -->
-
                 <q-select class="import-column-selector"
                           color="primary"
                           map-options
@@ -255,9 +221,8 @@
                   <i class="fa fa-trash-alt"></i>
                 </b-button>
               </td>
-              <td
-                :key="`row-col-${index}-${i}`"
-                v-for="(col, i) in row">
+              <td :key="`row-col-${index}-${i}`"
+                  v-for="(col, i) in row">
                 {{ col }}
               </td>
             </tr>
@@ -268,7 +233,8 @@
 
     <div class="import-content pb-0"
          v-if="currentStep === STEPS.REVIEW_DATA">
-      <b-overlay :show="loading" class="w-100">
+      <b-overlay class="w-100"
+                 :show="loading">
         <div class="select-columns-alert select-columns-alert--success mb-3">
           <div class="font-weight-bold">3. Review Data</div>
           <div>
@@ -284,10 +250,10 @@
             <thead>
               <tr>
                 <th></th>
-                <th :class="
-                      (title === 'warnings' ? 'cell-warning' : ' ') +
-                      (title === 'errors' ? 'cell-danger' : ' ')
-                    "
+                <th :class="{
+                      'cell-warning': title === 'warnings',
+                      'cell-danger': title === 'errors'
+                    }"
                     :key="`review-th-${i}`"
                     v-for="(title, i) in Object.keys(reviewData[0])">
                   {{ title != 'unknown_columns' ? fieldName(title) : '' }}
@@ -300,15 +266,10 @@
                 <td>{{ index + 1 }}</td>
                 <td :key="`review-tr-${index}-td-${i}`"
                     v-for="(key, i) in Object.keys(contact)"
-                    :class="
-                      (key === 'warnings' && contact[key].length > 0
-                        ? 'cell-warning'
-                        : '') +
-                      ' ' +
-                      (key === 'errors' && contact[key].length > 0
-                        ? 'cell-danger'
-                        : '')
-                    ">
+                    :class="{
+                      'cell-warning': key === 'warnings' && contact[key].length > 0,
+                      'cell-danger': key === 'errors' && contact[key].length > 0
+                    }">
                   <span v-if="key === 'phone_numbers'">
                     {{ contact[key].join(', ') }}
                   </span>
@@ -348,9 +309,8 @@
                 List Name is required
               </b-form-invalid-feedback>
 
-              <b-form-invalid-feedback
-                v-if="hasError('name')"
-                class="d-block">
+              <b-form-invalid-feedback class="d-block"
+                                       v-if="hasError('name')">
                 {{ getFieldError('name') }}
               </b-form-invalid-feedback>
             </b-form-row>
@@ -359,8 +319,7 @@
               <div>
                 <h5 class="form-label">Update existing contacts</h5>
                 <p class="form-helper-text">
-                  Override the original existing contact data with what's in the
-                  CSV file?
+                  Override the original existing contact data with what's in the CSV file?
                 </p>
               </div>
 
@@ -393,8 +352,7 @@
                   Multiple contacts for each phone number
                 </h5>
                 <p class="form-helper-text">
-                  Creates a separate contact for each phone number found in the
-                  file
+                  Creates a separate contact for each phone number found in the file
                 </p>
               </div>
 
@@ -482,15 +440,7 @@ import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { required } from 'vuelidate/lib/validators'
-
-const STEPS = {
-  DNC_AGREEMENT: 1,
-  CSV_UPLOAD: 2,
-  SELECT_COLUMNS: 3,
-  REVIEW_DATA: 4,
-  SETTINGS: 5,
-  FINISHED: 6
-}
+import { STEPS, contactFields } from 'src/constants/lists/import-contacts-modal'
 
 export default {
   mixins: [
@@ -559,7 +509,7 @@ export default {
     },
 
     csfFields () {
-      let fields = []
+      const fields = []
       if (this.attributeDictionaries && this.attributeDictionaries.length) {
         for (let index in this.attributeDictionaries) {
           fields.push({
@@ -573,9 +523,7 @@ export default {
     },
 
     backButtonVisible () {
-      if (
-        this.currentStep === STEPS.DNC_AGREEMENT ||
-        this.currentStep === STEPS.FINISHED
+      if (this.currentStep === STEPS.DNC_AGREEMENT || this.currentStep === STEPS.FINISHED
       ) {
         return false
       }
@@ -584,9 +532,7 @@ export default {
     },
 
     nextButtonVisible () {
-      if (
-        this.currentStep === STEPS.CSV_UPLOAD ||
-        this.currentStep === STEPS.FINISHED
+      if (this.currentStep === STEPS.CSV_UPLOAD || this.currentStep === STEPS.FINISHED
       ) {
         return false
       }
@@ -607,10 +553,6 @@ export default {
     }
   },
 
-  created () {
-    //
-  },
-
   data () {
     return {
       isOpen: false,
@@ -629,97 +571,11 @@ export default {
       uploading: false,
       loading: false,
       uploadError: '',
-      contacts: Array.from(new Array(100)),
+      contacts: [],
       filterBy: '',
       noFirstColumn: false,
       fieldErrors: {},
-      contactFields: [
-        {
-          group_name: 'Common Fields',
-          fields: [
-            {
-              value: 'full_name',
-              label: 'Full Name'
-            },
-            {
-              value: 'first_name',
-              label: 'First Name'
-            },
-            {
-              value: 'last_name',
-              label: 'Last Name'
-            },
-            {
-              value: 'phone_number',
-              label: 'Phone Number'
-            },
-            {
-              value: 'email',
-              label: 'Email'
-            },
-            {
-              value: 'company_name',
-              label: 'Company'
-            },
-            {
-              value: 'address',
-              label: 'Address'
-            },
-            {
-              value: 'cnam_city',
-              label: 'City'
-            },
-            {
-              value: 'cnam_state',
-              label: 'State'
-            },
-            {
-              value: 'cnam_zipcode',
-              label: 'Zip Code'
-            },
-            {
-              value: 'cnam_country',
-              label: 'Country'
-            },
-            {
-              value: 'date_of_birth',
-              label: 'Date of Birth'
-            },
-            {
-              value: 'notes',
-              label: 'Notes'
-            },
-            {
-              value: 'website',
-              label: 'Website'
-            },
-            {
-              value: 'csf1',
-              label: 'Custom Field 1'
-            },
-            {
-              value: 'csf2',
-              label: 'Custom Field 2'
-            },
-            {
-              value: 'lead_source',
-              label: 'Lead Source'
-            },
-            {
-              value: 'disposition_status',
-              label: 'Disposition Status'
-            },
-            {
-              value: 'tag',
-              label: 'Tag'
-            }
-          ]
-        },
-        {
-          group_name: 'Custom Fields',
-          fields: []
-        }
-      ]
+      contactFields
     }
   },
 
@@ -847,7 +703,7 @@ export default {
       talk2Api.V1.importWizard
         .analyze(this.tableHeaderValue, this.noFirstColumn, this.importModel.id)
         .then((res) => {
-          let data = res.data
+          const data = res.data
           this.importModel = data.import
           this.reviewData = data.data
 
@@ -872,7 +728,7 @@ export default {
         ]
 
         // find the field's label
-        let fieldData = _.find(fields, { value: field })
+        const fieldData = _.find(fields, { value: field })
 
         if (fieldData != null) {
           return fieldData.label
@@ -897,7 +753,6 @@ export default {
       }
 
       this.loading = true
-
       this.importModel.is_import_contact_list = true
       this.importModel.start_from_zero = this.noFirstColumn
 
@@ -935,7 +790,7 @@ export default {
         })
         .catch((err) => {
           if (err.response.status === 422) {
-            let message =
+            const message =
               err.response?.data?.message ??
               'Failed to Import CSV, please check the information and try again'
             this.$generalNotification(message, 'error')
