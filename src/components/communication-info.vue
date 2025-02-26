@@ -914,7 +914,7 @@
           </div>
         </div>
         <div class="text-left-align text-13 relative"
-             v-else-if="communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED && communication.metadata['transcription_info']['summary'] === ''">
+             v-else-if="isEmptyParsedTranscription(communication)">
           <div>Transcription cannot be generated for this communication.</div>
         </div>
         <div class="text-left-align text-13"
