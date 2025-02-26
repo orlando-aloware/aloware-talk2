@@ -82,21 +82,19 @@ export default {
   padding: 7px;
   background-color: #F9F9FB;
   display: flex;
+  flex: 0 0 100%;
+  flex-basis: auto;
 
   &__left {
     max-width: 250px;
     width: 100%;
     overflow: hidden;
     border-radius: 12px 0px 0px 12px;
-    position: relative;
-    z-index: 10;
   }
 
   &__right {
     max-width: 300px;
     border-radius: 0px 12px 0px 0px;
-    position: relative;
-    z-index: 9;
   }
 }
 </style>
