@@ -48,7 +48,7 @@
            @mouseleave="showLifecycleStageEditButton = false"
            data-testid="integration-hubspot-lifecycle-stage"
       >
-        <p class="mb-0" style="white-space: nowrap; overflow: hidden;">
+        <p class="mb-0 no-wrap-block">
           <span class="data-icon-label">Lifecycle Stage: </span>
           <span class="data-value">
             {{ truncatedDisplayedLifecycleStage }}
@@ -61,8 +61,7 @@
           <!-- End Tooltip for full text lifecycle stage if truncated -->
         </p>
         <div v-if="canUpdateLifecycleStage && showLifecycleStageEditButton && isPrimary"
-             class="absolute"
-             style="right: 10px; bottom: 18px;">
+             class="absolute edit-btn-pos">
           <b-link class="clickable" @click="onShowEditLifecycleStageMenu">
             <pencil-o-icon />
             <q-tooltip anchor="top middle" self="center middle">
@@ -302,5 +301,15 @@ export default {
 <style scoped>
 .clickable {
   cursor: pointer;
+}
+
+.no-wrap-block {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.edit-btn-pos {
+  right: 10px;
+  bottom: 18px;
 }
 </style>
