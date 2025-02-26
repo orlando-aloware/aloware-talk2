@@ -62,7 +62,7 @@
 
     <q-btn :to="{ name: 'EInbox' }"
            :ripple="false"
-           icon="img:app-icons/menu/ring_group_active.svg"
+           icon="img:app-icons/menu/multi_inbox_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
@@ -99,7 +99,7 @@
     </q-btn>
     <q-btn :to="{ name: 'EInbox' }"
            :ripple="false"
-           icon="img:app-icons/menu/ring_group_gray.svg"
+           icon="img:app-icons/menu/multi_inbox_gray.svg"
            align="left"
            padding="10px 0px 10px 20px"
            class="nav-icons w-100"
