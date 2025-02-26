@@ -12,7 +12,7 @@ module.exports = function (ctx) {
   const envFile = (() => {
     switch (process.env.NODE_ENV) {
       case 'production':
-        return '.env'
+        return '.env.prod'
       case 'staging':
         return '.env.staging'
       case 'dev1':
