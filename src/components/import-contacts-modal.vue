@@ -287,7 +287,8 @@
 
     <div class="p-4"
          v-if="currentStep === STEPS.SETTINGS">
-      <b-overlay :show="loading" class="w-100">
+      <b-overlay class="w-100"
+                 :show="loading">
         <b-form ref="settingsForm"
                 class="d-flex justify-center"
                 @submit.prevent>
