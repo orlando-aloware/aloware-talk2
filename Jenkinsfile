@@ -245,7 +245,7 @@ pipeline {
                             when { branch 'develop' }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'QUASAR_ENV=dev2 quasar build --debug'
+                                    sh 'NODE_ENV=dev2 quasar build --debug'
                                 }
                             }
                         }
