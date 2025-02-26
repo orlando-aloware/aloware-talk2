@@ -76,13 +76,16 @@
         <q-menu v-model="showEditLifecycleStageMenu"
                 no-parent-event
                 persistent
-                :offset="[290, -120]"
+                :offset="[305, -120]"
                 data-testid="edit-lifecycle-stage-menu">
           <div class="row no-wrap q-pa-md">
-            <b-form data-testid="edit-lifecycle-stage-form">
+            <b-form data-testid="edit-lifecycle-stage-form" style="width: 220px;">
               <b-form-group label="Update Lifecycle Stage">
-                <b-form-select v-model="selectedLifecycleStage"
-                               :options="lifecycleStagesOptionsWithClear"></b-form-select>
+                <q-select v-model="selectedLifecycleStage"
+                          :options="lifecycleStagesOptionsWithClear"
+                          outlined
+                          dense
+                          data-testid="edit-lifecycle-stage-form-select" />
               </b-form-group>
               <div class="d-flex justify-content-between">
                 <b-button type="button"
@@ -204,9 +207,9 @@ export default {
   data () {
     return {
       showEditLifecycleStageMenu: false,
-      selectedLifecycleStage: this.integrationData?.properties?.lifecyclestage || null,
+      selectedLifecycleStage: this.lifecycleStagesOptions.find(stage => stage.value === this.integrationData?.properties?.lifecyclestage) || null,
       previouslySelectedLifecycleStage: null,
-      displayedLifecycleStage: this.lifecycleStagesOptions.find(stage => stage.value === this.integrationData?.properties?.lifecyclestage)?.text || 'None',
+      displayedLifecycleStage: this.lifecycleStagesOptions.find(stage => stage.value === this.integrationData?.properties?.lifecyclestage)?.label || 'None',
       lifecycleStageIsSubmitting: false
     }
   },
@@ -227,7 +230,7 @@ export default {
 
     lifecycleStagesOptionsWithClear () {
       return [
-        { text: 'None (Unset)', value: null },
+        { label: 'None (Unset)', value: null },
         ...this.lifecycleStagesOptions
       ]
     },
@@ -261,7 +264,7 @@ export default {
 
       const response = await talk2Api.V1.integrations.hubspot.updateLifecycleStage(
         this.contactId,
-        this.selectedLifecycleStage,
+        this.selectedLifecycleStage?.value,
         this.isMovingBackwardsInLifecycle()
       )
 
@@ -271,7 +274,7 @@ export default {
         this.$generalNotification(response.data.error, 'error')
       } else {
         // Update the displayed text in the JIT card based on the selected lifecycle stage
-        this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === this.selectedLifecycleStage)?.text || 'None'
+        this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === this.selectedLifecycleStage.value)?.label || 'None'
         this.$generalNotification(response.data.success, 'success')
       }
 
@@ -296,9 +299,15 @@ export default {
   watch: {
     'integrationData.properties.lifecyclestage': function (newValue) {
       // Update the displayed text in the JIT card when the integration data changes from the parent component
-      this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === newValue)?.text || 'None'
+      this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === newValue)?.label || 'None'
       this.selectedLifecycleStage = newValue
     }
+  },
+
+  mounted () {
+    // Set the initial value of the select box to 'None (Unset)' if the lifecycle stage is not set
+    if (!this.integrationData?.properties?.lifecyclestage) this.selectedLifecycleStage = this.lifecycleStagesOptionsWithClear.find(stage => stage.value === null) || null
+    else this.selectedLifecycleStage = this.lifecycleStagesOptionsWithClear.find(stage => stage.value === this.integrationData?.properties?.lifecyclestage) || null
   }
 }
 
