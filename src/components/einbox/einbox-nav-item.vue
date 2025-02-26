@@ -4,9 +4,9 @@
        @click="$emit('click', value)">
     <div class="inbox-nav-item__content d-flex align-items-center justify-content-between">
       <div class="d-flex align-items-center">
-        <ring-group-icon class="inbox-nav-item__icon mr-1"
-                         width="24"
-                         height="24" />
+        <inbox-icon class="inbox-nav-item__icon mr-1"
+                    width="24"
+                    height="24" />
         <span class="inbox-nav-item__label">{{ label }}</span>
       </div>
     </div>
@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import RingGroupIcon from 'src/components/icons/ring-group-icon.vue'
+import InboxIcon from 'src/components/icons/inbox/inbox-icon.vue'
 
 export default {
   props: {
@@ -40,7 +40,7 @@ export default {
   },
 
   components: {
-    RingGroupIcon
+    InboxIcon
   }
 }
 </script>

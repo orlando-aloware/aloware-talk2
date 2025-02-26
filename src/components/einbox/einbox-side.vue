@@ -82,8 +82,6 @@ export default {
   padding: 7px;
   background-color: #F9F9FB;
   display: flex;
-  width: 100%;
-  flex: 0 0 100%;
 
   &__left {
     max-width: 250px;
