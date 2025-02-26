@@ -43,11 +43,7 @@
           }}</span>
       </p>
       <!-- Start Lifecycle Stage Section -->
-      <div class="row justify-between align-center relative"
-           @mouseover="showLifecycleStageEditButton = true"
-           @mouseleave="showLifecycleStageEditButton = false"
-           data-testid="integration-hubspot-lifecycle-stage"
-      >
+      <div class="row justify-between align-center relative" data-testid="integration-hubspot-lifecycle-stage">
         <p class="mb-0 no-wrap-block">
           <span class="data-icon-label">Lifecycle Stage: </span>
           <span class="data-value">
@@ -60,12 +56,17 @@
           </q-tooltip>
           <!-- End Tooltip for full text lifecycle stage if truncated -->
         </p>
-        <div v-if="canUpdateLifecycleStage && showLifecycleStageEditButton && isPrimary"
+        <div v-if="isPrimary"
              class="absolute edit-btn-pos">
-          <b-link class="clickable" @click="onShowEditLifecycleStageMenu">
+          <b-link :class="canUpdateLifecycleStage ? 'clickable' : 'not-clickable'"
+                  @click="onShowEditLifecycleStageMenu">
             <pencil-o-icon />
             <q-tooltip anchor="top middle" self="center middle">
-              Update Lifecycle Stage
+              <span v-if="canUpdateLifecycleStage">Update Lifecycle Stage</span>
+              <template v-if="!canUpdateLifecycleStage">
+                <p class="font-weight-bold mb-0">Update Lifecycle Stage is disabled</p>
+                <p class="mt-1 mb-0">Enable contact information updates in HubSpot's integration settings.</p>
+              </template>
             </q-tooltip>
           </b-link>
         </div>
@@ -202,7 +203,6 @@ export default {
   },
   data () {
     return {
-      showLifecycleStageEditButton: false,
       showEditLifecycleStageMenu: false,
       selectedLifecycleStage: this.integrationData?.properties?.lifecyclestage || null,
       previouslySelectedLifecycleStage: null,
@@ -244,6 +244,8 @@ export default {
   },
   methods: {
     onShowEditLifecycleStageMenu () {
+      if (!this.canUpdateLifecycleStage) return
+
       this.showEditLifecycleStageMenu = true
       this.previouslySelectedLifecycleStage = this.selectedLifecycleStage
     },
@@ -277,6 +279,10 @@ export default {
       this.showEditLifecycleStageMenu = false
     },
 
+    /**
+     * It is important to know if the user is moving backwards in the lifecycle stage.
+     * This is because we will send a `reset_required` flag to the API to signal if a reset is needed.
+     */
     isMovingBackwardsInLifecycle () {
       if (!this.previouslySelectedLifecycleStage || !this.selectedLifecycleStage) return false
 
@@ -301,6 +307,10 @@ export default {
 <style scoped>
 .clickable {
   cursor: pointer;
+}
+
+.not-clickable {
+  cursor: not-allowed;
 }
 
 .no-wrap-block {
