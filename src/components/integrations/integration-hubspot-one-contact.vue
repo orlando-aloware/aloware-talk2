@@ -79,7 +79,7 @@
                 :offset="[305, -120]"
                 data-testid="edit-lifecycle-stage-menu">
           <div class="row no-wrap q-pa-md">
-            <b-form data-testid="edit-lifecycle-stage-form" style="width: 220px;">
+            <b-form data-testid="edit-lifecycle-stage-form" class="lifecycle-stage-form">
               <b-form-group label="Update Lifecycle Stage">
                 <q-select v-model="selectedLifecycleStage"
                           :options="lifecycleStagesOptionsWithClear"
@@ -271,11 +271,11 @@ export default {
       if (response.status !== 200) {
         // Revert to the previous stage if there is an error from the back-end
         this.selectedLifecycleStage = this.previouslySelectedLifecycleStage
-        this.$generalNotification(response.data.error, 'error')
+        this.$generalNotification(response.data.message, 'error')
       } else {
         // Update the displayed text in the JIT card based on the selected lifecycle stage
         this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === this.selectedLifecycleStage.value)?.label || 'None'
-        this.$generalNotification(response.data.success, 'success')
+        this.$generalNotification(response.data.message, 'success')
       }
 
       this.lifecycleStageIsSubmitting = false
@@ -287,10 +287,10 @@ export default {
      * This is because we will send a `reset_required` flag to the API to signal if a reset is needed.
      */
     isMovingBackwardsInLifecycle () {
-      if (!this.previouslySelectedLifecycleStage || !this.selectedLifecycleStage) return false
+      if (!this.previouslySelectedLifecycleStage.value || !this.selectedLifecycleStage.value) return false
 
-      const previousIndex = this.lifecycleStagesOptions.findIndex(stage => stage.value === this.previouslySelectedLifecycleStage)
-      const currentIndex = this.lifecycleStagesOptions.findIndex(stage => stage.value === this.selectedLifecycleStage)
+      const previousIndex = this.lifecycleStagesOptions.findIndex(stage => stage.value === this.previouslySelectedLifecycleStage.value)
+      const currentIndex = this.lifecycleStagesOptions.findIndex(stage => stage.value === this.selectedLifecycleStage.value)
 
       return currentIndex < previousIndex
     }
@@ -300,7 +300,9 @@ export default {
     'integrationData.properties.lifecyclestage': function (newValue) {
       // Update the displayed text in the JIT card when the integration data changes from the parent component
       this.displayedLifecycleStage = this.lifecycleStagesOptions.find(stage => stage.value === newValue)?.label || 'None'
-      this.selectedLifecycleStage = newValue
+
+      if (!newValue) this.selectedLifecycleStage = this.lifecycleStagesOptionsWithClear.find(stage => stage.value === null) || null
+      else this.selectedLifecycleStage = this.lifecycleStagesOptionsWithClear.find(stage => stage.value === newValue) || null
     }
   },
 
@@ -330,5 +332,9 @@ export default {
 .edit-btn-pos {
   right: 10px;
   bottom: 18px;
+}
+
+.lifecycle-stage-form {
+  width: 220px;
 }
 </style>

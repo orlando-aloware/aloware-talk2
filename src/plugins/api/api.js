@@ -359,12 +359,12 @@ export default {
          * @param {string|number} contactId
          * @param {string} lifecycleStage
          * @param {boolean} resetRequired
-         * @returns {axios.AxiosResponse<{success: string}|{error: string}>}
+         * @returns {axios.AxiosResponse<{success: boolean, message: string}>}
          */
         async updateLifecycleStage (contactId, lifecycleStage, resetRequired = false) {
           let response = null
           try {
-            response = await window.axios.patch(`${suffixV1}integration/hubspot/lifecycle-stage`, {
+            response = await window.axios.patch(`${suffixV1}integrations/hubspot/lifecycle-stage`, {
               contact_id: contactId,
               lifecycle_stage: lifecycleStage,
               reset_required: resetRequired
