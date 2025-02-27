@@ -25,6 +25,12 @@
           </template>
         </b-overlay>
       </div>
+
+      <!-- Empty state -->
+      <div class="text-center q-pa-md text-grey"
+           v-else-if="!inboxes.length">
+        No Inboxes
+      </div>
     </div>
   </div>
 </template>
@@ -75,7 +81,7 @@ export default {
       }
     },
 
-    onInboxSelect (inboxId) {
+    onInboxSelect (inboxId, contactId = null) {
       if (inboxId === this.activeInboxId) {
         return
       }
@@ -84,9 +90,11 @@ export default {
       this.resetItems()
       this.fetchItems(inboxId)
 
+      const route = `/einbox/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
+
       // avoid redundant navigation
-      if (this.$route.path !== `/einbox/${inboxId}`) {
-        this.$router.push(`/einbox/${inboxId}`)
+      if (this.$route.path !== route) {
+        this.$router.push(route)
       }
     }
   },
@@ -97,8 +105,9 @@ export default {
     // If there are inboxes, set the first one as active
     if (this.inboxes.length) {
       const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.inboxes[0].id
+      const contactId = this.$route.params.id ? parseInt(this.$route.params.id) : null
 
-      this.onInboxSelect(inboxId)
+      this.onInboxSelect(inboxId, contactId)
     }
   },
 
