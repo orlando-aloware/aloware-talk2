@@ -64,6 +64,8 @@ export default {
 <style lang="scss">
 .collapse-button {
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .no-max-width {
