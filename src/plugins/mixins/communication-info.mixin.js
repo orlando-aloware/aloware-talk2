@@ -337,7 +337,7 @@ export default {
     },
 
     isEmptyParsedTranscription (communication) {
-      return communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED && 
+      return communication.call_transcription_status === TranscriptionStatus.STATUS_PARSED &&
              communication?.metadata?.transcription_info?.summary === ''
     },
 
