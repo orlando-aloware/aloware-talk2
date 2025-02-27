@@ -83,6 +83,7 @@ import _ from 'lodash'
 import DownloadIcon from 'components/icons/contact-activity/download-icon'
 import CopyIcon from 'components/icons/copy-icon'
 import { mapState } from 'vuex'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'ConversationSection',
@@ -117,7 +118,8 @@ export default {
 
   data () {
     return {
-      currentMessageIndex: -1
+      currentMessageIndex: -1,
+      CommunicationDispositionStatus
     }
   },
 
@@ -202,7 +204,7 @@ export default {
         color: 'rgb(150, 0, 150)'
       }
 
-      if (speaker === 'CONTACT') {
+      if (speaker === 'CONTACT' || this.communication?.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
         style.color = 'rgb(0, 150, 150)'
       }
 

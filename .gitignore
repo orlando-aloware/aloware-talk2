@@ -35,4 +35,7 @@ yarn-error.log*
 /.env.dev
 /.env.pre-prod
 /.env.prod
+/.env.staging
+/.env.dev2
+/.env.dev1
 .vscode/*
