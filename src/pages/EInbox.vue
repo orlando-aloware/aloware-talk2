@@ -5,7 +5,7 @@
       <e-inbox-side :class="inboxSideClasses"
                     @itemSelected="onItemSelected" />
 
-      <div :class="['inbox-details', 'd-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
+      <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
            v-if="isContactShow">
         <Contact />
       </div>

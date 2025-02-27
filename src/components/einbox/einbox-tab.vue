@@ -10,10 +10,6 @@
              v-if="activeInbox.name">
         {{ activeInbox.name }}
       </label>
-      <q-skeleton type=text
-                  width="200px"
-                  height="40px"
-                  v-else/>
     </div>
 
     <einbox-channel-toggle />
@@ -182,7 +178,6 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 100%;
   background-color: white;
   border-radius: inherit;
 
