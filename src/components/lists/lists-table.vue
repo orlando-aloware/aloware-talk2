@@ -274,11 +274,11 @@
                     <b-dropdown-item href="#"
                                      data-testid="lists-aloai-option"
                                      v-if="shouldShowAloAi"
-                                     @click="openAloAiBotContactsEnrollmentModal(props.row)">
+                                     @click="openAloAiAgentContactsEnrollmentModal(props.row)">
                       <add-user-icon width="14"
                                      height="14"
                                      color="#62666E"/>
-                      Enroll List in AloAi Text Bot
+                      Enroll List in AloAi Agent
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
@@ -354,9 +354,12 @@
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
 
-      <enroll-contacts-to-aloai-modal ref="enrollContactsToAloAiModal"
-                                      :params="attachedParams()"
-                                      :contactList="list" />
+      <aloai-enrollment-control-modal
+        ref="enrollContactsToAloAiModal"
+        :params="attachedParams()"
+        :contact-list="list"
+        :total-contacts-count="list?.no_of_contacts"
+        :multiple-phone-numbers="true" />
 
       <assign-contacts-modal :is-show="showAssignContacts"
                             :list="list"
@@ -405,12 +408,12 @@ import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
 import ListsFoldersManagement from './lists-folders-management'
 import SlashIcon from 'components/icons/slash-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
-import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 import SwitchIcon from 'components/icons/switch-icon'
 import ChangeListOwnerModal from './change-list-owner-modal.vue'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
 
 export default {
   name: 'ListsTable',
@@ -444,13 +447,13 @@ export default {
     SlashIcon,
     CompactBtn,
     AddUserIcon,
-    EnrollContactsToAloaiModal,
     SwitchIcon,
     ChangeListOwnerModal,
     EllipseIcon,
     PowerDialerMobileIcon,
     DeleteRedIcon,
-    InformationCircleIcon
+    InformationCircleIcon,
+    AloaiEnrollmentControlModal
   },
 
   data () {

@@ -108,7 +108,7 @@
               <add-user-icon width="14"
                              height="14"
                              color="#62666E"/>
-              Enroll in AloAi Text Bot
+              Enroll in AloAi Agent
             </b-dropdown-item>
           </b-dropdown>
         </div>
