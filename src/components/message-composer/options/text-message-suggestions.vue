@@ -6,8 +6,8 @@
       <q-list>
         <q-item-label class="q-pa-md pb-2">
           <h4 class="ai-effect-gradient-text">
-            AloAi-Crafted Message Suggestions
             <sparkle-icon width="16" height="16" color="#9333EA"/>
+            AloAi-Crafted Message Suggestions
           </h4>
         </q-item-label>
 

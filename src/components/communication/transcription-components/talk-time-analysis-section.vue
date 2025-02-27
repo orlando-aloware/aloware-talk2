@@ -29,8 +29,16 @@
 
 <script>
 
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+
 export default {
   name: 'TalkTimeAnalysisSection',
+
+  data () {
+    return {
+      CommunicationDispositionStatus
+    }
+  },
 
   props: {
     communication: {
@@ -61,7 +69,7 @@ export default {
         color: 'rgb(200, 0, 200)'
       }
 
-      if (speakerIndex === 1) {
+      if (speakerIndex === 1 || this.communication?.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_VOICEMAIL_NEW) {
         style.color = 'rgb(0, 200, 200)'
       }
 
