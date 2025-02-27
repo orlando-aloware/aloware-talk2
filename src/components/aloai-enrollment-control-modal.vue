@@ -24,7 +24,7 @@
       </div>
 
       <!-- AloAi Agent Type selector -->
-      <div class="w-75 mx-auto mb-2 mt-2">
+      <!-- <div class="w-75 mx-auto mb-2 mt-2">
         <q-select
           v-model="selectedBotType"
           :options="botTypeOptions"
@@ -36,7 +36,7 @@
           class="bot-type-select"
           data-testid="bot-type-filter"
         />
-      </div>
+      </div> -->
 
       <div class="w-75 my-2 mx-auto">
         <search placeholder="Search agent"
