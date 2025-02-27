@@ -10,6 +10,9 @@ export default {
   SET_INBOXES (state, inboxesFirstPage) {
     state.inboxes = [ ...inboxesFirstPage ]
   },
+  RESET_INBOXES (state) {
+    state.inboxes = []
+  },
   SET_IS_LOADING_INBOXES (state, loading) {
     state.isLoadingInboxes = loading
   },

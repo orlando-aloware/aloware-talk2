@@ -34,13 +34,27 @@ export default {
       'setIsLoadingMoreItems'
     ]),
 
-    async fetchInboxes () {
+    async fetchInboxes (search = '') {
       try {
+        if (this.abortController) {
+          this.abortController.abort()
+        }
+
+        this.abortController = new AbortController()
+
         this.setIsLoadingInboxes(true)
         const nextPage = 1
         const perPage = 100
 
-        const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage, perPage })
+        const response = await talk2Api.V2.inbox.inboxes.get({
+          params: {
+            page: nextPage,
+            per_page: perPage,
+            ...(search ? { search } : {})
+          },
+          signal: this.abortController.signal
+        })
+
         this.setInboxes(response.data)
       } catch (error) {
         console.error('Error fetching inboxes:', error)

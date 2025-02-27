@@ -1,6 +1,12 @@
 <template>
   <div class="einbox-nav-list"
        data-testid="einbox-nav-list">
+    <div class="einbox-nav-list__header border-bottom">
+      <search class="einbox-nav-list__header__search"
+              placeholder="Search Inboxes"
+              data-testid="einbox-search"
+              @search="onSearch"/>
+    </div>
     <div class="einbox-nav-list__scroll blue-scroll"
          @scroll="onScroll">
       <einbox-nav-item :label="inbox.name"
@@ -39,11 +45,13 @@
 import { mapState, mapActions } from 'vuex'
 import EinboxNavItem from './einbox-nav-item.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
+import Search from 'src/components/search.vue'
 import { debounce } from 'lodash'
 
 export default {
   components: {
-    EinboxNavItem
+    EinboxNavItem,
+    Search
   },
 
   mixins: [
@@ -54,7 +62,8 @@ export default {
     return {
       perPage: 50,
       hasMorePages: true,
-      loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300)
+      loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300),
+      search: ''
     }
   },
 
@@ -69,6 +78,8 @@ export default {
   methods: {
     ...mapActions('Einbox', [
       'setActiveInboxId',
+      'setActiveInbox',
+      'resetInboxes',
       'resetItems'
     ]),
 
@@ -96,14 +107,18 @@ export default {
       if (this.$route.path !== route) {
         this.$router.push(route)
       }
+    },
+
+    onSearch (search) {
+      this.search = search
     }
   },
 
   async created () {
     await this.fetchInboxes()
 
-    // If there are inboxes, set the first one as active
     if (this.inboxes.length) {
+      // If there are inboxes, set the first one as active
       const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.inboxes[0].id
       const contactId = this.$route.params.id ? parseInt(this.$route.params.id) : null
 
@@ -116,20 +131,38 @@ export default {
       if (!inboxId && this.inboxes.length) {
         this.onInboxSelect(this.inboxes[0].id) // use the same behavior as created method
       }
+    },
+
+    search (val) {
+      this.resetInboxes()
+      this.fetchInboxes(val)
     }
   },
 
   beforeDestroy () {
     this.setActiveInboxId(null)
+    this.setActiveInbox({})
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .einbox-nav-list {
   height: 100%;
   background-color: #fff;
   color: #000;
+
+  &__header {
+    width: 100%;
+
+    &__search {
+      padding: 5px 0px;
+
+      label {
+        border: none;
+      }
+    }
+  }
 
   &__scroll {
     height: 100%;
