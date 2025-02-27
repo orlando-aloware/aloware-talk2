@@ -88,7 +88,7 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-            when { not { branch 'master' } }            
+            when { not { branch 'master' } }
             steps {
                 nvm("${NODE_VERSION}") {
                     sh "yarn install --cache-folder ${YARN_CACHE_FOLDER} --pure-lockfile"
@@ -100,7 +100,7 @@ pipeline {
             parallel {
                 stage('Build dev1') {
                     stages {
-                        
+
                         stage('[PR/Dev1] Setup Env File') {
                             when { not { branch 'master' } }
                             steps {
@@ -129,15 +129,15 @@ pipeline {
                                     writeFile file: 'dev1.env', text: dev1EnvVars + '\n'
 
                                     sh '''
-                                    cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.dev1 
+                                    cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.dev1
                                     '''
 
                                     if (env.API_URL_OVERWRITE) {
-                                        sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
-                                        sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env"
+                                        sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env.dev1"
+                                        sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env.dev1"
                                     }
                                 }
-                                
+
                             }
                         }
 
@@ -152,7 +152,7 @@ pipeline {
 
                         stage('[PR/Dev1] Deploy Talk2') {
                             when { not { branch 'master' } }
-                            steps { 
+                            steps {
 
                                 script {
                                     def branchName = env.GIT_BRANCH.toLowerCase()
@@ -181,7 +181,7 @@ pipeline {
 
                                         sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
                                     }
-                                    
+
                                     sh "AWS_PROFILE=dev ENV=dev1 yarn upload-s3"
                                 }
                             }
@@ -203,7 +203,7 @@ pipeline {
                 }
 
                 stage('Build dev2') {
-                   stages {  
+                   stages {
 
                         stage('[Dev2] Setup Env File') {
                             when { branch 'develop' }
@@ -230,14 +230,14 @@ pipeline {
                                     """, returnStdout: true).trim()
 
                                     writeFile file: 'shared.env', text: sharedEnvVars + '\n'
-                                    writeFile file: 'dev2.env', text: dev2EnvVars + '\n' 
+                                    writeFile file: 'dev2.env', text: dev2EnvVars + '\n'
 
                                     sh '''
                                     cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env.dev2
                                     '''
 
                                 }
-                                
+
                             }
                         }
 
@@ -261,7 +261,7 @@ pipeline {
                                     mkdir -p ${WORKSPACE}/dev2/terraform
                                     cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront ${WORKSPACE}/dev2/terraform/
                                     '''
-                                    
+
                                     dir("${WORKSPACE}/dev2/terraform/s3_cloudfront") {
                                         sh '''
                                         terraform init -backend-config="profile=dev"; \
@@ -278,7 +278,7 @@ pipeline {
 
                                         sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
                                     }
-                                    
+
                                     sh "AWS_PROFILE=dev ENV=dev2 yarn upload-s3"
                                 }
                             }
@@ -314,13 +314,13 @@ pipeline {
                                     """, returnStdout: true).trim()
 
                                     writeFile file: 'shared.env', text: sharedEnvVars + '\n'
-                                    writeFile file: 'staging.env', text: stagingEnvVars + '\n' 
+                                    writeFile file: 'staging.env', text: stagingEnvVars + '\n'
 
                                     sh '''
                                     cat shared.env staging.env | awk -F= '!seen[$1]++' > .env.staging
                                     '''
                                 }
-                                
+
                             }
                         }
 
@@ -344,7 +344,7 @@ pipeline {
                                     mkdir -p ${WORKSPACE}/staging/terraform
                                     cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront ${WORKSPACE}/staging/terraform/
                                     '''
-                                    
+
                                     dir("${WORKSPACE}/staging/terraform/s3_cloudfront") {
                                         sh """
                                         terraform init \
@@ -353,7 +353,7 @@ pipeline {
                                             -backend-config="region=us-west-2" \
                                             -backend-config="dynamodb_table=terraform-state" \
                                             -backend-config="kms_key_id=${STAGING_KMS_KEY_ID}" \
-                                            -backend-config="profile=staging" 
+                                            -backend-config="profile=staging"
                                         terraform validate
                                         terraform fmt
                                         """
@@ -367,7 +367,7 @@ pipeline {
 
                                         sh "AWS_PROFILE=staging terraform apply -var environment='develop' -var domainName='${STAGING_URL}' -var route53_zone='${STAGING_DOMAIN}' -var cachePolicyId='${STAGING_CACHE_POLICY_ID}' --auto-approve"
                                     }
-                                    
+
                                     sh "AWS_PROFILE=staging ENV=staging yarn upload-s3"
                                 }
                             }
