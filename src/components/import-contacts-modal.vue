@@ -437,7 +437,7 @@ import {
   settingsMixin
 } from 'src/plugins/mixins'
 import FileUploader from 'components/file-uploader'
-import _ from 'lodash'
+import { find } from 'lodash'
 import talk2Api from 'src/plugins/api/api'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { required } from 'vuelidate/lib/validators'
@@ -512,7 +512,7 @@ export default {
     csfFields () {
       const fields = []
       if (this.attributeDictionaries && this.attributeDictionaries.length) {
-        for (let index in this.attributeDictionaries) {
+        for (const index in this.attributeDictionaries) {
           fields.push({
             label: this.attributeDictionaries[index].name,
             value: this.attributeDictionaries[index].slug
@@ -682,13 +682,13 @@ export default {
 
     tableHeaderChange (value) {
       if (value === 'full_name') {
-        let firstNameIndex = this.tableHeaderValue.indexOf('first_name')
+        const firstNameIndex = this.tableHeaderValue.indexOf('first_name')
         this.tableHeaderValue[firstNameIndex] = null
-        let lastNameIndex = this.tableHeaderValue.indexOf('last_name')
+        const lastNameIndex = this.tableHeaderValue.indexOf('last_name')
         this.tableHeaderValue[lastNameIndex] = null
       }
       if (value === 'first_name' || value === 'last_name') {
-        let fullNameIndex = this.tableHeaderValue.indexOf('full_name')
+        const fullNameIndex = this.tableHeaderValue.indexOf('full_name')
         this.tableHeaderValue[fullNameIndex] = null
       }
     },
@@ -723,13 +723,13 @@ export default {
         // collect all the contact fields.
         // index 1 - common contact fields
         // index 2 - custom contact fields
-        let fields = [
+        const fields = [
           ...this.contactFields[0].fields,
           ...this.contactFields[1].fields
         ]
 
         // find the field's label
-        const fieldData = _.find(fields, { value: field })
+        const fieldData = find(fields, { value: field })
 
         if (fieldData != null) {
           return fieldData.label
