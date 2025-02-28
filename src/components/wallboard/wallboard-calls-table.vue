@@ -211,11 +211,33 @@
                            v-if="hasRole('Company Admin')">
                           <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
                                 :title="getUserName(getUser(attemptingUser))">
-                            {{ getUserName(getUser(attemptingUser)) }}
+                            <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
+                              class="ai-effect-gradient-text">
+                              <sparkle-icon
+                                width="16"
+                                height="16"
+                                color="#9333EA"
+                              />
+                              {{ getUserName(getUser(attemptingUser)) }}
+                            </span>
+                            <span v-else>
+                              {{ getUserName(getUser(attemptingUser)) }}
+                            </span>
                           </span>
                         </a>
                         <span v-else>
-                          {{ getUserName(getUser(attemptingUser)) }}
+                          <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
+                            class="ai-effect-gradient-text">
+                            <sparkle-icon
+                              width="16"
+                              height="16"
+                              color="#9333EA"
+                            />
+                            {{ getUserName(getUser(attemptingUser)) }}
+                          </span>
+                          <span v-else>
+                            {{ getUserName(getUser(attemptingUser)) }}
+                          </span>
                         </span>
                       </li>
                     </div>
@@ -228,11 +250,33 @@
                            v-if="hasRole('Company Admin')">
                           <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
                                 :title="getUserName(getUser(attemptingUser))">
-                            {{ getUserName(getUser(attemptingUser)) }}
+                            <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
+                              class="ai-effect-gradient-text">
+                              <sparkle-icon
+                                width="16"
+                                height="16"
+                                color="#9333EA"
+                              />
+                              {{ getUserName(getUser(attemptingUser)) }}
+                            </span>
+                            <span v-else>
+                              {{ getUserName(getUser(attemptingUser)) }}
+                            </span>
                           </span>
                         </a>
                         <span v-else>
-                          {{ getUserName(getUser(attemptingUser)) }}
+                          <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
+                            class="ai-effect-gradient-text">
+                            <sparkle-icon
+                              width="16"
+                              height="16"
+                              color="#9333EA"
+                            />
+                            {{ getUserName(getUser(attemptingUser)) }}
+                          </span>
+                          <span v-else>
+                            {{ getUserName(getUser(attemptingUser)) }}
+                          </span>
                         </span>
                       </li>
                     </div>
@@ -265,8 +309,34 @@
                 <div v-else-if="call.user_id && getUser(call.user_id)">
                   <a target="_blank"
                      :href="getUserURL(call.user_id)"
-                     v-if="hasRole('Company Admin')">{{ getUserName(getUser(call.user_id)) }}</a>
-                  <span v-else>{{ getUserName(getUser(call.user_id)) }}</span>
+                     v-if="hasRole('Company Admin')">
+                    <span v-if="getUser(call.user_id).type === User.TYPE_AI_AGENT"
+                      class="ai-effect-gradient-text">
+                      <sparkle-icon
+                        width="16"
+                        height="16"
+                        color="#9333EA"
+                      />
+                      {{ getUserName(getUser(call.user_id)) }}
+                    </span>
+                    <span v-else>
+                      {{ getUserName(getUser(call.user_id)) }}
+                    </span>
+                  </a>
+                  <span v-else>
+                    <span v-if="getUser(call.user_id).type === User.TYPE_AI_AGENT"
+                      class="ai-effect-gradient-text">
+                      <sparkle-icon
+                        width="16"
+                        height="16"
+                        color="#9333EA"
+                      />
+                      {{ getUserName(getUser(call.user_id)) }}
+                    </span>
+                    <span v-else>
+                      {{ getUserName(getUser(call.user_id)) }}
+                    </span>
+                  </span>
                 </div>
                 <div v-else>
                   <span>--</span>
@@ -413,6 +483,8 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
+import * as User from 'src/constants/user'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'wallboard-calls-table',
@@ -436,7 +508,8 @@ export default {
     UnparkCommunicationButton,
     WallboardCallsNote,
     WhisperCommunicationButton,
-    EntityTags
+    EntityTags,
+    SparkleIcon
   },
 
   props: {
@@ -462,7 +535,8 @@ export default {
       CommunicationCurrentStatus,
       CommunicationDispositionStatus,
       CommunicationTypes,
-      TagCategories
+      TagCategories,
+      User
     }
   },
 

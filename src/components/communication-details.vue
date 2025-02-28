@@ -572,7 +572,18 @@
                           :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                           :title="getUserName(getUser(attemptingUser))"
                         >
-                          {{ getUserName(getUser(attemptingUser)) }}
+                          <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
+                            class="ai-effect-gradient-text">
+                            <sparkle-icon
+                              width="16"
+                              height="16"
+                              color="#9333EA"
+                            />
+                            {{ getUserName(getUser(attemptingUser)) }}
+                          </span>
+                          <span v-else>
+                            {{ getUserName(getUser(attemptingUser)) }}
+                          </span>
                         </span>
                       </div>
                     </li>
@@ -920,7 +931,18 @@
                       >
                         {{ getUserName(getUser(userId)) }}
                       </q-tooltip>
-                      {{ getUserName(getUser(userId)) }}
+                      <span v-if="getUser(userId).type === User.TYPE_AI_AGENT"
+                        class="ai-effect-gradient-text">
+                        <sparkle-icon
+                          width="16"
+                          height="16"
+                          color="#9333EA"
+                        />
+                        {{ getUserName(getUser(userId)) }}
+                      </span>
+                      <span v-else>
+                        {{ getUserName(getUser(userId)) }}
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -960,7 +982,18 @@
                       >
                         {{ getUserName(getUser(userId)) }}
                       </q-tooltip>
-                      {{ getUserName(getUser(userId)) }}
+                      <span v-if="getUser(userId).type === User.TYPE_AI_AGENT"
+                        class="ai-effect-gradient-text">
+                        <sparkle-icon
+                          width="16"
+                          height="16"
+                          color="#9333EA"
+                        />
+                        {{ getUserName(getUser(userId)) }}
+                      </span>
+                      <span v-else>
+                        {{ getUserName(getUser(userId)) }}
+                      </span>
                     </span>
                   </div>
                 </div>
