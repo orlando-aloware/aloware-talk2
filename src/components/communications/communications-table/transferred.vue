@@ -10,18 +10,7 @@
                    :to="{ path: getUserActivityURL(userId) }"
                    v-for="(userId, index) in row[prop]">
         <external-link-icon color="#1976D2"/>
-        <span v-if="getUser(userId).type === User.TYPE_AI_AGENT"
-          class="ai-effect-gradient-text">
-          <sparkle-icon
-            width="16"
-            height="16"
-            color="#9333EA"
-          />
-          {{ getUserName(getUser(userId)) }}
-        </span>
-        <span v-else>
-          {{ getUserName(getUser(userId)) }}
-        </span>
+        <user-display :user-id="userId" />
         <b-tooltip custom-class="talk-table__tooltip"
                    :target="`comm-attempt-${_uid}`">
           Click to go to user's page
@@ -33,18 +22,7 @@
       <span class="text-blue cursor-pointer ellipse"
             :key="index"
             v-for="(userId, index) in row[prop]">
-        <span v-if="getUser(userId).type === User.TYPE_AI_AGENT"
-          class="ai-effect-gradient-text">
-          <sparkle-icon
-            width="16"
-            height="16"
-            color="#9333EA"
-          />
-          {{ getUserName(getUser(userId)) }}
-        </span>
-        <span v-else>
-          {{ getUserName(getUser(userId)) }}
-        </span>
+        <user-display :user-id="userId" />
       </span>
     </div>
 
@@ -58,15 +36,14 @@
 import { userMixin, classicMixin, aclMixin } from 'src/plugins/mixins'
 import communicationsMixin from 'src/plugins/mixins/communications.mixin'
 import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
-import * as User from 'src/constants/user'
-import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import UserDisplay from 'src/components/user-display.vue'
 
 export default {
   name: 'Transferred',
 
   components: {
     ExternalLinkIcon,
-    SparkleIcon
+    UserDisplay
   },
 
   mixins: [
@@ -88,12 +65,6 @@ export default {
       validator (value) {
         return ['transfer_prior_user_ids', 'transfer_target_user_ids'].includes(value)
       }
-    }
-  },
-
-  data () {
-    return {
-      User
     }
   },
 

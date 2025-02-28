@@ -425,18 +425,7 @@
                                    self="center middle">
                           Click For More Info
                         </q-tooltip>
-                        <span v-if="getUser(communication.user_id).type === User.TYPE_AI_AGENT"
-                          class="ai-effect-gradient-text">
-                          <sparkle-icon
-                            width="16"
-                            height="16"
-                            color="#9333EA"
-                          />
-                          {{ getUserName(getUser(communication.user_id)) }}
-                        </span>
-                        <span v-else>
-                          {{ getUserName(getUser(communication.user_id)) }}
-                        </span>
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -488,18 +477,7 @@
                                    self="center left">
                           Click For More Info
                         </q-tooltip>
-                        <span v-if="getUser(communication.user_id).type === User.TYPE_AI_AGENT"
-                          class="ai-effect-gradient-text">
-                          <sparkle-icon
-                            width="16"
-                            height="16"
-                            color="#9333EA"
-                          />
-                          {{ getUserName(getUser(communication.user_id)) }}
-                        </span>
-                        <span v-else>
-                          {{ getUserName(getUser(communication.user_id)) }}
-                        </span>
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -525,18 +503,7 @@
                                   <span class="cursor-pointer"
                                         :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                                         :title="getUserName(getUser(attemptingUser))">
-                                    <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
-                                      class="ai-effect-gradient-text">
-                                      <sparkle-icon
-                                        width="16"
-                                        height="16"
-                                        color="#9333EA"
-                                      />
-                                      {{ getUserName(getUser(attemptingUser)) }}
-                                    </span>
-                                    <span v-else>
-                                      {{ getUserName(getUser(attemptingUser)) }}
-                                    </span>
+                                    <user-display :user-id="attemptingUser" />
                                   </span>
                                 </div>
                             </li>
@@ -1017,8 +984,8 @@ import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
-import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import OpenCalendarButton from 'components/open-calendar-button'
+import UserDisplay from 'src/components/user-display.vue'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
 import { marked } from 'marked'
@@ -1078,7 +1045,7 @@ export default {
     EntityTags,
     AloaiPromotionDialog,
     GenerateTranscriptionButton,
-    SparkleIcon
+    UserDisplay
   },
 
   props: {

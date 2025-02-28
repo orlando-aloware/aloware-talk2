@@ -211,33 +211,11 @@
                            v-if="hasRole('Company Admin')">
                           <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
                                 :title="getUserName(getUser(attemptingUser))">
-                            <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
-                              class="ai-effect-gradient-text">
-                              <sparkle-icon
-                                width="16"
-                                height="16"
-                                color="#9333EA"
-                              />
-                              {{ getUserName(getUser(attemptingUser)) }}
-                            </span>
-                            <span v-else>
-                              {{ getUserName(getUser(attemptingUser)) }}
-                            </span>
+                            <user-display :user-id="attemptingUser" />
                           </span>
                         </a>
                         <span v-else>
-                          <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
-                            class="ai-effect-gradient-text">
-                            <sparkle-icon
-                              width="16"
-                              height="16"
-                              color="#9333EA"
-                            />
-                            {{ getUserName(getUser(attemptingUser)) }}
-                          </span>
-                          <span v-else>
-                            {{ getUserName(getUser(attemptingUser)) }}
-                          </span>
+                          <user-display :user-id="attemptingUser" />
                         </span>
                       </li>
                     </div>
@@ -250,33 +228,11 @@
                            v-if="hasRole('Company Admin')">
                           <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
                                 :title="getUserName(getUser(attemptingUser))">
-                            <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
-                              class="ai-effect-gradient-text">
-                              <sparkle-icon
-                                width="16"
-                                height="16"
-                                color="#9333EA"
-                              />
-                              {{ getUserName(getUser(attemptingUser)) }}
-                            </span>
-                            <span v-else>
-                              {{ getUserName(getUser(attemptingUser)) }}
-                            </span>
+                            <user-display :user-id="attemptingUser" />
                           </span>
                         </a>
                         <span v-else>
-                          <span v-if="getUser(attemptingUser).type === User.TYPE_AI_AGENT"
-                            class="ai-effect-gradient-text">
-                            <sparkle-icon
-                              width="16"
-                              height="16"
-                              color="#9333EA"
-                            />
-                            {{ getUserName(getUser(attemptingUser)) }}
-                          </span>
-                          <span v-else>
-                            {{ getUserName(getUser(attemptingUser)) }}
-                          </span>
+                          <user-display :user-id="attemptingUser" />
                         </span>
                       </li>
                     </div>
@@ -310,32 +266,10 @@
                   <a target="_blank"
                      :href="getUserURL(call.user_id)"
                      v-if="hasRole('Company Admin')">
-                    <span v-if="getUser(call.user_id).type === User.TYPE_AI_AGENT"
-                      class="ai-effect-gradient-text">
-                      <sparkle-icon
-                        width="16"
-                        height="16"
-                        color="#9333EA"
-                      />
-                      {{ getUserName(getUser(call.user_id)) }}
-                    </span>
-                    <span v-else>
-                      {{ getUserName(getUser(call.user_id)) }}
-                    </span>
+                    <user-display :user-id="call.user_id" />
                   </a>
                   <span v-else>
-                    <span v-if="getUser(call.user_id).type === User.TYPE_AI_AGENT"
-                      class="ai-effect-gradient-text">
-                      <sparkle-icon
-                        width="16"
-                        height="16"
-                        color="#9333EA"
-                      />
-                      {{ getUserName(getUser(call.user_id)) }}
-                    </span>
-                    <span v-else>
-                      {{ getUserName(getUser(call.user_id)) }}
-                    </span>
+                    <user-display :user-id="call.user_id" />
                   </span>
                 </div>
                 <div v-else>
@@ -472,6 +406,7 @@ import UnparkCommunicationButton from 'src/components/communication/unpark-commu
 import WallboardCallsNote from 'src/components/wallboard/wallboard-calls-note.vue'
 import WhisperCommunicationButton from 'src/components/communication/whisper-communication-button.vue'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import UserDisplay from 'src/components/user-display.vue'
 import { COLUMNS } from 'src/constants/wallboard/calls-columns'
 import { isParkedCall } from 'src/plugins/helpers/functions'
 import {
@@ -484,7 +419,6 @@ import {
 } from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
 import * as User from 'src/constants/user'
-import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'wallboard-calls-table',
@@ -509,7 +443,7 @@ export default {
     WallboardCallsNote,
     WhisperCommunicationButton,
     EntityTags,
-    SparkleIcon
+    UserDisplay
   },
 
   props: {
