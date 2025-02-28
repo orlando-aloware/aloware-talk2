@@ -1,10 +1,10 @@
 <template>
   <div class="user-display d-inline-flex align-items-center">
-    <span v-if="isAiAgent" class="ai-effect-gradient-text">
-      <sparkle-icon
-        :width="iconSize"
-        :height="iconSize"
-        :color="iconColor"
+    <span class="ai-effect-gradient-text"
+          v-if="isAiAgent">
+      <sparkle-icon :width="iconSize"
+                    :height="iconSize"
+                    :color="iconColor"
       />
       {{ userName }}
     </span>
