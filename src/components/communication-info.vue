@@ -425,7 +425,7 @@
                                    self="center middle">
                           Click For More Info
                         </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -477,7 +477,7 @@
                                    self="center left">
                           Click For More Info
                         </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -503,7 +503,7 @@
                                   <span class="cursor-pointer"
                                         :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                                         :title="getUserName(getUser(attemptingUser))">
-                                    {{ getUserName(getUser(attemptingUser)) }}
+                                    <user-display :user-id="attemptingUser" />
                                   </span>
                                 </div>
                             </li>
@@ -985,6 +985,7 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
+import UserDisplay from 'src/components/user-display.vue'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
 import { marked } from 'marked'
@@ -1042,7 +1043,8 @@ export default {
     DownloadButton,
     EntityTags,
     AloaiPromotionDialog,
-    GenerateTranscriptionButton
+    GenerateTranscriptionButton,
+    UserDisplay
   },
 
   props: {

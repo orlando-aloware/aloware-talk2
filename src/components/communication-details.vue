@@ -523,7 +523,7 @@
                         >
                           Click For More Info
                         </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -559,7 +559,7 @@
                           :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                           :title="getUserName(getUser(attemptingUser))"
                         >
-                          {{ getUserName(getUser(attemptingUser)) }}
+                          <user-display :user-id="attemptingUser" />
                         </span>
                       </div>
                     </li>
@@ -907,7 +907,7 @@
                       >
                         {{ getUserName(getUser(userId)) }}
                       </q-tooltip>
-                      {{ getUserName(getUser(userId)) }}
+                      <user-display :user-id="userId" />
                     </span>
                   </div>
                 </div>
@@ -947,7 +947,7 @@
                       >
                         {{ getUserName(getUser(userId)) }}
                       </q-tooltip>
-                      {{ getUserName(getUser(userId)) }}
+                      <user-display :user-id="userId" />
                     </span>
                   </div>
                 </div>
@@ -1422,6 +1422,7 @@ import RingGroupSnapshot from 'components/ring-group-snapshot'
 import TranscriptionModal from 'src/components/communication/transcription-modal'
 import CloseIcon from 'components/icons/close-icon.vue'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
+import UserDisplay from 'src/components/user-display.vue'
 
 export default {
   name: 'communication-details',
@@ -1440,7 +1441,8 @@ export default {
     TranscriptionModal,
     EntityTags,
     GenerateTranscriptionButton,
-    CloseIcon
+    CloseIcon,
+    UserDisplay
   },
 
   mixins: [
