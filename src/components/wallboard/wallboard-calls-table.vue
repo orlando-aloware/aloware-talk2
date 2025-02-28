@@ -418,7 +418,6 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
-import * as User from 'src/constants/user'
 
 export default {
   name: 'wallboard-calls-table',
@@ -469,8 +468,7 @@ export default {
       CommunicationCurrentStatus,
       CommunicationDispositionStatus,
       CommunicationTypes,
-      TagCategories,
-      User
+      TagCategories
     }
   },
 

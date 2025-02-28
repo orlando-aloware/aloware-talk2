@@ -1404,7 +1404,6 @@ import * as CommunicationDirections from '../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
-import * as User from '../constants/user'
 
 import CallDispositionSelector from 'components/call-disposition-selector'
 import CommunicationAudio from 'components/communication-audio'
@@ -1467,8 +1466,7 @@ export default {
       CommunicationDirections,
       UploadedFileTypes,
       CommunicationCallbackStatus,
-      TagCategories,
-      User
+      TagCategories
     }
   },
 

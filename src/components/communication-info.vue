@@ -1003,7 +1003,6 @@ import * as CommunicationTypes from '../constants/communication-types'
 import * as SummaryStatus from '../constants/summary-status'
 import * as TranscriptionStatus from '../constants/transcription-status'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
-import * as User from 'src/constants/user'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
 
@@ -1156,8 +1155,7 @@ export default {
       CommunicationCallbackStatus,
       TranscriptionStatus,
       SummaryStatus,
-      TagCategories,
-      User
+      TagCategories
     }
   },
 
