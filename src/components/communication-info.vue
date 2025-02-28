@@ -649,7 +649,7 @@
                  v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)">
               <div class="form-group row mb-0">
                 <div class="w-100"
-                     v-if="communication.type === CommunicationTypes.CALL">
+                     v-if="communication.type === CommunicationTypes.CALL && !communication.has_voicemail">
                   <label class="form-control-label"
                          v-if="showAudio(communication)">
                     Call Recording
@@ -819,7 +819,7 @@
     <div v-show="!activeName">
       <div class="px-3 pt-2 border border-top-0 text-left"
            :class="[ !hasNotes ? 'bottom-radius' : 'border-bottom-0' ]"
-           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication)">
+           v-if="communication.type === CommunicationTypes.CALL && showAudio(communication) && !communication.has_voicemail">
         <div class="d-flex align-items-center w-100">
           <communication-audio class="mb-2"
                                data-testid="communication-info-call-recording-audio"
@@ -867,11 +867,11 @@
           <div class="flex items-center gap-2">
             <h3 class="ai-effect-gradient-text"
                 @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
+              <sparkle-icon width="16" height="16" color="#9333EA"/>
               Powered by AloAi
               <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
               </template>
-              <sparkle-icon width="16" height="16" color="#9333EA"/>
             </h3>
           </div>
           <div class="transcription-summary-container">
@@ -891,25 +891,6 @@
               <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in progress</span>
             </span>
           </div>
-        </div>
-        <div class="text-left-align text-13"
-             v-if="isTranscriptionAllowed(communication) && communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
-          <div>Transcription generation failed. Please try again later.</div>
-          <generate-transcription-button class="mt-2"
-                                         variant="button"
-                                         data-testid="comm-details-generate-transcription-button"
-                                         :communication="communication"
-                                         v-if="fileUuid && isMigrated">
-          </generate-transcription-button>
-        </div>
-        <div class="text-left-align text-13"
-             v-else-if="isTranscriptionAllowed(communication)">
-          <div>Click on the button to generate a transcription of this call.</div>
-          <generate-transcription-button class="mt-2"
-                                         variant="button"
-                                         data-testid="comm-details-generate-transcription-button"
-                                         :communication="communication"
-                                         v-if="fileUuid && isMigrated"/>
         </div>
         <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
@@ -932,6 +913,29 @@
             </q-btn>
           </div>
         </div>
+        <div class="text-left-align text-13 relative"
+             v-else-if="isEmptyParsedTranscription(communication)">
+          <div>Transcription cannot be generated for this communication.</div>
+        </div>
+        <div class="text-left-align text-13"
+             v-else-if="isTranscriptionAllowed(communication) && communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
+          <div>Transcription generation failed. Please try again later.</div>
+          <generate-transcription-button class="mt-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated">
+          </generate-transcription-button>
+        </div>
+        <div class="text-left-align text-13"
+             v-else-if="isTranscriptionAllowed(communication)">
+          <div>Click on the button to generate a transcription of this call.</div>
+          <generate-transcription-button class="mt-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated"/>
+        </div>
       </div>
     </div>
     <div class="ai-effect-container mt-2"
@@ -941,8 +945,8 @@
       <div class="ai-effect-content p-2">
         <div class="flex items-center gap-2">
           <h3 class="ai-effect-gradient-text">
-            Powered by AloAi
             <sparkle-icon width="16" height="16" color="#9333EA"/>
+            Powered by AloAi
           </h3>
         </div>
         <div class="text-left-align text-13 font-weight-light-bold my-2">
@@ -1184,34 +1188,31 @@ export default {
       return this.communication.body
     },
 
-    isAloaiDialogVisible () {
-      const allowedStatuses = [
-        TranscriptionStatus.STATUS_PROCESSING,
-        TranscriptionStatus.STATUS_COMPLETED,
-        TranscriptionStatus.STATUS_ERROR
-      ]
-
+    conditionForShowPoweredByAloAiBox () {
       return (
         !this.isSimpSocial &&
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrated &&
-        (this.isTranscriptionAllowed(this.communication) || this.communication.call_summary) && // Don't show empty AloAi dialog box
+        this.fileUuid && this.isMigrated
+      )
+    },
+
+    isAloaiDialogVisible () {
+      return (
+        this.conditionForShowPoweredByAloAiBox &&
+        (this.communication.is_eligible_for_transcribe || this.communication.call_summary) && // Don't show empty AloAi dialog box
         (this.communication.has_voicemail || this.showAudio(this.communication)) &&
         (
-          // If transcription does not exist, or transcription exists and is in allowed status
+          // If transcription does not exist for this call, or transcription has status
           (!this.communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
-          (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+          this.communication.call_transcription_status
         )
       )
     },
 
     isAvaPromotionDialogVisible () {
       return (
-        !this.isSimpSocial && // Exclude SimpSocial
-        this.currentCompany?.transcription_enabled &&
-        this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrated &&
+        this.conditionForShowPoweredByAloAiBox &&
         (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions
