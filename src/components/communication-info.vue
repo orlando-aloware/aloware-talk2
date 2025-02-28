@@ -1017,6 +1017,7 @@ import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import OpenCalendarButton from 'components/open-calendar-button'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
@@ -1035,6 +1036,7 @@ import * as CommunicationTypes from '../constants/communication-types'
 import * as SummaryStatus from '../constants/summary-status'
 import * as TranscriptionStatus from '../constants/transcription-status'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import * as User from 'src/constants/user'
 import SmsReminders from './sms-reminders'
 import TargetUsersTree from './target-users-tree'
 
@@ -1075,7 +1077,8 @@ export default {
     DownloadButton,
     EntityTags,
     AloaiPromotionDialog,
-    GenerateTranscriptionButton
+    GenerateTranscriptionButton,
+    SparkleIcon
   },
 
   props: {
@@ -1186,7 +1189,8 @@ export default {
       CommunicationCallbackStatus,
       TranscriptionStatus,
       SummaryStatus,
-      TagCategories
+      TagCategories,
+      User
     }
   },
 
