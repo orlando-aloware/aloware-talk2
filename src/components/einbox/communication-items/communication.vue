@@ -38,7 +38,8 @@
                           v-if="type" />
     </div>
 
-    <div class="communication__campaign">
+    <div class="communication__campaign"
+         v-if="campaignId">
       <campaign :campaign-id="campaignId" />
     </div>
 
@@ -157,8 +158,8 @@ export default {
 .communication {
   display: grid;
   grid-template-columns: 0.5fr 2.2fr 0.3fr;
-  grid-template-rows: 1fr 1fr 1fr 1fr;
-  gap: 5px 5px;
+  grid-template-rows: 1fr 1fr 1fr; // only 3 because campaign can be null
+  gap: 0px 5px;
   grid-template-areas:
     "communication__avatar communication__contact-name communication__time"
     "communication__avatar communication__phone-number communication__time"

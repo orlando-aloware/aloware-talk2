@@ -1,13 +1,12 @@
 <template>
   <div class="last-communication">
     <div class="d-flex">
-        <div class="pr-2">
-          <component height="18px"
-                     width="18px"
-                     data-testid="inbox-tasks-item-component"
-                     :is="stateToIcon(dispositionStatus, type, direction, callbackStatus)">
-          </component>
-        </div>
+        <component class="pr-1"
+                    height="22px"
+                    width="22px"
+                    data-testid="inbox-tasks-item-component"
+                    :is="stateToIcon(dispositionStatus, type, direction, callbackStatus)">
+        </component>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text last-communication__label"
                :class="[callStatusClass]"
