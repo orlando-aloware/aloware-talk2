@@ -523,7 +523,20 @@
                         >
                           Click For More Info
                         </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
+                        <span
+                          v-if="getUser(communication.user_id).type === User.TYPE_AI_AGENT"
+                          class="ai-effect-gradient-text"
+                        >
+                          <sparkle-icon
+                            width="16"
+                            height="16"
+                            color="#9333EA"
+                          />
+                          {{ getUserName(getUser(communication.user_id)) }}
+                        </span>
+                        <span v-else>
+                          {{ getUserName(getUser(communication.user_id)) }}
+                        </span>
                       </span>
                     </div>
                   </div>
@@ -1404,6 +1417,7 @@ import * as CommunicationDirections from '../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
+import * as User from '../constants/user'
 
 import CallDispositionSelector from 'components/call-disposition-selector'
 import CommunicationAudio from 'components/communication-audio'
@@ -1422,6 +1436,7 @@ import RingGroupSnapshot from 'components/ring-group-snapshot'
 import TranscriptionModal from 'src/components/communication/transcription-modal'
 import CloseIcon from 'components/icons/close-icon.vue'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'communication-details',
@@ -1440,7 +1455,8 @@ export default {
     TranscriptionModal,
     EntityTags,
     GenerateTranscriptionButton,
-    CloseIcon
+    CloseIcon,
+    SparkleIcon
   },
 
   mixins: [
@@ -1464,7 +1480,8 @@ export default {
       CommunicationDirections,
       UploadedFileTypes,
       CommunicationCallbackStatus,
-      TagCategories
+      TagCategories,
+      User
     }
   },
 

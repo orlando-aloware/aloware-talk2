@@ -26,8 +26,18 @@
        v-if="row.user_id"
        :class="{ 'deleted': userName === 'Deleted User' }"
        @click.prevent="filter">
-      {{ userName }}
-
+      <span v-if="getUser(row.user_id).type === User.TYPE_AI_AGENT"
+        class="ai-effect-gradient-text">
+        <sparkle-icon
+          width="16"
+          height="16"
+          color="#9333EA"
+        />
+        {{ userName }}
+      </span>
+      <span v-else>
+        {{ userName }}
+      </span>
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-user-${_uid}`">
         Click to filter by this user
@@ -41,9 +51,15 @@
 
 <script>
 import { userMixin } from 'src/plugins/mixins'
+import * as User from 'src/constants/user'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'User',
+
+  components: {
+    SparkleIcon
+  },
 
   mixins: [
     userMixin
@@ -53,6 +69,12 @@ export default {
     row: {
       type: Object,
       required: true
+    }
+  },
+
+  data () {
+    return {
+      User
     }
   },
 

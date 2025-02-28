@@ -75,7 +75,11 @@ export default {
           case AnswerTypes.BY_IP_PHONE:
             return user.name + ' - SIP (IP Phone)'
           case AnswerTypes.BY_PHONE_NUMBER:
-            return user.name + ' - Phone Number (' + user.phone_number + ')'
+            if (user.phone_number) {
+              return user.name + ' - Phone Number (' + user.phone_number + ')'
+            }
+
+            return user.name
           case AnswerTypes.BY_NONE:
             return user.name + ' - Will Not Answer'
         }
