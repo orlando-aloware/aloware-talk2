@@ -31,6 +31,9 @@ pipeline {
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
         API_URL_OVERWRITE = ''
+        GH_APP_PEM = credentials('github-app-private-key')
+        GH_APP_ID = '1157885'
+        GH_INSTALLATION_ID = '61798182'
     }
 
     stages {
@@ -408,24 +411,9 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
-                        withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GITHUB_APP_PRIVATE_KEY')]) {
-                            sh '''
-                              header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | openssl base64 -e | tr -d '=' | tr '/+' '_-' | tr -d '\n')
-                              payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":1157885}' | openssl base64 -e | tr -d '=' | tr '/+' '_-' | tr -d '\n')
-
-                              signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign $GITHUB_APP_PRIVATE_KEY | openssl base64 -e | tr -d '=' | tr '/+' '_-' | tr -d '\n')
-
-                              jwt="${header}.${payload}.${signature}"
-
-                              access_token=$(curl -s -X POST \
-                                -H "Authorization: Bearer $jwt" \
-                                -H "Accept: application/vnd.github.v3+json" \
-                                https://api.github.com/app/installations/61798182/access_tokens | jq -r .token)
-
-                              echo $access_token | gh auth login --with-token
-                              ''' 
-                        }
-                        sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${TALK_URL}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                        writeFile file: 'gh-app.pem', text: GH_APP_PEM
+                        sh 'gh auth login --with-app --app-id "$GH_APP_ID" --installation "$GH_INSTALLATION_ID" --private-key "gh-app.pem"'
+                        sh 'gh pr comment ${env.CHANGE_BRANCH} --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}'
                     }
                 } catch (Exception e) {
                     echo 'We could not add the comment in Github PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
