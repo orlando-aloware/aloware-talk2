@@ -32,7 +32,7 @@ pipeline {
         // REMOVE BEFORE MERGING TO develop/master
         API_URL_OVERWRITE = ''
         GH_APP_PEM = credentials('github-app-private-key')
-        GH_APP_ID = '1157885'
+        GH_APP_ID = 'Iv23lid94TAKm5enjtad'
         GH_INSTALLATION_ID = '61798182'
     }
 
@@ -413,8 +413,7 @@ pipeline {
                     if (env.CHANGE_BRANCH) {
                         writeFile file: 'gh-app.pem', text: GH_APP_PEM
                         sh '''
-                            chmod 600 gh-app.pem
-
+                            cat gh-app.pem
                             header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
                             payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 | tr -d '=\n' | tr '/+' '_-')
 
