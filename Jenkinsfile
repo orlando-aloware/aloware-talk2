@@ -416,7 +416,7 @@ pipeline {
                             header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
                             payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 | tr -d '=\n' | tr '/+' '_-')
 
-                            signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign <(echo -n "${GH_APP_PEM}") | base64 | tr -d '=\n' | tr '/+' '_-')
+                            signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign gh-app.pem | base64 | tr -d '=\n' | tr '/+' '_-')
 
                             GITHUB_JWT="${header}.${payload}.${signature}"
 
