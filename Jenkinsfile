@@ -415,14 +415,14 @@ pipeline {
                         sh '''
                             chmod 600 gh-app.pem
 
-                            header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
-                            payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+                            header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+                            payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 | tr -d '=\n' | tr '/+' '_-')
 
-                            signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign gh-app.pem | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+                            signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign gh-app.pem | base64 | tr -d '=\n' | tr '/+' '_-')
 
                             GITHUB_JWT="${header}.${payload}.${signature}"
 
-                            APP_TOKEN_URL=$(curl -s -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github.v3+json" https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens | jq -r .token)
+                            APP_TOKEN_URL=$(curl -s -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github+json" https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens | jq -r .token)
 
                             echo $APP_TOKEN_URL | gh auth login --with-token
                             gh pr comment ${env.CHANGE_BRANCH} --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}
