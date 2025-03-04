@@ -413,10 +413,10 @@ pipeline {
                     if (env.CHANGE_BRANCH) {
                         writeFile file: 'gh-app.pem', text: GH_APP_PEM
                         sh '''
-                            header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
-                            payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 | tr -d '=\n' | tr '/+' '_-')
+                            header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | tr -d '=' | tr '/+' '_-')
+                            payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 | tr -d '=' | tr '/+' '_-')
 
-                            signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign gh-app.pem | base64 | tr -d '=\n' | tr '/+' '_-')
+                            signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "./gh-app.pem" | base64 | tr -d '=' | tr '/+' '_-')
 
                             GITHUB_JWT="${header}.${payload}.${signature}"
 
