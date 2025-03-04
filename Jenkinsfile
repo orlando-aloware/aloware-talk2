@@ -408,8 +408,30 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
-                        sh "echo ${GIT_AUTH_PSW} > tmp_token.txt"
-                        sh 'gh auth login --with-token < tmp_token.txt'
+                        withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GITHUB_APP_PRIVATE_KEY')]) {
+                            sh '''
+                              # Generate JWT for GitHub App
+                              jwt=$(ruby -r openssl -r base64 -r json -e '
+                                private_key = OpenSSL::PKey::RSA.new(File.read(ENV["GITHUB_APP_PRIVATE_KEY"]))
+                                payload = {
+                                  iat: Time.now.to_i,
+                                  exp: Time.now.to_i + (10 * 60),
+                                  iss: 1157885
+                                }
+                                token = JWT.encode(payload, private_key, "RS256")
+                                puts token
+                              ')
+
+                              # Get installation access token
+                              access_token=$(curl -s -X POST \
+                                -H "Authorization: Bearer $jwt" \
+                                -H "Accept: application/vnd.github.v3+json" \
+                                https://api.github.com/app/installations/61798182/access_tokens | jq -r .token)
+
+                              # Authenticate with GitHub CLI
+                              echo $access_token | gh auth login --with-token
+                              ' 
+                        }
                         sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${TALK_URL}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
                     }
                 } catch (Exception e) {
