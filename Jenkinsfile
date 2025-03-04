@@ -417,7 +417,7 @@ pipeline {
                                     payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 -w 0 | tr -d '=' | tr '/+' '_-')
 
                                     cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem
-                                    signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "clean.pem" | base64 -w 0 | tr -d '=' | tr '/+' '_-')
+                                    signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "clean.pem" | base64 -w 0 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
                                     echo "$signature" | od -c
 
                                     GITHUB_JWT="${header}.${payload}.${signature}"
