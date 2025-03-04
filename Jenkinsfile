@@ -413,6 +413,8 @@ pipeline {
                     if (env.CHANGE_BRANCH) {
                         writeFile file: 'gh-app.pem', text: GH_APP_PEM
                         sh '''
+                            chmod 600 gh-app.pem
+
                             header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
                             payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | openssl base64 | tr -d '=' | tr '/+' '_-' | tr -d '\n')
 
