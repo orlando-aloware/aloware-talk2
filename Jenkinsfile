@@ -412,9 +412,14 @@ pipeline {
                 try {
                     if (env.CHANGE_BRANCH) {
                         writeFile file: 'gh-app.pem', text: GH_APP_PEM
-                        sh 'gh auth login --with-app --app-id "$GH_APP_ID" --installation "$GH_INSTALLATION_ID" --private-key "gh-app.pem"'
-                        sh 'gh pr comment ${env.CHANGE_BRANCH} --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}'
-                    }
+                        sh '''
+                            GITHUB_JWT=$( jwt encode --secret "@gh-app.pem" -i "${GH_APP_ID}" -e "10 minutes" --alg RS256 )
+                            APP_TOKEN_URL=$( curl -s -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github.v3+json" https://api.github.com/app/installations | yq r - '[0].access_tokens_url' )
+                            curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github.v3+json" ${APP_TOKEN_URL} | yq r - token > token.txt
+                            gh auth login --with-token < token.txt
+                            gh pr comment ${env.CHANGE_BRANCH} --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}
+                        '''
+                    }   
                 } catch (Exception e) {
                     echo 'We could not add the comment in Github PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
                 }
@@ -437,4 +442,18 @@ pipeline {
             cleanWs()
         }
     }
+}
+
+setup-gh-app-auth() {
+  if [[ "${GITHUB_APP_ID}" != "" ]] && [[ -e "${GITHUB_APP_SECRET_PATH}" ]] ; then
+    # Create a temporary JWT for API access
+    
+    # Request installation information; note that this assumes there's just one installation (this is a private GitHub app);
+    # if you have multiple installations you'll have to customize this to pick out the installation you are interested in    
+    APP_TOKEN_URL=$( curl -s -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github.v3+json" https://api.github.com/app/installations | yq r - '[0].access_tokens_url' )
+    # Now POST to the installation token URL to generate a new access token we can use to with with the gh and hub command lines
+    export GITHUB_TOKEN=$( curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github.v3+json" ${APP_TOKEN_URL} | yq r - token )
+    # Configure gh as an auth provider for git so we can use git push / pull / fetch with github.com URLs
+    gh auth setup-git
+  fi
 }
