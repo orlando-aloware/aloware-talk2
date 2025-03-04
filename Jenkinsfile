@@ -410,22 +410,23 @@ pipeline {
 
                 notificationSender.sendSlackSuccess()
                 try {
-                    if (env.CHANGE_BRANCH) {
-                        writeFile file: 'gh-app.pem', text: GH_APP_PEM
-                        sh '''
-                            header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | tr -d '=' | tr '/+' '_-')
-                            payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 | tr -d '=' | tr '/+' '_-')
+                        if (env.CHANGE_BRANCH) {
+                            withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
+                                sh '''
+                                    header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | tr -d '=' | tr '/+' '_-')
+                                    payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 | tr -d '=' | tr '/+' '_-')
 
-                            signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "./gh-app.pem" | base64 | tr -d '=' | tr '/+' '_-')
+                                    signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" | base64 | tr -d '=' | tr '/+' '_-')
 
-                            GITHUB_JWT="${header}.${payload}.${signature}"
+                                    GITHUB_JWT="${header}.${payload}.${signature}"
 
-                            APP_TOKEN_URL=$(curl -s -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github+json" https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens | jq -r .token)
+                                    APP_TOKEN_URL=$(curl -s -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github+json" https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens | jq -r .token)
 
-                            echo $APP_TOKEN_URL | gh auth login --with-token
-                            gh pr comment ${env.CHANGE_BRANCH} --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}
-                        '''
-                    }   
+                                    echo $APP_TOKEN_URL | gh auth login --with-token
+                                    gh pr comment ${env.CHANGE_BRANCH} --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}
+                                '''
+                            }
+                        }    
                 } catch (Exception e) {
                     echo 'We could not add the comment in Github PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
                 }
