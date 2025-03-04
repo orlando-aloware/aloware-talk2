@@ -414,14 +414,12 @@ pipeline {
                         withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
                             sh '''
                                 header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 -w 0 | tr -d '=' | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
-                                payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":'${GH_APP_ID}'}' | base64 -w 0 | tr -d '=' | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
+                                payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":"${GH_APP_ID}"}' | base64 -w 0 | tr -d '=' | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
 
                                 cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem
                                 signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "clean.pem" | base64 -w 0 | tr -d '=' | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
-                    
-                                echo "$signature" | od -c
 
-                                GITHUB_JWT="${header}.${payload}.${signature}"
+                                GITHUB_JWT=$(echo -n "${header}.${payload}.${signature}" | tr -d '\n' | tr -d '\r')
 
                                 APP_TOKEN=$(curl -s -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github+json" https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens | jq -r .token)
 
