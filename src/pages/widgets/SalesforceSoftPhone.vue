@@ -15,7 +15,7 @@
          v-if="criticalErrorHappened">
       <p><strong>Something went wrong</strong></p>
       <hr>
-      <p>For some reason we couldn’t complete the call. Please refresh the page and try again.</p>
+      <p>For some reason we couldn't complete the call. Please refresh the page and try again.</p>
     </div>
 
     <div class="p-3"
@@ -29,7 +29,14 @@
          v-else-if="showAlertCallFinished && dialer && !dialer.parkedCall">
       <p><strong>Call Finished</strong></p>
       <hr>
-      <p>Please close this window or click the back button to continue.</p>
+      <p>Please close this window or click to a phone number to start dialing.</p>
+    </div>
+
+    <div class="p-3"
+         v-else-if="showAlertCallNotStarted">
+      <p><strong>Phone number is not chosen</strong></p>
+      <hr>
+      <p>Please click to a phone number to start dialing.</p>
     </div>
 
     <webrtc
@@ -115,7 +122,7 @@ export default {
       //     },
       //     onDialNumber: async (event) => {
       //       this.criticalErrorHappened = false
-      //       this.setHubspotDialNumber(event)
+      //       this.setSalesforceDialNumber(event)
       //
       //       // do not continue if we not logged-in
       //       if (!this.initialized) {
@@ -139,6 +146,7 @@ export default {
       contactId: '',
       campaignId: null,
       defaultOutboundCampaignId: null,
+      showAlertCallNotStarted: true,
       showAlertCallFinished: false,
       criticalErrorHappened: false,
       authProfile: null,
@@ -147,7 +155,11 @@ export default {
         agentStatusUpdated: null
       },
       // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
-      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY']
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY'],
+      opencti_loaded: false,
+      // original path is https://MyDomainName--PackageName.vf.force.com/support/api/63.0/interaction.js
+      // documentation https://developer.salesforce.com/docs/atlas.en-us.api_cti.meta/api_cti/sforce_api_cti_connecting.htm
+      opencti_script_path: '/integrations/salesforce_lightning_call_center_62_0.js'
     }
   },
 
@@ -162,7 +174,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber']),
+    ...mapState(['isWidget', 'dialer', 'salesforceDialNumber']),
 
     allowed () {
       return this.authProfile && this.initialized && this.defaultCampaignInitialized
@@ -172,6 +184,7 @@ export default {
       return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
         !this.showAlertAgentOnCall &&
         !this.showAlertCallFinished &&
+        !this.showAlertCallNotStarted &&
         !this.dialer?.parkedCall &&
         !this.criticalErrorHappened
     }
@@ -184,11 +197,13 @@ export default {
       this.small = true
     }
 
-    // this.needsExtensions = this.$route.name === 'HubSpot Call Extension'
+    // this.needsExtensions = this.$route.name === 'Salesforce Call Extension'
     //
     // if (!this.needsExtensions) {
     //   this.extensionsVisibility = true
     // }
+
+    this.$VueEvent.listen('endWrapUp', this.endWrapUpListener)
   },
 
   async mounted () {
@@ -219,10 +234,20 @@ export default {
       setAgentStatus: 'setAgentStatus'
     }),
 
+    endWrapUpListener () {
+      // this.showAlertAgentOnCall = false
+      // this.showAlertCallFinished = false
+      // this.isDialed = false
+      //
+      // this.handleCallCompletedEvent()
+      // this.enableClickToDial()
+      // console.warn('current flags', this, this.dialer, this.dialer?.parkedCall === false)
+    },
+
     ...mapActions([
       'resetVuex',
       'setIsWidget',
-      'setHubspotDialNumber'
+      'setSalesforceDialNumber'
     ]),
 
     ...mapActions('cache', [
@@ -270,6 +295,16 @@ export default {
       })
     },
 
+    isAlwaysAskModeEnabled () {
+      if (!this.authProfile) return false
+
+      const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
+
+      const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+
+      return isCompanyAlwaysAsk || isUserAlwaysAsk
+    },
+
     checkAndResetCallDisposition () {
       if (!this.checkForceDisposition) {
         this.$VueEvent.fire('resetCall')
@@ -285,7 +320,7 @@ export default {
 
     getContactEmitPayload () {
       return {
-        currentNumber: this.hubspotDialNumber?.phoneNumber,
+        currentNumber: this.salesforceDialNumber?.number,
         contactName: this.contactName,
         companyName: this.companyName,
         contactId: this.contactId,
@@ -294,21 +329,19 @@ export default {
     },
 
     async getContact () {
-      await this.$axios.get('/api/v1/contact/44773678').then(res => {
-        console.warn('Contact:', res.data)
+      await this.$axios.post('/api/v1/integrations/salesforce/find-contact', {
+        params: this.salesforceDialNumber
+      }).then(res => {
         this.setContactDetails(res.data)
         this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
       }).catch(err => {
         this.$handleErrors(err.response)
         this.criticalErrorHappened = true
-        // if (this.extensions) {
-        //   this.extensions.callEnded()
-        // }
       })
     },
 
     async handleDialNumber () {
-      console.log('Handle')
+      console.warn('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
@@ -336,22 +369,41 @@ export default {
       }
     },
 
+    enableClickToDial () {
+      if (!this.opencti_loaded) {
+        return
+      }
+      // Enable click-to-dial functionality
+      sforce.opencti.enableClickToDial({
+        callback: (response) => {
+          if (response.success) {
+            console.log('Click-to-dial enabled successfully:', response)
+          } else {
+            console.error('Failed to enable click-to-dial:', response.errors)
+          }
+        }
+      })
+    },
+
     handleUserLogin () {
+
       // if (this.needsExtensions && this.extensionsInitialized) {
       //   this.extensions.userLoggedIn()
-      //   // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
-      //   if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
-      //     this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
-      //   }
+
       // }
 
-      // if empty then onDialNumber event was not called - skip calling,
-      // if not empty then dialer was called, and we are here after login page so we must dial the number
-      // if (!this.hubspotDialNumber) {
+      // // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
+      // if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
+      //   this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
+      // }
+      //
+      // // if empty then onDialNumber event was not called - skip calling,
+      // // if not empty then dialer was called, and we are here after login page so we must dial the number
+      // if (!this.salesforceDialNumber) {
       //   return
       // }
-
-      this.postDialNumber()
+      //
+      // this.postDialNumber()
     },
 
     handleCallConnectedEvent () {
@@ -363,11 +415,19 @@ export default {
     handleCallCompletedEvent (skipCallFinished = false) {
       // if (this.extensions) {
       //   this.extensions.callEnded()
-      //   this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
-      //   if (!this.defaultOutboundCampaignId) {
-      //     this.campaignId = null
-      //   }
+
       // }
+      this.showAlertAgentOnCall = false
+      // this.showAlertCallFinished = false
+      this.isDialed = false
+      console.warn('called handleCallCompletedEvent', skipCallFinished)
+
+      this.enableClickToDial()
+
+      this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
+      if (!this.defaultOutboundCampaignId) {
+        this.campaignId = null
+      }
     },
 
     handleChangeCampaignEvent (campaignId) {
@@ -440,8 +500,29 @@ export default {
         return
       }
 
+      if (this.opencti_loaded) {
+        // Disable click-to-dial functionality
+        sforce.opencti.disableClickToDial({
+          callback: (response) => {
+            if (response.success) {
+              console.log('Click-to-dial enabled successfully:', response)
+            } else {
+              console.error('Failed to enable click-to-dial:', response.errors)
+            }
+          }
+        })
+      }
+
+      console.warn('making call', {
+        currentNumber: this.$options.filters.fixPhone(this.salesforceDialNumber?.number),
+        outboundCampaignId: this.campaignId.toString(),
+        contactName: this.contactName,
+        companyName: this.companyName,
+        contactId: this.contactId
+      })
+
       this.$VueEvent.fire('makeCall', {
-        currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
+        currentNumber: this.$options.filters.fixPhone(this.salesforceDialNumber?.number),
         outboundCampaignId: this.campaignId.toString(),
         contactName: this.contactName,
         companyName: this.companyName,
@@ -467,16 +548,6 @@ export default {
       }
 
       this.defaultCampaignInitialized = true
-    },
-
-    isAlwaysAskModeEnabled () {
-      if (!this.authProfile) return false
-
-      const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
-
-      const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
-
-      return isCompanyAlwaysAsk || isUserAlwaysAsk
     },
 
     shouldUseCompanyCampaignId () {
@@ -549,64 +620,91 @@ export default {
       }
     },
     loadOpenCtiScript () {
-      const scriptUrl = 'https://aloware2-dev-ed--alowarepoc.sandbox.my.salesforce.com/support/api/62.0/lightning/opencti_min.js'
+      // Don't load the script if it's already been loaded
+      if (this.opencti_loaded) {
+        console.log('OpenCTI already loaded, skipping script load')
+        return
+      }
 
-      // Check if the script is already loaded
-      if (!document.querySelector(`script[src="${scriptUrl}"]`)) {
-        const script = document.createElement('script')
-        script.src = scriptUrl
-        script.async = true
-        script.onload = () => {
-          console.log('Open CTI script loaded successfully.')
-          this.initializeOpenCti()
-        }
-        script.onerror = () => {
-          console.error('Failed to load Open CTI script.')
-        }
-        document.head.appendChild(script)
-      } else {
-        console.log('Open CTI script is already loaded.')
+      // Check if the script is already loaded in the DOM
+      if (document.querySelector(`script[src="${this.opencti_script_path}"]`)) {
+        console.log('OpenCTI script already exists in DOM')
+        this.opencti_loaded = true
+        this.initializeOpenCti()
+        return
+      }
+
+      console.log('Loading Salesforce OpenCTI script from:', this.opencti_script_path)
+      const script = document.createElement('script')
+      script.src = this.opencti_script_path
+      script.async = true
+
+      script.onload = () => {
+        console.log('Salesforce OpenCTI script loaded successfully')
+        this.opencti_loaded = true
         this.initializeOpenCti()
       }
+
+      script.onerror = (error) => {
+        console.error('Failed to load Salesforce OpenCTI script:', error)
+        this.criticalErrorHappened = true
+      }
+
+      document.head.appendChild(script)
     },
+
     initializeOpenCti () {
-      if (typeof sforce !== 'undefined' && sforce.opencti) {
-        console.warn(sforce, 'sforce')
+      if (typeof sforce === 'undefined' || !sforce.opencti) {
+        console.error('Salesforce OpenCTI API (sforce.opencti) is not available')
+        return
+      }
 
-        sforce.opencti.getAppViewInfo({ callback: function (response) {
-          if (response.success) {
-            console.log('API method call executed successfully! returnValue:', response.returnValue)
-          } else {
-            console.error('Something went wrong! Errors:', response.errors)
+      this.enableClickToDial()
+
+      // Get application view information
+      // sforce.opencti.getAppViewInfo({
+      //   callback: (response) => {
+      //     if (response.success) {
+      //       console.log('App view info retrieved:', response)
+      //     } else {
+      //       console.error('Failed to get app view info:', response.errors)
+      //     }
+      //   }
+      // })
+
+      // Set up click-to-dial event listener
+      const clickToDialListener = (payload) => {
+        console.log('Click-to-dial event received with number:', payload)
+        sforce.opencti.setSoftphonePanelVisibility({
+          visible: true,
+          callback: (response) => {
+            if (response.success) {
+              console.log('API method call executed successfully! returnValue:', response)
+            } else {
+              console.error('Something went wrong! Errors:', response)
+            }
           }
-        } })
-
-        sforce.opencti.enableClickToDial({ callback: function (response) {
-          if (response.success) {
-            console.log('API method call executed successfully! returnValue:', response.returnValue)
-          } else {
-            console.error('Something went wrong! Errors:', response.errors)
-          }
-        } })
-
-        var listener = function (payload) {
-          console.log('Clicked phone number: ' + payload.number)
-        }
-
-        // Register the listener.
-        window.addEventListener('load', function () {
-          sforce.opencti.onClickToDial({ listener: listener })
         })
 
-        // sforce.opencti.initialize({
-        //   callback: (result) => {
-        //     console.log('Open CTI initialized:', result)
-        //     // this.openCtiLoaded = true;
-        //   }
-        // })
-      } else {
-        console.error('sforce.opencti is not available.')
+        if (payload.number) {
+          this.$VueEvent.fire('resetCall')
+          this.criticalErrorHappened = false
+
+          // Set the phone number to call
+          this.setSalesforceDialNumber(payload)
+
+          // Handle the dial action if we're logged in and ready
+          if (this.initialized && this.authProfile) {
+            this.showAlertCallNotStarted = false
+            this.postDialNumber()
+          }
+        }
       }
+
+      // Register the click-to-dial listener
+      sforce.opencti.onClickToDial({
+        listener: clickToDialListener
+      })
     }
   },
 
@@ -623,8 +721,8 @@ export default {
     //     this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
     //   } else {
     //     this.showAlertCallFinished = false
-    //     // if hidden, reset HubSpot dial number
-    //     this.setHubspotDialNumber(null)
+    //     // if hidden, reset Salesforce dial number
+    //     this.setSalesforceDialNumber(null)
     //   }
     // },
 

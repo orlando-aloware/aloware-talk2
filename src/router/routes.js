@@ -656,15 +656,6 @@ const routes = [
           isWidget: true
         },
         component: HubSpotMessageWidgetError
-      },
-      {
-        name: 'Salesforce SoftPhone',
-        path: '/salesforce/softphone',
-        props: true,
-        meta: {
-          isWidget: true
-        },
-        component: SalesforceSoftPhone
       }
     ]
   },
@@ -686,6 +677,15 @@ const routes = [
     path: '/widgets/hubspot-call-extension',
     props: true,
     component: Dialer
+  },
+  {
+    name: 'Salesforce SoftPhone',
+    path: '/salesforce/softphone',
+    props: true,
+    meta: {
+      isWidget: true
+    },
+    component: SalesforceSoftPhone
   },
   // deep link handlers
   // Apps handlers to open custom protocol
