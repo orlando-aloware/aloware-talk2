@@ -410,25 +410,18 @@ pipeline {
                     if (env.CHANGE_BRANCH) {
                         withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GITHUB_APP_PRIVATE_KEY')]) {
                             sh '''
-                              # Generate JWT for GitHub App
-                              jwt=$(ruby -r openssl -r base64 -r json -e '
-                                private_key = OpenSSL::PKey::RSA.new(File.read(ENV["GITHUB_APP_PRIVATE_KEY"]))
-                                payload = {
-                                  iat: Time.now.to_i,
-                                  exp: Time.now.to_i + (10 * 60),
-                                  iss: 1157885
-                                }
-                                token = JWT.encode(payload, private_key, "RS256")
-                                puts token
-                              ')
+                              header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | openssl base64 -e | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+                              payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":1157885}' | openssl base64 -e | tr -d '=' | tr '/+' '_-' | tr -d '\n')
 
-                              # Get installation access token
+                              signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign $GITHUB_APP_PRIVATE_KEY | openssl base64 -e | tr -d '=' | tr '/+' '_-' | tr -d '\n')
+
+                              jwt="${header}.${payload}.${signature}"
+
                               access_token=$(curl -s -X POST \
                                 -H "Authorization: Bearer $jwt" \
                                 -H "Accept: application/vnd.github.v3+json" \
                                 https://api.github.com/app/installations/61798182/access_tokens | jq -r .token)
 
-                              # Authenticate with GitHub CLI
                               echo $access_token | gh auth login --with-token
                               ''' 
                         }
