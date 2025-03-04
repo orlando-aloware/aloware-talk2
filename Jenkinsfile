@@ -430,7 +430,7 @@ pipeline {
 
                               # Authenticate with GitHub CLI
                               echo $access_token | gh auth login --with-token
-                              ' 
+                              ''' 
                         }
                         sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${TALK_URL}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
                     }
