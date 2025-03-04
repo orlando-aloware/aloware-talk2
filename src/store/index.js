@@ -305,6 +305,7 @@ export default function (/* { ssrContext } */) {
       isTrialBannerVisible: false,
       currentTimezone: null,
       hubspotDialNumber: null,
+      salesforceDialNumber: null,
       isRedirectedToHubspotWidget: false,
       isCallBackButtonDisabled: false,
       isFirstLoad: true,
@@ -611,7 +612,6 @@ export default function (/* { ssrContext } */) {
           commit('wallboard/RESET_VUEX', null, { root: true })
           commit('tagsModule/RESET_VUEX', null, { root: true })
           commit('broadcast/RESET_VUEX', null, { root: true })
-          commit('lists/RESET_VUEX', null, { root: true })
         }
       },
 
@@ -930,6 +930,10 @@ export default function (/* { ssrContext } */) {
 
       setHubspotDialNumber ({ commit }, value) {
         commit('SET_HUBSPOT_DIAL_NUMBER', value)
+      },
+
+      setSalesforceDialNumber ({ commit }, value) {
+        commit('SET_SALESFORCE_DIAL_NUMBER', value)
       },
 
       setIsRedirectedToHubspotWidget ({ commit }, value) {
@@ -1763,6 +1767,10 @@ export default function (/* { ssrContext } */) {
 
       SET_HUBSPOT_DIAL_NUMBER (state, value) {
         state.hubspotDialNumber = value
+      },
+
+      SET_SALESFORCE_DIAL_NUMBER (state, value) {
+        state.salesforceDialNumber = value
       },
 
       SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {
