@@ -739,22 +739,6 @@ export default {
           return Promise.reject(err)
         })
       }
-    },
-
-    importWizard: {
-      parseUrl: `${suffixV1}import-wizard/parse`,
-
-      analyze (headers, ignoreFirstRow, importId) {
-        return window.axios.post(`${suffixV1}import-wizard/analyze`, {
-          headers,
-          ignore_first_row: ignoreFirstRow,
-          import_id: importId
-        })
-      },
-
-      startImport (importId, data) {
-        return window.axios.post(`${suffixV1}import-wizard/${importId}/start`, data)
-      }
     }
   },
 
