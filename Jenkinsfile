@@ -436,7 +436,7 @@ pipeline {
                                 curl -X POST \
                                     -H "Authorization: Bearer ${TOKEN}" \
                                     -H "Accept: application/vnd.github.v3+json" \
-                                    -d "'{\"body\": \"Hi, your environment is ready to use at: https://${TALK_URL}\"}'" \
+                                    -d "{\"body\": \"Hi, your environment is ready to use at: https://${TALK_URL}\"}" \
                                     "https://api.github.com/repos/aloware/aloware-talk2/issues/${PR_ID}/comments"
 
                                 rm -f clean.pem token.txt
