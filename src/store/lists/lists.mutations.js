@@ -1,8 +1,4 @@
-import { updateField } from 'vuex-map-fields'
-
 export default {
-  updateField,
-
   SET_LISTS (state, lists) {
     state.lists = lists
   },

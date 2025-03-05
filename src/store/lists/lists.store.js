@@ -3,7 +3,6 @@ export default function () {
     lists: [],
     listsCount: 0,
     isListsLoading: false,
-    search: null,
-    listsImportedFromCsv: []
+    search: null
   }
 }
