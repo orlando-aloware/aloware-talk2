@@ -422,9 +422,8 @@ pipeline {
                                 payload=$(echo -n "${payload_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
                                 
                                 cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem
-                                
-                                signature_data="${header}.${payload}"
-                                signature=$(echo -n "${signature_data}" | openssl dgst -sha256 -sign clean.pem | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+                
+                                signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign clean.pem | base64 -w 0 | tr '+/' '-_' | tr -d '=')
                                 
                                 GITHUB_JWT="${header}.${payload}.${signature}"
                                 
@@ -434,10 +433,11 @@ pipeline {
         
                                 PR_ID=$(echo ${GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*')
                                 
-                                curl -X POST -H "Authorization: Bearer ${TOKEN}" \
+                                curl -X POST \
+                                    -H "Authorization: Bearer ${TOKEN}" \
                                     -H "Accept: application/vnd.github.v3+json" \
                                     -d "{\"body\": \"Hi, your environment is ready to use at: https://${TALK_URL}\"}" \
-                                    https://api.github.com/repos/aloware/aloware-talk2/issues/${PR_ID}/comments
+                                    "https://api.github.com/repos/aloware/aloware-talk2/issues/${PR_ID}/comments"
 
                                 rm -f clean.pem token.txt
                             '''
