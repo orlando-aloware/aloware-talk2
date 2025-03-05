@@ -4,6 +4,15 @@
             persistent
             v-model="visible">
     <q-card class="card">
+      <div class="d-flex mb-1"
+           v-if='isSalesforceWidget && salesforceDialNumber?.number'>
+        <strong>Calling to {{salesforceDialNumber.number}}</strong>
+      </div>
+
+      <div class='d-flex mb-3 small-text'
+           v-if='isSalesforceWidget && salesforceDialNumber?.recordName'>
+        {{ salesforceDialNumber.recordName }}
+      </div>
       <div class="label">Select a Line</div>
       <div class="d-flex">
         <line-selector class="line-selector"
@@ -25,12 +34,20 @@
           </q-btn>
         </div>
       </div>
+      <div class="d-flex"
+           v-if='isSalesforceWidget'>
+        <q-btn class="full-width mb-5"
+               rounded
+               @click="onCancelClick">
+          Cancel
+        </q-btn>
+      </div>
     </q-card>
   </q-dialog>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import LineSelector from 'components/generic-selectors/line-selector'
 
 export default {
@@ -57,7 +74,8 @@ export default {
   },
 
   computed: {
-    ...mapGetters('auth', ['profile'])
+    ...mapGetters('auth', ['profile']),
+    ...mapState(['isSalesforceWidget', 'salesforceDialNumber'])
   },
 
   watch: {
@@ -73,6 +91,10 @@ export default {
 
     onCallClick () {
       this.$emit('change-campaign-id', this.localCampaignId)
+    },
+
+    onCancelClick () {
+      this.$emit('cancel-campaign-id')
     }
   }
 }

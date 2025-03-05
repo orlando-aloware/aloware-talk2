@@ -29,7 +29,7 @@
          v-else-if="showAlertCallFinished && dialer && !dialer.parkedCall">
       <p><strong>Call Finished</strong></p>
       <hr>
-      <p>Please close this window or click to a phone number to start dialing.</p>
+      <p>Please minimize this window or click to a phone number to start dialing again.</p>
     </div>
 
     <div class="p-3"
@@ -46,7 +46,6 @@
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
       v-else-if="allowed"
-      @callConnected="handleCallConnectedEvent"
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
       @handleCall="handleCall"
@@ -56,17 +55,14 @@
 
 <script>
 /* global sforce */ // Declare sforce as a global variable
-
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import { timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
-// import CallingExtensionsManager from 'src/utils/CallingExtensionsManager'
 
 export default {
   name: 'Dialer',
@@ -91,55 +87,9 @@ export default {
       loading: false,
       small: false,
       initialized: false,
-      // needsExtensions: false,
-      // extensionsInitialized: false,
-      // not always this can be switched to true before call
-      // in HS Task view it's opening window automatically without sending event when
-      // maybe it sends an event before our component is mounted
-      // extensionsVisibility: true,
-      // extensions: null,
       timeout: null,
       showAlertAgentOnCall: false,
       defaultCampaignInitialized: false,
-      // callSdkOptions: {
-      //   // Whether to log various inbound/outbound messages to console
-      //   debugMode: true,
-      //   // eventHandlers handle inbound messages
-      //   eventHandlers: {
-      //     onReady: () => {
-      //       this.$VueEvent.fire('resetCall')
-      //
-      //       const payload = {
-      //         // Whether a user is logged-in
-      //         isLoggedIn: this.authenticated,
-      //         // Optionally send the desired widget size
-      //         sizeInfo: {
-      //           height: 522,
-      //           width: 300
-      //         }
-      //       }
-      //       this.extensions.initialized(payload)
-      //     },
-      //     onDialNumber: async (event) => {
-      //       this.criticalErrorHappened = false
-      //       this.setSalesforceDialNumber(event)
-      //
-      //       // do not continue if we not logged-in
-      //       if (!this.initialized) {
-      //         return
-      //       }
-      //
-      //       await this.postDialNumber()
-      //     },
-      //     onVisibilityChanged: (data) => {
-      //       this.extensionsVisibility = !data?.isHidden
-      //
-      //       if (!this.extensionsVisibility) {
-      //         this.endActiveCall()
-      //       }
-      //     }
-      //   }
-      // },
       contactName: '',
       contactTimezone: '',
       companyName: '',
@@ -192,34 +142,19 @@ export default {
 
   created () {
     this.setIsWidget(true)
+    this.setIsSalesforceWidget(true)
 
     if (this.$route.query.small) {
       this.small = true
     }
-
-    // this.needsExtensions = this.$route.name === 'Salesforce Call Extension'
-    //
-    // if (!this.needsExtensions) {
-    //   this.extensionsVisibility = true
-    // }
-
-    this.$VueEvent.listen('endWrapUp', this.endWrapUpListener)
   },
 
   async mounted () {
-    // try {
-    //   // init of CallingExtensions has to be once and do not repeat when, for instance, login page was called
-    //   // otherwise we lose connection with parent window
-    //   // that's why a global class was added
-    //   this.extensions = await CallingExtensionsManager.initialize(this.callSdkOptions)
-    // } catch (error) {
-    //   // there may iframe issue like "Blocked a frame with origin" but we don't want to break the whole app, it is still usable
-    //   console.log('Error during CallingExtensions init', error)
-    // }
-    //
-    // CallingExtensionsManager.subscribe(this.callSdkOptions.eventHandlers)
-    //
-    // this.extensionsInitialized = true
+    // we may come from login page with already defined phone number from the past
+    if (this.salesforceDialNumber) {
+      this.showAlertCallNotStarted = false
+    }
+
     await this.init()
     this.isFirstLoading = false
 
@@ -234,19 +169,10 @@ export default {
       setAgentStatus: 'setAgentStatus'
     }),
 
-    endWrapUpListener () {
-      // this.showAlertAgentOnCall = false
-      // this.showAlertCallFinished = false
-      // this.isDialed = false
-      //
-      // this.handleCallCompletedEvent()
-      // this.enableClickToDial()
-      // console.warn('current flags', this, this.dialer, this.dialer?.parkedCall === false)
-    },
-
     ...mapActions([
       'resetVuex',
       'setIsWidget',
+      'setIsSalesforceWidget',
       'setSalesforceDialNumber'
     ]),
 
@@ -256,6 +182,8 @@ export default {
 
     async postDialNumber () {
       this.showAlertCallFinished = false
+      // Hide the Bootstrap Vue modal by its ID
+      this.$bvModal.hide('daytime-hours-confirmation')
 
       do {
         await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
@@ -318,40 +246,27 @@ export default {
       this.contactId = contact.id
     },
 
-    getContactEmitPayload () {
-      return {
-        currentNumber: this.salesforceDialNumber?.number,
-        contactName: this.contactName,
-        companyName: this.companyName,
-        contactId: this.contactId,
-        contactTimezone: this.contactTimezone
-      }
-    },
-
     async getContact () {
-      await this.$axios.post('/api/v1/integrations/salesforce/find-contact', {
+      // Return the Promise so that await getContact() actually waits for completion
+      return this.$axios.post('/api/v1/integrations/salesforce/find-contact', {
         params: this.salesforceDialNumber
       }).then(res => {
         this.setContactDetails(res.data)
-        this.$emit('change', this.$emit('change', this.getContactEmitPayload()))
+        return res.data
       }).catch(err => {
         this.$handleErrors(err.response)
         this.criticalErrorHappened = true
+        throw err
       })
     },
 
     async handleDialNumber () {
-      console.warn('Handle')
+      console.log('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true
         return
       }
-
-      // stop if modal is disabled
-      // if (!this.extensionsVisibility) {
-      //   return
-      // }
 
       // don't allow to make a call if there's a parked call
       if (this.dialer?.parkedCall) {
@@ -374,53 +289,19 @@ export default {
         return
       }
       // Enable click-to-dial functionality
-      sforce.opencti.enableClickToDial({
-        callback: (response) => {
-          if (response.success) {
-            console.log('Click-to-dial enabled successfully:', response)
-          } else {
-            console.error('Failed to enable click-to-dial:', response.errors)
-          }
-        }
-      })
+      sforce.opencti.enableClickToDial()
     },
 
     handleUserLogin () {
-
-      // if (this.needsExtensions && this.extensionsInitialized) {
-      //   this.extensions.userLoggedIn()
-
-      // }
-
-      // // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
-      // if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
-      //   this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
-      // }
-      //
-      // // if empty then onDialNumber event was not called - skip calling,
-      // // if not empty then dialer was called, and we are here after login page so we must dial the number
-      // if (!this.salesforceDialNumber) {
-      //   return
-      // }
-      //
-      // this.postDialNumber()
-    },
-
-    handleCallConnectedEvent () {
-      // if (this.needsExtensions && this.extensionsInitialized) {
-      //   this.extensions.callAnswered()
-      // }
+      // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
+      if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
+        this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
+      }
     },
 
     handleCallCompletedEvent (skipCallFinished = false) {
-      // if (this.extensions) {
-      //   this.extensions.callEnded()
-
-      // }
       this.showAlertAgentOnCall = false
-      // this.showAlertCallFinished = false
       this.isDialed = false
-      console.warn('called handleCallCompletedEvent', skipCallFinished)
 
       this.enableClickToDial()
 
@@ -448,27 +329,8 @@ export default {
         name: this.contactName
       }
 
-      this.checkContactTimezone(contactData, this.makeCall, this.onCancelCall)
+      this.checkContactTimezone(contactData, this.makeCall)
       this.isDialed = true
-    },
-
-    onCancelCall () {
-      if (this.shouldUseCompanyCampaignId()) {
-        this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
-      } else if (this.shouldUseProfileCampaignId()) {
-        this.defaultOutboundCampaignId = this.authProfile.default_outbound_campaign_id
-      } else { // if there's no a line by default, we remove the selected line
-        this.defaultOutboundCampaignId = null
-      }
-
-      this.campaignId = this.defaultOutboundCampaignId
-
-      // if the call is canceled, we close the widget in HS
-      // setTimeout(() => {
-      //   this.extensions.callCompleted({
-      //     hideWidget: true
-      //   })
-      // }, 50)
     },
 
     handleAgentStatusUpdate (data) {
@@ -483,15 +345,6 @@ export default {
         if (!this.showAlertAgentOnCall && this.isFirstLoading && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.isDialed) {
           this.showAlertCallFinished = false
         }
-
-        // if we finished - don't need to handle dial number
-        if (this.showAlertCallFinished) {
-          return
-        }
-
-        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-          this.handleDialNumber()
-        }
       }
     },
 
@@ -502,24 +355,8 @@ export default {
 
       if (this.opencti_loaded) {
         // Disable click-to-dial functionality
-        sforce.opencti.disableClickToDial({
-          callback: (response) => {
-            if (response.success) {
-              console.log('Click-to-dial enabled successfully:', response)
-            } else {
-              console.error('Failed to enable click-to-dial:', response.errors)
-            }
-          }
-        })
+        sforce.opencti.disableClickToDial()
       }
-
-      console.warn('making call', {
-        currentNumber: this.$options.filters.fixPhone(this.salesforceDialNumber?.number),
-        outboundCampaignId: this.campaignId.toString(),
-        contactName: this.contactName,
-        companyName: this.companyName,
-        contactId: this.contactId
-      })
 
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.salesforceDialNumber?.number),
@@ -592,23 +429,6 @@ export default {
         !statuses.includes(this.dialer?.currentStatus)
     },
 
-    endActiveCall () {
-      this.showAlertAgentOnCall = false
-      this.showAlertCallFinished = false
-      this.isDialed = false
-
-      if (this.dialer?.currentStatus === 'WRAP_UP') {
-        this.$VueEvent.fire('endWrapUp')
-      }
-
-      if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
-        this.$VueEvent.fire('hangupCall')
-      }
-
-      this.$VueEvent.fire('resetCall')
-      this.handleCallCompletedEvent(true)
-    },
-
     async setLastUsedCallLine () {
       if (this.campaignId || !this.contactId) return
 
@@ -661,33 +481,14 @@ export default {
 
       this.enableClickToDial()
 
-      // Get application view information
-      // sforce.opencti.getAppViewInfo({
-      //   callback: (response) => {
-      //     if (response.success) {
-      //       console.log('App view info retrieved:', response)
-      //     } else {
-      //       console.error('Failed to get app view info:', response.errors)
-      //     }
-      //   }
-      // })
-
       // Set up click-to-dial event listener
       const clickToDialListener = (payload) => {
         console.log('Click-to-dial event received with number:', payload)
         sforce.opencti.setSoftphonePanelVisibility({
-          visible: true,
-          callback: (response) => {
-            if (response.success) {
-              console.log('API method call executed successfully! returnValue:', response)
-            } else {
-              console.error('Something went wrong! Errors:', response)
-            }
-          }
+          visible: true
         })
 
         if (payload.number) {
-          this.$VueEvent.fire('resetCall')
           this.criticalErrorHappened = false
 
           // Set the phone number to call
@@ -705,27 +506,17 @@ export default {
       sforce.opencti.onClickToDial({
         listener: clickToDialListener
       })
+
+      // if salesforceDialNumber is not empty then we are here after login page so we can dial the number
+      if (this.initialized && this.authProfile && this.salesforceDialNumber) {
+        this.criticalErrorHappened = false
+        this.showAlertCallNotStarted = false
+        this.postDialNumber()
+      }
     }
   },
 
   watch: {
-    // authenticated (newVal) {
-    //   if (newVal && this.extensions) {
-    //     this.extensions.initialized({
-    //       isLoggedIn: newVal
-    //     })
-    //   }
-    // },
-    // extensionsVisibility () {
-    //   if (this.extensionsVisibility) {
-    //     this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
-    //   } else {
-    //     this.showAlertCallFinished = false
-    //     // if hidden, reset Salesforce dial number
-    //     this.setSalesforceDialNumber(null)
-    //   }
-    // },
-
     'dialer.currentStatus' () {
       if (this.isLoadingDialer) {
         return
