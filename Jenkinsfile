@@ -428,15 +428,17 @@ pipeline {
                                 
                                 GITHUB_JWT="${header}.${payload}.${signature}"
                                 
-                                curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
+                                TOKEN=$(curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
                                     -H "Accept: application/vnd.github+json" \
-                                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token > token.txt
+                                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token)
+
+                                echo "${TOKEN}" > token.txt
                                 
                                 gh auth login --with-token < token.txt 
 
                                 gh auth status
                                 
-                                gh pr comment "${CHANGE_BRANCH}" --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R "https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                                GH_TOKEN="${TOKEN}" gh pr comment "${CHANGE_BRANCH}" --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R "https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
                                 
                                 rm -f clean.pem token.txt
                             '''
