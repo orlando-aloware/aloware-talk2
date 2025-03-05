@@ -418,7 +418,7 @@ pipeline {
                                 
                                 now=$(date +%s)
                                 exp=$((now + 600))
-                                payload_json='{"iat":'${now}',"exp":'${exp}',"iss":'${GH_APP_ID}'}'
+                                payload_json='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
                                 payload=$(echo -n "${payload_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
                                 
                                 cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem
@@ -428,19 +428,11 @@ pipeline {
                                 
                                 GITHUB_JWT="${header}.${payload}.${signature}"
                                 
-                                echo "JWT Header: ${header}"
-                                echo "JWT Payload: ${payload}"
-                                echo "Installation ID: ${GH_INSTALLATION_ID}"
-                                
                                 APP_TOKEN=$(curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
                                     -H "Accept: application/vnd.github+json" \
                                     "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token)
                                 
-                                echo "Token Response: $(curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
-                                    -H "Accept: application/vnd.github+json" \
-                                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq .)"
-                                
-                                if [ "$APP_TOKEN" == "null" ]; then
+                                if [ -z "$APP_TOKEN" ] || [ "$APP_TOKEN" = "null" ]; then
                                     echo "Failed to retrieve GitHub App token"
                                     exit 1
                                 fi
