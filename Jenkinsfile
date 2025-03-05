@@ -32,7 +32,7 @@ pipeline {
         // REMOVE BEFORE MERGING TO develop/master
         API_URL_OVERWRITE = ''
         GH_APP_PEM = credentials('github-app-private-key')
-        GH_APP_ID = 'Iv23lid94TAKm5enjtad'
+        GH_APP_ID = '1157885'
         GH_INSTALLATION_ID = '61798182'
     }
 
@@ -428,19 +428,15 @@ pipeline {
                                 
                                 GITHUB_JWT="${header}.${payload}.${signature}"
                                 
-                                APP_TOKEN=$(curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
+                                curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
                                     -H "Accept: application/vnd.github+json" \
-                                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token)
+                                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token > token.txt
                                 
-                                if [ -z "$APP_TOKEN" ] || [ "$APP_TOKEN" = "null" ]; then
-                                    echo "Failed to retrieve GitHub App token"
-                                    exit 1
-                                fi
+                                gh auth login --with-token < token.txt 
                                 
-                                echo $APP_TOKEN | gh auth login --with-token
-                                gh pr comment "${env.CHANGE_BRANCH}" --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R "https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                                gh pr comment "${CHANGE_BRANCH}" --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R "https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
                                 
-                                rm -f clean.pem
+                                rm -f clean.pem token.txt
                             '''
                         }
                     }    
