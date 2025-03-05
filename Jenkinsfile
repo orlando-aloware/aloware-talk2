@@ -161,8 +161,6 @@ pipeline {
                                     def branchName = env.GIT_BRANCH.toLowerCase()
                                     def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
 
-                                    // Set the AWS_PROFILE environment variable
-                                    // env.AWS_PROFILE = 'dev'
                                     sh '''
                                     mkdir -p ${WORKSPACE}/dev1/terraform
                                     cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront ${WORKSPACE}/dev1/terraform/
@@ -423,7 +421,7 @@ pipeline {
                                 
                                 cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem 2>/dev/null
                 
-                                signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign clean.pem 2>/dev/null | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
+                                signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" 2>/dev/null | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
                                 
                                 GITHUB_JWT="${header}.${payload}.${signature}"
                                 
