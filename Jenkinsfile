@@ -431,15 +431,12 @@ pipeline {
                                 TOKEN=$(curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
                                     -H "Accept: application/vnd.github+json" \
                                     "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token)
+        
+                                curl -X POST -H "Authorization: Bearer ${TOKEN}" \
+                                    -H "Accept: application/vnd.github.v3+json" \
+                                    -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \
+                                    https://api.github.com/repos/aloware/aloware-talk2/issues/${CHANGE_BRANCH}/comments
 
-                                echo "${TOKEN}" > token.txt
-                                
-                                gh auth login --with-token < token.txt 
-
-                                gh auth status
-                                
-                                GH_TOKEN="${TOKEN}" gh pr comment "${CHANGE_BRANCH}" --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R "https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
-                                
                                 rm -f clean.pem token.txt
                             '''
                         }
