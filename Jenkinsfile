@@ -414,22 +414,31 @@ pipeline {
                         withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
                             sh '''
                                 header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 -w 0 | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
-                                payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":"${GH_APP_ID}"}' | base64 -w 0 | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
+                                payload=$(echo -n '{"iat":'$(date +%s)',"exp":'$(($(date +%s) + 600))',"iss":"'${GH_APP_ID}'"}' | base64 -w 0 | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
 
                                 cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem
-                                signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "clean.pem" | base64 -w 0 | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
+                                signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign clean.pem | base64 -w 0 | tr '/+' '_-' | tr -d '\n' | tr -d '\r')
 
-                                GITHUB_JWT=$(echo -n "${header}.${payload}.${signature}" | tr -d '\n' | tr -d '\r')
+                                GITHUB_JWT="${header}.${payload}.${signature}"
 
-                                APP_TOKEN=$(curl -s -H "Authorization: Bearer ${GITHUB_JWT}" -H "Accept: application/vnd.github+json" https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens | jq -r .token)
+                                APP_TOKEN=$(curl -s -H "Authorization: Bearer ${GITHUB_JWT}" \
+                                    -H "Accept: application/vnd.github+json" \
+                                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token)
+
+                                if [ "$APP_TOKEN" == "null" ]; then
+                                    echo "Failed to retrieve GitHub App token"
+                                    exit 1
+                                fi
 
                                 echo $APP_TOKEN | gh auth login --with-token
-                                gh pr comment ${env.CHANGE_BRANCH} --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}
+                                gh pr comment "${env.CHANGE_BRANCH}" --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R "https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                                
+                                rm -f clean.pem
                             '''
                         }
                     }    
                 } catch (Exception e) {
-                    echo 'We could not add the comment in Github PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
+                    echo 'We could not add the comment in GitHub PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
                 }
             }
         }
