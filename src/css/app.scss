@@ -8815,6 +8815,20 @@ span.mention {
   }
 }
 
+
+.live-call-pulse {
+  animation: live-call-pulse 2s infinite;
+}
+
+@keyframes live-call-pulse {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0,0,0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(0,0,0, 0);
+  }
+}
+
 .ring-group-list {
   li {
     list-style: circle;
@@ -16109,6 +16123,16 @@ hr {
 
     tr:hover {
       background-color: $light-blue;
+    }
+
+    tr.live-call-tr {
+      background-color: $light-blue;
+
+      &:after {
+        content: '';
+        display: block;
+        height: 2px;
+      }
     }
 
     td:last-child {

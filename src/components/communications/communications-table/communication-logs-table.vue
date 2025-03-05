@@ -41,7 +41,7 @@
              row-key="index"
              virtual-scroll
              hide-bottom
-             :data="communications"
+             :data="combinedCommunications"
              :columns="columns"
              :loading="isLoadingMore || isLoadingCommunications"
              :virtual-scroll-item-size="80"
@@ -50,13 +50,15 @@
              :rows-per-page-options="[0]"
              @virtual-scroll="onScroll">
       <template v-slot:body="props">
-        <q-tr :props="props">
+        <q-tr :props="props"
+              :class="{'live-call-tr': isLiveCall(props.row)}">
           <q-td :props="props"
                 :key="col.name"
                 v-for="col in props.cols">
             <div v-if="col.name === 'disposition_status2'">
               <disposition :row="props.row"
                            :style="col.columnStyle"
+                           :is-live-call="isLiveCall(props.row)"
                            @on-details="onCommunicationDetails"/>
             </div>
 
@@ -196,7 +198,7 @@
     </q-table>
 
     <div class="talk-table--no-data h5"
-         v-if="!communications.length && !isLoadingMore && !isLoadingCommunications">
+         v-if="!combinedCommunications.length && !isLoadingMore && !isLoadingCommunications">
       No communications found based on the current filters
     </div>
 
@@ -268,7 +270,8 @@ import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
 import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters, mapMutations } from 'vuex'
+import { isLiveCall } from 'src/plugins/helpers/functions'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -318,8 +321,25 @@ export default {
 
   computed: {
     ...mapState('communications', [
+      'activeChannel',
       'hasMoreCommunications'
-    ])
+    ]),
+
+    ...mapGetters('wallboard', {
+      liveCalls: 'getLiveCalls'
+    }),
+
+    showLiveCalls () {
+      return ['all', 'calls'].includes(this.activeChannel.value)
+    },
+
+    // combine liveCalls (at the top) with communications
+    combinedCommunications () {
+      return [
+        ...(this.showLiveCalls ? this.liveCalls : []),
+        ...this.communications
+      ]
+    }
   },
 
   data () {
@@ -341,6 +361,11 @@ export default {
     ...mapActions('communications', [
       'setSearchQuery'
     ]),
+
+    ...mapMutations('wallboard', {
+      deleteCall: 'DELETE_CALL',
+      setLiveCall: 'SET_LIVE_CALL'
+    }),
 
     sort (sorts) {
       // Handle sorting logic here
@@ -380,7 +405,7 @@ export default {
         return
       }
 
-      const lastIndex = this.communications.length - 1
+      const lastIndex = this.combinedCommunications.length - 1
 
       if (
         this.hasMoreCommunications &&
@@ -441,13 +466,31 @@ export default {
     onCommunicationDetails (communication) {
       this.sidebarCommunication = communication
       this.showCommunicationSidebar = true
-    }
+    },
+
+    isLiveCall
   },
 
   created () {
     this.cancelToken = this.$axios.CancelToken
     this.source = this.cancelToken.source()
     this.columns = this.getSavedColumns()
+  },
+
+  watch: {
+    liveCalls: {
+      deep: true,
+      handler: function (newValue, oldValue) {
+        if (!this.showLiveCalls) {
+          return
+        }
+
+        // if a liveCall is ended, sync comm logs with the new communication
+        if (newValue.length < oldValue.length) {
+          this.getCommunications(this.communicationFilters)
+        }
+      }
+    }
   }
 }
 </script>
