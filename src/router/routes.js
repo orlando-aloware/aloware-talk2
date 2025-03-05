@@ -679,12 +679,9 @@ const routes = [
     component: Dialer
   },
   {
-    name: 'Salesforce SoftPhone',
+    name: 'Salesforce Softphone',
     path: '/salesforce/softphone',
     props: true,
-    meta: {
-      isWidget: true
-    },
     component: SalesforceSoftPhone
   },
   // deep link handlers
