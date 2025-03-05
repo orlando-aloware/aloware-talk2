@@ -433,11 +433,11 @@ pipeline {
         
                                 PR_ID=$(echo ${GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*')
                                 
-                                curl -X POST \
+                                curl -s -X POST \
                                     -H "Authorization: Bearer ${TOKEN}" \
                                     -H "Accept: application/vnd.github.v3+json" \
                                     -d '{"body": "Hi, your environment is ready to use at: https://'${TALK_URL}'"}' \
-                                    "https://api.github.com/repos/aloware/aloware-talk2/issues/${PR_ID}/comments"
+                                    "https://api.github.com/repos/aloware/aloware-talk2/issues/${PR_ID}/comments" > /dev/null
 
                                 rm -f clean.pem token.txt
                             '''
