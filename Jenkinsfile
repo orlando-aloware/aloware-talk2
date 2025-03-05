@@ -414,17 +414,17 @@ pipeline {
                         withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
                             sh '''
                                 header_json='{"alg":"RS256","typ":"JWT"}'
-                                header=$(echo -n "${header_json}" | base64 -w 0 | sed 's/+/-/g; s/\//_/g; s/=//g')
+                                header=$(echo -n "${header_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
                                 
                                 now=$(date +%s)
                                 exp=$((now + 600))
                                 payload_json='{"iat":'${now}',"exp":'${exp}',"iss":'${GH_APP_ID}'}'
-                                payload=$(echo -n "${payload_json}" | base64 -w 0 | sed 's/+/-/g; s/\//_/g; s/=//g')
+                                payload=$(echo -n "${payload_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
                                 
                                 cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem
                                 
                                 signature_data="${header}.${payload}"
-                                signature=$(echo -n "${signature_data}" | openssl dgst -sha256 -sign clean.pem | base64 -w 0 | sed 's/+/-/g; s/\//_/g; s/=//g')
+                                signature=$(echo -n "${signature_data}" | openssl dgst -sha256 -sign clean.pem | base64 -w 0 | tr '+/' '-_' | tr -d '=')
                                 
                                 GITHUB_JWT="${header}.${payload}.${signature}"
                                 
