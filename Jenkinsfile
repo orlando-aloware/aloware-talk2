@@ -432,10 +432,12 @@ pipeline {
                                     -H "Accept: application/vnd.github+json" \
                                     "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token)
         
+                                PR_ID=$(echo ${GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*')
+                                
                                 curl -X POST -H "Authorization: Bearer ${TOKEN}" \
                                     -H "Accept: application/vnd.github.v3+json" \
                                     -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \
-                                    https://api.github.com/repos/aloware/aloware-talk2/issues/${CHANGE_BRANCH}/comments
+                                    https://api.github.com/repos/aloware/aloware-talk2/issues/${PR_ID}/comments
 
                                 rm -f clean.pem token.txt
                             '''
