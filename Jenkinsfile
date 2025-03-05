@@ -433,6 +433,8 @@ pipeline {
                                     "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token > token.txt
                                 
                                 gh auth login --with-token < token.txt 
+
+                                gh auth status
                                 
                                 gh pr comment "${CHANGE_BRANCH}" --body "Hi, your environment is ready to use at: https://${TALK_URL}" -R "https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
                                 
