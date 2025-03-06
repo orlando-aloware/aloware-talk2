@@ -135,7 +135,7 @@ pipeline {
                                         try {
                                             prEnvVars = sh(script: """
                                                 aws ssm get-parameters-by-path \\
-                                                --path "/${prId}/talk2/app/" \\
+                                                --path "/pr-${prId}/talk2/app/" \\
                                                 --recursive \\
                                                 --with-decryption \\
                                                 --profile "dev" \\
