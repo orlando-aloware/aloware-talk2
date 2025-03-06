@@ -180,7 +180,7 @@ jobs:
 
       - name: Rename and Move Windows Executable
         run: |
-          mv "./dist/electron/Packaged/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup ${{ steps.pkg.outputs.VERSION }}.exe" "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe"
+          mv "./production/spa/Packaged/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup ${{ steps.pkg.outputs.VERSION }}.exe" "./${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe"
 
       - name: Install AWS CLI
         run: |
@@ -195,4 +195,4 @@ jobs:
 
       - name: Upload Renamed File to S3
         run: |
-          aws s3 cp "./dist/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe" "s3://${{ secrets.aws_bucket }}/latest/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe" --acl public-read
+          aws s3 cp "./${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe" "s3://${{ secrets.aws_bucket }}/latest/${{ steps.pkg.outputs.PRODUCT_NAME }} Setup Latest.exe" --acl public-read
