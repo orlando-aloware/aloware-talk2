@@ -265,7 +265,6 @@ export default {
     },
 
     async handleDialNumber () {
-      console.log('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         this.showAlertAgentOnCall = true

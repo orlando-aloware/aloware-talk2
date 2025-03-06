@@ -6,7 +6,7 @@
     <q-card class="card">
       <div class="d-flex mb-1"
            v-if='isSalesforceWidget && salesforceDialNumber?.number'>
-        <strong>Calling to {{salesforceDialNumber.number}}</strong>
+        <strong>Calling to {{ salesforceDialNumber.number }}</strong>
       </div>
 
       <div class='d-flex mb-3 small-text'
