@@ -6251,10 +6251,6 @@ table.datatable {
 }
 
 .import-modal {
-  .modal-title {
-    color: #fff;
-  }
-
   .modal-content {
     border-radius: 0;
   }
@@ -6414,23 +6410,18 @@ table.datatable {
   font-size: 14px;
 }
 
-.import-modal  {
-  .modal-body {
-    display: flex;
-    flex-direction: column;
-    min-height: calc(100vh - 300px);
-    max-height: 500px;
+.import-content {
+  min-height: calc(100vh - 155px);
+
+  @include screen('lg') {
+    min-height: 500px;
   }
 
-  .import-content {
-    flex-grow: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: start;
-    padding: 15px;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
 }
 
 .import-dropzone {
@@ -6467,7 +6458,7 @@ table.datatable {
 
 .import-steps {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 
   &__item {
     display: flex;

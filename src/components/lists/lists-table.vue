@@ -49,17 +49,11 @@
             </div>
           </div>
           <div class="ml-2">
-            <b-dropdown variant="primary"
-                        class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
-                        toggle-class="dropdown-btn-text py-0 my-0 d-flex align-items-center"
+            <b-dropdown text="Search Filters"
                         right
-                        no-caret>
-              <template #button-content>
-                <div class="dropdown-btn-text d-flex align-items-center">
-                  Search Filters
-                </div>
-                <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
-              </template>
+                        variant="light"
+                        class="calls__header__columns-dropdown m-2 b-compact-dropdown-button dropdown-white"
+                        size="lg">
               <b-overlay :show="isLoading">
                 <template #overlay>
                   <q-spinner-bars color="primary"
@@ -117,28 +111,16 @@
       </div>
 
         <div class="d-flex justify-between">
-          <b-dropdown variant="primary"
-                      class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
-                      toggle-class="dropdown-btn-text py-0 my-0 d-flex align-items-center"
-                      right
-                      no-caret>
-            <template #button-content>
-              <div class="dropdown-btn-text d-flex align-items-center">
-                Add List
-              </div>
-              <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
-            </template>
-            <b-dropdown-item href="#"
-                            @click="onCreateList">
-              <plus-icon />
-              Create new List
-            </b-dropdown-item>
-            <b-dropdown-item href="#"
-                            @click="openImportContactsModal">
-              <csv-icon />
-              Import from CSV
-            </b-dropdown-item>
-          </b-dropdown>
+          <div class="setting pr-3 align-items-center">
+            <compact-btn variant="primary"
+                         class="mr-2"
+                         data-testid="create-list-menu-item"
+                         @clicked="onCreateList($event)">
+              <plus-icon class="mr-1"
+                         color="white"/>
+              Add List
+            </compact-btn>
+          </div>
         </div>
       </div>
 
@@ -292,7 +274,7 @@
                     <b-dropdown-item href="#"
                                      data-testid="lists-aloai-option"
                                      v-if="shouldShowAloAi"
-                                     @click="openAloAiAgentContactsEnrollmentModal(props.row)">
+                                     @click="openAloAiBotContactsEnrollmentModal(props.row)">
                       <add-user-icon width="14"
                                      height="14"
                                      color="#62666E"/>
@@ -393,11 +375,6 @@
       <change-list-owner-modal ref="changeListOwnerModal"
                                :contactList="list"
                                @listOwnerChanged="onListOwnerChanged"/>
-
-      <import-contacts-modal ref="importContacts"
-                             :user-id="userId"
-                             :folder-id="folderId"
-                             @importStarted="onImportStarted" />
     </div>
   </div>
 </template>
@@ -412,6 +389,7 @@ import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-mo
 import AssignContactsModal from 'src/components/assign-contacts-modal'
 import MoveDialog from 'src/components/move-dialog'
 import CreateListModal from 'components/create-list-modal.vue'
+import CompactBtn from 'src/components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
@@ -422,7 +400,6 @@ import EyeOffIcon from 'components/icons/eye-off-icon'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
-import CsvIcon from 'components/icons/csv-icon.vue'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
@@ -436,7 +413,6 @@ import ChangeListOwnerModal from './change-list-owner-modal.vue'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
-import ImportContactsModal from 'src/components/import-contacts-modal.vue'
 import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
 
 export default {
@@ -458,7 +434,6 @@ export default {
     PencilOIcon,
     PinIcon,
     PlusIcon,
-    CsvIcon,
     SearchInput,
     AssignContactsModal,
     ConvertListToPublicDialog,
@@ -470,6 +445,7 @@ export default {
     RelativeTime,
     ListsFoldersManagement,
     SlashIcon,
+    CompactBtn,
     AddUserIcon,
     SwitchIcon,
     ChangeListOwnerModal,
@@ -477,7 +453,6 @@ export default {
     PowerDialerMobileIcon,
     DeleteRedIcon,
     InformationCircleIcon,
-    ImportContactsModal,
     AloaiEnrollmentControlModal
   },
 
@@ -527,22 +502,18 @@ export default {
       'moveDialog',
       'isAllContactsSelected'
     ]),
-
-    ...mapGetters('listsModule', {
-      lists: 'getLists',
-      listsCount: 'getListsCount'
-    }),
-
     ...mapState(['users']),
-
     ...mapState('listsModule', [
-      'isListsLoading',
-      'listsImportedFromCsv'
+      'isListsLoading'
     ]),
 
     ...mapState('contacts', [
       'unsavedList'
     ]),
+    ...mapGetters('listsModule', {
+      lists: 'getLists',
+      listsCount: 'getListsCount'
+    }),
 
     hasShowInPublicFolderPermission () {
       return this.isBillingAdminOrAdminOrSupervisor
@@ -592,11 +563,7 @@ export default {
     },
 
     folderId () {
-      if (this.$route.params.folderId) {
-        return +this.$route.params.folderId
-      }
-
-      return null
+      return +this.$route.params.folderId
     },
 
     publicListsFilterSelected () {
@@ -1119,39 +1086,6 @@ export default {
 
     onFilterChange () {
       this.refreshLists()
-    },
-
-    openImportContactsModal () {
-      if (this.$refs.importContacts) {
-        this.$refs.importContacts.open()
-      }
-    },
-
-    onImportStarted () {
-      if (this.isPublic) {
-        this.$router.push('/lists-management/user')
-      } else {
-        this.refreshLists()
-      }
-    },
-
-    listCsvImportFinished (event) {
-      if (!event?.contact_list) {
-        return
-      }
-
-      // notify user if is one of the Lists he imported
-      const list = this.listsImportedFromCsv.find((c) => c.id === event.contact_list.id)
-      if (!list) {
-        return
-      }
-
-      const listName = event.contact_list.name
-      this.$generalNotification(`Contacts successfully imported into ${listName}`)
-
-      if (!this.isPublic) {
-        this.refreshLists()
-      }
     }
   },
 
@@ -1159,12 +1093,10 @@ export default {
     this.initializeLists()
 
     this.$VueEvent.listen('lists-management-folder-click', this.onFolderSelected)
-    this.$VueEvent.listen('contact_list_import_csv', this.listCsvImportFinished)
   },
 
   beforeDestroy () {
     this.$VueEvent.stop('lists-management-folder-click', this.onFolderSelected)
-    this.$VueEvent.stop('contact_list_import_csv')
   },
 
   watch: {
@@ -1192,9 +1124,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-.dropdown-btn-text {
-  font-size: 12px;
-  font-weight: 400;
-}
-</style>

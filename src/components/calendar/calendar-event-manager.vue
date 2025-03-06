@@ -111,16 +111,6 @@
 
       <b-row v-if="schedule.type > 0 && schedule.contact && schedule.contact.id">
         <b-col md="12"
-               v-if="showSendContactReminderNotification">
-          <b-form-group class="checkbox-wrapper ml-1">
-            <b-form-checkbox :value="true"
-                             :unchecked-value="false"
-                             v-model="schedule.send_contact_reminder">
-              <span>Send reminder notification to the contact</span>
-            </b-form-checkbox>
-          </b-form-group>
-        </b-col>
-        <b-col md="12"
                :lg="isAppointment ? 4 : 6">
           <b-form-group class="form-label"
                         label="Date"
@@ -427,8 +417,7 @@ export default {
         timezone: this.profile?.timezone,
         date: moment().format(DATE_FORMAT),
         time: DEFAULT_HOUR,
-        type: null,
-        send_contact_reminder: false
+        type: null
       },
       originalSchedule: {},
       // not defined as camelCase because its used directly in API
@@ -560,10 +549,6 @@ export default {
 
     isContactSelected () {
       return this.schedule.contact?.id
-    },
-
-    showSendContactReminderNotification () {
-      return !this.isAppointment && this.mode === 'add'
     }
   },
 
