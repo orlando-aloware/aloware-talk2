@@ -127,17 +127,47 @@ pipeline {
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
                                         --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
                                     """, returnStdout: true).trim()
+                                    
+                                    def prEnvVars = ""
+                                    if (env.GIT_BRANCH.toLowerCase().contains('pr-')) {
+                                        def prId = env.GIT_BRANCH.toLowerCase().replaceAll('.*pr-([0-9]+).*', '$1')
+                                        echo "Looking for environment variables for PR-${prId}"
+                                        try {
+                                            prEnvVars = sh(script: """
+                                                aws ssm get-parameters-by-path \\
+                                                --path "/${prId}/talk2/app/" \\
+                                                --recursive \\
+                                                --with-decryption \\
+                                                --profile "dev" \\
+                                                --query "Parameters[].{Name:Name,Value:Value}" \\
+                                                --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                            """, returnStdout: true).trim()
+                                        } catch (Exception e) {
+                                            echo "No specific variables found for PR-${prId}: ${e.message}"
+                                            prEnvVars = ""
+                                        }
+                                    }
 
                                     writeFile file: 'shared.env', text: sharedEnvVars + '\n'
                                     writeFile file: 'dev1.env', text: dev1EnvVars + '\n'
-
-                                    sh '''
-                                    cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.dev1 
-                                    '''
+                                    
+                                    if (prEnvVars) {
+                                        writeFile file: 'pr.env', text: prEnvVars + '\n'
+                                        sh '''
+                                        cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.temp 
+                                        cat .env.temp pr.env | awk -F= '!seen[$1]++' > .env.dev1 
+                                        rm .env.temp shared.env dev1.env pr.env
+                                        '''
+                                    } else {
+                                        sh '''
+                                        cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.dev1
+                                        rm shared.env dev1.env
+                                        '''
+                                    }
 
                                     if (env.API_URL_OVERWRITE) {
-                                        sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
-                                        sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env"
+                                        sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env.dev1"
+                                        sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env.dev1"
                                     }
                                 }
                                 
@@ -148,7 +178,7 @@ pipeline {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'NODE_ENV=dev1 quasar build --debug'
+                                    sh 'cat .env.dev1 && NODE_ENV=dev1 quasar build --debug'
                                 }
                             }
                         }
@@ -235,6 +265,7 @@ pipeline {
 
                                     sh '''
                                     cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env.dev2
+                                    rm shared.env dev2.env
                                     '''
 
                                 }
@@ -319,6 +350,7 @@ pipeline {
 
                                     sh '''
                                     cat shared.env staging.env | awk -F= '!seen[$1]++' > .env.staging
+                                    rm shared.env staging.env
                                     '''
                                 }
                                 
