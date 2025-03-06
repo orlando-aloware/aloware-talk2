@@ -189,9 +189,13 @@ export default {
         await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
       } while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)
 
-      this.checkAndResetCallDisposition()
-      await this.getContact()
+      try {
+        await this.getContact()
+      } catch (e) {
+        return
+      }
 
+      this.checkAndResetCallDisposition()
       await this.findDefaultOutboundCampaign()
 
       if (this.isAlwaysAskModeEnabled()) {
@@ -329,8 +333,15 @@ export default {
         name: this.contactName
       }
 
-      this.checkContactTimezone(contactData, this.makeCall)
+      this.checkContactTimezone(contactData, this.makeCall, this.cancelCall)
       this.isDialed = true
+    },
+
+    cancelCall () {
+      // remove loading page if there is no ask about line
+      if (!this.isAlwaysAskModeEnabled()) {
+        this.handleCallCompletedEvent()
+      }
     },
 
     handleAgentStatusUpdate (data) {
