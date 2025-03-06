@@ -26,8 +26,7 @@
        v-if="row.user_id"
        :class="{ 'deleted': userName === 'Deleted User' }"
        @click.prevent="filter">
-      {{ userName }}
-
+      <user-display :user-id="row.user_id" />
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-user-${_uid}`">
         Click to filter by this user
@@ -41,9 +40,14 @@
 
 <script>
 import { userMixin } from 'src/plugins/mixins'
+import UserDisplay from 'src/components/user-display.vue'
 
 export default {
   name: 'User',
+
+  components: {
+    UserDisplay
+  },
 
   mixins: [
     userMixin

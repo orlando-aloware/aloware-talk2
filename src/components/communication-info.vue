@@ -425,7 +425,7 @@
                                    self="center middle">
                           Click For More Info
                         </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -477,7 +477,7 @@
                                    self="center left">
                           Click For More Info
                         </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -503,7 +503,7 @@
                                   <span class="cursor-pointer"
                                         :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                                         :title="getUserName(getUser(attemptingUser))">
-                                    {{ getUserName(getUser(attemptingUser)) }}
+                                    <user-display :user-id="attemptingUser" />
                                   </span>
                                 </div>
                             </li>
@@ -867,11 +867,11 @@
           <div class="flex items-center gap-2">
             <h3 class="ai-effect-gradient-text"
                 @click="currentCompany?.transcription_settings?.call_transcription_enabled ? (showInfoBox = true) : null">
+              <sparkle-icon width="16" height="16" color="#9333EA"/>
               Powered by AloAi
               <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
                 (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
               </template>
-              <sparkle-icon width="16" height="16" color="#9333EA"/>
             </h3>
           </div>
           <div class="transcription-summary-container">
@@ -891,25 +891,6 @@
               <span v-else-if="communication.call_summary_status === SummaryStatus.STATUS_PROCESSING">Summarization in progress</span>
             </span>
           </div>
-        </div>
-        <div class="text-left-align text-13"
-             v-if="isTranscriptionAllowed(communication) && communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
-          <div>Transcription generation failed. Please try again later.</div>
-          <generate-transcription-button class="mt-2"
-                                         variant="button"
-                                         data-testid="comm-details-generate-transcription-button"
-                                         :communication="communication"
-                                         v-if="fileUuid && isMigrated">
-          </generate-transcription-button>
-        </div>
-        <div class="text-left-align text-13"
-             v-else-if="isTranscriptionAllowed(communication)">
-          <div>Click on the button to generate a transcription of this call.</div>
-          <generate-transcription-button class="mt-2"
-                                         variant="button"
-                                         data-testid="comm-details-generate-transcription-button"
-                                         :communication="communication"
-                                         v-if="fileUuid && isMigrated"/>
         </div>
         <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
@@ -932,6 +913,29 @@
             </q-btn>
           </div>
         </div>
+        <div class="text-left-align text-13 relative"
+             v-else-if="isEmptyParsedTranscription(communication)">
+          <div>Transcription cannot be generated for this communication.</div>
+        </div>
+        <div class="text-left-align text-13"
+             v-else-if="isTranscriptionAllowed(communication) && communication.call_transcription_status === TranscriptionStatus.STATUS_ERROR">
+          <div>Transcription generation failed. Please try again later.</div>
+          <generate-transcription-button class="mt-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated">
+          </generate-transcription-button>
+        </div>
+        <div class="text-left-align text-13"
+             v-else-if="isTranscriptionAllowed(communication)">
+          <div>Click on the button to generate a transcription of this call.</div>
+          <generate-transcription-button class="mt-2"
+                                         variant="button"
+                                         data-testid="comm-details-generate-transcription-button"
+                                         :communication="communication"
+                                         v-if="fileUuid && isMigrated"/>
+        </div>
       </div>
     </div>
     <div class="ai-effect-container mt-2"
@@ -941,8 +945,8 @@
       <div class="ai-effect-content p-2">
         <div class="flex items-center gap-2">
           <h3 class="ai-effect-gradient-text">
-            Powered by AloAi
             <sparkle-icon width="16" height="16" color="#9333EA"/>
+            Powered by AloAi
           </h3>
         </div>
         <div class="text-left-align text-13 font-weight-light-bold my-2">
@@ -981,12 +985,13 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
+import UserDisplay from 'src/components/user-display.vue'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
 import { marked } from 'marked'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin, classicMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
@@ -1013,7 +1018,8 @@ export default {
     notificationMixin,
     liveCallsMixin,
     mentionsMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    classicMixin
   ],
 
   components: {
@@ -1038,7 +1044,8 @@ export default {
     DownloadButton,
     EntityTags,
     AloaiPromotionDialog,
-    GenerateTranscriptionButton
+    GenerateTranscriptionButton,
+    UserDisplay
   },
 
   props: {
@@ -1184,34 +1191,31 @@ export default {
       return this.communication.body
     },
 
-    isAloaiDialogVisible () {
-      const allowedStatuses = [
-        TranscriptionStatus.STATUS_PROCESSING,
-        TranscriptionStatus.STATUS_COMPLETED,
-        TranscriptionStatus.STATUS_ERROR
-      ]
-
+    conditionForShowPoweredByAloAiBox () {
       return (
         !this.isSimpSocial &&
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrated &&
-        (this.isTranscriptionAllowed(this.communication) || this.communication.call_summary) && // Don't show empty AloAi dialog box
+        this.fileUuid && this.isMigrated
+      )
+    },
+
+    isAloaiDialogVisible () {
+      return (
+        this.conditionForShowPoweredByAloAiBox &&
+        (this.communication.is_eligible_for_transcribe || this.communication.call_summary) && // Don't show empty AloAi dialog box
         (this.communication.has_voicemail || this.showAudio(this.communication)) &&
         (
-          // If transcription does not exist, or transcription exists and is in allowed status
+          // If transcription does not exist for this call, or transcription has status
           (!this.communication?.call_transcription_status && this.currentCompany?.transcription_settings?.call_transcription_enabled) ||
-          (this.communication.has_transcription || allowedStatuses.includes(this.communication.call_transcription_status))
+          this.communication.call_transcription_status
         )
       )
     },
 
     isAvaPromotionDialogVisible () {
       return (
-        !this.isSimpSocial && // Exclude SimpSocial
-        this.currentCompany?.transcription_enabled &&
-        this.communication.type === CommunicationTypes.CALL &&
-        this.fileUuid && this.isMigrated &&
+        this.conditionForShowPoweredByAloAiBox &&
         (this.showAudio(this.communication) || this.communication.has_voicemail) &&
         (
           // Either transcription is not enabled, or usage has exceeded limits with restrictions
