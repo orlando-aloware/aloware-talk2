@@ -272,6 +272,7 @@ import CommunicationsDetailsSidebar from 'components/communications/communicatio
 import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
 import { mapState, mapActions, mapGetters, mapMutations } from 'vuex'
 import { isLiveCall } from 'src/plugins/helpers/functions'
+import { CALL } from 'src/constants/communication-types'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -353,7 +354,10 @@ export default {
       paginated: false,
       showColumnHeadersModal: false,
       showCommunicationSidebar: false,
-      sidebarCommunication: {}
+      sidebarCommunication: {},
+      listeners: {
+        callUpdated: null
+      }
     }
   },
 
@@ -475,6 +479,19 @@ export default {
     this.cancelToken = this.$axios.CancelToken
     this.source = this.cancelToken.source()
     this.columns = this.getSavedColumns()
+
+    this.listeners.callUpdated = (communication) => {
+      if (![CALL].includes(communication.type)) {
+        return
+      }
+
+      this.setLiveCall(communication)
+    }
+
+    // live call events
+    this.$VueEvent.listen('new_communication', this.listeners.callUpdated)
+    this.$VueEvent.listen('update_communication', this.listeners.callUpdated)
+    this.$VueEvent.listen('delete_communication', this.deleteCall)
   },
 
   watch: {
@@ -491,6 +508,12 @@ export default {
         }
       }
     }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('new_communication', this.listeners.callUpdated)
+    this.$VueEvent.stop('update_communication', this.listeners.callUpdated)
+    this.$VueEvent.stop('delete_communication', this.deleteCall)
   }
 }
 </script>
