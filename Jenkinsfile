@@ -115,7 +115,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     def dev1EnvVars = sh(script: """
@@ -125,7 +125,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
                                     
                                     def prEnvVars = ""
@@ -140,7 +140,7 @@ pipeline {
                                                 --with-decryption \\
                                                 --profile "dev" \\
                                                 --query "Parameters[].{Name:Name,Value:Value}" \\
-                                                --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                                --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                             """, returnStdout: true).trim()
                                         } catch (Exception e) {
                                             echo "No specific variables found for PR-${prId}: ${e.message}"
@@ -247,7 +247,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     def dev2EnvVars = sh(script: """
@@ -257,7 +257,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     writeFile file: 'shared.env', text: sharedEnvVars + '\n'
@@ -332,7 +332,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     def stagingEnvVars = sh(script: """
@@ -342,7 +342,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     writeFile file: 'shared.env', text: sharedEnvVars + '\n'
