@@ -173,9 +173,9 @@ export default {
 
       switch (true) {
         case this.multiple && this.selected.length < 1:
-          return this.customPlaceholder || 'Select Lines or Ring Groups'
+          return this.customPlaceholder || 'Select Lines or Einbox'
         case !this.multiple && !this.selected:
-          return this.customPlaceholder || 'Select Line or Ring Group'
+          return this.customPlaceholder || 'Select Line or Einbox'
         case this.multiple && this.selected.length > 0:
         case !this.multiple && this.selected:
         default:
@@ -197,7 +197,7 @@ export default {
 
       if (ringGroupOptions && ringGroupOptions.length > 0) {
         ringGroupOptions.unshift({
-          group: 'Filter by Ring Group',
+          group: 'Filter by Einbox',
           disable: true
         })
       }
