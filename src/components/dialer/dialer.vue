@@ -1686,8 +1686,6 @@ export default {
       console.log('answerCallFishing', {
         connection: !!this.connection,
         dialer_currentStatus: this.dialer.currentStatus,
-        dialer_communication_id: this.dialer.communication.id,
-        communication_id: communication.id,
         communication_campaignId: communication.campaignId,
         agent_status: this.agentStatus
       })
