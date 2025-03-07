@@ -344,6 +344,11 @@ export default {
         call._connection.ignore()
         return
       }
+
+      if (this.isOnPowerDialerSessionRoute) {
+        return
+      }
+
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
@@ -1160,6 +1165,7 @@ export default {
 
         this.setDialerIsMuted(false)
       }).catch(err => {
+        console.log('ERROR: ', err)
         this.setDialerParkedCall()
         this.stopParkedCallTimer()
         console.log(err)
@@ -1750,7 +1756,7 @@ export default {
 
       // Set active task as redialed, so it won't process redial again for this task
       this.activeTask.forcedRedial = true
-
+      console.log('dialer - should process redial')
       // Trigger onNextTask to handle redialing
       this.$VueEvent.fire('onNextTask')
 
@@ -1798,6 +1804,7 @@ export default {
       if (value === 'ANSWERING_CALL' && this.dialer.error.code !== null) {
         this.setDialerErrorDefault()
       }
+      console.log('dialer - Dialer.currentStatus', this.dialer)
     }
   },
 

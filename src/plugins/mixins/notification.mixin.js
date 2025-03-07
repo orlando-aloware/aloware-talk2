@@ -24,7 +24,10 @@ export default {
       'notificationAudio'
     ]),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['isWidget'])
+    ...mapState(['isWidget']),
+    ...mapState('powerDialer', [
+      'powerDialerTasks'
+    ])
   },
 
   methods: {
@@ -309,6 +312,16 @@ export default {
       if (!_.isEmpty(params.data)) {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
           console.log('processActionNotification - params.data', params.data)
+          if (this.isOnPowerDialerSessionRoute) {
+            const contactWithCommunication = {
+              ...params.data.contact,
+              'communication_id': params.data.communicationId
+            }
+            console.log('ADD TO QUEUE:', contactWithCommunication)
+            this.powerDialerTasks.in_queue.unshift(contactWithCommunication)
+
+            return
+          }
           this.setShowIncomingCallNotification(true)
         }
 

@@ -71,6 +71,7 @@ export default {
 
       talk2Api.V1.communication.get(id)
         .then(res => {
+          console.log('getCommunication: ', res.data)
           this.communication = res.data
         }).catch(err => {
           this.hasError = true
@@ -87,6 +88,7 @@ export default {
     }
 
     this.$VueEvent.listen('update_communication', (data) => {
+      console.log('communication update: ', data)
       if (this.communication && this.communication.id === data.id) {
         data = _.merge(this.communication, data)
         this.communication = data

@@ -235,6 +235,7 @@ export default {
         // Implement: Should skip single task
         this.skipSingleTask(this.taskToCall, 'Task is skipped because timezone has not been set for this contact. Pushed the task to the bottom of the list.')
         // this.moveTask(this.taskToCall, this.moveDirection.bottom)
+        console.log('session call status - return run task - shouldSkip and !timezone')
         return
       }
 
@@ -243,12 +244,14 @@ export default {
         // Implement: Should skip single task
         this.skipSingleTask(this.taskToCall, 'Task is skipped because it\'s outside day times. Pushed the task to the bottom of the list.')
         // this.moveTask(this.taskToCall, this.moveDirection.bottom)
+        console.log('session call status - return run task - shouldSkip and outside day times')
         return
       }
 
       // Check if the contact is DNC'ed
       if (this.taskToCall?.is_dnc) {
         this.cancelSingleTask(this.taskToCall, 'Task is removed because the contact is on DNC.')
+        console.log('session call status - return run task - is dnc')
         return
       }
 
@@ -256,8 +259,9 @@ export default {
 
       // only proceed if task has a contact list item id and
       // dialer's status is ready
-      if (!this.taskToCall?.contact_list_item_id || !this.dialer.isReady) {
+      if ((!this.taskToCall?.contact_list_item_id && !this.taskToCall.communication_id) || !this.dialer.isReady) {
         this.sessionNotReady = true
+        console.log('sessions call status - return run task ', this.taskToCall?.contact_list_item_id, this.taskToCall.communication_id, this.dialer)
         return
       }
 
@@ -277,10 +281,10 @@ export default {
           }, 1000)
         })
       }
-
+      console.log('MAKE CALL - RUN TASK', this.taskToCall)
       // Fires an event to make a call
       this.$VueEvent.fire('makeCall', {
-        currentNumber: this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`), // we know this already based on the list (Required)
+        currentNumber: this.taskToCall.contact_list_item_id ? this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`) : this.$options.filters.fixPhone(`call:${this.taskToCall.communication_id}`), // we know this already based on the list (Required)
         outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
         contactName: `${this.taskToCall?.first_name} ${this.taskToCall?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
         companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)
@@ -313,6 +317,7 @@ export default {
           // }
           // this.skipped_list.push(autoDialTask.id)
           this.$generalNotification(message, 'warning')
+          console.log('sessions call status - skip single task')
           this.onNextTask()
           return Promise.resolve(res)
         }).catch(err => {
@@ -331,6 +336,7 @@ export default {
       return this.$axios.post(`/api/v2/power-dialer-list-items/${contactListItemId}/cancel`, { reason: message })
         .then(res => {
           this.$generalNotification(message, 'warning')
+          console.log('sessions call status - cancel single task')
           this.onNextTask(true, true)
           return Promise.resolve(res)
         }).catch(err => {
@@ -383,6 +389,7 @@ export default {
       }
 
       if (this.callInProgress) {
+        console.log('sessions call status - skipTask')
         this.$VueEvent.fire('hangupCall')
       }
     },

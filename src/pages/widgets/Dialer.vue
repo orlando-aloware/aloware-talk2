@@ -531,6 +531,7 @@ export default {
       }
 
       if (this.dialer?.communication?.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW) {
+        console.log('Dialer - end active call')
         this.$VueEvent.fire('hangupCall')
       }
 
