@@ -312,6 +312,7 @@ export default {
       if (!_.isEmpty(params.data)) {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
           console.log('processActionNotification - params.data', params.data)
+          console.log('ON POWER DIALER SESSION ROUTE?', this.isOnPowerDialerSessionRoute)
           if (this.isOnPowerDialerSessionRoute) {
             const contactWithCommunication = {
               ...params.data.contact,

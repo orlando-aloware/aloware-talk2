@@ -1689,15 +1689,6 @@ export default {
         return
       }
 
-      console.log('answerCallFishing', {
-        connection: !!this.connection,
-        dialer_currentStatus: this.dialer.currentStatus,
-        dialer_communication_id: this.dialer.communication.id,
-        communication_id: communication.id,
-        communication_campaignId: communication.campaignId,
-        agent_status: this.agentStatus
-      })
-
       if (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
         this.connection.accept()
       } else {
