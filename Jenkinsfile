@@ -31,6 +31,9 @@ pipeline {
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
         API_URL_OVERWRITE = ''
+        GH_APP_PEM = credentials('github-app-private-key')
+        GH_APP_ID = '1157885'
+        GH_INSTALLATION_ID = '61798182'
     }
 
     stages {
@@ -112,7 +115,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     def dev1EnvVars = sh(script: """
@@ -122,15 +125,45 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
+                                    
+                                    def prEnvVars = ""
+                                    if (env.GIT_BRANCH.toLowerCase().contains('pr-')) {
+                                        def prId = env.GIT_BRANCH.toLowerCase().replaceAll('.*pr-([0-9]+).*', '$1')
+                                        echo "Looking for environment variables for PR-${prId}"
+                                        try {
+                                            prEnvVars = sh(script: """
+                                                aws ssm get-parameters-by-path \\
+                                                --path "/pr-${prId}/talk2/app/" \\
+                                                --recursive \\
+                                                --with-decryption \\
+                                                --profile "dev" \\
+                                                --query "Parameters[].{Name:Name,Value:Value}" \\
+                                                --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
+                                            """, returnStdout: true).trim()
+                                        } catch (Exception e) {
+                                            echo "No specific variables found for PR-${prId}: ${e.message}"
+                                            prEnvVars = ""
+                                        }
+                                    }
 
                                     writeFile file: 'shared.env', text: sharedEnvVars + '\n'
                                     writeFile file: 'dev1.env', text: dev1EnvVars + '\n'
-
-                                    sh '''
-                                    cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.dev1 
-                                    '''
+                                    
+                                    if (prEnvVars) {
+                                        writeFile file: 'pr.env', text: prEnvVars + '\n'
+                                        sh '''
+                                        cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.temp 
+                                        cat .env.temp pr.env | awk -F= '!seen[$1]++' > .env.dev1 
+                                        rm .env.temp shared.env dev1.env pr.env
+                                        '''
+                                    } else {
+                                        sh '''
+                                        cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.dev1
+                                        rm shared.env dev1.env
+                                        '''
+                                    }
 
                                     if (env.API_URL_OVERWRITE) {
                                         sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env.dev1"
@@ -145,7 +178,7 @@ pipeline {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'NODE_ENV=dev1 quasar build --debug'
+                                    sh 'cat .env.dev1 && NODE_ENV=dev1 quasar build --debug'
                                 }
                             }
                         }
@@ -158,8 +191,6 @@ pipeline {
                                     def branchName = env.GIT_BRANCH.toLowerCase()
                                     def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
 
-                                    // Set the AWS_PROFILE environment variable
-                                    // env.AWS_PROFILE = 'dev'
                                     sh '''
                                     mkdir -p ${WORKSPACE}/dev1/terraform
                                     cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront ${WORKSPACE}/dev1/terraform/
@@ -216,7 +247,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     def dev2EnvVars = sh(script: """
@@ -226,7 +257,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     writeFile file: 'shared.env', text: sharedEnvVars + '\n'
@@ -234,6 +265,7 @@ pipeline {
 
                                     sh '''
                                     cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env.dev2
+                                    rm shared.env dev2.env
                                     '''
 
                                 }
@@ -300,7 +332,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     def stagingEnvVars = sh(script: """
@@ -310,7 +342,7 @@ pipeline {
                                         --with-decryption \\
                                         --profile "dev" \\
                                         --query "Parameters[].{Name:Name,Value:Value}" \\
-                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\(.Value)"'
+                                        --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                     """, returnStdout: true).trim()
 
                                     writeFile file: 'shared.env', text: sharedEnvVars + '\n'
@@ -318,6 +350,7 @@ pipeline {
 
                                     sh '''
                                     cat shared.env staging.env | awk -F= '!seen[$1]++' > .env.staging
+                                    rm shared.env staging.env
                                     '''
                                 }
                                 
@@ -408,12 +441,40 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
-                        sh "echo ${GIT_AUTH_PSW} > tmp_token.txt"
-                        sh 'gh auth login --with-token < tmp_token.txt'
-                        sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${TALK_URL}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
-                    }
+                        withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
+                            sh '''
+                                header_json='{"alg":"RS256","typ":"JWT"}'
+                                header=$(echo -n "${header_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
+                                
+                                now=$(date +%s 2>/dev/null)
+                                exp=$((now + 600))
+                                payload_json='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
+                                payload=$(echo -n "${payload_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
+                                
+                                cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem 2>/dev/null
+                
+                                signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" 2>/dev/null | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
+                                
+                                GITHUB_JWT="${header}.${payload}.${signature}"
+                                
+                                TOKEN=$(curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
+                                    -H "Accept: application/vnd.github+json" \
+                                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token 2>/dev/null)
+        
+                                PR_ID=$(echo ${GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*' 2>/dev/null)
+                                
+                                curl -s -X POST \
+                                    -H "Authorization: Bearer ${TOKEN}" \
+                                    -H "Accept: application/vnd.github.v3+json" \
+                                    -d '{"body": "Hi, your environment is ready to use at: https://'${TALK_URL}'"}' \
+                                    "https://api.github.com/repos/aloware/aloware-talk2/issues/${PR_ID}/comments" > /dev/null
+
+                                rm -f clean.pem
+                            '''
+                        }
+                    }    
                 } catch (Exception e) {
-                    echo 'We could not add the comment in Github PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
+                    echo 'We could not add the comment in GitHub PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
                 }
             }
         }
