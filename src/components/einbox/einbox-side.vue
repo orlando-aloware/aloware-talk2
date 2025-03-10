@@ -1,7 +1,7 @@
 <template>
   <div data-testid="einbox-side"
        class="einbox-side">
-    <einbox-nav-list class="einbox-side__left border-right"
+    <einbox-nav-list class="einbox-side__left"
                      data-testid="einbox-nav-list"
                      ref="eInboxNavList" />
     <einbox-tab class="einbox-side__right"
@@ -79,21 +79,22 @@ export default {
 
 <style lang="scss" scoped>
 .einbox-side {
-  padding: 7px;
+  padding: 10px;
   background-color: #F9F9FB;
   display: flex;
+  column-gap: 10px;
 
   &__left {
     max-width: 250px;
     width: 250px;
     overflow: hidden;
-    border-radius: 12px 0px 0px 12px;
+    border-radius: 8px;
   }
 
   &__right {
     max-width: 300px;
     width: 300px;
-    border-radius: 0px 12px 0px 0px;
+    border-radius: 8px;
   }
 }
 </style>
