@@ -29,6 +29,7 @@
     <saved-filters class="px-2 left-column-wrapper "
                    :fetch-filters="fetchSavedFilters"
                    :filter-type="filterTypeForGetSavedFilters"
+                   :apply-query-filter="isFirstLoad"
                    @filterSelected="(item) => onSelectSavedFilter(item)"
                    @filters-fetched="()=> fetchSavedFilters = false"
     />
@@ -133,8 +134,12 @@ export default {
       'isFilterDialogShown',
       'pinnedViews',
       'isEditingView',
-      'isFilterDialogForView'
+      'isFilterDialogForView',
+      'personalFilters',
+      'companyFilters'
     ]),
+
+    ...mapState(['isFirstLoad']),
 
     ...mapGetters('communications', [
       'allSavedFilters'
@@ -300,8 +305,6 @@ export default {
 
       this.setSelectedFilter(filter)
 
-      this.setIsFirstLoad(false)
-
       const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
 
       personalFilterObject.from_date = formattedDates.from_date
@@ -368,6 +371,19 @@ export default {
       // Apply the filter
       this.setAppliedFilter(filter)
       this.setChannelClonedFilter(personalFilterObject)
+
+      // if is first load, apply filter_id to query without removing other params
+      if (this.isFirstLoad) {
+        const query = {
+          ...this.$route.query,
+          filter_id: filter.id
+        }
+        this.$router.replace({ query }).catch(() => { })
+      } else {
+        this.$router.replace({ query: { filter_id: filter.id } }).catch(() => { })
+      }
+
+      this.setIsFirstLoad(false)
 
       // Get communications with the new filter
       this.$nextTick(() => {
@@ -482,6 +498,14 @@ export default {
         }).catch(err => {
           console.log(err)
           this.$handleErrors(err.response)
+        })
+      }
+    },
+
+    filtersLoaded () {
+      if (this.filtersLoaded) {
+        this.$nextTick(() => {
+          this.getCommunications(this.communicationFilters)
         })
       }
     }

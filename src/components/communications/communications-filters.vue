@@ -139,9 +139,17 @@ export default {
     }
   },
   mounted () {
-    this.filter = _.clone(this.channelDefaultFilterModel.filter)
+    console.log('>>> comm-filters.vue mounted')
+
+    const filter = _.clone(this.channelDefaultFilterModel.filter)
+
+    this.applyQueryStringFilters(filter)
+
+    this.filter = filter
 
     this.$VueEvent.listen('filter-communications', data => {
+      console.log('>>> filter-communications listener')
+
       // ex: data = { type: 'users', value: 1 }
       const current = typeof this.channelClonedFilter[data.type] === 'object' ? JSON.stringify(this.channelClonedFilter[data.type]) : this.channelClonedFilter[data.type]
       const attempt = typeof data.value === 'object' ? JSON.stringify(data.value) : data.value
@@ -161,6 +169,9 @@ export default {
         ...this.filter,
         [data.type]: data.value
       }
+
+      // update query string
+      this.updateQueryString()
 
       // refresh data
       this.setChannelClonedFilter(this.filter)
@@ -254,6 +265,7 @@ export default {
       // channel cloned filter are the current filter settings populated in the filter dialog form
       // especially when there is no applied or selected filter.
       this.setChannelClonedFilter(this.filter)
+      this.updateQueryString()
 
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
@@ -318,9 +330,78 @@ export default {
       this.setCommunications([])
       this.setIsFirstLoad(true)
       this.setAppliedFilter(null)
+      this.resetQueryStringFilters()
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
+    },
+
+    isFilterPropertyArray (property) {
+      // console.log('>>> this.channelDefaultFilterModel?.filter', this.channelDefaultFilterModel?.filter)
+
+      return this.channelDefaultFilterModel?.filter && Array.isArray(this.channelDefaultFilterModel.filter[property])
+    },
+
+    updateQueryString () {
+      console.log('>>> updateQueryString channel', this.channelChangedFilterFields)
+
+      const keptParams = {
+        ...(this.$route.query.filter_id && { filter_id: this.$route.query.filter_id })
+      }
+
+      const queryParams = new URLSearchParams(keptParams)
+
+      this.channelChangedFilterFields.forEach((filter) => {
+        let { property, value } = filter
+
+        if (this.isFilterPropertyArray(property)) {
+          value = value.join(',')
+        }
+
+        queryParams.set(property, value)
+      })
+
+      console.log('>>> updateQueryString queryParams', queryParams.toString())
+
+      // update query string
+      this.$router.replace({
+        query: Object.fromEntries(queryParams)
+      }).catch(err => {
+        if (err.name !== 'NavigationDuplicated') {
+          throw err
+        }
+      })
+    },
+
+    resetQueryStringFilters () {
+      this.$router.replace({ query: null }).catch(() => {})
+    },
+
+    applyQueryStringFilters (filter) {
+      console.log('>>> channelDefaultFilterModel', this.channelDefaultFilterModel)
+
+      // const hasFilter = Object.keys(this.$route.query).includes('filter_id')
+
+      Object.entries(this.$route.query).forEach(([property, value]) => {
+        if (this.isFilterPropertyArray(property)) {
+          value = value.split(',').map(parseInt)
+        }
+
+        if (value === 'null') {
+          value = null
+        }
+
+        if (property !== 'filter_id') {
+          this.updateChannelChangedFilterFields({
+            name: property,
+            value: value
+          })
+        }
+
+        filter[property] = value
+      })
+
+      console.log('>>> appliedFilter', filter)
     }
   },
 

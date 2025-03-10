@@ -81,9 +81,15 @@ export default {
       type: Boolean,
       default: false
     },
+
     currentTags: {
       type: Array,
       default: () => []
+    },
+
+    applyQueryFilter: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -187,6 +193,29 @@ export default {
         }
       })
       this.getTagsByIds(tagsIds)
+
+      if (!this.applyQueryFilter) {
+        return
+      }
+
+      const qsFilterId = this.$route.query.filter_id
+
+      if (!qsFilterId) {
+        return
+      }
+
+      let filter = this.companyFilters.find((f) => f.id === +qsFilterId)
+      if (filter) {
+        console.log('>>> found company filter', filter)
+        this.$emit('filterSelected', filter)
+        return
+      }
+
+      filter = this.personalFilters.find((f) => f.id === +qsFilterId)
+      if (filter) {
+        console.log('>>> found personal filter', filter)
+        this.$emit('filterSelected', filter)
+      }
     },
 
     getTagsByIds (ids) {

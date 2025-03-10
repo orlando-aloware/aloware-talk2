@@ -128,6 +128,19 @@ export default {
 
     onWindowResize () {
       this.setShowViewsList(false)
+    },
+
+    loadCommunications () {
+      // if a filter is present in query string, fetch the communications
+      // after loading the filter (and trying to apply it)
+      if (this.$route.query.filter_id) {
+        console.log('>>> aborting CommunicationsView getCommunications')
+        return
+      }
+
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     }
   },
 
@@ -169,9 +182,7 @@ export default {
 
     window.addEventListener('resize', this.onWindowResize)
 
-    this.$nextTick(() => {
-      this.getCommunications(this.communicationFilters)
-    })
+    this.loadCommunications()
   },
 
   unmounted () {
