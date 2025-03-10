@@ -30,25 +30,7 @@ module.exports = function (ctx) {
     !Array.isArray(parsedEnv) &&
     parsedEnv !== undefined &&
     parsedEnv !== null) {
-    // Processa cada variável de ambiente
-    const processedEnv = Object.entries(parsedEnv).reduce((acc, [key, value]) => {
-      try {
-        // Tenta fazer parse apenas de valores que são claramente JSON
-        if (typeof value === 'string' && 
-            (value.startsWith('[') || value.startsWith('{') || 
-             value === 'true' || value === 'false')) {
-          acc[key] = JSON.parse(value)
-        } else {
-          acc[key] = value
-        }
-      } catch (e) {
-        // Se falhar no parse, mantém o valor original
-        acc[key] = value
-      }
-      return acc
-    }, {})
-
-    process.env = { ...process.env, ...processedEnv }
+    process.env = { ...process.env, ...parsedEnv }
   }
 
   const noHttps = process.env.APP_SECURE === 'false'
@@ -90,9 +72,9 @@ module.exports = function (ctx) {
       devtool: 'source-map',
       transpile: true,
       
-      env: {
-        ...parsedEnv
-      },
+      // env: {
+      //   ...parsedEnv
+      // },
       
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).

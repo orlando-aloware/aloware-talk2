@@ -178,7 +178,7 @@ pipeline {
                             when { not { branch 'master' } }
                             steps {
                                 nvm("${NODE_VERSION}") {
-                                    sh 'cat .env.dev1 && NODE_ENV=dev1 quasar build --debug'
+                                    sh 'cp .env.dev1 .env.prod && NODE_ENV=dev1 quasar build --debug'
                                 }
                             }
                         }
