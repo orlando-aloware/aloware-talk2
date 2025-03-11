@@ -24,16 +24,6 @@ module.exports = function (ctx) {
     }
   })()
 
-  const parsedEnv = DotEnv.config({ path: envFile }).parsed
-
-  if (typeof parsedEnv === 'object' &&
-    !Array.isArray(parsedEnv) &&
-    parsedEnv !== undefined &&
-    parsedEnv !== null) {
-    process.env = { ...process.env, ...parsedEnv }
-    console.log('parsedEnv', parsedEnv)
-  }
-
   const noHttps = process.env.APP_SECURE === 'false'
 
   return {
@@ -72,10 +62,6 @@ module.exports = function (ctx) {
       vueRouterMode: 'history',
       devtool: 'source-map',
       transpile: true,
-      
-      env: {
-        ...parsedEnv
-      },
       
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
