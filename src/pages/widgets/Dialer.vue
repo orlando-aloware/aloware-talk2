@@ -34,7 +34,6 @@
 
     <webrtc
       :carrierName="authProfile.carrier_name"
-      :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
@@ -160,7 +159,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber']),
+    ...mapState(['dialer', 'hubspotDialNumber']),
 
     allowed () {
       return this.authProfile && this.initialized && this.defaultCampaignInitialized

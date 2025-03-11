@@ -41,11 +41,11 @@
 
     <webrtc
       :carrierName="authProfile.carrier_name"
-      :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
-      v-else-if="allowed"
+      :start-dialing="startDialing"
+      v-if="allowed"
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
       @handleCall="handleCall"
@@ -60,9 +60,18 @@ import * as AgentStatus from 'src/constants/agent-status'
 import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import { timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin } from 'src/plugins/mixins'
+import {
+  timezoneCheckMixin,
+  helperMixin,
+  agentMixin,
+  dispositionsMixin,
+  visibilityMixin,
+  notificationMixin
+} from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
+import { CURRENT_STATUS_COMPLETED_NEW } from 'src/constants/communication-current-status'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'Dialer',
@@ -72,7 +81,14 @@ export default {
     DialerListeners
   },
 
-  mixins: [ timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin ],
+  mixins: [
+    timezoneCheckMixin,
+    helperMixin,
+    agentMixin,
+    dispositionsMixin,
+    visibilityMixin,
+    notificationMixin
+  ],
 
   props: {
     apiKey: {
@@ -82,6 +98,7 @@ export default {
 
   data () {
     return {
+      startDialing: false,
       isFirstLoading: true,
       isDialed: false,
       loading: false,
@@ -102,10 +119,11 @@ export default {
       authProfile: null,
       listeners: {
         userLoggedIn: null,
-        agentStatusUpdated: null
+        agentStatusUpdated: null,
+        newInAppCall: null
       },
       // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
-      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY'],
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', 'ANSWERING_CALL'],
       opencti_loaded: false,
       // original path is https://MyDomainName--PackageName.vf.force.com/support/api/63.0/interaction.js
       // documentation https://developer.salesforce.com/docs/atlas.en-us.api_cti.meta/api_cti/sforce_api_cti_connecting.htm
@@ -124,10 +142,10 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget', 'dialer', 'salesforceDialNumber']),
+    ...mapState(['dialer', 'salesforceDialNumber', 'ringGroups']),
 
     allowed () {
-      return this.authProfile && this.initialized && this.defaultCampaignInitialized
+      return this.authProfile && this.initialized // && this.defaultCampaignInitialized
     },
 
     isLoadingDialer () {
@@ -146,6 +164,46 @@ export default {
 
     if (this.$route.query.small) {
       this.small = true
+    }
+
+    this.listeners.newInAppCall = (communication) => {
+      console.warn('newInAppCall')
+      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
+      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
+
+      if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
+        console.warn('newInAppCall 2')
+        return
+      }
+
+      const communicationType = communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
+      communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
+        ? 'missed call'
+        : 'call'
+
+      console.log('communicationType', communicationType, isFishingMode, communication.is_call_waiting, !this.profile.sleep_mode, this.profile)
+
+      // ignore call notifications if the call is not fishing mode and the user is in sleep mode
+      if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
+        console.warn('processActionNotification')
+
+        this.processActionNotification(communication, communicationType)
+
+        if (this.opencti_loaded) {
+          this.showAlertCallNotStarted = false
+          this.showAlertCallFinished = false
+          this.isDialed = true
+          sforce.opencti.isSoftphonePanelVisible({
+            callback: function (response) {
+              if (response.success && !response.returnValue.visible) {
+                sforce.opencti.setSoftphonePanelVisibility({
+                  visible: true
+                })
+              }
+            }
+          })
+        }
+      }
     }
   },
 
@@ -173,7 +231,10 @@ export default {
       'resetVuex',
       'setIsWidget',
       'setIsSalesforceWidget',
-      'setSalesforceDialNumber'
+      'setSalesforceDialNumber',
+      'setNotifications',
+      'setShowIncomingCallNotification',
+      'setShowPhone'
     ]),
 
     ...mapActions('cache', [
@@ -184,6 +245,7 @@ export default {
       this.showAlertCallFinished = false
       // Hide the Bootstrap Vue modal by its ID
       this.$bvModal.hide('daytime-hours-confirmation')
+      this.startDialing = true
 
       do {
         await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
@@ -295,11 +357,39 @@ export default {
       sforce.opencti.enableClickToDial()
     },
 
+    disableClickToDial () {
+      if (!this.opencti_loaded) {
+        return
+      }
+      // Enable click-to-dial functionality
+      sforce.opencti.disableClickToDial()
+    },
+
     handleUserLogin () {
       // Change agent status if profile allows, no call is active, and no force disposition is required or missing to complete.
       if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
       }
+
+      console.warn('initialized login')
+      this.$VueEvent.listen('new_in_app_call', this.listeners.newInAppCall)
+
+      // Register listeners for call action buttons
+      this.$VueEvent.listen('answerCall', () => {
+        console.log('Answering incoming call in SalesforceSoftPhone')
+        // this.$VueEvent.fire('answerIncomingCall')
+        // this.setShowPhone(true)
+
+        // Disable click-to-dial functionality
+        this.disableClickToDial()
+        this.$VueEvent.fire('showPhone')
+      })
+
+      this.$VueEvent.listen('rejectCall', () => {
+        this.showAlertCallFinished = true
+        console.log('Rejecting incoming call in SalesforceSoftPhone')
+        // this.$VueEvent.fire('rejectIncomingCall')
+      })
     },
 
     handleCallCompletedEvent (skipCallFinished = false) {
@@ -307,6 +397,7 @@ export default {
       this.isDialed = false
 
       this.enableClickToDial()
+      this.startDialing = false
 
       this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
       if (!this.defaultOutboundCampaignId) {
@@ -363,10 +454,8 @@ export default {
         return
       }
 
-      if (this.opencti_loaded) {
-        // Disable click-to-dial functionality
-        sforce.opencti.disableClickToDial()
-      }
+      // Disable click-to-dial functionality
+      this.disableClickToDial()
 
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.salesforceDialNumber?.number),
@@ -528,10 +617,13 @@ export default {
 
   watch: {
     'dialer.currentStatus' () {
+      console.warn('captured status', this.dialer?.currentStatus)
+
       if (this.isLoadingDialer) {
         return
       }
 
+      // CALL_CONNECTED, ANSWERING_CALL
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
       if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
         (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) &&
@@ -540,6 +632,15 @@ export default {
         this.showAlertCallFinished = false
       }
     }
+  },
+
+  beforeDestroy () {
+    // Clean up event listeners
+    if (this.listeners.newInAppCall) {
+      this.$VueEvent.stop('new_in_app_call', this.listeners.newInAppCall)
+    }
+    // this.$VueEvent.stop('answerCall')
+    // this.$VueEvent.stop('rejectCall')
   }
 }
 </script>
