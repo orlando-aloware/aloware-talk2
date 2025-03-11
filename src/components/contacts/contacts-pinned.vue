@@ -76,10 +76,6 @@ export default {
         this.loadDynamicListPinnedCount(list, true)
       }
 
-      // if (list.type === this.ContactListTypes.DYNAMIC && list.id === 'my-contacts') {
-      //   this.loadMyContactsCount()
-      // }
-
       if (list.type === this.ContactListTypes.STATIC) {
         this.loadPinnedCount(list.id)
       }
@@ -253,18 +249,9 @@ export default {
               type: data[item.i].type,
               order: data[item.i].order
             })
-
-            if (data[item.i].type === this.ContactListTypes.STATIC) {
-              await this.loadPinnedCount(contactListId.data)
-            }
-
-            if (data[item.i].type === this.ContactListTypes.DYNAMIC) {
-              await this.loadDynamicListPinnedCount(data[item.i], true)
-            }
           }
 
           this.pinnedLoaded(pinnedIds)
-          // this.loadDefaultCounts()
           this.loadingPinned = false
         }).catch((err) => {
           console.error(err)
