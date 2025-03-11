@@ -30,7 +30,7 @@ pipeline {
         DEV_CACHE_POLICY_ID="8276b0a9-835d-41d5-a981-85f98c8f390a"
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
-        API_URL_OVERWRITE = ''
+        API_URL_OVERWRITE = 'htsp://pr-11559.mde.alodev.org'
     }
 
     stages {
