@@ -282,9 +282,11 @@ export default {
         })
       }
       console.log('MAKE CALL - RUN TASK', this.taskToCall)
+      const label = this.taskToCall.contact_list_item_id ? 'power_dialer_task' : 'call'
+      const id = this.taskToCall.contact_list_item_id ?? this.taskToCall.communication_id
       // Fires an event to make a call
       this.$VueEvent.fire('makeCall', {
-        currentNumber: this.taskToCall.contact_list_item_id ? this.$options.filters.fixPhone(`power_dialer_task:${this.taskToCall?.contact_list_item_id}`) : this.$options.filters.fixPhone(`call:${this.taskToCall.communication_id}`), // we know this already based on the list (Required)
+        currentNumber: this.$options.filters.fixPhone(`${label}:${id}`), // we know this already based on the list (Required)
         outboundCampaignId: this.sessionSettings.campaign_id, // this.session.campaignId, // ID of the line that you are calling from (Required)
         contactName: `${this.taskToCall?.first_name} ${this.taskToCall?.last_name}`, // this.contactListItem.name, // the name of the contact that you are calling (Optional but it's best to have it)
         companyName: this.taskToCall?.company_name, // this.contactListItem.company_name, // the name of the company of the contact (Optional but it's best to have it)

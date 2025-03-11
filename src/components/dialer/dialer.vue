@@ -747,6 +747,10 @@ export default {
         'ContactId': contactId ? contactId.toString() : ''
       }
 
+      if (this.isOnPowerDialerSessionRoute) {
+        params['AnswerInPD'] = true
+      }
+
       console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)
 
       this.setDialerCurrentStatus('MAKING_CALL')

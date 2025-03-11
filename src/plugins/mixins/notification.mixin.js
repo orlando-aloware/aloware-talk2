@@ -92,6 +92,14 @@ export default {
         !['incomingCall', 'callFishing'].includes(type)) {
         return
       }
+      // removed from queue
+      if (this.isOnPowerDialerSessionRoute) {
+        const index = this.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.communication_id === communicationId)
+        if (index !== -1) {
+          console.log('removed from the queue: ', index)
+          this.powerDialerTasks.in_queue.splice(index, 1)
+        }
+      }
 
       // for incoming call
       const notificationCommId = { data: _.get(this.notifications, 'incomingCall.communication.id', null) }
@@ -274,6 +282,7 @@ export default {
           if (ringGroup &&
             ringGroup.should_queue &&
             ringGroup.fishing_mode &&
+            !ringGroup.experimental_fishing_mode_repeat_call_routing &&
             ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT &&
             this.user &&
             this.user.profile &&
@@ -313,7 +322,8 @@ export default {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
           console.log('processActionNotification - params.data', params.data)
           console.log('ON POWER DIALER SESSION ROUTE?', this.isOnPowerDialerSessionRoute)
-          if (this.isOnPowerDialerSessionRoute) {
+          const callInQueue = this.powerDialerTasks.in_queue.some(task => task.id === params.data.contact.id)
+          if (this.isOnPowerDialerSessionRoute && ringGroup.experimental_fishing_mode_repeat_call_routing && !callInQueue) {
             const contactWithCommunication = {
               ...params.data.contact,
               'communication_id': params.data.communicationId
