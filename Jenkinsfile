@@ -300,7 +300,8 @@ pipeline {
                                         writeFile file: 'dev2.env', text: dev2EnvVars + '\n' 
 
                                         sh '''
-                                        cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env.dev2
+                                        cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env
+                                        cp .env .env.prod
                                         rm shared.env dev2.env
                                         '''
                                     }
@@ -401,7 +402,8 @@ pipeline {
                                         writeFile file: 'staging.env', text: stagingEnvVars + '\n' 
 
                                         sh '''
-                                        cat shared.env staging.env | awk -F= '!seen[$1]++' > .env.staging
+                                        cat shared.env staging.env | awk -F= '!seen[$1]++' > .env
+                                        cp .env .env.prod
                                         rm shared.env staging.env
                                         '''
                                     }
