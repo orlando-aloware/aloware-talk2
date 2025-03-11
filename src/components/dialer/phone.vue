@@ -1736,14 +1736,13 @@ export default {
       if (this.dialer.call && this.dialer.call.direction === 'INCOMING' &&
         this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' &&
         this.showIncomingCallNotification) {
-        console.log('Phone - should show - return')
         return false
       }
 
       if (['menu', 'wrap-up'].includes(this.screen)) {
         return true
       }
-      console.log('Dialer and commmunication: ', this.dialer, !_.isEmpty(this.dialer.communication))
+
       return this.dialer && !_.isEmpty(this.dialer.communication)
     },
 
@@ -2082,13 +2081,11 @@ export default {
     },
 
     endCall ($event) {
-      console.log('phone - end call')
       this.saveAndResetExpansion($event)
       this.$VueEvent.fire('hangupCall')
     },
 
     hangupCall ($event) {
-      console.log('phone - hangup call')
       this.saveAndResetExpansion($event)
       this.$VueEvent.fire('hangupCall')
     },
@@ -2267,7 +2264,6 @@ export default {
 
     onFinish () {
       if (this.isOnPowerDialerSessionRoute && this.redialRequired) {
-        console.log('Phone - on finish - next task')
         this.$VueEvent.fire('onNextTask')
         return
       }

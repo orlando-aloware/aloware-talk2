@@ -923,7 +923,6 @@ export default {
     }, 500),
 
     processHangup () {
-      console.log('session call status - process hangup')
       this.$VueEvent.fire('hangupCall')
 
       if (this.wrapUpSeconds === -1) {
@@ -1035,7 +1034,6 @@ export default {
         }
 
         if (!this.togglePause && !this.wrapUp) {
-          console.log('session call status - run task')
           this.runTask()
         }
 
@@ -1306,7 +1304,6 @@ export default {
             this.wrapUpSeconds === -1 &&
             !this.loadingNext &&
             !this.isRedialClicked) {
-            console.log('MANAGING SESSION FLOWS', this.dialer)
             this.onNextTask()
           }
 
@@ -1335,7 +1332,6 @@ export default {
           // is "no wrap-up", then skip wrap-up countdown timer
           // and proceed immediately to the next task
           if (this.isSessionRunning && this.wrapUpSeconds === -1) {
-            console.log('WRAP UP SESSION CALL STATUS', this.dialer)
             this.onNextTask(true)
           }
 
@@ -1444,7 +1440,6 @@ export default {
 
       // hangup in-progress call
       if (this.callInProgress && this.dialer.currentStatus !== 'WRAP_UP') {
-        console.log('session call status - process hangup', this.callInProgress, this.dialer.currentStatus)
         this.processHangup()
       }
 
@@ -1466,14 +1461,12 @@ export default {
         this.processSession(noWrapUp)
         // Add task to skipped list when users clicks on the Next button
         if (!forceSkip && skipWrapUp && this.sessionPaused) {
-          console.log('Add task to skipped list when users clicks on the Next button')
           this.powerDialerTasks.skipped.push(cloneDeep(this.taskToCall))
         }
         return
       }
 
       if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-        console.log('session call status - process hangup - call connected')
         this.processHangup()
       }
     },
@@ -1485,7 +1478,6 @@ export default {
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
       }
-      console.log('session call status - hangup call')
       this.$VueEvent.fire('hangupCall')
     },
 
@@ -1591,7 +1583,6 @@ export default {
       this.redialTask(this.activeTask, redial, forcedRedial).then(() => {
         // hang-up call if still in a call
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
-          console.log('session call status - on redial - redial task - call connected')
           this.$VueEvent.fire('hangupCall')
         }
 
@@ -1754,7 +1745,6 @@ export default {
       // because dialer is not ready. If dialer reconnects and status
       // goes to ready, then we can continue running the task
       if (!this.sessionNotReady) {
-        console.log('session call status - dialer.isReady - run task')
         this.runTask()
         this.sessionNotReady = false
       }

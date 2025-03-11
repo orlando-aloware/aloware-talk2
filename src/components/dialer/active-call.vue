@@ -203,7 +203,7 @@ export default {
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
       }
-      console.log('Active call - Hangup call')
+
       this.$VueEvent.fire('hangupCall')
     },
 
@@ -212,7 +212,6 @@ export default {
       $event.preventDefault()
 
       if (this.isOnPowerDialerSessionRoute && this.redialRequired) {
-        console.log('Active call - End wrap up')
         this.$VueEvent.fire('onNextTask')
         return
       }
@@ -222,7 +221,6 @@ export default {
     },
 
     togglePhone () {
-      console.log('Active call - Toggle Phone')
       this.$VueEvent.fire('togglePhone')
     },
 

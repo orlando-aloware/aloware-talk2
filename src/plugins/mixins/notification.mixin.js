@@ -321,18 +321,18 @@ export default {
       if (!_.isEmpty(params.data)) {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
           console.log('processActionNotification - params.data', params.data)
-          console.log('ON POWER DIALER SESSION ROUTE?', this.isOnPowerDialerSessionRoute)
+
           const callInQueue = this.powerDialerTasks.in_queue.some(task => task.id === params.data.contact.id)
           if (this.isOnPowerDialerSessionRoute && ringGroup.experimental_fishing_mode_repeat_call_routing && !callInQueue) {
             const contactWithCommunication = {
               ...params.data.contact,
               'communication_id': params.data.communicationId
             }
-            console.log('ADD TO QUEUE:', contactWithCommunication)
             this.powerDialerTasks.in_queue.unshift(contactWithCommunication)
 
             return
           }
+
           this.setShowIncomingCallNotification(true)
         }
 

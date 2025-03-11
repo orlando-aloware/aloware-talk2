@@ -109,7 +109,6 @@ export default {
 
   methods: {
     endCurrentCall () {
-      console.log('session contact in progress - end current call')
       this.$VueEvent.fire('hangupCall')
     }
   }

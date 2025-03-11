@@ -271,7 +271,6 @@ export default {
 
       // handle active call
       if (this.dialer && this.dialer.state === 'open') {
-        console.log('live calls - on reject call')
         this.$VueEvent.fire('hangupCall')
         this.isRejecting = false
         return
@@ -283,7 +282,6 @@ export default {
       e.stopImmediatePropagation()
     },
     onHangUpCall (e) {
-      console.log('live calls - on hang up call')
       this.$VueEvent.fire('hangupCall')
       e.stopImmediatePropagation()
     },
