@@ -1,7 +1,7 @@
 <template>
   <div :class="['communication', { active: isActive }]">
     <div class="communication__avatar">
-      <div class="avatar position-relative"
+      <div class="position-relative"
            role="button">
         <b-badge class="avatar__unread-badge position-absolute"
                  variant="danger"
