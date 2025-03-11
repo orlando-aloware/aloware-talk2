@@ -154,6 +154,7 @@ export default {
 
   &__header {
     width: 100%;
+    height: 45px;
 
     &__search {
       padding: 5px 0px;

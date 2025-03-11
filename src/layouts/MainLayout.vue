@@ -478,7 +478,9 @@ export default {
     },
 
     pageClass () {
-      return _.get(this.$route, 'meta.title', '').toLowerCase()
+      const meta = _.get(this.$route, 'meta.title', '')
+
+      return meta === 'AI Inbox' ? null : meta.toLowerCase()
     },
 
     isMobilePhoneClosed () {

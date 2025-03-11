@@ -3,7 +3,8 @@
        v-if="isShown"
        data-testid="inbox-toggle-filters-wrapper">
     <!-- Left side group -->
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center"
+         v-if="!isNewInbox">
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center mr-1"
                    :disabled="isInboxRefreshBtnLoading"
                    data-testid="inbox-toggle-filters-compact-btn"
