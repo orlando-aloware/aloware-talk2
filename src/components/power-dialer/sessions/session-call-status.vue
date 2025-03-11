@@ -1453,7 +1453,6 @@ export default {
         if (isEmpty(task)) {
           this.hasActiveTask = false
           this.reRoute()
-          console.log('session call status - is empty - return')
           return
         }
 
@@ -1478,6 +1477,7 @@ export default {
       if (this.dialer.currentStatus === 'WRAP_UP') {
         this.$VueEvent.fire('endWrapUp')
       }
+
       this.$VueEvent.fire('hangupCall')
     },
 
