@@ -71,117 +71,113 @@
                           ]"
                           :key="`acc-item-${i}`"
                           v-if="taskItem">
-                    <div class="communication-wrapper">
-                      <div class="communication-label" v-if="taskItem.communication_id">
-                        <q-icon name="fas fa-address-book" size="xs" class="q-mr-xs" />
-                        <span>This call is from one of your contacts</span>
-                      </div>
+                    <div class="communication-label mb-2" v-if="taskItem.communication_id">
+                      <q-icon name="fas fa-address-book" size="xs" class="q-mr-xs" />
+                      <span>This call is from one of your contacts</span>
+                    </div>
 
-                      <div :class="{'communication-content d-flex': taskItem.communication_id}">
-                        <div :class="taskItem.communication_id ? 'avatar-column' : 'py-2'">
-                          <q-avatar size="30px" color="grey" v-if="getInitials(taskItem.name)">
-                            {{ getInitials(taskItem.name) }}
-                          </q-avatar>
-                          <q-avatar size="30px" color="grey" v-else>
-                            <i class="fa fa-user" aria-hidden="true"></i>
-                          </q-avatar>
-                        </div>
-                        <div :class="{'content-column': taskItem.communication_id}">
-                          <q-item-section class="pl-2">
-                            <q-item-label>
-                              {{ fetchName(taskItem) }}
-                            </q-item-label>
-                            <q-item-label lines="2" caption>
-                              {{ taskItem.phone_number | fixPhone('NATIONAL', true) }}
-                            </q-item-label>
-                            <q-item-label lines="2" caption>
-                              {{ taskItem.company_name }}
-                            </q-item-label>
-                            <q-item-label lines="2" caption>
+                    <div :class="taskItem.communication_id ? 'avatar-column' : 'py-2'">
+                      <q-avatar size="30px" color="grey" v-if="getInitials(taskItem.name)">
+                        {{ getInitials(taskItem.name) }}
+                      </q-avatar>
+                      <q-avatar size="30px" color="grey" v-else>
+                        <i class="fa fa-user" aria-hidden="true"></i>
+                      </q-avatar>
+                    </div>
+                    <div>
+                      <q-item-section class="pl-2">
+                        <q-item-label>
+                          {{ fetchName(taskItem) }}
+                        </q-item-label>
+                        <q-item-label lines="2" caption>
+                          {{ taskItem.phone_number | fixPhone('NATIONAL', true) }}
+                        </q-item-label>
+                        <q-item-label lines="2" caption>
+                          {{ taskItem.company_name }}
+                        </q-item-label>
+                        <q-item-label lines="2" caption>
                               <span>
                                 <i class="fa fa-globe"></i>
                                 {{ taskItem.timezone }}
                               </span>
-                            </q-item-label>
-                          </q-item-section>
-                        </div>
+                        </q-item-label>
+                      </q-item-section>
+                    </div>
 
-                        <q-item-section class="t-item-icon"
-                                        side
-                                        top
-                                        v-if="!taskItem.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'">
-                          <q-avatar color="red" size="md">
-                            <PhoneIcon color="white"/>
-                          </q-avatar>
-                        </q-item-section>
+                    <q-item-section class="t-item-icon"
+                                    side
+                                    top
+                                    v-if="!taskItem.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'">
+                      <q-avatar color="red" size="md">
+                        <PhoneIcon color="white" />
+                      </q-avatar>
+                    </q-item-section>
 
-                        <b-dropdown ref="dropdown"
-                                    class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top"
-                                    right size="xs"
-                                    variant="white"
-                                    no-caret
-                                    :disabled="isMoving || isDeleting"
-                                    @mouseover="onOver"
-                                    @mouseleave="onLeave">
+                    <b-dropdown ref="dropdown"
+                                class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top"
+                                right size="xs"
+                                variant="white"
+                                no-caret
+                                :disabled="isMoving || isDeleting"
+                                @mouseover="onOver"
+                                @mouseleave="onLeave">
 
-                          <template #button-content>
-                            <i class="fa fa-ellipsis-h">
-                            </i>
-                          </template>
+                      <template #button-content>
+                        <i class="fa fa-ellipsis-h">
+                        </i>
+                      </template>
 
-                          <template>
-                            <b-dropdown-item href="#"
-                                             v-if="key === 'in_queue'"
-                                             @click="moveTask(taskItem, moveDirection.top)">
-                              <ArrowUpIcon height="16px"
-                                           width="16px" />
-                              Move to Top
-                            </b-dropdown-item>
-                            <b-dropdown-item href="#"
-                                             v-if="key === 'in_queue'"
-                                             @click="moveTask(taskItem, moveDirection.bottom)">
-                              <ArrowDownIcon height="15px"
-                                             width="15px" />
-                              Move to Bottom
-                            </b-dropdown-item>
-                            <b-dropdown-item href="#"
-                                             v-if="key !== 'in_queue'"
-                                             @click="addTask(taskItem, moveDirection.top)">
-                              <ArrowUpIcon height="16px"
-                                           width="16px"/>
-                              Add to Top of In Queue
-                            </b-dropdown-item>
-                            <b-dropdown-item href="#"
-                                             v-if="key !== 'in_queue'"
-                                             @click="addTask(taskItem, moveDirection.bottom)">
-                              <ArrowDownIcon height="15px"
-                                             width="15px" />
-                              Add to Bottom of In Queue
-                            </b-dropdown-item>
-                            <b-dropdown-item href="#"
-                                             v-if="key === 'in_queue'"
-                                             @click="onDeleteTask(taskItem)">
-                              <TrashIcon />
-                              Remove from List
-                            </b-dropdown-item>
-                          </template>
+                      <template>
+                        <b-dropdown-item href="#"
+                                         v-if="key === 'in_queue'"
+                                         @click="moveTask(taskItem, moveDirection.top)">
+                          <ArrowUpIcon height="16px"
+                                       width="16px" />
+                          Move to Top
+                        </b-dropdown-item>
+                        <b-dropdown-item href="#"
+                                         v-if="key === 'in_queue'"
+                                         @click="moveTask(taskItem, moveDirection.bottom)">
+                          <ArrowDownIcon height="15px"
+                                         width="15px" />
+                          Move to Bottom
+                        </b-dropdown-item>
+                        <b-dropdown-item href="#"
+                                         v-if="key !== 'in_queue'"
+                                         @click="addTask(taskItem, moveDirection.top)">
+                          <ArrowUpIcon height="16px"
+                                       width="16px" />
+                          Add to Top of In Queue
+                        </b-dropdown-item>
+                        <b-dropdown-item href="#"
+                                         v-if="key !== 'in_queue'"
+                                         @click="addTask(taskItem, moveDirection.bottom)">
+                          <ArrowDownIcon height="15px"
+                                         width="15px" />
+                          Add to Bottom of In Queue
+                        </b-dropdown-item>
+                        <b-dropdown-item href="#"
+                                         v-if="key === 'in_queue'"
+                                         @click="onDeleteTask(taskItem)">
+                          <TrashIcon />
+                          Remove from List
+                        </b-dropdown-item>
+                      </template>
 
-                        </b-dropdown>
+                    </b-dropdown>
 
-                        <div ref="returnToQueue"
-                             class="dropdown t-btn-floater t-btn-floater__bottom"
-                             v-if="key === 'in_queue'">
-                          <q-btn size="xs"
-                                 flat
-                                 round
-                                 :disabled="isMoving || isDeleting"
-                                 @click="moveTask(taskItem, moveDirection.top)">
-                            <q-avatar size="15px">
-                              <ContactInQueueIcon />
-                            </q-avatar>
-                          </q-btn>
-                        </div>
-                      </div>
+                    <div ref="returnToQueue"
+                         class="dropdown t-btn-floater t-btn-floater__bottom"
+                         v-if="key === 'in_queue'">
+                      <q-btn size="xs"
+                             flat
+                             round
+                             :disabled="isMoving || isDeleting"
+                             @click="moveTask(taskItem, moveDirection.top)">
+                        <q-avatar size="15px">
+                          <ContactInQueueIcon />
+                        </q-avatar>
+                      </q-btn>
                     </div>
                   </q-item>
                 </template>
@@ -635,7 +631,7 @@ export default {
 .has-communication {
   border: 1px solid #FFD700 !important;
   background-color: rgba(255, 215, 0, 0.05) !important;
-  padding-top: 28px !important;
+  padding-top: 0 !important;
 }
 
 .communication-wrapper {
@@ -646,8 +642,6 @@ export default {
 }
 
 .communication-label {
-  position: absolute;
-  top: -28px;
   left: 0;
   right: 0;
   height: 28px;
@@ -657,7 +651,6 @@ export default {
   display: flex;
   align-items: center;
   background-color: rgba(255, 215, 0, 0.1);
-  z-index: 1;
   border-bottom: 1px solid #FFD700;
 
   .q-icon {
