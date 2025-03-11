@@ -31,6 +31,7 @@ module.exports = function (ctx) {
     parsedEnv !== undefined &&
     parsedEnv !== null) {
     process.env = { ...process.env, ...parsedEnv }
+    console.log('parsedEnv', parsedEnv)
   }
 
   const noHttps = process.env.APP_SECURE === 'false'
