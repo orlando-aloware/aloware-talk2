@@ -20,6 +20,18 @@
         </span>
         {{ INBOXES_MENU_TITLE }}
       </q-route-tab>
+      <q-route-tab name="einbox"
+                   to="/einbox"
+                   :content-class="tab === 'einbox' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
+                   :ripple="false"
+                   :active="tab === 'einbox'"
+                   no-caps
+                   exact>
+        <span class="tab-icon">
+          <inbox-mobile-icon :color="isActive('einbox') ? '#256EFF' : '#A3A3A3'" />
+        </span>
+        {{ EINBOXES_MENU_TITLE }}
+      </q-route-tab>
       <q-route-tab name="communications"
                    :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
                    :content-class="tab === 'communications' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
@@ -199,7 +211,7 @@ import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-ico
 import CalendarMobileIcon from 'components/icons/mobile-menu/calendar-mobile-icon.vue'
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
-import { COMMUNICATIONS_MENU_TITLE_MOBILE, DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE } from 'src/router/routes'
+import { COMMUNICATIONS_MENU_TITLE_MOBILE, DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE, EINBOXES_MENU_TITLE } from 'src/router/routes'
 import { userMixin } from 'src/plugins/mixins'
 
 export default {
@@ -260,6 +272,7 @@ export default {
       tab: 'inbox',
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       INBOXES_MENU_TITLE,
+      EINBOXES_MENU_TITLE,
       COMMUNICATIONS_MENU_TITLE_MOBILE,
       parkedCallQueue: []
     }
