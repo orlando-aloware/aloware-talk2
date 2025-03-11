@@ -83,11 +83,11 @@ export default {
       }
     },
 
-    async fetchItems (inboxId) {
+    async fetchItems (inboxId, search = null) {
       try {
         this.setIsLoadingItems(true)
 
-        const response = await this.getItemsRequest(inboxId, 1)
+        const response = await this.getItemsRequest(inboxId, 1, search)
 
         this.setItems(response.data)
         this.setIsLoadingItems(false)
@@ -118,7 +118,7 @@ export default {
       }
     },
 
-    getItemsRequest (inboxId, nextPage) {
+    getItemsRequest (inboxId, nextPage, search = null) {
       // abort current ongoign request
       if (this.abortController) {
         this.abortController.abort()
@@ -126,23 +126,16 @@ export default {
 
       this.abortController = new AbortController()
 
-      if (this.viewMode === THREADED) {
-        return talk2Api.V2.communications.threaded({
-          params: {
-            inbox_id: inboxId,
-            page: nextPage,
-            per_page: 100,
-            inbox_type: 'threaded'
-          },
-          signal: this.abortController.signal
-        })
-      }
-
       return talk2Api.V1.reports.communications.get({
         params: {
           inbox_id: inboxId,
           page: nextPage,
-          per_page: 100
+          per_page: 100,
+          ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : {}),
+          ...(search ? {
+            search_text: search,
+            search_fields: ['lead_number', 'contact.name', 'campaign.name']
+          } : {})
         },
         headers: { 'requested-from': 'api' },
         signal: this.abortController.signal

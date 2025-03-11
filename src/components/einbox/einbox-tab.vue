@@ -6,10 +6,27 @@
                        v-model="collapsed"
                        v-if="collapseTarget"/>
 
-      <label class="einbox-tab__header__label ellipse"
-             v-if="activeInbox.name">
-        {{ activeInbox.name }}
-      </label>
+      <template v-if="!isSearchActive">
+        <label class="einbox-tab__header__label ellipse"
+              v-if="activeInbox.name">
+          {{ activeInbox.name }}
+        </label>
+        <q-space></q-space>
+        <q-btn flat
+               round
+               color="primary"
+               icon="search"
+               size="sm"
+               @click="onEnterSearch"
+               data-testid="einbox-tab-search-button" />
+      </template>
+
+      <search-input v-else
+                    ref="search"
+                    class="einbox-tab__header__search"
+                    placeholder="Type ENTER to search"
+                    @search="search = $event"
+                    @blur="onLeaveSearch" />
     </div>
 
     <einbox-channel-toggle />
@@ -79,12 +96,14 @@ import { EinboxMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
+import SearchInput from 'src/components/search-input.vue'
 
 export default {
   components: {
     Communication,
     EinboxChannelToggle,
-    CollapseButton
+    CollapseButton,
+    SearchInput
   },
 
   mixins: [
@@ -103,7 +122,9 @@ export default {
       activeId: null,
       collapsed: false,
       THREADED,
-      UNTHREADED
+      UNTHREADED,
+      isSearchActive: false,
+      search: ''
     }
   },
 
@@ -159,6 +180,21 @@ export default {
       }
 
       this.$router.push(route)
+    },
+
+    async onEnterSearch () {
+      this.isSearchActive = true
+
+      await this.$nextTick()
+
+      // auto focus inside inner search input
+      this.$refs.search.$el.querySelector('input').focus()
+    },
+
+    onLeaveSearch () {
+      if (this.search === '') {
+        this.isSearchActive = false
+      }
     }
   },
 
@@ -170,12 +206,25 @@ export default {
           this.activeId = newV ? parseInt(newV) : null
         }
       }
+    },
+
+    viewMode () {
+      this.isSearchActive = false
+      this.search = ''
+    },
+
+    search (search) {
+      if (search === '') {
+        this.isSearchActive = false
+      }
+
+      this.fetchItems(this.activeInboxId, search || null)
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .einbox-tab {
   display: flex;
   flex-direction: column;
@@ -186,12 +235,24 @@ export default {
   &__header {
     display: flex;
     align-items: center;
-    padding: 15px;
+    padding: 6px 15px;
+    width: 100%;
+    height: 45px;
 
     &__label {
       margin: 0 0 0 10px;
       font-weight: 500;
       font-size: 16px;
+      flex-grow: 1;
+    }
+
+    &__search {
+      width: 100%;
+      margin-left: 10px;
+
+      label {
+        border: none;
+      }
     }
   }
 }

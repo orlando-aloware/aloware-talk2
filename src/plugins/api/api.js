@@ -1022,12 +1022,6 @@ const talk2Api = {
       toggleFeature (companyId, feature) {
         return window.axios.put(`${suffixV2}companies/${companyId}/features/${feature}`)
       }
-    },
-
-    communications: {
-      threaded: (data) => {
-        return window.axios.get(`${suffixV1}reports/communications`, data)
-      }
     }
   }
 }
