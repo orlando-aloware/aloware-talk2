@@ -110,7 +110,7 @@ pipeline {
                                 script {
                                   sh '''
                                   mkdir -p ${WORKSPACE}/build/dev1
-                                  find $WORKSPACE -mindepth 1 -maxdepth 1 ! -name 'build' -exec cp -r {} $WORKSPACE/build/dev1/ \;
+                                  find $WORKSPACE -mindepth 1 -maxdepth 1 ! -name 'build' -exec cp -r {} $WORKSPACE/build/dev1/ \\;
                                   '''
                                 }
                             }
