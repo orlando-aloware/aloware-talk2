@@ -110,8 +110,7 @@ pipeline {
                                 script {
                                   sh '''
                                   mkdir -p ${WORKSPACE}/build/dev1
-                                  cp -r $WORKSPACE/* $WORKSPACE/build/dev1/
-                                  rm -rf $WORKSPACE/build/dev1/build     
+                                  cp -r $WORKSPACE/!(build) $WORKSPACE/build/dev1/
                                   '''
                                 }
                             }
