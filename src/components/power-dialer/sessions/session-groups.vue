@@ -71,8 +71,11 @@
                           ]"
                           :key="`acc-item-${i}`"
                           v-if="taskItem">
-                    <div class="communication-label mb-2" v-if="taskItem.communication_id">
-                      <q-icon name="fas fa-address-book" size="xs" class="q-mr-xs" />
+                    <div class="communication-label mb-2"
+                         v-if="taskItem.communication_id">
+                      <q-icon name="fas fa-address-book"
+                              size="xs"
+                              class="q-mr-xs" />
                       <span>This call is from one of your contacts</span>
                     </div>
 
@@ -90,7 +93,6 @@
                         </i>
                       </q-avatar>
                     </div>
-
                     <q-item-section class="pl-2">
                       <q-item-label>
                         {{ fetchName(taskItem) }}
@@ -111,7 +113,6 @@
                         </span>
                       </q-item-label>
                     </q-item-section>
-
                     <q-item-section class="t-item-icon"
                                     side
                                     top
@@ -121,7 +122,6 @@
                         <PhoneIcon color="white"/>
                       </q-avatar>
                     </q-item-section>
-
                     <b-dropdown ref="dropdown"
                                 class="m-1 b-compact-dropdown-button text-bold contacts-options-dropdown t-btn-floater t-btn-floater__top"
                                 right size="xs"
@@ -141,7 +141,7 @@
                                          v-if="key === 'in_queue'"
                                          @click="moveTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
-                                       width="16px"/>
+                                       width="16px" />
                           Move to Top
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
