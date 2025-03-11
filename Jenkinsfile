@@ -54,20 +54,20 @@ pipeline {
 
                     // Attempt to restore node_modules, from the cache directory of this job
                     if (fileExists("${ARTIFACTS_CACHE_FOLDER}/node_modules")) {
-                        sh "rsync -a ${ARTIFACTS_CACHE_FOLDER}/node_modules ${WORKSPACE}/build/dev1/"
+                        sh "rsync -a ${ARTIFACTS_CACHE_FOLDER}/node_modules ."
                     }
 
                     // If the directories wers not restored, attempt to restore from the develop branch artifacts
                     if (!fileExists("${WORKSPACE}/build/dev1/node_modules")) {
                         if (fileExists("${DEVELOP_CACHE_FOLDER}/artifacts/node_modules")) {
-                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/artifacts/node_modules ${WORKSPACE}/build/dev1/"
+                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/artifacts/node_modules ."
                         }
                     }
 
                     // If this job has no cache, attempt to restore from the develop branch cache
                     if (!fileExists("{YARN_CACHE_FOLDER}")) {
                         if (fileExists("${DEVELOP_CACHE_FOLDER}/yarn")) {
-                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/yarn ${WORKSPACE}/build/dev1/"
+                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/yarn ."
                         }
                     }
                 }
