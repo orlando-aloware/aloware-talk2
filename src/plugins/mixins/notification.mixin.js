@@ -96,7 +96,6 @@ export default {
       if (this.isOnPowerDialerSessionRoute) {
         const index = this.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.communication_id === communicationId)
         if (index !== -1) {
-          console.log('removed from the queue: ', index)
           this.powerDialerTasks.in_queue.splice(index, 1)
         }
       }
