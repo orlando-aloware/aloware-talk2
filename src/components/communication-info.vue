@@ -21,8 +21,7 @@
       bordered
       class="rounded-contact-activity b-radius-12"
       :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
-      data-testid="communication-info-show-phone"
-      @click="onShowPhone">
+      data-testid="communication-info-show-phone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
           <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
@@ -985,13 +984,13 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
-import UserDisplay from 'src/components/user-display.vue'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
 import { marked } from 'marked'
+import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin, classicMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
