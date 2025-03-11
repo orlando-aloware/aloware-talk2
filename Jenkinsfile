@@ -105,7 +105,8 @@ pipeline {
                 stage('Build dev1') {
                     stages {
 
-                        stage ('[PR/Dev1] Setup Env') {
+                        stage ('[PR/Dev1] Setup workspace') {
+                            when { not { branch 'master' } }
                             steps {
                                 script {
                                   sh '''
@@ -257,8 +258,21 @@ pipeline {
 
                 stage('Build dev2') {
                    stages {  
+
+                        stage ('[Dev2] Setup workspace') {
+                            // when { branch 'develop' }
+                            steps {
+                                script {
+                                  sh '''
+                                  mkdir -p ${WORKSPACE}/build/dev2
+                                  find $WORKSPACE -mindepth 1 -maxdepth 1 ! -name 'build' -exec cp -r {} $WORKSPACE/build/dev2/ \\;
+                                  '''
+                                }
+                            }
+                        }
+
                         stage('[Dev2] Setup Env File') {
-                            when { branch 'develop' }
+                            // when { branch 'develop' }
                             steps {
                                 script {
                                     dir("${WORKSPACE}/build/dev2") {
@@ -295,7 +309,7 @@ pipeline {
                         }
 
                         stage('[Dev2] Build Assets') {
-                            when { branch 'develop' }
+                            // when { branch 'develop' }
                             steps {
                                 dir("${WORKSPACE}/build/dev2") {
                                     nvm("${NODE_VERSION}") {
@@ -306,7 +320,7 @@ pipeline {
                         }
 
                         stage('[Dev2] Deploy Talk2') {
-                            when { branch 'develop' }
+                            //when { branch 'develop' }
                             steps {
                                 script {
                                     def workspaceName = 'talk2'
@@ -345,8 +359,21 @@ pipeline {
 
                 stage('Build staging') {
                     stages {
+
+                        stage ('[Staging] Setup workspace') {
+                            //when { branch 'develop' }
+                            steps {
+                                script {
+                                  sh '''
+                                  mkdir -p ${WORKSPACE}/build/staging
+                                  find $WORKSPACE -mindepth 1 -maxdepth 1 ! -name 'build' -exec cp -r {} $WORKSPACE/build/staging/ \\;
+                                  '''
+                                }
+                            }
+                        }
+
                         stage('[Staging] Setup Env File') {
-                            when { branch 'develop' }
+                           // when { branch 'develop' }
                             steps {
                                 script {
                                     dir("${WORKSPACE}/build/staging") {
@@ -383,7 +410,7 @@ pipeline {
                         }
 
                         stage('[Staging] Build Assets') {
-                            when { branch 'develop' }
+                            // when { branch 'develop' }
                             steps {
                                 dir("${WORKSPACE}/build/staging") {
                                     nvm("${NODE_VERSION}") {
@@ -394,7 +421,7 @@ pipeline {
                         }
 
                         stage('[Staging] Deploy Talk2') {
-                            when { branch 'develop' }
+                            // when { branch 'develop' }
                             steps {
                                 script {
                                     def workspaceName = 'talk2'
