@@ -2,6 +2,18 @@
   <div class="d-inline-flex align-items-center flex-grow-1"
        v-if="isShown"
        data-testid="inbox-toggle-filters-wrapper">
+    <information-circle-icon id="inbox-disclaimer-helper-icon"
+                             class="ml-3"
+                             width="24"
+                             height="24"
+                             v-if="isNewInbox">
+    </information-circle-icon>
+    <b-tooltip custom-class="talk-table__tooltip"
+               target="inbox-disclaimer-helper-icon"
+               v-if="isNewInbox">
+      Visibility limits not observed
+    </b-tooltip>
+
     <!-- Left side group -->
     <div class="d-flex align-items-center"
          v-if="!isNewInbox">
@@ -77,6 +89,7 @@ import { mapActions, mapState } from 'vuex'
 import { inboxRoutesMixin, userMixin, EinboxMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
 
 export default {
@@ -90,7 +103,8 @@ export default {
 
   components: {
     CompactBtn,
-    RefreshIcon
+    RefreshIcon,
+    InformationCircleIcon
   },
 
   props: {
