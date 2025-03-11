@@ -77,39 +77,48 @@
                     </div>
 
                     <div :class="taskItem.communication_id ? 'avatar-column' : 'py-2'">
-                      <q-avatar size="30px" color="grey" v-if="getInitials(taskItem.name)">
+                      <q-avatar size="30px"
+                                color="grey"
+                                v-if="getInitials(taskItem.name)">
                         {{ getInitials(taskItem.name) }}
                       </q-avatar>
-                      <q-avatar size="30px" color="grey" v-else>
-                        <i class="fa fa-user" aria-hidden="true"></i>
+                      <q-avatar size="30px"
+                                color="grey"
+                                v-else>
+                        <i class="fa fa-user"
+                           aria-hidden="true">
+                        </i>
                       </q-avatar>
                     </div>
-                    <div>
-                      <q-item-section class="pl-2">
-                        <q-item-label>
-                          {{ fetchName(taskItem) }}
-                        </q-item-label>
-                        <q-item-label lines="2" caption>
-                          {{ taskItem.phone_number | fixPhone('NATIONAL', true) }}
-                        </q-item-label>
-                        <q-item-label lines="2" caption>
-                          {{ taskItem.company_name }}
-                        </q-item-label>
-                        <q-item-label lines="2" caption>
-                              <span>
-                                <i class="fa fa-globe"></i>
-                                {{ taskItem.timezone }}
-                              </span>
-                        </q-item-label>
-                      </q-item-section>
-                    </div>
+
+                    <q-item-section class="pl-2">
+                      <q-item-label>
+                        {{ fetchName(taskItem) }}
+                      </q-item-label>
+                      <q-item-label lines="2"
+                                    caption>
+                        {{ taskItem.phone_number | fixPhone('NATIONAL', true) }}
+                      </q-item-label>
+                      <q-item-label lines="2"
+                                    caption>
+                        {{ taskItem.company_name }}
+                      </q-item-label>
+                      <q-item-label lines="2"
+                                    caption>
+                        <span>
+                          <i class="fa fa-globe"></i>
+                          {{ taskItem.timezone }}
+                        </span>
+                      </q-item-label>
+                    </q-item-section>
 
                     <q-item-section class="t-item-icon"
                                     side
                                     top
                                     v-if="!taskItem.id === activeTaskId && listFilters[key.toUpperCase()].name === 'In Progress'">
-                      <q-avatar color="red" size="md">
-                        <PhoneIcon color="white" />
+                      <q-avatar color="red"
+                                size="md">
+                        <PhoneIcon color="white"/>
                       </q-avatar>
                     </q-item-section>
 
@@ -132,7 +141,7 @@
                                          v-if="key === 'in_queue'"
                                          @click="moveTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
-                                       width="16px" />
+                                       width="16px"/>
                           Move to Top
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
