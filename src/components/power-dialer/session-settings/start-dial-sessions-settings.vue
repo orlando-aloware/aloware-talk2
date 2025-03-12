@@ -472,6 +472,10 @@ export default {
 
     isAgentOnCall () {
       return this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+    },
+
+    userPersonalSessionSettings () {
+      return this.personalSessionSettings.filter((item) => item.user_id === this.profile.id)
     }
   },
 
@@ -745,7 +749,7 @@ export default {
     },
 
     fetchedGroupSettings (type) {
-      return type === 'personal' ? this.personalSessionSettings : this.companySessionSettings
+      return type === 'personal' ? this.userPersonalSessionSettings : this.companySessionSettings
     },
 
     toggleSelected () {
