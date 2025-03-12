@@ -72,7 +72,9 @@ export default {
       'inboxes',
       'activeInboxId',
       'isLoadingInboxes'
-    ])
+    ]),
+
+    ...mapState(['isMobile'])
   },
 
   methods: {
@@ -118,18 +120,29 @@ export default {
     await this.fetchInboxes()
 
     if (this.inboxes.length) {
-      // If there are inboxes, set the first one as active
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.inboxes[0].id
-      const contactId = this.$route.params.id ? parseInt(this.$route.params.id) : null
+      // If there are inboxes:
+      // - try to get id from route
+      // - otherwise set the first inbox as active, if not mobile
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : (!this.isMobile ? this.inboxes[0].id : null)
+      const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
-      this.onInboxSelect(inboxId, contactId)
+      if (inboxId) {
+        this.onInboxSelect(inboxId, contactId)
+      }
     }
   },
 
   watch: {
     '$route.params.inboxId' (inboxId) {
-      if (!inboxId && this.inboxes.length) {
+      if (!inboxId && this.inboxes.length && !this.isMobile) {
         this.onInboxSelect(this.inboxes[0].id) // use the same behavior as created method
+      }
+    },
+
+    '$route.name' (route) {
+      // reset active inbox id when this page is opened
+      if (this.isMobile && route === 'EInbox') {
+        this.setActiveInboxId(null)
       }
     },
 

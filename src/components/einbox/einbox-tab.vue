@@ -1,10 +1,10 @@
 <template>
   <div class="einbox-tab">
     <div class="einbox-tab__header border-bottom">
-      <collapse-button class="einbox-tab__header__collapse-button"
+      <collapse-button :class="['einbox-tab__header__collapse-button', { 'ml-2': !isMobile }]"
                        :target="collapseTarget"
                        v-model="collapsed"
-                       v-if="collapseTarget"/>
+                       v-if="collapseTarget && !isMobile"/>
 
       <template v-if="!isSearchActive">
         <label class="einbox-tab__header__label ellipse"
@@ -24,7 +24,7 @@
       <search-input v-else
                     ref="search"
                     class="einbox-tab__header__search"
-                    placeholder="Type ENTER to search"
+                    placeholder="Search for name, number or campaign"
                     @search="search = $event"
                     @blur="onLeaveSearch" />
     </div>
@@ -139,6 +139,8 @@ export default {
       'viewMode'
     ]),
 
+    ...mapState(['isMobile']),
+
     filteredItems () {
       return this.items.filter(item => !item.hidden)
     }
@@ -208,6 +210,13 @@ export default {
       }
     },
 
+    '$route.name' (route) {
+      // reset activeId in mobile when this page is opened
+      if (this.isMobile && route === 'EInboxDetail') {
+        this.activeId = null
+      }
+    },
+
     viewMode () {
       this.isSearchActive = false
       this.search = ''
@@ -240,7 +249,7 @@ export default {
     height: 45px;
 
     &__label {
-      margin: 0 0 0 10px;
+      margin: 0px;
       font-weight: 500;
       font-size: 16px;
       flex-grow: 1;
