@@ -16,7 +16,7 @@
       <div class="setting d-flex align-items-center flex-column flex-sm-row w-100 w-sm-auto gap-3 align-items-sm-center">
         <div class="small text-muted fs-13 order-1 order-sm-1">
           <template v-if="!isLoadingCommunicationsCount">
-            {{ communicationsCount }} Communications
+            {{ communicationsCountValue }} Communications
           </template>
           <q-skeleton type="text"
                       style="width: 80px"
@@ -41,7 +41,7 @@
              row-key="index"
              virtual-scroll
              hide-bottom
-             :data="combinedCommunications"
+             :data="communicationsData"
              :columns="columns"
              :loading="isLoadingMore || isLoadingCommunications"
              :virtual-scroll-item-size="80"
@@ -198,7 +198,7 @@
     </q-table>
 
     <div class="talk-table--no-data h5"
-         v-if="!combinedCommunications.length && !isLoadingMore && !isLoadingCommunications">
+         v-if="!communicationsData.length && !isLoadingMore && !isLoadingCommunications">
       No communications found based on the current filters
     </div>
 
@@ -240,7 +240,7 @@
 </template>
 
 <script>
-import { aclMixin, communicationsMixin } from 'src/plugins/mixins'
+import { aclMixin, communicationsMixin, visibilityMixin } from 'src/plugins/mixins'
 import SearchInput from 'components/search-input'
 import CompactBtn from 'components/compact-btn'
 import CommunicationTableSettings from './communication-table-settings.vue'
@@ -270,9 +270,9 @@ import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
 import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
-import { mapState, mapActions, mapGetters, mapMutations } from 'vuex'
+import { mapState, mapActions, mapMutations } from 'vuex'
 import { isLiveCall } from 'src/plugins/helpers/functions'
-import { CALL } from 'src/constants/communication-types'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -286,7 +286,8 @@ export default {
 
   mixins: [
     aclMixin,
-    communicationsMixin
+    communicationsMixin,
+    visibilityMixin
   ],
 
   components: {
@@ -324,23 +325,7 @@ export default {
     ...mapState('communications', [
       'activeChannel',
       'hasMoreCommunications'
-    ]),
-
-    ...mapGetters('wallboard', {
-      liveCalls: 'getLiveCalls'
-    }),
-
-    showLiveCalls () {
-      return ['all', 'calls'].includes(this.activeChannel.value)
-    },
-
-    // combine liveCalls (at the top) with communications
-    combinedCommunications () {
-      return [
-        ...(this.showLiveCalls ? this.liveCalls : []),
-        ...this.communications
-      ]
-    }
+    ])
   },
 
   data () {
@@ -355,9 +340,8 @@ export default {
       showColumnHeadersModal: false,
       showCommunicationSidebar: false,
       sidebarCommunication: {},
-      listeners: {
-        callUpdated: null
-      }
+      communicationsData: [],
+      communicationsCountValue: 0
     }
   },
 
@@ -367,8 +351,7 @@ export default {
     ]),
 
     ...mapMutations('wallboard', {
-      deleteCall: 'DELETE_CALL',
-      setLiveCall: 'SET_LIVE_CALL'
+      deleteCall: 'DELETE_CALL'
     }),
 
     sort (sorts) {
@@ -409,7 +392,7 @@ export default {
         return
       }
 
-      const lastIndex = this.combinedCommunications.length - 1
+      const lastIndex = this.communicationsData.length - 1
 
       if (
         this.hasMoreCommunications &&
@@ -462,8 +445,9 @@ export default {
     removeCommunication (communicationId) {
       const index = this.communicationsData.findIndex(communication => communication.id === communicationId)
 
-      if (index) {
+      if (index > -1) {
         this.communicationsData.splice(index, 1)
+        this.communicationsCountValue--
       }
     },
 
@@ -472,7 +456,67 @@ export default {
       this.showCommunicationSidebar = true
     },
 
-    isLiveCall
+    isLiveCall,
+
+    checkCommunicationChannels (communication) {
+      if (!this.activeChannel) {
+        return true
+      }
+
+      switch (communication.type) {
+        case CommunicationTypes.CALL:
+          return ['all', 'calls', 'voicemails'].includes(this.activeChannel.value)
+        case CommunicationTypes.SMS:
+          return ['messages'].includes(this.activeChannel.value)
+        default:
+          return true
+      }
+    },
+
+    newCommunicationListener (communication) {
+      const found = this.communicationsData.find(c => c.id === communication.id)
+
+      if (!found) {
+        const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
+          this.checkCommunicationMatchesSearch(this.communicationFilters.search_text, communication) &&
+          this.checkCommunicationMatchesFilters(this.communicationFilters, communication) &&
+          this.checkCommunicationMatchesUserAccessibility(communication) &&
+          this.checkCommunicationMatchesCampaign(this.communicationFilters.campaign_id, communication) &&
+          this.checkCommunicationMatchesWorkflow(this.communicationFilters.workflow_id, communication) &&
+          this.checkCommunicationMatchesUser(this.communicationFilters.user_id, communication) &&
+          this.checkCommunicationMatchesRingGroup(this.communicationFilters.ring_group_id, communication)
+
+        if (communicationMatchFilters) {
+          // add to the top of the array
+          this.communicationsData.unshift(communication)
+          this.communicationsCountValue++
+        }
+      }
+    },
+
+    updatedCommunicationListener (communication) {
+      const index = this.communicationsData.findIndex(c => c.id === communication.id)
+
+      if (index > -1) {
+        // update it if present in the array
+        this.communicationsData.splice(index, 1, communication)
+      } else {
+        const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
+          this.checkCommunicationMatchesSearch(this.communicationFilters.search_text, communication) &&
+          this.checkCommunicationMatchesFilters(this.communicationFilters, communication) &&
+          this.checkCommunicationMatchesUserAccessibility(communication) &&
+          this.checkCommunicationMatchesCampaign(this.communicationFilters.campaign_id, communication) &&
+          this.checkCommunicationMatchesWorkflow(this.communicationFilters.workflow_id, communication) &&
+          this.checkCommunicationMatchesUser(this.communicationFilters.user_id, communication) &&
+          this.checkCommunicationMatchesRingGroup(this.communicationFilters.ring_group_id, communication)
+
+        if (communicationMatchFilters) {
+          // add to the top of the array
+          this.communicationsData.unshift(communication)
+          this.communicationsCountValue++
+        }
+      }
+    }
   },
 
   created () {
@@ -480,39 +524,24 @@ export default {
     this.source = this.cancelToken.source()
     this.columns = this.getSavedColumns()
 
-    this.listeners.callUpdated = (communication) => {
-      if (![CALL].includes(communication.type)) {
-        return
-      }
-
-      this.setLiveCall(communication)
-    }
-
-    // live call events
-    this.$VueEvent.listen('new_communication', this.listeners.callUpdated)
-    this.$VueEvent.listen('update_communication', this.listeners.callUpdated)
+    // live communications events listeners
+    this.$VueEvent.listen('new_communication', this.newCommunicationListener)
+    this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
     this.$VueEvent.listen('delete_communication', this.deleteCall)
   },
 
   watch: {
-    liveCalls: {
-      deep: true,
-      handler: function (newValue, oldValue) {
-        if (!this.showLiveCalls) {
-          return
-        }
-
-        // if a liveCall is ended, sync comm logs with the new communication
-        if (newValue.length < oldValue.length) {
-          this.getCommunications(this.communicationFilters)
-        }
-      }
+    communications (newValue) {
+      this.communicationsData = newValue
+    },
+    communicationsCount (newValue) {
+      this.communicationsCountValue = newValue
     }
   },
 
   beforeDestroy () {
-    this.$VueEvent.stop('new_communication', this.listeners.callUpdated)
-    this.$VueEvent.stop('update_communication', this.listeners.callUpdated)
+    this.$VueEvent.stop('new_communication', this.newCommunicationListener)
+    this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
     this.$VueEvent.stop('delete_communication', this.deleteCall)
   }
 }
