@@ -53,7 +53,7 @@
       <!-- items list -->
       <template v-else-if="items.length">
         <div :key="item.id"
-             v-for="item in filteredItems"
+             v-for="item in itemsData"
              @click="onItemClick(item)">
           <communication :contact-id="item.contact_id"
                          :contact-name="item.contact.name"
@@ -124,7 +124,8 @@ export default {
       THREADED,
       UNTHREADED,
       isSearchActive: false,
-      search: ''
+      search: '',
+      itemsData: []
     }
   },
 
@@ -137,16 +138,16 @@ export default {
       'activeInboxId',
       'activeInbox',
       'viewMode'
-    ]),
-
-    filteredItems () {
-      return this.items.filter(item => !item.hidden)
-    }
+    ])
   },
 
   created () {
     // Create debounced version of the scroll handler
     this.debouncedScroll = debounce(this.handleScroll, 300)
+
+    // live communications events
+    this.$VueEvent.listen('new_communication', this.newCommunicationListener)
+    this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
   },
 
   beforeDestroy () {
@@ -154,6 +155,9 @@ export default {
     if (this.debouncedScroll) {
       this.debouncedScroll.cancel()
     }
+
+    this.$VueEvent.stop('new_communication', this.newCommunicationListener)
+    this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
   },
 
   methods: {
@@ -195,6 +199,40 @@ export default {
       if (this.search === '') {
         this.isSearchActive = false
       }
+    },
+
+    newCommunicationListener (communication) {
+      console.log('>> newCommunicationListener', communication)
+
+      if (communication.ring_group_id !== this.activeInboxId) {
+        console.log('>> newCommunicationListener communication not in active inbox')
+        return
+      }
+
+      if (this.viewMode === UNTHREADED) {
+        const found = this.itemsData.find(c => c.id === communication.id)
+
+        if (!found) {
+          this.itemsData.unshift(communication)
+        }
+      }
+    },
+
+    updatedCommunicationListener (communication) {
+      console.log('>> updatedCommunicationListener', communication)
+
+      if (communication.ring_group_id !== this.activeInboxId) {
+        console.log('>> updatedCommunicationListener communication not in active inbox')
+        return
+      }
+
+      if (this.viewMode === UNTHREADED) {
+        const index = this.itemsData.findIndex(c => c.id === communication.id)
+
+        if (index > -1) {
+          this.itemsData.splice(index, 1, communication)
+        }
+      }
     }
   },
 
@@ -219,6 +257,10 @@ export default {
       }
 
       this.fetchItems(this.activeInboxId, search || null)
+    },
+
+    items () {
+      this.itemsData = this.items.filter(item => !item.hidden)
     }
   }
 }
