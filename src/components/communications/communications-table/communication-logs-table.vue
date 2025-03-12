@@ -324,7 +324,8 @@ export default {
   computed: {
     ...mapState('communications', [
       'activeChannel',
-      'hasMoreCommunications'
+      'hasMoreCommunications',
+      'channelClonedFilter'
     ])
   },
 
@@ -478,13 +479,13 @@ export default {
 
       if (!found) {
         const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
-          this.checkCommunicationMatchesSearch(this.communicationFilters.search_text, communication) &&
-          this.checkCommunicationMatchesFilters(this.communicationFilters, communication) &&
+          this.checkCommunicationMatchesSearch(this.searchQuery, communication) &&
+          this.checkCommunicationMatchesFilters(this.channelClonedFilter, communication) &&
           this.checkCommunicationMatchesUserAccessibility(communication) &&
-          this.checkCommunicationMatchesCampaign(this.communicationFilters.campaign_id, communication) &&
-          this.checkCommunicationMatchesWorkflow(this.communicationFilters.workflow_id, communication) &&
-          this.checkCommunicationMatchesUser(this.communicationFilters.user_id, communication) &&
-          this.checkCommunicationMatchesRingGroup(this.communicationFilters.ring_group_id, communication)
+          this.checkCommunicationMatchesCampaign(this.channelClonedFilter.campaign_id, communication) &&
+          this.checkCommunicationMatchesWorkflow(this.channelClonedFilter.workflow_id, communication) &&
+          this.checkCommunicationMatchesUser(this.channelClonedFilter.user_id, communication) &&
+          this.checkCommunicationMatchesRingGroup(this.channelClonedFilter.ring_group_id, communication)
 
         if (communicationMatchFilters) {
           // add to the top of the array
@@ -502,13 +503,13 @@ export default {
         this.communicationsData.splice(index, 1, communication)
       } else {
         const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
-          this.checkCommunicationMatchesSearch(this.communicationFilters.search_text, communication) &&
-          this.checkCommunicationMatchesFilters(this.communicationFilters, communication) &&
+          this.checkCommunicationMatchesSearch(this.searchQuery, communication) &&
+          this.checkCommunicationMatchesFilters(this.channelClonedFilter, communication) &&
           this.checkCommunicationMatchesUserAccessibility(communication) &&
-          this.checkCommunicationMatchesCampaign(this.communicationFilters.campaign_id, communication) &&
-          this.checkCommunicationMatchesWorkflow(this.communicationFilters.workflow_id, communication) &&
-          this.checkCommunicationMatchesUser(this.communicationFilters.user_id, communication) &&
-          this.checkCommunicationMatchesRingGroup(this.communicationFilters.ring_group_id, communication)
+          this.checkCommunicationMatchesCampaign(this.channelClonedFilter.campaign_id, communication) &&
+          this.checkCommunicationMatchesWorkflow(this.channelClonedFilter.workflow_id, communication) &&
+          this.checkCommunicationMatchesUser(this.channelClonedFilter.user_id, communication) &&
+          this.checkCommunicationMatchesRingGroup(this.channelClonedFilter.ring_group_id, communication)
 
         if (communicationMatchFilters) {
           // add to the top of the array
