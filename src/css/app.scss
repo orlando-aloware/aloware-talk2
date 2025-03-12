@@ -16127,12 +16127,6 @@ hr {
 
     tr.live-call-tr {
       background-color: $light-blue;
-
-      &:after {
-        content: '';
-        display: block;
-        height: 2px;
-      }
     }
 
     td:last-child {
