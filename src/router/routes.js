@@ -3,6 +3,7 @@ const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
 const ResetPassword = () => import('pages/ResetPassword.vue')
 const Inbox = () => import('pages/Inbox.vue')
+const EInbox = () => import('pages/EInbox.vue')
 const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
 const Contact = () => import('src/pages/contacts/Contact.vue')
 const Contacts = () => import('src/pages/contacts/Contacts.vue')
@@ -55,6 +56,7 @@ export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Ch
 
 // Update the constants at the top
 export const INBOXES_MENU_TITLE = 'Inboxes'
+export const EINBOXES_MENU_TITLE = 'AI Inbox'
 export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
 export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
@@ -91,6 +93,35 @@ const routes = [
         component: ResetPassword
       },
       {
+        path: 'einbox',
+        name: 'EInbox',
+        component: EInbox,
+        meta: {
+          title: EINBOXES_MENU_TITLE,
+          isInbox: true
+        },
+        children: [
+          {
+            path: ':inboxId',
+            name: 'EInboxDetail',
+            component: EInbox,
+            meta: {
+              title: EINBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
+          {
+            path: ':inboxId/contacts/:id/communications',
+            name: 'EInboxCommunicationDetail',
+            component: Contact,
+            meta: {
+              title: EINBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          }
+        ]
+      },
+      {
         path: '',
         name: 'Inbox',
         component: Inbox,
@@ -99,33 +130,6 @@ const routes = [
           isInbox: true
         },
         children: [
-          {
-            path: 'einbox',
-            name: 'EInbox',
-            component: Inbox,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
-          {
-            path: 'einbox/:inboxId',
-            name: 'EInboxDetail',
-            component: Inbox,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
-          {
-            path: 'einbox/:inboxId/contacts/:id/communications',
-            name: 'EInboxCommunicationDetail',
-            component: Contact,
-            meta: {
-              title: INBOXES_MENU_TITLE,
-              isInbox: true
-            }
-          },
           {
             path: 'channels/:channel/:status/contacts/:id',
             name: 'Inbox Contact Task',

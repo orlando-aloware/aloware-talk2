@@ -1,19 +1,14 @@
 export default {
-  toggleNewInbox: ({ commit, state }) => {
-    const newValue = !state.newInboxEnabled
-    commit('SET_NEW_INBOX', newValue)
-    return {
-      success: true,
-      enabled: newValue
-    }
-  },
-  initNewInbox: ({ commit }, enabled) => {
-    commit('SET_NEW_INBOX', enabled)
-  },
   setInboxes: ({ commit }, data) => {
     commit('SET_INBOXES', data.data)
     commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
     commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
+  },
+  resetInboxes: ({ commit }) => {
+    commit('RESET_INBOXES')
+  },
+  setActiveInboxId: ({ commit }, inboxId) => {
+    commit('SET_ACTIVE_INBOX_ID', inboxId)
   },
   setActiveInbox: ({ commit }, inbox) => {
     commit('SET_ACTIVE_INBOX', inbox)
@@ -23,6 +18,11 @@ export default {
   },
   setHasMoreInboxes: ({ commit }, hasMore) => {
     commit('SET_HAS_MORE_INBOXES', hasMore)
+  },
+  appendInboxes: ({ commit }, data) => {
+    commit('APPEND_INBOXES', data.data)
+    commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
+    commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
   },
   setViewMode: ({ commit }, viewMode) => {
     commit('SET_VIEW_MODE', viewMode)

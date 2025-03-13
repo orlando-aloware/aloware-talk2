@@ -112,21 +112,6 @@
                                        @change="eventPayload => onFilterChange(eventPayload, 'contact_lists')" />
               </b-form-group>
             </b-col>
-
-            <b-col sm="12"
-                   md="6">
-              <b-form-group class="form-label"
-                            label="Inboxes">
-                <inbox-selector data-testid="filter-form-inbox-selector"
-                                :force-remove-missing-values="true"
-                                :multiple="true"
-                                :use-chips="true"
-                                :highlighted="isChanged('inboxes')"
-                                :generic-multiselect="false"
-                                v-model="filter.inboxes"
-                                @change="eventPayload => onFilterChange(eventPayload, 'inboxes')" />
-              </b-form-group>
-            </b-col>
           </b-form-row>
         </div>
 
@@ -548,7 +533,6 @@ import EntityTags from 'components/generic-selectors/entity-tags'
 import moment from 'moment'
 import { CALLS_CHANNEL, DEFAULT_COMMUNICATIONS_CHANNEL, MESSAGES_CHANNEL, VOICEMAILS_CHANNEL, RECORDINGS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 import companyTimezoneMixin from 'src/plugins/mixins/company-timezone.mixin'
-import InboxSelector from 'components/generic-selectors/inbox-selector'
 
 const RANGE_1_DAY = 'Today'
 const RANGE_7_DAYS = 'Last 7 Days'
@@ -582,8 +566,7 @@ export default {
     CreatorTypeSelector,
     TeamSelector,
     ContactListSelector,
-    EntityTags,
-    InboxSelector
+    EntityTags
   },
 
   props: {

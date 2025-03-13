@@ -1,11 +1,3 @@
-const INBOX_COLUMN = {
-  label: 'Inbox',
-  name: 'inbox',
-  align: 'left',
-  headerStyle: 'min-width: 200px',
-  columnStyle: 'width: 200px'
-}
-
 export const ALL_COLUMNS = [
   {
     label: '',
@@ -20,7 +12,6 @@ export const ALL_COLUMNS = [
     headerStyle: 'min-width: 150px',
     columnStyle: 'width: 150px'
   },
-  INBOX_COLUMN,
   {
     label: 'Message Body',
     name: 'body',
@@ -194,14 +185,13 @@ export const DEFAULT_COLUMNS = [
     columnStyle: 'width: 105px'
   },
   {
-    label: 'Number',
+    label: 'Line',
     name: 'incoming_number',
     field: 'incoming_number',
     align: 'left',
     headerStyle: 'min-width: 150px',
     columnStyle: 'width: 150px'
   },
-  INBOX_COLUMN,
   {
     label: 'Ring Group',
     name: 'ring_group',

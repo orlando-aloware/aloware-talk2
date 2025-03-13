@@ -1,5 +1,5 @@
 <template>
-  <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <svg :width="width" :height="height" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>arrow / chevron_big_left</title>
     <defs>
       <rect id="path-1" x="0" y="0" width="24" height="24"></rect>
@@ -10,7 +10,7 @@
           <use xlink:href="#path-1"></use>
         </mask>
         <g id="arrow-/-chevron_big_left-(Background/Mask)"></g>
-        <path d="M15.5355749,3.51470947 L7.05029297,11.9999914 L15.535574,20.4852734 L16.9497881,19.0710583 L9.878721,11.9999924 L16.9497881,4.92892289 L15.5355749,3.51470947 Z" fill="#15163F" fill-rule="nonzero" mask="url(#mask-2)"></path>
+        <path d="M15.5355749,3.51470947 L7.05029297,11.9999914 L15.535574,20.4852734 L16.9497881,19.0710583 L9.878721,11.9999924 L16.9497881,4.92892289 L15.5355749,3.51470947 Z" :fill="color" fill-rule="nonzero" mask="url(#mask-2)"></path>
       </g>
     </g>
   </svg>
@@ -18,6 +18,23 @@
 
 <script>
 export default {
-  name: 'chevron-right.vue'
+  name: 'chevron-right.vue',
+
+  props: {
+    color: {
+      type: String,
+      default: '#15163F'
+    },
+
+    width: {
+      type: [Number, String],
+      default: 24
+    },
+
+    height: {
+      type: [Number, String],
+      default: 24
+    }
+  }
 }
 </script>

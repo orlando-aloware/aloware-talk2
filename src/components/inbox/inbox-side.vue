@@ -1,6 +1,6 @@
 <template>
-  <div class="inbox-wrapper border-right"
-       data-testid="inbox-side-wrapper">
+  <div data-testid="inbox-side-wrapper"
+       class="inbox-wrapper border-right">
     <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
@@ -22,15 +22,11 @@
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
-          <div class="inbox-side__nav h-100" :class="{ 'einbox-side__nav': isEInboxEnabled }">
-            <einbox-nav-list data-testid="inbox-side-new-nav-list"
-                                v-if="isEInboxEnabled" />
-
+          <div class="inbox-side__nav h-100">
             <inbox-nav-list data-testid="inbox-side-nav-list"
                             :closed="closed"
                             :open-count="inboxTaskCounts.open"
                             :pending-count="inboxTaskCounts.pending"
-                            v-else
                             v-model="active"
                             @active="newActive"
                             @toInbox="navigateToInbox" />
@@ -39,10 +35,8 @@
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
-        <!--  -->
-        <einbox-tab v-if="isEInboxEnabled" />
 
-        <template v-else>
+        <template>
           <!-- This is the only previous item shown in the inbox tab with the old experience -->
 
           <!-- this is Inbox Tab (Inbox/Inbox View) UI -->
@@ -69,10 +63,7 @@
 
 <script>
 import _ from 'lodash'
-import { mapActions, mapState, mapGetters } from 'vuex'
-/* Einbox Components */
-import EinboxNavList from '../einbox/einbox-nav-list.vue'
-import einboxTab from '../einbox/einbox-tab.vue'
+import { mapActions, mapState } from 'vuex'
 
 /* OLD INBOX Components */
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
@@ -86,12 +77,10 @@ export default {
   name: 'inbox-side',
 
   components: {
-    einboxTab,
     BackButton,
     InboxTab,
     InboxChannels,
     InboxNavList,
-    EinboxNavList,
     Profile,
     InboxToggleFilters
   },
@@ -118,10 +107,6 @@ export default {
       'taskCounts',
       'inboxTaskCounts',
       'navListItems'
-    ]),
-
-    ...mapGetters('Einbox', [
-      'isEInboxEnabled'
     ]),
 
     ...mapState(['isMobile']),
@@ -198,10 +183,6 @@ export default {
       'gettingTasksList',
       'setActiveChannel',
       'setCommunications'
-    ]),
-
-    ...mapActions('eInbox', [
-      'setActiveInbox'
     ]),
 
     ...mapActions(['resetVuex']),

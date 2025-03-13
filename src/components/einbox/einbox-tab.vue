@@ -1,9 +1,38 @@
 <template>
-  <div class="einbox-tab d-flex flex-column w-100">
-    <inbox-channel-toggle />
+  <div class="einbox-tab">
+    <div class="einbox-tab__header border-bottom">
+      <collapse-button class="einbox-tab__header__collapse-button"
+                       :target="collapseTarget"
+                       v-model="collapsed"
+                       v-if="collapseTarget"/>
+
+      <template v-if="!isSearchActive">
+        <label class="einbox-tab__header__label ellipse"
+              v-if="activeInbox.name">
+          {{ activeInbox.name }}
+        </label>
+        <q-space></q-space>
+        <q-btn flat
+               round
+               color="primary"
+               icon="search"
+               size="sm"
+               @click="onEnterSearch"
+               data-testid="einbox-tab-search-button" />
+      </template>
+
+      <search-input v-else
+                    ref="search"
+                    class="einbox-tab__header__search"
+                    placeholder="Type ENTER to search"
+                    @search="search = $event"
+                    @blur="onLeaveSearch" />
+    </div>
+
+    <einbox-channel-toggle />
 
     <!-- Items List -->
-    <div class="items-list"
+    <div class="items-list blue-scroll"
          @scroll="onScroll">
       <!-- Initial loading state -->
       <div :class="[isLoadingItems ? 'py-5' : 'py-4', 'relative']"
@@ -26,34 +55,20 @@
         <div :key="item.id"
              v-for="item in filteredItems"
              @click="onItemClick(item)">
-          <!-- Threaded view -->
-          <communication :contact-id="item.id"
-                         :contact-name="item.name"
-                         :disposition-status="item.last_communication_disposition_status2"
-                         :type="item.last_communication_type"
-                         :direction="item.last_communication_direction"
-                         :callback-status="item.last_communication_callback_status"
-                         :body="item.last_communication_body"
-                         :current-status="item.last_communication_current_status2"
-                         :date="item.last_communication_at"
-                         :total-unreads="item.unread_comms"
-                         :is-active="activeId === item.id"
-                         v-if="viewMode === THREADED" />
-
-          <!-- Unthreaded View -->
           <communication :contact-id="item.contact_id"
-                         :contact-name="getContactName(item.contact || {})"
+                         :contact-name="item.contact.name"
+                         :contact-phone-number="item.contact.phone_number"
+                         :campaign-id="item.campaign_id"
                          :disposition-status="item.disposition_status2"
                          :type="item.type"
                          :direction="item.direction"
                          :callback-status="item.callback_status"
-                         :body="item.body"
+                         :body="item.body | truncate(20)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
-                         :total-unreads="0"
-                         :is-active="activeId === item.id"
-                         :repeats="item.repeats"
-          v-else-if="viewMode === UNTHREADED" />
+                         :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
+                         :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
+                         :repeats="viewMode === UNTHREADED ? item.repeats : null" />
         </div>
 
         <!-- Load more indicator -->
@@ -75,28 +90,41 @@
 
 <script>
 import Communication from 'src/components/einbox/communication-items/communication.vue'
-import InboxChannelToggle from './inbox-channel-toggle.vue'
-import { helperMixin, EinboxMixin } from 'src/plugins/mixins'
+import EinboxChannelToggle from './einbox-channel-toggle.vue'
+import CollapseButton from 'src/components/collapse-button.vue'
+import { EinboxMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
+import SearchInput from 'src/components/search-input.vue'
 
 export default {
   components: {
     Communication,
-    InboxChannelToggle
+    EinboxChannelToggle,
+    CollapseButton,
+    SearchInput
   },
 
   mixins: [
-    EinboxMixin,
-    helperMixin
+    EinboxMixin
   ],
+
+  props: {
+    collapseTarget: {
+      type: HTMLElement,
+      default: null
+    }
+  },
 
   data () {
     return {
       activeId: null,
+      collapsed: false,
       THREADED,
-      UNTHREADED
+      UNTHREADED,
+      isSearchActive: false,
+      search: ''
     }
   },
 
@@ -106,6 +134,7 @@ export default {
       'isLoadingItems',
       'isLoadingMoreItems',
       'hasMoreItems',
+      'activeInboxId',
       'activeInbox',
       'viewMode'
     ]),
@@ -137,14 +166,13 @@ export default {
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
       if (isNearBottom && !this.isLoadingMoreItems && !this.isLoadingItems && this.hasMoreItems) {
-        this.loadMoreItems(this.activeInbox)
+        this.loadMoreItems(this.activeInboxId)
       }
     },
 
     onItemClick (item) {
-      this.activeId = item.id
-      const contactId = this.viewMode === THREADED ? item.id : item.contact_id
-      const route = `/einbox/${this.activeInbox}/contacts/${contactId}/communications`
+      this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
+      const route = `/einbox/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
       // avoid redundant navigation
       if (route === this.$route.path) {
@@ -152,6 +180,21 @@ export default {
       }
 
       this.$router.push(route)
+    },
+
+    async onEnterSearch () {
+      this.isSearchActive = true
+
+      await this.$nextTick()
+
+      // auto focus inside inner search input
+      this.$refs.search.$el.querySelector('input').focus()
+    },
+
+    onLeaveSearch () {
+      if (this.search === '') {
+        this.isSearchActive = false
+      }
     }
   },
 
@@ -163,19 +206,60 @@ export default {
           this.activeId = newV ? parseInt(newV) : null
         }
       }
+    },
+
+    viewMode () {
+      this.isSearchActive = false
+      this.search = ''
+    },
+
+    search (search) {
+      if (search === '') {
+        this.isSearchActive = false
+      }
+
+      this.fetchItems(this.activeInboxId, search || null)
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .einbox-tab {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   background-color: white;
+  border-radius: inherit;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: 6px 15px;
+    width: 100%;
+    height: 45px;
+
+    &__label {
+      margin: 0 0 0 10px;
+      font-weight: 500;
+      font-size: 16px;
+      flex-grow: 1;
+    }
+
+    &__search {
+      width: 100%;
+      margin-left: 10px;
+
+      label {
+        border: none;
+      }
+    }
+  }
 }
 
 .items-list {
   flex: 1;
   overflow-y: auto;
+  width: 100%;
 }
 </style>

@@ -2,6 +2,7 @@
   <div :class="['avatar-circle', colorModuleClass]"
        :style="{ height: `${height}px`, width: `${width}px` }">
     {{ name | initials }}
+    <slot></slot>
   </div>
 </template>
 
@@ -50,6 +51,7 @@ export default {
   color: white;
   font-size: 13px;
   background-color: rgb(149, 152, 158);
+  font-weight: 600;
 
   &--color-0 {
     color: #E319C5;

@@ -1,7 +1,7 @@
 <template>
   <div :class="['communication', { active: isActive }]">
     <div class="communication__avatar">
-      <div class="avatar position-relative"
+      <div class="position-relative"
            role="button">
         <b-badge class="avatar__unread-badge position-absolute"
                  variant="danger"
@@ -24,6 +24,10 @@
                     :repeats="repeats" />
     </div>
 
+    <div class="communication__phone-number">
+      <phone-number :phone-number="contactPhoneNumber" />
+    </div>
+
     <div class="communication__communication-type">
       <last-communication :disposition-status="dispositionStatus"
                           :type="type"
@@ -32,6 +36,11 @@
                           :body="body"
                           :total-unreads="totalUnreads"
                           v-if="type" />
+    </div>
+
+    <div class="communication__campaign"
+         v-if="campaignId">
+      <campaign :campaign-id="campaignId" />
     </div>
 
     <div class="communication__time">
@@ -45,9 +54,11 @@
 
 <script>
 import Avatar from './avatar.vue'
+import Campaign from './campaign.vue'
 import ContactName from './contact-name.vue'
 import LastCommunication from './last-communication.vue'
 import LastCommunicationDate from './last-communication-date.vue'
+import PhoneNumber from './phone-number.vue'
 import { avatarMixin } from 'src/plugins/mixins'
 
 export default {
@@ -57,9 +68,11 @@ export default {
 
   components: {
     Avatar,
+    Campaign,
     ContactName,
     LastCommunication,
-    LastCommunicationDate
+    LastCommunicationDate,
+    PhoneNumber
   },
 
   props: {
@@ -70,6 +83,16 @@ export default {
 
     contactName: {
       type: String,
+      default: null
+    },
+
+    contactPhoneNumber: {
+      type: String,
+      default: null
+    },
+
+    campaignId: {
+      type: [Number, String],
       default: null
     },
 
@@ -134,14 +157,16 @@ export default {
 <style lang="scss" scoped>
 .communication {
   display: grid;
-  grid-template-columns: 0.5fr 2.3fr 0.2fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 5px 5px;
+  grid-template-columns: 0.5fr 2.2fr 0.3fr;
+  grid-template-rows: 1fr 1fr 1fr; // only 3 because campaign can be null
+  gap: 0px 5px;
   grid-template-areas:
     "communication__avatar communication__contact-name communication__time"
-    "communication__avatar communication__communication-type communication__time";
+    "communication__avatar communication__phone-number communication__time"
+    "communication__avatar communication__communication-type communication__time"
+    "communication__avatar communication__campaign communication__time";
 
-  padding: 8px 4px 8px 16px;
+  padding: 8px 0px 8px 16px;
   min-height: 64px;
   border-bottom: 1px solid #eeeeee;
   cursor: pointer;
@@ -173,6 +198,14 @@ export default {
 
   &__time {
     grid-area: communication__time;
+  }
+
+  &__phone-number {
+    grid-area: communication__phone-number;
+  }
+
+  &__campaign {
+    grid-area: communication__campaign;
   }
 
   &.active {

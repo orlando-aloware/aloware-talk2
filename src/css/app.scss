@@ -2244,11 +2244,6 @@ i.option-separator {
     }
   }
 
-  .contact-avatar {
-    background-color: $grey-80 !important;
-    font-weight: 600;
-  }
-
   .q-item__section--avatar {
     padding-right: 0 !important;
     min-width: 0 !important;
@@ -3855,10 +3850,6 @@ i.option-separator {
       white-space: nowrap;
     }
   }
-}
-
-.einbox-side__nav {
-  padding: 0;
 }
 
 .inbox-details {
@@ -16341,7 +16332,14 @@ hr {
   .tooltip-inner {
     background-color: #000 !important;
     color: #fff !important;
-    font-size: 13px !important;
+    font-size: 14px !important;
+    padding: 2px 8px !important;
+  }
+
+  &--md {
+    .tooltip-inner {
+      max-width: 350px;
+    }
   }
 }
 
@@ -16578,3 +16576,13 @@ hr {
   }
 }
 
+.blue-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: all 0.2s ease;
+
+  &:hover {
+    scrollbar-color: $blue transparent;
+    padding-right: 0px;
+  }
+}

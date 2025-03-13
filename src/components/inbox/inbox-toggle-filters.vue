@@ -2,8 +2,21 @@
   <div class="d-inline-flex align-items-center flex-grow-1"
        v-if="isShown"
        data-testid="inbox-toggle-filters-wrapper">
+    <information-circle-icon id="inbox-disclaimer-helper-icon"
+                             class="ml-3"
+                             width="24"
+                             height="24"
+                             v-if="isNewInbox">
+    </information-circle-icon>
+    <b-tooltip custom-class="talk-table__tooltip"
+               target="inbox-disclaimer-helper-icon"
+               v-if="isNewInbox">
+      Visibility limits not observed
+    </b-tooltip>
+
     <!-- Left side group -->
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center"
+         v-if="!isNewInbox">
       <compact-btn class="bg-white border stats-refresh-btn border-half-rounded d-flex justify-content-center align-items-center mr-1"
                    :disabled="isInboxRefreshBtnLoading"
                    data-testid="inbox-toggle-filters-compact-btn"
@@ -12,55 +25,17 @@
                       :class="$q.screen.width < MOBILE_LARGE_WIDTH ? 'm-0': ''"/>
         {{ refreshButtonLabel }}
       </compact-btn>
-
-      <div class="d-flex align-items-center mr-2" v-if="showNewInboxToggle">
-        <b-form-checkbox class="mt-1 ml-2 cursor-pointer einbox-toggle"
-                         size="sm"
-                         switch
-                         id="EinboxToggle"
-                         data-testid="inbox-new-experience-checkbox"
-                         :class="toggleFiltersClass"
-                         :disabled="isTogglingNewInbox"
-                         v-model="newInboxEnabled">
-          <q-tooltip content-class="bg-grey-10 text-white"
-                    anchor="bottom left"
-                    self="top middle">
-            <zap-bold-icon class="ml-1"
-                            width="16"
-                            height="16"
-                            color="#FFB020" />
-            Toggle New Inbox
-          </q-tooltip>
-        </b-form-checkbox>
-        <label class="mt-2 cursor-pointer text-nowrap text-13 text-sm-14 inbox-effect-gradient-text"
-               :class="[toggleFiltersClass, { 'text-grey-10': newInboxEnabled }]"
-               data-testid="inbox-new-experience-label">
-          <template v-if="newInboxEnabled">
-            <zap-bold-icon class="ml-1"
-                           width="16"
-                           height="16"
-                           color="#256eff" />
-            <strong>New Inbox Experience Enabled</strong>
-          </template>
-          <template v-else>
-            <zap-bold-icon class="ml-1"
-                           width="16"
-                           height="16"
-                           color="#256eff" />
-            <strong>Enable the New Inbox experience</strong>
-          </template>
-        </label>
-      </div>
     </div>
 
+    <div class="d-flex align-items-center"
+         v-if="!isNewInbox">
       <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                        size="sm"
                        switch
                        data-testid="inbox-my-contacts-filter-form-checkbox"
                        :class="toggleFiltersClass"
                        :disabled="toggleFiltersEnabled"
-                       v-model="inboxShowMyContactsFilter"
-                       v-if="!newInboxEnabled">
+                       v-model="inboxShowMyContactsFilter">
         <q-tooltip content-class="bg-grey-10 text-white"
                    anchor="bottom left"
                    self="top middle">
@@ -70,7 +45,6 @@
       <label class="text-primary mt-2 cursor-pointer text-nowrap text-13 text-sm-14"
              :class="toggleFiltersClass"
              data-testid="inbox-my-contacts-filter-my-contacts-label"
-             v-if="!newInboxEnabled"
              @click="myContactsFilterChange">
         <span class="label-my-contacts"
               :class="{ hidden: $q.screen.width < 390 }"
@@ -80,7 +54,7 @@
       </label>
 
       <div class="d-flex align-items-center ml-2"
-           v-if="shouldShowUnreadsToggle && !newInboxEnabled">
+           v-if="shouldShowUnreadsToggle">
         <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                          size="sm"
                          switch
@@ -106,32 +80,31 @@
         </label>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
 import VueCookies from 'vue-cookies'
-import { mapActions, mapState, mapGetters } from 'vuex'
-import { inboxRoutesMixin, userMixin } from 'src/plugins/mixins'
+import { mapActions, mapState } from 'vuex'
+import { inboxRoutesMixin, userMixin, EinboxMixin } from 'src/plugins/mixins'
 import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
-import ZapBoldIcon from 'components/icons/inbox/zap-bold-icon'
-
-const COOKIE_NEW_INBOX = 'new_inbox_enabled'
-const COOKIE_EXPIRES = 3650
 
 export default {
   name: 'inbox-toggle-filters',
 
   mixins: [
     inboxRoutesMixin,
-    userMixin
+    userMixin,
+    EinboxMixin
   ],
 
   components: {
     CompactBtn,
     RefreshIcon,
-    ZapBoldIcon
+    InformationCircleIcon
   },
 
   props: {
@@ -160,9 +133,8 @@ export default {
       'isFetchingContacts',
       'isInboxRefreshBtnLoading'
     ]),
+    ...mapState('Einbox', ['activeInboxId']),
     ...mapState('cache', ['currentCompany']),
-
-    ...mapGetters('Einbox', ['isEInboxEnabled']),
 
     isShown () {
       const isInboxRoute = this.$route?.meta?.isInbox
@@ -182,19 +154,8 @@ export default {
       return this.$q.screen.width < MOBILE_LARGE_WIDTH ? '' : 'Refresh'
     },
 
-    newInboxEnabled: {
-      get () {
-        return this.isEInboxEnabled
-      },
-      set (value) {
-        if (value !== this.isEInboxEnabled) {
-          this.handleNewInboxToggle()
-        }
-      }
-    },
-
-    showNewInboxToggle () {
-      return this.isShown && this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
+    isNewInbox () {
+      return this.$route.path.substring(0, 7) === '/einbox'
     }
   },
 
@@ -206,8 +167,7 @@ export default {
     ]),
 
     ...mapActions('Einbox', [
-      'toggleNewInbox',
-      'initNewInbox'
+      'resetItems'
     ]),
 
     ...mapActions('cache', ['setCurrentCompany']),
@@ -247,44 +207,16 @@ export default {
       this.inboxShowUnreadsFilter = !this.inboxShowUnreadsFilter
     },
 
-    refreshInbox () {
+    async refreshInbox () {
       this.setIsInboxRefreshBtnLoading(true)
-      this.$VueEvent.fire('fetchInbox')
-    },
 
-    async handleNewInboxToggle () {
-      try {
-        this.$cookies = VueCookies
-        this.isTogglingNewInbox = true
-        const result = await this.toggleNewInbox()
+      if (this.isNewInbox) {
+        this.resetItems()
+        await this.fetchItems(this.activeInboxId)
 
-        if (result.success) {
-          // Handle cookie storage
-          if (result.enabled) {
-            this.$cookies.set(COOKIE_NEW_INBOX, 'true', COOKIE_EXPIRES)
-            this.$router.push('/einbox')
-          } else {
-            this.$cookies.remove(COOKIE_NEW_INBOX)
-            this.$router.push('/')
-          }
-
-          this.$q.notify({
-            type: 'positive',
-            message: result.enabled
-              ? 'New inbox experience enabled'
-              : 'Rolled back to classic inbox',
-            position: 'top'
-          })
-        }
-      } catch (error) {
-        console.error('Failed to toggle new inbox:', error)
-        this.$q.notify({
-          type: 'negative',
-          message: 'Failed to update inbox preference',
-          position: 'top'
-        })
-      } finally {
-        this.isTogglingNewInbox = false
+        this.setIsInboxRefreshBtnLoading(false)
+      } else {
+        this.$VueEvent.fire('fetchInbox')
       }
     }
   },
@@ -316,10 +248,6 @@ export default {
 
     this.inboxShowMyContactsFilter = this.inboxShowMyContacts
     this.inboxShowUnreadsFilter = this.inboxShowUnreads
-
-    // Initialize from cookie
-    const enabled = this.$cookies.get(COOKIE_NEW_INBOX) === 'true'
-    this.initNewInbox(enabled)
   }
 }
 </script>

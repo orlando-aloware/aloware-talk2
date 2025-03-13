@@ -1,24 +1,16 @@
 <template>
   <div class="last-communication">
     <div class="d-flex">
-        <div class="pr-2">
-          <component height="18px"
-                     width="18px"
-                     data-testid="inbox-tasks-item-component"
-                     :is="stateToIcon(dispositionStatus, type, direction, callbackStatus)">
-          </component>
-        </div>
+        <component class="pr-1"
+                    height="22px"
+                    width="22px"
+                    data-testid="inbox-tasks-item-component"
+                    :is="stateToIcon(dispositionStatus, type, direction, callbackStatus)">
+        </component>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text last-communication__label"
                :class="[callStatusClass]"
-               :id="`last-comm-icon-${_uid}`"
                v-if="[CommunicationTypes.CALL, CommunicationTypes.FAX].includes(type)">
-            <b-tooltip data-testid="inbox-tasks-item-tooltip"
-                       custom-class="talk-table__tooltip"
-                       triggers="hover"
-                       :target="`last-comm-icon-${_uid}`">
-              {{ communicationLabel }}
-            </b-tooltip>
             {{ communicationLabel }}
           </div>
 

@@ -12,8 +12,8 @@
           <i class="fa fa-chevron-left" />
         </button>
       </router-link>
-      <h1 v-if="isMainTitle" class="flex-grow-2">{{ pageTitle || mainTitle }}</h1>
-      <h1 v-if="forcePageTitle" class="flex-grow-2">{{ pageTitle || forcePageTitle }}</h1>
+      <h1 v-if="isMainTitle" class="flex-grow-2">{{ mainTitle }}</h1>
+      <h1 v-if="forcePageTitle" class="flex-grow-2">{{ forcePageTitle }}</h1>
       <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ settingsTabHeaderName }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
@@ -208,11 +208,6 @@ export default {
     titleOnly: {
       type: Boolean,
       default: false
-    },
-
-    pageTitle: {
-      type: String,
-      default: ''
     }
   },
 

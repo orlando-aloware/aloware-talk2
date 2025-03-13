@@ -1,14 +1,17 @@
 import { THREADED } from './einbox.store'
 
 export default {
+  SET_ACTIVE_INBOX_ID (state, inbox) {
+    state.activeInboxId = inbox
+  },
   SET_ACTIVE_INBOX (state, inbox) {
     state.activeInbox = inbox
   },
-  SET_NEW_INBOX (state, enabled) {
-    state.newInboxEnabled = enabled
-  },
   SET_INBOXES (state, inboxesFirstPage) {
     state.inboxes = [ ...inboxesFirstPage ]
+  },
+  RESET_INBOXES (state) {
+    state.inboxes = []
   },
   SET_IS_LOADING_INBOXES (state, loading) {
     state.isLoadingInboxes = loading
@@ -18,6 +21,9 @@ export default {
   },
   SET_HAS_MORE_INBOXES (state, hasMore) {
     state.hasMoreInboxes = hasMore
+  },
+  APPEND_INBOXES (state, inboxes) {
+    state.inboxes = [ ...state.inboxes, ...inboxes ]
   },
   SET_VIEW_MODE (state, viewMode) {
     state.viewMode = viewMode
@@ -61,18 +67,14 @@ function handleDuplicatedItems (items) {
     delete items[index].hidden
   })
 
-  const found = []
   const hidden = []
 
   items.forEach((item, index) => {
-    const repeateds = !found.includes(item.contact_id)
-      ? findRepeateds(items, index)
-      : []
+    const repeateds = findRepeateds(items, index)
 
     // try to find repeated comms for this contact
     if (repeateds.length > 0) {
       items[index].repeats = repeateds.length
-      found.push(items[index].contact_id)
       hidden.push(...repeateds)
     }
 
