@@ -42,7 +42,7 @@
 
     <span class="cursor-pointer text-primary d-flex align-items-center"
           v-if="row.has_transcription && !row.transcription_is_deleted">
-      <i class="fa-solid fa-play mr-1"/>
+        <i class="fa-solid fa-note-sticky mr-1 align-note-icon"/>
         <transcription-modal no-button
                              data-testid="communication-audio-transcription-modal"
                              ref="transcriptionModal"
@@ -81,3 +81,9 @@ export default {
   })
 }
 </script>
+
+<style scoped>
+.align-note-icon {
+  margin-left: -2px;
+}
+</style>

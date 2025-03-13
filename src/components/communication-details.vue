@@ -1140,6 +1140,31 @@
               </b-col>
             </b-form-row>
 
+            <div class="ai-effect-container"
+                 v-if="isTranscriptionAllowed(communication)">
+              <div class="ai-effect-gradient"></div>
+              <div class="ai-effect-blur"></div>
+              <div class="ai-effect-content p-2">
+                <div class="flex items-center gap-2">
+                  <h3 class="ai-effect-gradient-text">
+                    <sparkle-icon width="16" height="16" color="#9333EA"/>
+                    Powered by AloAi
+                    <template v-if="currentCompany?.plan?.included_transcription_min > 0 && currentCompany?.transcription_settings?.is_trial">
+                      (free {{ currentCompany.plan.included_transcription_min / 1000 }}K trial)
+                    </template>
+                  </h3>
+                  <div>Click on the button to generate a transcription of this call.</div>
+                  <generate-transcription-button
+                    class="mr-2"
+                    variant="button"
+                    data-testid="comm-details-generate-transcription-button"
+                    :communication="communication"
+                    v-if="fileUuid && isMigrated"
+                  ></generate-transcription-button>
+                </div>
+              </div>
+            </div>
+
             <!--VM-->
             <b-form-row
               v-if="[CommunicationTypes.CALL, CommunicationTypes.RVM].includes(communication.type)"
@@ -1423,6 +1448,7 @@ import TranscriptionModal from 'src/components/communication/transcription-modal
 import CloseIcon from 'components/icons/close-icon.vue'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import UserDisplay from 'src/components/user-display.vue'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'communication-details',
@@ -1442,7 +1468,8 @@ export default {
     EntityTags,
     GenerateTranscriptionButton,
     CloseIcon,
-    UserDisplay
+    UserDisplay,
+    SparkleIcon
   },
 
   mixins: [
