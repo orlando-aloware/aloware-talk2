@@ -16560,6 +16560,10 @@ hr {
     @media (min-width: 785px) {
       height: calc(100vh - 60px); // Desktop: only account for top bar
     }
+
+    @media (min-width: 1280px) {
+      width: 480px;
+    }
   }
 
   .communication-details-card {
