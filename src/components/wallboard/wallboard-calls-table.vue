@@ -211,11 +211,11 @@
                            v-if="hasRole('Company Admin')">
                           <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
                                 :title="getUserName(getUser(attemptingUser))">
-                            {{ getUserName(getUser(attemptingUser)) }}
+                            <user-display :user-id="attemptingUser" />
                           </span>
                         </a>
                         <span v-else>
-                          {{ getUserName(getUser(attemptingUser)) }}
+                          <user-display :user-id="attemptingUser" />
                         </span>
                       </li>
                     </div>
@@ -228,11 +228,11 @@
                            v-if="hasRole('Company Admin')">
                           <span :class="getAttemptingClass(attemptingUser, call.disposition_status2, call.user_id)"
                                 :title="getUserName(getUser(attemptingUser))">
-                            {{ getUserName(getUser(attemptingUser)) }}
+                            <user-display :user-id="attemptingUser" />
                           </span>
                         </a>
                         <span v-else>
-                          {{ getUserName(getUser(attemptingUser)) }}
+                          <user-display :user-id="attemptingUser" />
                         </span>
                       </li>
                     </div>
@@ -265,8 +265,12 @@
                 <div v-else-if="call.user_id && getUser(call.user_id)">
                   <a target="_blank"
                      :href="getUserURL(call.user_id)"
-                     v-if="hasRole('Company Admin')">{{ getUserName(getUser(call.user_id)) }}</a>
-                  <span v-else>{{ getUserName(getUser(call.user_id)) }}</span>
+                     v-if="hasRole('Company Admin')">
+                    <user-display :user-id="call.user_id" />
+                  </a>
+                  <span v-else>
+                    <user-display :user-id="call.user_id" />
+                  </span>
                 </div>
                 <div v-else>
                   <span>--</span>
@@ -402,6 +406,7 @@ import UnparkCommunicationButton from 'src/components/communication/unpark-commu
 import WallboardCallsNote from 'src/components/wallboard/wallboard-calls-note.vue'
 import WhisperCommunicationButton from 'src/components/communication/whisper-communication-button.vue'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import UserDisplay from 'src/components/user-display.vue'
 import { COLUMNS } from 'src/constants/wallboard/calls-columns'
 import { isParkedCall } from 'src/plugins/helpers/functions'
 import {
@@ -436,7 +441,8 @@ export default {
     UnparkCommunicationButton,
     WallboardCallsNote,
     WhisperCommunicationButton,
-    EntityTags
+    EntityTags,
+    UserDisplay
   },
 
   props: {

@@ -340,7 +340,7 @@ Vue.prototype.$Sentry = window.Sentry
 
 Vue.prototype.$handleErrors = function (response, title = null) {
   if (response && response.status) {
-    const message = { data: response.data.error }
+    const message = { data: response.data.error || response.data.message }
     const error = { data: null }
 
     switch (response.status) {

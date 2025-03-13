@@ -470,7 +470,11 @@ export default {
         'custom_log',
         'aloai_text_bot_enrollment',
         'aloai_text_bot_disengagement',
-        'aloai_text_bot_reengagement'
+        'aloai_text_bot_reengagement',
+        'aloai_text_bot_reengagement',
+        'aloai_voice_bot_enrollment',
+        'aloai_voice_bot_disengagement',
+        'aloai_voice_bot_reengagement'
       ],
       custom_audit_messages: {
         'is_dnc': [
