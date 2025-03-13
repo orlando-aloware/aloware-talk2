@@ -5,7 +5,7 @@
     <div class="d-flex align-items-center text-xs"
          data-testid="start-time-row"
          v-if="row.call_disposition_id">
-      <i class="fa fa-bolt"
+      <i class="fa fa-bolt icon-size"
          :style="{ color: callDispositionColor(row.call_disposition_id) }"/>
         <span class="ml-1 text-grey-900">{{ callDispositionName(row.call_disposition_id)}}</span>
     </div>
@@ -13,7 +13,7 @@
     <span class="cursor-pointer text-primary"
           :id="`recording-comm-${row.id}`"
           v-if="row.has_recording || row.recording_is_deleted">
-      <i class="fa-solid fa-play"/> Left Recording
+      <i class="fa-solid fa-play icon-size"/> Left Recording
 
       <b-popover triggers="click blur"
                  placement="bottom"
@@ -28,7 +28,7 @@
     <span class="cursor-pointer text-primary"
           :id="`voicemail-comm-${row.id}`"
           v-if="row.has_voicemail">
-      <i class="fa-solid fa-play"/> Left Voicemail
+      <i class="fa-solid fa-play icon-size"/> Left Voicemail
 
       <b-popover triggers="click blur"
                  placement="bottom"
@@ -42,7 +42,7 @@
 
     <span class="cursor-pointer text-primary d-flex align-items-center"
           v-if="row.has_transcription && !row.transcription_is_deleted">
-      <i class="fa-solid fa-play mr-1"/>
+        <i class="fa-solid fa-note-sticky icon-size align-note-icon"/>
         <transcription-modal no-button
                              data-testid="communication-audio-transcription-modal"
                              ref="transcriptionModal"
@@ -81,3 +81,14 @@ export default {
   })
 }
 </script>
+
+<style scoped>
+.icon-size {
+  width: 12px;
+}
+
+.align-note-icon {
+  margin-left: -1px;
+  margin-right: 4px;
+}
+</style>

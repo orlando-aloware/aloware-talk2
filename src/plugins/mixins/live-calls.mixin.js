@@ -1,10 +1,10 @@
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import * as CommunicationTypes from 'src/constants/communication-types'
-import * as CommunicationDirection from 'src/constants/communication-direction'
-import { mapActions, mapState } from 'vuex'
 import _, { isEmpty } from 'lodash'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as CommunicationDirection from 'src/constants/communication-direction'
+import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   data () {
@@ -350,21 +350,6 @@ export default {
       }
       this.$VueEvent.fire('answerCallFishing', data)
       this.setShowPhone(true)
-    },
-    onShowPhone (e) {
-      this.showCallMenu = false
-      if (!this.isActiveCall && !this.isIncomingLiveCall && !this.isCallFishingMode) {
-        e.stopImmediatePropagation()
-        return
-      }
-
-      this.setShowIncomingCallNotification(false)
-      this.showCallFishingDataInPhone({
-        communication: this.communication,
-        contact: this.contact
-      })
-
-      e.stopImmediatePropagation()
     }
   }
 }

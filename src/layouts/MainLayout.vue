@@ -404,7 +404,8 @@ export default {
       MetricOptionGroups,
       AppDefaultLogin,
       isFirstLoading: true,
-      isSidebarExpanded: true
+      isSidebarExpanded: true,
+      loadingInboxes: false
     }
   },
 
@@ -479,7 +480,7 @@ export default {
     pageClass () {
       const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
 
-      return pageSlug.replace(/ /g, '_') + '-page'
+      return pageSlug === 'ai inbox' ? null : pageSlug.replace(/ /g, '_') + '-page'
     },
 
     isMobilePhoneClosed () {
@@ -2713,7 +2714,8 @@ export default {
       'setStatics',
       'setStaticsLoaded',
       'setIsWhiteLabel',
-      'setShowedKycReloadDialog'
+      'setShowedKycReloadDialog',
+      'setInboxes'
     ]),
     ...mapActions('contacts', [
       'resetSearch',

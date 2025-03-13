@@ -76,7 +76,8 @@ storage.local.setItem('api_url', process.env.API_URL)
 storage.local.setItem('api_reporting_url', process.env.API_REPORTING_URL)
 
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
-storage.local.setItem('aloware_demo_companies', Object.values(process.env.DEMO_COMPANY_IDS).join(','))
+// storage.local.setItem('aloware_demo_companies', Object.values(process.env.DEMO_COMPANY_IDS).join(',')) // Uncomment before merging to develop
+storage.local.setItem('aloware_demo_companies', '7,47,1659,4692') // Just for testing, remove before merging to develop
 storage.local.setItem('custom_edge_location_companies', Object.values(process.env.CUSTOM_EDGE_LOCATION_COMPANY_IDS).join(','))
 
 Vue.use(infiniteScroll)
@@ -339,7 +340,7 @@ Vue.prototype.$Sentry = window.Sentry
 
 Vue.prototype.$handleErrors = function (response, title = null) {
   if (response && response.status) {
-    const message = { data: response.data.error }
+    const message = { data: response.data.error || response.data.message }
     const error = { data: null }
 
     switch (response.status) {

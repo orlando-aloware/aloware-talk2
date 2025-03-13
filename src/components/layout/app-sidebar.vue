@@ -28,8 +28,8 @@
            v-show="isActive('Inbox')">
       <q-tooltip anchor="center right"
                  self="center left"
-                 :offset="[-5, 0]"
-                 v-if="!isSidebarExpanded">
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
         <span class="font-weight-bold text-sm">{{ INBOXES_MENU_TITLE }}</span>
       </q-tooltip>
 
@@ -58,6 +58,81 @@
             v-if="isSidebarExpanded">
         {{ INBOXES_MENU_TITLE }}
       </span>
+    </q-btn>
+
+    <q-btn :to="{ name: 'EInbox' }"
+           :ripple="false"
+           icon="img:app-icons/menu/multi_inbox_active.svg"
+           align="left"
+           padding="none"
+           class="nav-icons w-100"
+           data-testid="communication-active-sidebar-btn"
+           v-show="isActive('EInbox')"
+           v-if="isDemoCompany"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">AI Inbox</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
+            v-if="isSidebarExpanded">
+        AI Inbox
+      </span>
+
+      <!-- Temporary helper -->
+      <div class="ml-auto mr-3"
+           v-if="isSidebarExpanded">
+        <information-circle-icon height="20"
+                                 width="20"
+                                 color="#FFF"
+                                 id="einbox-helper-icon" />
+         <b-tooltip custom-class="talk-table__tooltip talk-table__tooltip--md"
+                    placement="right"
+                    boundary="#einbox-helper-icon"
+                    target="einbox-helper-icon">
+          {{ EINBOX_TOOLTIP_TEXT }}
+        </b-tooltip>
+      </div>
+    </q-btn>
+    <q-btn :to="{ name: 'EInbox' }"
+           :ripple="false"
+           icon="img:app-icons/menu/multi_inbox_gray.svg"
+           align="left"
+           padding="10px 0px 10px 20px"
+           class="nav-icons w-100"
+           data-testid="communication-no-active-sidebar-btn"
+           v-show="!isActive('EInbox')"
+           v-if="isDemoCompany"
+           flat>
+      <q-tooltip anchor="center right"
+                 self="center left"
+                 v-if="!isSidebarExpanded"
+                 :offset="[-5, 0]">
+        <span class="font-weight-bold text-sm">AI Inbox</span>
+      </q-tooltip>
+
+      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
+            v-if="isSidebarExpanded">
+        AI Inbox
+      </span>
+
+      <!-- Temporary helper -->
+      <div class="ml-auto mr-3"
+           v-if="isSidebarExpanded">
+        <information-circle-icon height="20"
+                                 width="20"
+                                 color="#9797AE"
+                                 id="einbox-helper-icon-gray" />
+         <b-tooltip custom-class="talk-table__tooltip talk-table__tooltip--md"
+                    placement="right"
+                    boundary="#einbox-helper-icon-gray"
+                    target="einbox-helper-icon-gray">
+          {{ EINBOX_TOOLTIP_TEXT }}
+        </b-tooltip>
+      </div>
     </q-btn>
 
     <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
@@ -850,6 +925,7 @@
         Settings
       </span>
     </q-btn>
+
     <div class="mt-auto w-100">
       <div class="width-40 margin-auto position-relative">
         <q-separator class="separator-blur mt-1"
@@ -886,9 +962,16 @@ import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 import { broadcastsMixin, kycMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE, COMMUNICATIONS_MENU_TITLE } from 'src/router/routes'
+import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+
+const EINBOX_TOOLTIP_TEXT = 'AI Inbox is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
 
 export default {
   name: 'app-sidebar',
+
+  components: {
+    InformationCircleIcon
+  },
 
   props: {
     isSidebarExpanded: {
@@ -960,8 +1043,9 @@ export default {
     return {
       modeIcon: 'img:app-icons/menu/mode_gray.svg',
       COMMUNICATIONS_MENU_TITLE,
+      DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       INBOXES_MENU_TITLE,
-      DEFAULT_COMMUNICATIONS_ROUTE_PATH
+      EINBOX_TOOLTIP_TEXT
     }
   },
 
@@ -977,6 +1061,10 @@ export default {
       }
 
       if (['Inbox Contact', 'Inbox Channel', 'Inbox Contact Task', 'Inbox Channel Task Status', 'Inbox Contact Communication', 'Inbox View', 'Inbox View Contact Task'].includes(this.$route.name) && name === 'Inbox') {
+        return true
+      }
+
+      if (['EInboxDetail', 'EInboxCommunicationDetail'].includes(this.$route.name) && name === 'EInbox') {
         return true
       }
 

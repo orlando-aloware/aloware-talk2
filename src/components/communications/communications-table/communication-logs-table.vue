@@ -188,7 +188,7 @@
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
-                                         @on-details="onCommunicationDetails"
+                                         @on-details="openCommunicationDetailsPage"
                                          @archived="removeCommunication"
                                          @terminated="removeCommunication" />
             </div>
@@ -523,6 +523,13 @@ export default {
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
       }
+    },
+
+    openCommunicationDetailsPage (communication) {
+      const route = this.$router.resolve({
+        path: `/contacts/${communication.contact_id}/communications/${communication.id}`
+      })
+      window.open(route.href, '_blank')
     }
   },
 
