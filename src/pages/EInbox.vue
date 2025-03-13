@@ -1,7 +1,7 @@
 <template>
   <div class="h-100"
        v-if="authenticated">
-    <div class="inbox animate__animated animate__fadeIn position-relative">
+    <div class="einbox animate__animated animate__fadeIn position-relative">
       <e-inbox-side :class="inboxSideClasses"
                     @itemSelected="onItemSelected" />
 
@@ -74,3 +74,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.einbox {
+  height: 100%;
+  width: 100%;
+  display: flex
+}
+</style>

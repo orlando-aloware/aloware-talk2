@@ -1,7 +1,7 @@
 <template>
   <div class="einbox-tab">
     <div class="einbox-tab__header border-bottom">
-      <collapse-button class="einbox-tab__header__collapse-button mr-2"
+      <collapse-button class="einbox-tab__header__collapse-button"
                        :target="collapseTarget"
                        v-model="collapsed"
                        v-if="collapseTarget && !isMobile"/>
@@ -23,8 +23,8 @@
 
       <search-input v-else
                     ref="search"
+                    placeholder="Type ENTER to search comms..."
                     class="einbox-tab__header__search"
-                    placeholder="Search for name, number or campaign"
                     @search="search = $event"
                     @blur="onLeaveSearch" />
     </div>
@@ -257,10 +257,23 @@ export default {
 
     &__search {
       width: 100%;
-      margin-left: 10px;
 
       label {
         border: none;
+      }
+    }
+  }
+
+  @media(min-width: 785px) {
+    &__header {
+      &__label {
+        margin-left: 10px;
+      }
+
+      &__search {
+        .q-field__prepend {
+          padding-left: 5px !important;
+        }
       }
     }
   }
