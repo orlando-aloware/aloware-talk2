@@ -68,7 +68,8 @@
                          :date="item.created_at"
                          :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
-                         :repeats="viewMode === UNTHREADED ? item.repeats : null" />
+                         :repeats="viewMode === UNTHREADED ? item.repeats : null"
+                         :is-live-call="isLiveCall(item)" />
         </div>
 
         <!-- Load more indicator -->
@@ -97,6 +98,7 @@ import { mapState } from 'vuex'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
 import SearchInput from 'src/components/search-input.vue'
+import { isLiveCall } from 'src/plugins/helpers/functions'
 
 export default {
   components: {
@@ -161,6 +163,8 @@ export default {
   },
 
   methods: {
+    isLiveCall,
+
     onScroll ({ target }) {
       this.debouncedScroll(target)
     },
@@ -201,38 +205,56 @@ export default {
       }
     },
 
-    newCommunicationListener (communication) {
-      console.log('>> newCommunicationListener', communication)
-
-      if (communication.ring_group_id !== this.activeInboxId) {
-        console.log('>> newCommunicationListener communication not in active inbox')
-        return
-      }
-
-      if (this.viewMode === UNTHREADED) {
+    handleUnthreadedCommunication (communication, isNew = false) {
+      if (isNew) {
         const found = this.itemsData.find(c => c.id === communication.id)
-
         if (!found) {
           this.itemsData.unshift(communication)
         }
-      }
-    },
-
-    updatedCommunicationListener (communication) {
-      console.log('>> updatedCommunicationListener', communication)
-
-      if (communication.ring_group_id !== this.activeInboxId) {
-        console.log('>> updatedCommunicationListener communication not in active inbox')
-        return
-      }
-
-      if (this.viewMode === UNTHREADED) {
+      } else {
         const index = this.itemsData.findIndex(c => c.id === communication.id)
-
         if (index > -1) {
           this.itemsData.splice(index, 1, communication)
         }
       }
+    },
+
+    handleThreadedCommunication (communication, isNew = false) {
+      const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
+
+      if (isNew && index === -1) {
+        this.itemsData.unshift(communication)
+        return
+      }
+
+      if (index > -1) {
+        this.itemsData.splice(index, 1, communication)
+        this.sortItemsByDate()
+      }
+    },
+
+    sortItemsByDate () {
+      this.itemsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    },
+
+    processCommunication (communication, isNew = false) {
+      if (communication.ring_group_id !== this.activeInboxId) {
+        return
+      }
+
+      if (this.viewMode === UNTHREADED) {
+        this.handleUnthreadedCommunication(communication, isNew)
+      } else {
+        this.handleThreadedCommunication(communication, isNew)
+      }
+    },
+
+    newCommunicationListener (communication) {
+      this.processCommunication(communication, true)
+    },
+
+    updatedCommunicationListener (communication) {
+      this.processCommunication(communication, false)
     }
   },
 
