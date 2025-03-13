@@ -464,7 +464,7 @@ export default {
         case CommunicationTypes.CALL:
           return ['all', 'calls', 'voicemails'].includes(this.activeChannel.value)
         case CommunicationTypes.SMS:
-          return ['messages'].includes(this.activeChannel.value)
+          return ['all', 'messages'].includes(this.activeChannel.value)
         default:
           return true
       }
