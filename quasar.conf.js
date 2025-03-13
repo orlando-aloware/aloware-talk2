@@ -70,10 +70,7 @@ module.exports = function (ctx) {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /node_modules/,
-          options: {
-            fix: true
-          }
+          exclude: /node_modules/
         })
 
         if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
