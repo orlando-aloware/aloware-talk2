@@ -1,11 +1,11 @@
 <template>
   <div class="einbox-nav-list"
        data-testid="einbox-nav-list">
-    <div class="einbox-nav-list__header border-bottom">
-      <search class="einbox-nav-list__header__search"
-              placeholder="Search Inboxes"
-              data-testid="einbox-search"
-              @search="onSearch"/>
+    <div class="einbox-nav-list__header border-bottom d-flex flex-column justify-content-center">
+      <search-input class="einbox-nav-list__header__search"
+                    placeholder="Type ENTER to search inboxes..."
+                    data-testid="einbox-search"
+                    @search="onSearch"/>
     </div>
     <div class="einbox-nav-list__scroll blue-scroll"
          @scroll="onScroll">
@@ -45,13 +45,13 @@
 import { mapState, mapActions } from 'vuex'
 import EinboxNavItem from './einbox-nav-item.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
-import Search from 'src/components/search.vue'
+import SearchInput from 'src/components/search-input.vue'
 import { debounce } from 'lodash'
 
 export default {
   components: {
     EinboxNavItem,
-    Search
+    SearchInput
   },
 
   mixins: [
@@ -170,8 +170,6 @@ export default {
     height: 45px;
 
     &__search {
-      padding: 5px 0px;
-
       label {
         border: none;
       }
