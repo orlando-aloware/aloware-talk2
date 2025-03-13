@@ -205,15 +205,15 @@ export default {
         return
       }
 
-      const companyFilter = this.companyFilters.find((f) => f.id === +this.$route.query.filter_id)
-      if (companyFilter) {
-        this.$emit('filterSelected', companyFilter)
+      const foundCompanyFilter = this.companyFilters.find((f) => f.id === +this.$route.query.filter_id)
+      if (foundCompanyFilter) {
+        this.$emit('filterSelected', foundCompanyFilter)
         return
       }
 
-      const personalFilter = this.personalFilters.find((f) => f.id === +this.$route.query.filter_id)
-      if (personalFilter) {
-        this.$emit('filterSelected', personalFilter)
+      const foundPersonalFilter = this.personalFilters.find((f) => f.id === +this.$route.query.filter_id)
+      if (foundPersonalFilter) {
+        this.$emit('filterSelected', foundPersonalFilter)
         return
       }
 
