@@ -36,6 +36,7 @@ const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
 const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
+const SalesforceSoftPhone = () => import('pages/widgets/SalesforceSoftPhone.vue')
 const AloAi = () => import('pages/AloAi.vue')
 const Apps = () => import('pages/Apps.vue')
 
@@ -676,6 +677,12 @@ const routes = [
     path: '/widgets/hubspot-call-extension',
     props: true,
     component: Dialer
+  },
+  {
+    name: 'Salesforce Softphone',
+    path: '/salesforce/softphone',
+    props: true,
+    component: SalesforceSoftPhone
   },
   // deep link handlers
   // Apps handlers to open custom protocol

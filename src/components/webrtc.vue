@@ -12,6 +12,7 @@
 
     <select-campaign-dialog v-if="showSelectCampaignDialog"
                             :campaignId="campaignId"
+                            @cancel-campaign-id='handleCallCompleted'
                             @change-campaign-id="handleChangeCampaignId"/>
   </div>
 </template>
