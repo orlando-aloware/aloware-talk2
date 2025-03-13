@@ -194,28 +194,31 @@ export default {
       })
       this.getTagsByIds(tagsIds)
 
-      if (!this.applyQueryFilter) {
+      if (this.applyQueryFilter) {
+        this.selectFilterFromQueryString()
+      }
+    },
+
+    // Check if filter_id is present in the query and apply if first load
+    selectFilterFromQueryString () {
+      if (!this.$route.query.filter_id) {
         return
       }
 
-      const qsFilterId = this.$route.query.filter_id
-
-      if (!qsFilterId) {
+      const companyFilter = this.companyFilters.find((f) => f.id === +this.$route.query.filter_id)
+      if (companyFilter) {
+        this.$emit('filterSelected', companyFilter)
         return
       }
 
-      let filter = this.companyFilters.find((f) => f.id === +qsFilterId)
-      if (filter) {
-        console.log('>>> found company filter', filter)
-        this.$emit('filterSelected', filter)
+      const personalFilter = this.personalFilters.find((f) => f.id === +this.$route.query.filter_id)
+      if (personalFilter) {
+        this.$emit('filterSelected', personalFilter)
         return
       }
 
-      filter = this.personalFilters.find((f) => f.id === +qsFilterId)
-      if (filter) {
-        console.log('>>> found personal filter', filter)
-        this.$emit('filterSelected', filter)
-      }
+      // if landed here then no filter was found for the given filter_id
+      this.$emit('filterNotFound')
     },
 
     getTagsByIds (ids) {

@@ -40,7 +40,7 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 
 import { mapState, mapActions } from 'vuex'
 import CompactBtn from 'src/components/compact-btn'
@@ -139,17 +139,13 @@ export default {
     }
   },
   mounted () {
-    console.log('>>> comm-filters.vue mounted')
+    const filterModel = cloneDeep(this.channelDefaultFilterModel)
 
-    const filter = _.clone(this.channelDefaultFilterModel.filter)
+    this.applyQueryStringFilters(filterModel, this.channelDefaultFilterModel)
 
-    this.applyQueryStringFilters(filter)
-
-    this.filter = filter
+    this.filter = filterModel.filter
 
     this.$VueEvent.listen('filter-communications', data => {
-      console.log('>>> filter-communications listener')
-
       // ex: data = { type: 'users', value: 1 }
       const current = typeof this.channelClonedFilter[data.type] === 'object' ? JSON.stringify(this.channelClonedFilter[data.type]) : this.channelClonedFilter[data.type]
       const attempt = typeof data.value === 'object' ? JSON.stringify(data.value) : data.value
@@ -337,14 +333,10 @@ export default {
     },
 
     isFilterPropertyArray (property) {
-      // console.log('>>> this.channelDefaultFilterModel?.filter', this.channelDefaultFilterModel?.filter)
-
       return this.channelDefaultFilterModel?.filter && Array.isArray(this.channelDefaultFilterModel.filter[property])
     },
 
     updateQueryString () {
-      console.log('>>> updateQueryString channel', this.channelChangedFilterFields)
-
       const keptParams = {
         ...(this.$route.query.filter_id && { filter_id: this.$route.query.filter_id })
       }
@@ -361,47 +353,12 @@ export default {
         queryParams.set(property, value)
       })
 
-      console.log('>>> updateQueryString queryParams', queryParams.toString())
-
       // update query string
-      this.$router.replace({
-        query: Object.fromEntries(queryParams)
-      }).catch(err => {
-        if (err.name !== 'NavigationDuplicated') {
-          throw err
-        }
-      })
+      this.$router.replace({ query: Object.fromEntries(queryParams) }).catch(() => {})
     },
 
     resetQueryStringFilters () {
       this.$router.replace({ query: null }).catch(() => {})
-    },
-
-    applyQueryStringFilters (filter) {
-      console.log('>>> channelDefaultFilterModel', this.channelDefaultFilterModel)
-
-      // const hasFilter = Object.keys(this.$route.query).includes('filter_id')
-
-      Object.entries(this.$route.query).forEach(([property, value]) => {
-        if (this.isFilterPropertyArray(property)) {
-          value = value.split(',').map(parseInt)
-        }
-
-        if (value === 'null') {
-          value = null
-        }
-
-        if (property !== 'filter_id') {
-          this.updateChannelChangedFilterFields({
-            name: property,
-            value: value
-          })
-        }
-
-        filter[property] = value
-      })
-
-      console.log('>>> appliedFilter', filter)
     }
   },
 

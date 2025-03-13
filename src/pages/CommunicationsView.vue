@@ -97,7 +97,8 @@ export default {
       'setChannelClonedFilter',
       'setInboxFilters',
       'resetChannelChangedFilterFields',
-      'setSearchQuery'
+      'setSearchQuery',
+      'setIsLoadingCommunications'
     ]),
 
     setChannel (routeChanged = false) {
@@ -131,10 +132,9 @@ export default {
     },
 
     loadCommunications () {
-      // if a filter is present in query string, fetch the communications
-      // after loading the filter (and trying to apply it)
+      // if filter_id is present in query string, fetch the communications later on after applying the filter
       if (this.$route.query.filter_id) {
-        console.log('>>> aborting CommunicationsView getCommunications')
+        this.setIsLoadingCommunications(true)
         return
       }
 

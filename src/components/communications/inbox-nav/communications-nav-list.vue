@@ -32,6 +32,7 @@
                    :apply-query-filter="isFirstLoad"
                    @filterSelected="(item) => onSelectSavedFilter(item)"
                    @filters-fetched="()=> fetchSavedFilters = false"
+                   @filterNotFound="loadCommunications"
     />
 
     <div v-if="shouldShowViewsUnderChannels">
@@ -84,9 +85,9 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import * as Filters from 'src/constants/filters'
 import { communicationsRoutesMixin, communicationsMixin, userMixin } from 'src/plugins/mixins'
 import communicationsDefaultFilterModelMixin from 'src/plugins/mixins/communications-default-filter-model.mixin'
-
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, COMMUNICATIONS_VIEWS_ROUTE_NAME } from 'src/router/routes'
+import { cloneDeep } from 'lodash'
 
 export default {
   name: 'communications-nav-list',
@@ -300,8 +301,26 @@ export default {
     },
 
     async onSelectSavedFilter (filter) {
+      filter = cloneDeep(filter)
+
       // Skip showing filter dialog
       let personalFilterObject = filter.filter
+
+      if (this.isFirstLoad) {
+        // apply query properties to this filter
+        this.applyQueryStringFilters(filter, this.channelDefaultFilterModel)
+      }
+
+      // if is first load, apply filter_id to query without removing other params
+      if (this.isFirstLoad) {
+        const query = {
+          ...this.$route.query,
+          filter_id: filter.id
+        }
+        this.$router.replace({ query }).catch(() => { })
+      } else {
+        this.$router.replace({ query: { filter_id: filter.id } }).catch(() => { })
+      }
 
       this.setSelectedFilter(filter)
 
@@ -372,17 +391,6 @@ export default {
       this.setAppliedFilter(filter)
       this.setChannelClonedFilter(personalFilterObject)
 
-      // if is first load, apply filter_id to query without removing other params
-      if (this.isFirstLoad) {
-        const query = {
-          ...this.$route.query,
-          filter_id: filter.id
-        }
-        this.$router.replace({ query }).catch(() => { })
-      } else {
-        this.$router.replace({ query: { filter_id: filter.id } }).catch(() => { })
-      }
-
       this.setIsFirstLoad(false)
 
       // Get communications with the new filter
@@ -435,6 +443,10 @@ export default {
       this.toggleFilterDialogWithFilters(true)
 
       this.$VueEvent.fire('reset-communications-filters')
+    },
+
+    loadCommunications () {
+      this.getCommunications(this.communicationFilters)
     }
   },
 
