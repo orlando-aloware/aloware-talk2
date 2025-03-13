@@ -28,7 +28,7 @@
                    no-caps
                    exact>
         <span class="tab-icon">
-          <inbox-mobile-icon :color="isActive('einbox') ? '#256EFF' : '#A3A3A3'" />
+          <e-inbox-mobile-icon :color="isActive('einbox') ? '#256EFF' : '#A3A3A3'" />
         </span>
         {{ EINBOXES_MENU_TITLE }}
       </q-route-tab>
@@ -199,6 +199,7 @@
 
 <script>
 import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon'
+import EInboxMobileIcon from 'components/icons/mobile-menu/einbox-mobile-icon'
 import CommunicationsMobileIcon from 'components/icons/mobile-menu/communications-mobile-icon'
 import ContactsMobileIcon from 'components/icons/mobile-menu/contacts-mobile-icon'
 import StatsMobileIcon from 'components/icons/mobile-menu/stats-mobile-icon'
@@ -224,6 +225,7 @@ export default {
     StatsMobileIcon,
     ContactsMobileIcon,
     InboxMobileIcon,
+    EInboxMobileIcon,
     CommunicationsMobileIcon,
     ContactMenu,
     ContactMenuItem,
