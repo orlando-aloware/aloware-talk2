@@ -2,9 +2,11 @@
   <span class="collapse-button"
         :id="`btn-collapse-${_uid}`"
         @click="toggle">
-    <collapse-icon color="#256eff"
-                   :width="18"
-                   :height="18"/>
+        <chevron-right-icon class="collapse-button__icon"
+                            color="#256eff"
+                            :width="18"
+                            :height="18"
+                            :style="{ transform: value ? 'rotate(-180deg)' : null }"/>
     <b-tooltip custom-class="talk-table__tooltip"
                ref="tooltip"
                :target="`btn-collapse-${_uid}`">
@@ -14,13 +16,13 @@
 </template>
 
 <script>
-import CollapseIcon from 'src/components/icons/collapse-icon.vue'
+import ChevronRightIcon from 'src/components/icons/chevron-right-icon.vue'
 
 export default {
   name: 'collapse-button',
 
   components: {
-    CollapseIcon
+    ChevronRightIcon
   },
 
   props: {
@@ -66,6 +68,10 @@ export default {
   cursor: pointer;
   display: flex;
   align-items: center;
+
+  &__icon {
+    transition: transform .5s ease-in-out;
+  }
 }
 
 .no-max-width {
