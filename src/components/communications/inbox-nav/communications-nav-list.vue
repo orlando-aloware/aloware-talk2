@@ -319,7 +319,7 @@ export default {
         }
         this.$router.replace({ query }).catch(() => { })
       } else {
-        this.$router.replace({ query: { filter_id: filter.id } }).catch(() => { })
+        this.$router.replace({ query: { filter_id: filter.id } }).catch(() => {})
       }
 
       this.setSelectedFilter(filter)
