@@ -63,7 +63,7 @@
                          :type="item.type"
                          :direction="item.direction"
                          :callback-status="item.callback_status"
-                         :body="item.body"
+                         :body="item.body | truncate(20)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
                          :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"

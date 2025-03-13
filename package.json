@@ -1,6 +1,6 @@
 {
   "name": "aloware-talk2",
-  "version": "1.64.0",
+  "version": "1.65.0",
   "description": "Aloware Agent Interface",
   "productName": "Talk",
   "author": "Aloware <support@aloware.com>",
@@ -47,7 +47,7 @@
     "country-state-city": "^3.2.1",
     "countup.js": "^2.8.0",
     "dhtmlx-scheduler": "^6.0.5",
-    "dompurify": "^3.1.7",
+    "dompurify": "^3.2.4",
     "dotenv": "^16.4.5",
     "electron-notarize": "^0.3.0",
     "fs-extra": "^11.2.0",

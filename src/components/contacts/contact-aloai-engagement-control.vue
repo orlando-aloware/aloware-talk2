@@ -1,9 +1,9 @@
 <template>
   <b-card class="border-0 position-relative contact-about-wrapper" v-if="profile?.company?.aloai_enabled">
-    <h4>AloAi Text Bot Engagement</h4>
+    <h4>AloAi Agent Engagement</h4>
 
     <b-card-text class="fs-14 mt-2">
-      Control which bots this contact is allowed to interact with.
+      Control which agents this contact is allowed to interact with.
     </b-card-text>
 
     <block-tooltip

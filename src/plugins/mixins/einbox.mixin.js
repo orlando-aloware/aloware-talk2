@@ -131,7 +131,7 @@ export default {
           inbox_id: inboxId,
           page: nextPage,
           per_page: 100,
-          ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : {}),
+          ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : { inbox_type: 'unthreaded' }),
           ...(search ? {
             search_text: search,
             search_fields: ['lead_number', 'contact.name', 'campaign.name']

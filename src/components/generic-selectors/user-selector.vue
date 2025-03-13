@@ -97,6 +97,7 @@
 import _ from 'lodash'
 import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
+import * as User from 'src/constants/user'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { selectorMixin, userMixin } from 'src/plugins/mixins'
 
@@ -258,7 +259,8 @@ export default {
       if (!_.isEmpty(this.availableUsers)) {
         if (this.allAnswerTypes) {
           return this.availableUsers.filter((user) =>
-            !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access)
+            !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access) &&
+            user.type !== User.TYPE_AI_AGENT
           )
         }
 

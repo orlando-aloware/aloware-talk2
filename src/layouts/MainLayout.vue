@@ -478,9 +478,9 @@ export default {
     },
 
     pageClass () {
-      const meta = _.get(this.$route, 'meta.title', '')
+      const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
 
-      return meta === 'AI Inbox' ? null : meta.toLowerCase()
+      return pageSlug === 'ai inbox' ? null : pageSlug.replace(/ /g, '_') + '-page'
     },
 
     isMobilePhoneClosed () {
@@ -1774,7 +1774,10 @@ export default {
 
         return this.$axios
           .get('/api/v2/users', {
-            mode: 'no-cors'
+            mode: 'no-cors',
+            params: {
+              include_ai_users: true
+            }
           })
           .then((res) => {
             this.setUsers(res.data)

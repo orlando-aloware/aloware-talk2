@@ -10,13 +10,13 @@
     <div class="p-2">
       <h1 data-testid="aloai-engagement-control-modal-title"
           class="text-center mb-2">
-        AloAi Text Bot Engagement
+        AloAi Agent Engagement
       </h1>
       <div class="text-center">
-        Manage the bots that you want your contact to interact with. If a bot is disabled, it will no longer respond to this contact.
+        Manage the agents that you want your contact to interact with. If an agent is disabled, it will no longer respond to this contact.
       </div>
       <div class="w-75 my-2 mx-auto">
-        <search placeholder="Search bot"
+        <search placeholder="Search agent"
                 data-testid="aloai-engagement-control-modal-search"
                 @search="onSearch"/>
       </div>
@@ -157,40 +157,6 @@ export default {
           this.isBusy = false
         })
     },
-    onSubmitEnrollment (event) {
-      event.preventDefault()
-
-      if (!this.selectedBotId) {
-        this.$generalNotification(
-          'Please select a bot to enroll the contact.',
-          'error'
-        )
-        return
-      }
-
-      this.isBusy = true
-
-      talk2Api.V2.aloAiBot
-        .enrollContacts(this.selectedBotId, { contact_ids: [this.contact.id] })
-        .then(() => {
-          this.$generalNotification(
-            'Contact successfully enrolled to the selected AloAi Bot.'
-          )
-          this.onHidden()
-        })
-        .catch((error) => {
-          let errorMsg = 'Error while enrolling contact to AloAi Bot.'
-          if (error?.response.data?.message) {
-            errorMsg = error.response.data.message
-          }
-
-          this.$generalNotification(errorMsg, 'error')
-          console.error('[onSubmitEnrollment] error', error)
-        })
-        .finally(() => {
-          this.isBusy = false
-        })
-    },
     onHidden () {
       this.isOpen = false
       setTimeout(() => {
@@ -227,7 +193,7 @@ export default {
         this.isLoading = false
         this.isBusy = false
       } catch (error) {
-        this.$generalNotification('Error while fetching AloAi Bots.', 'error')
+        this.$generalNotification('Error while fetching AloAi Agents.', 'error')
         console.error('[loadBots] error', error)
         this.isLoading = false
         this.isBusy = false
@@ -239,8 +205,7 @@ export default {
           return this.bots
         }
         const { data } = await talk2Api.V2.aloAiBot.getBots({
-          enabled: true,
-          type: AloAi.TYPE_TEXT
+          enabled: true
         })
         return data?.data ?? []
       } catch (error) {

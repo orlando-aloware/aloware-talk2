@@ -59,6 +59,7 @@ export default function (/* { ssrContext } */) {
 
     state: {
       isWidget: false,
+      isSalesforceWidget: false,
       showMenu: false,
       filter: {},
       tags: [],
@@ -308,6 +309,7 @@ export default function (/* { ssrContext } */) {
       isTrialBannerVisible: false,
       currentTimezone: null,
       hubspotDialNumber: null,
+      salesforceDialNumber: null,
       isRedirectedToHubspotWidget: false,
       isCallBackButtonDisabled: false,
       isFirstLoad: true,
@@ -328,6 +330,10 @@ export default function (/* { ssrContext } */) {
     actions: {
       setIsWidget ({ commit }, value) {
         commit('SET_IS_WIDGET', value)
+      },
+
+      setIsSalesforceWidget ({ commit }, value) {
+        commit('SET_IS_SALESFORCE_WIDGET', value)
       },
 
       setDialerToken ({ commit }, token) {
@@ -618,7 +624,6 @@ export default function (/* { ssrContext } */) {
           commit('wallboard/RESET_VUEX', null, { root: true })
           commit('tagsModule/RESET_VUEX', null, { root: true })
           commit('broadcast/RESET_VUEX', null, { root: true })
-          commit('lists/RESET_VUEX', null, { root: true })
         }
       },
 
@@ -939,6 +944,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_HUBSPOT_DIAL_NUMBER', value)
       },
 
+      setSalesforceDialNumber ({ commit }, value) {
+        commit('SET_SALESFORCE_DIAL_NUMBER', value)
+      },
+
       setIsRedirectedToHubspotWidget ({ commit }, value) {
         commit('SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET', value)
       },
@@ -971,6 +980,10 @@ export default function (/* { ssrContext } */) {
     mutations: {
       SET_IS_WIDGET (state, value) {
         state.isWidget = value
+      },
+
+      SET_IS_SALESFORCE_WIDGET (state, value) {
+        state.isSalesforceWidget = value
       },
 
       SET_DIALER_TOKEN (state, token) {
@@ -1774,6 +1787,10 @@ export default function (/* { ssrContext } */) {
 
       SET_HUBSPOT_DIAL_NUMBER (state, value) {
         state.hubspotDialNumber = value
+      },
+
+      SET_SALESFORCE_DIAL_NUMBER (state, value) {
+        state.salesforceDialNumber = value
       },
 
       SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {
