@@ -21,8 +21,7 @@
       bordered
       class="rounded-contact-activity b-radius-12"
       :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
-      data-testid="communication-info-show-phone"
-      @click="onShowPhone">
+      data-testid="communication-info-show-phone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
           <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
@@ -425,7 +424,7 @@
                                    self="center middle">
                           Click For More Info
                         </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -477,7 +476,7 @@
                                    self="center left">
                           Click For More Info
                         </q-tooltip>
-                        {{ getUserName(getUser(communication.user_id)) }}
+                        <user-display :user-id="communication.user_id" />
                       </span>
                     </div>
                   </div>
@@ -503,7 +502,7 @@
                                   <span class="cursor-pointer"
                                         :class="getAttemptingClass(attemptingUser, communication.disposition_status2, communication.user_id)"
                                         :title="getUserName(getUser(attemptingUser))">
-                                    {{ getUserName(getUser(attemptingUser)) }}
+                                    <user-display :user-id="attemptingUser" />
                                   </span>
                                 </div>
                             </li>
@@ -988,9 +987,10 @@ import OpenCalendarButton from 'components/open-calendar-button'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
 import { marked } from 'marked'
+import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
@@ -1017,7 +1017,8 @@ export default {
     notificationMixin,
     liveCallsMixin,
     mentionsMixin,
-    simpsocialMixin
+    simpsocialMixin,
+    classicMixin
   ],
 
   components: {
@@ -1042,7 +1043,8 @@ export default {
     DownloadButton,
     EntityTags,
     AloaiPromotionDialog,
-    GenerateTranscriptionButton
+    GenerateTranscriptionButton,
+    UserDisplay
   },
 
   props: {

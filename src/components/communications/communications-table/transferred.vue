@@ -10,8 +10,7 @@
                    :to="{ path: getUserActivityURL(userId) }"
                    v-for="(userId, index) in row[prop]">
         <external-link-icon color="#1976D2"/>
-        {{ getUserName(getUser(userId)) }}
-
+        <user-display :user-id="userId" />
         <b-tooltip custom-class="talk-table__tooltip"
                    :target="`comm-attempt-${_uid}`">
           Click to go to user's page
@@ -23,8 +22,8 @@
       <span class="text-blue cursor-pointer ellipse"
             :key="index"
             v-for="(userId, index) in row[prop]">
-          {{ getUserName(getUser(userId)) }}
-        </span>
+        <user-display :user-id="userId" />
+      </span>
     </div>
 
     <span v-else>
@@ -37,10 +36,15 @@
 import { userMixin, classicMixin, aclMixin } from 'src/plugins/mixins'
 import communicationsMixin from 'src/plugins/mixins/communications.mixin'
 import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
+import UserDisplay from 'src/components/user-display.vue'
 
 export default {
   name: 'Transferred',
-  components: { ExternalLinkIcon },
+
+  components: {
+    ExternalLinkIcon,
+    UserDisplay
+  },
 
   mixins: [
     userMixin,

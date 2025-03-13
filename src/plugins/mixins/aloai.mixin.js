@@ -20,6 +20,16 @@ export default _.merge({
           [AloAi.DIRECTION_OUTBOUND]: 'green-6'
         }[direction] || 'black'
       )
+    },
+    getAgentTypeLabel (type) {
+      switch (type) {
+        case AloAi.TYPE_TEXT:
+          return 'Text'
+        case AloAi.TYPE_VOICE:
+          return 'Voice'
+        default:
+          return 'Unknown'
+      }
     }
   }
 })

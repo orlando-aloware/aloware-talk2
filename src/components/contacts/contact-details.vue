@@ -33,7 +33,7 @@
           <contact-aloai-engagement-control ss="w-100"
                                             data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
-                                            v-if="showAloAiControls"/>
+                                            v-if="false"/>
           <contact-phones data-testid="contact-details-contact-phones"/>
           <contact-information data-testid="contact-details-contact-information"
                                :first-outbound-call="communicationsSummary.first_outbound_call"/>

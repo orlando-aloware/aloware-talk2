@@ -351,6 +351,29 @@ const talk2Api = {
 
         getList (params) {
           return window.axios.get(`${suffixV1}integration/hubspot/lists`, params)
+        },
+
+        /**
+         * Update a contact's Lifecycle Stage in HubSpot
+         *
+         * @param {string|number} contactId
+         * @param {string} lifecycleStage
+         * @param {boolean} resetRequired
+         * @returns {axios.AxiosResponse<{success: boolean, message: string}>}
+         */
+        async updateLifecycleStage (contactId, lifecycleStage, resetRequired = false) {
+          let response = null
+          try {
+            response = await window.axios.patch(`${suffixV1}integrations/hubspot/lifecycle-stage`, {
+              contact_id: contactId,
+              lifecycle_stage: lifecycleStage,
+              reset_required: resetRequired
+            })
+          } catch (error) {
+            response = error.response
+          }
+
+          return response
         }
       },
 
@@ -715,6 +738,22 @@ const talk2Api = {
         }).catch((err) => {
           return Promise.reject(err)
         })
+      }
+    },
+
+    importWizard: {
+      parseUrl: `${suffixV1}import-wizard/parse`,
+
+      analyze (headers, ignoreFirstRow, importId) {
+        return window.axios.post(`${suffixV1}import-wizard/analyze`, {
+          headers,
+          ignore_first_row: ignoreFirstRow,
+          import_id: importId
+        })
+      },
+
+      startImport (importId, data) {
+        return window.axios.post(`${suffixV1}import-wizard/${importId}/start`, data)
       }
     }
   },

@@ -88,14 +88,12 @@ export default {
     }, 500),
 
     onInput () {
-      const hasMinimumLength = this.searchValue?.trim().length > 2
-
-      if (!this.searchValue || hasMinimumLength) {
+      if (!this.searchValue || this.searchValue.trim().length > 2) {
         this.hasError = false
         this.$emit('show-error', this.hasError)
       }
 
-      if (hasMinimumLength && this.searchOnInput) {
+      if (this.searchOnInput) {
         this.onSearch()
       }
     },

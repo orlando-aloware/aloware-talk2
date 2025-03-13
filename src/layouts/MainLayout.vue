@@ -1797,7 +1797,10 @@ export default {
 
         return this.$axios
           .get('/api/v2/users', {
-            mode: 'no-cors'
+            mode: 'no-cors',
+            params: {
+              include_ai_users: true
+            }
           })
           .then((res) => {
             this.setUsers(res.data)

@@ -788,7 +788,7 @@ export default {
 
 <style scoped>
 .information-container {
-  max-height: 150px;
+  max-height: 235px;
 }
 
 .information-container.auto-height {
