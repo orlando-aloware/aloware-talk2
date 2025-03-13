@@ -270,7 +270,7 @@ import CsatScore from './csat-score.vue'
 import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
 import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationTypes from 'src/constants/communication-types'
 
@@ -521,6 +521,7 @@ export default {
       if (index > -1) {
         // remove it if found
         this.communicationsData.splice(index, 1)
+        this.communicationsCountValue--
       }
     }
   },
