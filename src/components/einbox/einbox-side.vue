@@ -1,12 +1,12 @@
 <template>
   <div data-testid="einbox-side"
        class="einbox-side">
-    <einbox-nav-list class="einbox-side__left"
-                     data-testid="einbox-nav-list"
-                     ref="eInboxNavList" />
-    <einbox-tab class="einbox-side__right"
-                data-testid="einbox-tab"
-                :collapse-target="collapseTarget"/>
+    <einbox-nav-list data-testid="einbox-nav-list"
+                      :class="['einbox-side__left', {'einbox-side__left--mobile-hidden': $route.name !== 'EInbox'}]"
+                      ref="eInboxNavList" />
+    <einbox-tab data-testid="einbox-tab"
+                :class="['einbox-side__right', {'einbox-side__right--mobile-hidden': $route.name !== 'EInboxDetail'}]"
+                :collapse-target="collapseTarget" />
   </div>
 </template>
 
@@ -31,7 +31,9 @@ export default {
   },
 
   mounted () {
-    this.collapseTarget = this.$refs.eInboxNavList.$el
+    if (this.$refs.eInboxNavList) {
+      this.collapseTarget = this.$refs.eInboxNavList.$el
+    }
   },
 
   computed: {
@@ -79,22 +81,44 @@ export default {
 
 <style lang="scss" scoped>
 .einbox-side {
-  padding: 10px;
   background-color: #F9F9FB;
   display: flex;
-  column-gap: 10px;
+
+  @media(min-width: 785px) {
+    padding: 10px;
+    column-gap: 10px;
+  }
 
   &__left {
-    max-width: 250px;
-    width: 250px;
-    overflow: hidden;
+    width: 100vw;
     border-radius: 8px;
+    overflow: hidden;
+
+    @media(min-width: 785px) { // width defined in 'isMobile'
+      max-width: 250px;
+      width: 250px;
+    }
   }
 
   &__right {
-    max-width: 300px;
-    width: 300px;
+    width: 100vw;
     border-radius: 8px;
+
+    @media(min-width: 785px) { // width defined in 'isMobile'
+      max-width: 300px;
+      width: 300px;
+    }
+  }
+
+  @media(max-width: 784px) {
+    &__left,
+    &__right {
+      transition: all .5s ease-in-out;
+
+      &--mobile-hidden {
+        width: 0 !important;
+      }
+    }
   }
 }
 </style>

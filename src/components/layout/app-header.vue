@@ -3,7 +3,7 @@
              :class="{ 'pl-2 pr-2': !noPadding }">
     <div class="d-flex h-100 align-items-center flex-grow-1">
       <back-button class="mobile-back-btn-global-header"
-                   v-if="['Contact', 'Settings Tab'].includes($route.name)"
+                   v-if="['Contact', 'Settings Tab', 'EInboxDetail', 'EInboxCommunicationDetail'].includes($route.name)"
                    @click="navigateBack"/>
       <router-link class="btn-header-nav-back"
                    :to="backRoute"
@@ -450,8 +450,7 @@ export default {
       const previousPage = _.get(this.$route.query, 'previousPage', null)
       const previousList = _.get(this.$route.query, 'list', null)
 
-      if (previousPage &&
-        previousPage.replace(' ', '') === 'PowerDialer') {
+      if (previousPage && previousPage.replace(' ', '') === 'PowerDialer') {
         if (previousList) {
           this.$router.push(`/power-dialer/list/${previousList}`)
         } else {
@@ -460,7 +459,7 @@ export default {
         return
       }
 
-      if (this.$route.name === 'Settings Tab') {
+      if (['Settings Tab', 'EInboxDetail', 'EInboxCommunicationDetail'].includes(this.$route.name)) {
         this.$router.back()
         return
       }

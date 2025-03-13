@@ -314,6 +314,10 @@ export default {
         case 'Inbox Channel Task Status':
         case 'Inbox Contact Communication':
           return 'inbox'
+        case 'EInbox':
+        case 'EInboxDetail':
+        case 'EInboxCommunicationDetail':
+          return 'einbox'
         case 'Contacts':
         case 'Contact':
           return 'contacts'
