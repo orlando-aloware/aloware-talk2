@@ -1,7 +1,7 @@
 <template>
   <div class="einbox-tab">
     <div class="einbox-tab__header border-bottom">
-      <collapse-button :class="['einbox-tab__header__collapse-button', { 'ml-2': !isMobile }]"
+      <collapse-button class="einbox-tab__header__collapse-button mr-2"
                        :target="collapseTarget"
                        v-model="collapsed"
                        v-if="collapseTarget && !isMobile"/>
