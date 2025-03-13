@@ -351,10 +351,6 @@ export default {
       'setSearchQuery'
     ]),
 
-    ...mapMutations('wallboard', {
-      deleteCall: 'DELETE_CALL'
-    }),
-
     sort (sorts) {
       // Handle sorting logic here
       this.getCommunications(this.communicationFilters)
@@ -517,6 +513,15 @@ export default {
           this.communicationsCountValue++
         }
       }
+    },
+
+    deletedCommunicationListener (communication) {
+      const index = this.communicationsData.findIndex(c => c.id === communication.id)
+
+      if (index > -1) {
+        // remove it if found
+        this.communicationsData.splice(index, 1)
+      }
     }
   },
 
@@ -528,7 +533,7 @@ export default {
     // live communications events listeners
     this.$VueEvent.listen('new_communication', this.newCommunicationListener)
     this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
-    this.$VueEvent.listen('delete_communication', this.deleteCall)
+    this.$VueEvent.listen('delete_communication', this.deletedCommunicationListener)
   },
 
   watch: {
@@ -543,7 +548,7 @@ export default {
   beforeDestroy () {
     this.$VueEvent.stop('new_communication', this.newCommunicationListener)
     this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
-    this.$VueEvent.stop('delete_communication', this.deleteCall)
+    this.$VueEvent.stop('delete_communication', this.deletedCommunicationListener)
   }
 }
 </script>
