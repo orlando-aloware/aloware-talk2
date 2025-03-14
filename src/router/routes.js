@@ -56,7 +56,7 @@ export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Ch
 
 // Update the constants at the top
 export const INBOXES_MENU_TITLE = 'Inboxes'
-export const EINBOXES_MENU_TITLE = 'AI Inbox'
+export const EINBOXES_MENU_TITLE = 'EinBox'
 export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
 export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'

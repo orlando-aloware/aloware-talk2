@@ -1,11 +1,21 @@
 <template>
   <div class="einbox-nav-list"
        data-testid="einbox-nav-list">
-    <div class="einbox-nav-list__header border-bottom">
-      <search class="einbox-nav-list__header__search"
-              placeholder="Search Inboxes"
-              data-testid="einbox-search"
-              @search="onSearch"/>
+    <div class="einbox-nav-list__header border-bottom d-flex flex-column justify-content-center">
+      <search-input class="einbox-nav-list__header__search"
+                    placeholder="Type ENTER to search inboxes..."
+                    data-testid="einbox-search"
+                    :id="`einbox-nav-list-search-${_uid}`"
+                    @search="onSearch"
+                    @focus="showSearchTooltip = true"
+                    @blur="showSearchTooltip = false"/>
+      <b-tooltip custom-class="talk-table__tooltip"
+                 placement="top"
+                 :boundary="`einbox-nav-list-search-${_uid}`"
+                 :target="`einbox-nav-list-search-${_uid}`"
+                 :show="showSearchTooltip">
+        Search inboxes by name
+      </b-tooltip>
     </div>
     <div class="einbox-nav-list__scroll blue-scroll"
          @scroll="onScroll">
@@ -45,13 +55,13 @@
 import { mapState, mapActions } from 'vuex'
 import EinboxNavItem from './einbox-nav-item.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
-import Search from 'src/components/search.vue'
+import SearchInput from 'src/components/search-input.vue'
 import { debounce } from 'lodash'
 
 export default {
   components: {
     EinboxNavItem,
-    Search
+    SearchInput
   },
 
   mixins: [
@@ -63,7 +73,8 @@ export default {
       perPage: 50,
       hasMorePages: true,
       loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300),
-      search: ''
+      search: '',
+      showSearchTooltip: false
     }
   },
 
@@ -72,7 +83,9 @@ export default {
       'inboxes',
       'activeInboxId',
       'isLoadingInboxes'
-    ])
+    ]),
+
+    ...mapState(['isMobile'])
   },
 
   methods: {
@@ -118,18 +131,29 @@ export default {
     await this.fetchInboxes()
 
     if (this.inboxes.length) {
-      // If there are inboxes, set the first one as active
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.inboxes[0].id
-      const contactId = this.$route.params.id ? parseInt(this.$route.params.id) : null
+      // If there are inboxes:
+      // - try to get id from route
+      // - otherwise set the first inbox as active, if not mobile
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : (!this.isMobile ? this.inboxes[0].id : null)
+      const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
-      this.onInboxSelect(inboxId, contactId)
+      if (inboxId) {
+        this.onInboxSelect(inboxId, contactId)
+      }
     }
   },
 
   watch: {
     '$route.params.inboxId' (inboxId) {
-      if (!inboxId && this.inboxes.length) {
+      if (!inboxId && this.inboxes.length && !this.isMobile) {
         this.onInboxSelect(this.inboxes[0].id) // use the same behavior as created method
+      }
+    },
+
+    '$route.name' (route) {
+      // reset active inbox id when this page is opened
+      if (this.isMobile && route === 'EInbox') {
+        this.setActiveInboxId(null)
       }
     },
 
@@ -157,8 +181,6 @@ export default {
     height: 45px;
 
     &__search {
-      padding: 5px 0px;
-
       label {
         border: none;
       }

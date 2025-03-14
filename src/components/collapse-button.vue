@@ -44,9 +44,9 @@ export default {
   methods: {
     toggle () {
       if (this.value) {
-        this.target.classList.remove('no-max-width')
+        this.target.classList.remove('no-max-width-collapse-button')
       } else {
-        this.target.classList.add('no-max-width')
+        this.target.classList.add('no-max-width-collapse-button')
       }
 
       this.$emit('input', !this.value)
@@ -74,7 +74,7 @@ export default {
   }
 }
 
-.no-max-width {
+.no-max-width-collapse-button {
   max-width: 0px !important;
 }
 </style>

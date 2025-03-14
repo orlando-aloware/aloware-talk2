@@ -91,6 +91,7 @@ export default {
 .channel-toggle-wrapper {
   padding: 8px 16px;
   width: 100%;
+  min-width: 200px;
 
   .channel-toggle {
     width: 100%;

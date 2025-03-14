@@ -2,7 +2,7 @@
   <div class="calls-header d-flex justify-content-between pr-3">
     <div class="calls-header__label">
       <back-button class="p-0"
-                   v-if="$q.screen.lt.md"
+                   v-if="$q.screen.lt.md && !['EInboxCommunicationDetail'].includes($route.name)"
                    data-testid="contact-activities-back-btn"
                    @click="back"/>
       <div class="contact-name">{{ label }}</div>

@@ -4654,7 +4654,7 @@ i.option-separator {
 
   .phone-notes {
     .q-field__inner {
-      justify-content: start !important;
+      justify-content: flex-start !important;
     }
   }
 
@@ -6415,15 +6415,15 @@ table.datatable {
     flex-direction: column;
     min-height: calc(100vh - 300px);
     max-height: 500px;
-  } 
+  }
 
   .import-content {
     flex-grow: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: start;
+    justify-content: flex-start;
+    align-items: flex-start;
     padding: 15px;
   }
 }

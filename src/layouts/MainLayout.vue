@@ -480,7 +480,7 @@ export default {
     pageClass () {
       const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
 
-      return pageSlug === 'ai inbox' ? null : pageSlug.replace(/ /g, '_') + '-page'
+      return pageSlug === 'einbox' ? null : pageSlug.replace(/ /g, '_') + '-page'
     },
 
     isMobilePhoneClosed () {

@@ -1,14 +1,12 @@
 <template>
   <div data-testid="einbox-nav-item"
-       :class="['inbox-nav-item', 'd-flex', 'align-items-center', { 'inbox-nav-item--active': isActive }]"
+       :class="['inbox-nav-item', { 'inbox-nav-item--active': isActive }]"
        @click="$emit('click', value)">
-    <div class="inbox-nav-item__content d-flex align-items-center justify-content-between">
-      <div class="d-flex align-items-center">
-        <inbox-icon class="inbox-nav-item__icon mr-1"
-                    width="24"
-                    height="24" />
-        <span class="inbox-nav-item__label">{{ label }}</span>
-      </div>
+    <div class="inbox-nav-item__content d-flex align-items-center">
+      <inbox-icon class="inbox-nav-item__icon mr-1"
+                  width="24"
+                  height="24" />
+      <span class="inbox-nav-item__label">{{ label }}</span>
     </div>
   </div>
 </template>
@@ -50,7 +48,7 @@ export default {
   padding: 12px 16px;
   border-radius: 10px;
   transition: all 0.2s ease;
-  max-width: 235px;
+  width: 100%;
   cursor: pointer;
 
   &:hover {
@@ -59,7 +57,7 @@ export default {
 
   &__label {
     font-size: 14px;
-    max-width: 180px;
+    max-width: calc(100vw - 75px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -90,6 +88,14 @@ export default {
       pointer-events: none;
       clip-path: inset(0 round 8px);
       border-radius: 8px;
+    }
+  }
+
+  @media(min-width: 785px) {
+    max-width: 235px;
+
+    &__label {
+      max-width: 180px;
     }
   }
 }
