@@ -12,30 +12,48 @@
           {{ activeInbox.name }}
         </label>
         <q-space></q-space>
+
+        <span class="cursor-pointer"
+              :id="`einbox-tab-open-comms-page-icon-${_uid}`"
+              @click="$router.push(DEFAULT_COMMUNICATIONS_ROUTE_PATH)">
+          <watch-icon />
+          <b-tooltip custom-class="talk-table__tooltip"
+                     :target="`einbox-tab-open-comms-page-icon-${_uid}`">
+            Open Communications Page
+          </b-tooltip>
+        </span>
+
         <q-btn flat
                round
                color="primary"
                icon="search"
                size="sm"
-               @click="onEnterSearch"
-               data-testid="einbox-tab-search-button" />
+               data-testid="einbox-tab-search-button"
+               :id="`einbox-tab-search-icon-${_uid}`"
+               @click="onEnterSearch">
+          <b-tooltip custom-class="talk-table__tooltip"
+                     :target="`einbox-tab-search-icon-${_uid}`">
+            Click to search
+          </b-tooltip>
+        </q-btn>
       </template>
 
-      <search-input v-else
-                    ref="search"
-                    placeholder="Type ENTER to search comms..."
-                    class="einbox-tab__header__search"
-                    :id="`einbox-tab-search-${_uid}`"
-                    @search="search = $event"
-                    @blur="onLeaveSearch"
-                    @focus="showSearchTooltip = true"/>
-      <b-tooltip custom-class="talk-table__tooltip"
-                 placement="top"
-                 :boundary="`einbox-tab-search-${_uid}`"
-                 :target="`einbox-tab-search-${_uid}`"
-                 :show="showSearchTooltip">
-        Search communications by contact's name or phone number
-      </b-tooltip>
+      <template v-else>
+        <search-input ref="search"
+                      placeholder="Type ENTER to search comms..."
+                      class="einbox-tab__header__search"
+                      :id="`einbox-tab-search-${_uid}`"
+                      @search="search = $event"
+                      @blur="onLeaveSearch"
+                      @focus="showSearchTooltip = true"/>
+        <b-tooltip custom-class="talk-table__tooltip"
+                   placement="top"
+                   :boundary="`einbox-tab-search-${_uid}`"
+                   :target="`einbox-tab-search-${_uid}`"
+                   :show="showSearchTooltip">
+          Search communications by contact's name or phone number
+        </b-tooltip>
+      </template>
     </div>
 
     <einbox-channel-toggle />
@@ -106,13 +124,16 @@ import { mapState } from 'vuex'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
 import SearchInput from 'src/components/search-input.vue'
+import WatchIcon from 'src/components/icons/watch-icon.vue'
+import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 
 export default {
   components: {
     Communication,
     EinboxChannelToggle,
     CollapseButton,
-    SearchInput
+    SearchInput,
+    WatchIcon
   },
 
   mixins: [
@@ -132,6 +153,7 @@ export default {
       collapsed: false,
       THREADED,
       UNTHREADED,
+      DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       isSearchActive: false,
       search: '',
       showSearchTooltip: false
