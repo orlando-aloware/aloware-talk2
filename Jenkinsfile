@@ -91,12 +91,12 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-            when { not { branch 'master' } }            
+            when { not { branch 'master' } }
             steps {
                 nvm("${NODE_VERSION}") {
                     sh "yarn install --cache-folder ${YARN_CACHE_FOLDER} --pure-lockfile"
                 }
-                
+
             }
         }
 
@@ -116,7 +116,7 @@ pipeline {
                                 }
                             }
                         }
-                        
+
                         stage('[PR/Dev1] Setup Env File') {
                             when { not { branch 'master' } }
                             steps {
@@ -141,7 +141,7 @@ pipeline {
                                             --query "Parameters[].{Name:Name,Value:Value}" \\
                                             --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                         """, returnStdout: true).trim()
-                                        
+
                                         def prEnvVars = ""
                                         if (env.GIT_BRANCH.toLowerCase().contains('pr-')) {
                                             def prId = env.GIT_BRANCH.toLowerCase().replaceAll('.*pr-([0-9]+).*', '$1')
@@ -164,11 +164,11 @@ pipeline {
 
                                         writeFile file: 'shared.env', text: sharedEnvVars + '\n'
                                         writeFile file: 'dev1.env', text: dev1EnvVars + '\n'
-                                        
+
                                         if (prEnvVars) {
                                             writeFile file: 'pr.env', text: prEnvVars + '\n'
                                             sh '''
-                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.temp 
+                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.temp
                                             cat .env.temp pr.env | awk -F= '!seen[$1]++' > .env
                                             rm .env.temp shared.env dev1.env pr.env
                                             '''
@@ -205,7 +205,7 @@ pipeline {
 
                         stage('[PR/Dev1] Deploy Talk2') {
                             when { not { branch 'master' } }
-                            steps { 
+                            steps {
                                 script {
                                     def branchName = env.GIT_BRANCH.toLowerCase()
                                     def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
@@ -232,7 +232,7 @@ pipeline {
 
                                             sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
                                         }
-                                        
+
                                         sh "AWS_PROFILE=dev ENV=dev1 yarn upload-s3"
                                     }
                                 }
@@ -257,7 +257,7 @@ pipeline {
                 }
 
                 stage('Build dev2') {
-                   stages {  
+                   stages {
 
                         stage ('[Dev2] Setup workspace') {
                             when { branch 'develop' }
@@ -297,7 +297,7 @@ pipeline {
                                         """, returnStdout: true).trim()
 
                                         writeFile file: 'shared.env', text: sharedEnvVars + '\n'
-                                        writeFile file: 'dev2.env', text: dev2EnvVars + '\n' 
+                                        writeFile file: 'dev2.env', text: dev2EnvVars + '\n'
 
                                         sh '''
                                         cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env
@@ -332,7 +332,7 @@ pipeline {
                                         mkdir -p terraform
                                         cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront terraform/
                                         '''
-                                        
+
                                         dir("terraform/s3_cloudfront") {
                                             sh '''
                                             terraform init -backend-config="profile=dev"; \
@@ -349,7 +349,7 @@ pipeline {
 
                                             sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
                                         }
-                                        
+
                                         sh "AWS_PROFILE=dev ENV=dev2 yarn upload-s3"
                                     }
                                 }
@@ -399,7 +399,7 @@ pipeline {
                                         """, returnStdout: true).trim()
 
                                         writeFile file: 'shared.env', text: sharedEnvVars + '\n'
-                                        writeFile file: 'staging.env', text: stagingEnvVars + '\n' 
+                                        writeFile file: 'staging.env', text: stagingEnvVars + '\n'
 
                                         sh '''
                                         cat shared.env staging.env | awk -F= '!seen[$1]++' > .env
@@ -434,7 +434,7 @@ pipeline {
                                         mkdir -p terraform
                                         cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront terraform/
                                         '''
-                                        
+
                                         dir("terraform/s3_cloudfront") {
                                             sh """
                                             terraform init \\
@@ -443,7 +443,7 @@ pipeline {
                                                 -backend-config="region=us-west-2" \\
                                                 -backend-config="dynamodb_table=terraform-state" \\
                                                 -backend-config="kms_key_id=${STAGING_KMS_KEY_ID}" \\
-                                                -backend-config="profile=staging" 
+                                                -backend-config="profile=staging"
                                             terraform validate
                                             terraform fmt
                                             """
@@ -457,7 +457,7 @@ pipeline {
 
                                             sh "AWS_PROFILE=staging terraform apply -var environment='develop' -var domainName='${STAGING_URL}' -var route53_zone='${STAGING_DOMAIN}' -var cachePolicyId='${STAGING_CACHE_POLICY_ID}' --auto-approve"
                                         }
-                                        
+
                                         sh "AWS_PROFILE=staging ENV=staging yarn upload-s3"
                                     }
                                 }
@@ -503,24 +503,24 @@ pipeline {
                             sh '''
                                 header_json='{"alg":"RS256","typ":"JWT"}'
                                 header=$(echo -n "${header_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
-                                
+
                                 now=$(date +%s 2>/dev/null)
                                 exp=$((now + 600))
                                 payload_json='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
                                 payload=$(echo -n "${payload_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
-                                
+
                                 cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem 2>/dev/null
-                
+
                                 signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" 2>/dev/null | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
-                                
+
                                 GITHUB_JWT="${header}.${payload}.${signature}"
-                                
+
                                 TOKEN=$(curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
                                     -H "Accept: application/vnd.github+json" \
                                     "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token 2>/dev/null)
-        
+
                                 PR_ID=$(echo ${GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*' 2>/dev/null)
-                                
+
                                 curl -s -X POST \
                                     -H "Authorization: Bearer ${TOKEN}" \
                                     -H "Accept: application/vnd.github.v3+json" \
@@ -530,7 +530,7 @@ pipeline {
                                 rm -f clean.pem
                             '''
                         }
-                    }    
+                    }
                 } catch (Exception e) {
                     echo 'We could not add the comment in GitHub PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
                 }

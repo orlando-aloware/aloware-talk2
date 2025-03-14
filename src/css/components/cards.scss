@@ -10,6 +10,10 @@
         background-color: $light-blue4;
       }
 
+      &.call-hover:hover {
+        background-color: $blue-60-opaque !important;
+      }
+
       &:hover {
         background-color: $grey-50 !important;
         cursor: pointer;
