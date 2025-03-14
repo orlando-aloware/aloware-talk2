@@ -5,7 +5,17 @@
       <search-input class="einbox-nav-list__header__search"
                     placeholder="Type ENTER to search inboxes..."
                     data-testid="einbox-search"
-                    @search="onSearch"/>
+                    :id="`einbox-nav-list-search-${_uid}`"
+                    @search="onSearch"
+                    @focus="showSearchTooltip = true"
+                    @blur="showSearchTooltip = false"/>
+      <b-tooltip custom-class="talk-table__tooltip"
+                 placement="top"
+                 :boundary="`einbox-nav-list-search-${_uid}`"
+                 :target="`einbox-nav-list-search-${_uid}`"
+                 :show="showSearchTooltip">
+        Search inboxes by name
+      </b-tooltip>
     </div>
     <div class="einbox-nav-list__scroll blue-scroll"
          @scroll="onScroll">
@@ -63,7 +73,8 @@ export default {
       perPage: 50,
       hasMorePages: true,
       loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300),
-      search: ''
+      search: '',
+      showSearchTooltip: false
     }
   },
 

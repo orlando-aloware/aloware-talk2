@@ -25,8 +25,17 @@
                     ref="search"
                     placeholder="Type ENTER to search comms..."
                     class="einbox-tab__header__search"
+                    :id="`einbox-tab-search-${_uid}`"
                     @search="search = $event"
-                    @blur="onLeaveSearch" />
+                    @blur="onLeaveSearch"
+                    @focus="showSearchTooltip = true"/>
+      <b-tooltip custom-class="talk-table__tooltip"
+                 placement="top"
+                 :boundary="`einbox-tab-search-${_uid}`"
+                 :target="`einbox-tab-search-${_uid}`"
+                 :show="showSearchTooltip">
+        Search communications by contact's name or phone number
+      </b-tooltip>
     </div>
 
     <einbox-channel-toggle />
@@ -124,7 +133,8 @@ export default {
       THREADED,
       UNTHREADED,
       isSearchActive: false,
-      search: ''
+      search: '',
+      showSearchTooltip: false
     }
   },
 
@@ -197,6 +207,8 @@ export default {
       if (this.search === '') {
         this.isSearchActive = false
       }
+
+      this.showSearchTooltip = false
     }
   },
 
