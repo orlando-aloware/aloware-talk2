@@ -157,8 +157,7 @@ export default {
       UNTHREADED,
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       isSearchActive: false,
-      search: '',
-      itemsData: []
+      itemsData: [],
       search: '',
       showSearchTooltip: false
     }
@@ -173,7 +172,6 @@ export default {
       'activeInboxId',
       'activeInbox',
       'viewMode'
-    ])
     ]),
 
     ...mapState(['isMobile']),
