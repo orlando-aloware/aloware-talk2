@@ -2,8 +2,8 @@
   <div data-testid="einbox-side"
        class="einbox-side">
     <einbox-nav-list data-testid="einbox-nav-list"
-                      :class="['einbox-side__left', {'einbox-side__left--mobile-hidden': $route.name !== 'EInbox'}]"
-                      ref="eInboxNavList" />
+                     :class="['einbox-side__left', {'einbox-side__left--mobile-hidden': $route.name !== 'EInbox'}]"
+                     ref="eInboxNavList" />
     <einbox-tab data-testid="einbox-tab"
                 :class="['einbox-side__right', {'einbox-side__right--mobile-hidden': $route.name !== 'EInboxDetail'}]"
                 :collapse-target="collapseTarget" />
