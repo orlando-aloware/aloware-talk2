@@ -74,12 +74,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">AI Inbox</span>
+        <span class="font-weight-bold text-sm">EinBox</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        AI Inbox
+          EinBox
       </span>
 
       <!-- Temporary helper -->
@@ -111,12 +111,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">AI Inbox</span>
+        <span class="font-weight-bold text-sm">EinBox</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        AI Inbox
+        EinBox
       </span>
 
       <!-- Temporary helper -->
@@ -964,7 +964,7 @@ import { broadcastsMixin, kycMixin, simpsocialMixin, userMixin } from 'src/plugi
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE, COMMUNICATIONS_MENU_TITLE } from 'src/router/routes'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 
-const EINBOX_TOOLTIP_TEXT = 'AI Inbox is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
+const EINBOX_TOOLTIP_TEXT = 'EinBox is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
 
 export default {
   name: 'app-sidebar',
