@@ -53,7 +53,7 @@
       <!-- items list -->
       <template v-else-if="items.length">
         <div :key="item.id"
-             v-for="item in filteredItems"
+             v-for="item in itemsData"
              @click="onItemClick(item)">
           <communication :contact-id="item.contact_id"
                          :contact-name="item.contact.name"
@@ -68,7 +68,8 @@
                          :date="item.created_at"
                          :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
-                         :repeats="viewMode === UNTHREADED ? item.repeats : null" />
+                         :repeats="viewMode === UNTHREADED ? item.repeats : null"
+                         :is-live-call="isLiveCall(item)" />
         </div>
 
         <!-- Load more indicator -->
@@ -97,6 +98,7 @@ import { mapState } from 'vuex'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { debounce } from 'lodash'
 import SearchInput from 'src/components/search-input.vue'
+import { isLiveCall } from 'src/plugins/helpers/functions'
 
 export default {
   components: {
@@ -124,7 +126,8 @@ export default {
       THREADED,
       UNTHREADED,
       isSearchActive: false,
-      search: ''
+      search: '',
+      itemsData: []
     }
   },
 
@@ -137,16 +140,16 @@ export default {
       'activeInboxId',
       'activeInbox',
       'viewMode'
-    ]),
-
-    filteredItems () {
-      return this.items.filter(item => !item.hidden)
-    }
+    ])
   },
 
   created () {
     // Create debounced version of the scroll handler
     this.debouncedScroll = debounce(this.handleScroll, 300)
+
+    // live communications events
+    this.$VueEvent.listen('new_communication', this.newCommunicationListener)
+    this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
   },
 
   beforeDestroy () {
@@ -154,9 +157,14 @@ export default {
     if (this.debouncedScroll) {
       this.debouncedScroll.cancel()
     }
+
+    this.$VueEvent.stop('new_communication', this.newCommunicationListener)
+    this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
   },
 
   methods: {
+    isLiveCall,
+
     onScroll ({ target }) {
       this.debouncedScroll(target)
     },
@@ -195,6 +203,58 @@ export default {
       if (this.search === '') {
         this.isSearchActive = false
       }
+    },
+
+    handleUnthreadedCommunication (communication, isNew = false) {
+      if (isNew) {
+        const found = this.itemsData.find(c => c.id === communication.id)
+        if (!found) {
+          this.itemsData.unshift(communication)
+        }
+      } else {
+        const index = this.itemsData.findIndex(c => c.id === communication.id)
+        if (index > -1) {
+          this.itemsData.splice(index, 1, communication)
+        }
+      }
+    },
+
+    handleThreadedCommunication (communication, isNew = false) {
+      const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
+
+      if (isNew && index === -1) {
+        this.itemsData.unshift(communication)
+        return
+      }
+
+      if (index > -1) {
+        this.itemsData.splice(index, 1, communication)
+        this.sortItemsByDate()
+      }
+    },
+
+    sortItemsByDate () {
+      this.itemsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    },
+
+    processCommunication (communication, isNew = false) {
+      if (communication.ring_group_id !== this.activeInboxId) {
+        return
+      }
+
+      if (this.viewMode === UNTHREADED) {
+        this.handleUnthreadedCommunication(communication, isNew)
+      } else {
+        this.handleThreadedCommunication(communication, isNew)
+      }
+    },
+
+    newCommunicationListener (communication) {
+      this.processCommunication(communication, true)
+    },
+
+    updatedCommunicationListener (communication) {
+      this.processCommunication(communication, false)
     }
   },
 
@@ -219,6 +279,10 @@ export default {
       }
 
       this.fetchItems(this.activeInboxId, search || null)
+    },
+
+    items () {
+      this.itemsData = this.items.filter(item => !item.hidden)
     }
   }
 }
