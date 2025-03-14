@@ -761,7 +761,7 @@
                       </b-popover>
                     </label>
                   </div>
-                  <div class="d-flex align-items-center pt-2 w-100">
+                  <div class="d-flex align-items-center w-100">
                     <call-disposition-selector :communication="communication"></call-disposition-selector>
                   </div>
                   <div class="mt-2 w-100"
@@ -769,7 +769,7 @@
                     <div class="d-flex align-items-center co-12">
                       <label class="form-control-label mb-1">HubSpot Call Type:</label>
                     </div>
-                    <div class="d-flex align-items-center pt-2 w-100">
+                    <div class="d-flex align-items-center w-100">
                       <hubspot-activity-type-selector :communication="communication"></hubspot-activity-type-selector>
                     </div>
                   </div>
@@ -985,13 +985,13 @@ import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
 import ParkedCallIcon from 'components/icons/parked-call-icon'
 import OpenCalendarButton from 'components/open-calendar-button'
-import UserDisplay from 'src/components/user-display.vue'
 import DOMPurify from 'dompurify'
 import _ from 'lodash'
 import { marked } from 'marked'
+import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin, classicMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
