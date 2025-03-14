@@ -90,7 +90,7 @@
                          :type="item.type"
                          :direction="item.direction"
                          :callback-status="item.callback_status"
-                         :body="item.body | truncate(20)"
+                         :body="getMessageBody(item)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
                          :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
@@ -295,6 +295,16 @@ export default {
       this.processCommunication(communication, false)
 
       this.showSearchTooltip = false
+    },
+
+    getMessageBody (item) {
+      if (!item.body) {
+        if (item.attachments?.length > 0) {
+          return `${item.direction === 1 ? 'Inbound' : 'Outbound'} MMS`
+        }
+        return ''
+      }
+      return this.$options.filters.truncate(item.body, 20)
     }
   },
 
