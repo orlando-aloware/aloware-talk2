@@ -1,11 +1,12 @@
 <template>
   <div class="last-communication">
-    <div class="d-flex">
+    <div class="d-flex q-gutter-xs">
         <component class="pr-1"
                     height="22px"
                     width="22px"
                     data-testid="inbox-tasks-item-component"
-                    :is="stateToIcon(dispositionStatus, type, direction, callbackStatus)">
+                    :is="iconComponent"
+                    :class="['disposition-icon', `disposition-icon--${iconComponent}`, isLiveCallItem && 'live-call-pulse']">
         </component>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text last-communication__label"
@@ -65,6 +66,11 @@ export default {
     totalUnreads: {
       type: [Number, String],
       required: true
+    },
+
+    isLiveCallItem: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -114,6 +120,10 @@ export default {
       return this.type === CommunicationTypes.NOTE
         ? this.parseMentionToView(this.body)
         : this.body
+    },
+
+    iconComponent () {
+      return this.stateToIcon(this.dispositionStatus, this.type, this.direction, this.callbackStatus)
     }
   }
 }
@@ -127,6 +137,38 @@ export default {
 
   &__label {
     font-size: 12px;
+  }
+}
+
+.disposition-icon {
+  border-radius: 50%;
+  padding: 3px;
+
+  &[class*="completed"],
+  &[class*="answered"] {
+    background-color: rgba(#00BF4A, 0.1);
+  }
+
+  &[class*="missed"],
+  &[class*="failed"],
+  &[class*="voicemail"]{
+    background-color: rgba(#FA003F, 0.1);
+  }
+
+  &[class*="abandoned"] {
+    background-color: rgba(#9C27BB, 0.1);
+  }
+
+  &[class*="inprogress"] {
+    background-color: rgba(#4450C0, 0.1);
+  }
+
+  &[class*="callback-pending"] {
+    background-color: rgba(156,39,187, 0.1);
+  }
+
+  &[class*="deadend"] {
+    background-color: rgba(#F6D047, 0.1);
   }
 }
 </style>

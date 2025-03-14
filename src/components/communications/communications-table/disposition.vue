@@ -4,7 +4,7 @@
           :id="`comm-disposition-${_uid}`"
           v-if="row.id && row.contact_id"
           @click="$emit('on-details', row)">
-      <component :class="['disposition-icon', `disposition-icon--${icon}`]"
+      <component :class="['disposition-icon', `disposition-icon--${icon}`, isLiveCall && 'live-call-pulse']"
                  :is="icon"
                  v-if="row.disposition_status2" />
 
@@ -34,6 +34,10 @@ export default {
     row: {
       type: Object,
       required: true
+    },
+    isLiveCall: {
+      type: Boolean,
+      default: false
     }
   },
 

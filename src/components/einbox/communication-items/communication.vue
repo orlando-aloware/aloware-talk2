@@ -1,5 +1,5 @@
 <template>
-  <div :class="['communication', { active: isActive }]">
+  <div :class="['communication', { active: isActive, 'live-call-item': isLiveCall }]">
     <div class="communication__avatar">
       <div class="position-relative"
            role="button">
@@ -35,6 +35,7 @@
                           :callback-status="callbackStatus"
                           :body="body"
                           :total-unreads="totalUnreads"
+                          :is-live-call-item="isLiveCall"
                           v-if="type" />
     </div>
 
@@ -149,6 +150,11 @@ export default {
     defaultEmptyName: {
       type: String,
       default: 'No Name'
+    },
+
+    isLiveCall: {
+      type: Boolean,
+      default: false
     }
   }
 }
@@ -214,6 +220,10 @@ export default {
 
   &:hover {
     background-color: #E9F0FF;
+  }
+
+  &.live-call-item {
+    background-color: #e1ebfe;
   }
 }
 </style>

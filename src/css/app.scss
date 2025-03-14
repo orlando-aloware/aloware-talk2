@@ -8810,6 +8810,20 @@ span.mention {
   }
 }
 
+
+.live-call-pulse {
+  animation: live-call-pulse 2s infinite;
+}
+
+@keyframes live-call-pulse {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0,0,0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(0,0,0, 0);
+  }
+}
+
 .ring-group-list {
   li {
     list-style: circle;
@@ -16115,6 +16129,10 @@ hr {
       background-color: $light-blue;
     }
 
+    tr.live-call-tr {
+      background-color: $light-blue;
+    }
+
     td:last-child {
       z-index: 1;
     }
@@ -16560,6 +16578,10 @@ hr {
     @media (min-width: 785px) {
       height: calc(100vh - 60px); // Desktop: only account for top bar
     }
+
+    @media (min-width: 1280px) {
+      width: 480px;
+    }
   }
 
   .communication-details-card {
@@ -16584,5 +16606,18 @@ hr {
   &:hover {
     scrollbar-color: $blue transparent;
     padding-right: 0px;
+  }
+}
+
+.live-call-pulse {
+  animation: live-call-pulse 2s infinite;
+}
+
+@keyframes live-call-pulse {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0,0,0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(0,0,0, 0);
   }
 }
