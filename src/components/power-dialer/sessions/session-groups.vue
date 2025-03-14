@@ -67,46 +67,52 @@
                   <q-item class="t-expansion-panel px-2"
                           :class="[
                             groupItemGetClass(key, taskItem),
-                            {'has-communication': taskItem.communication_id}
+                            {'has-communication bg-blue-60-opaque border-full-rounded call-hover': taskItem.communication_id}
                           ]"
                           :key="`acc-item-${i}`"
                           v-if="taskItem">
-                    <div class="communication-label mb-2"
-                         v-if="taskItem.communication_id">
-                      <q-icon name="fas fa-address-book"
-                              size="xs"
-                              class="q-mr-xs" />
-                      <span>This call is from one of your contacts</span>
+                    <div class="communication-label" v-if="taskItem.communication_id">
+                      <span>New Inbound Call</span>
                     </div>
 
                     <div :class="taskItem.communication_id ? 'avatar-column' : 'py-2'">
-                      <q-avatar size="30px"
-                                color="grey"
-                                v-if="getInitials(taskItem.name)">
-                        {{ getInitials(taskItem.name) }}
-                      </q-avatar>
-                      <q-avatar size="30px"
-                                color="grey"
-                                v-else>
-                        <i class="fa fa-user"
-                           aria-hidden="true">
-                        </i>
-                      </q-avatar>
+                      <template v-if="taskItem.communication_id">
+                        <q-avatar size="30px" class="incoming-call-avatar">
+                          <call-incoming-icon/>
+                        </q-avatar>
+                      </template>
+                      <template v-else>
+                        <q-avatar size="30px"
+                                  color="grey"
+                                  v-if="getInitials(taskItem.name)">
+                          {{ getInitials(taskItem.name) }}
+                        </q-avatar>
+                        <q-avatar size="30px"
+                                  color="grey"
+                                  v-else>
+                          <i class="fa fa-user"
+                             aria-hidden="true">
+                          </i>
+                        </q-avatar>
+                      </template>
                     </div>
                     <q-item-section class="pl-2">
-                      <q-item-label>
+                      <q-item-label :class="{'text-white':taskItem.communication_id}">
                         {{ fetchName(taskItem) }}
-                      </q-item-label>
+                      </q-item-label >
                       <q-item-label lines="2"
-                                    caption>
+                                    caption
+                                    :class="{'text-white':taskItem.communication_id}">
                         {{ taskItem.phone_number | fixPhone('NATIONAL', true) }}
                       </q-item-label>
                       <q-item-label lines="2"
-                                    caption>
+                                    caption
+                                    :class="{'text-white':taskItem.communication_id}">
                         {{ taskItem.company_name }}
                       </q-item-label>
                       <q-item-label lines="2"
-                                    caption>
+                                    caption
+                                    :class="{'text-white':taskItem.communication_id}">
                         <span>
                           <i class="fa fa-globe"></i>
                           {{ taskItem.timezone }}
@@ -638,9 +644,12 @@ export default {
 
 <style lang="scss" scoped>
 .has-communication {
-  border: 1px solid #FFD700 !important;
-  background-color: rgba(255, 215, 0, 0.05) !important;
-  padding-top: 0 !important;
+  padding-y: 8px !important;
+  color: white !important;
+}
+
+.label-color {
+  color: white !important;
 }
 
 .communication-wrapper {
@@ -653,18 +662,10 @@ export default {
 .communication-label {
   left: 0;
   right: 0;
-  height: 28px;
-  padding: 4px 12px;
+  padding: 4px 45px;
   font-size: 11px;
-  color: #B8860B;
-  display: flex;
+  width: 100%;
   align-items: center;
-  background-color: rgba(255, 215, 0, 0.1);
-  border-bottom: 1px solid #FFD700;
-
-  .q-icon {
-    color: #FFD700;
-  }
 }
 
 .communication-content {
