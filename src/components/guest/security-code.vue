@@ -2,7 +2,7 @@
     <div class="security-code clearfix">
         <div class="security-code-wrapper">
             <div class="security-code-field"
-                 :class="{ 'security-code-hs-widget-mode': hubspotWidget }"
+                 :class="{ 'security-code-hs-widget-mode': isWidget }"
                  v-for="n in securityCodeLength"
                  :key="n">
                 <input maxlength="1"
@@ -26,6 +26,7 @@
 
 <script>
 import _ from 'lodash'
+import { mapState } from 'vuex'
 
 export default {
   props: {
@@ -42,11 +43,6 @@ export default {
     securityCodeLength: {
       type: Number,
       default: 6
-    },
-
-    hubspotWidget: {
-      type: Boolean,
-      default: false
     }
   },
 
@@ -54,6 +50,10 @@ export default {
     return {
       securityCode: new Array(this.securityCodeLength)
     }
+  },
+
+  computed: {
+    ...mapState(['isWidget'])
   },
 
   mounted () {
