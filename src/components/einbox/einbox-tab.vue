@@ -124,6 +124,8 @@ import SearchInput from 'src/components/search-input.vue'
 import WatchIcon from 'src/components/icons/watch-icon.vue'
 import { EinboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
+import * as CommunicationDirections from 'src/constants/communication-direction'
+import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 import { mapState } from 'vuex'
@@ -159,7 +161,9 @@ export default {
       isSearchActive: false,
       itemsData: [],
       search: '',
-      showSearchTooltip: false
+      showSearchTooltip: false,
+      CommunicationDirections,
+      CommunicationTypes
     }
   },
 
@@ -298,13 +302,15 @@ export default {
     },
 
     getMessageBody (item) {
-      if (!item.body) {
-        if (item.attachments?.length > 0) {
-          return `${item.direction === 1 ? 'Inbound' : 'Outbound'} MMS`
-        }
-        return ''
+      if (item.body) {
+        return this.$options.filters.truncate(item.body, 20)
       }
-      return this.$options.filters.truncate(item.body, 20)
+
+      if (item.attachments?.length > 0) {
+        return `${item.direction === CommunicationDirections.INBOUND ? CommunicationDirections.INBOUND_STRING : CommunicationDirections.OUTBOUND_STRING} ${CommunicationTypes.MMS_TYPE}`
+      }
+
+      return ''
     }
   },
 
