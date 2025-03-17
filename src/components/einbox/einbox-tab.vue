@@ -27,8 +27,8 @@
               :id="`einbox-tab-search-icon-${_uid}`"
               @click="onEnterSearch">
           <search-icon color="#256eff"
-                      width="18"
-                      height="18" />
+                       width="18"
+                       height="18" />
           <b-tooltip custom-class="talk-table__tooltip"
                      :target="`einbox-tab-search-icon-${_uid}`">
             Click to search
