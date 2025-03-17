@@ -13,7 +13,7 @@
         </label>
         <q-space></q-space>
 
-        <span class="cursor-pointer"
+        <span class="cursor-pointer mr-2"
               :id="`einbox-tab-open-comms-page-icon-${_uid}`"
               @click="$router.push(DEFAULT_COMMUNICATIONS_ROUTE_PATH)">
           <watch-icon />
@@ -23,19 +23,17 @@
           </b-tooltip>
         </span>
 
-        <q-btn flat
-               round
-               color="primary"
-               icon="search"
-               size="sm"
-               data-testid="einbox-tab-search-button"
-               :id="`einbox-tab-search-icon-${_uid}`"
-               @click="onEnterSearch">
+        <span class="cursor-pointer"
+              :id="`einbox-tab-search-icon-${_uid}`"
+              @click="onEnterSearch">
+          <search-icon color="#256eff"
+                      width="18"
+                      height="18" />
           <b-tooltip custom-class="talk-table__tooltip"
                      :target="`einbox-tab-search-icon-${_uid}`">
             Click to search
           </b-tooltip>
-        </q-btn>
+        </span>
       </template>
 
       <template v-else>
@@ -122,6 +120,7 @@ import EinboxChannelToggle from './einbox-channel-toggle.vue'
 import CollapseButton from 'src/components/collapse-button.vue'
 import SearchInput from 'src/components/search-input.vue'
 import WatchIcon from 'src/components/icons/watch-icon.vue'
+import SearchIcon from 'src/components/icons/search-icon.vue'
 import { EinboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
@@ -135,7 +134,8 @@ export default {
     EinboxChannelToggle,
     CollapseButton,
     SearchInput,
-    WatchIcon
+    WatchIcon,
+    SearchIcon
   },
 
   mixins: [
