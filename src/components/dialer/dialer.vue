@@ -344,6 +344,11 @@ export default {
         call._connection.ignore()
         return
       }
+
+      if (this.isOnPowerDialerSessionRoute) {
+        return
+      }
+
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
@@ -740,6 +745,10 @@ export default {
         'ContactName': contactName ? contactName.toString() : 'No Name',
         'CompanyName': companyName ? companyName.toString() : '',
         'ContactId': contactId ? contactId.toString() : ''
+      }
+
+      if (this.isOnPowerDialerSessionRoute) {
+        params['AnswerInPD'] = true
       }
 
       console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)
