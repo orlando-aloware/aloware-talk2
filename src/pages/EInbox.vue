@@ -18,6 +18,7 @@ import Contact from 'pages/contacts/Contact'
 import EInboxSide from 'components/einbox/einbox-side'
 import { userMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
+import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'EInbox',
@@ -34,7 +35,7 @@ export default {
   data () {
     return {
       mobileContactScreenRoutes: [
-        'EInboxCommunicationDetail'
+        EINBOXES_MENU_COMMUNICATIONS_TITLE
       ]
     }
   },

@@ -3,7 +3,7 @@
              :class="{ 'pl-2 pr-2': !noPadding }">
     <div class="d-flex h-100 align-items-center flex-grow-1">
       <back-button class="mobile-back-btn-global-header"
-                   v-if="['Contact', 'Settings Tab', 'EInboxDetail', 'EInboxCommunicationDetail'].includes($route.name)"
+                   v-if="['Contact', 'Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes($route.name)"
                    @click="navigateBack"/>
       <router-link class="btn-header-nav-back"
                    :to="backRoute"
@@ -156,7 +156,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME } from 'src/router/routes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-header',
@@ -216,7 +216,9 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      PHONE_USAGE_ERRORS
+      PHONE_USAGE_ERRORS,
+      EINBOXES_MENU_ITEMS_TITLE,
+      EINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
@@ -459,7 +461,7 @@ export default {
         return
       }
 
-      if (['Settings Tab', 'EInboxDetail', 'EInboxCommunicationDetail'].includes(this.$route.name)) {
+      if (['Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
         this.$router.back()
         return
       }

@@ -60,26 +60,26 @@
       </span>
     </q-btn>
 
-    <q-btn :to="{ name: 'EInbox' }"
+    <q-btn :to="{ name: EINBOXES_MENU_TITLE }"
            :ripple="false"
            icon="img:app-icons/menu/multi_inbox_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
            data-testid="communication-active-sidebar-btn"
-           v-show="isActive('EInbox')"
+           v-show="isActive(EINBOXES_MENU_TITLE)"
            v-if="isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">EinBox</span>
+        <span class="font-weight-bold text-sm">{{ EINBOXES_MENU_TITLE }}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-          EinBox
+        {{ EINBOXES_MENU_TITLE }}
       </span>
 
       <!-- Temporary helper -->
@@ -97,26 +97,26 @@
         </b-tooltip>
       </div>
     </q-btn>
-    <q-btn :to="{ name: 'EInbox' }"
+    <q-btn :to="{ name: EINBOXES_MENU_TITLE }"
            :ripple="false"
            icon="img:app-icons/menu/multi_inbox_gray.svg"
            align="left"
            padding="10px 0px 10px 20px"
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
-           v-show="!isActive('EInbox')"
+           v-show="!isActive(EINBOXES_MENU_TITLE)"
            v-if="isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">EinBox</span>
+        <span class="font-weight-bold text-sm">{{ EINBOXES_MENU_TITLE }}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        EinBox
+        {{ EINBOXES_MENU_TITLE }}
       </span>
 
       <!-- Temporary helper -->
@@ -961,10 +961,17 @@
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
 import { broadcastsMixin, kycMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
-import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE, COMMUNICATIONS_MENU_TITLE } from 'src/router/routes'
+import {
+  DEFAULT_COMMUNICATIONS_ROUTE_PATH,
+  INBOXES_MENU_TITLE,
+  COMMUNICATIONS_MENU_TITLE,
+  EINBOXES_MENU_TITLE,
+  EINBOXES_MENU_ITEMS_TITLE,
+  EINBOXES_MENU_COMMUNICATIONS_TITLE
+} from 'src/router/routes'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 
-const EINBOX_TOOLTIP_TEXT = 'EinBox is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
+const EINBOX_TOOLTIP_TEXT = 'Team Inboxes is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
 
 export default {
   name: 'app-sidebar',
@@ -1045,7 +1052,10 @@ export default {
       COMMUNICATIONS_MENU_TITLE,
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       INBOXES_MENU_TITLE,
-      EINBOX_TOOLTIP_TEXT
+      EINBOX_TOOLTIP_TEXT,
+      EINBOXES_MENU_TITLE,
+      EINBOXES_MENU_ITEMS_TITLE,
+      EINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
@@ -1064,12 +1074,12 @@ export default {
         return true
       }
 
-      if (['EInboxDetail', 'EInboxCommunicationDetail'].includes(this.$route.name) && name === 'EInbox') {
+      if ([EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && name === EINBOXES_MENU_TITLE) {
         return true
       }
 
       // if the route name includes Communications and name is Communications
-      if (this.$route.name.includes('Communications') && name === 'Communications') {
+      if (this.$route.meta?.title === COMMUNICATIONS_MENU_TITLE && name === 'Communications') {
         return true
       }
 

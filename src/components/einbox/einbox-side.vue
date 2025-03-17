@@ -2,10 +2,10 @@
   <div data-testid="einbox-side"
        class="einbox-side">
     <einbox-nav-list data-testid="einbox-nav-list"
-                     :class="['einbox-side__left', {'einbox-side__left--mobile-hidden': $route.name !== 'EInbox'}]"
+                     :class="['einbox-side__left', {'einbox-side__left--mobile-hidden': $route.name !== EINBOXES_MENU_TITLE}]"
                      ref="eInboxNavList" />
     <einbox-tab data-testid="einbox-tab"
-                :class="['einbox-side__right', {'einbox-side__right--mobile-hidden': $route.name !== 'EInboxDetail'}]"
+                :class="['einbox-side__right', {'einbox-side__right--mobile-hidden': $route.name !== EINBOXES_MENU_ITEMS_TITLE}]"
                 :collapse-target="collapseTarget" />
   </div>
 </template>
@@ -15,6 +15,7 @@ import EinboxNavList from '../einbox/einbox-nav-list.vue'
 import einboxTab from '../einbox/einbox-tab.vue'
 import { isEmpty } from 'lodash'
 import { mapActions, mapState } from 'vuex'
+import { EINBOXES_MENU_TITLE, EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'einbox-side',
@@ -26,7 +27,9 @@ export default {
 
   data () {
     return {
-      collapseTarget: null
+      collapseTarget: null,
+      EINBOXES_MENU_TITLE,
+      EINBOXES_MENU_ITEMS_TITLE
     }
   },
 

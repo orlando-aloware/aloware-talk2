@@ -104,6 +104,7 @@ import {
   MIN_TABLET_WIDTH,
   MAX_TABLET_WIDTH
 } from 'src/constants/viewport-sizes'
+import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'contact',
@@ -145,7 +146,7 @@ export default {
     ]),
 
     isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', 'EInboxCommunicationDetail'].includes(this.$route.name)
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
     },
 
     isEmptyContact () {
@@ -177,7 +178,8 @@ export default {
       leaving: false,
       contactComponentListeners: {},
       ContactTaskStatus,
-      CommunicationDirections
+      CommunicationDirections,
+      EINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
@@ -273,7 +275,7 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
-      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication', 'EInboxCommunicationDetail']
+      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE]
       if (validRoutes.includes(this.$route.name)) {
         this.fetchTaskCounts()
       }
@@ -289,7 +291,7 @@ export default {
 
       this.contactListSidebarOpen = false
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', 'EInboxCommunicationDetail'].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
@@ -304,7 +306,7 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication', 'EInboxCommunicationDetail'].includes(this.$route.name)) {
+      if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
     },
