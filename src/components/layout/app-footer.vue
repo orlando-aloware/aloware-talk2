@@ -217,8 +217,8 @@ import {
   DEFAULT_COMMUNICATIONS_ROUTE_PATH,
   INBOXES_MENU_TITLE,
   EINBOXES_MENU_TITLE,
-  EINBOXES_MENU_ITEMS,
-  EINBOXES_MENU_COMMUNICATIONS
+  EINBOXES_MENU_ITEMS_TITLE,
+  EINBOXES_MENU_COMMUNICATIONS_TITLE
 } from 'src/router/routes'
 import { userMixin } from 'src/plugins/mixins'
 
@@ -282,8 +282,8 @@ export default {
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       INBOXES_MENU_TITLE,
       EINBOXES_MENU_TITLE,
-      EINBOXES_MENU_ITEMS,
-      EINBOXES_MENU_COMMUNICATIONS,
+      EINBOXES_MENU_ITEMS_TITLE,
+      EINBOXES_MENU_COMMUNICATIONS_TITLE,
       COMMUNICATIONS_MENU_TITLE_MOBILE,
       parkedCallQueue: []
     }
@@ -326,8 +326,8 @@ export default {
         case 'Inbox Contact Communication':
           return 'inbox'
         case EINBOXES_MENU_TITLE:
-        case EINBOXES_MENU_ITEMS:
-        case EINBOXES_MENU_COMMUNICATIONS:
+        case EINBOXES_MENU_ITEMS_TITLE:
+        case EINBOXES_MENU_COMMUNICATIONS_TITLE:
           return 'team-inboxes'
         case 'Contacts':
         case 'Contact':

@@ -966,8 +966,8 @@ import {
   INBOXES_MENU_TITLE,
   COMMUNICATIONS_MENU_TITLE,
   EINBOXES_MENU_TITLE,
-  EINBOXES_MENU_ITEMS,
-  EINBOXES_MENU_COMMUNICATIONS
+  EINBOXES_MENU_ITEMS_TITLE,
+  EINBOXES_MENU_COMMUNICATIONS_TITLE
 } from 'src/router/routes'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 
@@ -1054,8 +1054,8 @@ export default {
       INBOXES_MENU_TITLE,
       EINBOX_TOOLTIP_TEXT,
       EINBOXES_MENU_TITLE,
-      EINBOXES_MENU_ITEMS,
-      EINBOXES_MENU_COMMUNICATIONS
+      EINBOXES_MENU_ITEMS_TITLE,
+      EINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
@@ -1074,7 +1074,7 @@ export default {
         return true
       }
 
-      if ([EINBOXES_MENU_ITEMS, EINBOXES_MENU_COMMUNICATIONS].includes(this.$route.name) && name === EINBOXES_MENU_TITLE) {
+      if ([EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && name === EINBOXES_MENU_TITLE) {
         return true
       }
 

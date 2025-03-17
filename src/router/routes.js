@@ -57,8 +57,8 @@ export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Ch
 // Update the constants at the top
 export const INBOXES_MENU_TITLE = 'Inboxes'
 export const EINBOXES_MENU_TITLE = 'Team Inboxes'
-export const EINBOXES_MENU_ITEMS = 'Team Inboxes Items'
-export const EINBOXES_MENU_COMMUNICATIONS = 'Team Inboxes Communications'
+export const EINBOXES_MENU_ITEMS_TITLE = 'Team Inboxes Items'
+export const EINBOXES_MENU_COMMUNICATIONS_TITLE = 'Team Inboxes Communications'
 export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
 export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
@@ -105,7 +105,7 @@ const routes = [
         children: [
           {
             path: ':inboxId',
-            name: EINBOXES_MENU_ITEMS,
+            name: EINBOXES_MENU_ITEMS_TITLE,
             component: EInbox,
             meta: {
               title: EINBOXES_MENU_TITLE,
@@ -114,7 +114,7 @@ const routes = [
           },
           {
             path: ':inboxId/contacts/:id/communications',
-            name: EINBOXES_MENU_COMMUNICATIONS,
+            name: EINBOXES_MENU_COMMUNICATIONS_TITLE,
             component: Contact,
             meta: {
               title: EINBOXES_MENU_TITLE,
