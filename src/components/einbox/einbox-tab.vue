@@ -302,7 +302,7 @@ export default {
     },
 
     getMessageBody (item) {
-      if (item.body) {
+      if (item.body && item.body.trim() !== '') {
         return this.$options.filters.truncate(item.body, 20)
       }
 
