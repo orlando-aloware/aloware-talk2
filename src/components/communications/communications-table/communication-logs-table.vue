@@ -273,6 +273,7 @@ import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
 import { mapState, mapActions } from 'vuex'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { merge } from 'lodash'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -497,6 +498,9 @@ export default {
       if (index > -1) {
         // update it if present in the array
         this.communicationsData.splice(index, 1, communication)
+        if (this.showCommunicationSidebar && this.sidebarCommunication?.id === communication.id) {
+          this.sidebarCommunication = merge(this.sidebarCommunication, communication)
+        }
       } else {
         const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
           this.checkCommunicationMatchesSearch(this.searchQuery, communication) &&
