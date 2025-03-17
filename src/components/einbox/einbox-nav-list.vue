@@ -114,7 +114,7 @@ export default {
       this.resetItems()
       this.fetchItems(inboxId)
 
-      const route = `/einbox/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
+      const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
 
       // avoid redundant navigation
       if (this.$route.path !== route) {

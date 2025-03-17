@@ -91,6 +91,7 @@ import CompactBtn from 'components/compact-btn'
 import RefreshIcon from 'components/icons/refresh-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import { MOBILE_LARGE_WIDTH, EXTRA_SMALL_MOBILE_WIDTH } from 'src/constants/viewport-sizes'
+import { EINBOXES_MENU_TITLE, EINBOXES_MENU_ITEMS, EINBOXES_MENU_COMMUNICATIONS } from 'src/router/routes'
 
 export default {
   name: 'inbox-toggle-filters',
@@ -120,7 +121,10 @@ export default {
       inboxShowUnreadsFilter: false,
       MOBILE_LARGE_WIDTH,
       EXTRA_SMALL_MOBILE_WIDTH,
-      isTogglingNewInbox: false
+      isTogglingNewInbox: false,
+      EINBOXES_MENU_TITLE,
+      EINBOXES_MENU_ITEMS,
+      EINBOXES_MENU_COMMUNICATIONS
     }
   },
 
@@ -155,7 +159,7 @@ export default {
     },
 
     isNewInbox () {
-      return this.$route.path.substring(0, 7) === '/einbox'
+      return [EINBOXES_MENU_TITLE, EINBOXES_MENU_ITEMS, EINBOXES_MENU_COMMUNICATIONS].includes(this.$route.name)
     }
   },
 

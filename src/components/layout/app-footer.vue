@@ -20,15 +20,15 @@
         </span>
         {{ INBOXES_MENU_TITLE }}
       </q-route-tab>
-      <q-route-tab name="einbox"
-                   to="/einbox"
-                   :content-class="tab === 'einbox' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
+      <q-route-tab name="team-inboxes"
+                   to="/team-inboxes"
+                   :content-class="tab === 'team-inboxes' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
                    :ripple="false"
-                   :active="tab === 'einbox'"
+                   :active="tab === 'team-inboxes'"
                    no-caps
                    exact>
         <span class="tab-icon">
-          <e-inbox-mobile-icon :color="isActive('einbox') ? '#256EFF' : '#A3A3A3'" />
+          <e-inbox-mobile-icon :color="isActive('team-inboxes') ? '#256EFF' : '#A3A3A3'" />
         </span>
         {{ EINBOXES_MENU_TITLE }}
       </q-route-tab>
@@ -212,7 +212,14 @@ import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-ico
 import CalendarMobileIcon from 'components/icons/mobile-menu/calendar-mobile-icon.vue'
 import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
-import { COMMUNICATIONS_MENU_TITLE_MOBILE, DEFAULT_COMMUNICATIONS_ROUTE_PATH, INBOXES_MENU_TITLE, EINBOXES_MENU_TITLE } from 'src/router/routes'
+import {
+  COMMUNICATIONS_MENU_TITLE_MOBILE,
+  DEFAULT_COMMUNICATIONS_ROUTE_PATH,
+  INBOXES_MENU_TITLE,
+  EINBOXES_MENU_TITLE,
+  EINBOXES_MENU_ITEMS,
+  EINBOXES_MENU_COMMUNICATIONS
+} from 'src/router/routes'
 import { userMixin } from 'src/plugins/mixins'
 
 export default {
@@ -275,6 +282,8 @@ export default {
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       INBOXES_MENU_TITLE,
       EINBOXES_MENU_TITLE,
+      EINBOXES_MENU_ITEMS,
+      EINBOXES_MENU_COMMUNICATIONS,
       COMMUNICATIONS_MENU_TITLE_MOBILE,
       parkedCallQueue: []
     }
@@ -316,10 +325,10 @@ export default {
         case 'Inbox Channel Task Status':
         case 'Inbox Contact Communication':
           return 'inbox'
-        case 'EInbox':
-        case 'EInboxDetail':
-        case 'EInboxCommunicationDetail':
-          return 'einbox'
+        case EINBOXES_MENU_TITLE:
+        case EINBOXES_MENU_ITEMS:
+        case EINBOXES_MENU_COMMUNICATIONS:
+          return 'team-inboxes'
         case 'Contacts':
         case 'Contact':
           return 'contacts'

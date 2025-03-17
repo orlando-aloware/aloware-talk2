@@ -125,7 +125,7 @@ import WatchIcon from 'src/components/icons/watch-icon.vue'
 import { EinboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
-import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
+import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, EINBOXES_MENU_ITEMS } from 'src/router/routes'
 import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 
@@ -156,6 +156,7 @@ export default {
       THREADED,
       UNTHREADED,
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
+      EINBOXES_MENU_ITEMS,
       isSearchActive: false,
       itemsData: [],
       search: '',
@@ -218,7 +219,7 @@ export default {
 
     onItemClick (item) {
       this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
-      const route = `/einbox/${this.activeInboxId}/contacts/${item.contact_id}/communications`
+      const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
       // avoid redundant navigation
       if (route === this.$route.path) {
@@ -310,7 +311,7 @@ export default {
 
     '$route.name' (route) {
       // reset activeId in mobile when this page is opened
-      if (this.isMobile && route === 'EInboxDetail') {
+      if (this.isMobile && route === EINBOXES_MENU_ITEMS) {
         this.activeId = null
       }
     },
