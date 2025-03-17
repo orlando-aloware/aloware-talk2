@@ -88,7 +88,7 @@
                          :type="item.type"
                          :direction="item.direction"
                          :callback-status="item.callback_status"
-                         :body="item.body | truncate(20)"
+                         :body="getMessageBody(item)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
                          :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
@@ -123,6 +123,8 @@ import WatchIcon from 'src/components/icons/watch-icon.vue'
 import SearchIcon from 'src/components/icons/search-icon.vue'
 import { EinboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
+import * as CommunicationDirections from 'src/constants/communication-direction'
+import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState } from 'vuex'
@@ -160,7 +162,9 @@ export default {
       isSearchActive: false,
       itemsData: [],
       search: '',
-      showSearchTooltip: false
+      showSearchTooltip: false,
+      CommunicationDirections,
+      CommunicationTypes
     }
   },
 
@@ -296,6 +300,18 @@ export default {
       this.processCommunication(communication, false)
 
       this.showSearchTooltip = false
+    },
+
+    getMessageBody (item) {
+      if (item.body) {
+        return this.$options.filters.truncate(item.body, 20)
+      }
+
+      if (item.attachments?.length > 0) {
+        return `${item.direction === CommunicationDirections.INBOUND ? CommunicationDirections.INBOUND_STRING : CommunicationDirections.OUTBOUND_STRING} ${CommunicationTypes.MMS_TYPE}`
+      }
+
+      return ''
     }
   },
 
