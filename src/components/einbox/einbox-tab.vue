@@ -272,12 +272,21 @@ export default {
 
       if (index > -1) {
         this.itemsData.splice(index, 1, communication)
-        this.sortItemsByDate()
       }
     },
 
-    sortItemsByDate () {
-      this.itemsData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    sortItems () {
+      this.itemsData.sort((a, b) => {
+        if (isLiveCall(a) && !isLiveCall(b)) {
+          return -1
+        }
+
+        if (!isLiveCall(a) && isLiveCall(b)) {
+          return 1
+        }
+
+        return new Date(b.created_at) - new Date(a.created_at)
+      })
     },
 
     processCommunication (communication, isNew = false) {
@@ -290,6 +299,8 @@ export default {
       } else {
         this.handleThreadedCommunication(communication, isNew)
       }
+
+      this.sortItems()
     },
 
     newCommunicationListener (communication) {
@@ -347,6 +358,7 @@ export default {
 
     items () {
       this.itemsData = this.items.filter(item => !item.hidden)
+      this.sortItems()
     }
   }
 }
