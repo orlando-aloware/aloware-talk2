@@ -34,6 +34,8 @@ pipeline {
         GH_APP_PEM = credentials('github-app-private-key')
         GH_APP_ID = '1157885'
         GH_INSTALLATION_ID = '61798182'
+
+        GITHUB_TOKEN = getGitHubAppToken()
     }
 
     stages {
@@ -81,8 +83,7 @@ pipeline {
                 }
                 script {
                     echo '==> Clone GitOps Repo'
-                    def token = getGitHubAppToken()
-                    sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
+                    sh "git clone https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
                 }
             }
         }
@@ -496,13 +497,12 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
-                        def token = getGitHubAppToken()
                         def prId = sh(script: "echo ${env.GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*'", returnStdout: true).trim()
                         
                         if (prId) {
                             sh """
                                 curl -s -X POST \
-                                    -H "Authorization: Bearer ${token}" \
+                                    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
                                     -H "Accept: application/vnd.github.v3+json" \
                                     -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \
                                     "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
