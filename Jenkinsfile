@@ -79,7 +79,7 @@ pipeline {
                 nvm("${NODE_VERSION}") {
                     sh 'npm i -g yarn'
                 }
-                sshagent(credentials: ['jenkins-github-creds']) {
+                sshagent(credentials: ['github-app-private-key']) {
                     echo '==> Clone GitOps Repo'
                     sh("""
                     [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
