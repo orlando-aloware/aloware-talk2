@@ -31,9 +31,35 @@ pipeline {
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
         API_URL_OVERWRITE = ''
+        
         GH_APP_PEM = credentials('github-app-private-key')
         GH_APP_ID = '1157885'
         GH_INSTALLATION_ID = '61798182'
+
+        GITHUB_TOKEN = getGitHubAppToken()
+    }
+
+    def getGitHubAppToken() {
+        withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
+            return sh(script: '''
+                now=$(date +%s)
+                exp=$((now + 600))
+                
+                header='{"alg":"RS256","typ":"JWT"}'
+                payload='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
+                
+                base64_header=$(echo -n "${header}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+                base64_payload=$(echo -n "${payload}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+                
+                signature=$(echo -n "${base64_header}.${base64_payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+                
+                jwt="${base64_header}.${base64_payload}.${signature}"
+                curl -s -X POST \
+                    -H "Authorization: Bearer ${jwt}" \
+                    -H "Accept: application/vnd.github+json" \
+                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
+            ''', returnStdout: true).trim()
+        }
     }
 
     stages {
@@ -79,13 +105,9 @@ pipeline {
                 nvm("${NODE_VERSION}") {
                     sh 'npm i -g yarn'
                 }
-                sshagent(credentials: ['github-app-private-key']) {
+                script {
                     echo '==> Clone GitOps Repo'
-                    sh("""
-                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-                    git clone git@github.com:${GITHUB_ORG}/${TERRAFORM_REPO}.git
-                """)
+                    sh "git clone https://${GITHUB_TOKEN}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
                 }
             }
         }
@@ -499,36 +521,16 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
-                        withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
-                            sh '''
-                                header_json='{"alg":"RS256","typ":"JWT"}'
-                                header=$(echo -n "${header_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
-
-                                now=$(date +%s 2>/dev/null)
-                                exp=$((now + 600))
-                                payload_json='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
-                                payload=$(echo -n "${payload_json}" | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
-
-                                cat "${GH_APP_PEM_FILE}" | awk 'NF {sub(/\r/, ""); printf "%s\\n", $0}' > clean.pem 2>/dev/null
-
-                                signature=$(echo -n "${header}.${payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" 2>/dev/null | base64 -w 0 | tr '+/' '-_' | tr -d '=' 2>/dev/null)
-
-                                GITHUB_JWT="${header}.${payload}.${signature}"
-
-                                TOKEN=$(curl -s -X POST -H "Authorization: Bearer ${GITHUB_JWT}" \
-                                    -H "Accept: application/vnd.github+json" \
-                                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token 2>/dev/null)
-
-                                PR_ID=$(echo ${GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*' 2>/dev/null)
-
+                        def prId = sh(script: "echo ${env.GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*'", returnStdout: true).trim()
+                        
+                        if (prId) {
+                            sh """
                                 curl -s -X POST \
-                                    -H "Authorization: Bearer ${TOKEN}" \
+                                    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
                                     -H "Accept: application/vnd.github.v3+json" \
-                                    -d '{"body": "Hi, your environment is ready to use at: https://'${TALK_URL}'"}' \
-                                    "https://api.github.com/repos/aloware/aloware-talk2/issues/${PR_ID}/comments" > /dev/null
-
-                                rm -f clean.pem
-                            '''
+                                    -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \
+                                    "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
+                            """
                         }
                     }
                 } catch (Exception e) {
@@ -554,3 +556,4 @@ pipeline {
         }
     }
 }
+
