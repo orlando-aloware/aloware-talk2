@@ -34,8 +34,6 @@ pipeline {
         GH_APP_PEM = credentials('github-app-private-key')
         GH_APP_ID = '1157885'
         GH_INSTALLATION_ID = '61798182'
-
-        GITHUB_TOKEN = getGitHubAppToken()
     }
 
     stages {
@@ -83,7 +81,8 @@ pipeline {
                 }
                 script {
                     echo '==> Clone GitOps Repo'
-                    sh "git clone https://${GITHUB_TOKEN}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
+                    def token = getGitHubAppToken()
+                    sh "git clone https://${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
                 }
             }
         }
@@ -497,12 +496,13 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
+                        def token = getGitHubAppToken()
                         def prId = sh(script: "echo ${env.GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*'", returnStdout: true).trim()
                         
                         if (prId) {
                             sh """
                                 curl -s -X POST \
-                                    -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                                    -H "Authorization: Bearer ${token}" \
                                     -H "Accept: application/vnd.github.v3+json" \
                                     -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \
                                     "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
@@ -534,25 +534,25 @@ pipeline {
 }
 
 def getGitHubAppToken() {
-        withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
-            return sh(script: '''
-                now=$(date +%s)
-                exp=$((now + 600))
-                
-                header='{"alg":"RS256","typ":"JWT"}'
-                payload='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
-                
-                base64_header=$(echo -n "${header}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-                base64_payload=$(echo -n "${payload}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-                
-                signature=$(echo -n "${base64_header}.${base64_payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-                
-                jwt="${base64_header}.${base64_payload}.${signature}"
-                curl -s -X POST \
-                    -H "Authorization: Bearer ${jwt}" \
-                    -H "Accept: application/vnd.github+json" \
-                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
-            ''', returnStdout: true).trim()
-        }
+    withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
+        return sh(script: '''
+            now=$(date +%s)
+            exp=$((now + 600))
+            
+            header='{"alg":"RS256","typ":"JWT"}'
+            payload='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
+            
+            base64_header=$(echo -n "${header}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+            base64_payload=$(echo -n "${payload}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+            
+            signature=$(echo -n "${base64_header}.${base64_payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+            
+            jwt="${base64_header}.${base64_payload}.${signature}"
+            curl -s -X POST \
+                -H "Authorization: Bearer ${jwt}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
+        ''', returnStdout: true).trim()
     }
+}
 
