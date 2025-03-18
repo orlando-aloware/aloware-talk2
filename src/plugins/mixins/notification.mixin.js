@@ -24,7 +24,10 @@ export default {
       'notificationAudio'
     ]),
     ...mapState('cache', ['currentCompany']),
-    ...mapState(['isWidget', 'isSalesforceWidget'])
+    ...mapState(['isWidget', 'isSalesforceWidget']),
+    ...mapState('powerDialer', [
+      'powerDialerTasks'
+    ])
   },
 
   methods: {
@@ -88,6 +91,13 @@ export default {
       if (!communicationId ||
         !['incomingCall', 'callFishing'].includes(type)) {
         return
+      }
+      // removed from queue
+      if (this.isOnPowerDialerSessionRoute) {
+        const index = this.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.communication_id === communicationId)
+        if (index !== -1) {
+          this.powerDialerTasks.in_queue.splice(index, 1)
+        }
       }
 
       // for incoming call
@@ -271,6 +281,7 @@ export default {
           if (ringGroup &&
             ringGroup.should_queue &&
             ringGroup.fishing_mode &&
+            !ringGroup.experimental_fishing_mode_repeat_call_routing &&
             ringGroup.repeat_contact_route_to === RingGroupRepeatContactTo.REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT &&
             this.user &&
             this.user.profile &&
@@ -309,6 +320,21 @@ export default {
       if (!_.isEmpty(params.data)) {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
           console.log('processActionNotification - params.data', params.data)
+
+          if (this.isOnPowerDialerSessionRoute && ringGroup.experimental_fishing_mode_repeat_call_routing) {
+            const contactWithCommunication = {
+              ...params.data.contact,
+              'communication_id': params.data.communicationId
+            }
+
+            const callInQueue = this.powerDialerTasks.in_queue.some(task => task.communication_id === params.data.communicationId)
+
+            if (!callInQueue) {
+              this.powerDialerTasks.in_queue.unshift(contactWithCommunication)
+            }
+            return
+          }
+
           this.setShowIncomingCallNotification(true)
         }
 

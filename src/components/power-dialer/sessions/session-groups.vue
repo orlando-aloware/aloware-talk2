@@ -65,37 +65,54 @@
                       @mouseleave="onLeave">
                 <template v-for="(taskItem, i) in group">
                   <q-item class="t-expansion-panel px-2"
-                          :class="groupItemGetClass(key, taskItem)"
+                          :class="[
+                            groupItemGetClass(key, taskItem),
+                            {'has-communication bg-blue-60-opaque border-full-rounded call-hover': taskItem.communication_id}
+                          ]"
                           :key="`acc-item-${i}`"
                           v-if="taskItem">
-                    <div class="py-2">
-                      <q-avatar size="30px"
-                                color="grey"
-                                v-if="getInitials(taskItem.name)">
-                        {{ getInitials(taskItem.name) }}
-                      </q-avatar>
-                      <q-avatar size="30px"
-                                color="grey"
-                                v-else>
-                        <i class="fa fa-user"
-                           aria-hidden="true">
-                        </i>
-                      </q-avatar>
+                    <div class="communication-label" v-if="taskItem.communication_id">
+                      <span>New Inbound Call</span>
+                    </div>
+
+                    <div :class="taskItem.communication_id ? 'avatar-column' : 'py-2'">
+                      <template v-if="taskItem.communication_id">
+                        <q-avatar size="30px" class="incoming-call-avatar">
+                          <call-incoming-icon/>
+                        </q-avatar>
+                      </template>
+                      <template v-else>
+                        <q-avatar size="30px"
+                                  color="grey"
+                                  v-if="getInitials(taskItem.name)">
+                          {{ getInitials(taskItem.name) }}
+                        </q-avatar>
+                        <q-avatar size="30px"
+                                  color="grey"
+                                  v-else>
+                          <i class="fa fa-user"
+                             aria-hidden="true">
+                          </i>
+                        </q-avatar>
+                      </template>
                     </div>
                     <q-item-section class="pl-2">
-                      <q-item-label>
+                      <q-item-label :class="{'text-white':taskItem.communication_id}">
                         {{ fetchName(taskItem) }}
-                      </q-item-label>
+                      </q-item-label >
                       <q-item-label lines="2"
-                                    caption>
+                                    caption
+                                    :class="{'text-white':taskItem.communication_id}">
                         {{ taskItem.phone_number | fixPhone('NATIONAL', true) }}
                       </q-item-label>
                       <q-item-label lines="2"
-                                    caption>
+                                    caption
+                                    :class="{'text-white':taskItem.communication_id}">
                         {{ taskItem.company_name }}
                       </q-item-label>
                       <q-item-label lines="2"
-                                    caption>
+                                    caption
+                                    :class="{'text-white':taskItem.communication_id}">
                         <span>
                           <i class="fa fa-globe"></i>
                           {{ taskItem.timezone }}
@@ -144,7 +161,7 @@
                                          v-if="key !== 'in_queue'"
                                          @click="addTask(taskItem, moveDirection.top)">
                           <ArrowUpIcon height="16px"
-                                       width="16px"/>
+                                       width="16px" />
                           Add to Top of In Queue
                         </b-dropdown-item>
                         <b-dropdown-item href="#"
@@ -624,3 +641,49 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.has-communication {
+  padding-y: 8px !important;
+  color: white !important;
+}
+
+.label-color {
+  color: white !important;
+}
+
+.communication-wrapper {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+}
+
+.communication-label {
+  left: 0;
+  right: 0;
+  padding: 4px 45px;
+  font-size: 11px;
+  width: 100%;
+  align-items: center;
+}
+
+.communication-content {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  padding-top: 8px;
+}
+
+.avatar-column {
+  flex: 0 0 auto;
+  padding-top: 8px;
+}
+
+.content-column {
+  flex: 1;
+  min-width: 0;
+}
+</style>

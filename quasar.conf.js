@@ -8,6 +8,16 @@
 /* eslint-env node */
 
 module.exports = function (ctx) {
+  const DotEnv = require('dotenv')
+
+  const parsedEnv = DotEnv.config({ path: '.env' }).parsed
+
+  if (typeof parsedEnv === 'object' &&
+    !Array.isArray(parsedEnv) &&
+    parsedEnv !== undefined &&
+    parsedEnv !== null) {
+    process.env = { ...process.env, ...parsedEnv }
+  }
 
   const noHttps = process.env.APP_SECURE === 'false'
 
@@ -47,7 +57,11 @@ module.exports = function (ctx) {
       vueRouterMode: 'history',
       devtool: 'source-map',
       transpile: true,
-      
+
+      env: {
+        ...parsedEnv
+      },
+
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
       // Applies only if "transpile" is set to true.
@@ -70,10 +84,7 @@ module.exports = function (ctx) {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /node_modules/,
-          options: {
-            fix: true
-          }
+          exclude: /node_modules/
         })
 
         if (process.env.APP_ENV !== 'local' && cfg.output?.path) {
