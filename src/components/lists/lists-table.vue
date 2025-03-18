@@ -1,5 +1,5 @@
 <template>
-  <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+  <div class="contacts lists-management mx-0 content-row d-flex overflow-hidden h-100">
     <lists-folders-management :is-loading="isLoading || isLoadingMore" />
 
     <div class="talk-table-container flex-grow-1 d-flex flex-column">
@@ -397,6 +397,7 @@
       <import-contacts-modal ref="importContacts"
                              :user-id="userId"
                              :folder-id="folderId"
+                             :is-public="isPublic"
                              @importStarted="onImportStarted" />
     </div>
   </div>
@@ -1128,11 +1129,7 @@ export default {
     },
 
     onImportStarted () {
-      if (this.isPublic) {
-        this.$router.push('/lists-management/user')
-      } else {
-        this.refreshLists()
-      }
+      this.refreshLists()
     },
 
     listCsvImportFinished (event) {
@@ -1148,10 +1145,7 @@ export default {
 
       const listName = event.contact_list.name
       this.$generalNotification(`Contacts successfully imported into ${listName}`)
-
-      if (!this.isPublic) {
-        this.refreshLists()
-      }
+      this.refreshLists()
     }
   },
 
@@ -1193,6 +1187,10 @@ export default {
 }
 </script>
 <style scoped>
+.lists-management .talk-table td {
+  padding: 8px 16px;
+}
+
 .dropdown-btn-text {
   font-size: 12px;
   font-weight: 400;
