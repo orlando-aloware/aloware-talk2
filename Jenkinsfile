@@ -552,11 +552,6 @@ def getGitHubAppToken() {
             
             jwt="${base64_header}.${base64_payload}.${signature}"
             
-            echo "BASE64_HEADER=${base64_header}"
-            echo "BASE64_PAYLOAD=${base64_payload}"
-            echo "SIGNATURE=${signature}"
-            echo "JWT=${jwt}"
-            
             curl -s -X POST \
                 -H "Authorization: Bearer ${jwt}" \
                 -H "Accept: application/vnd.github+json" \
