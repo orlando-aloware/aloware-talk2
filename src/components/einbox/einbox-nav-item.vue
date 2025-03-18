@@ -1,12 +1,13 @@
 <template>
   <div data-testid="einbox-nav-item"
-       :class="['inbox-nav-item', { 'inbox-nav-item--active': isActive }]"
+       :class="['einbox-nav-item', { 'einbox-nav-item--active': isActive }]"
        @click="$emit('click', value)">
-    <div class="inbox-nav-item__content d-flex align-items-center">
-      <inbox-icon class="inbox-nav-item__icon mr-1"
-                  width="24"
-                  height="24" />
-      <span class="inbox-nav-item__label">{{ label }}</span>
+    <div class="einbox-nav-item__content d-flex align-items-center">
+      <span class="d-flex align-items-center mr-1">
+        <inbox-icon width="18"
+                    height="18" />
+      </span>
+      <span class="einbox-nav-item__label">{{ label }}</span>
     </div>
   </div>
 </template>
@@ -44,12 +45,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.inbox-nav-item {
-  padding: 12px 16px;
+.einbox-nav-item {
+  padding: 10px 16px;
   border-radius: 10px;
   transition: all 0.2s ease;
   width: 100%;
   cursor: pointer;
+  position: relative;
 
   &:hover {
     background-color: #E9F0FF;
@@ -65,10 +67,6 @@ export default {
 
   &__content {
     width: 100%;
-  }
-
-  &__icon {
-    font-size: 20px;
   }
 
   &--active {
