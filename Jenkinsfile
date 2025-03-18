@@ -82,7 +82,7 @@ pipeline {
                 script {
                     echo '==> Clone GitOps Repo'
                     def token = getGitHubAppToken()
-                    sh "git clone https://${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
+                    sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
                 }
             }
         }
