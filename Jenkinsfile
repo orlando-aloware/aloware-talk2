@@ -81,7 +81,7 @@ pipeline {
                 }
                 script {
                     echo '==> Clone GitOps Repo'
-                    def token = mask(getGitHubAppToken())
+                    def token = getGitHubAppToken()
                     sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
                     
                 }
