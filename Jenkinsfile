@@ -81,7 +81,7 @@ pipeline {
                 }
                 script {
                     echo '==> Clone GitOps Repo'
-                    def token = getGitHubAppToken()
+                    def token = mask(getGitHubAppToken())
                     sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
                     
                 }
@@ -497,19 +497,17 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
-                        def token = getGitHubAppToken()
+                        def token = mask(getGitHubAppToken())
                         def prId = sh(script: "echo ${env.GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*'", returnStdout: true).trim()
                         
                         if (prId) {
-                            wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: token, var: 'GITHUB_TOKEN']]]) {
-                                sh """
-                                    curl -s -X POST \
-                                        -H "Authorization: Bearer ${token}" \
-                                        -H "Accept: application/vnd.github.v3+json" \
-                                        -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \
-                                        "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
-                                """
-                            }
+                            sh """
+                            curl -s -X POST \
+                                -H "Authorization: Bearer ${token}" \
+                                    -H "Accept: application/vnd.github.v3+json" \
+                                    -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \
+                                    "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
+                            """
                         }
                     }
                 } catch (Exception e) {
