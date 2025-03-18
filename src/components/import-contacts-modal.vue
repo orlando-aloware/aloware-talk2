@@ -99,7 +99,7 @@
         <information-circle-icon class="cursor-pointer"
                                  width="33"
                                  height="33" />
-        <div>
+        <div class="dnc-agreement-container">
           <b-form-checkbox class="mt-1 ml-2 cursor-pointer"
                            size="sm"
                            v-model="isDncAgreed">
@@ -150,7 +150,7 @@
                            @fileUploaded="renderColumnChooser">
               <template slot="description">
                 <div class="text-center mt-2 notice">
-                  <p class="mb-0">Supports CSV only.</p>
+                  <p class="mb-0">Supports CSV files only.</p>
                 </div>
               </template>
             </file-uploader>
@@ -174,7 +174,7 @@
          v-if="currentStep === STEPS.SELECT_COLUMNS">
       <div class="select-columns-alert select-columns-alert--success mb-3">
         <div class="font-weight-bold">
-          2. First 10 Contacts in Your List look good
+          First 10 Contacts in Your List look good
         </div>
         <div>
           We've fetched the first 10 rows in your file so you can assign each
@@ -233,10 +233,8 @@
 
     <div class="import-content pb-0"
          v-if="currentStep === STEPS.REVIEW_DATA">
-      <b-overlay class="w-100"
-                 :show="loading">
         <div class="select-columns-alert select-columns-alert--success mb-3">
-          <div class="font-weight-bold">3. Review Data</div>
+          <div class="font-weight-bold">Review Data</div>
           <div>
             We've fetched and analyzed the first 10 rows in your file and merged
             all phone numbers found in one column. Warnings and errors will show
@@ -244,58 +242,60 @@
             partial rows before going to the next step.
           </div>
         </div>
-        <div class="table-responsive container-table-csv mb-0">
-          <table class="table table-csv table-striped"
-                 v-if="reviewData.length > 0">
-            <thead>
-              <tr>
-                <th></th>
-                <th :class="{
-                      'cell-warning': title === 'warnings',
-                      'cell-danger': title === 'errors'
-                    }"
-                    :key="`review-th-${i}`"
-                    v-for="(title, i) in Object.keys(reviewData[0])">
-                  {{ title != 'unknown_columns' ? fieldName(title) : '' }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr :key="`review-tr-${index}`"
-                  v-for="(contact, index) in reviewData">
-                <td>{{ index + 1 }}</td>
-                <td :key="`review-tr-${index}-td-${i}`"
-                    v-for="(key, i) in Object.keys(contact)"
-                    :class="{
-                      'cell-warning': key === 'warnings' && contact[key].length > 0,
-                      'cell-danger': key === 'errors' && contact[key].length > 0
-                    }">
-                  <span v-if="key === 'phone_numbers'">
-                    {{ contact[key].join(', ') }}
-                  </span>
-                  <span v-else>
-                    {{ key != 'unknown_columns' ? contact[key] : '' }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div v-else style="height: 300px;"></div>
+        <div class="table-responsive container-table-csv mb-0 h-100">
+          <b-overlay class="w-100 min-h-100"
+                     :show="loading">
+            <table class="table table-csv table-striped"
+                   v-if="reviewData.length > 0">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th :class="{
+                        'cell-warning': title === 'warnings',
+                        'cell-danger': title === 'errors'
+                      }"
+                      :key="`review-th-${i}`"
+                      v-for="(title, i) in Object.keys(reviewData[0])">
+                    {{ title != 'unknown_columns' ? fieldName(title) : '' }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr :key="`review-tr-${index}`"
+                     v-for="(contact, index) in reviewData">
+                  <td>{{ index + 1 }}</td>
+                  <td :key="`review-tr-${index}-td-${i}`"
+                      :class="{
+                        'cell-warning': key === 'warnings' && contact[key].length > 0,
+                        'cell-danger': key === 'errors' && contact[key].length > 0
+                      }"
+                      v-for="(key, i) in Object.keys(contact)">
+                    <span v-if="key === 'phone_numbers'">
+                      {{ contact[key].join(', ') }}
+                    </span>
+                    <span v-else>
+                      {{ key != 'unknown_columns' ? contact[key] : '' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="h-100"></div>
+          </b-overlay>
         </div>
-      </b-overlay>
     </div>
 
-    <div class="p-4"
+    <div class="import-content"
          v-if="currentStep === STEPS.SETTINGS">
       <b-overlay class="w-100"
                  :show="loading">
         <b-form ref="settingsForm"
                 class="d-flex justify-center"
                 @submit.prevent>
-          <b-col class="settings-form-wrapper"
+          <b-col class="settings-form-wrapper pb-0"
                  sm="12"
                  md="6">
-            <b-form-row class="mt-4">
+            <b-form-row>
               <b-form-group label="List Name"
                             class="form-label w-100 mb-0"
                             ref="listName"
@@ -467,6 +467,11 @@ export default {
     folderId: {
       type: Number,
       required: false
+    },
+
+    isPublic: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -763,7 +768,7 @@ export default {
         update_existing: this.settings.updateExisting,
         unknown_columns_to_notes: this.settings.saveUnknownColumnAsNotes,
         cascade_contacts: this.settings.cascadeContacts,
-        show_in_public_folder: false
+        show_in_public_folder: this.isPublic
       }
 
       if (this.userId) {
@@ -784,6 +789,7 @@ export default {
           }
 
           this.onNextStep(STEPS.FINISHED)
+          this.$VueEvent.fire('fetchContactsLists')
 
           this.$emit('importStarted')
 
@@ -844,5 +850,14 @@ export default {
 .container-table-csv .cell-warning {
   color: #856404;
   background-color: #fff3cd;
+}
+
+.dnc-agreement-container .custom-control-label::before,
+.dnc-agreement-container .custom-control-label::after {
+  top: 6px !important;
+}
+
+.min-h-100 {
+  min-height: 100%;
 }
 </style>
