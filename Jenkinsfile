@@ -81,10 +81,9 @@ pipeline {
                 }
                 script {
                     echo '==> Clone GitOps Repo'
-                    def token = getGitHubAppToken()
-                    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: token, var: 'GITHUB_TOKEN']]]) {
-                        sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
-                    }
+                    def token = mask(getGitHubAppToken())
+                    sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
+                    
                 }
             }
         }
@@ -539,7 +538,7 @@ pipeline {
 
 def getGitHubAppToken() {
     withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
-        def scriptOutput = sh(script: '''
+        return sh(script: '''
             now=$(date +%s)
             exp=$((now + 600))
             
@@ -563,18 +562,6 @@ def getGitHubAppToken() {
                 -H "Accept: application/vnd.github+json" \
                 "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
         ''', returnStdout: true).trim()
-        
-        def lines = scriptOutput.split('\n')
-        def token = lines[-1]
-        
-        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [
-            [password: lines[0].split('=')[1], var: 'BASE64_HEADER'],
-            [password: lines[1].split('=')[1], var: 'BASE64_PAYLOAD'],
-            [password: lines[2].split('=')[1], var: 'SIGNATURE'],
-            [password: lines[3].split('=')[1], var: 'JWT']
-        ]]) {
-            return token
-        }
     }
 }
 
