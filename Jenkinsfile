@@ -539,7 +539,7 @@ pipeline {
 
 def getGitHubAppToken() {
     withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
-        return sh(script: '''
+        def scriptOutput = sh(script: '''
             now=$(date +%s)
             exp=$((now + 600))
             
@@ -553,18 +553,28 @@ def getGitHubAppToken() {
             
             jwt="${base64_header}.${base64_payload}.${signature}"
             
-            wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [
-                [password: base64_header, var: 'BASE64_HEADER'],
-                [password: base64_payload, var: 'BASE64_PAYLOAD'],
-                [password: signature, var: 'SIGNATURE'],
-                [password: jwt, var: 'JWT']
-            ]]) {
-                curl -s -X POST \
-                    -H "Authorization: Bearer ${jwt}" \
-                    -H "Accept: application/vnd.github+json" \
-                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
-            }
+            echo "BASE64_HEADER=${base64_header}"
+            echo "BASE64_PAYLOAD=${base64_payload}"
+            echo "SIGNATURE=${signature}"
+            echo "JWT=${jwt}"
+            
+            curl -s -X POST \
+                -H "Authorization: Bearer ${jwt}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
         ''', returnStdout: true).trim()
+        
+        def lines = scriptOutput.split('\n')
+        def token = lines[-1]
+        
+        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [
+            [password: lines[0].split('=')[1], var: 'BASE64_HEADER'],
+            [password: lines[1].split('=')[1], var: 'BASE64_PAYLOAD'],
+            [password: lines[2].split('=')[1], var: 'SIGNATURE'],
+            [password: lines[3].split('=')[1], var: 'JWT']
+        ]]) {
+            return token
+        }
     }
 }
 
