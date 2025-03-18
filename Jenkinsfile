@@ -31,35 +31,11 @@ pipeline {
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
         API_URL_OVERWRITE = ''
-        
         GH_APP_PEM = credentials('github-app-private-key')
         GH_APP_ID = '1157885'
         GH_INSTALLATION_ID = '61798182'
 
         GITHUB_TOKEN = getGitHubAppToken()
-    }
-
-    def getGitHubAppToken() {
-        withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
-            return sh(script: '''
-                now=$(date +%s)
-                exp=$((now + 600))
-                
-                header='{"alg":"RS256","typ":"JWT"}'
-                payload='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
-                
-                base64_header=$(echo -n "${header}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-                base64_payload=$(echo -n "${payload}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-                
-                signature=$(echo -n "${base64_header}.${base64_payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-                
-                jwt="${base64_header}.${base64_payload}.${signature}"
-                curl -s -X POST \
-                    -H "Authorization: Bearer ${jwt}" \
-                    -H "Accept: application/vnd.github+json" \
-                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
-            ''', returnStdout: true).trim()
-        }
     }
 
     stages {
@@ -556,4 +532,27 @@ pipeline {
         }
     }
 }
+
+def getGitHubAppToken() {
+        withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
+            return sh(script: '''
+                now=$(date +%s)
+                exp=$((now + 600))
+                
+                header='{"alg":"RS256","typ":"JWT"}'
+                payload='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
+                
+                base64_header=$(echo -n "${header}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+                base64_payload=$(echo -n "${payload}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+                
+                signature=$(echo -n "${base64_header}.${base64_payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+                
+                jwt="${base64_header}.${base64_payload}.${signature}"
+                curl -s -X POST \
+                    -H "Authorization: Bearer ${jwt}" \
+                    -H "Accept: application/vnd.github+json" \
+                    "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
+            ''', returnStdout: true).trim()
+        }
+    }
 
