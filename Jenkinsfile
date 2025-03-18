@@ -81,9 +81,10 @@ pipeline {
                 }
                 script {
                     echo '==> Clone GitOps Repo'
-                    def token = mask(getGitHubAppToken())
-                    sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
-                    
+                    def token = getGitHubAppToken()
+                    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: token, var: 'TOKEN']]]) {
+                        sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
+                    }
                 }
             }
         }
@@ -497,17 +498,19 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
-                        def token = mask(getGitHubAppToken())
+                        def token = getGitHubAppToken()
                         def prId = sh(script: "echo ${env.GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*'", returnStdout: true).trim()
                         
                         if (prId) {
-                            sh """
-                            curl -s -X POST \
-                                -H "Authorization: Bearer ${token}" \
-                                    -H "Accept: application/vnd.github.v3+json" \
-                                    -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \
-                                    "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
-                            """
+                            wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: token, var: 'TOKEN']]]) {
+                                sh """
+                                curl -s -X POST \\
+                                    -H "Authorization: Bearer ${token}" \\
+                                        -H "Accept: application/vnd.github.v3+json" \\
+                                        -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \\
+                                        "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
+                                """
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -536,7 +539,7 @@ pipeline {
 
 def getGitHubAppToken() {
     withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
-        return sh(script: '''
+        def rawToken = sh(script: '''
             now=$(date +%s)
             exp=$((now + 600))
             
@@ -555,6 +558,8 @@ def getGitHubAppToken() {
                 -H "Accept: application/vnd.github+json" \
                 "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
         ''', returnStdout: true).trim()
+        
+        return rawToken
     }
 }
 
