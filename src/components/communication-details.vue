@@ -106,18 +106,15 @@
                  data-testid="comm-details-mobile-archive-card-section"
                  v-if="mobileView">
               <div class="d-flex header-btn-wrapper">
-                <generate-transcription-button
-                  class="mr-2"
-                  variant="button"
-                  data-testid="comm-details-generate-transcription-button"
-                  :communication="communication"
-                  v-if="fileUuid && isMigrated"
-                >
-                </generate-transcription-button>
+                <generate-transcription-button class="mr-2"
+                                               variant="button"
+                                               data-testid="comm-details-generate-transcription-button"
+                                               :communication="communication"
+                                               v-if="fileUuid && isMigrated"/>
                 <div class="flex items-center mr-1 h-100"
-                    data-testid="comm-transcription-modal-btn"
-                    v-if="!communication.transcription_is_deleted && communication.has_transcription"
-                    @click="fetchSmartTranscriptionData()">
+                     data-testid="comm-transcription-modal-btn"
+                     v-if="!communication.transcription_is_deleted && communication.has_transcription"
+                     @click="fetchSmartTranscriptionData()">
                   <span class="text-blue cursor-pointer">
                     Show Transcription
                   </span>
