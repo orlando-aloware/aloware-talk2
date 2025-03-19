@@ -291,9 +291,9 @@ export const fixFullDateTime = (dt) => {
       if (window.timezone === 'Asia/Manila') {
         return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD h:mm:ssa') + ' MNL'
       }
-      return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD h:mm:ssa z')
+      return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD h:mm:ssa')
     } else {
-      return window.moment.utc(dt).local().format('YYYY-MM-DD h:mm:ssa z')
+      return window.moment.utc(dt).local().format('YYYY-MM-DD h:mm:ssa')
     }
   } else {
     return '-'
