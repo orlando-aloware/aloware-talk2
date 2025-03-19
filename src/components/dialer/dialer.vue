@@ -875,7 +875,7 @@ export default {
     },
 
     hangupCall () {
-      if (!this.dialer.call) {
+      if (!this.dialer.call || !this.connection) {
         return
       }
 
