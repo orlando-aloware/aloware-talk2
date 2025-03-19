@@ -1,51 +1,61 @@
 <template>
-  <div class="inbox-wrapper border-right" data-testid="inbox-side-wrapper">
+  <div data-testid="inbox-side-wrapper"
+       class="inbox-wrapper border-right">
     <div class="mobile-header align-items-center justify-content-between pr-2 flex-grow-0"
          v-if="isInboxTaskOpened">
       <div class="d-flex h-100 align-items-center justify-content-center min-w-0">
-        <back-button data-testid="inbox-side-back-btn" @click="back"/>
+        <back-button data-testid="inbox-side-back-btn"
+                     @click="back" />
         <span class="truncated-text"
               v-if="isInboxTaskOpened">{{ channelName | ucwords }}</span>
         <inbox-toggle-filters :should-show-unreads-toggle="true"
-                              data-testid="inbox-side-my-contacts-filter"/>
+                              data-testid="inbox-side-my-contacts-filter" />
       </div>
       <profile class="p-0"
-               :hide-profile-info="true"/>
+               :hide-profile-info="true" />
     </div>
+
+    <!-- TODO: separate the entire new/old inbox experience into two different wrappers
+        this way we can have a better control of the new/old experience on responsive
+    -->
     <div class="inbox-side border-top-0 flex-grow-0 h-100 overflow-hidden">
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
         <div class="h-100">
           <div class="inbox-side__nav h-100">
-            <inbox-nav-list :closed="closed"
-                            :openCount="inboxTaskCounts.open"
-                            :pendingCount="inboxTaskCounts.pending"
-                            :value.sync="active"
+            <inbox-nav-list data-testid="inbox-side-nav-list"
+                            :closed="closed"
+                            :open-count="inboxTaskCounts.open"
+                            :pending-count="inboxTaskCounts.pending"
                             v-model="active"
-                            data-testid="inbox-side-nav-list"
                             @active="newActive"
-                            @toInbox="navigateToInbox">
-            </inbox-nav-list>
+                            @toInbox="navigateToInbox" />
           </div>
         </div>
       </div>
       <div class="inbox-side__right border-left d-flex align-items-start flex-column"
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
-        <!-- Inbox Tab (Inbox/Inbox View) UI -->
-        <inbox-tab :search-text="searchText"
-                   v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
-                   data-testid="inbox-side-inbox-tab"
-                   @itemSelected="onItemSelected" />
 
-        <!-- Channels (Communications) UI -->
-        <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
-                        :filter-type="activeChannel?.type"
-                        :answer-status="activeChannel?.answerStatus"
-                        :channel="activeChannel?.value"
-                        :search-text="searchText"
-                        :sort="sort"
-                        data-testid="inbox-side-inbox-channels"
-                        v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
+        <template>
+          <!-- This is the only previous item shown in the inbox tab with the old experience -->
+
+          <!-- this is Inbox Tab (Inbox/Inbox View) UI -->
+          <inbox-tab :search-text="searchText"
+                     data-testid="inbox-side-inbox-tab"
+                     v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
+                     @itemSelected="onItemSelected" />
+
+          <!-- These were moved to communications logs so should be deprecated -->
+          <!-- this is Channels (Communications) UI -->
+          <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
+                          :filter-type="activeChannel?.type"
+                          :answer-status="activeChannel?.answerStatus"
+                          :channel="activeChannel?.value"
+                          :search-text="searchText"
+                          :sort="sort"
+                          data-testid="inbox-side-inbox-channels"
+                          v-if="activeChannel && !['inbox'].includes(activeChannel.value) && activeChannel.value.indexOf('view') === -1" />
+        </template>
       </div>
     </div>
   </div>
@@ -54,6 +64,8 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
+
+/* OLD INBOX Components */
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
@@ -199,6 +211,7 @@ export default {
       this.onLoadShowTasks = false
 
       if (this.$q.screen.lt.md && this.$route.name === 'Inbox') {
+        /* TODO: complete the logic of the new inbox here */
         const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }

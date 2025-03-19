@@ -2244,11 +2244,6 @@ i.option-separator {
     }
   }
 
-  .contact-avatar {
-    background-color: $grey-80 !important;
-    font-weight: 600;
-  }
-
   .q-item__section--avatar {
     padding-right: 0 !important;
     min-width: 0 !important;
@@ -4659,7 +4654,7 @@ i.option-separator {
 
   .phone-notes {
     .q-field__inner {
-      justify-content: start !important;
+      justify-content: flex-start !important;
     }
   }
 
@@ -6420,15 +6415,15 @@ table.datatable {
     flex-direction: column;
     min-height: calc(100vh - 300px);
     max-height: 500px;
-  } 
+  }
 
   .import-content {
     flex-grow: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: start;
+    justify-content: flex-start;
+    align-items: flex-start;
     padding: 15px;
   }
 }
@@ -8812,6 +8807,20 @@ span.mention {
   }
   90% {
     box-shadow: 0 0 5px 13px rgba(173, 0, 0, 0);
+  }
+}
+
+
+.live-call-pulse {
+  animation: live-call-pulse 2s infinite;
+}
+
+@keyframes live-call-pulse {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0,0,0, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(0,0,0, 0);
   }
 }
 
@@ -15939,6 +15948,15 @@ hr {
   }
 }
 
+/* Gradient text effect for inbox */
+.inbox-effect-gradient-text {
+  cursor: pointer;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+  background-image: linear-gradient(135deg, #9031B5, #256EFF, #0E8EBB) !important;
+}
+
 .q-message-text-content {
   line-height: 1.5;
   font-size: 13px;
@@ -16108,6 +16126,10 @@ hr {
     }
 
     tr:hover {
+      background-color: $light-blue;
+    }
+
+    tr.live-call-tr {
       background-color: $light-blue;
     }
 
@@ -16328,7 +16350,14 @@ hr {
   .tooltip-inner {
     background-color: #000 !important;
     color: #fff !important;
-    font-size: 13px !important;
+    font-size: 14px !important;
+    padding: 2px 8px !important;
+  }
+
+  &--md {
+    .tooltip-inner {
+      max-width: 350px;
+    }
   }
 }
 
@@ -16337,8 +16366,28 @@ hr {
   color: #fff;
   font-size: 13px;
 
-  .arrow::before, .arrow::after {
-    border-right-color: #000;
+  &[x-placement="bottom"] {
+    .arrow::before, .arrow::after {
+      border-bottom-color: #000;
+    }
+  }
+
+  &[x-placement="top"] {
+    .arrow::before, .arrow::after {
+      border-top-color: #000;
+    }
+  }
+
+  &[x-placement="left"] {
+    .arrow::before, .arrow::after {
+      border-left-color: #000;
+    }
+  }
+
+  &[x-placement="right"] {
+    .arrow::before, .arrow::after {
+      border-right-color: #000;
+    }
   }
 
   .popover-body {
@@ -16529,6 +16578,10 @@ hr {
     @media (min-width: 785px) {
       height: calc(100vh - 60px); // Desktop: only account for top bar
     }
+
+    @media (min-width: 1280px) {
+      width: 480px;
+    }
   }  
 
   // fix sidebar when the notification banner is visible
@@ -16555,3 +16608,13 @@ hr {
   }
 }
 
+.blue-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: all 0.2s ease;
+
+  &:hover {
+    scrollbar-color: $blue transparent;
+    padding-right: 0px;
+  }
+}

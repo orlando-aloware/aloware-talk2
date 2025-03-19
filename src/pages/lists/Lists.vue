@@ -1,5 +1,5 @@
 <template>
-  <lists-table v-if="isDemoCompany"/>
+  <lists-table />
 </template>
 
 <script>
@@ -19,11 +19,7 @@ export default {
   },
 
   computed: {
-    ...mapState('cache', ['currentCompany']),
-
-    isDemoCompany () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
-    }
+    ...mapState('cache', ['currentCompany'])
   }
 }
 </script>
