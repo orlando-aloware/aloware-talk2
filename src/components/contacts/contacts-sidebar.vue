@@ -59,11 +59,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('cache', ['currentCompany']),
-
-    isDemoCompany () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
-    }
+    ...mapState('cache', ['currentCompany'])
   },
   watch: {
     '$route': {
