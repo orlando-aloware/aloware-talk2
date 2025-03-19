@@ -16582,6 +16582,16 @@ hr {
     @media (min-width: 1280px) {
       width: 480px;
     }
+  }  
+
+  // fix sidebar when the notification banner is visible
+  body.has-notification-banner & {
+    .b-sidebar {
+      @media (min-width: 785px) {
+        top: 110px;
+        height: calc(100vh - 110px);
+      }
+    }
   }
 
   .communication-details-card {

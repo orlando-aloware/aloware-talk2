@@ -11,6 +11,7 @@
     </div>
 
     <span class="cursor-pointer text-primary"
+          tabindex="0"
           :id="`recording-comm-${row.id}`"
           v-if="row.has_recording || row.recording_is_deleted">
       <i class="fa-solid fa-play icon-size"/> Left Recording
@@ -26,6 +27,7 @@
     </span>
 
     <span class="cursor-pointer text-primary"
+          tabindex="0"
           :id="`voicemail-comm-${row.id}`"
           v-if="row.has_voicemail">
       <i class="fa-solid fa-play icon-size"/> Left Voicemail
