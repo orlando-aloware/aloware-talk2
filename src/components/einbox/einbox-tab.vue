@@ -273,6 +273,10 @@ export default {
       }
 
       if (index > -1) {
+        if (isLiveCall(this.itemsData[index]) && communication.type !== CommunicationTypes.CALL) {
+          return
+        }
+
         this.itemsData.splice(index, 1, communication)
       }
     },

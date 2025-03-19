@@ -1,4 +1,5 @@
 import { THREADED } from './einbox.store'
+import { isLiveCall } from 'src/plugins/helpers/functions'
 
 export default {
   SET_ACTIVE_INBOX_ID (state, inbox) {
@@ -77,8 +78,22 @@ function handleDuplicatedItems (items) {
 
     // try to find repeated comms for this contact
     if (repeateds.length > 0) {
-      items[index].repeats = repeateds.length
-      hidden.push(...repeateds)
+      const repeatedItems = [item, ...repeateds.map(id => items.find(i => i.id === id))]
+      const liveCallItem = repeatedItems.find(i => isLiveCall(i))
+
+      if (liveCallItem) {
+        repeatedItems.forEach(repeatedItem => {
+          const itemIndex = items.findIndex(i => i.id === repeatedItem.id)
+          if (repeatedItem.id !== liveCallItem.id) {
+            hidden.push(repeatedItem.id)
+          } else {
+            items[itemIndex].repeats = repeatedItems.length - 1
+          }
+        })
+      } else {
+        items[index].repeats = repeateds.length
+        hidden.push(...repeateds)
+      }
     }
 
     // mark repeated comms to dont appear
