@@ -16608,16 +16608,3 @@ hr {
     padding-right: 0px;
   }
 }
-
-.live-call-pulse {
-  animation: live-call-pulse 2s infinite;
-}
-
-@keyframes live-call-pulse {
-  0% {
-    box-shadow: 0 0 0 0px rgba(0,0,0, 0.2);
-  }
-  100% {
-    box-shadow: 0 0 0 10px rgba(0,0,0, 0);
-  }
-}
