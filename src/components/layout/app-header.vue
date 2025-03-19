@@ -3,11 +3,11 @@
              :class="{ 'pl-2 pr-2': !noPadding }">
     <div class="d-flex h-100 align-items-center flex-grow-1">
       <back-button class="mobile-back-btn-global-header"
-                   v-if="['Contact', 'Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes($route.name)"
+                   v-if="shouldShowNavigateBackButton"
                    @click="navigateBack"/>
       <router-link class="btn-header-nav-back"
                    :to="backRoute"
-                   v-if="['Communication'].includes($route.name)">
+                   v-if="['Communication'].includes($route.name) && !shouldShowNavigateBackButton">
         <button class="more-details font-weight-light-bold btn btn-sm">
           <i class="fa fa-chevron-left" />
         </button>
@@ -405,6 +405,14 @@ export default {
         return this.loading
       }
       return false
+    },
+
+    isCommsPageFromEInbox () {
+      return this.$route.name === 'Communication' && this.prevRoute?.substr(0, 13) === '/team-inboxes'
+    },
+
+    shouldShowNavigateBackButton () {
+      return ['Contact', 'Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromEInbox
     }
   },
 
@@ -461,7 +469,7 @@ export default {
         return
       }
 
-      if (['Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
+      if (['Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromEInbox) {
         this.$router.back()
         return
       }
