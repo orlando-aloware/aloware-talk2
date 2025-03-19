@@ -7,7 +7,7 @@
               v-if="!simpleTable">
       <div class="d-flex flex-column">
         <div class="ml-2 pr-2 contacts__title d-flex flex-wrap align-items-center">
-          <div v-if="isDemoCompany && !isNaN(list.id) && typeof list.id === 'string'">
+          <div v-if="!isNaN(list.id) && typeof list.id === 'string'">
             <compact-btn variant="primary"
                         class="mr-3"
                         data-testid="contacts-view-back-to-lists-button"
@@ -38,16 +38,12 @@
                  :key="`f-${index}`"
                  class="d-flex align-items-center title-path"
                  data-testid="contacts-view-folder-path">
-              <template v-if="isDemoCompany">
+              <template>
                 <router-link class="d-flex align-items-center title-path"
                              :to="buildListManagementLink(folder.id)">
                   <folder-icon color="#62666E" class="mr-1"></folder-icon>
                   <div class="title-breadcrumb-link d-flex align-items-center">{{ folder.name }}</div>
                 </router-link>
-              </template>
-              <template v-else>
-                <folder-icon color="#62666E" class="mr-1"></folder-icon>
-                <div class="title-breadcrumb d-flex align-items-center">{{ folder.name }}</div>
               </template>
               <slash-icon class="title-slash d-flex align-items-center" />
             </div>
@@ -1231,12 +1227,8 @@ export default {
       return !this.isContactListSelected || !this.totalRows
     },
 
-    isDemoCompany () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
-    },
-
     showUserBreadcrumbNav () {
-      return this.isDemoCompany && (this.$route.params.userId || this.$route.params.type === 'public')
+      return this.$route.params.userId || this.$route.params.type === 'public'
     },
 
     isFromListsManagement () {

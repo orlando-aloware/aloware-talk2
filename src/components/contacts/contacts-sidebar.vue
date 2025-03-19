@@ -7,7 +7,6 @@
       label="Public List"
       class="contact-sidebar-list-wrapper"
       data-testid="public-lists-sidebar-expansion-item"
-      v-if="!isDemoCompany"
     >
       <template v-slot:header>
         <q-item-section>
@@ -31,8 +30,7 @@
       </template>
       <contacts-shared class="public-lists" data-testid="contacts-folders-shared-list"></contacts-shared>
     </q-expansion-item>
-    <contacts-folders data-testid="contact-share-folders"
-                      v-if="!isDemoCompany" />
+    <contacts-folders data-testid="contact-share-folders" />
   </card>
 </template>
 
