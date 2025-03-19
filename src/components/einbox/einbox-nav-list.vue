@@ -57,6 +57,7 @@ import EinboxNavItem from './einbox-nav-item.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import { debounce } from 'lodash'
+import { EINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   components: {
@@ -107,6 +108,14 @@ export default {
 
     onInboxSelect (inboxId, contactId = null) {
       if (inboxId === this.activeInboxId) {
+        return
+      }
+
+      // checks if user has access to the inbox
+      if (!this.checkInboxAccess(inboxId)) {
+        this.$generalNotification('You don\'t have access to this inbox.', 'error')
+        this.$router.push({ name: EINBOXES_MENU_TITLE })
+
         return
       }
 

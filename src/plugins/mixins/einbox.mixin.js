@@ -142,6 +142,10 @@ export default {
         headers: { 'requested-from': 'api' },
         signal: this.abortController.signal
       })
+    },
+
+    checkInboxAccess (inboxId) {
+      return this.inboxes.some(inbox => inbox.id === inboxId)
     }
   }
 }
