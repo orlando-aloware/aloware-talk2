@@ -239,7 +239,9 @@ export default {
       await this.$nextTick()
 
       // auto focus inside inner search input
-      this.$refs.search.$el.querySelector('input').focus()
+      if (this.$refs.search) {
+        this.$refs.search.$el.querySelector('input').focus()
+      }
     },
 
     onLeaveSearch () {

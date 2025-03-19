@@ -120,6 +120,7 @@ export default {
 
       &--mobile-hidden {
         width: 0 !important;
+        overflow: hidden;
       }
     }
   }

@@ -2,11 +2,11 @@
   <div class="last-communication">
     <div class="d-flex q-gutter-xs">
         <component class="pr-1"
-                    height="22px"
-                    width="22px"
-                    data-testid="inbox-tasks-item-component"
-                    :is="iconComponent"
-                    :class="['disposition-icon', `disposition-icon--${iconComponent}`, isLiveCallItem && 'live-call-pulse']">
+                   height="22px"
+                   width="22px"
+                   data-testid="inbox-tasks-item-component"
+                   :is="iconComponent"
+                   :class="['disposition-icon', `disposition-icon--${iconComponent}`, isLiveCallItem && 'live-call-pulse']">
         </component>
         <div class="comm-label text-grey-90 d-flex align-items-center">
           <div class="truncated-text last-communication__label"
@@ -15,8 +15,7 @@
             {{ communicationLabel }}
           </div>
 
-          <div class="truncated-text"
-               :class="[appointmentReminderTextClass]"
+          <div :class="['truncated-text', appointmentReminderTextClass]"
                v-else
                v-html="parsedBody">
           </div>

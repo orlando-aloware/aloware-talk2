@@ -51,6 +51,9 @@ export default {
   },
   SET_IS_LOADING_MORE_ITEMS (state, loading) {
     state.isLoadingMoreItems = loading
+  },
+  SET_ABORT_CONTROLLER (state, abortController) {
+    state.abortController = abortController
   }
 }
 
