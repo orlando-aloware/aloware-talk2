@@ -227,7 +227,6 @@
            padding="none"
            class="nav-icons w-100"
            v-show="isActive('Lists')"
-           v-if="isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
@@ -248,7 +247,6 @@
            padding="10px 20px"
            class="nav-icons w-100"
            v-show="!isActive('Lists')"
-           v-if="isDemoCompany"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
