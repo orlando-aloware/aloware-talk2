@@ -30,11 +30,11 @@ export default {
   methods: {
     checkCommunicationMatchesSearch (searchText, communication) {
       // checks if communication matches search
-      if (!_.isEmpty(searchText) && this.searchText.trim().length > 0) {
-        const searchField = { field: null }
-        for (searchField.field of this.searchFields) {
-          if (communication[searchField.field]) {
-            if (communication[searchField.field].toString().indexOf(searchText) > -1) {
+      if (!_.isEmpty(searchText) && searchText.trim().length > 0) {
+        for (const searchField of this.searchFields) {
+          const property = _.get(communication, searchField)
+          if (property) {
+            if (property.toString().toLowerCase().indexOf(searchText.toLowerCase()) > -1) {
               return true
             }
           }
@@ -197,7 +197,7 @@ export default {
         filter.to_date !== undefined &&
         filter.from_date &&
         filter.to_date &&
-        this.$options.filters.utcToLocalizedMoment(communication.created_at).isBetween(filter.from_date, filter.to_date)) {
+        !this.$options.filters.utcToLocalizedMoment(communication.created_at).isBetween(filter.from_date, filter.to_date)) {
         return false
       }
       // checks min talk time filter matches communication talk time

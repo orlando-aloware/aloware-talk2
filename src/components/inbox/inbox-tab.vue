@@ -255,7 +255,7 @@ import * as ChannelType from 'src/constants/inbox-channels'
 import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 
 export default {
-  name: 'inbox-tab',
+  name: 'InboxTab',
 
   mixins: [
     aclMixin,
