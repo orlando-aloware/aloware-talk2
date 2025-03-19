@@ -14,10 +14,6 @@
       <profile class="p-0"
                :hide-profile-info="true" />
     </div>
-
-    <!-- TODO: separate the entire new/old inbox experience into two different wrappers
-        this way we can have a better control of the new/old experience on responsive
-    -->
     <div class="inbox-side border-top-0 flex-grow-0 h-100 overflow-hidden">
       <div class="inbox-side__left"
            :class="{'inbox-side__left--closed': isInboxTaskOpened }">
@@ -37,15 +33,12 @@
            :class="{'inbox-side__right--opened': isInboxTaskOpened }">
 
         <template>
-          <!-- This is the only previous item shown in the inbox tab with the old experience -->
-
           <!-- this is Inbox Tab (Inbox/Inbox View) UI -->
           <inbox-tab :search-text="searchText"
                      data-testid="inbox-side-inbox-tab"
                      v-if="!activeChannel || activeChannel.value === 'inbox' || activeChannel.value.indexOf('view') !== -1"
                      @itemSelected="onItemSelected" />
 
-          <!-- These were moved to communications logs so should be deprecated -->
           <!-- this is Channels (Communications) UI -->
           <inbox-channels class="h-100 w-100 flex-grow-1 scroll-y"
                           :filter-type="activeChannel?.type"
@@ -64,8 +57,6 @@
 <script>
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
-
-/* OLD INBOX Components */
 import InboxNavList from 'components/inbox/inbox-nav/inbox-nav-list'
 import InboxChannels from 'components/inbox/inbox-channels'
 import InboxTab from 'components/inbox/inbox-tab'
@@ -211,7 +202,6 @@ export default {
       this.onLoadShowTasks = false
 
       if (this.$q.screen.lt.md && this.$route.name === 'Inbox') {
-        /* TODO: complete the logic of the new inbox here */
         const channel = this.navListItems.find(item => item.value === 'inbox')
         this.setActiveChannel(channel)
       }
