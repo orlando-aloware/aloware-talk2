@@ -52,7 +52,7 @@ const talk2Api = {
 
       getPhoneNumbers (id) {
         if (!id) {
-          return null
+          return Promise.reject(new Error('Failed to get phone numbers, missing contact id!'))
         }
 
         return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
