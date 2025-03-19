@@ -45,5 +45,8 @@ export default {
   },
   setIsLoadingMoreItems: ({ commit }, loading) => {
     commit('SET_IS_LOADING_MORE_ITEMS', loading)
+  },
+  setAbortController: ({ commit }, abortController) => {
+    commit('SET_ABORT_CONTROLLER', abortController)
   }
 }

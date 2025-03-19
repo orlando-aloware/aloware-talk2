@@ -3,10 +3,6 @@ import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
-  data: () => ({
-    abortController: null
-  }),
-
   computed: {
     ...mapState('Einbox', [
       'isLoadingInboxes',
@@ -18,7 +14,8 @@ export default {
       'isLoadingItems',
       'currentItemsPage',
       'hasMoreItems',
-      'isLoadingMoreItems'
+      'isLoadingMoreItems',
+      'abortController'
     ])
   },
 
@@ -31,7 +28,8 @@ export default {
       'appendItems',
       'setIsLoadingItems',
       'resetItems',
-      'setIsLoadingMoreItems'
+      'setIsLoadingMoreItems',
+      'setAbortController'
     ]),
 
     async fetchInboxes (search = '') {
@@ -40,7 +38,7 @@ export default {
           this.abortController.abort()
         }
 
-        this.abortController = new AbortController()
+        this.setAbortController(new AbortController())
 
         this.setIsLoadingInboxes(true)
         const nextPage = 1
@@ -91,6 +89,8 @@ export default {
 
         this.setItems(response.data)
         this.setIsLoadingItems(false)
+
+        this.setAbortController(null)
       } catch (error) {
         console.error('Error fetching items:', error)
 
@@ -111,6 +111,8 @@ export default {
         const response = await this.getItemsRequest(inboxId, nextPage)
 
         this.appendItems(response.data)
+
+        this.setAbortController(null)
       } catch (error) {
         console.error('Error loading more items:', error)
       } finally {
@@ -124,7 +126,7 @@ export default {
         this.abortController.abort()
       }
 
-      this.abortController = new AbortController()
+      this.setAbortController(new AbortController())
 
       return talk2Api.V1.reports.communications.get({
         params: {

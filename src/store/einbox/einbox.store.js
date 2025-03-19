@@ -14,6 +14,7 @@ export default function () {
     isLoadingItems: false,
     isLoadingMoreItems: false,
     currentItemsPage: 0,
-    hasMoreItems: true
+    hasMoreItems: true,
+    abortController: null
   }
 }
