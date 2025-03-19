@@ -161,7 +161,7 @@ export default {
 
     '$route.name' (route) {
       // reset active inbox id when this page is opened
-      if (this.isMobile && route === 'EInbox') {
+      if (this.isMobile && route === EINBOXES_MENU_TITLE) {
         this.setActiveInboxId(null)
       }
     },
