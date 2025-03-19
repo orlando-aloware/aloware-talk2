@@ -8,7 +8,7 @@
                  data-testid="inbox-tasks-item-badge"
                  pill
                  v-if="totalUnreads > 0">
-          <span v-if="totalUnreads < 99">{{ totalUnreads }}</span>
+          <span v-if="totalUnreads <= 99">{{ totalUnreads }}</span>
           <span v-else>99<sup>+</sup></span>
         </b-badge>
         <avatar width="34"
@@ -185,11 +185,15 @@ export default {
 
     .avatar {
       &__unread-badge {
-        top: -2px;
-        right: -2px;
-        padding: 2px;
+        top: -8px;
+        right: -5px;
         font-size: 9px;
         font-weight: 500;
+        height: 18px;
+        width: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }
