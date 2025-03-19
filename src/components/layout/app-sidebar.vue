@@ -24,18 +24,18 @@
            padding="none"
            class="nav-icons w-100"
            data-testid="communication-active-sidebar-btn"
-           v-show="isActive('Inbox')"
-           flat>
+           flat
+           v-show="isActive('Inbox')">
       <q-tooltip anchor="center right"
                  self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{inboxMenuTitle}}</span>
+                 :offset="[-5, 0]"
+                 v-if="!isSidebarExpanded">
+        <span class="font-weight-bold text-sm">{{ INBOXES_MENU_TITLE }}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        {{inboxMenuTitle}}
+        {{ INBOXES_MENU_TITLE }}
       </span>
     </q-btn>
     <q-btn :to="{ name: 'Inbox' }"
@@ -51,12 +51,12 @@
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{inboxMenuTitle}}</span>
+        <span class="font-weight-bold text-sm">{{ INBOXES_MENU_TITLE }}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        {{inboxMenuTitle}}
+        {{ INBOXES_MENU_TITLE }}
       </span>
     </q-btn>
 
@@ -67,18 +67,17 @@
            padding="none"
            class="nav-icons w-100"
            data-testid="communication-active-sidebar-btn"
-           v-show="isActive('Communications')"
-           v-if="hasNewCommunicationsFeatureEnabled"
-           flat>
+           flat
+           v-show="isActive('Communications')">
       <q-tooltip anchor="center right"
                  self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{COMMUNICATIONS_MENU_TITLE}}</span>
+                 :offset="[-5, 0]"
+                 v-if="!isSidebarExpanded">
+        <span class="font-weight-bold text-sm">{{ COMMUNICATIONS_MENU_TITLE }}</span>
       </q-tooltip>
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        {{COMMUNICATIONS_MENU_TITLE}}
+        {{ COMMUNICATIONS_MENU_TITLE }}
       </span>
     </q-btn>
     <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
@@ -88,18 +87,17 @@
            padding="10px 20px"
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
-           v-show="!isActive('Communications')"
-           v-if="hasNewCommunicationsFeatureEnabled"
-           flat>
+           flat
+           v-show="!isActive('Communications')">
       <q-tooltip anchor="center right"
                  self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{COMMUNICATIONS_MENU_TITLE}}</span>
+                 :offset="[-5, 0]"
+                 v-if="!isSidebarExpanded">
+        <span class="font-weight-bold text-sm">{{ COMMUNICATIONS_MENU_TITLE }}</span>
       </q-tooltip>
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        {{COMMUNICATIONS_MENU_TITLE}}
+        {{ COMMUNICATIONS_MENU_TITLE }}
       </span>
     </q-btn>
 
@@ -954,12 +952,6 @@ export default {
 
     sidebarIcon () {
       return this.isSidebarExpanded ? 'unfold_less' : 'unfold_more'
-    },
-    /*
-      WAT-1105: when the feature not corresponds inbox remains as communications
-    */
-    inboxMenuTitle () {
-      return this.hasNewCommunicationsFeatureEnabled ? INBOXES_MENU_TITLE : COMMUNICATIONS_MENU_TITLE
     }
 
   },
@@ -968,6 +960,7 @@ export default {
     return {
       modeIcon: 'img:app-icons/menu/mode_gray.svg',
       COMMUNICATIONS_MENU_TITLE,
+      INBOXES_MENU_TITLE,
       DEFAULT_COMMUNICATIONS_ROUTE_PATH
     }
   },

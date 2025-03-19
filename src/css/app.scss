@@ -6251,6 +6251,10 @@ table.datatable {
 }
 
 .import-modal {
+  .modal-title {
+    color: #fff;
+  }
+
   .modal-content {
     border-radius: 0;
   }
@@ -6410,18 +6414,23 @@ table.datatable {
   font-size: 14px;
 }
 
-.import-content {
-  min-height: calc(100vh - 155px);
+.import-modal  {
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 300px);
+    max-height: 500px;
+  } 
 
-  @include screen('lg') {
-    min-height: 500px;
+  .import-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    padding: 15px;
   }
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 15px;
 }
 
 .import-dropzone {
@@ -6458,7 +6467,7 @@ table.datatable {
 
 .import-steps {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
 
   &__item {
     display: flex;
@@ -9130,6 +9139,16 @@ span.mention {
   .title-breadcrumb {
     height: 19px;
     margin-right: 5px;
+  }
+
+  .title-breadcrumb-link {
+    font-family: Roboto;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 14px;
+    height: 19px;
+    margin-right: 5px;
+    color: #256eff;
   }
 
   .title-path:not(:last-child) {
@@ -12068,10 +12087,6 @@ screen and (max-width: 956px) {
   .ring-group-snapshot-wrapper {
     padding-left: 0 !important;
     margin-top: 10px;
-  }
-
-  .communication-details-card {
-    margin-top: 60px;
   }
 }
 
@@ -15628,7 +15643,7 @@ label[for="start-date-time-picker-input"], label[for="end-date-time-picker-input
 
   .card {
     width: 375px;
-    height: 130px;
+    min-height: 130px;
     padding: 36px 36px 0 36px;
   }
 
@@ -16114,7 +16129,7 @@ hr {
     }
 
     td {
-      padding: 16px;
+      padding: 8px 0;
       border: none;
 
       & *.d-flex {
@@ -16205,7 +16220,7 @@ hr {
       overflow: hidden;
       transition: width 0.3s ease;
     }
-  
+
     .rotate-180 {
       transform: rotate(180deg);
     }
@@ -16509,7 +16524,24 @@ hr {
 .communication-details-sidebar {
   .b-sidebar {
     top: 60px;
-    height: calc(100vh - 60px)
+    height: calc(100vh - 110px); // Mobile default: 60px for top + 50px for bottom
+
+    @media (min-width: 785px) {
+      height: calc(100vh - 60px); // Desktop: only account for top bar
+    }
+  }
+
+  .communication-details-card {
+    .comm-type-container {
+      &.sticky-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        margin-bottom: .25rem;
+        border-bottom: 1px solid #EBEBEB;
+      }
+    }
   }
 }
 

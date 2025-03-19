@@ -18,7 +18,7 @@
         <span class="tab-icon">
           <inbox-mobile-icon :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'" />
         </span>
-        {{inboxMenuTitle}}
+        {{ INBOXES_MENU_TITLE }}
       </q-route-tab>
       <q-route-tab name="communications"
                    :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
@@ -26,9 +26,7 @@
                    :ripple="false"
                    :active="tab === 'communications'"
                    no-caps
-                   exact
-                   v-if="hasNewCommunicationsFeatureEnabled"
-                   >
+                   exact>
         <span class="tab-icon">
           <communications-mobile-icon :color="isActive('communications') ? '#256EFF' : '#A3A3A3'" />
         </span>
@@ -255,18 +253,13 @@ export default {
       }
 
       return []
-    },
-    /*
-      WAT-1105: when the feature not corresponds inbox remains as communications
-    */
-    inboxMenuTitle () {
-      return this.hasNewCommunicationsFeatureEnabled ? INBOXES_MENU_TITLE : COMMUNICATIONS_MENU_TITLE_MOBILE
     }
   },
   data () {
     return {
       tab: 'inbox',
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
+      INBOXES_MENU_TITLE,
       COMMUNICATIONS_MENU_TITLE_MOBILE,
       parkedCallQueue: []
     }

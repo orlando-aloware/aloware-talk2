@@ -32,16 +32,6 @@ export default {
 
     shouldSeeExperimentalXproAiFeatures () {
       return (this.shouldSeeExperimentalAiFeatures && this.currentCompany?.plan?.use_case === 'xPro') || this.isDemoCompany
-    },
-
-    /*
-      WAT-1105:
-          - second code freeze: 01-22-2025
-            - new Communications menu general available
-            - channels only present in Communications menu
-    */
-    hasNewCommunicationsFeatureEnabled () {
-      return this.currentCompany?.communication_logs_enabled || false
     }
   },
 
@@ -85,7 +75,11 @@ export default {
           case AnswerTypes.BY_IP_PHONE:
             return user.name + ' - SIP (IP Phone)'
           case AnswerTypes.BY_PHONE_NUMBER:
-            return user.name + ' - Phone Number (' + user.phone_number + ')'
+            if (user.phone_number) {
+              return user.name + ' - Phone Number (' + user.phone_number + ')'
+            }
+
+            return user.name
           case AnswerTypes.BY_NONE:
             return user.name + ' - Will Not Answer'
         }

@@ -201,6 +201,7 @@ export default {
     }
 
     this.dialerListeners.answerCall = (communication = null) => {
+      console.log('dialerListeners.answerCall communication', communication)
       this.answerCall(communication)
       this.$closeActionNotification('incomingCall')
       this.$closeActionNotification('callFishing')
@@ -261,6 +262,7 @@ export default {
     }
 
     this.dialerListeners.answerCallFishing = (data) => {
+      console.log('dialerListeners.answerCallFishing', data)
       this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
     }
 
@@ -342,6 +344,11 @@ export default {
         call._connection.ignore()
         return
       }
+
+      if (this.isOnPowerDialerSessionRoute) {
+        return
+      }
+
       this.stopAudio()
       this.connection = this.device._createConnection(call._connection, true)
       this.initConnectionEvents()
@@ -738,6 +745,10 @@ export default {
         'ContactName': contactName ? contactName.toString() : 'No Name',
         'CompanyName': companyName ? companyName.toString() : '',
         'ContactId': contactId ? contactId.toString() : ''
+      }
+
+      if (this.isOnPowerDialerSessionRoute) {
+        params['AnswerInPD'] = true
       }
 
       console.log(' %c Making a call to: ', 'background: #000; color: #fff000;', params)
@@ -1681,7 +1692,18 @@ export default {
         return
       }
 
-      this.makeCall('call:' + communication.id, communication.campaignId)
+      console.log('answerCallFishing', {
+        connection: !!this.connection,
+        dialer_currentStatus: this.dialer.currentStatus,
+        communication_campaignId: communication.campaignId,
+        agent_status: this.agentStatus
+      })
+
+      if (this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' && this.agentStatus === AgentStatus.AGENT_STATUS_RINGING) {
+        this.connection.accept()
+      } else {
+        this.makeCall('call:' + communication.id, communication.campaignId)
+      }
     },
 
     saveCallIssue (warningName, warningData) {

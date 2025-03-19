@@ -1,9 +1,9 @@
 <template>
   <div class="login-form-bg h-100 w-100 d-flex justify-content-center align-items-sm-center text-sm-left text-lg-center">
-    <div :class="{'login-container px-3 px-sm-2 pt-sm-0': true, 'pt-5': !hubspotWidget, 'pt-2': hubspotWidget}">
+    <div :class="{'login-container px-3 px-sm-2 pt-sm-0': true, 'pt-5': !isWidget, 'pt-2': isWidget}">
       <div class="d-flex w-100 justify-content-center"
            v-if="shouldShowAppLogo">
-        <img :class="{'col-6 w-auto login-form-logo px-0': true, 'pb-5': !hubspotWidget, 'pb-2': hubspotWidget}"
+        <img :class="{'col-6 w-auto login-form-logo px-0': true, 'pb-5': !isWidget, 'pb-2': isWidget}"
              :src="appLogo"/>
       </div>
       <form class="login-form w-100 px-2"
@@ -80,7 +80,7 @@
           </b-link>
         </div>
       </form>
-      <div :class="['login-form', 'w-100', 'text-center', hubspotWidget ? 'px-3' : 'px-5']"
+      <div :class="['login-form', 'w-100', 'text-center', isWidget ? 'px-3' : 'px-5']"
            v-else>
         <h2 class="text-black mb-3">2FA Email Sent</h2>
         <p v-html="error"></p>
@@ -88,7 +88,6 @@
           <security-code v-model="token"
                          ref="securityCode"
                          class="mb-2"
-                         :hubspot-widget="hubspotWidget"
                          @input="clearError"
                          @completed="verifyToken">
           </security-code>
@@ -144,7 +143,6 @@ export default {
       verificationMessageType: 'success',
       verificationMessage: '',
       verificationRequestSent: false,
-      hubspotWidget: false,
       shouldShowAppLogo: false
     }
   },
@@ -251,11 +249,6 @@ export default {
         redirectPath = decodeURIComponent(redirectQuery)
       }
 
-      if (this.hubspotWidget) {
-        redirectPath = '/widgets/hubspot-call-extension'
-        this.setIsRedirectedToHubspotWidget(true)
-      }
-
       this.$emit('userLoggedIn')
       await this.$router.push(String(redirectPath))
       await this.redirectTimeout()
@@ -309,8 +302,7 @@ export default {
 
     ...mapActions([
       'resetVuex',
-      'setUsage',
-      'setIsRedirectedToHubspotWidget'
+      'setUsage'
     ]),
 
     ...mapActions('auth', [
@@ -324,10 +316,6 @@ export default {
     ...mapActions('contacts', [
       'setDefaultIsShortenedUrlRemembered'
     ])
-  },
-
-  mounted () {
-    this.hubspotWidget = this.$route.query.redirect === '/widgets/hubspot-call-extension'
   },
 
   watch: {

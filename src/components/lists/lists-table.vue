@@ -1,5 +1,5 @@
 <template>
-  <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+  <div class="contacts lists-management mx-0 content-row d-flex overflow-hidden h-100">
     <lists-folders-management :is-loading="isLoading || isLoadingMore" />
 
     <div class="talk-table-container flex-grow-1 d-flex flex-column">
@@ -11,7 +11,7 @@
                 v-if="!isPublic && !isLoading">
               <div class="d-flex align-items-center title-path mb-2">
                 <router-link :to="buildFolderPath()">
-                  <div class="title-breadcrumb d-flex align-items-center">All Folders</div>
+                  <div class="title-breadcrumb-link d-flex align-items-center">All Folders</div>
                 </router-link>
                 <slash-icon class="title-slash d-flex align-items-center" v-if="foldersPath.length"/>
               </div>
@@ -20,7 +20,7 @@
                      :key="folder.id"
                      v-for="(folder, index) in foldersPath">
                   <router-link :to="buildFolderPath(folder.id)">
-                    <div class="title-breadcrumb d-flex align-items-center">
+                    <div class="title-breadcrumb-link d-flex align-items-center">
                       {{ folder.name == 'Root' ? 'Root Folder' : folder.name }}
                     </div>
                   </router-link>
@@ -49,76 +49,96 @@
             </div>
           </div>
           <div class="ml-2">
-            <b-dropdown text="Search Filters"
-                        :disabled="!isPerformingTextSearch"
+            <b-dropdown variant="primary"
+                        class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                        toggle-class="dropdown-btn-text py-0 my-0 d-flex align-items-center"
                         right
-                        variant="light"
-                        class="calls__header__columns-dropdown m-2 b-compact-dropdown-button dropdown-white"
-                        size="lg"
-                        v-b-tooltip.hover="textSearchFiltersTooltip">
+                        no-caret>
+              <template #button-content>
+                <div class="dropdown-btn-text d-flex align-items-center">
+                  Search Filters
+                </div>
+                <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
+              </template>
               <b-overlay :show="isLoading">
                 <template #overlay>
                   <q-spinner-bars color="primary"
                                   size="30px" />
                 </template>
                 <h5 class="form-label relative-time m-2" style="width: 185px;">Visibility</h5>
-                <div class="px-2 py-1">
-                  <div class="d-flex align-items-center cursor-pointer w-100 text-sm mb-1"
-                      @click="toggleTextSearchPublicLists()">
-                    <input class="cursor-pointer"
-                          type="checkbox"
-                          :checked="textSearchPublicLists"
-                          value="Public"/>
-                    <div class="flex-grow-1 pl-2">
-                      Public Lists
-                    </div>
-                  </div>
+                <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+                  <b-form-checkbox value="publicLists"
+                                  v-model="visibilityFilters"
+                                  @change="onFilterChange">
+                    Public Lists
+                  </b-form-checkbox>
+                </b-form-group>
+                <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+                  <b-form-checkbox value="myLists"
+                                   v-model="visibilityFilters"
+                                  @change="onFilterChange">
+                    {{ isAdmin ? 'Personal' : 'My' }} Lists
+                  </b-form-checkbox>
+                </b-form-group>
+                <div class="d-flex align-items-center cursor-pointer"
+                     v-if="isAdmin">
+                  <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer text-sm mb-0">
+                    <b-form-checkbox value="personalLists"
+                                     v-model="visibilityFilters"
+                                    @change="onFilterChange">
+                      All Personal Lists
+                    </b-form-checkbox>
+                  </b-form-group>
+                  <information-circle-icon id="personal-lists-tooltip"
+                                           color="#2F80ED"/>
+                  <b-tooltip custom-class="talk-table__tooltip"
+                             placement="bottom"
+                             boundary="window"
+                             target="personal-lists-tooltip">
+                    Search through all users Personal Lists
+                  </b-tooltip>
                 </div>
-                <div class="px-2 py-1">
-                  <div class="d-flex align-items-center cursor-pointer w-100 text-sm mb-1"
-                      @click="toggleTextSearchPrivateLists()">
-                    <input class="cursor-pointer"
-                          type="checkbox"
-                          :checked="textSearchPrivateLists"
-                          value="Public"/>
-                    <div class="flex-grow-1 pl-2">
-                      {{ isAdmin ? 'Personal' : 'My' }} Lists
-                    </div>
-                  </div>
-                </div>
+
                 <h5 class="form-label relative-time m-2">Type</h5>
-                <div class="px-2 py-1"
-                    :key="option.value"
-                    v-for="option of listTypeOptions">
-                  <div class="d-flex align-items-center cursor-pointer w-100 text-sm mb-1"
-                      @click="toggleListTypeFilter(option.value)">
-                    <input class="cursor-pointer"
-                          type="checkbox"
-                          :checked="listTypeFilterSelected(option.value)"
-                          value="Public"/>
-                    <div class="flex-grow-1 pl-2">
+                <div :key="option.value"
+                     v-for="option of listTypeOptions">
+                  <b-form-group class="px-2 py-1 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+                    <b-form-checkbox :value="option.value"
+                                     v-model="listTypesFilter"
+                                     @change="onFilterChange">
                       {{ option.label }}
-                    </div>
-                  </div>
+                    </b-form-checkbox>
+                  </b-form-group>
                 </div>
               </b-overlay>
             </b-dropdown>
           </div>
         </div>
-
       </div>
 
         <div class="d-flex justify-between">
-          <div class="setting pr-3 align-items-center">
-            <compact-btn variant="success"
-                         class="mr-2"
-                         data-testid="create-list-menu-item"
-                         @clicked="onCreateList($event)">
-              <plus-icon class="mr-1"
-                         color="white"/>
-              Add List
-            </compact-btn>
-          </div>
+          <b-dropdown variant="primary"
+                      class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                      toggle-class="dropdown-btn-text py-0 my-0 d-flex align-items-center"
+                      right
+                      no-caret>
+            <template #button-content>
+              <div class="dropdown-btn-text d-flex align-items-center">
+                Add List
+              </div>
+              <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
+            </template>
+            <b-dropdown-item href="#"
+                            @click="onCreateList">
+              <plus-icon />
+              Create new List
+            </b-dropdown-item>
+            <b-dropdown-item href="#"
+                            @click="openImportContactsModal">
+              <csv-icon />
+              Import from CSV
+            </b-dropdown-item>
+          </b-dropdown>
         </div>
       </div>
 
@@ -276,13 +296,13 @@
                       <add-user-icon width="14"
                                      height="14"
                                      color="#62666E"/>
-                      Enroll List in AloAi Text Bot
+                      Enroll List in AloAi Agent
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
                                     data-testid="lists-move-option"
                                     :data-popper-target="'list-' + props.row.id"
-                                    v-if="!isPublic"
+                                    v-if="!props.row.show_in_public_folder"
                                     @click.stop="onMoveList(props.row)">
                       <move-icon />
                       Move List
@@ -352,9 +372,12 @@
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
 
-      <enroll-contacts-to-aloai-modal ref="enrollContactsToAloAiModal"
-                                      :params="attachedParams()"
-                                      :contactList="list" />
+      <aloai-enrollment-control-modal
+        ref="enrollContactsToAloAiModal"
+        :params="attachedParams()"
+        :contact-list="list"
+        :total-contacts-count="list?.no_of_contacts"
+        :multiple-phone-numbers="true" />
 
       <assign-contacts-modal :is-show="showAssignContacts"
                             :list="list"
@@ -370,6 +393,12 @@
       <change-list-owner-modal ref="changeListOwnerModal"
                                :contactList="list"
                                @listOwnerChanged="onListOwnerChanged"/>
+
+      <import-contacts-modal ref="importContacts"
+                             :user-id="userId"
+                             :folder-id="folderId"
+                             :is-public="isPublic"
+                             @importStarted="onImportStarted" />
     </div>
   </div>
 </template>
@@ -384,7 +413,6 @@ import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-mo
 import AssignContactsModal from 'src/components/assign-contacts-modal'
 import MoveDialog from 'src/components/move-dialog'
 import CreateListModal from 'components/create-list-modal.vue'
-import CompactBtn from 'src/components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
@@ -395,6 +423,7 @@ import EyeOffIcon from 'components/icons/eye-off-icon'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+import CsvIcon from 'components/icons/csv-icon.vue'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
@@ -403,11 +432,13 @@ import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
 import ListsFoldersManagement from './lists-folders-management'
 import SlashIcon from 'components/icons/slash-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
-import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 import SwitchIcon from 'components/icons/switch-icon'
 import ChangeListOwnerModal from './change-list-owner-modal.vue'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
+import InformationCircleIcon from 'components/icons/information-circle-icon'
+import ImportContactsModal from 'src/components/import-contacts-modal.vue'
+import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
 
 export default {
   name: 'ListsTable',
@@ -428,6 +459,7 @@ export default {
     PencilOIcon,
     PinIcon,
     PlusIcon,
+    CsvIcon,
     SearchInput,
     AssignContactsModal,
     ConvertListToPublicDialog,
@@ -439,14 +471,15 @@ export default {
     RelativeTime,
     ListsFoldersManagement,
     SlashIcon,
-    CompactBtn,
     AddUserIcon,
-    EnrollContactsToAloaiModal,
     SwitchIcon,
     ChangeListOwnerModal,
     EllipseIcon,
     PowerDialerMobileIcon,
-    DeleteRedIcon
+    DeleteRedIcon,
+    InformationCircleIcon,
+    ImportContactsModal,
+    AloaiEnrollmentControlModal
   },
 
   data () {
@@ -478,8 +511,7 @@ export default {
       foldersPath: [],
 
       // Filters
-      textSearchPublicLists: true,
-      textSearchPrivateLists: true,
+      visibilityFilters: [],
       listTypesFilter: [ContactListTypes.STATIC, ContactListTypes.DYNAMIC, ContactListTypes.DYNAMIC_REMOTE_LIST],
       listTypeOptions: [
         { value: ContactListTypes.STATIC, label: 'Static' },
@@ -496,18 +528,22 @@ export default {
       'moveDialog',
       'isAllContactsSelected'
     ]),
+
+    ...mapGetters('listsModule', {
+      lists: 'getLists',
+      listsCount: 'getListsCount'
+    }),
+
     ...mapState(['users']),
+
     ...mapState('listsModule', [
-      'isListsLoading'
+      'isListsLoading',
+      'listsImportedFromCsv'
     ]),
 
     ...mapState('contacts', [
       'unsavedList'
     ]),
-    ...mapGetters('listsModule', {
-      lists: 'getLists',
-      listsCount: 'getListsCount'
-    }),
 
     hasShowInPublicFolderPermission () {
       return this.isBillingAdminOrAdminOrSupervisor
@@ -557,19 +593,27 @@ export default {
     },
 
     folderId () {
-      return +this.$route.params.folderId
-    },
-
-    textSearchFiltersTooltip () {
-      if (this.isPerformingTextSearch) {
-        return { disabled: true }
+      if (this.$route.params.folderId) {
+        return +this.$route.params.folderId
       }
 
-      return { placement: 'bottom', title: 'Please enter a List Name in order to enable Search Filters', customClass: 'talk-table__tooltip no-pointer-events', boundary: 'window' }
+      return null
     },
 
-    isPerformingTextSearch () {
-      return this.search.length > 2
+    publicListsFilterSelected () {
+      return this.visibilityFilters.includes('publicLists')
+    },
+
+    myListsFilterSelected () {
+      return this.visibilityFilters.includes('myLists')
+    },
+
+    personalListsFilterSelected () {
+      return this.isAdmin && this.visibilityFilters.includes('personalLists')
+    },
+
+    isGlobalSearch () {
+      return this.publicListsFilterSelected && (this.myListsFilterSelected || this.personalListsFilterSelected)
     }
   },
 
@@ -595,6 +639,8 @@ export default {
     ]),
 
     async initializeLists () {
+      this.SET_SEARCH('')
+      this.search = ''
       this.resetSearchFilters()
       this.getPinnedLists()
       await this.getLists()
@@ -632,37 +678,36 @@ export default {
       this.setLoadingState(isLoadMore)
 
       const filters = {
-        private_only: !this.isPublic,
         ...(this.userId && { user_id: this.userId }),
         ...(this.folderId && { folder_id: this.folderId })
       }
 
-      // If performing text search, Global Search is enabled
-      // need to apply selected filters
-      if (this.isPerformingTextSearch) {
-        delete filters.folder_id
+      if (this.myListsFilterSelected) {
+        filters.private_only = true
+      }
 
-        // if searching for all lists (Global Search)
-        if (this.textSearchPublicLists && this.textSearchPrivateLists) {
-          filters.global_search = true
-        } else if (this.textSearchPublicLists) {
-          filters.private_only = false
-          delete filters.user_id
-        } else if (this.textSearchPrivateLists) {
-          filters.private_only = true
-
-          // admins are able to search through all users lists
-          if (this.isAdmin) {
-            delete filters.user_id
-          }
-        }
-
-        if (this.listTypesFilter.length > 0) {
-          filters.list_types = this.listTypesFilter
-        }
-      } else if (this.isPublic) {
+      if (this.personalListsFilterSelected) {
+        filters.private_only = true
         delete filters.user_id
         delete filters.folder_id
+      }
+
+      if (this.publicListsFilterSelected) {
+        if (filters.private_only) {
+          delete filters.private_only
+        } else {
+          filters.private_only = false
+          delete filters.user_id
+          delete filters.folder_id
+        }
+      }
+
+      if (this.isGlobalSearch) {
+        filters.global_search = true
+      }
+
+      if (this.listTypesFilter.length > 0) {
+        filters.list_types = this.listTypesFilter
       }
 
       const props = {
@@ -907,7 +952,7 @@ export default {
         listLink = `/lists/user/${list.contact_folder_created_by}`
       }
 
-      if (this.folderId && !this.isPerformingTextSearch) {
+      if (this.folderId) {
         listLink += `/folder/${this.folderId}`
       }
 
@@ -1006,9 +1051,9 @@ export default {
     isColumnVisible (field) {
       switch (field) {
         case this.COLUMN_NAMES.owner_name:
-          return this.isPublic || this.isPerformingTextSearch
+          return this.isPublic || this.personalListsFilterSelected
         case this.COLUMN_NAMES.show_in_public_folder:
-          return this.isPerformingTextSearch && this.textSearchPublicLists && this.textSearchPrivateLists
+          return this.isGlobalSearch
         default:
           return true
       }
@@ -1045,33 +1090,12 @@ export default {
       this.refreshLists()
     },
 
-    toggleTextSearchPublicLists () {
-      this.textSearchPublicLists = !this.textSearchPublicLists
-      this.refreshLists()
-    },
-
-    toggleTextSearchPrivateLists () {
-      this.textSearchPrivateLists = !this.textSearchPrivateLists
-      this.refreshLists()
-    },
-
     listTypeFilterSelected (type) {
       return this.listTypesFilter.includes(type)
     },
 
-    toggleListTypeFilter (type) {
-      if (this.listTypeFilterSelected(type)) {
-        this.listTypesFilter = this.listTypesFilter.filter((item) => item !== type)
-      } else {
-        this.listTypesFilter.push(type)
-      }
-
-      this.refreshLists()
-    },
-
     resetSearchFilters () {
-      this.textSearchPublicLists = true
-      this.textSearchPrivateLists = true
+      this.visibilityFilters = this.isPublic ? ['publicLists'] : ['myLists']
     },
 
     onShow ({ target }) {
@@ -1092,6 +1116,36 @@ export default {
       const { target } = event
       const el = target.closest('td')
       el.style.zIndex = '0'
+    },
+
+    onFilterChange () {
+      this.refreshLists()
+    },
+
+    openImportContactsModal () {
+      if (this.$refs.importContacts) {
+        this.$refs.importContacts.open()
+      }
+    },
+
+    onImportStarted () {
+      this.refreshLists()
+    },
+
+    listCsvImportFinished (event) {
+      if (!event?.contact_list) {
+        return
+      }
+
+      // notify user if is one of the Lists he imported
+      const list = this.listsImportedFromCsv.find((c) => c.id === event.contact_list.id)
+      if (!list) {
+        return
+      }
+
+      const listName = event.contact_list.name
+      this.$generalNotification(`Contacts successfully imported into ${listName}`)
+      this.refreshLists()
     }
   },
 
@@ -1099,10 +1153,12 @@ export default {
     this.initializeLists()
 
     this.$VueEvent.listen('lists-management-folder-click', this.onFolderSelected)
+    this.$VueEvent.listen('contact_list_import_csv', this.listCsvImportFinished)
   },
 
   beforeDestroy () {
     this.$VueEvent.stop('lists-management-folder-click', this.onFolderSelected)
+    this.$VueEvent.stop('contact_list_import_csv')
   },
 
   watch: {
@@ -1123,7 +1179,20 @@ export default {
       if (this.list) {
         this.setCurrentListFilters(this.list.filters)
       }
+    },
+    userId () {
+      this.resetSearchFilters()
     }
   }
 }
 </script>
+<style scoped>
+.lists-management .talk-table td {
+  padding: 8px 16px;
+}
+
+.dropdown-btn-text {
+  font-size: 12px;
+  font-weight: 400;
+}
+</style>
