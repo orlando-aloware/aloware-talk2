@@ -322,6 +322,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+
+    forceActive: {
+      type: Boolean,
+      required: false
     }
   },
 
@@ -363,7 +368,7 @@ export default {
     },
 
     activeClass () {
-      return this.isActiveItem ? 'active' : ''
+      return this.isActiveItem || this.forceActive ? 'active' : ''
     },
 
     totalUnreads () {

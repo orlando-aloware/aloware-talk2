@@ -21,8 +21,7 @@
       bordered
       class="rounded-contact-activity b-radius-12"
       :class="[isActiveCall ? 'call-connected cursor-pointer' : '', isActiveCall || isIncomingLiveCall || isCallFishingMode ? 'cursor-pointer' : '']"
-      data-testid="communication-info-show-phone"
-      @click="onShowPhone">
+      data-testid="communication-info-show-phone">
       <q-item class="communication-header flex-row">
         <div class="ml-3 pr-2">
           <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"

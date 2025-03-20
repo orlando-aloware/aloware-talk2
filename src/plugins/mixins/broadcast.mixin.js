@@ -183,6 +183,7 @@ export default {
         '.export.created',
         '.export.updated',
         '.export.deleted',
+        '.contact-list.import-csv',
         '.contact-list.import-hubspot',
         '.contact-list.import-zoho',
         '.contact-list.import-pipedrive',
@@ -822,6 +823,9 @@ export default {
         })
         .listen('.export.deleted', (event) => {
           window.VueEvent.fire('export_event_delete', event)
+        })
+        .listen('.contact-list.import-csv', (event) => {
+          window.VueEvent.fire('contact_list_import_csv', event)
         })
         .listen('.contact-list.import-hubspot', (event) => {
           window.VueEvent.fire('contact_list_import_hubspot', event)

@@ -220,7 +220,8 @@ export default {
       'setCommunicationsCount',
       'setHasMoreCommunications',
       'setPaginationPage',
-      'setIsLoadingMore'
+      'setIsLoadingMore',
+      'updateChannelChangedFilterFields'
     ]),
 
     getNoneLiveCallContactTasks (contacts) {
@@ -1019,6 +1020,31 @@ export default {
 
     handleElectronNavigation (e, url) {
       return handleElectronNavigation.call(this, e, url)
+    },
+
+    applyQueryStringFilters (filter, channelDefaultFilterModel) {
+      const isFilterPropertyArray = (property) => {
+        return channelDefaultFilterModel?.filter && Array.isArray(channelDefaultFilterModel.filter[property])
+      }
+
+      Object.entries(this.$route.query).forEach(([property, value]) => {
+        if (isFilterPropertyArray(property)) {
+          value = value.split(',').map((v) => parseInt(v))
+        }
+
+        if (value === 'null') {
+          value = null
+        }
+
+        if (property !== 'filter_id') {
+          this.updateChannelChangedFilterFields({
+            name: property,
+            value: value
+          })
+        }
+
+        filter.filter[property] = value
+      })
     }
   },
 

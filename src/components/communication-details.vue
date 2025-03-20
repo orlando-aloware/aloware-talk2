@@ -5,7 +5,7 @@
   >
     <b-row data-testid="comm-details-row">
       <b-col
-        :md="isWidget || mobileView ? 12 : 4"
+        :md="isWidget || mobileView ? 12 : 5"
         sm="12"
         data-testid="comm-details-col"
         class="pl-0 pr-0"
@@ -101,6 +101,25 @@
                   Close
                 </q-tooltip>
               </span>
+            </div>
+            <div class="d-flex justify-content-between mt-2 mobile-transcription-actions"
+                 data-testid="comm-details-mobile-archive-card-section"
+                 v-if="mobileView">
+              <div class="d-flex header-btn-wrapper">
+                <generate-transcription-button class="mr-2"
+                                               variant="button"
+                                               data-testid="comm-details-generate-transcription-button"
+                                               :communication="communication"
+                                               v-if="fileUuid && isMigrated"/>
+                <div class="flex items-center mr-1 h-100"
+                     data-testid="comm-transcription-modal-btn"
+                     v-if="!communication.transcription_is_deleted && communication.has_transcription"
+                     @click="fetchSmartTranscriptionData()">
+                  <span class="text-blue cursor-pointer">
+                    Show Transcription
+                  </span>
+                </div>
+              </div>
             </div>
           </q-card-section>
 
@@ -237,7 +256,7 @@
               <b-col class="pl-0 pr-0">
                 <q-item-label>Contact: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col cols="7">
                 <router-link
                   :to="getContactRouteLink(communication)"
                   data-testid="comm-details-contact-router-link"
@@ -255,6 +274,7 @@
               </b-col>
               <b-col
                 class="text-capitalize"
+                cols="7"
                 v-if="communication.direction === CommunicationDirections.INBOUND
                             && communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW
                             && [CommunicationCallbackStatus.CALLBACK_STATUS_INITIATED, CommunicationCallbackStatus.CALLBACK_STATUS_REQUESTED].includes(communication.callback_status)"
@@ -262,7 +282,8 @@
                 {{ $options.filters.translateDispositionStatusText(communication.disposition_status2,
                 communication.callback_status) | replaceDash | capitalize }}
               </b-col>
-              <b-col v-else>
+              <b-col cols="7"
+                     v-else>
                 {{
                 communication.disposition_status2 | translateDispositionStatusText | replaceDash |
                 capitalize
@@ -271,14 +292,16 @@
             </b-form-row>
             <hr />
 
-            <b-form-row data-testid="comm-details-disposition-row">
+            <b-form-row data-testid="comm-details-disposition-row"
+                        cols="7">
               <b-col
                 class="pl-0 pr-0"
                 data-testid="comm-details-disposition-col"
               >
                 <q-item-label>From: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-disposition-col">
+              <b-col cols="7"
+                     data-testid="comm-details-disposition-col">
                 <div
                   class="d-flex align-items-center"
                   v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL"
@@ -373,7 +396,8 @@
               >
                 <q-item-label>To: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-disposition-col">
+              <b-col cols="7"
+                     data-testid="comm-details-disposition-col">
                 <div
                   class="d-flex align-items-center"
                   v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL"
@@ -469,7 +493,7 @@
                       attemptLabel }})</span>:
                   </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <target-users-tree
                     class="w-100"
                     :communication="communication"
@@ -488,7 +512,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>User: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <q-icon
                     class="status-icon d-inline-block text-danger"
                     :state="communication.rejected_by_app"
@@ -543,7 +567,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Attempting Users: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <ul class="list list-unstyled inset mb-0">
                     <li
                       class="pb-1"
@@ -576,7 +600,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Answered with Fishing Mode: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     {{ communication.metadata.reports.is_fishing ? 'Yes' : 'No' }}
                   </div>
@@ -587,7 +611,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Barged: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     {{ communication.metadata.reports.is_barge ? 'Yes' : 'No' }}
                   </div>
@@ -595,7 +619,8 @@
               </b-form-row>
 
               <b-form-row>
-                <b-col class="pl-0 pr-0">
+                <b-col class="pl-0 pr-0"
+                       cols="7">
                   <q-item-label>Whispered: </q-item-label>
                 </b-col>
                 <b-col>
@@ -609,7 +634,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Queued: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     {{ communication.metadata.reports.is_queued ? 'Yes' : 'No' }}
                   </div>
@@ -625,7 +650,7 @@
                 <q-item-label>{{ communication.type === CommunicationTypes.CALL ? 'Started at' : 'Sent at'}}:
                 </q-item-label>
               </b-col>
-              <b-col>
+              <b-col cols="7">
                 <div class="d-flex align-items-center">
                   {{ communication.created_at | fixCommunicationDateTime }}
                 </div>
@@ -644,7 +669,7 @@
                 >
                   <q-item-label>Current Status: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     {{
                     communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_COMPLETED_NEW
@@ -662,7 +687,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Ended at: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     {{ communication.created_at | fixCommunicationDateTime(communication.duration) }}
                   </div>
@@ -676,7 +701,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Duration: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     {{ communication.duration | fixDuration }}
                   </div>
@@ -689,7 +714,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Parts: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     {{ communication.duration }}
                   </div>
@@ -711,7 +736,8 @@
                 >
                   <q-item-label>Talk Time: </q-item-label>
                 </b-col>
-                <b-col data-testid="comm-details-talk-time-form-col">
+                <b-col cols="7"
+                       data-testid="comm-details-talk-time-form-col">
                   <div class="d-flex align-items-center">
                     {{ communication.talk_time | fixDuration }}
                   </div>
@@ -728,7 +754,7 @@
                 <b-col class="pl-0 pr-0">
                   <q-item-label>Wait Time: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     <span
                       v-if="communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_COMPLETED_NEW"
@@ -757,7 +783,8 @@
               >
                 <q-item-label>Ring Group: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-ring-group-col">
+              <b-col cols="7"
+                     data-testid="comm-details-ring-group-col">
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -803,7 +830,8 @@
               >
                 <q-item-label>Sequence: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-sequence-col">
+              <b-col cols="7"
+                     data-testid="comm-details-sequence-col">
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -844,7 +872,8 @@
               >
                 <q-item-label>Broadcast: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-broadcast-col">
+              <b-col cols="7"
+                     data-testid="comm-details-broadcast-col">
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -885,7 +914,8 @@
               >
                 <q-item-label>Transferred from: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-transferred-from-col">
+              <b-col cols="7"
+                     data-testid="comm-details-transferred-from-col">
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -925,7 +955,8 @@
               >
                 <q-item-label>Transferred to: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-transferred-to-col">
+              <b-col cols="7"
+                     data-testid="comm-details-transferred-to-col">
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -965,7 +996,8 @@
               >
                 <q-item-label>Cold transferred: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-cold-transfer-col">
+              <b-col cols="7"
+                     data-testid="comm-details-cold-transfer-col">
                 <div class="d-flex align-items-center">
                   {{ communication.in_cold_transfer | fixBooleanType }}
                 </div>
@@ -983,7 +1015,8 @@
               >
                 <q-item-label>Child Call: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-new-col">
+              <b-col cols="7"
+                     data-testid="comm-details-new-col">
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.new_communication_id }}"
@@ -1006,7 +1039,8 @@
               >
                 <q-item-label>Parent Call: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-original-col">
+              <b-col cols="7"
+                     data-testid="comm-details-original-col">
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.original_communication_id }}"
@@ -1029,7 +1063,8 @@
               >
                 <q-item-label>Child Call: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-child-col">
+              <b-col cols="7"
+                     data-testid="comm-details-child-col">
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.active_communication_id }}"
@@ -1052,7 +1087,8 @@
               >
                 <q-item-label>Parent Call: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-fake-col">
+              <b-col cols="7"
+                     data-testid="comm-details-fake-col">
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.fake_communication_id }}"
@@ -1080,7 +1116,8 @@
                   Sent by:
                 </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-sent-by-col">
+              <b-col cols="7"
+                     data-testid="comm-details-sent-by-col">
                 <div class="d-flex align-items-center">
                   {{ getUser(communication.user_id).name }}
                 </div>
@@ -1098,7 +1135,8 @@
               >
                 <q-item-label>Sent as MMS: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-sent-as-mms-col">
+              <b-col cols="7"
+                     data-testid="comm-details-sent-as-mms-col">
                 <div class="d-flex align-items-center">
                   {{ sentAsMmsLabel }}
                 </div>
@@ -1116,7 +1154,8 @@
               >
                 <q-item-label class="mt-3 custom-item-label">Recording: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-recording-col">
+              <b-col cols="7"
+                     data-testid="comm-details-recording-col">
                 <div
                   class="d-flex align-items-center"
                   v-if="showAudio(communication)"
@@ -1151,7 +1190,7 @@
               >
                 <q-item-label>Voicemail: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col cols="7">
                 <div
                   class="d-flex align-items-center"
                   v-if="communication.has_voicemail"
@@ -1190,6 +1229,7 @@
               <b-col>
                 <div
                   class="text-dark-greenish w-100"
+                  cols="7"
                   :key="index"
                   v-for="(attachment, index) in communication.attachments"
                 >
@@ -1216,7 +1256,7 @@
               <b-col class="pl-0 pr-0">
                 <q-item-label>Notes: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col cols="7">
                 <div
                   class="align-items-center"
                   v-if="!isEditingNote"
@@ -1262,7 +1302,7 @@
               <b-col class="pl-0 pr-0">
                 <q-item-label>Creator Type: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col cols="7">
                 <span>
                   {{ communication.creator_type | translateCreatorType }}
                 </span>
@@ -1279,7 +1319,7 @@
               <b-col class="pl-0 pr-0">
                 <q-item-label>Tags: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col cols="7">
                 <div class="d-flex align-items-center">
                   <entity-tags
                     data-testid="communication-tags-multi-select"
@@ -1311,7 +1351,8 @@
                   data-testid="comm-details-call-disposition-item"
                 >Call Disposition: </q-item-label>
               </b-col>
-              <b-col data-testid="comm-details-call-disposition-col">
+              <b-col cols="7"
+                     data-testid="comm-details-call-disposition-col">
                 <div class="d-flex align-items-center">
                   <call-disposition-selector
                     data-testid="comm-details-disposition-selector"
@@ -1327,7 +1368,7 @@
               <b-col class="pl-0 pr-0">
                 <q-item-label class="mt-3 custom-item-label">HubSpot Call Type: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col cols="7">
                 <div class="d-flex align-items-center">
                   <hubspot-activity-type-selector
                     data-testid="comm-details-call-disposition-hubspot"
@@ -1353,7 +1394,7 @@
               <b-col class="pl-0 pr-0">
                 <q-item-label> {{ convertToTitleCase(key) }}: </q-item-label>
               </b-col>
-              <b-col>
+              <b-col cols="7">
                 <span>
                   {{ custom_field }}
                 </span>
@@ -1363,7 +1404,7 @@
         </q-card>
       </b-col>
       <b-col
-        :md="isWidget || mobileView ? 12 : 8"
+        :md="isWidget || mobileView ? 12 : 7"
         class="ring-group-snapshot-wrapper"
         :class="isWidget || mobileView ? 'px-0 mt-0' : 'pr-0'"
         data-testid="comm-details-col"
@@ -1423,6 +1464,7 @@ import TranscriptionModal from 'src/components/communication/transcription-modal
 import CloseIcon from 'components/icons/close-icon.vue'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import UserDisplay from 'src/components/user-display.vue'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'communication-details',
@@ -1442,7 +1484,8 @@ export default {
     EntityTags,
     GenerateTranscriptionButton,
     CloseIcon,
-    UserDisplay
+    UserDisplay,
+    SparkleIcon
   },
 
   mixins: [
@@ -1781,5 +1824,9 @@ export default {
   padding: 0;
   line-height: 11px;
   margin-top: -2px;
+}
+
+.mobile-transcription-actions {
+  margin-bottom: -12px;
 }
 </style>

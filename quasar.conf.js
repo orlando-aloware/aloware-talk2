@@ -9,22 +9,8 @@
 
 module.exports = function (ctx) {
   const DotEnv = require('dotenv')
-  const envFile = (() => {
-    switch (process.env.NODE_ENV) {
-      case 'production':
-        return '.env.prod'
-      case 'staging':
-        return '.env.staging'
-      case 'dev1':
-        return '.env.dev1'
-      case 'dev2':
-        return '.env.dev2'
-      default:
-        return '.env'
-    }
-  })()
 
-  const parsedEnv = DotEnv.config({ path: envFile }).parsed
+  const parsedEnv = DotEnv.config({ path: '.env' }).parsed
 
   if (typeof parsedEnv === 'object' &&
     !Array.isArray(parsedEnv) &&
@@ -71,11 +57,11 @@ module.exports = function (ctx) {
       vueRouterMode: 'history',
       devtool: 'source-map',
       transpile: true,
-      
+
       env: {
         ...parsedEnv
       },
-      
+
       // Add dependencies for transpiling with Babel (Array of string/regex)
       // (from node_modules, which are by default not transpiled).
       // Applies only if "transpile" is set to true.
@@ -98,10 +84,7 @@ module.exports = function (ctx) {
           enforce: 'pre',
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
-          exclude: /node_modules/,
-          options: {
-            fix: true
-          }
+          exclude: /node_modules/
         })
 
         if (process.env.APP_ENV !== 'local' && cfg.output?.path) {

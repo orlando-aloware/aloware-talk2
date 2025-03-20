@@ -11,6 +11,7 @@ import carrierFee from './carrier-fee'
 import communications from './communications'
 import contacts from './contacts'
 import inbox from './inbox'
+import Einbox from './einbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import transcriptions from './transcriptions'
@@ -43,6 +44,7 @@ export default function (/* { ssrContext } */) {
       communications,
       contacts,
       inbox,
+      Einbox,
       stats,
       powerDialer,
       transcriptions,
@@ -68,6 +70,7 @@ export default function (/* { ssrContext } */) {
       ringGroups: [],
       teams: [],
       contactLists: [],
+      inboxes: [],
       workflows: [],
       changelogs: [],
       broadcasts: [],
@@ -559,6 +562,10 @@ export default function (/* { ssrContext } */) {
 
       setTeams ({ commit }, teams) {
         commit('SET_TEAMS', teams)
+      },
+
+      setInboxes ({ commit }, inboxes) {
+        commit('SET_INBOXES', inboxes)
       },
 
       setContactLists ({ commit }, contactLists) {
@@ -1344,6 +1351,10 @@ export default function (/* { ssrContext } */) {
 
       SET_TEAMS (state, teams) {
         state.teams = teams
+      },
+
+      SET_INBOXES (state, inboxes) {
+        state.inboxes = inboxes
       },
 
       SET_CONTACT_LISTS (state, contactLists) {
