@@ -40,7 +40,7 @@
   </div>
 </template>
 <script>
-import _ from 'lodash'
+import { cloneDeep } from 'lodash'
 
 import { mapState, mapActions } from 'vuex'
 import CompactBtn from 'src/components/compact-btn'
@@ -139,7 +139,11 @@ export default {
     }
   },
   mounted () {
-    this.filter = _.clone(this.channelDefaultFilterModel.filter)
+    const filterModel = cloneDeep(this.channelDefaultFilterModel)
+
+    this.applyQueryStringFilters(filterModel, this.channelDefaultFilterModel)
+
+    this.filter = filterModel.filter
 
     this.$VueEvent.listen('filter-communications', data => {
       // ex: data = { type: 'users', value: 1 }
@@ -161,6 +165,9 @@ export default {
         ...this.filter,
         [data.type]: data.value
       }
+
+      // update query string
+      this.updateQueryString()
 
       // refresh data
       this.setChannelClonedFilter(this.filter)
@@ -254,6 +261,7 @@ export default {
       // channel cloned filter are the current filter settings populated in the filter dialog form
       // especially when there is no applied or selected filter.
       this.setChannelClonedFilter(this.filter)
+      this.updateQueryString()
 
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
@@ -318,9 +326,39 @@ export default {
       this.setCommunications([])
       this.setIsFirstLoad(true)
       this.setAppliedFilter(null)
+      this.resetQueryStringFilters()
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
+    },
+
+    isFilterPropertyArray (property) {
+      return this.channelDefaultFilterModel?.filter && Array.isArray(this.channelDefaultFilterModel.filter[property])
+    },
+
+    updateQueryString () {
+      const keptParams = {
+        ...(this.$route.query.filter_id && { filter_id: this.$route.query.filter_id })
+      }
+
+      const queryParams = new URLSearchParams(keptParams)
+
+      this.channelChangedFilterFields.forEach((filter) => {
+        let { property, value } = filter
+
+        if (this.isFilterPropertyArray(property)) {
+          value = value.join(',')
+        }
+
+        queryParams.set(property, value)
+      })
+
+      // update query string
+      this.$router.replace({ query: Object.fromEntries(queryParams) }).catch(() => {})
+    },
+
+    resetQueryStringFilters () {
+      this.$router.replace({ query: null }).catch(() => {})
     }
   },
 

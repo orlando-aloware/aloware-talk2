@@ -9,7 +9,7 @@ const exportCommunications = async (contactId) => {
   return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
 }
 
-export default {
+const talk2Api = {
   V1: {
     contact: {
       createAxiosError (message, status) {
@@ -52,7 +52,7 @@ export default {
 
       getPhoneNumbers (id) {
         if (!id) {
-          return null
+          return Promise.reject(new Error('Failed to get phone numbers, missing contact id!'))
         }
 
         return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
@@ -1013,6 +1013,12 @@ export default {
         delete (filterId) {
           return window.axios.delete(`${suffixV2}filters/${filterId}`)
         }
+      },
+
+      inboxes: {
+        async get (data) {
+          return window.axios.get(`${suffixV2}inboxes`, data)
+        }
       }
     },
 
@@ -1049,6 +1055,14 @@ export default {
       disenrollContact (botId, params) {
         return window.axios.post(`${suffixV1}aloai/bot/${botId}/disenroll-contact`, params)
       }
+    },
+
+    companies: {
+      toggleFeature (companyId, feature) {
+        return window.axios.put(`${suffixV2}companies/${companyId}/features/${feature}`)
+      }
     }
   }
 }
+
+export default talk2Api

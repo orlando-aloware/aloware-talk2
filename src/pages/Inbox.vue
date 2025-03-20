@@ -27,6 +27,7 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
+import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'inbox',
@@ -81,7 +82,8 @@ export default {
         'Inbox Contact',
         'Inbox Contact Task',
         'Inbox View Contact Task',
-        'Inbox Contact Communication'
+        'Inbox Contact Communication',
+        EINBOXES_MENU_COMMUNICATIONS_TITLE
       ]
     }
   },
