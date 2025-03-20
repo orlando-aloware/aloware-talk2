@@ -389,6 +389,7 @@ pipeline {
                                         """, returnStdout: true).trim()
 
                                         writeFile file: '.env', text: stagingEnvVars + '\n'
+                                        writeFile file: '.env.prod', text: stagingEnvVars + '\n'
 
                                     }
                                 }
