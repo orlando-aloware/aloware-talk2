@@ -19,6 +19,15 @@
                               :data-testid="'contacts-pinned-non-default-list-'+item.id"
                               :countsLoading="loading">
         </contacts-pinned-item>
+        <div v-if="nonDefaultLists.length === 0" class="d-flex flex-column align-items-center justify-content-center">
+          <div class="header__header__title font-weight-bold flex-grow-1 mt-4">
+            Where are my contact lists?
+          </div>
+          <div class="mt-2 px-4">
+            <p>Lists can be more easily managed through the <router-link :to="{ name: 'Lists' }">Lists Management</router-link> page.</p>
+            <p>You can also add lists to this space by pinning 📍 a list in the <router-link :to="{ name: 'Lists' }">Lists Management</router-link> page, using the Actions menu from the list that you want to pin.</p>
+          </div>
+        </div>
       </template>
       <contacts-sidebar-loader v-if="loadingPinned"></contacts-sidebar-loader>
     </div>
