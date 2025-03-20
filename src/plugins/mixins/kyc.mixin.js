@@ -53,6 +53,13 @@ export default _.merge({
         return true
       }
 
+      if (this.isGBLine(selectedLine)) {
+        /**
+         * 4 - 10DLC GB - Britain (UK) lines -> Allow messaging
+         */
+        return true
+      }
+
       if (this.isTrial) {
         /**
          * If it's trial -> Allow messaging, let it fail on compliance
@@ -74,6 +81,10 @@ export default _.merge({
 
     isCanadaLine (selectedLine) {
       return selectedLine?.incoming_numbers?.filter(number => number.country === 'CA').length > 0
+    },
+
+    isGBLine (selectedLine) {
+      return selectedLine?.incoming_numbers?.filter(number => number.country === 'GB').length > 0
     }
   }
 })
