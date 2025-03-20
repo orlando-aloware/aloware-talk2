@@ -81,8 +81,8 @@
              v-for="item in itemsData"
              @click="onItemClick(item)">
           <communication :contact-id="item.contact_id"
-                         :contact-name="item.contact.name"
-                         :contact-phone-number="item.contact.phone_number"
+                         :contact-name="item.contact?.name"
+                         :contact-phone-number="item.contact?.phone_number || item.lead_number"
                          :campaign-id="item.campaign_id"
                          :disposition-status="item.disposition_status2"
                          :type="item.type"
