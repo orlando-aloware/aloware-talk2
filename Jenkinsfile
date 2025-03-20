@@ -377,34 +377,20 @@ pipeline {
                             steps {
                                 script {
                                     dir("${WORKSPACE}/build/staging") {
-                                        def sharedEnvVars = sh(script: """
-                                            aws ssm get-parameters-by-path \\
-                                            --path "/shared/talk2/app/" \\
-                                            --recursive \\
-                                            --with-decryption \\
-                                            --profile "dev" \\
-                                            --query "Parameters[].{Name:Name,Value:Value}" \\
-                                            --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
-                                        """, returnStdout: true).trim()
 
                                         def stagingEnvVars = sh(script: """
                                             aws ssm get-parameters-by-path \\
                                             --path "/staging/talk2/app/" \\
                                             --recursive \\
                                             --with-decryption \\
-                                            --profile "dev" \\
+                                            --profile "staging" \\
                                             --query "Parameters[].{Name:Name,Value:Value}" \\
                                             --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                         """, returnStdout: true).trim()
 
-                                        writeFile file: 'shared.env', text: sharedEnvVars + '\n'
-                                        writeFile file: 'staging.env', text: stagingEnvVars + '\n'
+                                        writeFile file: '.env', text: stagingEnvVars + '\n'
+                                        writeFile file: '.env.prod', text: stagingEnvVars + '\n'
 
-                                        sh '''
-                                        cat shared.env staging.env | awk -F= '!seen[$1]++' > .env
-                                        cp .env .env.prod
-                                        rm shared.env staging.env
-                                        '''
                                     }
                                 }
                             }
