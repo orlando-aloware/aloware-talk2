@@ -54,7 +54,6 @@
 </template>
 
 <script>
-/* global sforce */ // Declare sforce as a global variable
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import Webrtc from 'components/webrtc'
@@ -193,10 +192,10 @@ export default {
           this.showAlertCallNotStarted = false
           this.showAlertCallFinished = false
           this.isDialed = true
-          sforce.opencti.isSoftphonePanelVisible({
+          window.sforce.opencti.isSoftphonePanelVisible({
             callback: function (response) {
               if (response.success && !response.returnValue.visible) {
-                sforce.opencti.setSoftphonePanelVisibility({
+                window.sforce.opencti.setSoftphonePanelVisibility({
                   visible: true
                 })
               }
@@ -354,7 +353,7 @@ export default {
         return
       }
       // Enable click-to-dial functionality
-      sforce.opencti.enableClickToDial()
+      window.sforce.opencti.enableClickToDial()
     },
 
     disableClickToDial () {
@@ -362,7 +361,7 @@ export default {
         return
       }
       // Enable click-to-dial functionality
-      sforce.opencti.disableClickToDial()
+      window.sforce.opencti.disableClickToDial()
     },
 
     handleUserLogin () {
@@ -548,9 +547,17 @@ export default {
       // Check if the script is already loaded in the DOM
       if (document.querySelector(`script[src="${this.opencti_script_path}"]`)) {
         console.log('OpenCTI script already exists in DOM')
-        this.opencti_loaded = true
-        this.initializeOpenCti()
-        return
+
+        // If script exists but window.sforce doesn't, remove the script to reload it
+        if (!window.sforce || !window.sforce.opencti) {
+          console.log('Script exists but window.sforce not found, reloading script')
+          const existingScript = document.querySelector(`script[src="${this.opencti_script_path}"]`)
+          existingScript.remove()
+        } else {
+          this.opencti_loaded = true
+          this.initializeOpenCti()
+          return
+        }
       }
 
       console.log('Loading Salesforce OpenCTI script from:', this.opencti_script_path)
@@ -573,8 +580,9 @@ export default {
     },
 
     initializeOpenCti () {
-      if (typeof sforce === 'undefined' || !sforce.opencti) {
-        console.error('Salesforce OpenCTI API (sforce.opencti) is not available')
+      if (typeof window.sforce === 'undefined' || !window.sforce.opencti) {
+        console.error('Salesforce OpenCTI API (window.sforce.opencti) is not available')
+        this.criticalErrorHappened = true
         return
       }
 
@@ -583,7 +591,7 @@ export default {
       // Set up click-to-dial event listener
       const clickToDialListener = (payload) => {
         console.log('Click-to-dial event received with number:', payload)
-        sforce.opencti.setSoftphonePanelVisibility({
+        window.sforce.opencti.setSoftphonePanelVisibility({
           visible: true
         })
 
@@ -602,7 +610,7 @@ export default {
       }
 
       // Register the click-to-dial listener
-      sforce.opencti.onClickToDial({
+      window.sforce.opencti.onClickToDial({
         listener: clickToDialListener
       })
 
@@ -641,6 +649,14 @@ export default {
     }
     // this.$VueEvent.stop('answerCall')
     // this.$VueEvent.stop('rejectCall')
+
+    console.log('window.sforce', window.sforce)
+
+    // Destroy sforce object when component is destroyed
+    if (window.sforce) {
+      console.log('Destroying sforce object as component is being unmounted')
+      window.sforce = undefined
+    }
   }
 }
 </script>
