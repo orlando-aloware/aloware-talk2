@@ -42,7 +42,7 @@
            :ripple="false"
            icon="img:app-icons/menu/inbox_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 21px"
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
            v-show="!isActive('Inbox')"
@@ -101,7 +101,7 @@
            :ripple="false"
            icon="img:app-icons/menu/multi_inbox_gray.svg"
            align="left"
-           padding="10px 0px 10px 20px"
+           padding="10px 0px 10px 22px"
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
            v-show="!isActive(EINBOXES_MENU_TITLE)"
@@ -159,7 +159,7 @@
            :ripple="false"
            icon="img:app-icons/menu/communications_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 21px"
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
            flat
@@ -202,7 +202,7 @@
            :ripple="false"
            icon="img:app-icons/menu/contacts_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 21px"
            class="nav-icons w-100"
            data-testid="contacts-no-active-sidebar-btn"
            v-show="!isActive('Contacts')"
@@ -285,7 +285,7 @@
            :ripple="false"
            icon="img:app-icons/menu/power_dialer_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 21px"
            class="nav-icons w-100"
            v-show="(!isActive('Power Dialer') && profile.auto_dialer_enabled) || !profile.auto_dialer_enabled"
            flat>
@@ -324,7 +324,7 @@
     </q-btn>
     <q-btn icon="img:app-icons/menu/wallboard_grey.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 22px"
            class="nav-icons w-100"
            flat
            :to="{ name: 'Wallboard' }"
@@ -406,7 +406,7 @@
     </q-btn>
     <q-btn icon="img:app-icons/menu/tags_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 22px"
            class="nav-icons w-100"
            :to="{ name: 'Tags' }"
            :ripple="false"
@@ -449,7 +449,7 @@
            :ripple="false"
            icon="img:app-icons/menu/stats_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 21px"
            class="nav-icons w-100"
            v-show="!isActive('Stats')"
            flat>
@@ -768,7 +768,7 @@
 
     <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 21px"
            class="nav-icons w-100 disabled"
            flat
            :ripple="false"
@@ -818,7 +818,7 @@
     </q-btn>
     <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 21px"
            class="nav-icons w-100"
            flat
            :to="{ path: '/broadcasts' }"
@@ -907,7 +907,7 @@
            :ripple="false"
            icon="img:app-icons/menu/settings_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 21px"
            class="nav-icons w-100"
            v-show="!isActive('Settings')"
            flat>
