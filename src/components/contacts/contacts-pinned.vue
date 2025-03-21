@@ -24,8 +24,9 @@
             Where are my contact lists?
           </div>
           <div class="mt-2 px-4">
-            <p>Contact lists can be managed through the <span class="font-weight-bold">Lists Management</span> page.</p>
-            <p>You can add lists to this space by pinning 📍 a list using the <span class="font-weight-bold">Actions</span> menu from any list in <span class="font-weight-bold">Lists Management</span>.</p>
+            <p>Your contact lists are now managed in the <span class="font-weight-bold">List Management</span> page.</p>
+            <p>To make a list appear here, simply pin 📍 it using the <span class="font-weight-bold">Actions</span> menu in <span class="font-weight-bold">List Management</span>.</p>
+            <p>To remove a list from this view, just unpin it from the same menu.</p>
           </div>
           <div class="px-4 w-100 mt-3 mb-4">
             <router-link
