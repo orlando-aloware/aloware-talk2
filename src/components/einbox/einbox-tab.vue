@@ -213,7 +213,7 @@ export default {
     },
 
     handleScroll (target) {
-      const bottomThreshold = 100
+      const bottomThreshold = 25
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
       if (isNearBottom && !this.isLoadingMoreItems && !this.isLoadingItems && this.hasMoreItems) {
