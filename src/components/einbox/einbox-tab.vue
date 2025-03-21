@@ -299,7 +299,7 @@ export default {
       if (communication.ring_group_id !== this.activeInboxId) {
         return
       }
-
+      console.log('live update on communication', communication)
       if (this.viewMode === UNTHREADED) {
         this.handleUnthreadedCommunication(communication, isNew)
       } else {
