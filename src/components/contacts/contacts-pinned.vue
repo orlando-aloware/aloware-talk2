@@ -24,8 +24,15 @@
             Where are my contact lists?
           </div>
           <div class="mt-2 px-4">
-            <p>Lists can be more easily managed through the <router-link :to="{ name: 'Lists' }">Lists Management</router-link> page.</p>
-            <p>You can also add lists to this space by pinning 📍 a list in the <router-link :to="{ name: 'Lists' }">Lists Management</router-link> page, using the Actions menu from the list that you want to pin.</p>
+            <p>Contact lists can be managed through the Lists Management page.</p>
+            <p>You can add lists to this space by pinning 📍 a list using the Actions menu from any list in Lists Management.</p>
+          </div>
+          <div class="px-4 w-100 mt-3 mb-4">
+            <router-link
+              :to="{ name: 'Lists' }"
+              class="btn btn-primary w-100">
+              Go to Lists Management
+            </router-link>
           </div>
         </div>
       </template>
