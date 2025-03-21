@@ -145,11 +145,12 @@
       <q-table class="talk-table"
               row-key="index"
               virtual-scroll
+              hide-bottom
               :data="listsData"
               :columns="fixedColumns"
               :loading="isLoadingMore || isLoading || isListsLoading"
-              :virtual-scroll-item-size="100"
-              :virtual-scroll-sticky-size-start="100"
+              :virtual-scroll-item-size="60"
+              :virtual-scroll-sticky-size-start="48"
               :pagination="pagination"
               :rows-per-page-options="[0]"
               @virtual-scroll="onScroll">
@@ -326,13 +327,6 @@
               </div>
             </q-td>
           </q-tr>
-        </template>
-
-        <template v-slot:loading>
-          <div class="d-flex justify-center">
-            <q-spinner-bars color="primary"
-                            size="30px" />
-          </div>
         </template>
 
         <template v-slot:no-data>
