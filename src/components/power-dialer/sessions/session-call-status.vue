@@ -1122,7 +1122,6 @@ export default {
 
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
-        this.setContact(this.taskToCall)
         this.TOGGLE_SESSION_LOADER(true)
         this.resetTimer()
 
@@ -1388,7 +1387,6 @@ export default {
 
       this.activeTask = this.taskToCall
       this.hasActiveTask = true
-      this.setContact(this.taskToCall)
 
       if (!this.isSessionRunning) {
         this.isSessionRunning = true
