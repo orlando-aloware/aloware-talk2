@@ -34,7 +34,6 @@
                           :direction="direction"
                           :callback-status="callbackStatus"
                           :body="body"
-                          :total-unreads="totalUnreads"
                           :is-live-call-item="isLiveCall"
                           v-if="type" />
     </div>
