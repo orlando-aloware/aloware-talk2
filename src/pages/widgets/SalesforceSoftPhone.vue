@@ -364,7 +364,6 @@ export default {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
       }
 
-      console.warn('initialized login')
       this.$VueEvent.listen('new_in_app_call', this.listeners.newInAppCall)
 
       // Register listeners for call action buttons
