@@ -144,7 +144,7 @@ export default {
     ...mapState(['dialer', 'salesforceDialNumber', 'ringGroups']),
 
     allowed () {
-      return this.authProfile && this.initialized // && this.defaultCampaignInitialized
+      return this.authProfile && this.initialized
     },
 
     isLoadingDialer () {
@@ -166,12 +166,10 @@ export default {
     }
 
     this.listeners.newInAppCall = (communication) => {
-      console.warn('newInAppCall')
       const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
       const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
 
       if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
-        console.warn('newInAppCall 2')
         return
       }
 
@@ -180,12 +178,8 @@ export default {
         ? 'missed call'
         : 'call'
 
-      console.log('communicationType', communicationType, isFishingMode, communication.is_call_waiting, !this.profile.sleep_mode, this.profile)
-
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
       if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
-        console.warn('processActionNotification')
-
         this.processActionNotification(communication, communicationType)
 
         if (this.opencti_loaded) {
@@ -376,8 +370,6 @@ export default {
       // Register listeners for call action buttons
       this.$VueEvent.listen('answerCall', () => {
         console.log('Answering incoming call in SalesforceSoftPhone')
-        // this.$VueEvent.fire('answerIncomingCall')
-        // this.setShowPhone(true)
 
         // Disable click-to-dial functionality
         this.disableClickToDial()
@@ -387,7 +379,6 @@ export default {
       this.$VueEvent.listen('rejectCall', () => {
         this.showAlertCallFinished = true
         console.log('Rejecting incoming call in SalesforceSoftPhone')
-        // this.$VueEvent.fire('rejectIncomingCall')
       })
     },
 
@@ -625,13 +616,10 @@ export default {
 
   watch: {
     'dialer.currentStatus' () {
-      console.warn('captured status', this.dialer?.currentStatus)
-
       if (this.isLoadingDialer) {
         return
       }
 
-      // CALL_CONNECTED, ANSWERING_CALL
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
       if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
         (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) &&
@@ -647,10 +635,6 @@ export default {
     if (this.listeners.newInAppCall) {
       this.$VueEvent.stop('new_in_app_call', this.listeners.newInAppCall)
     }
-    // this.$VueEvent.stop('answerCall')
-    // this.$VueEvent.stop('rejectCall')
-
-    console.log('window.sforce', window.sforce)
 
     // Destroy sforce object when component is destroyed
     if (window.sforce) {

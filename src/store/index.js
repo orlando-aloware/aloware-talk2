@@ -346,7 +346,6 @@ export default function (/* { ssrContext } */) {
       },
 
       setDialerCurrentStatus ({ commit }, status) {
-        console.warn('change dialer status', status)
         commit('SET_DIALER_CURRENT_STATUS', status)
       },
 
@@ -754,7 +753,6 @@ export default function (/* { ssrContext } */) {
       },
 
       setShowPhone ({ commit }, value) {
-        console.warn('setShowPhone', value)
         commit('SET_SHOW_PHONE', value)
       },
 

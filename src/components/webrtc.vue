@@ -87,7 +87,6 @@ export default {
     showSelectCampaignDialog () {
       const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
       if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
-        console.warn('showSelectCampaignDialog 1')
         return false
       }
 
@@ -109,9 +108,6 @@ export default {
     ...mapActions('auth', ['setAgentStatus']),
 
     initAuth () {
-      // @todo if it's not breaking login in HS widget
-      // this.broadcastInit()
-
       this.getUsers()
       this.getDispositionStatuses()
       this.getCallDispositions()
