@@ -1,22 +1,12 @@
 <template>
   <div :class="['communication', { active: isActive, 'live-call-item': isLiveCall }]">
     <div class="communication__avatar">
-      <div class="position-relative"
-           role="button">
-        <b-badge class="avatar__unread-badge position-absolute"
-                 variant="danger"
-                 data-testid="inbox-tasks-item-badge"
-                 pill
-                 v-if="totalUnreads > 0">
-          <span v-if="totalUnreads <= 99">{{ totalUnreads }}</span>
-          <span v-else>99<sup>+</sup></span>
-        </b-badge>
-        <avatar width="34"
-                height="34"
-                :color-module-id="contactId"
-                :name="contactName || defaultEmptyName">
-        </avatar>
-      </div>
+      <avatar width="34"
+              height="34"
+              :color-module-id="contactId"
+              :name="contactName || defaultEmptyName">
+        <unread-counter :unread-properties="unreadProperties" />
+      </avatar>
     </div>
 
     <div class="communication__contact-name">
@@ -54,6 +44,7 @@
 
 <script>
 import Avatar from './avatar.vue'
+import UnreadCounter from './unread-counter.vue'
 import Campaign from './campaign.vue'
 import ContactName from './contact-name.vue'
 import LastCommunication from './last-communication.vue'
@@ -68,6 +59,7 @@ export default {
 
   components: {
     Avatar,
+    UnreadCounter,
     Campaign,
     ContactName,
     LastCommunication,
@@ -131,9 +123,9 @@ export default {
       required: false
     },
 
-    totalUnreads: {
-      type: [Number, String],
-      required: true
+    unreadProperties: {
+      type: Object,
+      required: false
     },
 
     isActive: {
@@ -181,20 +173,6 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-
-    .avatar {
-      &__unread-badge {
-        top: -8px;
-        right: -5px;
-        font-size: 9px;
-        font-weight: 500;
-        height: 18px;
-        width: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    }
   }
 
   &__contact-name {

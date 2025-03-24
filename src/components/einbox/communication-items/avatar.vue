@@ -52,6 +52,7 @@ export default {
   font-size: 13px;
   background-color: rgb(149, 152, 158);
   font-weight: 600;
+  position: relative;
 
   &--color-0 {
     color: #E319C5;

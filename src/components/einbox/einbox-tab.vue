@@ -91,7 +91,7 @@
                          :body="getMessageBody(item)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
-                         :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
+                         :unread-properties="getUnreadsProperties(item.contact)"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                          :repeats="viewMode === UNTHREADED ? item.repeats : null"
                          :is-live-call="isLiveCall(item)" />
@@ -128,7 +128,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState } from 'vuex'
-import { debounce } from 'lodash'
+import { debounce, isEmpty, pick } from 'lodash'
 
 export default {
   components: {
@@ -207,6 +207,14 @@ export default {
 
   methods: {
     isLiveCall,
+
+    getUnreadsProperties (contact) {
+      if (isEmpty(contact)) {
+        return null
+      }
+
+      return pick(contact, ['unread_voicemail_count', 'unread_missed_call_count', 'unread_count'])
+    },
 
     onScroll ({ target }) {
       this.debouncedScroll(target)
@@ -299,7 +307,7 @@ export default {
       if (communication.ring_group_id !== this.activeInboxId) {
         return
       }
-      console.log('live update on communication', communication)
+
       if (this.viewMode === UNTHREADED) {
         this.handleUnthreadedCommunication(communication, isNew)
       } else {
