@@ -97,7 +97,8 @@ export default {
       'setChannelClonedFilter',
       'setInboxFilters',
       'resetChannelChangedFilterFields',
-      'setSearchQuery'
+      'setSearchQuery',
+      'setIsLoadingCommunications'
     ]),
 
     setChannel (routeChanged = false) {
@@ -128,6 +129,18 @@ export default {
 
     onWindowResize () {
       this.setShowViewsList(false)
+    },
+
+    loadCommunications () {
+      // if filter_id is present in query string, fetch the communications later on after applying the filter
+      if (this.$route.query.filter_id) {
+        this.setIsLoadingCommunications(true)
+        return
+      }
+
+      this.$nextTick(() => {
+        this.getCommunications(this.communicationFilters)
+      })
     }
   },
 
@@ -169,9 +182,7 @@ export default {
 
     window.addEventListener('resize', this.onWindowResize)
 
-    this.$nextTick(() => {
-      this.getCommunications(this.communicationFilters)
-    })
+    this.loadCommunications()
   },
 
   unmounted () {

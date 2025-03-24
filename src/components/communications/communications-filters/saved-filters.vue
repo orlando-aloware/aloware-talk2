@@ -81,9 +81,15 @@ export default {
       type: Boolean,
       default: false
     },
+
     currentTags: {
       type: Array,
       default: () => []
+    },
+
+    applyQueryFilter: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -187,6 +193,32 @@ export default {
         }
       })
       this.getTagsByIds(tagsIds)
+
+      if (this.applyQueryFilter) {
+        this.selectFilterFromQueryString()
+      }
+    },
+
+    // Check if filter_id is present in the query and apply if first load
+    selectFilterFromQueryString () {
+      if (!this.$route.query.filter_id) {
+        return
+      }
+
+      const foundCompanyFilter = this.companyFilters.find((f) => f.id === +this.$route.query.filter_id)
+      if (foundCompanyFilter) {
+        this.$emit('filterSelected', foundCompanyFilter)
+        return
+      }
+
+      const foundPersonalFilter = this.personalFilters.find((f) => f.id === +this.$route.query.filter_id)
+      if (foundPersonalFilter) {
+        this.$emit('filterSelected', foundPersonalFilter)
+        return
+      }
+
+      // if landed here then no filter was found for the given filter_id
+      this.$emit('filterNotFound')
     },
 
     getTagsByIds (ids) {

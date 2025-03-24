@@ -16,7 +16,7 @@
       <div class="setting d-flex align-items-center flex-column flex-sm-row w-100 w-sm-auto gap-3 align-items-sm-center">
         <div class="small text-muted fs-13 order-1 order-sm-1">
           <template v-if="!isLoadingCommunicationsCount">
-            {{ communicationsCount }} Communications
+            {{ communicationsCountValue }} Communications
           </template>
           <q-skeleton type="text"
                       style="width: 80px"
@@ -41,7 +41,7 @@
              row-key="index"
              virtual-scroll
              hide-bottom
-             :data="communications"
+             :data="communicationsData"
              :columns="columns"
              :loading="isLoadingMore || isLoadingCommunications"
              :virtual-scroll-item-size="80"
@@ -50,13 +50,15 @@
              :rows-per-page-options="[0]"
              @virtual-scroll="onScroll">
       <template v-slot:body="props">
-        <q-tr :props="props">
+        <q-tr :props="props"
+              :class="{'live-call-tr': isLiveCall(props.row)}">
           <q-td :props="props"
                 :key="col.name"
                 v-for="col in props.cols">
             <div v-if="col.name === 'disposition_status2'">
               <disposition :row="props.row"
                            :style="col.columnStyle"
+                           :is-live-call="isLiveCall(props.row)"
                            @on-details="onCommunicationDetails"/>
             </div>
 
@@ -186,7 +188,7 @@
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'operations'">
               <communications-operations :row="props.row"
-                                         @on-details="onCommunicationDetails"
+                                         @on-details="openCommunicationDetailsPage"
                                          @archived="removeCommunication"
                                          @terminated="removeCommunication" />
             </div>
@@ -196,7 +198,7 @@
     </q-table>
 
     <div class="talk-table--no-data h5"
-         v-if="!communications.length && !isLoadingMore && !isLoadingCommunications">
+         v-if="!communicationsData.length && !isLoadingMore && !isLoadingCommunications">
       No communications found based on the current filters
     </div>
 
@@ -238,7 +240,7 @@
 </template>
 
 <script>
-import { aclMixin, communicationsMixin } from 'src/plugins/mixins'
+import { aclMixin, communicationsMixin, visibilityMixin } from 'src/plugins/mixins'
 import SearchInput from 'components/search-input'
 import CompactBtn from 'components/compact-btn'
 import CommunicationTableSettings from './communication-table-settings.vue'
@@ -269,6 +271,9 @@ import WallboardCallsNote from 'components/wallboard/wallboard-calls-note.vue'
 import CommunicationsDetailsSidebar from 'components/communications/communication-details-sidebar.vue'
 import { ALL_COLUMNS, DEFAULT_COLUMNS } from './communications-table-columns'
 import { mapState, mapActions } from 'vuex'
+import { isLiveCall } from 'src/plugins/helpers/functions'
+import * as CommunicationTypes from 'src/constants/communication-types'
+import { merge } from 'lodash'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -282,7 +287,8 @@ export default {
 
   mixins: [
     aclMixin,
-    communicationsMixin
+    communicationsMixin,
+    visibilityMixin
   ],
 
   components: {
@@ -318,7 +324,9 @@ export default {
 
   computed: {
     ...mapState('communications', [
-      'hasMoreCommunications'
+      'activeChannel',
+      'hasMoreCommunications',
+      'channelClonedFilter'
     ])
   },
 
@@ -333,7 +341,9 @@ export default {
       paginated: false,
       showColumnHeadersModal: false,
       showCommunicationSidebar: false,
-      sidebarCommunication: {}
+      sidebarCommunication: {},
+      communicationsData: [],
+      communicationsCountValue: 0
     }
   },
 
@@ -380,7 +390,7 @@ export default {
         return
       }
 
-      const lastIndex = this.communications.length - 1
+      const lastIndex = this.communicationsData.length - 1
 
       if (
         this.hasMoreCommunications &&
@@ -433,14 +443,97 @@ export default {
     removeCommunication (communicationId) {
       const index = this.communicationsData.findIndex(communication => communication.id === communicationId)
 
-      if (index) {
+      if (index > -1) {
         this.communicationsData.splice(index, 1)
+        this.communicationsCountValue--
       }
     },
 
     onCommunicationDetails (communication) {
       this.sidebarCommunication = communication
       this.showCommunicationSidebar = true
+    },
+
+    isLiveCall,
+
+    checkCommunicationChannels (communication) {
+      if (!this.activeChannel) {
+        return true
+      }
+
+      switch (communication.type) {
+        case CommunicationTypes.CALL:
+          return ['all', 'calls', 'voicemails'].includes(this.activeChannel.value)
+        case CommunicationTypes.SMS:
+          return ['all', 'messages'].includes(this.activeChannel.value)
+        default:
+          return true
+      }
+    },
+
+    newCommunicationListener (communication) {
+      const found = this.communicationsData.find(c => c.id === communication.id)
+
+      if (!found) {
+        const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
+          this.checkCommunicationMatchesSearch(this.searchQuery, communication) &&
+          this.checkCommunicationMatchesFilters(this.channelClonedFilter, communication) &&
+          this.checkCommunicationMatchesUserAccessibility(communication) &&
+          this.checkCommunicationMatchesCampaign(this.channelClonedFilter.campaign_id, communication) &&
+          this.checkCommunicationMatchesWorkflow(this.channelClonedFilter.workflow_id, communication) &&
+          this.checkCommunicationMatchesUser(this.channelClonedFilter.user_id, communication) &&
+          this.checkCommunicationMatchesRingGroup(this.channelClonedFilter.ring_group_id, communication)
+
+        if (communicationMatchFilters) {
+          // add to the top of the array
+          this.communicationsData.unshift(communication)
+          this.communicationsCountValue++
+        }
+      }
+    },
+
+    updatedCommunicationListener (communication) {
+      const index = this.communicationsData.findIndex(c => c.id === communication.id)
+
+      if (index > -1) {
+        // update it if present in the array
+        this.communicationsData.splice(index, 1, communication)
+        if (this.showCommunicationSidebar && this.sidebarCommunication?.id === communication.id) {
+          this.sidebarCommunication = merge(this.sidebarCommunication, communication)
+        }
+      } else {
+        const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
+          this.checkCommunicationMatchesSearch(this.searchQuery, communication) &&
+          this.checkCommunicationMatchesFilters(this.channelClonedFilter, communication) &&
+          this.checkCommunicationMatchesUserAccessibility(communication) &&
+          this.checkCommunicationMatchesCampaign(this.channelClonedFilter.campaign_id, communication) &&
+          this.checkCommunicationMatchesWorkflow(this.channelClonedFilter.workflow_id, communication) &&
+          this.checkCommunicationMatchesUser(this.channelClonedFilter.user_id, communication) &&
+          this.checkCommunicationMatchesRingGroup(this.channelClonedFilter.ring_group_id, communication)
+
+        if (communicationMatchFilters) {
+          // add to the top of the array
+          this.communicationsData.unshift(communication)
+          this.communicationsCountValue++
+        }
+      }
+    },
+
+    deletedCommunicationListener (communication) {
+      const index = this.communicationsData.findIndex(c => c.id === communication.id)
+
+      if (index > -1) {
+        // remove it if found
+        this.communicationsData.splice(index, 1)
+        this.communicationsCountValue--
+      }
+    },
+
+    openCommunicationDetailsPage (communication) {
+      const route = this.$router.resolve({
+        path: `/contacts/${communication.contact_id}/communications/${communication.id}`
+      })
+      window.open(route.href, '_blank')
     }
   },
 
@@ -448,6 +541,26 @@ export default {
     this.cancelToken = this.$axios.CancelToken
     this.source = this.cancelToken.source()
     this.columns = this.getSavedColumns()
+
+    // live communications events listeners
+    this.$VueEvent.listen('new_communication', this.newCommunicationListener)
+    this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
+    this.$VueEvent.listen('delete_communication', this.deletedCommunicationListener)
+  },
+
+  watch: {
+    communications (newValue) {
+      this.communicationsData = newValue
+    },
+    communicationsCount (newValue) {
+      this.communicationsCountValue = newValue
+    }
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('new_communication', this.newCommunicationListener)
+    this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
+    this.$VueEvent.stop('delete_communication', this.deletedCommunicationListener)
   }
 }
 </script>

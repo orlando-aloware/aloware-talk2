@@ -39,7 +39,7 @@ export default {
       const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
       const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
 
-      return isForceCallDisposition || isForceContactDisposition || this.isForcedSmsSending
+      return Boolean(isForceCallDisposition || isForceContactDisposition || this.isForcedSmsSending)
     },
 
     isHighlightedCallDisposition () {

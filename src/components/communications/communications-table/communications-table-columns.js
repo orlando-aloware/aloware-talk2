@@ -185,7 +185,7 @@ export const DEFAULT_COLUMNS = [
     columnStyle: 'width: 105px'
   },
   {
-    label: 'Number',
+    label: 'Line',
     name: 'incoming_number',
     field: 'incoming_number',
     align: 'left',
