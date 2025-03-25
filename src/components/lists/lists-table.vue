@@ -202,7 +202,7 @@
               <div v-else-if="col.name === COLUMN_NAMES.imported_at">
                 <relative-time humanized
                                :from-time="row[col.field]"
-                              v-if="row[col.field]" />
+                               v-if="row[col.field]" />
                 <span v-else>-</span>
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.actions">
