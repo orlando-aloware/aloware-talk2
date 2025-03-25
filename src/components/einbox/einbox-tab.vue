@@ -193,6 +193,7 @@ export default {
     // live communications events
     this.$VueEvent.listen('new_communication', this.newCommunicationListener)
     this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
+    this.$VueEvent.listen('contact_updated', this.updatedContactListener)
   },
 
   beforeDestroy () {
@@ -203,6 +204,7 @@ export default {
 
     this.$VueEvent.stop('new_communication', this.newCommunicationListener)
     this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
+    this.$VueEvent.stop('contact_updated', this.updatedContactListener)
   },
 
   methods: {
@@ -325,6 +327,16 @@ export default {
       this.processCommunication(communication, false)
 
       this.showSearchTooltip = false
+    },
+
+    updatedContactListener (contact) {
+      // search for this contact in the current communications
+      // this is necessary for keeping the contact updated from other inboxes communications
+      const index = this.itemsData.findIndex(communication => communication.contact_id === contact.id)
+
+      if (index >= 0) {
+        this.itemsData[index].contact = contact
+      }
     },
 
     getMessageBody (item) {
