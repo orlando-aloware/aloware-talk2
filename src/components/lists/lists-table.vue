@@ -318,7 +318,7 @@
                                      data-testid="lists-pin-option"
                                      @click="onPinList(row)">
                       <pin-icon />
-                      {{ pinnedLists.includes(row.id) ? 'Unpin' : 'Pin' }} List
+                      {{ pinnedLists.includes(row.id) ? 'Unpin from' : 'Pin to' }} Contacts page
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
