@@ -1,11 +1,17 @@
 <template>
-  <b-badge pill
-           class="unread-badge"
-           variant="danger"
-           v-if="viewMode === THREADED && totalUnreads > 0">
-    <span v-if="totalUnreads <= 99">{{ totalUnreads }}</span>
-    <span v-else>99<sup>+</sup></span>
-  </b-badge>
+  <transition mode="out-in"
+              :name="isIncreasing ? 'slide-vertical' : 'slide-vertical-reverse'">
+    <b-badge pill
+             class="unread-badge"
+             variant="danger"
+             :key="totalUnreads"
+             v-if="viewMode === THREADED && totalUnreads > 0">
+      <span>
+        <template v-if="totalUnreads <= 99">{{ totalUnreads }}</template>
+        <template v-else>99<sup>+</sup></template>
+      </span>
+    </b-badge>
+  </transition>
 </template>
 
 <script>
@@ -21,7 +27,8 @@ export default {
   },
 
   data: () => ({
-    THREADED
+    THREADED,
+    isIncreasing: true
   }),
 
   computed: {
@@ -30,11 +37,17 @@ export default {
     ]),
 
     totalUnreads () {
-      const unreadVoiceMail = this.unreadProperties.unread_voicemail_count || 0
-      const unreadMissedCall = this.unreadProperties.unread_missed_call_count || 0
-      const unreadCount = this.unreadProperties.unread_count || 0
+      const unreadVoiceMail = this.unreadProperties?.unread_voicemail_count || 0
+      const unreadMissedCall = this.unreadProperties?.unread_missed_call_count || 0
+      const unreadCount = this.unreadProperties?.unread_count || 0
 
       return unreadVoiceMail + unreadMissedCall + unreadCount
+    }
+  },
+
+  watch: {
+    totalUnreads (newCount, oldCount) {
+      this.isIncreasing = newCount > oldCount
     }
   }
 }
@@ -52,5 +65,27 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease-out;
+}
+
+.slide-vertical-enter {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.slide-vertical-leave-active {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.slide-vertical-reverse-enter {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.slide-vertical-reverse-leave-active {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 </style>
