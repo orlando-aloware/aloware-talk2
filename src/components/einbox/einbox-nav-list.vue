@@ -24,7 +24,7 @@
                        :message-count="inbox.message_count"
                        :is-active="activeInboxId === inbox.id"
                        :key="inbox.id"
-                       v-for="inbox in inboxes"
+                       v-for="inbox in inboxesData"
                        @click="onInboxSelect" />
 
       <div :class="[isLoadingInboxes ? 'py-5' : 'py-4', 'relative']"
@@ -44,7 +44,7 @@
 
       <!-- Empty state -->
       <div class="text-center q-pa-md text-grey"
-           v-else-if="!inboxes.length">
+           v-else-if="!inboxesData.length">
         No Inboxes
       </div>
     </div>
@@ -75,7 +75,8 @@ export default {
       hasMorePages: true,
       loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300),
       search: '',
-      showSearchTooltip: false
+      showSearchTooltip: false,
+      inboxesData: []
     }
   },
 
@@ -139,17 +140,22 @@ export default {
   async created () {
     await this.fetchInboxes()
 
-    if (this.inboxes.length) {
+    if (this.inboxesData.length) {
       // If there are inboxes:
       // - try to get id from route
       // - otherwise set the first inbox as active, if not mobile
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : (!this.isMobile ? this.inboxes[0].id : null)
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : (!this.isMobile ? this.inboxesData[0].id : null)
       const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
       if (inboxId) {
         this.onInboxSelect(inboxId, contactId)
       }
     }
+
+    // Listen to ring group events
+    this.$VueEvent.listen('ring_group_created', this.newRingGroupListener)
+    this.$VueEvent.listen('ring_group_updated', this.updateRingGroupListener)
+    this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
   },
 
   watch: {
@@ -169,6 +175,13 @@ export default {
     search (val) {
       this.resetInboxes()
       this.fetchInboxes(val)
+    },
+
+    inboxes: {
+      immediate: true,
+      handler (newInboxes) {
+        this.inboxesData = [...newInboxes]
+      }
     }
   },
 
