@@ -207,6 +207,11 @@ export default {
     showAnswerType: {
       type: Boolean,
       default: true
+    },
+
+    onlyShowSyncedWithCrm: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -257,14 +262,21 @@ export default {
 
     filteredUsers () {
       if (!_.isEmpty(this.availableUsers)) {
+        let filtered = this.availableUsers
+
+        // Apply CRM sync filter if enabled
+        if (this.onlyShowSyncedWithCrm) {
+          filtered = filtered.filter(user => user.synced_with_crm === true)
+        }
+
         if (this.allAnswerTypes) {
-          return this.availableUsers.filter((user) =>
+          return filtered.filter((user) =>
             !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access) &&
             user.type !== User.TYPE_AI_AGENT
           )
         }
 
-        return this.filterUsers(this.availableUsers)
+        return this.filterUsers(filtered)
       }
 
       return []
