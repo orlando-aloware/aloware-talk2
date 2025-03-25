@@ -31,18 +31,20 @@
                  @close="onSelectClose"
                  @input="changeCallDisposition">
       <template slot="option" slot-scope="props">
-        <div class="option__desc">
-          <q-icon name="fa fa-bolt"
-                  :style="{ color: props.option.color }"
-                  v-show="!props.option.is_external"
-                  data-testid="call-disposition-selector-icon-no-external">
-          </q-icon>
-          <q-icon name="fa fa-lock"
-                  :style="{ color: props.option.color }"
-                  v-show="props.option.is_external"
-                  data-testid="call-disposition-selector-icon-external">
-          </q-icon>
-          <span class="option__small ml-2">{{ props.option.name }}</span>
+        <div class="option__desc" :class="{'no-icon': shouldFilterExternalDispositions}">
+          <template v-if="!shouldFilterExternalDispositions">
+            <q-icon name="fa fa-bolt"
+                    :style="{ color: props.option.color }"
+                    v-show="!props.option.is_external"
+                    data-testid="call-disposition-selector-icon-no-external">
+            </q-icon>
+            <q-icon name="fa fa-lock"
+                    :style="{ color: props.option.color }"
+                    v-show="props.option.is_external"
+                    data-testid="call-disposition-selector-icon-external">
+            </q-icon>
+          </template>
+          <span class="option__small" :class="{'no-margin': shouldFilterExternalDispositions}">{{ props.option.name }}</span>
         </div>
       </template>
       <span slot="noResult" data-testid="call-disposition-no-call-found">
@@ -77,18 +79,20 @@
                  @close="onSelectClose"
                  @input="selectCallDisposition">
       <template slot="option" slot-scope="props">
-        <div class="option__desc">
-          <q-icon name="fa fa-bolt"
-                  :style="{ color: props.option.color }"
-                  v-show="!props.option.is_external"
-                  data-testid="call-disposition-selector-icon-no-external">
-          </q-icon>
-          <q-icon name="fa fa-lock"
-                  :style="{ color: props.option.color }"
-                  v-show="props.option.is_external"
-                  data-testid="call-disposition-selector-icon-external">
-          </q-icon>
-          <span class="option__small ml-2">{{ props.option.name }}</span>
+        <div class="option__desc" :class="{'no-icon': shouldFilterExternalDispositions}">
+          <template v-if="!shouldFilterExternalDispositions">
+            <q-icon name="fa fa-bolt"
+                    :style="{ color: props.option.color }"
+                    v-show="!props.option.is_external"
+                    data-testid="call-disposition-selector-icon-no-external">
+            </q-icon>
+            <q-icon name="fa fa-lock"
+                    :style="{ color: props.option.color }"
+                    v-show="props.option.is_external"
+                    data-testid="call-disposition-selector-icon-external">
+            </q-icon>
+          </template>
+          <span class="option__small" :class="{'no-margin': shouldFilterExternalDispositions}">{{ props.option.name }}</span>
         </div>
       </template>
       <span slot="noResult" data-testid="call-disposition-selector-no-call-found">
@@ -103,9 +107,10 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import Multiselect from 'vue-multiselect'
+import integrationMixin from 'src/plugins/mixins/integration.mixin'
 
 export default {
-  mixins: [aclMixin],
+  mixins: [aclMixin, integrationMixin],
 
   components: {
     Multiselect
@@ -156,6 +161,11 @@ export default {
   computed: {
     ...mapState(['callDispositions']),
 
+    shouldFilterExternalDispositions () {
+      // Just HubSpot for now
+      return this.currentCompany?.hubspot_integration_enabled === true
+    },
+
     computedCommunication () {
       if (this.communication) {
         const found = this.callDispositionsAlphabeticalOrder.find(callDisposition => callDisposition.id === this.communication.call_disposition_id)
@@ -179,9 +189,16 @@ export default {
 
     availableDispositions () {
       if (this.callDispositions) {
-        return this.callDispositions.filter((callDisposition) => {
+        let dispositions = this.callDispositions.filter((callDisposition) => {
           return callDisposition.id !== this.exclude
         })
+
+        // Add CRM filter
+        if (this.shouldFilterExternalDispositions) {
+          dispositions = dispositions.filter(disposition => disposition.is_external === true)
+        }
+
+        return dispositions
       }
 
       return []
@@ -300,3 +317,14 @@ export default {
 }
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
+<style>
+.no-icon {
+  padding-left: 0;
+}
+.no-margin {
+  margin-left: 0 !important;
+}
+.option__small {
+  margin-left: 4px;
+}
+</style>

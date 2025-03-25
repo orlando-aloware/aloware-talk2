@@ -100,11 +100,12 @@ import * as AnswerTypes from 'src/constants/answer-types'
 import * as User from 'src/constants/user'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { selectorMixin, userMixin } from 'src/plugins/mixins'
+import integrationMixin from 'src/plugins/mixins/integration.mixin'
 
 export default {
   name: 'user-selector',
 
-  mixins: [selectorMixin, userMixin],
+  mixins: [selectorMixin, userMixin, integrationMixin],
 
   components: { RemoveTagIcon },
 
@@ -260,12 +261,16 @@ export default {
       return this.options
     },
 
+    shouldFilterBySyncedCrmUsers () {
+      // Just check for HubSpot Integration for now
+      return this.onlyShowSyncedWithCrm && this.currentCompany?.hubspot_integration_enabled === true
+    },
+
     filteredUsers () {
       if (!_.isEmpty(this.availableUsers)) {
         let filtered = this.availableUsers
 
-        // Apply CRM sync filter if enabled
-        if (this.onlyShowSyncedWithCrm) {
+        if (this.shouldFilterBySyncedCrmUsers) {
           filtered = filtered.filter(user => user.synced_with_crm === true)
         }
 
