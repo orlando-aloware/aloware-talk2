@@ -1344,6 +1344,7 @@ export default {
     }
 
     this.$VueEvent.listen('contact_list_import_hubspot', this.viewListeners.listenDynamicListUpdate)
+    this.$VueEvent.listen('contact_list_import_salesforce', this.viewListeners.listenDynamicListUpdate)
     this.$VueEvent.listen('contact_list_import_failed', this.viewListeners.listenDynamicListUpdateFailed)
 
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
@@ -2140,6 +2141,7 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('contact_list_import_hubspot')
+    this.$VueEvent.stop('contact_list_import_salesforce')
     this.$VueEvent.stop('contact_list_import_failed')
     this.$VueEvent.stop('shouldUpdateListCount')
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)

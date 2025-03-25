@@ -234,7 +234,12 @@ import {
 import IntegrationListSelector from 'components/generic-selectors/integration-list-selector'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import talk2Api from 'src/plugins/api/api'
-import { HUBSPOT_INTEGRATION, PIPEDRIVE_INTEGRATION, ZOHO_INTEGRATION } from 'src/constants/integrations'
+import {
+  HUBSPOT_INTEGRATION,
+  PIPEDRIVE_INTEGRATION,
+  SALESFORCE_INTEGRATION,
+  ZOHO_INTEGRATION
+} from 'src/constants/integrations'
 
 export default {
   components: {
@@ -597,6 +602,7 @@ export default {
     },
 
     onSubmit () {
+      console.warn('this.createList.type', this.IMPORT_FROM_INTEGRATION_TYPE)
       if (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE) {
         this.processIntegrationListSubmit()
         return
@@ -714,6 +720,8 @@ export default {
       switch (this.getIntegration) {
         case HUBSPOT_INTEGRATION:
           return this.importFromHubspot()
+        case SALESFORCE_INTEGRATION:
+          return this.importFromSalesforce()
         case PIPEDRIVE_INTEGRATION:
           return this.addPipedriveFilter()
         case ZOHO_INTEGRATION:
@@ -726,6 +734,21 @@ export default {
         .then(response => response.data)
         .then(data => {
           this.$generalNotification("Your HubSpot contact list is being imported. It can take a couple of minutes if it's a large list.")
+          this.createListClose()
+          this.loadFolders()
+          this.loadPublicLists()
+        })
+        .catch(_err => {
+          this.isLoading = false
+          this.$generalNotification('Unable to import contacts from list, please try again.', 'error')
+        })
+    },
+
+    importFromSalesforce () {
+      return talk2Api.V2.integrations.salesforce.importList(this.integrationListId, {})
+        .then(response => response.data)
+        .then(data => {
+          this.$generalNotification("Your Salesforce contact list is being imported. It can take a couple of minutes if it's a large list.")
           this.createListClose()
           this.loadFolders()
           this.loadPublicLists()
@@ -775,6 +798,8 @@ export default {
       switch (this.getIntegration) {
         case HUBSPOT_INTEGRATION:
           return this.checkHubspotList()
+        case SALESFORCE_INTEGRATION:
+          return this.checkSalesforceList()
         case PIPEDRIVE_INTEGRATION:
           return this.checkPipedriveFilter()
         case ZOHO_INTEGRATION:
@@ -787,6 +812,15 @@ export default {
 
       if (res.data.exists) {
         this.integrationImportConfirmMessage = 'The HubSpot list you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
+        this.showIntegrationImportConfirmDialog = true
+      }
+    },
+
+    async checkSalesforceList () {
+      const res = await talk2Api.V2.integrations.salesforce.listExists(this.integrationListId)
+
+      if (res.data.exists) {
+        this.integrationImportConfirmMessage = 'The Salesforce list you are trying to import shares the name of a list that already exists, and will update that list once the import is complete. Would you like to proceed?'
         this.showIntegrationImportConfirmDialog = true
       }
     },
