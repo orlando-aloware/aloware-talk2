@@ -16640,4 +16640,8 @@ hr {
   .loading-spinner {
     margin-top: -80px;
   }
+
+  .scrollableArea .datatable {
+    z-index: 4;
+  }
 }
