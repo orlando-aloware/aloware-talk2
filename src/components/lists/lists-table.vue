@@ -1054,7 +1054,7 @@ export default {
     isColumnVisible (field) {
       switch (field) {
         case this.COLUMN_NAMES.owner_name:
-          return this.isPublic || this.personalListsFilterSelected
+          return this.isPublic || this.publicListsFilterSelected || this.personalListsFilterSelected
         case this.COLUMN_NAMES.show_in_public_folder:
           return this.isGlobalSearch
         default:
@@ -1188,6 +1188,15 @@ export default {
       this.search = ''
       this.refreshLists()
       this.refreshFoldersPath()
+    },
+    isPublic () {
+      this.initFixedColumns()
+    },
+    publicListsFilterSelected () {
+      this.initFixedColumns()
+    },
+    personalListsFilterSelected () {
+      this.initFixedColumns()
     },
     folders () {
       this.SET_SEARCH('')
