@@ -176,7 +176,7 @@
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.date_created">
                 <relative-time humanized
-                              :from-time="row[col.field]" />
+                               :from-time="row[col.field]" />
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.no_of_contacts">
                 {{ row.no_of_contacts }}
@@ -201,7 +201,7 @@
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.imported_at">
                 <relative-time humanized
-                              :from-time="row[col.field]"
+                               :from-time="row[col.field]"
                               v-if="row[col.field]" />
                 <span v-else>-</span>
               </div>
@@ -281,8 +281,8 @@
                                      data-testid="lists-add-to-sequence-option"
                                      @click="onEnrollContactsToSequence(row)">
                       <add-sequence-icon height="14"
-                                        width="14"
-                                        color="#62666E"/>
+                                         width="14"
+                                         color="#62666E"/>
                       Add List to Sequence
                     </b-dropdown-item>
 
@@ -306,10 +306,10 @@
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
-                                    data-testid="lists-move-option"
-                                    :data-popper-target="'list-' + row.id"
-                                    v-if="!row.show_in_public_folder"
-                                    @click.stop="onMoveList(row)">
+                                     data-testid="lists-move-option"
+                                     :data-popper-target="'list-' + row.id"
+                                     v-if="!row.show_in_public_folder"
+                                     @click.stop="onMoveList(row)">
                       <move-icon />
                       Move List
                     </b-dropdown-item>
@@ -1205,25 +1205,3 @@ export default {
   }
 }
 </script>
-<style>
-.lists-management .talk-table {
-  max-height: calc(100% - 136px);
-}
-
-.lists-management .talk-table td {
-  padding: 8px 16px;
-}
-
-.lists-management .dropdown-btn-text {
-  font-size: 12px;
-  font-weight: 400;
-}
-
-.lists-management #cols-actions {
-  max-width: initial !important;
-}
-
-.lists-management .loading-spinner {
-  margin-top: -80px;
-}
-</style>

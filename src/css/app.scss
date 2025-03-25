@@ -16618,3 +16618,26 @@ hr {
     padding-right: 0px;
   }
 }
+
+.lists-management  {
+  .talk-table {
+    max-height: calc(100% - 136px);
+
+    td {
+      padding: 8px 16px;
+    }
+  }
+  
+  .dropdown-btn-text {
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  #cols-actions {
+    max-width: initial !important;
+  }
+
+  .loading-spinner {
+    margin-top: -80px;
+  }
+}
