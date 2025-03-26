@@ -41,11 +41,11 @@
 
     <webrtc
       :carrierName="authProfile.carrier_name"
+      :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
-      :start-dialing="startDialing"
-      v-if="allowed"
+      v-else-if="allowed"
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
       @handleCall="handleCall"
@@ -54,23 +54,15 @@
 </template>
 
 <script>
+/* global sforce */ // Declare sforce as a global variable
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
 import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import {
-  timezoneCheckMixin,
-  helperMixin,
-  agentMixin,
-  dispositionsMixin,
-  visibilityMixin,
-  notificationMixin
-} from 'src/plugins/mixins'
+import { timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
-import { CURRENT_STATUS_COMPLETED_NEW } from 'src/constants/communication-current-status'
-import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 
 export default {
   name: 'Dialer',
@@ -80,14 +72,7 @@ export default {
     DialerListeners
   },
 
-  mixins: [
-    timezoneCheckMixin,
-    helperMixin,
-    agentMixin,
-    dispositionsMixin,
-    visibilityMixin,
-    notificationMixin
-  ],
+  mixins: [ timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin ],
 
   props: {
     apiKey: {
@@ -97,7 +82,6 @@ export default {
 
   data () {
     return {
-      startDialing: false,
       isFirstLoading: true,
       isDialed: false,
       loading: false,
@@ -118,11 +102,10 @@ export default {
       authProfile: null,
       listeners: {
         userLoggedIn: null,
-        agentStatusUpdated: null,
-        newInAppCall: null
+        agentStatusUpdated: null
       },
       // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
-      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', 'ANSWERING_CALL'],
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY'],
       opencti_loaded: false,
       // original path is https://MyDomainName--PackageName.vf.force.com/support/api/63.0/interaction.js
       // documentation https://developer.salesforce.com/docs/atlas.en-us.api_cti.meta/api_cti/sforce_api_cti_connecting.htm
@@ -141,10 +124,10 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['dialer', 'salesforceDialNumber', 'ringGroups']),
+    ...mapState(['isWidget', 'dialer', 'salesforceDialNumber']),
 
     allowed () {
-      return this.authProfile && this.initialized
+      return this.authProfile && this.initialized && this.defaultCampaignInitialized
     },
 
     isLoadingDialer () {
@@ -163,40 +146,6 @@ export default {
 
     if (this.$route.query.small) {
       this.small = true
-    }
-
-    this.listeners.newInAppCall = (communication) => {
-      const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
-      const isFishingMode = ringGroup && ringGroup.should_queue && ringGroup.fishing_mode
-
-      if (!isFishingMode && !this.checkCommunicationMatchesUserAccessibility(communication)) {
-        return
-      }
-
-      const communicationType = communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
-      communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
-        ? 'missed call'
-        : 'call'
-
-      // ignore call notifications if the call is not fishing mode and the user is in sleep mode
-      if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
-        this.processActionNotification(communication, communicationType)
-
-        if (this.opencti_loaded) {
-          this.showAlertCallNotStarted = false
-          this.showAlertCallFinished = false
-          this.isDialed = true
-          window.sforce.opencti.isSoftphonePanelVisible({
-            callback: function (response) {
-              if (response.success && !response.returnValue.visible) {
-                window.sforce.opencti.setSoftphonePanelVisibility({
-                  visible: true
-                })
-              }
-            }
-          })
-        }
-      }
     }
   },
 
@@ -224,10 +173,7 @@ export default {
       'resetVuex',
       'setIsWidget',
       'setIsSalesforceWidget',
-      'setSalesforceDialNumber',
-      'setNotifications',
-      'setShowIncomingCallNotification',
-      'setShowPhone'
+      'setSalesforceDialNumber'
     ]),
 
     ...mapActions('cache', [
@@ -238,7 +184,6 @@ export default {
       this.showAlertCallFinished = false
       // Hide the Bootstrap Vue modal by its ID
       this.$bvModal.hide('daytime-hours-confirmation')
-      this.startDialing = true
 
       do {
         await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
@@ -347,15 +292,7 @@ export default {
         return
       }
       // Enable click-to-dial functionality
-      window.sforce.opencti.enableClickToDial()
-    },
-
-    disableClickToDial () {
-      if (!this.opencti_loaded) {
-        return
-      }
-      // Enable click-to-dial functionality
-      window.sforce.opencti.disableClickToDial()
+      sforce.opencti.enableClickToDial()
     },
 
     handleUserLogin () {
@@ -363,22 +300,6 @@ export default {
       if (this.profile && this.profile?.go_to_available_after_login && !this.dialer.call && !this.checkForceDisposition) {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-InitAuth-3')
       }
-
-      this.$VueEvent.listen('new_in_app_call', this.listeners.newInAppCall)
-
-      // Register listeners for call action buttons
-      this.$VueEvent.listen('answerCall', () => {
-        console.log('Answering incoming call in SalesforceSoftPhone')
-
-        // Disable click-to-dial functionality
-        this.disableClickToDial()
-        this.$VueEvent.fire('showPhone')
-      })
-
-      this.$VueEvent.listen('rejectCall', () => {
-        this.showAlertCallFinished = true
-        console.log('Rejecting incoming call in SalesforceSoftPhone')
-      })
     },
 
     handleCallCompletedEvent (skipCallFinished = false) {
@@ -386,7 +307,6 @@ export default {
       this.isDialed = false
 
       this.enableClickToDial()
-      this.startDialing = false
 
       this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
       if (!this.defaultOutboundCampaignId) {
@@ -443,8 +363,10 @@ export default {
         return
       }
 
-      // Disable click-to-dial functionality
-      this.disableClickToDial()
+      if (this.opencti_loaded) {
+        // Disable click-to-dial functionality
+        sforce.opencti.disableClickToDial()
+      }
 
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.salesforceDialNumber?.number),
@@ -537,17 +459,9 @@ export default {
       // Check if the script is already loaded in the DOM
       if (document.querySelector(`script[src="${this.opencti_script_path}"]`)) {
         console.log('OpenCTI script already exists in DOM')
-
-        // If script exists but window.sforce doesn't, remove the script to reload it
-        if (!window.sforce || !window.sforce.opencti) {
-          console.log('Script exists but window.sforce not found, reloading script')
-          const existingScript = document.querySelector(`script[src="${this.opencti_script_path}"]`)
-          existingScript.remove()
-        } else {
-          this.opencti_loaded = true
-          this.initializeOpenCti()
-          return
-        }
+        this.opencti_loaded = true
+        this.initializeOpenCti()
+        return
       }
 
       console.log('Loading Salesforce OpenCTI script from:', this.opencti_script_path)
@@ -570,9 +484,8 @@ export default {
     },
 
     initializeOpenCti () {
-      if (typeof window.sforce === 'undefined' || !window.sforce.opencti) {
-        console.error('Salesforce OpenCTI API (window.sforce.opencti) is not available')
-        this.criticalErrorHappened = true
+      if (typeof sforce === 'undefined' || !sforce.opencti) {
+        console.error('Salesforce OpenCTI API (sforce.opencti) is not available')
         return
       }
 
@@ -581,7 +494,7 @@ export default {
       // Set up click-to-dial event listener
       const clickToDialListener = (payload) => {
         console.log('Click-to-dial event received with number:', payload)
-        window.sforce.opencti.setSoftphonePanelVisibility({
+        sforce.opencti.setSoftphonePanelVisibility({
           visible: true
         })
 
@@ -600,7 +513,7 @@ export default {
       }
 
       // Register the click-to-dial listener
-      window.sforce.opencti.onClickToDial({
+      sforce.opencti.onClickToDial({
         listener: clickToDialListener
       })
 
@@ -626,19 +539,6 @@ export default {
         this.showAlertAgentOnCall = true
         this.showAlertCallFinished = false
       }
-    }
-  },
-
-  beforeDestroy () {
-    // Clean up event listeners
-    if (this.listeners.newInAppCall) {
-      this.$VueEvent.stop('new_in_app_call', this.listeners.newInAppCall)
-    }
-
-    // Destroy sforce object when component is destroyed
-    if (window.sforce) {
-      console.log('Destroying sforce object as component is being unmounted')
-      window.sforce = undefined
     }
   }
 }
