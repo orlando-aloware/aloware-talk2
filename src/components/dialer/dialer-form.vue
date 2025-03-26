@@ -377,16 +377,12 @@ export default {
 
   created () {
     this.$VueEvent.listen('changePhoneNumber', async (data) => {
-      if (!this.campaignId) {
-        await this.findDefaultOutboundCampaign()
-      }
-
-      this.setMode('call')
-
       await this.changePhoneNumber(data)
       await this.setLastUsedCallLine()
 
-      if (this.campaignId && (this.shouldMakeCallDirectlyAccountLevel || this.shouldMakeCallDirectlyUserLevel)) {
+      this.setMode('call')
+
+      if (this.campaignId && !this.callDisabled) {
         this.makeCall()
       }
     })
