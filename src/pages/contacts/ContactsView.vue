@@ -318,11 +318,11 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-sync-with-integration-dropdown"
-                           v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST && this.list.remote_list_url'
+                           v-if='this.list?.remote?.data'
                            @click="updateRemoteList">
             <folder-dynamic-icon color="#00bf4a"
                                  :data-testid="`contacts-view-sync-dynamic-remote-icon`"/>
-            Sync with HubSpot
+            Sync with Integration
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
