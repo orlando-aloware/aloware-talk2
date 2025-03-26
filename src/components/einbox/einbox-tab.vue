@@ -1,7 +1,8 @@
 <template>
   <div class="einbox-tab">
     <einbox-tab-header :collapse-target="collapseTarget"
-                       @search="onSearch" />
+                       :search="search"
+                       @search="search = $event" />
 
     <einbox-channel-toggle @channel="onChannel"/>
 
@@ -97,6 +98,7 @@ export default {
   data () {
     return {
       activeId: null,
+      search: '',
       THREADED,
       UNTHREADED,
       EINBOXES_MENU_ITEMS_TITLE,
@@ -171,17 +173,13 @@ export default {
       this.$router.push(route)
     },
 
-    onSearch (search) {
-      this.fetchItems(this.activeInboxId, search || null)
-    },
-
     onChannel () {
       if (!this.activeInboxId) {
         return
       }
 
       this.resetItems()
-      this.fetchItems(this.activeInboxId)
+      this.fetchItems(this.activeInboxId, this.search || null)
     },
 
     handleUnthreadedCommunication (communication, isNew = false) {
@@ -249,8 +247,6 @@ export default {
 
     updatedCommunicationListener (communication) {
       this.processCommunication(communication, false)
-
-      // this.showSearchTooltip = false FIXME
     },
 
     getMessageBody (item) {
@@ -281,6 +277,10 @@ export default {
       if (this.isMobile && route === EINBOXES_MENU_ITEMS_TITLE) {
         this.activeId = null
       }
+    },
+
+    search (search) {
+      this.fetchItems(this.activeInboxId, search || null)
     },
 
     items () {

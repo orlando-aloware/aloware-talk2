@@ -41,7 +41,7 @@
                     placeholder="Type ENTER to search comms..."
                     class="einbox-tab__header__search"
                     :id="`einbox-tab-search-${_uid}`"
-                    @search="search = $event"
+                    @search="$emit('search', $event)"
                     @blur="onLeaveSearch"
                     @focus="showSearchTooltip = true"/>
       <b-tooltip custom-class="talk-table__tooltip"
@@ -68,6 +68,11 @@ export default {
     collapseTarget: {
       type: HTMLElement,
       default: null
+    },
+
+    search: {
+      type: String,
+      required: true
     }
   },
 
@@ -80,7 +85,6 @@ export default {
 
   data: () => ({
     isSearchActive: false,
-    search: '',
     showSearchTooltip: false,
     collapsed: false,
     DEFAULT_COMMUNICATIONS_ROUTE_PATH
@@ -121,11 +125,6 @@ export default {
       }
 
       this.$emit('search', search)
-    },
-
-    viewMode () {
-      this.isSearchActive = false
-      this.search = ''
     }
   }
 }
