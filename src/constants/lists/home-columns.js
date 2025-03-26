@@ -18,7 +18,7 @@ export const COLUMNS = [
     field: 'name',
     align: 'left',
     sortable: true,
-    minWidth: 390,
+    minWidth: 200,
     resizable: true
   },
   {
