@@ -37,7 +37,8 @@
       </template>
 
       <template v-else>
-        <search-input ref="search"
+        <search-input no-clear-on-route-change
+                      ref="search"
                       placeholder="Type ENTER to search comms..."
                       class="einbox-tab__header__search"
                       :id="`einbox-tab-search-${_uid}`"
