@@ -278,13 +278,6 @@ export default {
   },
 
   watch: {
-    filteredDispositions: {
-      immediate: true,
-      handler (newVal) {
-        this.options = newVal
-      }
-    },
-
     value () {
       this.getCallDisposition()
       this.selectedId = this.value
