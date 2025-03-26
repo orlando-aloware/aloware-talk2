@@ -24,21 +24,6 @@ export default {
 
     isUseCompanyDefaultOutboundCallingMode () {
       return this.user?.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_USE_COMPANY_DEFAULT
-    },
-
-    shouldMakeCallDirectlyAccountLevel () {
-      return (this.forceOutboundLine && this.currentCompany.default_outbound_campaign_id) ||
-        (this.isUseCompanyDefaultOutboundCallingMode && this.currentCompany.default_outbound_campaign_id)
-    },
-
-    shouldMakeCallDirectlyUserLevel () {
-      if (this.forceOutboundLine) {
-        return false
-      }
-
-      return !this.isAlwaysAskOutboundCallingMode &&
-        ((this.isSelectManuallyOutboundCallingMode && this.user.default_outbound_campaign_id) ||
-          (this.isUseCompanyDefaultOutboundCallingMode && this.currentCompany.default_outbound_campaign_id))
     }
   }
 }
