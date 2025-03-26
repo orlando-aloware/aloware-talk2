@@ -380,8 +380,9 @@ export default {
       await this.changePhoneNumber(data)
       await this.setLastUsedCallLine()
 
+      this.setMode('call')
+
       if (this.campaignId && !this.callDisabled) {
-        this.setMode('call')
         this.makeCall()
       }
     })
