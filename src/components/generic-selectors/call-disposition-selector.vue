@@ -41,11 +41,11 @@
         <q-item-section avatar>
           <q-icon name="fa fa-bolt"
                   :style="{ color: scope.opt.color, fontSize: '14px' }"
-                  v-show="!scope.opt.is_external && !shouldFilterExternalDispositions">
+                  v-show="!scope.opt.is_external">
           </q-icon>
           <q-icon name="fa fa-lock"
                   :style="{ color: scope.opt.color, fontSize: '14px' }"
-                  v-show="scope.opt.is_external && !shouldFilterExternalDispositions">
+                  v-show="scope.opt.is_external">
           </q-icon>
         </q-item-section>
         <q-item-section>

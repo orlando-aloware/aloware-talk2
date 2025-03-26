@@ -31,20 +31,18 @@
                  @close="onSelectClose"
                  @input="changeCallDisposition">
       <template slot="option" slot-scope="props">
-        <div class="option__desc" :class="{'no-icon': shouldFilterExternalDispositions}">
-          <template v-if="!shouldFilterExternalDispositions">
-            <q-icon name="fa fa-bolt"
-                    :style="{ color: props.option.color }"
-                    v-show="!props.option.is_external"
-                    data-testid="call-disposition-selector-icon-no-external">
-            </q-icon>
-            <q-icon name="fa fa-lock"
-                    :style="{ color: props.option.color }"
-                    v-show="props.option.is_external"
-                    data-testid="call-disposition-selector-icon-external">
-            </q-icon>
-          </template>
-          <span class="option__small" :class="{'no-margin': shouldFilterExternalDispositions}">{{ props.option.name }}</span>
+        <div class="option__desc">
+          <q-icon name="fa fa-bolt"
+                  :style="{ color: props.option.color }"
+                  v-show="!props.option.is_external"
+                  data-testid="call-disposition-selector-icon-no-external">
+          </q-icon>
+          <q-icon name="fa fa-lock"
+                  :style="{ color: props.option.color }"
+                  v-show="props.option.is_external"
+                  data-testid="call-disposition-selector-icon-external">
+          </q-icon>
+          <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
       </template>
       <span slot="noResult" data-testid="call-disposition-no-call-found">
@@ -79,20 +77,18 @@
                  @close="onSelectClose"
                  @input="selectCallDisposition">
       <template slot="option" slot-scope="props">
-        <div class="option__desc" :class="{'no-icon': shouldFilterExternalDispositions}">
-          <template v-if="!shouldFilterExternalDispositions">
-            <q-icon name="fa fa-bolt"
-                    :style="{ color: props.option.color }"
-                    v-show="!props.option.is_external"
-                    data-testid="call-disposition-selector-icon-no-external">
-            </q-icon>
-            <q-icon name="fa fa-lock"
-                    :style="{ color: props.option.color }"
-                    v-show="props.option.is_external"
-                    data-testid="call-disposition-selector-icon-external">
-            </q-icon>
-          </template>
-          <span class="option__small" :class="{'no-margin': shouldFilterExternalDispositions}">{{ props.option.name }}</span>
+        <div class="option__desc">
+          <q-icon name="fa fa-bolt"
+                  :style="{ color: props.option.color }"
+                  v-show="!props.option.is_external"
+                  data-testid="call-disposition-selector-icon-no-external">
+          </q-icon>
+          <q-icon name="fa fa-lock"
+                  :style="{ color: props.option.color }"
+                  v-show="props.option.is_external"
+                  data-testid="call-disposition-selector-icon-external">
+          </q-icon>
+          <span class="option__small ml-2">{{ props.option.name }}</span>
         </div>
       </template>
       <span slot="noResult" data-testid="call-disposition-selector-no-call-found">
@@ -317,14 +313,3 @@ export default {
 }
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
-<style>
-.no-icon {
-  padding-left: 0;
-}
-.no-margin {
-  margin-left: 0 !important;
-}
-.option__small {
-  margin-left: 4px;
-}
-</style>
