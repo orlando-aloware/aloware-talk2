@@ -158,7 +158,7 @@ export default {
     ...mapState(['callDispositions']),
 
     shouldFilterExternalDispositions () {
-      // Just HubSpot for now
+      // Just check for HubSpot Integration for now
       return this.currentCompany?.hubspot_integration_enabled === true
     },
 

@@ -255,12 +255,6 @@ export default {
   },
 
   watch: {
-    filteredDispositions: {
-      immediate: true,
-      handler (newVal) {
-        this.options = newVal
-      }
-    },
     value () {
       this.selectedId = this.value
     },
