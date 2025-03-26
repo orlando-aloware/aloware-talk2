@@ -19,6 +19,23 @@
                               :data-testid="'contacts-pinned-non-default-list-'+item.id"
                               :countsLoading="loading">
         </contacts-pinned-item>
+        <div v-if="nonDefaultLists.length === 0" class="d-flex flex-column align-items-center justify-content-center">
+          <div class="header__header__title font-weight-bold flex-grow-1 mt-4">
+            Where are my contact lists?
+          </div>
+          <div class="mt-2 px-4">
+            <p>Your contact lists are now managed in the <span class="font-weight-bold">List Management</span> page.</p>
+            <p>To make a list appear here, simply pin 📍 it using the <span class="font-weight-bold">Actions</span> menu in <span class="font-weight-bold">List Management</span>.</p>
+            <p>To remove a list from this view, just unpin it from the same menu.</p>
+          </div>
+          <div class="px-4 w-100 mt-3 mb-4">
+            <router-link
+              :to="{ name: 'Lists' }"
+              class="btn btn-primary w-100">
+              Go to Lists Management
+            </router-link>
+          </div>
+        </div>
       </template>
       <contacts-sidebar-loader v-if="loadingPinned"></contacts-sidebar-loader>
     </div>
