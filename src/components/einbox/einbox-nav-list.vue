@@ -87,6 +87,8 @@ export default {
       'isLoadingInboxes'
     ]),
 
+    ...mapState('auth', ['profile']),
+
     ...mapState(['isMobile'])
   },
 
@@ -95,7 +97,8 @@ export default {
       'setActiveInboxId',
       'setActiveInbox',
       'resetInboxes',
-      'resetItems'
+      'resetItems',
+      'setInboxes'
     ]),
 
     onScroll ({ verticalPosition, verticalSize, verticalContainerSize }) {
@@ -134,6 +137,67 @@ export default {
 
     onSearch (search) {
       this.search = search
+    },
+
+    orderInboxes () {
+      this.inboxesData = this.inboxesData.sort((a, b) => a.name.localeCompare(b.name))
+    },
+
+    checkAndRedirectActiveInbox (ringGroup) {
+      const inboxId = this.$route.params.inboxId
+        ? parseInt(this.$route.params.inboxId)
+        : (!this.isMobile ? this.inboxesData[0].id : null)
+
+      if (inboxId && inboxId === ringGroup.id) {
+        this.$router.push({ name: EINBOXES_MENU_TITLE })
+      }
+    },
+
+    newRingGroupListener (ringGroup) {
+      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+        this.inboxesData.push(ringGroup)
+        this.orderInboxes()
+        this.setInboxes({
+          data: [...this.inboxesData]
+        })
+      }
+    },
+
+    updateRingGroupListener (ringGroup) {
+      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+        const index = this.inboxesData.findIndex(inbox => inbox.id === ringGroup.id)
+
+        if (index !== -1) {
+          this.inboxesData[index] = ringGroup
+        } else {
+          this.inboxesData.push(ringGroup)
+        }
+
+        this.orderInboxes()
+        this.setInboxes({
+          data: [...this.inboxesData]
+        })
+      } else {
+        const index = this.inboxesData.findIndex(inbox => inbox.id === ringGroup.id)
+        if (index !== -1) {
+          this.inboxesData.splice(index, 1)
+          this.setInboxes({
+            data: [...this.inboxesData]
+          })
+          this.checkAndRedirectActiveInbox(ringGroup)
+        }
+      }
+    },
+
+    deleteRingGroupListener (ringGroup) {
+      const index = this.inboxesData.findIndex(inbox => inbox.id === ringGroup.id)
+      if (index !== -1) {
+        this.inboxesData.splice(index, 1)
+        this.setInboxes({
+          data: [...this.inboxesData]
+        })
+        this.checkAndRedirectActiveInbox(ringGroup)
+      }
     }
   },
 
