@@ -3,7 +3,7 @@
     <einbox-tab-header :collapse-target="collapseTarget"
                        @search="onSearch" />
 
-    <einbox-channel-toggle />
+    <einbox-channel-toggle @channel="onChannel"/>
 
     <!-- Items List -->
     <div class="items-list blue-scroll"
@@ -173,6 +173,15 @@ export default {
 
     onSearch (search) {
       this.fetchItems(this.activeInboxId, search || null)
+    },
+
+    onChannel () {
+      if (!this.activeInboxId) {
+        return
+      }
+
+      this.resetItems()
+      this.fetchItems(this.activeInboxId)
     },
 
     handleUnthreadedCommunication (communication, isNew = false) {

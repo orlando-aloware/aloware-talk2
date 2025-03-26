@@ -34,24 +34,18 @@
 </template>
 
 <script>
-import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { mapActions, mapState } from 'vuex'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 
 export default {
-  mixins: [
-    EinboxMixin
-  ],
-
   components: {
     InformationCircleIcon
   },
 
   computed: {
     ...mapState('Einbox', [
-      'viewMode',
-      'activeInboxId'
+      'viewMode'
     ]),
 
     options () {
@@ -77,11 +71,7 @@ export default {
 
     onChange (value) {
       this.setViewMode(value)
-
-      if (this.activeInboxId) {
-        this.resetItems()
-        this.fetchItems(this.activeInboxId)
-      }
+      this.$emit('channel', value)
     }
   }
 }
