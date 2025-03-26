@@ -272,6 +272,10 @@ export default {
       }
     },
 
+    '$route.params.inboxId' () {
+      this.search = ''
+    },
+
     '$route.name' (route) {
       // reset activeId in mobile when this page is opened
       if (this.isMobile && route === EINBOXES_MENU_ITEMS_TITLE) {
