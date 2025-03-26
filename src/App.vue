@@ -140,9 +140,19 @@ export default {
         return
       }
 
-      window.axios.post('/api/v1/contact', {
-        add_phone_number: fixedPhoneNumber
-      }).then(res => {
+      const requestData = {
+        phone_number: fixedPhoneNumber
+      }
+
+      if (data.first_name) {
+        requestData.first_name = data.first_name
+      }
+
+      if (data.last_name) {
+        requestData.last_name = data.last_name
+      }
+
+      window.axios.post('/api/v2/contacts/click-to-call', requestData).then(res => {
         this.isPageLoading = false
         const contact = res.data
         const callData = {
@@ -172,9 +182,19 @@ export default {
     this.$VueEvent.listen('add_contact', (data) => {
       this.isPageLoading = true
 
-      window.axios.post('/api/v1/contact', {
-        add_phone_number: this.$options.filters.fixPhone(data.phone_number)
-      }).then(res => {
+      const requestData = {
+        phone_number: this.$options.filters.fixPhone(data.phone_number)
+      }
+
+      if (data.first_name) {
+        requestData.first_name = data.first_name
+      }
+
+      if (data.last_name) {
+        requestData.last_name = data.last_name
+      }
+
+      window.axios.post('/api/v2/contacts/click-to-call', requestData).then(res => {
         this.isPageLoading = false
         this.$router.replace('/contacts/' + res.data.id)
           .catch(this.$handleRouteError)
