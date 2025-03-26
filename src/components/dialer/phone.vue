@@ -1,7 +1,7 @@
 <template>
   <div class="phone d-flex flex-column"
        ref="phone"
-       :class="{ 'phone-with-banner': banner, 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': isWidget }"
+       :class="{ 'phone-with-banner': banner, 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center flex-grow-0"
@@ -26,7 +26,7 @@
               'flex-row',
               'justify-content-between',
               'align-items-center',
-              (isWidget && (isCallCompleted || loadingPhone)) ? 'width-32' : 'width-65'
+              (is_widget && (isCallCompleted || loadingPhone)) ? 'width-32' : 'width-65'
             ]">
         <pause-record-icon width="14"
                            height="14"
@@ -98,7 +98,7 @@
           </div>
         </q-btn-dropdown>
 
-        <q-btn v-show="!isWidget"
+        <q-btn v-show="!is_widget"
                class="icon-btn auto-size height-12"
                icon="img:app-icons/dialer/phone_exit.svg"
                size="12px"
@@ -150,7 +150,7 @@
                 <span class="d-inline-flex">
                   {{ contactName | truncate(15) }}
                 </span>
-                <q-btn v-if="!isWidget"
+                <q-btn v-if="!is_widget"
                        class="text-size-rg d-inline-flex ml-1"
                        color="white"
                        icon="o_info"
@@ -1379,6 +1379,12 @@ export default {
   ],
 
   props: {
+    is_widget: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
     ignore_calls: {
       type: Boolean,
       required: false,
@@ -1486,8 +1492,7 @@ export default {
       'parkedCalls',
       'callFishingQueue',
       'isCallBackButtonDisabled',
-      'isWidget',
-      'isSalesforceWidget'
+      'isWidget'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -2016,7 +2021,7 @@ export default {
     },
 
     setupDraggable () {
-      if (!this.isWidget && this.shouldShow) {
+      if (!this.is_widget && this.shouldShow) {
         this.openPhone()
 
         setTimeout(() => {
@@ -2036,7 +2041,7 @@ export default {
     },
 
     widgetShouldOpen () {
-      if ((this.isSalesforceWidget ? false : this.isWidget) && this.shouldShow) {
+      if (this.is_widget && this.shouldShow) {
         this.openPhone()
       }
     },
@@ -2688,8 +2693,8 @@ export default {
         this.$emit('onPhoneVisible', false)
 
         // emit the callCompleted event to display a message to close the widget.
-        // only emit the event if isWidget=true and the finish button is clicked.
-        if (this.isWidget && !this.callbackAction) {
+        // only emit the event if is_widget=true and the finish button is clicked.
+        if (this.is_widget && !this.callbackAction) {
           this.$emit('callCompleted')
         }
 
