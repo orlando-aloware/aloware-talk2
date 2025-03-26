@@ -152,6 +152,10 @@ export default {
         requestData.last_name = data.last_name
       }
 
+      if (data.is_company) {
+        requestData.is_company = data.is_company
+      }
+
       window.axios.post('/api/v2/contacts/click-to-call', requestData).then(res => {
         this.isPageLoading = false
         const contact = res.data
@@ -192,6 +196,10 @@ export default {
 
       if (data.last_name) {
         requestData.last_name = data.last_name
+      }
+
+      if (data.is_company) {
+        requestData.is_company = data.is_company
       }
 
       window.axios.post('/api/v2/contacts/click-to-call', requestData).then(res => {
