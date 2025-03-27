@@ -1250,12 +1250,23 @@ export default {
 
   methods: {
     processUrl (url) {
-      const params = url.split('//////////')
-      const phoneNumber = decodeURIComponent(params[1] || '')
-      const firstName = decodeURIComponent(params[2] || '').trim()
-      const lastName = decodeURIComponent(params[3] || '').trim()
-      const isCompany = params[4] === 'true'
-
+      // New format: expected url like "contact-<phoneNumber>" or "contact-<phoneNumber>?first=...&last=...&isCompany=..."
+      let cleaned = url.replace(/contact[:-]/, '')
+      let phoneNumber, firstName, lastName, isCompany
+      if (cleaned.indexOf('?') !== -1) {
+        let parts = cleaned.split('?')
+        phoneNumber = parts[0]
+        let query = parts[1]
+        let params = new URLSearchParams(query)
+        firstName = params.get('first_name') || ''
+        lastName = params.get('last_name') || ''
+        isCompany = params.get('is_company') === 'true'
+      } else {
+        phoneNumber = cleaned
+        firstName = ''
+        lastName = ''
+        isCompany = false
+      }
       return {
         phoneNumber: this.$options.filters.fixPhone(phoneNumber),
         firstName: firstName,
@@ -1293,28 +1304,16 @@ export default {
       }
 
       if (url.indexOf('alowaretalk:') > -1) {
-        if (url.indexOf('contact/') > -1) {
-          const { phoneNumber, firstName, lastName, isCompany } = this.processUrl(url)
-
+        if (url.indexOf('contact:') > -1 || url.indexOf('contact-') > -1) {
+          const contactData = this.processUrl(action)
+          console.log('contactData: ', contactData)
           this.$VueEvent.fire('add_contact', {
-            phone_number: phoneNumber,
-            first_name: firstName,
-            last_name: lastName,
-            is_company: isCompany
+            phone_number: contactData.phoneNumber,
+            first_name: contactData.firstName,
+            last_name: contactData.lastName,
+            is_company: contactData.isCompany
           })
-
           return
-        }
-
-        if (url.indexOf('call/') > -1) {
-          const { phoneNumber, firstName, lastName, isCompany } = this.processUrl(url)
-
-          this.$VueEvent.fire('make_new_call', {
-            phone_number: phoneNumber,
-            first_name: firstName,
-            last_name: lastName,
-            is_company: isCompany
-          })
         }
       }
 

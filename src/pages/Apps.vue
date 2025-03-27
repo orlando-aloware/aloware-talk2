@@ -104,7 +104,22 @@ export default {
         return
       }
 
-      const opened = await window.open(`${ALOWARE_PROTOCOL}${this.action}//////////${this.phoneNumber}//////////${this.firstName}//////////${this.lastName}//////////${this.isCompany}`, '_blank')
+      let deepLink = `${ALOWARE_PROTOCOL}${this.action}-${this.phoneNumber}`
+      const params = []
+      if (this.firstName) {
+        params.push(`first_name=${encodeURIComponent(this.firstName)}`)
+      }
+      if (this.lastName) {
+        params.push(`last_name=${encodeURIComponent(this.lastName)}`)
+      }
+      if (this.isCompany === true) {
+        params.push(`is_company=true`)
+      }
+      if (params.length) {
+        deepLink += `?${params.join('&')}`
+      }
+
+      const opened = await window.open(deepLink, '_blank')
       if (opened) {
         window.close()
       }
