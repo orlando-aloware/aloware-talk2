@@ -15,6 +15,8 @@ export default function () {
     isLoadingMoreItems: false,
     currentItemsPage: 0,
     hasMoreItems: true,
-    abortController: null
+    abortController: null,
+    showRefreshInboxesButton: false,
+    showRefreshCommunicationsButton: false
   }
 }

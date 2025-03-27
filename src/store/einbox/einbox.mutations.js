@@ -55,6 +55,12 @@ export default {
   },
   SET_ABORT_CONTROLLER (state, abortController) {
     state.abortController = abortController
+  },
+  SET_SHOW_REFRESH_INBOXES_BUTTON (state, show) {
+    state.showRefreshInboxesButton = show
+  },
+  SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON (state, show) {
+    state.showRefreshCommunicationsButton = show
   }
 }
 
