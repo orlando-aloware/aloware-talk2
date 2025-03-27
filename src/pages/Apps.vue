@@ -105,18 +105,18 @@ export default {
       }
 
       let deepLink = `${ALOWARE_PROTOCOL}${this.action}-${this.phoneNumber}`
-      const params = []
+      const params = new URLSearchParams()
       if (this.firstName) {
-        params.push(`first_name=${encodeURIComponent(this.firstName)}`)
+        params.append('first_name', this.firstName)
       }
       if (this.lastName) {
-        params.push(`last_name=${encodeURIComponent(this.lastName)}`)
+        params.append('last_name', this.lastName)
       }
       if (this.isCompany === 'true') {
-        params.push(`is_company=true`)
+        params.append('is_company', 'true')
       }
-      if (params.length) {
-        deepLink += `?${params.join('&')}`
+      if (params.toString()) {
+        deepLink += `?${params.toString()}`
       }
 
       const opened = await window.open(deepLink, '_blank')
