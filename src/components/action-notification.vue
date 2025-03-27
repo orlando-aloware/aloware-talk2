@@ -566,7 +566,8 @@ export default {
       'setNotifications',
       'setShowPhone',
       'clearCallFishingQueue',
-      'removeFromCallFishingQueue'
+      'removeFromCallFishingQueue',
+      'setDialerCommunication'
     ]),
 
     startNotificationListeners () {
@@ -708,7 +709,6 @@ export default {
     },
 
     answerCommunication (shouldPark = false, shouldHangup = false) {
-      console.log('answerCommunication')
       const data = {
         communication: {
           id: this.communicationId,
@@ -722,10 +722,10 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
-
+      console.log('answerCommunication', data)
       if (!this.dialer.communication && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.$axios.post('/api/v1/profile/get-live-calls').then(res => {
-          this.dialer.communication = res.data[0]
+          this.setDialerCommunication(res.data[0])
           console.log('live call :) ', res.data[0])
           this.answerCallFishing(data)
         }).catch((err) => {

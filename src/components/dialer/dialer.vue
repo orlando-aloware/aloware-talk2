@@ -514,6 +514,7 @@ export default {
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {
+        console.log('return Promise resolve', this.dialer.communication, force)
         return Promise.resolve()
       }
 
@@ -526,6 +527,7 @@ export default {
         }
       }).then(res => {
         if (this.dialer.communication && !force) {
+          console.log('get communication - return')
           return Promise.resolve()
         }
 
@@ -558,7 +560,7 @@ export default {
           this.activeTask.id !== res.data.contact_id) {
           return Promise.resolve()
         }
-
+        console.log('get communication - setDialer communication', res.data)
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
@@ -578,9 +580,10 @@ export default {
             parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
+          console.log('set Dialer Contact', this.dialer.communication.contact)
           this.setDialerContact(this.dialer.communication.contact)
         }
-
+        console.log('setDialerCurrentNumber', this.dialer.communication.lead_number)
         this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.communication.lead_number, 'E164'))
         this.$VueEvent.fire('communicationLoaded')
         this.loadingCommunication = false
@@ -766,7 +769,7 @@ export default {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
         return
       }
-
+      console.log('Connect')
       this.connection = await this.device.connect(params, true)
       this.initConnectionEvents()
 
@@ -1171,6 +1174,10 @@ export default {
         console.log('Call parked')
 
         if (shouldAnswer) {
+          if (this.dialer.communication) {
+            this.setDialerCommunication()
+          }
+
           this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
         } else if (shouldUnpark) {
           this.unparkCall(data, true)
