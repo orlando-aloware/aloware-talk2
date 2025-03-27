@@ -99,13 +99,6 @@ export default {
       this.setDefaultShowMyContacts()
       this.setDefaultIsShortenedUrlRemembered()
     }
-
-    // CtC extension call to web app
-    if (this.$route.query.add_contact) {
-      this.$VueEvent.fire('add_contact', {
-        phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
-      })
-    }
   },
 
   mounted () {
@@ -192,6 +185,7 @@ export default {
 
     this.$VueEvent.listen('add_contact', (data) => {
       this.isPageLoading = true
+      console.log('adding contact 2', data)
 
       const requestData = {
         phone_number: this.$options.filters.fixPhone(data.phone_number)
@@ -205,8 +199,8 @@ export default {
         requestData.last_name = data.last_name
       }
 
-      if (data.is_company) {
-        requestData.is_company = data.is_company
+      if (data.is_company === 'true') {
+        requestData.is_company = true
       }
 
       window.axios.post('/api/v2/contacts/click-to-call', requestData).then(res => {
