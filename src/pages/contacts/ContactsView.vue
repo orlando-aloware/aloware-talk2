@@ -91,7 +91,7 @@
                 v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST'>
         <div class="text-dark">
           <span v-html="dynamicListHubSpotMessage"></span>
-          <span v-if='this.list.remote_list_url'> and click '<a href="javascript:void(0);" @click="updateRemoteList">Sync with HubSpot</a>' for immediate update, or wait up to one hour for automatic sync.</span>
+          <span v-if='this.list?.remote?.remote_url'> and click '<a href="javascript:void(0);" @click="updateRemoteList">Sync with HubSpot</a>' for immediate update, or wait up to one hour for automatic sync.</span>
         </div>
       </al-alert>
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
@@ -1019,8 +1019,8 @@ export default {
 
     dynamicListHubSpotMessage () {
       let text = 'This is a list managed by HubSpot.'
-      if (this.list.remote_list_url) {
-        text = text + ` Make your changes <a target='_blank' href='${this.list.remote_list_url}'>here</a>`
+      if (this.list?.remote?.remote_url) {
+        text = text + ` Make your changes <a target='_blank' href='${this.list.remote.remote_url}'>here</a>`
       }
 
       return text
