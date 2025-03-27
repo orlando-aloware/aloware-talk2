@@ -28,11 +28,11 @@ export default {
     },
 
     isForcedCallDisposition () {
-      return Boolean(this.currentCompany?.force_call_disposition || this.isForcedRedialEnabled)
+      return (this.currentCompany && this.currentCompany.force_call_disposition) || this.isForcedRedialEnabled
     },
 
     isForcedContactDisposition () {
-      return Boolean(this.currentCompany?.force_contact_disposition)
+      return this.currentCompany && this.currentCompany.force_contact_disposition
     },
 
     isNotDisposed () {
