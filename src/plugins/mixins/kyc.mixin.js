@@ -46,7 +46,7 @@ export default _.merge({
         return true
       }
 
-      if (this.isNotUSLine(selectedLine)) {
+      if (this.thereAreNotUSLines(selectedLine)) {
         /**
          * Allow messaging for non-US lines (Canada, GB, etc)
          */
@@ -72,8 +72,9 @@ export default _.merge({
       return window.open(link, '_self')
     },
 
-    isNotUSLine (selectedLine) {
-      return selectedLine?.incoming_numbers?.filter(number => number.country !== 'US').length > 0
+    // It verifies if there are not US lines on the selected line
+    thereAreNotUSLines (selectedLine) {
+      return selectedLine?.incoming_numbers?.filter(number => number.country === 'US').length === 0
     }
   }
 })
