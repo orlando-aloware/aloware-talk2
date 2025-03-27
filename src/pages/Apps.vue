@@ -4,7 +4,7 @@
                       extra-text2="👇"
                       image-link="/assets/images/logo.png"
                       title-text="Open with our desktop app"
-                      :extra-text="`Phone: ${phone}`"
+                      :extra-text="`Phone: ${phoneNumber}`"
                       :show-button="false"
                       :text="getActionText"
     />

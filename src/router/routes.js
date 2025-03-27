@@ -734,11 +734,11 @@ const routes = [
     props: (route) => {
       // Backward compatibility with old deep links from CtC extension
       if (route.query.action && route.query.phone) {
-        return { action: route.query.action, phone_number: route.query.phone }
+        return { action: route.query.action, phoneNumber: route.query.phone }
       }
 
       // New deep links from CtC extension
-      return { action: route.query.action, phone_number: route.query.phone_number, first_name: route.query.first_name, last_name: route.query.last_name, is_company: route.query.is_company }
+      return { action: route.query.action, phoneNumber: route.query.phone_number, firstName: route.query.first_name, lastName: route.query.last_name, isCompany: route.query.is_company }
     },
     component: Apps,
     meta: {
