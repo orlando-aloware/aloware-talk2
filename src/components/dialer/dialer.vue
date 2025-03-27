@@ -860,7 +860,7 @@ export default {
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
         if (this.dialer.communication) {
           const communication = this.dialer.communication
-          console.log('dialer communication', this.dialer.communication, this.dialer.communication.current_status2, communication.conference_status, CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW, communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW)
+          console.log('dialer communication', this.dialer.communication, this.dialer.communication.current_status2, communication.conference_status, CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW, communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW, communication.disposition_status2)
           console.log('dialer call', this.dialer.call)
           if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
             this.setDialerParkedCall(this.dialer.communication)
@@ -1478,6 +1478,7 @@ export default {
 
       // when communication is rejected by app, skip wrap-up
       if (this.dialer.communication?.rejected_by_app) {
+        console.log('rejected by app')
         this.$VueEvent.fire('callEnded')
         return
       }
