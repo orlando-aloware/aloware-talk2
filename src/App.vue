@@ -185,8 +185,6 @@ export default {
 
     this.$VueEvent.listen('add_contact', (data) => {
       this.isPageLoading = true
-      console.log('adding contact 2', data)
-
       const requestData = {
         phone_number: this.$options.filters.fixPhone(data.phone_number)
       }

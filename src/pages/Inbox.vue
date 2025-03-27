@@ -154,7 +154,6 @@ export default {
         data.is_company = this.$route.query.is_company
       }
 
-      console.log('adding contact 1', data)
       this.$VueEvent.fire('add_contact', data)
     }
   },
