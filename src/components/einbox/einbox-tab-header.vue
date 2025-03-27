@@ -1,13 +1,13 @@
 <template>
   <div class="einbox-tab__header border-bottom">
     <collapse-button class="einbox-tab__header__collapse-button"
-                      :target="collapseTarget"
-                      v-model="collapsed"
-                      v-if="collapseTarget && !isMobile"/>
+                     :target="collapseTarget"
+                     v-model="collapsed"
+                     v-if="collapseTarget && !isMobile"/>
 
     <template v-if="!isSearchActive">
       <label class="einbox-tab__header__label ellipse"
-            v-if="activeInbox.name">
+             v-if="activeInbox.name">
         {{ activeInbox.name }}
       </label>
       <q-space></q-space>
@@ -17,7 +17,7 @@
             @click="$router.push(DEFAULT_COMMUNICATIONS_ROUTE_PATH)">
         <watch-icon />
         <b-tooltip custom-class="talk-table__tooltip"
-                    :target="`einbox-tab-open-comms-page-icon-${_uid}`">
+                   :target="`einbox-tab-open-comms-page-icon-${_uid}`">
           Open Communications Page
         </b-tooltip>
       </span>
@@ -26,10 +26,10 @@
             :id="`einbox-tab-search-icon-${_uid}`"
             @click="onEnterSearch">
         <search-icon color="#256eff"
-                      width="18"
-                      height="18" />
+                     width="18"
+                     height="18" />
         <b-tooltip custom-class="talk-table__tooltip"
-                    :target="`einbox-tab-search-icon-${_uid}`">
+                   :target="`einbox-tab-search-icon-${_uid}`">
           Click to search
         </b-tooltip>
       </span>
@@ -45,10 +45,10 @@
                     @blur="onLeaveSearch"
                     @focus="showSearchTooltip = true"/>
       <b-tooltip custom-class="talk-table__tooltip"
-                  placement="top"
-                  :boundary="`einbox-tab-search-${_uid}`"
-                  :target="`einbox-tab-search-${_uid}`"
-                  :show="showSearchTooltip">
+                 placement="top"
+                 :boundary="`einbox-tab-search-${_uid}`"
+                 :target="`einbox-tab-search-${_uid}`"
+                 :show="showSearchTooltip">
         Search communications by contact's name or phone number
       </b-tooltip>
     </template>
