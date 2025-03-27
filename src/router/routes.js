@@ -733,7 +733,7 @@ const routes = [
     path: '/apps',
     props: (route) => {
       // Backward compatibility with old deep links from CtC extension
-      if (route.query.action && route.query.phone) {
+      if (route.query.action && route.query.phone && !route.query.phone_number) {
         return { action: route.query.action, phoneNumber: route.query.phone }
       }
 
