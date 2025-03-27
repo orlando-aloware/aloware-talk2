@@ -58,8 +58,20 @@ export default {
       type: String,
       required: true
     },
-    phone: {
+    phoneNumber: {
       type: String,
+      required: true
+    },
+    firstName: {
+      type: String,
+      required: true
+    },
+    lastName: {
+      type: String,
+      required: true
+    },
+    isCompany: {
+      type: Boolean,
       required: true
     }
   },
@@ -92,7 +104,7 @@ export default {
         return
       }
 
-      const opened = await window.open(`${ALOWARE_PROTOCOL}${this.action}-${this.phone}`, '_blank')
+      const opened = await window.open(`${ALOWARE_PROTOCOL}${this.action}//////////${this.phoneNumber}//////////${this.firstName}//////////${this.lastName}//////////${this.isCompany}`, '_blank')
       if (opened) {
         window.close()
       }

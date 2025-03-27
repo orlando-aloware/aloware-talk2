@@ -129,17 +129,17 @@ export default {
       }
 
       if (user.outbound_calling_selector === 1) {
-        user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT
+        user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT
       }
 
       if (user.outbound_calling_selector === 2) {
         user.default_outbound_campaign_id = null
-        user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT
+        user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT
       }
 
       if (user.outbound_calling_selector === 3) {
         user.default_outbound_campaign_id = null
-        user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+        user.outbound_calling_mode = UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK
       }
 
       return talk2Api.V1.user.update(this.user.id, user).then(response => {

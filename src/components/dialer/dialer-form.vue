@@ -212,7 +212,8 @@ import {
   selectorMixin,
   timezoneCheckMixin,
   visibilityMixin,
-  outboundCallingModesMixin
+  outboundCallingModesMixin,
+  settingsMixin
 } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
@@ -228,7 +229,8 @@ export default {
     aclMixin,
     selectorMixin,
     kycMixin,
-    outboundCallingModesMixin
+    outboundCallingModesMixin,
+    settingsMixin
   ],
 
   components: {
@@ -386,7 +388,7 @@ export default {
       await this.changePhoneNumber(data)
       await this.setLastUsedCallLine()
 
-      if (this.campaignId && (this.shouldMakeCallDirectlyAccountLevel || this.shouldMakeCallDirectlyUserLevel)) {
+      if (this.campaignId && (this.shouldMakeCallDirectlyAccountLevel || this.shouldMakeCallDirectlyUserLevel) && !this.callDisabled) {
         this.makeCall()
       }
     })
@@ -460,7 +462,7 @@ export default {
           this.lastContactCampaignId = data?.last_campaign_id
           this.loadingContact = false
         }).catch((err) => {
-          console.log(err)
+          console.error(err)
           this.loadingContact = false
         })
       }
@@ -495,7 +497,7 @@ export default {
       if (this.previousOutboundCallingMode &&
         this.profile &&
         this.previousOutboundCallingMode === this.profile.outbound_calling_mode &&
-        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+        this.previousOutboundCallingMode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK) {
         return
       }
 
@@ -512,7 +514,7 @@ export default {
       }
 
       // 2. [User level] Outbound line is set to follow account default
-      if (this.currentCompany && this.profile && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && !this.profile.default_outbound_campaign_id) {
+      if (this.currentCompany && this.profile && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT && !this.profile.default_outbound_campaign_id) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
 
@@ -520,7 +522,8 @@ export default {
       }
 
       // 3. [User level] user has a default outbound line
-      if (this.profile && this.profile.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+      if (this.profile && this.profile.default_outbound_campaign_id && this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT) {
+        console.log('dialer: user level - user has a default outbound line')
         this.defaultOutboundCampaignId = this.profile.default_outbound_campaign_id
         this.campaignId = this.defaultOutboundCampaignId
       }
@@ -585,7 +588,7 @@ export default {
               id: res.data.id
             }
           }).catch(err => {
-            console.log(err)
+            console.error(err)
           })
         }
       }).catch(err => {
