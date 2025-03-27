@@ -120,6 +120,7 @@
                 :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
                 class="ml-2"
                 data-testid="comm-transcription-modal-sentiment-analysis-section"
+                @filter-sentiment="handleFilterSentiment"
               />
             </div>
           </div>
@@ -143,6 +144,7 @@
                 :speakers="speakers"
                 :is-empty="isEmpty"
                 data-testid="comm-transcription-modal-highlights-section"
+                @filter-highlight="handleFilterHighlight"
               />
 
               <entities-section
@@ -151,6 +153,7 @@
                 :speakers="speakers"
                 :is-empty="isEmpty"
                 data-testid="comm-transcription-modal-entities-section"
+                @filter-entity="handleFilterEntity"
               />
 
               <custom-keywords-section
@@ -158,6 +161,7 @@
                 :speakers="speakers"
                 :is-empty="isEmpty"
                 data-testid="comm-transcription-modal-custom-keywords-section"
+                @filter-keyword="handleFilterKeyword"
               />
             </div>
 
@@ -496,6 +500,56 @@
                   class="p-0"
                   name="transcription"
                 >
+                  <div class="active-filter-container" v-if="hasActiveFilters">
+                    <div class="active-filter">
+                      <span class="filter-label">Active Filter:</span>
+                      <q-chip
+                        v-if="activeFilters.highlight"
+                        color="blue-3"
+                        text-color="white"
+                        size="sm"
+                        dense
+                      >
+                        Highlight: {{ activeFilters.highlight.text }}
+                      </q-chip>
+                      <q-chip
+                        v-if="activeFilters.entity"
+                        color="green-11"
+                        text-color="white"
+                        size="sm"
+                        dense
+                      >
+                        Entity ({{ activeFilters.entity.type }}): {{ activeFilters.entity.text }}
+                      </q-chip>
+                      <q-chip
+                        v-if="activeFilters.keyword"
+                        color="amber-2"
+                        text-color="white"
+                        size="sm"
+                        dense
+                      >
+                        Keyword: {{ activeFilters.keyword.text }}
+                      </q-chip>
+                      <q-chip
+                        v-if="activeFilters.sentiment"
+                        :color="sentimentChipColors[activeFilters.sentiment.sentiment]"
+                        text-color="white"
+                        size="sm"
+                        dense
+                      >
+                        Sentiment: {{ activeFilters.sentiment.sentiment }}
+                      </q-chip>
+                      <q-btn
+                        flat
+                        dense
+                        round
+                        size="sm"
+                        icon="close"
+                        class="ml-2"
+                        @click="clearAllFilters"
+                      />
+                    </div>
+                  </div>
                   <conversation-section
                     :communication="communication"
                     :contact="contact"
@@ -680,7 +734,13 @@ export default {
       is_editing_summary: false,
       is_saving_summary: false,
       edited_call_summary: '',
-      TEXT_FORMATTING
+      TEXT_FORMATTING,
+      activeFilters: {
+        highlight: null,
+        entity: null,
+        keyword: null,
+        sentiment: null
+      }
     }
   },
 
@@ -730,6 +790,10 @@ export default {
 
     sentimentSummaryText () {
       return this.sentiment_analysis.map(sentiment => this.calculateOverAllSentimentBySpeaker(sentiment))
+    },
+
+    hasActiveFilters () {
+      return Object.values(this.activeFilters).some(filter => filter !== null)
     }
   },
 
@@ -1246,6 +1310,202 @@ export default {
       if (this.currentCompany?.transcription_settings?.call_transcription_enabled) {
         this.show_promotion_box = true
       }
+    },
+
+    /**
+     * Handle filter by highlight
+     * @param {Object} filter - The filter object containing speaker and text
+     */
+    handleFilterHighlight (filter) {
+      this.activeFilters = {
+        highlight: filter,
+        entity: null,
+        keyword: null,
+        sentiment: null
+      }
+
+      // Switch to transcription tab
+      this.tabName = 'transcription'
+      this.$nextTick(() => {
+        this.findAndHighlightFilteredText(filter.text, filter.speaker)
+      })
+    },
+
+    /**
+     * Handle filter by entity
+     * @param {Object} filter - The filter object containing speaker, type, and text
+     */
+    handleFilterEntity (filter) {
+      this.activeFilters = {
+        highlight: null,
+        entity: filter,
+        keyword: null,
+        sentiment: null
+      }
+
+      // Switch to transcription tab
+      this.tabName = 'transcription'
+      this.$nextTick(() => {
+        this.findAndHighlightFilteredText(filter.text, filter.speaker)
+      })
+    },
+
+    /**
+     * Handle filter by keyword
+     * @param {Object} filter - The filter object containing speaker and text
+     */
+    handleFilterKeyword (filter) {
+      // Reset other filters
+      this.activeFilters = {
+        highlight: null,
+        entity: null,
+        keyword: filter,
+        sentiment: null
+      }
+
+      // Switch to transcription tab
+      this.tabName = 'transcription'
+
+      // Find message containing the keyword
+      this.$nextTick(() => {
+        this.findAndHighlightFilteredText(filter.text, filter.speaker)
+      })
+    },
+
+    /**
+     * Handle filter by sentiment
+     * @param {Object} filter - The filter object containing speaker and sentiment
+     */
+    handleFilterSentiment (filter) {
+      // Reset other filters
+      this.activeFilters = {
+        highlight: null,
+        entity: null,
+        keyword: null,
+        sentiment: filter
+      }
+
+      // Switch to transcription tab
+      this.tabName = 'transcription'
+
+      // Find messages with the specific sentiment
+      this.$nextTick(() => {
+        this.findAndHighlightSentiment(filter.speaker, filter.sentiment)
+      })
+    },
+
+    /**
+     * Find and highlight text in messages
+     * @param {string} text - The text to search for
+     * @param {string} speaker - The speaker who said the text
+     */
+    findAndHighlightFilteredText (text, speaker) {
+      const messages = this.formattedMessages.filter(msg =>
+        msg.speaker === speaker &&
+        msg.text.toLowerCase().includes(text.toLowerCase())
+      )
+
+      if (messages.length > 0) {
+        // Find the first message containing the text
+        const firstMessage = messages[0]
+
+        // Seek to the audio position
+        if (firstMessage.start) {
+          this.handleSeekAudio(firstMessage.start / 1000)
+        }
+
+        this.$nextTick(() => {
+          messages.forEach(message => {
+            const index = this.formattedMessages.findIndex(msg => msg === message)
+            const messageElement = document.getElementById(`msg-${index}`)
+            if (messageElement) {
+              // Apply highlighting animation
+              this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
+              this.$refs.conversationSection.scrollToMessage(messageElement)
+              const content = messageElement.innerHTML
+              const regex = new RegExp(`(${this.escapeRegExp(text)})`, 'gi')
+              messageElement.innerHTML = content.replace(
+                regex,
+                '<span class="filtered-text-highlight">$1</span>'
+              )
+            }
+          })
+        })
+      }
+    },
+
+    /**
+     * Find and highlight messages with specific sentiment
+     * @param {string} speaker - The speaker
+     * @param {string} sentiment - The sentiment to filter by
+     */
+    findAndHighlightSentiment (speaker, sentiment) {
+      const messages = this.formattedMessages.filter(msg =>
+        msg.speaker === speaker &&
+        msg.sentiment === sentiment
+      )
+
+      if (messages.length > 0) {
+        // Find the first message with the sentiment
+        const firstMessage = messages[0]
+
+        if (firstMessage.start) {
+          this.handleSeekAudio(firstMessage.start / 1000)
+        }
+
+        this.$nextTick(() => {
+          messages.forEach(message => {
+            const index = this.formattedMessages.findIndex(msg => msg === message)
+            const messageElement = document.getElementById(`msg-${index}`)
+            if (messageElement) {
+              this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
+              this.$refs.conversationSection.scrollToMessage(messageElement)
+              messageElement.classList.add('filtered-sentiment-highlight')
+            }
+          })
+        })
+      }
+    },
+
+    /**
+     * Escape special characters in text for use in regex
+     * @param {string} text - The text to escape
+     * @returns {string} - The escaped text
+     */
+    escapeRegExp (text) {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    },
+
+    clearAllFilters () {
+      this.activeFilters = {
+        highlight: null,
+        entity: null,
+        keyword: null,
+        sentiment: null
+      }
+
+      // Clear all highlighted elements
+      this.$nextTick(() => {
+        document.querySelectorAll('.filtered-sentiment-highlight').forEach(el => {
+          el.classList.remove('filtered-sentiment-highlight')
+        })
+
+        document.querySelectorAll('.current').forEach(el => {
+          el.classList.remove('current')
+        })
+
+        // Reset message HTML to remove filtered-text-highlight spans
+        this.formattedMessages.forEach((message, index) => {
+          const messageElement = document.getElementById(`msg-${index}`)
+          if (messageElement) {
+            // Reset the HTML with the original formatted message
+            const textContainer = messageElement.querySelector('span[style="line-height: 1.6"]')
+            if (textContainer) {
+              textContainer.innerHTML = message.formattedText
+            }
+          }
+        })
+      })
     }
   },
 
@@ -1405,4 +1665,40 @@ textarea::placeholder {
   justify-content: flex-end;
 }
 
+.filtered-text-highlight {
+  background-color: #f8ff00;
+  border-radius: 3px;
+  padding: 0 2px;
+  font-weight: bold;
+}
+
+.filtered-sentiment-highlight {
+  box-shadow: 0 0 0 3px #ffeb3b;
+}
+
+:deep(.q-chip--clickable) {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+:deep(.q-chip--clickable:hover) {
+  transform: scale(1.05);
+}
+
+.active-filter-container {
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.active-filter {
+  display: flex;
+  align-items: center;
+}
+
+.filter-label {
+  font-weight: bold;
+  margin-right: 8px;
+}
 </style>

@@ -12,7 +12,9 @@
       <q-chip text-color="black"
               dense
               data-testid="comm-sentiment-analysis-section-chip"
-              :color="sentimentChipColors[sentimentSummary.overall]">
+              clickable
+              :color="sentimentChipColors[sentimentSummary.overall]"
+              @click="emitSentimentFilter(sentimentSummary.speaker, sentimentSummary.overall)">
         <strong>{{ sentimentSummary.overall }}</strong>
         <q-tooltip data-testid="comm-sentiment-analysis-section-tooltip">
           {{ calculateOverAllSentimentBySpeaker(sentimentSummary) }}
@@ -43,6 +45,12 @@ export default {
     calculateOverAllSentimentBySpeaker: {
       type: Function,
       required: true
+    }
+  },
+
+  methods: {
+    emitSentimentFilter (speaker, sentiment) {
+      this.$emit('filter-sentiment', { speaker, sentiment })
     }
   }
 }
