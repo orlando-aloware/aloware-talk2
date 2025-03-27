@@ -112,7 +112,7 @@ export default {
       if (this.lastName) {
         params.push(`last_name=${encodeURIComponent(this.lastName)}`)
       }
-      if (this.isCompany === true) {
+      if (this.isCompany === 'true') {
         params.push(`is_company=true`)
       }
       if (params.length) {
