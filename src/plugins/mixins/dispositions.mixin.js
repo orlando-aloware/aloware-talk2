@@ -28,11 +28,11 @@ export default {
     },
 
     isForcedCallDisposition () {
-      return Boolean(this.currentCompany?.force_call_disposition || this.isForcedRedialEnabled)
+      return (this.currentCompany && this.currentCompany.force_call_disposition) || this.isForcedRedialEnabled
     },
 
     isForcedContactDisposition () {
-      return Boolean(this.currentCompany?.force_contact_disposition)
+      return this.currentCompany && this.currentCompany.force_contact_disposition
     },
 
     isNotDisposed () {
@@ -118,10 +118,10 @@ export default {
       // if force redial is enabled, force sms sending if the
       // selected call disposition is not one of the successful call dispositions
       // and the sms template has not been sent yet
-      return Boolean(this.isForcedRedialEnabled &&
+      return this.isForcedRedialEnabled &&
         this.sessionSettings?.force_sms &&
         !successfulCallDispositionSelected &&
-        !this.tasksSentSmsTemplates[this.activeTask.id])
+        !this.tasksSentSmsTemplates[this.activeTask.id]
     }
   },
 
