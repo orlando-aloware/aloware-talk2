@@ -28,18 +28,22 @@ export default {
     },
 
     isForcedCallDisposition () {
-      return this.currentCompany?.force_call_disposition || this.isForcedRedialEnabled
+      return Boolean(this.currentCompany?.force_call_disposition || this.isForcedRedialEnabled)
     },
 
     isForcedContactDisposition () {
-      return this.currentCompany?.force_contact_disposition
+      return Boolean(this.currentCompany?.force_contact_disposition)
     },
 
     isNotDisposed () {
-      const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
-      const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
+      // Ensure isCallDisposed and isContactDisposed are always treated as booleans
+      const callDisposed = Boolean(this.isCallDisposed)
+      const contactDisposed = Boolean(this.isContactDisposed)
 
-      return Boolean(isForceCallDisposition || isForceContactDisposition || this.isForcedSmsSending)
+      const isForceCallDisposition = this.isForcedCallDisposition && !callDisposed
+      const isForceContactDisposition = this.isForcedContactDisposition && !contactDisposed
+
+      return isForceCallDisposition || isForceContactDisposition || this.isForcedSmsSending
     },
 
     isHighlightedCallDisposition () {
@@ -118,10 +122,10 @@ export default {
       // if force redial is enabled, force sms sending if the
       // selected call disposition is not one of the successful call dispositions
       // and the sms template has not been sent yet
-      return this.isForcedRedialEnabled &&
+      return Boolean(this.isForcedRedialEnabled &&
         this.sessionSettings?.force_sms &&
         !successfulCallDispositionSelected &&
-        !this.tasksSentSmsTemplates[this.activeTask.id]
+        !this.tasksSentSmsTemplates[this.activeTask.id])
     }
   },
 
