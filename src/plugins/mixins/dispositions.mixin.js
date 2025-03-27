@@ -32,7 +32,7 @@ export default {
     },
 
     isForcedContactDisposition () {
-      return this.currentCompany ? this.currentCompany.force_contact_disposition : false
+      return Boolean(this.currentCompany?.force_contact_disposition)
     },
 
     isNotDisposed () {
