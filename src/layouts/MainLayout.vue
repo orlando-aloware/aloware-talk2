@@ -1249,6 +1249,21 @@ export default {
   },
 
   methods: {
+    processUrl (url) {
+      const params = url.split('//////////')
+      const phoneNumber = decodeURIComponent(params[1] || '')
+      const firstName = decodeURIComponent(params[2] || '').trim()
+      const lastName = decodeURIComponent(params[3] || '').trim()
+      const isCompany = params[4] === 'true'
+
+      return {
+        phoneNumber: this.$options.filters.fixPhone(phoneNumber),
+        firstName: firstName,
+        lastName: lastName,
+        isCompany: isCompany
+      }
+    },
+
     processLiveContacts (contacts) {
       this.setLiveContacts(
         [
@@ -1279,14 +1294,10 @@ export default {
 
       if (url.indexOf('alowaretalk:') > -1) {
         if (url.indexOf('contact/') > -1) {
-          const params = url.split('//////////')
-          const phoneNumber = decodeURIComponent(params[1] || '')
-          const firstName = decodeURIComponent(params[2] || '').trim()
-          const lastName = decodeURIComponent(params[3] || '').trim()
-          const isCompany = params[4] === 'true'
+          const { phoneNumber, firstName, lastName, isCompany } = this.processUrl(url)
 
           this.$VueEvent.fire('add_contact', {
-            phone_number: this.$options.filters.fixPhone(phoneNumber),
+            phone_number: phoneNumber,
             first_name: firstName,
             last_name: lastName,
             is_company: isCompany
@@ -1296,14 +1307,10 @@ export default {
         }
 
         if (url.indexOf('call/') > -1) {
-          const params = url.split('//////////')
-          const phoneNumber = decodeURIComponent(params[1] || '')
-          const firstName = decodeURIComponent(params[2] || '').trim()
-          const lastName = decodeURIComponent(params[3] || '').trim()
-          const isCompany = params[4] === 'true'
+          const { phoneNumber, firstName, lastName, isCompany } = this.processUrl(url)
 
           this.$VueEvent.fire('make_new_call', {
-            phone_number: this.$options.filters.fixPhone(phoneNumber),
+            phone_number: phoneNumber,
             first_name: firstName,
             last_name: lastName,
             is_company: isCompany
