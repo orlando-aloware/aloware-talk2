@@ -36,12 +36,8 @@ export default {
     },
 
     isNotDisposed () {
-      // Ensure isCallDisposed and isContactDisposed are always treated as booleans
-      const callDisposed = Boolean(this.isCallDisposed)
-      const contactDisposed = Boolean(this.isContactDisposed)
-
-      const isForceCallDisposition = this.isForcedCallDisposition && !callDisposed
-      const isForceContactDisposition = this.isForcedContactDisposition && !contactDisposed
+      const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
+      const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
 
       return isForceCallDisposition || isForceContactDisposition || this.isForcedSmsSending
     },
@@ -146,13 +142,11 @@ export default {
     ]),
 
     onCallDisposed (value) {
-      const newValue = value || value === 0
-      this.setIsCallDisposed(newValue)
+      this.setIsCallDisposed(value > 0)
     },
 
     onContactDisposed (value) {
-      const newValue = value || value === 0
-      this.setIsContactDisposed(newValue)
+      this.setIsContactDisposed(value > 0)
     },
 
     clearDispositions () {
