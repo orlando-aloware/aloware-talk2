@@ -1306,8 +1306,18 @@ export default {
       if (url.indexOf('alowaretalk:') > -1) {
         if (url.indexOf('contact:') > -1 || url.indexOf('contact-') > -1) {
           const contactData = this.processUrl(action)
-          console.log('contactData: ', contactData)
           this.$VueEvent.fire('add_contact', {
+            phone_number: contactData.phoneNumber,
+            first_name: contactData.firstName,
+            last_name: contactData.lastName,
+            is_company: contactData.isCompany
+          })
+          return
+        }
+
+        if (url.indexOf('call:') > -1 || url.indexOf('call-') > -1) {
+          const contactData = this.processUrl(action)
+          this.$VueEvent.fire('make_new_call', {
             phone_number: contactData.phoneNumber,
             first_name: contactData.firstName,
             last_name: contactData.lastName,
