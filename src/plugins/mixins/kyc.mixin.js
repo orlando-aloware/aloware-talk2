@@ -46,16 +46,9 @@ export default _.merge({
         return true
       }
 
-      if (this.isCanadaLine(selectedLine)) {
+      if (this.thereAreNotUSLines(selectedLine)) {
         /**
-         * 3 - 10DLC Canada lines -> Allow messaging
-         */
-        return true
-      }
-
-      if (this.isGBLine(selectedLine)) {
-        /**
-         * 4 - 10DLC GB - Britain (UK) lines -> Allow messaging
+         * Allow messaging for non-US lines (Canada, GB, etc)
          */
         return true
       }
@@ -79,12 +72,9 @@ export default _.merge({
       return window.open(link, '_self')
     },
 
-    isCanadaLine (selectedLine) {
-      return selectedLine?.incoming_numbers?.filter(number => number.country === 'CA').length > 0
-    },
-
-    isGBLine (selectedLine) {
-      return selectedLine?.incoming_numbers?.filter(number => number.country === 'GB').length > 0
+    // It verifies if there are not US lines on the selected line
+    thereAreNotUSLines (selectedLine) {
+      return selectedLine?.incoming_numbers?.filter(number => number.country === 'US').length === 0
     }
   }
 })
