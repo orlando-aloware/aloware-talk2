@@ -135,12 +135,6 @@ export default {
     if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
       this.getPinnedViews()
     }
-
-    if (this.$route.query && this.$route.query.add_contact) {
-      this.$VueEvent.fire('add_contact', {
-        phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
-      })
-    }
   },
 
   mounted () {

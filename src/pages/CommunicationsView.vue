@@ -156,12 +156,6 @@ export default {
       this.resetChannelChangedFilterFields()
       this.setInboxFilters(filter)
     }
-
-    if (this.$route.query && this.$route.query.add_contact) {
-      this.$VueEvent.fire('add_contact', {
-        phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
-      })
-    }
   },
   mounted () {
     // when the user tries to access the channel directly but without a personal line
