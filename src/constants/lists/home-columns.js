@@ -18,7 +18,7 @@ export const COLUMNS = [
     field: 'name',
     align: 'left',
     sortable: true,
-    minWidth: 390,
+    minWidth: 200,
     resizable: true
   },
   {
@@ -32,14 +32,6 @@ export const COLUMNS = [
     name: 'date_created',
     label: 'Date Created',
     field: 'created_at',
-    align: 'center',
-    sortable: true,
-    draggable: true
-  },
-  {
-    name: 'no_of_contacts',
-    label: '# of Contacts',
-    field: 'no_of_contacts',
     align: 'center',
     sortable: true,
     draggable: true
@@ -104,13 +96,11 @@ export const columnsByViewportConfig = {
   ],
   tablet: [
     'name',
-    'no_of_contacts',
     'actions'
   ],
   smallDesktop: [
     'name',
     'owner_name',
-    'no_of_contacts',
     'type',
     'actions'
   ],
@@ -118,7 +108,6 @@ export const columnsByViewportConfig = {
     'name',
     'owner_name',
     'date_created',
-    'no_of_contacts',
     'type',
     'show_in_public_folder',
     'source',
@@ -129,7 +118,6 @@ export const columnsByViewportConfig = {
     'name',
     'owner_name',
     'date_created',
-    'no_of_contacts',
     'type',
     'show_in_public_folder',
     'source',
@@ -141,7 +129,6 @@ export const columnsByViewportConfig = {
     'name',
     'owner_name',
     'date_created',
-    'no_of_contacts',
     'type',
     'show_in_public_folder',
     'source',
@@ -155,7 +142,6 @@ export const COLUMN_NAMES = {
   name: 'name',
   owner_name: 'owner_name',
   date_created: 'date_created',
-  no_of_contacts: 'no_of_contacts',
   type: 'type',
   show_in_public_folder: 'show_in_public_folder',
   source: 'source',

@@ -8,11 +8,12 @@ pipeline {
 
     environment {
         DEV_DOMAIN = 'alodev.org'
+        STAGING_DOMAIN = 'alostaging.com'
         TERRAFORM_REPO = 'terraform-groundwork'
         TALK2_REPO = 'aloware-talk2'
         GITHUB_ORG = 'aloware'
         GIT_AUTH = credentials('jenkins-github-user')
-        AWS_CREDS = credentials('aws-credentials')
+        CREDS = credentials('aws-credentials-profiles')
         AWS_REGION = 'us-west-2'
         NODE_VERSION = '20'
         SAFE_JOB_NAME = "${env.JOB_NAME.replaceAll('/', '-').toLowerCase()}"
@@ -23,193 +24,427 @@ pipeline {
         DEVELOP_CACHE_FOLDER = "${HOME}/.jenkins-cache/${DEVELOP_SAFE_JOB_NAME}"
         TALK_URL = "${env.GIT_BRANCH.toLowerCase().contains('pr') ? "${env.GIT_BRANCH.toLowerCase()}.talk" : 'talk'}.${DEV_DOMAIN}"
         TALK2_URL = "talk2.${DEV_DOMAIN}"
-
+        STAGING_URL = "talk.${STAGING_DOMAIN}"
+        STAGING_KMS_KEY_ID = "ad590faf-76cb-4e4d-a6f1-f97606417ab4"
+        STAGING_CACHE_POLICY_ID="82a16562-447e-4078-89af-77c83f74d9ce"
+        DEV_CACHE_POLICY_ID="8276b0a9-835d-41d5-a981-85f98c8f390a"
         // Fill this with the URL of the MDE instance, for example https://pr-9331.mde.alodev.org to be able to use this Talk PR with MDE.
         // REMOVE BEFORE MERGING TO develop/master
         API_URL_OVERWRITE = ''
+        GH_APP_PEM = credentials('github-app-private-key')
+        GH_APP_ID = '1157885'
+        GH_INSTALLATION_ID = '61798182'
     }
 
     stages {
+
+        stage('Send Job Start Notification') {
+            steps {
+                script {
+                    notificationSender.sendSlackInfo()
+                }
+            }
+        }
+
+        stage ('Setup Cache') {
+            steps {
+                script {
+                    // Create the cache directory
+                    sh "mkdir -p ${CACHE_FOLDER}"
+
+                    // Attempt to restore node_modules, from the cache directory of this job
+                    if (fileExists("${ARTIFACTS_CACHE_FOLDER}/node_modules")) {
+                        sh "rsync -a ${ARTIFACTS_CACHE_FOLDER}/node_modules ."
+                    }
+
+                    // If the directories wers not restored, attempt to restore from the develop branch artifacts
+                    if (!fileExists("${WORKSPACE}/build/dev1/node_modules")) {
+                        if (fileExists("${DEVELOP_CACHE_FOLDER}/artifacts/node_modules")) {
+                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/artifacts/node_modules ."
+                        }
+                    }
+
+                    // If this job has no cache, attempt to restore from the develop branch cache
+                    if (!fileExists("{YARN_CACHE_FOLDER}")) {
+                        if (fileExists("${DEVELOP_CACHE_FOLDER}/yarn")) {
+                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/yarn ."
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Setup environment') {
+            steps {
+                nvm("${NODE_VERSION}") {
+                    sh 'npm i -g yarn'
+                }
+                script {
+                    echo '==> Clone GitOps Repo'
+                    def token = getGitHubAppToken()
+                    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: token, var: 'TOKEN']]]) {
+                        sh "git clone https://x-access-token:${token}@github.com/${GITHUB_ORG}/${TERRAFORM_REPO}.git"
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            when { not { branch 'master' } }
+            steps {
+                nvm("${NODE_VERSION}") {
+                    sh "yarn install --cache-folder ${YARN_CACHE_FOLDER} --pure-lockfile"
+                }
+
+            }
+        }
+
         stage('Build and Analysis') {
             parallel {
-                stage('Build and deployment') {
+                stage('Build dev1') {
                     stages {
-                        stage('Send Job Start Notification') {
+
+                        stage ('[PR/Dev1] Setup workspace') {
+                            when { not { branch 'master' } }
                             steps {
                                 script {
-                                    notificationSender.sendSlackInfo()
+                                  sh '''
+                                  mkdir -p ${WORKSPACE}/build/dev1
+                                  find $WORKSPACE -mindepth 1 -maxdepth 1 ! -name 'build' -exec cp -r {} $WORKSPACE/build/dev1/ \\;
+                                  '''
                                 }
                             }
                         }
 
-                        stage ('Setup Cache') {
+                        stage('[PR/Dev1] Setup Env File') {
+                            when { not { branch 'master' } }
                             steps {
                                 script {
-                                    // Create the cache directory
-                                    sh "mkdir -p ${CACHE_FOLDER}"
+                                    dir("${WORKSPACE}/build/dev1") {
+                                        def sharedEnvVars = sh(script: """
+                                            aws ssm get-parameters-by-path \\
+                                            --path "/shared/talk2/app/" \\
+                                            --recursive \\
+                                            --with-decryption \\
+                                            --profile "dev" \\
+                                            --query "Parameters[].{Name:Name,Value:Value}" \\
+                                            --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
+                                        """, returnStdout: true).trim()
 
-                                    // Attempt to restore node_modules, from the cache directory of this job
-                                    if (fileExists("${ARTIFACTS_CACHE_FOLDER}/node_modules")) {
-                                        sh "rsync -a ${ARTIFACTS_CACHE_FOLDER}/node_modules ."
-                                    }
+                                        def dev1EnvVars = sh(script: """
+                                            aws ssm get-parameters-by-path \\
+                                            --path "/dev1/talk2/app/" \\
+                                            --recursive \\
+                                            --with-decryption \\
+                                            --profile "dev" \\
+                                            --query "Parameters[].{Name:Name,Value:Value}" \\
+                                            --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
+                                        """, returnStdout: true).trim()
 
-                                    // If the directories wers not restored, attempt to restore from the develop branch artifacts
-                                    if (!fileExists("node_modules")) {
-                                        if (fileExists("${DEVELOP_CACHE_FOLDER}/artifacts/node_modules")) {
-                                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/artifacts/node_modules ."
+                                        def prEnvVars = ""
+                                        if (env.GIT_BRANCH.toLowerCase().contains('pr-')) {
+                                            def prId = env.GIT_BRANCH.toLowerCase().replaceAll('.*pr-([0-9]+).*', '$1')
+                                            echo "Looking for environment variables for PR-${prId}"
+                                            try {
+                                                prEnvVars = sh(script: """
+                                                    aws ssm get-parameters-by-path \\
+                                                    --path "/pr-${prId}/talk2/app/" \\
+                                                    --recursive \\
+                                                    --with-decryption \\
+                                                    --profile "dev" \\
+                                                    --query "Parameters[].{Name:Name,Value:Value}" \\
+                                                    --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
+                                                """, returnStdout: true).trim()
+                                            } catch (Exception e) {
+                                                echo "No specific variables found for PR-${prId}: ${e.message}"
+                                                prEnvVars = ""
+                                            }
                                         }
-                                    }
 
-                                    // If this job has no cache, attempt to restore from the develop branch cache
-                                    if (!fileExists("{YARN_CACHE_FOLDER}")) {
-                                        if (fileExists("${DEVELOP_CACHE_FOLDER}/yarn")) {
-                                            sh "rsync -a ${DEVELOP_CACHE_FOLDER}/yarn ."
+                                        writeFile file: 'shared.env', text: sharedEnvVars + '\n'
+                                        writeFile file: 'dev1.env', text: dev1EnvVars + '\n'
+
+                                        if (prEnvVars) {
+                                            writeFile file: 'pr.env', text: prEnvVars + '\n'
+                                            sh '''
+                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.temp
+                                            cat .env.temp pr.env | awk -F= '!seen[$1]++' > .env
+                                            rm .env.temp shared.env dev1.env pr.env
+                                            '''
+                                        } else {
+                                            sh '''
+                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env
+                                            rm shared.env dev1.env
+                                            '''
                                         }
+
+                                        if (env.API_URL_OVERWRITE) {
+                                            sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
+                                            sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env"
+                                        }
+
+                                        sh '''
+                                        cp .env .env.prod
+                                        '''
                                     }
                                 }
                             }
                         }
 
-                        stage('Setup environment') {
+                        stage('[PR/Dev1] Build Assets') {
+                            when { not { branch 'master' } }
                             steps {
-                                nvm("${NODE_VERSION}") {
-                                    sh 'npm i -g yarn'
+                                dir("${WORKSPACE}/build/dev1") {
+                                    nvm("${NODE_VERSION}") {
+                                        sh 'NODE_ENV=dev1 quasar build --debug'
+                                    }
                                 }
                             }
                         }
 
-                        stage('Setup Dev Env File') {
+                        stage('[PR/Dev1] Deploy Talk2') {
                             when { not { branch 'master' } }
                             steps {
                                 script {
-                                    //String text
-                                    withCredentials([file(credentialsId: 'talk2-dev-env', variable: 'dev_env')]) {
-                                        // text = readFile(dev_env)
-                                        sh "cat ${dev_env} >> .env && cat ${dev_env} >> .env.prod"
+                                    def branchName = env.GIT_BRANCH.toLowerCase()
+                                    def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
+
+                                    dir("${WORKSPACE}/build/dev1") {
+                                        sh '''
+                                        mkdir -p terraform
+                                        cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront terraform/
+                                        '''
+
+                                        dir("terraform/s3_cloudfront") {
+                                            sh '''
+                                            terraform init -backend-config="profile=dev"; \
+                                            terraform validate; \
+                                            terraform fmt
+                                            '''
+
+                                            try {
+                                                sh "terraform workspace new ${branchName}"
+                                            } catch (Exception e) {
+                                                echo 'The workspace already exists, running TF Commands...'
+                                                sh "terraform workspace select ${branchName}"
+                                            }
+
+                                            sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
+                                        }
+
+                                        sh "AWS_PROFILE=dev ENV=dev1 yarn upload-s3"
                                     }
-
-                                    // If the API_URL_OVERWRITE is set, we will replace the API_URL and API_REPORTING_URL in the .env file
-                                    if (env.API_URL_OVERWRITE) {
-                                        sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
-                                        sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env"
-                                    }
-
-                                }
-                            }
-                        }
-
-                        stage('Install Dependencies') {
-                            when { not { branch 'master' } }
-                            steps {
-                                nvm("${NODE_VERSION}") {
-                                    sh "yarn install --cache-folder ${YARN_CACHE_FOLDER} --pure-lockfile"
-                                }
-                            }
-                        }
-
-                        stage('Build Talk2 Assets') {
-                            when { not { branch 'master' } }
-                            steps {
-                                nvm("${NODE_VERSION}") {
-                                    sh 'quasar build --debug'
                                 }
                             }
                         }
 
                         stage('Save Cache (node_modules)') {
                             steps {
-                                sh '''
-                                    mkdir -p ${ARTIFACTS_CACHE_FOLDER}
-                                    if [ -d "node_modules" ]; then
-                                        rsync -a node_modules ${ARTIFACTS_CACHE_FOLDER}
-                                    else
-                                        echo "node_modules directory not found, skipping cache"
-                                    fi
-                                '''
-                            }
-                        }
-
-                        stage('Deploy New Dev-Env Cloudfront Distribution') {
-                            when { not { branch 'master' } }
-                            steps {
-                                sshagent(credentials: ['jenkins-github-creds']) {
-                                    echo '==> Clone GitOps Repo'
-                                    sh("""
-                                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                                    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-                                    git clone git@github.com:${GITHUB_ORG}/${TERRAFORM_REPO}.git
-                                """)
-                                }
-
-                                sh "export AWS_ACCESS_KEY_ID='${AWS_CREDS_USR}'; export AWS_SECRET_ACCESS_KEY='${AWS_CREDS_PSW}'; export AWS_REGION='${AWS_REGION}'"
-
-                                script {
-                                    def branchName = env.GIT_BRANCH.toLowerCase()
-                                    def subDomain = branchName.contains('pr') ? "${branchName}.talk" : 'talk'
-
-                                    dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
-                                        sh '''
-                                        terraform init; \
-                                        terraform validate; \
-                                        terraform fmt
+                                dir("${WORKSPACE}/build/dev1") {
+                                    sh '''
+                                        mkdir -p ${ARTIFACTS_CACHE_FOLDER}
+                                        if [ -d "node_modules" ]; then
+                                            rsync -a node_modules ${ARTIFACTS_CACHE_FOLDER}
+                                        else
+                                            echo "node_modules directory not found, skipping cache"
+                                        fi
                                     '''
-
-                                        try {
-                                            sh "terraform workspace new ${branchName}"
-                                    } catch (Exception e) {
-                                            echo 'The workspace already exists, running TF Commands...'
-                                            sh "terraform workspace select ${branchName}"
-                                        }
-
-                                        sh "terraform apply -var environment='develop' -var domainName='${TALK_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
-                                    }
-
-                                    sh "yarn upload-s3-dev1"
                                 }
                             }
                         }
+                    }
+                }
 
-                        // Start build talk2 pointing to app2.alodev.org if is the develop branch
+                stage('Build dev2') {
+                   stages {
 
-                        stage('Build Talk2 Assets for Dev2') {
+                        stage ('[Dev2] Setup workspace') {
                             when { branch 'develop' }
                             steps {
-                                // Set the API_URL to https://app2.alodev.org
-                                sh "sed -i 's|API_URL=.*|API_URL=https://app2.alodev.org|' .env"
-                                // Set the API_REPORTING_URL to https://app2.alodev.org
-                                sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=https://app2.alodev.org|' .env"
-
-                                nvm("${NODE_VERSION}") {
-                                    sh 'quasar build --debug'
+                                script {
+                                  sh '''
+                                  mkdir -p ${WORKSPACE}/build/dev2
+                                  find $WORKSPACE -mindepth 1 -maxdepth 1 ! -name 'build' -exec cp -r {} $WORKSPACE/build/dev2/ \\;
+                                  '''
                                 }
                             }
                         }
 
-                        stage('Deploy Talk2 for Dev2') {
+                        stage('[Dev2] Setup Env File') {
+                            when { branch 'develop' }
+                            steps {
+                                script {
+                                    dir("${WORKSPACE}/build/dev2") {
+                                        def sharedEnvVars = sh(script: """
+                                            aws ssm get-parameters-by-path \\
+                                            --path "/shared/talk2/app/" \\
+                                            --recursive \\
+                                            --with-decryption \\
+                                            --profile "dev" \\
+                                            --query "Parameters[].{Name:Name,Value:Value}" \\
+                                            --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
+                                        """, returnStdout: true).trim()
+
+                                        def dev2EnvVars = sh(script: """
+                                            aws ssm get-parameters-by-path \\
+                                            --path "/dev2/talk2/app/" \\
+                                            --recursive \\
+                                            --with-decryption \\
+                                            --profile "dev" \\
+                                            --query "Parameters[].{Name:Name,Value:Value}" \\
+                                            --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
+                                        """, returnStdout: true).trim()
+
+                                        writeFile file: 'shared.env', text: sharedEnvVars + '\n'
+                                        writeFile file: 'dev2.env', text: dev2EnvVars + '\n'
+
+                                        sh '''
+                                        cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env
+                                        cp .env .env.prod
+                                        rm shared.env dev2.env
+                                        '''
+                                    }
+                                }
+                            }
+                        }
+
+                        stage('[Dev2] Build Assets') {
+                            when { branch 'develop' }
+                            steps {
+                                dir("${WORKSPACE}/build/dev2") {
+                                    nvm("${NODE_VERSION}") {
+                                        sh 'NODE_ENV=dev2 quasar build --debug'
+                                    }
+                                }
+                            }
+                        }
+
+                        stage('[Dev2] Deploy Talk2') {
                             when { branch 'develop' }
                             steps {
                                 script {
                                     def workspaceName = 'talk2'
                                     def subDomain = 'talk2'
 
-                                    dir("${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront") {
+                                    dir("${WORKSPACE}/build/dev2") {
                                         sh '''
-                                        terraform init; \
-                                        terraform validate; \
-                                        terraform fmt
-                                    '''
+                                        mkdir -p terraform
+                                        cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront terraform/
+                                        '''
 
-                                      try {
-                                            sh "terraform workspace new ${workspaceName}"
-                                      } catch (Exception e) {
-                                            echo 'The workspace already exists, running TF Commands...'
-                                            sh "terraform workspace select ${workspaceName}"
+                                        dir("terraform/s3_cloudfront") {
+                                            sh '''
+                                            terraform init -backend-config="profile=dev"; \
+                                            terraform validate; \
+                                            terraform fmt
+                                            '''
+
+                                            try {
+                                                sh "terraform workspace new ${workspaceName}"
+                                            } catch (Exception e) {
+                                                echo 'The workspace already exists, running TF Commands...'
+                                                sh "terraform workspace select ${workspaceName}"
+                                            }
+
+                                            sh "AWS_PROFILE=dev terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' -var cachePolicyId='${DEV_CACHE_POLICY_ID}' --auto-approve"
                                         }
 
-                                      sh "terraform apply -var environment='develop' -var domainName='${TALK2_URL}' -var route53_zone='${DEV_DOMAIN}' --auto-approve;"
+                                        sh "AWS_PROFILE=dev ENV=dev2 yarn upload-s3"
                                     }
+                                }
+                            }
+                        }
+                   }
+                }
 
-                                    sh "yarn upload-s3-dev2"
+                stage('Build staging') {
+                    stages {
+
+                        stage ('[Staging] Setup workspace') {
+                            when { branch 'develop' }
+                            steps {
+                                script {
+                                  sh '''
+                                  mkdir -p ${WORKSPACE}/build/staging
+                                  find $WORKSPACE -mindepth 1 -maxdepth 1 ! -name 'build' -exec cp -r {} $WORKSPACE/build/staging/ \\;
+                                  '''
+                                }
+                            }
+                        }
+
+                        stage('[Staging] Setup Env File') {
+                           when { branch 'develop' }
+                            steps {
+                                script {
+                                    dir("${WORKSPACE}/build/staging") {
+
+                                        def stagingEnvVars = sh(script: """
+                                            aws ssm get-parameters-by-path \\
+                                            --path "/staging/talk2/app/" \\
+                                            --recursive \\
+                                            --with-decryption \\
+                                            --profile "staging" \\
+                                            --query "Parameters[].{Name:Name,Value:Value}" \\
+                                            --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
+                                        """, returnStdout: true).trim()
+
+                                        writeFile file: '.env', text: stagingEnvVars + '\n'
+                                        writeFile file: '.env.prod', text: stagingEnvVars + '\n'
+
+                                    }
+                                }
+                            }
+                        }
+
+                        stage('[Staging] Build Assets') {
+                            when { branch 'develop' }
+                            steps {
+                                dir("${WORKSPACE}/build/staging") {
+                                    nvm("${NODE_VERSION}") {
+                                        sh 'NODE_ENV=staging quasar build --debug'
+                                    }
+                                }
+                            }
+                        }
+
+                        stage('[Staging] Deploy Talk2') {
+                            when { branch 'develop' }
+                            steps {
+                                script {
+                                    def workspaceName = 'talk2'
+                                    def subDomain = 'talk2'
+
+                                    dir("${WORKSPACE}/build/staging") {
+                                        sh '''
+                                        mkdir -p terraform
+                                        cp -r ${WORKSPACE}/${TERRAFORM_REPO}/s3_cloudfront terraform/
+                                        '''
+
+                                        dir("terraform/s3_cloudfront") {
+                                            sh """
+                                            terraform init \\
+                                                -backend-config="bucket=aloware-terraform-tfstate-staging" \\
+                                                -backend-config="key=s3_cloudfront/terraform.tfstate" \\
+                                                -backend-config="region=us-west-2" \\
+                                                -backend-config="dynamodb_table=terraform-state" \\
+                                                -backend-config="kms_key_id=${STAGING_KMS_KEY_ID}" \\
+                                                -backend-config="profile=staging"
+                                            terraform validate
+                                            terraform fmt
+                                            """
+
+                                            try {
+                                                sh "terraform workspace new ${workspaceName}"
+                                            } catch (Exception e) {
+                                                echo 'The workspace already exists, running TF Commands...'
+                                                sh "terraform workspace select ${workspaceName}"
+                                            }
+
+                                            sh "AWS_PROFILE=staging terraform apply -var environment='develop' -var domainName='${STAGING_URL}' -var route53_zone='${STAGING_DOMAIN}' -var cachePolicyId='${STAGING_CACHE_POLICY_ID}' --auto-approve"
+                                        }
+
+                                        sh "AWS_PROFILE=staging ENV=staging yarn upload-s3"
+                                    }
                                 }
                             }
                         }
@@ -217,18 +452,22 @@ pipeline {
                 }
 
                 stage('Sonar Analysis') {
-                    when {
-                        anyOf {
-                            branch 'master';
-                            branch 'develop'
-                        }
-                    }
-                    steps {
-                        script {
-                            sh 'git rev-parse --abbrev-ref HEAD'
-                            def scannerHome = tool 'SonarQube Tool'
-                            withSonarQubeEnv('Sonar') {
-                                sh "${scannerHome}/bin/sonar-scanner"
+                    stages {
+                        stage('SonarQube') {
+                            when {
+                                anyOf {
+                                    branch 'master';
+                                    branch 'develop'
+                                }
+                            }
+                            steps {
+                                script {
+                                    sh 'git rev-parse --abbrev-ref HEAD'
+                                    def scannerHome = tool 'SonarQube Tool';
+                                    withSonarQubeEnv('Sonar') {
+                                        sh "${scannerHome}/bin/sonar-scanner"
+                                    }
+                                }
                             }
                         }
                     }
@@ -245,12 +484,23 @@ pipeline {
                 notificationSender.sendSlackSuccess()
                 try {
                     if (env.CHANGE_BRANCH) {
-                        sh "echo ${GIT_AUTH_PSW} > tmp_token.txt"
-                        sh 'gh auth login --with-token < tmp_token.txt'
-                        sh "gh pr comment ${env.CHANGE_BRANCH} --body 'Hi, your environment is ready to use at: https://${TALK_URL}' -R https://github.com/${GITHUB_ORG}/${TALK2_REPO}"
+                        def token = getGitHubAppToken()
+                        def prId = sh(script: "echo ${env.GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*'", returnStdout: true).trim()
+                        
+                        if (prId) {
+                            wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: token, var: 'TOKEN']]]) {
+                                sh """
+                                curl -s -X POST \\
+                                    -H "Authorization: Bearer ${token}" \\
+                                        -H "Accept: application/vnd.github.v3+json" \\
+                                        -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \\
+                                        "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
+                                """
+                            }
+                        }
                     }
                 } catch (Exception e) {
-                    echo 'We could not add the comment in Github PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
+                    echo 'We could not add the comment in GitHub PR. Error: ' + e.toString() + '. Please check #dev-deployments channel in Slack for the environment URL.'
                 }
             }
         }
@@ -272,3 +522,30 @@ pipeline {
         }
     }
 }
+
+def getGitHubAppToken() {
+    withCredentials([file(credentialsId: 'github-app-private-key', variable: 'GH_APP_PEM_FILE')]) {
+        def rawToken = sh(script: '''
+            now=$(date +%s)
+            exp=$((now + 600))
+            
+            header='{"alg":"RS256","typ":"JWT"}'
+            payload='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
+            
+            base64_header=$(echo -n "${header}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+            base64_payload=$(echo -n "${payload}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+            
+            signature=$(echo -n "${base64_header}.${base64_payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
+            
+            jwt="${base64_header}.${base64_payload}.${signature}"
+            
+            curl -s -X POST \
+                -H "Authorization: Bearer ${jwt}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
+        ''', returnStdout: true).trim()
+        
+        return rawToken
+    }
+}
+

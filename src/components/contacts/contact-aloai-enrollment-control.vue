@@ -16,11 +16,11 @@
       v-if="profile?.company?.aloai_enabled"
       class="border-0 position-relative contact-about-wrapper"
     >
-      <h4>AloAi Text Bot Enrollment</h4>
+      <h4>AloAi Agent Enrollments</h4>
 
       <b-card-text class="fs-14 mt-2">
         <span v-if="hasBotEnrollments">Currently enrolled to:</span>
-        <span v-else>Enroll this contact to any of your Outbound Text Bots and let them do the work for you!</span>
+        <span v-else>Enroll this contact to any of your Outbound Agents and let them do the work for you!</span>
       </b-card-text>
 
       <b-card-text
@@ -40,13 +40,22 @@
           <!-- Bot name -->
           <h5 class="mt-0">{{ displayedBot?.name }}</h5>
 
-          <!-- Bot Use Case Badge -->
+          <!-- Bot Type Badge -->
           <p class="mb-0 text-muted fs-13 mt-1">
+            <!-- Direction Badge -->
             <q-badge
               :color="directionColor(displayedBot?.direction)"
               class="mr-1"
             >
               <span>{{ formatDirection(displayedBot?.direction) }}</span>
+            </q-badge>
+
+            <!-- Type Badge -->
+            <q-badge
+              color="black"
+              class="mr-1"
+            >
+              <span>{{ getAgentTypeLabel(displayedBot?.type) }}</span>
             </q-badge>
           </p>
         </b-media>
@@ -119,7 +128,7 @@
             size="sm"
             data-testid="disenroll-single-bot-contact-button"
           >
-            <i class="fa fa-trash"/> Disenroll from Bot
+            <i class="fa fa-trash"/> Disenroll from agent
           </b-button>
         </div>
 
@@ -133,7 +142,7 @@
           block
           data-testid="disenroll-contact-button"
         >
-          <i class="fa fa-trash"/> Disenroll from Bot
+          <i class="fa fa-trash"/> Disenroll from agent
         </b-button>
       </b-card-text>
 
@@ -152,8 +161,8 @@
             height="22"
             width="22"
           />
-          <span v-if="!hasBotEnrollments">Enroll to Bot</span>
-          <span v-else>Enroll to more Bots</span>
+          <span v-if="!hasBotEnrollments">Enroll to agent</span>
+          <span v-else>Enroll to more agents</span>
         </b-button>
       </div>
 
@@ -165,7 +174,7 @@
 
     <confirm-dialog
       id="contact-disenroll-from-bot"
-      title="Disenroll Contact from AloAi Text Bot"
+      title="Disenroll Contact from AloAi Agent"
       @close="closeDisenrollmentConfirmation"
     >
       <div slot="content">
@@ -200,6 +209,7 @@ import AloaiEnrollmentControlModal from 'components/aloai-enrollment-control-mod
 import ConfirmDialog from 'components/confirm-dialog.vue'
 import { mapGetters } from 'vuex'
 import { aloaiMixin } from 'src/plugins/mixins'
+import * as AloAi from 'src/constants/aloai'
 import _ from 'lodash'
 
 export default {
@@ -221,7 +231,8 @@ export default {
       bots: [],
       botEnrollments: [],
       activeBotIndex: 0,
-      isBusy: false
+      isBusy: false,
+      AloAi
     }
   },
 
@@ -252,20 +263,22 @@ export default {
         return null
       }
 
-      // Filter bots using the botEnrollments aloai_bot_id
-      let enrolledBots = this.bots.filter((bot) => bot.id === this.botEnrollments.find(enrollment => enrollment.aloai_bot_id === bot.id)?.aloai_bot_id)
-
-      // Sanity check
-      if (_.isEmpty(enrolledBots)) {
-        console.warn('No bot found for the current enrollment')
+      const currentEnrollment = this.botEnrollments[this.activeBotIndex]
+      if (!currentEnrollment) {
         return null
       }
 
-      return enrolledBots[this.activeBotIndex]
+      return this.bots.find(bot => bot.id === currentEnrollment.aloai_bot_id)
     },
     confirmDeletionMessage () {
       let name = this.contact.first_name || 'No Name'
-      return `Are you sure you want to remove <b>${name}</b> from <b>${this.displayedBot?.name}</b>?`
+
+      // Add safety check for empty enrollments
+      if (!this.hasBotEnrollments || !this.displayedBot) {
+        return `Are you sure you want to remove <b>${name}</b> from this agent?`
+      }
+
+      return `Are you sure you want to disenroll <b>${name}</b> from <b>${this.displayedBot?.name}</b>?`
     }
   },
 
@@ -341,12 +354,54 @@ export default {
     closeDisenrollmentConfirmation () {
       this.$bvModal.hide('contact-disenroll-from-bot')
     },
+    getEnrollmentTypeText (botId, type = null) {
+      // Add safety check for null/undefined type
+      if (!type) {
+        return ''
+      }
+
+      if (type !== null) {
+        switch (type) {
+          case AloAi.ENROLLMENT_TYPE_TEXT:
+            return 'SMS'
+          case AloAi.ENROLLMENT_TYPE_VOICE:
+            return 'Call'
+          default:
+            return ''
+        }
+      }
+
+      // Add safety check for empty enrollments
+      if (!this.bot_enrollments) {
+        return ''
+      }
+
+      const enrollment = this.bot_enrollments.find(
+        enrollment => enrollment.aloai_bot_id === botId
+      )
+      return this.getEnrollmentTypeText(botId, enrollment?.type)
+    },
     disenrollContact () {
+      // Add safety check for empty enrollments
+      if (!this.hasBotEnrollments || !this.displayedBot) {
+        this.closeDisenrollmentConfirmation()
+        return
+      }
+
+      const currentEnrollment = this.botEnrollments[this.activeBotIndex]
+      if (!currentEnrollment) {
+        this.closeDisenrollmentConfirmation()
+        return
+      }
+
       talk2Api.V2.aloAiBot
-        .disenrollContact(this.displayedBot.id, { contact_id: this.contact.id })
+        .disenrollContact(this.displayedBot.id, {
+          contact_id: this.contact.id,
+          type: currentEnrollment.type
+        })
         .then(() => {
           this.$generalNotification(
-            'Contact successfully disenrolled from the selected AloAi Text Bot.'
+            `Contact successfully disenrolled from AloAi Agent: ${this.displayedBot.name}.`
           )
 
           this.closeDisenrollmentConfirmation()
@@ -359,13 +414,13 @@ export default {
           }, 2000)
         })
         .catch((error) => {
-          let errorMsg = 'Error while disenrolling contact from AloAi Text Bot.'
+          let errorMsg = `Error while disenrolling contact from AloAi Agent: ${this.displayedBot.name}.`
           if (error?.response?.data?.message) {
             errorMsg = error.response.data.message
           }
 
           this.$generalNotification(errorMsg, 'error')
-          console.error('[submitEnrollment] error', error)
+          console.error('[disenrollContact] error', error)
         })
     },
     async fetchBots () {

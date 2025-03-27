@@ -24,6 +24,7 @@ export const NOTE_TYPES = [
 // string types
 export const CALL_TYPE = 'call'
 export const SMS_TYPE = 'sms'
+export const MMS_TYPE = 'MMS'
 export const EMAIL_TYPE = 'email'
 export const FAX_TYPE = 'fax'
 export const ANY_COMMUNICATION_TYPE = 'all'

@@ -28,7 +28,7 @@
       </b-progress>
       <p v-if="hasError && !isUploading"
          class="error-notice">
-        Error while uploading attachment...
+        {{ uploadErrorMessage }}
       </p>
     </form>
     <slot name="description"></slot>
@@ -62,7 +62,8 @@ export default {
       files: [],
       selectedFiles: [],
       uploadedFiles: [],
-      hasError: false
+      hasError: false,
+      uploadErrorMessage: ''
     }
   },
   methods: {
@@ -95,6 +96,7 @@ export default {
         this.hasError = true
         this.isUploading = false
         this.files = []
+        this.uploadErrorMessage = error?.response?.data?.message ?? 'Error while uploading attachment...'
       })
     },
     emitFileUploaded () {
@@ -102,8 +104,9 @@ export default {
         this.$emit('fileUploaded', !this.multiple ? this.uploadedFiles[0] : this.uploadedFiles)
       })
     },
-    onBrowse () {
+    onBrowse (event) {
       this.$refs.file.click()
+      event.stopPropagation()
     }
   },
   watch: {

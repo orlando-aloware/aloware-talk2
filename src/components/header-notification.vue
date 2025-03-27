@@ -190,6 +190,15 @@ export default {
 
       return link.href
     }
+  },
+  watch: {
+    isShow (value) {
+      if (value) {
+        document.body.classList.add('has-notification-banner')
+      } else {
+        document.body.classList.remove('has-notification-banner')
+      }
+    }
   }
 }
 </script>

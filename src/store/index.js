@@ -11,6 +11,7 @@ import carrierFee from './carrier-fee'
 import communications from './communications'
 import contacts from './contacts'
 import inbox from './inbox'
+import Einbox from './einbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import transcriptions from './transcriptions'
@@ -43,6 +44,7 @@ export default function (/* { ssrContext } */) {
       communications,
       contacts,
       inbox,
+      Einbox,
       stats,
       powerDialer,
       transcriptions,
@@ -57,6 +59,7 @@ export default function (/* { ssrContext } */) {
 
     state: {
       isWidget: false,
+      isSalesforceWidget: false,
       showMenu: false,
       filter: {},
       tags: [],
@@ -67,6 +70,7 @@ export default function (/* { ssrContext } */) {
       ringGroups: [],
       teams: [],
       contactLists: [],
+      inboxes: [],
       workflows: [],
       changelogs: [],
       broadcasts: [],
@@ -305,6 +309,7 @@ export default function (/* { ssrContext } */) {
       isTrialBannerVisible: false,
       currentTimezone: null,
       hubspotDialNumber: null,
+      salesforceDialNumber: null,
       isRedirectedToHubspotWidget: false,
       isCallBackButtonDisabled: false,
       isFirstLoad: true,
@@ -325,6 +330,10 @@ export default function (/* { ssrContext } */) {
     actions: {
       setIsWidget ({ commit }, value) {
         commit('SET_IS_WIDGET', value)
+      },
+
+      setIsSalesforceWidget ({ commit }, value) {
+        commit('SET_IS_SALESFORCE_WIDGET', value)
       },
 
       setDialerToken ({ commit }, token) {
@@ -555,6 +564,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_TEAMS', teams)
       },
 
+      setInboxes ({ commit }, inboxes) {
+        commit('SET_INBOXES', inboxes)
+      },
+
       setContactLists ({ commit }, contactLists) {
         commit('SET_CONTACT_LISTS', contactLists)
       },
@@ -611,7 +624,6 @@ export default function (/* { ssrContext } */) {
           commit('wallboard/RESET_VUEX', null, { root: true })
           commit('tagsModule/RESET_VUEX', null, { root: true })
           commit('broadcast/RESET_VUEX', null, { root: true })
-          commit('lists/RESET_VUEX', null, { root: true })
         }
       },
 
@@ -932,6 +944,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_HUBSPOT_DIAL_NUMBER', value)
       },
 
+      setSalesforceDialNumber ({ commit }, value) {
+        commit('SET_SALESFORCE_DIAL_NUMBER', value)
+      },
+
       setIsRedirectedToHubspotWidget ({ commit }, value) {
         commit('SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET', value)
       },
@@ -964,6 +980,10 @@ export default function (/* { ssrContext } */) {
     mutations: {
       SET_IS_WIDGET (state, value) {
         state.isWidget = value
+      },
+
+      SET_IS_SALESFORCE_WIDGET (state, value) {
+        state.isSalesforceWidget = value
       },
 
       SET_DIALER_TOKEN (state, token) {
@@ -1331,6 +1351,10 @@ export default function (/* { ssrContext } */) {
 
       SET_TEAMS (state, teams) {
         state.teams = teams
+      },
+
+      SET_INBOXES (state, inboxes) {
+        state.inboxes = inboxes
       },
 
       SET_CONTACT_LISTS (state, contactLists) {
@@ -1763,6 +1787,10 @@ export default function (/* { ssrContext } */) {
 
       SET_HUBSPOT_DIAL_NUMBER (state, value) {
         state.hubspotDialNumber = value
+      },
+
+      SET_SALESFORCE_DIAL_NUMBER (state, value) {
+        state.salesforceDialNumber = value
       },
 
       SET_IS_REDIRECTED_TO_HUBSPOT_WIDGET (state, value) {

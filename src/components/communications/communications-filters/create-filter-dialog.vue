@@ -248,6 +248,9 @@ export default {
             this.setFilterDialogForView(true)
           }
 
+          // add the created filter_id to query params
+          this.$router.replace({ query: { filter_id: response.data.filter.id } }).catch(() => {})
+
           this.isCreating = false
           this.$VueEvent.fire('channel_filter_created', response.data.filter)
           this.$emit('created', response.data.filter)

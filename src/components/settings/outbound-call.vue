@@ -157,9 +157,9 @@ import UserVmDropLibrary from 'components/user-vm-drop-library'
 import SettingsMap from 'components/settings/settings-map'
 import { required } from 'vuelidate/lib/validators'
 import {
-  OUTBOUND_CALLING_MODE_SELECTOR_USE_COMPANY_DEFAULT,
-  OUTBOUND_CALLING_MODE_SELECTOR_SELECT_MANUALLY,
-  OUTBOUND_CALLING_MODE_SELECTOR_ALWAYS_ASK
+  OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT,
+  OUTBOUND_CALLING_MODE_SELECTOR_USER_SELECT_MANUALLY,
+  OUTBOUND_CALLING_MODE_SELECTOR_USER_ALWAYS_ASK
 } from 'src/constants/user-outbound-calling-modes'
 
 export default {
@@ -182,9 +182,9 @@ export default {
       selected: '',
       status: '',
       options: [
-        { text: 'Use Company Default', value: OUTBOUND_CALLING_MODE_SELECTOR_USE_COMPANY_DEFAULT, notEnabled: this.outboundLineSettingsDisabled },
-        { text: 'Select Manually', value: OUTBOUND_CALLING_MODE_SELECTOR_SELECT_MANUALLY, notEnabled: this.outboundLineSettingsDisabled },
-        { text: 'Always Ask', value: OUTBOUND_CALLING_MODE_SELECTOR_ALWAYS_ASK, notEnabled: this.outboundLineSettingsDisabled }
+        { text: 'Use Company Default', value: OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT, notEnabled: this.outboundLineSettingsDisabled },
+        { text: 'Select Manually', value: OUTBOUND_CALLING_MODE_SELECTOR_USER_SELECT_MANUALLY, notEnabled: this.outboundLineSettingsDisabled },
+        { text: 'Always Ask', value: OUTBOUND_CALLING_MODE_SELECTOR_USER_ALWAYS_ASK, notEnabled: this.outboundLineSettingsDisabled }
       ],
       callRecordingsOptions: [
         { text: 'Use Company Default', value: 1 },

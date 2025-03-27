@@ -12,12 +12,12 @@
             class="ai-effect-gradient-text"
             @click="onExpanded"
           >
-            AloAi Conversation Insights
             <sparkle-icon
               width="16"
               height="16"
               color="#9333EA"
             />
+            AloAi Conversation Insights
           </h4>
         </div>
         <div :class="`information-container mt-3 mb-4 ${autoHeightClass}`">
@@ -471,6 +471,7 @@ export default {
      * @returns {string}
      */
     parseMarkdown (text) {
+      if (!text) return ''
       let renderer = new marked.Renderer()
       renderer.link = function (href, title, text) {
         var link = marked.Renderer.prototype.link.apply(this, arguments)
@@ -787,7 +788,7 @@ export default {
 
 <style scoped>
 .information-container {
-  max-height: 150px;
+  max-height: 235px;
 }
 
 .information-container.auto-height {

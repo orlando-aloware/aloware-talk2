@@ -131,12 +131,11 @@
                  round
                  no-caps
                  @click="ignoreFishing">
-            <ignore-call-icon>
-              <q-tooltip anchor="top middle"
-                         self="center middle">
-                Ignore
-              </q-tooltip>
-            </ignore-call-icon>
+            <ignore-call-icon/>
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Ignore
+            </q-tooltip>
           </q-btn>
 
           <q-btn class="height-32"
@@ -152,12 +151,24 @@
             <accept-call-icon width="32" height="32"/>
           </q-btn>
 
+          <q-btn class="height-32"
+                 ripple
+                 no-caps
+                 @click="answerCall"
+                 v-if="dialer.currentStatus !== 'WRAP_UP' && agentStatus === AgentStatus.AGENT_STATUS_RINGING">
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              Answer
+            </q-tooltip>
+            <accept-call-icon width="32" height="32"/>
+          </q-btn>
+
           <b-dropdown no-caret
                       :right="$q.screen.lt.lg"
                       :dropright="!$q.screen.lt.lg"
                       variant="transparent"
                       class="m-2 b-compact-dropdown-button text-bold height-32"
-                      v-if="dialer.currentStatus !== 'WRAP_UP'">
+                      v-else-if="dialer.currentStatus !== 'WRAP_UP'">
             <template #button-content>
               <accept-call-icon width="32" height="32"/>
             </template>

@@ -951,7 +951,7 @@ export default {
       // Outbound line is set to use account default and account has a default
       if (this.currentCompany &&
         this.currentCompany.default_outbound_campaign_id &&
-        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
+        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT &&
         !this.profile.default_outbound_campaign_id) {
         this.autoDialer.outbound_campaign_id = this.currentCompany.default_outbound_campaign_id
         return
@@ -959,13 +959,13 @@ export default {
 
       // User has a default outbound line
       if (this.profile.default_outbound_campaign_id &&
-        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+        this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT) {
         this.autoDialer.outbound_campaign_id = this.profile.default_outbound_campaign_id
         return
       }
 
       // User has to choose outbound line every time
-      if (this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+      if (this.profile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK) {
         this.autoDialer.outbound_campaign_id = null
       }
     },
@@ -1122,7 +1122,6 @@ export default {
 
         this.activeTask = this.taskToCall
         this.hasActiveTask = true
-        this.setContact(this.taskToCall)
         this.TOGGLE_SESSION_LOADER(true)
         this.resetTimer()
 
@@ -1388,7 +1387,6 @@ export default {
 
       this.activeTask = this.taskToCall
       this.hasActiveTask = true
-      this.setContact(this.taskToCall)
 
       if (!this.isSessionRunning) {
         this.isSessionRunning = true

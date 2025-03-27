@@ -1160,18 +1160,6 @@ export default {
       })
     },
 
-    addContactByPhoneNumber (phoneNumber) {
-      if (!this.$options.filters.fixPhone(phoneNumber)) {
-        return Promise.reject('Phone number is not valid')
-      }
-
-      return this.$axios.post('/api/v1/contact', {
-        add_phone_number: this.$options.filters.fixPhone(phoneNumber)
-      }).then(res => {
-        return Promise.resolve(res.data)
-      })
-    },
-
     sortCommunicationsAndAudits: _.debounce(function () {
       this.communicationsAndAudits = _.orderBy(
         this.communicationsAndAudits,

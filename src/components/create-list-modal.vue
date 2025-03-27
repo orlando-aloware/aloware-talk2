@@ -572,12 +572,12 @@ export default {
               id: null,
               loading: false
             })
-
-            const { message, html } = extractErrorMessage(error)
-            console.log(html)
-            this.errorMsg = message
-            this.$generalNotification(message, 'error')
           }
+
+          const { message } = extractErrorMessage(error)
+          this.errorMsg = message
+          this.$generalNotification(message, 'error')
+          this.isLoading = false
         })
         .finally(() => {
           if (!isChunked) {
@@ -849,6 +849,7 @@ export default {
       this.isOpen = open
       this.name = null
       this.type = this.ContactListTypes.DYNAMIC
+      this.errorMsg = ''
     }
   }
 }

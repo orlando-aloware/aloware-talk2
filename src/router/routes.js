@@ -1,9 +1,9 @@
-
 const MainLayout = () => import('layouts/MainLayout.vue')
 const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
 const ResetPassword = () => import('pages/ResetPassword.vue')
 const Inbox = () => import('pages/Inbox.vue')
+const EInbox = () => import('pages/EInbox.vue')
 const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
 const Contact = () => import('src/pages/contacts/Contact.vue')
 const Contacts = () => import('src/pages/contacts/Contacts.vue')
@@ -36,6 +36,7 @@ const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
 const HubSpotMessageWidgetError = () => import('pages/widgets/HubSpotMessageWidgetError.vue')
+const SalesforceSoftPhone = () => import('pages/widgets/SalesforceSoftPhone.vue')
 const AloAi = () => import('pages/AloAi.vue')
 const Apps = () => import('pages/Apps.vue')
 
@@ -53,8 +54,12 @@ export const COMMUNICATIONS_VIEWS_ROUTE_NAME = 'Communications View'
 export const COMMUNICATIONS_CHANNELS_ROUTE_NAME = 'Communications Channel'
 export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Channel Task Status'
 
-// NO difference in the titles for Inboxes on mobile
+// Update the constants at the top
 export const INBOXES_MENU_TITLE = 'Inboxes'
+export const EINBOXES_MENU_TITLE = 'Team Inboxes'
+export const EINBOXES_MENU_ITEMS_TITLE = 'Team Inboxes Items'
+export const EINBOXES_MENU_COMMUNICATIONS_TITLE = 'Team Inboxes Communications'
+export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
 export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
 
@@ -90,11 +95,41 @@ const routes = [
         component: ResetPassword
       },
       {
+        path: 'team-inboxes',
+        name: EINBOXES_MENU_TITLE,
+        component: EInbox,
+        meta: {
+          title: EINBOXES_MENU_TITLE,
+          isInbox: true
+        },
+        children: [
+          {
+            path: ':inboxId',
+            name: EINBOXES_MENU_ITEMS_TITLE,
+            component: EInbox,
+            meta: {
+              title: EINBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
+          {
+            path: ':inboxId/contacts/:id/communications',
+            name: EINBOXES_MENU_COMMUNICATIONS_TITLE,
+            component: Contact,
+            meta: {
+              title: EINBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          }
+        ]
+      },
+      {
         path: '',
         name: 'Inbox',
         component: Inbox,
         meta: {
-          title: INBOXES_MENU_TITLE
+          title: INBOXES_MENU_TITLE,
+          isInbox: true
         },
         children: [
           {
@@ -102,7 +137,8 @@ const routes = [
             name: 'Inbox Contact Task',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -110,7 +146,8 @@ const routes = [
             name: 'Inbox Channel Task Status',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -118,7 +155,8 @@ const routes = [
             name: 'Inbox Contact',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -126,7 +164,8 @@ const routes = [
             name: 'Inbox Contact Communication',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -134,7 +173,8 @@ const routes = [
             name: 'Inbox Channel',
             component: Inbox,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -142,7 +182,8 @@ const routes = [
             name: 'Inbox View',
             component: Inbox,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           },
           {
@@ -150,7 +191,8 @@ const routes = [
             name: 'Inbox View Contact Task',
             component: Contact,
             meta: {
-              title: INBOXES_MENU_TITLE
+              title: INBOXES_MENU_TITLE,
+              isInbox: true
             }
           }
         ]
@@ -677,13 +719,19 @@ const routes = [
     props: true,
     component: Dialer
   },
+  {
+    name: 'Salesforce Softphone',
+    path: '/salesforce/softphone',
+    props: true,
+    component: SalesforceSoftPhone
+  },
   // deep link handlers
   // Apps handlers to open custom protocol
   //
   {
     name: 'Desktop App',
     path: '/apps',
-    props: (route) => ({ action: route.query.action, phone: route.query.phone }),
+    props: (route) => ({ action: route.query.action, phoneNumber: route.query.phone_number, firstName: route.query.first_name, lastName: route.query.last_name, isCompany: route.query.is_company }),
     component: Apps,
     meta: {
       title: 'Open with the desktop app...'

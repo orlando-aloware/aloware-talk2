@@ -27,6 +27,7 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
+import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'inbox',
@@ -81,7 +82,8 @@ export default {
         'Inbox Contact',
         'Inbox Contact Task',
         'Inbox View Contact Task',
-        'Inbox Contact Communication'
+        'Inbox Contact Communication',
+        EINBOXES_MENU_COMMUNICATIONS_TITLE
       ]
     }
   },
@@ -132,12 +134,6 @@ export default {
   created () {
     if (this.isCompanyPartOfAlowareDemoCompanies(this.profile.company_id) || this.isInboxViewsEnabledCompany) {
       this.getPinnedViews()
-    }
-
-    if (this.$route.query && this.$route.query.add_contact) {
-      this.$VueEvent.fire('add_contact', {
-        phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
-      })
     }
   },
 

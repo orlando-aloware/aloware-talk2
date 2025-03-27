@@ -1,8 +1,13 @@
 <template>
-  <div class="integration-wrapper" data-testid="integration-hubspot-wrapper">
-    <q-card class="integration-card"
-            data-testid="integration-hubspot-card"
-            flat>
+  <div
+    class="integration-wrapper"
+    data-testid="integration-hubspot-wrapper"
+  >
+    <q-card
+      class="integration-card"
+      data-testid="integration-hubspot-card"
+      flat
+    >
       <q-item class="p-0">
         <span class='integration-jit-card-header'>
           <i class="fab fa-hubspot hubspot-icon"></i>
@@ -10,112 +15,164 @@
         </span>
       </q-item>
       <q-separator data-testid="integration-hubspot-separator" />
-      <q-card-section class='duplicateContactPhoneNumberMessage'
-                      v-if='hasDuplicates'>
-        {{ duplicatePhoneNumbersDescription }}
-      </q-card-section>
-      <q-separator v-if='hasDuplicates' />
-      <integration-hubspot-one-contact v-if='integrationData'
-                                       :integration-data="integrationData"
-                                       is-primary />
-      <q-card-section  data-testid="integration-hubspot-card-section-3">
-        <b-row>
-          <b-button class="text-white"
-                    size="sm"
-                    variant="primary"
-                    tabindex="0"
-                    block
-                    data-testid="integration-hubspot-sync-button"
-                    @click="syncHubspot">
-            <i class="fa fa-sync-alt" v-if="!isSyncing"></i>
-            <q-spinner-bars v-if="isSyncing"
-                            data-testid="integration-hubspot-sync-spinner"
-                            color="white">
-            </q-spinner-bars>
-            {{ isSyncing ? 'Syncing...' : 'Sync with HubSpot' }}
-            <q-tooltip anchor="center start"
-                       self="center left"
-                       data-testid="integration-hubspot-sync-tooltip"
-                       :offset="[-220, 10]">
-              <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and HubSpot.</p>
-              <p class="font-weight-bold">You'll want to click on this button if:</p>
-              <p class="mt-1 mb-0">- The contact was recently merged in HubSpot with another contact.</p>
-              <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and HubSpot data on this contact.</p>
-            </q-tooltip>
-          </b-button>
-        </b-row>
-      </q-card-section>
-      <q-card-section
-        data-testid="integration-hubspot-card-section-4"
-        v-if="integrationData && integrationData.properties && integrationData.properties.email && false">
-        <b-row>
-          <b-button class="text-white btn-block"
-                    size="sm"
-                    variant="primary"
-                    tabindex="0"
-                    data-testid="integration-hubspot-enroll-button"
-                    @click="onEnrollToWorkflow">
-            <i class="fa fa-user-plus"></i>
-            Enroll to Workflow
-          </b-button>
-        </b-row>
-      </q-card-section>
 
-      <q-menu content-class="mx-height-300"
-              ref="templatesMenu"
-              no-parent-event
-              no-focus
-              data-testid="hubspot-workflow-popover"
-              :offset="[366, -105]"
-              v-model="showWorkflowSelectorForm">
-        <div class="no-wrap q-pa-md">
-          <workflow-selector data-testid="integration-hubspot-workflow-selector"
-                             @onWorkflowSelected="onWorkflowSelected"/>
-          <b-button class="btn-block"
-                    size="sm"
-                    variant="primary"
-                    data-testid="integration-hubspot-enroll-button"
-                    :disabled="isEnrolling || !isWorkflowValid"
-                    @click.prevent="enrollToWorkflow">
-            <q-spinner-bars v-if="isEnrolling"
-                            color="white">
-            </q-spinner-bars>
-            {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
-          </b-button>
-        </div>
-      </q-menu>
+      <!-- Start Skeleton Loader -->
+      <q-card-section v-if="!contactIntegrationDataLoaded">
+        <q-skeleton type="QInput" />
+      </q-card-section>
+      <!-- End Skeleton Loader -->
 
-      <div v-if='hasDuplicates'>
-        <div v-if="showDuplicates">
-          <div v-for="duplicate in this.integrationData.duplicates"
-               :key="duplicate.id">
-            <q-separator data-testid="integration-hubspot-separator" />
-            <integration-hubspot-one-contact :integrationData="duplicate"/>
+      <!-- Start JIT Card Main Content -->
+      <template v-if="contactIntegrationDataLoaded">
+        <!-- Start Duplicate Contacts Section -->
+        <q-card-section
+          class='duplicateContactPhoneNumberMessage'
+          v-if='hasDuplicates'
+        >
+          {{ duplicatePhoneNumbersDescription }}
+        </q-card-section>
+        <q-separator v-if='hasDuplicates' />
+        <integration-hubspot-one-contact
+          v-if='integrationData'
+          is-primary
+          :integration-data="integrationData"
+          :lifecycle-stages-options="lifecycleStagesOptions"
+          :contact-id="contact.id"
+        />
+        <!-- End Duplicate Contacts Section -->
+        <!-- Start Sync Button -->
+        <q-card-section data-testid="integration-hubspot-card-section-3">
+          <b-row>
+            <b-button
+              class="text-white"
+              size="sm"
+              variant="primary"
+              tabindex="0"
+              block
+              data-testid="integration-hubspot-sync-button"
+              @click="syncHubspot"
+            >
+              <i
+                class="fa fa-sync-alt"
+                v-if="!isSyncing"
+              ></i>
+              <q-spinner-bars
+                v-if="isSyncing"
+                data-testid="integration-hubspot-sync-spinner"
+                color="white"
+              >
+              </q-spinner-bars>
+              {{ isSyncing ? 'Syncing...' : 'Sync with HubSpot' }}
+              <q-tooltip
+                anchor="top middle"
+                self="center middle"
+                data-testid="integration-hubspot-sync-tooltip"
+                :offset="[-220, 10]"
+              >
+                <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and HubSpot.</p>
+                <p class="font-weight-bold">You'll want to click on this button if:</p>
+                <p class="mt-1 mb-0">- The contact was recently merged in HubSpot with another contact.</p>
+                <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and HubSpot data on
+                  this contact.</p>
+              </q-tooltip>
+            </b-button>
+          </b-row>
+        </q-card-section>
+        <!-- End Sync Button -->
+        <!-- Start Workflow Section -->
+        <q-card-section
+          data-testid="integration-hubspot-card-section-4"
+          v-if="integrationData && integrationData.properties && integrationData.properties.email && false"
+        >
+          <b-row>
+            <b-button
+              class="text-white btn-block"
+              size="sm"
+              variant="primary"
+              tabindex="0"
+              data-testid="integration-hubspot-enroll-button"
+              @click="onEnrollToWorkflow"
+            >
+              <i class="fa fa-user-plus"></i>
+              Enroll to Workflow
+            </b-button>
+          </b-row>
+        </q-card-section>
+        <q-menu
+          content-class="mx-height-300"
+          ref="templatesMenu"
+          no-parent-event
+          no-focus
+          data-testid="hubspot-workflow-popover"
+          :offset="[366, -105]"
+          v-model="showWorkflowSelectorForm"
+        >
+          <div class="no-wrap q-pa-md">
+            <workflow-selector
+              data-testid="integration-hubspot-workflow-selector"
+              @onWorkflowSelected="onWorkflowSelected"
+            />
+            <b-button
+              class="btn-block"
+              size="sm"
+              variant="primary"
+              data-testid="integration-hubspot-enroll-button"
+              :disabled="isEnrolling || !isWorkflowValid"
+              @click.prevent="enrollToWorkflow"
+            >
+              <q-spinner-bars
+                v-if="isEnrolling"
+                color="white"
+              >
+              </q-spinner-bars>
+              {{ isEnrolling ? 'Enrolling...' : 'Enroll' }}
+            </b-button>
           </div>
+        </q-menu>
+        <!-- End Workflow Section -->
+        <!-- Start Duplicate Contacts Section -->
+        <div v-if='hasDuplicates'>
+          <div v-if="showDuplicates">
+            <div
+              v-for="duplicate in this.integrationData.duplicates"
+              :key="duplicate.id"
+            >
+              <q-separator data-testid="integration-hubspot-separator" />
+              <integration-hubspot-one-contact
+                :integrationData="duplicate"
+                :lifecycle-stages-options="lifecycleStagesOptions"
+                :contact-id="contact.id"
+              />
+            </div>
+          </div>
+          <b-button
+            size="sm"
+            variant="link"
+            tabindex="0"
+            block
+            @click="toggleDuplicates"
+          >
+            {{ showDuplicates ? 'See less matches' : 'See all matches' }}
+          </b-button>
         </div>
-        <b-button size="sm"
-                  variant="link"
-                  tabindex="0"
-                  block
-                  @click="toggleDuplicates">
-          {{ showDuplicates ? 'See less matches' : 'See all matches' }}
-        </b-button>
-      </div>
+        <!-- End Duplicate Contacts Section -->
+      </template>
+      <!-- End JIT Card Main Content -->
     </q-card>
   </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
-import WorkflowSelector from 'src/components/integrations/workflow-selector'
+import IntegrationHubspotOneContact from 'components/integrations/integration-hubspot-one-contact.vue'
 import _ from 'lodash'
+import WorkflowSelector from 'src/components/integrations/workflow-selector'
+import talk2Api from 'src/plugins/api/api'
 import {
   hubspotIntegrationMixin,
   integrationMixin,
   simpsocialMixin
 } from 'src/plugins/mixins'
-import IntegrationHubspotOneContact from 'components/integrations/integration-hubspot-one-contact.vue'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'integration-hubspot',
@@ -177,6 +234,14 @@ export default {
       return 'This contact has other matches with the same number' +
         (values.length > 1 ? 's' : '') +
         (values.length ? `: ${values.join(', ')}` : '')
+    },
+
+    lifecycleStagesOptions () {
+      // transform from an object to a list of objects with label and value properties
+      // example: [{ label: 'Subscriber', value: 'subscriber' }, { label: 'Lead', value: 'lead' }, { label: 'Customer', value: 'customer' }]
+      return this.integrationData?.lifecycle_stages
+        ? Object.entries(this.integrationData.lifecycle_stages).map(([label, value]) => ({ label, value }))
+        : []
     }
   },
 
@@ -242,16 +307,15 @@ export default {
       this.showWorkflowSelectorForm = true
     },
 
-    syncHubspot (showAlert = true) {
+    async syncHubspot (showAlert = true) {
       this.isSyncing = true
-      talk2Api.V1.contact.syncHubspot(this.contact.id).then(response => {
-        this.isSyncing = false
-        this.getData()
+      await talk2Api.V1.contact.syncHubspot(this.contact.id)
+      await this.getData()
+      this.isSyncing = false
 
-        if (showAlert) {
-          this.$generalNotification('Contact has been successfully synced.')
-        }
-      })
+      if (showAlert) {
+        this.$generalNotification('Contact has been successfully synced.')
+      }
     },
 
     toggleDuplicates () {

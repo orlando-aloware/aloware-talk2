@@ -1,19 +1,19 @@
 <template>
   <q-toolbar class="page-header"
              :class="{ 'pl-2 pr-2': !noPadding }">
-    <div class="d-flex h-100 align-items-center">
+    <div class="d-flex h-100 align-items-center flex-grow-1">
       <back-button class="mobile-back-btn-global-header"
-                   v-if="['Contact', 'Settings Tab'].includes($route.name)"
+                   v-if="shouldShowNavigateBackButton"
                    @click="navigateBack"/>
       <router-link class="btn-header-nav-back"
                    :to="backRoute"
-                   v-if="['Communication'].includes($route.name)">
+                   v-if="['Communication'].includes($route.name) && !shouldShowNavigateBackButton">
         <button class="more-details font-weight-light-bold btn btn-sm">
           <i class="fa fa-chevron-left" />
         </button>
       </router-link>
-      <h1 v-if="isMainTitle">{{ mainTitle }}</h1>
-      <h1 v-if="forcePageTitle">{{ forcePageTitle }}</h1>
+      <h1 v-if="isMainTitle" class="flex-grow-2">{{ mainTitle }}</h1>
+      <h1 v-if="forcePageTitle" class="flex-grow-2">{{ forcePageTitle }}</h1>
       <h1 v-if="$q.screen.lt.md && ['Settings Tab'].includes($route.name)">{{ settingsTabHeaderName }}</h1>
       <contact-app-header v-if="['Contact'].includes($route.name) && !titleOnly"></contact-app-header>
       <contact-list-navigation v-if="['Contact'].includes($route.name) && !titleOnly" />
@@ -156,7 +156,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME } from 'src/router/routes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-header',
@@ -216,7 +216,9 @@ export default {
       dialerStatus: false,
       loading: false,
       prevRoute: null,
-      PHONE_USAGE_ERRORS
+      PHONE_USAGE_ERRORS,
+      EINBOXES_MENU_ITEMS_TITLE,
+      EINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
@@ -269,7 +271,7 @@ export default {
     },
 
     mainTitle () {
-      return this.$route.meta && this.$route.meta.title ? this.$route.meta.title : this.$route.name
+      return this.$route.meta?.title || ''
     },
 
     contactsRefreshIsDisabled () {
@@ -403,6 +405,14 @@ export default {
         return this.loading
       }
       return false
+    },
+
+    isCommsPageFromEInbox () {
+      return this.$route.name === 'Communication' && this.prevRoute?.substr(0, 13) === '/team-inboxes'
+    },
+
+    shouldShowNavigateBackButton () {
+      return ['Contact', 'Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromEInbox
     }
   },
 
@@ -450,8 +460,7 @@ export default {
       const previousPage = _.get(this.$route.query, 'previousPage', null)
       const previousList = _.get(this.$route.query, 'list', null)
 
-      if (previousPage &&
-        previousPage.replace(' ', '') === 'PowerDialer') {
+      if (previousPage && previousPage.replace(' ', '') === 'PowerDialer') {
         if (previousList) {
           this.$router.push(`/power-dialer/list/${previousList}`)
         } else {
@@ -460,7 +469,7 @@ export default {
         return
       }
 
-      if (this.$route.name === 'Settings Tab') {
+      if (['Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromEInbox) {
         this.$router.back()
         return
       }

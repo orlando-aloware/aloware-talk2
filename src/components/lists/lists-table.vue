@@ -1,5 +1,5 @@
 <template>
-  <div class="contacts mx-0 content-row d-flex overflow-hidden h-100">
+  <div class="contacts lists-management mx-0 content-row d-flex overflow-hidden h-100">
     <lists-folders-management :is-loading="isLoading || isLoadingMore" />
 
     <div class="talk-table-container flex-grow-1 d-flex flex-column">
@@ -49,11 +49,17 @@
             </div>
           </div>
           <div class="ml-2">
-            <b-dropdown text="Search Filters"
+            <b-dropdown variant="primary"
+                        class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                        toggle-class="dropdown-btn-text py-0 my-0 d-flex align-items-center"
                         right
-                        variant="light"
-                        class="calls__header__columns-dropdown m-2 b-compact-dropdown-button dropdown-white"
-                        size="lg">
+                        no-caret>
+              <template #button-content>
+                <div class="dropdown-btn-text d-flex align-items-center">
+                  Search Filters
+                </div>
+                <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
+              </template>
               <b-overlay :show="isLoading">
                 <template #overlay>
                   <q-spinner-bars color="primary"
@@ -111,74 +117,92 @@
       </div>
 
         <div class="d-flex justify-between">
-          <div class="setting pr-3 align-items-center">
-            <compact-btn variant="primary"
-                         class="mr-2"
-                         data-testid="create-list-menu-item"
-                         @clicked="onCreateList($event)">
-              <plus-icon class="mr-1"
-                         color="white"/>
-              Add List
-            </compact-btn>
-          </div>
+          <b-dropdown variant="primary"
+                      class="m-2 b-compact-dropdown-button text-bold text-black dropdown-white filter-toggle-button"
+                      toggle-class="dropdown-btn-text py-0 my-0 d-flex align-items-center"
+                      right
+                      no-caret>
+            <template #button-content>
+              <div class="dropdown-btn-text d-flex align-items-center">
+                Add List
+              </div>
+              <i class="fa fa-chevron-down fs-12 ml-2 text-grey-90" />
+            </template>
+            <b-dropdown-item href="#"
+                            @click="onCreateList">
+              <plus-icon />
+              Create new List
+            </b-dropdown-item>
+            <b-dropdown-item href="#"
+                            @click="openImportContactsModal">
+              <csv-icon />
+              Import from CSV
+            </b-dropdown-item>
+          </b-dropdown>
         </div>
       </div>
 
-      <q-table class="talk-table"
-              row-key="index"
-              virtual-scroll
-              :data="listsData"
-              :columns="fixedColumns"
-              :loading="isLoadingMore || isLoading || isListsLoading"
-              :virtual-scroll-item-size="100"
-              :virtual-scroll-sticky-size-start="100"
-              :pagination="pagination"
-              :rows-per-page-options="[0]"
-              @virtual-scroll="onScroll">
-        <template v-slot:body="props">
-          <q-tr :props="props">
-            <q-td :props="props"
-                  :key="col.name"
-                  v-for="col in props.cols">
-              <div v-if="col.name === COLUMN_NAMES.name">
-                <router-link class="d-flex align-items-center item contact-name"
+      <datatable class="talk-table mt-0"
+                 sticky-headers
+                 scroll-area-class="lists-management-scroll-area"
+                 use-empty-slot
+                 :paginated="false"
+                 :columns="fixedColumns"
+                 :total-rows="pagination.rowsNumber"
+                 :current-page="pagination.currentPage"
+                 :last-page="pagination.totalPages"
+                 :is-loading="isLoading"
+                 :is-loading-more="isLoadingMore"
+                 @sort="onSortByField"
+                 @reordered="onColumnsReordered"
+                 @more="onScroll">
+        <template #tbody>
+          <tr class=""
+              :key="index"
+              v-for="(row, index) in listsData">
+            <td :class="{ 'actions-td': col.name === COLUMN_NAMES.actions }"
+                :key="col.name"
+                v-for="col in fixedColumns">
+              <div class="ellipse"
+                   v-if="col.name === COLUMN_NAMES.name">
+                <router-link class="contact-name"
                              data-testid="lists-view-list-name-link"
-                             :to="buildListLink(props.row)">
-                    {{ props.row.name }}
+                             :to="buildListLink(row)">
+                    {{ row.name }}
                 </router-link>
               </div>
               <div v-if="col.name === COLUMN_NAMES.owner_name && isColumnVisible(col.name)">
-                {{ props.row.owner_name }}
+                {{ row.owner_name }}
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.date_created">
                 <relative-time humanized
-                              :from-time="props.row[col.field]" />
+                               :from-time="row[col.field]" />
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.no_of_contacts">
-                {{ props.row.no_of_contacts }}
+                {{ row.no_of_contacts }}
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.show_in_public_folder">
-                {{ props.row.show_in_public_folder ? 'Public' : 'Private' }}
+                {{ row.show_in_public_folder ? 'Public' : 'Private' }}
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.type">
-                {{ getContactListType(props.row) }}
+                {{ getContactListType(row) }}
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.source">
-                <span v-if="props.row.source_name">
-                  {{ props.row.source_name | ucwords }}
+                <span v-if="row.source_name">
+                  {{ row.source_name | ucwords }}
                 </span>
                 <span v-else>-</span>
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.import_status">
-                <span v-if="props.row.import_status_name">
-                  {{ props.row.import_status_name | ucwords }}
+                <span v-if="row.import_status_name">
+                  {{ row.import_status_name | ucwords }}
                 </span>
                 <span v-else>-</span>
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.imported_at">
                 <relative-time humanized
-                              :from-time="props.row[col.field]"
-                              v-if="props.row[col.field]" />
+                               :from-time="row[col.field]"
+                               v-if="row[col.field]" />
                 <span v-else>-</span>
               </div>
               <div v-else-if="col.name === COLUMN_NAMES.actions">
@@ -201,7 +225,7 @@
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-edit-option"
-                                     @click="onEditList(props.row)">
+                                     @click="onEditList(row)">
                       <pencil-o-icon height="14"
                                      width="14"
                                      color="#62666E"/>
@@ -210,14 +234,14 @@
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-rename-option"
-                                     @click="onRenameList(props.row)">
+                                     @click="onRenameList(row)">
                       <pencil-icon />
                       Rename List
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-duplicate-option"
-                                     @click="onDuplicateList(props.row)">
+                                     @click="onDuplicateList(row)">
                       <duplicate-icon />
                       Duplicate List
                     </b-dropdown-item>
@@ -225,7 +249,7 @@
                     <b-dropdown-item href="#"
                                      data-testid="change-list-owner-option"
                                      v-if="isAdmin"
-                                     @click="openChangeListOwnerModal(props.row)">
+                                     @click="openChangeListOwnerModal(row)">
                       <switch-icon />
                       Change List Owner
                     </b-dropdown-item>
@@ -233,8 +257,8 @@
                     <b-dropdown-item href="#"
                                      data-testid="lists-show-option"
                                      v-if="hasShowInPublicFolderPermission"
-                                     @click="onShowInPublicFolderList(props.row)">
-                      <template v-if="!props.row.show_in_public_folder">
+                                     @click="onShowInPublicFolderList(row)">
+                      <template v-if="!row.show_in_public_folder">
                         <eye-icon />
                         Convert List to Public
                       </template>
@@ -246,7 +270,7 @@
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-add-to-powerdialer-option"
-                                     @click="onAddListToPowerDialer(props.row)">
+                                     @click="onAddListToPowerDialer(row)">
                       <power-dialer-mobile-icon width="14"
                                                 height="14"
                                                 color="#62666E"/>
@@ -255,16 +279,16 @@
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-add-to-sequence-option"
-                                     @click="onEnrollContactsToSequence(props.row)">
+                                     @click="onEnrollContactsToSequence(row)">
                       <add-sequence-icon height="14"
-                                        width="14"
-                                        color="#62666E"/>
+                                         width="14"
+                                         color="#62666E"/>
                       Add List to Sequence
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-assign-option"
-                                     @click="openAssignContacts(props.row)">
+                                     @click="openAssignContacts(row)">
                       <power-dialer-mobile-icon width="14"
                                                 height="14"
                                                 color="#62666E"/>
@@ -274,56 +298,57 @@
                     <b-dropdown-item href="#"
                                      data-testid="lists-aloai-option"
                                      v-if="shouldShowAloAi"
-                                     @click="openAloAiBotContactsEnrollmentModal(props.row)">
+                                     @click="openAloAiBotContactsEnrollmentModal(row)">
                       <add-user-icon width="14"
                                      height="14"
                                      color="#62666E"/>
-                      Enroll List in AloAi Text Bot
+                      Enroll List in AloAi Agent
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
-                                    data-testid="lists-move-option"
-                                    :data-popper-target="'list-' + props.row.id"
-                                    v-if="!props.row.show_in_public_folder"
-                                    @click.stop="onMoveList(props.row)">
+                                     data-testid="lists-move-option"
+                                     :data-popper-target="'list-' + row.id"
+                                     v-if="!row.show_in_public_folder"
+                                     @click.stop="onMoveList(row)">
                       <move-icon />
                       Move List
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-pin-option"
-                                     @click="onPinList(props.row)">
+                                     @click="onPinList(row)">
                       <pin-icon />
-                      {{ pinnedLists.includes(props.row.id) ? 'Unpin' : 'Pin' }} List
+                      {{ pinnedLists.includes(row.id) ? 'Unpin from' : 'Pin to' }} Contacts page
                     </b-dropdown-item>
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-delete-option"
-                                     @click="onDeleteList(props.row)">
+                                     @click="onDeleteList(row)">
                       <delete-red-icon />
                       <span class="text-danger">Delete</span>
                     </b-dropdown-item>
                   </b-dropdown>
                 </div>
               </div>
-            </q-td>
-          </q-tr>
+            </td>
+          </tr>
         </template>
 
-        <template v-slot:loading>
-          <div class="d-flex justify-center">
-            <q-spinner-bars color="primary"
-                            size="30px" />
+        <template #empty>
+          <div class="text-center loading-spinner"
+               v-if="listsData.length === 0 && isLoading">
+            <q-spinner-bars class=""
+                            color="primary"
+                            size="28px" />
+
           </div>
-        </template>
-
-        <template v-slot:no-data>
           <div class="w-100 text-center"
-              v-if="!isLoadingMore && !isLoading">
+              v-else-if="!isLoading && !isLoadingMore && listsData.length === 0">
             <h2> No data </h2>
           </div>
         </template>
-      </q-table>
+
+      </datatable>
 
       <lists-rename-form :is-show="isOpenListForm"
                         :editable-list="list"
@@ -354,9 +379,12 @@
                               @hidden="openPDModal = false">
       </power-dialer-add-modal>
 
-      <enroll-contacts-to-aloai-modal ref="enrollContactsToAloAiModal"
-                                      :params="attachedParams()"
-                                      :contactList="list" />
+      <aloai-enrollment-control-modal
+        ref="enrollContactsToAloAiModal"
+        :params="attachedParams()"
+        :contact-list="list"
+        :total-contacts-count="list?.no_of_contacts"
+        :multiple-phone-numbers="true" />
 
       <assign-contacts-modal :is-show="showAssignContacts"
                             :list="list"
@@ -372,6 +400,12 @@
       <change-list-owner-modal ref="changeListOwnerModal"
                                :contactList="list"
                                @listOwnerChanged="onListOwnerChanged"/>
+
+      <import-contacts-modal ref="importContacts"
+                             :user-id="userId"
+                             :folder-id="folderId"
+                             :is-public="isPublic"
+                             @importStarted="onImportStarted" />
     </div>
   </div>
 </template>
@@ -386,7 +420,6 @@ import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-mo
 import AssignContactsModal from 'src/components/assign-contacts-modal'
 import MoveDialog from 'src/components/move-dialog'
 import CreateListModal from 'components/create-list-modal.vue'
-import CompactBtn from 'src/components/compact-btn.vue'
 import RelativeTime from 'src/components/relative-time.vue'
 import PencilIcon from 'components/icons/pencil-icon.vue'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
@@ -397,6 +430,7 @@ import EyeOffIcon from 'components/icons/eye-off-icon'
 import AddSequenceIcon from 'components/icons/add-sequence-icon'
 import MoveIcon from 'components/icons/move-icon.vue'
 import PlusIcon from 'components/icons/plus-icon.vue'
+import CsvIcon from 'components/icons/csv-icon.vue'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
 import { COLUMNS, columnsByViewportConfig, COLUMN_NAMES } from 'src/constants/lists/home-columns'
@@ -405,12 +439,14 @@ import { aclMixin, dataTableMixin, mainViewMixin } from 'src/plugins/mixins'
 import ListsFoldersManagement from './lists-folders-management'
 import SlashIcon from 'components/icons/slash-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
-import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
 import SwitchIcon from 'components/icons/switch-icon'
 import ChangeListOwnerModal from './change-list-owner-modal.vue'
 import EllipseIcon from 'components/icons/ellipse-icon'
 import DeleteRedIcon from 'components/icons/delete-red-icon'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import ImportContactsModal from 'src/components/import-contacts-modal.vue'
+import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
+import Datatable from 'src/components/datatable.vue'
 
 export default {
   name: 'ListsTable',
@@ -431,6 +467,7 @@ export default {
     PencilOIcon,
     PinIcon,
     PlusIcon,
+    CsvIcon,
     SearchInput,
     AssignContactsModal,
     ConvertListToPublicDialog,
@@ -442,15 +479,16 @@ export default {
     RelativeTime,
     ListsFoldersManagement,
     SlashIcon,
-    CompactBtn,
     AddUserIcon,
-    EnrollContactsToAloaiModal,
     SwitchIcon,
     ChangeListOwnerModal,
     EllipseIcon,
     PowerDialerMobileIcon,
     DeleteRedIcon,
-    InformationCircleIcon
+    InformationCircleIcon,
+    ImportContactsModal,
+    AloaiEnrollmentControlModal,
+    Datatable
   },
 
   data () {
@@ -466,6 +504,8 @@ export default {
         totalPages: 1,
         currentPage: 1
       },
+      sort: 'contact_lists.created_at',
+      order: 'desc',
       listsData: [],
       list: null,
       isUnsavedListModalShown: false,
@@ -478,6 +518,7 @@ export default {
       addToPowerDialerMode: 'add',
       addToPowerDialerIsManualSelection: false,
       COLUMNS,
+      fixedColumns: [],
       COLUMN_NAMES,
       foldersPath: [],
 
@@ -499,18 +540,22 @@ export default {
       'moveDialog',
       'isAllContactsSelected'
     ]),
+
+    ...mapGetters('listsModule', {
+      lists: 'getLists',
+      listsCount: 'getListsCount'
+    }),
+
     ...mapState(['users']),
+
     ...mapState('listsModule', [
-      'isListsLoading'
+      'isListsLoading',
+      'listsImportedFromCsv'
     ]),
 
     ...mapState('contacts', [
       'unsavedList'
     ]),
-    ...mapGetters('listsModule', {
-      lists: 'getLists',
-      listsCount: 'getListsCount'
-    }),
 
     hasShowInPublicFolderPermission () {
       return this.isBillingAdminOrAdminOrSupervisor
@@ -518,13 +563,6 @@ export default {
 
     columnsByViewport () {
       return columnsByViewportConfig
-    },
-
-    fixedColumns () {
-      const allColumns = this.$jsonClone(this.COLUMNS)
-
-      return this.getResponsiveColumns(allColumns, this.columnsByViewport)
-        .filter((col) => this.isColumnVisible(col.field))
     },
 
     isPinned () {
@@ -560,7 +598,11 @@ export default {
     },
 
     folderId () {
-      return +this.$route.params.folderId
+      if (this.$route.params.folderId) {
+        return +this.$route.params.folderId
+      }
+
+      return null
     },
 
     publicListsFilterSelected () {
@@ -600,6 +642,13 @@ export default {
       'SET_SEARCH',
       'SET_LISTS_COUNT'
     ]),
+
+    initFixedColumns () {
+      const allColumns = this.$jsonClone(this.COLUMNS)
+
+      this.fixedColumns = this.getResponsiveColumns(allColumns, this.columnsByViewport)
+        .filter((col) => this.isColumnVisible(col.field))
+    },
 
     async initializeLists () {
       this.SET_SEARCH('')
@@ -676,6 +725,8 @@ export default {
       const props = {
         page: this.pagination.currentPage,
         perPage: this.pagination.perPage,
+        sort: this.sort,
+        order: this.order,
         filters
       }
 
@@ -719,14 +770,10 @@ export default {
         })
     },
 
-    async onScroll ({ to, ref }) {
+    async onScroll () {
       if (this.isLoading) return
 
-      const lastIndex = this.listsData.length - 1
-      if (!this.isLoadingMore && this.pagination.currentPage < this.pagination.totalPages && to === lastIndex) {
-        await this.loadMoreLists()
-        ref.refresh()
-      }
+      this.loadMoreLists()
     },
 
     openListForm () {
@@ -924,21 +971,14 @@ export default {
       return listLink
     },
 
-    async loadMoreLists (done) {
+    async loadMoreLists () {
       if (this.isLoadingMore || this.pagination.currentPage >= this.pagination.totalPages) {
-        if (typeof done === 'function') {
-          done()
-        }
         return
       }
 
       this.pagination.currentPage += 1
       await this.getLists(true)
       this.listsData.push(...this.lists)
-
-      if (typeof done === 'function') {
-        done()
-      }
     },
 
     onCreateList (event) {
@@ -1014,7 +1054,7 @@ export default {
     isColumnVisible (field) {
       switch (field) {
         case this.COLUMN_NAMES.owner_name:
-          return this.isPublic || this.personalListsFilterSelected
+          return this.isPublic || this.publicListsFilterSelected || this.personalListsFilterSelected
         case this.COLUMN_NAMES.show_in_public_folder:
           return this.isGlobalSearch
         default:
@@ -1083,17 +1123,61 @@ export default {
 
     onFilterChange () {
       this.refreshLists()
+    },
+
+    openImportContactsModal () {
+      if (this.$refs.importContacts) {
+        this.$refs.importContacts.open()
+      }
+    },
+
+    onImportStarted () {
+      this.refreshLists()
+    },
+
+    listCsvImportFinished (event) {
+      if (!event?.contact_list) {
+        return
+      }
+
+      // notify user if is one of the Lists he imported
+      const list = this.listsImportedFromCsv.find((c) => c.id === event.contact_list.id)
+      if (!list) {
+        return
+      }
+
+      const listName = event.contact_list.name
+      this.$generalNotification(`Contacts successfully imported into ${listName}`)
+      this.refreshLists()
+    },
+
+    onColumnsReordered (columns) {
+      this.fixedColumns = columns
+    },
+
+    onSortByField ({ orderBy, order }) {
+      if (orderBy !== 'owner_name') {
+        orderBy = orderBy === 'date_created' ? 'created_at' : orderBy
+        orderBy = `contact_lists.${orderBy}`
+      }
+
+      this.sort = orderBy
+      this.order = order
+      this.refreshLists()
     }
   },
 
   mounted () {
+    this.initFixedColumns()
     this.initializeLists()
 
     this.$VueEvent.listen('lists-management-folder-click', this.onFolderSelected)
+    this.$VueEvent.listen('contact_list_import_csv', this.listCsvImportFinished)
   },
 
   beforeDestroy () {
     this.$VueEvent.stop('lists-management-folder-click', this.onFolderSelected)
+    this.$VueEvent.stop('contact_list_import_csv')
   },
 
   watch: {
@@ -1104,6 +1188,15 @@ export default {
       this.search = ''
       this.refreshLists()
       this.refreshFoldersPath()
+    },
+    isPublic () {
+      this.initFixedColumns()
+    },
+    publicListsFilterSelected () {
+      this.initFixedColumns()
+    },
+    personalListsFilterSelected () {
+      this.initFixedColumns()
     },
     folders () {
       this.SET_SEARCH('')

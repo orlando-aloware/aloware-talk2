@@ -11,21 +11,34 @@
                (communication.type === CommunicationTypes.NOTE && communication.direction === CommunicationDirection.INBOUND)) &&
                (communication.body || communication.attachments)) && !communication.is_read">
       </q-badge>
-      <avatar class="contact-avatar"
-              width="34"
-              height="34"
-              data-testid="contact-activity-avatar"
-              :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
-              :style="avatarStyle(isSender)"
-              :class="[ communication.direction === CommunicationDirection.INBOUND ? 'mr-2' : 'ml-2' ]"
-              v-if="communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE"
-              :name="avatarName">
+      <outbound-avatar class="contact-avatar ml-2"
+                       width="34"
+                       height="34"
+                       data-testid="contact-activity-avatar"
+                       :sequenceIcon="communication.direction === CommunicationDirection.OUTBOUND && communication.workflow_id !== null"
+                       :style="avatarStyle(isSender)"
+                       :name="avatarName"
+                       v-if="communication.direction === CommunicationDirection.OUTBOUND && communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
         <q-tooltip content-class="bg-grey-light11"
                    data-testid="contact-activity-avatar-tooltip"
                    anchor="top middle" self="center middle">
           {{ avatarName }}
         </q-tooltip>
-      </avatar>
+      </outbound-avatar>
+
+      <inbound-avatar class="contact-avatar mr-2"
+                      width="34"
+                      height="34"
+                      data-testid="contact-activity-avatar"
+                      :name="avatarName"
+                      :color-module-id="communication.contact_id"
+                      v-if="communication.direction === CommunicationDirection.INBOUND && communication.type !== undefined && communication.type !== CommunicationTypes.SYSNOTE">
+        <q-tooltip content-class="bg-grey-light11"
+                   data-testid="contact-activity-avatar-tooltip"
+                   anchor="top middle" self="center middle">
+          {{ avatarName }}
+        </q-tooltip>
+      </inbound-avatar>
     </div>
 
     <div class="w-100"
@@ -381,7 +394,8 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CommunicationInfo from 'components/communication-info'
-import Avatar from 'components/avatar'
+import OutboundAvatar from 'components/avatar'
+import InboundAvatar from 'src/components/einbox/communication-items/avatar.vue'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import DownloadButton from 'components/download-button'
 import { CREATOR_TYPE_MANUAL } from 'src/constants/creator-types'
@@ -395,7 +409,8 @@ export default {
 
   components: {
     CommunicationInfo,
-    Avatar,
+    OutboundAvatar,
+    InboundAvatar,
     InformationCircleIcon,
     DownloadButton
   },
@@ -455,7 +470,11 @@ export default {
         'custom_log',
         'aloai_text_bot_enrollment',
         'aloai_text_bot_disengagement',
-        'aloai_text_bot_reengagement'
+        'aloai_text_bot_reengagement',
+        'aloai_text_bot_reengagement',
+        'aloai_voice_bot_enrollment',
+        'aloai_voice_bot_disengagement',
+        'aloai_voice_bot_reengagement'
       ],
       custom_audit_messages: {
         'is_dnc': [

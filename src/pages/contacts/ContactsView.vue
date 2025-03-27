@@ -7,7 +7,7 @@
               v-if="!simpleTable">
       <div class="d-flex flex-column">
         <div class="ml-2 pr-2 contacts__title d-flex flex-wrap align-items-center">
-          <div v-if="isDemoCompany && !isNaN(list.id) && typeof list.id === 'string'">
+          <div v-if="!isNaN(list.id) && typeof list.id === 'string'">
             <compact-btn variant="primary"
                         class="mr-3"
                         data-testid="contacts-view-back-to-lists-button"
@@ -38,16 +38,12 @@
                  :key="`f-${index}`"
                  class="d-flex align-items-center title-path"
                  data-testid="contacts-view-folder-path">
-              <template v-if="isDemoCompany">
+              <template>
                 <router-link class="d-flex align-items-center title-path"
                              :to="buildListManagementLink(folder.id)">
                   <folder-icon color="#62666E" class="mr-1"></folder-icon>
                   <div class="title-breadcrumb-link d-flex align-items-center">{{ folder.name }}</div>
                 </router-link>
-              </template>
-              <template v-else>
-                <folder-icon color="#62666E" class="mr-1"></folder-icon>
-                <div class="title-breadcrumb d-flex align-items-center">{{ folder.name }}</div>
               </template>
               <slash-icon class="title-slash d-flex align-items-center" />
             </div>
@@ -363,7 +359,7 @@
                            v-if="shouldShowAloAi"
                            @click="openAloAiBotContactsEnrollmentModal('add-contact-list')">
             <add-user-icon width="14" height="14" color="#62666E" />
-            Enroll List in AloAi Text Bot
+            Enroll List in AloAi Agent
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            v-if="isAdmin"
@@ -781,11 +777,13 @@
       <tag-contacts-workflow-enroller :is-show="showAddToSequence"
                                       :list="selectedList"
                                       @closeEnrollTagContactsToSequenceDialog="closeAddToSequence" />
-      <enroll-contacts-to-aloai-modal
+      <aloai-enrollment-control-modal
         ref="enrollContactsToAloAiModal"
         :params="attachedParams()"
-        :contactList="selectedList"
+        :contact-list="selectedList"
         :checked-count="selectedAllCount"
+        :total-contacts-count="totalRows"
+        :multiple-phone-numbers="true"
       />
     <assign-contacts-modal :is-show="showAssignContacts"
                            :list="selectedList"
@@ -838,7 +836,7 @@ import { OPERATORS } from 'src/constants/contacts-filter-operators'
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal'
 import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-enroller.vue'
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
-import EnrollContactsToAloaiModal from 'src/components/aloai/enroll-contacts-to-aloai-modal'
+import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
 import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
 import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
@@ -890,7 +888,7 @@ export default {
     ImportContactsModal,
     PowerDialerAddModal,
     TagContactsWorkflowEnroller,
-    EnrollContactsToAloaiModal,
+    AloaiEnrollmentControlModal,
     AssignContactsModal,
     TagsCellList,
     FolderIcon,
@@ -1229,12 +1227,8 @@ export default {
       return !this.isContactListSelected || !this.totalRows
     },
 
-    isDemoCompany () {
-      return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
-    },
-
     showUserBreadcrumbNav () {
-      return this.isDemoCompany && (this.$route.params.userId || this.$route.params.type === 'public')
+      return this.$route.params.userId || this.$route.params.type === 'public'
     },
 
     isFromListsManagement () {
@@ -1548,12 +1542,17 @@ export default {
     },
 
     attachedParams () {
+      // If "Select All" is checked, return with selected_all true and empty contact_ids
+      if (this.isDatatableSelectedAll) {
+        return {
+          selected_all: true,
+          contact_ids: [],
+          ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})
+        }
+      }
+
       // If there are no selected contacts and a contact list is selected
-      // all contacts in the list should be added to the power dialer
-      if (
-        this.checkedItemIds.length === 0 &&
-        this.isContactListSelected
-      ) {
+      if (this.checkedItemIds.length === 0 && this.isContactListSelected) {
         return {
           list_id: this.selectedList.id,
           selected_all: true,
@@ -1561,6 +1560,7 @@ export default {
         }
       }
 
+      // For specific selected contacts
       return {
         contact_ids: this.checkedItemIds,
         ...(this.isContactListSelected ? { list_id: this.selectedList.id } : {})

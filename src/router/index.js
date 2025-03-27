@@ -46,6 +46,12 @@ export default function ({ store }) {
       store.commit('SET_IS_WIDGET', true)
     }
 
+    const isSalesforceWidget = to.matched.some(route => route?.meta?.isSalesforceWidget)
+
+    if (isSalesforceWidget) {
+      store.commit('SET_IS_SALESFORCE_WIDGET', true)
+    }
+
     const record = to.matched.find(record => record.meta.title)
     const documentTitle = { data: '' }
 

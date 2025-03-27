@@ -299,6 +299,7 @@ import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
 import { FINISHED } from 'src/constants/export-status'
+import { EINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'MyLayout',
@@ -404,7 +405,9 @@ export default {
       MetricOptionGroups,
       AppDefaultLogin,
       isFirstLoading: true,
-      isSidebarExpanded: true
+      isSidebarExpanded: true,
+      loadingInboxes: false,
+      EINBOXES_MENU_TITLE
     }
   },
 
@@ -479,7 +482,7 @@ export default {
     pageClass () {
       const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
 
-      return pageSlug.replace(/ /g, '_') + '-page'
+      return pageSlug === EINBOXES_MENU_TITLE.toLowerCase() ? null : pageSlug.replace(/ /g, '_') + '-page'
     },
 
     isMobilePhoneClosed () {
@@ -1246,6 +1249,21 @@ export default {
   },
 
   methods: {
+    processUrl (url) {
+      const params = url.split('//////////')
+      const phoneNumber = decodeURIComponent(params[1] || '')
+      const firstName = decodeURIComponent(params[2] || '').trim()
+      const lastName = decodeURIComponent(params[3] || '').trim()
+      const isCompany = params[4] === 'true'
+
+      return {
+        phoneNumber: this.$options.filters.fixPhone(phoneNumber),
+        firstName: firstName,
+        lastName: lastName,
+        isCompany: isCompany
+      }
+    },
+
     processLiveContacts (contacts) {
       this.setLiveContacts(
         [
@@ -1275,17 +1293,28 @@ export default {
       }
 
       if (url.indexOf('alowaretalk:') > -1) {
-        if (url.indexOf('contact:') > -1 || url.indexOf('contact-') > -1) {
-          const phoneNumber = action.replace(/contact[:-]/, '')
+        if (url.indexOf('contact/') > -1) {
+          const { phoneNumber, firstName, lastName, isCompany } = this.processUrl(url)
+
           this.$VueEvent.fire('add_contact', {
-            phone_number: this.$options.filters.fixPhone(phoneNumber)
+            phone_number: phoneNumber,
+            first_name: firstName,
+            last_name: lastName,
+            is_company: isCompany
           })
+
           return
         }
 
-        if (url.indexOf('call:') > -1 || url.indexOf('call-') > -1) {
-          const phoneNumber = action.replace(/call[:-]/, '')
-          return this.sendCall(phoneNumber)
+        if (url.indexOf('call/') > -1) {
+          const { phoneNumber, firstName, lastName, isCompany } = this.processUrl(url)
+
+          this.$VueEvent.fire('make_new_call', {
+            phone_number: phoneNumber,
+            first_name: firstName,
+            last_name: lastName,
+            is_company: isCompany
+          })
         }
       }
 
@@ -1773,7 +1802,10 @@ export default {
 
         return this.$axios
           .get('/api/v2/users', {
-            mode: 'no-cors'
+            mode: 'no-cors',
+            params: {
+              include_ai_users: true
+            }
           })
           .then((res) => {
             this.setUsers(res.data)
@@ -2710,7 +2742,8 @@ export default {
       'setStatics',
       'setStaticsLoaded',
       'setIsWhiteLabel',
-      'setShowedKycReloadDialog'
+      'setShowedKycReloadDialog',
+      'setInboxes'
     ]),
     ...mapActions('contacts', [
       'resetSearch',
