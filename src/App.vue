@@ -99,6 +99,13 @@ export default {
       this.setDefaultShowMyContacts()
       this.setDefaultIsShortenedUrlRemembered()
     }
+
+    // CtC extension call to web app
+    if (this.$route.query.add_contact) {
+      this.$VueEvent.fire('add_contact', {
+        phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
+      })
+    }
   },
 
   mounted () {
