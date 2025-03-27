@@ -28,8 +28,7 @@ export default {
     },
 
     isForcedCallDisposition () {
-      const forceCallDisposition = this.currentCompany ? this.currentCompany.force_call_disposition : false
-      return forceCallDisposition || this.isForcedRedialEnabled
+      return Boolean(this.currentCompany?.force_call_disposition || this.isForcedRedialEnabled)
     },
 
     isForcedContactDisposition () {
