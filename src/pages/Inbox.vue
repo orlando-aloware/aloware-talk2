@@ -136,10 +136,25 @@ export default {
       this.getPinnedViews()
     }
 
-    if (this.$route.query && this.$route.query.add_contact) {
-      this.$VueEvent.fire('add_contact', {
+    // CtC extension call to web app
+    if (this.$route.query.add_contact) {
+      const data = {
         phone_number: this.$options.filters.fixPhone(this.$route.query.add_contact)
-      })
+      }
+
+      if (this.$route.query.first_name) {
+        data.first_name = this.$route.query.first_name
+      }
+
+      if (this.$route.query.last_name) {
+        data.last_name = this.$route.query.last_name
+      }
+
+      if (this.$route.query.is_company) {
+        data.is_company = this.$route.query.is_company
+      }
+
+      this.$VueEvent.fire('add_contact', data)
     }
   },
 

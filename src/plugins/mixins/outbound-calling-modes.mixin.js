@@ -1,44 +1,58 @@
 import { mapState } from 'vuex'
 import {
-  OUTBOUND_CALLING_MODE_SELECTOR_ALWAYS_ASK,
-  OUTBOUND_CALLING_MODE_SELECTOR_SELECT_MANUALLY,
-  OUTBOUND_CALLING_MODE_SELECTOR_USE_COMPANY_DEFAULT
+  OUTBOUND_CALLING_MODE_USER_DEFAULT
 } from 'src/constants/user-outbound-calling-modes'
 
 export default {
   computed: {
-    ...mapState('settings', ['user']),
+    ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
 
-    forceOutboundLine () {
+    accountForceOutboundLine () {
       return this.currentCompany && this.currentCompany.force_outbound_line
     },
 
-    isAlwaysAskOutboundCallingMode () {
-      return this.user?.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_ALWAYS_ASK
+    accountIsSelectManuallyOutboundCallingMode () {
+      return this.currentCompany.default_outbound_campaign_id !== null
     },
 
-    isSelectManuallyOutboundCallingMode () {
-      return this.user?.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_SELECT_MANUALLY
+    userIsSelectManuallyOutboundCallingMode () {
+      return this.profile.outbound_calling_mode === OUTBOUND_CALLING_MODE_USER_DEFAULT &&
+        this.profile.default_outbound_campaign_id
     },
 
-    isUseCompanyDefaultOutboundCallingMode () {
-      return this.user?.outbound_calling_selector === OUTBOUND_CALLING_MODE_SELECTOR_USE_COMPANY_DEFAULT
+    userIsUseCompanyDefaultOutboundCallingMode () {
+      return this.profile.outbound_calling_mode === OUTBOUND_CALLING_MODE_USER_DEFAULT &&
+        !this.profile.default_outbound_campaign_id &&
+        this.currentCompany.default_outbound_campaign_id
     },
 
     shouldMakeCallDirectlyAccountLevel () {
-      return (this.forceOutboundLine && this.currentCompany.default_outbound_campaign_id) ||
-        (this.isUseCompanyDefaultOutboundCallingMode && this.currentCompany.default_outbound_campaign_id)
-    },
+      if (!this.accountForceOutboundLine) {
+        if (this.userIsUseCompanyDefaultOutboundCallingMode) {
+          return true
+        }
 
-    shouldMakeCallDirectlyUserLevel () {
-      if (this.forceOutboundLine) {
         return false
       }
 
-      return !this.isAlwaysAskOutboundCallingMode &&
-        ((this.isSelectManuallyOutboundCallingMode && this.user.default_outbound_campaign_id) ||
-          (this.isUseCompanyDefaultOutboundCallingMode && this.currentCompany.default_outbound_campaign_id))
+      if (this.accountIsSelectManuallyOutboundCallingMode) {
+        return true
+      }
+
+      return false
+    },
+
+    shouldMakeCallDirectlyUserLevel () {
+      if (this.accountForceOutboundLine) {
+        return false
+      }
+
+      if (this.userIsSelectManuallyOutboundCallingMode) {
+        return true
+      }
+
+      return false
     }
   }
 }

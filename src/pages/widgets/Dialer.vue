@@ -34,6 +34,7 @@
 
     <webrtc
       :carrierName="authProfile.carrier_name"
+      :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
@@ -159,7 +160,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['dialer', 'hubspotDialNumber']),
+    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber']),
 
     allowed () {
       return this.authProfile && this.initialized && this.defaultCampaignInitialized
@@ -470,7 +471,7 @@ export default {
 
       const isCompanyAlwaysAsk = this.shouldUseCompanyCampaignId() && !this.currentCompany.default_outbound_campaign_id
 
-      const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+      const isUserAlwaysAsk = this.authProfile.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK
 
       return isCompanyAlwaysAsk || isUserAlwaysAsk
     },
@@ -478,14 +479,14 @@ export default {
     shouldUseCompanyCampaignId () {
       return this.currentCompany &&
         (this.currentCompany.force_outbound_line ||
-          (this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT &&
+          (this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT &&
             !this.authProfile.default_outbound_campaign_id))
     },
 
     shouldUseProfileCampaignId () {
       return this.authProfile &&
         this.authProfile.default_outbound_campaign_id &&
-        this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT
+        this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT
     },
 
     setCampaignIdAndDialNumber () {

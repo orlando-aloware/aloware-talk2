@@ -1249,6 +1249,32 @@ export default {
   },
 
   methods: {
+    processUrl (url) {
+      // New format: expected url like "contact-<phoneNumber>" or "contact-<phoneNumber>?first=...&last=...&isCompany=..."
+      let cleaned = url.replace(/contact[:-]/, '')
+      let phoneNumber, firstName, lastName, isCompany
+      if (cleaned.indexOf('?') !== -1) {
+        let parts = cleaned.split('?')
+        phoneNumber = parts[0]
+        let query = parts[1]
+        let params = new URLSearchParams(query)
+        firstName = params.get('first_name') || ''
+        lastName = params.get('last_name') || ''
+        isCompany = params.get('is_company') === 'true'
+      } else {
+        phoneNumber = cleaned
+        firstName = ''
+        lastName = ''
+        isCompany = false
+      }
+      return {
+        phoneNumber: this.$options.filters.fixPhone(phoneNumber),
+        firstName: firstName,
+        lastName: lastName,
+        isCompany: isCompany
+      }
+    },
+
     processLiveContacts (contacts) {
       this.setLiveContacts(
         [
@@ -1279,16 +1305,25 @@ export default {
 
       if (url.indexOf('alowaretalk:') > -1) {
         if (url.indexOf('contact:') > -1 || url.indexOf('contact-') > -1) {
-          const phoneNumber = action.replace(/contact[:-]/, '')
+          const contactData = this.processUrl(action)
           this.$VueEvent.fire('add_contact', {
-            phone_number: this.$options.filters.fixPhone(phoneNumber)
+            phone_number: contactData.phoneNumber,
+            first_name: contactData.firstName,
+            last_name: contactData.lastName,
+            is_company: contactData.isCompany
           })
           return
         }
 
         if (url.indexOf('call:') > -1 || url.indexOf('call-') > -1) {
-          const phoneNumber = action.replace(/call[:-]/, '')
-          return this.sendCall(phoneNumber)
+          const contactData = this.processUrl(action)
+          this.$VueEvent.fire('make_new_call', {
+            phone_number: contactData.phoneNumber,
+            first_name: contactData.firstName,
+            last_name: contactData.lastName,
+            is_company: contactData.isCompany
+          })
+          return
         }
       }
 

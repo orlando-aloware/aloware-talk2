@@ -389,11 +389,11 @@ export default {
     },
 
     isAlwaysAskEnabled () {
-      return this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK
+      return this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK
     },
 
     defaultOutboundCampaignId () {
-      if (this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT) {
+      if (this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT) {
         return this.profile?.default_outbound_campaign_id ?? this.currentCompany?.default_outbound_campaign_id
       }
 

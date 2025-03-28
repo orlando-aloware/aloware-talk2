@@ -1,6 +1,7 @@
 <template>
-  <div class='webrtcClass'>
-    <phone @callCompleted="handleCallCompleted" />
+  <div>
+    <phone :is_widget='isWidget'
+           @callCompleted="handleCallCompleted" />
 
     <dialer />
 
@@ -45,14 +46,15 @@ export default {
       type: String
     },
 
-    campaignId: {
-      type: Number,
+    isWidget: {
+      default: false,
+      type: Boolean,
       required: false
     },
 
-    startDialing: {
-      default: true,
-      type: Boolean
+    campaignId: {
+      type: Number,
+      required: false
     },
 
     isAlwaysAskModeEnabled: {
@@ -80,7 +82,7 @@ export default {
       'timezones'
     ]),
 
-    ...mapState(['dialer', 'isSalesforceWidget']),
+    ...mapState(['dialer']),
 
     ...mapGetters('auth', ['profile']),
 
@@ -90,10 +92,9 @@ export default {
         return false
       }
 
-      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL', 'ANSWERING_CALL', 'CALL_CONNECTED']
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
-      return this.startDialing &&
-        (this.isAlwaysAskModeEnabled ? true : !this.campaignId) &&
+      return (!this.campaignId || (this.campaignId && this.isAlwaysAskModeEnabled)) &&
         !isCallInProgress.includes(this.dialer?.currentStatus) &&
         this.campaignsAreLoaded &&
         !this.dialer.parkedCall
@@ -108,6 +109,8 @@ export default {
     ...mapActions('auth', ['setAgentStatus']),
 
     initAuth () {
+      this.broadcastInit()
+
       this.getUsers()
       this.getDispositionStatuses()
       this.getCallDispositions()
