@@ -509,8 +509,13 @@
                         text-color="white"
                         size="sm"
                         dense
+                        clickable
+                        @click="navigateToNextOccurrence"
                       >
                         Highlight: {{ activeFilters.highlight.text }}
+                        <span v-if="filteredMessages.length > 0" class="occurrence-counter">
+                          {{ currentFilteredMessageIndex + 1 }}/{{ filteredMessages.length }}
+                        </span>
                       </q-chip>
                       <q-chip
                         v-if="activeFilters.entity"
@@ -518,8 +523,13 @@
                         text-color="white"
                         size="sm"
                         dense
+                        clickable
+                        @click="navigateToNextOccurrence"
                       >
                         Entity ({{ activeFilters.entity.type }}): {{ activeFilters.entity.text }}
+                        <span v-if="filteredMessages.length > 0" class="occurrence-counter">
+                          {{ currentFilteredMessageIndex + 1 }}/{{ filteredMessages.length }}
+                        </span>
                       </q-chip>
                       <q-chip
                         v-if="activeFilters.keyword"
@@ -527,8 +537,13 @@
                         text-color="white"
                         size="sm"
                         dense
+                        clickable
+                        @click="navigateToNextOccurrence"
                       >
                         Keyword: {{ activeFilters.keyword.text }}
+                        <span v-if="filteredMessages.length > 0" class="occurrence-counter">
+                          {{ currentFilteredMessageIndex + 1 }}/{{ filteredMessages.length }}
+                        </span>
                       </q-chip>
                       <q-chip
                         v-if="activeFilters.sentiment"
@@ -536,8 +551,13 @@
                         text-color="white"
                         size="sm"
                         dense
+                        clickable
+                        @click="navigateToNextOccurrence"
                       >
                         Sentiment: {{ activeFilters.sentiment.sentiment }}
+                        <span v-if="filteredMessages.length > 0" class="occurrence-counter">
+                          {{ currentFilteredMessageIndex + 1 }}/{{ filteredMessages.length }}
+                        </span>
                       </q-chip>
                       <q-btn
                         flat
@@ -740,7 +760,9 @@ export default {
         entity: null,
         keyword: null,
         sentiment: null
-      }
+      },
+      currentFilteredMessageIndex: 0,
+      filteredMessages: []
     }
   },
 
@@ -1317,12 +1339,24 @@ export default {
      * @param {Object} filter - The filter object containing speaker and text
      */
     handleFilterHighlight (filter) {
+      // If the same filter is already active, navigate to next occurrence
+      if (this.activeFilters.highlight &&
+          this.activeFilters.highlight.speaker === filter.speaker &&
+          this.activeFilters.highlight.text === filter.text) {
+        this.navigateToNextOccurrence()
+        return
+      }
+
       this.activeFilters = {
         highlight: filter,
         entity: null,
         keyword: null,
         sentiment: null
       }
+
+      // Reset the current index
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
 
       // Switch to transcription tab
       this.tabName = 'transcription'
@@ -1336,12 +1370,25 @@ export default {
      * @param {Object} filter - The filter object containing speaker, type, and text
      */
     handleFilterEntity (filter) {
+      // If the same filter is already active, navigate to next occurrence
+      if (this.activeFilters.entity &&
+          this.activeFilters.entity.speaker === filter.speaker &&
+          this.activeFilters.entity.type === filter.type &&
+          this.activeFilters.entity.text === filter.text) {
+        this.navigateToNextOccurrence()
+        return
+      }
+
       this.activeFilters = {
         highlight: null,
         entity: filter,
         keyword: null,
         sentiment: null
       }
+
+      // Reset the current index
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
 
       // Switch to transcription tab
       this.tabName = 'transcription'
@@ -1355,6 +1402,14 @@ export default {
      * @param {Object} filter - The filter object containing speaker and text
      */
     handleFilterKeyword (filter) {
+      // If the same filter is already active, navigate to next occurrence
+      if (this.activeFilters.keyword &&
+          this.activeFilters.keyword.speaker === filter.speaker &&
+          this.activeFilters.keyword.text === filter.text) {
+        this.navigateToNextOccurrence()
+        return
+      }
+
       // Reset other filters
       this.activeFilters = {
         highlight: null,
@@ -1362,6 +1417,10 @@ export default {
         keyword: filter,
         sentiment: null
       }
+
+      // Reset the current index
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
 
       // Switch to transcription tab
       this.tabName = 'transcription'
@@ -1377,6 +1436,14 @@ export default {
      * @param {Object} filter - The filter object containing speaker and sentiment
      */
     handleFilterSentiment (filter) {
+      // If the same filter is already active, navigate to next occurrence
+      if (this.activeFilters.sentiment &&
+          this.activeFilters.sentiment.speaker === filter.speaker &&
+          this.activeFilters.sentiment.sentiment === filter.sentiment) {
+        this.navigateToNextOccurrence()
+        return
+      }
+
       // Reset other filters
       this.activeFilters = {
         highlight: null,
@@ -1384,6 +1451,10 @@ export default {
         keyword: null,
         sentiment: filter
       }
+
+      // Reset the current index
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
 
       // Switch to transcription tab
       this.tabName = 'transcription'
@@ -1395,19 +1466,58 @@ export default {
     },
 
     /**
+     * Navigate to the next occurrence of the filtered text
+     */
+    navigateToNextOccurrence () {
+      if (this.filteredMessages.length === 0) {
+        return
+      }
+
+      // Increment the index and wrap around if necessary
+      this.currentFilteredMessageIndex = (this.currentFilteredMessageIndex + 1) % this.filteredMessages.length
+
+      const currentMessage = this.filteredMessages[this.currentFilteredMessageIndex]
+
+      // Seek to the audio position of the current message
+      if (currentMessage.start) {
+        this.handleSeekAudio(currentMessage.start / 1000)
+      }
+
+      // Scroll to and highlight the message
+      this.$nextTick(() => {
+        const index = this.formattedMessages.findIndex(msg => msg === currentMessage)
+        const messageElement = document.getElementById(`msg-${index}`)
+
+        if (messageElement) {
+          // Remove "current" class from all messages
+          document.querySelectorAll('.current').forEach(el => {
+            el.classList.remove('current')
+          })
+
+          // Add "current" class to the current message
+          messageElement.classList.add('current')
+
+          // Trigger highlighting animation and scroll
+          this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
+          this.$refs.conversationSection.scrollToMessage(messageElement)
+        }
+      })
+    },
+
+    /**
      * Find and highlight text in messages
      * @param {string} text - The text to search for
      * @param {string} speaker - The speaker who said the text
      */
     findAndHighlightFilteredText (text, speaker) {
-      const messages = this.formattedMessages.filter(msg =>
+      this.filteredMessages = this.formattedMessages.filter(msg =>
         msg.speaker === speaker &&
         msg.text.toLowerCase().includes(text.toLowerCase())
       )
 
-      if (messages.length > 0) {
+      if (this.filteredMessages.length > 0) {
         // Find the first message containing the text
-        const firstMessage = messages[0]
+        const firstMessage = this.filteredMessages[0]
 
         // Seek to the audio position
         if (firstMessage.start) {
@@ -1415,13 +1525,21 @@ export default {
         }
 
         this.$nextTick(() => {
-          messages.forEach(message => {
+          this.filteredMessages.forEach((message, messageIdx) => {
             const index = this.formattedMessages.findIndex(msg => msg === message)
             const messageElement = document.getElementById(`msg-${index}`)
             if (messageElement) {
+              // Add "current" class to the first message
+              if (messageIdx === this.currentFilteredMessageIndex) {
+                messageElement.classList.add('current')
+              }
+
               // Apply highlighting animation
-              this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
-              this.$refs.conversationSection.scrollToMessage(messageElement)
+              if (messageIdx === 0) {
+                this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
+                this.$refs.conversationSection.scrollToMessage(messageElement)
+              }
+
               const content = messageElement.innerHTML
               const regex = new RegExp(`(${this.escapeRegExp(text)})`, 'gi')
               messageElement.innerHTML = content.replace(
@@ -1440,26 +1558,34 @@ export default {
      * @param {string} sentiment - The sentiment to filter by
      */
     findAndHighlightSentiment (speaker, sentiment) {
-      const messages = this.formattedMessages.filter(msg =>
+      this.filteredMessages = this.formattedMessages.filter(msg =>
         msg.speaker === speaker &&
         msg.sentiment === sentiment
       )
 
-      if (messages.length > 0) {
+      if (this.filteredMessages.length > 0) {
         // Find the first message with the sentiment
-        const firstMessage = messages[0]
+        const firstMessage = this.filteredMessages[0]
 
         if (firstMessage.start) {
           this.handleSeekAudio(firstMessage.start / 1000)
         }
 
         this.$nextTick(() => {
-          messages.forEach(message => {
+          this.filteredMessages.forEach((message, messageIdx) => {
             const index = this.formattedMessages.findIndex(msg => msg === message)
             const messageElement = document.getElementById(`msg-${index}`)
             if (messageElement) {
-              this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
-              this.$refs.conversationSection.scrollToMessage(messageElement)
+              // Add "current" class to the first message
+              if (messageIdx === this.currentFilteredMessageIndex) {
+                messageElement.classList.add('current')
+              }
+
+              if (messageIdx === 0) {
+                this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
+                this.$refs.conversationSection.scrollToMessage(messageElement)
+              }
+
               messageElement.classList.add('filtered-sentiment-highlight')
             }
           })
@@ -1483,6 +1609,9 @@ export default {
         keyword: null,
         sentiment: null
       }
+
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
 
       // Clear all highlighted elements
       this.$nextTick(() => {
@@ -1676,6 +1805,12 @@ textarea::placeholder {
   box-shadow: 0 0 0 3px #ffeb3b;
 }
 
+.current {
+  box-shadow: 0 0 0 3px #ff5722 !important;
+  position: relative;
+  z-index: 1;
+}
+
 :deep(.q-chip--clickable) {
   cursor: pointer;
   transition: transform 0.2s ease;
@@ -1700,5 +1835,14 @@ textarea::placeholder {
 .filter-label {
   font-weight: bold;
   margin-right: 8px;
+}
+
+.occurrence-counter {
+  margin-left: 6px;
+  font-size: 0.8em;
+  opacity: 0.9;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  border-radius: 4px;
 }
 </style>
