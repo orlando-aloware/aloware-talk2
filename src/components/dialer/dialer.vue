@@ -865,7 +865,6 @@ export default {
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
         if (this.dialer.communication) {
           this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-
         }
 
         this.removeUnownedLiveContactTask()
