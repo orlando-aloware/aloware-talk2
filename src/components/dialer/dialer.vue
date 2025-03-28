@@ -97,14 +97,6 @@ export default {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
-    callParkedFromAnotherTab () {
-      console.log(this.dialer.communication, this.parkedCalls)
-      return this.parkedCalls.find(parkedCall => {
-        console.log(parkedCall.id === this.dialer.communication.id, parkedCall.id, this.dialer.communication.id)
-        return parkedCall.id === this.dialer.communication.id
-      })
-    },
-
     shouldPushPhoneRoute () {
       return (this.isMobile && !this.isWidget) && this.$route.name !== 'Phone'
     },
@@ -439,6 +431,15 @@ export default {
         this.forceStartOnWrapUp()
       }
     },
+
+    callParkedFromAnotherTab () {
+      console.log(this.dialer.communication, this.parkedCalls, '--------callParkedFromAnotherTab--------')
+      return this.parkedCalls.find(parkedCall => {
+        console.log(parkedCall.id === this.dialer.communication.id, parkedCall.id, this.dialer.communication.id)
+        return parkedCall.id === this.dialer.communication.id
+      })
+    },
+
     forceStartOnWrapUp () {
       const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
         ? this.currentCompany.wrap_up_seconds
