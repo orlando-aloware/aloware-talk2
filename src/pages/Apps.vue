@@ -4,7 +4,7 @@
                       extra-text2="👇"
                       image-link="/assets/images/logo.png"
                       title-text="Open with our desktop app"
-                      :extra-text="`Phone: ${phone}`"
+                      :extra-text="`Phone: ${phoneNumber}`"
                       :show-button="false"
                       :text="getActionText"
     />
@@ -104,7 +104,22 @@ export default {
         return
       }
 
-      const opened = await window.open(`${ALOWARE_PROTOCOL}${this.action}//////////${this.phoneNumber}//////////${this.firstName}//////////${this.lastName}//////////${this.isCompany}`, '_blank')
+      let deepLink = `${ALOWARE_PROTOCOL}${this.action}-${this.phoneNumber}`
+      const params = new URLSearchParams()
+      if (this.firstName) {
+        params.append('first_name', this.firstName)
+      }
+      if (this.lastName) {
+        params.append('last_name', this.lastName)
+      }
+      if (this.isCompany === 'true') {
+        params.append('is_company', 'true')
+      }
+      if (params.toString()) {
+        deepLink += `?${params.toString()}`
+      }
+
+      const opened = await window.open(deepLink, '_blank')
       if (opened) {
         window.close()
       }

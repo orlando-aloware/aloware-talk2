@@ -185,7 +185,6 @@ export default {
 
     this.$VueEvent.listen('add_contact', (data) => {
       this.isPageLoading = true
-
       const requestData = {
         phone_number: this.$options.filters.fixPhone(data.phone_number)
       }
@@ -198,8 +197,8 @@ export default {
         requestData.last_name = data.last_name
       }
 
-      if (data.is_company) {
-        requestData.is_company = data.is_company
+      if (data.is_company === 'true') {
+        requestData.is_company = true
       }
 
       window.axios.post('/api/v2/contacts/click-to-call', requestData).then(res => {

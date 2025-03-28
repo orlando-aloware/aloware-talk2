@@ -340,6 +340,11 @@ const talk2Api = {
     },
 
     integrations: {
+      salesforce: {
+        getList (params) {
+          return window.axios.get(`${suffixV1}integration/salesforce/lists`, params)
+        }
+      },
       hubspot: {
         getWorkflows () {
           return window.axios.get(`${suffixV1}integration/hubspot/workflows`)
@@ -926,6 +931,14 @@ const talk2Api = {
     },
 
     integrations: {
+      salesforce: {
+        importList (target, params) {
+          return window.axios.post(`${suffixV2}contacts-list/import-salesforce-list/${target}`, params)
+        },
+        listExists (target) {
+          return window.axios.get(`${suffixV2}contacts-list/salesforce-list-exists/${target}`)
+        }
+      },
       hubspot: {
         importList (target, params) {
           return window.axios.post(`${suffixV2}contacts-list/import-hubspot-list/${target}`, params)

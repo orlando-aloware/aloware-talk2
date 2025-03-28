@@ -91,7 +91,7 @@
                 v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST'>
         <div class="text-dark">
           <span v-html="dynamicListHubSpotMessage"></span>
-          <span v-if='this.list.remote_list_url'> and click '<a href="javascript:void(0);" @click="updateRemoteList">Sync with HubSpot</a>' for immediate update, or wait up to one hour for automatic sync.</span>
+          <span v-if='this.list?.remote?.remote_url'> and click '<a href="javascript:void(0);" @click="updateRemoteList">Sync with HubSpot</a>' for immediate update, or wait up to one hour for automatic sync.</span>
         </div>
       </al-alert>
       <div class="col-lg-6 px-0 mb-2 mb-lg-0 d-flex align-items-center">
@@ -318,11 +318,11 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-sync-with-integration-dropdown"
-                           v-if='list.type === ContactListTypes.DYNAMIC_REMOTE_LIST && this.list.remote_list_url'
+                           v-if='this.list?.remote?.data'
                            @click="updateRemoteList">
             <folder-dynamic-icon color="#00bf4a"
                                  :data-testid="`contacts-view-sync-dynamic-remote-icon`"/>
-            Sync with HubSpot
+            Sync with Integration
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contacts-view-add-to-power-dialer-option-dropdown"
@@ -1019,8 +1019,8 @@ export default {
 
     dynamicListHubSpotMessage () {
       let text = 'This is a list managed by HubSpot.'
-      if (this.list.remote_list_url) {
-        text = text + ` Make your changes <a target='_blank' href='${this.list.remote_list_url}'>here</a>`
+      if (this.list?.remote?.remote_url) {
+        text = text + ` Make your changes <a target='_blank' href='${this.list.remote.remote_url}'>here</a>`
       }
 
       return text
@@ -1344,6 +1344,7 @@ export default {
     }
 
     this.$VueEvent.listen('contact_list_import_hubspot', this.viewListeners.listenDynamicListUpdate)
+    this.$VueEvent.listen('contact_list_import_salesforce', this.viewListeners.listenDynamicListUpdate)
     this.$VueEvent.listen('contact_list_import_failed', this.viewListeners.listenDynamicListUpdateFailed)
 
     this.$VueEvent.listen('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
@@ -2140,6 +2141,7 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('contact_list_import_hubspot')
+    this.$VueEvent.stop('contact_list_import_salesforce')
     this.$VueEvent.stop('contact_list_import_failed')
     this.$VueEvent.stop('shouldUpdateListCount')
     this.$VueEvent.stop('shouldUpdateListCountOnSearch', this.viewListeners.setDataCount)
