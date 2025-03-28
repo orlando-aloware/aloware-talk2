@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-select ref="hubspotListSelector"
+    <q-select ref="integrationListSelector"
               options-selected-class="text-primary"
               class="q-basic-selector"
               color="primary"
@@ -89,6 +89,7 @@ import { selectorMixin, integrationMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import talk2Api from 'src/plugins/api/api'
 import { debounce } from 'lodash'
+import { HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'integration-list-selector',
@@ -202,7 +203,7 @@ export default {
       isScrolling: false,
       options: [],
       total: 0,
-      reference: 'hubspotListSelector',
+      reference: 'integrationListSelector',
       fullOptionsProperty: 'sorted',
       lists: [],
       disableAddView: false,
@@ -214,8 +215,41 @@ export default {
   },
 
   methods: {
-    isHubSpotIntegration () {
-      return this.integration?.toLowerCase() === 'hubspot'
+    paginatedScrollSupported () {
+      return [HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION].includes(this.integration?.toLowerCase())
+    },
+
+    fetchSalesforceOptions (search = null, offset = 0) {
+      if (this.searchQuery !== search) {
+        offset = 0
+      }
+
+      this.offset = offset
+
+      if (!offset) {
+        // do not block the UI if we are loading more
+        this.isLoading = true
+      }
+
+      return talk2Api.V1.integrations.salesforce.getList({
+        params: {
+          search,
+          offset
+        }
+      }).then(response => {
+        const result = response.data
+        if (offset === 0) {
+          this.options = result
+        } else {
+          this.options.push(...result)
+        }
+        this.hasMore = result.length >= 25
+        this.isLoading = false
+      }).catch((err) => {
+        this.isLoading = false
+        this.$handleErrors(err.response)
+        console.log(err)
+      })
     },
 
     fetchOptions (search = null, offset = 0) {
@@ -253,7 +287,7 @@ export default {
     },
 
     filterFn (val, update) {
-      if (this.isHubSpotIntegration()) {
+      if (this.paginatedScrollSupported()) {
         if (val === this.searchQuery) {
           update()
 
@@ -282,7 +316,7 @@ export default {
     },
 
     onScroll ({ to, ref }) {
-      if (!this.isHubSpotIntegration()) {
+      if (!this.paginatedScrollSupported()) {
         return
       }
 
@@ -307,8 +341,11 @@ export default {
       this.lists = []
 
       switch (this.integration?.toLowerCase()) {
-        case 'hubspot':
+        case HUBSPOT_INTEGRATION:
           return this.fetchOptions()
+
+        case SALESFORCE_INTEGRATION:
+          return this.fetchSalesforceOptions()
 
         case 'zoho':
           return this.getZohoViews()
