@@ -97,6 +97,10 @@ export default {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
+    callParkedFromAnotherTab () {
+      return this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
+    },
+
     shouldPushPhoneRoute () {
       return (this.isMobile && !this.isWidget) && this.$route.name !== 'Phone'
     },
@@ -859,25 +863,22 @@ export default {
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
         if (this.dialer.communication) {
-          const communication = this.dialer.communication
-          console.log('dialer communication', this.dialer.communication, this.dialer.communication.current_status2, communication.conference_status, CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW, communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW, communication.disposition_status2)
-          console.log('dialer call', this.dialer.call)
-          if (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW) {
-            this.setDialerParkedCall(this.dialer.communication)
-          } else {
-            this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-            console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-            this.removeUnownedLiveContactTask()
-          }
+          this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+          console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+          this.removeUnownedLiveContactTask()
         }
 
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-
-        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
+        console.log(this.hasNoParkedAndInprogressCall, this.hasParkedAndInprogressCall, this.hasCallInProgressNoParkedCall)
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab)) {
           this.startWrapUpTimer()
           return
+        }
+
+        if (this.callParkedFromAnotherTab) {
+          this.setDialerParkedCall(this.dialer.communication)
         }
 
         this.backToDial('Talk-Connection.OnDisconnect')
