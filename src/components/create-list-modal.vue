@@ -602,7 +602,6 @@ export default {
     },
 
     onSubmit () {
-      console.warn('this.createList.type', this.IMPORT_FROM_INTEGRATION_TYPE)
       if (this.createList.type === this.IMPORT_FROM_INTEGRATION_TYPE) {
         this.processIntegrationListSubmit()
         return
