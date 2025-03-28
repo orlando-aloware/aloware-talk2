@@ -98,6 +98,7 @@ export default {
     },
 
     callParkedFromAnotherTab () {
+      console.log(this.dialer.communication, this.parkedCalls)
       return this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
     },
 
