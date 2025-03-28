@@ -30,6 +30,7 @@ export default {
       'resetItems',
       'setIsLoadingMoreItems',
       'setAbortController',
+      'setShowRefreshInboxesButton',
       'setShowRefreshCommunicationsButton'
     ]),
 
@@ -39,6 +40,7 @@ export default {
           this.abortController.abort()
         }
 
+        this.setShowRefreshCommunicationsButton(false)
         this.setAbortController(new AbortController())
 
         this.setIsLoadingInboxes(true)
@@ -56,7 +58,10 @@ export default {
 
         this.setInboxes(response.data)
       } catch (error) {
-        console.error('Error fetching inboxes:', error)
+        if (error.name !== 'CanceledError') {
+          this.$generalNotification('Error while fetching inboxes, please try again', 'error')
+          this.setShowRefreshInboxesButton(true)
+        }
       } finally {
         this.setIsLoadingInboxes(false)
       }

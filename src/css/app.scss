@@ -16582,7 +16582,7 @@ hr {
     @media (min-width: 1280px) {
       width: 480px;
     }
-  }  
+  }
 
   // fix sidebar when the notification banner is visible
   body.has-notification-banner & {
@@ -16615,7 +16615,6 @@ hr {
 
   &:hover {
     scrollbar-color: $blue transparent;
-    padding-right: 0px;
   }
 }
 
@@ -16627,7 +16626,7 @@ hr {
       padding: 8px 16px;
     }
   }
-  
+
   .dropdown-btn-text {
     font-size: 12px;
     font-weight: 400;
