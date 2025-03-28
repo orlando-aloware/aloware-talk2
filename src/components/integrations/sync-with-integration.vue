@@ -14,14 +14,16 @@
                         color="white">
         </q-spinner-bars>
         {{ isSyncing ? 'Syncing...' : 'Sync with ' + getIntegrationTitle }}
-        <q-tooltip anchor="center start"
-                   self="center left"
+        <q-tooltip :anchor="isWidget ? 'top middle' : 'center start'"
+                   :self="isWidget ? 'center middle' : 'center left'"
                    data-testid="integration-sync-tooltip"
-                   :offset="[-220, 10]">
-          <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and {{ getIntegrationTitle }}.</p>
-          <p class="font-weight-bold">You'll want to click on this button if:</p>
-          <p class="mt-1 mb-0">- The contact was recently merged in {{ getIntegrationTitle }} with another contact.</p>
-          <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and {{ getIntegrationTitle }} data on this contact.</p>
+                   :offset="isWidget ? [0, 100] : [-220, 10]">
+          <div :class="{ 'small-text': isWidget }">
+            <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and {{ getIntegrationTitle }}.</p>
+            <p class="font-weight-bold">You'll want to click on this button if:</p>
+            <p class="mt-1 mb-0">- The contact was recently merged in {{ getIntegrationTitle }} with another contact.</p>
+            <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and {{ getIntegrationTitle }} data on this contact.</p>
+          </div>
         </q-tooltip>
       </b-button>
     </b-row>
@@ -33,6 +35,7 @@ import {
   simpsocialMixin
 } from 'src/plugins/mixins'
 import { GUESTY_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION } from 'src/constants/integrations'
+import { mapState } from 'vuex'
 
 export default {
   name: 'sync-with-integration',
@@ -59,6 +62,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['isWidget']),
     getIntegrationTitle () {
       return this.integration_title || this.integration_name.charAt(0).toUpperCase() + this.integration_name.slice(1)
     }
@@ -97,3 +101,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.small-text {
+  font-size: 12px;
+}
+</style>

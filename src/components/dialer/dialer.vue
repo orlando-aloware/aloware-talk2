@@ -1506,7 +1506,10 @@ export default {
     },
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
-      this.resetAgentStatus(forceStatus, signature)
+      // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
+      if (signature !== 'Talk-Connection.OnCancel') {
+        this.resetAgentStatus(forceStatus, signature)
+      }
       this.resetCall(signature)
     },
 
