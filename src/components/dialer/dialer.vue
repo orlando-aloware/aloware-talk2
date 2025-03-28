@@ -23,6 +23,7 @@ import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'dialer',
@@ -1204,11 +1205,22 @@ export default {
     },
 
     hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      if (!this.dialer.call) {
+      if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.dialer.call && this.dialer.communication) {
+        talk2Api.V1.communication.forceTerminate(this.dialer.communication.id)
+          .then(response => {
+            console.log('response?', response)
+            this.hangUpInterval(shouldAnswer, shouldUnpark, data)
+          })
+
         return
       }
 
-      console.log('Hanging up call')
+      if (!this.dialer.call) {
+        console.log('return hangup call combo')
+        return
+      }
+
+      console.log('Hanging up call', this.connection)
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
@@ -1219,18 +1231,25 @@ export default {
       // hangup an incoming call
       this.connection.hangup()
 
+      this.hangUpInterval(shouldAnswer, shouldUnpark, data)
+    },
+
+    hangUpInterval (shouldAnswer = false, shouldUnpark = false, data = null) {
       const counter = { data: 0 }
 
       this.$options.hangupInterval = setInterval(() => {
         // Added 'READY' status to handle the case when the agent has set Wrap Time to 'No Wrap up'
         if (['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)) {
+          console.log(this.dialer.currentStatus)
           this.backToDial('Talk-hangupInterval')
           this.setDialerCurrentStatus('HANGING_UP_CALL')
 
           setTimeout(() => {
             if (shouldUnpark) {
+              console.log('unpark?')
               this.unparkCall(data)
             } else if (shouldAnswer) {
+              console.log('make call')
               this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
             }
 
@@ -1708,12 +1727,14 @@ export default {
 
       // hang-up the in-progress call and unpark the parked call
       if (shouldHangup && parkedCall) {
+        console.log('hangupCallCombo 1')
         this.hangupCallCombo(false, true, parkedCall)
         return
       }
 
       // hangup the in-progress call and answer the incoming call
       if (shouldHangup && !parkedCall) {
+        console.log('hangupCallCombo 2')
         this.hangupCallCombo(true, false, communication)
         return
       }
