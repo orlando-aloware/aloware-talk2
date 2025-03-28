@@ -1246,7 +1246,6 @@ export default {
 
           setTimeout(() => {
             if (shouldUnpark) {
-              console.log('unpark?')
               this.unparkCall(data)
             } else if (shouldAnswer) {
               console.log('make call')
