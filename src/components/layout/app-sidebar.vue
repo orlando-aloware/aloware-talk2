@@ -367,7 +367,7 @@
            :ripple="false"
            icon="img:app-icons/menu/calendar_gray.svg"
            align="left"
-           padding="10px 20px"
+           padding="10px 22px"
            class="nav-icons w-100"
            v-show="!isActive('Calendar')"
            flat>
