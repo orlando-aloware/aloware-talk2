@@ -24,7 +24,7 @@
                        :message-count="inbox.message_count"
                        :is-active="activeInboxId === inbox.id"
                        :key="inbox.id"
-                       v-for="inbox in inboxesData"
+                       v-for="inbox in inboxes"
                        @click="onInboxSelect" />
 
       <div :class="[isLoadingInboxes ? 'py-5' : 'py-4', 'relative']"
@@ -44,7 +44,7 @@
 
       <!-- Empty state -->
       <div class="text-center q-pa-md text-grey"
-           v-else-if="!inboxesData.length">
+           v-else-if="!inboxes.length">
         No Inboxes
       </div>
     </div>
@@ -75,8 +75,7 @@ export default {
       hasMorePages: true,
       loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300),
       search: '',
-      showSearchTooltip: false,
-      inboxesData: []
+      showSearchTooltip: false
     }
   },
 
@@ -140,13 +139,14 @@ export default {
     },
 
     orderInboxes () {
-      this.inboxesData = this.inboxesData.sort((a, b) => a.name.localeCompare(b.name))
+      const sortedInboxes = [...this.inboxes].sort((a, b) => a.name.localeCompare(b.name))
+      this.setInboxes({ data: sortedInboxes })
     },
 
     checkAndRedirectActiveInbox (ringGroup) {
       const inboxId = this.$route.params.inboxId
         ? parseInt(this.$route.params.inboxId)
-        : (!this.isMobile ? this.inboxesData[0].id : null)
+        : (!this.isMobile ? this.inboxes[0]?.id : null)
 
       if (inboxId && inboxId === ringGroup.id) {
         this.$router.push({ name: EINBOXES_MENU_TITLE })
@@ -155,47 +155,40 @@ export default {
 
     newRingGroupListener (ringGroup) {
       if (ringGroup.all_user_ids?.includes(this.profile.id)) {
-        this.inboxesData.push(ringGroup)
+        const updatedInboxes = [...this.inboxes, ringGroup]
+        this.setInboxes({ data: updatedInboxes })
         this.orderInboxes()
-        this.setInboxes({
-          data: [...this.inboxesData]
-        })
       }
     },
 
     updateRingGroupListener (ringGroup) {
       if (ringGroup.all_user_ids?.includes(this.profile.id)) {
-        const index = this.inboxesData.findIndex(inbox => inbox.id === ringGroup.id)
+        const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
+        const updatedInboxes = [...this.inboxes]
 
         if (index !== -1) {
-          this.inboxesData[index] = ringGroup
+          updatedInboxes[index] = ringGroup
         } else {
-          this.inboxesData.push(ringGroup)
+          updatedInboxes.push(ringGroup)
         }
 
+        this.setInboxes({ data: updatedInboxes })
         this.orderInboxes()
-        this.setInboxes({
-          data: [...this.inboxesData]
-        })
       } else {
-        const index = this.inboxesData.findIndex(inbox => inbox.id === ringGroup.id)
+        const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
         if (index !== -1) {
-          this.inboxesData.splice(index, 1)
-          this.setInboxes({
-            data: [...this.inboxesData]
-          })
+          const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
+          this.setInboxes({ data: updatedInboxes })
           this.checkAndRedirectActiveInbox(ringGroup)
         }
       }
     },
 
     deleteRingGroupListener (ringGroup) {
-      const index = this.inboxesData.findIndex(inbox => inbox.id === ringGroup.id)
+      const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
       if (index !== -1) {
-        this.inboxesData.splice(index, 1)
-        this.setInboxes({
-          data: [...this.inboxesData]
-        })
+        const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
+        this.setInboxes({ data: updatedInboxes })
         this.checkAndRedirectActiveInbox(ringGroup)
       }
     }
@@ -204,11 +197,11 @@ export default {
   async created () {
     await this.fetchInboxes()
 
-    if (this.inboxesData.length) {
+    if (this.inboxes.length) {
       // If there are inboxes:
       // - try to get id from route
       // - otherwise set the first inbox as active, if not mobile
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : (!this.isMobile ? this.inboxesData[0].id : null)
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : (!this.isMobile ? this.inboxes[0].id : null)
       const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
       if (inboxId) {
@@ -239,13 +232,6 @@ export default {
     search (val) {
       this.resetInboxes()
       this.fetchInboxes(val)
-    },
-
-    inboxes: {
-      immediate: true,
-      handler (newInboxes) {
-        this.inboxesData = [...newInboxes]
-      }
     }
   },
 
