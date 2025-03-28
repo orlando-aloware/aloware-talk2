@@ -252,6 +252,10 @@ export default {
   beforeDestroy () {
     this.setActiveInboxId(null)
     this.setActiveInbox({})
+
+    this.$VueEvent.stop('ring_group_created', this.newRingGroupListener)
+    this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
+    this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
   }
 }
 </script>
