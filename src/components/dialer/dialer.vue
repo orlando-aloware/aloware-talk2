@@ -434,7 +434,6 @@ export default {
     },
 
     callParkedFromAnotherTab () {
-      console.log(this.dialer.communication, this.parkedCalls, '--------callParkedFromAnotherTab--------')
       return this.parkedCalls.find(parkedCall => {
         console.log(parkedCall.id === this.dialer.communication.id, parkedCall.id, this.dialer.communication.id)
         return parkedCall.id === this.dialer.communication.id
@@ -524,7 +523,6 @@ export default {
       console.log('Getting communication', sid, from, getCommunicationTry)
 
       if (this.dialer.communication && !force) {
-        console.log('return Promise resolve', this.dialer.communication, force)
         return Promise.resolve()
       }
 
@@ -537,7 +535,6 @@ export default {
         }
       }).then(res => {
         if (this.dialer.communication && !force) {
-          console.log('get communication - return')
           return Promise.resolve()
         }
 
@@ -570,7 +567,6 @@ export default {
           this.activeTask.id !== res.data.contact_id) {
           return Promise.resolve()
         }
-        console.log('get communication - setDialer communication', res.data)
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
@@ -590,10 +586,9 @@ export default {
             parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
-          console.log('set Dialer Contact', this.dialer.communication.contact)
           this.setDialerContact(this.dialer.communication.contact)
         }
-        console.log('setDialerCurrentNumber', this.dialer.communication.lead_number)
+
         this.setDialerCurrentNumber(this.$options.filters.fixPhone(this.dialer.communication.lead_number, 'E164'))
         this.$VueEvent.fire('communicationLoaded')
         this.loadingCommunication = false
@@ -779,7 +774,7 @@ export default {
         console.log('Dialer is busy', currentNumber, outboundCampaignId)
         return
       }
-      console.log('Connect')
+
       this.connection = await this.device.connect(params, true)
       this.initConnectionEvents()
 
@@ -870,14 +865,13 @@ export default {
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
         if (this.dialer.communication) {
           this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-          console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-          this.removeUnownedLiveContactTask()
+
         }
 
+        this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-        console.log(this.hasNoParkedAndInprogressCall, this.hasParkedAndInprogressCall, this.hasCallInProgressNoParkedCall)
         if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab)) {
           this.startWrapUpTimer()
           return
@@ -1109,9 +1103,7 @@ export default {
     },
 
     parkCall () {
-      console.log('park call')
       if (this.isNotInProgressCall) {
-        console.log('return park call')
         return
       }
 
@@ -1208,7 +1200,6 @@ export default {
       if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.dialer.call && this.dialer.communication) {
         talk2Api.V1.communication.forceTerminate(this.dialer.communication.id)
           .then(response => {
-            console.log('response?', response)
             this.hangUpInterval(shouldAnswer, shouldUnpark, data)
           })
 
@@ -1216,11 +1207,8 @@ export default {
       }
 
       if (!this.dialer.call) {
-        console.log('return hangup call combo')
         return
       }
-
-      console.log('Hanging up call', this.connection)
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
@@ -1240,7 +1228,6 @@ export default {
       this.$options.hangupInterval = setInterval(() => {
         // Added 'READY' status to handle the case when the agent has set Wrap Time to 'No Wrap up'
         if (['WRAP_UP', 'READY'].includes(this.dialer.currentStatus)) {
-          console.log(this.dialer.currentStatus)
           this.backToDial('Talk-hangupInterval')
           this.setDialerCurrentStatus('HANGING_UP_CALL')
 
@@ -1248,7 +1235,6 @@ export default {
             if (shouldUnpark) {
               this.unparkCall(data)
             } else if (shouldAnswer) {
-              console.log('make call')
               this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
             }
 
@@ -1502,8 +1488,6 @@ export default {
 
       // when communication is rejected by app, skip wrap-up
       if (this.dialer.communication?.rejected_by_app) {
-        console.log('rejected by app')
-        this.$VueEvent.fire('callEnded')
         return
       }
 
@@ -1698,7 +1682,6 @@ export default {
     },
 
     answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
-      console.log('answer call fishing')
       this.setShowIncomingCallNotification(false)
 
       if (this.shouldPushPhoneRoute) {
@@ -1712,28 +1695,24 @@ export default {
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
-        console.log('parkCallCombo 1')
         this.parkCallCombo(true, false, communication)
         return
       }
 
       // park the in-progress call and unpark the parked call
       if (shouldPark && parkedCall) {
-        console.log('parkCallCombo 2 ')
         this.parkCallCombo(false, true, parkedCall)
         return
       }
 
       // hang-up the in-progress call and unpark the parked call
       if (shouldHangup && parkedCall) {
-        console.log('hangupCallCombo 1')
         this.hangupCallCombo(false, true, parkedCall)
         return
       }
 
       // hangup the in-progress call and answer the incoming call
       if (shouldHangup && !parkedCall) {
-        console.log('hangupCallCombo 2')
         this.hangupCallCombo(true, false, communication)
         return
       }
