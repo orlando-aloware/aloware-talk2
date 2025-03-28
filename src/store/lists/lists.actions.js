@@ -1,7 +1,7 @@
 import API from 'src/plugins/api/api'
 
 export default {
-  async fetchLists ({ commit, state }, { page, perPage, filters }) {
+  async fetchLists ({ commit, state }, { page, perPage, sort, order, filters }) {
     try {
       if (state.isListsLoading) {
         return
@@ -12,7 +12,9 @@ export default {
       const params = {
         page: page || 1,
         size: perPage || 10,
-        ...(state.search && { search: state.search }),
+        sort,
+        order,
+        ...(state.search && { search: state.search.trim() }),
         ...filters
       }
 
