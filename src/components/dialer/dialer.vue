@@ -434,10 +434,8 @@ export default {
     },
 
     callParkedFromAnotherTab () {
-      return this.parkedCalls.find(parkedCall => {
-        console.log(parkedCall.id === this.dialer.communication.id, parkedCall.id, this.dialer.communication.id)
-        return parkedCall.id === this.dialer.communication.id
-      })
+      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
+      return found
     },
 
     forceStartOnWrapUp () {
@@ -871,16 +869,18 @@ export default {
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab)) {
-          this.startWrapUpTimer()
-          return
-        }
+        setTimeout(() => {
+          if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
+            this.startWrapUpTimer()
+            return
+          }
 
-        if (this.callParkedFromAnotherTab) {
-          this.setDialerParkedCall(this.dialer.communication)
-        }
+          if (this.callParkedFromAnotherTab()) {
+            this.setDialerParkedCall(this.dialer.communication)
+          }
 
-        this.backToDial('Talk-Connection.OnDisconnect')
+          this.backToDial('Talk-Connection.OnDisconnect')
+        }, 500)
       })
     },
 
