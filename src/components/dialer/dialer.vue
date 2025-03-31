@@ -869,13 +869,13 @@ export default {
           this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
         }
 
-        this.forceRefreshCommunication()
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
         if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
           console.log('Webrtc Events CONNECTION DISCONECT')
+          this.forceRefreshCommunication()
           this.startWrapUpTimer()
           return
         }
@@ -1486,7 +1486,7 @@ export default {
     },
 
     startWrapUpTimer () {
-      if (this.callParkedFromAnotherTab) {
+      if (this.callParkedFromAnotherTab()) {
         this.setDialerParkedCall(this.dialer.communication)
         return
       }
