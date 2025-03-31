@@ -24,7 +24,6 @@ import * as CommunicationDispositionStatus from '../../constants/communication-d
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import talk2Api from 'src/plugins/api/api'
-import { CURRENT_STATUS_HOLD_NEW } from '../../constants/communication-current-status'
 
 export default {
   name: 'dialer',
