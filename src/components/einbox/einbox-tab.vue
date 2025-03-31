@@ -41,7 +41,7 @@
                          :body="getMessageBody(item)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
-                         :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
+                         :unread-properties="getUnreadsProperties(item.contact)"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                          :repeats="viewMode === UNTHREADED ? item.repeats : null"
                          :is-live-call="isLiveCall(item)" />
@@ -75,7 +75,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
 import { EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState } from 'vuex'
-import { debounce } from 'lodash'
+import { debounce, isEmpty, pick } from 'lodash'
 
 export default {
   components: {
@@ -133,6 +133,7 @@ export default {
     // live communications events
     this.$VueEvent.listen('new_communication', this.newCommunicationListener)
     this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
+    this.$VueEvent.listen('contact_updated', this.updatedContactListener)
   },
 
   beforeDestroy () {
@@ -143,10 +144,19 @@ export default {
 
     this.$VueEvent.stop('new_communication', this.newCommunicationListener)
     this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
+    this.$VueEvent.stop('contact_updated', this.updatedContactListener)
   },
 
   methods: {
     isLiveCall,
+
+    getUnreadsProperties (contact) {
+      if (isEmpty(contact)) {
+        return null
+      }
+
+      return pick(contact, ['unread_voicemail_count', 'unread_missed_call_count', 'unread_count'])
+    },
 
     onScroll ({ target }) {
       this.debouncedScroll(target)
@@ -247,6 +257,16 @@ export default {
 
     updatedCommunicationListener (communication) {
       this.processCommunication(communication, false)
+    },
+
+    updatedContactListener (contact) {
+      // search for this contact in the current communications
+      // this is necessary for keeping the contact updated from other inboxes communications
+      const index = this.itemsData.findIndex(communication => communication.contact_id === contact.id)
+
+      if (index >= 0) {
+        this.itemsData[index].contact = contact
+      }
     },
 
     getMessageBody (item) {
