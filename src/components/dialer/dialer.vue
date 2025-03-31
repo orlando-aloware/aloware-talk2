@@ -400,8 +400,7 @@ export default {
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
-        console.log('Webrtc Events DISCONECT')
+      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
         this.startWrapUpTimer()
         return
       }
@@ -436,7 +435,7 @@ export default {
 
     callParkedFromAnotherTab () {
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
-      console.log(this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication.conference_status2, this.dialer.communication)
+      console.log(this.parkedCalls, this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication.conference_status2, this.dialer.communication)
       return found || (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && this.dialer.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW)
     },
 
@@ -867,7 +866,7 @@ export default {
         if (this.dialer.communication) {
           this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
         }
-
+        this.forceRefreshCommunication()
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
@@ -876,7 +875,6 @@ export default {
         setTimeout(() => {
           if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
             console.log('Webrtc Events CONNECTION DISCONECT')
-            this.forceRefreshCommunication()
             this.startWrapUpTimer()
             return
           }
