@@ -565,6 +565,7 @@ export default {
           this.activeTask.id !== res.data.contact_id) {
           return Promise.resolve()
         }
+
         this.setDialerCommunication(res.data)
 
         const communication = this.dialer.communication
@@ -864,6 +865,8 @@ export default {
         if (this.dialer.communication) {
           this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
         }
+
+        console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
         this.forceRefreshCommunication()
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
@@ -1205,6 +1208,7 @@ export default {
         return
       }
 
+      console.log('Hanging up call')
       if (!this.dialer.call) {
         return
       }
@@ -1492,6 +1496,7 @@ export default {
 
       // when communication is rejected by app, skip wrap-up
       if (this.dialer.communication?.rejected_by_app) {
+        this.$VueEvent.fire('callEnded')
         return
       }
 

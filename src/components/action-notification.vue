@@ -722,7 +722,7 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
-      console.log('answerCommunication', data)
+
       if (!this.dialer.communication && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         this.$axios.post('/api/v1/profile/get-live-calls').then(res => {
           this.setDialerCommunication(res.data[0])
