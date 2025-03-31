@@ -437,8 +437,7 @@ export default {
     callParkedFromAnotherTab () {
       this.forceRefreshCommunication()
       console.log(this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication)
-      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
-      return found
+      return this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && this.dialer.communication.conference_status2 === 4
     },
 
     forceStartOnWrapUp () {
