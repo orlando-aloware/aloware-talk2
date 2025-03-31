@@ -1,60 +1,10 @@
 <template>
   <div class="einbox-tab">
-    <div class="einbox-tab__header border-bottom">
-      <collapse-button class="einbox-tab__header__collapse-button"
-                       :target="collapseTarget"
-                       v-model="collapsed"
-                       v-if="collapseTarget && !isMobile"/>
+    <einbox-tab-header :collapse-target="collapseTarget"
+                       :search="search"
+                       @search="search = $event" />
 
-      <template v-if="!isSearchActive">
-        <label class="einbox-tab__header__label ellipse"
-              v-if="activeInbox.name">
-          {{ activeInbox.name }}
-        </label>
-        <q-space></q-space>
-
-        <span class="cursor-pointer mr-2"
-              :id="`einbox-tab-open-comms-page-icon-${_uid}`"
-              @click="$router.push(DEFAULT_COMMUNICATIONS_ROUTE_PATH)">
-          <watch-icon />
-          <b-tooltip custom-class="talk-table__tooltip"
-                     :target="`einbox-tab-open-comms-page-icon-${_uid}`">
-            Open Communications Page
-          </b-tooltip>
-        </span>
-
-        <span class="cursor-pointer"
-              :id="`einbox-tab-search-icon-${_uid}`"
-              @click="onEnterSearch">
-          <search-icon color="#256eff"
-                       width="18"
-                       height="18" />
-          <b-tooltip custom-class="talk-table__tooltip"
-                     :target="`einbox-tab-search-icon-${_uid}`">
-            Click to search
-          </b-tooltip>
-        </span>
-      </template>
-
-      <template v-else>
-        <search-input ref="search"
-                      placeholder="Type ENTER to search comms..."
-                      class="einbox-tab__header__search"
-                      :id="`einbox-tab-search-${_uid}`"
-                      @search="search = $event"
-                      @blur="onLeaveSearch"
-                      @focus="showSearchTooltip = true"/>
-        <b-tooltip custom-class="talk-table__tooltip"
-                   placement="top"
-                   :boundary="`einbox-tab-search-${_uid}`"
-                   :target="`einbox-tab-search-${_uid}`"
-                   :show="showSearchTooltip">
-          Search communications by contact's name or phone number
-        </b-tooltip>
-      </template>
-    </div>
-
-    <einbox-channel-toggle />
+    <einbox-channel-toggle @channel="onChannel"/>
 
     <!-- Items List -->
     <div class="items-list blue-scroll"
@@ -125,17 +75,14 @@
 <script>
 import Communication from 'src/components/einbox/communication-items/communication.vue'
 import EinboxChannelToggle from './einbox-channel-toggle.vue'
-import CollapseButton from 'src/components/collapse-button.vue'
-import SearchInput from 'src/components/search-input.vue'
-import WatchIcon from 'src/components/icons/watch-icon.vue'
-import SearchIcon from 'src/components/icons/search-icon.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
+import EinboxTabHeader from './einbox-tab-header.vue'
 import { EinboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
-import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
+import { EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState } from 'vuex'
 import { debounce } from 'lodash'
 
@@ -143,11 +90,8 @@ export default {
   components: {
     Communication,
     EinboxChannelToggle,
-    CollapseButton,
-    SearchInput,
-    WatchIcon,
-    SearchIcon,
-    RefreshIcon
+    RefreshIcon,
+    EinboxTabHeader
   },
 
   mixins: [
@@ -164,15 +108,11 @@ export default {
   data () {
     return {
       activeId: null,
-      collapsed: false,
+      search: '',
       THREADED,
       UNTHREADED,
-      DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       EINBOXES_MENU_ITEMS_TITLE,
-      isSearchActive: false,
       itemsData: [],
-      search: '',
-      showSearchTooltip: false,
       CommunicationDirections,
       CommunicationTypes
     }
@@ -244,21 +184,13 @@ export default {
       this.$router.push(route)
     },
 
-    async onEnterSearch () {
-      this.isSearchActive = true
-
-      await this.$nextTick()
-
-      // auto focus inside inner search input
-      if (this.$refs.search) {
-        this.$refs.search.$el.querySelector('input').focus()
+    onChannel () {
+      if (!this.activeInboxId) {
+        return
       }
-    },
 
-    onLeaveSearch () {
-      if (this.search === '') {
-        this.isSearchActive = false
-      }
+      this.resetItems()
+      this.fetchItems(this.activeInboxId, this.search || null)
     },
 
     handleUnthreadedCommunication (communication, isNew = false) {
@@ -326,8 +258,6 @@ export default {
 
     updatedCommunicationListener (communication) {
       this.processCommunication(communication, false)
-
-      this.showSearchTooltip = false
     },
 
     getMessageBody (item) {
@@ -357,6 +287,10 @@ export default {
       }
     },
 
+    '$route.params.inboxId' () {
+      this.search = ''
+    },
+
     '$route.name' (route) {
       // reset activeId in mobile when this page is opened
       if (this.isMobile && route === EINBOXES_MENU_ITEMS_TITLE) {
@@ -364,16 +298,7 @@ export default {
       }
     },
 
-    viewMode () {
-      this.isSearchActive = false
-      this.search = ''
-    },
-
     search (search) {
-      if (search === '') {
-        this.isSearchActive = false
-      }
-
       this.fetchItems(this.activeInboxId, search || null)
     },
 
@@ -392,43 +317,6 @@ export default {
   height: 100%;
   background-color: white;
   border-radius: inherit;
-
-  &__header {
-    display: flex;
-    align-items: center;
-    padding: 6px 15px;
-    width: 100%;
-    height: 45px;
-
-    &__label {
-      margin: 0px;
-      font-weight: 500;
-      font-size: 16px;
-      flex-grow: 1;
-    }
-
-    &__search {
-      width: 100%;
-
-      label {
-        border: none;
-      }
-    }
-  }
-
-  @media(min-width: 785px) {
-    &__header {
-      &__label {
-        margin-left: 10px;
-      }
-
-      &__search {
-        .q-field__prepend {
-          padding-left: 5px !important;
-        }
-      }
-    }
-  }
 }
 
 .items-list {

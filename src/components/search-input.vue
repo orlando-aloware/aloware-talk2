@@ -59,6 +59,11 @@ export default {
     searchOnInput: {
       type: Boolean,
       default: false
+    },
+
+    noClearOnRouteChange: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -116,7 +121,9 @@ export default {
 
   watch: {
     '$route.query': function () {
-      this.searchValue = ''
+      if (!this.noClearOnRouteChange) {
+        this.searchValue = ''
+      }
     }
   }
 }

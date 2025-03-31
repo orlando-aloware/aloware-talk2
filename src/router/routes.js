@@ -731,7 +731,15 @@ const routes = [
   {
     name: 'Desktop App',
     path: '/apps',
-    props: (route) => ({ action: route.query.action, phoneNumber: route.query.phone_number, firstName: route.query.first_name, lastName: route.query.last_name, isCompany: route.query.is_company }),
+    props: (route) => {
+      // Backward compatibility with old deep links from CtC extension
+      if (route.query.action && route.query.phone && !route.query.phone_number) {
+        return { action: route.query.action, phoneNumber: route.query.phone }
+      }
+
+      // New deep links from CtC extension
+      return { action: route.query.action, phoneNumber: route.query.phone_number, firstName: route.query.first_name, lastName: route.query.last_name, isCompany: route.query.is_company }
+    },
     component: Apps,
     meta: {
       title: 'Open with the desktop app...'
