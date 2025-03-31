@@ -1486,6 +1486,11 @@ export default {
     },
 
     startWrapUpTimer () {
+      if (this.callParkedFromAnotherTab) {
+        this.setDialerParkedCall(this.dialer.communication)
+        return
+      }
+
       this.setDialerCurrentStatus('WRAP_UP')
 
       // when communication is rejected by app, skip wrap-up
@@ -1497,11 +1502,6 @@ export default {
         ? this.currentCompany.wrap_up_seconds
         : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
-
-      if (this.callParkedFromAnotherTab) {
-        this.setDialerParkedCall(this.dialer.communication)
-        return
-      }
 
       if (wrapUpTimer < 0 || this.isBargingOrWhispering) {
         this.backToDial('Talk-StartWrapUpTimer')
