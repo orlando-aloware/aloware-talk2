@@ -435,7 +435,6 @@ export default {
     },
 
     callParkedFromAnotherTab () {
-      this.forceRefreshCommunication()
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
       console.log(this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication.conference_status2, this.dialer.communication)
       console.log(found)
@@ -870,22 +869,21 @@ export default {
           this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
         }
 
+        this.forceRefreshCommunication()
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-        setTimeout(() => {
-          if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
-            console.log('Webrtc Events CONNECTION DISCONECT')
-            this.startWrapUpTimer()
-            return
-          }
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
+          console.log('Webrtc Events CONNECTION DISCONECT')
+          this.startWrapUpTimer()
+          return
+        }
 
-          if (this.callParkedFromAnotherTab()) {
-            this.setDialerParkedCall(this.dialer.communication)
-          }
-          this.backToDial('Talk-Connection.OnDisconnect')
-        }, 500)
+        if (this.callParkedFromAnotherTab()) {
+          this.setDialerParkedCall(this.dialer.communication)
+        }
+        this.backToDial('Talk-Connection.OnDisconnect')
       })
     },
 
