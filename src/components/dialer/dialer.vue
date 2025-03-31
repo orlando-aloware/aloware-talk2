@@ -873,17 +873,20 @@ export default {
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
-          console.log('Webrtc Events CONNECTION DISCONECT')
-          this.forceRefreshCommunication()
-          this.startWrapUpTimer()
-          return
-        }
 
-        if (this.callParkedFromAnotherTab()) {
-          this.setDialerParkedCall(this.dialer.communication)
-        }
-        this.backToDial('Talk-Connection.OnDisconnect')
+        setTimeout(() => {
+          if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
+            console.log('Webrtc Events CONNECTION DISCONECT')
+            this.forceRefreshCommunication()
+            this.startWrapUpTimer()
+            return
+          }
+
+          if (this.callParkedFromAnotherTab()) {
+            this.setDialerParkedCall(this.dialer.communication)
+          }
+          this.backToDial('Talk-Connection.OnDisconnect')
+        }, 500)
       })
     },
 
