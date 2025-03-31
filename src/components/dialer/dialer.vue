@@ -435,6 +435,8 @@ export default {
     },
 
     callParkedFromAnotherTab () {
+      this.forceRefreshCommunication()
+      console.log(this.dialer.communication.currentStatus2, this.dialer.communication.disposition_status2, this.dialer.communication)
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
       return found
     },
