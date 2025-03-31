@@ -886,7 +886,7 @@ export default {
             this.setDialerParkedCall(this.dialer.communication)
           }
           this.backToDial('Talk-Connection.OnDisconnect')
-        }, 500)
+        }, 800)
       })
     },
 
