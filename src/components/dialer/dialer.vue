@@ -400,7 +400,8 @@ export default {
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
+      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
+        console.log('Webrtc Events DISCONECT')
         this.startWrapUpTimer()
         return
       }
@@ -449,6 +450,7 @@ export default {
 
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
+      console.log('Force start on wrap up')
       this.startWrapUpTimer()
     },
     startDialerEvents () {
@@ -871,6 +873,7 @@ export default {
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
         setTimeout(() => {
           if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
+            console.log('Webrtc Events CONNECTION DISCONECT')
             this.startWrapUpTimer()
             return
           }
@@ -879,7 +882,7 @@ export default {
             this.setDialerParkedCall(this.dialer.communication)
           }
           this.backToDial('Talk-Connection.OnDisconnect')
-        }, 300)
+        }, 500)
       })
     },
 
