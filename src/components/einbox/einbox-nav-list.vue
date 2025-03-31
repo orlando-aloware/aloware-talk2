@@ -97,7 +97,15 @@ export default {
       'showRefreshInboxesButton'
     ]),
 
-    ...mapState(['isMobile'])
+    ...mapState(['isMobile']),
+
+    connectedInboxes () {
+      return this.inboxes.filter(inbox => inbox.is_connected)
+    },
+
+    watcherInboxes () {
+      return this.inboxes.filter(inbox => inbox.is_watcher)
+    }
   },
 
   methods: {
