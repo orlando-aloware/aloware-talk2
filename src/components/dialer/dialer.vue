@@ -435,7 +435,6 @@ export default {
 
     callParkedFromAnotherTab () {
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
-      console.log(this.parkedCalls, this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication.conference_status2, this.dialer.communication)
       return found || (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && this.dialer.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW)
     },
 
@@ -450,7 +449,6 @@ export default {
 
       this.setDialerCommunication(this.profile.last_call)
       this.setDialerContact(this.profile.last_call.contact)
-      console.log('Force start on wrap up')
       this.startWrapUpTimer()
     },
     startDialerEvents () {
@@ -874,7 +872,6 @@ export default {
 
         setTimeout(() => {
           if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
-            console.log('Webrtc Events CONNECTION DISCONECT')
             this.startWrapUpTimer()
             return
           }
