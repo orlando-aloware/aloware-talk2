@@ -1503,7 +1503,7 @@ export default {
         return
       }
 
-      if (wrapUpTimer === 0) {
+      if (wrapUpTimer === 0 || this.callParkedFromAnotherTab()) {
         this.stopWrapUpTimer()
         return
       }
