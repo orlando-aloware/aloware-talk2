@@ -436,7 +436,7 @@ export default {
 
     callParkedFromAnotherTab () {
       this.forceRefreshCommunication()
-      console.log(this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication)
+      console.log(this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication.conference_status2, this.dialer.communication)
       return this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && this.dialer.communication.conference_status2 === 4
     },
 
@@ -883,7 +883,7 @@ export default {
             this.setDialerParkedCall(this.dialer.communication)
           }
           this.backToDial('Talk-Connection.OnDisconnect')
-        }, 500)
+        }, 700)
       })
     },
 
