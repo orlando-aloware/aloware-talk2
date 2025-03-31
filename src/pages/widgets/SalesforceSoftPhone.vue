@@ -45,6 +45,7 @@
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
       :start-dialing="startDialing"
+      :if-visible='widgetMessage === WIDGET_STATUS_HIDE'
       v-if="allowed"
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
