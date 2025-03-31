@@ -24,6 +24,7 @@ import * as CommunicationDispositionStatus from '../../constants/communication-d
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import talk2Api from 'src/plugins/api/api'
+import { CURRENT_STATUS_HOLD_NEW } from '../../constants/communication-current-status'
 
 export default {
   name: 'dialer',
@@ -435,9 +436,9 @@ export default {
     },
 
     callParkedFromAnotherTab () {
-      console.log(this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication)
+      console.log(this.dialer.communicthis.dialer.communication.current_status2ation.current_status2, this.dialer.communication.disposition_status2, this.dialer.conference_status2, this.dialer.communication)
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
-      return found
+      return found || (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && this.dialer.communication.conference_status2 === 4)
     },
 
     forceStartOnWrapUp () {
