@@ -28,18 +28,18 @@ export default {
     },
 
     isForcedCallDisposition () {
-      return this.currentCompany?.force_call_disposition || this.isForcedRedialEnabled
+      return (this.currentCompany && this.currentCompany.force_call_disposition) || this.isForcedRedialEnabled
     },
 
     isForcedContactDisposition () {
-      return this.currentCompany?.force_contact_disposition
+      return this.currentCompany && this.currentCompany.force_contact_disposition
     },
 
     isNotDisposed () {
       const isForceCallDisposition = this.isForcedCallDisposition && !this.isCallDisposed
       const isForceContactDisposition = this.isForcedContactDisposition && !this.isContactDisposed
 
-      return Boolean(isForceCallDisposition || isForceContactDisposition || this.isForcedSmsSending)
+      return isForceCallDisposition || isForceContactDisposition || this.isForcedSmsSending
     },
 
     isHighlightedCallDisposition () {
@@ -142,13 +142,11 @@ export default {
     ]),
 
     onCallDisposed (value) {
-      const newValue = value || value === 0
-      this.setIsCallDisposed(newValue)
+      this.setIsCallDisposed(value > 0)
     },
 
     onContactDisposed (value) {
-      const newValue = value || value === 0
-      this.setIsContactDisposed(newValue)
+      this.setIsContactDisposed(value > 0)
     },
 
     clearDispositions () {

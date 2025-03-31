@@ -144,9 +144,9 @@ export default {
         this.localUser.phone_number_as_backup = true
       }
 
-      if (this.localUser.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_DEFAULT && this.localUser.default_outbound_campaign_id) {
+      if (this.localUser.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT && this.localUser.default_outbound_campaign_id) {
         this.localUser.outbound_calling_selector = 1
-      } else if (this.localUser.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ALWAYS_ASK) {
+      } else if (this.localUser.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_ALWAYS_ASK) {
         this.localUser.outbound_calling_selector = 3
       } else {
         this.localUser.outbound_calling_selector = 2

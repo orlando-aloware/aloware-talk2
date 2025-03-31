@@ -46,6 +46,14 @@
       <div class="text-center q-pa-md text-grey"
            v-else-if="!inboxes.length">
         No Inboxes
+
+        <br/>
+
+        <button class="btn btn-sm btn-primary mt-4"
+                v-if="showRefreshInboxesButton"
+                @click.prevent="onRefreshInboxes">
+          <refresh-icon color="#fff"/> Refresh
+        </button>
       </div>
     </div>
   </div>
@@ -56,13 +64,15 @@ import { mapState, mapActions } from 'vuex'
 import EinboxNavItem from './einbox-nav-item.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
+import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { debounce } from 'lodash'
 import { EINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   components: {
     EinboxNavItem,
-    SearchInput
+    SearchInput,
+    RefreshIcon
   },
 
   mixins: [
@@ -83,7 +93,8 @@ export default {
     ...mapState('Einbox', [
       'inboxes',
       'activeInboxId',
-      'isLoadingInboxes'
+      'isLoadingInboxes',
+      'showRefreshInboxesButton'
     ]),
 
     ...mapState('auth', ['profile']),
@@ -136,6 +147,10 @@ export default {
 
     onSearch (search) {
       this.search = search
+    },
+    
+    onRefreshInboxes () {
+      this.fetchInboxes(this.search)
     },
 
     orderInboxes () {

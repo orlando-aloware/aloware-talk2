@@ -575,10 +575,23 @@ export default {
 
     isDialerReady (value) {
       if (value && this.$route.query && this.$route.query.call) {
-        this.$VueEvent.fire('make_new_call', {
-          phone_number: this.$options.filters.fixPhone(this.$route.query.call),
-          open_contact_page: true
-        })
+        const data = {
+          phone_number: this.$options.filters.fixPhone(this.$route.query.call)
+        }
+
+        if (this.$route.query.first_name) {
+          data.first_name = this.$route.query.first_name
+        }
+
+        if (this.$route.query.last_name) {
+          data.last_name = this.$route.query.last_name
+        }
+
+        if (this.$route.query.is_company === 'true') {
+          data.is_company = true
+        }
+
+        this.$VueEvent.fire('make_new_call', data)
         let query = Object.assign({}, this.$route.query)
         delete query.call
         this.$router.replace({ query })

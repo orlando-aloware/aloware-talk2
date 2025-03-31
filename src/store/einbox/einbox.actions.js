@@ -48,5 +48,11 @@ export default {
   },
   setAbortController: ({ commit }, abortController) => {
     commit('SET_ABORT_CONTROLLER', abortController)
+  },
+  setShowRefreshInboxesButton: ({ commit }, show) => {
+    commit('SET_SHOW_REFRESH_INBOXES_BUTTON', show)
+  },
+  setShowRefreshCommunicationsButton: ({ commit }, show) => {
+    commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
   }
 }

@@ -26,11 +26,11 @@
     <action-notification id="mention"
                          v-if="!isWidget" />
     <action-notification id="incomingCall"
-                         v-if="isWidget ? isSalesforceWidget : true"
+                         v-if="!isWidget"
                          position="b-toaster-top-center" />
     <action-notification id="callFishing"
                          position="b-toaster-top-center"
-                         v-if="isWidget ? isSalesforceWidget : true" />
+                         v-if="!isWidget" />
     <intercom v-if="isIntercomEnabled && !isWidget" />
   </div>
 </template>
@@ -67,7 +67,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
-    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget', 'isSalesforceWidget']),
+    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
@@ -140,9 +140,23 @@ export default {
         return
       }
 
-      window.axios.post('/api/v1/contact', {
-        add_phone_number: fixedPhoneNumber
-      }).then(res => {
+      const requestData = {
+        phone_number: fixedPhoneNumber
+      }
+
+      if (data.first_name) {
+        requestData.first_name = data.first_name
+      }
+
+      if (data.last_name) {
+        requestData.last_name = data.last_name
+      }
+
+      if (data.is_company) {
+        requestData.is_company = data.is_company
+      }
+
+      window.axios.post('/api/v2/contacts/click-to-call', requestData).then(res => {
         this.isPageLoading = false
         const contact = res.data
         const callData = {
@@ -171,10 +185,23 @@ export default {
 
     this.$VueEvent.listen('add_contact', (data) => {
       this.isPageLoading = true
+      const requestData = {
+        phone_number: this.$options.filters.fixPhone(data.phone_number)
+      }
 
-      window.axios.post('/api/v1/contact', {
-        add_phone_number: this.$options.filters.fixPhone(data.phone_number)
-      }).then(res => {
+      if (data.first_name) {
+        requestData.first_name = data.first_name
+      }
+
+      if (data.last_name) {
+        requestData.last_name = data.last_name
+      }
+
+      if (data.is_company === 'true') {
+        requestData.is_company = true
+      }
+
+      window.axios.post('/api/v2/contacts/click-to-call', requestData).then(res => {
         this.isPageLoading = false
         this.$router.replace('/contacts/' + res.data.id)
           .catch(this.$handleRouteError)

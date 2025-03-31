@@ -16582,7 +16582,7 @@ hr {
     @media (min-width: 1280px) {
       width: 480px;
     }
-  }  
+  }
 
   // fix sidebar when the notification banner is visible
   body.has-notification-banner & {
@@ -16615,7 +16615,6 @@ hr {
 
   &:hover {
     scrollbar-color: $blue transparent;
-    padding-right: 0px;
   }
 }
 
@@ -16627,7 +16626,7 @@ hr {
       padding: 8px 16px;
     }
   }
-  
+
   .dropdown-btn-text {
     font-size: 12px;
     font-weight: 400;
@@ -16643,5 +16642,41 @@ hr {
 
   .scrollableArea .datatable {
     z-index: 4;
+  }
+}
+
+.attempting-users-container {
+  height: 65px;
+  overflow: hidden;
+  position: relative;
+
+  .show-more-icon {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    margin-left: -15px;
+    color: #555;
+    background: #f9f9f9;
+    padding: 1px 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0, .2)
+  }
+
+  &:hover {
+    overflow: visible;
+    z-index: 2;
+
+    .expand-on-hover {
+      position: absolute;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0, .2)
+    }
+
+    .show-more-icon {
+      display: none;
+    }
   }
 }
