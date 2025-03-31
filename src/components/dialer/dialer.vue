@@ -435,6 +435,7 @@ export default {
     },
 
     callParkedFromAnotherTab () {
+      this.forceRefreshCommunication()
       console.log(this.dialer.communication.current_status2, this.dialer.communication.disposition_status2, this.dialer.communication.conference_status2, this.dialer.communication)
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
       console.log(found)
@@ -885,7 +886,7 @@ export default {
             this.setDialerParkedCall(this.dialer.communication)
           }
           this.backToDial('Talk-Connection.OnDisconnect')
-        }, 1500)
+        }, 1000)
       })
     },
 
@@ -1505,7 +1506,7 @@ export default {
         return
       }
 
-      if (wrapUpTimer === 0 || this.callParkedFromAnotherTab()) {
+      if (wrapUpTimer === 0) {
         this.stopWrapUpTimer()
         return
       }
