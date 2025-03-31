@@ -29,7 +29,9 @@ export default {
       'setIsLoadingItems',
       'resetItems',
       'setIsLoadingMoreItems',
-      'setAbortController'
+      'setAbortController',
+      'setShowRefreshInboxesButton',
+      'setShowRefreshCommunicationsButton'
     ]),
 
     async fetchInboxes (search = '') {
@@ -38,6 +40,7 @@ export default {
           this.abortController.abort()
         }
 
+        this.setShowRefreshCommunicationsButton(false)
         this.setAbortController(new AbortController())
 
         this.setIsLoadingInboxes(true)
@@ -55,7 +58,10 @@ export default {
 
         this.setInboxes(response.data)
       } catch (error) {
-        console.error('Error fetching inboxes:', error)
+        if (error.name !== 'CanceledError') {
+          this.$generalNotification('Error while fetching inboxes, please try again', 'error')
+          this.setShowRefreshInboxesButton(true)
+        }
       } finally {
         this.setIsLoadingInboxes(false)
       }
@@ -84,6 +90,7 @@ export default {
     async fetchItems (inboxId, search = null) {
       try {
         this.setIsLoadingItems(true)
+        this.setShowRefreshCommunicationsButton(false)
 
         const response = await this.getItemsRequest(inboxId, 1, search)
 
@@ -92,11 +99,11 @@ export default {
 
         this.setAbortController(null)
       } catch (error) {
-        console.error('Error fetching items:', error)
-
-        // dont cancel loading animation is requested was forced canceled
+        // dont perform the actions below if request was forced canceled
         if (error.name !== 'CanceledError') {
           this.setIsLoadingItems(false)
+          this.$generalNotification('Error while fetching items, please try again', 'error')
+          this.setShowRefreshCommunicationsButton(true)
         }
       }
     },

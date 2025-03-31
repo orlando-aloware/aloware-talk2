@@ -56,9 +56,17 @@
       </template>
 
       <!-- Empty state -->
-      <div class="text-center q-pa-md text-grey"
+      <div class="text-center text-grey pt-4"
            v-else>
         Empty Inbox
+
+        <br/>
+
+        <button class="btn btn-sm btn-primary mt-4"
+                v-if="showRefreshCommunicationsButton"
+                @click.prevent="onRefreshCommunications">
+          <refresh-icon color="#fff"/> Refresh
+        </button>
       </div>
     </div>
   </div>
@@ -67,6 +75,7 @@
 <script>
 import Communication from 'src/components/einbox/communication-items/communication.vue'
 import EinboxChannelToggle from './einbox-channel-toggle.vue'
+import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import EinboxTabHeader from './einbox-tab-header.vue'
 import { EinboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
@@ -81,6 +90,7 @@ export default {
   components: {
     Communication,
     EinboxChannelToggle,
+    RefreshIcon,
     EinboxTabHeader
   },
 
@@ -116,7 +126,8 @@ export default {
       'hasMoreItems',
       'activeInboxId',
       'activeInbox',
-      'viewMode'
+      'viewMode',
+      'showRefreshCommunicationsButton'
     ]),
 
     ...mapState(['isMobile']),
@@ -279,6 +290,10 @@ export default {
       }
 
       return ''
+    },
+
+    onRefreshCommunications () {
+      this.fetchItems(this.activeInboxId, this.search || null)
     }
   },
 
