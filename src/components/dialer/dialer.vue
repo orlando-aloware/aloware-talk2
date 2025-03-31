@@ -880,7 +880,7 @@ export default {
           }
 
           this.backToDial('Talk-Connection.OnDisconnect')
-        }, 500)
+        }, 1000)
       })
     },
 
