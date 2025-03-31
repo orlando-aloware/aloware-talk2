@@ -619,11 +619,10 @@
               </b-form-row>
 
               <b-form-row>
-                <b-col class="pl-0 pr-0"
-                       cols="7">
+                <b-col class="pl-0 pr-0">
                   <q-item-label>Whispered: </q-item-label>
                 </b-col>
-                <b-col>
+                <b-col cols="7">
                   <div class="d-flex align-items-center">
                     {{ communication.metadata.reports.is_whisper ? 'Yes' : 'No' }}
                   </div>
