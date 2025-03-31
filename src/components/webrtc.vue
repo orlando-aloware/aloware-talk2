@@ -108,6 +108,7 @@ export default {
     ...mapActions('auth', ['setAgentStatus']),
 
     initAuth () {
+      this.broadcastInit()
       this.getUsers()
       this.getDispositionStatuses()
       this.getCallDispositions()

@@ -117,7 +117,6 @@ export default {
       small: false,
       initialized: false,
       timeout: null,
-      defaultCampaignInitialized: false,
       contactName: '',
       contactTimezone: '',
       companyName: '',
@@ -208,7 +207,12 @@ export default {
   async mounted () {
     // we may come from login page with already defined phone number from the past
     if (this.salesforceDialNumber) {
-      // this.showAlertCallNotStarted = false
+      this.widgetMessage = WIDGET_STATUS_HIDE
+    }
+
+    // use iframe origin domain if found
+    if (this.$route?.query?.sfdcIframeOrigin) {
+      this.opencti_script_path = this.$route.query.sfdcIframeOrigin + '/support/api/63.0/lightning/opencti_min.js'
     }
 
     await this.init()
@@ -282,7 +286,7 @@ export default {
         this.$handleErrors(err.response)
         this.loading = false
         if (this.$route.name !== 'Login') {
-          this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
+          this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath, ...this.$route?.query } })
         }
       })
     },
@@ -326,6 +330,13 @@ export default {
 
     async handleDialNumber () {
       console.log('CurrentStatus:', this.dialer?.currentStatus)
+
+      if (this.dialer?.currentStatus === 'WRAP_UP' && this.checkForceDisposition) {
+        this.$VueEvent.fire('showPhone')
+        this.disableClickToDial()
+        return
+      }
+
       if (this.checkAgentHasActiveCallInAnotherDevice()) {
         return
       }
@@ -381,11 +392,12 @@ export default {
         this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_FINISHED
         console.log('Rejecting incoming call in SalesforceSoftPhone')
       })
+
+      this.predefinedCampaign()
     },
 
     handleCallCompletedEvent (skipCallFinished = false) {
       this.isDialed = false
-
       this.enableClickToDial()
       this.startDialing = false
 
@@ -435,7 +447,7 @@ export default {
 
         if (['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY'].includes(this.dialer?.currentStatus) &&
           !this.dialer?.parkedCall) {
-          if ([AGENT_STATUS_ON_CALL, AGENT_STATUS_ON_WRAP_UP].includes(agentStatus)) {
+          if (agentStatus === AGENT_STATUS_ON_CALL || (agentStatus === AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) {
             this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_AGENT_ON_CALL
           } else if ([AGENT_STATUS_ACCEPTING_CALLS].includes(agentStatus)) {
             this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_NOT_STARTED
@@ -461,13 +473,7 @@ export default {
       })
     },
 
-    async findDefaultOutboundCampaign () {
-      if (this.isAlwaysAskModeEnabled()) {
-        await this.setLastUsedCallLine()
-        this.defaultCampaignInitialized = true
-        return
-      }
-
+    predefinedCampaign () {
       if (this.shouldUseCompanyCampaignId()) {
         this.defaultOutboundCampaignId = this.currentCompany.default_outbound_campaign_id
       } else if (this.shouldUseProfileCampaignId()) {
@@ -475,10 +481,21 @@ export default {
       }
 
       if (this.defaultOutboundCampaignId) {
-        this.setCampaignIdAndDialNumber()
+        this.campaignId = this.defaultOutboundCampaignId
+      }
+    },
+
+    async findDefaultOutboundCampaign () {
+      if (this.isAlwaysAskModeEnabled()) {
+        await this.setLastUsedCallLine()
+        return
       }
 
-      this.defaultCampaignInitialized = true
+      this.predefinedCampaign()
+
+      if (this.defaultOutboundCampaignId) {
+        this.setCampaignIdAndDialNumber()
+      }
     },
 
     shouldUseCompanyCampaignId () {
@@ -580,15 +597,15 @@ export default {
           visible: true
         })
 
-        if (this.checkAgentHasActiveCallInAnotherDevice()) {
-          return
-        }
-
         if (payload.number) {
-          this.widgetMessage = WIDGET_STATUS_HIDE
-
           // Set the phone number to call
           this.setSalesforceDialNumber(payload)
+
+          if (!this.initialized || this.checkAgentHasActiveCallInAnotherDevice()) {
+            return
+          }
+
+          this.widgetMessage = WIDGET_STATUS_HIDE
 
           // Handle the dial action if we're logged in and ready
           if (this.initialized && this.authProfile) {
@@ -612,8 +629,25 @@ export default {
 
   watch: {
     'dialer.currentStatus' () {
-      if (this.isLoadingDialer && this.dialer?.currentStatus === 'READY' && !this.startDialing) {
+      if (this.isLoadingDialer &&
+        this.dialer?.currentStatus === 'READY' &&
+        !this.startDialing) {
         this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_NOT_STARTED
+      } else if (!this.isLoadingDialer &&
+        this.dialer?.currentStatus === 'WRAP_UP' &&
+        this.checkForceDisposition &&
+        !this.startDialing) {
+        this.disableClickToDial()
+        this.$VueEvent.fire('showPhone')
+        this.widgetMessage = WIDGET_STATUS_HIDE
+      }
+    },
+    'dialer.parkedCall' () {
+      // switch message when parked call was finished by client
+      if (this.dialer?.parkedCall === undefined &&
+        this.dialer?.currentStatus === 'READY' &&
+        this.widgetMessage === WIDGET_STATUS_HIDE) {
+        this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_FINISHED
       }
     }
   },
@@ -622,12 +656,6 @@ export default {
     // Clean up event listeners
     if (this.listeners.newInAppCall) {
       this.$VueEvent.stop('new_in_app_call', this.listeners.newInAppCall)
-    }
-
-    // Destroy sforce object when component is destroyed
-    if (window.sforce) {
-      console.log('Destroying sforce object as component is being unmounted')
-      window.sforce = undefined
     }
   }
 }
