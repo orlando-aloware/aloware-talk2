@@ -878,9 +878,8 @@ export default {
           if (this.callParkedFromAnotherTab()) {
             this.setDialerParkedCall(this.dialer.communication)
           }
-
           this.backToDial('Talk-Connection.OnDisconnect')
-        }, 200)
+        }, 300)
       })
     },
 
