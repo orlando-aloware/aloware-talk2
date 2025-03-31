@@ -883,7 +883,7 @@ export default {
             this.setDialerParkedCall(this.dialer.communication)
           }
           this.backToDial('Talk-Connection.OnDisconnect')
-        }, 800)
+        }, 1000)
       })
     },
 
