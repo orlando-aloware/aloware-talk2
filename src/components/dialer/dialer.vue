@@ -1498,6 +1498,11 @@ export default {
         : this.profile.wrap_up_seconds
       console.log('Wrap-up time: ' + wrapUpTimer)
 
+      if (this.callParkedFromAnotherTab) {
+        this.setDialerParkedCall(this.dialer.communication)
+        return
+      }
+
       if (wrapUpTimer < 0 || this.isBargingOrWhispering) {
         this.backToDial('Talk-StartWrapUpTimer')
         return
