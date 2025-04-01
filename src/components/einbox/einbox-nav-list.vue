@@ -17,15 +17,18 @@
         Search inboxes by name
       </b-tooltip>
     </div>
-    <div class="einbox-nav-list__scroll blue-scroll"
-         @scroll="onScroll">
-      <einbox-nav-item :label="inbox.name"
-                       :value="inbox.id"
-                       :message-count="inbox.message_count"
-                       :is-active="activeInboxId === inbox.id"
-                       :key="inbox.id"
-                       v-for="inbox in inboxes"
-                       @click="onInboxSelect" />
+    <div class="einbox-nav-list__content">
+      <einbox-nav-type :type="type.id"
+                       :label="type.name"
+                       :typed-inboxes="type.inboxes"
+                       :key="type.name"
+                       :active-inbox-id="activeInboxId"
+                       :expanded="expandedType === type.id"
+                       :reduced="expandedType && expandedType !== type.id"
+                       v-for="type in typedInboxes"
+                       @inbox="onInboxSelect"
+                       @toggle-expanded="onToggleExpanded"
+                       @load-more="onLoadMore" />
 
       <div :class="[isLoadingInboxes ? 'py-5' : 'py-4', 'relative']"
            v-if="isLoadingInboxes">
@@ -61,7 +64,8 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import EinboxNavItem from './einbox-nav-item.vue'
+
+import EinboxNavType from './einbox-nav-type.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
@@ -70,7 +74,7 @@ import { EINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   components: {
-    EinboxNavItem,
+    EinboxNavType,
     SearchInput,
     RefreshIcon
   },
@@ -81,11 +85,10 @@ export default {
 
   data () {
     return {
-      perPage: 50,
-      hasMorePages: true,
       loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300),
       search: '',
-      showSearchTooltip: false
+      showSearchTooltip: false,
+      expandedType: null
     }
   },
 
@@ -103,8 +106,23 @@ export default {
       return this.inboxes.filter(inbox => inbox.is_connected)
     },
 
-    watcherInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_watcher)
+    watchingInboxes () {
+      return this.inboxes.filter(inbox => inbox.is_watching)
+    },
+
+    typedInboxes () {
+      return [
+        {
+          id: 'connected',
+          name: 'Connected Inboxes',
+          inboxes: this.connectedInboxes
+        },
+        {
+          id: 'watching',
+          name: 'Watching Inboxes',
+          inboxes: this.watchingInboxes
+        }
+      ]
     }
   },
 
@@ -116,13 +134,13 @@ export default {
       'resetItems'
     ]),
 
-    onScroll ({ verticalPosition, verticalSize, verticalContainerSize }) {
-      const bottomThreshold = 100
-      const isNearBottom = verticalPosition + verticalContainerSize + bottomThreshold >= verticalSize
-
-      if (isNearBottom && !this.loading && this.hasMorePages) {
-        this.loadMoreInboxesDebounced()
+    onToggleExpanded (type) {
+      if (this.expandedType === type) {
+        this.expandedType = null
+        return
       }
+
+      this.expandedType = type
     },
 
     onInboxSelect (inboxId, contactId = null) {
@@ -156,6 +174,10 @@ export default {
 
     onRefreshInboxes () {
       this.fetchInboxes(this.search)
+    },
+
+    onLoadMore (type) {
+      console.log('load more', type)
     }
   },
 
@@ -207,6 +229,7 @@ export default {
   height: 100%;
   background-color: #fff;
   color: #000;
+  padding: 7px;
 
   &__header {
     width: 100%;
@@ -219,10 +242,15 @@ export default {
     }
   }
 
-  &__scroll {
-    height: 100%;
-    padding: 7px;
-    overflow-y: auto;
+  &__content {
+    height: calc(100% - 55px);
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+
+    .einbox-nav-type {
+      height: 50%;
+    }
   }
 }
 </style>
