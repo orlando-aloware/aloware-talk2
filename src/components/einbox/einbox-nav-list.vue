@@ -148,7 +148,7 @@ export default {
     onSearch (search) {
       this.search = search
     },
-    
+
     onRefreshInboxes () {
       this.fetchInboxes(this.search)
     },
