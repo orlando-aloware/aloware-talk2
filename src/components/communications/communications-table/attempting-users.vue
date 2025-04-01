@@ -34,7 +34,7 @@ export default {
 
   computed: {
     shouldExpandOnHover () {
-      return this.expandOnHover && this.row.attempting_users?.length > 1
+      return this.expandOnHover && (this.row.attempting_users?.length > 1 || this.row.target_users?.length > 1)
     }
   }
 }
