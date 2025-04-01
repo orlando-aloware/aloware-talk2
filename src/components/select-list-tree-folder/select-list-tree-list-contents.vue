@@ -11,6 +11,18 @@
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
     />
+    <div v-if="hasMore" class="d-flex justify-content-center mt-2">
+      <b-button variant="link"
+                size="sm"
+                :disabled="isLoadingMore"
+                @click="$emit('load-more')">
+        <span v-if="isLoadingMore">
+          <i class="fa fa-spinner fa-spin mr-1"></i>
+          Loading...
+        </span>
+        <span v-else>Load More</span>
+      </b-button>
+    </div>
   </div>
 </template>
 
@@ -22,7 +34,8 @@ export default {
 
   props: {
     lists: {
-      type: Array
+      type: Array,
+      required: true
     },
     layer: {
       type: Number
@@ -32,6 +45,14 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    hasMore: {
+      type: Boolean,
+      default: false
+    },
+    isLoadingMore: {
+      type: Boolean,
+      default: false
     }
   }
 }
