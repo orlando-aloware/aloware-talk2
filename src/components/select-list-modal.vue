@@ -67,7 +67,7 @@
                                      :hasEdit="folder.has_edit"
                                      :hasDelete="folder.has_delete"
                                      :folders="folder.child_folders"
-                                     :lists="folder.lists"
+                                     :lists="privateLists"
                                      :has-more="hasMorePrivate"
                                      :is-loading-more="isLoadingMorePrivate"
                                      :type="1"
@@ -175,7 +175,7 @@ export default {
       const params = {
         page: this.publicPage,
         size: 20,
-        list_type: 1
+        list_type: ContactListTypes.STATIC
       }
 
       if (this.selectList.search_value && this.selectList.search_value.length > 0) {
@@ -201,7 +201,7 @@ export default {
       const params = {
         page: this.privatePage,
         size: 20,
-        list_type: 1,
+        list_type: ContactListTypes.STATIC,
         user_id: this.profile.id,
         private_only: true
       }

@@ -12,24 +12,27 @@
       :hasDelete="hasDelete"
     />
     <div v-if="hasMore" class="d-flex justify-content-center mt-2">
-      <b-button variant="link"
-                size="sm"
-                :disabled="isLoadingMore"
-                @click="$emit('load-more')">
+      <compact-btn variant="outlined-light"
+                   size="sm"
+                   :disabled="isLoadingMore"
+                   @clicked="$emit('load-more')">
         <span v-if="isLoadingMore">
           <i class="fa fa-spinner fa-spin mr-1"></i>
           Loading...
         </span>
         <span v-else>Load More</span>
-      </b-button>
+      </compact-btn>
     </div>
   </div>
 </template>
 
 <script>
+import CompactBtn from 'src/components/compact-btn.vue'
+
 export default {
   components: {
-    selectListTreeListItem: () => import('./select-list-tree-list-item.vue')
+    selectListTreeListItem: () => import('./select-list-tree-list-item.vue'),
+    CompactBtn
   },
 
   props: {
