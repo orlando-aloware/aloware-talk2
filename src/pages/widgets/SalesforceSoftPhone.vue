@@ -12,28 +12,28 @@
                       @agent-status-updated="handleAgentStatusUpdate"/>
 
     <div class="p-3"
-         v-if="widgetMessage === WIDGET_STATUS_CRITICAL_ERROR_HAPPENED">
+         v-if="widgetMessage === WIDGET_MSG_CRITICAL_ERROR_HAPPENED">
       <p><strong>Something went wrong</strong></p>
       <hr>
       <p>For some reason we couldn't complete the call. Please refresh the page and try again.</p>
     </div>
 
     <div class="p-3"
-         v-else-if="widgetMessage === WIDGET_STATUS_SHOW_ALERT_AGENT_ON_CALL">
+         v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL">
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
       <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
     </div>
 
     <div class="p-3"
-         v-else-if="widgetMessage === WIDGET_STATUS_SHOW_ALERT_CALL_FINISHED">
+         v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_FINISHED">
       <p><strong>Call Finished</strong></p>
       <hr>
       <p>Please minimize this window or click to a phone number to start dialing again.</p>
     </div>
 
     <div class="p-3"
-         v-else-if="widgetMessage === WIDGET_STATUS_SHOW_ALERT_CALL_NOT_STARTED">
+         v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED">
       <p><strong>Phone number is not chosen</strong></p>
       <hr>
       <p>Please click to a phone number to start dialing.</p>
@@ -45,7 +45,7 @@
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
       :start-dialing="startDialing"
-      :if-visible='widgetMessage === WIDGET_STATUS_HIDE'
+      v-show='widgetMessage === WIDGET_MSG_HIDE'
       v-if="allowed"
       @callCompleted="handleCallCompletedEvent"
       @changeCampaignId="handleChangeCampaignEvent"
@@ -74,11 +74,11 @@ import { CURRENT_STATUS_COMPLETED_NEW } from 'src/constants/communication-curren
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import { AGENT_STATUS_ACCEPTING_CALLS, AGENT_STATUS_ON_CALL, AGENT_STATUS_ON_WRAP_UP } from 'src/constants/agent-status'
 
-const WIDGET_STATUS_HIDE = 1
-const WIDGET_STATUS_SHOW_ALERT_AGENT_ON_CALL = 2
-const WIDGET_STATUS_SHOW_ALERT_CALL_FINISHED = 3
-const WIDGET_STATUS_SHOW_ALERT_CALL_NOT_STARTED = 4
-const WIDGET_STATUS_CRITICAL_ERROR_HAPPENED = 5
+const WIDGET_MSG_HIDE = 1
+const WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL = 2
+const WIDGET_MSG_SHOW_ALERT_CALL_FINISHED = 3
+const WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED = 4
+const WIDGET_MSG_CRITICAL_ERROR_HAPPENED = 5
 
 export default {
   name: 'Dialer',
@@ -105,15 +105,14 @@ export default {
 
   data () {
     return {
-      WIDGET_STATUS_HIDE,
-      WIDGET_STATUS_SHOW_ALERT_AGENT_ON_CALL,
-      WIDGET_STATUS_SHOW_ALERT_CALL_FINISHED,
-      WIDGET_STATUS_SHOW_ALERT_CALL_NOT_STARTED,
-      WIDGET_STATUS_CRITICAL_ERROR_HAPPENED,
-      widgetMessage: WIDGET_STATUS_SHOW_ALERT_CALL_NOT_STARTED,
+      WIDGET_MSG_HIDE,
+      WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL,
+      WIDGET_MSG_SHOW_ALERT_CALL_FINISHED,
+      WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED,
+      WIDGET_MSG_CRITICAL_ERROR_HAPPENED,
+      widgetMessage: WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED,
       startDialing: false,
       isFirstLoading: true,
-      isDialed: false,
       loading: false,
       small: false,
       initialized: false,
@@ -158,7 +157,7 @@ export default {
 
     isLoadingDialer () {
       return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
-        this.widgetMessage === WIDGET_STATUS_HIDE &&
+        this.widgetMessage === WIDGET_MSG_HIDE &&
         !this.dialer?.parkedCall
     }
   },
@@ -189,8 +188,7 @@ export default {
         this.processActionNotification(communication, communicationType)
 
         if (this.opencti_loaded) {
-          this.widgetMessage = WIDGET_STATUS_HIDE
-          this.isDialed = true
+          this.widgetMessage = WIDGET_MSG_HIDE
           window.sforce.opencti.isSoftphonePanelVisible({
             callback: function (response) {
               if (response.success && !response.returnValue.visible) {
@@ -208,7 +206,7 @@ export default {
   async mounted () {
     // we may come from login page with already defined phone number from the past
     if (this.salesforceDialNumber) {
-      this.widgetMessage = WIDGET_STATUS_HIDE
+      this.widgetMessage = WIDGET_MSG_HIDE
     }
 
     // use iframe origin domain if found
@@ -324,7 +322,7 @@ export default {
         return res.data
       }).catch(err => {
         this.$handleErrors(err.response)
-        this.widgetMessage = WIDGET_STATUS_CRITICAL_ERROR_HAPPENED
+        this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
         throw err
       })
     },
@@ -390,24 +388,22 @@ export default {
       })
 
       this.$VueEvent.listen('rejectCall', () => {
-        this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_FINISHED
+        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
         console.log('Rejecting incoming call in SalesforceSoftPhone')
       })
 
       this.predefinedCampaign()
     },
 
-    handleCallCompletedEvent (skipCallFinished = false) {
-      this.isDialed = false
-      this.enableClickToDial()
-      this.startDialing = false
+    handleCallCompletedEvent () {
+      if (!this.dialer.parkedCall && this.dialer?.currentStatus !== 'MAKING_CALL') {
+        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
+        this.startDialing = false
+        this.enableClickToDial()
 
-      if (!this.dialer.parkedCall && !skipCallFinished) {
-        this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_FINISHED
-      }
-
-      if (!this.defaultOutboundCampaignId) {
-        this.campaignId = null
+        if (!this.defaultOutboundCampaignId) {
+          this.campaignId = null
+        }
       }
     },
 
@@ -430,7 +426,6 @@ export default {
       }
 
       this.checkContactTimezone(contactData, this.makeCall, this.cancelCall)
-      this.isDialed = true
     },
 
     cancelCall () {
@@ -448,10 +443,15 @@ export default {
 
         if (['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY'].includes(this.dialer?.currentStatus) &&
           !this.dialer?.parkedCall) {
-          if (agentStatus === AGENT_STATUS_ON_CALL || (agentStatus === AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) {
-            this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_AGENT_ON_CALL
-          } else if ([AGENT_STATUS_ACCEPTING_CALLS].includes(agentStatus)) {
-            this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_NOT_STARTED
+          if (agentStatus === AGENT_STATUS_ON_CALL) {
+            this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+          } else if (agentStatus === AGENT_STATUS_ON_WRAP_UP &&
+            !this.checkForceDisposition &&
+            this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
+            this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+          } else if (agentStatus === AGENT_STATUS_ACCEPTING_CALLS &&
+            this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
+            this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
           }
         }
       }
@@ -527,7 +527,7 @@ export default {
     },
 
     checkAgentHasActiveCallInAnotherDevice () {
-      return this.widgetMessage === WIDGET_STATUS_SHOW_ALERT_AGENT_ON_CALL
+      return this.widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
     },
 
     async setLastUsedCallLine () {
@@ -576,7 +576,7 @@ export default {
 
       script.onerror = (error) => {
         console.error('Failed to load Salesforce OpenCTI script:', error)
-        this.widgetMessage = WIDGET_STATUS_CRITICAL_ERROR_HAPPENED
+        this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
       }
 
       document.head.appendChild(script)
@@ -585,7 +585,7 @@ export default {
     initializeOpenCti () {
       if (typeof window.sforce === 'undefined' || !window.sforce.opencti) {
         console.error('Salesforce OpenCTI API (window.sforce.opencti) is not available')
-        this.widgetMessage = WIDGET_STATUS_CRITICAL_ERROR_HAPPENED
+        this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
         return
       }
 
@@ -606,7 +606,7 @@ export default {
             return
           }
 
-          this.widgetMessage = WIDGET_STATUS_HIDE
+          this.widgetMessage = WIDGET_MSG_HIDE
 
           // Handle the dial action if we're logged in and ready
           if (this.initialized && this.authProfile) {
@@ -622,7 +622,7 @@ export default {
 
       // if salesforceDialNumber is not empty then we are here after login page so we can dial the number
       if (this.initialized && this.authProfile && this.salesforceDialNumber) {
-        this.widgetMessage = WIDGET_STATUS_HIDE
+        this.widgetMessage = WIDGET_MSG_HIDE
         this.postDialNumber()
       }
     }
@@ -630,25 +630,27 @@ export default {
 
   watch: {
     'dialer.currentStatus' () {
-      if (this.isLoadingDialer &&
-        this.dialer?.currentStatus === 'READY' &&
-        !this.startDialing) {
-        this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_NOT_STARTED
-      } else if (!this.isLoadingDialer &&
-        this.dialer?.currentStatus === 'WRAP_UP' &&
-        this.checkForceDisposition &&
-        !this.startDialing) {
-        this.disableClickToDial()
-        this.$VueEvent.fire('showPhone')
-        this.widgetMessage = WIDGET_STATUS_HIDE
+      if (!this.startDialing) {
+        if (this.isLoadingDialer) {
+          if (this.dialer?.currentStatus === 'READY') {
+            this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
+          }
+        } else {
+          if (this.dialer?.currentStatus === 'WRAP_UP' &&
+            this.checkForceDisposition) {
+            this.disableClickToDial()
+            this.$VueEvent.fire('showPhone')
+            this.widgetMessage = WIDGET_MSG_HIDE
+          }
+        }
       }
     },
     'dialer.parkedCall' () {
       // switch message when parked call was finished by client
       if (this.dialer?.parkedCall === undefined &&
         this.dialer?.currentStatus === 'READY' &&
-        this.widgetMessage === WIDGET_STATUS_HIDE) {
-        this.widgetMessage = WIDGET_STATUS_SHOW_ALERT_CALL_FINISHED
+        this.widgetMessage === WIDGET_MSG_HIDE) {
+        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
       }
     }
   },
