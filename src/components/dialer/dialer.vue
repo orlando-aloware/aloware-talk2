@@ -867,6 +867,7 @@ export default {
         }
 
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+        this.forceRefreshCommunication()
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
@@ -874,12 +875,16 @@ export default {
 
         setTimeout(() => {
           if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())) {
+            console.log('start wrap up')
             this.startWrapUpTimer()
             return
           }
 
           if (this.callParkedFromAnotherTab()) {
+            console.log('call parked')
             this.setDialerParkedCall(this.dialer.communication)
+            this.resetCall('Talk-Connection.OnDisconnect')
+            return
           }
           this.backToDial('Talk-Connection.OnDisconnect')
         }, 2000)
