@@ -67,7 +67,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany', 'profile']),
 
-    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
+    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups', 'parkedCalls']),
 
     ...mapState('auth', ['profile', 'authenticated']),
 
