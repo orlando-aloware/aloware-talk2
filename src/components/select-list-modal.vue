@@ -190,7 +190,7 @@ export default {
           } else {
             this.publicLists = [...this.publicLists, ...data.data]
           }
-          this.hasMorePublic = data.data.length === 20
+          this.hasMorePublic = this.publicLists.length < data.total
         })
         .catch((error) => {
           this.$generalNotification(extractErrorMessage(error), 'error')
@@ -218,7 +218,7 @@ export default {
           } else {
             this.privateLists = [...this.privateLists, ...data.data]
           }
-          this.hasMorePrivate = data.data.length === 20
+          this.hasMorePrivate = this.privateLists.length < data.total
         })
         .catch((error) => {
           this.$generalNotification(extractErrorMessage(error), 'error')
