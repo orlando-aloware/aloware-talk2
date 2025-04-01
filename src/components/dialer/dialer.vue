@@ -867,7 +867,6 @@ export default {
         }
 
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-        this.forceRefreshCommunication()
         this.removeUnownedLiveContactTask()
         this.stopCallTimer()
         this.connection = null
