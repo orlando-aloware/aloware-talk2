@@ -525,6 +525,10 @@ export default {
             bulkMessage.list_id = this.source.integration.list.listId
 
             break
+          case 'Salesforce':
+            bulkMessage.salesforce_list_id = this.source.integration.list.Id
+
+            break
           case 'Zoho':
             bulkMessage.view_id = this.source.integration.list.id
 
