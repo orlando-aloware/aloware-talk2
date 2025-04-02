@@ -17,7 +17,7 @@
         Search inboxes by name
       </b-tooltip>
     </div>
-    <div class="einbox-nav-list__content">
+    <div :class="['einbox-nav-list__content', { 'einbox-nav-list__content--no-gap': expandedType !== null }]">
       <einbox-nav-type :type="type.id"
                        :label="type.name"
                        :typed-inboxes="type.inboxes"
@@ -71,6 +71,7 @@ import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { debounce } from 'lodash'
 import { EINBOXES_MENU_TITLE } from 'src/router/routes'
+import { INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
 
 export default {
   components: {
@@ -113,12 +114,12 @@ export default {
     typedInboxes () {
       return [
         {
-          id: 'connected',
+          id: INBOX_TYPE_CONNECTED,
           name: 'Connected Inboxes',
           inboxes: this.connectedInboxes
         },
         {
-          id: 'watching',
+          id: INBOX_TYPE_WATCHING,
           name: 'Watching Inboxes',
           inboxes: this.watchingInboxes
         }
@@ -177,7 +178,7 @@ export default {
     },
 
     onLoadMore (type) {
-      console.log('load more', type)
+      this.loadMoreInboxes(type, this.search)
     }
   },
 
@@ -243,10 +244,15 @@ export default {
   }
 
   &__content {
-    height: calc(100% - 55px);
+    height: calc(100% - 45px);
     display: flex;
     flex-direction: column;
     row-gap: 10px;
+    padding: 10px;
+
+    &--no-gap {
+      row-gap: 0;
+    }
 
     .einbox-nav-type {
       height: 50%;
