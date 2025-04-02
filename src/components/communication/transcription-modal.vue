@@ -1517,11 +1517,11 @@ export default {
 
       if (this.filteredMessages.length > 0) {
         // Find the first message containing the text
-        const first_message = this.filteredMessages[0]
+        const firstMessage = this.filteredMessages[0]
 
         // Seek to the audio position
-        if (first_message.start) {
-          this.handleSeekAudio(first_message.start)
+        if (firstMessage.start) {
+          this.handleSeekAudio(firstMessage.start)
         }
 
         this.$nextTick(() => {
@@ -1565,10 +1565,10 @@ export default {
 
       if (this.filteredMessages.length > 0) {
         // Find the first message with the sentiment
-        const first_message = this.filteredMessages[0]
+        const firstMessage = this.filteredMessages[0]
 
-        if (first_message.start) {
-          this.handleSeekAudio(first_message.start)
+        if (firstMessage.start) {
+          this.handleSeekAudio(firstMessage.start)
         }
 
         this.$nextTick(() => {
