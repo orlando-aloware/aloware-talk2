@@ -8,7 +8,6 @@ export default {
       'isLoadingInboxes',
       'inboxes',
       'currentInboxesPage',
-      'hasMoreInboxes',
       'items',
       'viewMode',
       'isLoadingItems',
@@ -67,19 +66,27 @@ export default {
       }
     },
 
-    async loadMoreInboxes () {
+    async loadMoreInboxes (type, search = '') {
       try {
-        if (this.isLoadingInboxes || !this.hasMoreInboxes) {
+        if (this.isLoadingInboxes) {
           return
         }
 
         this.setIsLoadingInboxes(true)
+        this.setAbortController(new AbortController())
 
         const perPage = 100
-        const nextPage = this.currentInboxesPage + 1
-        const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage, perPage })
+        const response = await talk2Api.V2.inbox.inboxes.get({
+          params: {
+            page: this.currentInboxesPage[type],
+            per_page: perPage,
+            type,
+            ...(search ? { search } : {})
+          },
+          signal: this.abortController.signal
+        })
 
-        this.appendInboxes(response.data)
+        this.appendInboxes({ data: response.data, type })
       } catch (error) {
         console.error('Error loading more inboxes:', error)
       } finally {
