@@ -17,7 +17,9 @@
                 dense
                 :key="highlight_index"
                 data-testid="comm-highlights-section-chip"
-                v-for="(highlight, highlight_index) in highlights[speaker]">
+                clickable
+                v-for="(highlight, highlight_index) in highlights[speaker]"
+                @click="emitHighlightFilter(speaker, highlight)">
           {{ highlight }}
         </q-chip>
       </div>
@@ -57,6 +59,12 @@ export default {
     isEmpty: {
       type: Function,
       required: true
+    }
+  },
+
+  methods: {
+    emitHighlightFilter (speaker, highlight) {
+      this.$emit('filter-highlight', { speaker, text: highlight })
     }
   }
 }
