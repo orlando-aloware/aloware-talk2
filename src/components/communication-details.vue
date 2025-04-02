@@ -1433,7 +1433,6 @@ import {
   classicMixin,
   communicationInfoMixin,
   goBackMixin,
-  simpsocialMixin,
   userMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
@@ -1492,7 +1491,6 @@ export default {
     classicMixin,
     userMixin,
     aclMixin,
-    simpsocialMixin,
     goBackMixin
   ],
 
@@ -1695,23 +1693,23 @@ export default {
     },
 
     getClassicUrlUserActivity (userId) {
-      return `${this.getClassicURL(this.isSimpSocial)}/users/${userId}/activity`
+      return `${this.getClassicURL()}/users/${userId}/activity`
     },
 
     getClassicUrlSequenceActivity (sequenceId) {
-      return `${this.getClassicURL(this.isSimpSocial)}/sequences2/manager/${sequenceId}`
+      return `${this.getClassicURL()}/sequences2/manager/${sequenceId}`
     },
 
     getClassicUrlRingGroupActivity (ringGroupId) {
-      return `${this.getClassicURL(this.isSimpSocial)}/ring-groups/${ringGroupId}/activity`
+      return `${this.getClassicURL()}/ring-groups/${ringGroupId}/activity`
     },
 
     getClassicUrlBroadcastActivity (broadcastId) {
-      return `${this.getClassicURL(this.isSimpSocial)}/broadcast/${broadcastId}/activity`
+      return `${this.getClassicURL()}/broadcast/${broadcastId}/activity`
     },
 
     getClassicUrlLineActivity (campaignId) {
-      return `${this.getClassicURL(this.isSimpSocial)}/lines/${campaignId}/activity`
+      return `${this.getClassicURL()}/lines/${campaignId}/activity`
     },
 
     onArchive () {
