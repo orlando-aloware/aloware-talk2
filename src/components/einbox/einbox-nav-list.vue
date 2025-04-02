@@ -101,6 +101,8 @@ export default {
       'showRefreshInboxesButton'
     ]),
 
+    ...mapState('auth', ['profile']),
+
     ...mapState(['isMobile']),
 
     connectedInboxes () {
@@ -132,7 +134,8 @@ export default {
       'setActiveInboxId',
       'setActiveInbox',
       'resetInboxes',
-      'resetItems'
+      'resetItems',
+      'setInboxes'
     ]),
 
     onToggleExpanded (type) {
@@ -179,6 +182,61 @@ export default {
 
     onLoadMore (type) {
       this.loadMoreInboxes(type, this.search)
+    },
+
+    orderInboxes () {
+      const sortedInboxes = [...this.inboxes].sort((a, b) => a.name.localeCompare(b.name))
+      this.setInboxes({ data: sortedInboxes })
+    },
+
+    checkAndRedirectActiveInbox (ringGroup) {
+      const inboxId = this.$route.params.inboxId
+        ? parseInt(this.$route.params.inboxId)
+        : (!this.isMobile ? this.inboxes[0]?.id : null)
+
+      if (inboxId && inboxId === ringGroup.id) {
+        this.$router.push({ name: EINBOXES_MENU_TITLE })
+      }
+    },
+
+    newRingGroupListener (ringGroup) {
+      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+        const updatedInboxes = [...this.inboxes, ringGroup]
+        this.setInboxes({ data: updatedInboxes })
+        this.orderInboxes()
+      }
+    },
+
+    updateRingGroupListener (ringGroup) {
+      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+        const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
+        const updatedInboxes = [...this.inboxes]
+
+        if (index !== -1) {
+          updatedInboxes[index] = ringGroup
+        } else {
+          updatedInboxes.push(ringGroup)
+        }
+
+        this.setInboxes({ data: updatedInboxes })
+        this.orderInboxes()
+      } else {
+        const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
+        if (index !== -1) {
+          const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
+          this.setInboxes({ data: updatedInboxes })
+          this.checkAndRedirectActiveInbox(ringGroup)
+        }
+      }
+    },
+
+    deleteRingGroupListener (ringGroup) {
+      const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
+      if (index !== -1) {
+        const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
+        this.setInboxes({ data: updatedInboxes })
+        this.checkAndRedirectActiveInbox(ringGroup)
+      }
     }
   },
 
@@ -196,6 +254,11 @@ export default {
         this.onInboxSelect(inboxId, contactId)
       }
     }
+
+    // Listen to ring group events
+    this.$VueEvent.listen('ring_group_created', this.newRingGroupListener)
+    this.$VueEvent.listen('ring_group_updated', this.updateRingGroupListener)
+    this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
   },
 
   watch: {
@@ -221,6 +284,10 @@ export default {
   beforeDestroy () {
     this.setActiveInboxId(null)
     this.setActiveInbox({})
+
+    this.$VueEvent.stop('ring_group_created', this.newRingGroupListener)
+    this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
+    this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
   }
 }
 </script>

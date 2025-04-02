@@ -26,7 +26,7 @@
       </div>
 
       <!-- items list -->
-      <template v-else-if="items.length">
+      <template v-else-if="itemsData.length">
         <div :key="item.id"
              v-for="item in itemsData"
              @click="onItemClick(item)">
