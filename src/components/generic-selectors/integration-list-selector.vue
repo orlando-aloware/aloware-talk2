@@ -252,7 +252,7 @@ export default {
       })
     },
 
-    fetchOptions (search = null, offset = 0) {
+    fetchHubSpotOptions (search = null, offset = 0) {
       if (this.searchQuery !== search) {
         offset = 0
       }
@@ -284,6 +284,16 @@ export default {
         this.$handleErrors(err.response)
         console.log(err)
       })
+    },
+
+    fetchOptions (search = null, offset = 0) {
+      switch (this.integration?.toLowerCase()) {
+        case HUBSPOT_INTEGRATION:
+          return this.fetchHubSpotOptions(search, offset)
+
+        case SALESFORCE_INTEGRATION:
+          return this.fetchSalesforceOptions(search, offset)
+      }
     },
 
     filterFn (val, update) {
@@ -342,7 +352,7 @@ export default {
 
       switch (this.integration?.toLowerCase()) {
         case HUBSPOT_INTEGRATION:
-          return this.fetchOptions()
+          return this.fetchHubSpotOptions()
 
         case SALESFORCE_INTEGRATION:
           return this.fetchSalesforceOptions()
