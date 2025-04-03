@@ -97,11 +97,19 @@ export default {
     },
 
     onResize () {
-      const inboxesInner = this.$refs.inboxesInner.getBoundingClientRect().height
+      const inboxesInnerHeight = this.$refs.inboxesInner.getBoundingClientRect().height
       const inboxesHeight = this.$refs.inboxes.getBoundingClientRect().height
 
       // always show if expanded, otherwise show if inner is greater than outer (means hidden contents)
-      this.showSeeButton = this.expanded ? true : inboxesInner >= inboxesHeight
+      this.showSeeButton = this.expanded ? true : inboxesInnerHeight > inboxesHeight
+    }
+  },
+
+  watch: {
+    typedInboxes () {
+      this.$nextTick(() => {
+        this.onResize()
+      })
     }
   },
 
