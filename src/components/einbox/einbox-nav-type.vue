@@ -98,6 +98,10 @@ export default {
     },
 
     onResize () {
+      if (!this.$refs.inboxesInner || !this.$refs.inboxes) {
+        return
+      }
+
       const inboxesInnerHeight = this.$refs.inboxesInner.getBoundingClientRect().height
       const inboxesHeight = this.$refs.inboxes.getBoundingClientRect().height
 
