@@ -127,7 +127,8 @@
 
             <div :style="col.columnStyle"
                  v-else-if="col.name === 'attempting_users'">
-              <attempting-users :row="props.row" />
+              <attempting-users expand-on-hover
+                                :row="props.row" />
             </div>
 
             <div :style="col.columnStyle"

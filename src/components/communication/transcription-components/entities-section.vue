@@ -21,9 +21,11 @@
                       color="green-11"
                       text-color="white"
                       dense
-                      :key="entity_index"
+                      clickable
                       data-testid="comm-entities-section-chip"
-                      v-for="(entity, entity_index) in entities[speaker][type]">
+                      :key="entity_index"
+                      v-for="(entity, entity_index) in entities[speaker][type]"
+                      @click="emitEntityFilter(speaker, type, entity)">
                 {{ entity }}
               </q-chip>
             </template>
@@ -70,6 +72,12 @@ export default {
     isEmpty: {
       type: Function,
       required: true
+    }
+  },
+
+  methods: {
+    emitEntityFilter (speaker, type, entity) {
+      this.$emit('filter-entity', { speaker, type, text: entity })
     }
   }
 }

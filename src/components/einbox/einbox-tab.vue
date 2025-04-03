@@ -1,60 +1,10 @@
 <template>
   <div class="einbox-tab">
-    <div class="einbox-tab__header border-bottom">
-      <collapse-button class="einbox-tab__header__collapse-button"
-                       :target="collapseTarget"
-                       v-model="collapsed"
-                       v-if="collapseTarget && !isMobile"/>
+    <einbox-tab-header :collapse-target="collapseTarget"
+                       :search="search"
+                       @search="search = $event" />
 
-      <template v-if="!isSearchActive">
-        <label class="einbox-tab__header__label ellipse"
-              v-if="activeInbox.name">
-          {{ activeInbox.name }}
-        </label>
-        <q-space></q-space>
-
-        <span class="cursor-pointer mr-2"
-              :id="`einbox-tab-open-comms-page-icon-${_uid}`"
-              @click="$router.push(DEFAULT_COMMUNICATIONS_ROUTE_PATH)">
-          <watch-icon />
-          <b-tooltip custom-class="talk-table__tooltip"
-                     :target="`einbox-tab-open-comms-page-icon-${_uid}`">
-            Open Communications Page
-          </b-tooltip>
-        </span>
-
-        <span class="cursor-pointer"
-              :id="`einbox-tab-search-icon-${_uid}`"
-              @click="onEnterSearch">
-          <search-icon color="#256eff"
-                       width="18"
-                       height="18" />
-          <b-tooltip custom-class="talk-table__tooltip"
-                     :target="`einbox-tab-search-icon-${_uid}`">
-            Click to search
-          </b-tooltip>
-        </span>
-      </template>
-
-      <template v-else>
-        <search-input ref="search"
-                      placeholder="Type ENTER to search comms..."
-                      class="einbox-tab__header__search"
-                      :id="`einbox-tab-search-${_uid}`"
-                      @search="search = $event"
-                      @blur="onLeaveSearch"
-                      @focus="showSearchTooltip = true"/>
-        <b-tooltip custom-class="talk-table__tooltip"
-                   placement="top"
-                   :boundary="`einbox-tab-search-${_uid}`"
-                   :target="`einbox-tab-search-${_uid}`"
-                   :show="showSearchTooltip">
-          Search communications by contact's name or phone number
-        </b-tooltip>
-      </template>
-    </div>
-
-    <einbox-channel-toggle />
+    <einbox-channel-toggle @channel="onChannel"/>
 
     <!-- Items List -->
     <div class="items-list blue-scroll"
@@ -76,7 +26,7 @@
       </div>
 
       <!-- items list -->
-      <template v-else-if="items.length">
+      <template v-else-if="itemsData.length">
         <div :key="item.id"
              v-for="item in itemsData"
              @click="onItemClick(item)">
@@ -91,7 +41,7 @@
                          :body="getMessageBody(item)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
-                         :total-unreads="viewMode === THREADED ? parseInt(item.unread_comms || 0) : 0"
+                         :unread-properties="getUnreadsProperties(item.contact)"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                          :repeats="viewMode === UNTHREADED ? item.repeats : null"
                          :is-live-call="isLiveCall(item)" />
@@ -106,9 +56,17 @@
       </template>
 
       <!-- Empty state -->
-      <div class="text-center q-pa-md text-grey"
+      <div class="text-center text-grey pt-4"
            v-else>
         Empty Inbox
+
+        <br/>
+
+        <button class="btn btn-sm btn-primary mt-4"
+                v-if="showRefreshCommunicationsButton"
+                @click.prevent="onRefreshCommunications">
+          <refresh-icon color="#fff"/> Refresh
+        </button>
       </div>
     </div>
   </div>
@@ -117,27 +75,23 @@
 <script>
 import Communication from 'src/components/einbox/communication-items/communication.vue'
 import EinboxChannelToggle from './einbox-channel-toggle.vue'
-import CollapseButton from 'src/components/collapse-button.vue'
-import SearchInput from 'src/components/search-input.vue'
-import WatchIcon from 'src/components/icons/watch-icon.vue'
-import SearchIcon from 'src/components/icons/search-icon.vue'
+import RefreshIcon from 'src/components/icons/refresh-icon.vue'
+import EinboxTabHeader from './einbox-tab-header.vue'
 import { EinboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
-import { DEFAULT_COMMUNICATIONS_ROUTE_PATH, EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
+import { EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState } from 'vuex'
-import { debounce } from 'lodash'
+import { debounce, isEmpty, pick } from 'lodash'
 
 export default {
   components: {
     Communication,
     EinboxChannelToggle,
-    CollapseButton,
-    SearchInput,
-    WatchIcon,
-    SearchIcon
+    RefreshIcon,
+    EinboxTabHeader
   },
 
   mixins: [
@@ -154,15 +108,11 @@ export default {
   data () {
     return {
       activeId: null,
-      collapsed: false,
+      search: '',
       THREADED,
       UNTHREADED,
-      DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       EINBOXES_MENU_ITEMS_TITLE,
-      isSearchActive: false,
       itemsData: [],
-      search: '',
-      showSearchTooltip: false,
       CommunicationDirections,
       CommunicationTypes
     }
@@ -176,7 +126,8 @@ export default {
       'hasMoreItems',
       'activeInboxId',
       'activeInbox',
-      'viewMode'
+      'viewMode',
+      'showRefreshCommunicationsButton'
     ]),
 
     ...mapState(['isMobile']),
@@ -193,6 +144,7 @@ export default {
     // live communications events
     this.$VueEvent.listen('new_communication', this.newCommunicationListener)
     this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
+    this.$VueEvent.listen('contact_updated', this.updatedContactListener)
   },
 
   beforeDestroy () {
@@ -203,10 +155,19 @@ export default {
 
     this.$VueEvent.stop('new_communication', this.newCommunicationListener)
     this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
+    this.$VueEvent.stop('contact_updated', this.updatedContactListener)
   },
 
   methods: {
     isLiveCall,
+
+    getUnreadsProperties (contact) {
+      if (isEmpty(contact)) {
+        return null
+      }
+
+      return pick(contact, ['unread_voicemail_count', 'unread_missed_call_count', 'unread_count'])
+    },
 
     onScroll ({ target }) {
       this.debouncedScroll(target)
@@ -233,21 +194,13 @@ export default {
       this.$router.push(route)
     },
 
-    async onEnterSearch () {
-      this.isSearchActive = true
-
-      await this.$nextTick()
-
-      // auto focus inside inner search input
-      if (this.$refs.search) {
-        this.$refs.search.$el.querySelector('input').focus()
+    onChannel () {
+      if (!this.activeInboxId) {
+        return
       }
-    },
 
-    onLeaveSearch () {
-      if (this.search === '') {
-        this.isSearchActive = false
-      }
+      this.resetItems()
+      this.fetchItems(this.activeInboxId, this.search || null)
     },
 
     handleUnthreadedCommunication (communication, isNew = false) {
@@ -315,8 +268,16 @@ export default {
 
     updatedCommunicationListener (communication) {
       this.processCommunication(communication, false)
+    },
 
-      this.showSearchTooltip = false
+    updatedContactListener (contact) {
+      // search for this contact in the current communications
+      // this is necessary for keeping the contact updated from other inboxes communications
+      const index = this.itemsData.findIndex(communication => communication.contact_id === contact.id)
+
+      if (index >= 0) {
+        this.itemsData[index].contact = contact
+      }
     },
 
     getMessageBody (item) {
@@ -329,6 +290,10 @@ export default {
       }
 
       return ''
+    },
+
+    onRefreshCommunications () {
+      this.fetchItems(this.activeInboxId, this.search || null)
     }
   },
 
@@ -342,6 +307,10 @@ export default {
       }
     },
 
+    '$route.params.inboxId' () {
+      this.search = ''
+    },
+
     '$route.name' (route) {
       // reset activeId in mobile when this page is opened
       if (this.isMobile && route === EINBOXES_MENU_ITEMS_TITLE) {
@@ -349,16 +318,7 @@ export default {
       }
     },
 
-    viewMode () {
-      this.isSearchActive = false
-      this.search = ''
-    },
-
     search (search) {
-      if (search === '') {
-        this.isSearchActive = false
-      }
-
       this.fetchItems(this.activeInboxId, search || null)
     },
 
@@ -377,43 +337,6 @@ export default {
   height: 100%;
   background-color: white;
   border-radius: inherit;
-
-  &__header {
-    display: flex;
-    align-items: center;
-    padding: 6px 15px;
-    width: 100%;
-    height: 45px;
-
-    &__label {
-      margin: 0px;
-      font-weight: 500;
-      font-size: 16px;
-      flex-grow: 1;
-    }
-
-    &__search {
-      width: 100%;
-
-      label {
-        border: none;
-      }
-    }
-  }
-
-  @media(min-width: 785px) {
-    &__header {
-      &__label {
-        margin-left: 10px;
-      }
-
-      &__search {
-        .q-field__prepend {
-          padding-left: 5px !important;
-        }
-      }
-    }
-  }
 }
 
 .items-list {

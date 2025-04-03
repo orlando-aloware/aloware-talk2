@@ -62,11 +62,6 @@ export default {
       default: ''
     },
 
-    totalUnreads: {
-      type: [Number, String],
-      required: true
-    },
-
     isLiveCallItem: {
       type: Boolean,
       default: false

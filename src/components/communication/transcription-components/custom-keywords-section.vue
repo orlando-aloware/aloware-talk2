@@ -15,9 +15,11 @@
                   color="amber-2"
                   text-color="white"
                   dense
+                  clickable
                   data-testid="comm-custom-keywords-section-chip"
                   :key="idx"
-                  v-for="(keyword, idx) in Object.keys(customKeywords[speaker])">
+                  v-for="(keyword, idx) in Object.keys(customKeywords[speaker])"
+                  @click="emitKeywordFilter(speaker, keyword)">
             {{ keyword | ucfirst }}<span class="ml-1 text-grey-30">{{ ` x ${customKeywords[speaker][keyword]}` }}</span>
           </q-chip>
         </div>
@@ -58,6 +60,12 @@ export default {
     isEmpty: {
       type: Function,
       required: true
+    }
+  },
+
+  methods: {
+    emitKeywordFilter (speaker, keyword) {
+      this.$emit('filter-keyword', { speaker, text: keyword })
     }
   }
 }

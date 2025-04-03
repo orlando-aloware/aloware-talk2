@@ -73,7 +73,7 @@ export default {
 
     ...mapState('powerDialer', ['powerDialerTasks']),
 
-    ...mapState(['isWidget']),
+    ...mapState(['isWidget', 'isSalesforceWidget']),
 
     ...mapFields('powerDialer', [
       'activeTask',
@@ -319,7 +319,7 @@ export default {
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
       this.removeUnownedLiveContactTask()
 
-      if (this.dialer.isReady && !this.isWidget) {
+      if (this.dialer.isReady && (this.isSalesforceWidget ? true : !this.isWidget)) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         console.warn('[UNREGISTERED] Twilio token', this.dialer.token)
         this.setDialerIsReady(false)
@@ -341,7 +341,7 @@ export default {
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       // Avoid continuing with the incoming call if it's a widget,
       // and ignore the call. Otherwise, Twilio will play the default incoming sound.
-      if (this.isWidget) {
+      if (this.isSalesforceWidget ? false : this.isWidget) {
         call._connection.ignore()
         return
       }
@@ -1540,7 +1540,10 @@ export default {
     },
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
-      this.resetAgentStatus(forceStatus, signature)
+      // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
+      if (signature !== 'Talk-Connection.OnCancel') {
+        this.resetAgentStatus(forceStatus, signature)
+      }
       this.resetCall(signature)
     },
 
