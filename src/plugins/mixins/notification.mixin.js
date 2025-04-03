@@ -1,6 +1,6 @@
-import { mapActions, mapState } from 'vuex'
 import _ from 'lodash'
 import * as RingGroupRepeatContactTo from 'src/constants/ring-group-repeat-calls'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   data () {
@@ -224,8 +224,12 @@ export default {
       const message = { data: '' }
       const ringGroup = this.ringGroups.find(ringGroup => ringGroup.id === communication.ring_group_id)
 
+      if (!communication.contact) {
+        return
+      }
+
       if (type !== 'mention') {
-        name.data = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
+        name.data = communication.contact ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
         companyName.data = communication.contact.company_name
         firstAttachment.data = _.get(communication.attachments, '0.url', null)
       }
