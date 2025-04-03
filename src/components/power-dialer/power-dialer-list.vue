@@ -44,12 +44,14 @@ export default {
 
   mounted () {
     this.$VueEvent.stop('contact_list_import_hubspot')
+    this.$VueEvent.stop('contact_list_import_salesforce')
     this.$VueEvent.stop('contact_list_import_zoho')
     this.$VueEvent.stop('contact_list_import_pipedrive')
     this.$VueEvent.stop('contact_list_import_failed')
 
     // Handle import successfull
     this.$VueEvent.listen('contact_list_import_hubspot', event => this.handleImportFinishedEvent(event))
+    this.$VueEvent.listen('contact_list_import_salesforce', event => this.handleImportFinishedEvent(event))
     this.$VueEvent.listen('contact_list_import_zoho', event => this.handleImportFinishedEvent(event))
     this.$VueEvent.listen('contact_list_import_pipedrive', event => this.handleImportFinishedEvent(event))
     this.$VueEvent.listen('contact_list_import_failed', event => this.handleImportFailedEvent(event))
@@ -155,6 +157,7 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('contact_list_import_hubspot')
+    this.$VueEvent.stop('contact_list_import_salesforce')
     this.$VueEvent.stop('contact_list_import_zoho')
     this.$VueEvent.stop('contact_list_import_pipedrive')
     this.$VueEvent.stop('contact_list_import_failed')

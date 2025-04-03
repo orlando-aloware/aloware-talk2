@@ -41,6 +41,9 @@
                                       :layer="layer + 1"
                                       :hasEdit="hasEdit"
                                       :hasDelete="hasDelete"
+                                      :has-more="hasMore"
+                                      :is-loading-more="isLoadingMore"
+                                      @load-more="$emit('load-more')"
       />
     </div>
   </div>
@@ -91,6 +94,16 @@ export default {
 
     order: {
       type: Number
+    },
+
+    hasMore: {
+      type: Boolean,
+      default: false
+    },
+
+    isLoadingMore: {
+      type: Boolean,
+      default: false
     }
   },
 

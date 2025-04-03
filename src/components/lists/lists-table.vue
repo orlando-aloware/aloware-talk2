@@ -42,9 +42,7 @@
               <search-input class="width-260"
                             data-testid="lists-search-input"
                             limit-search-characters
-                            placeholder="Search List Name"
                             :search="search"
-                            :search-on-input="true"
                             @search="onSearch" />
             </div>
           </div>
