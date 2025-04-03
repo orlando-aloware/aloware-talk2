@@ -229,7 +229,7 @@ export default {
       }
 
       if (type !== 'mention') {
-        name.data = communication.contact ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
+        name.data = communication.contact.name ? communication.contact.name : this.$options.filters.fixPhone(communication.contact.phone_number)
         companyName.data = communication.contact.company_name
         firstAttachment.data = _.get(communication.attachments, '0.url', null)
       }
