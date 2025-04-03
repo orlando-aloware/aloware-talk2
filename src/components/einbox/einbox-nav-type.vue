@@ -1,5 +1,6 @@
 <template>
-  <div :class="['einbox-nav-type', { 'einbox-nav-type--expanded': expanded }, { 'einbox-nav-type--reduced': reduced }]">
+  <div :class="['einbox-nav-type', { 'einbox-nav-type--expanded': expanded }, { 'einbox-nav-type--reduced': reduced }]"
+       v-if="typedInboxes.length">
     <div class="einbox-nav-type__label">
       {{ label }}
     </div>
