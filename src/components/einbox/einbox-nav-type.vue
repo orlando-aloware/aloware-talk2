@@ -4,7 +4,7 @@
       {{ label }}
     </div>
 
-    <div class="einbox-nav-type__inboxes"
+    <div class="einbox-nav-type__inboxes blue-scroll"
          @scroll="onScroll">
       <einbox-nav-item :label="inbox.name"
                        :value="inbox.id"

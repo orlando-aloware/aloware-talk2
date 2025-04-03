@@ -63,15 +63,14 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-
 import EinboxNavType from './einbox-nav-type.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
-import { debounce } from 'lodash'
 import { EINBOXES_MENU_TITLE } from 'src/router/routes'
 import { INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
+import { mapState, mapActions } from 'vuex'
+import { debounce } from 'lodash'
 
 export default {
   components: {
@@ -315,7 +314,7 @@ export default {
     display: flex;
     flex-direction: column;
     row-gap: 10px;
-    padding: 10px;
+    padding: 10px 0px 10px 10px;
 
     &--no-gap {
       row-gap: 0;
