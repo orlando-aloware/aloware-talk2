@@ -394,17 +394,21 @@ export default {
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+
       if (this.dialer.communication) {
         this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
       }
+
       this.removeUnownedLiveContactTask()
       this.stopCallTimer()
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
+
       if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
         this.startWrapUpTimer()
         return
       }
+
       this.backToDial('Talk-Device.OnDisconnect')
     })
 
