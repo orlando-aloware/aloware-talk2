@@ -96,7 +96,7 @@
         </div>
 
         <div class="d-flex justify-content-center align-items-center call-actions"
-             v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !(dialer.call || agentStatus === AgentStatus.AGENT_STATUS_ON_CALL))">
+             v-if="shouldShowCallActions">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -125,7 +125,7 @@
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
              :class="id === 'callFishing' && getSource ? 'mt-2' : ''"
-             v-if="id === 'callFishing' && dialer && (dialer.call || agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)">
+             v-if="shouldShowFishingActions">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -535,6 +535,26 @@ export default {
 
     notificationQueue () {
       return this.notifications?.[this.id]?.queue
+    },
+
+    isAgentOnCall () {
+      return this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
+    },
+
+    isAgentOrDialerOnCall () {
+      return this.dialer.call || this.isAgentOnCall
+    },
+
+    isCallFishingWithDialer () {
+      return this.id === 'callFishing' && this.dialer
+    },
+
+    shouldShowCallActions () {
+      return this.id === 'incomingCall' || (this.isCallFishingWithDialer && !this.isAgentOrDialerOnCall)
+    },
+
+    shouldShowFishingActions () {
+      return this.isCallFishingWithDialer && this.isAgentOrDialerOnCall
     }
   },
 
@@ -708,7 +728,7 @@ export default {
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
-    answerCommunication (shouldPark = false, shouldHangup = false) {
+    async answerCommunication(shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.communicationId,
@@ -723,19 +743,26 @@ export default {
         shouldHangup: shouldHangup
       }
 
-      if (!this.dialer.communication && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-        this.$axios.post('/api/v1/profile/get-live-calls').then(res => {
-          this.setDialerCommunication(res.data[0])
-          this.answerCallFishing(data)
-        }).catch((err) => {
-          console.log(err)
-        })
-      } else {
-        this.answerCallFishing(data)
-      }
-    },
+      // Check if we need to fetch current communication
+      const needsCurrentCommunication = !this.dialer.communication &&
+        this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
 
-    answerCallFishing (data) {
+      if (needsCurrentCommunication) {
+        try {
+          const response = await this.$axios.post('/api/v1/profile/get-live-calls')
+          const currentCommunication = response.data[0]
+
+          if (!currentCommunication) {
+            console.log('No live calls found for this agent')
+            return
+          }
+
+          this.setDialerCommunication(currentCommunication)
+        } catch (err) {
+          console.log(err)
+        }
+      }
+
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
       this.setShowPhone(true)

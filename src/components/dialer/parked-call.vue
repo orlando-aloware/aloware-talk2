@@ -1,6 +1,6 @@
 <template>
-  <q-item :clickable="dialer && dialer.parkedCall && !dialer.call && agentStatus !== AGENT_STATUS_ON_CALL"
-          :disabled="dialer.call || agentStatus === AGENT_STATUS_ON_CALL"
+  <q-item :clickable="canUnparkCall"
+          :disabled="dialer.call || isAgentOnCall"
           v-if="dialer && dialer.parkedCall"
           class="mr-3 pl-2 pr-2 parked-call cursor-pointer no-select"
           v-ripple
@@ -58,6 +58,14 @@ export default {
       }
 
       return 'Unpark Call'
+    },
+
+    isAgentOnCall () {
+      return this.agentStatus === AGENT_STATUS_ON_CALL
+    },
+
+    canUnparkCall () {
+      return this.dialer?.parkedCall && !this.dialer.call && !this.isAgentOnCall
     }
   },
 
