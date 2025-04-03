@@ -21,10 +21,12 @@
         >
         </q-spinner-bars>
         {{ isSyncing ? 'Syncing...' : 'Sync with ' + getIntegrationTitle }}
-        <q-tooltip anchor="top middle"
-                   self="center middle"
-                   data-testid="integration-sync-tooltip"
-                   :offset="isWidget ? [0, 100] : [-220, 10]">
+        <q-tooltip
+          anchor="top middle"
+          self="center middle"
+          data-testid="integration-sync-tooltip"
+          :offset="isWidget ? [0, 100] : [0, 70]"
+        >
           <div :class="{ 'small-text': isWidget }">
             <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and {{ getIntegrationTitle }}.</p>
             <p class="font-weight-bold">You'll want to click on this button if:</p>
@@ -109,7 +111,6 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 .small-text {
   font-size: 12px;

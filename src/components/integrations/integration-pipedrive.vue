@@ -99,7 +99,7 @@
               anchor="top middle"
               self="center middle"
               data-testid="integration-pipedrive-sync-tooltip"
-              :offset="[-220, 10]"
+              :offset="[0, 50]"
             >
               <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and Pipedrive.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>
