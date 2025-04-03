@@ -3,26 +3,26 @@
 </template>
 
 <script>
-import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   agentMixin,
-  userMixin,
-  notificationMixin,
-  visibilityMixin,
-  unownedContactTaskMixin,
   dialerWrapUpMixin,
   dispositionsMixin,
-  sessionCallStatusMixin
+  notificationMixin,
+  sessionCallStatusMixin,
+  unownedContactTaskMixin,
+  userMixin,
+  visibilityMixin
 } from '../../boot/mixins'
-import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
-import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
+import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
+import * as WebrtcEvents from '../../constants/webrtc-events'
+import TwilioDevice from '../communication/twilio/device'
 
 export default {
   name: 'dialer',
@@ -363,7 +363,7 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
+      this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')
@@ -371,8 +371,8 @@ export default {
         }
       }).catch((err) => {
         console.log('getCommunication error', {
-          'callSid': this.dialer.call.callSid,
-          'from': this.dialer.call.from,
+          'callSid': call.callSid,
+          'from': call.from,
           'err': err
         })
       })
