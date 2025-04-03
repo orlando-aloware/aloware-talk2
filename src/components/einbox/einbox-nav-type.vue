@@ -5,17 +5,21 @@
     </div>
 
     <div class="einbox-nav-type__inboxes blue-scroll"
+         ref="inboxes"
          @scroll="onScroll">
-      <einbox-nav-item :label="inbox.name"
-                       :value="inbox.id"
-                       :message-count="inbox.message_count"
-                       :is-active="activeInboxId === inbox.id"
-                       :key="inbox.id"
-                       v-for="inbox in typedInboxes"
-                       @click="$emit('inbox', inbox.id)" />
+      <div ref="inboxesInner">
+        <einbox-nav-item :label="inbox.name"
+                        :value="inbox.id"
+                        :message-count="inbox.message_count"
+                        :is-active="activeInboxId === inbox.id"
+                        :key="inbox.id"
+                        v-for="inbox in typedInboxes"
+                        @click="$emit('inbox', inbox.id)" />
+      </div>
     </div>
 
     <div class="einbox-nav-type__see-more"
+         v-if="showSeeButton"
          @click="$emit('toggle-expanded', type)">
       See {{ expanded ? 'less' : 'all' }} {{ label }}
     </div>
@@ -63,11 +67,20 @@ export default {
     }
   },
 
+  data: () => ({
+    showSeeButton: true
+  }),
+
   computed: {
     ...mapState('Einbox', [
       'isLoadingInboxes',
       'hasMoreInboxes'
     ])
+  },
+
+  mounted () {
+    window.addEventListener('resize', this.onResize)
+    this.onResize() // immediate trigger
   },
 
   methods: {
@@ -81,7 +94,19 @@ export default {
       if (isNearBottom && !this.isLoadingInboxes && this.hasMoreInboxes[this.type]) {
         this.$emit('load-more', this.type)
       }
+    },
+
+    onResize () {
+      const inboxesInner = this.$refs.inboxesInner.getBoundingClientRect().height
+      const inboxesHeight = this.$refs.inboxes.getBoundingClientRect().height
+
+      // always show if expanded, otherwise show if inner is greater than outer (means hidden contents)
+      this.showSeeButton = this.expanded ? true : inboxesInner >= inboxesHeight
     }
+  },
+
+  beforeDestroy () {
+    window.removeEventListener('resize', this.onResize)
   }
 }
 </script>
