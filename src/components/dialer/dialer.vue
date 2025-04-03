@@ -871,15 +871,27 @@ export default {
         }
 
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
+
+        // Common disconnect handling steps
+        const handleDisconnect = () => {
+          this.removeUnownedLiveContactTask()
+          this.stopCallTimer()
+          this.connection = null
+          this.setDialerCurrentStatus('CALL_DISCONNECTED')
+          this.handlePostDisconnect()
+        }
+
+        // First refresh communication if there's an active call
         if (this.dialer.call) {
           this.forceRefreshCommunication()
+            .then(handleDisconnect)
+            .catch(err => {
+              console.error('Error refreshing communication:', err)
+              handleDisconnect()
+            })
+        } else {
+          handleDisconnect()
         }
-        this.removeUnownedLiveContactTask()
-        this.stopCallTimer()
-        this.connection = null
-        this.setDialerCurrentStatus('CALL_DISCONNECTED')
-
-        setTimeout(() => this.handlePostDisconnect(), 2000)
       })
     },
 
