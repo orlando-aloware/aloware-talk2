@@ -67,13 +67,15 @@
                 anchor="top middle"
                 self="center middle"
                 data-testid="integration-hubspot-sync-tooltip"
-                :offset="[-220, 10]"
+                :offset="isWidget ? [0, 100] : [0, 50]"
               >
-                <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and HubSpot.</p>
-                <p class="font-weight-bold">You'll want to click on this button if:</p>
-                <p class="mt-1 mb-0">- The contact was recently merged in HubSpot with another contact.</p>
-                <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and HubSpot data on
-                  this contact.</p>
+                <div :class="{ 'small-text': isWidget }">
+                  <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and HubSpot.</p>
+                  <p class="font-weight-bold">You'll want to click on this button if:</p>
+                  <p class="mt-1 mb-0">- The contact was recently merged in HubSpot with another contact.</p>
+                  <p class="mt-0 mb-0">- You notice any inconsistencies between {{ whiteLabelName }} and HubSpot data on
+                    this contact.</p>
+                </div>
               </q-tooltip>
             </b-button>
           </b-row>
@@ -201,7 +203,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
 
-    ...mapState(['statics']),
+    ...mapState(['statics', 'isWidget']),
 
     isWorkflowValid () {
       return this.workflow.id
@@ -333,3 +335,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.small-text {
+  font-size: 12px;
+}
+</style>
