@@ -108,7 +108,7 @@ export default {
 
     isCallInProgress () {
       return this.dialer.call && ['connected', 'open'].includes(this.dialer.call.state)
-    },
+    }
   },
 
   created () {

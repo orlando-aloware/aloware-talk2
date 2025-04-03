@@ -728,7 +728,7 @@ export default {
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
-    async answerCommunication(shouldPark = false, shouldHangup = false) {
+    async answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.communicationId,
