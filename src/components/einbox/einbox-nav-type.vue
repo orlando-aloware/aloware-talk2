@@ -125,6 +125,7 @@ export default {
   display: flex;
   flex-direction: column;
   transition: all 0.5s ease;
+  max-height: 50%;
 
   &__label {
     font-weight: 600;
@@ -146,7 +147,7 @@ export default {
   }
 
   &--expanded {
-    height: 100% !important;
+    max-height: 100% !important;
 
     .einbox-nav-type__inboxes {
       overflow-y: auto;
@@ -155,7 +156,7 @@ export default {
   }
 
   &--reduced {
-    height: 0% !important;
+    max-height: 0% !important;
   }
 }
 

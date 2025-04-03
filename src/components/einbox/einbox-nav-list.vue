@@ -319,10 +319,6 @@ export default {
     &--no-gap {
       row-gap: 0;
     }
-
-    .einbox-nav-type {
-      height: 50%;
-    }
   }
 }
 </style>
