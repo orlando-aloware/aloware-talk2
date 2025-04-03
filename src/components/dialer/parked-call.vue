@@ -60,10 +60,6 @@ export default {
       return 'Unpark Call'
     },
 
-    isAgentOnCall () {
-      return this.agentStatus === AGENT_STATUS_ON_CALL
-    },
-
     canUnparkCall () {
       return this.dialer?.parkedCall && !this.dialer.call && !this.isAgentOnCall
     }

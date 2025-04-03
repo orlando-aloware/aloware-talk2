@@ -537,10 +537,6 @@ export default {
       return this.notifications?.[this.id]?.queue
     },
 
-    isAgentOnCall () {
-      return this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
-    },
-
     isAgentOrDialerOnCall () {
       return this.dialer.call || this.isAgentOnCall
     },

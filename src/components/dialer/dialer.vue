@@ -83,7 +83,7 @@ export default {
 
     isNotInProgressCall () {
       return (!this.dialer.call || !this.dialer.communication ||
-        !['connected', 'open'].includes(this.dialer.call.state)) && this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL
+        !['connected', 'open'].includes(this.dialer.call.state)) && !this.isAgentOnCall
     },
 
     hasNoParkedAndInprogressCall () {
@@ -424,7 +424,7 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
+      if (!this.profile.last_call || (this.isImpersonate && this.isAgentOnCall)) {
         return
       }
 
@@ -1228,9 +1228,9 @@ export default {
     },
 
     hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL && !this.dialer.call && this.dialer.communication) {
+      if (this.isAgentOnCall && !this.dialer.call && this.dialer.communication) {
         talk2Api.V1.communication.forceTerminate(this.dialer.communication.id)
-          .then(response => {
+          .then(res => {
             this.hangUpInterval(shouldAnswer, shouldUnpark, data)
           })
 
