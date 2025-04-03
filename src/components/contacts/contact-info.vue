@@ -222,36 +222,6 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="!isSimpSocialIntegrationEnabled"
-                v-if="isSimpSocial"
-                data-testid="contact-info-email-button"
-                @click="openEmailBlast">
-        <q-tooltip anchor="bottom middle"
-                   data-testid="contact-info-email-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
-          Email
-        </q-tooltip>
-        <email-icon width="16"/>
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                :disabled="isVideoConferenceLinkSending"
-                v-if="isSimpSocial"
-                data-testid="contact-info-video-conference-button"
-                @click="openVideoConference">
-        <q-tooltip anchor="bottom middle"
-                   data-testid="contact-info-video-conference-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
-          Video Conference
-        </q-tooltip>
-        <video-conference-icon data-testid="contact-info-video-conference-icon" width="16"/>
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
                 data-testid="contact-info-merge-button"
                 v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled"
                 @click="openMergeContactModal">
@@ -303,8 +273,6 @@ import { aclMixin, simpsocialMixin, timezoneCheckMixin, integrationMixin, contac
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
-import EmailIcon from 'components/icons/email-icon'
-import VideoConferenceIcon from 'components/icons/video-conference-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
 
@@ -326,8 +294,6 @@ export default {
   ],
 
   components: {
-    VideoConferenceIcon,
-    EmailIcon,
     ContactDncActions,
     DigitalClock,
     ContactAddReminderModal,
@@ -429,31 +395,6 @@ export default {
 
     openMergeContactModal () {
       this.addMergeContactOpen(true)
-    },
-
-    openEmailBlast () {
-      this.$router.push({
-        name: 'Email Blast',
-        params: {
-          id: this.contact.id
-        }
-      })
-    },
-
-    openVideoConference () {
-      if (this.isVideoConferenceLinkSending) {
-        return
-      }
-
-      this.isVideoConferenceLinkSending = true
-
-      talk2Api.V1.integrations.simpsocial.videoConference.send(this.contact.id, this.campaignId)
-        .then(res => {
-          this.isVideoConferenceLinkSending = false
-        }).catch(err => {
-          this.isVideoConferenceLinkSending = false
-          this.$handleErrors(err.response)
-        })
     },
 
     onOpenEditForm () {

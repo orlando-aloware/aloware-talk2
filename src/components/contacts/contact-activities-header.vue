@@ -36,7 +36,7 @@
                            data-testid="contact-activities-export-communications-item"
                            class="d-flex"
                            :disabled="loading"
-                           v-if="isAdmin && !isWidget && enableExport && !isSimpSocial && !inPowerDialerPage"
+                           v-if="isAdmin && !isWidget && enableExport && !inPowerDialerPage"
                            @click="handleExportCommunications">
             <export-icon class="mark-all-as-read-icon dropdown-icon" />
             Export Communications
@@ -109,7 +109,7 @@
                class="text-decoration-none"
                data-testid="contact-activities-export-communications-btn"
                :disabled="loading"
-               v-if="isAdmin && !isWidget && enableExport && !isSimpSocial && !inPowerDialerPage"
+               v-if="isAdmin && !isWidget && enableExport && !inPowerDialerPage"
                @click="handleExportCommunications">
           <q-tooltip anchor="top middle"
                      self="center middle">
@@ -221,13 +221,13 @@ import BackButton from 'components/back-button'
 import Profile from 'components/profile'
 import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin } from 'src/plugins/mixins'
 import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'contact-activities-header',
 
-  mixins: [aclMixin, simpsocialMixin],
+  mixins: [aclMixin],
 
   components: {
     Profile,

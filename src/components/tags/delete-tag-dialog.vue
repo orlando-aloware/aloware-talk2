@@ -26,7 +26,6 @@
                      unchecked-value="no"
                      class="mt-4"
                      data-testid="tags-delete-dialog-confirm-checkbox"
-                     v-if="!isBulk && !isSimpSocial"
                      v-show="!isBulk && showDeleteContactsQuestion"
                      v-model="isDeleteContacts">
       Do you also want to delete the tagged contacts of this tag?
@@ -69,16 +68,13 @@
 
 <script>
 import { numeric, requiredIf } from 'vuelidate/lib/validators'
-import { tagsMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { tagsMixin } from 'src/plugins/mixins'
 import API from 'src/plugins/api/api'
 
 export default {
   name: 'delete-tag-dialog',
 
-  mixins: [
-    tagsMixin,
-    simpsocialMixin
-  ],
+  mixins: [tagsMixin],
 
   props: {
     tag: {

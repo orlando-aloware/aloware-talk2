@@ -30,7 +30,6 @@
 
 <script>
 import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
-import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcast-add-cards',
@@ -38,10 +37,6 @@ export default {
   components: {
     BroadcastWarningNote
   },
-
-  mixins: [
-    simpsocialMixin
-  ],
 
   props: {
     contactsLength: {
@@ -73,7 +68,7 @@ export default {
         {
           title: this.$options.filters.toCurrency(this.$options.filters.fixRounding(this.estimatedCost)),
           text: 'Estimated Cost',
-          enabled: !this.isSimpSocial,
+          enabled: true,
           showWarning: true
         }
       ].filter(card => card.enabled)
