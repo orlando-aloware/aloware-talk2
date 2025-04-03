@@ -1,20 +1,16 @@
 <template>
   <span class="cursor-pointer"
-        data-testid="comm-whisper-button-whisper-span"
+        data-testid="comm-whisper-comm-button-dialog-click"
         :id="`action-whisper-${_uid}`"
-        @click="dialog"
-        v-if="userCanBargeAndWhisper(communication)">
+        @click="dialog">
     <ear-icon :height="iconHeight"
               :width="iconWidth"/>
-
+    <span v-if="showButtonText" class="ml-1">Whisper</span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-whisper-${_uid}`"
-               v-if="blackTooltip">
+               v-else>
       Whisper
     </b-tooltip>
-    <q-tooltip v-else>
-      Whisper
-    </q-tooltip>
   </span>
 </template>
 
@@ -58,7 +54,7 @@ export default {
       default: 22
     },
 
-    blackTooltip: {
+    showButtonText: {
       type: Boolean,
       default: false
     }

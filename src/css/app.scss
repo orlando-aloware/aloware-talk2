@@ -6212,6 +6212,10 @@ table.datatable {
       }
     }
   }
+
+  &.table-striped tbody tr:nth-of-type(odd) td {
+    background-color: $light-grey;
+  }
 }
 
 .submenu {
@@ -16131,6 +16135,10 @@ hr {
 
     tr.live-call-tr {
       background-color: $light-blue;
+
+      td {
+        background-color: $light-blue !important;
+      }
     }
 
     td:last-child {
@@ -16143,6 +16151,7 @@ hr {
 
       @media (max-width: 575px) {
         position: relative;
+        padding: 0;
       }
     }
 
@@ -16343,6 +16352,16 @@ hr {
 
   .q-table__control {
     display: none !important;
+  }
+}
+
+.talk-table.communication-logs-table {
+  td:last-child, th:last-child {
+    @media (max-width: 575px) {
+      position: sticky !important;
+      min-width: 65px !important;
+      padding: 0 !important;
+    }
   }
 }
 
@@ -16645,6 +16664,46 @@ hr {
   }
 }
 
+// .attempting-users-container {
+//   height: 65px;
+//   overflow: hidden;
+//   position: relative;
+
+//   .q-tree {
+//     border: 1px solid transparent;
+//   }
+
+//   &.expand-on-hover:hover {
+//     overflow: visible;
+//     z-index: 2;
+
+//     .q-tree {
+//       background-color: #fff;
+//       border: 1px solid #ddd;
+//       position: absolute;
+//       border-radius: 5px;
+//       box-shadow: 0 2px 5px rgba(0,0,0, .2)
+//     }
+
+//     .show-more-icon {
+//       display: none;
+//     }
+//   }
+
+//   .show-more-icon {
+//     position: absolute;
+//     bottom: 3px;
+//     left: 50%;
+//     margin-left: -15px;
+//     color: #555;
+//     background: #f9f9f9;
+//     padding: 1px 8px;
+//     border: 1px solid #ddd;
+//     border-radius: 5px;
+//     box-shadow: 0 2px 5px rgba(0,0,0, .2)
+//   }
+// }
+
 .attempting-users-container {
   height: 65px;
   overflow: hidden;
@@ -16663,11 +16722,11 @@ hr {
     box-shadow: 0 2px 5px rgba(0,0,0, .2)
   }
 
-  &:hover {
+  &.expand-on-hover:hover {
     overflow: visible;
     z-index: 2;
 
-    .expand-on-hover {
+    > div {
       position: absolute;
       background-color: #fff;
       border: 1px solid #ddd;
@@ -16679,4 +16738,8 @@ hr {
       display: none;
     }
   }
+}
+
+.overflow-visible {
+  overflow: visible !important;
 }

@@ -26,7 +26,7 @@
                 :key="column.name"
                 :data-column-id="column.name"
                 :id="`cols-${column.name}`"
-                :style="getHeaderStyle(column.name, column.minWidth, column.maxWidth)"
+                :style="getHeaderStyle(column.name, column.minWidth, column.maxWidth, column.align)"
                 v-for="(column, key) in fixedColumns"
                 @mouseout="onInitReorder(false, null)">
               <label class="custom-checkbox-container check-all"
@@ -410,18 +410,24 @@ export default {
       'setAllContactsSelected'
     ]),
 
-    getHeaderStyle (name, minWidth, maxWidth) {
+    getHeaderStyle (name, minWidth, maxWidth, align) {
       let minWidthPixels = minWidth ? `${minWidth}px` : ''
       let maxWidthPixels = maxWidth ? `${maxWidth}px` : ''
+      let textAlign = 'left'
 
       if (name === 'checkbox') {
         minWidthPixels = '40px'
         maxWidthPixels = '40px'
       }
 
+      if (align) {
+        textAlign = align
+      }
+
       return {
         minWidth: minWidthPixels,
-        maxWidth: maxWidthPixels
+        maxWidth: maxWidthPixels,
+        textAlign
       }
     },
 

@@ -3,21 +3,16 @@
         :class="classes"
         :disabled="loading"
         :id="`action-terminate-${_uid}`"
-        v-if="show"
         @click="dialog">
     <power-icon :height="iconHeight"
                 :width="iconWidth"/>
-
+    <span v-if="showButtonText" class="ml-1">Terminate</span>
     <b-tooltip data-testid="comm-terminate-comm-button-tooltip"
                custom-class="talk-table__tooltip"
                :target="`action-terminate-${_uid}`"
-               v-if="blackTooltip">
-      Terminate
-    </b-tooltip>
-    <q-tooltip data-testid="comm-terminate-comm-button-tooltip"
                v-else>
       Terminate
-    </q-tooltip>
+    </b-tooltip>
   </span>
 </template>
 
@@ -56,7 +51,7 @@ export default {
       default: 22
     },
 
-    blackTooltip: {
+    showButtonText: {
       type: Boolean,
       default: false
     }

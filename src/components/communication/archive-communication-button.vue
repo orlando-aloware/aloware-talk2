@@ -2,20 +2,16 @@
   <span :class="[{ 'opacity-05 cursor-blocked': loading }, {'cursor-pointer': !loading }]"
         data-testid="comm-archive-button"
         :id="`action-delete-${_uid}`"
-        v-if="hasPermissionTo('archive communication')"
         @click="dialog">
     <trash-icon height="16"
                 width="16"
                 color="#62666E"/>
-
+    <span v-if="showButtonText" class="ml-1">Delete</span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-delete-${_uid}`"
-               v-if="blackTooltip">
+               v-else>
       Delete
     </b-tooltip>
-    <q-tooltip v-else>
-      Delete
-    </q-tooltip>
   </span>
 </template>
 
@@ -41,7 +37,7 @@ export default {
       required: true
     },
 
-    blackTooltip: {
+    showButtonText: {
       type: Boolean,
       default: false
     }

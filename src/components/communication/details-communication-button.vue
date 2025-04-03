@@ -2,20 +2,16 @@
   <span class="cursor-pointer"
         data-testid="comm-details-button"
         :id="`action-details-${_uid}`"
-        v-if="communication.contact_id"
         @click="seeDetails">
     <information-circle-icon height="16"
                              width="16"
                              color="#62666E"/>
-
+    <span v-if="showButtonText" class="ml-1">More Details</span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-details-${_uid}`"
-               v-if="blackTooltip">
+               v-else>
       More Details
     </b-tooltip>
-    <q-tooltip v-else>
-      More Details
-    </q-tooltip>
   </span>
 </template>
 
@@ -41,6 +37,11 @@ export default {
     },
 
     blackTooltip: {
+      type: Boolean,
+      default: false
+    },
+
+    showButtonText: {
       type: Boolean,
       default: false
     }
