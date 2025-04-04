@@ -170,7 +170,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   hubspotIntegrationMixin,
   integrationMixin,
-  simpsocialMixin
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -182,7 +182,7 @@ export default {
   mixins: [
     hubspotIntegrationMixin,
     integrationMixin,
-    simpsocialMixin
+    whiteLabelMixin
   ],
 
   props: {

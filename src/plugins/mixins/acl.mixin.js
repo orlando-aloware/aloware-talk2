@@ -266,10 +266,6 @@ export default _.merge({
         return false
       }
 
-      if (this.currentCompany && this.currentCompany.reseller_id === 357 && !this.hasRole('Billing Admin')) {
-        return false
-      }
-
       return true
     },
 

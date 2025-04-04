@@ -1,9 +1,6 @@
 import { mapState } from 'vuex'
-import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
-  mixins: [simpsocialMixin],
-
   computed: {
     ...mapState(['statics']),
 

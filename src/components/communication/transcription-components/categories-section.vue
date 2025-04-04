@@ -35,12 +35,8 @@
 </template>
 
 <script>
-import { simpsocialMixin } from 'src/plugins/mixins'
-
 export default {
   name: 'CategoriesSection',
-
-  mixins: [simpsocialMixin],
 
   props: {
     categories: {

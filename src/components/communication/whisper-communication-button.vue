@@ -3,7 +3,7 @@
         data-testid="comm-whisper-button-whisper-span"
         :id="`action-whisper-${_uid}`"
         @click="dialog"
-        v-if="userCanBargeAndWhisper(communication)">
+        v-if="userCanBargeAndWhisper(communication) || true">
     <ear-icon :height="iconHeight"
               :width="iconWidth"/>
 
@@ -20,7 +20,7 @@
 
 <script>
 import EarIcon from 'src/components/icons/ear-icon.vue'
-import { aclMixin, agentMixin, communicationMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'whisper-communication-button',
@@ -28,8 +28,7 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin,
-    simpsocialMixin
+    communicationMixin
   ],
 
   components: {

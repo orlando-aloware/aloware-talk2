@@ -50,7 +50,6 @@
 import UploadIcon from 'components/icons/upload-icon'
 import { mapGetters } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
-import { simpsocialMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'attachments',
@@ -58,8 +57,6 @@ export default {
   components: {
     UploadIcon
   },
-
-  mixins: [simpsocialMixin],
 
   props: {
     isBroadcast: {
