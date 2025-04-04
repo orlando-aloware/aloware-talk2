@@ -139,7 +139,7 @@ export default {
         params: {
           inbox_id: inboxId,
           page: nextPage,
-          per_page: 25,
+          per_page: 100,
           ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : { inbox_type: 'unthreaded' }),
           ...(search ? {
             search_text: search,
