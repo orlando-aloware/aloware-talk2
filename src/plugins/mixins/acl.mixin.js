@@ -169,10 +169,6 @@ export default _.merge({
       }
     },
 
-    shouldShowUpgradeNow () {
-      return !this.isSimpSocial()
-    },
-
     hideMenu () {
       if (this.$refs && this.$refs.menu) {
         this.$refs.menu.hide()

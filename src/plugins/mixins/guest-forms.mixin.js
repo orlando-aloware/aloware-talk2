@@ -12,10 +12,6 @@ export default {
         return this.statics.logo && this.statics.logo.replace(/\//, '') // replace first occurrence of '/'
       }
 
-      if (this.isSimpSocial) {
-        return '/assets/images/logos/simpsocial.png'
-      }
-
       return 'app-icons/misc/logo.svg'
     }
   }

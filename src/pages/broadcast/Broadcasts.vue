@@ -378,7 +378,7 @@
                       title-text="Broadcast"
                       kb-link="https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast"
                       class="mt-5"
-                      v-if="!shouldShowBroadcast && shouldShowUpgradeNow">
+                      v-if="!shouldShowBroadcast">
     </upgrade-now-page>
   </div>
 </template>

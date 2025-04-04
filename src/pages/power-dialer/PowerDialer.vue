@@ -60,7 +60,7 @@
                       title-text="Power Dialer"
                       kb-link="https://support.aloware.com/en/articles/9037581-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
                       class="mt-5"
-                      v-if="!shouldShowPowerDialer && shouldShowUpgradeNow">
+                      v-if="!shouldShowPowerDialer">
     </upgrade-now-page>
   </div>
 </template>
