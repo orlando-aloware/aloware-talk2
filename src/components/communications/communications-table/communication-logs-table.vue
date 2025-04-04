@@ -60,7 +60,7 @@
                   class="text-center"
                   :style="col.columnStyle"
                   v-if="col.name === 'disposition_status2'">
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center justify-center">
                   <button class="btn btn-outlined-light btn-sm mr-3 toggle-mobile-details"
                           @click="toggleMobileDetails(row, $event)">
                     <i class="fa fa-chevron-down"
@@ -701,6 +701,12 @@ export default {
 
 <style lang="scss">
 .talk-table.communication-logs-table {
+  .toggle-mobile-details {
+    display: none;
+    width: 30px;
+    flex-shrink: 0;
+  }
+
   @media (max-width: 575px) {
     th, td {
       display: none;
@@ -715,8 +721,7 @@ export default {
     }
 
     .toggle-mobile-details {
-      width: 30px;
-      flex-shrink: 0;
+      display: block;
     }
 
     .mobile-details-row {
