@@ -60,12 +60,22 @@
                   class="text-center"
                   :style="col.columnStyle"
                   v-if="col.name === 'disposition_status2'">
-                <disposition :row="row"
-                           :is-live-call="isLiveCall(row)"
-                           @on-details="onCommunicationDetails"/>
+                <div class="d-flex align-items-center">
+                  <button class="btn btn-outlined-light btn-sm mr-3 toggle-mobile-details"
+                          @click="toggleMobileDetails(row, $event)">
+                    <i class="fa fa-chevron-down"
+                       v-if="communicationMobileDetailsOpened[row.id]"></i>
+                    <i class="fa fa-chevron-right"
+                       v-else></i>
+                  </button>
+                  <disposition :row="row"
+                             :is-live-call="isLiveCall(row)"
+                             @on-details="onCommunicationDetails"/>
+                </div>
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'incoming_number'">
                 <incoming-number :row="row"
@@ -74,48 +84,56 @@
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'body'">
                 <message-body :communication="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'ring_group'">
                 <ring-group :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'created_at'">
                 <start-time :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'talk_time'">
                 <talk-time :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'wait_time'">
                 <wait-time :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'hold_time'">
                 <hold-time :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'contact'">
                 <contact :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'user_id'">
                 <user :row="row"
@@ -123,24 +141,28 @@
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'broadcast'">
                 <broadcast :value="row.broadcast_id" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'workflow'">
                 <workflow :value="row.workflow_id" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'duration'">
                 <duration :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   class="overflow-visible"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'attempting_users'">
@@ -149,6 +171,7 @@
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'transfer_prior_user_ids'">
                 <transferred prop="transfer_prior_user_ids"
@@ -156,6 +179,7 @@
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'transfer_target_user_ids'">
                 <transferred prop="transfer_target_user_ids"
@@ -163,42 +187,49 @@
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'in_cold_transfer'">
                 <span data-testid="cold-transfer-row">{{ row.in_cold_transfer ? 'Yes' : 'No' }}</span>
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'transfer_type'">
                 <transfer-type :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'callback_status'">
                 <callback-status :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'queue_resolution2'">
                 <queue-resolution :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'creator_type'">
                 <creator-type :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'tags'">
                 <communications-tags :communication="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'notes'">
                 <wallboard-calls-note ellipse
@@ -206,6 +237,7 @@
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'csat_score'">
                 <csat-score :row="row" />
@@ -368,7 +400,8 @@ export default {
       showCommunicationSidebar: false,
       sidebarCommunication: {},
       communicationsData: [],
-      communicationsCountValue: 0
+      communicationsCountValue: 0,
+      communicationMobileDetailsOpened: {}
     }
   },
 
@@ -564,6 +597,77 @@ export default {
     onColumnsReordered (columns) {
       this.columns = columns
       this.saveColumns(columns)
+    },
+
+    toggleMobileDetails (row, event) {
+      const currentRow = event.target.closest('tr')
+      const tableBody = currentRow.parentElement
+      const rowIndex = Array.from(tableBody.children).indexOf(currentRow)
+      // Check if details row already exists
+      let detailsRow = tableBody.querySelector(`tr[data-details-for="${row.id}"]`)
+      if (detailsRow) {
+        // If exists, remove it
+        detailsRow.remove()
+        this.communicationMobileDetailsOpened[row.id] = false
+        return
+      }
+
+      // assign with spread operator to fix reactivity issues
+      this.communicationMobileDetailsOpened = {
+        ...this.communicationMobileDetailsOpened,
+        [row.id]: true
+      }
+
+      // Create new details row
+      detailsRow = document.createElement('tr')
+      detailsRow.setAttribute('data-details-for', row.id)
+      detailsRow.classList.add('mobile-details-row')
+      // Create single cell that spans all columns
+      const detailsCell = document.createElement('td')
+      detailsCell.colSpan = this.columns.length
+      // Create container for details
+      const detailsContainer = document.createElement('div')
+      detailsContainer.classList.add('mobile-detail-container')
+      // Clone and populate each column's content
+      this.columns.forEach(column => {
+        const detailItem = document.createElement('div')
+        detailItem.classList.add('mobile-detail-item')
+        // Add label
+        const label = document.createElement('div')
+        label.classList.add('mobile-detail-label')
+        label.textContent = column.label
+        detailItem.appendChild(label)
+        // Add value container
+        const valueContainer = document.createElement('div')
+        valueContainer.classList.add('mobile-detail-value')
+        // Find the original cell content
+        const originalCell = currentRow.querySelector(`td[data-column="${column.name}"]`)
+        if (originalCell) {
+          // Clone only the contents of the cell
+          const cellContents = Array.from(originalCell.childNodes)
+          cellContents.forEach(node => {
+            // Skip text nodes that are just whitespace
+            if (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) {
+              return
+            }
+            const clonedNode = node.cloneNode(true)
+            // Only try to querySelector if it's an element node
+            if (clonedNode.nodeType === Node.ELEMENT_NODE) {
+              const existingMobileDetails = clonedNode.querySelector('.mobile-details-row')
+              if (existingMobileDetails) {
+                existingMobileDetails.remove()
+              }
+            }
+            valueContainer.appendChild(clonedNode)
+          })
+          detailItem.appendChild(valueContainer)
+          detailsContainer.appendChild(detailItem)
+        }
+      })
+      detailsCell.appendChild(detailsContainer)
+      detailsRow.appendChild(detailsCell)
+      // Insert after the current row
+      tableBody.insertBefore(detailsRow, tableBody.children[rowIndex + 1])
     }
   },
 
@@ -594,3 +698,61 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.talk-table.communication-logs-table {
+  @media (max-width: 575px) {
+    th, td {
+      display: none;
+
+      &:nth-child(1), &:nth-child(2), &:last-child {
+        display: table-cell;
+      }
+
+      &:nth-child(1) {
+        min-width: 110px;
+      }
+    }
+
+    .toggle-mobile-details {
+      width: 30px;
+      flex-shrink: 0;
+    }
+
+    .mobile-details-row {
+      display: table-row;
+      td {
+        display: table-cell;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-top: 2px solid #dee2e6;
+        .mobile-detail-container {
+          padding: 5px 8px;
+          background: #fff;
+          box-shadow: inset 0 -2px 5px #ddd;
+          gap: 0.5rem;
+          font-size: 0.8rem;
+          .mobile-detail-item {
+            display: flex;
+            flex-direction: column;
+            padding: 6px 0;
+            margin-bottom: 6px;
+            // border-bottom: 1px solid #eee;
+            &:last-child {
+              border-bottom: none;
+            }
+            .mobile-detail-label {
+              font-weight: 600;
+              color: #6c757d;
+              margin-bottom: 4px;
+            }
+            .mobile-detail-value {
+              color: #212529;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+</style>
