@@ -116,42 +116,6 @@
         AloAi-crafted message suggestions based on past interactions with the contact
       </q-tooltip>
     </b-link>
-
-    <b-link v-if="isSimpSocialIntegrationEnabled"
-            href="#">
-      <q-menu content-class="inventory-menu mx-height-600 overflow-x-hidden"
-              ref="newCarMenu"
-              v-model="newCarMenu"
-              :offset="[0,5]"
-              @before-hide="onNewCarBeforeHide"
-              @hide="onNewCarFormClosed">
-        <div class="row no-wrap q-pa-md">
-          <new-car ref="newCarMessage"
-                   :key="newCarCounter"
-                   :contact-id="contact.id"
-                   :selected-campaign-id="campaignId"
-                   v-if="hasPermissionTo('update contact')"
-                   @success="hideNewCarMenu"
-                   @preventNewCarMenuClose="onPreventNewCarMenuClose"
-                   @newCarMenuClose="onNewCarMenuClose">
-          </new-car>
-        </div>
-      </q-menu>
-      <simpsocial-inventory-icon/>
-      <q-tooltip>
-        Inventory
-      </q-tooltip>
-    </b-link>
-
-    <b-link v-if="isSimpSocialIntegrationEnabled"
-            href="#"
-            :disabled="creditApplicationSending"
-            @click="sendCreditApplicationLink">
-      <simpsocial-credit-application-icon/>
-      <q-tooltip>
-        Credit Application
-      </q-tooltip>
-    </b-link>
   </div>
 </template>
 
@@ -162,16 +126,12 @@ import ContactCardIcon from 'components/icons/contact-card-icon.vue'
 import Attachments from 'components/message-composer/options/attachments'
 import AttachmentIcon from 'components/icons/attachment-icon'
 import MessageTemplates from 'components/message-composer/options/message-templates'
-import NewCar from 'components/new-car'
 import CalendarTodayIcon from 'components/icons/calendar-today-icon'
 import Variables from 'components/message-composer/options/variables'
 import ContactCard from 'components/message-composer/options/contact-card.vue'
 import VariableIcon from 'components/icons/variable-icon'
 import { mapGetters, mapState } from 'vuex'
-import { aclMixin, userMixin, simpsocialMixin } from 'src/plugins/mixins'
-import SimpsocialInventoryIcon from 'components/icons/simpsocial-inventory-icon'
-import SimpsocialCreditApplicationIcon from 'components/icons/simpsocial-credit-application-icon'
-import talk2Api from 'src/plugins/api/api'
+import { aclMixin, userMixin } from 'src/plugins/mixins'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import TextMessageSuggestions from 'components/message-composer/options/text-message-suggestions.vue'
 
@@ -197,8 +157,6 @@ export default {
   components: {
     TextMessageSuggestions,
     SparkleIcon,
-    SimpsocialCreditApplicationIcon,
-    SimpsocialInventoryIcon,
     VariableIcon,
     Variables,
     CalendarTodayIcon,
@@ -207,24 +165,17 @@ export default {
     Attachments,
     GifIcon,
     SearchGiphy,
-    NewCar,
     ContactCard,
     ContactCardIcon
   },
 
   mixins: [
     aclMixin,
-    userMixin,
-    simpsocialMixin
+    userMixin
   ],
 
   data () {
-    return {
-      creditApplicationSending: false,
-      newCarCounter: 0,
-      newCarMenu: false,
-      isCarMenuClosing: false
-    }
+    return { }
   },
 
   computed: {
@@ -283,47 +234,6 @@ export default {
     onVariableSelected (variable) {
       this.$emit('variableSelected', variable)
       this.$refs.variablesMenu.hide()
-    },
-
-    onNewCarFormClosed () {
-      this.newCarCounter += 1
-      this.isCarMenuClosing = false
-    },
-
-    hideNewCarMenu () {
-      this.$refs.newCarMenu.hide()
-    },
-
-    sendCreditApplicationLink () {
-      this.creditApplicationSending = true
-      talk2Api.V1.integrations.simpsocial.creditApplication.send(this.contact.id, this.campaignId)
-        .then(res => {
-          this.creditApplicationSending = false
-        }).catch(err => {
-          console.log(err)
-          this.$handleErrors(err.response)
-          this.creditApplicationSending = false
-        })
-    },
-
-    onNewCarBeforeHide () {
-      // prevent confirmation message infinite loop
-      if (!this.isCarMenuClosing) {
-        this.newCarMenu = true
-        this.$refs.newCarMessage.beforeCloseModal()
-      }
-    },
-
-    onNewCarMenuClose () {
-      setTimeout(() => {
-        this.newCarMenu = false
-        this.hideNewCarMenu()
-        this.isCarMenuClosing = true
-      }, 100)
-    },
-
-    onPreventNewCarMenuClose () {
-      this.newCarMenu = true
     },
 
     onContactCardUploaded (files) {
