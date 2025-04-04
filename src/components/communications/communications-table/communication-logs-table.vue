@@ -322,6 +322,8 @@ import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { merge } from 'lodash'
 import Datatable from 'src/components/datatable.vue'
+import CommunicationsMobileRowDetails from './communications-mobile-row-details.vue'
+import Vue from 'vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -446,25 +448,18 @@ export default {
     },
 
     async onScroll () {
-      console.log('>>> isLoadingCommunications', this.isLoadingCommunications)
-      console.log('>>> isLoadingMore', this.isLoadingMore)
-      console.log('>>> hasMoreCommunications', this.hasMoreCommunications)
-
       if (this.isLoadingCommunications || this.isLoadingMore) {
         return
       }
 
       if (this.hasMoreCommunications) {
-        await this.loadMoreCommunications()
+        this.loadMoreCommunications()
       }
     },
 
     async loadMoreCommunications () {
-      console.log('>>> this.pagination', this.pagination)
-      console.log('>>> this.paginationPage', this.paginationPage)
-
       if (this.hasMoreCommunications && !this.isLoadingMore && !this.isLoadingCommunications) {
-        await this.getCommunications(this.communicationFilters, undefined, true)
+        this.getCommunications(this.communicationFilters, undefined, true)
       }
     },
 
@@ -627,49 +622,44 @@ export default {
       // Create single cell that spans all columns
       const detailsCell = document.createElement('td')
       detailsCell.colSpan = this.columns.length
-      // Create container for details
-      const detailsContainer = document.createElement('div')
-      detailsContainer.classList.add('mobile-detail-container')
-      // Clone and populate each column's content
-      this.columns.forEach(column => {
-        const detailItem = document.createElement('div')
-        detailItem.classList.add('mobile-detail-item')
-        // Add label
-        const label = document.createElement('div')
-        label.classList.add('mobile-detail-label')
-        label.textContent = column.label
-        detailItem.appendChild(label)
-        // Add value container
-        const valueContainer = document.createElement('div')
-        valueContainer.classList.add('mobile-detail-value')
-        // Find the original cell content
-        const originalCell = currentRow.querySelector(`td[data-column="${column.name}"]`)
-        if (originalCell) {
-          // Clone only the contents of the cell
-          const cellContents = Array.from(originalCell.childNodes)
-          cellContents.forEach(node => {
-            // Skip text nodes that are just whitespace
-            if (node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) {
-              return
-            }
-            const clonedNode = node.cloneNode(true)
-            // Only try to querySelector if it's an element node
-            if (clonedNode.nodeType === Node.ELEMENT_NODE) {
-              const existingMobileDetails = clonedNode.querySelector('.mobile-details-row')
-              if (existingMobileDetails) {
-                existingMobileDetails.remove()
-              }
-            }
-            valueContainer.appendChild(clonedNode)
-          })
-          detailItem.appendChild(valueContainer)
-          detailsContainer.appendChild(detailItem)
-        }
+
+      // Create a div to mount the Vue component
+      const mountPoint = document.createElement('div')
+      detailsCell.appendChild(mountPoint)
+
+      // Show all columns that are applied (but dispo and operations)
+      const visibleColumns = this.columns.filter((c) => !['disposition', 'operations'].includes(c.name))
+
+      // Create and mount the Vue component
+      const ComponentClass = Vue.extend(CommunicationsMobileRowDetails)
+      const instance = new ComponentClass({
+        propsData: {
+          communication: row,
+          visibleColumns
+        },
+        parent: this
       })
-      detailsCell.appendChild(detailsContainer)
+
+      instance.$on('on-filter', this.onFilter)
+      instance.$on('on-details', this.onCommunicationDetails)
+
+      instance.$mount(mountPoint)
       detailsRow.appendChild(detailsCell)
+
       // Insert after the current row
       tableBody.insertBefore(detailsRow, tableBody.children[rowIndex + 1])
+    },
+
+    cleanupMobileDetailRows () {
+      if (this.isLoadingMore) {
+        return
+      }
+
+      if (Object.keys(this.communicationMobileDetailsOpened).length) {
+        this.communicationMobileDetailsOpened = {}
+      }
+
+      document.querySelectorAll('.mobile-details-row').forEach((e) => e.remove())
     }
   },
 
@@ -690,6 +680,11 @@ export default {
     },
     communicationsCount (newValue) {
       this.communicationsCountValue = newValue
+    },
+    isLoadingCommunications (newValue) {
+      if (newValue) {
+        this.cleanupMobileDetailRows()
+      }
     }
   },
 
@@ -734,7 +729,7 @@ export default {
         background-color: #f8f9fa;
         border-top: 2px solid #dee2e6;
         .mobile-detail-container {
-          padding: 5px 8px;
+          padding: 8px 25px;
           background: #fff;
           box-shadow: inset 0 -2px 5px #ddd;
           gap: 0.5rem;
