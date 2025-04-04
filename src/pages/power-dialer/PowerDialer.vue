@@ -60,7 +60,7 @@
                       title-text="Power Dialer"
                       kb-link="https://support.aloware.com/en/articles/9037581-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
                       class="mt-5"
-                      v-if="!shouldShowPowerDialer && shouldShowUpgradeNow && !isSimpSocial">
+                      v-if="!shouldShowPowerDialer && shouldShowUpgradeNow">
     </upgrade-now-page>
   </div>
 </template>
@@ -88,8 +88,7 @@ import {
   aclMixin,
   visibilityMixin,
   contactListCountMixin,
-  mainViewMixin,
-  simpsocialMixin
+  mainViewMixin
 } from 'src/plugins/mixins'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
@@ -121,8 +120,7 @@ export default {
     aclMixin,
     visibilityMixin,
     contactListCountMixin,
-    mainViewMixin,
-    simpsocialMixin
+    mainViewMixin
   ],
 
   data () {
