@@ -62,16 +62,14 @@ export default {
         {
           title: this.contactsLength,
           text: (this.contactsLength === 1 ? 'Contact' : 'Contacts'),
-          enabled: true,
           showWarning: false
         },
         {
           title: this.$options.filters.toCurrency(this.$options.filters.fixRounding(this.estimatedCost)),
           text: 'Estimated Cost',
-          enabled: true,
           showWarning: true
         }
-      ].filter(card => card.enabled)
+      ]
     },
 
     isValid () {
