@@ -10,12 +10,12 @@
          @scroll="onScroll">
       <div ref="inboxesInner">
         <einbox-nav-item :label="inbox.name"
-                        :value="inbox.id"
-                        :message-count="inbox.message_count"
-                        :is-active="activeInboxId === inbox.id"
-                        :key="inbox.id"
-                        v-for="inbox in typedInboxes"
-                        @click="$emit('inbox', inbox.id)" />
+                         :value="inbox.id"
+                         :message-count="inbox.message_count"
+                         :is-active="activeInboxId === inbox.id"
+                         :key="inbox.id"
+                         v-for="inbox in typedInboxes"
+                         @click="$emit('inbox', inbox.id)" />
       </div>
     </div>
 
