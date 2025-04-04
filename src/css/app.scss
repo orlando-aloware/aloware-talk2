@@ -16355,12 +16355,24 @@ hr {
   }
 }
 
-.talk-table.communication-logs-table {
-  td:last-child, th:last-child {
+.communications-page {
+  .talk-table-container {
     @media (max-width: 575px) {
-      position: sticky !important;
-      min-width: 65px !important;
-      padding: 0 !important;
+      padding-top: 8px;
+
+      .filters .search {
+        width: 70%;
+      }
+    }
+
+    .talk-table {
+      @media (max-width: 575px) {
+        td:last-child, th:last-child {
+          position: sticky !important;
+          min-width: 65px !important;
+          padding: 0 !important;
+        }
+      }
     }
   }
 }
