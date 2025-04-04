@@ -709,7 +709,7 @@ export default {
     flex-shrink: 0;
   }
 
-  @media (max-width: 575px) {
+  @media (max-width: 767px) {
     th, td {
       display: none;
 

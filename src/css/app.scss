@@ -16357,7 +16357,7 @@ hr {
 
 .communications-page {
   .talk-table-container {
-    @media (max-width: 575px) {
+    @media (max-width: 604px) {
       padding-top: 8px;
 
       .filters .search {
@@ -16366,7 +16366,7 @@ hr {
     }
 
     .talk-table {
-      @media (max-width: 575px) {
+      @media (max-width: 767px) {
         td:last-child, th:last-child {
           position: sticky !important;
           min-width: 65px !important;
