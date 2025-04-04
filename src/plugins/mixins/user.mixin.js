@@ -26,6 +26,10 @@ export default {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     },
 
+    isTeamInboxDemoCompany () {
+      return this.isCompanyPartOfTeamInboxDemoCompanies(this.currentCompany?.id)
+    },
+
     shouldSeeExperimentalAiFeatures () {
       return this.isDemoCompany || this.currentCompany?.plan?.ai_plan === true
     },
@@ -101,6 +105,10 @@ export default {
 
     isCompanyPartOfAlowareDemoCompanies (companyId) {
       return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
+    },
+
+    isCompanyPartOfTeamInboxDemoCompanies (companyId) {
+      return storage.local.getItem('aloware_team_inbox_demo_companies') && storage.local.getItem('aloware_team_inbox_demo_companies').split(',').includes(String(companyId))
     },
 
     // Temporary function to check if company is part of new inbox filters
