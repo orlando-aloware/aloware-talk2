@@ -200,6 +200,9 @@ pipeline {
                                         sh '''
                                         cp .env .env.prod
                                         '''
+
+                                        // Show the .env.prod file
+                                        echo "Env Prod File: ${env.ENV_PROD}"
                                     }
                                 }
                             }
