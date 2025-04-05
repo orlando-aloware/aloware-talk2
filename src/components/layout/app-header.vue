@@ -156,7 +156,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE, EINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-header',
@@ -218,7 +218,8 @@ export default {
       prevRoute: null,
       PHONE_USAGE_ERRORS,
       EINBOXES_MENU_ITEMS_TITLE,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE
+      EINBOXES_MENU_COMMUNICATIONS_TITLE,
+      EINBOXES_MENU_TITLE
     }
   },
 
@@ -353,6 +354,11 @@ export default {
       return this.$route.name === COMMUNICATIONS_CHANNELS_ROUTE_NAME
     },
 
+    isTeamInboxPage () {
+      const validRoutes = [EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE]
+      return validRoutes.includes(this.$route.name)
+    },
+
     settingsTabHeaderName () {
       if (!['Settings Tab'].includes(this.$route.name)) {
         return this.$route.name
@@ -388,7 +394,8 @@ export default {
       return this.isStatsPage ||
              this.isContactsPage ||
              this.isInPowerDialerListPage ||
-             this.isCommunicationsPage
+             this.isCommunicationsPage ||
+             this.isTeamInboxPage
     },
 
     isRefreshDisabled () {
@@ -402,6 +409,9 @@ export default {
         return this.loading
       }
       if (this.isCommunicationsPage) {
+        return this.loading
+      }
+      if (this.isTeamInboxPage) {
         return this.loading
       }
       return false
@@ -499,8 +509,10 @@ export default {
       } else if (this.isInPowerDialerListPage) {
         this.refreshPowerDialerListItems()
       } else if (this.isCommunicationsPage) {
-        this.resetCommunications()
+        this.resetCommunications(this.communicationFilters)
         this.getCommunications(this.communicationFilters)
+      } else if (this.isTeamInboxPage) {
+        this.resetTeamInbox()
       }
     },
 
@@ -541,6 +553,12 @@ export default {
 
     refreshPowerDialerListItems () {
       this.$VueEvent.fire('fetchPowerDialerListItems')
+    },
+
+    resetTeamInbox () {
+      this.$router.push({
+        name: 'Team Inboxes'
+      })
     }
   },
 
