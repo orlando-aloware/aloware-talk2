@@ -131,6 +131,9 @@ pipeline {
                                             --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                         """, returnStdout: true).trim()
 
+                                        // Show the shared env vars
+                                        echo "Shared Env Vars: ${sharedEnvVars}"
+
                                         def dev1EnvVars = sh(script: """
                                             aws ssm get-parameters-by-path \\
                                             --path "/dev1/talk2/app/" \\
@@ -140,6 +143,9 @@ pipeline {
                                             --query "Parameters[].{Name:Name,Value:Value}" \\
                                             --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                         """, returnStdout: true).trim()
+
+                                        // Show the dev1 env vars
+                                        echo "Dev1 Env Vars: ${dev1EnvVars}"
 
                                         def prEnvVars = ""
                                         if (env.GIT_BRANCH.toLowerCase().contains('pr-')) {
@@ -161,8 +167,13 @@ pipeline {
                                             }
                                         }
 
+                                        // Show the pr env vars
+                                        echo "Pr Env Vars: ${prEnvVars}"
+
                                         writeFile file: 'shared.env', text: sharedEnvVars + '\n'
                                         writeFile file: 'dev1.env', text: dev1EnvVars + '\n'
+
+                                        // Show the shared and dev1 env vars
 
                                         if (prEnvVars) {
                                             writeFile file: 'pr.env', text: prEnvVars + '\n'
@@ -177,6 +188,9 @@ pipeline {
                                             rm shared.env dev1.env
                                             '''
                                         }
+
+                                        // Show the .env file
+                                        echo "Env File: ${env.ENV}"
 
                                         if (env.API_URL_OVERWRITE) {
                                             sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
