@@ -131,9 +131,6 @@ pipeline {
                                             --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                         """, returnStdout: true).trim()
 
-                                        // Show the shared env vars
-                                        echo "Shared Env Vars: ${sharedEnvVars}"
-
                                         def dev1EnvVars = sh(script: """
                                             aws ssm get-parameters-by-path \\
                                             --path "/dev1/talk2/app/" \\
@@ -143,9 +140,6 @@ pipeline {
                                             --query "Parameters[].{Name:Name,Value:Value}" \\
                                             --output json | jq -r '.[] | "\\(.Name | sub(".*/"; ""))=\\"\\(.Value)\\""'
                                         """, returnStdout: true).trim()
-
-                                        // Show the dev1 env vars
-                                        echo "Dev1 Env Vars: ${dev1EnvVars}"
 
                                         def prEnvVars = ""
                                         if (env.GIT_BRANCH.toLowerCase().contains('pr-')) {
@@ -167,19 +161,8 @@ pipeline {
                                             }
                                         }
 
-                                        // Show the pr env vars
-                                        echo "Pr Env Vars: ${prEnvVars}"
-
                                         writeFile file: 'shared.env', text: sharedEnvVars + '\n'
                                         writeFile file: 'dev1.env', text: dev1EnvVars + '\n'
-
-                                        // Show the contents of the shared.env file
-                                        sh "cat shared.env"
-
-                                        // Show the contents of the dev1.env file
-                                        sh "cat dev1.env"
-
-                                        // Show the shared and dev1 env vars
 
                                         if (prEnvVars) {
                                             writeFile file: 'pr.env', text: prEnvVars + '\n'
@@ -189,7 +172,7 @@ pipeline {
                                             '''
                                         } else {
                                             sh '''
-                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env
+                                            cat dev1.env shared.env | awk -F= '!seen[$1]++' > .env
                                             rm shared.env dev1.env
                                             '''
                                         }
@@ -203,9 +186,6 @@ pipeline {
                                         sh '''
                                         cp .env .env.prod
                                         '''
-
-                                        // Show the contents of the .env.prod file
-                                        sh "cat .env.prod"
                                     }
                                 }
                             }
