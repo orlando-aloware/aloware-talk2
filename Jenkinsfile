@@ -177,7 +177,6 @@ pipeline {
                                             '''
                                         }
 
-                                        // Show the .env file
                                         if (env.API_URL_OVERWRITE) {
                                             sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
                                             sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env"
