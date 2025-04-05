@@ -298,7 +298,7 @@ pipeline {
                                         writeFile file: 'dev2.env', text: dev2EnvVars + '\n'
 
                                         sh '''
-                                        cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env
+                                        cat dev2.env shared.env | awk -F= '!seen[$1]++' > .env
                                         cp .env .env.prod
                                         rm shared.env dev2.env
                                         '''
