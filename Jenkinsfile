@@ -173,6 +173,12 @@ pipeline {
                                         writeFile file: 'shared.env', text: sharedEnvVars + '\n'
                                         writeFile file: 'dev1.env', text: dev1EnvVars + '\n'
 
+                                        // Show the contents of the shared.env file
+                                        sh "cat shared.env"
+
+                                        // Show the contents of the dev1.env file
+                                        sh "cat dev1.env"
+
                                         // Show the shared and dev1 env vars
 
                                         if (prEnvVars) {
@@ -190,8 +196,6 @@ pipeline {
                                         }
 
                                         // Show the .env file
-                                        echo "Env File: ${env.ENV}"
-
                                         if (env.API_URL_OVERWRITE) {
                                             sh "sed -i 's|API_URL=.*|API_URL=${env.API_URL_OVERWRITE}|' .env"
                                             sh "sed -i 's|API_REPORTING_URL=.*|API_REPORTING_URL=${env.API_URL_OVERWRITE}|' .env"
@@ -201,8 +205,8 @@ pipeline {
                                         cp .env .env.prod
                                         '''
 
-                                        // Show the .env.prod file
-                                        echo "Env Prod File: ${env.ENV_PROD}"
+                                        // Show the contents of the .env.prod file
+                                        sh "cat .env.prod"
                                     }
                                 }
                             }
