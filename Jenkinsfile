@@ -184,9 +184,8 @@ pipeline {
                                         if (prEnvVars) {
                                             writeFile file: 'pr.env', text: prEnvVars + '\n'
                                             sh '''
-                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.temp
-                                            cat .env.temp pr.env | awk -F= '!seen[$1]++' > .env
-                                            rm .env.temp shared.env dev1.env pr.env
+                                            cat pr.env dev1.env shared.env | awk -F= '{if (!seen[$1]++) print}' > .env
+                                            rm shared.env dev1.env pr.env
                                             '''
                                         } else {
                                             sh '''
@@ -513,7 +512,7 @@ pipeline {
                                 sh """
                                 curl -s -X POST \\
                                     -H "Authorization: Bearer ${token}" \\
-                                        -H "Accept: application/vnd.github.v3+json" \\
+                                        -H "Accept: application/vnd.github+json" \\
                                         -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \\
                                         "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
                                 """
