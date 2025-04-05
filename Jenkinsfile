@@ -492,7 +492,7 @@ pipeline {
                                 sh """
                                 curl -s -X POST \\
                                     -H "Authorization: Bearer ${token}" \\
-                                        -H "Accept: application/vnd.github+json" \\
+                                        -H "Accept: application/vnd.github.v3+json" \\
                                         -d '{"body": "Hi, your environment is ready to use at: https://${TALK_URL}"}' \\
                                         "https://api.github.com/repos/${GITHUB_ORG}/${TALK2_REPO}/issues/${prId}/comments" > /dev/null
                                 """
