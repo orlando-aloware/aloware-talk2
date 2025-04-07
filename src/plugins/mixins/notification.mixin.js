@@ -97,11 +97,11 @@ export default {
       if (this.isOnPowerDialerSessionRoute) {
         console.log('Close call notification...', this.powerDialerTasks.in_queue, communicationId)
         const index = this.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.communication_id === communicationId)
-        if (index !== -1 && !this.activeTask.forcedRedial) {
-          console.log('Removed from power dialer: ', index, this.powerDialerTasks)
+        if (index !== -1) {
           this.powerDialerTasks.in_queue.splice(index, 1)
         }
         console.log('Close', this.powerDialerTasks.in_queue, this.activeTask.forcedRedial)
+        console.log('Removed from power dialer: ', this.powerDialerTasks)
       }
 
       // for incoming call
