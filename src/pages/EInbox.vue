@@ -63,7 +63,7 @@ export default {
 
   mounted () {
     // block direct access from non demo companies
-    if (!this.isDemoCompany) {
+    if (!this.isDemoCompany && !this.isTeamInboxDemoCompany) {
       this.$router.push({ name: 'Inbox' })
     }
   },
