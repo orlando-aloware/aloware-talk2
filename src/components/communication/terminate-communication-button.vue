@@ -3,6 +3,7 @@
         :class="classes"
         :disabled="loading"
         :id="`action-terminate-${_uid}`"
+        v-if="show"
         @click="dialog">
     <power-icon :height="iconHeight"
                 :width="iconWidth"/>

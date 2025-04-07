@@ -2,6 +2,7 @@
   <span :class="[{ 'opacity-05 cursor-blocked': loading }, {'cursor-pointer': !loading }]"
         data-testid="comm-archive-button"
         :id="`action-delete-${_uid}`"
+        v-if="hasPermissionTo('archive communication')"
         @click="dialog">
     <trash-icon height="16"
                 width="16"

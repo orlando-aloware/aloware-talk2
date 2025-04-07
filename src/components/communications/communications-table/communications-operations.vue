@@ -16,12 +16,18 @@
                                     v-if="showArchiveButton"/>
       <terminate-communication-button class="operation-button mx-1"
                                       :communication="row"
+                                      :iconHeight="16"
+                                      :iconWidth="16"
                                       v-if="showTerminateButton"/>
       <barge-communication-button class="operation-button mx-1"
                                   :communication="row"
+                                  :iconHeight="16"
+                                  :iconWidth="16"
                                   v-if="showBargeAndWhisperButton"/>
       <whisper-communication-button class="operation-button mx-1"
                                     :communication="row"
+                                    :iconHeight="16"
+                                    :iconWidth="16"
                                     v-if="showBargeAndWhisperButton"/>
     </div>
 
@@ -61,14 +67,20 @@
         </b-dropdown-item>
         <b-dropdown-item v-if="showTerminateButton">
           <terminate-communication-button show-button-text
+                                          :iconHeight="16"
+                                          :iconWidth="16"
                                           :communication="row"/>
         </b-dropdown-item>
         <b-dropdown-item v-if="showBargeAndWhisperButton">
           <barge-communication-button show-button-text
+                                      :iconHeight="16"
+                                      :iconWidth="16"
                                       :communication="row"/>
         </b-dropdown-item>
         <b-dropdown-item v-if="showBargeAndWhisperButton">
           <whisper-communication-button show-button-text
+                                        :iconHeight="16"
+                                        :iconWidth="16"
                                         :communication="row"/>
         </b-dropdown-item>
       </b-dropdown>
