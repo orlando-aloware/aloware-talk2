@@ -501,6 +501,7 @@ export default {
       if (index > -1) {
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
+        this.cleanupMobileDetailRows()
       }
     },
 
@@ -581,6 +582,7 @@ export default {
         // remove it if found
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
+        this.cleanupMobileDetailRows()
       }
     },
 
@@ -627,10 +629,10 @@ export default {
       const mountPoint = document.createElement('div')
       detailsCell.appendChild(mountPoint)
 
-      // Show all columns that are applied (but dispo and operations)
-      const visibleColumns = this.columns.filter((c) => !['disposition', 'operations'].includes(c.name))
+      // Show all columns that are applied (except disposition_status2 and operations)
+      const visibleColumns = this.columns.filter((c) => !['disposition_status2', 'operations'].includes(c.name))
 
-      // Create and mount the Vue component
+      // Create and mount the Mobile details component
       const ComponentClass = Vue.extend(CommunicationsMobileRowDetails)
       const instance = new ComponentClass({
         propsData: {
@@ -695,66 +697,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.talk-table.communication-logs-table {
-  .toggle-mobile-details {
-    display: none;
-    width: 30px;
-    flex-shrink: 0;
-  }
-
-  @media (max-width: 767px) {
-    th, td {
-      display: none;
-
-      &:nth-child(1), &:nth-child(2), &:last-child {
-        display: table-cell;
-      }
-
-      &:nth-child(1) {
-        min-width: 110px;
-      }
-    }
-
-    .toggle-mobile-details {
-      display: block;
-    }
-
-    .mobile-details-row {
-      display: table-row;
-      td {
-        display: table-cell;
-        padding: 1rem;
-        background-color: #f8f9fa;
-        border-top: 2px solid #dee2e6;
-        .mobile-detail-container {
-          padding: 8px 25px;
-          background: #fff;
-          box-shadow: inset 0 -2px 5px #ddd;
-          gap: 0.5rem;
-          font-size: 0.8rem;
-          .mobile-detail-item {
-            display: flex;
-            flex-direction: column;
-            padding: 6px 0;
-            margin-bottom: 6px;
-            // border-bottom: 1px solid #eee;
-            &:last-child {
-              border-bottom: none;
-            }
-            .mobile-detail-label {
-              font-weight: 600;
-              color: #6c757d;
-              margin-bottom: 4px;
-            }
-            .mobile-detail-value {
-              color: #212529;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-</style>
