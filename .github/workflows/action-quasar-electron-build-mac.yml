@@ -1,9 +1,6 @@
 name: Deploy macOS
 
 on:
-  push:
-    tags:
-      - '*'
   workflow_dispatch:
     inputs:
       environment:
