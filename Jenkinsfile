@@ -167,13 +167,12 @@ pipeline {
                                         if (prEnvVars) {
                                             writeFile file: 'pr.env', text: prEnvVars + '\n'
                                             sh '''
-                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.temp
-                                            cat .env.temp pr.env | awk -F= '!seen[$1]++' > .env
-                                            rm .env.temp shared.env dev1.env pr.env
+                                            cat pr.env dev1.env shared.env | awk -F= '{if (!seen[$1]++) print}' > .env
+                                            rm shared.env dev1.env pr.env
                                             '''
                                         } else {
                                             sh '''
-                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env
+                                            cat dev1.env shared.env | awk -F= '!seen[$1]++' > .env
                                             rm shared.env dev1.env
                                             '''
                                         }
@@ -299,7 +298,7 @@ pipeline {
                                         writeFile file: 'dev2.env', text: dev2EnvVars + '\n'
 
                                         sh '''
-                                        cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env
+                                        cat dev2.env shared.env | awk -F= '!seen[$1]++' > .env
                                         cp .env .env.prod
                                         rm shared.env dev2.env
                                         '''
