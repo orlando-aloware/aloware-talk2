@@ -94,10 +94,12 @@ export default {
       }
       // removed from queue
       if (this.isOnPowerDialerSessionRoute) {
+        console.log('Close call notification...', this.powerDialerTasks.in_queue)
         const index = this.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.communication_id === communicationId)
         if (index !== -1) {
           this.powerDialerTasks.in_queue.splice(index, 1)
         }
+        console.log('Close', this.powerDialerTasks.in_queue)
       }
 
       // for incoming call
