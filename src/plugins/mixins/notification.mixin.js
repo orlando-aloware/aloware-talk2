@@ -26,7 +26,8 @@ export default {
     ...mapState('cache', ['currentCompany']),
     ...mapState(['isWidget', 'isSalesforceWidget']),
     ...mapState('powerDialer', [
-      'powerDialerTasks'
+      'powerDialerTasks',
+      'activeTask'
     ])
   },
 
@@ -96,10 +97,10 @@ export default {
       if (this.isOnPowerDialerSessionRoute) {
         console.log('Close call notification...', this.powerDialerTasks.in_queue)
         const index = this.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.communication_id === communicationId)
-        if (index !== -1) {
+        if (index !== -1 && !this.activeTask.forcedRedial) {
           this.powerDialerTasks.in_queue.splice(index, 1)
         }
-        console.log('Close', this.powerDialerTasks.in_queue)
+        console.log('Close', this.powerDialerTasks.in_queue, this.activeTask.forcedRedial)
       }
 
       // for incoming call
