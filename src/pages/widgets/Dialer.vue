@@ -569,10 +569,9 @@ export default {
 
     'dialer.currentStatus' () {
       console.log('dialer current status', this.dialer)
-      if (!this.dialer.communication && !this.dialer.parkedCall) {
+      if (!this.dialer.communication && !this.dialer.parkedCall && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
         console.log('call completed')
         this.handleCallCompletedEvent()
-        this.extensionsVisibility = false
       }
 
       if (this.isLoadingDialer) {
