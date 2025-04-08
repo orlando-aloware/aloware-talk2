@@ -51,31 +51,6 @@ export default {
         return []
       }
 
-      // @custom for Bluepen Funding and for Teli lines
-      if (this.currentCompany.id === 444) {
-        return [{
-          id: 1,
-          name: '240 per hour',
-          value: 4
-        }, {
-          id: 2,
-          name: '480 per hour',
-          value: 8
-        }, {
-          id: 3,
-          name: '960 per hour',
-          value: 16
-        }, {
-          id: 4,
-          name: '1980 per hour',
-          value: 33
-        }, {
-          id: 5,
-          name: '10000 per hour',
-          value: 167
-        }]
-      }
-
       const maxMps = this.campaign?.max_mps || 0
       const mpsList = [0.05, 0.1, 0.25, 0.5, 1, 2, 3, 4, 6, 8, 10]
 
