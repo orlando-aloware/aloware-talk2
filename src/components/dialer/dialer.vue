@@ -891,7 +891,7 @@ export default {
         }
 
         const ringGroup = this.ringGroups.find(item => item.id === this.dialer.communication?.ring_group_id)
-
+        console.log('ring group', ringGroup, this.dialer.communication)
         // First refresh communication if there's an active call
         if (this.dialer.call && ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) {
           this.forceRefreshCommunication()
