@@ -116,12 +116,6 @@ export default {
 
     initAuth () {
       console.log('************** INIT AUTH ********************')
-      const campaignsPromise = this.getCampaigns()
-      if (campaignsPromise) {
-        campaignsPromise.then(() => {
-          this.campaignsAreLoaded = true
-        })
-      }
       this.getRingGroups()
       this.broadcastInit()
       this.getUsers()
@@ -129,6 +123,12 @@ export default {
       this.getCallDispositions()
       this.getActivityTypes()
       this.getTemplates()
+      const campaignsPromise = this.getCampaigns()
+      if (campaignsPromise) {
+        campaignsPromise.then(() => {
+          this.campaignsAreLoaded = true
+        })
+      }
     },
 
     startMainEvents () {
