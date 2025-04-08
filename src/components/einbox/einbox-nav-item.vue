@@ -1,6 +1,7 @@
 <template>
   <div data-testid="einbox-nav-item"
        :class="['einbox-nav-item', { 'einbox-nav-item--active': isActive }]"
+       :id="`einbox-nav-item-${_uid}`"
        @click="$emit('click', value)">
     <div class="einbox-nav-item__content d-flex align-items-center">
       <span class="d-flex align-items-center mr-1">
@@ -8,6 +9,13 @@
                     height="18" />
       </span>
       <span class="einbox-nav-item__label">{{ label }}</span>
+
+      <b-tooltip custom-class="talk-table__tooltip"
+                 placement="top"
+                 :boundary="`einbox-nav-item-${_uid}`"
+                 :target="`einbox-nav-item-${_uid}`">
+        {{ label }}
+      </b-tooltip>
     </div>
   </div>
 </template>
