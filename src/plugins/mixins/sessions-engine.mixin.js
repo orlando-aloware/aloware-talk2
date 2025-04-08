@@ -59,9 +59,10 @@ export default {
       if (isEmpty(task)) {
         return
       }
-
+      console.log('before on status in progress', this.powerDialerTasks.in_queue);
       // Re-assign new items for IN QUEUE and exclude the current task
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
+      console.log('after on status in progress', this.powerDialerTasks.in_queue);
     },
     onStatusCompleted (task) {
       if (isEmpty(task)) {

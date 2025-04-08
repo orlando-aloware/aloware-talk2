@@ -1675,6 +1675,7 @@ export default {
 
     'powerDialerTasks.in_queue': {
       handler (tasks) {
+        console.log('WATCH POWER DIALER TASK IN QUEUE', tasks)
         // end the session if:
         // there's no tasks in queue
         // and there's no active task
@@ -1694,6 +1695,7 @@ export default {
             this.start()
           }
         }
+        console.log('Finished handle watch', this.powerDialerTasks.in_queue)
       },
       deep: true
     },
