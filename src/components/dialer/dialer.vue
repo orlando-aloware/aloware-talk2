@@ -438,8 +438,16 @@ export default {
     },
 
     callParkedFromAnotherTab () {
+      if (!this.dialer.communication) {
+        return false
+      }
+
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
-      return found || (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && this.dialer.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW)
+
+      const isHoldAndInProgress = this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW &&
+        this.dialer.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW
+
+      return found || isHoldAndInProgress
     },
 
     forceStartOnWrapUp () {
