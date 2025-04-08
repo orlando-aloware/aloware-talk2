@@ -1,9 +1,9 @@
 <template>
   <span class="cursor-pointer"
         data-testid="comm-whisper-button-whisper-span"
+        v-if="userCanBargeAndWhisper(communication)"
         :id="`action-whisper-${_uid}`"
-        @click="dialog"
-        v-if="userCanBargeAndWhisper(communication) || true">
+        @click="dialog">
     <ear-icon :height="iconHeight"
               :width="iconWidth"/>
 
