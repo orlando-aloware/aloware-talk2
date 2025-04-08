@@ -174,10 +174,6 @@ export default {
     userMixin
   ],
 
-  data () {
-    return { }
-  },
-
   computed: {
     ...mapState('cache', ['currentCompany']),
 
