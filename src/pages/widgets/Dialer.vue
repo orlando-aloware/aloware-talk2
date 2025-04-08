@@ -237,6 +237,7 @@ export default {
       await this.findDefaultOutboundCampaign()
 
       if (this.isAlwaysAskModeEnabled()) {
+        console.log('postDialNumber')
         this.handleDialNumber()
       }
     },
@@ -327,6 +328,7 @@ export default {
         this.handleCall()
       } else if (!this.dialer?.isReady) {
         this.timeout = setTimeout(() => {
+          console.log('handleDialNumber')
           this.handleDialNumber()
         }, 1000)
       }
@@ -408,6 +410,7 @@ export default {
     },
 
     handleAgentStatusUpdate (data) {
+      console.log('handleAgentStatusUpdate', data)
       if (
         this.currentCompany?.id === data.company_id &&
         this.profile?.id === data.user_id &&
@@ -426,6 +429,7 @@ export default {
         }
 
         if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          console.log('handleAgentStatusUpdate')
           this.handleDialNumber()
         }
       }
@@ -490,6 +494,7 @@ export default {
 
     setCampaignIdAndDialNumber () {
       this.campaignId = this.defaultOutboundCampaignId
+      console.log('setCampaignIdAndDialNumber')
       this.handleDialNumber()
     },
 
@@ -568,6 +573,11 @@ export default {
     },
 
     'dialer.currentStatus' () {
+      console.log('changes dialer current status', this.dialer)
+      if (!this.dialer.communication && !this.dialer.parkedCall) {
+        this.extensionsVisibility = false
+      }
+
       if (this.isLoadingDialer) {
         return
       }
