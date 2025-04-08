@@ -269,6 +269,7 @@ export default {
     }
 
     this.powerDialerListeners.contactRemoved = (contactId) => {
+      console.log('contact removed BEFORE', this.powerDialerTasks.in_queue)
       let index = this.contactsData.data.findIndex(contact => contact.id === contactId)
 
       // try to remove the contact from the table
@@ -296,6 +297,8 @@ export default {
       if (index >= 0) {
         this.powerDialerTasks[TaskType.IN_QUEUE].splice(index, 1)
       }
+
+      console.log('contact removed AFTER', this.powerDialerTasks.in_queue)
     }
 
     this.$VueEvent.listen('metric_sessions_update', this.powerDialerListeners.metricSessionsUpdate)

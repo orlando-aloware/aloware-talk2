@@ -27,11 +27,13 @@ export default {
     ]),
     ...mapActions(['setShowPhone']),
     async fetchInQueueTasks (task) {
+      console.log('fetch in queue tasks BEFORE', this.powerDialerTasks.in_queue)
       let res = await this.getSessionTaskByFilter({
         id: task.contact_list_id,
         task_status: 1
       })
       this.powerDialerTasks['in_queue'] = res.data.data
+      console.log('fetch in queue tasks AFTER', this.powerDialerTasks.in_queue)
     },
     updateTaskStatus (task) {
       // console.log(` %c TASK UPDATED : ${task.task_status} `, 'background:red;color:white;', task)
