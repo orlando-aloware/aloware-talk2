@@ -14,14 +14,17 @@
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-barge-${_uid}`"
                v-else>
-      Barge
+      {{ isAiAgent(communication.user) ? 'Take over' : 'Barge' }}
     </b-tooltip>
+    <q-tooltip v-else>
+      {{ isAiAgent(communication.user) ? 'Take over' : 'Barge' }}
+    </q-tooltip>
   </span>
 </template>
 
 <script>
 import VolumeHighIcon from 'src/components/icons/volume-high-icon.vue'
-import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin, userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'barge-communication-button',
@@ -29,7 +32,8 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin
+    communicationMixin,
+    userMixin
   ],
 
   components: {
@@ -66,7 +70,11 @@ export default {
 
   methods: {
     dialog () {
-      this.$bvModal.msgBoxConfirm('Do you want to barge into this call? You\'ll be muted by default. If you unmute yourself, both parties will hear you.', {
+      const message = this.isAiAgent(this.communication.user)
+        ? 'Do you want to take over this AI agent call? You\'ll be muted by default. If you unmute yourself, AI agent will be dropped from the call completely.'
+        : 'Do you want to barge into this call? You\'ll be muted by default. If you unmute yourself, both parties will hear you.'
+
+      this.$bvModal.msgBoxConfirm(message, {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',

@@ -787,9 +787,27 @@ export default {
 
       // Make sure that phone number is string in this part before proceeding
       currentNumber = currentNumber.toString()
-      // force mute
-      if (currentNumber.includes('barge') || currentNumber.includes('whisper')) {
+      const isWhisperCall = currentNumber.includes('whisper')
+      const isBargeCall = currentNumber.includes('barge')
+
+      // Force mute for whisper/barge calls
+      if (isBargeCall || isWhisperCall) {
         this.forceMute()
+        // If it's a whisper call to an AI agent, disable unmute functionality
+        if (isWhisperCall) {
+          const commId = currentNumber.split(':')[1]
+          if (commId) {
+            this.$axios.get(`/api/v1/communication/${commId}`)
+              .then(res => {
+                if (res.data && this.isAiAgent(res.data.user)) {
+                  this.setDialerAiAgentWhisper(true)
+                }
+              })
+              .catch(err => {
+                console.error('Error fetching communication details:', err)
+              })
+          }
+        }
       }
     },
 
@@ -1012,6 +1030,13 @@ export default {
 
     toggleMute () {
       if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+        return
+      }
+
+      // If this is a whisper call to an AI agent, prevent unmuting
+      if (this.dialer.aiAgentWhisper && this.dialer.isMuted) {
+        console.log('Cannot unmute when listening to an AI agent call')
+        this.$generalNotification('Cannot unmute when listening to an AI agent call', 'info')
         return
       }
 
@@ -1470,6 +1495,7 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(false)
+      this.setDialerAiAgentWhisper(false)
     },
 
     countCallDuration () {
@@ -1865,7 +1891,8 @@ export default {
       'setDialerError',
       'setDialerErrorDefault',
       'removeParkedCall',
-      'setIsCallBackButtonDisabled'
+      'setIsCallBackButtonDisabled',
+      'setDialerAiAgentWhisper'
     ])
   },
 
