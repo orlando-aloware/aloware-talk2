@@ -85,19 +85,12 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     showSelectCampaignDialog () {
-      console.log('show select campaign dialog?', this.dialer.currentStatus)
       const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
       if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
         return false
       }
 
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL', 'ANSWERING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL']
-      console.log(this.startDialing,
-        (this.isAlwaysAskModeEnabled ? true : !this.campaignId),
-        !isCallInProgress.includes(this.dialer?.currentStatus),
-        this.campaignsAreLoaded,
-        !this.dialer.parkedCall)
-      console.log('****************+')
       return this.startDialing &&
         (this.isAlwaysAskModeEnabled ? true : !this.campaignId) &&
         !isCallInProgress.includes(this.dialer?.currentStatus) &&
