@@ -88,7 +88,6 @@ export default {
       console.log('show select campaign dialog?', this.dialer.currentStatus)
       const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
       if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
-        console.log('noup')
         return false
       }
 
@@ -115,8 +114,6 @@ export default {
     ...mapActions('auth', ['setAgentStatus']),
 
     initAuth () {
-      console.log('************** INIT AUTH ********************')
-      this.getRingGroups()
       this.broadcastInit()
       this.getUsers()
       this.getDispositionStatuses()
@@ -129,6 +126,7 @@ export default {
           this.campaignsAreLoaded = true
         })
       }
+      this.getRingGroups()
     },
 
     startMainEvents () {
