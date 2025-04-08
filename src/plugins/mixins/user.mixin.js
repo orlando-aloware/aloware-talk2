@@ -27,7 +27,7 @@ export default {
     },
 
     hasCompanyTeamInboxEnabled () {
-      return this.currentCompany?.team_inbox_enabled
+      return this.currentCompany?.team_inbox_enabled === true
     },
 
     shouldSeeExperimentalAiFeatures () {
