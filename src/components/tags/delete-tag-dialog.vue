@@ -26,6 +26,7 @@
                      unchecked-value="no"
                      class="mt-4"
                      data-testid="tags-delete-dialog-confirm-checkbox"
+                     v-if="!isBulk"
                      v-show="!isBulk && showDeleteContactsQuestion"
                      v-model="isDeleteContacts">
       Do you also want to delete the tagged contacts of this tag?
