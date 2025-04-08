@@ -471,6 +471,7 @@ export default {
         })
         .then((response) => response.data)
         .then((data) => {
+          console.log('UPDATE MY QUEUE LIST DATA____________________________')
           this.updateMyQueueListData(data)
         })
     },
