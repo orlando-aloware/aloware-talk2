@@ -27,7 +27,7 @@ export default {
     },
 
     isTeamInboxDemoCompany () {
-      return this.isCompanyPartOfTeamInboxDemoCompanies(this.currentCompany?.id)
+      return this.currentCompany?.team_inbox_enabled
     },
 
     shouldSeeExperimentalAiFeatures () {
@@ -105,10 +105,6 @@ export default {
 
     isCompanyPartOfAlowareDemoCompanies (companyId) {
       return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
-    },
-
-    isCompanyPartOfTeamInboxDemoCompanies (companyId) {
-      return storage.local.getItem('aloware_team_inbox_demo_companies') && storage.local.getItem('aloware_team_inbox_demo_companies').split(',').includes(String(companyId))
     },
 
     // Temporary function to check if company is part of new inbox filters
