@@ -20,6 +20,10 @@ export default {
 
     isBargingOrWhispering () {
       return AgentStatus.AGENT_STATUS_SENTRY === this.agentStatus
+    },
+
+    isAgentOnCall () {
+      return AgentStatus.AGENT_STATUS_ON_CALL === this.agentStatus
     }
   },
 
