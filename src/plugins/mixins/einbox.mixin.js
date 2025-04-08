@@ -8,6 +8,7 @@ export default {
       'isLoadingInboxes',
       'inboxes',
       'currentInboxesPage',
+      'hasMoreInboxes',
       'items',
       'viewMode',
       'isLoadingItems',
@@ -44,7 +45,7 @@ export default {
 
         this.setIsLoadingInboxes(true)
         const nextPage = 1
-        const perPage = 100
+        const perPage = 50
 
         const response = await talk2Api.V2.inbox.inboxes.get({
           params: {
@@ -66,27 +67,19 @@ export default {
       }
     },
 
-    async loadMoreInboxes (type, search = '') {
+    async loadMoreInboxes () {
       try {
-        if (this.isLoadingInboxes) {
+        if (this.isLoadingInboxes || !this.hasMoreInboxes) {
           return
         }
 
         this.setIsLoadingInboxes(true)
-        this.setAbortController(new AbortController())
 
-        const perPage = 100
-        const response = await talk2Api.V2.inbox.inboxes.get({
-          params: {
-            page: this.currentInboxesPage[type],
-            per_page: perPage,
-            type,
-            ...(search ? { search } : {})
-          },
-          signal: this.abortController.signal
-        })
+        const perPage = 50
+        const nextPage = this.currentInboxesPage + 1
+        const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage, perPage })
 
-        this.appendInboxes({ data: response.data, type })
+        this.appendInboxes(response.data)
       } catch (error) {
         console.error('Error loading more inboxes:', error)
       } finally {
