@@ -568,6 +568,7 @@ export default {
     },
 
     'dialer.currentStatus' () {
+      console.log('dialer current status', this.dialer)
       if (!this.dialer.communication && !this.dialer.parkedCall) {
         this.extensionsVisibility = false
       }
