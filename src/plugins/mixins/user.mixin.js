@@ -26,7 +26,7 @@ export default {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     },
 
-    isTeamInboxDemoCompany () {
+    hasCompanyTeamInboxEnabled () {
       return this.currentCompany?.team_inbox_enabled
     },
 
