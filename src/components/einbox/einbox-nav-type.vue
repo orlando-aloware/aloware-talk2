@@ -130,7 +130,7 @@ export default {
   display: flex;
   flex-direction: column;
   transition: all 0.5s ease;
-  max-height: 50%;
+  max-height: 100%;
 
   &__label {
     font-weight: 600;

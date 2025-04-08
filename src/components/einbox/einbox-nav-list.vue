@@ -68,7 +68,7 @@ import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { EINBOXES_MENU_TITLE } from 'src/router/routes'
-import { INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
+import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
 import { mapState, mapActions } from 'vuex'
 import { debounce } from 'lodash'
 
@@ -104,6 +104,10 @@ export default {
 
     ...mapState(['isMobile']),
 
+    personalInboxes () {
+      return this.inboxes.filter(inbox => inbox.is_personal)
+    },
+
     connectedInboxes () {
       return this.inboxes.filter(inbox => inbox.is_connected)
     },
@@ -114,6 +118,11 @@ export default {
 
     typedInboxes () {
       return [
+        {
+          id: INBOX_TYPE_PERSONAL,
+          name: 'Personal Inboxes',
+          inboxes: this.personalInboxes
+        },
         {
           id: INBOX_TYPE_CONNECTED,
           name: 'Connected Inboxes',
