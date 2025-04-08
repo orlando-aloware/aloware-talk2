@@ -1,13 +1,8 @@
 export default {
-  setInboxes: ({ commit, state }, data) => {
+  setInboxes: ({ commit }, data) => {
     commit('SET_INBOXES', data.data)
-
-    // set all types to false at once
-    if (data.next_page_url === null) {
-      Object.keys(state.hasMoreInboxes).forEach(type => {
-        commit('SET_HAS_MORE_INBOXES', { type, hasMore: false })
-      })
-    }
+    commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
+    commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
   },
   resetInboxes: ({ commit }) => {
     commit('RESET_INBOXES')
@@ -21,13 +16,13 @@ export default {
   setIsLoadingInboxes: ({ commit }, loading) => {
     commit('SET_IS_LOADING_INBOXES', loading)
   },
-  appendInboxes: ({ commit, state }, { data, type }) => {
-    // append only new inboxes
-    commit('APPEND_INBOXES', data.data.filter(inbox => !state.inboxes.find(i => i.id === inbox.id)))
-    // sort inboxes by name
-    commit('SET_INBOXES', [...state.inboxes.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1)])
-    commit('SET_HAS_MORE_INBOXES', { hasMore: data.next_page_url !== null, type })
-    commit('SET_CURRENT_INBOXES_PAGE', { page: data.current_page, type })
+  setHasMoreInboxes: ({ commit }, hasMore) => {
+    commit('SET_HAS_MORE_INBOXES', hasMore)
+  },
+  appendInboxes: ({ commit }, data) => {
+    commit('APPEND_INBOXES', data.data)
+    commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
+    commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
   },
   setViewMode: ({ commit }, viewMode) => {
     commit('SET_VIEW_MODE', viewMode)
