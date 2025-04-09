@@ -426,8 +426,7 @@ export default {
           return
         }
 
-        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-          console.log('handleAgentStatus', agentStatus, this.dialer.call, this.dialer.parkedCall)
+        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.dialer.parkedCall) {
           this.handleDialNumber()
         }
       }
