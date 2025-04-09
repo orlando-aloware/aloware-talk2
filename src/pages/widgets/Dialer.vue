@@ -225,7 +225,6 @@ export default {
     ]),
 
     async postDialNumber () {
-      console.log('postDialNumber')
       this.showAlertCallFinished = false
 
       do {
@@ -425,8 +424,8 @@ export default {
         if (this.showAlertCallFinished) {
           return
         }
-        console.log('cancel call', this.isDialed, this.dialer.call, this.dialer.parkedCall, this.dialer.communication, agentStatus)
-        if (this.isDialed && !this.dialer.call && this.dialer.parkedCall && !this.dialer.communication && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+
+        if (this.isDialed && !this.dialer.call && !this.dialer.communication && this.dialer.parkedCall && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
           this.isDialed = false
           this.onCancelCall()
         }

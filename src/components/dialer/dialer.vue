@@ -882,7 +882,6 @@ export default {
 
         // Common disconnect handling steps
         const handleDisconnect = () => {
-          console.log('HANDLE DISCONNECT ------------------')
           this.removeUnownedLiveContactTask()
           this.stopCallTimer()
           this.connection = null
