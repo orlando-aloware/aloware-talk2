@@ -890,10 +890,8 @@ export default {
           this.handlePostDisconnect()
         }
 
-        const ringGroup = this.ringGroups.find(item => item.id === this.dialer.communication?.ring_group_id)
-        console.log('ring group', ringGroup, this.dialer.communication, this.ringGroups)
         // First refresh communication if there's an active call
-        if (this.dialer.call) { // && ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) {
+        if (this.dialer.call) {
           this.forceRefreshCommunication()
             .then(handleDisconnect)
             .catch(err => {

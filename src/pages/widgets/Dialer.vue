@@ -225,6 +225,7 @@ export default {
     ]),
 
     async postDialNumber () {
+      console.log('postDialNumber')
       this.showAlertCallFinished = false
 
       do {
@@ -426,6 +427,7 @@ export default {
         }
 
         if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+          console.log('handleAgentStatus', agentStatus)
           this.handleDialNumber()
         }
       }
