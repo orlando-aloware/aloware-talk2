@@ -696,7 +696,7 @@ body,
   border-bottom: 1px solid #EBEBEB;
   width: auto;
   height: 62px;
-  z-index: 6001;
+  z-index: 4;
 
   & .q-item {
     padding: 0;
@@ -16643,7 +16643,7 @@ hr {
   }
 
   .scrollableArea .datatable {
-    z-index: 4;
+    z-index: 3;
   }
 }
 
