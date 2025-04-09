@@ -90,7 +90,7 @@ export default {
         return false
       }
 
-      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL', 'ANSWERING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL']
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL', 'ANSWERING_CALL', 'CALL_CONNECTED']
       return this.startDialing &&
         (this.isAlwaysAskModeEnabled ? true : !this.campaignId) &&
         !isCallInProgress.includes(this.dialer?.currentStatus) &&
