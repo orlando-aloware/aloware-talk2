@@ -96,7 +96,7 @@
         </div>
 
         <div class="d-flex justify-content-center align-items-center call-actions"
-             v-if="shouldShowCallActions">
+             v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -125,7 +125,7 @@
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
              :class="id === 'callFishing' && getSource ? 'mt-2' : ''"
-             v-if="shouldShowFishingActions">
+             v-if="id === 'callFishing' && dialer && dialer.call">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -202,7 +202,6 @@ import {
   aclMixin,
   agentMixin
 } from 'src/plugins/mixins'
-import * as AgentStatus from '../constants/agent-status'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
@@ -249,8 +248,7 @@ export default {
       runningDateTime: null,
       runningDateTimeInterval: null,
       isValidNotification: false,
-      notificationListeners: {},
-      AgentStatus
+      notificationListeners: {}
     }
   },
 
@@ -535,22 +533,6 @@ export default {
 
     notificationQueue () {
       return this.notifications?.[this.id]?.queue
-    },
-
-    isAgentOrDialerOnCall () {
-      return this.dialer.call || this.isAgentOnCall
-    },
-
-    isCallFishingWithDialer () {
-      return this.id === 'callFishing' && this.dialer
-    },
-
-    shouldShowCallActions () {
-      return this.id === 'incomingCall' || (this.isCallFishingWithDialer && !this.isAgentOrDialerOnCall)
-    },
-
-    shouldShowFishingActions () {
-      return this.isCallFishingWithDialer && this.isAgentOrDialerOnCall
     }
   },
 
@@ -582,8 +564,7 @@ export default {
       'setNotifications',
       'setShowPhone',
       'clearCallFishingQueue',
-      'removeFromCallFishingQueue',
-      'setDialerCommunication'
+      'removeFromCallFishingQueue'
     ]),
 
     startNotificationListeners () {
@@ -724,7 +705,7 @@ export default {
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
-    async answerCommunication (shouldPark = false, shouldHangup = false) {
+    answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.communicationId,
@@ -738,27 +719,6 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
-
-      // Check if we need to fetch current communication
-      const needsCurrentCommunication = !this.dialer.communication &&
-        this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
-
-      if (needsCurrentCommunication) {
-        try {
-          const response = await this.$axios.post('/api/v1/profile/get-live-calls')
-          const currentCommunication = response.data[0]
-
-          if (!currentCommunication) {
-            console.log('No live calls found for this agent')
-            return
-          }
-
-          this.setDialerCommunication(currentCommunication)
-        } catch (err) {
-          console.log(err)
-        }
-      }
-
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
       this.setShowPhone(true)
