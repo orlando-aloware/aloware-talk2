@@ -426,7 +426,7 @@ export default {
           return
         }
 
-        if (this.isDialed && !this.dialer.parkedCall && !this.dialer.call) {
+        if (this.isDialed && !this.dialer.call && !this.dialer.parkedCall && !this.dialer.call) {
           console.log('cancel call')
           this.isDialed = false
           this.onCancelCall()
