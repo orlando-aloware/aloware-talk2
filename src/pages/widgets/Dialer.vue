@@ -426,10 +426,10 @@ export default {
           return
         }
 
-        if (this.isDialed && !this.dialer.call && !this.dialer.parkedCall && !this.dialer.call) {
-          console.log('cancel call')
-          this.isDialed = false
-          this.onCancelCall()
+        if (this.isDialed && !this.dialer.call && !this.dialer.parkedCall && !this.dialer.communication && agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL) {
+          console.log('cancel call', this.isDialed, !this.dialer.call, !this.dialer.parkedCall, !this.dialer.communication, agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL)
+          // this.isDialed = false
+          // this.onCancelCall()
         }
 
         if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.dialer.parkedCall) {
