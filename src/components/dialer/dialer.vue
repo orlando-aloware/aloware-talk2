@@ -93,7 +93,7 @@ export default {
       return this.dialer.parkedCall && this.dialer.call
     },
 
-    hasCallInProgressNoParkedCall () {
+    hasCallInProgressNotParked () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
@@ -390,6 +390,11 @@ export default {
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
 
+      // don't do anything if there is no communication
+      if (!this.dialer.communication) {
+        console.log('No dialer communication found')
+      }
+
       if (this.dialer.communication) {
         this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
       }
@@ -399,9 +404,12 @@ export default {
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
-        this.startWrapUpTimer()
-        return
+      // only start wrap up timer if there is a communication
+      if (this.dialer.communication) {
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
+          this.startWrapUpTimer()
+          return
+        }
       }
 
       this.backToDial('Talk-Device.OnDisconnect')
@@ -864,7 +872,7 @@ export default {
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
           this.startWrapUpTimer()
           return
         }

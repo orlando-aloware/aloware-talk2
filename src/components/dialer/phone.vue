@@ -1937,7 +1937,7 @@ export default {
     },
 
     // there is no parked call, but there is a call in-progress.
-    hasCallInProgressNoParkedCall () {
+    hasCallInProgressNotParked () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
@@ -1945,7 +1945,7 @@ export default {
     // arrives via Pusher at the frontend and changes the agent's status to wrap-up, at which point the button becomes enabled.
     // it includes "ParkingCalls" conditionals.
     isNotOnWrapUp () {
-      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall)
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked)
     },
 
     shouldDisableCallBackButton () {
