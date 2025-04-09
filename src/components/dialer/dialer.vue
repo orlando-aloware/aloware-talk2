@@ -393,6 +393,8 @@ export default {
       // don't do anything if there is no communication
       if (!this.dialer.communication) {
         console.log('No dialer communication found')
+      } else {
+        console.log('Dialer communication found', this.dialer.communication)
       }
 
       if (this.dialer.communication) {
