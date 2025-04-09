@@ -17,11 +17,11 @@ export default {
   SET_IS_LOADING_INBOXES (state, loading) {
     state.isLoadingInboxes = loading
   },
-  SET_CURRENT_INBOXES_PAGE (state, { page, type }) {
-    state.currentInboxesPage[type] = page
+  SET_CURRENT_INBOXES_PAGE (state, page) {
+    state.currentInboxesPage = page
   },
-  SET_HAS_MORE_INBOXES (state, { hasMore, type }) {
-    state.hasMoreInboxes[type] = hasMore
+  SET_HAS_MORE_INBOXES (state, hasMore) {
+    state.hasMoreInboxes = hasMore
   },
   APPEND_INBOXES (state, inboxes) {
     state.inboxes = [ ...state.inboxes, ...inboxes ]
