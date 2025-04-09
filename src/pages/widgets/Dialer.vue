@@ -427,7 +427,7 @@ export default {
         }
 
         if (this.isDialed && !this.dialer.call && !this.dialer.parkedCall && !this.dialer.communication && agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL) {
-          console.log('cancel call', this.isDialed, !this.dialer.call, !this.dialer.parkedCall, !this.dialer.communication, agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL)
+          console.log('cancel call', this.isDialed, this.dialer.call, this.dialer.parkedCall, this.dialer.communication, agentStatus)
           // this.isDialed = false
           // this.onCancelCall()
         }
