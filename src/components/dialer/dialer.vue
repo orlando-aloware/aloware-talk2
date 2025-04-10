@@ -3,26 +3,27 @@
 </template>
 
 <script>
-import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
+import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   agentMixin,
-  userMixin,
-  notificationMixin,
-  visibilityMixin,
-  unownedContactTaskMixin,
   dialerWrapUpMixin,
   dispositionsMixin,
-  sessionCallStatusMixin
+  notificationMixin,
+  sessionCallStatusMixin,
+  unownedContactTaskMixin,
+  userMixin,
+  visibilityMixin
 } from '../../boot/mixins'
-import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
-import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
+import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
+import * as WebrtcEvents from '../../constants/webrtc-events'
+import TwilioDevice from '../communication/twilio/device'
 
 export default {
   name: 'dialer',
@@ -66,13 +67,13 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany', 'profile']),
 
-    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
+    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups', 'parkedCalls']),
 
     ...mapState('auth', ['profile', 'authenticated']),
 
     ...mapState('powerDialer', ['powerDialerTasks']),
 
-    ...mapState(['isWidget']),
+    ...mapState(['isWidget', 'isSalesforceWidget']),
 
     ...mapFields('powerDialer', [
       'activeTask',
@@ -81,8 +82,8 @@ export default {
     ]),
 
     isNotInProgressCall () {
-      return !this.dialer.call || !this.dialer.communication ||
-        !['connected', 'open'].includes(this.dialer.call.state)
+      return (!this.dialer.call || !this.dialer.communication ||
+        !['connected', 'open'].includes(this.dialer.call.state)) && !this.isAgentOnCall
     },
 
     hasNoParkedAndInprogressCall () {
@@ -93,7 +94,7 @@ export default {
       return this.dialer.parkedCall && this.dialer.call
     },
 
-    hasCallInProgressNoParkedCall () {
+    hasCallInProgressNotParked () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
@@ -103,6 +104,10 @@ export default {
 
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
+    },
+
+    isCallInProgress () {
+      return this.dialer.call && ['connected', 'open'].includes(this.dialer.call.state)
     }
   },
 
@@ -318,7 +323,7 @@ export default {
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
       this.removeUnownedLiveContactTask()
 
-      if (this.dialer.isReady && !this.isWidget) {
+      if (this.dialer.isReady && (this.isSalesforceWidget ? true : !this.isWidget)) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         console.warn('[UNREGISTERED] Twilio token', this.dialer.token)
         this.setDialerIsReady(false)
@@ -340,7 +345,7 @@ export default {
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       // Avoid continuing with the incoming call if it's a widget,
       // and ignore the call. Otherwise, Twilio will play the default incoming sound.
-      if (this.isWidget) {
+      if (this.isSalesforceWidget ? false : this.isWidget) {
         call._connection.ignore()
         return
       }
@@ -363,7 +368,7 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
+      this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')
@@ -371,8 +376,8 @@ export default {
         }
       }).catch((err) => {
         console.log('getCommunication error', {
-          'callSid': this.dialer.call.callSid,
-          'from': this.dialer.call.from,
+          'callSid': call.callSid,
+          'from': call.from,
           'err': err
         })
       })
@@ -390,6 +395,13 @@ export default {
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
 
+      // don't do anything if there is no communication
+      if (!this.dialer.communication) {
+        console.log('No dialer communication found')
+      } else {
+        console.log('Dialer communication found', this.dialer.communication)
+      }
+
       if (this.dialer.communication) {
         this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
       }
@@ -399,9 +411,12 @@ export default {
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
-        this.startWrapUpTimer()
-        return
+      // only start wrap up timer if there is a communication
+      if (this.dialer.communication) {
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
+          this.startWrapUpTimer()
+          return
+        }
       }
 
       this.backToDial('Talk-Device.OnDisconnect')
@@ -419,7 +434,7 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
+      if (!this.profile.last_call || (this.isImpersonate && this.isAgentOnCall)) {
         return
       }
 
@@ -431,6 +446,17 @@ export default {
         this.forceStartOnWrapUp()
       }
     },
+
+    callParkedFromAnotherTab () {
+      if (!this.dialer.communication) {
+        return false
+      }
+      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
+      const isHoldAndInProgress = this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW &&
+        this.dialer.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW
+      return found || isHoldAndInProgress
+    },
+
     forceStartOnWrapUp () {
       const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
         ? this.currentCompany.wrap_up_seconds
@@ -860,18 +886,49 @@ export default {
         }
 
         console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-        this.removeUnownedLiveContactTask()
-        this.stopCallTimer()
-        this.connection = null
-        this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
-          this.startWrapUpTimer()
-          return
+        // Common disconnect handling steps
+        const handleDisconnect = () => {
+          this.removeUnownedLiveContactTask()
+          this.stopCallTimer()
+          this.connection = null
+          this.setDialerCurrentStatus('CALL_DISCONNECTED')
+          this.handlePostDisconnect()
         }
 
-        this.backToDial('Talk-Connection.OnDisconnect')
+        // First refresh communication if there's an active call
+        if (this.dialer.call) {
+          this.forceRefreshCommunication()
+            .then(handleDisconnect)
+            .catch(err => {
+              console.error('Error refreshing communication:', err)
+              handleDisconnect()
+            })
+        } else {
+          handleDisconnect()
+        }
       })
+    },
+
+    handlePostDisconnect () {
+      // Check if we should start wrap up timer
+      const shouldStartWrapUp = this.hasNoParkedAndInprogressCall ||
+        this.hasParkedAndInprogressCall ||
+        (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())
+
+      if (shouldStartWrapUp) {
+        this.startWrapUpTimer()
+        return
+      }
+
+      // Handle parked call from another tab
+      if (this.callParkedFromAnotherTab()) {
+        this.setDialerParkedCall(this.dialer.communication)
+        this.resetCall('Talk-Connection.OnDisconnect')
+        return
+      }
+
+      this.backToDial('Talk-Connection.OnDisconnect')
     },
 
     hangupCall () {
@@ -950,8 +1007,8 @@ export default {
       }
 
       // set agent status to busy if it's an answer by browser/apps user
-      // @custom for HutchBug, Cardone Capital: rejecting a call should still keep the agent on the previous status
-      if (this.currentCompany && ![379, 892].includes(this.currentCompany.id) &&
+      // @custom for Cardone Capital: rejecting a call should still keep the agent on the previous status
+      if (this.currentCompany?.id === 892 &&
         !this.currentCompany.force_users_always_available) {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS, false, 1, 'Talk-RejectCall')
       }
@@ -960,7 +1017,7 @@ export default {
     },
 
     toggleMute () {
-      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (!this.isCallInProgress) {
         return
       }
 
@@ -1050,7 +1107,7 @@ export default {
     },
 
     toggleHold () {
-      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+      if (!this.isCallInProgress) {
         return
       }
 
@@ -1162,6 +1219,10 @@ export default {
         console.log('Call parked')
 
         if (shouldAnswer) {
+          if (this.dialer.communication) {
+            this.setDialerCommunication()
+          }
+
           this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
         } else if (shouldUnpark) {
           this.unparkCall(data, true)
@@ -1182,11 +1243,19 @@ export default {
     },
 
     hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      if (!this.dialer.call) {
+      if (this.isAgentOnCall && !this.dialer.call && this.dialer.communication) {
+        talk2Api.V1.communication.forceTerminate(this.dialer.communication.id)
+          .then(res => {
+            this.hangUpInterval(shouldAnswer, shouldUnpark, data)
+          })
+
         return
       }
 
       console.log('Hanging up call')
+      if (!this.dialer.call) {
+        return
+      }
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
@@ -1197,6 +1266,10 @@ export default {
       // hangup an incoming call
       this.connection.hangup()
 
+      this.hangUpInterval(shouldAnswer, shouldUnpark, data)
+    },
+
+    hangUpInterval (shouldAnswer = false, shouldUnpark = false, data = null) {
       const counter = { data: 0 }
 
       this.$options.hangupInterval = setInterval(() => {
@@ -1506,7 +1579,10 @@ export default {
     },
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
-      this.resetAgentStatus(forceStatus, signature)
+      // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
+      if (signature !== 'Talk-Connection.OnCancel') {
+        this.resetAgentStatus(forceStatus, signature)
+      }
       this.resetCall(signature)
     },
 

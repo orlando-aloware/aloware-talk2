@@ -15,9 +15,11 @@
                   color="amber-2"
                   text-color="white"
                   dense
+                  clickable
                   data-testid="comm-custom-keywords-section-chip"
                   :key="idx"
-                  v-for="(keyword, idx) in Object.keys(customKeywords[speaker])">
+                  v-for="(keyword, idx) in Object.keys(customKeywords[speaker])"
+                  @click="emitKeywordFilter(speaker, keyword)">
             {{ keyword | ucfirst }}<span class="ml-1 text-grey-30">{{ ` x ${customKeywords[speaker][keyword]}` }}</span>
           </q-chip>
         </div>
@@ -25,11 +27,12 @@
     </div>
 
     <!-- If no custom keywords were detected. -->
-    <div v-else-if="!isSimpSocial">
+    <div v-else>
       <span>
         We couldn't find any custom keywords in this call. For more information please check
         <a style="color: blue"
            data-testid="comm-custom-keywords-section-this-article-link"
+           target="_blank"
            href="https://support.aloware.com/en/articles/9037887-frequently-asked-questions-smart-transcription">
           this article.
         </a>
@@ -39,12 +42,8 @@
 </template>
 
 <script>
-import { simpsocialMixin } from 'src/plugins/mixins'
-
 export default {
   name: 'CustomKeywordsSection',
-
-  mixins: [simpsocialMixin],
 
   props: {
     customKeywords: {
@@ -58,6 +57,12 @@ export default {
     isEmpty: {
       type: Function,
       required: true
+    }
+  },
+
+  methods: {
+    emitKeywordFilter (speaker, keyword) {
+      this.$emit('filter-keyword', { speaker, text: keyword })
     }
   }
 }

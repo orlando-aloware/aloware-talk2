@@ -120,6 +120,7 @@
                 :calculate-over-all-sentiment-by-speaker="calculateOverAllSentimentBySpeaker"
                 class="ml-2"
                 data-testid="comm-transcription-modal-sentiment-analysis-section"
+                @filter-sentiment="handleFilterSentiment"
               />
             </div>
           </div>
@@ -143,6 +144,7 @@
                 :speakers="speakers"
                 :is-empty="isEmpty"
                 data-testid="comm-transcription-modal-highlights-section"
+                @filter-highlight="handleFilterHighlight"
               />
 
               <entities-section
@@ -151,6 +153,7 @@
                 :speakers="speakers"
                 :is-empty="isEmpty"
                 data-testid="comm-transcription-modal-entities-section"
+                @filter-entity="handleFilterEntity"
               />
 
               <custom-keywords-section
@@ -158,6 +161,7 @@
                 :speakers="speakers"
                 :is-empty="isEmpty"
                 data-testid="comm-transcription-modal-custom-keywords-section"
+                @filter-keyword="handleFilterKeyword"
               />
             </div>
 
@@ -496,6 +500,76 @@
                   class="p-0"
                   name="transcription"
                 >
+                  <div class="active-filter-container" v-if="hasActiveFilters">
+                    <div class="active-filter">
+                      <span class="filter-label">Active Filter:</span>
+                      <q-chip
+                        v-if="activeFilters.highlight"
+                        color="blue-3"
+                        text-color="white"
+                        size="sm"
+                        dense
+                        clickable
+                        @click="navigateToNextOccurrence"
+                      >
+                        Highlight: {{ activeFilters.highlight.text }}
+                        <span v-if="filteredMessages.length > 0" class="occurrence-counter">
+                          {{ currentFilteredMessageIndex + 1 }}/{{ filteredMessages.length }}
+                        </span>
+                      </q-chip>
+                      <q-chip
+                        v-if="activeFilters.entity"
+                        color="green-11"
+                        text-color="white"
+                        size="sm"
+                        dense
+                        clickable
+                        @click="navigateToNextOccurrence"
+                      >
+                        Entity ({{ activeFilters.entity.type }}): {{ activeFilters.entity.text }}
+                        <span v-if="filteredMessages.length > 0" class="occurrence-counter">
+                          {{ currentFilteredMessageIndex + 1 }}/{{ filteredMessages.length }}
+                        </span>
+                      </q-chip>
+                      <q-chip
+                        v-if="activeFilters.keyword"
+                        color="amber-2"
+                        text-color="white"
+                        size="sm"
+                        dense
+                        clickable
+                        @click="navigateToNextOccurrence"
+                      >
+                        Keyword: {{ activeFilters.keyword.text }}
+                        <span v-if="filteredMessages.length > 0" class="occurrence-counter">
+                          {{ currentFilteredMessageIndex + 1 }}/{{ filteredMessages.length }}
+                        </span>
+                      </q-chip>
+                      <q-chip
+                        v-if="activeFilters.sentiment"
+                        :color="sentimentChipColors[activeFilters.sentiment.sentiment]"
+                        text-color="white"
+                        size="sm"
+                        dense
+                        clickable
+                        @click="navigateToNextOccurrence"
+                      >
+                        Sentiment: {{ activeFilters.sentiment.sentiment }}
+                        <span v-if="filteredMessages.length > 0" class="occurrence-counter">
+                          {{ currentFilteredMessageIndex + 1 }}/{{ filteredMessages.length }}
+                        </span>
+                      </q-chip>
+                      <q-btn
+                        flat
+                        dense
+                        round
+                        size="sm"
+                        icon="close"
+                        class="ml-2"
+                        @click="clearAllFilters"
+                      />
+                    </div>
+                  </div>
                   <conversation-section
                     :communication="communication"
                     :contact="contact"
@@ -680,7 +754,15 @@ export default {
       is_editing_summary: false,
       is_saving_summary: false,
       edited_call_summary: '',
-      TEXT_FORMATTING
+      TEXT_FORMATTING,
+      activeFilters: {
+        highlight: null,
+        entity: null,
+        keyword: null,
+        sentiment: null
+      },
+      currentFilteredMessageIndex: 0,
+      filteredMessages: []
     }
   },
 
@@ -730,6 +812,10 @@ export default {
 
     sentimentSummaryText () {
       return this.sentiment_analysis.map(sentiment => this.calculateOverAllSentimentBySpeaker(sentiment))
+    },
+
+    hasActiveFilters () {
+      return Object.values(this.activeFilters).some(filter => filter !== null)
     }
   },
 
@@ -1246,6 +1332,309 @@ export default {
       if (this.currentCompany?.transcription_settings?.call_transcription_enabled) {
         this.show_promotion_box = true
       }
+    },
+
+    /**
+     * Handle filter by highlight
+     * @param {Object} filter - The filter object containing speaker and text
+     */
+    handleFilterHighlight (filter) {
+      // If the same filter is already active, navigate to next occurrence
+      if (this.activeFilters.highlight &&
+          this.activeFilters.highlight.speaker === filter.speaker &&
+          this.activeFilters.highlight.text === filter.text) {
+        this.navigateToNextOccurrence()
+        return
+      }
+
+      this.activeFilters = {
+        highlight: filter,
+        entity: null,
+        keyword: null,
+        sentiment: null
+      }
+
+      // Reset the current index
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
+
+      // Switch to transcription tab
+      this.tabName = 'transcription'
+      this.$nextTick(() => {
+        this.findAndHighlightFilteredText(filter.text, filter.speaker)
+      })
+    },
+
+    /**
+     * Handle filter by entity
+     * @param {Object} filter - The filter object containing speaker, type, and text
+     */
+    handleFilterEntity (filter) {
+      // If the same filter is already active, navigate to next occurrence
+      if (this.activeFilters.entity &&
+          this.activeFilters.entity.speaker === filter.speaker &&
+          this.activeFilters.entity.type === filter.type &&
+          this.activeFilters.entity.text === filter.text) {
+        this.navigateToNextOccurrence()
+        return
+      }
+
+      this.activeFilters = {
+        highlight: null,
+        entity: filter,
+        keyword: null,
+        sentiment: null
+      }
+
+      // Reset the current index
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
+
+      // Switch to transcription tab
+      this.tabName = 'transcription'
+      this.$nextTick(() => {
+        this.findAndHighlightFilteredText(filter.text, filter.speaker)
+      })
+    },
+
+    /**
+     * Handle filter by keyword
+     * @param {Object} filter - The filter object containing speaker and text
+     */
+    handleFilterKeyword (filter) {
+      // If the same filter is already active, navigate to next occurrence
+      if (this.activeFilters.keyword &&
+          this.activeFilters.keyword.speaker === filter.speaker &&
+          this.activeFilters.keyword.text === filter.text) {
+        this.navigateToNextOccurrence()
+        return
+      }
+
+      // Reset other filters
+      this.activeFilters = {
+        highlight: null,
+        entity: null,
+        keyword: filter,
+        sentiment: null
+      }
+
+      // Reset the current index
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
+
+      // Switch to transcription tab
+      this.tabName = 'transcription'
+
+      // Find message containing the keyword
+      this.$nextTick(() => {
+        this.findAndHighlightFilteredText(filter.text, filter.speaker)
+      })
+    },
+
+    /**
+     * Handle filter by sentiment
+     * @param {Object} filter - The filter object containing speaker and sentiment
+     */
+    handleFilterSentiment (filter) {
+      // If the same filter is already active, navigate to next occurrence
+      if (this.activeFilters.sentiment &&
+          this.activeFilters.sentiment.speaker === filter.speaker &&
+          this.activeFilters.sentiment.sentiment === filter.sentiment) {
+        this.navigateToNextOccurrence()
+        return
+      }
+
+      // Reset other filters
+      this.activeFilters = {
+        highlight: null,
+        entity: null,
+        keyword: null,
+        sentiment: filter
+      }
+
+      // Reset the current index
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
+
+      // Switch to transcription tab
+      this.tabName = 'transcription'
+
+      // Find messages with the specific sentiment
+      this.$nextTick(() => {
+        this.findAndHighlightSentiment(filter.speaker, filter.sentiment)
+      })
+    },
+
+    /**
+     * Navigate to the next occurrence of the filtered text
+     */
+    navigateToNextOccurrence () {
+      if (this.filteredMessages.length === 0) {
+        return
+      }
+
+      // Increment the index and wrap around if necessary
+      this.currentFilteredMessageIndex = (this.currentFilteredMessageIndex + 1) % this.filteredMessages.length
+
+      const currentMessage = this.filteredMessages[this.currentFilteredMessageIndex]
+
+      // Seek to the audio position of the current message
+      if (currentMessage.start) {
+        this.handleSeekAudio(currentMessage.start)
+      }
+
+      // Scroll to and highlight the message
+      this.$nextTick(() => {
+        const index = this.formattedMessages.findIndex(msg => msg === currentMessage)
+        const messageElement = document.getElementById(`msg-${index}`)
+
+        if (messageElement) {
+          // Remove "current" class from all messages
+          document.querySelectorAll('.current').forEach(el => {
+            el.classList.remove('current')
+          })
+
+          // Add "current" class to the current message
+          messageElement.classList.add('current')
+
+          // Trigger highlighting animation and scroll
+          this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
+          this.$refs.conversationSection.scrollToMessage(messageElement)
+        }
+      })
+    },
+
+    /**
+     * Find and highlight text in messages
+     * @param {string} text - The text to search for
+     * @param {string} speaker - The speaker who said the text
+     */
+    findAndHighlightFilteredText (text, speaker) {
+      this.filteredMessages = this.formattedMessages.filter(msg =>
+        msg.speaker === speaker &&
+        msg.text.toLowerCase().includes(text.toLowerCase())
+      )
+
+      if (this.filteredMessages.length > 0) {
+        // Find the first message containing the text
+        const firstMessage = this.filteredMessages[0]
+
+        // Seek to the audio position
+        if (firstMessage.start) {
+          this.handleSeekAudio(firstMessage.start)
+        }
+
+        this.$nextTick(() => {
+          this.filteredMessages.forEach((message, messageIdx) => {
+            const index = this.formattedMessages.findIndex(msg => msg === message)
+            const messageElement = document.getElementById(`msg-${index}`)
+            if (messageElement) {
+              // Add "current" class to the first message
+              if (messageIdx === this.currentFilteredMessageIndex) {
+                messageElement.classList.add('current')
+              }
+
+              // Apply highlighting animation
+              if (messageIdx === 0) {
+                this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
+                this.$refs.conversationSection.scrollToMessage(messageElement)
+              }
+
+              const content = messageElement.innerHTML
+              const regex = new RegExp(`(${this.escapeRegExp(text)})`, 'gi')
+              messageElement.innerHTML = content.replace(
+                regex,
+                '<span class="filtered-text-highlight">$1</span>'
+              )
+            }
+          })
+        })
+      }
+    },
+
+    /**
+     * Find and highlight messages with specific sentiment
+     * @param {string} speaker - The speaker
+     * @param {string} sentiment - The sentiment to filter by
+     */
+    findAndHighlightSentiment (speaker, sentiment) {
+      this.filteredMessages = this.formattedMessages.filter(msg =>
+        msg.speaker === speaker &&
+        msg.sentiment === sentiment
+      )
+
+      if (this.filteredMessages.length > 0) {
+        // Find the first message with the sentiment
+        const firstMessage = this.filteredMessages[0]
+
+        if (firstMessage.start) {
+          this.handleSeekAudio(firstMessage.start)
+        }
+
+        this.$nextTick(() => {
+          this.filteredMessages.forEach((message, messageIdx) => {
+            const index = this.formattedMessages.findIndex(msg => msg === message)
+            const messageElement = document.getElementById(`msg-${index}`)
+            if (messageElement) {
+              // Add "current" class to the first message
+              if (messageIdx === this.currentFilteredMessageIndex) {
+                messageElement.classList.add('current')
+              }
+
+              if (messageIdx === 0) {
+                this.$refs.conversationSection.triggerHighlightAnimation(messageElement)
+                this.$refs.conversationSection.scrollToMessage(messageElement)
+              }
+
+              messageElement.classList.add('filtered-sentiment-highlight')
+            }
+          })
+        })
+      }
+    },
+
+    /**
+     * Escape special characters in text for use in regex
+     * @param {string} text - The text to escape
+     * @returns {string} - The escaped text
+     */
+    escapeRegExp (text) {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    },
+
+    clearAllFilters () {
+      this.activeFilters = {
+        highlight: null,
+        entity: null,
+        keyword: null,
+        sentiment: null
+      }
+
+      this.currentFilteredMessageIndex = 0
+      this.filteredMessages = []
+
+      // Clear all highlighted elements
+      this.$nextTick(() => {
+        document.querySelectorAll('.filtered-sentiment-highlight').forEach(el => {
+          el.classList.remove('filtered-sentiment-highlight')
+        })
+
+        document.querySelectorAll('.current').forEach(el => {
+          el.classList.remove('current')
+        })
+
+        // Reset message HTML to remove filtered-text-highlight spans
+        this.formattedMessages.forEach((message, index) => {
+          const messageElement = document.getElementById(`msg-${index}`)
+          if (messageElement) {
+            // Reset the HTML with the original formatted message
+            const textContainer = messageElement.querySelector('span[style="line-height: 1.6"]')
+            if (textContainer) {
+              textContainer.innerHTML = message.formattedText
+            }
+          }
+        })
+      })
     }
   },
 
@@ -1405,4 +1794,55 @@ textarea::placeholder {
   justify-content: flex-end;
 }
 
+.filtered-text-highlight {
+  background-color: #f8ff00;
+  border-radius: 3px;
+  padding: 0 2px;
+  font-weight: bold;
+}
+
+.filtered-sentiment-highlight {
+  box-shadow: 0 0 0 3px #ffeb3b;
+}
+
+.current {
+  box-shadow: 0 0 0 3px #ff5722 !important;
+  position: relative;
+  z-index: 1;
+}
+
+:deep(.q-chip--clickable) {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+:deep(.q-chip--clickable:hover) {
+  transform: scale(1.05);
+}
+
+.active-filter-container {
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.active-filter {
+  display: flex;
+  align-items: center;
+}
+
+.filter-label {
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+.occurrence-counter {
+  margin-left: 6px;
+  font-size: 0.8em;
+  opacity: 0.9;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
 </style>

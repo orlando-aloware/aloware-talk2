@@ -26,6 +26,10 @@ export default {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     },
 
+    hasCompanyTeamInboxEnabled () {
+      return this.currentCompany?.team_inbox_enabled === true
+    },
+
     shouldSeeExperimentalAiFeatures () {
       return this.isDemoCompany || this.currentCompany?.plan?.ai_plan === true
     },

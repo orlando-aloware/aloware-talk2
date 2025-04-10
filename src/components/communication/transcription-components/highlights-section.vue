@@ -17,18 +17,21 @@
                 dense
                 :key="highlight_index"
                 data-testid="comm-highlights-section-chip"
-                v-for="(highlight, highlight_index) in highlights[speaker]">
+                clickable
+                v-for="(highlight, highlight_index) in highlights[speaker]"
+                @click="emitHighlightFilter(speaker, highlight)">
           {{ highlight }}
         </q-chip>
       </div>
     </div>
 
     <!-- If no highlights were detected. -->
-    <div v-else-if="!isSimpSocial">
+    <div v-else>
       <span class="mt-3">
         We couldn't find any highlights in this call. For more information please check
         <a style="color: blue"
            data-testid="comm-highlights-section-this-article-link"
+           target="_blank"
            href="https://support.aloware.com/en/articles/9037887-frequently-asked-questions-smart-transcription">
           this article.
         </a>
@@ -38,12 +41,8 @@
 </template>
 
 <script>
-import { simpsocialMixin } from 'src/plugins/mixins'
-
 export default {
   name: 'HighlightsSection',
-
-  mixins: [simpsocialMixin],
 
   props: {
     highlights: {
@@ -57,6 +56,12 @@ export default {
     isEmpty: {
       type: Function,
       required: true
+    }
+  },
+
+  methods: {
+    emitHighlightFilter (speaker, highlight) {
+      this.$emit('filter-highlight', { speaker, text: highlight })
     }
   }
 }

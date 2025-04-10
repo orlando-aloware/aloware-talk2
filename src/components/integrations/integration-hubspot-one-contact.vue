@@ -61,12 +61,15 @@
           <b-link :class="canUpdateLifecycleStage ? 'clickable' : 'not-clickable'"
                   @click="onShowEditLifecycleStageMenu">
             <pencil-o-icon />
-            <q-tooltip anchor="top middle" self="center middle">
-              <span v-if="canUpdateLifecycleStage">Update Lifecycle Stage</span>
-              <template v-if="!canUpdateLifecycleStage">
-                <p class="font-weight-bold mb-0">Update Lifecycle Stage is disabled</p>
-                <p class="mt-1 mb-0">Enable contact information updates in HubSpot's integration settings.</p>
-              </template>
+            <q-tooltip anchor="top middle" self="center middle"
+                       :offset="isWidget ? [0, 50] : [0, 30]">
+              <div :class="{ 'small-text': isWidget }">
+                <span v-if="canUpdateLifecycleStage">Update Lifecycle Stage</span>
+                <template v-if="!canUpdateLifecycleStage">
+                  <p class="font-weight-bold mb-0">Update Lifecycle Stage is disabled</p>
+                  <p class="mt-1 mb-0">Enable contact information updates in HubSpot's integration settings.</p>
+                </template>
+              </div>
             </q-tooltip>
           </b-link>
         </div>
@@ -177,6 +180,7 @@
 import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 import PencilOIcon from 'components/icons/pencil-o-icon.vue'
 import talk2Api from 'src/plugins/api/api'
+import { mapState } from 'vuex'
 
 export default {
   name: 'integration-hubspot-one-contact',
@@ -214,6 +218,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(['isWidget']),
     hasDuplicates () {
       return this.integrationData && this.integrationData.duplicates && this.integrationData.duplicates.length > 0
     },

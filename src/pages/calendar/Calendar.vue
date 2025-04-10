@@ -175,7 +175,7 @@ import CalendarEventList from 'components/calendar/calendar-event-list.vue'
 import moment from 'moment'
 import { mapActions, mapState } from 'vuex'
 import api from 'src/plugins/api/api'
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin } from 'src/plugins/mixins'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import { getBrowserTimeZone } from 'src/utils'
 import { CALENDAR_VIEWS, HOUR_VIEW, DAY_VIEW, WEEK_VIEW, MONTH_VIEW, DEFAULT_VIEW } from 'src/constants/calendar'
@@ -183,10 +183,7 @@ import { CALENDAR_VIEWS, HOUR_VIEW, DAY_VIEW, WEEK_VIEW, MONTH_VIEW, DEFAULT_VIE
 export default {
   name: 'Calendar',
 
-  mixins: [
-    aclMixin,
-    simpsocialMixin
-  ],
+  mixins: [aclMixin],
 
   components: {
     CalendarIcon,

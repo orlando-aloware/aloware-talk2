@@ -169,10 +169,6 @@ export default _.merge({
       }
     },
 
-    shouldShowUpgradeNow () {
-      return !this.isSimpSocial()
-    },
-
     hideMenu () {
       if (this.$refs && this.$refs.menu) {
         this.$refs.menu.hide()
@@ -267,10 +263,6 @@ export default _.merge({
       }
 
       if (this.hasReporterAccess) {
-        return false
-      }
-
-      if (this.currentCompany && this.currentCompany.reseller_id === 357 && !this.hasRole('Billing Admin')) {
         return false
       }
 

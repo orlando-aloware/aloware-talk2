@@ -34,7 +34,6 @@
 
     <webrtc
       :carrierName="authProfile.carrier_name"
-      :isWidget="true"
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
@@ -160,7 +159,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['authenticated', 'profile']),
-    ...mapState(['isWidget', 'dialer', 'hubspotDialNumber']),
+    ...mapState(['dialer', 'hubspotDialNumber']),
 
     allowed () {
       return this.authProfile && this.initialized && this.defaultCampaignInitialized
@@ -426,7 +425,13 @@ export default {
           return
         }
 
-        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+        // Automatically close the widget when replying from another tab
+        if (this.isDialed && !this.dialer.call && !this.dialer.communication && this.dialer.parkedCall && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+          this.isDialed = false
+          this.onCancelCall()
+        }
+
+        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.dialer.parkedCall) {
           this.handleDialNumber()
         }
       }

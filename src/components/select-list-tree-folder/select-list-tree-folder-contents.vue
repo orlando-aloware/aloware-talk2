@@ -8,7 +8,7 @@
       :order="folder.order"
       :layer="layer"
       :folders="folder.child_folders"
-      :lists="folder.lists"
+      :lists="filterLists(folder.lists)"
       :hasEdit="hasEdit"
       :hasDelete="hasDelete"
     />
@@ -32,6 +32,16 @@ export default {
     },
     hasDelete: {
       type: Number
+    },
+    type: {
+      type: Number,
+      default: null
+    }
+  },
+  methods: {
+    filterLists (lists) {
+      if (!lists || !this.type) return lists
+      return lists.filter(list => list.type === this.type)
     }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <span class="cursor-pointer"
-        data-testid="comm-whisper-comm-button-dialog-click"
+        data-testid="comm-whisper-button-whisper-span"
         :id="`action-whisper-${_uid}`"
         v-if="userCanBargeAndWhisper(communication)"
         @click="dialog">
@@ -17,7 +17,7 @@
 
 <script>
 import EarIcon from 'src/components/icons/ear-icon.vue'
-import { aclMixin, agentMixin, communicationMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'whisper-communication-button',
@@ -25,8 +25,7 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin,
-    simpsocialMixin
+    communicationMixin
   ],
 
   components: {

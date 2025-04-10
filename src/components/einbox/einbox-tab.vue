@@ -174,7 +174,7 @@ export default {
     },
 
     handleScroll (target) {
-      const bottomThreshold = 100
+      const bottomThreshold = 50
       const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
 
       if (isNearBottom && !this.isLoadingMoreItems && !this.isLoadingItems && this.hasMoreItems) {
@@ -249,7 +249,7 @@ export default {
     },
 
     processCommunication (communication, isNew = false) {
-      if (communication.ring_group_id !== this.activeInboxId) {
+      if (!this.activeInboxId || communication.ring_group_id !== this.activeInboxId) {
         return
       }
 

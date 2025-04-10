@@ -18,7 +18,6 @@
           </q-tooltip>
         </b-link>
         <b-link href="#"
-                v-if="currentCompany && currentCompany.reseller_id !== 357"
                 :disabled="disableFax || isPhoneNumberInvalid"
                 :class="{ active : messageComposer.mode === 'fax' }"
                 data-testid="fax-tab-link"
@@ -31,7 +30,6 @@
           </q-tooltip>
         </b-link>
         <b-link href="#"
-                v-if="currentCompany && currentCompany.reseller_id !== 357"
                 :disabled="!contact.email"
                 :class="{ active : messageComposer.mode === 'email' }"
                 data-testid="email-tab-link"

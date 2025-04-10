@@ -26,7 +26,8 @@
                    :ripple="false"
                    :active="tab === 'team-inboxes'"
                    no-caps
-                   exact>
+                   exact
+                   v-if="hasCompanyTeamInboxEnabled">
         <span class="tab-icon">
           <e-inbox-mobile-icon :color="isActive('team-inboxes') ? '#256EFF' : '#A3A3A3'" />
         </span>

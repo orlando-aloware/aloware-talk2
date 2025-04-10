@@ -30,7 +30,7 @@
 
       <a href="https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast"
          target="_blank"
-         v-if="$route.name === 'Broadcasts' && !isSimpSocial">
+         v-if="$route.name === 'Broadcasts'">
         <information-circle-icon class="ml-2 cursor-pointer"/>
         <q-tooltip>
           Check the article how to use the Broadcast
@@ -49,7 +49,7 @@
 
         <shared-login-menu v-if="!isElectron" />
 
-        <header-help v-if="!isTrial && !isSimpSocial" />
+        <header-help v-if="!isTrial" />
 
         <profile :hideProfileInfo="isMobileTransitionWidth" />
 
@@ -126,7 +126,6 @@ import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
   aclMixin,
-  simpsocialMixin,
   avatarMixin,
   goBackMixin,
   contactsListFiltersMixin,
@@ -156,14 +155,13 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE, EINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-header',
 
   mixins: [
     aclMixin,
-    simpsocialMixin,
     avatarMixin,
     goBackMixin,
     contactsListFiltersMixin,
@@ -218,7 +216,8 @@ export default {
       prevRoute: null,
       PHONE_USAGE_ERRORS,
       EINBOXES_MENU_ITEMS_TITLE,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE
+      EINBOXES_MENU_COMMUNICATIONS_TITLE,
+      EINBOXES_MENU_TITLE
     }
   },
 
@@ -353,6 +352,11 @@ export default {
       return this.$route.name === COMMUNICATIONS_CHANNELS_ROUTE_NAME
     },
 
+    isTeamInboxPage () {
+      const validRoutes = [EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE]
+      return validRoutes.includes(this.$route.name)
+    },
+
     settingsTabHeaderName () {
       if (!['Settings Tab'].includes(this.$route.name)) {
         return this.$route.name
@@ -388,7 +392,8 @@ export default {
       return this.isStatsPage ||
              this.isContactsPage ||
              this.isInPowerDialerListPage ||
-             this.isCommunicationsPage
+             this.isCommunicationsPage ||
+             this.isTeamInboxPage
     },
 
     isRefreshDisabled () {
@@ -402,6 +407,9 @@ export default {
         return this.loading
       }
       if (this.isCommunicationsPage) {
+        return this.loading
+      }
+      if (this.isTeamInboxPage) {
         return this.loading
       }
       return false
@@ -499,8 +507,10 @@ export default {
       } else if (this.isInPowerDialerListPage) {
         this.refreshPowerDialerListItems()
       } else if (this.isCommunicationsPage) {
-        this.resetCommunications()
+        this.resetCommunications(this.communicationFilters)
         this.getCommunications(this.communicationFilters)
+      } else if (this.isTeamInboxPage) {
+        this.resetTeamInbox()
       }
     },
 
@@ -541,6 +551,12 @@ export default {
 
     refreshPowerDialerListItems () {
       this.$VueEvent.fire('fetchPowerDialerListItems')
+    },
+
+    resetTeamInbox () {
+      this.$router.push({
+        name: 'Team Inboxes'
+      })
     }
   },
 

@@ -18,7 +18,7 @@
 
 <script>
 import VolumeHighIcon from 'src/components/icons/volume-high-icon.vue'
-import { aclMixin, agentMixin, communicationMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'barge-communication-button',
@@ -26,8 +26,7 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin,
-    simpsocialMixin
+    communicationMixin
   ],
 
   components: {

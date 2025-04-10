@@ -70,7 +70,7 @@ import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import { cloneDeep } from 'lodash'
-import { aclMixin, classicMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, classicMixin, whiteLabelMixin } from 'src/plugins/mixins'
 import * as storage from 'src/plugins/helpers/storage'
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import AloaiPromotionDialog from 'components/aloai-voice-analytics/aloai-promotion-dialog.vue'
@@ -81,7 +81,7 @@ export default {
   mixins: [
     aclMixin,
     classicMixin,
-    simpsocialMixin
+    whiteLabelMixin
   ],
 
   components: {
@@ -113,15 +113,15 @@ export default {
     },
 
     alowareTalk () {
-      return this.isSimpSocial ? 'Talk' : `${this.statics.name} Talk`
+      return `${this.statics.name} Talk`
     },
 
     classicUrl () {
-      return `${this.getClassicURL(this.isSimpSocial)}?from_talk_2=1&token=${storage.local.getItem('shared_cookie')}`
+      return `${this.getClassicURL()}?from_talk_2=1&token=${storage.local.getItem('shared_cookie')}`
     },
 
     isAiEngineEnabled () {
-      return (!this.isSimpSocial && this.currentCompany?.transcription_settings?.call_transcription_enabled &&
+      return (this.currentCompany?.transcription_settings?.call_transcription_enabled &&
              (this.currentCompany?.used_transcription_min < this.currentCompany?.plan?.included_transcription_min || !this.currentCompany?.transcription_settings?.overusage_restriction_enabled))
     },
 

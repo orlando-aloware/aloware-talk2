@@ -1,9 +1,6 @@
 name: Deploy Windows
 
 on:
-  push:
-    tags:
-      - '*'
   workflow_dispatch:
     inputs:
       environment:

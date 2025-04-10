@@ -122,6 +122,7 @@
               anchor="top middle"
               self="center middle"
               data-testid="integration-gohighlevel-sync-tooltip"
+              :offset="[0, 50]"
             >
               <p class="font-weight-bold mb-0">Click on this button to sync the data for this contact between {{ whiteLabelName }} and HighLevel.</p>
               <p class="font-weight-bold">You'll want to click on this button if:</p>
@@ -144,7 +145,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   gohighlevelIntegrationMixin,
   integrationMixin,
-  simpsocialMixin
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -156,7 +157,7 @@ export default {
   mixins: [
     gohighlevelIntegrationMixin,
     integrationMixin,
-    simpsocialMixin
+    whiteLabelMixin
   ],
 
   props: {

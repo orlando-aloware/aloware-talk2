@@ -6,6 +6,7 @@
       <div class="d-flex"
            v-if="!isBigScreen">
         <video-modal ref="videoModal"
+                     v-if="isTrial"
                      title="📞 Welcome to Aloware Talk!"
                      cookieName="welcome"
                      videoUrl="https://www.youtube.com/embed/6CAkvtjJMBQ?si=5IzLiDNjjIarUr1m"
@@ -13,7 +14,7 @@
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
                      :should-show-in-first-visit="true"
-                     v-if="!isSimpSocial && isTrial">
+        >
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -40,6 +41,7 @@
       <div class="d-flex"
            v-if="isBigScreen">
         <video-modal ref="videoModal"
+                     v-if="isTrial"
                      title="📞 Welcome to Aloware Talk!"
                      cookieName="welcome"
                      videoUrl="https://www.youtube.com/embed/6CAkvtjJMBQ?si=5IzLiDNjjIarUr1m"
@@ -47,7 +49,7 @@
                      notes="🔥 Ignite your communication game with <strong>Aloware Talk!</strong> </br></br> 📞 Dive into seamless conversations, build stronger connections, and make every word count. </br></br> Amplify your talk experience now! 💥🔊"
                      :should-show-default-activator="false"
                      :should-show-in-first-visit="true"
-                     v-if="!isSimpSocial && isTrial">
+        >
           <template v-slot:activator>
             <div class="button-index q-mr-lg demo--button"
                 @click="openWatchGuideVideo">
@@ -93,7 +95,7 @@
 </template>
 
 <script>
-import { classicMixin, simpsocialMixin, kycMixin } from 'src/plugins/mixins'
+import { classicMixin, kycMixin } from 'src/plugins/mixins'
 import { mapActions, mapState, mapGetters } from 'vuex'
 import VideoModal from 'components/video-modal.vue'
 import CompactBtn from 'components/compact-btn'
@@ -108,7 +110,6 @@ export default {
 
   mixins: [
     classicMixin,
-    simpsocialMixin,
     kycMixin
   ],
 
@@ -142,7 +143,7 @@ export default {
     },
 
     classicUrlCompliancePage () {
-      return `${this.getClassicURL(this.isSimpSocial)}/account?tab=compliance`
+      return `${this.getClassicURL()}/account?tab=compliance`
     },
 
     shouldShowUnlockTrialExperienceButton () {
@@ -172,9 +173,7 @@ export default {
   },
 
   mounted () {
-    if (this.isTrial && !this.isSimpSocial) {
-      this.setIsTrialBannerVisible(true)
-    }
+    this.setIsTrialBannerVisible(this.isTrial)
   }
 }
 </script>

@@ -45,7 +45,7 @@ export default {
 
         this.setIsLoadingInboxes(true)
         const nextPage = 1
-        const perPage = 100
+        const perPage = 50
 
         const response = await talk2Api.V2.inbox.inboxes.get({
           params: {
@@ -75,7 +75,7 @@ export default {
 
         this.setIsLoadingInboxes(true)
 
-        const perPage = 100
+        const perPage = 50
         const nextPage = this.currentInboxesPage + 1
         const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage, perPage })
 
@@ -139,7 +139,7 @@ export default {
         params: {
           inbox_id: inboxId,
           page: nextPage,
-          per_page: 100,
+          per_page: 50,
           ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : { inbox_type: 'unthreaded' }),
           ...(search ? {
             search_text: search,

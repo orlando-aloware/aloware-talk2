@@ -26,11 +26,11 @@
     <action-notification id="mention"
                          v-if="!isWidget" />
     <action-notification id="incomingCall"
-                         v-if="!isWidget"
+                         v-if="isWidget ? isSalesforceWidget : true"
                          position="b-toaster-top-center" />
     <action-notification id="callFishing"
                          position="b-toaster-top-center"
-                         v-if="!isWidget" />
+                         v-if="isWidget ? isSalesforceWidget : true" />
     <intercom v-if="isIntercomEnabled && !isWidget" />
   </div>
 </template>
@@ -67,7 +67,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile', 'authenticated', 'loading']),
-    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget']),
+    ...mapState(['statics', 'staticsLoaded', 'isWhiteLabel', 'isWidget', 'isSalesforceWidget']),
 
     isFromClassic () {
       const urlParams = new URLSearchParams(window.location.search)
