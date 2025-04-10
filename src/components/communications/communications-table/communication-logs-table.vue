@@ -7,9 +7,9 @@
       <div class="search flex-grow-1">
         <search-input class="w-100"
                       limit-search-characters
-                      :search="searchQuery"
-                      :disabled="isLoadingDisabled"
                       data-testid="contacts-view-search-input"
+                      :search="searchQuery"
+                      :disabled="isLoadingDisabled"                      
                       @search="onSearch" />
       </div>
 
@@ -30,8 +30,8 @@
 
           <div class="d-flex align-items-center justify-content-center ml-2 ml-sm-4 mr-sm-2">
             <compact-btn variant="primary"
-                        :compact="false"
-                        @clicked="changeTableSettingsVisibility(true)">
+                         :compact="false"
+                         @clicked="changeTableSettingsVisibility(true)">
               Table Settings
             </compact-btn>
           </div>
@@ -58,8 +58,8 @@
               :class="{'live-call-tr': isLiveCall(row)}"
               v-for="(row, index) in communicationsData">
             <template v-for="(col, colIndex) in columns">
-              <td :key="`r-${index}-c-${colIndex}`"
-                  class="text-center"
+              <td class="text-center"
+                  :key="`r-${index}-c-${colIndex}`"
                   :style="col.columnStyle"
                   v-if="col.name === 'disposition_status2'">
                 <div class="d-flex align-items-center justify-center">
@@ -71,8 +71,8 @@
                        v-else></i>
                   </button>
                   <disposition :row="row"
-                             :is-live-call="isLiveCall(row)"
-                             @on-details="onCommunicationDetails"/>
+                               :is-live-call="isLiveCall(row)"
+                               @on-details="onCommunicationDetails"/>
                 </div>
               </td>
 
@@ -81,8 +81,8 @@
                   :style="col.columnStyle"
                   v-else-if="col.name === 'incoming_number'">
                 <incoming-number :row="row"
-                               :campaign-id="row.campaign_id"
-                               @on-filter="onFilter"/>
+                                 :campaign-id="row.campaign_id"
+                                 @on-filter="onFilter"/>
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
@@ -169,7 +169,7 @@
                   :style="col.columnStyle"
                   v-else-if="col.name === 'attempting_users'">
                 <attempting-users expand-on-hover
-                                :row="row" />
+                                  :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
@@ -177,7 +177,7 @@
                   :style="col.columnStyle"
                   v-else-if="col.name === 'transfer_prior_user_ids'">
                 <transferred prop="transfer_prior_user_ids"
-                           :row="row" />
+                             :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
@@ -185,7 +185,7 @@
                   :style="col.columnStyle"
                   v-else-if="col.name === 'transfer_target_user_ids'">
                 <transferred prop="transfer_target_user_ids"
-                           :row="row" />
+                             :row="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
