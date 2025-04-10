@@ -914,7 +914,7 @@ export default {
       // Check if we should start wrap up timer
       const shouldStartWrapUp = this.hasNoParkedAndInprogressCall ||
         this.hasParkedAndInprogressCall ||
-        (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())
+        (this.hasCallInProgressNotParked && !this.callParkedFromAnotherTab())
 
       if (shouldStartWrapUp) {
         this.startWrapUpTimer()
