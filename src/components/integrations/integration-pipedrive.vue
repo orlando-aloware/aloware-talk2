@@ -122,7 +122,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   integrationMixin,
   pipedriveIntegrationMixin,
-  simpsocialMixin
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -134,7 +134,7 @@ export default {
   mixins: [
     pipedriveIntegrationMixin,
     integrationMixin,
-    simpsocialMixin
+    whiteLabelMixin
   ],
 
   props: {

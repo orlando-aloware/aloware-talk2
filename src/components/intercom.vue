@@ -35,11 +35,6 @@ export default {
 
   methods: {
     setup (newRoute = false) {
-      // @custom for SimpSocial
-      if (this.currentCompany?.reseller_id === 357) {
-        return
-      }
-
       if (!this.authenticated || !this.profile?.enabled || this.isWhiteLabel) {
         return
       }

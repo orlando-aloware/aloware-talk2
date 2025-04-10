@@ -31,22 +31,14 @@
     </script>
 
     <script>
-    // Favicon change script
-    const resellerHostnames = ['simpsocial', 'aloreseller']
-    const faviconElements = ['favicon128', 'favicon96', 'favicon32', 'favicon16', 'faviconIco']
+      // Favicon change script
+      const faviconElements = ['favicon128', 'favicon96', 'favicon32', 'favicon16', 'faviconIco']
 
-    // Check if current hostname is one of the resellers
-    const isReseller = resellerHostnames.some(hostname => window?.location?.hostname?.includes(hostname));
+      function updateFavicon(elementId, filename) {
+        document.getElementById(elementId).href = filename
+      }
 
-    function updateFavicon(elementId, filename) {
-      document.getElementById(elementId).href = filename
-    }
-
-    if (isReseller) {
-      // If the hostname matches a reseller, set all favicon links to the same file
-      faviconElements.forEach(element => updateFavicon(element, 'company-357-favicon.ico'))
-    } else {
-      // If not a reseller, determine favicon path based on the environment
+      // Determine favicon path based on the environment
       const env = '<%= process.env.APP_ENV %>';
       faviconElements.forEach(element => {
         const size = element.replace('favicon', '')
@@ -55,7 +47,6 @@
         const filename = env !== "production" ? `favicon-dev${suffix}` : `favicon${suffix}`
         updateFavicon(element, filename)
       })
-    }
-  </script>
+    </script>
   </body>
 </html>

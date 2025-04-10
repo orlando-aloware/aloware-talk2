@@ -13159,22 +13159,6 @@ h1.contact-list-name-label {
   scrollbar-width: none;
 }
 
-.new-car-container {
-  width: 600px;
-  max-width: 600px;
-  max-height: 576px;
-  height: 576px;
-
-  .container-cars {
-    overflow-y: scroll;
-    max-height: 400px;
-  }
-
-  .infinite-scroll-loading {
-    height: 50px;
-  }
-}
-
 .overflow-x-hidden {
   overflow-x: hidden;
 }

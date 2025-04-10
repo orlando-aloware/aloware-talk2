@@ -145,21 +145,6 @@
                              @change="onFetchMyContacts">
             </b-form-checkbox>
           </div>
-          <div>
-            <compact-btn borderless
-                         variant="outlined-light"
-                         customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
-                         v-if="isSimpSocial"
-                         data-testid="contacts-view-simp-social-compact-button"
-                         @clicked="onMessengerClick">
-              <iframe id="ss-messenger-button"
-                      frameborder="0"
-                      style=""
-                      data-testid="contacts-view-simp-social-iframe"
-                      :src="simpsocialMessengerIframeLink">
-              </iframe>
-            </compact-btn>
-          </div>
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
@@ -827,7 +812,6 @@ import {
   aclMixin,
   viewMixin,
   contactsListFiltersMixin,
-  simpsocialMixin,
   kycMixin,
   userMixin
 } from 'src/plugins/mixins'
@@ -855,7 +839,6 @@ export default {
     aclMixin,
     viewMixin,
     contactsListFiltersMixin,
-    simpsocialMixin,
     kycMixin,
     userMixin
   ],
@@ -1193,10 +1176,6 @@ export default {
         !this.listContactsLoaded ||
         this.list.show_in_public_folder ||
         this.list.type === this.ContactListTypes.DYNAMIC_REMOTE_LIST
-    },
-
-    simpsocialMessengerIframeLink () {
-      return `https://dealer.simpsocial.com/${this.currentCompany.id}/messenger/unread/count`
     },
 
     cleanedCurrentListFilters () {
@@ -2027,12 +2006,6 @@ export default {
 
       const owner = this.users.find(user => user.id === userId)
       return owner ? owner.name : ''
-    },
-
-    onMessengerClick () {
-      this.$router.push({
-        name: 'Messenger'
-      })
     },
 
     onBackToListsRedirect () {

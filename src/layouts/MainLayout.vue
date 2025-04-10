@@ -247,7 +247,6 @@ import {
   agentMixin,
   contactV2AttributesMixin,
   kycMixin,
-  simpsocialMixin,
   userMixin,
   settingsMixin,
   broadcastsMixin,
@@ -343,7 +342,6 @@ export default {
     agentMixin,
     contactV2AttributesMixin,
     kycMixin,
-    simpsocialMixin,
     userMixin,
     settingsMixin,
     broadcastsMixin,
@@ -997,7 +995,7 @@ export default {
     }
 
     this.mainListeners.kycStatusUpdated = (company) => {
-      if (this.isTrial && !this.isSimpSocial && !this.isModGen) {
+      if (this.isTrial && !this.isModGen) {
         this.setShowedKycReloadDialog(true)
       }
     }

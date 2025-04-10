@@ -1,6 +1,5 @@
 <template>
-    <div class="upgrade-now no-select"
-         v-if="!isSimpSocial">
+    <div class="upgrade-now no-select">
         <h3 class="title-text mt-2">{{ titleText }}</h3>
         <div class="flex-row mb-4 mt-2">
           <div class="col-12 col-md-10 offset-md-1">
@@ -29,13 +28,12 @@
 </template>
 
 <script>
-import { simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'upgrade-now',
 
   mixins: [
-    simpsocialMixin,
     userMixin
   ],
 

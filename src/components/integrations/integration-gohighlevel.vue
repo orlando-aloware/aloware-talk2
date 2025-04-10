@@ -145,7 +145,7 @@ import talk2Api from 'src/plugins/api/api'
 import {
   gohighlevelIntegrationMixin,
   integrationMixin,
-  simpsocialMixin
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -157,7 +157,7 @@ export default {
   mixins: [
     gohighlevelIntegrationMixin,
     integrationMixin,
-    simpsocialMixin
+    whiteLabelMixin
   ],
 
   props: {
