@@ -477,7 +477,7 @@ export default {
      * @returns {string}
      */
     parseMarkdown (text) {
-      if (typeof text !== 'string') return '';
+      if (typeof text !== 'string') return ''
       let renderer = new marked.Renderer()
       renderer.link = function (href, title, text) {
         var link = marked.Renderer.prototype.link.apply(this, arguments)
