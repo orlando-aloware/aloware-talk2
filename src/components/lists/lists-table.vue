@@ -321,6 +321,7 @@
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-delete-option"
+                                     v-if="showDeleteButton(row)"
                                      @click="onDeleteList(row)">
                       <delete-red-icon />
                       <span class="text-danger">Delete</span>
@@ -1162,6 +1163,14 @@ export default {
       this.sort = orderBy
       this.order = order
       this.refreshLists()
+    },
+
+    showDeleteButton (list) {
+      if (!this.isAdmin) {
+        return this.profile.id === list.contact_folder_created_by
+      }
+
+      return true
     }
   },
 
