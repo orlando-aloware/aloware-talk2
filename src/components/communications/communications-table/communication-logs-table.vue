@@ -9,7 +9,7 @@
                       limit-search-characters
                       data-testid="contacts-view-search-input"
                       :search="searchQuery"
-                      :disabled="isLoadingDisabled"                      
+                      :disabled="isLoadingDisabled"
                       @search="onSearch" />
       </div>
 
