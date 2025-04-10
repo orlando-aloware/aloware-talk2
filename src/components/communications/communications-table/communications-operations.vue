@@ -99,7 +99,7 @@ import WhisperCommunicationButton from 'components/communication/whisper-communi
 import EllipseIcon from 'components/icons/ellipse-icon'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { DISPOSITION_STATUS_INPROGRESS_NEW } from 'src/constants/communication-disposition-status'
-import { aclMixin, agentMixin, communicationMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'communications-operations',
@@ -107,8 +107,7 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin,
-    simpsocialMixin
+    communicationMixin
   ],
 
   components: {
