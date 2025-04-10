@@ -40,6 +40,7 @@
         We couldn't find any specific entities in this call. For more information please check
         <a style="color: blue"
            data-testid="comm-entities-section-this-article"
+           target="_blank"
            href="https://support.aloware.com/en/articles/9037887-frequently-asked-questions-smart-transcription">
           this article.
         </a>

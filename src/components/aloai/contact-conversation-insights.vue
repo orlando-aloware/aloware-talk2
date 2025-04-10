@@ -448,6 +448,12 @@ export default {
         }
       }).then(response => {
         this.insights = response.data
+        // Filter out key_topics that are objects or empty
+        if (this.insights?.summary?.key_topics && Array.isArray(this.insights.summary.key_topics)) {
+          this.insights.summary.key_topics = this.insights.summary.key_topics.filter(topic =>
+            typeof topic === 'string' && topic.trim() !== ''
+          )
+        }
       }).finally(() => {
         this.insightsLoaded = true
       })
@@ -471,7 +477,7 @@ export default {
      * @returns {string}
      */
     parseMarkdown (text) {
-      if (!text) return ''
+      if (typeof text !== 'string') return '';
       let renderer = new marked.Renderer()
       renderer.link = function (href, title, text) {
         var link = marked.Renderer.prototype.link.apply(this, arguments)
