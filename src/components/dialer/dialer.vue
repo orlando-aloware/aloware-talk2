@@ -3,26 +3,26 @@
 </template>
 
 <script>
-import TwilioDevice from '../communication/twilio/device'
 import _ from 'lodash'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
   agentMixin,
-  userMixin,
-  notificationMixin,
-  visibilityMixin,
-  unownedContactTaskMixin,
   dialerWrapUpMixin,
   dispositionsMixin,
-  sessionCallStatusMixin
+  notificationMixin,
+  sessionCallStatusMixin,
+  unownedContactTaskMixin,
+  userMixin,
+  visibilityMixin
 } from '../../boot/mixins'
-import * as WebrtcEvents from '../../constants/webrtc-events'
 import * as AgentStatus from '../../constants/agent-status'
-import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
+import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
+import * as WebrtcEvents from '../../constants/webrtc-events'
+import TwilioDevice from '../communication/twilio/device'
 
 export default {
   name: 'dialer',
@@ -72,7 +72,7 @@ export default {
 
     ...mapState('powerDialer', ['powerDialerTasks']),
 
-    ...mapState(['isWidget']),
+    ...mapState(['isWidget', 'isSalesforceWidget']),
 
     ...mapFields('powerDialer', [
       'activeTask',
@@ -93,7 +93,7 @@ export default {
       return this.dialer.parkedCall && this.dialer.call
     },
 
-    hasCallInProgressNoParkedCall () {
+    hasCallInProgressNotParked () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
@@ -318,7 +318,7 @@ export default {
     this.device.on(WebrtcEvents.UNREGISTERED, (device) => {
       this.removeUnownedLiveContactTask()
 
-      if (this.dialer.isReady && !this.isWidget) {
+      if (this.dialer.isReady && (this.isSalesforceWidget ? true : !this.isWidget)) {
         this.$generalNotification('Whoops! You have lost connection with the server. Check your internet connection and try again.', 'error', 10000)
         console.warn('[UNREGISTERED] Twilio token', this.dialer.token)
         this.setDialerIsReady(false)
@@ -340,7 +340,7 @@ export default {
     this.device.on(WebrtcEvents.INCOMING, (call) => {
       // Avoid continuing with the incoming call if it's a widget,
       // and ignore the call. Otherwise, Twilio will play the default incoming sound.
-      if (this.isWidget) {
+      if (this.isSalesforceWidget ? false : this.isWidget) {
         call._connection.ignore()
         return
       }
@@ -363,7 +363,7 @@ export default {
         this.$q.electron.ipcRenderer.send('restore_app')
       }
 
-      this.getCommunication(this.dialer.call.callSid, this.dialer.call.from).then(res => {
+      this.getCommunication(call.callSid, call.from).then(res => {
         if (res) {
           this.$VueEvent.fire('new_in_app_call', res.data)
           this.processActionNotification(res.data, 'call')
@@ -371,8 +371,8 @@ export default {
         }
       }).catch((err) => {
         console.log('getCommunication error', {
-          'callSid': this.dialer.call.callSid,
-          'from': this.dialer.call.from,
+          'callSid': call.callSid,
+          'from': call.from,
           'err': err
         })
       })
@@ -390,6 +390,13 @@ export default {
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
       console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
 
+      // don't do anything if there is no communication
+      if (!this.dialer.communication) {
+        console.log('No dialer communication found')
+      } else {
+        console.log('Dialer communication found', this.dialer.communication)
+      }
+
       if (this.dialer.communication) {
         this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
       }
@@ -399,9 +406,12 @@ export default {
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
 
-      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
-        this.startWrapUpTimer()
-        return
+      // only start wrap up timer if there is a communication
+      if (this.dialer.communication) {
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
+          this.startWrapUpTimer()
+          return
+        }
       }
 
       this.backToDial('Talk-Device.OnDisconnect')
@@ -864,8 +874,7 @@ export default {
         this.stopCallTimer()
         this.connection = null
         this.setDialerCurrentStatus('CALL_DISCONNECTED')
-
-        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
           this.startWrapUpTimer()
           return
         }
@@ -950,8 +959,8 @@ export default {
       }
 
       // set agent status to busy if it's an answer by browser/apps user
-      // @custom for HutchBug, Cardone Capital: rejecting a call should still keep the agent on the previous status
-      if (this.currentCompany && ![379, 892].includes(this.currentCompany.id) &&
+      // @custom for Cardone Capital: rejecting a call should still keep the agent on the previous status
+      if (this.currentCompany?.id === 892 &&
         !this.currentCompany.force_users_always_available) {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS, false, 1, 'Talk-RejectCall')
       }
@@ -1506,7 +1515,10 @@ export default {
     },
 
     backToDial (signature = 'Talk-BackToDial', forceStatus = false) {
-      this.resetAgentStatus(forceStatus, signature)
+      // do not send status change to Aloware because connection was cancelled outside, we will wait a new agent status from Aloware
+      if (signature !== 'Talk-Connection.OnCancel') {
+        this.resetAgentStatus(forceStatus, signature)
+      }
       this.resetCall(signature)
     },
 

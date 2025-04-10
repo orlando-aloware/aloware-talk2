@@ -167,13 +167,12 @@ pipeline {
                                         if (prEnvVars) {
                                             writeFile file: 'pr.env', text: prEnvVars + '\n'
                                             sh '''
-                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env.temp
-                                            cat .env.temp pr.env | awk -F= '!seen[$1]++' > .env
-                                            rm .env.temp shared.env dev1.env pr.env
+                                            cat pr.env dev1.env shared.env | awk -F= '{if (!seen[$1]++) print}' > .env
+                                            rm shared.env dev1.env pr.env
                                             '''
                                         } else {
                                             sh '''
-                                            cat shared.env dev1.env | awk -F= '!seen[$1]++' > .env
+                                            cat dev1.env shared.env | awk -F= '!seen[$1]++' > .env
                                             rm shared.env dev1.env
                                             '''
                                         }
@@ -299,7 +298,7 @@ pipeline {
                                         writeFile file: 'dev2.env', text: dev2EnvVars + '\n'
 
                                         sh '''
-                                        cat shared.env dev2.env | awk -F= '!seen[$1]++' > .env
+                                        cat dev2.env shared.env | awk -F= '!seen[$1]++' > .env
                                         cp .env .env.prod
                                         rm shared.env dev2.env
                                         '''
@@ -486,7 +485,7 @@ pipeline {
                     if (env.CHANGE_BRANCH) {
                         def token = getGitHubAppToken()
                         def prId = sh(script: "echo ${env.GIT_BRANCH} | grep -o 'PR-[0-9]*' | grep -o '[0-9]*'", returnStdout: true).trim()
-                        
+
                         if (prId) {
                             wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[password: token, var: 'TOKEN']]]) {
                                 sh """
@@ -528,23 +527,23 @@ def getGitHubAppToken() {
         def rawToken = sh(script: '''
             now=$(date +%s)
             exp=$((now + 600))
-            
+
             header='{"alg":"RS256","typ":"JWT"}'
             payload='{"iat":'${now}',"exp":'${exp}',"iss":"'${GH_APP_ID}'"}'
-            
+
             base64_header=$(echo -n "${header}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
             base64_payload=$(echo -n "${payload}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-            
+
             signature=$(echo -n "${base64_header}.${base64_payload}" | openssl dgst -sha256 -sign "${GH_APP_PEM_FILE}" | base64 -w 0 | tr '+/' '-_' | tr -d '=')
-            
+
             jwt="${base64_header}.${base64_payload}.${signature}"
-            
+
             curl -s -X POST \
                 -H "Authorization: Bearer ${jwt}" \
                 -H "Accept: application/vnd.github+json" \
                 "https://api.github.com/app/installations/${GH_INSTALLATION_ID}/access_tokens" | jq -r .token
         ''', returnStdout: true).trim()
-        
+
         return rawToken
     }
 }

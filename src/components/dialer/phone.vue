@@ -1,7 +1,7 @@
 <template>
   <div class="phone d-flex flex-column"
        ref="phone"
-       :class="{ 'phone-with-banner': banner, 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': is_widget }"
+       :class="{ 'phone-with-banner': banner, 'invisible': !isVisible, 'no-padding': loadingPhone, 'phone-widget': isWidget }"
        v-if="loadingPhone || shouldShow">
     <mobile-live-call-bar :hide-live-call="true" />
     <div class="phone-header d-flex grabbable d-flex justify-content-between align-items-center flex-grow-0"
@@ -26,7 +26,7 @@
               'flex-row',
               'justify-content-between',
               'align-items-center',
-              (is_widget && (isCallCompleted || loadingPhone)) ? 'width-32' : 'width-65'
+              (isWidget && (isCallCompleted || loadingPhone)) ? 'width-32' : 'width-65'
             ]">
         <pause-record-icon width="14"
                            height="14"
@@ -98,7 +98,7 @@
           </div>
         </q-btn-dropdown>
 
-        <q-btn v-show="!is_widget"
+        <q-btn v-show="!isWidget"
                class="icon-btn auto-size height-12"
                icon="img:app-icons/dialer/phone_exit.svg"
                size="12px"
@@ -150,7 +150,7 @@
                 <span class="d-inline-flex">
                   {{ contactName | truncate(15) }}
                 </span>
-                <q-btn v-if="!is_widget"
+                <q-btn v-if="!isWidget"
                        class="text-size-rg d-inline-flex ml-1"
                        color="white"
                        icon="o_info"
@@ -542,7 +542,8 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="contact">
               <label class="form-control-label text-grey-90">
                 Contact Disposition
               </label>
@@ -556,7 +557,8 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90">
                 Send Message
               </label>
@@ -1251,72 +1253,72 @@
 </style>
 
 <script>
-import _ from 'lodash'
-import { mapActions, mapState } from 'vuex'
-import { mapFields } from 'vuex-map-fields'
-import {
-  communicationInfoMixin,
-  notificationMixin,
-  dispositionsMixin,
-  agentMixin,
-  dialerCommunicationMixin,
-  sessionCallStatusMixin
-} from 'src/plugins/mixins'
-import CancelCallIcon from 'components/icons/cancel-call-icon'
-import AcceptCallIcon from 'components/icons/accept-call-icon'
-import PersonIcon from 'components/icons/person-icon'
 import Avatar from 'components/avatar'
-import RecordIcon from 'components/icons/record-icon'
+import CommunicationAudio from 'components/communication-audio'
+import CommunicationNote from 'components/communication-note'
+import ContactIntegrations from 'components/contacts/contact-integrations'
+import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
+import AvailableUserSelector from 'components/generic-selectors/available-user-selector'
+import CommunicationTags from 'components/generic-selectors/communication-tags'
+import DeviceSelector from 'components/generic-selectors/device-selector'
+import EntityTags from 'components/generic-selectors/entity-tags'
+import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
+import ScriptSelector from 'components/generic-selectors/script-selector'
+import TemplateSelector from 'components/generic-selectors/template-selector'
+import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
+import CallDispositionWrapper from 'components/generic-wrappers/call-disposition-wrapper'
+import ContactDispositionWrapper from 'components/generic-wrappers/contact-disposition-wrapper'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
+import AcceptCallIcon from 'components/icons/accept-call-icon'
+import AddIcon from 'components/icons/add-icon'
+import CancelCallIcon from 'components/icons/cancel-call-icon'
+import ContactIcon from 'components/icons/contact-icon'
+import CopyIcon from 'components/icons/copy-icon'
 import DialpadIcon from 'components/icons/dialpad-icon'
+import DropParticipantIcon from 'components/icons/drop-participant-icon'
 import HoldIcon from 'components/icons/hold-icon'
+import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import IntegrationsIcon from 'components/icons/integrations-icon'
+import MergeIcon from 'components/icons/merge-icon'
+import MoreIcon from 'components/icons/more-icon'
 import MuteIcon from 'components/icons/mute-icon'
 import NotesIcon from 'components/icons/notes-icon'
-import TagsIcon from 'components/icons/tags-icon'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
+import ParticipantsIcon from 'components/icons/participants-icon'
+import PauseRecordIcon from 'components/icons/pause-record-icon'
+import PersonIcon from 'components/icons/person-icon'
+import ReadyIcon from 'components/icons/ready-icon'
+import RecordIcon from 'components/icons/record-icon'
 import ScriptsIcon from 'components/icons/scripts-icon'
-import ContactIntegrations from 'components/contacts/contact-integrations'
-import AddIcon from 'components/icons/add-icon'
-import MoreIcon from 'components/icons/more-icon'
+import TagsIcon from 'components/icons/tags-icon'
 import TransferIcon from 'components/icons/transfer-icon'
 import UnholdIcon from 'components/icons/unhold-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
-import PauseRecordIcon from 'components/icons/pause-record-icon'
-import IntegrationsIcon from 'components/icons/integrations-icon'
 import VmDropIcon from 'components/icons/vm-drop-icon'
-import CommunicationAudio from 'components/communication-audio'
-import CommunicationNote from 'components/communication-note'
-import CommunicationTags from 'components/generic-selectors/communication-tags'
-import CallDispositionWrapper from 'components/generic-wrappers/call-disposition-wrapper'
-import ContactDispositionWrapper from 'components/generic-wrappers/contact-disposition-wrapper'
-import TemplateSelector from 'components/generic-selectors/template-selector'
-import ParkCallIcon from 'components/icons/park-call-icon'
-import ContactIcon from 'components/icons/contact-icon'
-import ScriptSelector from 'components/generic-selectors/script-selector'
-import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
-import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
-import AvailableUserSelector from 'components/generic-selectors/available-user-selector'
-import ParticipantsIcon from 'components/icons/participants-icon'
-import ReadyIcon from 'components/icons/ready-icon'
-import DropParticipantIcon from 'components/icons/drop-participant-icon'
 import WaitingIcon from 'components/icons/waiting-icon'
-import MergeIcon from 'components/icons/merge-icon'
+import _ from 'lodash'
+import * as AnswerTypes from 'src/constants/answer-types'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import * as AnswerTypes from 'src/constants/answer-types'
 import * as InboundCallRecordingModes from 'src/constants/inbound-call-recording-modes'
 import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import CopyIcon from 'components/icons/copy-icon'
-import IgnoreCallIcon from 'components/icons/ignore-call-icon'
-import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
-import DeviceSelector from 'components/generic-selectors/device-selector'
-import ParkedCallIcon from 'components/icons/parked-call-icon'
+import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import API from 'src/plugins/api/api'
-import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
-import EntityTags from 'components/generic-selectors/entity-tags'
+import {
+  agentMixin,
+  communicationInfoMixin,
+  dialerCommunicationMixin,
+  dispositionsMixin,
+  notificationMixin,
+  sessionCallStatusMixin
+} from 'src/plugins/mixins'
+import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import * as AgentStatus from '../../constants/agent-status'
 
 export default {
@@ -1379,12 +1381,6 @@ export default {
   ],
 
   props: {
-    is_widget: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-
     ignore_calls: {
       type: Boolean,
       required: false,
@@ -1492,7 +1488,8 @@ export default {
       'parkedCalls',
       'callFishingQueue',
       'isCallBackButtonDisabled',
-      'isWidget'
+      'isWidget',
+      'isSalesforceWidget'
     ]),
 
     ...mapState('cache', ['currentCompany']),
@@ -1940,7 +1937,7 @@ export default {
     },
 
     // there is no parked call, but there is a call in-progress.
-    hasCallInProgressNoParkedCall () {
+    hasCallInProgressNotParked () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
@@ -1948,7 +1945,7 @@ export default {
     // arrives via Pusher at the frontend and changes the agent's status to wrap-up, at which point the button becomes enabled.
     // it includes "ParkingCalls" conditionals.
     isNotOnWrapUp () {
-      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall)
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked)
     },
 
     shouldDisableCallBackButton () {
@@ -2021,7 +2018,7 @@ export default {
     },
 
     setupDraggable () {
-      if (!this.is_widget && this.shouldShow) {
+      if (!this.isWidget && this.shouldShow) {
         this.openPhone()
 
         setTimeout(() => {
@@ -2041,7 +2038,7 @@ export default {
     },
 
     widgetShouldOpen () {
-      if (this.is_widget && this.shouldShow) {
+      if ((this.isSalesforceWidget ? false : this.isWidget) && this.shouldShow) {
         this.openPhone()
       }
     },
@@ -2693,8 +2690,8 @@ export default {
         this.$emit('onPhoneVisible', false)
 
         // emit the callCompleted event to display a message to close the widget.
-        // only emit the event if is_widget=true and the finish button is clicked.
-        if (this.is_widget && !this.callbackAction) {
+        // only emit the event if isWidget=true and the finish button is clicked.
+        if (this.isWidget && !this.callbackAction) {
           this.$emit('callCompleted')
         }
 

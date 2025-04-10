@@ -46,6 +46,12 @@ export default {
     ...mapActions('cache', ['setCurrentCompany']),
     broadcastInit () {
       console.log('initiating broadcast')
+
+      if (window.Echo) {
+        console.log('Broadcast already initialized')
+        return
+      }
+
       /**
        * Echo exposes an expressive API for subscribing to channels and listening
        * for events that are broadcast by Laravel. Echo and event broadcasting
