@@ -6,7 +6,10 @@
         @click="dialog">
     <ear-icon :height="iconHeight"
               :width="iconWidth"/>
-    <span v-if="showButtonText" class="ml-1">Whisper</span>
+    <span class="ml-1"
+          v-if="showButtonText">
+      Whisper
+    </span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-whisper-${_uid}`"
                v-else>

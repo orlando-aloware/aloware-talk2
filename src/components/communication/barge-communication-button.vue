@@ -7,7 +7,10 @@
     <volume-high-icon data-testid="comm-barge-comm-button-volume-high-icon-2"
                       :height="iconHeight"
                       :width="iconWidth"/>
-    <span v-if="showButtonText" class="ml-1">Barge</span>
+    <span class="ml-1"
+          v-if="showButtonText">
+      Barge
+    </span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-barge-${_uid}`"
                v-else>

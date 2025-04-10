@@ -7,7 +7,10 @@
         @click="dialog">
     <power-icon :height="iconHeight"
                 :width="iconWidth"/>
-    <span v-if="showButtonText" class="ml-1">Terminate</span>
+    <span class="ml-1"
+          v-if="showButtonText">
+      Terminate
+    </span>
     <b-tooltip data-testid="comm-terminate-comm-button-tooltip"
                custom-class="talk-table__tooltip"
                :target="`action-terminate-${_uid}`"
