@@ -163,9 +163,9 @@
                 <duration :row="row" />
               </td>
 
-              <td :key="`r-${index}-c-${colIndex}`"
+              <td class="overflow-visible"
+                  :key="`r-${index}-c-${colIndex}`"
                   :data-column="col.name"
-                  class="overflow-visible"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'attempting_users'">
                 <attempting-users expand-on-hover
@@ -245,8 +245,8 @@
                 <csat-score :row="row" />
               </td>
 
-              <td :key="`r-${index}-c-${colIndex}`"
-                  class="actions-td"
+              <td class="actions-td"
+                  :key="`r-${index}-c-${colIndex}`"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'operations'">
                 <div class="d-flex justify-content-center">
