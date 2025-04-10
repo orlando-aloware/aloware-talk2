@@ -7,14 +7,14 @@
       <div class="search flex-grow-1">
         <search-input class="w-100"
                       limit-search-characters
+                      data-testid="contacts-view-search-input"
                       :search="searchQuery"
                       :disabled="isLoadingDisabled"
-                      data-testid="contacts-view-search-input"
                       @search="onSearch" />
       </div>
 
       <div class="setting d-flex align-items-center flex-column flex-sm-row w-100 w-sm-auto gap-3 align-items-sm-center">
-        <div class="small text-muted fs-13 order-1 order-sm-1">
+        <div class="small text-muted fs-13 my-2 my-sm-0">
           <template v-if="!isLoadingCommunicationsCount">
             {{ communicationsCountValue }} Communications
           </template>
@@ -23,214 +23,260 @@
                       v-else />
         </div>
 
-        <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-3 order-0 order-sm-2 ml-sm-4">
-          <communications-filters />
-        </div>
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-flex align-items-center justify-content-center justify-content-sm-start ml-sm-4">
+            <communications-filters />
+          </div>
 
-        <div class="d-flex align-items-center justify-content-center order-2 order-sm-3 ml-sm-4 mr-sm-2">
-          <compact-btn variant="primary"
-                       :compact="false"
-                       @clicked="changeTableSettingsVisibility(true)">
-            Table Settings
-          </compact-btn>
+          <div class="d-flex align-items-center justify-content-center ml-2 ml-sm-4 mr-sm-2">
+            <compact-btn variant="primary"
+                         :compact="false"
+                         @clicked="changeTableSettingsVisibility(true)">
+              Table Settings
+            </compact-btn>
+          </div>
         </div>
       </div>
     </div>
 
-    <q-table class="talk-table flex-grow-1"
-             row-key="index"
-             virtual-scroll
-             hide-bottom
-             :data="communicationsData"
-             :columns="columns"
-             :loading="isLoadingMore || isLoadingCommunications"
-             :virtual-scroll-item-size="80"
-             :virtual-scroll-sticky-size-start="48"
-             :pagination="pagination"
-             :rows-per-page-options="[0]"
-             @virtual-scroll="onScroll">
-      <template v-slot:body="props">
-        <q-tr :props="props"
-              :class="{'live-call-tr': isLiveCall(props.row)}">
-          <q-td :props="props"
-                :key="col.name"
-                v-for="col in props.cols">
-            <div v-if="col.name === 'disposition_status2'">
-              <disposition :row="props.row"
-                           :style="col.columnStyle"
-                           :is-live-call="isLiveCall(props.row)"
-                           @on-details="onCommunicationDetails"/>
-            </div>
+    <div class="talk-table-container">
+      <datatable custom-class="communication-logs-table talk-table table-striped pl-0"
+                 sticky-headers
+                 scroll-area-class="communications-management-scroll-area"
+                 use-empty-slot
+                 :paginated="false"
+                 :columns="columns"
+                 :total-rows="communicationsCountValue"
+                 :current-page="paginationPage"
+                 :is-loading="isFirstLoad"
+                 :is-loading-more="isLoadingMore"
+                 @sort="sort"
+                 @reordered="onColumnsReordered"
+                 @more="onScroll">
+        <template #tbody>
+          <tr :key="index"
+              :class="{'live-call-tr': isLiveCall(row)}"
+              v-for="(row, index) in communicationsData">
+            <template v-for="(col, colIndex) in columns">
+              <td class="text-center"
+                  :key="`r-${index}-c-${colIndex}`"
+                  :style="col.columnStyle"
+                  v-if="col.name === 'disposition_status2'">
+                <div class="d-flex align-items-center justify-center">
+                  <button class="btn btn-outlined-light btn-sm mr-3 toggle-mobile-details"
+                          @click="toggleMobileDetails(row, $event)">
+                    <i class="fa fa-chevron-down"
+                       v-if="communicationMobileDetailsOpened[row.id]"></i>
+                    <i class="fa fa-chevron-right"
+                       v-else></i>
+                  </button>
+                  <disposition :row="row"
+                               :is-live-call="isLiveCall(row)"
+                               @on-details="onCommunicationDetails"/>
+                </div>
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'incoming_number'">
-              <incoming-number :row="props.row"
-                               :campaign-id="props.row.campaign_id"
-                               @on-filter="onFilter"/>
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'incoming_number'">
+                <incoming-number :row="row"
+                                 :campaign-id="row.campaign_id"
+                                 @on-filter="onFilter"/>
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'body'">
-              <message-body :style="col.columnStyle"
-                            :communication="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'body'">
+                <message-body :communication="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'ring_group'">
-              <ring-group :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'ring_group'">
+                <ring-group :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'created_at'">
-              <start-time :row="props.row" />
-            </div>
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'talk_time'">
-              <talk-time :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'created_at'">
+                <start-time :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'wait_time'">
-              <wait-time :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'talk_time'">
+                <talk-time :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'hold_time'">
-              <hold-time :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'wait_time'">
+                <wait-time :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'contact'">
-              <contact :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'hold_time'">
+                <hold-time :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'user_id'">
-              <user :row="props.row"
-                    @on-filter="onFilter"/>
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'contact'">
+                <contact :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'broadcast'">
-              <broadcast :value="props.row.broadcast_id" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'user_id'">
+                <user :row="row"
+                      @on-filter="onFilter"/>
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'workflow'">
-              <workflow :value="props.row.workflow_id" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'broadcast'">
+                <broadcast :value="row.broadcast_id" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'duration'">
-              <duration :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'workflow'">
+                <workflow :value="row.workflow_id" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'attempting_users'">
-              <attempting-users expand-on-hover
-                                :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'duration'">
+                <duration :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'transfer_prior_user_ids'">
-              <transferred prop="transfer_prior_user_ids"
-                           :row="props.row" />
-            </div>
+              <td class="overflow-visible"
+                  :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'attempting_users'">
+                <attempting-users expand-on-hover
+                                  :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'transfer_target_user_ids'">
-              <transferred prop="transfer_target_user_ids"
-                           :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'transfer_prior_user_ids'">
+                <transferred prop="transfer_prior_user_ids"
+                             :row="row" />
+              </td>
 
-            <div data-testid="cold-transfer-row"
-                 :style="col.columnStyle"
-                 v-else-if="col.name === 'in_cold_transfer'">
-              <span>{{ props.row.in_cold_transfer ? 'Yes' : 'No' }}</span>
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'transfer_target_user_ids'">
+                <transferred prop="transfer_target_user_ids"
+                             :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'transfer_type'">
-              <transfer-type :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'in_cold_transfer'">
+                <span data-testid="cold-transfer-row">{{ row.in_cold_transfer ? 'Yes' : 'No' }}</span>
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'callback_status'">
-              <callback-status :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'transfer_type'">
+                <transfer-type :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'queue_resolution2'">
-              <queue-resolution :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'callback_status'">
+                <callback-status :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'creator_type'">
-              <creator-type :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'queue_resolution2'">
+                <queue-resolution :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'tags'">
-              <communications-tags :communication="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'creator_type'">
+                <creator-type :row="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'notes'">
-              <wallboard-calls-note ellipse
-                                    :style="col.columnStyle"
-                                    :communication="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'tags'">
+                <communications-tags :communication="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'csat_score'">
-              <csat-score :row="props.row" />
-            </div>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'notes'">
+                <wallboard-calls-note ellipse
+                                      :communication="row" />
+              </td>
 
-            <div :style="col.columnStyle"
-                 v-else-if="col.name === 'operations'">
-              <communications-operations :row="props.row"
-                                         @on-details="openCommunicationDetailsPage"
-                                         @archived="removeCommunication"
-                                         @terminated="removeCommunication" />
-            </div>
-          </q-td>
-        </q-tr>
-      </template>
-    </q-table>
+              <td :key="`r-${index}-c-${colIndex}`"
+                  :data-column="col.name"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'csat_score'">
+                <csat-score :row="row" />
+              </td>
 
-    <div class="talk-table--no-data h5"
-         v-if="!communicationsData.length && !isLoadingMore && !isLoadingCommunications">
-      No communications found based on the current filters
+              <td class="actions-td"
+                  :key="`r-${index}-c-${colIndex}`"
+                  :style="col.columnStyle"
+                  v-else-if="col.name === 'operations'">
+                <div class="d-flex justify-content-center">
+                  <communications-operations :row="row"
+                                             @on-details="openCommunicationDetailsPage"
+                                             @archived="removeCommunication"
+                                             @terminated="removeCommunication" />
+                </div>
+              </td>
+            </template>
+          </tr>
+        </template>
+
+        <template #empty>
+          <div class="text-center loading-spinner"
+               v-if="communicationsData.length === 0 && isLoadingCommunications">
+            <q-spinner-bars class=""
+                            color="primary"
+                            size="28px" />
+          </div>
+          <div class="w-100 text-center"
+               v-else-if="!isLoadingCommunications && !isLoadingMore && communicationsData.length === 0">
+            <h2>No communications found based on the current filters</h2>
+          </div>
+        </template>
+      </datatable>
     </div>
 
     <communications-details-sidebar :communication="sidebarCommunication"
                                     v-model="showCommunicationSidebar"/>
-
-    <div class="d-flex align-items-center justify-content-center border-top flex-grow-0 overflow-x-hidden pt-3"
-         v-if="paginated">
-      <q-pagination class="table-pagination talk-table-pagination"
-                    padding="0 5px"
-                    boundary-links
-                    direction-links
-                    dense
-                    data-testid="datatable-pagination"
-                    :max="lastPage"
-                    :max-pages="maxPaginationPages"
-                    :ellipses="false"
-                    :boundary-numbers="false"
-                    v-model="paginationPage"
-                    @input="updatePaginationButtons" />
-      <q-select class="q-select-pager talk-table-per-page-select"
-                option-value="value"
-                option-label="label"
-                outlined
-                dense
-                emit-value
-                data-testid="datatable-per-page-select"
-                :options="perPageOptions"
-                :display-value="`${perPage} per page`"
-                v-model="perPage" />
-    </div>
 
     <communication-table-settings :is-open="showColumnHeadersModal"
                                   :available-fields="tableFields"
@@ -275,6 +321,9 @@ import { mapState, mapActions } from 'vuex'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { merge } from 'lodash'
+import Datatable from 'src/components/datatable.vue'
+import CommunicationsMobileRowDetails from './communications-mobile-row-details.vue'
+import Vue from 'vue'
 
 export default {
   name: 'CommunicationLogsTable',
@@ -320,15 +369,26 @@ export default {
     CreatorType,
     CsatScore,
     WallboardCallsNote,
-    CommunicationsDetailsSidebar
+    CommunicationsDetailsSidebar,
+    Datatable
   },
 
   computed: {
     ...mapState('communications', [
       'activeChannel',
       'hasMoreCommunications',
-      'channelClonedFilter'
-    ])
+      'channelClonedFilter',
+      'paginationPage'
+    ]),
+
+    isFirstLoad () {
+      // return false if loading more to mantain datatable scroll position (via resetScroll())
+      if (this.isLoadingMore) {
+        return false
+      }
+
+      return this.isLoadingCommunications
+    }
   },
 
   data () {
@@ -344,7 +404,8 @@ export default {
       showCommunicationSidebar: false,
       sidebarCommunication: {},
       communicationsData: [],
-      communicationsCountValue: 0
+      communicationsCountValue: 0,
+      communicationMobileDetailsOpened: {}
     }
   },
 
@@ -386,26 +447,19 @@ export default {
       })
     },
 
-    async onScroll ({ index, ref }) {
+    async onScroll () {
       if (this.isLoadingCommunications || this.isLoadingMore) {
         return
       }
 
-      const lastIndex = this.communicationsData.length - 1
-
-      if (
-        this.hasMoreCommunications &&
-        index === lastIndex &&
-        index > 0
-      ) {
-        await this.loadMoreCommunications()
-        ref.refresh()
+      if (this.hasMoreCommunications) {
+        this.loadMoreCommunications()
       }
     },
 
     async loadMoreCommunications () {
       if (this.hasMoreCommunications && !this.isLoadingMore && !this.isLoadingCommunications) {
-        await this.getCommunications(this.communicationFilters, undefined, true)
+        this.getCommunications(this.communicationFilters, undefined, true)
       }
     },
 
@@ -447,6 +501,7 @@ export default {
       if (index > -1) {
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
+        this.cleanupMobileDetailRows()
       }
     },
 
@@ -527,6 +582,7 @@ export default {
         // remove it if found
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
+        this.cleanupMobileDetailRows()
       }
     },
 
@@ -535,6 +591,77 @@ export default {
         path: `/contacts/${communication.contact_id}/communications/${communication.id}`
       })
       window.open(route.href, '_blank')
+    },
+
+    onColumnsReordered (columns) {
+      this.columns = columns
+      this.saveColumns(columns)
+    },
+
+    toggleMobileDetails (row, event) {
+      const currentRow = event.target.closest('tr')
+      const tableBody = currentRow.parentElement
+      const rowIndex = Array.from(tableBody.children).indexOf(currentRow)
+      // Check if details row already exists
+      let detailsRow = tableBody.querySelector(`tr[data-details-for="${row.id}"]`)
+      if (detailsRow) {
+        // If exists, remove it
+        detailsRow.remove()
+        this.communicationMobileDetailsOpened[row.id] = false
+        return
+      }
+
+      // assign with spread operator to fix reactivity issues
+      this.communicationMobileDetailsOpened = {
+        ...this.communicationMobileDetailsOpened,
+        [row.id]: true
+      }
+
+      // Create new details row
+      detailsRow = document.createElement('tr')
+      detailsRow.setAttribute('data-details-for', row.id)
+      detailsRow.classList.add('mobile-details-row')
+      // Create single cell that spans all columns
+      const detailsCell = document.createElement('td')
+      detailsCell.colSpan = this.columns.length
+
+      // Create a div to mount the Vue component
+      const mountPoint = document.createElement('div')
+      detailsCell.appendChild(mountPoint)
+
+      // Show all columns that are applied (except disposition_status2 and operations)
+      const visibleColumns = this.columns.filter((c) => !['disposition_status2', 'operations'].includes(c.name))
+
+      // Create and mount the Mobile details component
+      const ComponentClass = Vue.extend(CommunicationsMobileRowDetails)
+      const instance = new ComponentClass({
+        propsData: {
+          communication: row,
+          visibleColumns
+        },
+        parent: this
+      })
+
+      instance.$on('on-filter', this.onFilter)
+      instance.$on('on-details', this.onCommunicationDetails)
+
+      instance.$mount(mountPoint)
+      detailsRow.appendChild(detailsCell)
+
+      // Insert after the current row
+      tableBody.insertBefore(detailsRow, tableBody.children[rowIndex + 1])
+    },
+
+    cleanupMobileDetailRows () {
+      if (this.isLoadingMore) {
+        return
+      }
+
+      if (Object.keys(this.communicationMobileDetailsOpened).length) {
+        this.communicationMobileDetailsOpened = {}
+      }
+
+      document.querySelectorAll('.mobile-details-row').forEach((e) => e.remove())
     }
   },
 
@@ -555,6 +682,11 @@ export default {
     },
     communicationsCount (newValue) {
       this.communicationsCountValue = newValue
+    },
+    isLoadingCommunications (newValue) {
+      if (newValue) {
+        this.cleanupMobileDetailRows()
+      }
     }
   },
 

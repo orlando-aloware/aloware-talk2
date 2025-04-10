@@ -2,20 +2,20 @@
   <span class="cursor-pointer"
         data-testid="comm-barge-comm-button-dialog-click"
         :id="`action-barge-${_uid}`"
-        @click="dialog"
-        v-if="userCanBargeAndWhisper(communication)">
+        v-if="userCanBargeAndWhisper(communication)"
+        @click="dialog">
     <volume-high-icon data-testid="comm-barge-comm-button-volume-high-icon-2"
                       :height="iconHeight"
                       :width="iconWidth"/>
-
+    <span class="ml-1"
+          v-if="showButtonText">
+      Barge
+    </span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-barge-${_uid}`"
-               v-if="blackTooltip">
+               v-else>
       Barge
     </b-tooltip>
-    <q-tooltip v-else>
-      Barge
-    </q-tooltip>
   </span>
 </template>
 
@@ -58,7 +58,7 @@ export default {
       default: 22
     },
 
-    blackTooltip: {
+    showButtonText: {
       type: Boolean,
       default: false
     }
