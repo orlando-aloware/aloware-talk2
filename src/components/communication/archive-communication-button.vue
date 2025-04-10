@@ -7,7 +7,10 @@
     <trash-icon height="16"
                 width="16"
                 color="#62666E"/>
-    <span v-if="showButtonText" class="ml-1">Delete</span>
+    <span class="ml-1"
+          v-if="showButtonText">
+      Delete
+    </span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-delete-${_uid}`"
                v-else>

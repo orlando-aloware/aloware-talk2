@@ -235,7 +235,7 @@
                   :style="col.columnStyle"
                   v-else-if="col.name === 'notes'">
                 <wallboard-calls-note ellipse
-                                    :communication="row" />
+                                      :communication="row" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
@@ -251,9 +251,9 @@
                   v-else-if="col.name === 'operations'">
                 <div class="d-flex justify-content-center">
                   <communications-operations :row="row"
-                                           @on-details="openCommunicationDetailsPage"
-                                           @archived="removeCommunication"
-                                           @terminated="removeCommunication" />
+                                             @on-details="openCommunicationDetailsPage"
+                                             @archived="removeCommunication"
+                                             @terminated="removeCommunication" />
                 </div>
               </td>
             </template>
@@ -264,8 +264,8 @@
           <div class="text-center loading-spinner"
                v-if="communicationsData.length === 0 && isLoadingCommunications">
             <q-spinner-bars class=""
-                          color="primary"
-                          size="28px" />
+                            color="primary"
+                            size="28px" />
           </div>
           <div class="w-100 text-center"
                v-else-if="!isLoadingCommunications && !isLoadingMore && communicationsData.length === 0">

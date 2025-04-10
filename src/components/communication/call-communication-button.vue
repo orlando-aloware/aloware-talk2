@@ -6,7 +6,10 @@
     <call-o-icon height="16"
                  width="16"
                  color="#62666E"/>
-    <span v-if="showButtonText" class="ml-1">Call Back</span>
+    <span class="ml-1"
+          v-if="showButtonText">
+      Call Back
+    </span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-call-${_uid}`"
                v-else>

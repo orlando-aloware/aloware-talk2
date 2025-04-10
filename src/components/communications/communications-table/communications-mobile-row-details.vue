@@ -1,91 +1,91 @@
 <template>
   <div class="mobile-detail-container">
-    <div v-for="column in visibleColumns"
+    <div class="mobile-detail-item"
          :key="column.name"
          :data-test-id="`mobile-detail-item-column-${column.name}`"
-         class="mobile-detail-item">
-      <div class="mobile-detail-label">
+         v-for="column in visibleColumns">
+       <div class="mobile-detail-label">
         {{ column.label }}
       </div>
       <div class="mobile-detail-value">
-        <incoming-number v-if="column.name === 'incoming_number'"
-                        :row="communication"
-                        :campaign-id="communication.campaign_id"
-                        @on-filter="$emit('on-filter', $event)" />
+        <incoming-number :row="communication"
+                         :campaign-id="communication.campaign_id"
+                         v-if="column.name === 'incoming_number'"
+                         @on-filter="$emit('on-filter', $event)" />
 
-        <message-body v-else-if="column.name === 'body'"
-                     :communication="communication" />
+        <message-body :communication="communication"
+                      v-else-if="column.name === 'body'" />
 
-        <ring-group v-else-if="column.name === 'ring_group'"
-                   :row="communication" />
+        <ring-group :row="communication"
+                    v-else-if="column.name === 'ring_group'" />
 
-        <start-time v-else-if="column.name === 'created_at'"
-                    mobile-row-details
-                   :row="communication" />
+        <start-time mobile-row-details
+                    :row="communication"
+                    v-else-if="column.name === 'created_at'" />
 
-        <talk-time v-else-if="column.name === 'talk_time'"
-                  :row="communication" />
+        <talk-time :row="communication"
+                   v-else-if="column.name === 'talk_time'" />
 
-        <wait-time v-else-if="column.name === 'wait_time'"
-                  :row="communication" />
+        <wait-time :row="communication"
+                   v-else-if="column.name === 'wait_time'" />
 
-        <hold-time v-else-if="column.name === 'hold_time'"
-                  :row="communication" />
+        <hold-time :row="communication"
+                   v-else-if="column.name === 'hold_time'" />
 
-        <contact v-else-if="column.name === 'contact'"
-                :row="communication" />
+        <contact :row="communication"
+                 v-else-if="column.name === 'contact'" />
 
-        <user v-else-if="column.name === 'user_id'"
-              :row="communication"
-              @on-filter="$emit('on-filter', $event)" />
+        <user :row="communication"
+               v-else-if="column.name === 'user_id'"
+               @on-filter="$emit('on-filter', $event)" />
 
-        <broadcast v-else-if="column.name === 'broadcast'"
-                  :value="communication.broadcast_id" />
+        <broadcast :value="communication.broadcast_id"
+                   v-else-if="column.name === 'broadcast'" />
 
-        <workflow v-else-if="column.name === 'workflow'"
-                 :value="communication.workflow_id" />
+        <workflow :value="communication.workflow_id"
+                  v-else-if="column.name === 'workflow'" />
 
-        <duration v-else-if="column.name === 'duration'"
-                 :row="communication" />
+        <duration :row="communication"
+                  v-else-if="column.name === 'duration'" />
 
-        <attempting-users v-else-if="column.name === 'attempting_users'"
-                         expand-on-hover
-                         :row="communication" />
+        <attempting-users expand-on-hover
+                          :row="communication"
+                          v-else-if="column.name === 'attempting_users'" />
 
-        <transferred v-else-if="column.name === 'transfer_prior_user_ids'"
-                    prop="transfer_prior_user_ids"
-                    :row="communication" />
+        <transferred prop="transfer_prior_user_ids"
+                     :row="communication"
+                     v-else-if="column.name === 'transfer_prior_user_ids'" />
 
-        <transferred v-else-if="column.name === 'transfer_target_user_ids'"
-                    prop="transfer_target_user_ids"
-                    :row="communication" />
+        <transferred prop="transfer_target_user_ids"
+                     :row="communication"
+                     v-else-if="column.name === 'transfer_target_user_ids'" />
 
-        <span v-else-if="column.name === 'in_cold_transfer'"
-              data-testid="cold-transfer-row">
+        <span data-testid="cold-transfer-row"
+              v-else-if="column.name === 'in_cold_transfer'">
           {{ communication.in_cold_transfer ? 'Yes' : 'No' }}
         </span>
 
-        <transfer-type v-else-if="column.name === 'transfer_type'"
-                      :row="communication" />
+        <transfer-type :row="communication"
+                       v-else-if="column.name === 'transfer_type'" />
 
-        <callback-status v-else-if="column.name === 'callback_status'"
-                        :row="communication" />
+        <callback-status :row="communication"
+                         v-else-if="column.name === 'callback_status'" />
 
-        <queue-resolution v-else-if="column.name === 'queue_resolution2'"
-                         :row="communication" />
+        <queue-resolution :row="communication"
+                          v-else-if="column.name === 'queue_resolution2'" />
 
-        <creator-type v-else-if="column.name === 'creator_type'"
-                     :row="communication" />
+        <creator-type :row="communication"
+                      v-else-if="column.name === 'creator_type'" />
 
-        <communications-tags v-else-if="column.name === 'tags'"
-                           :communication="communication" />
+        <communications-tags :communication="communication"
+                             v-else-if="column.name === 'tags'" />
 
-        <wallboard-calls-note v-else-if="column.name === 'notes'"
-                             ellipse
-                             :communication="communication" />
+        <wallboard-calls-note ellipse
+                              :communication="communication"
+                              v-else-if="column.name === 'notes'" />
 
-        <csat-score v-else-if="column.name === 'csat_score'"
-                   :row="communication" />
+        <csat-score :row="communication"
+                    v-else-if="column.name === 'csat_score'" />
       </div>
     </div>
   </div>
