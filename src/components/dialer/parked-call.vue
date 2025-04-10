@@ -37,11 +37,6 @@ import { mapState } from 'vuex'
 export default {
   name: 'parked-call',
 
-  data () {
-    return {
-    }
-  },
-
   computed: {
     ...mapState(['dialer']),
 
