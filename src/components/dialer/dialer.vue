@@ -393,33 +393,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-
-      // don't do anything if there is no communication
-      if (!this.dialer.communication) {
-        console.log('No dialer communication found')
-      } else {
-        console.log('Dialer communication found', this.dialer.communication)
-      }
-
-      if (this.dialer.communication) {
-        this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-      }
-
-      this.removeUnownedLiveContactTask()
-      this.stopCallTimer()
-      this.connection = null
-      this.setDialerCurrentStatus('CALL_DISCONNECTED')
-
-      // only start wrap up timer if there is a communication
-      if (this.dialer.communication) {
-        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
-          this.startWrapUpTimer()
-          return
-        }
-      }
-
-      this.backToDial('Talk-Device.OnDisconnect')
+      this.handleCallDisconnected(call, WebrtcEvents.DISCONNECT)
     })
 
     this.getDesktopToken()
@@ -881,33 +855,38 @@ export default {
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
-        if (this.dialer.communication) {
-          this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-        }
-
-        console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-
-        // Common disconnect handling steps
-        const handleDisconnect = () => {
-          this.removeUnownedLiveContactTask()
-          this.stopCallTimer()
-          this.connection = null
-          this.setDialerCurrentStatus('CALL_DISCONNECTED')
-          this.handlePostDisconnect()
-        }
-
-        // First refresh communication if there's an active call
-        if (this.dialer.call) {
-          this.forceRefreshCommunication()
-            .then(handleDisconnect)
-            .catch(err => {
-              console.error('Error refreshing communication:', err)
-              handleDisconnect()
-            })
-        } else {
-          handleDisconnect()
-        }
+        this.handleCallDisconnected(call, WebrtcEvents.CONNECTION_DISCONNECT)
       })
+    },
+
+    handleCallDisconnected (call, event) {
+      console.log('Call ended', call, event, this.dialer.parkedCall, this.dialer.call)
+
+      // don't do anything if there is no communication
+      if (!this.dialer.communication) {
+        console.log('No dialer communication found')
+      } else {
+        console.log('Dialer communication found', this.dialer.communication)
+      }
+
+      if (this.dialer.communication) {
+        this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+      }
+
+      this.removeUnownedLiveContactTask()
+      this.stopCallTimer()
+      this.connection = null
+      this.setDialerCurrentStatus('CALL_DISCONNECTED')
+
+      // only start wrap up timer if there is a communication
+      if (this.dialer.communication) {
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
+          this.startWrapUpTimer()
+          return
+        }
+      }
+
+      this.backToDial('Talk-Device.OnDisconnect')
     },
 
     handlePostDisconnect () {
