@@ -1,9 +1,9 @@
 import Echo from 'laravel-echo'
 import _ from 'lodash'
+import { getWebSocketCredentials } from 'src/boot/helpers'
+import * as ChannelType from 'src/constants/inbox-channels'
 import * as storage from 'src/plugins/helpers/storage'
 import { mapActions, mapState } from 'vuex'
-import * as ChannelType from 'src/constants/inbox-channels'
-import { getWebSocketCredentials } from 'src/boot/helpers'
 
 export default {
   computed: {
@@ -46,11 +46,6 @@ export default {
     ...mapActions('cache', ['setCurrentCompany']),
     broadcastInit () {
       console.log('initiating broadcast')
-
-      if (window.Echo) {
-        console.log('Broadcast already initialized')
-        return
-      }
 
       /**
        * Echo exposes an expressive API for subscribing to channels and listening
