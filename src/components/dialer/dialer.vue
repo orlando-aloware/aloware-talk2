@@ -109,8 +109,10 @@ export default {
   created () {
     this.dialerListeners.updateCommunication = (data) => {
       // check data matches dialer communication
+      let condition = 'none'
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
+        condition = 'dialer-communication'
         this.setDialerCommunication(data)
 
         const communication = this.dialer?.communication
@@ -139,6 +141,7 @@ export default {
       // check data matches dialer parked call
       if (this.dialer.parkedCall && this.dialer.parkedCall.id === data.id) {
         data = _.merge(this.dialer.parkedCall, data)
+        condition = 'parked-call'
         this.setDialerParkedCall(data)
 
         if (!this.dialer.parkedCallTimer) {
@@ -154,6 +157,12 @@ export default {
           }
         }
       }
+
+      console.log(`updateCommunication - ${condition}`, {
+        id: data.id,
+        current_status2: data.current_status2,
+        disposition_status2: data.disposition_status2
+      })
     }
 
     this.dialerListeners.reconnectDialer = () => {
