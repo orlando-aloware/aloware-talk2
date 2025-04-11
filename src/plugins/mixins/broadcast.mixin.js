@@ -527,6 +527,7 @@ export default {
           if (campaign) {
             event.communication.campaign = campaign
           }
+          console.log('update_communication - event.communication', event.communication.id)
           this.$VueEvent.fire('update_communication', event.communication)
         })
 
