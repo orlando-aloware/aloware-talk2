@@ -10,16 +10,8 @@ export default function () {
     activeInbox: {},
     inboxes: [],
     isLoadingInboxes: false,
-    currentInboxesPage: {
-      [INBOX_TYPE_PERSONAL]: 1,
-      [INBOX_TYPE_CONNECTED]: 1,
-      [INBOX_TYPE_WATCHING]: 1
-    },
-    hasMoreInboxes: {
-      [INBOX_TYPE_PERSONAL]: true,
-      [INBOX_TYPE_CONNECTED]: true,
-      [INBOX_TYPE_WATCHING]: true
-    },
+    currentInboxesPage: 0,
+    hasMoreInboxes: true,
     viewMode: THREADED,
     items: [],
     isLoadingItems: false,
