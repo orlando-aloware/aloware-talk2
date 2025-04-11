@@ -17,18 +17,15 @@
         Search inboxes by name
       </b-tooltip>
     </div>
-    <div :class="['einbox-nav-list__content', { 'einbox-nav-list__content--no-gap': expandedType !== null }]">
+    <div class="einbox-nav-list__content blue-scroll"
+         @scroll="onScroll">
       <einbox-nav-type :type="type.id"
                        :label="type.name"
                        :typed-inboxes="type.inboxes"
                        :key="type.name"
                        :active-inbox-id="activeInboxId"
-                       :expanded="expandedType === type.id"
-                       :reduced="expandedType && expandedType !== type.id"
                        v-for="type in typedInboxes"
-                       @inbox="onInboxSelect"
-                       @toggle-expanded="onToggleExpanded"
-                       @load-more="onLoadMore" />
+                       @inbox="onInboxSelect" />
 
       <div :class="[isLoadingInboxes ? 'py-5' : 'py-4', 'relative']"
            v-if="isLoadingInboxes">
@@ -70,7 +67,6 @@ import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { EINBOXES_MENU_TITLE } from 'src/router/routes'
 import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
 import { mapState, mapActions } from 'vuex'
-import { debounce } from 'lodash'
 
 export default {
   components: {
@@ -85,10 +81,8 @@ export default {
 
   data () {
     return {
-      loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300),
       search: '',
-      showSearchTooltip: false,
-      expandedType: null
+      showSearchTooltip: false
     }
   },
 
@@ -96,6 +90,7 @@ export default {
     ...mapState('Einbox', [
       'inboxes',
       'activeInboxId',
+      'hasMoreInboxes',
       'isLoadingInboxes',
       'showRefreshInboxesButton'
     ]),
@@ -146,12 +141,15 @@ export default {
       'setInboxes'
     ]),
 
-    onToggleExpanded (type) {
-      if (this.expandedType === type) {
-        this.expandedType = null
-        return
+    onScroll ({ target }) {
+      const bottomThreshold = 20
+
+      // Check if scrolled to bottom (with a small threshold)
+      const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
+
+      if (isNearBottom && !this.isLoadingInboxes && this.hasMoreInboxes) {
+        this.loadMoreInboxes(this.search)
       }
-      this.expandedType = type
     },
 
     onInboxSelect (inboxId, contactId = null) {
@@ -187,19 +185,21 @@ export default {
       this.fetchInboxes(this.search)
     },
 
-    onLoadMore (type) {
-      this.loadMoreInboxes(type, this.search)
-    },
-
     orderInboxes () {
       const sortedInboxes = [...this.inboxes].sort((a, b) => a.name.localeCompare(b.name))
       this.setInboxes({ data: sortedInboxes })
     },
 
+    getFirstInboxId () {
+      if (this.isMobile || !this.inboxes.length) {
+        return null
+      }
+
+      return this.personalInboxes.length ? this.personalInboxes[0]?.id : this.inboxes[0]?.id
+    },
+
     checkAndRedirectActiveInbox (ringGroup) {
-      const inboxId = this.$route.params.inboxId
-        ? parseInt(this.$route.params.inboxId)
-        : (!this.isMobile ? this.inboxes[0]?.id : null)
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
 
       if (inboxId && inboxId === ringGroup.id) {
         this.$router.push({ name: EINBOXES_MENU_TITLE })
@@ -251,10 +251,7 @@ export default {
     await this.fetchInboxes()
 
     if (this.inboxes.length) {
-      // If there are inboxes:
-      // - try to get id from route
-      // - otherwise set the first inbox as active, if not mobile
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : (!this.isMobile ? this.inboxes[0].id : null)
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
       const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
       if (inboxId) {
@@ -271,7 +268,7 @@ export default {
   watch: {
     '$route.params.inboxId' (inboxId) {
       if (!inboxId && this.inboxes.length && !this.isMobile) {
-        this.onInboxSelect(this.inboxes[0].id) // use the same behavior as created method
+        this.onInboxSelect(this.getFirstInboxId())
       }
     },
 
@@ -304,7 +301,7 @@ export default {
   height: 100%;
   background-color: #fff;
   color: #000;
-  padding: 7px;
+  padding: 7px 0 7px 7px;
 
   &__header {
     width: 100%;
@@ -323,10 +320,7 @@ export default {
     flex-direction: column;
     row-gap: 10px;
     padding: 10px 0px 10px 10px;
-
-    &--no-gap {
-      row-gap: 0;
-    }
+    overflow-y: auto;
   }
 }
 </style>
