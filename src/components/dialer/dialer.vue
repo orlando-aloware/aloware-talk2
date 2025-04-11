@@ -158,7 +158,11 @@ export default {
         }
       }
 
-      console.log(`updateCommunication - ${condition}`, data.id)
+      console.log(`updateCommunication - ${condition}`, {
+        id: data.id,
+        current_status2: data.current_status2,
+        disposition_status2: data.disposition_status2
+      })
     }
 
     this.dialerListeners.reconnectDialer = () => {
