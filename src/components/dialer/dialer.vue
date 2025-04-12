@@ -877,6 +877,7 @@ export default {
       this.stopCallTimer()
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
+      this.handlePostDisconnect()
 
       // only start wrap up timer if there is a communication
       if (this.dialer.communication) {
