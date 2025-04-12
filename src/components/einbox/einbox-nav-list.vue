@@ -17,15 +17,15 @@
         Search inboxes by name
       </b-tooltip>
     </div>
-    <div class="einbox-nav-list__scroll blue-scroll"
+    <div class="einbox-nav-list__content blue-scroll"
          @scroll="onScroll">
-      <einbox-nav-item :label="inbox.name"
-                       :value="inbox.id"
-                       :message-count="inbox.message_count"
-                       :is-active="activeInboxId === inbox.id"
-                       :key="inbox.id"
-                       v-for="inbox in inboxes"
-                       @click="onInboxSelect" />
+      <einbox-nav-type :type="type.id"
+                       :label="type.name"
+                       :typed-inboxes="type.inboxes"
+                       :key="type.name"
+                       :active-inbox-id="activeInboxId"
+                       v-for="type in typedInboxes"
+                       @inbox="onInboxSelect" />
 
       <div :class="[isLoadingInboxes ? 'py-5' : 'py-4', 'relative']"
            v-if="isLoadingInboxes">
@@ -60,17 +60,17 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
-import EinboxNavItem from './einbox-nav-item.vue'
+import EinboxNavType from './einbox-nav-type.vue'
 import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
-import { debounce } from 'lodash'
 import { EINBOXES_MENU_TITLE } from 'src/router/routes'
+import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
-    EinboxNavItem,
+    EinboxNavType,
     SearchInput,
     RefreshIcon
   },
@@ -81,9 +81,6 @@ export default {
 
   data () {
     return {
-      perPage: 50,
-      hasMorePages: true,
-      loadMoreInboxesDebounced: debounce(this.loadMoreInboxes, 300),
       search: '',
       showSearchTooltip: false
     }
@@ -93,13 +90,46 @@ export default {
     ...mapState('Einbox', [
       'inboxes',
       'activeInboxId',
+      'hasMoreInboxes',
       'isLoadingInboxes',
       'showRefreshInboxesButton'
     ]),
 
     ...mapState('auth', ['profile']),
 
-    ...mapState(['isMobile'])
+    ...mapState(['isMobile']),
+
+    personalInboxes () {
+      return this.inboxes.filter(inbox => inbox.is_personal)
+    },
+
+    connectedInboxes () {
+      return this.inboxes.filter(inbox => inbox.is_connected)
+    },
+
+    watchingInboxes () {
+      return this.inboxes.filter(inbox => inbox.is_watching)
+    },
+
+    typedInboxes () {
+      return [
+        {
+          id: INBOX_TYPE_PERSONAL,
+          name: 'Personal Inboxes',
+          inboxes: this.personalInboxes
+        },
+        {
+          id: INBOX_TYPE_CONNECTED,
+          name: 'Connected Inboxes',
+          inboxes: this.connectedInboxes
+        },
+        {
+          id: INBOX_TYPE_WATCHING,
+          name: 'Watching Inboxes',
+          inboxes: this.watchingInboxes
+        }
+      ]
+    }
   },
 
   methods: {
@@ -111,12 +141,14 @@ export default {
       'setInboxes'
     ]),
 
-    onScroll ({ verticalPosition, verticalSize, verticalContainerSize }) {
-      const bottomThreshold = 100
-      const isNearBottom = verticalPosition + verticalContainerSize + bottomThreshold >= verticalSize
+    onScroll ({ target }) {
+      const bottomThreshold = 20
 
-      if (isNearBottom && !this.loading && this.hasMorePages) {
-        this.loadMoreInboxesDebounced()
+      // Check if scrolled to bottom (with a small threshold)
+      const isNearBottom = target.scrollHeight - (target.scrollTop + target.clientHeight) <= bottomThreshold
+
+      if (isNearBottom && !this.isLoadingInboxes && this.hasMoreInboxes) {
+        this.loadMoreInboxes(this.search)
       }
     },
 
@@ -158,10 +190,16 @@ export default {
       this.setInboxes({ data: sortedInboxes })
     },
 
+    getFirstInboxId () {
+      if (this.isMobile || !this.inboxes.length) {
+        return null
+      }
+
+      return this.personalInboxes.length ? this.personalInboxes[0]?.id : this.inboxes[0]?.id
+    },
+
     checkAndRedirectActiveInbox (ringGroup) {
-      const inboxId = this.$route.params.inboxId
-        ? parseInt(this.$route.params.inboxId)
-        : (!this.isMobile ? this.inboxes[0]?.id : null)
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
 
       if (inboxId && inboxId === ringGroup.id) {
         this.$router.push({ name: EINBOXES_MENU_TITLE })
@@ -213,10 +251,7 @@ export default {
     await this.fetchInboxes()
 
     if (this.inboxes.length) {
-      // If there are inboxes:
-      // - try to get id from route
-      // - otherwise set the first inbox as active, if not mobile
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : (!this.isMobile ? this.inboxes[0].id : null)
+      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
       const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
       if (inboxId) {
@@ -233,7 +268,7 @@ export default {
   watch: {
     '$route.params.inboxId' (inboxId) {
       if (!inboxId && this.inboxes.length && !this.isMobile) {
-        this.onInboxSelect(this.inboxes[0].id) // use the same behavior as created method
+        this.onInboxSelect(this.getFirstInboxId())
       }
     },
 
@@ -266,6 +301,7 @@ export default {
   height: 100%;
   background-color: #fff;
   color: #000;
+  padding: 7px 0 7px 7px;
 
   &__header {
     width: 100%;
@@ -278,9 +314,12 @@ export default {
     }
   }
 
-  &__scroll {
-    height: 100%;
-    padding: 7px;
+  &__content {
+    height: calc(100% - 45px);
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    padding: 10px 0px 10px 10px;
     overflow-y: auto;
   }
 }

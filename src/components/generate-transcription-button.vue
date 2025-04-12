@@ -38,7 +38,7 @@
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import * as TranscriptionStatus from 'src/constants/transcription-status'
 import talk2Api from 'src/plugins/api/api'
-import { communicationInfoMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { communicationInfoMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
@@ -56,7 +56,7 @@ export default {
     }
   },
 
-  mixins: [communicationInfoMixin, simpsocialMixin],
+  mixins: [communicationInfoMixin],
 
   data () {
     return {

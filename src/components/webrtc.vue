@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
 import Dialer from 'components/dialer/dialer'
+import ParkedCall from 'components/dialer/parked-call.vue'
 import Phone from 'components/dialer/phone'
 import SelectCampaignDialog from 'components/dialer/select-campaign-dialog.vue'
 import {
@@ -27,7 +27,7 @@ import {
   broadcastMixin,
   dialerDataMixin
 } from 'src/boot/mixins'
-import ParkedCall from 'components/dialer/parked-call.vue'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   components: { ParkedCall, Dialer, Phone, SelectCampaignDialog },
@@ -85,19 +85,13 @@ export default {
     ...mapGetters('auth', ['profile']),
 
     showSelectCampaignDialog () {
-      console.log('show select campaign dialog?', this.dialer.currentStatus)
       const isLoadingDialer = ['GENERATING_TOKEN', 'TOKEN_GENERATED']
       if (isLoadingDialer.includes(this.dialer?.currentStatus)) {
         return false
       }
 
-      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL', 'ANSWERING_CALL', 'CALL_CONNECTED', 'HANGING_UP_CALL']
-      console.log(this.startDialing,
-        (this.isAlwaysAskModeEnabled ? true : !this.campaignId),
-        !isCallInProgress.includes(this.dialer?.currentStatus),
-        this.campaignsAreLoaded,
-        !this.dialer.parkedCall)
-      console.log('****************+')
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+
       return this.startDialing &&
         (this.isAlwaysAskModeEnabled ? true : !this.campaignId) &&
         !isCallInProgress.includes(this.dialer?.currentStatus) &&

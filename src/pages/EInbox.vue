@@ -63,7 +63,7 @@ export default {
 
   mounted () {
     // block direct access from non demo companies
-    if (!this.isDemoCompany && !this.isTeamInboxDemoCompany) {
+    if (!this.hasCompanyTeamInboxEnabled) {
       this.$router.push({ name: 'Inbox' })
     }
   },
@@ -80,6 +80,7 @@ export default {
 .einbox {
   height: 100%;
   width: 100%;
-  display: flex
+  display: flex;
+  background-color: #F9F9FB;
 }
 </style>

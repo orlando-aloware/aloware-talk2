@@ -2,20 +2,19 @@
   <span class="cursor-pointer"
         data-testid="comm-reply-button"
         :id="`action-reply-${_uid}`"
-        v-if="communication.type === CommunicationTypes.SMS && hasPermissionTo('send sms')"
         @click="goToContactPage">
     <reply-icon height="16"
                 width="16"
                 color="#62666E"/>
-
+    <span class="ml-1"
+          v-if="showButtonText">
+      Reply
+    </span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-reply-${_uid}`"
-               v-if="blackTooltip">
+               v-else>
       Reply
     </b-tooltip>
-    <q-tooltip v-else>
-      Reply
-    </q-tooltip>
   </span>
 </template>
 
@@ -41,7 +40,7 @@ export default {
       required: true
     },
 
-    blackTooltip: {
+    showButtonText: {
       type: Boolean,
       default: false
     }

@@ -1,9 +1,9 @@
 <template>
   <div data-testid="attempting-users-row"
        class="ellipse attempting-users-container"
+       :class="{ 'expand-on-hover': shouldExpandOnHover }"
        v-if="row.attempting_users?.length > 0">
-    <target-users-tree :class="{ 'expand-on-hover': shouldExpandOnHover }"
-                       :communication="row"
+    <target-users-tree :communication="row"
                        :show-label="false"/>
     <i class="fa fa-chevron-down show-more-icon"
        v-if="shouldExpandOnHover"/>

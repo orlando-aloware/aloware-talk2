@@ -70,5 +70,6 @@ export default {
 
 .no-max-width-collapse-button {
   max-width: 0px !important;
+  padding: 0px !important;
 }
 </style>

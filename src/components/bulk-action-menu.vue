@@ -142,10 +142,7 @@
 import { chunk } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { MOVE_CONTACTS_DIRECTION } from 'src/constants/power-dialer/power-dialer'
-import {
-  aclMixin,
-  simpsocialMixin
-} from 'src/plugins/mixins'
+import { aclMixin } from 'src/plugins/mixins'
 import { FROM_BULK_MENU } from 'src/constants/contacts-list-create-mode'
 import PowerDialerMobileIcon from 'components/icons/mobile-menu/power-dialer-mobile-icon'
 import AddUserIcon from 'components/icons/add-user-icon'
@@ -160,8 +157,7 @@ export default {
   ],
 
   mixins: [
-    aclMixin,
-    simpsocialMixin
+    aclMixin
   ],
 
   components: { PowerDialerMobileIcon, AddUserIcon },
@@ -308,7 +304,7 @@ export default {
     },
 
     showDeleteButton () {
-      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isSimpSocial && !this.isPowerDialer &&
+      return this.hasDeletePermission && !this.isAddView && this.canDelete && !this.isPowerDialer &&
         // hide button when dynamic remote list fetched
         this.lists[this.id]?.type !== ContactListTypes.DYNAMIC_REMOTE_LIST
     },
@@ -341,10 +337,6 @@ export default {
 
       // If user have been granted Delete permission, which is higher than Removing from list permission
       if (this.hasDeletePermission) {
-        // if is SimpSocial and user is just agent don't show, even when user has specific permission to delete contacts
-        if (this.isSimpSocial && isUserOnlyAgentInPublicFolder) {
-          return false
-        }
         return this.canDelete
       }
 

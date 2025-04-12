@@ -249,7 +249,7 @@ export default {
     },
 
     processCommunication (communication, isNew = false) {
-      if (communication.ring_group_id !== this.activeInboxId) {
+      if (!this.activeInboxId || communication.ring_group_id !== this.activeInboxId) {
         return
       }
 

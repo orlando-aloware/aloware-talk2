@@ -382,56 +382,6 @@ const talk2Api = {
         }
       },
 
-      simpsocial: {
-        messenger: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/messenger-source`)
-          }
-        },
-
-        dmsEquity: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/dms-equity-source`)
-          }
-        },
-
-        digitalLeadWar: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/digital-lead-war-source`)
-          }
-        },
-
-        emailBlast: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/email-source`)
-          }
-        },
-
-        videoConference: {
-          send (contactId = null, campaignId = null) {
-            if (contactId === null || campaignId === null) {
-              return null
-            }
-
-            return window.axios.post(`/integrations/simpsocial/video-conference-to-contact/${contactId}`, {
-              campaign_id: campaignId
-            })
-          }
-        },
-
-        creditApplication: {
-          send (contactId = null, campaignId = null) {
-            if (contactId === null || campaignId === null) {
-              return null
-            }
-
-            return window.axios.post(`/integrations/simpsocial/credit-application-to-contact/${contactId}`, {
-              campaign_id: campaignId
-            })
-          }
-        }
-      },
-
       zoho: {
         getViews () {
           return window.axios.get(`${suffixV1}integration/zoho/views`)

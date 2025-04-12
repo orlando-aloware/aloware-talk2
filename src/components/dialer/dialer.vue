@@ -94,7 +94,7 @@ export default {
       return this.dialer.parkedCall && this.dialer.call
     },
 
-    hasCallInProgressNoParkedCall () {
+    hasCallInProgressNotParked () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
@@ -393,24 +393,7 @@ export default {
     })
 
     this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-
-      if (this.dialer.communication) {
-        this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-      }
-
-      this.removeUnownedLiveContactTask()
-      this.stopCallTimer()
-      this.connection = null
-      this.setDialerCurrentStatus('CALL_DISCONNECTED')
-      this.handlePostDisconnect()
-
-      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
-        this.startWrapUpTimer()
-        return
-      }
-
-      this.backToDial('Talk-Device.OnDisconnect')
+      this.handleCallDisconnected(call, WebrtcEvents.DISCONNECT)
     })
 
     this.getDesktopToken()
@@ -442,12 +425,9 @@ export default {
       if (!this.dialer.communication) {
         return false
       }
-
       const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
-
       const isHoldAndInProgress = this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW &&
         this.dialer.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW
-
       return found || isHoldAndInProgress
     },
 
@@ -849,7 +829,7 @@ export default {
         this.dialerCallPrep(call)
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
-        this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+        this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
           .catch((err) => {
             console.log(err)
           })
@@ -875,43 +855,45 @@ export default {
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
-        if (this.dialer.communication) {
-          this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-        }
-
-        console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-
-        // Common disconnect handling steps
-        const handleDisconnect = () => {
-          console.log('HANDLE DISCONNECT ------------------')
-          this.removeUnownedLiveContactTask()
-          this.stopCallTimer()
-          this.connection = null
-          this.setDialerCurrentStatus('CALL_DISCONNECTED')
-          this.handlePostDisconnect()
-        }
-
-        const ringGroup = this.ringGroups.find(item => item.id === this.dialer.communication?.ring_group_id)
-        console.log('ring group', ringGroup, this.dialer.communication, this.ringGroups)
-        // First refresh communication if there's an active call
-        if (this.dialer.call) { // && ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) {
-          this.forceRefreshCommunication()
-            .then(handleDisconnect)
-            .catch(err => {
-              console.error('Error refreshing communication:', err)
-              handleDisconnect()
-            })
-        } else {
-          handleDisconnect()
-        }
+        this.handleCallDisconnected(call, WebrtcEvents.CONNECTION_DISCONNECT)
       })
+    },
+
+    handleCallDisconnected (call, event) {
+      console.log('Call ended', call, event, this.dialer.parkedCall, this.dialer.call)
+
+      // don't do anything if there is no communication
+      if (!this.dialer.communication) {
+        console.log('No dialer communication found')
+      } else {
+        console.log('Dialer communication found', this.dialer.communication)
+      }
+
+      if (this.dialer.communication) {
+        this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+      }
+
+      this.removeUnownedLiveContactTask()
+      this.stopCallTimer()
+      this.connection = null
+      this.setDialerCurrentStatus('CALL_DISCONNECTED')
+
+      // only start wrap up timer if there is a communication
+      if (this.dialer.communication) {
+        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
+          this.startWrapUpTimer()
+          return
+        }
+      }
+
+      this.backToDial('Talk-Device.OnDisconnect')
     },
 
     handlePostDisconnect () {
       // Check if we should start wrap up timer
       const shouldStartWrapUp = this.hasNoParkedAndInprogressCall ||
         this.hasParkedAndInprogressCall ||
-        (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())
+        (this.hasCallInProgressNotParked && !this.callParkedFromAnotherTab())
 
       if (shouldStartWrapUp) {
         this.startWrapUpTimer()
@@ -1004,8 +986,8 @@ export default {
       }
 
       // set agent status to busy if it's an answer by browser/apps user
-      // @custom for HutchBug, Cardone Capital: rejecting a call should still keep the agent on the previous status
-      if (this.currentCompany && ![379, 892].includes(this.currentCompany.id) &&
+      // @custom for Cardone Capital: rejecting a call should still keep the agent on the previous status
+      if (this.currentCompany?.id === 892 &&
         !this.currentCompany.force_users_always_available) {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS, false, 1, 'Talk-RejectCall')
       }
