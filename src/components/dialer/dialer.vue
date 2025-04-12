@@ -4,7 +4,6 @@
 
 <script>
 import _ from 'lodash'
-import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
@@ -67,7 +66,7 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany', 'profile']),
 
-    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups', 'parkedCalls']),
+    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
 
     ...mapState('auth', ['profile', 'authenticated']),
 
@@ -82,8 +81,8 @@ export default {
     ]),
 
     isNotInProgressCall () {
-      return (!this.dialer.call || !this.dialer.communication ||
-        !['connected', 'open'].includes(this.dialer.call.state)) && !this.isAgentOnCall
+      return !this.dialer.call || !this.dialer.communication ||
+        !['connected', 'open'].includes(this.dialer.call.state)
     },
 
     hasNoParkedAndInprogressCall () {
@@ -104,10 +103,6 @@ export default {
 
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
-    },
-
-    isCallInProgress () {
-      return this.dialer.call && ['connected', 'open'].includes(this.dialer.call.state)
     }
   },
 
@@ -408,7 +403,7 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.last_call || (this.isImpersonate && this.isAgentOnCall)) {
+      if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
         return
       }
 
@@ -420,17 +415,6 @@ export default {
         this.forceStartOnWrapUp()
       }
     },
-
-    callParkedFromAnotherTab () {
-      if (!this.dialer.communication) {
-        return false
-      }
-      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
-      const isHoldAndInProgress = this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW &&
-        this.dialer.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW
-      return found || isHoldAndInProgress
-    },
-
     forceStartOnWrapUp () {
       const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
         ? this.currentCompany.wrap_up_seconds
@@ -996,7 +980,7 @@ export default {
     },
 
     toggleMute () {
-      if (!this.isCallInProgress) {
+      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
 
@@ -1086,7 +1070,7 @@ export default {
     },
 
     toggleHold () {
-      if (!this.isCallInProgress) {
+      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
 
@@ -1198,10 +1182,6 @@ export default {
         console.log('Call parked')
 
         if (shouldAnswer) {
-          if (this.dialer.communication) {
-            this.setDialerCommunication()
-          }
-
           this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
         } else if (shouldUnpark) {
           this.unparkCall(data, true)
@@ -1222,19 +1202,11 @@ export default {
     },
 
     hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
-      if (this.isAgentOnCall && !this.dialer.call && this.dialer.communication) {
-        talk2Api.V1.communication.forceTerminate(this.dialer.communication.id)
-          .then(res => {
-            this.hangUpInterval(shouldAnswer, shouldUnpark, data)
-          })
-
+      if (!this.dialer.call) {
         return
       }
 
       console.log('Hanging up call')
-      if (!this.dialer.call) {
-        return
-      }
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
@@ -1245,10 +1217,6 @@ export default {
       // hangup an incoming call
       this.connection.hangup()
 
-      this.hangUpInterval(shouldAnswer, shouldUnpark, data)
-    },
-
-    hangUpInterval (shouldAnswer = false, shouldUnpark = false, data = null) {
       const counter = { data: 0 }
 
       this.$options.hangupInterval = setInterval(() => {
