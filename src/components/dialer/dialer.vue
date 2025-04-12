@@ -403,6 +403,7 @@ export default {
       this.stopCallTimer()
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
+      this.handlePostDisconnect()
 
       if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
         this.startWrapUpTimer()
