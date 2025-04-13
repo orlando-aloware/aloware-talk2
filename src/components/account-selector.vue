@@ -86,6 +86,7 @@ export default {
 
   computed: {
     ...mapState(['isMobile']),
+    ...mapState('cache', ['currentCompany']),
 
     accessesWithoutCurrent () {
       if (this.showAccountSelectorFirstLoad) {
