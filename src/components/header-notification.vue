@@ -63,7 +63,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex'
-import { aclMixin, classicMixin, kycMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, classicMixin, kycMixin } from 'src/plugins/mixins'
 import * as CompanyIssues from 'src/constants/company-issues'
 import CompactBtn from 'components/compact-btn'
 
@@ -75,8 +75,7 @@ export default {
   mixins: [
     aclMixin,
     classicMixin,
-    kycMixin,
-    simpsocialMixin
+    kycMixin
   ],
 
   computed: {
@@ -185,7 +184,7 @@ export default {
 
     getLink (link) {
       if (!link.external || !this.isAbsoluteURL(link.href)) {
-        return `${this.getClassicURL(this.isSimpSocial)}${link.href}`
+        return `${this.getClassicURL()}${link.href}`
       }
 
       return link.href

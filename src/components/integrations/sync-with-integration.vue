@@ -43,14 +43,14 @@
 import { GUESTY_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION } from 'src/constants/integrations'
 import talk2Api from 'src/plugins/api/api'
 import {
-  simpsocialMixin
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
 export default {
   name: 'sync-with-integration',
   mixins: [
-    simpsocialMixin
+    whiteLabelMixin
   ],
   props: {
     integration_title: {

@@ -820,11 +820,6 @@ export default {
         this.sms_reminder_fields.time = this.schedule.time
       }
 
-      // Set default time to 09:00 if reseller is SimpSocial
-      if (this.profile.company.reseller_id === 357) {
-        this.sms_reminder_fields.time = '09:00'
-      }
-
       this.setDefaultSmsReminderFields()
     },
 

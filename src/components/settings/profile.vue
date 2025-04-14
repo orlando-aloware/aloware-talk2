@@ -639,7 +639,7 @@ import {
   aclMixin,
   settingsMixin,
   kycMixin,
-  simpsocialMixin
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
@@ -653,7 +653,7 @@ export default {
     aclMixin,
     settingsMixin,
     kycMixin,
-    simpsocialMixin
+    whiteLabelMixin
   ],
 
   components: { UserCampaignSelector, AnswerTypeSelector, LineSelector, InformationCircleIcon },

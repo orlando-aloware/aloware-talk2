@@ -6,11 +6,10 @@
                :video-url="routeTutorialData.videoUrl"
                :learn-more-link="routeTutorialData.learnMoreLink"
                :should-show-in-first-visit="routeTutorialData.shouldShowInFirstVisit"
-               v-if="doesRouteHasTutorial && !isSimpSocial && isTrial && !isRouteLoading"/>
+               v-if="doesRouteHasTutorial && isTrial && !isRouteLoading"/>
 </template>
 
 <script>
-import { simpsocialMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
 import VideoModal from './video-modal.vue'
 
@@ -20,10 +19,6 @@ export default {
   components: {
     VideoModal
   },
-
-  mixins: [
-    simpsocialMixin
-  ],
 
   data () {
     return {

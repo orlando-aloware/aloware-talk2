@@ -21,11 +21,10 @@
                             :contact="contact"
                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
           <contact-push-to-crm data-testid="contact-details-push-to-crm"
-                               :contact="contact"
-                               v-if="isSimpSocial"/>
+                               :contact="contact"/>
           <contact-conversation-insights :contact="contact"
                                          data-testid="contact-conversation-insights"
-                                         v-if="!isSimpSocial && contact && shouldSeeExperimentalXproAiFeatures"/>
+                                         v-if="contact && shouldSeeExperimentalXproAiFeatures"/>
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
@@ -105,7 +104,7 @@ import ContactReservations from 'components/contacts/contact-reservations.vue'
 import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
 import EntityTags from 'components/generic-selectors/entity-tags'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import { aclMixin, contactMixin, contactV2AttributesMixin, simpsocialMixin, visibilityMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, contactV2AttributesMixin, visibilityMixin, userMixin } from 'src/plugins/mixins'
 import ContactConversationInsights from 'components/aloai/contact-conversation-insights.vue'
 
 export default {
@@ -134,7 +133,6 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    simpsocialMixin,
     userMixin
   ],
 
@@ -186,8 +184,7 @@ export default {
     },
 
     showAloAiControls () {
-      return !this.isSimpSocial &&
-        this.currentCompany.aloai_enabled &&
+      return this.currentCompany.aloai_enabled &&
         this.contact && !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
     }

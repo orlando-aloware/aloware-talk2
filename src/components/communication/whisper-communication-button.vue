@@ -2,25 +2,25 @@
   <span class="cursor-pointer"
         data-testid="comm-whisper-button-whisper-span"
         :id="`action-whisper-${_uid}`"
-        @click="dialog"
-        v-if="userCanBargeAndWhisper(communication)">
+        v-if="userCanBargeAndWhisper(communication)"
+        @click="dialog">
     <ear-icon :height="iconHeight"
               :width="iconWidth"/>
-
+    <span class="ml-1"
+          v-if="showButtonText">
+      Whisper
+    </span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-whisper-${_uid}`"
-               v-if="blackTooltip">
+               v-else>
       Whisper
     </b-tooltip>
-    <q-tooltip v-else>
-      Whisper
-    </q-tooltip>
   </span>
 </template>
 
 <script>
 import EarIcon from 'src/components/icons/ear-icon.vue'
-import { aclMixin, agentMixin, communicationMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'whisper-communication-button',
@@ -28,8 +28,7 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin,
-    simpsocialMixin
+    communicationMixin
   ],
 
   components: {
@@ -58,7 +57,7 @@ export default {
       default: 22
     },
 
-    blackTooltip: {
+    showButtonText: {
       type: Boolean,
       default: false
     }
