@@ -449,7 +449,7 @@ pipeline {
                         }
                     }
                 }
-
+                /*
                 stage('Sonar Analysis') {
                     stages {
                         stage('SonarQube') {
@@ -471,6 +471,7 @@ pipeline {
                         }
                     }
                 }
+                */
             }
         }
     }
