@@ -2,8 +2,24 @@
   <b-overlay class="h-100"
              :show="isBusy">
     <div class="t-flex-group__no-bg flex-column border-top h-100 overflow-hidden">
-      <SessionFilters @selected-tab="selectTab" />
-
+      <div class="d-flex align-items-center">
+        <div class="flex-grow-1">
+          <SessionFilters :selected-integration='selectedIntegration'
+                        @selected-tab="selectTab" />
+        </div>
+        <div class="ml-2" style="width: 200px;" v-if="supportedEnabledIntegrations.length > 1">
+          <q-select style="word-break: break-all;"
+                    color="primary"
+                    use-input
+                    emit-value
+                    map-options
+                    dense
+                    hide-bottom-space
+                    :options="supportedEnabledIntegrations"
+                    v-model="selectedIntegration">
+          </q-select>
+        </div>
+      </div>
       <div class="t-panel-container h-100 flex-grow-0 overflow-hidden">
         <q-tab-panels class="bg-transparent h-100 overflow-hidden"
                       v-model="panel">
@@ -20,12 +36,13 @@
 
           <q-tab-panel class="p-0"
                        name="CRM View">
-            <SessionContactPageCrm :usePopup="false" />
+            <SessionContactPageCrm :selected-integration='selectedIntegration'
+                                   :usePopup="false" />
           </q-tab-panel>
 
           <q-tab-panel class="p-0"
                        name="CRM Popup">
-            <SessionContactPageCrm />
+            <SessionContactPageCrm :selected-integration='selectedIntegration' />
           </q-tab-panel>
         </q-tab-panels>
       </div>
@@ -49,14 +66,16 @@ import SessionContactPageDetails from './pages/session-contact-page-details'
 import SessionContactPageActivity from './pages/session-contact-page-activity'
 import SessionContactPageCrm from './pages/session-contact-page-crm'
 import { mapActions, mapState } from 'vuex'
-import { hubspotIntegrationMixin } from 'src/plugins/mixins'
+import { hubspotIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
+import { HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'SessionPage',
 
   mixins: [
-    hubspotIntegrationMixin
+    hubspotIntegrationMixin,
+    integrationMixin
   ],
 
   components: {
@@ -71,12 +90,22 @@ export default {
       panel: 'Details',
       cancelToken: null,
       source: null,
-      isBusy: false
+      isBusy: false,
+      selectedIntegration: 'none'
+    }
+  },
+
+  mounted () {
+    if (this.supportedEnabledIntegrations.length > 0) {
+      this.selectedIntegration = this.supportedEnabledIntegrations[0]
     }
   },
 
   computed: {
-    ...mapState('powerDialer', ['activeTask', 'taskToCall'])
+    ...mapState('powerDialer', ['activeTask', 'taskToCall']),
+    supportedEnabledIntegrations () {
+      return this.integrationsEnabled.filter(integration => [HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION].includes(integration.toLowerCase()))
+    }
   },
 
   created () {

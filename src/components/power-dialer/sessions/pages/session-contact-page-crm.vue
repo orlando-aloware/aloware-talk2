@@ -1,15 +1,15 @@
 <template>
   <div class="row full-height">
     <div class="col-12 p-0">
-      <div class="hubspot-iframe-container" v-if="usePopup && hubspotLink">
+      <div class="integration-iframe-container" v-if="usePopup && integrationLink">
         The CRM will display in a popup. <br />
-        <a href="#" @click.prevent="openHubspotLink">Click here to manually open the CRM.</a>
+        <a href="#" @click.prevent="openIntegrationLink">Click here to manually open the CRM.</a>
       </div>
-      <div class="hubspot-iframe-container" v-if="!usePopup && hubspotLink">
-        <iframe class="hubspot-crm-iframe"
-                :src="hubspotLink"
+      <div class="integration-iframe-container" v-if="!usePopup && integrationLink">
+        <iframe class="integration-crm-iframe"
+                :src="integrationLink"
                 frameborder="0"
-                id="hubspot-crm">
+                id="integration-crm">
         </iframe>
       </div>
     </div>
@@ -21,6 +21,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 import { isEmpty } from 'lodash'
+import { HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
 export default {
   name: 'SessionContactPageCrm',
@@ -29,12 +30,16 @@ export default {
     usePopup: {
       type: Boolean,
       default: true
+    },
+    selectedIntegration: {
+      type: String,
+      required: true
     }
   },
 
   mounted () {
-    if (this.usePopup && !isEmpty(this.hubspotLink)) {
-      this.openHubspotLink()
+    if (this.usePopup && !isEmpty(this.integrationLink)) {
+      this.openIntegrationLink()
     }
   },
 
@@ -46,13 +51,15 @@ export default {
     ...mapGetters('auth', ['profile']),
     ...mapState('contacts', ['contact']),
 
-    hubspotLink () {
-      return this.getHubspotContactLink(this.contact, !this.usePopup)
-    },
-
-    test () {
-      const iframe = document.getElementById('hubspot-crm')
-      return iframe.contentWindow
+    integrationLink () {
+      switch (this.selectedIntegration.toLowerCase()) {
+        case SALESFORCE_INTEGRATION:
+          return this.getSalesforceLink()
+        case HUBSPOT_INTEGRATION:
+          return this.getHubspotContactLink(this.contact, !this.usePopup)
+        default:
+          return null
+      }
     }
   },
 
@@ -62,102 +69,44 @@ export default {
       'setContactClone'
     ]),
 
-    openHubspotLink () {
-      if (isEmpty(this.hubspotLink)) {
+    getSalesforceLink () {
+      return this.contact?.integration_data?.salesforce?.link
+    },
+
+    openIntegrationLink () {
+      if (isEmpty(this.integrationLink)) {
         return
       }
 
-      window.open(this.hubspotLink, 'hubspot-crm', 'width=1200,height=800')
-    },
-
-    getMappedUrlParams (params) {
-      const agentName = this.profile.name
-      const leadNumber = this.contact.phone_number
-      const firstName = this.contact.first_name
-      const address = this.contact.address
-      const companyName = this.contact.company_name
-      const city = this.contact.cnam_city
-      const state = this.contact.cnam_state
-      const zipcode = this.contact.cnam_zipcode
-      const email = this.contact.email
-      const website = this.contact.website
-      const userId = this.profile.id
-      let mappedParams = []
-
-      for (const entry of params.entries()) {
-        let [key, value] = entry
-
-        // map and convert to its equivalent actual value
-        if (/\[*\]/.test(value)) {
-          switch (value) {
-            case '[AgentName]':
-              value = agentName
-              break
-
-            case '[LeadNumber]':
-              value = leadNumber
-              break
-
-            case '[FirstName]':
-              value = firstName
-              break
-
-            case '[Address]':
-              value = address
-              break
-
-            case '[CompanyName]':
-              value = companyName
-              break
-
-            case '[FullState]':
-              value = city
-              break
-
-            case '[City]':
-              value = state
-              break
-
-            case '[ZipCode]':
-              value = zipcode
-              break
-
-            case '[Email]':
-              value = email
-              break
-
-            case '[Website]':
-              value = website
-              break
-
-            case '[UserId]':
-              value = userId
-              break
-          }
-        }
-
-        mappedParams.push(`${key}=${value}`)
-      }
-
-      return mappedParams
+      window.open(this.integrationLink, 'integration-crm', 'width=1200,height=800')
     }
   },
   watch: {
     contact: {
       deep: true,
       handler (newValue, oldValue) {
-        const oldHubspotLink = this.getHubspotContactLink(oldValue, !this.usePopup)
-        const newHubspotLink = this.getHubspotContactLink(newValue, !this.usePopup)
+        let oldLink = null
+        let newLink = null
+        switch (this.selectedIntegration.toLowerCase()) {
+          case HUBSPOT_INTEGRATION:
+            oldLink = this.getHubspotContactLink(oldValue, !this.usePopup)
+            newLink = this.getHubspotContactLink(newValue, !this.usePopup)
+            break
+          case SALESFORCE_INTEGRATION:
+            oldLink = this.getSalesforceLink(oldValue, !this.usePopup)
+            newLink = this.getSalesforceLink(newValue, !this.usePopup)
+            break
+        }
 
         // if it's the same contact (contact was immediately redialed)
         // but hubspot link is gone, reuse the old contact.
-        if (oldValue?.id === newValue?.id && isEmpty(newHubspotLink) && !isEmpty(oldHubspotLink)) {
+        if (oldValue?.id === newValue?.id && isEmpty(newLink) && !isEmpty(oldLink)) {
           this.setContact(oldValue)
           this.setContactClone(oldValue)
         }
 
         if (this.usePopup) {
-          this.openHubspotLink()
+          this.openIntegrationLink()
         }
       }
     }
@@ -166,7 +115,7 @@ export default {
 </script>
 
 <style scoped>
-.hubspot-iframe-container {
+.integration-iframe-container {
   display: flex;
   justify-content: center;
   align-items: center;
