@@ -96,7 +96,7 @@
               <td :key="`col-${colIndex}`"
                   v-if="column.name === 'start'">
                 <span>
-                  {{ call.created_at | fixFullDateTime($store) }}
+                  {{ call.created_at | fixFullDateTime }}
                 </span>
                 <div class="d-flex align-items-center justify-content-left"
                      v-if="call.call_disposition_id">

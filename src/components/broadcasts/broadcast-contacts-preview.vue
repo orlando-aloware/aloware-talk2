@@ -47,7 +47,7 @@
 
             <td :key="column.name"
                 v-else-if="column.name === 'created_at'">
-              {{ contact.created_at | fixFullDateTime($store) }}
+              {{ contact.created_at | fixFullDateTime }}
             </td>
           </template>
         </tr>
