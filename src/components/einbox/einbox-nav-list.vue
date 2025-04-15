@@ -68,7 +68,7 @@ import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { EINBOXES_MENU_TITLE } from 'src/router/routes'
 import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
-import { mapState, mapActions, mapMutations } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
@@ -161,10 +161,6 @@ export default {
       'setInboxes'
     ]),
 
-    ...mapMutations('Einbox', [
-      'SET_INBOXES'
-    ]),
-
     onScroll ({ target }) {
       const bottomThreshold = 20
 
@@ -211,7 +207,7 @@ export default {
 
     orderInboxes () {
       const sortedInboxes = [...this.inboxes].sort((a, b) => a.name.localeCompare(b.name))
-      this.SET_INBOXES(sortedInboxes)
+      this.setInboxes({ data: sortedInboxes })
     },
 
     getFirstInboxId () {
@@ -233,7 +229,7 @@ export default {
     newRingGroupListener (ringGroup) {
       if (ringGroup.all_user_ids?.includes(this.profile.id)) {
         const updatedInboxes = [...this.inboxes, ringGroup]
-        this.SET_INBOXES(updatedInboxes)
+        this.setInboxes({ data: updatedInboxes })
         this.orderInboxes()
       }
     },
@@ -249,7 +245,7 @@ export default {
           updatedInboxes.push(ringGroup)
         }
 
-        this.SET_INBOXES(updatedInboxes)
+        this.setInboxes({ data: updatedInboxes })
         this.orderInboxes()
       } else {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
@@ -257,7 +253,7 @@ export default {
         if (index !== -1) {
           const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
 
-          this.SET_INBOXES(updatedInboxes)
+          this.setInboxes({ data: updatedInboxes })
           this.checkAndRedirectActiveInbox(ringGroup)
         }
       }
@@ -268,7 +264,7 @@ export default {
       if (index !== -1) {
         const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
 
-        this.SET_INBOXES(updatedInboxes)
+        this.setInboxes({ data: updatedInboxes })
         this.checkAndRedirectActiveInbox(ringGroup)
       }
     },
