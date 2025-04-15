@@ -1,8 +1,14 @@
 export default {
   setInboxes: ({ commit }, data) => {
     commit('SET_INBOXES', data.data)
-    commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
-    commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
+
+    if (data.next_page_url) {
+      commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
+    }
+
+    if (data.current_page) {
+      commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
+    }
   },
   resetInboxes: ({ commit }) => {
     commit('RESET_INBOXES')

@@ -97,18 +97,36 @@ export default {
 
     ...mapState('auth', ['profile']),
 
-    ...mapState(['isMobile']),
+    ...mapState(['isMobile', 'teams']),
+
+    teamsIds () {
+      return this.teams
+        .filter(team => team.users.includes(this.profile.id))
+        .map(team => team.id)
+    },
 
     personalInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_personal)
+      return this.inboxes.filter(inbox => inbox.call_waiting)
     },
 
     connectedInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_connected)
+      return this.inboxes.filter(inbox => {
+        if (inbox.call_waiting) {
+          return false
+        }
+
+        return inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
+      })
     },
 
     watchingInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_watching)
+      return this.inboxes.filter(inbox => {
+        if (inbox.call_waiting) {
+          return false
+        }
+
+        return inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+      })
     },
 
     typedInboxes () {
@@ -229,8 +247,10 @@ export default {
         this.orderInboxes()
       } else {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
+
         if (index !== -1) {
           const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
+
           this.setInboxes({ data: updatedInboxes })
           this.checkAndRedirectActiveInbox(ringGroup)
         }
@@ -241,6 +261,7 @@ export default {
       const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
       if (index !== -1) {
         const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
+
         this.setInboxes({ data: updatedInboxes })
         this.checkAndRedirectActiveInbox(ringGroup)
       }
