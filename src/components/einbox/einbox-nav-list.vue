@@ -66,7 +66,7 @@ import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { EINBOXES_MENU_TITLE } from 'src/router/routes'
 import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapMutations } from 'vuex'
 
 export default {
   components: {
@@ -97,18 +97,36 @@ export default {
 
     ...mapState('auth', ['profile']),
 
-    ...mapState(['isMobile']),
+    ...mapState(['isMobile', 'teams']),
+
+    teamsIds () {
+      return this.teams
+        .filter(team => team.users.includes(this.profile.id))
+        .map(team => team.id)
+    },
 
     personalInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_personal)
+      return this.inboxes.filter(inbox => inbox.call_waiting === true)
     },
 
     connectedInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_connected)
+      return this.inboxes.filter(inbox => {
+        if (inbox.call_waiting) {
+          return false
+        }
+
+        return inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
+      })
     },
 
     watchingInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_watching)
+      return this.inboxes.filter(inbox => {
+        if (inbox.call_waiting) {
+          return false
+        }
+
+        return inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+      })
     },
 
     typedInboxes () {
@@ -139,6 +157,10 @@ export default {
       'resetInboxes',
       'resetItems',
       'setInboxes'
+    ]),
+
+    ...mapMutations('Einbox', [
+      'SET_INBOXES'
     ]),
 
     onScroll ({ target }) {
@@ -187,7 +209,7 @@ export default {
 
     orderInboxes () {
       const sortedInboxes = [...this.inboxes].sort((a, b) => a.name.localeCompare(b.name))
-      this.setInboxes({ data: sortedInboxes })
+      this.SET_INBOXES(sortedInboxes)
     },
 
     getFirstInboxId () {
@@ -209,7 +231,7 @@ export default {
     newRingGroupListener (ringGroup) {
       if (ringGroup.all_user_ids?.includes(this.profile.id)) {
         const updatedInboxes = [...this.inboxes, ringGroup]
-        this.setInboxes({ data: updatedInboxes })
+        this.SET_INBOXES(updatedInboxes)
         this.orderInboxes()
       }
     },
@@ -225,13 +247,15 @@ export default {
           updatedInboxes.push(ringGroup)
         }
 
-        this.setInboxes({ data: updatedInboxes })
+        this.SET_INBOXES(updatedInboxes)
         this.orderInboxes()
       } else {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
+
         if (index !== -1) {
           const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
-          this.setInboxes({ data: updatedInboxes })
+
+          this.SET_INBOXES(updatedInboxes)
           this.checkAndRedirectActiveInbox(ringGroup)
         }
       }
@@ -241,7 +265,8 @@ export default {
       const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
       if (index !== -1) {
         const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
-        this.setInboxes({ data: updatedInboxes })
+
+        this.SET_INBOXES(updatedInboxes)
         this.checkAndRedirectActiveInbox(ringGroup)
       }
     }
