@@ -4,11 +4,11 @@
     <div class="t-flex-group__no-bg flex-column border-top h-100 overflow-hidden">
       <div class="d-flex align-items-center">
         <div class="flex-grow-1">
-          <SessionFilters :selected-integration='selectedIntegration'
+          <SessionFilters :selected-integration="selectedIntegration"
                         @selected-tab="selectTab" />
         </div>
         <div class="ml-2" style="width: 200px;" v-if="supportedEnabledIntegrations.length > 1">
-          <q-select style="word-break: break-all;"
+          <q-select class="break-all"
                     color="primary"
                     use-input
                     emit-value
