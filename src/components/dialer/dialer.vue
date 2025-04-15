@@ -873,27 +873,6 @@ export default {
       this.backToDial('Talk-Device.OnDisconnect')
     },
 
-    handlePostDisconnect () {
-      // Check if we should start wrap up timer
-      const shouldStartWrapUp = this.hasNoParkedAndInprogressCall ||
-        this.hasParkedAndInprogressCall ||
-        (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())
-
-      if (shouldStartWrapUp) {
-        this.startWrapUpTimer()
-        return
-      }
-
-      // Handle parked call from another tab
-      if (this.callParkedFromAnotherTab()) {
-        this.setDialerParkedCall(this.dialer.communication)
-        this.resetCall('Talk-Connection.OnDisconnect')
-        return
-      }
-
-      this.backToDial('Talk-Connection.OnDisconnect')
-    },
-
     hangupCall () {
       if (!this.dialer.call || !this.connection) {
         return
