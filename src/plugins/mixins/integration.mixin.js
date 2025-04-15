@@ -28,33 +28,6 @@ const integrations = [
   }
 ]
 
-const crmIntegrations = [
-  {
-    name: 'pipedrive',
-    value: 'pipedrive_integration_enabled'
-  },
-  {
-    name: 'highlevel',
-    value: 'gohighlevel_integration_enabled'
-  },
-  {
-    name: 'hubspot',
-    value: 'hubspot_integration_enabled'
-  },
-  {
-    name: 'zoho',
-    value: 'zoho_integration_enabled'
-  },
-  {
-    name: 'guesty',
-    value: 'guesty_integration_enabled'
-  },
-  {
-    name: 'salesforce',
-    value: 'salesforce_integration_enabled'
-  }
-]
-
 export default {
   computed: {
 
@@ -89,12 +62,6 @@ export default {
 
     hasCompanyIntegrationsEnabled () {
       return integrations.some(integration => this.currentCompany?.[integration.value])
-    },
-
-    crmIntegrationsEnabled () {
-      return crmIntegrations
-        .filter(integration => this.currentCompany?.[integration.value])
-        .map(integration => integration.name)
     }
   },
 

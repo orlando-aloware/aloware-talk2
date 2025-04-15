@@ -14,7 +14,6 @@
                        :outlined="false"
                        :show-placeholder="false"
                        v-model="contact.user_id"
-                       :only-show-synced-with-crm="true"
                        data-testid="contact-information-user-selector"
                        @change="(eventPayload) => onUpdateFields(eventPayload, 'user_id')">
         </user-selector>
