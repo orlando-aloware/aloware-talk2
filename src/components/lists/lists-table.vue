@@ -45,7 +45,7 @@
                             input-error-border
                             :search="search"
                             @search="onSearch"
-                            @show-error="showLimitCharactersError = $event" />
+                            @show-error="onSearchInputShowError" />
             </div>
           </div>
           <div class="ml-2">
@@ -1179,6 +1179,10 @@ export default {
       }
 
       return true
+    },
+
+    onSearchInputShowError (show) {
+      this.showLimitCharactersError = show
     }
   },
 

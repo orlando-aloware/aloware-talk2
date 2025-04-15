@@ -12,7 +12,7 @@
                       :search="searchQuery"
                       :disabled="isLoadingDisabled"
                       @search="onSearch"
-                      @show-error="showLimitCharactersError = $event"/>
+                      @show-error="onSearchInputShowError"/>
         <div class="limit-characters-error d-flex align-items-center mt-1"
             v-if="showLimitCharactersError">
             <span class="search-error-icon mr-1">&times;</span>
@@ -670,6 +670,10 @@ export default {
       }
 
       document.querySelectorAll('.mobile-details-row').forEach((e) => e.remove())
+    },
+
+    onSearchInputShowError (show) {
+      this.showLimitCharactersError = show
     }
   },
 

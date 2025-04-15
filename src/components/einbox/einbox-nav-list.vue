@@ -8,8 +8,8 @@
                     limit-search-characters
                     :id="`einbox-nav-list-search-${_uid}`"
                     @search="onSearch"
-                    @focus="showSearchTooltip = true"
-                    @blur="showSearchTooltip = false"
+                    @focus="setShowSearchTooltip(true)"
+                    @blur="setShowSearchTooltip(false)"
                     @show-error="showLimitCharactersError"/>
       <b-tooltip custom-class="talk-table__tooltip"
                  placement="top"
@@ -246,6 +246,10 @@ export default {
         this.setInboxes({ data: updatedInboxes })
         this.checkAndRedirectActiveInbox(ringGroup)
       }
+    },
+
+    setShowSearchTooltip (show) {
+      this.showSearchTooltip = show
     },
 
     showLimitCharactersError (show) {
