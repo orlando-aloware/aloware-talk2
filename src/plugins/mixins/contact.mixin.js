@@ -598,6 +598,11 @@ export default {
 
       // 1. if contact has initial campaign and there were no communications select initial campaign
       if (!this.communicationsAndAudits.length && this.contact && this.contact.initial_campaign_id) {
+        console.log('selectedCampaignId - condition 1', {
+          contact_id_param: contactId,
+          contact_id: this.contact.id,
+          contact_initial_campaign_id: this.contact.initial_campaign_id
+        })
         this.selectedCampaignId = this.contact.initial_campaign_id
       }
 
@@ -609,6 +614,11 @@ export default {
         })
 
         if (latestCommunication) {
+          console.log('selectedCampaignId - condition 2', {
+            contact_id: contactId,
+            communication_id: latestCommunication.id,
+            communication_campaign_id: latestCommunication.campaign_id
+          })
           this.selectedCampaignId = latestCommunication.campaign_id
         }
       }
@@ -617,6 +627,10 @@ export default {
       const userCampaignId = _.get(this.profile, 'campaign_id', null)
 
       if (!this.selectedCampaignId && userCampaignId) {
+        console.log('selectedCampaignId - condition 3', {
+          contact_id: contactId,
+          user_campaign_id: userCampaignId
+        })
         this.selectedCampaignId = userCampaignId
       }
 
@@ -624,6 +638,10 @@ export default {
       const selectedContactFirstCampaignId = _.get(this.selectedContactCampaigns, '[0].id', null)
 
       if (!this.selectedCampaignId && selectedContactFirstCampaignId) {
+        console.log('selectedCampaignId - condition 4', {
+          contact_id: contactId,
+          selected_contact_first_campaign_id: selectedContactFirstCampaignId
+        })
         this.selectedCampaignId = selectedContactFirstCampaignId
       }
 
@@ -631,11 +649,19 @@ export default {
       const firstCampaignId = _.get(this.campaigns, '[0].id', null)
 
       if (!this.selectedCampaignId && !selectedContactFirstCampaignId && firstCampaignId) {
+        console.log('selectedCampaignId - condition 5', {
+          contact_id: contactId,
+          first_campaign_id: firstCampaignId
+        })
         this.selectedCampaignId = firstCampaignId
       }
 
       // 6. if contact doesn't have situation 1 and 2 and 3 and 4 and company has more then one campaign select the first one
       if (!this.selectedCampaignId && firstCampaignId) {
+        console.log('selectedCampaignId - condition 6', {
+          contact_id: contactId,
+          first_campaign_id: firstCampaignId
+        })
         this.selectedCampaignId = firstCampaignId
       }
 
