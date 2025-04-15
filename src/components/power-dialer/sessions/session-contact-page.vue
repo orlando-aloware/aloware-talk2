@@ -102,7 +102,7 @@ export default {
 
   computed: {
     ...mapState('powerDialer', ['activeTask', 'taskToCall']),
-    
+
     supportedEnabledIntegrations () {
       const supportedIntegrations = [HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION]
       let enabledIntegrations = []

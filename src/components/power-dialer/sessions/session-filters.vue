@@ -7,7 +7,7 @@
         class="link px-1"
         style="display:contents;">
         <div
-          :class="`t-grouped-buttons__btn cursor-pointer ml-1 ${key === filter.key ? 'active' : ''} ${filter.enabled ? '' : 'disabled'}`"
+          :class="`t-grouped-buttons__btn cursor-pointer ml-1 ${currentTab === filter.key ? 'active' : ''} ${filter.enabled ? '' : 'disabled'}`"
           @click="clicked(filter, filter.enabled)">
           <div class="t-badge-name">
             {{ filter.name }}
@@ -72,7 +72,7 @@ export default {
         }
       ]
 
-      if (this.selectedIntegration.toLowerCase() === HUBSPOT_INTEGRATION) {
+      if (this.selectedIntegration.toLowerCase() !== SALESFORCE_INTEGRATION) {
         tabs.push({
           key: 'crm_view',
           name: 'CRM View',
