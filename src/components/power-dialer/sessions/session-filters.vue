@@ -72,7 +72,7 @@ export default {
         }
       ]
 
-      if (this.selectedIntegration.toLowerCase() !== SALESFORCE_INTEGRATION) {
+      if ([HUBSPOT_INTEGRATION, 'none'].includes(this.selectedIntegration.toLowerCase())) {
         tabs.push({
           key: 'crm_view',
           name: 'CRM View',
