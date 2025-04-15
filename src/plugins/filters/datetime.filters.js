@@ -285,13 +285,13 @@ export const fixDateTime = (dt) => {
  * @param {date|string|Moment} dt
  * @returns {string|*}
  */
-export const fixFullDateTime = (dt) => {
+export const fixFullDateTime = (dt, store = null) => {
   if (dt) {
-    if (window.timezone) {
-      if (window.timezone === 'Asia/Manila') {
-        return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD h:mm:ssa') + ' MNL'
+    if (store?.state?.currentTimezone) {
+      if (store.state.currentTimezone === 'Asia/Manila') {
+        return window.moment.utc(dt).tz(store.state.currentTimezone).format('YYYY-MM-DD h:mm:ssa') + ' MNL'
       }
-      return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD h:mm:ssa')
+      return window.moment.utc(dt).tz(store.state.currentTimezone).format('YYYY-MM-DD h:mm:ssa')
     } else {
       return window.moment.utc(dt).local().format('YYYY-MM-DD h:mm:ssa')
     }

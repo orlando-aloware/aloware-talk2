@@ -322,7 +322,7 @@
         <div
           v-else-if="column.name.includes('_at') || column.name.includes('date')"
           class="text-left ellipse">
-          {{ contact[column.name] | fixFullDateTime }}
+          {{ contact[column.name] | fixFullDateTime($store) }}
         </div>
         <div
           v-else
