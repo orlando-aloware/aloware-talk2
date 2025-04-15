@@ -108,7 +108,7 @@ export default {
     },
 
     personalInboxes () {
-      return this.inboxes.filter(inbox => inbox.call_waiting === true)
+      return this.inboxes.filter(inbox => inbox.call_waiting)
     },
 
     connectedInboxes () {
