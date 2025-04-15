@@ -2,12 +2,12 @@
   <b-card class="bg-transparent border-0 text-center">
     <div class="t-grouped-buttons pr-1">
       <div
-        v-for="(filter, key) in tabs"
-        :key="key"
+        v-for="(filter, idx) in tabs"
+        :key="idx"
         class="link px-1"
         style="display:contents;">
         <div
-          :class="`t-grouped-buttons__btn cursor-pointer ml-1 ${id === filter.id ? 'active' : ''} ${filter.enabled ? '' : 'disabled'}`"
+          :class="`t-grouped-buttons__btn cursor-pointer ml-1 ${key === filter.key ? 'active' : ''} ${filter.enabled ? '' : 'disabled'}`"
           @click="clicked(filter, filter.enabled)">
           <div class="t-badge-name">
             {{ filter.name }}
@@ -30,7 +30,7 @@
 import { mapGetters, mapState } from 'vuex'
 import { HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
-const DEFAULT_TAB = 1
+const DEFAULT_TAB = 'details'
 
 export default {
   name: 'SessionFilters',
@@ -61,27 +61,27 @@ export default {
     tabs () {
       let tabs = [
         {
-          id: 1,
+          key: 'details',
           name: 'Details',
           enabled: true
         },
         {
-          id: 2,
+          key: 'activity',
           name: 'Activity',
           enabled: true
         }
       ]
 
-      if (this.selectedIntegration.toLowerCase() !== SALESFORCE_INTEGRATION) {
+      if (this.selectedIntegration.toLowerCase() === HUBSPOT_INTEGRATION) {
         tabs.push({
-          id: 3,
+          key: 'crm_view',
           name: 'CRM View',
           enabled: this.integrationEnabled
         })
       }
 
       tabs.push({
-        id: 4,
+        key: 'crm_popup',
         name: 'CRM Popup',
         enabled: this.integrationEnabled
       })
@@ -93,7 +93,7 @@ export default {
   methods: {
     clicked (value, enabled = undefined) {
       if (enabled) {
-        this.id = value.id
+        this.currentTab = value.key
         this.$emit('selected-tab', value)
       }
     }
@@ -101,14 +101,14 @@ export default {
 
   data () {
     return {
-      id: DEFAULT_TAB
+      currentTab: DEFAULT_TAB
     }
   },
   watch: {
     'selectedIntegration' (newValue) {
       // when we switch integration need to make sure we are not at the iframe tab that is not working with salesforce
-      if (newValue.toLowerCase() === SALESFORCE_INTEGRATION && this.id === 3) {
-        this.id = DEFAULT_TAB
+      if (newValue.toLowerCase() === SALESFORCE_INTEGRATION && this.currentTab === 'crm_view') {
+        this.currentTab = DEFAULT_TAB
         this.$emit('selected-tab', this.tabs[0])
       }
     }
