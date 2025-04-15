@@ -262,8 +262,8 @@ export default {
     },
 
     shouldFilterBySyncedCrmUsers () {
-      // Only filter by synced CRM users if only one CRM integration is enabled and it's HubSpot
-      return this.onlyShowSyncedWithCrm && this.crmIntegrationsEnabled.length === 1 && this.crmIntegrationsEnabled[0] === 'hubspot'
+      // Just check for HubSpot Integration for now
+      return this.onlyShowSyncedWithCrm && this.currentCompany?.hubspot_integration_enabled === true
     },
 
     filteredUsers () {

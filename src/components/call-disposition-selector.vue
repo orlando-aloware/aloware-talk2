@@ -158,8 +158,8 @@ export default {
     ...mapState(['callDispositions']),
 
     shouldFilterExternalDispositions () {
-      // Only filter by external dispositions if only one CRM integration is enabled and it's HubSpot
-      return this.crmIntegrationsEnabled.length === 1 && this.crmIntegrationsEnabled[0] === 'hubspot'
+      // Just check for HubSpot Integration for now
+      return this.currentCompany?.hubspot_integration_enabled === true
     },
 
     computedCommunication () {
