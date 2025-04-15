@@ -7,10 +7,17 @@
       <div class="search flex-grow-1">
         <search-input class="w-100"
                       limit-search-characters
+                      input-error-border
                       data-testid="contacts-view-search-input"
                       :search="searchQuery"
                       :disabled="isLoadingDisabled"
-                      @search="onSearch" />
+                      @search="onSearch"
+                      @show-error="showLimitCharactersError = $event"/>
+        <div class="limit-characters-error d-flex align-items-center mt-1"
+            v-if="showLimitCharactersError">
+            <span class="search-error-icon mr-1">&times;</span>
+            <span class="search-error-text">Search requires at least 3 characters</span>
+        </div>
       </div>
 
       <div class="setting d-flex align-items-center flex-column flex-sm-row w-100 w-sm-auto gap-3 align-items-sm-center">
@@ -405,7 +412,8 @@ export default {
       sidebarCommunication: {},
       communicationsData: [],
       communicationsCountValue: 0,
-      communicationMobileDetailsOpened: {}
+      communicationMobileDetailsOpened: {},
+      showLimitCharactersError: false
     }
   },
 

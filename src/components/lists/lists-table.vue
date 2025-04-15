@@ -42,8 +42,10 @@
               <search-input class="width-260"
                             data-testid="lists-search-input"
                             limit-search-characters
+                            input-error-border
                             :search="search"
-                            @search="onSearch" />
+                            @search="onSearch"
+                            @show-error="showLimitCharactersError = $event" />
             </div>
           </div>
           <div class="ml-2">
@@ -111,6 +113,11 @@
               </b-overlay>
             </b-dropdown>
           </div>
+        </div>
+        <div class="limit-characters-error d-flex align-items-center ml-3 mb-1"
+             v-if="showLimitCharactersError">
+            <span class="search-error-icon mr-1">&times;</span>
+            <span class="search-error-text">Search requires at least 3 characters</span>
         </div>
       </div>
 
@@ -528,7 +535,8 @@ export default {
         { value: ContactListTypes.STATIC, label: 'Static' },
         { value: ContactListTypes.DYNAMIC, label: 'Dynamic' },
         { value: ContactListTypes.DYNAMIC_REMOTE_LIST, label: 'Integration Dynamic' }
-      ]
+      ],
+      showLimitCharactersError: false
     }
   },
 
