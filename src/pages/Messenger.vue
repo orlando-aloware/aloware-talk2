@@ -10,12 +10,9 @@
 </template>
 
 <script>
-import { resellerMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'Messenger',
-
-  mixins: [ resellerMixin ],
 
   created () {
     this.getIntegration('messenger')

@@ -66,7 +66,7 @@ import SessionContactPageDetails from './pages/session-contact-page-details'
 import SessionContactPageActivity from './pages/session-contact-page-activity'
 import SessionContactPageCrm from './pages/session-contact-page-crm'
 import { mapActions, mapState } from 'vuex'
-import { hubspotIntegrationMixin, integrationMixin } from 'src/plugins/mixins'
+import { hubspotIntegrationMixin } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
 import { HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 
@@ -74,8 +74,7 @@ export default {
   name: 'SessionPage',
 
   mixins: [
-    hubspotIntegrationMixin,
-    integrationMixin
+    hubspotIntegrationMixin
   ],
 
   components: {
@@ -104,7 +103,16 @@ export default {
   computed: {
     ...mapState('powerDialer', ['activeTask', 'taskToCall']),
     supportedEnabledIntegrations () {
-      return this.integrationsEnabled.filter(integration => [HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION].includes(integration.toLowerCase()))
+      const supportedIntegrations = [HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION]
+      let enabledIntegrations = []
+
+      supportedIntegrations.forEach(integration => {
+        if (this.currentCompany?.[integration + '_integration_enabled']) {
+          enabledIntegrations.push(integration)
+        }
+      })
+
+      return enabledIntegrations
     }
   },
 
@@ -158,6 +166,17 @@ export default {
   },
 
   watch: {
+    'supportedEnabledIntegrations': function (value) {
+      if (this.selectedIntegration === 'none') {
+        if (value.length > 0) {
+          this.selectedIntegration = value[0]
+        }
+      } else {
+        if (!value.includes(this.selectedIntegration.toLowerCase())) {
+          this.selectedIntegration = 'none'
+        }
+      }
+    },
     'taskToCall': function (value) {
       if (!value) {
         return

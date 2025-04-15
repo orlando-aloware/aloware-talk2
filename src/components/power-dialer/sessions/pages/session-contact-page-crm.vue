@@ -54,7 +54,7 @@ export default {
     integrationLink () {
       switch (this.selectedIntegration.toLowerCase()) {
         case SALESFORCE_INTEGRATION:
-          return this.getSalesforceLink()
+          return this.getSalesforceLink(this.contact)
         case HUBSPOT_INTEGRATION:
           return this.getHubspotContactLink(this.contact, !this.usePopup)
         default:
@@ -69,8 +69,8 @@ export default {
       'setContactClone'
     ]),
 
-    getSalesforceLink () {
-      return this.contact?.integration_data?.salesforce?.link
+    getSalesforceLink (contact) {
+      return contact?.integration_data?.salesforce?.link
     },
 
     openIntegrationLink () {
@@ -93,8 +93,8 @@ export default {
             newLink = this.getHubspotContactLink(newValue, !this.usePopup)
             break
           case SALESFORCE_INTEGRATION:
-            oldLink = this.getSalesforceLink(oldValue, !this.usePopup)
-            newLink = this.getSalesforceLink(newValue, !this.usePopup)
+            oldLink = this.getSalesforceLink(oldValue)
+            newLink = this.getSalesforceLink(newValue)
             break
         }
 
@@ -108,6 +108,11 @@ export default {
         if (this.usePopup) {
           this.openIntegrationLink()
         }
+      }
+    },
+    'selectedIntegration' () {
+      if (this.usePopup) {
+        this.openIntegrationLink()
       }
     }
   }
