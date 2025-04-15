@@ -36,13 +36,13 @@
 
           <q-tab-panel class="p-0"
                        name="CRM View">
-            <SessionContactPageCrm :selected-integration='selectedIntegration'
+            <SessionContactPageCrm :selected-integration="selectedIntegration"
                                    :usePopup="false" />
           </q-tab-panel>
 
           <q-tab-panel class="p-0"
                        name="CRM Popup">
-            <SessionContactPageCrm :selected-integration='selectedIntegration' />
+            <SessionContactPageCrm :selected-integration="selectedIntegration" />
           </q-tab-panel>
         </q-tab-panels>
       </div>
@@ -102,6 +102,7 @@ export default {
 
   computed: {
     ...mapState('powerDialer', ['activeTask', 'taskToCall']),
+    
     supportedEnabledIntegrations () {
       const supportedIntegrations = [HUBSPOT_INTEGRATION, SALESFORCE_INTEGRATION]
       let enabledIntegrations = []
