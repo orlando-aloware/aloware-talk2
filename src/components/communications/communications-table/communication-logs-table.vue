@@ -510,6 +510,7 @@ export default {
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
         this.cleanupMobileDetailRows()
+        this.sortItems()
       }
     },
 
@@ -552,6 +553,7 @@ export default {
           // add to the top of the array
           this.communicationsData.unshift(communication)
           this.communicationsCountValue++
+          this.sortItems()
         }
       }
     },
@@ -565,6 +567,7 @@ export default {
         if (this.showCommunicationSidebar && this.sidebarCommunication?.id === communication.id) {
           this.sidebarCommunication = merge(this.sidebarCommunication, communication)
         }
+        this.sortItems()
       } else {
         const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
           this.checkCommunicationMatchesSearch(this.searchQuery, communication) &&
@@ -579,6 +582,7 @@ export default {
           // add to the top of the array
           this.communicationsData.unshift(communication)
           this.communicationsCountValue++
+          this.sortItems()
         }
       }
     },
@@ -591,6 +595,7 @@ export default {
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
         this.cleanupMobileDetailRows()
+        this.sortItems()
       }
     },
 
@@ -674,6 +679,20 @@ export default {
 
     onSearchInputShowError (show) {
       this.showLimitCharactersError = show
+    },
+
+    sortItems (communications = this.communicationsData) {
+      communications.sort((a, b) => {
+        if (isLiveCall(a) && !isLiveCall(b)) {
+          return -1
+        }
+
+        if (!isLiveCall(a) && isLiveCall(b)) {
+          return 1
+        }
+
+        return b.communication_id - a.communication_id
+      })
     }
   },
 
@@ -690,7 +709,10 @@ export default {
 
   watch: {
     communications (newValue) {
-      this.communicationsData = newValue
+      // copy and sort to avoid mutating the original object
+      const newArr = [...newValue]
+      this.sortItems(newArr)
+      this.communicationsData = newArr
     },
     communicationsCount (newValue) {
       this.communicationsCountValue = newValue
