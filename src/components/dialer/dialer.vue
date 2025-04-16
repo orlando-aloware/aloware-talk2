@@ -387,10 +387,6 @@ export default {
       this.$closeActionNotification('incomingCall')
     })
 
-    this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      this.handleCallDisconnected(call, WebrtcEvents.DISCONNECT)
-    })
-
     this.getDesktopToken()
 
     // ping getDesktopToken every 24 hours
