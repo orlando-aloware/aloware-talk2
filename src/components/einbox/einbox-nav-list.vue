@@ -108,7 +108,9 @@ export default {
     },
 
     personalInboxes () {
-      return this.inboxes.filter(inbox => inbox.call_waiting)
+      return this.inboxes.filter(inbox => {
+        return inbox.call_waiting && (inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id)))
+      })
     },
 
     connectedInboxes () {
@@ -123,10 +125,6 @@ export default {
 
     watchingInboxes () {
       return this.inboxes.filter(inbox => {
-        if (inbox.call_waiting) {
-          return false
-        }
-
         return inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
       })
     },
