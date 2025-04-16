@@ -5,10 +5,12 @@
       <search-input class="einbox-nav-list__header__search"
                     placeholder="Type ENTER to search inboxes..."
                     data-testid="einbox-search"
+                    limit-search-characters
                     :id="`einbox-nav-list-search-${_uid}`"
                     @search="onSearch"
-                    @focus="showSearchTooltip = true"
-                    @blur="showSearchTooltip = false"/>
+                    @focus="setShowSearchTooltip(true)"
+                    @blur="setShowSearchTooltip(false)"
+                    @show-error="showLimitCharactersError"/>
       <b-tooltip custom-class="talk-table__tooltip"
                  placement="top"
                  :boundary="`einbox-nav-list-search-${_uid}`"
@@ -243,6 +245,16 @@ export default {
         const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
         this.setInboxes({ data: updatedInboxes })
         this.checkAndRedirectActiveInbox(ringGroup)
+      }
+    },
+
+    setShowSearchTooltip (show) {
+      this.showSearchTooltip = show
+    },
+
+    showLimitCharactersError (show) {
+      if (show) {
+        this.$generalNotification('Search requires at least 3 characters', 'error')
       }
     }
   },

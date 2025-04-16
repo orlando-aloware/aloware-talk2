@@ -40,10 +40,12 @@
                     ref="search"
                     placeholder="Type ENTER to search comms..."
                     class="einbox-tab__header__search"
+                    limit-search-characters
                     :id="`einbox-tab-search-${_uid}`"
                     @search="$emit('search', $event)"
                     @blur="onLeaveSearch"
-                    @focus="showSearchTooltip = true"/>
+                    @focus="setShowSearchTooltip(true)"
+                    @show-error="showLimitCharactersError"/>
       <b-tooltip custom-class="talk-table__tooltip"
                  placement="top"
                  :boundary="`einbox-tab-search-${_uid}`"
@@ -114,6 +116,16 @@ export default {
     onLeaveSearch () {
       if (this.search === '') {
         this.isSearchActive = false
+      }
+    },
+
+    setShowSearchTooltip (show) {
+      this.showSearchTooltip = show
+    },
+
+    showLimitCharactersError (show) {
+      if (show) {
+        this.$generalNotification('Search requires at least 3 characters', 'error')
       }
     }
   },
