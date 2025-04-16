@@ -387,10 +387,6 @@ export default {
       this.$closeActionNotification('incomingCall')
     })
 
-    this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      this.handleCallDisconnected(call, WebrtcEvents.DISCONNECT)
-    })
-
     this.getDesktopToken()
 
     // ping getDesktopToken every 24 hours
@@ -557,9 +553,9 @@ export default {
         // with the communication's contact id
         // else, set the contact.
         if ((routeTitle &&
-            this.activeTask &&
-            routeTitle === 'Power Dialer Sessions' &&
-            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+          this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
@@ -844,7 +840,10 @@ export default {
     },
 
     handleCallDisconnected (call, event) {
-      console.log('Call ended', call, event, this.dialer.parkedCall, this.dialer.call)
+      console.log('Call ended event', event)
+      console.log('Call ended', call)
+      console.log('** Parked call', this.dialer.parkedCall)
+      console.log('** Dialer call', this.dialer.call)
 
       // don't do anything if there is no communication
       if (!this.dialer.communication) {
