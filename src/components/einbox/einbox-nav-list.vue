@@ -216,7 +216,7 @@ export default {
         return null
       }
 
-      return this.personalInboxes.length ? this.personalInboxes[0]?.id : this.inboxes[0]?.id
+      return this.parsedInboxes.personal.length ? this.parsedInboxes.personal[0]?.id : this.inboxes[0]?.id
     },
 
     checkAndRedirectActiveInbox (ringGroup) {
