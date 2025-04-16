@@ -642,8 +642,32 @@ export default {
       const mountPoint = document.createElement('div')
       detailsCell.appendChild(mountPoint)
 
-      // Show all columns that are applied (except disposition_status2 and operations)
-      const visibleColumns = this.columns.filter((c) => !['disposition_status2', 'operations'].includes(c.name))
+      const visibleColumns = this.columns.filter((c) => {
+        // for mobile we do not show these two columns
+        if (['disposition_status2', 'operations'].includes(c.name)) {
+          return false
+        }
+
+        // hide these columns when SMS
+        const smsHiddenColumns = [
+          'talk_time',
+          'duration',
+          'wait_time',
+          'hold_time',
+          'attempting_users',
+          'transfer_prior_user_ids',
+          'transfer_target_user_ids',
+          'transfer_type',
+          'callback_status',
+          'queue_resolution2'
+        ]
+
+        if (row.type === CommunicationTypes.SMS && smsHiddenColumns.includes(c.name)) {
+          return false
+        }
+
+        return true
+      })
 
       // Create and mount the Mobile details component
       const ComponentClass = Vue.extend(CommunicationsMobileRowDetails)

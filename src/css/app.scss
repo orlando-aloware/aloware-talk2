@@ -16125,6 +16125,10 @@ hr {
       td {
         background-color: $light-blue !important;
       }
+
+      .actions-td {        
+        min-width: 205px !important;
+      }
     }
 
     td:last-child {
@@ -16356,6 +16360,10 @@ hr {
         display: none;
         width: 30px;
         flex-shrink: 0;
+      }
+
+      .mobile-details-row {
+        display: none;
       }
 
       @media (max-width: 767px) {
