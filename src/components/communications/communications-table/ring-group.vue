@@ -51,14 +51,17 @@ export default {
   },
 
   computed: {
-    ...mapState(['ringGroups']),
+    ...mapState([
+      'ringGroups',
+      'ringGroupsIsLoading'
+    ]),
 
     ringGroup () {
       return this.ringGroups.find(rg => rg.id === this.row.ring_group_id) || {}
     },
 
     ringGroupName () {
-      return this.row.ring_group_id && !this.ringGroup.name ? 'Deleted Ring Group' : (this.ringGroup.name || '')
+      return this.row.ring_group_id && !this.ringGroup.name && !this.ringGroupsIsLoading ? 'Deleted Ring Group' : (this.ringGroup.name || '')
     }
   },
 

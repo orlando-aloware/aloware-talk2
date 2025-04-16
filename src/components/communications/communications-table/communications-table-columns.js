@@ -190,7 +190,7 @@ export const ALL_COLUMNS = [
     draggable: true
   },
   {
-    label: '#',
+    label: 'Operations',
     name: 'operations',
     align: 'center',
     minWidth: 150,
