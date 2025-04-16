@@ -513,8 +513,8 @@ export default {
 
         // If the communication was rejected by app then move it to skipped list
         if (res.data?.rejected_by_app) {
-          const skipedAndActive = this.getSkippedAndActiveTasks()
-          const tempSet = new Set(skipedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          const skippedAndActive = this.getSkippedAndActiveTasks()
+          const tempSet = new Set(skippedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
           this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
 
           const rejectionReason = REJECTION_REASONS.find(rejectionReason => rejectionReason.type === res.data.rejected_by_app)
@@ -576,8 +576,8 @@ export default {
           this.loadingCommunication = false
 
           // Move task to skipped list
-          const skipedAndActive = this.getSkippedAndActiveTasks()
-          const tempSet = new Set(skipedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          const skippedAndActive = this.getSkippedAndActiveTasks()
+          const tempSet = new Set(skippedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
           this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
 
           return Promise.reject(err)
