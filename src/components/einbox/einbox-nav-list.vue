@@ -107,26 +107,29 @@ export default {
         .map(team => team.id)
     },
 
-    personalInboxes () {
-      return this.inboxes.filter(inbox => {
-        return inbox.call_waiting && (inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id)))
-      })
-    },
+    parsedInboxes () {
+      const personal = []
+      const connected = []
+      const watching = []
 
-    connectedInboxes () {
-      return this.inboxes.filter(inbox => {
-        if (inbox.call_waiting) {
-          return false
+      this.inboxes.forEach(inbox => {
+        const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
+        const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+
+        if (inbox.call_waiting && isConnected) {
+          personal.push(inbox)
+        } else if (!inbox.call_waiting && isConnected) {
+          connected.push(inbox)
+        } else if (isWatching) {
+          watching.push(inbox)
         }
-
-        return inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
       })
-    },
 
-    watchingInboxes () {
-      return this.inboxes.filter(inbox => {
-        return inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
-      })
+      return {
+        personal,
+        connected,
+        watching
+      }
     },
 
     typedInboxes () {
@@ -134,17 +137,17 @@ export default {
         {
           id: INBOX_TYPE_PERSONAL,
           name: 'Personal Inboxes',
-          inboxes: this.personalInboxes
+          inboxes: this.parsedInboxes.personal
         },
         {
           id: INBOX_TYPE_CONNECTED,
           name: 'Connected Inboxes',
-          inboxes: this.connectedInboxes
+          inboxes: this.parsedInboxes.connected
         },
         {
           id: INBOX_TYPE_WATCHING,
           name: 'Watching Inboxes',
-          inboxes: this.watchingInboxes
+          inboxes: this.parsedInboxes.watching
         }
       ]
     }
