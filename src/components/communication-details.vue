@@ -766,54 +766,43 @@
             </div>
           </q-card-section>
 
-          <q-card-section
-            class="pt-0 pb-0"
-            v-if="typeHaveLine"
-            data-testid="comm-details-card-section"
-          >
+          <q-card-section class="pt-0 pb-0"
+                          data-testid="comm-details-card-section"
+                          v-if="typeHaveLine">
             <!--RING GROUP-->
-            <b-form-row
-              v-if="communication.ring_group_id"
-              data-testid="comm-details-ring-group-row"
-            >
-              <b-col
-                class="pl-0 pr-0"
-                data-testid="comm-details-ring-group-col"
-              >
+            <b-form-row data-testid="comm-details-ring-group-row"
+                        v-if="communication.ring_group_id">
+              <b-col class="pl-0 pr-0"
+                     data-testid="comm-details-ring-group-col">
                 <q-item-label>Ring Group: </q-item-label>
               </b-col>
               <b-col cols="7"
                      data-testid="comm-details-ring-group-col">
                 <div class="d-flex align-items-center">
-                  <div
-                    class="flex items-center mr-1 h-100"
-                    data-testid="comm-details-ring-group-open-rg-in-classic"
-                    @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
-                    v-if="usedRingGroup && !usedRingGroup?.call_waiting"
-                  >
-                    <span
-                      class="text-blue cursor-pointer"
-                      :title="usedRingGroup.name"
-                    >
-                      <q-tooltip
-                        anchor="top middle"
-                        self="bottom middle"
-                        max-width="150px"
-                        data-testid="comm-details-ring-group-tooltip"
-                      >
+                  <div class="flex items-center mr-1 h-100"
+                       data-testid="comm-details-ring-group-open-rg-in-classic"
+                       @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
+                       v-if="usedRingGroup && hasCompanyTeamInboxEnabled">
+                    <span class="text-blue cursor-pointer"
+                          :title="usedRingGroup.name">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px"
+                                 data-testid="comm-details-ring-group-tooltip">
                         Click For More Info
                       </q-tooltip>
                       {{ usedRingGroup.name }}
                     </span>
                   </div>
-                  <template v-else>
-                    <span v-if="usedRingGroup?.call_waiting">
-                      Call waiting Queue
-                    </span>
-                    <span v-else>
-                      Deleted Ring Group
-                    </span>
-                  </template>
+                  <span v-else-if="usedRingGroup && !hasCompanyTeamInboxEnabled">
+                    Call waiting Queue
+                  </span>
+                  <span v-else-if="ringGroups.length > 0">
+                    Deleted Ring Group
+                  </span>
+                  <span v-else>
+                    -
+                  </span>
                 </div>
               </b-col>
             </b-form-row>
