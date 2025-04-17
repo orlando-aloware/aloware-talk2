@@ -40,8 +40,9 @@ export default {
       }
 
       window.axios.get('/api/v1/profile/intercom-user-hash').then(response => {
+        console.log('[Intercom] Booting ...')
         if (window.Intercom) {
-          window.Intercom('boot', {
+          const results = window.Intercom('boot', {
             alignment: 'left',
             api_base: 'https://api-iam.intercom.io',
             app_id: this.app_id,
@@ -50,6 +51,13 @@ export default {
             user_id: this.profile.id, // Current user id
             user_hash: response.data, // Current user hash
             created_at: Math.floor(Date.now() / 1000)
+          })
+
+          console.log('[Intercom] Boot results:', {
+            results,
+            has_user_id: this.profile.id !== null && this.profile.id !== undefined,
+            has_email: this.profile.email !== null && this.profile.email !== undefined,
+            has_name: this.profile.name !== null && this.profile.name !== undefined
           })
 
           this.timeInterval = setInterval(() => {
@@ -62,6 +70,8 @@ export default {
 
             this.intercomBannerHeight = intercomIframeHeight
           }, 1 * 1000)
+        } else {
+          console.log('[Intercom] Not loaded')
         }
       }).catch(err => {
         console.log(err)
