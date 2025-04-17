@@ -13,10 +13,10 @@
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-whisper-${_uid}`"
                v-else>
-      {{ isAiAgent(communication.user) ? 'Listen' : 'Whisper' }}
+      {{ isAiAgentUser(communication.user) ? 'Listen' : 'Whisper' }}
     </b-tooltip>
     <q-tooltip v-else>
-      {{ isAiAgent(communication.user) ? 'Listen' : 'Whisper' }}
+      {{ isAiAgentUser(communication.user) ? 'Listen' : 'Whisper' }}
     </q-tooltip>
   </span>
 </template>
@@ -69,7 +69,7 @@ export default {
 
   methods: {
     dialog () {
-      const message = this.isAiAgent(this.communication.user)
+      const message = this.isAiAgentUser(this.communication.user)
         ? 'Do you want to listen to the AI agent call? Note that you will be muted by default.'
         : 'Do you want to whisper to the agent of this call? Note that you will be muted by default.'
 

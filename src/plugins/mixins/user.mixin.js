@@ -63,7 +63,7 @@ export default {
       }
     },
 
-    isAiAgent (user) {
+    isAiAgentUser (user) {
       return user && user.type === User.TYPE_AI_AGENT
     },
 

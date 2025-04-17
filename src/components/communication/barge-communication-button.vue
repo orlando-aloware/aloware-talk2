@@ -14,10 +14,10 @@
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-barge-${_uid}`"
                v-else>
-      {{ isAiAgent(communication.user) ? 'Take over' : 'Barge' }}
+      {{ isAiAgentUser(communication.user) ? 'Take over' : 'Barge' }}
     </b-tooltip>
     <q-tooltip v-else>
-      {{ isAiAgent(communication.user) ? 'Take over' : 'Barge' }}
+      {{ isAiAgentUser(communication.user) ? 'Take over' : 'Barge' }}
     </q-tooltip>
   </span>
 </template>
@@ -25,6 +25,7 @@
 <script>
 import VolumeHighIcon from 'src/components/icons/volume-high-icon.vue'
 import { aclMixin, agentMixin, communicationMixin, userMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
 
 export default {
   name: 'barge-communication-button',
@@ -38,6 +39,10 @@ export default {
 
   components: {
     VolumeHighIcon
+  },
+
+  computed: {
+    ...mapState('auth', ['profile'])
   },
 
   props: {

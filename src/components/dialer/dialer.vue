@@ -799,8 +799,32 @@ export default {
           if (commId) {
             this.$axios.get(`/api/v1/communication/${commId}`)
               .then(res => {
-                if (res.data && this.isAiAgent(res.data.user)) {
+                if (res.data && this.isAiAgentUser(res.data.user)) {
                   this.setDialerAiAgentWhisper(true)
+                }
+              })
+              .catch(err => {
+                console.error('Error fetching communication details:', err)
+              })
+          }
+        }
+
+        // If it's a barge call to an AI agent, drop other agents
+        if (isBargeCall) {
+          const commId = currentNumber.split(':')[1]
+          if (commId) {
+            this.$axios.get(`/api/v1/communication/${commId}`)
+              .then(res => {
+                if (res.data && this.isAiAgentUser(res.data.user)) {
+                  this.$axios.post('/api/v1/dialer/drop-other-agents', {
+                    communication_id: commId
+                  })
+                    .then(response => {
+                      console.log('Successfully dropped other agents from call')
+                    })
+                    .catch(err => {
+                      console.error('Error dropping other agents from call:', err)
+                    })
                 }
               })
               .catch(err => {
