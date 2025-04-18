@@ -113,7 +113,8 @@ export default function (/* { ssrContext } */) {
           message: '',
           code: null
         },
-        aiAgentWhisper: false
+        aiAgentWhisper: false,
+        aiAgentTakeover: false
       },
       warnings: [],
       shouldIntroduce: false,
@@ -992,6 +993,10 @@ export default function (/* { ssrContext } */) {
 
       setDialerAiAgentWhisper ({ commit }, value) {
         commit('SET_DIALER_AI_AGENT_WHISPER', value)
+      },
+
+      setDialerAiAgentTakeover ({ commit }, value) {
+        commit('SET_DIALER_AI_AGENT_TAKEOVER', value)
       }
     },
 
@@ -1845,6 +1850,10 @@ export default function (/* { ssrContext } */) {
 
       SET_DIALER_AI_AGENT_WHISPER (state, value) {
         state.dialer.aiAgentWhisper = value
+      },
+
+      SET_DIALER_AI_AGENT_TAKEOVER (state, value) {
+        state.dialer.aiAgentTakeover = value
       },
 
       updateField

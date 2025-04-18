@@ -25,7 +25,6 @@
 <script>
 import VolumeHighIcon from 'src/components/icons/volume-high-icon.vue'
 import { aclMixin, agentMixin, communicationMixin, userMixin } from 'src/plugins/mixins'
-import { mapState } from 'vuex'
 
 export default {
   name: 'barge-communication-button',
@@ -39,10 +38,6 @@ export default {
 
   components: {
     VolumeHighIcon
-  },
-
-  computed: {
-    ...mapState('auth', ['profile'])
   },
 
   props: {
@@ -75,7 +70,7 @@ export default {
 
   methods: {
     dialog () {
-      const message = this.isAiAgent(this.communication.user)
+      const message = this.isAiAgentUser(this.communication.user)
         ? 'Do you want to take over this AI agent call? You\'ll be muted by default. If you unmute yourself, AI agent will be dropped from the call completely.'
         : 'Do you want to barge into this call? You\'ll be muted by default. If you unmute yourself, both parties will hear you.'
 

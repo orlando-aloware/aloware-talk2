@@ -816,15 +816,8 @@ export default {
             this.$axios.get(`/api/v1/communication/${commId}`)
               .then(res => {
                 if (res.data && this.isAiAgentUser(res.data.user)) {
-                  this.$axios.post('/api/v1/dialer/drop-other-agents', {
-                    communication_id: commId
-                  })
-                    .then(response => {
-                      console.log('Successfully dropped other agents from call')
-                    })
-                    .catch(err => {
-                      console.error('Error dropping other agents from call:', err)
-                    })
+                  // Only set the state without calling the API
+                  this.setDialerAiAgentTakeover(true)
                 }
               })
               .catch(err => {
@@ -1061,6 +1054,34 @@ export default {
       if (this.dialer.aiAgentWhisper && this.dialer.isMuted) {
         console.log('Cannot unmute when listening to an AI agent call')
         this.$generalNotification('Cannot unmute when listening to an AI agent call', 'info')
+        return
+      }
+
+      // If this is a barge call to an AI agent and user tries to unmute, handle takeover
+      if (this.dialer.aiAgentTakeover && this.dialer.isMuted) {
+        console.log('Taking over the call from AI agent')
+        this.$generalNotification('You are taking over the call from the AI agent', 'info')
+
+        if (this.dialer.communication) {
+          // Call the drop-other-agents API when taking over
+          this.$axios.post('/api/v1/dialer/drop-aloai-agent', {
+            communication_id: this.dialer.communication.id
+          })
+            .then(response => {
+              console.log('Successfully dropped other agents from call')
+            })
+            .catch(err => {
+              console.error('Error dropping other agents from call:', err)
+            })
+        }
+
+        // Unmute the call and update the state
+        if (this.connection) {
+          this.connection.mute(false)
+        }
+        this.setDialerIsMuted(false)
+        this.setDialerAiAgentTakeover(false)
+
         return
       }
 
@@ -1520,6 +1541,7 @@ export default {
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(false)
       this.setDialerAiAgentWhisper(false)
+      this.setDialerAiAgentTakeover(false)
     },
 
     countCallDuration () {
@@ -1916,7 +1938,8 @@ export default {
       'setDialerErrorDefault',
       'removeParkedCall',
       'setIsCallBackButtonDisabled',
-      'setDialerAiAgentWhisper'
+      'setDialerAiAgentWhisper',
+      'setDialerAiAgentTakeover'
     ])
   },
 
