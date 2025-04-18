@@ -41,7 +41,7 @@
               Cancel
             </button>
             <button class="btn btn-sm bg-primary text-white"
-                    :disabled="$v.$invalid"
+                    :disabled="$v.$invalid || listNameUnchanged"
                     data-testid="lists-edit-modal-update-button"
                     @click.prevent="saveList">
               Save
@@ -104,6 +104,10 @@ export default {
       set (isShow) {
         return isShow
       }
+    },
+
+    listNameUnchanged () {
+      return this.editableList.name === this.list.name
     }
   },
 
@@ -199,7 +203,12 @@ export default {
           this.closeListForm()
         })
         .catch(err => {
-          this.$handleErrors(err.response)
+          if (this.editableList.show_in_public_folder) {
+            this.$generalNotification('You don\'t have permission to rename this public list. Only the list owner or an admin can make changes.', 'error')
+          } else {
+            this.$handleErrors(err.response)
+          }
+
           this.loading = false
           console.log(err)
         })
