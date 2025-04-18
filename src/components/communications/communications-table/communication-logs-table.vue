@@ -103,7 +103,7 @@
                   :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'ring_group'">
-                <ring-group :row="row" />
+                <ring-group :ring-group-id="row.ring_group_id" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
