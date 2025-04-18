@@ -779,10 +779,14 @@
               <b-col cols="7"
                      data-testid="comm-details-ring-group-col">
                 <div class="d-flex align-items-center">
+                  <span v-if="usedRingGroup && usedRingGroup.call_waiting && !hasCompanyTeamInboxEnabled">
+                    Call waiting Queue
+                  </span>
+
                   <div class="flex items-center mr-1 h-100"
                        data-testid="comm-details-ring-group-open-rg-in-classic"
                        @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
-                       v-if="usedRingGroup && hasCompanyTeamInboxEnabled">
+                       v-else-if="usedRingGroup">
                     <span class="text-blue cursor-pointer"
                           :title="usedRingGroup.name">
                       <q-tooltip anchor="top middle"
@@ -794,9 +798,6 @@
                       {{ usedRingGroup.name }}
                     </span>
                   </div>
-                  <span v-else-if="usedRingGroup && !hasCompanyTeamInboxEnabled">
-                    Call waiting Queue
-                  </span>
                   <span v-else-if="ringGroups.length > 0">
                     Deleted Ring Group
                   </span>
