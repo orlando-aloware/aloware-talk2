@@ -417,8 +417,43 @@ const SettingsMap = {
     route: '/settings/profile',
     hash_keyword: 'company-contact-card',
     visible: true
-  }
+  },
 
+  // CONNECTION TEST SETTINGS
+  'connection_test': {
+    title: 'Connection Test',
+    description: 'Test your connection for voice and video calls.',
+    route: '/settings/connection-test',
+    visible: true
+  },
+  'connection_status': {
+    title: 'Connection Status',
+    description: 'Check if you are currently connected to the internet.',
+    route: '/settings/connection-test',
+    hash_keyword: 'connection-status',
+    visible: true
+  },
+  'network_type': {
+    title: 'Network Type',
+    description: 'See what type of network you are connected to (WiFi, Ethernet, etc).',
+    route: '/settings/connection-test',
+    hash_keyword: 'network-type',
+    visible: true
+  },
+  'connection_speed': {
+    title: 'Connection Speed',
+    description: 'Test your download and upload speeds.',
+    route: '/settings/connection-test',
+    hash_keyword: 'connection-speed',
+    visible: true
+  },
+  'call_suitability': {
+    title: 'Call Suitability',
+    description: 'Check if your connection is suitable for voice and video calls.',
+    route: '/settings/connection-test',
+    hash_keyword: 'call-suitability',
+    visible: true
+  }
 }
 
 export default SettingsMap

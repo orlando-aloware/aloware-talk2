@@ -58,6 +58,12 @@ export default function () {
         value: 'diagnosis',
         icon: 'diagnosis',
         disabled: false
+      },
+      {
+        label: 'Connection Test',
+        value: 'connection-test',
+        icon: 'wifi',
+        disabled: false
       }
     ],
     user: null,

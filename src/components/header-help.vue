@@ -23,6 +23,12 @@
                 @click="noClose($event)">
             Role: <b>{{ user.profile.role_name }}</b>
           </span>
+          <q-separator class="my-2" />
+          <q-item clickable v-close-popup @click="goToConnectionTest">
+            <q-item-section>
+              <span class="text-md">Run Connection Test</span>
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
@@ -69,6 +75,10 @@ export default {
       if (event) {
         event.stopPropagation()
       }
+    },
+
+    goToConnectionTest () {
+      this.$router.push('/settings/connection-test')
     }
   },
 
