@@ -62,7 +62,7 @@ export default function () {
       {
         label: 'Connection Test',
         value: 'connection-test',
-        icon: 'wifi',
+        icon: 'diagnosis',
         disabled: false
       }
     ],

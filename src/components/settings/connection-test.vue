@@ -18,6 +18,11 @@
       <b-col class="text-center mb-2"
              md="12"
              sm="12">
+        <b-alert show variant="info" class="mb-3">
+          <i class="fa fa-info-circle mr-2"></i>
+          <strong>Note:</strong> Running this test will use a small amount of Twilio resources and may incur minimal charges to your account.
+          Each test is counted as a 0-second Voice call.
+        </b-alert>
         <b-button size="sm"
                   variant="success"
                   @click="testConnection"
@@ -32,6 +37,10 @@
         <br/>
         <i class="fa fa-wifi fs-20 mt-5"
            v-if="!isTesting"/>
+        <div v-if="testCount > 0" class="text-muted mt-2 small">
+          <i class="fa fa-history mr-1"></i> Tests run in this session: {{ testCount }}
+          <div v-if="lastTestTime">Last test: {{ lastTestTime | momentFormat('MM/DD h:mma', true) }}</div>
+        </div>
       </b-col>
     </b-row>
     <b-row class="row-no-padding"
@@ -110,8 +119,22 @@
               </b-list-group-item>
               <b-list-group-item class="d-flex justify-content-between align-items-center">
                 ICE Connection
-                <b-badge :variant="testResults.twilio.iceConnectionStatus ? 'success' : (testResults.twilio.potentialFalseNegative ? 'warning' : 'danger')" pill>
-                  {{ testResults.twilio.iceConnectionStatus ? 'Connected' : (testResults.twilio.potentialFalseNegative ? 'Partial' : 'Failed') }}
+                <b-badge :variant="testResults.twilio.iceConnectionStatus ? 'success' : 'danger'" pill>
+                  {{ testResults.twilio.iceConnectionStatus ? 'Connected' : 'Failed' }}
+                </b-badge>
+              </b-list-group-item>
+              <!-- Show TURN requirement when available -->
+              <b-list-group-item v-if="testResults.twilio.iceStats" class="d-flex justify-content-between align-items-center">
+                TURN Required
+                <b-badge :variant="testResults.twilio.iceStats.isTurnRequired ? 'warning' : 'success'" pill>
+                  {{ testResults.twilio.iceStats.isTurnRequired ? 'Yes' : 'No' }}
+                </b-badge>
+              </b-list-group-item>
+              <!-- Show network timing when available -->
+              <b-list-group-item v-if="testResults.twilio.networkTiming && testResults.twilio.networkTiming.signaling" class="d-flex justify-content-between align-items-center">
+                Signaling Time
+                <b-badge variant="info" pill>
+                  {{ testResults.twilio.networkTiming.signaling.duration || 0 }} ms
                 </b-badge>
               </b-list-group-item>
             </b-list-group>
@@ -121,9 +144,6 @@
               variant="warning"
               v-if="!testResults.twilio.connected || !testResults.twilio.webRtcSupported || !testResults.twilio.iceConnectionStatus">
               <p><strong>Twilio connection issues detected.</strong></p>
-              <p v-if="testResults.twilio.potentialFalseNegative" class="text-info">
-                <i class="fa fa-info-circle"></i> <strong>Note:</strong> This may be a false negative. If you can make calls successfully, your connection is likely working despite this test result.
-              </p>
               <ul>
                 <li v-if="!testResults.twilio.webRtcSupported">Your browser doesn't support WebRTC. Please try using a modern browser like Chrome, Firefox, or Edge.</li>
                 <li v-if="!testResults.twilio.connected">
@@ -145,6 +165,167 @@
                 </li>
               </ul>
             </b-alert>
+            <!-- Show detailed Twilio report button when available -->
+            <div v-if="preflightReport" class="mt-3 text-center">
+              <b-button size="sm" variant="outline-secondary" v-b-toggle.twilio-report-collapse>
+                Show Detailed Report
+              </b-button>
+              <b-collapse id="twilio-report-collapse" class="mt-2">
+                <b-card>
+                  <div class="twilio-report">
+                    <!-- Overall Quality Section -->
+                    <div class="mb-4">
+                      <h5>Call Quality Score</h5>
+                      <div class="d-flex align-items-center">
+                        <div class="quality-indicator"
+                             :class="getQualityClass(preflightReport.callQuality)">
+                          {{ preflightReport.callQuality || 'N/A' }}
+                        </div>
+                        <div class="ml-3 text-left">
+                          <div>MOS Score: <strong>{{ preflightReport.stats?.mos?.average?.toFixed(2) || 'N/A' }}</strong> / 5.0</div>
+                          <div>Packet Loss: <strong>{{ preflightReport.totals?.packetsLostFraction || 0 }}%</strong></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Network Metrics Section -->
+                    <div class="row mb-4">
+                      <div class="col-md-4">
+                        <div class="metric-card">
+                          <h6>Round Trip Time</h6>
+                          <div class="metric-value">{{ preflightReport.stats?.rtt?.average?.toFixed(0) || 'N/A' }} ms</div>
+                          <div class="metric-range">
+                            <small>Min: {{ preflightReport.stats?.rtt?.min || 'N/A' }} ms | Max: {{ preflightReport.stats?.rtt?.max || 'N/A' }} ms</small>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="metric-card">
+                          <h6>Jitter</h6>
+                          <div class="metric-value">{{ preflightReport.stats?.jitter?.average?.toFixed(1) || 'N/A' }} ms</div>
+                          <div class="metric-range">
+                            <small>Min: {{ preflightReport.stats?.jitter?.min || 'N/A' }} ms | Max: {{ preflightReport.stats?.jitter?.max || 'N/A' }} ms</small>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="metric-card">
+                          <h6>Selected Edge</h6>
+                          <div class="metric-value">{{ preflightReport.selectedEdge || 'N/A' }}</div>
+                          <div class="metric-detail">
+                            <small>Actual: {{ preflightReport.edge || 'N/A' }}</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Connection Details -->
+                    <div class="mb-4">
+                      <h5>Connection Details</h5>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="connection-details">
+                            <div><strong>TURN Required:</strong> {{ preflightReport.isTurnRequired ? 'Yes' : 'No' }}</div>
+                            <div><strong>Codec Used:</strong> {{ preflightReport.samples?.[0]?.codecName || 'N/A' }}</div>
+                            <div><strong>Test Duration:</strong> {{ (preflightReport.testTiming?.duration / 1000).toFixed(1) || 'N/A' }} seconds</div>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="connection-details">
+                            <div><strong>Data Sent:</strong> {{ formatBytes(preflightReport.totals?.bytesSent) }}</div>
+                            <div><strong>Data Received:</strong> {{ formatBytes(preflightReport.totals?.bytesReceived) }}</div>
+                            <div><strong>Packets Exchanged:</strong> {{ (preflightReport.totals?.packetsSent || 0) + (preflightReport.totals?.packetsReceived || 0) }}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Timing Information -->
+                    <div class="mb-4">
+                      <h5>Connection Timing</h5>
+                      <div class="timing-bars">
+                        <div v-if="preflightReport.networkTiming">
+                          <div class="timing-bar-label">Signaling:</div>
+                          <div class="timing-bar-container">
+                            <div class="timing-bar bg-info"
+                                 :style="{width: getTimingBarWidth(preflightReport.networkTiming.signaling.duration) + '%'}"
+                                 :title="preflightReport.networkTiming.signaling.duration + 'ms'">
+                              {{ preflightReport.networkTiming.signaling.duration }}ms
+                            </div>
+                          </div>
+
+                          <div class="timing-bar-label">ICE Setup:</div>
+                          <div class="timing-bar-container">
+                            <div class="timing-bar bg-success"
+                                 :style="{width: getTimingBarWidth(preflightReport.networkTiming.ice.duration) + '%'}"
+                                 :title="preflightReport.networkTiming.ice.duration + 'ms'">
+                              {{ preflightReport.networkTiming.ice.duration }}ms
+                            </div>
+                          </div>
+
+                          <div class="timing-bar-label">DTLS Handshake:</div>
+                          <div class="timing-bar-container">
+                            <div class="timing-bar bg-warning"
+                                 :style="{width: getTimingBarWidth(preflightReport.networkTiming.dtls.duration) + '%'}"
+                                 :title="preflightReport.networkTiming.dtls.duration + 'ms'">
+                              {{ preflightReport.networkTiming.dtls.duration }}ms
+                            </div>
+                          </div>
+
+                          <div class="timing-bar-label">Total Connection:</div>
+                          <div class="timing-bar-container">
+                            <div class="timing-bar bg-primary"
+                                 :style="{width: getTimingBarWidth(preflightReport.networkTiming.peerConnection.duration) + '%'}"
+                                 :title="preflightReport.networkTiming.peerConnection.duration + 'ms'">
+                              {{ preflightReport.networkTiming.peerConnection.duration }}ms
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Selected Path -->
+                    <div class="mb-2">
+                      <h5>Selected Connection Path</h5>
+                      <div class="connection-path">
+                        <div class="row">
+                          <div class="col-5 text-right">
+                            <div class="endpoint local">
+                              <div class="ip">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.ip }}:{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.port }}</div>
+                              <div class="network-type">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.networkType || 'unknown' }}</div>
+                              <div class="candidate-type badge badge-info">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.candidateType || 'unknown' }}</div>
+                            </div>
+                          </div>
+                          <div class="col-2 text-center">
+                            <div class="connection-arrow">
+                              <i class="fa fa-exchange-alt"></i>
+                              <div class="protocol">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.protocol?.toUpperCase() || 'unknown' }}</div>
+                            </div>
+                          </div>
+                          <div class="col-5 text-left">
+                            <div class="endpoint remote">
+                              <div class="ip">{{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.ip }}:{{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.port }}</div>
+                              <div class="server-type">Twilio Edge Server</div>
+                              <div class="candidate-type badge badge-info">{{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.candidateType || 'unknown' }}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Toggle button for raw JSON data -->
+                    <div class="mt-4 text-center">
+                      <b-button size="sm" variant="outline-secondary" v-b-toggle.raw-json-collapse>
+                        Show Raw JSON Data
+                      </b-button>
+                      <b-collapse id="raw-json-collapse" class="mt-2">
+                        <pre class="text-left" style="max-height: 300px; overflow-y: auto; font-size: 12px;">{{ JSON.stringify(preflightReport, null, 2) }}</pre>
+                      </b-collapse>
+                    </div>
+                  </div>
+                </b-card>
+              </b-collapse>
+            </div>
           </b-card-text>
           <b-card-text v-if="isTesting">
             <q-skeleton type="text" v-for="i in 3" :key="'twilio'+i"/>
@@ -309,242 +490,9 @@
 <script>
 import talk2Api from 'src/plugins/api/api'
 import { settingsLayoutMixin } from 'src/plugins/mixins'
+import { Device } from '@twilio/voice-sdk'
 
-// Enhanced implementation of Twilio Voice connectivity testing functions
-// Based on approach from aloware/rtc-diagnostics-react-app
-const testConnectivity = async (options = {}) => {
-  // Use the same STUN/TURN servers as options or fall back to default
-  const iceServers = options.iceServers || [
-    { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
-    // Add a backup STUN server to increase chances of success
-    { urls: 'stun:stun.l.google.com:19302' }
-  ]
-  // Increase timeout to allow for slower networks
-  const timeout = options.timeout || 15000 // 15 seconds instead of 10
-
-  try {
-    // Check if WebRTC is supported
-    if (!window.RTCPeerConnection) {
-      return { success: false, iceConnections: [] }
-    }
-
-    console.log('Starting ICE connectivity test with servers:', iceServers)
-
-    // Create RTCPeerConnection with the provided ICE servers
-    const pc = new RTCPeerConnection({ iceServers })
-
-    const iceConnections = []
-    let connectionSuccess = false
-
-    // Create a data channel (needed to trigger ICE candidate gathering)
-    pc.createDataChannel('voiceConnectivityTest')
-
-    // Create an offer and set it as local description
-    const offer = await pc.createOffer()
-    await pc.setLocalDescription(offer)
-
-    console.log('Created offer and set local description')
-
-    // Promise to track ICE connection state and candidates
-    const iceConnectionPromise = new Promise((resolve) => {
-      // Track gathered ICE candidates
-      pc.onicecandidate = (event) => {
-        if (event.candidate) {
-          const candidate = event.candidate
-          console.log('ICE candidate gathered:', candidate.type, candidate.protocol)
-
-          // Store candidate info
-          iceConnections.push({
-            type: candidate.type,
-            protocol: candidate.protocol,
-            successful: candidate.type !== 'relay', // Non-relay candidates are generally successful
-            url: candidate.address || candidate.ip,
-            relatedAddress: candidate.relatedAddress || null
-          })
-        } else if (event.candidate === null) {
-          // ICE gathering completed
-          console.log('ICE gathering completed with', iceConnections.length, 'candidates')
-          if (iceConnections.length > 0) {
-            // If we got any candidates, consider partial success
-            resolve()
-          }
-        }
-      }
-
-      // Track ICE connection state
-      pc.oniceconnectionstatechange = () => {
-        console.log('ICE connection state changed to:', pc.iceConnectionState)
-        if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
-          connectionSuccess = true
-          resolve()
-        } else if (pc.iceConnectionState === 'failed' || pc.iceConnectionState === 'disconnected') {
-          resolve()
-        }
-      }
-    })
-
-    // Setup timeout
-    const timeoutPromise = new Promise(resolve => setTimeout(() => {
-      console.log('ICE connectivity test timeout reached after', timeout, 'ms')
-      resolve()
-    }, timeout))
-
-    // Wait for either connection or timeout
-    await Promise.race([iceConnectionPromise, timeoutPromise])
-
-    // Less strict success criteria - if we have at least one viable candidate, consider it potentially successful
-    // This better matches real-world calling scenarios where calls can succeed even with limited connectivity
-    const hasViableCandidates = iceConnections.length > 0
-
-    // Clean up resources
-    pc.close()
-
-    // Even if direct ICE connection wasn't established, but we gathered candidates,
-    // we'll consider it a "soft success" since actual calls might still work
-    const adjustedSuccess = connectionSuccess || hasViableCandidates
-
-    console.log('ICE connectivity test completed:',
-      adjustedSuccess ? 'Success' : 'Failed',
-      'Gathered candidates:', iceConnections.length,
-      'Direct ICE connection:', connectionSuccess)
-
-    return {
-      success: adjustedSuccess,
-      iceConnections,
-      // Include details for better diagnostics (following Voice Diagnostics Tool approach)
-      details: {
-        webRtcSupported: true,
-        peerConnectionState: pc.connectionState || 'unknown',
-        iceConnectionState: pc.iceConnectionState || 'unknown',
-        candidateCount: iceConnections.length,
-        hasViableCandidates: hasViableCandidates,
-        directConnectionEstablished: connectionSuccess,
-        timeoutReached: !connectionSuccess && iceConnections.length === 0
-      }
-    }
-  } catch (error) {
-    console.error('Voice connectivity test error:', error)
-    return {
-      success: false,
-      iceConnections: [],
-      details: {
-        webRtcSupported: !!window.RTCPeerConnection,
-        error: error.message
-      }
-    }
-  }
-}
-
-const testMediaDevices = async (options = {}) => {
-  const requestAudio = options.audio || false
-  const requestVideo = options.video || false
-  const timeout = options.timeout || 10000
-
-  try {
-    // Check if getUserMedia is supported - essential for voice calls
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      return {
-        audio: { successful: false, errorMessage: 'getUserMedia not supported' },
-        video: { successful: false, errorMessage: 'getUserMedia not supported' }
-      }
-    }
-
-    const constraints = {
-      audio: requestAudio ? { echoCancellation: true, noiseSuppression: true } : false,
-      video: requestVideo
-    }
-    // eslint-disable-next-line promise/param-names
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Device access timeout')), timeout)
-    })
-
-    // Try to get user media with enhanced audio settings for voice quality
-    const stream = await Promise.race([
-      navigator.mediaDevices.getUserMedia(constraints),
-      timeoutPromise
-    ])
-
-    // Check what we got
-    const result = {
-      audio: { successful: false },
-      video: { successful: false }
-    }
-
-    if (stream) {
-      // Check for audio tracks and their capabilities
-      if (requestAudio) {
-        const audioTracks = stream.getAudioTracks()
-        result.audio.successful = audioTracks.length > 0
-        result.audio.tracks = audioTracks.map(track => ({
-          id: track.id,
-          label: track.label || 'Unknown microphone',
-          enabled: track.enabled,
-          muted: track.muted,
-          readyState: track.readyState,
-          constraints: track.getConstraints(),
-          // Include these settings for voice quality assessment
-          settings: track.getSettings()
-        }))
-      }
-
-      // Check for video tracks
-      if (requestVideo) {
-        const videoTracks = stream.getVideoTracks()
-        result.video.successful = videoTracks.length > 0
-        result.video.tracks = videoTracks.map(track => ({
-          id: track.id,
-          label: track.label || 'Unknown camera',
-          enabled: track.enabled,
-          muted: track.muted,
-          readyState: track.readyState,
-          constraints: track.getConstraints(),
-          settings: track.getSettings()
-        }))
-      }
-
-      // Add diagnostics section for better troubleshooting - follows Voice Diagnostics Tool approach
-      result.diagnostics = {
-        deviceCount: {
-          audio: stream.getAudioTracks().length,
-          video: stream.getVideoTracks().length
-        },
-        devicePermissionGranted: true,
-        deviceAccessSuccessful: true
-      }
-
-      // Stop all tracks to release resources
-      stream.getTracks().forEach(track => track.stop())
-    }
-
-    return result
-  } catch (error) {
-    console.error('Media devices test error:', error)
-    // Provide detailed error information for troubleshooting
-    const errorType = error.name || 'Unknown'
-    const isPermissionDenied = errorType === 'NotAllowedError' || errorType === 'PermissionDeniedError'
-
-    return {
-      audio: {
-        successful: false,
-        errorMessage: error.message,
-        errorType: errorType,
-        permissionDenied: isPermissionDenied
-      },
-      video: {
-        successful: false,
-        errorMessage: error.message,
-        errorType: errorType,
-        permissionDenied: isPermissionDenied
-      },
-      diagnostics: {
-        devicePermissionGranted: !isPermissionDenied,
-        deviceAccessSuccessful: false,
-        errorName: errorType,
-        errorMessage: error.message
-      }
-    }
-  }
-}
+// Remove custom implementations and use Voice SDK's PreflightTest
 
 export default {
   name: 'connection-test',
@@ -565,7 +513,11 @@ export default {
       isTesting: false,
       soketiHost: null,
       wsProtocol: null,
-      wsPort: null
+      wsPort: null,
+      preflightTest: null, // Store the preflightTest instance
+      preflightReport: null, // Store the completed report
+      testCount: 0, // Track how many tests have been run
+      lastTestTime: null // Track when the last test was run
     }
   },
 
@@ -592,6 +544,8 @@ export default {
   methods: {
     async testConnection () {
       this.isTesting = true
+      this.testCount++
+      this.lastTestTime = new Date()
 
       try {
         // Initialize test results
@@ -606,7 +560,9 @@ export default {
           twilio: {
             connected: false,
             webRtcSupported: false,
-            iceConnectionStatus: false
+            iceConnectionStatus: false,
+            networkTiming: null,
+            iceStats: null
           },
           permissions: {
             microphone: false,
@@ -630,7 +586,7 @@ export default {
         // Test network connection
         await this.testNetworkConnection()
 
-        // Test browser capabilities
+        // Test Twilio Voice connectivity using the official PreflightTest API
         await this.testTwilioRequirements()
 
         // Test permissions
@@ -645,17 +601,16 @@ export default {
         // Determine overall status
         this.evaluateOverallStatus()
 
-        // Try to get real data from API if available
+        // Save test results to localStorage
         try {
-          const response = await talk2Api.V1.user.connectionTest(this.user.id)
-          if (response && response.data) {
-            // Merge API response data with our test results
-            // This allows backend to override or supplement frontend tests
-            this.testResults = { ...this.testResults, ...response.data }
-          }
+          localStorage.setItem('connectionTestResults', JSON.stringify({
+            timestamp: this.lastTestTime,
+            results: this.testResults,
+            preflightReport: this.preflightReport,
+            testCount: this.testCount
+          }))
         } catch (error) {
-          console.error('API connection test failed:', error)
-          // Continue with client-side test results
+          console.error('Error saving test results:', error)
         }
       } catch (error) {
         console.error('Connection test error:', error)
@@ -724,71 +679,173 @@ export default {
           return
         }
 
-        // Use Twilio's official connectivity test
-        const connectivityResults = await testConnectivity({
-          // Optional configuration
-          iceServers: [
-            { urls: 'stun:global.stun.twilio.com:3478?transport=udp' }
-          ],
-          timeout: 15000 // 15 seconds
-        })
+        // Get access token for PreflightTest
+        const tokenResponse = await this.getTwilioAccessToken()
 
-        // Store detailed results for better troubleshooting
-        this.testResults.twilio.connectivityDetails = connectivityResults.details
-
-        // Check if at least one ICE connection was successful
-        this.testResults.twilio.iceConnectionStatus = connectivityResults.success
-
-        // Track if this is potentially a false negative
-        const potentialFalseNegative = !connectivityResults.details.directConnectionEstablished &&
-                                       connectivityResults.details.hasViableCandidates
-
-        // Check for overall connectivity success
-        this.testResults.twilio.connected = connectivityResults.success
-        this.testResults.twilio.potentialFalseNegative = potentialFalseNegative
-
-        // If connectivity test failed, try a basic fetch to Twilio domain
-        if (!this.testResults.twilio.connected) {
-          try {
-            await fetch('https://api.twilio.com/favicon.ico', {
-              method: 'HEAD',
-              mode: 'no-cors',
-              cache: 'no-store'
-            })
-            // We can at least reach Twilio's domain
-            this.testResults.twilio.connected = true
-            // If we can reach Twilio but ICE failed, it's likely a false negative
-            if (!this.testResults.twilio.iceConnectionStatus) {
-              this.testResults.twilio.potentialFalseNegative = true
-            }
-          } catch (e) {
-            this.testResults.twilio.connected = false
-          }
+        // Extract the token - the dialer endpoint returns the token directly,
+        // while the Talk2 API returns it in a data.token property
+        let token = tokenResponse
+        if (typeof tokenResponse === 'object' && tokenResponse !== null) {
+          // If it's from the dialer endpoint, it may be the token itself
+          token = tokenResponse.token || tokenResponse
         }
 
-        // Log complete connectivity results for debugging
-        console.log('Twilio Connectivity Test Results:', connectivityResults)
+        // Create and run the preflight test
+        console.log('Starting Twilio PreflightTest')
+        this.preflightTest = Device.runPreflight(token, {
+          codecPreferences: ['pcmu', 'opus'],
+          edge: 'roaming', // Use the closest edge location
+          fakeMicInput: true, // Don't require a real microphone for the test
+          signalingTimeoutMs: 10000 // 10 second timeout
+        })
+
+        // Promise to wait for the test to complete
+        await new Promise((resolve, reject) => {
+          // Set a timeout just in case
+          const timeout = setTimeout(() => {
+            if (this.preflightTest) {
+              this.preflightTest.stop()
+            }
+            reject(new Error('PreflightTest timeout'))
+          }, 15000) // 15 second max test time
+
+          // Listen for connection event
+          this.preflightTest.on('connected', () => {
+            console.log('PreflightTest connected to Twilio')
+            this.testResults.twilio.connected = true
+          })
+
+          // Listen for test completion
+          this.preflightTest.on('completed', (report) => {
+            console.log('PreflightTest completed successfully', report)
+            clearTimeout(timeout)
+
+            // Store the report for debugging
+            this.preflightReport = report
+
+            // Update test results with details from the report
+            this.testResults.twilio.connected = true
+            this.testResults.twilio.iceConnectionStatus = true
+            this.testResults.twilio.networkTiming = report.networkTiming
+            this.testResults.twilio.iceStats = {
+              candidates: report.iceCandidateStats,
+              selectedPair: report.selectedIceCandidatePairStats,
+              isTurnRequired: report.isTurnRequired || false
+            }
+
+            resolve()
+          })
+
+          // Listen for test failure
+          this.preflightTest.on('failed', (error) => {
+            console.error('PreflightTest failed', error)
+            clearTimeout(timeout)
+
+            // Mark as connected to Twilio, but ICE connectivity failed
+            // This allows the test to continue and doesn't mark everything as failed
+            // when the token is invalid but basic connectivity exists
+            this.testResults.twilio.connected = true
+            this.testResults.twilio.iceConnectionStatus = false
+            this.testResults.twilio.error = {
+              code: error.code,
+              message: error.message
+            }
+
+            // Store the error for debugging
+            this.preflightReport = { error }
+
+            // If connection to Twilio failed, try a basic fetch to Twilio domain
+            this.fallbackTwilioConnectivityTest()
+              .then(resolve)
+              .catch(resolve) // Resolve anyway to continue with other tests
+          })
+        })
       } catch (error) {
         console.error('Twilio requirements test error:', error)
         this.testResults.twilio.connected = false
         this.testResults.twilio.iceConnectionStatus = false
+
+        // Try fallback test
+        await this.fallbackTwilioConnectivityTest()
       }
+    },
+
+    async fallbackTwilioConnectivityTest () {
+      try {
+        await fetch('https://api.twilio.com/favicon.ico', {
+          method: 'HEAD',
+          mode: 'no-cors',
+          cache: 'no-store'
+        })
+        // We can at least reach Twilio's domain
+        this.testResults.twilio.connected = true
+        console.log('Fallback Twilio connectivity test: Success')
+      } catch (e) {
+        this.testResults.twilio.connected = false
+        console.log('Fallback Twilio connectivity test: Failed')
+      }
+    },
+
+    async getTwilioAccessToken () {
+      try {
+        // First try to use the same endpoint that dialer component uses
+        console.log('Trying to get Twilio token from dialer endpoint')
+
+        try {
+          const response = await this.$axios.post('/api/v1/dialer/new-mobile-token', { reset: false })
+          if (response && response.data) {
+            console.log('Successfully retrieved token from dialer endpoint')
+            return response.data
+          }
+        } catch (dialerError) {
+          console.warn('Failed to get token from dialer endpoint:', dialerError)
+          // Continue to try fallback methods
+        }
+
+        // Next, try the Talk2 API if available
+        if (talk2Api.V1 && talk2Api.V1.twilio && talk2Api.V1.twilio.token) {
+          console.log('Trying to get Twilio token from Talk2 API')
+          const response = await talk2Api.V1.twilio.token()
+          if (response && response.data && response.data.token) {
+            console.log('Successfully retrieved token from Talk2 API')
+            return response.data.token
+          }
+        }
+
+        // If no token is available, use dummy token
+        console.log('No token available from any source, using dummy token for testing')
+        return this.generateDummyToken()
+      } catch (error) {
+        console.error('Failed to get Twilio token:', error)
+        // Return dummy token to allow tests to proceed
+        console.log('Error getting token, using dummy token for testing')
+        return this.generateDummyToken()
+      }
+    },
+
+    generateDummyToken () {
+      console.log('Using dummy Twilio token - connectivity tests will be limited')
+      // Create a dummy token formatted like a JWT but will not work for actual Twilio operations
+      // This is just to allow the tests to proceed with basic connectivity checks
+      return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkdW1teV90d2lsaW9fdG9rZW4iLCJuYW1lIjoiVGVzdCBVc2VyIiwiaWF0IjoxNTE2MjM5MDIyfQ.dummy_signature_for_testing'
     },
 
     async testPermissions () {
       try {
-        // Use Twilio's official media devices test for microphone access
-        const mediaDevicesResults = await testMediaDevices({
-          audio: true, // Test audio only since we only need microphone for voice calls
-          video: false,
-          timeout: 10000 // 10 seconds
-        })
+        // Test microphone access
+        let micAccessGranted = false
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+          micAccessGranted = true
 
-        // Check if microphone access was successful
-        this.testResults.permissions.microphone = mediaDevicesResults.audio.successful
+          // Release the stream when done
+          stream.getTracks().forEach(track => track.stop())
+        } catch (error) {
+          console.error('Microphone access error:', error)
+          micAccessGranted = false
+        }
 
-        // Log complete media device test results for debugging
-        console.log('Twilio Media Devices Test Results:', mediaDevicesResults)
+        this.testResults.permissions.microphone = micAccessGranted
 
         // Check notification permission
         if ('Notification' in window) {
@@ -975,11 +1032,178 @@ export default {
       if (ping < 100) return 'success'
       if (ping < 300) return 'warning'
       return 'danger'
+    },
+
+    getQualityClass (quality) {
+      if (!quality) return 'secondary'
+      switch (quality) {
+        case 'excellent': return 'success'
+        case 'good': return 'info'
+        case 'fair': return 'warning'
+        case 'poor': return 'danger'
+        default: return 'secondary'
+      }
+    },
+
+    getTimingBarWidth (duration) {
+      if (!duration) return 0
+      const maxDuration = 3000 // Assuming most connections take less than 3 seconds
+      return Math.min((duration / maxDuration) * 100, 100) // Cap at 100%
+    },
+
+    formatBytes (bytes) {
+      if (bytes === 0 || !bytes) return '0 Bytes'
+      const k = 1024
+      const sizes = ['Bytes', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     }
   },
 
   mounted () {
+    // Check if we have recent test results saved in localStorage
+    try {
+      const savedTestData = localStorage.getItem('connectionTestResults')
+      if (savedTestData) {
+        const parsedData = JSON.parse(savedTestData)
+
+        // Only use saved data if it's less than 12 hours old
+        const savedTime = new Date(parsedData.timestamp)
+        const twelveHoursAgo = new Date(Date.now() - (12 * 60 * 60 * 1000))
+
+        if (savedTime > twelveHoursAgo) {
+          console.log('Using saved test results from:', savedTime)
+          this.testResults = parsedData.results
+          this.preflightReport = parsedData.preflightReport
+          this.lastTestTime = savedTime
+          this.testCount = parsedData.testCount || 1
+          return // Don't run new test if we have recent results
+        }
+      }
+    } catch (error) {
+      console.error('Error loading saved test results:', error)
+    }
+
+    // Run new test if no recent results exist
     this.testConnection()
+  },
+
+  beforeDestroy () {
+    // Clean up resources if test is still running
+    if (this.preflightTest) {
+      this.preflightTest.stop()
+      this.preflightTest = null
+    }
   }
 }
 </script>
+
+<style>
+.twilio-report {
+  padding: 1rem 0;
+}
+
+.quality-indicator {
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  text-transform: capitalize;
+}
+
+.quality-indicator.success {
+  background-color: #28a745;
+  color: white;
+}
+
+.quality-indicator.info {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.quality-indicator.warning {
+  background-color: #ffc107;
+  color: black;
+}
+
+.quality-indicator.danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.metric-card {
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.connection-details {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.3rem;
+}
+
+.timing-bar-container {
+  height: 24px;
+  background-color: #f1f1f1;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timing-bar {
+  height: 100%;
+  line-height: 24px;
+  color: white;
+  text-align: right;
+  padding-right: 8px;
+  border-radius: 4px;
+  min-width: 40px;
+}
+
+.timing-bar-label {
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+}
+
+.connection-path {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.endpoint {
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+
+.endpoint .ip {
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.connection-arrow {
+  margin-top: 1.5rem;
+}
+
+.connection-arrow i {
+  font-size: 1.5rem;
+}
+
+.protocol {
+  font-weight: bold;
+  color: #6c757d;
+}
+</style>
