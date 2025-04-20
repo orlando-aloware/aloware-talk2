@@ -26,7 +26,7 @@
           <q-separator class="my-2" />
           <q-item clickable v-close-popup @click="goToConnectionTest">
             <q-item-section>
-              <span class="text-md">Run Connection Test</span>
+              <span class="text-md"><i class="fa fa-stethoscope mr-2"></i>Run Connection Test</span>
             </q-item-section>
           </q-item>
         </q-list>

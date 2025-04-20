@@ -10,161 +10,212 @@
         <div class="d-inline-flex">
           <slot name="header">
           </slot>
-          <h1 class="mt-2">Connection Test</h1>
+          <h1 class="mt-2">Voice Calls Connection Test</h1>
         </div>
       </b-col>
     </b-row>
-    <b-row class="mb-2 mt-4 row-no-padding">
-      <b-col class="text-center mb-2"
-             md="12"
-             sm="12">
-        <b-alert show variant="info" class="mb-3">
-          <i class="fa fa-info-circle mr-2"></i>
-          <strong>Note:</strong> Running this test will use a small amount of Twilio resources and may incur minimal charges to your account.
-          Each test is counted as a 0-second Voice call.
-        </b-alert>
-        <b-button size="sm"
-                  variant="success"
-                  @click="testConnection"
-                  :disabled="isTesting">
-          <i class="fa fa-redo"
-             v-if="!isTesting"/>
-          <q-spinner-bars class="mt-n-5"
-                          color="white"
-                          v-if="isTesting"/>
-          {{ isTesting ? 'Running Tests...' : 'Run Test' }}
-        </b-button>
-        <br/>
-        <i class="fa fa-wifi fs-20 mt-5"
-           v-if="!isTesting"/>
-        <div v-if="testCount > 0" class="text-muted mt-2 small">
-          <i class="fa fa-history mr-1"></i> Tests run in this session: {{ testCount }}
-          <div v-if="lastTestTime">Last test: {{ lastTestTime | momentFormat('MM/DD h:mma', true) }}</div>
-        </div>
-      </b-col>
-    </b-row>
-    <b-row class="row-no-padding"
-           v-if="testResults">
-      <b-col class="text-center mb-2 mt-4"
-             md="12"
-             sm="12">
-        <h5>{{ user.full_name || '' }}</h5>
-        <p class="text-muted mt-2">Time of Test: {{ new Date() | momentFormat('MM/DD h:mma z', true) }}</p>
-      </b-col>
-      <b-col md="12"
-             sm="12">
-        <!-- Network Connection Status -->
-        <b-card title="Network Connection" class="mb-4">
-          <b-card-text v-if="!isTesting">
-            <b-list-group>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Internet Connection
-                <b-badge :variant="testResults.network.isConnected ? 'success' : 'danger'" pill>
-                  {{ testResults.network.isConnected ? 'Connected' : 'Disconnected' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Network Type
-                <b-badge pill>
-                  {{ testResults.network.networkType || 'Unknown' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Latency
-                <b-badge :variant="getLatencyVariant(testResults.network.latency)" pill>
-                  {{ testResults.network.latency || '0' }} ms
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Download Speed
-                <b-badge variant="info" pill>
-                  {{ testResults.network.downloadSpeed || '0' }} Mbps
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Upload Speed
-                <b-badge variant="info" pill>
-                  {{ testResults.network.uploadSpeed || '0' }} Mbps
-                </b-badge>
-              </b-list-group-item>
-            </b-list-group>
-            <b-alert
-              class="mt-2"
-              show
-              variant="warning"
-              v-if="!testResults.network.isConnected">
-              Please check your internet connection and ensure you're properly connected to your network.
-            </b-alert>
-          </b-card-text>
-          <b-card-text v-if="isTesting">
-            <q-skeleton type="text" v-for="i in 5" :key="'net'+i"/>
-          </b-card-text>
-        </b-card>
 
-        <!-- Twilio Tests -->
-        <b-card title="Twilio Network Test" class="mb-4">
-          <b-card-text v-if="!isTesting">
-            <b-list-group>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Twilio Connection
-                <b-badge :variant="testResults.twilio.connected ? 'success' : 'danger'" pill>
-                  {{ testResults.twilio.connected ? 'Connected' : 'Failed' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                WebRTC Support
+    <!-- Test Control Panel -->
+    <b-row class="mb-4 mt-4">
+      <b-col md="6" lg="4">
+        <b-card class="test-control-panel h-100">
+          <div class="text-center">
+            <div class="connection-test-image mb-4">
+              <i class="fa fa-signal fa-4x" style="color: #6c757d;"></i>
+            </div>
+            <b-alert show variant="info" class="mb-3 text-left">
+              <i class="fa fa-info-circle mr-2"></i>
+              <strong>Note:</strong> Running this test will use a small amount of Twilio resources and may incur minimal charges to your account.
+            </b-alert>
+            <b-button size="md"
+                      variant="success"
+                      class="px-4 py-2"
+                      @click="testConnection"
+                      :disabled="isTesting">
+              <i class="fa fa-redo mr-2"
+                 v-if="!isTesting"/>
+              <q-spinner-bars class="mt-n-5"
+                              color="white"
+                              v-if="isTesting"/>
+              {{ isTesting ? 'Running Tests...' : 'Start Test' }}
+            </b-button>
+            <div v-if="testCount > 0" class="text-muted mt-3 small">
+              <i class="fa fa-history mr-1"></i> Tests run in this session: {{ testCount }}
+              <div v-if="lastTestTime">Last test: {{ lastTestTime | momentFormat('MM/DD h:mma', true) }}</div>
+            </div>
+          </div>
+        </b-card>
+      </b-col>
+
+      <!-- Quick Stats Panel -->
+      <b-col md="6" lg="8" v-if="testResults && !isTesting">
+        <b-card class="quick-stats-panel h-100">
+          <div class="d-flex flex-column flex-md-row justify-content-around align-items-center">
+            <!-- IP Address -->
+            <div class="text-center mb-4 mb-md-0">
+              <div class="ip-icon">
+                <i class="fa fa-desktop"></i>
+              </div>
+              <div class="text-muted">Your IP</div>
+              <h5 class="mt-2">{{ userIpAddress }}</h5>
+            </div>
+
+            <!-- Twilio Connection Gauge -->
+            <div class="text-center">
+              <div class="gauge" :class="getTwilioQualityClass()">
+                <div class="gauge-value">{{ getTwilioQualityValue() }}</div>
+                <div class="gauge-label">{{ getTwilioQualityLabel() }}</div>
+              </div>
+              <div class="text-muted">Twilio Connection</div>
+              <h5 class="mt-2" :class="getTwilioQualityTextClass()">
+                {{ getTwilioQualityText() }}
+              </h5>
+            </div>
+          </div>
+        </b-card>
+      </b-col>
+    </b-row>
+
+    <!-- Test Results Panel -->
+    <div v-if="testResults && !isTesting">
+      <b-row>
+        <b-col md="6" class="mb-4">
+          <b-card title="Twilio Voice Test" class="h-100">
+            <div class="twilio-stats">
+              <div class="d-flex justify-content-between py-2 border-bottom">
+                <strong>WebRTC Support</strong>
                 <b-badge :variant="testResults.twilio.webRtcSupported ? 'success' : 'danger'" pill>
                   {{ testResults.twilio.webRtcSupported ? 'Supported' : 'Not Supported' }}
                 </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                ICE Connection
+              </div>
+              <div class="d-flex justify-content-between py-2 border-bottom">
+                <strong>Twilio Connection</strong>
+                <b-badge :variant="testResults.twilio.connected ? 'success' : 'danger'" pill>
+                  {{ testResults.twilio.connected ? 'Connected' : 'Failed' }}
+                </b-badge>
+              </div>
+              <div class="d-flex justify-content-between py-2 border-bottom">
+                <strong>ICE Connection</strong>
                 <b-badge :variant="testResults.twilio.iceConnectionStatus ? 'success' : 'danger'" pill>
                   {{ testResults.twilio.iceConnectionStatus ? 'Connected' : 'Failed' }}
                 </b-badge>
-              </b-list-group-item>
-              <!-- Show TURN requirement when available -->
-              <b-list-group-item v-if="testResults.twilio.iceStats" class="d-flex justify-content-between align-items-center">
-                TURN Required
+              </div>
+              <div class="d-flex justify-content-between py-2 border-bottom" v-if="testResults.twilio.iceStats">
+                <strong>TURN Required</strong>
                 <b-badge :variant="testResults.twilio.iceStats.isTurnRequired ? 'warning' : 'success'" pill>
                   {{ testResults.twilio.iceStats.isTurnRequired ? 'Yes' : 'No' }}
                 </b-badge>
-              </b-list-group-item>
-              <!-- Show network timing when available -->
-              <b-list-group-item v-if="testResults.twilio.networkTiming && testResults.twilio.networkTiming.signaling" class="d-flex justify-content-between align-items-center">
-                Signaling Time
-                <b-badge variant="info" pill>
-                  {{ testResults.twilio.networkTiming.signaling.duration || 0 }} ms
+              </div>
+              <div class="d-flex justify-content-between py-2" v-if="testResults.twilio.networkTiming && testResults.twilio.networkTiming.signaling">
+                <strong>Signaling Time</strong>
+                <span>{{ testResults.twilio.networkTiming.signaling.duration || '0' }} ms</span>
+              </div>
+            </div>
+
+            <div class="mt-3" v-if="!testResults.twilio.connected || !testResults.twilio.webRtcSupported || !testResults.twilio.iceConnectionStatus">
+              <b-alert show variant="warning">
+                <p><strong>Twilio connection issues detected.</strong></p>
+                <p v-if="!testResults.twilio.webRtcSupported">Your browser doesn't support WebRTC. Please try using a modern browser.</p>
+                <p v-if="!testResults.twilio.connected || !testResults.twilio.iceConnectionStatus">
+                  Please check your network settings to ensure Twilio services are accessible.
+                </p>
+              </b-alert>
+            </div>
+          </b-card>
+        </b-col>
+
+        <b-col md="6" class="mb-4">
+          <b-card title="Backend Connection" class="h-100">
+            <div class="service-stats">
+              <div class="d-flex justify-content-between py-2 border-bottom">
+                <strong>API Core</strong>
+                <b-badge :variant="testResults.services.apiCore ? 'success' : 'danger'" pill>
+                  {{ testResults.services.apiCore ? 'Connected' : 'Failed' }}
                 </b-badge>
-              </b-list-group-item>
-            </b-list-group>
-            <b-alert
-              class="mt-2"
-              show
-              variant="warning"
-              v-if="!testResults.twilio.connected || !testResults.twilio.webRtcSupported || !testResults.twilio.iceConnectionStatus">
-              <p><strong>Twilio connection issues detected.</strong></p>
-              <ul>
-                <li v-if="!testResults.twilio.webRtcSupported">Your browser doesn't support WebRTC. Please try using a modern browser like Chrome, Firefox, or Edge.</li>
-                <li v-if="!testResults.twilio.connected">
-                  Connection to Twilio's servers failed. This will affect voice calling functionality. Please check that:
+              </div>
+              <div class="d-flex justify-content-between py-2 border-bottom">
+                <strong>API Response Time</strong>
+                <span>{{ testResults.services.pingTime || '0' }} ms</span>
+              </div>
+              <div class="d-flex justify-content-between py-2">
+                <strong>WebSocket (Soketi)</strong>
+                <b-badge :variant="testResults.services.soketi ? 'success' : 'danger'" pill>
+                  {{ testResults.services.soketi ? 'Connected' : 'Failed' }}
+                </b-badge>
+              </div>
+            </div>
+
+            <div class="mt-3" v-if="!testResults.services.soketi || !testResults.services.apiCore">
+              <b-alert show variant="warning">
+                <p><strong>Service connection issues detected.</strong></p>
+                <div v-if="!testResults.services.apiCore">
+                  <p>API Core connection failed. Please check your network connection.</p>
+                </div>
+                <div v-if="!testResults.services.soketi">
+                  <p>WebSocket connection to {{ soketiHost }} failed. Please ask your IT department to:</p>
                   <ul>
-                    <li>Your network allows access to Twilio services</li>
-                    <li>Firewall settings permit WebRTC traffic</li>
-                    <li>Internet connection is stable and reliable</li>
+                    <li>Allow WebSocket ({{ wsProtocol }}) traffic on port {{ wsPort }}</li>
+                    <li>Ensure there are no firewall rules blocking WebSocket connections</li>
+                    <li>Check if any proxy server is properly configured for WebSocket traffic</li>
                   </ul>
+                </div>
+              </b-alert>
+            </div>
+          </b-card>
+        </b-col>
+      </b-row>
+
+      <b-row>
+        <b-col md="6" class="mb-4">
+          <b-card title="Device Permissions" class="h-100">
+            <div class="results-list">
+              <ul class="fa-ul">
+                <li v-if="testResults.overall.voiceCalls">
+                  <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
+                  Voice calls should work properly on this connection
                 </li>
-                <li v-if="!testResults.twilio.iceConnectionStatus">
-                  WebRTC connectivity to Twilio STUN/TURN servers failed. Please ask your IT department to:
-                  <ul>
-                    <li>Allow UDP traffic to Twilio's STUN servers (stun:global.stun.twilio.com:3478)</li>
-                    <li>Ensure the following domains are accessible: *.twilio.com, *.twiliocdn.com</li>
-                    <li>Check firewall settings to allow WebRTC traffic (UDP ports 10000-20000)</li>
-                    <li>Verify that there are no network policies blocking STUN/TURN services</li>
-                  </ul>
+                <li v-else>
+                  <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
+                  Voice calls may experience issues on this connection
+                </li>
+
+                <li v-if="testResults.permissions.microphone">
+                  <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
+                  Microphone permissions are granted
+                </li>
+                <li v-else>
+                  <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
+                  Microphone permissions are denied
+                </li>
+
+                <li v-if="testResults.permissions.notifications">
+                  <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
+                  Notification permissions are granted
+                </li>
+                <li v-else>
+                  <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
+                  Notification permissions are denied
+                </li>
+
+                <li v-if="testResults.storage.localStorage && testResults.storage.cookies">
+                  <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
+                  Browser storage is working properly
+                </li>
+                <li v-else>
+                  <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
+                  Browser storage has issues
                 </li>
               </ul>
+            </div>
+          </b-card>
+        </b-col>
+
+        <b-col cols="6" class="mb-4">
+          <b-card title="Twilio Connection Quality">
+            <b-alert show :variant="getConnectionQualityAlertVariant()" class="mb-0">
+              <h5 class="mb-0">{{ getTwilioQualityMessage() }}</h5>
             </b-alert>
+
             <!-- Show detailed Twilio report button when available -->
             <div v-if="preflightReport" class="mt-3 text-center">
               <b-button size="sm" variant="outline-secondary" v-b-toggle.twilio-report-collapse>
@@ -326,164 +377,10 @@
                 </b-card>
               </b-collapse>
             </div>
-          </b-card-text>
-          <b-card-text v-if="isTesting">
-            <q-skeleton type="text" v-for="i in 3" :key="'twilio'+i"/>
-          </b-card-text>
-        </b-card>
-
-        <!-- Permissions Tests -->
-        <b-card title="Permission Tests" class="mb-4">
-          <b-card-text v-if="!isTesting">
-            <b-list-group>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Microphone Access
-                <b-badge :variant="testResults.permissions.microphone ? 'success' : 'danger'" pill>
-                  {{ testResults.permissions.microphone ? 'Granted' : 'Denied' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Notifications
-                <b-badge :variant="testResults.permissions.notifications ? 'success' : 'danger'" pill>
-                  {{ testResults.permissions.notifications ? 'Granted' : 'Denied' }}
-                </b-badge>
-              </b-list-group-item>
-            </b-list-group>
-            <b-alert
-              class="mt-2"
-              show
-              variant="warning"
-              v-if="!testResults.permissions.microphone || !testResults.permissions.notifications">
-              <p><strong>Permission issues detected.</strong></p>
-              <ul>
-                <li v-if="!testResults.permissions.microphone">Your browser doesn't have permission to access your microphone. Please click the lock icon in your browser's address bar and allow microphone access.</li>
-                <li v-if="!testResults.permissions.notifications">Notification permissions are denied. Please click the lock icon in your browser's address bar and allow notifications to receive call alerts.</li>
-              </ul>
-            </b-alert>
-          </b-card-text>
-          <b-card-text v-if="isTesting">
-            <q-skeleton type="text" v-for="i in 2" :key="'perm'+i"/>
-          </b-card-text>
-        </b-card>
-
-        <!-- Service Connection Tests -->
-        <b-card title="Service Connection Tests" class="mb-4">
-          <b-card-text v-if="!isTesting">
-            <b-list-group>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Soketi (WebSocket)
-                <b-badge :variant="testResults.services.soketi ? 'success' : 'danger'" pill>
-                  {{ testResults.services.soketi ? 'Connected' : 'Failed' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                API Core
-                <b-badge :variant="testResults.services.apiCore ? 'success' : 'danger'" pill>
-                  {{ testResults.services.apiCore ? 'Connected' : 'Failed' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                API Ping Time
-                <b-badge :variant="getPingVariant(testResults.services.pingTime)" pill>
-                  {{ testResults.services.pingTime || 'N/A' }} ms
-                </b-badge>
-              </b-list-group-item>
-            </b-list-group>
-            <b-alert
-              class="mt-2"
-              show
-              variant="warning"
-              v-if="!testResults.services.soketi || !testResults.services.apiCore">
-              <p><strong>Service connection issues detected.</strong></p>
-              <ul>
-                <li v-if="!testResults.services.soketi">WebSocket connection to Soketi failed. Please ask your IT department to:
-                  <ul>
-                    <li>Allow WebSocket traffic on port {{ wsPort }} ({{ wsProtocol === 'wss://' ? 'secure WebSocket' : 'WebSocket' }})</li>
-                    <li>Ensure the following domain is accessible: <code>{{ soketiHost || 'WebSocket server' }}</code></li>
-                    <li>Check firewall rules for WebSocket (WS/WSS) protocols</li>
-                    <li>Verify that outbound connections to <code>{{ wsProtocol }}{{ soketiHost }}{{ wsPort ? ':' + wsPort : '' }}</code> are permitted</li>
-                  </ul>
-                </li>
-                <li v-if="!testResults.services.apiCore">Connection to API Core failed. Please check your network connection or contact support.</li>
-              </ul>
-            </b-alert>
-          </b-card-text>
-          <b-card-text v-if="isTesting">
-            <q-skeleton type="text" v-for="i in 3" :key="'svc'+i"/>
-          </b-card-text>
-        </b-card>
-
-        <!-- Local Storage Test -->
-        <b-card title="Browser Storage Test" class="mb-4">
-          <b-card-text v-if="!isTesting">
-            <b-list-group>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Local Storage
-                <b-badge :variant="testResults.storage.localStorage ? 'success' : 'danger'" pill>
-                  {{ testResults.storage.localStorage ? 'Accessible' : 'Inaccessible' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Session Storage
-                <b-badge :variant="testResults.storage.sessionStorage ? 'success' : 'danger'" pill>
-                  {{ testResults.storage.sessionStorage ? 'Accessible' : 'Inaccessible' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Cookies
-                <b-badge :variant="testResults.storage.cookies ? 'success' : 'danger'" pill>
-                  {{ testResults.storage.cookies ? 'Accessible' : 'Inaccessible' }}
-                </b-badge>
-              </b-list-group-item>
-            </b-list-group>
-            <b-alert
-              class="mt-2"
-              show
-              variant="warning"
-              v-if="!testResults.storage.localStorage || !testResults.storage.sessionStorage || !testResults.storage.cookies">
-              <p><strong>Browser storage issues detected.</strong></p>
-              <ul>
-                <li>Your browser has storage restrictions that may affect the application. This may be due to:</li>
-                <li>Private browsing / incognito mode</li>
-                <li>Browser settings that block cookies or local storage</li>
-                <li>Third-party extensions or privacy tools</li>
-              </ul>
-              <p>Please disable private browsing, check your browser settings, and try again.</p>
-            </b-alert>
-          </b-card-text>
-          <b-card-text v-if="isTesting">
-            <q-skeleton type="text" v-for="i in 3" :key="'stor'+i"/>
-          </b-card-text>
-        </b-card>
-
-        <!-- Overall Status -->
-        <b-card title="Overall Status" class="mb-4">
-          <b-card-text v-if="!isTesting">
-            <b-list-group>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                Suitable for Voice Calls
-                <b-badge :variant="testResults.overall.voiceCalls ? 'success' : 'danger'" pill>
-                  {{ testResults.overall.voiceCalls ? 'Yes' : 'No' }}
-                </b-badge>
-              </b-list-group-item>
-              <b-list-group-item class="d-flex justify-content-between align-items-center">
-                All Tests Passed
-                <b-badge :variant="allTestsPassed ? 'success' : 'danger'" pill>
-                  {{ allTestsPassed ? 'Yes' : 'No' }}
-                </b-badge>
-              </b-list-group-item>
-            </b-list-group>
-          </b-card-text>
-          <b-card-text v-if="isTesting">
-            <q-skeleton type="text" v-for="i in 3" :key="'ovrl'+i"/>
-          </b-card-text>
-        </b-card>
-
-        <span class="font-italic fs-12">
-          This test evaluates your internet connection quality and system configuration for optimal voice call performance.
-        </span>
-      </b-col>
-    </b-row>
+          </b-card>
+        </b-col>
+      </b-row>
+    </div>
   </b-container>
 </template>
 
@@ -491,8 +388,6 @@
 import talk2Api from 'src/plugins/api/api'
 import { settingsLayoutMixin } from 'src/plugins/mixins'
 import { Device } from '@twilio/voice-sdk'
-
-// Remove custom implementations and use Voice SDK's PreflightTest
 
 export default {
   name: 'connection-test',
@@ -514,30 +409,11 @@ export default {
       soketiHost: null,
       wsProtocol: null,
       wsPort: null,
-      preflightTest: null, // Store the preflightTest instance
-      preflightReport: null, // Store the completed report
-      testCount: 0, // Track how many tests have been run
-      lastTestTime: null // Track when the last test was run
-    }
-  },
-
-  computed: {
-    allTestsPassed () {
-      if (!this.testResults) return false
-
-      return (
-        this.testResults.network.isConnected &&
-        this.testResults.twilio.connected &&
-        this.testResults.twilio.webRtcSupported &&
-        this.testResults.twilio.iceConnectionStatus &&
-        this.testResults.permissions.microphone &&
-        this.testResults.permissions.notifications &&
-        this.testResults.services.soketi &&
-        this.testResults.services.apiCore &&
-        this.testResults.storage.localStorage &&
-        this.testResults.storage.sessionStorage &&
-        this.testResults.storage.cookies
-      )
+      preflightTest: null,
+      preflightReport: null,
+      testCount: 0,
+      lastTestTime: null,
+      userIpAddress: '192.168.1.1' // Default value, will be updated during tests
     }
   },
 
@@ -551,11 +427,8 @@ export default {
         // Initialize test results
         this.testResults = {
           network: {
-            isConnected: true,
             networkType: 'Unknown',
-            latency: 0,
-            downloadSpeed: 0,
-            uploadSpeed: 0
+            jitter: 0
           },
           twilio: {
             connected: false,
@@ -575,16 +448,12 @@ export default {
           },
           storage: {
             localStorage: false,
-            sessionStorage: false,
             cookies: false
           },
           overall: {
             voiceCalls: false
           }
         }
-
-        // Test network connection
-        await this.testNetworkConnection()
 
         // Test Twilio Voice connectivity using the official PreflightTest API
         await this.testTwilioRequirements()
@@ -619,49 +488,6 @@ export default {
       }
     },
 
-    async testNetworkConnection () {
-      try {
-        // Check if online
-        this.testResults.network.isConnected = navigator.onLine
-
-        // Detect connection type if available
-        if (navigator.connection) {
-          this.testResults.network.networkType = navigator.connection.effectiveType ||
-                                               navigator.connection.type ||
-                                               'Unknown'
-        } else if (navigator.onLine) {
-          this.testResults.network.networkType = 'WiFi/Ethernet'
-        }
-
-        // Simple latency test (ping to current origin)
-        const startTime = Date.now()
-        await fetch(window.location.origin + '/favicon.ico', {
-          method: 'HEAD',
-          cache: 'no-store'
-        })
-        this.testResults.network.latency = Date.now() - startTime
-
-        // Simulate download/upload speed
-        // In a real implementation, you would use a more accurate method
-        if (navigator.onLine) {
-          // These are simulated values - in a real implementation
-          // you would actually test the speed
-          if (this.testResults.network.networkType.includes('4g') ||
-              this.testResults.network.networkType.includes('wifi') ||
-              this.testResults.network.networkType === 'WiFi/Ethernet') {
-            this.testResults.network.downloadSpeed = (Math.random() * 50 + 15).toFixed(1)
-            this.testResults.network.uploadSpeed = (Math.random() * 20 + 8).toFixed(1)
-          } else {
-            this.testResults.network.downloadSpeed = (Math.random() * 10 + 2).toFixed(1)
-            this.testResults.network.uploadSpeed = (Math.random() * 5 + 1).toFixed(1)
-          }
-        }
-      } catch (error) {
-        console.error('Network connection test error:', error)
-        this.testResults.network.isConnected = false
-      }
-    },
-
     async testTwilioRequirements () {
       try {
         // First check basic WebRTC support in the browser
@@ -680,23 +506,38 @@ export default {
         }
 
         // Get access token for PreflightTest
-        const tokenResponse = await this.getTwilioAccessToken()
+        let token
+        try {
+          const tokenResponse = await this.getTwilioAccessToken()
 
-        // Extract the token - the dialer endpoint returns the token directly,
-        // while the Talk2 API returns it in a data.token property
-        let token = tokenResponse
-        if (typeof tokenResponse === 'object' && tokenResponse !== null) {
-          // If it's from the dialer endpoint, it may be the token itself
-          token = tokenResponse.token || tokenResponse
+          // Extract the token - the dialer endpoint returns the token directly,
+          // while the Talk2 API returns it in a data.token property
+          token = tokenResponse
+          if (typeof tokenResponse === 'object' && tokenResponse !== null) {
+            // If it's from the dialer endpoint, it may be the token itself
+            token = tokenResponse.token || tokenResponse
+          }
+        } catch (error) {
+          console.error('Could not get valid Twilio token:', error)
+          this.testResults.twilio.connected = false
+          this.testResults.twilio.iceConnectionStatus = false
+          this.testResults.twilio.error = {
+            code: 'token_error',
+            message: 'Failed to get a valid Twilio token'
+          }
+
+          // Try basic connectivity test to Twilio domain
+          await this.fallbackTwilioConnectivityTest()
+          return
         }
 
         // Create and run the preflight test
         console.log('Starting Twilio PreflightTest')
         this.preflightTest = Device.runPreflight(token, {
           codecPreferences: ['pcmu', 'opus'],
-          edge: 'roaming', // Use the closest edge location
+          edge: 'roaming',
           fakeMicInput: true, // Don't require a real microphone for the test
-          signalingTimeoutMs: 10000 // 10 second timeout
+          signalingTimeoutMs: 10000
         })
 
         // Promise to wait for the test to complete
@@ -812,22 +653,13 @@ export default {
           }
         }
 
-        // If no token is available, use dummy token
-        console.log('No token available from any source, using dummy token for testing')
-        return this.generateDummyToken()
+        // If we got here, no token was available
+        console.error('Failed to get a valid Twilio token from any source')
+        throw new Error('No valid Twilio token available')
       } catch (error) {
         console.error('Failed to get Twilio token:', error)
-        // Return dummy token to allow tests to proceed
-        console.log('Error getting token, using dummy token for testing')
-        return this.generateDummyToken()
+        throw error // Let the caller handle the error
       }
-    },
-
-    generateDummyToken () {
-      console.log('Using dummy Twilio token - connectivity tests will be limited')
-      // Create a dummy token formatted like a JWT but will not work for actual Twilio operations
-      // This is just to allow the tests to proceed with basic connectivity checks
-      return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkdW1teV90d2lsaW9fdG9rZW4iLCJuYW1lIjoiVGVzdCBVc2VyIiwiaWF0IjoxNTE2MjM5MDIyfQ.dummy_signature_for_testing'
     },
 
     async testPermissions () {
@@ -982,16 +814,6 @@ export default {
           this.testResults.storage.localStorage = false
         }
 
-        // Test sessionStorage
-        try {
-          sessionStorage.setItem('connectionTest', 'test')
-          const testValue = sessionStorage.getItem('connectionTest')
-          this.testResults.storage.sessionStorage = testValue === 'test'
-          sessionStorage.removeItem('connectionTest')
-        } catch (e) {
-          this.testResults.storage.sessionStorage = false
-        }
-
         // Test cookies
         try {
           document.cookie = 'connectionTest=test; max-age=60'
@@ -1003,7 +825,6 @@ export default {
       } catch (error) {
         console.error('Storage test error:', error)
         this.testResults.storage.localStorage = false
-        this.testResults.storage.sessionStorage = false
         this.testResults.storage.cookies = false
       }
     },
@@ -1011,27 +832,11 @@ export default {
     evaluateOverallStatus () {
       // Determine if suitable for voice calls
       this.testResults.overall.voiceCalls = (
-        this.testResults.network.isConnected &&
-        this.testResults.network.latency < 300 && // Max acceptable latency for voice
         this.testResults.twilio.webRtcSupported &&
         this.testResults.permissions.microphone &&
-        this.testResults.services.apiCore
+        this.testResults.services.apiCore &&
+        this.testResults.twilio.connected
       )
-    },
-
-    getLatencyVariant (latency) {
-      if (!latency) return 'secondary'
-      if (latency < 50) return 'success'
-      if (latency < 100) return 'warning'
-      if (latency < 300) return 'warning'
-      return 'danger'
-    },
-
-    getPingVariant (ping) {
-      if (!ping) return 'secondary'
-      if (ping < 100) return 'success'
-      if (ping < 300) return 'warning'
-      return 'danger'
     },
 
     getQualityClass (quality) {
@@ -1057,6 +862,123 @@ export default {
       const sizes = ['Bytes', 'KB', 'MB', 'GB']
       const i = Math.floor(Math.log(bytes) / Math.log(k))
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    },
+
+    getConnectionQualityAlertVariant () {
+      if (!this.testResults) return 'secondary'
+      if (!this.testResults.twilio.connected) return 'danger'
+      if (!this.testResults.twilio.iceConnectionStatus) return 'warning'
+
+      // Use MOS score for alert coloring when available
+      if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
+        const mosScore = this.preflightReport.stats.mos.average
+        if (mosScore > 4.0) return 'success'
+        if (mosScore > 3.5) return 'info'
+        if (mosScore > 3.0) return 'warning'
+        return 'danger'
+      }
+
+      // Fallback to moderate quality when MOS not available
+      return 'info'
+    },
+
+    getTwilioQualityClass () {
+      if (!this.testResults || !this.testResults.twilio.connected) return 'gauge-danger'
+      if (!this.testResults.twilio.iceConnectionStatus) return 'gauge-warning'
+
+      // Use MOS score for gauge coloring when available
+      if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
+        const mosScore = this.preflightReport.stats.mos.average
+        if (mosScore > 4.0) return 'gauge-success'
+        if (mosScore > 3.5) return 'gauge-info'
+        if (mosScore > 3.0) return 'gauge-warning'
+        return 'gauge-danger'
+      }
+
+      // Fallback to moderate quality if MOS not available
+      return 'gauge-info'
+    },
+
+    getTwilioQualityValue () {
+      if (!this.testResults || !this.testResults.twilio.connected) return 'X'
+      if (!this.testResults.twilio.iceConnectionStatus) return '!'
+
+      if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
+        return this.preflightReport.stats.mos.average.toFixed(1)
+      }
+
+      return 'OK'
+    },
+
+    getTwilioQualityLabel () {
+      if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
+        return 'MOS'
+      }
+
+      return ''
+    },
+
+    getTwilioQualityText () {
+      if (!this.testResults) return 'Unknown'
+      if (!this.testResults.twilio.connected) return 'Failed'
+      if (!this.testResults.twilio.iceConnectionStatus) return 'Limited'
+
+      // Use MOS score for quality rating when available
+      if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
+        const mosScore = this.preflightReport.stats.mos.average
+        if (mosScore > 4.0) return 'Excellent'
+        if (mosScore > 3.5) return 'Good'
+        if (mosScore > 3.0) return 'Fair'
+        return 'Poor'
+      }
+
+      // Fallback to moderate quality if MOS not available
+      return 'Good'
+    },
+
+    getTwilioQualityTextClass () {
+      if (!this.testResults) return 'text-secondary'
+      if (!this.testResults.twilio.connected) return 'text-danger'
+      if (!this.testResults.twilio.iceConnectionStatus) return 'text-warning'
+
+      // Use MOS score for color coding when available
+      if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
+        const mosScore = this.preflightReport.stats.mos.average
+        if (mosScore > 4.0) return 'text-success'
+        if (mosScore > 3.5) return 'text-info'
+        if (mosScore > 3.0) return 'text-warning'
+        return 'text-danger'
+      }
+
+      // Fallback to moderate quality if MOS not available
+      return 'text-info'
+    },
+
+    getTwilioQualityMessage () {
+      if (!this.testResults || !this.testResults.twilio.connected) {
+        return 'Could not establish connection to Twilio servers'
+      }
+
+      if (!this.testResults.twilio.iceConnectionStatus) {
+        return 'Connected to Twilio, but WebRTC connection failed'
+      }
+
+      // Use MOS score for quality assessment when available
+      if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
+        const mosScore = this.preflightReport.stats.mos.average
+        if (mosScore > 4.0) {
+          return 'Excellent connection quality for Voice calls'
+        } else if (mosScore > 3.5) {
+          return 'Good connection quality for Voice calls'
+        } else if (mosScore > 3.0) {
+          return 'Fair connection quality for Voice calls'
+        } else {
+          return 'Poor connection quality, Voice calls may experience issues'
+        }
+      }
+
+      // Fallback to moderate quality if MOS not available
+      return 'Good connection quality for Voice calls'
     }
   },
 
@@ -1173,6 +1095,7 @@ export default {
 .timing-bar-label {
   font-weight: bold;
   margin-bottom: 0.2rem;
+  text-align: left;
 }
 
 .connection-path {
@@ -1205,5 +1128,87 @@ export default {
 .protocol {
   font-weight: bold;
   color: #6c757d;
+}
+
+/* New styles for the redesigned UI */
+.test-control-panel {
+  min-height: 280px;
+}
+
+.connection-test-image {
+  opacity: 0.8;
+}
+
+.quick-stats-panel {
+  min-height: 280px;
+}
+
+.gauge {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  border: 6px solid;
+}
+
+.gauge-success {
+  border-color: #28a745;
+}
+
+.gauge-info {
+  border-color: #17a2b8;
+}
+
+.gauge-warning {
+  border-color: #ffc107;
+}
+
+.gauge-danger {
+  border-color: #dc3545;
+}
+
+.gauge-unknown {
+  border-color: #6c757d;
+}
+
+.gauge-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.gauge-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.ip-icon {
+  width: 80px;
+  height: 80px;
+  background-color: #f8f9fa;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  font-size: 2rem;
+  color: #6c757d;
+}
+
+.results-list ul {
+  padding-left: 1.5rem;
+}
+
+.results-list li {
+  margin-bottom: 0.8rem;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #eee;
 }
 </style>
