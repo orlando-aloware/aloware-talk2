@@ -128,7 +128,7 @@
           <b-card title="Backend Connection" class="h-100">
             <div class="service-stats">
               <div class="d-flex justify-content-between py-2 border-bottom">
-                <strong>API Core</strong>
+                <strong>Backend API</strong>
                 <b-badge :variant="testResults.services.apiCore ? 'success' : 'danger'" pill>
                   {{ testResults.services.apiCore ? 'Connected' : 'Failed' }}
                 </b-badge>
