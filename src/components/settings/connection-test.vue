@@ -23,14 +23,9 @@
             <div class="connection-test-image mb-4">
               <i class="fa fa-signal fa-4x" style="color: #6c757d;"></i>
             </div>
-            <b-alert v-if="includeTwilioTest" show variant="info" class="mb-3 text-left">
-              <i class="fa fa-info-circle mr-2"></i>
-              <strong>Note:</strong> This test uses Twilio resources and may incur charges to your account (approx. $0.01-$0.02 per test) as it establishes a brief connection to measure call quality.
-            </b-alert>
             <div class="mb-3">
-              <b-form-checkbox v-model="includeTwilioTest" switch>
-                Include Twilio voice test <small class="text-muted">(incurs costs)</small>
-              </b-form-checkbox>
+              <h5>Voice Connection Test</h5>
+              <p class="small text-muted">Tests your network connectivity for voice calls</p>
             </div>
             <b-button size="md"
                       variant="success"
@@ -86,12 +81,7 @@
       <b-row>
         <b-col md="6" class="mb-4">
           <b-card title="Twilio Voice Test" class="h-100">
-            <div v-if="testResults.twilio.testSkipped" class="text-center p-3">
-              <p><i class="fa fa-info-circle fa-2x text-muted mb-2"></i></p>
-              <p class="mb-0">Twilio test was skipped to avoid costs.</p>
-              <p class="mb-0">Enable the Twilio test option before running the test if you want to check voice call connectivity.</p>
-            </div>
-            <div v-else class="twilio-stats">
+            <div class="twilio-stats">
               <div class="d-flex justify-content-between py-2 border-bottom">
                 <strong>WebRTC Support</strong>
                 <b-badge :variant="testResults.twilio.webRtcSupported ? 'success' : 'danger'" pill>
@@ -122,7 +112,7 @@
               </div>
             </div>
 
-            <div class="mt-3" v-if="!testResults.twilio.testSkipped && (!testResults.twilio.connected || !testResults.twilio.webRtcSupported || !testResults.twilio.iceConnectionStatus)">
+            <div class="mt-3" v-if="!testResults.twilio.connected || !testResults.twilio.webRtcSupported || !testResults.twilio.iceConnectionStatus">
               <b-alert show variant="warning">
                 <p><strong>Twilio connection issues detected.</strong></p>
                 <p v-if="!testResults.twilio.webRtcSupported">Your browser doesn't support WebRTC. Please try using a modern browser.</p>
@@ -227,7 +217,7 @@
             </b-alert>
 
             <!-- Show detailed Twilio report button when available -->
-            <div v-if="preflightReport && !testResults.twilio.testSkipped" class="mt-3 text-center">
+            <div v-if="preflightReport" class="mt-3 text-center">
               <b-button size="sm" variant="outline-secondary" v-b-toggle.twilio-report-collapse>
                 Show Detailed Report
               </b-button>
@@ -438,8 +428,7 @@ export default {
       preflightTest: null,
       preflightReport: null,
       testCount: 0,
-      lastTestTime: null,
-      includeTwilioTest: false
+      lastTestTime: null
     }
   },
 
@@ -461,8 +450,7 @@ export default {
             webRtcSupported: false,
             iceConnectionStatus: false,
             networkTiming: null,
-            iceStats: null,
-            testSkipped: !this.includeTwilioTest
+            iceStats: null
           },
           permissions: {
             microphone: false,
@@ -483,9 +471,7 @@ export default {
         }
 
         // Test Twilio Voice connectivity using the official PreflightTest API
-        if (this.includeTwilioTest) {
-          await this.testTwilioRequirements()
-        }
+        await this.testTwilioRequirements()
 
         // Test permissions
         await this.testPermissions()
@@ -860,21 +846,12 @@ export default {
 
     evaluateOverallStatus () {
       // Determine if suitable for voice calls
-      if (this.testResults.twilio.testSkipped) {
-        // If Twilio test was skipped, base it only on the required permissions and backend connectivity
-        this.testResults.overall.voiceCalls = (
-          this.testResults.permissions.microphone &&
-          this.testResults.services.apiCore
-        )
-      } else {
-        // Complete evaluation including Twilio test results
-        this.testResults.overall.voiceCalls = (
-          this.testResults.twilio.webRtcSupported &&
-          this.testResults.permissions.microphone &&
-          this.testResults.services.apiCore &&
-          this.testResults.twilio.connected
-        )
-      }
+      this.testResults.overall.voiceCalls = (
+        this.testResults.twilio.webRtcSupported &&
+        this.testResults.permissions.microphone &&
+        this.testResults.services.apiCore &&
+        this.testResults.twilio.connected
+      )
     },
 
     getQualityClass (quality) {
@@ -904,7 +881,6 @@ export default {
 
     getConnectionQualityAlertVariant () {
       if (!this.testResults) return 'secondary'
-      if (this.testResults.twilio.testSkipped) return 'secondary'
       if (!this.testResults.twilio.connected) return 'danger'
       if (!this.testResults.twilio.iceConnectionStatus) return 'warning'
 
@@ -923,7 +899,6 @@ export default {
 
     getTwilioQualityClass () {
       if (!this.testResults) return 'gauge-danger'
-      if (this.testResults.twilio.testSkipped) return 'gauge-unknown'
       if (!this.testResults.twilio.connected) return 'gauge-danger'
       if (!this.testResults.twilio.iceConnectionStatus) return 'gauge-warning'
 
@@ -942,7 +917,6 @@ export default {
 
     getTwilioQualityValue () {
       if (!this.testResults) return 'X'
-      if (this.testResults.twilio.testSkipped) return '-'
       if (!this.testResults.twilio.connected) return 'X'
       if (!this.testResults.twilio.iceConnectionStatus) return '!'
 
@@ -963,7 +937,6 @@ export default {
 
     getTwilioQualityText () {
       if (!this.testResults) return 'Unknown'
-      if (this.testResults.twilio.testSkipped) return 'Skipped'
       if (!this.testResults.twilio.connected) return 'Failed'
       if (!this.testResults.twilio.iceConnectionStatus) return 'Limited'
 
@@ -982,7 +955,6 @@ export default {
 
     getTwilioQualityTextClass () {
       if (!this.testResults) return 'text-secondary'
-      if (this.testResults.twilio.testSkipped) return 'text-muted'
       if (!this.testResults.twilio.connected) return 'text-danger'
       if (!this.testResults.twilio.iceConnectionStatus) return 'text-warning'
 
@@ -1001,10 +973,6 @@ export default {
 
     getTwilioQualityMessage () {
       if (!this.testResults) return 'Connection test not run'
-
-      if (this.testResults.twilio.testSkipped) {
-        return 'Twilio test was skipped - enable it to check voice call quality'
-      }
 
       if (!this.testResults.twilio.connected) {
         return 'Could not establish connection to Twilio servers'
