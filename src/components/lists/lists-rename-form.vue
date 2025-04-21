@@ -205,7 +205,6 @@ export default {
         .catch(err => {
           if (this.editableList.show_in_public_folder) {
             this.$generalNotification(`You don't have permission to rename this public list. Only the list owner or an admin can make changes.`, 'error')
-
           } else {
             this.$handleErrors(err.response)
           }
