@@ -16,9 +16,6 @@
                v-else>
       {{ isAiAgentUser(communication.user) ? 'Take over' : 'Barge' }}
     </b-tooltip>
-    <q-tooltip v-else>
-      {{ isAiAgentUser(communication.user) ? 'Take over' : 'Barge' }}
-    </q-tooltip>
   </span>
 </template>
 
