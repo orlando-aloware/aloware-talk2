@@ -25,8 +25,13 @@
             </div>
             <b-alert show variant="info" class="mb-3 text-left">
               <i class="fa fa-info-circle mr-2"></i>
-              <strong>Note:</strong> Running this test will use a small amount of Twilio resources and may incur minimal charges to your account.
+              <strong>Note:</strong> Running this test will use a small amount of Twilio resources and may incur minimal charges to your account. The preflight test typically costs approximately $0.01-$0.02 per test (based on Twilio's voice pricing) as it establishes a brief test connection to measure call quality.
             </b-alert>
+            <div class="mb-3">
+              <b-form-checkbox v-model="includeTwilioTest" switch>
+                Include Twilio voice test <small class="text-muted">(incurs costs)</small>
+              </b-form-checkbox>
+            </div>
             <b-button size="md"
                       variant="success"
                       class="px-4 py-2"
@@ -51,13 +56,13 @@
       <b-col md="6" lg="8" v-if="testResults && !isTesting">
         <b-card class="quick-stats-panel h-100">
           <div class="d-flex flex-column flex-md-row justify-content-around align-items-center">
-            <!-- IP Address -->
+            <!-- Network Status -->
             <div class="text-center mb-4 mb-md-0">
-              <div class="ip-icon">
+              <div class="network-icon">
                 <i class="fa fa-desktop"></i>
               </div>
-              <div class="text-muted">Your IP</div>
-              <h5 class="mt-2">{{ userIpAddress }}</h5>
+              <div class="text-muted">Network Status</div>
+              <h5 class="mt-2">{{ testResults.services.apiCore ? 'Connected' : 'Disconnected' }}</h5>
             </div>
 
             <!-- Twilio Connection Gauge -->
@@ -81,7 +86,12 @@
       <b-row>
         <b-col md="6" class="mb-4">
           <b-card title="Twilio Voice Test" class="h-100">
-            <div class="twilio-stats">
+            <div v-if="testResults.twilio.testSkipped" class="text-center p-3">
+              <p><i class="fa fa-info-circle fa-2x text-muted mb-2"></i></p>
+              <p class="mb-0">Twilio test was skipped to avoid costs.</p>
+              <p class="mb-0">Enable the Twilio test option before running the test if you want to check voice call connectivity.</p>
+            </div>
+            <div v-else class="twilio-stats">
               <div class="d-flex justify-content-between py-2 border-bottom">
                 <strong>WebRTC Support</strong>
                 <b-badge :variant="testResults.twilio.webRtcSupported ? 'success' : 'danger'" pill>
@@ -108,11 +118,11 @@
               </div>
               <div class="d-flex justify-content-between py-2" v-if="testResults.twilio.networkTiming && testResults.twilio.networkTiming.signaling">
                 <strong>Signaling Time</strong>
-                <span>{{ testResults.twilio.networkTiming.signaling.duration || '0' }} ms</span>
+                <span class="text-nowrap">{{ testResults.twilio.networkTiming.signaling.duration || '0' }} ms</span>
               </div>
             </div>
 
-            <div class="mt-3" v-if="!testResults.twilio.connected || !testResults.twilio.webRtcSupported || !testResults.twilio.iceConnectionStatus">
+            <div class="mt-3" v-if="!testResults.twilio.testSkipped && (!testResults.twilio.connected || !testResults.twilio.webRtcSupported || !testResults.twilio.iceConnectionStatus)">
               <b-alert show variant="warning">
                 <p><strong>Twilio connection issues detected.</strong></p>
                 <p v-if="!testResults.twilio.webRtcSupported">Your browser doesn't support WebRTC. Please try using a modern browser.</p>
@@ -135,7 +145,7 @@
               </div>
               <div class="d-flex justify-content-between py-2 border-bottom">
                 <strong>API Response Time</strong>
-                <span>{{ testResults.services.pingTime || '0' }} ms</span>
+                <span class="text-nowrap">{{ testResults.services.pingTime || '0' }} ms</span>
               </div>
               <div class="d-flex justify-content-between py-2">
                 <strong>Live Updates (WebSocket)</strong>
@@ -210,14 +220,14 @@
           </b-card>
         </b-col>
 
-        <b-col cols="6" class="mb-4">
+        <b-col md="6" class="mb-4">
           <b-card title="Twilio Connection Quality">
             <b-alert show :variant="getConnectionQualityAlertVariant()" class="mb-0">
               <h5 class="mb-0">{{ getTwilioQualityMessage() }}</h5>
             </b-alert>
 
             <!-- Show detailed Twilio report button when available -->
-            <div v-if="preflightReport" class="mt-3 text-center">
+            <div v-if="preflightReport && !testResults.twilio.testSkipped" class="mt-3 text-center">
               <b-button size="sm" variant="outline-secondary" v-b-toggle.twilio-report-collapse>
                 Show Detailed Report
               </b-button>
@@ -227,12 +237,12 @@
                     <!-- Overall Quality Section -->
                     <div class="mb-4">
                       <h5>Call Quality Score</h5>
-                      <div class="d-flex align-items-center">
-                        <div class="quality-indicator"
+                      <div class="d-flex flex-wrap align-items-center">
+                        <div class="quality-indicator mr-3 mb-2"
                              :class="getQualityClass(preflightReport.callQuality)">
                           {{ preflightReport.callQuality || 'N/A' }}
                         </div>
-                        <div class="ml-3 text-left">
+                        <div class="text-left">
                           <div>MOS Score: <strong>{{ preflightReport.stats?.mos?.average?.toFixed(2) || 'N/A' }}</strong> / 5.0</div>
                           <div>Packet Loss: <strong>{{ preflightReport.totals?.packetsLostFraction || 0 }}%</strong></div>
                         </div>
@@ -241,30 +251,34 @@
 
                     <!-- Network Metrics Section -->
                     <div class="row mb-4">
-                      <div class="col-md-4">
+                      <div class="col-md-4 col-sm-12 mb-3">
                         <div class="metric-card">
                           <h6>Round Trip Time</h6>
-                          <div class="metric-value">{{ preflightReport.stats?.rtt?.average?.toFixed(0) || 'N/A' }} ms</div>
-                          <div class="metric-range">
-                            <small>Min: {{ preflightReport.stats?.rtt?.min || 'N/A' }} ms | Max: {{ preflightReport.stats?.rtt?.max || 'N/A' }} ms</small>
+                          <div class="metric-value text-nowrap">{{ preflightReport.stats?.rtt?.average?.toFixed(0) || 'N/A' }} ms</div>
+                          <div class="metric-range d-flex flex-column">
+                            <small class="text-nowrap">Min: {{ preflightReport.stats?.rtt?.min || 'N/A' }} ms</small>
+                            <small class="text-nowrap">Max: {{ preflightReport.stats?.rtt?.max || 'N/A' }} ms</small>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-4 col-sm-12 mb-3">
                         <div class="metric-card">
                           <h6>Jitter</h6>
-                          <div class="metric-value">{{ preflightReport.stats?.jitter?.average?.toFixed(1) || 'N/A' }} ms</div>
-                          <div class="metric-range">
-                            <small>Min: {{ preflightReport.stats?.jitter?.min || 'N/A' }} ms | Max: {{ preflightReport.stats?.jitter?.max || 'N/A' }} ms</small>
+                          <div class="metric-value text-nowrap">{{ preflightReport.stats?.jitter?.average?.toFixed(1) || 'N/A' }} ms</div>
+                          <div class="metric-range d-flex flex-column">
+                            <small class="text-nowrap">Min: {{ preflightReport.stats?.jitter?.min || 'N/A' }} ms</small>
+                            <small class="text-nowrap">Max: {{ preflightReport.stats?.jitter?.max || 'N/A' }} ms</small>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-4 col-sm-12 mb-3">
                         <div class="metric-card">
                           <h6>Selected Edge</h6>
-                          <div class="metric-value">{{ preflightReport.selectedEdge || 'N/A' }}</div>
+                          <div class="metric-value text-nowrap overflow-hidden text-truncate" :title="preflightReport.selectedEdge || 'N/A'">
+                            {{ preflightReport.selectedEdge || 'N/A' }}
+                          </div>
                           <div class="metric-detail">
-                            <small>Actual: {{ preflightReport.edge || 'N/A' }}</small>
+                            <small>Actual: <span class="text-nowrap">{{ preflightReport.edge || 'N/A' }}</span></small>
                           </div>
                         </div>
                       </div>
@@ -273,19 +287,19 @@
                     <!-- Connection Details -->
                     <div class="mb-4">
                       <h5>Connection Details</h5>
-                      <div class="row">
-                        <div class="col-md-6">
+                      <div class="row connection-details-container">
+                        <div class="col-md-6 col-sm-12 mb-3">
                           <div class="connection-details">
-                            <div><strong>TURN Required:</strong> {{ preflightReport.isTurnRequired ? 'Yes' : 'No' }}</div>
-                            <div><strong>Codec Used:</strong> {{ preflightReport.samples?.[0]?.codecName || 'N/A' }}</div>
-                            <div><strong>Test Duration:</strong> {{ (preflightReport.testTiming?.duration / 1000).toFixed(1) || 'N/A' }} seconds</div>
+                            <div class="text-nowrap"><strong>TURN Required:</strong> {{ preflightReport.isTurnRequired ? 'Yes' : 'No' }}</div>
+                            <div class="text-nowrap"><strong>Codec Used:</strong> {{ preflightReport.samples?.[0]?.codecName || 'N/A' }}</div>
+                            <div class="text-nowrap"><strong>Test Duration:</strong> {{ (preflightReport.testTiming?.duration / 1000).toFixed(1) || 'N/A' }} seconds</div>
                           </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 col-sm-12 mb-3">
                           <div class="connection-details">
-                            <div><strong>Data Sent:</strong> {{ formatBytes(preflightReport.totals?.bytesSent) }}</div>
-                            <div><strong>Data Received:</strong> {{ formatBytes(preflightReport.totals?.bytesReceived) }}</div>
-                            <div><strong>Packets Exchanged:</strong> {{ (preflightReport.totals?.packetsSent || 0) + (preflightReport.totals?.packetsReceived || 0) }}</div>
+                            <div class="text-nowrap"><strong>Data Sent:</strong> {{ formatBytes(preflightReport.totals?.bytesSent) }}</div>
+                            <div class="text-nowrap"><strong>Data Received:</strong> {{ formatBytes(preflightReport.totals?.bytesReceived) }}</div>
+                            <div class="text-nowrap"><strong>Packets Exchanged:</strong> {{ (preflightReport.totals?.packetsSent || 0) + (preflightReport.totals?.packetsReceived || 0) }}</div>
                           </div>
                         </div>
                       </div>
@@ -296,39 +310,47 @@
                       <h5>Connection Timing</h5>
                       <div class="timing-bars">
                         <div v-if="preflightReport.networkTiming">
-                          <div class="timing-bar-label">Signaling:</div>
-                          <div class="timing-bar-container">
-                            <div class="timing-bar bg-info"
-                                 :style="{width: getTimingBarWidth(preflightReport.networkTiming.signaling.duration) + '%'}"
-                                 :title="preflightReport.networkTiming.signaling.duration + 'ms'">
-                              {{ preflightReport.networkTiming.signaling.duration }}ms
+                          <div class="d-flex align-items-center timing-row">
+                            <div class="timing-bar-label text-right">Signaling:</div>
+                            <div class="timing-bar-container flex-grow-1">
+                              <div class="timing-bar bg-info text-nowrap"
+                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.signaling.duration) + '%'}"
+                                   :title="preflightReport.networkTiming.signaling.duration + 'ms'">
+                                {{ preflightReport.networkTiming.signaling.duration }}ms
+                              </div>
                             </div>
                           </div>
 
-                          <div class="timing-bar-label">ICE Setup:</div>
-                          <div class="timing-bar-container">
-                            <div class="timing-bar bg-success"
-                                 :style="{width: getTimingBarWidth(preflightReport.networkTiming.ice.duration) + '%'}"
-                                 :title="preflightReport.networkTiming.ice.duration + 'ms'">
-                              {{ preflightReport.networkTiming.ice.duration }}ms
+                          <div class="d-flex align-items-center timing-row">
+                            <div class="timing-bar-label text-right">ICE Setup:</div>
+                            <div class="timing-bar-container flex-grow-1">
+                              <div class="timing-bar bg-success text-nowrap"
+                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.ice.duration) + '%'}"
+                                   :title="preflightReport.networkTiming.ice.duration + 'ms'">
+                                {{ preflightReport.networkTiming.ice.duration }}ms
+                              </div>
                             </div>
                           </div>
 
-                          <div class="timing-bar-label">DTLS Handshake:</div>
-                          <div class="timing-bar-container">
-                            <div class="timing-bar bg-warning"
-                                 :style="{width: getTimingBarWidth(preflightReport.networkTiming.dtls.duration) + '%'}"
-                                 :title="preflightReport.networkTiming.dtls.duration + 'ms'">
-                              {{ preflightReport.networkTiming.dtls.duration }}ms
+                          <div class="d-flex align-items-center timing-row">
+                            <div class="timing-bar-label text-right">DTLS Handshake:</div>
+                            <div class="timing-bar-container flex-grow-1">
+                              <div class="timing-bar bg-warning text-nowrap"
+                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.dtls.duration) + '%'}"
+                                   :title="preflightReport.networkTiming.dtls.duration + 'ms'">
+                                {{ preflightReport.networkTiming.dtls.duration }}ms
+                              </div>
                             </div>
                           </div>
 
-                          <div class="timing-bar-label">Total Connection:</div>
-                          <div class="timing-bar-container">
-                            <div class="timing-bar bg-primary"
-                                 :style="{width: getTimingBarWidth(preflightReport.networkTiming.peerConnection.duration) + '%'}"
-                                 :title="preflightReport.networkTiming.peerConnection.duration + 'ms'">
-                              {{ preflightReport.networkTiming.peerConnection.duration }}ms
+                          <div class="d-flex align-items-center timing-row">
+                            <div class="timing-bar-label text-right">Total Connection:</div>
+                            <div class="timing-bar-container flex-grow-1">
+                              <div class="timing-bar bg-primary text-nowrap"
+                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.peerConnection.duration) + '%'}"
+                                   :title="preflightReport.networkTiming.peerConnection.duration + 'ms'">
+                                {{ preflightReport.networkTiming.peerConnection.duration }}ms
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -340,24 +362,28 @@
                       <h5>Selected Connection Path</h5>
                       <div class="connection-path">
                         <div class="row">
-                          <div class="col-5 text-right">
+                          <div class="col-sm-5 col-12 text-center text-sm-right mb-2">
                             <div class="endpoint local">
-                              <div class="ip">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.ip }}:{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.port }}</div>
-                              <div class="network-type">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.networkType || 'unknown' }}</div>
-                              <div class="candidate-type badge badge-info">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.candidateType || 'unknown' }}</div>
+                              <div class="network-type mb-1">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.networkType || 'unknown' }}</div>
+                              <div class="address text-truncate" :title="preflightReport.selectedIceCandidatePairStats?.localCandidate?.ip + ':' + preflightReport.selectedIceCandidatePairStats?.localCandidate?.port">
+                                {{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.ip }}:{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.port }}
+                              </div>
+                              <div class="candidate-type badge badge-info mt-1">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.candidateType || 'unknown' }}</div>
                             </div>
                           </div>
-                          <div class="col-2 text-center">
+                          <div class="col-sm-2 col-12 text-center mb-2">
                             <div class="connection-arrow">
                               <i class="fa fa-exchange-alt"></i>
-                              <div class="protocol">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.protocol?.toUpperCase() || 'unknown' }}</div>
+                              <div class="protocol text-uppercase">{{ preflightReport.selectedIceCandidatePairStats?.localCandidate?.protocol || 'unknown' }}</div>
                             </div>
                           </div>
-                          <div class="col-5 text-left">
+                          <div class="col-sm-5 col-12 text-center text-sm-left">
                             <div class="endpoint remote">
-                              <div class="ip">{{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.ip }}:{{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.port }}</div>
-                              <div class="server-type">Twilio Edge Server</div>
-                              <div class="candidate-type badge badge-info">{{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.candidateType || 'unknown' }}</div>
+                              <div class="server-type mb-1">Twilio Edge Server</div>
+                              <div class="address text-truncate" :title="preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.ip + ':' + preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.port">
+                                {{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.ip }}:{{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.port }}
+                              </div>
+                              <div class="candidate-type badge badge-info mt-1">{{ preflightReport.selectedIceCandidatePairStats?.remoteCandidate?.candidateType || 'unknown' }}</div>
                             </div>
                           </div>
                         </div>
@@ -413,7 +439,7 @@ export default {
       preflightReport: null,
       testCount: 0,
       lastTestTime: null,
-      userIpAddress: '192.168.1.1' // Default value, will be updated during tests
+      includeTwilioTest: false
     }
   },
 
@@ -435,7 +461,8 @@ export default {
             webRtcSupported: false,
             iceConnectionStatus: false,
             networkTiming: null,
-            iceStats: null
+            iceStats: null,
+            testSkipped: !this.includeTwilioTest
           },
           permissions: {
             microphone: false,
@@ -456,7 +483,9 @@ export default {
         }
 
         // Test Twilio Voice connectivity using the official PreflightTest API
-        await this.testTwilioRequirements()
+        if (this.includeTwilioTest) {
+          await this.testTwilioRequirements()
+        }
 
         // Test permissions
         await this.testPermissions()
@@ -831,12 +860,21 @@ export default {
 
     evaluateOverallStatus () {
       // Determine if suitable for voice calls
-      this.testResults.overall.voiceCalls = (
-        this.testResults.twilio.webRtcSupported &&
-        this.testResults.permissions.microphone &&
-        this.testResults.services.apiCore &&
-        this.testResults.twilio.connected
-      )
+      if (this.testResults.twilio.testSkipped) {
+        // If Twilio test was skipped, base it only on the required permissions and backend connectivity
+        this.testResults.overall.voiceCalls = (
+          this.testResults.permissions.microphone &&
+          this.testResults.services.apiCore
+        )
+      } else {
+        // Complete evaluation including Twilio test results
+        this.testResults.overall.voiceCalls = (
+          this.testResults.twilio.webRtcSupported &&
+          this.testResults.permissions.microphone &&
+          this.testResults.services.apiCore &&
+          this.testResults.twilio.connected
+        )
+      }
     },
 
     getQualityClass (quality) {
@@ -866,6 +904,7 @@ export default {
 
     getConnectionQualityAlertVariant () {
       if (!this.testResults) return 'secondary'
+      if (this.testResults.twilio.testSkipped) return 'secondary'
       if (!this.testResults.twilio.connected) return 'danger'
       if (!this.testResults.twilio.iceConnectionStatus) return 'warning'
 
@@ -883,7 +922,9 @@ export default {
     },
 
     getTwilioQualityClass () {
-      if (!this.testResults || !this.testResults.twilio.connected) return 'gauge-danger'
+      if (!this.testResults) return 'gauge-danger'
+      if (this.testResults.twilio.testSkipped) return 'gauge-unknown'
+      if (!this.testResults.twilio.connected) return 'gauge-danger'
       if (!this.testResults.twilio.iceConnectionStatus) return 'gauge-warning'
 
       // Use MOS score for gauge coloring when available
@@ -900,7 +941,9 @@ export default {
     },
 
     getTwilioQualityValue () {
-      if (!this.testResults || !this.testResults.twilio.connected) return 'X'
+      if (!this.testResults) return 'X'
+      if (this.testResults.twilio.testSkipped) return '-'
+      if (!this.testResults.twilio.connected) return 'X'
       if (!this.testResults.twilio.iceConnectionStatus) return '!'
 
       if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
@@ -920,6 +963,7 @@ export default {
 
     getTwilioQualityText () {
       if (!this.testResults) return 'Unknown'
+      if (this.testResults.twilio.testSkipped) return 'Skipped'
       if (!this.testResults.twilio.connected) return 'Failed'
       if (!this.testResults.twilio.iceConnectionStatus) return 'Limited'
 
@@ -938,6 +982,7 @@ export default {
 
     getTwilioQualityTextClass () {
       if (!this.testResults) return 'text-secondary'
+      if (this.testResults.twilio.testSkipped) return 'text-muted'
       if (!this.testResults.twilio.connected) return 'text-danger'
       if (!this.testResults.twilio.iceConnectionStatus) return 'text-warning'
 
@@ -955,7 +1000,13 @@ export default {
     },
 
     getTwilioQualityMessage () {
-      if (!this.testResults || !this.testResults.twilio.connected) {
+      if (!this.testResults) return 'Connection test not run'
+
+      if (this.testResults.twilio.testSkipped) {
+        return 'Twilio test was skipped - enable it to check voice call quality'
+      }
+
+      if (!this.testResults.twilio.connected) {
         return 'Could not establish connection to Twilio servers'
       }
 
@@ -1031,6 +1082,9 @@ export default {
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   text-transform: capitalize;
+  display: inline-block;
+  min-width: 120px;
+  text-align: center;
 }
 
 .quality-indicator.success {
@@ -1056,22 +1110,32 @@ export default {
 .metric-card {
   border: 1px solid #e9ecef;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 0.8rem;
   margin-bottom: 1rem;
   text-align: center;
+  height: 100%;
 }
 
 .metric-value {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: bold;
   margin: 0.5rem 0;
+  word-break: normal;
+  white-space: nowrap;
+}
+
+.metric-range, .metric-detail {
+  font-size: 0.75rem;
+  line-height: 1.2;
 }
 
 .connection-details {
-  margin: 1rem 0;
+  margin: 0;
   padding: 0.5rem;
   background-color: #f8f9fa;
   border-radius: 0.3rem;
+  height: 100%;
+  font-size: 0.9rem;
 }
 
 .timing-bar-container {
@@ -1090,12 +1154,17 @@ export default {
   padding-right: 8px;
   border-radius: 4px;
   min-width: 40px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .timing-bar-label {
   font-weight: bold;
   margin-bottom: 0.2rem;
   text-align: left;
+  font-size: 0.9rem;
 }
 
 .connection-path {
@@ -1103,6 +1172,7 @@ export default {
   padding: 1rem;
   border-radius: 0.5rem;
   margin-top: 0.5rem;
+  font-size: 0.9rem;
 }
 
 .endpoint {
@@ -1110,11 +1180,25 @@ export default {
   border: 1px solid #dee2e6;
   border-radius: 0.5rem;
   padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
 }
 
-.endpoint .ip {
+.endpoint .address {
   font-family: monospace;
   font-weight: bold;
+  word-break: break-all;
+  font-size: 0.85rem;
+}
+
+.network-type, .server-type {
+  font-size: 0.85rem;
+}
+
+.protocol {
+  font-weight: bold;
+  color: #6c757d;
+  font-size: 0.8rem;
 }
 
 .connection-arrow {
@@ -1123,11 +1207,6 @@ export default {
 
 .connection-arrow i {
   font-size: 1.5rem;
-}
-
-.protocol {
-  font-weight: bold;
-  color: #6c757d;
 }
 
 /* New styles for the redesigned UI */
@@ -1187,7 +1266,7 @@ export default {
   color: #6c757d;
 }
 
-.ip-icon {
+.network-icon {
   width: 80px;
   height: 80px;
   background-color: #f8f9fa;
@@ -1210,5 +1289,186 @@ export default {
 
 .border-bottom {
   border-bottom: 1px solid #eee;
+}
+
+@media (max-width: 767.98px) {
+  .quality-indicator {
+    font-size: 1.2rem;
+    padding: 0.4rem 0.8rem;
+    min-width: 100px;
+  }
+
+  .metric-value {
+    font-size: 1.1rem;
+  }
+
+  .metric-range, .metric-detail {
+    font-size: 0.7rem;
+  }
+
+  .connection-path {
+    padding: 0.5rem;
+  }
+
+  .endpoint {
+    max-width: 100%;
+  }
+
+  .endpoint .address, .network-type, .server-type, .protocol {
+    font-size: 0.75rem;
+  }
+
+  .connection-details {
+    font-size: 0.8rem;
+  }
+
+  .metric-card {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 359px) {
+  .metric-card {
+    min-width: 90px;
+  }
+
+  .metric-value {
+    font-size: 1rem;
+  }
+}
+
+/* Additional CSS for small screens to improve display of stats */
+.twilio-stats span, .service-stats span {
+  white-space: nowrap;
+}
+
+@media (max-width: 359px) {
+  .results-list li {
+    white-space: normal;
+  }
+
+  .d-flex.justify-content-between {
+    flex-wrap: wrap;
+  }
+
+  .d-flex.justify-content-between > strong {
+    margin-right: 0.5rem;
+  }
+}
+
+/* Additional CSS for medium-small screens to fix the layout between mobile and desktop */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .metric-card {
+    display: flex;
+    flex-direction: row;
+    text-align: left;
+    align-items: center;
+    padding: 0.6rem;
+  }
+
+  .metric-card h6 {
+    margin-bottom: 0;
+    margin-right: 1rem;
+    min-width: 85px;
+  }
+
+  .metric-value {
+    margin: 0;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+  }
+
+  .metric-range, .metric-detail {
+    text-align: right;
+    margin-left: auto;
+    font-size: 0.7rem;
+  }
+
+  .endpoint {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .connection-path .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .connection-arrow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .connection-arrow i {
+    margin-right: 0.5rem;
+  }
+
+  .protocol {
+    margin: 0;
+  }
+
+  /* Adjust spacing in connection details */
+  .connection-details {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .timing-bar-container {
+    height: 20px;
+  }
+
+  .timing-bar {
+    line-height: 20px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Specific fixes for the connection path display */
+@media (max-width: 991.98px) {
+  .endpoint .address {
+    max-width: 140px;
+    margin: 0 auto;
+  }
+
+  .network-type, .server-type {
+    max-width: 140px;
+    margin: 0 auto;
+  }
+
+  .candidate-type {
+    margin: 0 auto;
+    margin-top: 0.25rem;
+  }
+}
+
+/* Additional CSS for the timing bars */
+.timing-row {
+  margin-bottom: 1rem;
+}
+
+.timing-bar-label {
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+  text-align: left;
+  font-size: 0.9rem;
+  min-width: 120px;
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .timing-bar-label {
+    min-width: 105px;
+    font-size: 0.8rem;
+  }
+
+  .connection-details-container {
+    margin: 0 -0.5rem;
+  }
+
+  .connection-details {
+    margin: 0 0.5rem;
+  }
 }
 </style>
