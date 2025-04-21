@@ -27,6 +27,8 @@
                            v-if="$route.params.tab === 'outbound-call' && !isLoading"/>
             <diagnosis :user="user"
                        v-if="$route.params.tab === 'diagnosis' && !isLoading"/>
+            <connection-test :user="user"
+                           v-if="$route.params.tab === 'connection-test' && !isLoading"/>
             <sms-templates :user="user"
                            v-if="$route.params.tab === 'sms-templates' && !isLoading"/>
             <settings-save-bar :user="user"/>
@@ -50,6 +52,7 @@ import Visibility from 'components/settings/visibility'
 import InboundCall from 'components/settings/inbound-call'
 import OutboundCall from 'components/settings/outbound-call'
 import Diagnosis from 'components/settings/diagnosis'
+import ConnectionTest from 'components/settings/connection-test'
 import SmsTemplates from 'components/settings/sms-templates'
 import talk2Api from 'src/plugins/api/api'
 import SettingsSaveBar from 'components/settings/settings-save-bar'
@@ -63,6 +66,7 @@ export default {
     SettingsSaveBar,
     SmsTemplates,
     Diagnosis,
+    ConnectionTest,
     OutboundCall,
     InboundCall,
     Visibility,
@@ -88,7 +92,7 @@ export default {
 
     contentClass () {
       const rightSideClass = this.isSettingsOpened ? 'settings-side__right--opened' : ''
-      const otherSettingsRoutes = ['diagnosis', 'sms-templates']
+      const otherSettingsRoutes = ['diagnosis', 'connection-test', 'sms-templates']
       const flexClass = !otherSettingsRoutes.includes(this.$route.params.tab) ? 'flex' : ''
 
       return [
