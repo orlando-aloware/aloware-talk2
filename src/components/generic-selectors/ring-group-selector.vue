@@ -93,7 +93,7 @@
 import { mapState } from 'vuex'
 import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
-import { aclMixin, selectorMixin } from 'src/plugins/mixins'
+import { aclMixin, selectorMixin, userMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
@@ -101,7 +101,8 @@ export default {
 
   mixins: [
     aclMixin,
-    selectorMixin
+    selectorMixin,
+    userMixin
   ],
 
   components: {
@@ -182,7 +183,9 @@ export default {
     }),
 
     filteredRingGroups () {
-      return this.allRingGroups.filter(ringGroup => !ringGroup.call_waiting)
+      return this.hasCompanyTeamInboxEnabled
+        ? this.allRingGroups
+        : this.allRingGroups.filter(ringGroup => !ringGroup.call_waiting)
     },
 
     placeholder () {
