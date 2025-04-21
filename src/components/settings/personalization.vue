@@ -104,6 +104,9 @@
         </b-col>
       </b-form-row>
 
+      <hr>
+
+      <outbound-greeting :user="user" />
     </b-form>
   </b-container>
 </template>
@@ -114,6 +117,7 @@ import { mapActions, mapState } from 'vuex'
 import SettingsMap from 'components/settings/settings-map'
 import { aclMixin, kycMixin } from 'src/plugins/mixins'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
+import OutboundGreeting from 'components/settings/outbound-greeting.vue'
 
 export default {
   name: 'personalization',
@@ -122,7 +126,8 @@ export default {
 
   components: {
     WrapUpSelector,
-    InformationCircleIcon
+    InformationCircleIcon,
+    OutboundGreeting
   },
 
   props: {
