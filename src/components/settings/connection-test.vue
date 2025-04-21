@@ -23,9 +23,9 @@
             <div class="connection-test-image mb-4">
               <i class="fa fa-signal fa-4x" style="color: #6c757d;"></i>
             </div>
-            <b-alert show variant="info" class="mb-3 text-left">
+            <b-alert v-if="includeTwilioTest" show variant="info" class="mb-3 text-left">
               <i class="fa fa-info-circle mr-2"></i>
-              <strong>Note:</strong> Running this test will use a small amount of Twilio resources and may incur minimal charges to your account. The preflight test typically costs approximately $0.01-$0.02 per test (based on Twilio's voice pricing) as it establishes a brief test connection to measure call quality.
+              <strong>Note:</strong> This test uses Twilio resources and may incur charges to your account (approx. $0.01-$0.02 per test) as it establishes a brief connection to measure call quality.
             </b-alert>
             <div class="mb-3">
               <b-form-checkbox v-model="includeTwilioTest" switch>
