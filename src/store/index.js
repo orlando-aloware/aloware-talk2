@@ -68,6 +68,7 @@ export default function (/* { ssrContext } */) {
       users: [],
       usersIsLoading: false,
       ringGroups: [],
+      ringGroupsIsLoading: false,
       teams: [],
       contactLists: [],
       inboxes: [],
@@ -558,6 +559,10 @@ export default function (/* { ssrContext } */) {
 
       setRingGroups ({ commit }, ringGroups) {
         commit('SET_RING_GROUPS', ringGroups)
+      },
+
+      setRingGroupsIsLoading ({ commit }, loading) {
+        commit('SET_RING_GROUPS_IS_LOADING', loading)
       },
 
       setTeams ({ commit }, teams) {
@@ -1343,6 +1348,10 @@ export default function (/* { ssrContext } */) {
         if (found) {
           state.ringGroups.splice(state.ringGroups.indexOf(found), 1)
         }
+      },
+
+      SET_RING_GROUPS_IS_LOADING (state, loading) {
+        state.ringGroupsIsLoading = loading
       },
 
       SET_RING_GROUPS (state, ringGroups) {

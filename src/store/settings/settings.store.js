@@ -58,6 +58,12 @@ export default function () {
         value: 'diagnosis',
         icon: 'diagnosis',
         disabled: false
+      },
+      {
+        label: 'Connection Test',
+        value: 'connection-test',
+        icon: 'diagnosis',
+        disabled: false
       }
     ],
     user: null,

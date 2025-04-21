@@ -2,8 +2,8 @@ const suffixV1 = '/api/v1/'
 const suffixV2 = '/api/v2/'
 import _ from 'lodash'
 import qs from 'qs'
-import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import * as AloAi from 'src/constants/aloai'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 const exportCommunications = async (contactId) => {
   return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
@@ -206,14 +206,6 @@ const talk2Api = {
         }
 
         return window.axios.get(`${suffixV1}contact/${contactId}/communications-summary`)
-      },
-
-      pushToCrm (contactId) {
-        if (!contactId) {
-          return null
-        }
-
-        return window.axios.post(`${suffixV1}contact/${contactId}/push-to-crm`)
       }
     },
 

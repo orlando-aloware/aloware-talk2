@@ -1,7 +1,7 @@
 
 <template>
   <div class="d-flex flex-column">
-    <span>{{ row.created_at | fixFullDateTime }}</span>
+    <span>{{ row.created_at | fixFullDateTimeCompany($store) }}</span>
     <div class="d-flex align-items-center text-xs"
          data-testid="start-time-row"
          v-if="row.call_disposition_id">

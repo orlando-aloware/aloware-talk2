@@ -7,10 +7,17 @@
       <div class="search flex-grow-1">
         <search-input class="w-100"
                       limit-search-characters
+                      input-error-border
                       data-testid="contacts-view-search-input"
                       :search="searchQuery"
                       :disabled="isLoadingDisabled"
-                      @search="onSearch" />
+                      @search="onSearch"
+                      @show-error="onSearchInputShowError"/>
+        <div class="limit-characters-error d-flex align-items-center mt-1"
+            v-if="showLimitCharactersError">
+            <span class="search-error-icon mr-1">&times;</span>
+            <span class="search-error-text">Search requires at least 3 characters</span>
+        </div>
       </div>
 
       <div class="setting d-flex align-items-center flex-column flex-sm-row w-100 w-sm-auto gap-3 align-items-sm-center">
@@ -96,7 +103,7 @@
                   :data-column="col.name"
                   :style="col.columnStyle"
                   v-else-if="col.name === 'ring_group'">
-                <ring-group :row="row" />
+                <ring-group :ring-group-id="row.ring_group_id" />
               </td>
 
               <td :key="`r-${index}-c-${colIndex}`"
@@ -405,7 +412,8 @@ export default {
       sidebarCommunication: {},
       communicationsData: [],
       communicationsCountValue: 0,
-      communicationMobileDetailsOpened: {}
+      communicationMobileDetailsOpened: {},
+      showLimitCharactersError: false
     }
   },
 
@@ -502,6 +510,7 @@ export default {
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
         this.cleanupMobileDetailRows()
+        this.sortItems()
       }
     },
 
@@ -544,6 +553,7 @@ export default {
           // add to the top of the array
           this.communicationsData.unshift(communication)
           this.communicationsCountValue++
+          this.sortItems()
         }
       }
     },
@@ -557,6 +567,7 @@ export default {
         if (this.showCommunicationSidebar && this.sidebarCommunication?.id === communication.id) {
           this.sidebarCommunication = merge(this.sidebarCommunication, communication)
         }
+        this.sortItems()
       } else {
         const communicationMatchFilters = this.checkCommunicationChannels(communication) &&
           this.checkCommunicationMatchesSearch(this.searchQuery, communication) &&
@@ -571,6 +582,7 @@ export default {
           // add to the top of the array
           this.communicationsData.unshift(communication)
           this.communicationsCountValue++
+          this.sortItems()
         }
       }
     },
@@ -583,6 +595,7 @@ export default {
         this.communicationsData.splice(index, 1)
         this.communicationsCountValue--
         this.cleanupMobileDetailRows()
+        this.sortItems()
       }
     },
 
@@ -629,8 +642,32 @@ export default {
       const mountPoint = document.createElement('div')
       detailsCell.appendChild(mountPoint)
 
-      // Show all columns that are applied (except disposition_status2 and operations)
-      const visibleColumns = this.columns.filter((c) => !['disposition_status2', 'operations'].includes(c.name))
+      const visibleColumns = this.columns.filter((c) => {
+        // for mobile we do not show these two columns
+        if (['disposition_status2', 'operations'].includes(c.name)) {
+          return false
+        }
+
+        // hide these columns when SMS
+        const smsHiddenColumns = [
+          'talk_time',
+          'duration',
+          'wait_time',
+          'hold_time',
+          'attempting_users',
+          'transfer_prior_user_ids',
+          'transfer_target_user_ids',
+          'transfer_type',
+          'callback_status',
+          'queue_resolution2'
+        ]
+
+        if (row.type === CommunicationTypes.SMS && smsHiddenColumns.includes(c.name)) {
+          return false
+        }
+
+        return true
+      })
 
       // Create and mount the Mobile details component
       const ComponentClass = Vue.extend(CommunicationsMobileRowDetails)
@@ -662,6 +699,24 @@ export default {
       }
 
       document.querySelectorAll('.mobile-details-row').forEach((e) => e.remove())
+    },
+
+    onSearchInputShowError (show) {
+      this.showLimitCharactersError = show
+    },
+
+    sortItems (communications = this.communicationsData) {
+      communications.sort((a, b) => {
+        if (isLiveCall(a) && !isLiveCall(b)) {
+          return -1
+        }
+
+        if (!isLiveCall(a) && isLiveCall(b)) {
+          return 1
+        }
+
+        return b.communication_id - a.communication_id
+      })
     }
   },
 
@@ -678,7 +733,10 @@ export default {
 
   watch: {
     communications (newValue) {
-      this.communicationsData = newValue
+      // copy and sort to avoid mutating the original object
+      const newArr = [...newValue]
+      this.sortItems(newArr)
+      this.communicationsData = newArr
     },
     communicationsCount (newValue) {
       this.communicationsCountValue = newValue

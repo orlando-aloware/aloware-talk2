@@ -5,10 +5,12 @@
       <search-input class="einbox-nav-list__header__search"
                     placeholder="Type ENTER to search inboxes..."
                     data-testid="einbox-search"
+                    limit-search-characters
                     :id="`einbox-nav-list-search-${_uid}`"
                     @search="onSearch"
-                    @focus="showSearchTooltip = true"
-                    @blur="showSearchTooltip = false"/>
+                    @focus="setShowSearchTooltip(true)"
+                    @blur="setShowSearchTooltip(false)"
+                    @show-error="showLimitCharactersError"/>
       <b-tooltip custom-class="talk-table__tooltip"
                  placement="top"
                  :boundary="`einbox-nav-list-search-${_uid}`"
@@ -97,18 +99,37 @@ export default {
 
     ...mapState('auth', ['profile']),
 
-    ...mapState(['isMobile']),
+    ...mapState(['isMobile', 'teams']),
 
-    personalInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_personal)
+    teamsIds () {
+      return this.teams
+        .filter(team => team.users.includes(this.profile.id))
+        .map(team => team.id)
     },
 
-    connectedInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_connected)
-    },
+    parsedInboxes () {
+      const personal = []
+      const connected = []
+      const watching = []
 
-    watchingInboxes () {
-      return this.inboxes.filter(inbox => inbox.is_watching)
+      this.inboxes.forEach(inbox => {
+        const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
+        const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+
+        if (inbox.call_waiting && isConnected) {
+          personal.push(inbox)
+        } else if (!inbox.call_waiting && isConnected) {
+          connected.push(inbox)
+        } else if (isWatching) {
+          watching.push(inbox)
+        }
+      })
+
+      return {
+        personal,
+        connected,
+        watching
+      }
     },
 
     typedInboxes () {
@@ -116,17 +137,17 @@ export default {
         {
           id: INBOX_TYPE_PERSONAL,
           name: 'Personal Inboxes',
-          inboxes: this.personalInboxes
+          inboxes: this.parsedInboxes.personal
         },
         {
           id: INBOX_TYPE_CONNECTED,
           name: 'Connected Inboxes',
-          inboxes: this.connectedInboxes
+          inboxes: this.parsedInboxes.connected
         },
         {
           id: INBOX_TYPE_WATCHING,
           name: 'Watching Inboxes',
-          inboxes: this.watchingInboxes
+          inboxes: this.parsedInboxes.watching
         }
       ]
     }
@@ -195,7 +216,7 @@ export default {
         return null
       }
 
-      return this.personalInboxes.length ? this.personalInboxes[0]?.id : this.inboxes[0]?.id
+      return this.parsedInboxes.personal.length ? this.parsedInboxes.personal[0]?.id : this.inboxes[0]?.id
     },
 
     checkAndRedirectActiveInbox (ringGroup) {
@@ -229,8 +250,10 @@ export default {
         this.orderInboxes()
       } else {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
+
         if (index !== -1) {
           const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
+
           this.setInboxes({ data: updatedInboxes })
           this.checkAndRedirectActiveInbox(ringGroup)
         }
@@ -241,8 +264,19 @@ export default {
       const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
       if (index !== -1) {
         const updatedInboxes = this.inboxes.filter(inbox => inbox.id !== ringGroup.id)
+
         this.setInboxes({ data: updatedInboxes })
         this.checkAndRedirectActiveInbox(ringGroup)
+      }
+    },
+
+    setShowSearchTooltip (show) {
+      this.showSearchTooltip = show
+    },
+
+    showLimitCharactersError (show) {
+      if (show) {
+        this.$generalNotification('Search requires at least 3 characters', 'error')
       }
     }
   },

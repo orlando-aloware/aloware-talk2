@@ -301,6 +301,26 @@ export const fixFullDateTime = (dt) => {
 }
 
 /**
+ * Fix date time for Company Timezone
+ * @param {date|string|Moment} dt
+ * @returns {string|*}
+ */
+export const fixFullDateTimeCompany = (dt, store = null) => {
+  if (dt) {
+    if (store?.state?.currentTimezone) {
+      if (store.state.currentTimezone === 'Asia/Manila') {
+        return window.moment.utc(dt).tz(store.state.currentTimezone).format('YYYY-MM-DD h:mm:ssa') + ' MNL'
+      }
+      return window.moment.utc(dt).tz(store.state.currentTimezone).format('YYYY-MM-DD h:mm:ssa')
+    } else {
+      return window.moment.utc(dt).local().format('YYYY-MM-DD h:mm:ssa')
+    }
+  } else {
+    return '-'
+  }
+}
+
+/**
  * Fix date time
  * @param {date|string|Moment} dt
  * @returns {string|*}
@@ -598,6 +618,7 @@ export default ({ Vue }) => {
     fixDate,
     fixDateTime,
     fixFullDateTime,
+    fixFullDateTimeCompany,
     fixFullDate,
     fixTime,
     fixTimeLocal,

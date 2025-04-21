@@ -23,6 +23,10 @@
                 @click="noClose($event)">
             Role: <b>{{ user.profile.role_name }}</b>
           </span>
+          <q-separator class="my-2" />
+          <div class="custom-connection-test py-2 px-3" v-close-popup @click="goToConnectionTest">
+            <span class="text-md"><i class="fa fa-stethoscope mr-2"></i>Run Connection Test</span>
+          </div>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
@@ -69,6 +73,10 @@ export default {
       if (event) {
         event.stopPropagation()
       }
+    },
+
+    goToConnectionTest () {
+      this.$router.push('/settings/connection-test')
     }
   },
 
@@ -77,3 +85,33 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.no-hover {
+  &:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  &.q-item--clickable:hover,
+  &.q-item--active:hover,
+  &.q-hoverable:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  &::after {
+    content: none !important;
+    opacity: 0 !important;
+  }
+}
+
+.custom-connection-test {
+  cursor: pointer;
+
+  &:hover, &:active, &:focus {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+}
+</style>

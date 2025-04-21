@@ -48,10 +48,12 @@
                   v-if="fileUuid && isMigrated"
                 >
                 </generate-transcription-button>
-                <div class="flex items-center mr-1 h-100"
-                     data-testid="comm-transcription-modal-btn"
-                     v-if="!communication.transcription_is_deleted && communication.has_transcription"
-                     @click="fetchSmartTranscriptionData()">
+                <div
+                  class="flex items-center mr-1 h-100"
+                  data-testid="comm-transcription-modal-btn"
+                  v-if="!communication.transcription_is_deleted && communication.has_transcription"
+                  @click="fetchSmartTranscriptionData()"
+                >
                   <span class="text-blue cursor-pointer">
                     Show Transcription
                   </span>
@@ -80,11 +82,14 @@
               commTypeAsHeader ? 'sticky-header' : ''
             ]"
           >
-            <div class="text-lt p-x d-flex"
-                 :class="[!communication.duration ? 'flex-grow-1 text-left' : '']"
+            <div
+              class="text-lt p-x d-flex"
+              :class="[!communication.duration ? 'flex-grow-1 text-left' : '']"
             >
-              <component :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
-                         v-if="communication.disposition_status2" />
+              <component
+                :is="stateToIcon(communication.disposition_status2, communication.type, communication.direction, communication.callback_status)"
+                v-if="communication.disposition_status2"
+              />
               <div class="comm-type-wrapper">
                 <span
                   v-if="![CommunicationTypes.NOTE, CommunicationTypes.SYSNOTE, CommunicationTypes.APPOINTMENT, CommunicationTypes.REMINDER].includes(communication.type)"
@@ -93,28 +98,36 @@
                 </span>
                 {{ communication.type | fixCommType }}
               </div>
-              <span class="cursor-pointer ml-auto"
-                    v-if="closable"
-                    @click="$emit('close')">
+              <span
+                class="cursor-pointer ml-auto"
+                v-if="closable"
+                @click="$emit('close')"
+              >
                 <close-icon icon-color="#62666E" />
                 <q-tooltip>
                   Close
                 </q-tooltip>
               </span>
             </div>
-            <div class="d-flex justify-content-between mt-2 mobile-transcription-actions"
-                 data-testid="comm-details-mobile-archive-card-section"
-                 v-if="mobileView">
+            <div
+              class="d-flex justify-content-between mt-2 mobile-transcription-actions"
+              data-testid="comm-details-mobile-archive-card-section"
+              v-if="mobileView"
+            >
               <div class="d-flex header-btn-wrapper">
-                <generate-transcription-button class="mr-2"
-                                               variant="button"
-                                               data-testid="comm-details-generate-transcription-button"
-                                               :communication="communication"
-                                               v-if="fileUuid && isMigrated"/>
-                <div class="flex items-center mr-1 h-100"
-                     data-testid="comm-transcription-modal-btn"
-                     v-if="!communication.transcription_is_deleted && communication.has_transcription"
-                     @click="fetchSmartTranscriptionData()">
+                <generate-transcription-button
+                  class="mr-2"
+                  variant="button"
+                  data-testid="comm-details-generate-transcription-button"
+                  :communication="communication"
+                  v-if="fileUuid && isMigrated"
+                />
+                <div
+                  class="flex items-center mr-1 h-100"
+                  data-testid="comm-transcription-modal-btn"
+                  v-if="!communication.transcription_is_deleted && communication.has_transcription"
+                  @click="fetchSmartTranscriptionData()"
+                >
                   <span class="text-blue cursor-pointer">
                     Show Transcription
                   </span>
@@ -282,8 +295,10 @@
                 {{ $options.filters.translateDispositionStatusText(communication.disposition_status2,
                 communication.callback_status) | replaceDash | capitalize }}
               </b-col>
-              <b-col cols="7"
-                     v-else>
+              <b-col
+                cols="7"
+                v-else
+              >
                 {{
                 communication.disposition_status2 | translateDispositionStatusText | replaceDash |
                 capitalize
@@ -292,16 +307,20 @@
             </b-form-row>
             <hr />
 
-            <b-form-row data-testid="comm-details-disposition-row"
-                        cols="7">
+            <b-form-row
+              data-testid="comm-details-disposition-row"
+              cols="7"
+            >
               <b-col
                 class="pl-0 pr-0"
                 data-testid="comm-details-disposition-col"
               >
                 <q-item-label>From: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-disposition-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-disposition-col"
+              >
                 <div
                   class="d-flex align-items-center"
                   v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL"
@@ -396,8 +415,10 @@
               >
                 <q-item-label>To: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-disposition-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-disposition-col"
+              >
                 <div
                   class="d-flex align-items-center"
                   v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL"
@@ -639,6 +660,17 @@
                   </div>
                 </b-col>
               </b-form-row>
+
+              <b-form-row v-if="communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW && communication.metadata.reports.last_queue_position && communication.metadata.reports.last_queue_position !== null">
+                <b-col class="pl-0 pr-0">
+                  <q-item-label>Last position in queue: </q-item-label>
+                </b-col>
+                <b-col cols="7">
+                  <div class="d-flex align-items-center">
+                    {{ communication.metadata.reports.is_queued ? 'Yes' : 'No' }}
+                  </div>
+                </b-col>
+              </b-form-row>
               <hr />
             </div>
 
@@ -735,8 +767,10 @@
                 >
                   <q-item-label>Talk Time: </q-item-label>
                 </b-col>
-                <b-col cols="7"
-                       data-testid="comm-details-talk-time-form-col">
+                <b-col
+                  cols="7"
+                  data-testid="comm-details-talk-time-form-col"
+                >
                   <div class="d-flex align-items-center">
                     {{ communication.talk_time | fixDuration }}
                   </div>
@@ -766,54 +800,46 @@
             </div>
           </q-card-section>
 
-          <q-card-section
-            class="pt-0 pb-0"
-            v-if="typeHaveLine"
-            data-testid="comm-details-card-section"
-          >
+          <q-card-section class="pt-0 pb-0"
+                          data-testid="comm-details-card-section"
+                          v-if="typeHaveLine">
             <!--RING GROUP-->
-            <b-form-row
-              v-if="communication.ring_group_id"
-              data-testid="comm-details-ring-group-row"
-            >
-              <b-col
-                class="pl-0 pr-0"
-                data-testid="comm-details-ring-group-col"
-              >
+            <b-form-row data-testid="comm-details-ring-group-row"
+                        v-if="communication.ring_group_id">
+              <b-col class="pl-0 pr-0"
+                     data-testid="comm-details-ring-group-col">
                 <q-item-label>Ring Group: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-ring-group-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-ring-group-col"
+              >
                 <div class="d-flex align-items-center">
-                  <div
-                    class="flex items-center mr-1 h-100"
-                    data-testid="comm-details-ring-group-open-rg-in-classic"
-                    @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
-                    v-if="usedRingGroup && !usedRingGroup?.call_waiting"
-                  >
-                    <span
-                      class="text-blue cursor-pointer"
-                      :title="usedRingGroup.name"
-                    >
-                      <q-tooltip
-                        anchor="top middle"
-                        self="bottom middle"
-                        max-width="150px"
-                        data-testid="comm-details-ring-group-tooltip"
-                      >
+                  <span v-if="usedRingGroup && usedRingGroup.call_waiting && !hasCompanyTeamInboxEnabled">
+                    Call waiting Queue
+                  </span>
+
+                  <div class="flex items-center mr-1 h-100"
+                       data-testid="comm-details-ring-group-open-rg-in-classic"
+                       @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
+                       v-else-if="usedRingGroup">
+                    <span class="text-blue cursor-pointer"
+                          :title="usedRingGroup.name">
+                      <q-tooltip anchor="top middle"
+                                 self="bottom middle"
+                                 max-width="150px"
+                                 data-testid="comm-details-ring-group-tooltip">
                         Click For More Info
                       </q-tooltip>
                       {{ usedRingGroup.name }}
                     </span>
                   </div>
-                  <template v-else>
-                    <span v-if="usedRingGroup?.call_waiting">
-                      Call waiting Queue
-                    </span>
-                    <span v-else>
-                      Deleted Ring Group
-                    </span>
-                  </template>
+                  <span v-else-if="ringGroups.length > 0">
+                    Deleted Ring Group
+                  </span>
+                  <span v-else>
+                    -
+                  </span>
                 </div>
               </b-col>
             </b-form-row>
@@ -829,8 +855,10 @@
               >
                 <q-item-label>Sequence: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-sequence-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-sequence-col"
+              >
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -871,8 +899,10 @@
               >
                 <q-item-label>Broadcast: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-broadcast-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-broadcast-col"
+              >
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -913,8 +943,10 @@
               >
                 <q-item-label>Transferred from: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-transferred-from-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-transferred-from-col"
+              >
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -954,8 +986,10 @@
               >
                 <q-item-label>Transferred to: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-transferred-to-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-transferred-to-col"
+              >
                 <div class="d-flex align-items-center">
                   <div
                     class="flex items-center mr-1 h-100"
@@ -995,8 +1029,10 @@
               >
                 <q-item-label>Cold transferred: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-cold-transfer-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-cold-transfer-col"
+              >
                 <div class="d-flex align-items-center">
                   {{ communication.in_cold_transfer | fixBooleanType }}
                 </div>
@@ -1014,8 +1050,10 @@
               >
                 <q-item-label>Child Call: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-new-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-new-col"
+              >
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.new_communication_id }}"
@@ -1038,8 +1076,10 @@
               >
                 <q-item-label>Parent Call: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-original-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-original-col"
+              >
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.original_communication_id }}"
@@ -1062,8 +1102,10 @@
               >
                 <q-item-label>Child Call: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-child-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-child-col"
+              >
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.active_communication_id }}"
@@ -1086,8 +1128,10 @@
               >
                 <q-item-label>Parent Call: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-fake-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-fake-col"
+              >
                 <div class="d-flex align-items-center">
                   <router-link
                     :to="{ name: 'Communication', params: {contactId: communication.contact_id, communicationId: communication.metadata.fake_communication_id }}"
@@ -1115,8 +1159,10 @@
                   Sent by:
                 </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-sent-by-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-sent-by-col"
+              >
                 <div class="d-flex align-items-center">
                   {{ getUser(communication.user_id).name }}
                 </div>
@@ -1134,8 +1180,10 @@
               >
                 <q-item-label>Sent as MMS: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-sent-as-mms-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-sent-as-mms-col"
+              >
                 <div class="d-flex align-items-center">
                   {{ sentAsMmsLabel }}
                 </div>
@@ -1153,8 +1201,10 @@
               >
                 <q-item-label class="mt-3 custom-item-label">Recording: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-recording-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-recording-col"
+              >
                 <div
                   class="d-flex align-items-center"
                   v-if="showAudio(communication)"
@@ -1350,8 +1400,10 @@
                   data-testid="comm-details-call-disposition-item"
                 >Call Disposition: </q-item-label>
               </b-col>
-              <b-col cols="7"
-                     data-testid="comm-details-call-disposition-col">
+              <b-col
+                cols="7"
+                data-testid="comm-details-call-disposition-col"
+              >
                 <div class="d-flex align-items-center">
                   <call-disposition-selector
                     data-testid="comm-details-disposition-selector"
@@ -1427,7 +1479,25 @@
 </template>
 
 <script>
+import CallDispositionSelector from 'components/call-disposition-selector'
+import CommunicationAudio from 'components/communication-audio'
+import CommunicationNote from 'components/communication-note'
+import DownloadButton from 'components/download-button'
+import GenerateTranscriptionButton from 'components/generate-transcription-button'
+import EntityTags from 'components/generic-selectors/entity-tags'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
+import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
+import CloseIcon from 'components/icons/close-icon.vue'
+import PencilOIcon from 'components/icons/pencil-o-icon'
+import NetworkLogsDisplay from 'components/network-logs/network-logs-display'
+import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
+import RingGroupSnapshot from 'components/ring-group-snapshot'
+import TargetUsersTree from 'components/target-users-tree'
 import _ from 'lodash'
+import TranscriptionModal from 'src/components/communication/transcription-modal'
+import UserDisplay from 'src/components/user-display.vue'
+import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
+import talk2Api from 'src/plugins/api/api'
 import {
   aclMixin,
   classicMixin,
@@ -1436,33 +1506,12 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
-
-import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
+import * as CommunicationCallbackStatus from '../constants/callback-status'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
 import * as CommunicationDirections from '../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../constants/communication-disposition-status'
 import * as CommunicationTypes from '../constants/communication-types'
 import * as UploadedFileTypes from '../constants/uploaded-file-types'
-
-import CallDispositionSelector from 'components/call-disposition-selector'
-import CommunicationAudio from 'components/communication-audio'
-import CommunicationNote from 'components/communication-note'
-import TargetUsersTree from 'components/target-users-tree'
-import talk2Api from 'src/plugins/api/api'
-
-import DownloadButton from 'components/download-button'
-import GenerateTranscriptionButton from 'components/generate-transcription-button'
-import EntityTags from 'components/generic-selectors/entity-tags'
-import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
-import PencilOIcon from 'components/icons/pencil-o-icon'
-import NetworkLogsDisplay from 'components/network-logs/network-logs-display'
-import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
-import RingGroupSnapshot from 'components/ring-group-snapshot'
-import TranscriptionModal from 'src/components/communication/transcription-modal'
-import CloseIcon from 'components/icons/close-icon.vue'
-import * as CommunicationCallbackStatus from '../constants/callback-status'
-import UserDisplay from 'src/components/user-display.vue'
-import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 
 export default {
   name: 'communication-details',

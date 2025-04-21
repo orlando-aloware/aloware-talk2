@@ -86,8 +86,9 @@
                     <span class="data-value">{{ integrationData.other_phone }}</span>
                 </p>
             </q-card-section>
-          <sync-with-integration :integration_name='integrationName()'
-                                 :contact_id='contact.id'
+          <sync-with-integration :integration_name="integrationName()"
+                                 :contact_id="contact.id"
+                                 v-if="contact?.id"
                                  @sync-complete="afterSyncComplete"/>
         </q-card>
     </div>

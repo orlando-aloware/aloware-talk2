@@ -1,8 +1,11 @@
 <template>
   <div class="contact-name"
        :id="`contact-name-${_uid}`">
-    <div class="ellipse">
-      {{ name }} {{ repeats ? `(${repeats + 1})` : '' }}
+    <div class="contact-name ellipse">
+      {{ name }}
+      <span class="contact-name__repeat-counter">
+        {{ repeats ? `(${repeats + 1})` : '' }}
+      </span>
     </div>
 
     <b-popover triggers="hover"
@@ -31,10 +34,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .contact-name {
   font-size: 14px;
   font-weight: 500;
   width: 195px;
+
+  &__repeat-counter {
+    color: #256eff;
+  }
 }
 </style>
