@@ -138,7 +138,7 @@
                 <span>{{ testResults.services.pingTime || '0' }} ms</span>
               </div>
               <div class="d-flex justify-content-between py-2">
-                <strong>WebSocket (Soketi)</strong>
+                <strong>Live Updates (WebSocket)</strong>
                 <b-badge :variant="testResults.services.soketi ? 'success' : 'danger'" pill>
                   {{ testResults.services.soketi ? 'Connected' : 'Failed' }}
                 </b-badge>
