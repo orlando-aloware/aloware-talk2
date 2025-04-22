@@ -28,7 +28,7 @@
               <p class="small text-muted">Tests your network connectivity for voice calls</p>
             </div>
             <b-button size="md"
-                      variant="success"
+                      variant="primary"
                       class="px-4 py-2"
                       @click="testConnection"
                       :disabled="isTesting">
@@ -50,9 +50,9 @@
       <!-- Quick Stats Panel -->
       <b-col md="6" lg="8" v-if="testResults && !isTesting">
         <b-card class="quick-stats-panel h-100">
-          <div class="d-flex flex-column flex-md-row justify-content-around align-items-center">
+          <div class="d-flex flex-column flex-md-row justify-content-around align-items-center h-100">
             <!-- Network Status -->
-            <div class="text-center mb-4 mb-md-0">
+            <div class="text-center mb-4 mb-md-0 d-flex flex-column justify-content-center">
               <div class="network-icon">
                 <i class="fa fa-desktop"></i>
               </div>
@@ -61,7 +61,7 @@
             </div>
 
             <!-- Twilio Connection Gauge -->
-            <div class="text-center">
+            <div class="text-center d-flex flex-column justify-content-center">
               <div class="gauge" :class="getTwilioQualityClass()">
                 <div class="gauge-value">{{ getTwilioQualityValue() }}</div>
                 <div class="gauge-label">{{ getTwilioQualityLabel() }}</div>
@@ -304,7 +304,7 @@
                             <div class="timing-bar-label text-right">Signaling:</div>
                             <div class="timing-bar-container flex-grow-1">
                               <div class="timing-bar bg-info text-nowrap"
-                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.signaling.duration) + '%'}"
+                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.signaling.duration) + '%', minWidth: '60px'}"
                                    :title="preflightReport.networkTiming.signaling.duration + 'ms'">
                                 {{ preflightReport.networkTiming.signaling.duration }}ms
                               </div>
@@ -315,7 +315,7 @@
                             <div class="timing-bar-label text-right">ICE Setup:</div>
                             <div class="timing-bar-container flex-grow-1">
                               <div class="timing-bar bg-success text-nowrap"
-                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.ice.duration) + '%'}"
+                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.ice.duration) + '%', minWidth: '60px'}"
                                    :title="preflightReport.networkTiming.ice.duration + 'ms'">
                                 {{ preflightReport.networkTiming.ice.duration }}ms
                               </div>
@@ -326,7 +326,7 @@
                             <div class="timing-bar-label text-right">DTLS Handshake:</div>
                             <div class="timing-bar-container flex-grow-1">
                               <div class="timing-bar bg-warning text-nowrap"
-                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.dtls.duration) + '%'}"
+                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.dtls.duration) + '%', minWidth: '60px'}"
                                    :title="preflightReport.networkTiming.dtls.duration + 'ms'">
                                 {{ preflightReport.networkTiming.dtls.duration }}ms
                               </div>
@@ -337,7 +337,7 @@
                             <div class="timing-bar-label text-right">Total Connection:</div>
                             <div class="timing-bar-container flex-grow-1">
                               <div class="timing-bar bg-primary text-nowrap"
-                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.peerConnection.duration) + '%'}"
+                                   :style="{width: getTimingBarWidth(preflightReport.networkTiming.peerConnection.duration) + '%', minWidth: '60px'}"
                                    :title="preflightReport.networkTiming.peerConnection.duration + 'ms'">
                                 {{ preflightReport.networkTiming.peerConnection.duration }}ms
                               </div>
@@ -1109,7 +1109,6 @@ export default {
 .timing-bar-container {
   height: 24px;
   background-color: #f1f1f1;
-  margin-bottom: 1rem;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -1118,21 +1117,29 @@ export default {
   height: 100%;
   line-height: 24px;
   color: white;
-  text-align: right;
-  padding-right: 8px;
+  text-align: center;
+  padding: 0 8px;
   border-radius: 4px;
-  min-width: 40px;
-  font-size: 0.85rem;
+  min-width: 60px;
+  font-size: 0.8rem;
+  font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.7);
 }
 
 .timing-bar-label {
   font-weight: bold;
-  margin-bottom: 0.2rem;
-  text-align: left;
+  margin-bottom: 0;
+  text-align: right;
+  margin-right: 0.5rem ;
   font-size: 0.9rem;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 24px;
 }
 
 .connection-path {
@@ -1414,15 +1421,20 @@ export default {
 
 /* Additional CSS for the timing bars */
 .timing-row {
-  margin-bottom: 1rem;
+  margin-bottom: 1.7rem;
+  align-items: center;
 }
 
-.timing-bar-label {
+/* Make the h5 headings in the detailed report look like proper headers */
+.twilio-report h5 {
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
   font-weight: bold;
-  margin-bottom: 0.2rem;
-  text-align: left;
-  font-size: 0.9rem;
-  min-width: 120px;
+  border-bottom: 2px solid #dee2e6;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+  color: #495057;
+  letter-spacing: 0.5px;
 }
 
 @media (min-width: 768px) and (max-width: 991.98px) {
