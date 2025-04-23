@@ -377,8 +377,7 @@
               <div class="w-100">
                 <label class="form-control-label mb-1">Ring Group</label>
                 <router-link
-                  :to="{ name: 'Ring Group Activity', params: { ring_group_id: communication.ring_group_id }}"
-                  v-if="!getRingGroup(communication.ring_group_id).call_waiting">
+                  :to="{ name: 'Ring Group Activity', params: { ring_group_id: communication.ring_group_id }}">
                   <!-- we are only showing this section if the ring group is available-->
                   <q-tooltip anchor="top left"
                              self="top left">
@@ -388,9 +387,6 @@
                     </span>
                   </q-tooltip>
                 </router-link>
-                <template v-else>
-                  Call waiting Queue
-                </template>
                 <target-users-tree class="w-100"
                                    :communication="communication"
                                    :is-form="true"/>

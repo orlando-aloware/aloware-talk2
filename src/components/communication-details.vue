@@ -815,14 +815,10 @@
                 data-testid="comm-details-ring-group-col"
               >
                 <div class="d-flex align-items-center">
-                  <span v-if="usedRingGroup && usedRingGroup.call_waiting && !hasCompanyTeamInboxEnabled">
-                    Call waiting Queue
-                  </span>
-
                   <div class="flex items-center mr-1 h-100"
                        data-testid="comm-details-ring-group-open-rg-in-classic"
                        @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
-                       v-else-if="usedRingGroup">
+                       v-if="usedRingGroup">
                     <span class="text-blue cursor-pointer"
                           :title="usedRingGroup.name">
                       <q-tooltip anchor="top middle"
