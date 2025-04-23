@@ -182,7 +182,7 @@ export default {
     sendTimeLabel () {
       return 'Send ' + (this.time === 'now'
         ? `today at ${this.companyDate.format('hh:mm a')}`
-        : 'message at ' + window.moment(this.schedule.date + ' ' + this.schedule.time).format('MM/DD/YYYY hh:mma Z'))
+        : 'message at ' + window.moment(this.schedule.date + ' ' + this.schedule.time).format('MM/DD/YYYY hh:mma z'))
     },
 
     scheduleIsPast () {

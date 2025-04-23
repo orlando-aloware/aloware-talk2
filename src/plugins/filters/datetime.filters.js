@@ -274,10 +274,10 @@ export const fixDateTime = (dt) => {
   }
 
   if (window.timezone) {
-    return window.moment.utc(dt).tz(window.timezone).format('MM/DD/YYYY h:mm:ssa Z')
+    return window.moment.utc(dt).tz(window.timezone).format('MM/DD/YYYY h:mm:ssa z')
   }
 
-  return window.moment.utc(dt).local().format('MM/DD/YYYY h:mma Z')
+  return window.moment.utc(dt).local().format('MM/DD/YYYY h:mma z')
 }
 
 /**
