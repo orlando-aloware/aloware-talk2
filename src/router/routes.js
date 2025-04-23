@@ -586,11 +586,6 @@ const routes = [
         component: Account
       },
       {
-        path: 'ring-group-activity/:ringGroupId',
-        name: 'Ring Group Activity',
-        component: Account
-      },
-      {
         path: 'sequence-activity/:sequenceId',
         name: 'Sequence Activity',
         component: Account
