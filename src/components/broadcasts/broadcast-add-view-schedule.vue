@@ -105,15 +105,15 @@
 </template>
 
 <script>
+import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+import { isEmpty } from 'lodash'
 import BroadcastTimeRestrictionAlert from 'src/components/broadcasts/broadcast-time-restriction-alert'
+import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
 import ContactLineSelector from 'src/components/contact-line-selector.vue'
 import DateSelector from 'src/components/date-selector.vue'
-import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
-import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
 import { broadcastsMixin, classicMixin, companyTimezone } from 'src/plugins/mixins'
-import { mapState, mapGetters } from 'vuex'
-import { isEmpty } from 'lodash'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'broadcast-add-view-schedule',
@@ -182,7 +182,7 @@ export default {
     sendTimeLabel () {
       return 'Send ' + (this.time === 'now'
         ? `today at ${this.companyDate.format('hh:mm a')}`
-        : 'message at ' + window.moment(this.schedule.date + ' ' + this.schedule.time).format('MM/DD/YYYY hh:mm a'))
+        : 'message at ' + window.moment(this.schedule.date + ' ' + this.schedule.time).format('MM/DD/YYYY hh:mma Z'))
     },
 
     scheduleIsPast () {

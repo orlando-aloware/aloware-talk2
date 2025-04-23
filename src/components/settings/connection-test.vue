@@ -41,7 +41,7 @@
             </b-button>
             <div v-if="testCount > 0" class="text-muted mt-3 small">
               <i class="fa fa-history mr-1"></i> Tests run in this session: {{ testCount }}
-              <div v-if="lastTestTime">Last test: {{ lastTestTime | momentFormat('MM/DD h:mma', true) }}</div>
+              <div v-if="lastTestTime">Last test: {{ lastTestTime | momentFormat('MM/DD/YYYY h:mma Z', true) }}</div>
             </div>
           </div>
         </b-card>

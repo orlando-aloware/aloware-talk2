@@ -115,14 +115,14 @@
 </template>
 
 <script>
+import ContactLineSelector from 'components/contact-line-selector'
+import NumberOfDaysSelector from 'components/number-of-days-selector'
+import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
+import PredefinedTimeSelector from 'components/predefined-time-selector'
+import TimezoneSelector from 'components/timezone-selector'
+import talk2Api from 'src/plugins/api/api'
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker'
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
-import PredefinedTimeDurationSelector from 'components/predefined-time-duration-selector'
-import TimezoneSelector from 'components/timezone-selector'
-import ContactLineSelector from 'components/contact-line-selector'
-import PredefinedTimeSelector from 'components/predefined-time-selector'
-import NumberOfDaysSelector from 'components/number-of-days-selector'
-import talk2Api from 'src/plugins/api/api'
 import { mapState } from 'vuex'
 
 export default {
@@ -149,7 +149,7 @@ export default {
     return {
       isSaving: false,
       appointment: {
-        date: '', // window.moment().format('MM/DD/YYYY HH:mm'),
+        date: '',
         time: '',
         duration: '',
         timezone: '',
