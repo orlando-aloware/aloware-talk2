@@ -83,13 +83,13 @@ import { mapState } from 'vuex'
 import _ from 'lodash'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 import { dispositionsOptionsMixin } from 'src/plugins/mixins'
-import integrationMixin from 'src/plugins/mixins/integration.mixin'
+
 export default {
   name: 'call-disposition-selector',
 
   components: { RemoveTagIcon },
 
-  mixins: [dispositionsOptionsMixin, integrationMixin],
+  mixins: [dispositionsOptionsMixin],
 
   props: {
     value: {
@@ -156,19 +156,6 @@ export default {
   computed: {
     ...mapState(['callDispositions']),
 
-    shouldFilterExternalDispositions () {
-      // Just check for HubSpot Integration for now
-      return this.currentCompany?.hubspot_integration_enabled === true
-    },
-
-    filteredDispositions () {
-      const dispositions = this.orderedDispositions || []
-      if (this.shouldFilterExternalDispositions) {
-        return dispositions.filter(disposition => disposition.is_external === true)
-      }
-      return dispositions
-    },
-
     placeholder () {
       switch (true) {
         case this.multiple && (!this.selectedId || (this.selectedId && this.selectedId.length < 1)):
@@ -223,7 +210,7 @@ export default {
   },
 
   created () {
-    this.options = this.filteredDispositions
+    this.options = this.orderedDispositions
     this.selectedId = this.multiple ? [] : this.selectedId
     this.getCallDisposition()
   },
@@ -234,7 +221,7 @@ export default {
         this.selectedId = []
         const callDispId = { data: null }
         for (callDispId.data in this.values) {
-          const found = this.filteredDispositions.find(callDispo => callDispo.id === callDispId.data)
+          const found = this.orderedDispositions.find(callDispo => callDispo.id === callDispId.data)
 
           if (found) {
             this.selectedId.push(found)
@@ -244,7 +231,7 @@ export default {
       }
 
       if (!_.isEmpty(this.values) && !this.multiple) {
-        this.selectedId = this.filteredDispositions.find(callDispo => callDispo.id === this.values)
+        this.selectedId = this.orderedDispositions.find(callDispo => callDispo.id === this.values)
       }
     },
 
@@ -255,21 +242,21 @@ export default {
     filterFn (val, update) {
       if (this.callDispositionId && val === this.callDispositionId) {
         update(() => {
-          this.options = this.filteredDispositions.filter(script => script.id === this.callDispositionId)
+          this.options = this.orderedDispositions.filter(script => script.id === this.callDispositionId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.options = this.filteredDispositions
+          this.options = this.orderedDispositions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.filteredDispositions.filter(script => script.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.orderedDispositions.filter(script => script.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
