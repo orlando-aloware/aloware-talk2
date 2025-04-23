@@ -1040,10 +1040,6 @@ export default {
 </script>
 
 <style>
-.twilio-report {
-  padding: 1rem 0;
-}
-
 .quality-indicator {
   font-size: 1.5rem;
   font-weight: bold;
