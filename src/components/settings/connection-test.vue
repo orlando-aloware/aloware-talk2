@@ -401,9 +401,9 @@
 </template>
 
 <script>
+import { Device } from '@twilio/voice-sdk'
 import talk2Api from 'src/plugins/api/api'
 import { settingsLayoutMixin } from 'src/plugins/mixins'
-import { Device } from '@twilio/voice-sdk'
 
 export default {
   name: 'connection-test',
@@ -1314,6 +1314,7 @@ export default {
 
 /* Additional CSS for small screens to improve display of stats */
 .twilio-stats span, .service-stats span {
+  line-height: inherit;
   white-space: nowrap;
 }
 
