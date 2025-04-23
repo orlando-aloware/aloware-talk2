@@ -383,14 +383,14 @@
                   v-if="communication.ring_group_id"
                   @click="handleRingGroupClick(communication.ring_group_id, $event)">
                   <span class="text-blue cursor-pointer"
-                        :title="getRingGroup(communication.ring_group_id)?.name">
+                        :title="getRingGroup(communication.ring_group_id).name">
                     <q-tooltip anchor="top middle"
                                 self="bottom middle"
                                 max-width="150px"
                                 data-testid="comm-details-ring-group-tooltip">
                         Click For More Info
                     </q-tooltip>
-                    {{ getRingGroup(communication.ring_group_id)?.name }}
+                    {{ getRingGroup(communication.ring_group_id).name }}
                   </span>
                 </a>
                 <target-users-tree class="w-100"
