@@ -417,8 +417,15 @@ const SettingsMap = {
     route: '/settings/profile',
     hash_keyword: 'company-contact-card',
     visible: true
-  }
+  },
 
+  // CONNECTION TEST SETTINGS
+  'connection_test': {
+    title: 'Connection Test',
+    description: 'Test your connection for voice and video calls.',
+    route: '/settings/connection-test',
+    visible: true
+  }
 }
 
 export default SettingsMap

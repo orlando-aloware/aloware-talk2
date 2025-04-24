@@ -26,7 +26,7 @@
 <script>
 import CalendarIconOutlined from 'components/icons/calendar-icon-outlined'
 import { mapState } from 'vuex'
-import { classicMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { classicMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'open-calendar-button',
@@ -36,8 +36,7 @@ export default {
   },
 
   mixins: [
-    classicMixin,
-    simpsocialMixin
+    classicMixin
   ],
 
   props: {

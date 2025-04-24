@@ -247,7 +247,6 @@ import {
   agentMixin,
   contactV2AttributesMixin,
   kycMixin,
-  simpsocialMixin,
   userMixin,
   settingsMixin,
   broadcastsMixin,
@@ -343,7 +342,6 @@ export default {
     agentMixin,
     contactV2AttributesMixin,
     kycMixin,
-    simpsocialMixin,
     userMixin,
     settingsMixin,
     broadcastsMixin,
@@ -997,7 +995,7 @@ export default {
     }
 
     this.mainListeners.kycStatusUpdated = (company) => {
-      if (this.isTrial && !this.isSimpSocial && !this.isModGen) {
+      if (this.isTrial && !this.isModGen) {
         this.setShowedKycReloadDialog(true)
       }
     }
@@ -1746,6 +1744,8 @@ export default {
       if (this.hasPermissionTo('list ring group')) {
         this.loadingRingGroups = true
 
+        this.setRingGroupsIsLoading(true)
+
         return this.$axios
           .get('/api/v1/ring-group', {
             mode: 'no-cors'
@@ -1753,12 +1753,14 @@ export default {
           .then((res) => {
             this.setRingGroups(res.data)
             this.loadingRingGroups = false
+            this.setRingGroupsIsLoading(false)
 
             return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingRingGroups = false
+            this.setRingGroupsIsLoading(false)
 
             return Promise.reject()
           })
@@ -2713,6 +2715,7 @@ export default {
       'setCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
+      'setRingGroupsIsLoading',
       'setTeams',
       'setContactLists',
       'setUsers',

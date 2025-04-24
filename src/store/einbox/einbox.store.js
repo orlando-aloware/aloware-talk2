@@ -1,5 +1,8 @@
 export const THREADED = 1
 export const UNTHREADED = 2
+export const INBOX_TYPE_PERSONAL = 'personal'
+export const INBOX_TYPE_CONNECTED = 'connected'
+export const INBOX_TYPE_WATCHING = 'watching'
 
 export default function () {
   return {

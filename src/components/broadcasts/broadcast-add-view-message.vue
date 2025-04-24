@@ -154,7 +154,7 @@ import ContactLineSelector from 'src/components/contact-line-selector.vue'
 import ThrottleSelector from 'src/components/generic-selectors/throttle-selector.vue'
 import BroadcastWarningNote from 'src/components/broadcasts/broadcast-warning-note.vue'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { aclMixin, broadcastsMixin, classicMixin, smsMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, broadcastsMixin, classicMixin, smsMixin, whiteLabelMixin } from 'src/plugins/mixins'
 import { IS_OPT_OUT_FORCED_TEXT } from '../../constants/compliance-messages'
 
 export default {
@@ -165,7 +165,7 @@ export default {
     broadcastsMixin,
     classicMixin,
     smsMixin,
-    simpsocialMixin
+    whiteLabelMixin
   ],
 
   components: {

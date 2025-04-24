@@ -14,7 +14,6 @@ import {
   aclMixin,
   classicMixin,
   settingsMixin,
-  simpsocialMixin,
   htmlMixin
 } from 'boot/mixins'
 import LoginLargeScreensInfo from 'components/guest/login-large-screens-info'
@@ -32,7 +31,6 @@ export default {
     aclMixin,
     classicMixin,
     settingsMixin,
-    simpsocialMixin,
     htmlMixin
   ],
 
@@ -89,11 +87,6 @@ export default {
       await talk2Api.V1.statics.get(this.currentCompany?.id)
         .then(res => {
           this.setStatics(res.data)
-
-          if (this.statics.domain === 'app.simpsocial.com') {
-            this.setPageTitle(`${this.statics?.name} - Login`)
-            this.setDocumentFavicon(this.statics?.favicon)
-          }
         })
         .catch(err => {
           this.setPageTitle('Login - Talk')

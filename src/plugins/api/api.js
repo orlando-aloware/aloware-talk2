@@ -2,8 +2,8 @@ const suffixV1 = '/api/v1/'
 const suffixV2 = '/api/v2/'
 import _ from 'lodash'
 import qs from 'qs'
-import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import * as AloAi from 'src/constants/aloai'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
 const exportCommunications = async (contactId) => {
   return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
@@ -206,14 +206,6 @@ const talk2Api = {
         }
 
         return window.axios.get(`${suffixV1}contact/${contactId}/communications-summary`)
-      },
-
-      pushToCrm (contactId) {
-        if (!contactId) {
-          return null
-        }
-
-        return window.axios.post(`${suffixV1}contact/${contactId}/push-to-crm`)
       }
     },
 
@@ -379,56 +371,6 @@ const talk2Api = {
           }
 
           return response
-        }
-      },
-
-      simpsocial: {
-        messenger: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/messenger-source`)
-          }
-        },
-
-        dmsEquity: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/dms-equity-source`)
-          }
-        },
-
-        digitalLeadWar: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/digital-lead-war-source`)
-          }
-        },
-
-        emailBlast: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/email-source`)
-          }
-        },
-
-        videoConference: {
-          send (contactId = null, campaignId = null) {
-            if (contactId === null || campaignId === null) {
-              return null
-            }
-
-            return window.axios.post(`/integrations/simpsocial/video-conference-to-contact/${contactId}`, {
-              campaign_id: campaignId
-            })
-          }
-        },
-
-        creditApplication: {
-          send (contactId = null, campaignId = null) {
-            if (contactId === null || campaignId === null) {
-              return null
-            }
-
-            return window.axios.post(`/integrations/simpsocial/credit-application-to-contact/${contactId}`, {
-              campaign_id: campaignId
-            })
-          }
         }
       },
 

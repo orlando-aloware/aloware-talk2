@@ -67,17 +67,29 @@ export default {
       }
     },
 
-    async loadMoreInboxes () {
+    async loadMoreInboxes (search = '') {
       try {
         if (this.isLoadingInboxes || !this.hasMoreInboxes) {
           return
         }
 
+        if (this.abortController) {
+          this.abortController.abort()
+        }
+
         this.setIsLoadingInboxes(true)
+        this.setAbortController(new AbortController())
 
         const perPage = 50
         const nextPage = this.currentInboxesPage + 1
-        const response = await talk2Api.V2.inbox.inboxes.get({ page: nextPage, perPage })
+        const response = await talk2Api.V2.inbox.inboxes.get({
+          params: {
+            page: nextPage,
+            per_page: perPage,
+            ...(search ? { search } : {})
+          },
+          signal: this.abortController.signal
+        })
 
         this.appendInboxes(response.data)
       } catch (error) {

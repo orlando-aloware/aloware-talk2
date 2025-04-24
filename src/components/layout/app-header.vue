@@ -30,7 +30,7 @@
 
       <a href="https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast"
          target="_blank"
-         v-if="$route.name === 'Broadcasts' && !isSimpSocial">
+         v-if="$route.name === 'Broadcasts'">
         <information-circle-icon class="ml-2 cursor-pointer"/>
         <q-tooltip>
           Check the article how to use the Broadcast
@@ -49,7 +49,7 @@
 
         <shared-login-menu v-if="!isElectron" />
 
-        <header-help v-if="!isTrial && !isSimpSocial" />
+        <header-help v-if="!isTrial" />
 
         <profile :hideProfileInfo="isMobileTransitionWidth" />
 
@@ -126,7 +126,6 @@ import { Platform } from 'quasar'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
   aclMixin,
-  simpsocialMixin,
   avatarMixin,
   goBackMixin,
   contactsListFiltersMixin,
@@ -163,7 +162,6 @@ export default {
 
   mixins: [
     aclMixin,
-    simpsocialMixin,
     avatarMixin,
     goBackMixin,
     contactsListFiltersMixin,

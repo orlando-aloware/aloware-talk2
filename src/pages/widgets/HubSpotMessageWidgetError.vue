@@ -108,13 +108,13 @@
 import * as HubspotMessageError from 'src/constants/hubspot-message-widget-errors'
 import talk2Api from 'src/plugins/api/api'
 import {
-  simpsocialMixin
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 
 export default {
   name: 'hubspot-message-widget-error',
   mixins: [
-    simpsocialMixin
+    whiteLabelMixin
   ],
   data () {
     return {

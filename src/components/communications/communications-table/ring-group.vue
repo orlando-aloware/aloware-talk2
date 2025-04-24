@@ -1,23 +1,33 @@
 <template>
   <div class="ellipse"
        data-testid="ring-group-row">
+    <span v-if="ringGroup.id && ringGroup.call_waiting && !hasCompanyTeamInboxEnabled">
+      Call waiting queue
+    </span>
     <a class="cursor-pointer"
        target="_blank"
-       :href="getRingGroupURL(row.ring_group_id)"
-       @click="handleRingGroupClick(row.ring_group_id, $event)"
-       v-if="row.ring_group_id && ringGroupName !== 'Deleted Ring Group'">
+       :href="getRingGroupURL(ringGroupId)"
+       :id="`comm-ring-group-${_uid}`"
+       v-else-if="ringGroup.id && !isAgent"
+       @click="handleRingGroupClick(ringGroupId, $event)">
       <external-link-icon color="#1976D2"/>
-      {{ ringGroupName }}
+      {{ ringGroup.name }}
 
-      <q-tooltip>
+      <b-tooltip custom-class="talk-table__tooltip"
+                 :target="`comm-ring-group-${_uid}`">
         Click to go to ring group's page
-      </q-tooltip>
+      </b-tooltip>
     </a>
-    <span
-      v-else-if="isAgent || row.ring_group_id"
-      :class="{ 'deleted': ringGroupName === 'Deleted Ring Group' }">
-      {{ ringGroupName }}
+
+    <span v-else-if="ringGroup.id && isAgent">
+      {{ ringGroup.name }}
     </span>
+
+    <span class="deleted"
+          v-else-if="ringGroupId && !ringGroup.id && ringGroups.length > 0">
+      Deleted Ring Group
+    </span>
+
     <span v-else>
       -
     </span>
@@ -26,7 +36,7 @@
 
 <script>
 import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
-import { aclMixin, classicMixin } from 'src/plugins/mixins'
+import { aclMixin, classicMixin, userMixin } from 'src/plugins/mixins'
 import communicationsMixin from 'src/plugins/mixins/communications.mixin'
 import { mapState } from 'vuex'
 
@@ -40,25 +50,24 @@ export default {
   mixins: [
     aclMixin,
     classicMixin,
-    communicationsMixin
+    communicationsMixin,
+    userMixin
   ],
 
   props: {
-    row: {
-      type: Object,
-      default: () => ({})
+    ringGroupId: {
+      type: Number,
+      default: null
     }
   },
 
   computed: {
-    ...mapState(['ringGroups']),
+    ...mapState([
+      'ringGroups'
+    ]),
 
     ringGroup () {
-      return this.ringGroups.find(rg => rg.id === this.row.ring_group_id) || {}
-    },
-
-    ringGroupName () {
-      return this.row.ring_group_id && !this.ringGroup.name ? 'Deleted Ring Group' : (this.ringGroup.name || '')
+      return this.ringGroups.find(rg => rg.id === this.ringGroupId) || {}
     }
   },
 

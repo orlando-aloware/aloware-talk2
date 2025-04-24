@@ -91,6 +91,7 @@ export default {
       }
 
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+
       return this.startDialing &&
         (this.isAlwaysAskModeEnabled ? true : !this.campaignId) &&
         !isCallInProgress.includes(this.dialer?.currentStatus) &&

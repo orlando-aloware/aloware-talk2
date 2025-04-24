@@ -42,8 +42,10 @@
               <search-input class="width-260"
                             data-testid="lists-search-input"
                             limit-search-characters
+                            input-error-border
                             :search="search"
-                            @search="onSearch" />
+                            @search="onSearch"
+                            @show-error="onSearchInputShowError" />
             </div>
           </div>
           <div class="ml-2">
@@ -111,6 +113,11 @@
               </b-overlay>
             </b-dropdown>
           </div>
+        </div>
+        <div class="limit-characters-error d-flex align-items-center ml-3 mb-1"
+             v-if="showLimitCharactersError">
+            <span class="search-error-icon mr-1">&times;</span>
+            <span class="search-error-text">Search requires at least 3 characters</span>
         </div>
       </div>
 
@@ -321,6 +328,7 @@
 
                     <b-dropdown-item href="#"
                                      data-testid="lists-delete-option"
+                                     v-if="showDeleteButton(row)"
                                      @click="onDeleteList(row)">
                       <delete-red-icon />
                       <span class="text-danger">Delete</span>
@@ -527,7 +535,8 @@ export default {
         { value: ContactListTypes.STATIC, label: 'Static' },
         { value: ContactListTypes.DYNAMIC, label: 'Dynamic' },
         { value: ContactListTypes.DYNAMIC_REMOTE_LIST, label: 'Integration Dynamic' }
-      ]
+      ],
+      showLimitCharactersError: false
     }
   },
 
@@ -1162,6 +1171,18 @@ export default {
       this.sort = orderBy
       this.order = order
       this.refreshLists()
+    },
+
+    showDeleteButton (list) {
+      if (!this.isAdmin) {
+        return this.profile.id === list.contact_folder_created_by
+      }
+
+      return true
+    },
+
+    onSearchInputShowError (show) {
+      this.showLimitCharactersError = show
     }
   },
 

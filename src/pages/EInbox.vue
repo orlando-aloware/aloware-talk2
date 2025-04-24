@@ -80,6 +80,7 @@ export default {
 .einbox {
   height: 100%;
   width: 100%;
-  display: flex
+  display: flex;
+  background-color: #F9F9FB;
 }
 </style>

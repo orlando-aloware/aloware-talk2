@@ -60,14 +60,14 @@
 <script>
 import VueCookies from 'vue-cookies'
 import { mapState } from 'vuex'
-import { aclMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, whiteLabelMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'cancelled-account-modal',
 
   mixins: [
     aclMixin,
-    simpsocialMixin
+    whiteLabelMixin
   ],
 
   props: {

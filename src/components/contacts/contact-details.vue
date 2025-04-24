@@ -20,12 +20,9 @@
                             data-testid="contact-details-sequence"
                             :contact="contact"
                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
-          <contact-push-to-crm data-testid="contact-details-push-to-crm"
-                               :contact="contact"
-                               v-if="isSimpSocial"/>
           <contact-conversation-insights :contact="contact"
                                          data-testid="contact-conversation-insights"
-                                         v-if="!isSimpSocial && contact && shouldSeeExperimentalXproAiFeatures"/>
+                                         v-if="contact && shouldSeeExperimentalXproAiFeatures"/>
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
@@ -79,34 +76,33 @@
 </template>
 
 <script>
-import ContactPhones from 'src/components/contacts/contact-phones'
-import ContactInfo from 'src/components/contacts/contact-info'
-import ContactListsCard from 'src/components/contacts/contact-lists-card'
-import ContactNotes from 'src/components/contacts/contact-notes'
-import ContactActivityCounts from 'src/components/contacts/contact-activity-counts'
-import ContactLines from 'src/components/contacts/contact-lines'
-import ContactRingGroups from 'src/components/contacts/contact-ring-groups'
-import ContactBroadcast from 'src/components/contacts/contact-broadcast'
-import ContactInformation from 'src/components/contacts/contact-information'
-import ContactIntegrations from 'src/components/contacts/contact-integrations'
-import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
-import ContactPushToCrm from 'src/components/contacts/contact-push-to-crm'
+import ContactConversationInsights from 'components/aloai/contact-conversation-insights.vue'
 import BackButton from 'components/back-button'
-import { mapActions, mapGetters, mapState } from 'vuex'
-import { CALL, SMS } from 'src/constants/communication-types'
-import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
-import ContactSaveBar from 'components/contacts/contact-save-bar'
-import _ from 'lodash'
-import Profile from 'components/profile'
-import ContactSequence from 'components/contacts/contact-sequence'
 import ContactAloaiEngagementControl from 'components/contacts/contact-aloai-engagement-control'
 import ContactAloaiEnrollmentControl from 'components/contacts/contact-aloai-enrollment-control'
-import ContactReservations from 'components/contacts/contact-reservations.vue'
 import ContactReservationsMessages from 'components/contacts/contact-reservations-messages.vue'
+import ContactReservations from 'components/contacts/contact-reservations.vue'
+import ContactSaveBar from 'components/contacts/contact-save-bar'
+import ContactSequence from 'components/contacts/contact-sequence'
 import EntityTags from 'components/generic-selectors/entity-tags'
+import Profile from 'components/profile'
+import _ from 'lodash'
+import ContactActivityCounts from 'src/components/contacts/contact-activity-counts'
+import ContactBroadcast from 'src/components/contacts/contact-broadcast'
+import ContactInfo from 'src/components/contacts/contact-info'
+import ContactInformation from 'src/components/contacts/contact-information'
+import ContactIntegrations from 'src/components/contacts/contact-integrations'
+import ContactLines from 'src/components/contacts/contact-lines'
+import ContactListsCard from 'src/components/contacts/contact-lists-card'
+import ContactNotes from 'src/components/contacts/contact-notes'
+import ContactPhones from 'src/components/contacts/contact-phones'
+import ContactRingGroups from 'src/components/contacts/contact-ring-groups'
+import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-messages'
+import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
+import { CALL, SMS } from 'src/constants/communication-types'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import { aclMixin, contactMixin, contactV2AttributesMixin, simpsocialMixin, visibilityMixin, userMixin } from 'src/plugins/mixins'
-import ContactConversationInsights from 'components/aloai/contact-conversation-insights.vue'
+import { aclMixin, contactMixin, contactV2AttributesMixin, userMixin, visibilityMixin } from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'contact-details',
@@ -134,7 +130,6 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    simpsocialMixin,
     userMixin
   ],
 
@@ -146,7 +141,6 @@ export default {
     Profile,
     ContactSaveBar,
     ContactScheduledMessages,
-    ContactPushToCrm,
     ContactIntegrations,
     ContactInformation,
     ContactBroadcast,
@@ -186,8 +180,7 @@ export default {
     },
 
     showAloAiControls () {
-      return !this.isSimpSocial &&
-        this.currentCompany.aloai_enabled &&
+      return this.currentCompany.aloai_enabled &&
         this.contact && !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
     }

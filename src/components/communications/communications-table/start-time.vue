@@ -1,7 +1,7 @@
 
 <template>
   <div class="d-flex flex-column">
-    <span>{{ row.created_at | fixFullDateTime }}</span>
+    <span>{{ row.created_at | fixFullDateTimeCompany($store) }}</span>
     <div class="d-flex align-items-center text-xs"
          data-testid="start-time-row"
          v-if="row.call_disposition_id">
@@ -12,13 +12,13 @@
 
     <span class="cursor-pointer text-primary"
           tabindex="0"
-          :id="`recording-comm-${row.id}`"
+          :id="`recording-comm-${row.id}${mobileRowDetails ? '-mobile' : ''}`"
           v-if="row.has_recording || row.recording_is_deleted">
       <i class="fa-solid fa-play icon-size"/> Left Recording
 
       <b-popover triggers="click blur"
                  placement="bottom"
-                 :target="`recording-comm-${row.id}`">
+                 :target="`recording-comm-${row.id}${mobileRowDetails ? '-mobile' : ''}`">
         <communication-audio data-testid="comm-log-communication-audio"
                              :communication="row"
                              :unique-id="row.id + '1'"
@@ -28,13 +28,13 @@
 
     <span class="cursor-pointer text-primary"
           tabindex="0"
-          :id="`voicemail-comm-${row.id}`"
+          :id="`voicemail-comm-${row.id}${mobileRowDetails ? '-mobile' : ''}`"
           v-if="row.has_voicemail">
       <i class="fa-solid fa-play icon-size"/> Left Voicemail
 
       <b-popover triggers="click blur"
                  placement="bottom"
-                 :target="`voicemail-comm-${row.id}`">
+                 :target="`voicemail-comm-${row.id}${mobileRowDetails ? '-mobile' : ''}`">
         <communication-audio data-testid="comm-log-communication-audio"
                              :communication="row"
                              :unique-id="row.id + '1'"
@@ -75,6 +75,10 @@ export default {
     row: {
       type: Object,
       required: false
+    },
+    mobileRowDetails: {
+      type: Boolean,
+      default: false
     }
   },
 

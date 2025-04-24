@@ -64,7 +64,7 @@
                  :loading="loading"/>
         </div>
         <div class="description-sm field text-left pt-3 mt-1"
-             v-if="!isSimpSocial && !isWidget">
+             v-if="!isWidget">
           Don’t have an account?
           <a href="https://meetings.hubspot.com/alwr/aloware-demo"
              target="_blank">
@@ -72,7 +72,7 @@
           </a>
         </div>
         <div class="field text-left pt-3 mt-1"
-             v-if="!isSimpSocial && !isWidget">
+             v-if="!isWidget">
           <b-link href="https://support.aloware.com/en/articles/9037819-troubleshooting-aloware-authentication-issues"
                   class="cursor-pointer field text-left text-decoration-none"
                   target="_blank">
@@ -104,7 +104,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex'
-import { aclMixin, guestFormsMixin, recaptchaMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, guestFormsMixin, recaptchaMixin } from 'src/plugins/mixins'
 import SecurityCode from 'components/guest/security-code'
 import * as storage from 'src/plugins/helpers/storage'
 
@@ -114,8 +114,7 @@ export default {
   mixins: [
     aclMixin,
     guestFormsMixin,
-    recaptchaMixin,
-    simpsocialMixin
+    recaptchaMixin
   ],
 
   name: 'login-form',

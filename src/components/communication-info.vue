@@ -376,19 +376,24 @@
                  v-if="communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && getRingGroup(communication.ring_group_id)">
               <div class="w-100">
                 <label class="form-control-label mb-1">Ring Group</label>
-                <router-link
-                  :to="{ name: 'Ring Group Activity', params: { ring_group_id: communication.ring_group_id }}"
-                  v-if="!getRingGroup(communication.ring_group_id).call_waiting">
-                  <!-- we are only showing this section if the ring group is available-->
-                  <q-tooltip anchor="top left"
-                             self="top left">
-                    Click For More Info
-                    <span class="text-dark-greenish">
-                      {{ getRingGroup(communication.ring_group_id, true) }}
-                    </span>
-                  </q-tooltip>
-                </router-link>
-                <template v-else>
+                <a class="cursor-pointer"
+                  target="_blank"
+                  :href="getRingGroupURL(communication.ring_group_id)"
+                  :id="`comm-ring-group-${_uid}`"
+                  v-if="communication.ring_group_id && (this.hasCompanyTeamInboxEnabled || !getRingGroup(communication.ring_group_id).call_waiting)"
+                  @click="handleRingGroupClick(communication.ring_group_id, $event)">
+                  <span class="text-blue cursor-pointer"
+                        :title="getRingGroup(communication.ring_group_id).name">
+                    <q-tooltip anchor="top middle"
+                                self="bottom middle"
+                                max-width="150px"
+                                data-testid="comm-details-ring-group-tooltip">
+                        Click For More Info
+                    </q-tooltip>
+                    {{ getRingGroup(communication.ring_group_id).name }}
+                  </span>
+                </a>
+                <template v-else-if="!this.hasCompanyTeamInboxEnabled && communication.ring_group_id">
                   Call waiting Queue
                 </template>
                 <target-users-tree class="w-100"
@@ -990,7 +995,7 @@ import { marked } from 'marked'
 import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
@@ -1017,7 +1022,6 @@ export default {
     notificationMixin,
     liveCallsMixin,
     mentionsMixin,
-    simpsocialMixin,
     classicMixin
   ],
 
@@ -1192,7 +1196,6 @@ export default {
 
     conditionForShowPoweredByAloAiBox () {
       return (
-        !this.isSimpSocial &&
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
         this.fileUuid && this.isMigrated
@@ -1327,7 +1330,7 @@ export default {
     },
 
     getClassicUrlUserActivity (userId) {
-      return `${this.getClassicURL(this.isSimpSocial)}/users/${userId}/activity`
+      return `${this.getClassicURL()}/users/${userId}/activity`
     },
 
     dispose (dispositionStatus) {
