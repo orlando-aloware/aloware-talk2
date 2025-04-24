@@ -10,7 +10,7 @@
         <div class="d-inline-flex">
           <slot name="header">
           </slot>
-          <h1 class="mt-2">Voice Calls Connection Test</h1>
+          <h1 class="mt-2">Connection Test</h1>
         </div>
       </b-col>
     </b-row>
@@ -24,8 +24,8 @@
               <i class="fa fa-signal fa-4x" style="color: #6c757d;"></i>
             </div>
             <div class="mb-3">
-              <h5>Voice Connection Test</h5>
-              <p class="small text-muted">Tests your network connectivity for voice calls</p>
+              <h5>Connection Test</h5>
+              <p class="small text-muted">Tests your network connectivity with our servers</p>
             </div>
             <b-button size="md"
                       variant="primary"
@@ -41,7 +41,7 @@
             </b-button>
             <div v-if="testCount > 0" class="text-muted mt-3 small">
               <i class="fa fa-history mr-1"></i> Tests run in this session: {{ testCount }}
-              <div v-if="lastTestTime">Last test: {{ lastTestTime | momentFormat('MM/DD h:mma', true) }}</div>
+              <div v-if="lastTestTime">Last test: {{ lastTestTime | momentFormat('MM/DD/YYYY h:mma z', true) }}</div>
             </div>
           </div>
         </b-card>
@@ -137,7 +137,7 @@
                 <strong>API Response Time</strong>
                 <span class="text-nowrap">{{ testResults.services.pingTime || '0' }} ms</span>
               </div>
-              <div class="d-flex justify-content-between py-2">
+              <div class="d-flex justify-content-between py-2" v-if="!isElectron">
                 <strong>Live Updates (WebSocket)</strong>
                 <b-badge :variant="testResults.services.soketi ? 'success' : 'danger'" pill>
                   {{ testResults.services.soketi ? 'Connected' : 'Failed' }}
@@ -167,44 +167,46 @@
 
       <b-row>
         <b-col md="6" class="mb-4">
-          <b-card title="Device Permissions" class="h-100">
-            <div class="results-list">
-              <ul class="fa-ul">
+          <b-card title="Device Permissions" class="h-100 device-permissions-card">
+            <div class="results-list pl-0">
+              <ul class="fa-ul device-permissions-list">
                 <li v-if="testResults.overall.voiceCalls">
                   <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
-                  Voice calls should work properly on this connection
+                  <span class="permission-text">Voice calls should work properly on this connection</span>
                 </li>
                 <li v-else>
                   <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
-                  Voice calls may experience issues on this connection
+                  <span class="permission-text">Voice calls may experience issues on this connection</span>
                 </li>
 
                 <li v-if="testResults.permissions.microphone">
                   <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
-                  Microphone permissions are granted
+                  <span class="permission-text">Microphone permissions are granted</span>
                 </li>
                 <li v-else>
                   <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
-                  Microphone permissions are denied
+                  <span class="permission-text">Microphone permissions are denied</span>
                 </li>
 
                 <li v-if="testResults.permissions.notifications">
                   <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
-                  Notification permissions are granted
+                  <span class="permission-text">Notification permissions are granted</span>
                 </li>
                 <li v-else>
                   <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
-                  Notification permissions are denied
+                  <span class="permission-text">Notification permissions are denied</span>
                 </li>
 
-                <li v-if="testResults.storage.localStorage && testResults.storage.cookies">
-                  <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
-                  Browser storage is working properly
-                </li>
-                <li v-else>
-                  <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
-                  Browser storage has issues
-                </li>
+                <template v-if="!isElectron">
+                  <li v-if="testResults.storage.localStorage && testResults.storage.cookies">
+                    <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
+                    <span class="permission-text">Browser storage is working properly</span>
+                  </li>
+                  <li v-else>
+                    <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
+                    <span class="permission-text">Browser storage has issues</span>
+                  </li>
+                </template>
               </ul>
             </div>
           </b-card>
@@ -218,8 +220,8 @@
 
             <!-- Show detailed Twilio report button when available -->
             <div v-if="preflightReport" class="mt-3 text-center">
-              <b-button size="sm" variant="outline-secondary" v-b-toggle.twilio-report-collapse>
-                Show Detailed Report
+              <b-button size="sm" variant="outline-secondary" v-b-toggle.twilio-report-collapse @click="detailedReportCollapsed = !detailedReportCollapsed">
+                {{ detailedReportCollapsed ? 'Show Detailed Report' : 'Hide Detailed Report' }}
               </b-button>
               <b-collapse id="twilio-report-collapse" class="mt-2">
                 <b-card>
@@ -264,8 +266,13 @@
                       <div class="col-md-4 col-sm-12 mb-3">
                         <div class="metric-card">
                           <h6>Selected Edge</h6>
-                          <div class="metric-value text-nowrap overflow-hidden text-truncate" :title="preflightReport.selectedEdge || 'N/A'">
-                            {{ preflightReport.selectedEdge || 'N/A' }}
+                          <div class="metric-value" :title="preflightReport.selectedEdge || 'N/A'" style="font-size: 0.9rem; white-space: normal; line-height: 1.3;">
+                            <template v-if="preflightReport.selectedEdge && Array.isArray(preflightReport.selectedEdge)">
+                              <div v-for="(edge, index) in preflightReport.selectedEdge" :key="index" class="mb-1">{{ edge }}</div>
+                            </template>
+                            <template v-else>
+                              {{ preflightReport.selectedEdge || 'N/A' }}
+                            </template>
                           </div>
                           <div class="metric-detail">
                             <small>Actual: <span class="text-nowrap">{{ preflightReport.edge || 'N/A' }}</span></small>
@@ -300,9 +307,9 @@
                       <h5>Connection Timing</h5>
                       <div class="timing-bars">
                         <div v-if="preflightReport.networkTiming">
-                          <div class="d-flex align-items-center timing-row">
-                            <div class="timing-bar-label text-right">Signaling:</div>
-                            <div class="timing-bar-container flex-grow-1">
+                          <div class="timing-row">
+                            <div class="timing-bar-label">Signaling:</div>
+                            <div class="timing-bar-container">
                               <div class="timing-bar bg-info text-nowrap"
                                    :style="{width: getTimingBarWidth(preflightReport.networkTiming.signaling.duration) + '%', minWidth: '60px'}"
                                    :title="preflightReport.networkTiming.signaling.duration + 'ms'">
@@ -311,9 +318,9 @@
                             </div>
                           </div>
 
-                          <div class="d-flex align-items-center timing-row">
-                            <div class="timing-bar-label text-right">ICE Setup:</div>
-                            <div class="timing-bar-container flex-grow-1">
+                          <div class="timing-row">
+                            <div class="timing-bar-label">ICE Setup:</div>
+                            <div class="timing-bar-container">
                               <div class="timing-bar bg-success text-nowrap"
                                    :style="{width: getTimingBarWidth(preflightReport.networkTiming.ice.duration) + '%', minWidth: '60px'}"
                                    :title="preflightReport.networkTiming.ice.duration + 'ms'">
@@ -322,9 +329,9 @@
                             </div>
                           </div>
 
-                          <div class="d-flex align-items-center timing-row">
-                            <div class="timing-bar-label text-right">DTLS Handshake:</div>
-                            <div class="timing-bar-container flex-grow-1">
+                          <div class="timing-row">
+                            <div class="timing-bar-label">DTLS Handshake:</div>
+                            <div class="timing-bar-container">
                               <div class="timing-bar bg-warning text-nowrap"
                                    :style="{width: getTimingBarWidth(preflightReport.networkTiming.dtls.duration) + '%', minWidth: '60px'}"
                                    :title="preflightReport.networkTiming.dtls.duration + 'ms'">
@@ -333,9 +340,9 @@
                             </div>
                           </div>
 
-                          <div class="d-flex align-items-center timing-row">
-                            <div class="timing-bar-label text-right">Total Connection:</div>
-                            <div class="timing-bar-container flex-grow-1">
+                          <div class="timing-row">
+                            <div class="timing-bar-label">Total Connection:</div>
+                            <div class="timing-bar-container">
                               <div class="timing-bar bg-primary text-nowrap"
                                    :style="{width: getTimingBarWidth(preflightReport.networkTiming.peerConnection.duration) + '%', minWidth: '60px'}"
                                    :title="preflightReport.networkTiming.peerConnection.duration + 'ms'">
@@ -382,8 +389,8 @@
 
                     <!-- Toggle button for raw JSON data -->
                     <div class="mt-4 text-center">
-                      <b-button size="sm" variant="outline-secondary" v-b-toggle.raw-json-collapse>
-                        Show Raw JSON Data
+                      <b-button size="sm" variant="outline-secondary" v-b-toggle.raw-json-collapse @click="rawJsonCollapsed = !rawJsonCollapsed">
+                        {{ rawJsonCollapsed ? 'Show Raw JSON Data' : 'Hide Raw JSON Data' }}
                       </b-button>
                       <b-collapse id="raw-json-collapse" class="mt-2">
                         <pre class="text-left" style="max-height: 300px; overflow-y: auto; font-size: 12px;">{{ JSON.stringify(preflightReport, null, 2) }}</pre>
@@ -428,7 +435,9 @@ export default {
       preflightTest: null,
       preflightReport: null,
       testCount: 0,
-      lastTestTime: null
+      lastTestTime: null,
+      detailedReportCollapsed: true,
+      rawJsonCollapsed: true
     }
   },
 
@@ -437,6 +446,10 @@ export default {
       this.isTesting = true
       this.testCount++
       this.lastTestTime = new Date()
+
+      // Reset collapse states when starting a new test
+      this.detailedReportCollapsed = true
+      this.rawJsonCollapsed = true
 
       try {
         // Initialize test results
@@ -549,8 +562,8 @@ export default {
         // Create and run the preflight test
         console.log('Starting Twilio PreflightTest')
         this.preflightTest = Device.runPreflight(token, {
-          codecPreferences: ['pcmu', 'opus'],
-          edge: 'roaming',
+          codecPreferences: ['opus', 'pcmu'],
+          edge: ['umatilla', 'ashburn', 'roaming'],
           fakeMicInput: true, // Don't require a real microphone for the test
           signalingTimeoutMs: 10000
         })
@@ -746,6 +759,11 @@ export default {
 
         // Test Soketi WebSocket with actual connection
         try {
+          if (this.isElectron) {
+            this.testResults.services.soketi = true
+            return
+          }
+
           if (!window.WebSocket) {
             this.testResults.services.soketi = false
             return
@@ -818,6 +836,11 @@ export default {
     },
 
     async testStorage () {
+      if (this.isElectron) {
+        this.testResults.services.storage = true
+        return
+      }
+
       try {
         // Test localStorage
         try {
@@ -986,18 +1009,24 @@ export default {
       if (this.preflightReport && this.preflightReport.stats && this.preflightReport.stats.mos && this.preflightReport.stats.mos.average) {
         const mosScore = this.preflightReport.stats.mos.average
         if (mosScore > 4.0) {
-          return 'Excellent connection quality for Voice calls'
+          return 'Excellent connection quality for voice calls'
         } else if (mosScore > 3.5) {
-          return 'Good connection quality for Voice calls'
+          return 'Good connection quality for voice calls'
         } else if (mosScore > 3.0) {
-          return 'Fair connection quality for Voice calls'
+          return 'Fair connection quality for voice calls'
         } else {
           return 'Poor connection quality, Voice calls may experience issues'
         }
       }
 
       // Fallback to moderate quality if MOS not available
-      return 'Good connection quality for Voice calls'
+      return 'Good connection quality for voice calls'
+    }
+  },
+
+  computed: {
+    isElectron () {
+      return this.$q.platform.is.electron
     }
   },
 
@@ -1102,11 +1131,36 @@ export default {
   font-size: 0.9rem;
 }
 
+.timing-bars {
+  position: relative;
+}
+
+.timing-row {
+  margin-bottom: 1.7rem;
+  display: flex;
+  width: 100%;
+  position: relative;
+}
+
+.timing-bar-label {
+  font-weight: bold;
+  margin-bottom: 0;
+  text-align: right;
+  padding-right: 15px;
+  font-size: 0.9rem;
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+  flex: 0 0 150px;
+}
+
 .timing-bar-container {
   height: 24px;
   background-color: #f1f1f1;
   border-radius: 4px;
   overflow: hidden;
+  flex-grow: 1;
+  position: relative;
 }
 
 .timing-bar {
@@ -1123,19 +1177,6 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.7);
-}
-
-.timing-bar-label {
-  font-weight: bold;
-  margin-bottom: 0;
-  text-align: right;
-  margin-right: 0.5rem ;
-  font-size: 0.9rem;
-  min-width: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 24px;
 }
 
 .connection-path {
@@ -1296,6 +1337,14 @@ export default {
   .metric-card {
     padding: 0.5rem;
   }
+
+  .timing-bar-label {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    flex: 0 0 120px;
+    font-size: 0.8rem;
+  }
 }
 
 @media (max-width: 359px) {
@@ -1447,5 +1496,34 @@ export default {
   .connection-details {
     margin: 0 0.5rem;
   }
+}
+
+/* Device Permissions List Styling */
+.device-permissions-card .card-body {
+  padding-left: 1.25rem;
+}
+
+.device-permissions-list {
+  padding-left: 1.5rem !important;
+  margin-left: 0;
+  text-align: left;
+}
+
+.device-permissions-list .fa-li {
+  position: absolute;
+  width: 1.5rem;
+  text-align: center;
+}
+
+.device-permissions-list li {
+  position: relative;
+  padding-left: 0;
+  margin-bottom: 1rem;
+  list-style-type: none;
+}
+
+.permission-text {
+  display: inline-block;
+  padding-left: 0;
 }
 </style>

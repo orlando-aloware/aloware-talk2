@@ -818,7 +818,6 @@
                   <span v-if="usedRingGroup && usedRingGroup.call_waiting && !hasCompanyTeamInboxEnabled">
                     Call waiting Queue
                   </span>
-
                   <div class="flex items-center mr-1 h-100"
                        data-testid="comm-details-ring-group-open-rg-in-classic"
                        @click="onOpenRingGroupInClassicClicked(communication?.ring_group_id)"
