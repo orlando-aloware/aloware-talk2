@@ -10,7 +10,7 @@
         <div class="d-inline-flex">
           <slot name="header">
           </slot>
-          <h1 class="mt-2">Voice Calls Connection Test</h1>
+          <h1 class="mt-2">Connection Test</h1>
         </div>
       </b-col>
     </b-row>
@@ -24,8 +24,8 @@
               <i class="fa fa-signal fa-4x" style="color: #6c757d;"></i>
             </div>
             <div class="mb-3">
-              <h5>Voice Connection Test</h5>
-              <p class="small text-muted">Tests your network connectivity for voice calls</p>
+              <h5>Connection Test</h5>
+              <p class="small text-muted">Tests your network connectivity with our servers</p>
             </div>
             <b-button size="md"
                       variant="primary"
@@ -137,7 +137,7 @@
                 <strong>API Response Time</strong>
                 <span class="text-nowrap">{{ testResults.services.pingTime || '0' }} ms</span>
               </div>
-              <div class="d-flex justify-content-between py-2">
+              <div class="d-flex justify-content-between py-2" v-if="!isElectron">
                 <strong>Live Updates (WebSocket)</strong>
                 <b-badge :variant="testResults.services.soketi ? 'success' : 'danger'" pill>
                   {{ testResults.services.soketi ? 'Connected' : 'Failed' }}
@@ -197,14 +197,16 @@
                   <span class="permission-text">Notification permissions are denied</span>
                 </li>
 
-                <li v-if="testResults.storage.localStorage && testResults.storage.cookies">
-                  <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
-                  <span class="permission-text">Browser storage is working properly</span>
-                </li>
-                <li v-else>
-                  <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
-                  <span class="permission-text">Browser storage has issues</span>
-                </li>
+                <template v-if="!isElectron">
+                  <li v-if="testResults.storage.localStorage && testResults.storage.cookies">
+                    <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
+                    <span class="permission-text">Browser storage is working properly</span>
+                  </li>
+                  <li v-else>
+                    <span class="fa-li"><i class="fa fa-times-circle text-danger"></i></span>
+                    <span class="permission-text">Browser storage has issues</span>
+                  </li>
+                </template>
               </ul>
             </div>
           </b-card>
@@ -757,6 +759,11 @@ export default {
 
         // Test Soketi WebSocket with actual connection
         try {
+          if (this.isElectron) {
+            this.testResults.services.soketi = true
+            return
+          }
+
           if (!window.WebSocket) {
             this.testResults.services.soketi = false
             return
@@ -829,6 +836,11 @@ export default {
     },
 
     async testStorage () {
+      if (this.isElectron) {
+        this.testResults.services.storage = true
+        return
+      }
+
       try {
         // Test localStorage
         try {
@@ -1009,6 +1021,12 @@ export default {
 
       // Fallback to moderate quality if MOS not available
       return 'Good connection quality for voice calls'
+    }
+  },
+
+  computed: {
+    isElectron () {
+      return this.$q.platform.is.electron
     }
   },
 
