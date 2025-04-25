@@ -973,6 +973,10 @@ const talk2Api = {
       inboxes: {
         async get (data) {
           return window.axios.get(`${suffixV2}inboxes`, data)
+        },
+
+        unreadCount (inboxIds) {
+          return window.axios.post(`${suffixV2}inboxes/unread-count`, { inbox_ids: inboxIds })
         }
       }
     },

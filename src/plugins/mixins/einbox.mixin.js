@@ -7,6 +7,8 @@ export default {
     ...mapState('Einbox', [
       'isLoadingInboxes',
       'inboxes',
+      'inboxesUnreadCount',
+      'isLoadingInboxesUnreadCount',
       'currentInboxesPage',
       'hasMoreInboxes',
       'items',
@@ -23,6 +25,8 @@ export default {
     ...mapActions('Einbox', [
       'setInboxes',
       'setIsLoadingInboxes',
+      'setInboxesUnreadCount',
+      'setIsLoadingInboxesUnreadCount',
       'appendInboxes',
       'setItems',
       'appendItems',
@@ -165,6 +169,35 @@ export default {
 
     checkInboxAccess (inboxId) {
       return this.inboxes.some(inbox => inbox.id === inboxId)
+    },
+
+    async fetchInboxesUnreadCount (inboxIds) {
+      this.setIsLoadingInboxesUnreadCount(true)
+      try {
+        const { data } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds)
+        this.setInboxesUnreadCount(data)
+      } catch (error) {
+        this.setInboxesUnreadCount([])
+        console.error('[fetchInboxesUnreadCount] error', error)
+      }
+      this.setIsLoadingInboxesUnreadCount(false)
+    },
+
+    calcInboxUnreadCount (inboxId) {
+      return this.inboxesUnreadCount?.reduce((total, inbox) => inbox.ring_group_id === inboxId ? (total + inbox.unread_count) : total, 0)
+    },
+
+    einboxContactClearedUnreads (contactId) {
+      console.log('>>> clearing einboxContactClearedUnreads', contactId)
+      return this.setInboxesUnreadCount(this.inboxesUnreadCount.filter((inbox) => inbox.contact_id !== contactId))
+    },
+
+    einboxContactAddedUnread (inboxId, contactId) {
+      console.log('>>> clearing einboxContactAddedUnread', inboxId, contactId)
+      return this.setInboxesUnreadCount([
+        ...this.inboxesUnreadCount,
+        { ring_group_id: inboxId, contact_id: contactId, unread_count: 1 }
+      ])
     }
   }
 }

@@ -791,9 +791,16 @@ export default {
 
         // if contact has no unreads anymore, refresh inbox result
         const contact = res.data.contact
-        const hasUnreads = contact.unread_texts_count + contact.unread_missed_calls_count + contact.unread_voicemails_count
+        const hasUnreads = contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count
+
         if (hasUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+
+          if (this.$route.params.inboxId) {
+            this.$nextTick(() => {
+              this.$VueEvent.fire('einbox_contact_cleared_unread', contact.id)
+            })
+          }
         }
       }).catch(err => {
         this.$handleErrors(err.response)
@@ -817,6 +824,17 @@ export default {
         const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
         if (oldTotalUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+
+          console.log('>>> data', data)
+
+          if (this.$route.params.inboxId) {
+            this.$nextTick(() => {
+              this.$VueEvent.fire('einbox_contact_added_unread', {
+                inboxId: parseInt(this.$route.params.inboxId),
+                contactId: data.id
+              })
+            })
+          }
         }
       }).catch(err => {
         this.$handleErrors(err.response)

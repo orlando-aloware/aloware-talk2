@@ -17,6 +17,12 @@ export default {
   SET_IS_LOADING_INBOXES (state, loading) {
     state.isLoadingInboxes = loading
   },
+  SET_INBOXES_UNREAD_COUNT (state, inboxesUnreadCount) {
+    state.inboxesUnreadCount = [ ...inboxesUnreadCount ]
+  },
+  SET_IS_LOADING_INBOXES_UNREAD_COUNT (state, loading) {
+    state.isLoadingInboxesUnreadCount = loading
+  },
   SET_CURRENT_INBOXES_PAGE (state, page) {
     state.currentInboxesPage = page
   },

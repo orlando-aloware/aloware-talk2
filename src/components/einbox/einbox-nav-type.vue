@@ -9,7 +9,8 @@
       <div ref="inboxesInner">
         <einbox-nav-item :label="inbox.name"
                          :value="inbox.id"
-                         :message-count="inbox.message_count"
+                         :is-loading-unread-count="isLoadingInboxesUnreadCount"
+                         :unread-count="calcInboxUnreadCount(inbox.id)"
                          :is-active="activeInboxId === inbox.id"
                          :key="inbox.id"
                          v-for="inbox in typedInboxes"
@@ -21,6 +22,7 @@
 
 <script>
 import EinboxNavItem from './einbox-nav-item.vue'
+import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
 
 export default {
   components: {
@@ -47,7 +49,11 @@ export default {
       type: Number,
       required: false
     }
-  }
+  },
+
+  mixins: [
+    EinboxMixin
+  ]
 }
 </script>
 

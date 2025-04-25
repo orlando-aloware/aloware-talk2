@@ -94,6 +94,7 @@ export default {
       'activeInboxId',
       'hasMoreInboxes',
       'isLoadingInboxes',
+      'inboxesUnreadCount',
       'showRefreshInboxesButton'
     ]),
 
@@ -297,6 +298,10 @@ export default {
     this.$VueEvent.listen('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.listen('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
+
+    // Listen to contact communications read/unread event
+    this.$VueEvent.listen('einbox_contact_cleared_unread', this.einboxContactClearedUnreadListener)
+    this.$VueEvent.listen('einbox_contact_added_unread', this.einboxContactAddedUnreadListener)
   },
 
   watch: {
@@ -313,9 +318,35 @@ export default {
       }
     },
 
+    parsedInboxes (parsedInboxes) {
+      const inboxIds = Object.keys(parsedInboxes).flatMap((parsedInbox) => parsedInboxes[parsedInbox].map((inbox) => inbox.id))
+
+      if (!inboxIds.length) {
+        return
+      }
+
+      this.fetchInboxesUnreadCount(inboxIds)
+    },
+
     search (val) {
       this.resetInboxes()
       this.fetchInboxes(val)
+    },
+
+    einboxContactClearedUnreadListener (contactId) {
+      try {
+        this.einboxContactClearedUnread(contactId)
+      } catch (err) {
+        console.error('aqui1', err)
+      }
+    },
+
+    einboxContactAddedUnreadListener ({ inboxId, contactId }) {
+      try {
+        this.einboxContactAddedUnread(inboxId, contactId)
+      } catch (err) {
+        console.error('aqui2', err)
+      }
     }
   },
 
@@ -326,6 +357,8 @@ export default {
     this.$VueEvent.stop('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
+    this.$VueEvent.stop('einbox_contact_cleared_unread', this.einboxContactClearedUnreadListener)
+    this.$VueEvent.stop('einbox_contact_added_unread', this.einboxContactAddedUnreadListener)
   }
 }
 </script>

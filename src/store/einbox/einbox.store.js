@@ -10,6 +10,8 @@ export default function () {
     activeInbox: {},
     inboxes: [],
     isLoadingInboxes: false,
+    inboxesUnreadCount: [],
+    isLoadingInboxesUnreadCount: false,
     currentInboxesPage: 0,
     hasMoreInboxes: true,
     viewMode: THREADED,
