@@ -138,7 +138,7 @@
                       :offset="[5, 9]"
                       data-testid="item-answer-menu"
                       v-model="showIncomingCallMenu"
-                      v-if="isDialerConnected || isAgentOnCall"
+                      v-if="isDialerOrAgentOnCall"
                       @hide="showIncomingCallMenu = false">
                 <q-list>
                   <q-item clickable
@@ -212,7 +212,7 @@
                       fit
                       :offset="[5, 9]"
                       v-model="showParkedCallMenu"
-                      v-if="isDialerConnected || isAgentOnCall"
+                      v-if="isDialerOrAgentOnCall"
                       data-testid="item-parked-menu"
                       @hide="showParkedCallMenu = false">
                 <q-list>
