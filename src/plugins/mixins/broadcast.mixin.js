@@ -165,6 +165,8 @@ export default {
         '.call_disposition.created',
         '.call_disposition.updated',
         '.call_disposition.deleted',
+        '.call.parked',
+        '.call.hung_up',
         '.activity_type.created',
         '.activity_type.deleted',
         '.contact.created',
@@ -594,6 +596,22 @@ export default {
           if (this.currentCompany && this.currentCompany.id === event.company.id) {
             this.setCurrentCompany(event.company)
             this.$VueEvent.fire('company_updated', event.company)
+          }
+        })
+        .listen('.call.parked', (event) => {
+          console.log('Call parked event received from another tab', event)
+          if (event.communication_id) {
+            this.$VueEvent.fire('call_parked_from_another_tab', {
+              communicationId: event.communication_id
+            })
+          }
+        })
+        .listen('.call.hung_up', (event) => {
+          console.log('Call hung up event received from another tab', event)
+          if (event.communication_id) {
+            this.$VueEvent.fire('call_hung_up_from_another_tab', {
+              communicationId: event.communication_id
+            })
           }
         })
         .listen('.communication.created', (event) => {

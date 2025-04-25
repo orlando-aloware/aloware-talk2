@@ -459,6 +459,10 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
       },
 
+      agentForceTerminate (id) {
+        return window.axios.post(`${suffixV1}agent/communication/${id}/terminate`)
+      },
+
       forceDequeue (id) {
         return window.axios.post(`${suffixV1}communication/${id}/force-dequeue`)
       },

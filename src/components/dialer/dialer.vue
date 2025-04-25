@@ -23,6 +23,7 @@ import * as CommunicationDispositionStatus from '../../constants/communication-d
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   name: 'dialer',
@@ -59,7 +60,9 @@ export default {
       AgentStatus,
       WebrtcEvents,
       CommunicationDispositionStatus,
-      taskRedialed: false
+      taskRedialed: false,
+      hungFromAnotherTab: false,
+      parkFromAnotherTab: false
     }
   },
 
@@ -81,8 +84,8 @@ export default {
     ]),
 
     isNotInProgressCall () {
-      return !this.dialer.call || !this.dialer.communication ||
-        !['connected', 'open'].includes(this.dialer.call.state)
+      return (!this.dialer.call || !this.dialer.communication ||
+        !['connected', 'open'].includes(this.dialer.call.state)) && !this.isAgentOnCall
     },
 
     hasNoParkedAndInprogressCall () {
@@ -263,7 +266,7 @@ export default {
 
     this.dialerListeners.answerCallFishing = (data) => {
       console.log('dialerListeners.answerCallFishing', data)
-      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
+      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup, data.parkFromAnotherTab)
     }
 
     this.dialerListeners.setInputDevice = (inputDevice) => {
@@ -280,6 +283,21 @@ export default {
 
     this.dialerListeners.initializeSettings = () => {
       this.initializeSettings()
+    }
+
+    this.dialerListeners.handleCallParkedFromOtherTab = (data) => {
+      console.log('Call parked from other tab', data, this.dialer.communication)
+      // If we have the same communication open
+      if (this.dialer.communication && this.dialer.communication.id === data.communicationId && this.dialer.call) {
+        this.parkFromAnotherTab = true
+      }
+    }
+    this.dialerListeners.handleCallHungUpFromOtherTab = (data) => {
+      console.log('Call hung up from other tab', data, this.dialer.communication)
+      // If we have the same communication open
+      if (this.dialer.communication && this.dialer.communication.id === data.communicationId && this.dialer.call) {
+        this.hungFromAnotherTab = true
+      }
     }
 
     this.startDialerEvents()
@@ -453,6 +471,8 @@ export default {
       this.$VueEvent.listen('setOutputDevice', this.dialerListeners.setOutputDevice)
       this.$VueEvent.listen('testOutputDevice', this.dialerListeners.testOutputDevice)
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
+      this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
+      this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
     },
 
     stopDialerEvents () {
@@ -484,6 +504,8 @@ export default {
       this.$VueEvent.stop('setOutputDevice', this.dialerListeners.setOutputDevice)
       this.$VueEvent.stop('testOutputDevice', this.dialerListeners.testOutputDevice)
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
+      this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
+      this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
     },
 
     forceRefreshCommunication () {
@@ -860,14 +882,31 @@ export default {
       this.stopCallTimer()
       this.connection = null
       this.setDialerCurrentStatus('CALL_DISCONNECTED')
-      this.handlePostDisconnect()
 
       // only start wrap up timer if there is a communication
       if (this.dialer.communication) {
-        if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked) {
+        const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
+                                  this.hasParkedAndInprogressCall ||
+                                  this.hasCallInProgressNotParked) &&
+                                  !(this.parkFromAnotherTab || this.hungFromAnotherTab)
+
+        if (shouldStartWrapUp) {
           this.startWrapUpTimer()
           return
         }
+      }
+
+      // Handle parked call from another tab
+      if (this.parkFromAnotherTab) {
+        this.setDialerParkedCall(this.dialer.communication)
+      }
+
+      if (this.hungFromAnotherTab || this.parkFromAnotherTab) {
+        this.resetCall('Talk-Device.OnDisconnect')
+        this.hungFromAnotherTab = false
+        this.parkFromAnotherTab = false
+
+        return
       }
 
       this.backToDial('Talk-Device.OnDisconnect')
@@ -1146,7 +1185,7 @@ export default {
       }
     },
 
-    parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
+    parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null, parkFromAnotherTab = false) {
       if (this.isNotInProgressCall || (!shouldUnpark && this.dialer.parkedCall)) {
         return
       }
@@ -1154,13 +1193,18 @@ export default {
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
       const params = {
-        communication_id: this.dialer.communication.id
+        communication_id: this.dialer.communication.id,
+        call_parked_from_another_tab: parkFromAnotherTab
       }
 
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
         console.log('Call parked')
 
         if (shouldAnswer) {
+          if (this.dialer.communication) {
+            this.setDialerCommunication()
+          }
+
           this.makeCall('call:' + data.id, data.campaignId, '', '', null, data.isCallWaiting, shouldAnswer)
         } else if (shouldUnpark) {
           this.unparkCall(data, true)
@@ -1181,6 +1225,13 @@ export default {
     },
 
     hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
+      if (this.isAgentOnCall && !this.dialer.call && this.dialer.communication) {
+        talk2Api.V1.communication.agentForceTerminate(this.dialer.communication.id)
+          .then(res => {
+            this.hangUpInterval(shouldAnswer, shouldUnpark, data)
+          })
+      }
+
       if (!this.dialer.call) {
         return
       }
@@ -1195,7 +1246,10 @@ export default {
 
       // hangup an incoming call
       this.connection.hangup()
+      this.hangUpInterval(shouldAnswer, shouldUnpark, data)
+    },
 
+    hangUpInterval (shouldAnswer = false, shouldUnpark = false, data = null) {
       const counter = { data: 0 }
 
       this.$options.hangupInterval = setInterval(() => {
@@ -1658,7 +1712,7 @@ export default {
       this.setDialerCurrentStatus('READY')
     },
 
-    answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+    answerCallFishing (communication, shouldPark = false, shouldHangup = false, parkFromAnotherTab = false) {
       this.setShowIncomingCallNotification(false)
 
       if (this.shouldPushPhoneRoute) {
@@ -1672,13 +1726,13 @@ export default {
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
-        this.parkCallCombo(true, false, communication)
+        this.parkCallCombo(true, false, communication, parkFromAnotherTab)
         return
       }
 
       // park the in-progress call and unpark the parked call
       if (shouldPark && parkedCall) {
-        this.parkCallCombo(false, true, parkedCall)
+        this.parkCallCombo(false, true, parkedCall, parkFromAnotherTab)
         return
       }
 

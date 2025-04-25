@@ -96,7 +96,7 @@
         </div>
 
         <div class="d-flex justify-content-center align-items-center call-actions"
-             v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
+             v-if="shouldShowCallActions">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -118,14 +118,14 @@
                  @click="answerCall">
             <q-tooltip anchor="top middle"
                        self="center middle">
-              Answer
+              Answer1
             </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
              :class="id === 'callFishing' && getSource ? 'mt-2' : ''"
-             v-if="id === 'callFishing' && dialer && dialer.call">
+             v-if="shouldShowFishingActions">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -146,7 +146,7 @@
                  v-if="dialer.currentStatus === 'WRAP_UP'">
             <q-tooltip anchor="top middle"
                        self="center middle">
-              Answer
+              Answer2
             </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
@@ -158,7 +158,7 @@
                  v-if="dialer.currentStatus !== 'WRAP_UP' && agentStatus === AgentStatus.AGENT_STATUS_RINGING">
             <q-tooltip anchor="top middle"
                        self="center middle">
-              Answer
+              Answer3
             </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
@@ -200,8 +200,10 @@ import {
   notificationMixin,
   visibilityMixin,
   aclMixin,
-  agentMixin
+  agentMixin,
+  liveCallsMixin
 } from 'src/plugins/mixins'
+import * as AgentStatus from '../constants/agent-status'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
@@ -218,7 +220,8 @@ export default {
     mentionsMixin,
     visibilityMixin,
     aclMixin,
-    agentMixin
+    agentMixin,
+    liveCallsMixin
   ],
 
   components: {
@@ -248,7 +251,8 @@ export default {
       runningDateTime: null,
       runningDateTimeInterval: null,
       isValidNotification: false,
-      notificationListeners: {}
+      notificationListeners: {},
+      AgentStatus
     }
   },
 
@@ -533,6 +537,18 @@ export default {
 
     notificationQueue () {
       return this.notifications?.[this.id]?.queue
+    },
+
+    isAgentOrDialerOnCall () {
+      return this.dialer.call || this.isAgentOnCall
+    },
+
+    shouldShowCallActions () {
+      return this.id === 'incomingCall' || (this.id === 'callFishing' && this.dialer && !this.isAgentOrDialerOnCall)
+    },
+
+    shouldShowFishingActions () {
+      return this.id === 'callFishing' && this.dialer && this.isAgentOrDialerOnCall
     }
   },
 
@@ -705,7 +721,7 @@ export default {
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
-    answerCommunication (shouldPark = false, shouldHangup = false) {
+    async answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.communicationId,
@@ -719,6 +735,9 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
+
+      await this.fetchCurrentCommunicationIfNeeded(data)
+
       this.$VueEvent.fire('answerCallFishing', data)
       this.$closeActionNotification('callFishing')
       this.setShowPhone(true)

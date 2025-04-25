@@ -424,6 +424,12 @@ export default {
         if (this.showAlertCallFinished) {
           return
         }
+        // Automatically close the widget when replying from another tab
+        if (this.isDialed && !this.dialer.call && !this.dialer.communication && this.dialer.parkedCall && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+          this.isDialed = false
+          this.onCancelCall()
+          return
+        }
 
         if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
           this.handleDialNumber()

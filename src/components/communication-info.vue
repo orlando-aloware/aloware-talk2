@@ -123,7 +123,7 @@
           </div>
         </q-item-section>
       </q-item>
-      <q-menu v-if="isDialerConnected"
+      <q-menu v-if="isDialerConnected || isAgentOnCall"
               fit
               content-class="live-call-options"
               anchor="top right"
@@ -160,7 +160,7 @@
           </q-item>
         </q-list>
       </q-menu>
-      <q-menu v-if="isDialerConnected"
+      <q-menu v-if="isDialerConnected || isAgentOnCall"
               fit
               content-class="live-call-options"
               anchor="top right"
@@ -995,7 +995,7 @@ import { marked } from 'marked'
 import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
@@ -1015,6 +1015,7 @@ export default {
 
   mixins: [
     aclMixin,
+    agentMixin,
     avatarMixin,
     communicationInfoMixin,
     dateMixin,
