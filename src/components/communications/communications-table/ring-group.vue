@@ -4,7 +4,6 @@
     <span v-if="ringGroup.id && ringGroup.call_waiting && !hasCompanyTeamInboxEnabled">
       Call waiting queue
     </span>
-
     <a class="cursor-pointer"
        target="_blank"
        :href="getRingGroupURL(ringGroupId)"
