@@ -200,6 +200,10 @@ export default {
 
     isShowCancelCallIcon () {
       return this.isIncomingLiveCall && !this.isCallFishing
+    },
+
+    isDialerOrAgentOnCall () {
+      return this.isDialerConnected || this.isAgentOnCall
     }
   },
 

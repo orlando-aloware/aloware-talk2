@@ -123,7 +123,7 @@
           </div>
         </q-item-section>
       </q-item>
-      <q-menu v-if="isDialerConnected || isAgentOnCall"
+      <q-menu v-if="isDialerOrAgentOnCall"
               fit
               content-class="live-call-options"
               anchor="top right"
@@ -160,7 +160,7 @@
           </q-item>
         </q-list>
       </q-menu>
-      <q-menu v-if="isDialerConnected || isAgentOnCall"
+      <q-menu v-if="isDialerOrAgentOnCall"
               fit
               content-class="live-call-options"
               anchor="top right"
