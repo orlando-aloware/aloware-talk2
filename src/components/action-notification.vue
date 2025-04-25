@@ -118,7 +118,7 @@
                  @click="answerCall">
             <q-tooltip anchor="top middle"
                        self="center middle">
-              Answer1
+              Answer
             </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
@@ -146,7 +146,7 @@
                  v-if="dialer.currentStatus === 'WRAP_UP'">
             <q-tooltip anchor="top middle"
                        self="center middle">
-              Answer2
+              Answer
             </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
@@ -158,7 +158,7 @@
                  v-if="dialer.currentStatus !== 'WRAP_UP' && agentStatus === AgentStatus.AGENT_STATUS_RINGING">
             <q-tooltip anchor="top middle"
                        self="center middle">
-              Answer3
+              Answer
             </q-tooltip>
             <accept-call-icon width="32" height="32"/>
           </q-btn>
