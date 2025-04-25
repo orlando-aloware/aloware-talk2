@@ -774,13 +774,10 @@ export default {
           // Save the host for error messages
           this.soketiHost = WS_HOST
 
-          // Determine if we're in a desktop app (Electron)
-          const isDesktopApp = window.process && window.process.versions && window.process.versions.electron
-
           // For desktop apps, always use secure WebSockets
           // For web browsers, determine based on current protocol
-          this.wsProtocol = isDesktopApp ? 'wss://' : (window.location.protocol === 'https:' ? 'wss://' : 'ws://')
-          this.wsPort = isDesktopApp ? '443' : (window.location.protocol === 'https:' ? '443' : '6001')
+          this.wsProtocol = this.isElectron ? 'wss://' : (window.location.protocol === 'https:' ? 'wss://' : 'ws://')
+          this.wsPort = this.isElectron ? '443' : (window.location.protocol === 'https:' ? '443' : '6001')
 
           // Use Echo to test the connection instead of raw WebSocket
           // This will work better in a desktop environment
@@ -852,12 +849,9 @@ export default {
 
     async testStorage () {
       try {
-        // Determine if we're in a desktop app (Electron)
-        const isDesktopApp = window.process && window.process.versions && window.process.versions.electron
-
         // In desktop environments, access to storage should be OK
         // but the standard test might fail due to different storage implementation
-        if (isDesktopApp) {
+        if (this.isElectron) {
           try {
             // Test using the local storage helper directly when available
             const { local } = await import('src/plugins/helpers/storage')
@@ -1058,6 +1052,11 @@ export default {
 
       // Fallback to moderate quality if MOS not available
       return 'Good connection quality for voice calls'
+    }
+  },
+  computed: {
+    isElectron () {
+      return this.$q.platform.is.electron
     }
   },
   mounted () {
