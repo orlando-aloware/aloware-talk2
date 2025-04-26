@@ -287,6 +287,10 @@ export default {
 
     this.dialerListeners.handleCallParkedFromOtherTab = (data) => {
       console.log('Call parked from other tab', data, this.dialer.communication)
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('callEnded')
+        return
+      }
       // If we have the same communication open
       if (this.dialer.communication && this.dialer.communication.id === data.communicationId && this.dialer.call) {
         this.parkFromAnotherTab = true
@@ -294,6 +298,10 @@ export default {
     }
     this.dialerListeners.handleCallHungUpFromOtherTab = (data) => {
       console.log('Call hung up from other tab', data, this.dialer.communication)
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('callEnded')
+        return
+      }
       // If we have the same communication open
       if (this.dialer.communication && this.dialer.communication.id === data.communicationId && this.dialer.call) {
         this.hungFromAnotherTab = true

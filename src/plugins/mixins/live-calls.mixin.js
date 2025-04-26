@@ -4,7 +4,7 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { agentMixin } from 'src/plugins/mixins/index'
 export default {
   mixins: [
@@ -35,6 +35,10 @@ export default {
     ...mapState('auth', ['profile']),
 
     ...mapState('inbox', ['liveContacts']),
+
+    ...mapGetters('wallboard', {
+      liveCalls: 'getLiveCalls'
+    }),
 
     shouldShowIncomingCallMenu () {
       if (this.isIncomingLiveCall &&
@@ -204,6 +208,14 @@ export default {
 
     isDialerOrAgentOnCall () {
       return this.isDialerConnected || this.isAgentOnCall
+    },
+
+    isCallWaiting () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
+      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
     }
   },
 
@@ -216,6 +228,8 @@ export default {
       'setDialerCommunication'
     ]),
     ...mapActions('inbox', ['setLiveContacts']),
+    ...mapActions('wallboard', ['fetchLiveCalls']),
+
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },
@@ -336,13 +350,6 @@ export default {
       this.showIncomingCallMenu = false
       this.answerCommunication(false, true)
     },
-    isCallWaiting () {
-      if (isEmpty(this.communication)) {
-        return false
-      }
-
-      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
-    },
     async answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
@@ -370,9 +377,11 @@ export default {
 
       if (needsCurrentCommunication) {
         try {
-          const response = await this.$axios.post('/api/v1/profile/get-live-calls')
-          const currentCommunication = response.data.find(call => {
-            return call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
+          if (this.liveCalls.length === 0) {
+            await this.fetchLiveCalls()
+          }
+          const currentCommunication = this.liveCalls.find(call => {
+            return call.owner_id === this.profile.id
           })
 
           if (!currentCommunication) {

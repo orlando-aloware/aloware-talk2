@@ -174,14 +174,14 @@
             </template>
             <b-dropdown-item href=""
                              link-class="d-flex align-items-center"
-                             @click="answerCommunication(true, false)">
+                             @click="handleAnswerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
                               height="13"
                               color="#9B51E0"/>Park Current Call & Connect
             </b-dropdown-item>
             <b-dropdown-item href=""
-                             @click="answerCommunication(false, true)">
+                             @click="handleAnswerCommunication(false, true)">
               <hangup-icon class="icon-margin" width="13"/>Hangup Current Call & Connect
             </b-dropdown-item>
           </b-dropdown>
@@ -505,14 +505,6 @@ export default {
       return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_USER
     },
 
-    isCallWaiting () {
-      if (isEmpty(this.communication)) {
-        return false
-      }
-
-      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
-    },
-
     notificationIconClasses () {
       return [
         this.id === 'system' ? 'system-update' : ''
@@ -707,7 +699,7 @@ export default {
       }
 
       if (this.id === 'callFishing') {
-        this.answerCommunication()
+        this.handleAnswerCommunication()
         return
       }
 
@@ -721,26 +713,9 @@ export default {
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
-    async answerCommunication (shouldPark = false, shouldHangup = false) {
-      const data = {
-        communication: {
-          id: this.communicationId,
-          campaignId: this.campaignId,
-          contactName: this.title,
-          companyName: this.message,
-          contactId: this.contactId,
-          phoneNumber: this.phoneNumber,
-          isCallWaiting: this.isCallWaiting
-        },
-        shouldPark: shouldPark,
-        shouldHangup: shouldHangup
-      }
-
-      await this.fetchCurrentCommunicationIfNeeded(data)
-
-      this.$VueEvent.fire('answerCallFishing', data)
+    async handleAnswerCommunication (shouldPark = false, shouldHangup = false) {
+      await this.answerCommunication(shouldPark, shouldHangup)
       this.$closeActionNotification('callFishing')
-      this.setShowPhone(true)
     },
 
     rejectCall () {
