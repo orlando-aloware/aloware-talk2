@@ -391,7 +391,6 @@ export default {
       ) {
         // If we have an empty inbox or we're on the last page, reset the initial load flag
         if (this.itemsData.length === 0) {
-          console.log('Empty inbox detected, stopping auto-load')
           this.setIsInitialLoad(false)
         }
         return
@@ -405,7 +404,6 @@ export default {
         // Load more items and continue checking after they're loaded
         this.loadMoreItemsAndCheckAgain(this.activeInboxId)
       } else {
-        console.log(`Sufficient groups loaded: ${groupCount}, threshold: ${MIN_GROUP_THRESHOLD}`)
         // We've reached the threshold, reset the initial load flag
         this.setIsInitialLoad(false)
       }
