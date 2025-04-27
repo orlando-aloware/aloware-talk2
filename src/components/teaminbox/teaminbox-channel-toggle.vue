@@ -67,7 +67,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('teaminbox', ['setViewMode']),
+    ...mapActions('TeamInbox', ['setViewMode']),
 
     onChange (value) {
       this.setViewMode(value)
