@@ -32,7 +32,7 @@ export default {
   }),
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'viewMode'
     ]),
 

@@ -44,7 +44,7 @@ export default {
   },
 
   computed: {
-    ...mapState('teaminbox', [
+    ...mapState('TeamInbox', [
       'viewMode'
     ]),
 
