@@ -27,6 +27,18 @@
         </b-overlay>
       </div>
 
+      <!-- Error state -->
+      <div class="text-center text-danger py-5" v-else-if="loadError">
+        <div class="mb-3">
+          <i class="fas fa-exclamation-triangle fa-2x"></i>
+        </div>
+        <h5>We had a problem loading the inbox</h5>
+        <button class="btn btn-sm btn-primary mt-3"
+                @click.prevent="onRefreshCommunications">
+          <refresh-icon color="#fff"/> Reload
+        </button>
+      </div>
+
       <!-- items list -->
       <template v-else-if="itemsData.length">
         <div :key="item.id"
@@ -67,7 +79,7 @@
         <button class="btn btn-sm btn-primary mt-4"
                 v-if="showRefreshCommunicationsButton"
                 @click.prevent="onRefreshCommunications">
-          <refresh-icon color="#fff"/> Refresh
+          <refresh-icon color="#fff"/> Reload
         </button>
       </div>
     </div>
@@ -120,7 +132,8 @@ export default {
       CommunicationDirections,
       CommunicationTypes,
       filterOption: 'All',
-      sortOption: 'Newest'
+      sortOption: 'Newest',
+      loadError: false
     }
   },
 
@@ -337,6 +350,7 @@ export default {
     },
 
     onRefreshCommunications () {
+      this.loadError = false
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
     },
 
@@ -400,7 +414,6 @@ export default {
       const groupCount = this.countDistinctGroups()
 
       if (groupCount < MIN_GROUP_THRESHOLD) {
-        console.log(`Auto-loading more items. Current groups: ${groupCount}, threshold: ${MIN_GROUP_THRESHOLD}`)
         // Load more items and continue checking after they're loaded
         this.loadMoreItemsAndCheckAgain(this.activeInboxId)
       } else {
@@ -444,6 +457,20 @@ export default {
         console.error('Error loading more items:', error)
         this.setIsLoadingMoreItems(false)
         this.setIsInitialLoad(false) // Reset on error
+        this.loadError = true // Set error state
+      }
+    },
+
+    async fetchItems (inboxId, search = null, filters = {}, sort = {}) {
+      try {
+        this.loadError = false
+        // Call the mixin method directly instead of dispatching a Vuex action
+        await this.$options.mixins[0].methods.fetchItems.call(this, inboxId, search, filters, sort)
+      } catch (error) {
+        console.error('Error fetching items:', error)
+        this.loadError = true
+        this.$store.commit('TeamInbox/SET_IS_LOADING_ITEMS', false)
+        this.setIsInitialLoad(false)
       }
     }
   },
