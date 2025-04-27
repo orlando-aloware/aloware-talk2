@@ -135,7 +135,9 @@ export default {
       'viewMode',
       'showRefreshCommunicationsButton',
       'activeFilters',
-      'currentSearch'
+      'activeSort',
+      'currentSearch',
+      'isInitialLoad'
     ]),
 
     ...mapState(['isMobile']),
@@ -169,7 +171,10 @@ export default {
   methods: {
     ...mapActions('TeamInbox', [
       'setActiveFilters',
-      'setCurrentSearch'
+      'setActiveSort',
+      'setCurrentSearch',
+      'setIsInitialLoad',
+      'setIsLoadingMoreItems'
     ]),
 
     isLiveCall,
@@ -213,14 +218,21 @@ export default {
       }
 
       this.resetItems()
-      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters)
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
     },
 
     handleUnthreadedCommunication (communication, isNew = false) {
+      const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
+
       if (isNew) {
         const found = this.itemsData.find(c => c.id === communication.id)
         if (!found) {
-          this.itemsData.unshift(communication)
+          // For new communications, add them at appropriate position based on sort order
+          if (isAscendingOrder && !isLiveCall(communication)) {
+            this.itemsData.push(communication) // Add to end for ascending order
+          } else {
+            this.itemsData.unshift(communication) // Add to beginning for descending order or live calls
+          }
         }
       } else {
         const index = this.itemsData.findIndex(c => c.id === communication.id)
@@ -231,10 +243,16 @@ export default {
     },
 
     handleThreadedCommunication (communication, isNew = false) {
+      const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
       const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
 
       if (isNew && index === -1) {
-        this.itemsData.unshift(communication)
+        // For new communications, add them at appropriate position based on sort order
+        if (isAscendingOrder && !isLiveCall(communication)) {
+          this.itemsData.push(communication) // Add to end for ascending order
+        } else {
+          this.itemsData.unshift(communication) // Add to beginning for descending order or live calls
+        }
         return
       }
 
@@ -248,7 +266,10 @@ export default {
     },
 
     sortItems () {
+      const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
+
       this.itemsData.sort((a, b) => {
+        // Always prioritize live calls at the top regardless of sort order
         if (isLiveCall(a) && !isLiveCall(b)) {
           return -1
         }
@@ -257,7 +278,17 @@ export default {
           return 1
         }
 
-        return new Date(b.created_at) - new Date(a.created_at)
+        // For non-live calls, respect the sort order
+        const dateA = new Date(a.created_at)
+        const dateB = new Date(b.created_at)
+
+        if (isAscendingOrder) {
+          // Oldest first (ascending)
+          return dateA - dateB
+        } else {
+          // Newest first (descending, default)
+          return dateB - dateA
+        }
       })
     },
 
@@ -306,17 +337,94 @@ export default {
     },
 
     onRefreshCommunications () {
-      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters)
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
     },
 
     onFilterChange (filters) {
       this.setActiveFilters(filters)
-      this.fetchItems(this.activeInboxId, this.search || null, filters)
+      this.fetchItems(this.activeInboxId, this.search || null, filters, this.activeSort)
     },
 
-    onSortChange (option) {
-      this.sortOption = option
-      // Placeholder for future sort functionality
+    onSortChange (sort) {
+      this.setActiveSort(sort)
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, sort)
+    },
+
+    // Count distinct contact groups in the current data
+    countDistinctGroups () {
+      if (!this.itemsData.length) return 0
+
+      // If in threaded mode, count the number of unique contact IDs
+      if (this.viewMode === THREADED) {
+        const uniqueContactIds = new Set()
+        this.itemsData.forEach(item => {
+          if (!item.hidden && item.contact_id) {
+            uniqueContactIds.add(item.contact_id)
+          }
+        })
+        return uniqueContactIds.size
+      }
+
+      // If in unthreaded mode, count communications that aren't marked as hidden
+      // and those that are the first in a sequence (with repeats > 0)
+      let count = 0
+      for (let i = 0; i < this.itemsData.length; i++) {
+        const item = this.itemsData[i]
+        if (!item.hidden) {
+          count++
+        }
+      }
+      return count
+    },
+
+    // Check if we need to load more data based on group count threshold
+    checkAndLoadMoreIfNeeded () {
+      // Check if already loading or no more items
+      if (this.isLoadingMoreItems || !this.hasMoreItems) return
+
+      const MIN_GROUP_THRESHOLD = 25
+      const groupCount = this.countDistinctGroups()
+
+      if (groupCount < MIN_GROUP_THRESHOLD) {
+        console.log(`Auto-loading more items. Current groups: ${groupCount}, threshold: ${MIN_GROUP_THRESHOLD}`)
+        // Load more items and continue checking after they're loaded
+        this.loadMoreItemsAndCheckAgain(this.activeInboxId)
+      } else {
+        console.log(`Sufficient groups loaded: ${groupCount}, threshold: ${MIN_GROUP_THRESHOLD}`)
+        // We've reached the threshold, reset the initial load flag
+        this.setIsInitialLoad(false)
+      }
+    },
+
+    // Load more items and check again after they're loaded
+    async loadMoreItemsAndCheckAgain (inboxId) {
+      try {
+        if (this.isLoadingMoreItems || !this.hasMoreItems) return
+
+        this.setIsLoadingMoreItems(true)
+
+        const nextPage = this.currentItemsPage + 1
+        // Get current filter and sort state from Vuex
+        const filters = this.activeFilters || {}
+        const sort = this.activeSort || {}
+        const search = this.currentSearch
+
+        const response = await this.getItemsRequest(inboxId, nextPage, search, filters, sort)
+
+        this.appendItems(response.data)
+        this.setIsLoadingMoreItems(false)
+
+        // Wait a short time for the UI to update, then check if we need more
+        setTimeout(() => {
+          if (this.isInitialLoad) {
+            this.checkAndLoadMoreIfNeeded()
+          }
+        }, 100)
+      } catch (error) {
+        console.error('Error loading more items:', error)
+        this.setIsLoadingMoreItems(false)
+        this.setIsInitialLoad(false) // Reset on error
+      }
     }
   },
 
@@ -341,9 +449,21 @@ export default {
       }
     },
 
-    items () {
-      this.itemsData = this.items.filter(item => !item.hidden)
-      this.sortItems()
+    search (search) {
+      this.setCurrentSearch(search)
+      this.fetchItems(this.activeInboxId, search || null, this.activeFilters, this.activeSort)
+    },
+
+    items: {
+      handler (newItems) {
+        this.itemsData = newItems.filter(item => !item.hidden)
+        this.sortItems()
+
+        // Only auto-load more if this is the initial page load
+        if (this.isInitialLoad) {
+          this.checkAndLoadMoreIfNeeded()
+        }
+      }
     }
   }
 }

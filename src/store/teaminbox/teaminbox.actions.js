@@ -64,7 +64,13 @@ export default {
   setActiveFilters: ({ commit }, filters) => {
     commit('SET_ACTIVE_FILTERS', filters)
   },
+  setActiveSort: ({ commit }, sort) => {
+    commit('SET_ACTIVE_SORT', sort)
+  },
   setCurrentSearch: ({ commit }, search) => {
     commit('SET_CURRENT_SEARCH', search)
+  },
+  setIsInitialLoad: ({ commit }, isInitial) => {
+    commit('SET_IS_INITIAL_LOAD', isInitial)
   }
 }

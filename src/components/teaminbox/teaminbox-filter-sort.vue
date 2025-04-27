@@ -25,6 +25,10 @@ export default {
       filters: {
         All: {},
         Unread: { unreadonly: true }
+      },
+      sorts: {
+        Newest: {},
+        Oldest: { order: 'asc' }
       }
     }
   },
@@ -35,7 +39,7 @@ export default {
     },
     setSortOption (option) {
       this.sortOption = option
-      this.$emit('sort-change', option)
+      this.$emit('sort-change', this.sorts[option])
     }
   }
 }

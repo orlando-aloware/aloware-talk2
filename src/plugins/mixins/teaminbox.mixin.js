@@ -99,15 +99,20 @@ export default {
       }
     },
 
-    async fetchItems (inboxId, search = null, filters = {}) {
+    async fetchItems (inboxId, search = null, filters = {}, sort = {}) {
       try {
         this.setIsLoadingItems(true)
         this.setShowRefreshCommunicationsButton(false)
 
-        const response = await this.getItemsRequest(inboxId, 1, search, filters)
+        const response = await this.getItemsRequest(inboxId, 1, search, filters, sort)
 
         this.setItems(response.data)
         this.setIsLoadingItems(false)
+
+        // Store the fact that this is the initial load in case we need to auto-load more
+        this.$store.dispatch('TeamInbox/setIsInitialLoad', true)
+
+        console.log('fetchItems done')
 
         this.setAbortController(null)
       } catch (error) {
@@ -129,9 +134,10 @@ export default {
         const nextPage = this.currentItemsPage + 1
         // Get current filter state from Vuex
         const filters = this.$store.state.TeamInbox.activeFilters || {}
+        const sort = this.$store.state.TeamInbox.activeSort || {}
         const search = this.$store.state.TeamInbox.currentSearch
 
-        const response = await this.getItemsRequest(inboxId, nextPage, search, filters)
+        const response = await this.getItemsRequest(inboxId, nextPage, search, filters, sort)
 
         this.appendItems(response.data)
 
@@ -143,7 +149,7 @@ export default {
       }
     },
 
-    getItemsRequest (inboxId, nextPage, search = null, filters = {}) {
+    getItemsRequest (inboxId, nextPage, search = null, filters = {}, sort = {}) {
       // abort current ongoign request
       if (this.abortController) {
         this.abortController.abort()
@@ -157,6 +163,11 @@ export default {
       // Map filter keys to API parameters
       if (filters.unreadonly) {
         apiFilters.unread_only = true
+      }
+
+      // Map sort keys to API parameters
+      if (sort.order) {
+        apiFilters.order = sort.order
       }
 
       return talk2Api.V1.reports.communications.get({

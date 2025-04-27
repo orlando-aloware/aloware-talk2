@@ -65,8 +65,14 @@ export default {
   SET_ACTIVE_FILTERS (state, filters) {
     state.activeFilters = filters
   },
+  SET_ACTIVE_SORT (state, sort) {
+    state.activeSort = sort
+  },
   SET_CURRENT_SEARCH (state, search) {
     state.currentSearch = search
+  },
+  SET_IS_INITIAL_LOAD (state, isInitial) {
+    state.isInitialLoad = isInitial
   }
 }
 

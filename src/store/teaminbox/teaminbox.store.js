@@ -22,6 +22,8 @@ export default function () {
     showRefreshInboxesButton: false,
     showRefreshCommunicationsButton: false,
     activeFilters: {},
-    currentSearch: null
+    activeSort: {},
+    currentSearch: null,
+    isInitialLoad: false
   }
 }
