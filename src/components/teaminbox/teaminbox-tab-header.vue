@@ -20,7 +20,7 @@
 
       <span class="cursor-pointer mr-2"
             :id="`teaminbox-tab-open-comms-page-icon-${_uid}`"
-            @click="$router.push(DEFAULT_COMMUNICATIONS_ROUTE_PATH)">
+            @click="openCommunicationsPage">
         <watch-icon />
         <b-tooltip custom-class="talk-table__tooltip"
                    :target="`teaminbox-tab-open-comms-page-icon-${_uid}`">
@@ -117,6 +117,20 @@ export default {
       if (this.$refs.search) {
         this.$refs.search.$el.querySelector('input').focus()
       }
+    },
+
+    openCommunicationsPage () {
+      const route = {
+        path: DEFAULT_COMMUNICATIONS_ROUTE_PATH,
+        query: {}
+      }
+
+      // Add the inbox ID as ring_groups query parameter if available
+      if (this.activeInbox && this.activeInbox.id) {
+        route.query.ring_groups = this.activeInbox.id
+      }
+
+      this.$router.push(route)
     },
 
     onLeaveSearch () {
