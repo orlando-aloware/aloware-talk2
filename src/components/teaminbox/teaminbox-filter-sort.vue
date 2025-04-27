@@ -21,13 +21,17 @@ export default {
   data () {
     return {
       filterOption: 'All',
-      sortOption: 'Newest'
+      sortOption: 'Newest',
+      filters: {
+        All: {},
+        Unread: { unreadonly: true }
+      }
     }
   },
   methods: {
     setFilterOption (option) {
       this.filterOption = option
-      this.$emit('filter-change', option)
+      this.$emit('filter-change', this.filters[option])
     },
     setSortOption (option) {
       this.sortOption = option

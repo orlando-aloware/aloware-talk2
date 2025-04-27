@@ -86,7 +86,7 @@ import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { debounce, isEmpty, pick } from 'lodash'
 
 export default {
@@ -133,7 +133,9 @@ export default {
       'activeInboxId',
       'activeInbox',
       'viewMode',
-      'showRefreshCommunicationsButton'
+      'showRefreshCommunicationsButton',
+      'activeFilters',
+      'currentSearch'
     ]),
 
     ...mapState(['isMobile']),
@@ -165,6 +167,11 @@ export default {
   },
 
   methods: {
+    ...mapActions('TeamInbox', [
+      'setActiveFilters',
+      'setCurrentSearch'
+    ]),
+
     isLiveCall,
 
     getUnreadsProperties (contact) {
@@ -206,7 +213,7 @@ export default {
       }
 
       this.resetItems()
-      this.fetchItems(this.activeInboxId, this.search || null)
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters)
     },
 
     handleUnthreadedCommunication (communication, isNew = false) {
@@ -299,12 +306,12 @@ export default {
     },
 
     onRefreshCommunications () {
-      this.fetchItems(this.activeInboxId, this.search || null)
+      this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters)
     },
 
-    onFilterChange (option) {
-      this.filterOption = option
-      // Placeholder for future filter functionality
+    onFilterChange (filters) {
+      this.setActiveFilters(filters)
+      this.fetchItems(this.activeInboxId, this.search || null, filters)
     },
 
     onSortChange (option) {
@@ -332,10 +339,6 @@ export default {
       if (this.isMobile && route === TEAMINBOXES_MENU_ITEMS_TITLE) {
         this.activeId = null
       }
-    },
-
-    search (search) {
-      this.fetchItems(this.activeInboxId, search || null)
     },
 
     items () {

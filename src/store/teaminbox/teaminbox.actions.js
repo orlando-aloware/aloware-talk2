@@ -60,5 +60,11 @@ export default {
   },
   setShowRefreshCommunicationsButton: ({ commit }, show) => {
     commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
+  },
+  setActiveFilters: ({ commit }, filters) => {
+    commit('SET_ACTIVE_FILTERS', filters)
+  },
+  setCurrentSearch: ({ commit }, search) => {
+    commit('SET_CURRENT_SEARCH', search)
   }
 }

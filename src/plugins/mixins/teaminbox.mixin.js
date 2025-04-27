@@ -99,12 +99,12 @@ export default {
       }
     },
 
-    async fetchItems (inboxId, search = null) {
+    async fetchItems (inboxId, search = null, filters = {}) {
       try {
         this.setIsLoadingItems(true)
         this.setShowRefreshCommunicationsButton(false)
 
-        const response = await this.getItemsRequest(inboxId, 1, search)
+        const response = await this.getItemsRequest(inboxId, 1, search, filters)
 
         this.setItems(response.data)
         this.setIsLoadingItems(false)
@@ -127,7 +127,11 @@ export default {
         this.setIsLoadingMoreItems(true)
 
         const nextPage = this.currentItemsPage + 1
-        const response = await this.getItemsRequest(inboxId, nextPage)
+        // Get current filter state from Vuex
+        const filters = this.$store.state.TeamInbox.activeFilters || {}
+        const search = this.$store.state.TeamInbox.currentSearch
+
+        const response = await this.getItemsRequest(inboxId, nextPage, search, filters)
 
         this.appendItems(response.data)
 
@@ -139,13 +143,21 @@ export default {
       }
     },
 
-    getItemsRequest (inboxId, nextPage, search = null) {
+    getItemsRequest (inboxId, nextPage, search = null, filters = {}) {
       // abort current ongoign request
       if (this.abortController) {
         this.abortController.abort()
       }
 
       this.setAbortController(new AbortController())
+
+      // Transform filters to API parameters
+      const apiFilters = {}
+
+      // Map filter keys to API parameters
+      if (filters.unreadonly) {
+        apiFilters.unread_only = true
+      }
 
       return talk2Api.V1.reports.communications.get({
         params: {
@@ -156,7 +168,8 @@ export default {
           ...(search ? {
             search_text: search,
             search_fields: ['lead_number', 'contact.name', 'campaign.name']
-          } : {})
+          } : {}),
+          ...apiFilters
         },
         headers: { 'requested-from': 'api' },
         signal: this.abortController.signal

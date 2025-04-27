@@ -61,6 +61,12 @@ export default {
   },
   SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON (state, show) {
     state.showRefreshCommunicationsButton = show
+  },
+  SET_ACTIVE_FILTERS (state, filters) {
+    state.activeFilters = filters
+  },
+  SET_CURRENT_SEARCH (state, search) {
+    state.currentSearch = search
   }
 }
 
