@@ -7,7 +7,7 @@
 
     <div class="teaminbox-nav-type__inboxes">
       <div ref="inboxesInner">
-        <teaminbox-nav-item :label="inbox.name"
+        <TeamInboxNavItem :label="inbox.name"
                          :value="inbox.id"
                          :message-count="inbox.message_count"
                          :is-active="activeInboxId === inbox.id"

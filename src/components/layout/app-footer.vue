@@ -29,7 +29,7 @@
                    exact
                    v-if="hasCompanyTeamInboxEnabled">
         <span class="tab-icon">
-          <e-inbox-mobile-icon :color="isActive('team-inboxes') ? '#256EFF' : '#A3A3A3'" />
+          <TeamInboxMobileIcon :color="isActive('team-inboxes') ? '#256EFF' : '#A3A3A3'" />
         </span>
         {{ TEAMINBOXES_MENU_TITLE }}
       </q-route-tab>
@@ -200,7 +200,7 @@
 
 <script>
 import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon'
-import TeamInboxMobileIcon from 'components/icons/mobile-menu/team-inbox-mobile-icon'
+import TeamInboxMobileIcon from 'components/icons/mobile-menu/teaminbox-mobile-icon'
 import CommunicationsMobileIcon from 'components/icons/mobile-menu/communications-mobile-icon'
 import ContactsMobileIcon from 'components/icons/mobile-menu/contacts-mobile-icon'
 import StatsMobileIcon from 'components/icons/mobile-menu/stats-mobile-icon'

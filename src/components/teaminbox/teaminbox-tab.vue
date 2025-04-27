@@ -1,10 +1,10 @@
 <template>
   <div class="teaminbox-tab">
-    <teaminbox-tab-header :collapse-target="collapseTarget"
+    <TeamInboxTabHeader :collapse-target="collapseTarget"
                        :search="search"
                        @search="search = $event" />
 
-    <teaminbox-channel-toggle @channel="onChannel"/>
+    <TeamInboxChannelToggle @channel="onChannel"/>
 
     <!-- Items List -->
     <div class="items-list blue-scroll"

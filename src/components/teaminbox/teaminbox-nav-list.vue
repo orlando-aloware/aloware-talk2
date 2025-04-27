@@ -21,7 +21,7 @@
     </div>
     <div class="teaminbox-nav-list__content blue-scroll"
          @scroll="onScroll">
-      <teaminbox-nav-type :type="type.id"
+      <TeamInboxNavType :type="type.id"
                        :label="type.name"
                        :typed-inboxes="type.inboxes"
                        :key="type.name"

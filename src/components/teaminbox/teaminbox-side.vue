@@ -1,10 +1,10 @@
 <template>
   <div data-testid="teaminbox-side"
        class="teaminbox-side">
-    <teaminbox-nav-list data-testid="teaminbox-nav-list"
+    <TeamInboxNavList data-testid="teaminbox-nav-list"
                      :class="['teaminbox-side__left', {'teaminbox-side__left--mobile-hidden': $route.name !== TEAMINBOXES_MENU_TITLE}]"
                      ref="TeaminboxNavList" />
-    <teaminbox-tab data-testid="teaminbox-tab"
+    <TeamInboxTab data-testid="teaminbox-tab"
                 :class="['teaminbox-side__right', {'teaminbox-side__right--mobile-hidden': $route.name !== TEAMINBOXES_MENU_ITEMS_TITLE}]"
                 :collapse-target="collapseTarget" />
   </div>

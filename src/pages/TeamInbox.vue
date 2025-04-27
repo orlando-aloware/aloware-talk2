@@ -2,7 +2,7 @@
   <div class="h-100"
        v-if="authenticated">
     <div class="teaminbox animate__animated animate__fadeIn position-relative">
-      <teaminbox-side :class="inboxSideClasses"
+      <TeamInboxSide :class="inboxSideClasses"
                     @itemSelected="onItemSelected" />
 
       <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"

@@ -256,7 +256,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import ContactNameForm from 'src/components/forms/contact-name-form'
-import Avatar from 'src/components/einbox/communication-items/avatar.vue'
+import Avatar from 'src/components/teaminbox/communication-items/avatar.vue'
 import TimerIcon from 'src/components/icons/timer-icon'
 import CalendarIcon from 'src/components/icons/calendar-icon'
 import CallIcon from 'src/components/icons/call-icon'
