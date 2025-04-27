@@ -1,5 +1,5 @@
 <template>
-  <div class="teaminbox-tab__header border-bottom">
+  <div class="teaminbox-tab__header">
     <collapse-button class="teaminbox-tab__header__collapse-button"
                      :target="collapseTarget"
                      v-model="collapsed"
@@ -166,9 +166,8 @@ export default {
 .teaminbox-tab__header {
   display: flex;
   align-items: center;
-  padding: 6px 15px;
+  padding: 4px 15px;
   width: 100%;
-  height: 45px;
 
   &__label {
     margin: 0px;

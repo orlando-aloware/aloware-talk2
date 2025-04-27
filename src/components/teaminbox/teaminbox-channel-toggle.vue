@@ -1,5 +1,5 @@
 <template>
-  <div class="channel-toggle-wrapper d-flex align-items-center border-bottom">
+  <div class="channel-toggle-wrapper d-flex align-items-center">
     <q-btn-toggle class="channel-toggle"
                   no-caps
                   rounded
@@ -79,7 +79,7 @@ export default {
 
 <style lang="scss">
 .channel-toggle-wrapper {
-  padding: 8px 16px;
+  padding: 2px 16px;
   width: 100%;
   min-width: 200px;
 

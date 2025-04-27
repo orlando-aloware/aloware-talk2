@@ -16773,3 +16773,22 @@ hr {
 .overflow-visible {
   overflow: visible !important;
 }
+
+.teaminbox-filter-sort {
+  .filter-dropdown,
+  .sort-dropdown,
+  .filter-dropdown.show,
+  .sort-dropdown.show {
+    .btn {
+      border: 1px solid transparent !important;
+      background-color: transparent !important;
+      color: #040404 !important;
+
+      &:hover, &:focus {
+        border: 1px solid transparent !important;
+        background-color: transparent !important;
+        color: #040404 !important;
+      }
+    }
+  }
+}

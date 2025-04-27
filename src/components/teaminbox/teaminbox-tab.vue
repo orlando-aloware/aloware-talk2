@@ -6,6 +6,8 @@
 
     <TeamInboxChannelToggle @channel="onChannel"/>
 
+    <TeamInboxFilterSort @filter-change="onFilterChange" @sort-change="onSortChange" />
+
     <!-- Items List -->
     <div class="items-list blue-scroll"
          @scroll="onScroll">
@@ -77,6 +79,7 @@ import Communication from 'src/components/teaminbox/communication-items/communic
 import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
+import TeamInboxFilterSort from './teaminbox-filter-sort.vue'
 import { TeamInboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
@@ -91,7 +94,8 @@ export default {
     Communication,
     TeamInboxChannelToggle,
     RefreshIcon,
-    TeamInboxTabHeader
+    TeamInboxTabHeader,
+    TeamInboxFilterSort
   },
 
   mixins: [
@@ -114,7 +118,9 @@ export default {
       TEAMINBOXES_MENU_ITEMS_TITLE,
       itemsData: [],
       CommunicationDirections,
-      CommunicationTypes
+      CommunicationTypes,
+      filterOption: 'All',
+      sortOption: 'Newest'
     }
   },
 
@@ -294,6 +300,16 @@ export default {
 
     onRefreshCommunications () {
       this.fetchItems(this.activeInboxId, this.search || null)
+    },
+
+    onFilterChange (option) {
+      this.filterOption = option
+      // Placeholder for future filter functionality
+    },
+
+    onSortChange (option) {
+      this.sortOption = option
+      // Placeholder for future sort functionality
     }
   },
 
