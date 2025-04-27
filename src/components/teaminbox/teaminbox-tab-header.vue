@@ -7,8 +7,14 @@
 
     <template v-if="!isSearchActive">
       <label class="teaminbox-tab__header__label ellipse"
+             :id="`teaminbox-tab-header-label-${_uid}`"
              v-if="activeInbox.name">
         {{ activeInbox.name }}
+        <b-tooltip custom-class="talk-table__tooltip"
+          :target="`teaminbox-tab-header-label-${_uid}`"
+          :delay="500">
+          {{ activeInbox.name }}
+        </b-tooltip>
       </label>
       <q-space></q-space>
 

@@ -7,7 +7,12 @@
         <inbox-icon width="18"
                     height="18" />
       </span>
-      <span class="teaminbox-nav-item__label">{{ label }}</span>
+      <span class="teaminbox-nav-item__label" :id="`teaminbox-nav-item-label-${_uid}`">{{ label }}</span>
+      <b-tooltip custom-class="talk-table__tooltip"
+        :target="`teaminbox-nav-item-label-${_uid}`"
+        :delay="500">
+        {{ label }}
+      </b-tooltip>
     </div>
   </div>
 </template>
