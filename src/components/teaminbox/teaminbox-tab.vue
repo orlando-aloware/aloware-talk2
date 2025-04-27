@@ -379,8 +379,23 @@ export default {
 
     // Check if we need to load more data based on group count threshold
     checkAndLoadMoreIfNeeded () {
-      // Check if already loading or no more items
-      if (this.isLoadingMoreItems || !this.hasMoreItems) return
+      // Don't try to load more if:
+      // 1. Already loading
+      // 2. No more items available
+      // 3. We're on the last page (next_page_url is null)
+      // 4. Empty inbox (no items at all)
+      if (
+        this.isLoadingMoreItems ||
+        !this.hasMoreItems ||
+        this.itemsData.length === 0
+      ) {
+        // If we have an empty inbox or we're on the last page, reset the initial load flag
+        if (this.itemsData.length === 0) {
+          console.log('Empty inbox detected, stopping auto-load')
+          this.setIsInitialLoad(false)
+        }
+        return
+      }
 
       const MIN_GROUP_THRESHOLD = 25
       const groupCount = this.countDistinctGroups()
@@ -413,6 +428,13 @@ export default {
 
         this.appendItems(response.data)
         this.setIsLoadingMoreItems(false)
+
+        // Check if we received empty data or we're on the last page
+        if (!response.data || !response.data.data || response.data.data.length === 0 || response.data.next_page_url === null) {
+          console.log('Reached last page or empty response, stopping auto-load')
+          this.setIsInitialLoad(false)
+          return
+        }
 
         // Wait a short time for the UI to update, then check if we need more
         setTimeout(() => {

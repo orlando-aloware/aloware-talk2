@@ -112,8 +112,6 @@ export default {
         // Store the fact that this is the initial load in case we need to auto-load more
         this.$store.dispatch('TeamInbox/setIsInitialLoad', true)
 
-        console.log('fetchItems done')
-
         this.setAbortController(null)
       } catch (error) {
         // dont perform the actions below if request was forced canceled
