@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'einbox-mobile-icon',
+  name: 'teaminbox-mobile-icon',
 
   props: {
     width: {

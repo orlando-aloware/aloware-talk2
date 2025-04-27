@@ -1,8 +1,8 @@
 <template>
   <div class="h-100"
        v-if="authenticated">
-    <div class="einbox animate__animated animate__fadeIn position-relative">
-      <e-inbox-side :class="inboxSideClasses"
+    <div class="teaminbox animate__animated animate__fadeIn position-relative">
+      <teaminbox-side :class="inboxSideClasses"
                     @itemSelected="onItemSelected" />
 
       <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
@@ -15,13 +15,13 @@
 
 <script>
 import Contact from 'pages/contacts/Contact'
-import EInboxSide from 'components/einbox/einbox-side'
+import TeamInboxSide from 'components/teaminbox/teaminbox-side'
 import { userMixin } from 'src/plugins/mixins'
 import { mapGetters } from 'vuex'
-import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
-  name: 'EInbox',
+  name: 'TeamInbox',
 
   mixins: [
     userMixin
@@ -29,13 +29,13 @@ export default {
 
   components: {
     Contact,
-    EInboxSide
+    TeamInboxSide
   },
 
   data () {
     return {
       mobileContactScreenRoutes: [
-        EINBOXES_MENU_COMMUNICATIONS_TITLE
+        TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
       ]
     }
   },
@@ -77,7 +77,7 @@ export default {
 </script>
 
 <style scoped>
-.einbox {
+.teaminbox {
   height: 100%;
   width: 100%;
   display: flex;

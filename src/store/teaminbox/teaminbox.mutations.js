@@ -1,4 +1,4 @@
-import { THREADED } from './einbox.store'
+import { THREADED } from './teaminbox.store'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 
 export default {

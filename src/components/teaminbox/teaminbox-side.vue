@@ -1,46 +1,46 @@
 <template>
-  <div data-testid="einbox-side"
-       class="einbox-side">
-    <einbox-nav-list data-testid="einbox-nav-list"
-                     :class="['einbox-side__left', {'einbox-side__left--mobile-hidden': $route.name !== EINBOXES_MENU_TITLE}]"
-                     ref="eInboxNavList" />
-    <einbox-tab data-testid="einbox-tab"
-                :class="['einbox-side__right', {'einbox-side__right--mobile-hidden': $route.name !== EINBOXES_MENU_ITEMS_TITLE}]"
+  <div data-testid="teaminbox-side"
+       class="teaminbox-side">
+    <teaminbox-nav-list data-testid="teaminbox-nav-list"
+                     :class="['teaminbox-side__left', {'teaminbox-side__left--mobile-hidden': $route.name !== TEAMINBOXES_MENU_TITLE}]"
+                     ref="TeaminboxNavList" />
+    <teaminbox-tab data-testid="teaminbox-tab"
+                :class="['teaminbox-side__right', {'teaminbox-side__right--mobile-hidden': $route.name !== TEAMINBOXES_MENU_ITEMS_TITLE}]"
                 :collapse-target="collapseTarget" />
   </div>
 </template>
 
 <script>
-import EinboxNavList from '../einbox/einbox-nav-list.vue'
-import einboxTab from '../einbox/einbox-tab.vue'
+import TeamInboxNavList from '../teaminbox/teaminbox-nav-list.vue'
+import TeamInboxTab from '../teaminbox/teaminbox-tab.vue'
 import { isEmpty } from 'lodash'
 import { mapActions, mapState } from 'vuex'
-import { EINBOXES_MENU_TITLE, EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 
 export default {
-  name: 'einbox-side',
+  name: 'teaminbox-side',
 
   components: {
-    einboxTab,
-    EinboxNavList
+    TeamInboxTab,
+    TeamInboxNavList
   },
 
   data () {
     return {
       collapseTarget: null,
-      EINBOXES_MENU_TITLE,
-      EINBOXES_MENU_ITEMS_TITLE
+      TEAMINBOXES_MENU_TITLE,
+      TEAMINBOXES_MENU_ITEMS_TITLE
     }
   },
 
   mounted () {
-    if (this.$refs.eInboxNavList) {
-      this.collapseTarget = this.$refs.eInboxNavList.$el
+    if (this.$refs.teaminboxNavList) {
+      this.collapseTarget = this.$refs.teaminboxNavList.$el
     }
   },
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'activeInboxId',
       'activeInbox'
     ]),
@@ -51,7 +51,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('Einbox', [
+    ...mapActions('TeamInbox', [
       'setActiveInbox'
     ])
   },
@@ -83,7 +83,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.einbox-side {
+.teaminbox-side {
   background-color: #F9F9FB;
   display: flex;
 

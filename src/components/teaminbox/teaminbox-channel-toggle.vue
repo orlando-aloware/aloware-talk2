@@ -21,10 +21,10 @@
                                    width="16"
                                    class="ml-1"
                                    :color="viewMode === option.value ? '#fff' : '#256eff'"
-                                   :id="`einbox-channel-${option.slot}`"/>
+                                   :id="`teaminbox-channel-${option.slot}`"/>
 
           <b-tooltip custom-class="talk-table__tooltip"
-                     :target="`einbox-channel-${option.slot}`">
+                     :target="`teaminbox-channel-${option.slot}`">
             {{ option.description }}
           </b-tooltip>
         </div>
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
+import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 
@@ -44,7 +44,7 @@ export default {
   },
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('teaminbox', [
       'viewMode'
     ]),
 
@@ -67,7 +67,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('Einbox', ['setViewMode']),
+    ...mapActions('teaminbox', ['setViewMode']),
 
     onChange (value) {
       this.setViewMode(value)

@@ -1,10 +1,10 @@
 <template>
-  <div class="einbox-tab">
-    <einbox-tab-header :collapse-target="collapseTarget"
+  <div class="teaminbox-tab">
+    <teaminbox-tab-header :collapse-target="collapseTarget"
                        :search="search"
                        @search="search = $event" />
 
-    <einbox-channel-toggle @channel="onChannel"/>
+    <teaminbox-channel-toggle @channel="onChannel"/>
 
     <!-- Items List -->
     <div class="items-list blue-scroll"
@@ -73,29 +73,29 @@
 </template>
 
 <script>
-import Communication from 'src/components/einbox/communication-items/communication.vue'
-import EinboxChannelToggle from './einbox-channel-toggle.vue'
+import Communication from 'src/components/teaminbox/communication-items/communication.vue'
+import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
-import EinboxTabHeader from './einbox-tab-header.vue'
-import { EinboxMixin } from 'src/plugins/mixins'
+import TeamInboxTabHeader from './teaminbox-tab-header.vue'
+import { TeamInboxMixin } from 'src/plugins/mixins'
 import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { THREADED, UNTHREADED } from 'src/store/einbox/einbox.store'
-import { EINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
+import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
+import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState } from 'vuex'
 import { debounce, isEmpty, pick } from 'lodash'
 
 export default {
   components: {
     Communication,
-    EinboxChannelToggle,
+    TeamInboxChannelToggle,
     RefreshIcon,
-    EinboxTabHeader
+    TeamInboxTabHeader
   },
 
   mixins: [
-    EinboxMixin
+    TeamInboxMixin
   ],
 
   props: {
@@ -111,7 +111,7 @@ export default {
       search: '',
       THREADED,
       UNTHREADED,
-      EINBOXES_MENU_ITEMS_TITLE,
+      TEAMINBOXES_MENU_ITEMS_TITLE,
       itemsData: [],
       CommunicationDirections,
       CommunicationTypes
@@ -119,7 +119,7 @@ export default {
   },
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'items',
       'isLoadingItems',
       'isLoadingMoreItems',
@@ -313,7 +313,7 @@ export default {
 
     '$route.name' (route) {
       // reset activeId in mobile when this page is opened
-      if (this.isMobile && route === EINBOXES_MENU_ITEMS_TITLE) {
+      if (this.isMobile && route === TEAMINBOXES_MENU_ITEMS_TITLE) {
         this.activeId = null
       }
     },
@@ -331,7 +331,7 @@ export default {
 </script>
 
 <style lang="scss">
-.einbox-tab {
+.teaminbox-tab {
   display: flex;
   flex-direction: column;
   height: 100%;

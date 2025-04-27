@@ -1,10 +1,10 @@
-import { THREADED } from 'src/store/einbox/einbox.store'
+import { THREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'isLoadingInboxes',
       'inboxes',
       'currentInboxesPage',
@@ -20,7 +20,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('Einbox', [
+    ...mapActions('TeamInbox', [
       'setInboxes',
       'setIsLoadingInboxes',
       'appendInboxes',

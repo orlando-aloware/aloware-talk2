@@ -155,7 +155,7 @@ import * as Roles from 'src/constants/roles'
 import { PHONE_USAGE_ERRORS } from 'src/constants/twilio-error-codes'
 import TutorialVideoButton from 'components/tutorial-video-button'
 import { MOBILE_HEADER_TRANSITION_WIDTH } from 'src/constants/viewport-sizes'
-import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE, EINBOXES_MENU_TITLE } from 'src/router/routes'
+import { COMMUNICATIONS_CHANNELS_ROUTE_NAME, TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'app-header',
@@ -215,9 +215,9 @@ export default {
       loading: false,
       prevRoute: null,
       PHONE_USAGE_ERRORS,
-      EINBOXES_MENU_ITEMS_TITLE,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE,
-      EINBOXES_MENU_TITLE
+      TEAMINBOXES_MENU_ITEMS_TITLE,
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
+      TEAMINBOXES_MENU_TITLE
     }
   },
 
@@ -353,7 +353,7 @@ export default {
     },
 
     isTeamInboxPage () {
-      const validRoutes = [EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE]
+      const validRoutes = [TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE]
       return validRoutes.includes(this.$route.name)
     },
 
@@ -415,12 +415,12 @@ export default {
       return false
     },
 
-    isCommsPageFromEInbox () {
+    isCommsPageFromTeamInbox () {
       return this.$route.name === 'Communication' && this.prevRoute?.substr(0, 13) === '/team-inboxes'
     },
 
     shouldShowNavigateBackButton () {
-      return ['Contact', 'Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromEInbox
+      return ['Contact', 'Settings Tab', TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromTeamInbox
     }
   },
 
@@ -477,7 +477,7 @@ export default {
         return
       }
 
-      if (['Settings Tab', EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromEInbox) {
+      if (['Settings Tab', TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) || this.isCommsPageFromTeamInbox) {
         this.$router.back()
         return
       }

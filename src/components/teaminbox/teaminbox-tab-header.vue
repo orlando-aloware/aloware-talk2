@@ -1,35 +1,35 @@
 <template>
-  <div class="einbox-tab__header border-bottom">
-    <collapse-button class="einbox-tab__header__collapse-button"
+  <div class="teaminbox-tab__header border-bottom">
+    <collapse-button class="teaminbox-tab__header__collapse-button"
                      :target="collapseTarget"
                      v-model="collapsed"
                      v-if="collapseTarget && !isMobile"/>
 
     <template v-if="!isSearchActive">
-      <label class="einbox-tab__header__label ellipse"
+      <label class="teaminbox-tab__header__label ellipse"
              v-if="activeInbox.name">
         {{ activeInbox.name }}
       </label>
       <q-space></q-space>
 
       <span class="cursor-pointer mr-2"
-            :id="`einbox-tab-open-comms-page-icon-${_uid}`"
+            :id="`teaminbox-tab-open-comms-page-icon-${_uid}`"
             @click="$router.push(DEFAULT_COMMUNICATIONS_ROUTE_PATH)">
         <watch-icon />
         <b-tooltip custom-class="talk-table__tooltip"
-                   :target="`einbox-tab-open-comms-page-icon-${_uid}`">
+                   :target="`teaminbox-tab-open-comms-page-icon-${_uid}`">
           Open Communications Page
         </b-tooltip>
       </span>
 
       <span class="cursor-pointer"
-            :id="`einbox-tab-search-icon-${_uid}`"
+            :id="`teaminbox-tab-search-icon-${_uid}`"
             @click="onEnterSearch">
         <search-icon color="#256eff"
                      width="18"
                      height="18" />
         <b-tooltip custom-class="talk-table__tooltip"
-                   :target="`einbox-tab-search-icon-${_uid}`">
+                   :target="`teaminbox-tab-search-icon-${_uid}`">
           Click to search
         </b-tooltip>
       </span>
@@ -39,17 +39,17 @@
       <search-input no-clear-on-route-change
                     ref="search"
                     placeholder="Type ENTER to search comms..."
-                    class="einbox-tab__header__search"
+                    class="teaminbox-tab__header__search"
                     limit-search-characters
-                    :id="`einbox-tab-search-${_uid}`"
+                    :id="`teaminbox-tab-search-${_uid}`"
                     @search="$emit('search', $event)"
                     @blur="onLeaveSearch"
                     @focus="setShowSearchTooltip(true)"
                     @show-error="showLimitCharactersError"/>
       <b-tooltip custom-class="talk-table__tooltip"
                  placement="top"
-                 :boundary="`einbox-tab-search-${_uid}`"
-                 :target="`einbox-tab-search-${_uid}`"
+                 :boundary="`teaminbox-tab-search-${_uid}`"
+                 :target="`teaminbox-tab-search-${_uid}`"
                  :show="showSearchTooltip">
         Search communications by contact's name or phone number
       </b-tooltip>
@@ -93,7 +93,7 @@ export default {
   }),
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'viewMode',
       'activeInbox'
     ]),
@@ -143,7 +143,7 @@ export default {
 </script>
 
 <style lang="scss">
-.einbox-tab__header {
+.teaminbox-tab__header {
   display: flex;
   align-items: center;
   padding: 6px 15px;
