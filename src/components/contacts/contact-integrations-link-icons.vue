@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 import HubspotIcon from 'components/icons/hubspot-icon.vue'
 
 export default {
@@ -26,7 +25,6 @@ export default {
     }
   },
   computed: {
-    ...mapState('cache', ['currentCompany']),
     hubspot_link () {
       return this.contact?.integration_data?.hubspot?.link || null
     }

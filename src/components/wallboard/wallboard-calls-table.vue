@@ -129,12 +129,14 @@
                   v-if="column.name === 'lead_number'">
                 <div class="d-flex">
                   <div class="d-flex flex-column justify-center flex-grow-1">
-                    <!-- contact with link -->
-                    <router-link class="mb-1"
-                                 :to="{ path: `/contacts/${call.contact_id}` }"
+                    <!-- contact with link and integration icons -->
+                    <div class="d-flex align-items-center mb-1">
+                      <router-link :to="{ path: `/contacts/${call.contact_id}` }"
                                  v-if="call.contact">
-                      {{ call.contact.name | ucwords }}
-                    </router-link>
+                        {{ call.contact.name | ucwords }}
+                      </router-link>
+                      <contact-integrations-link-icons :contact='call.contact' />
+                    </div>
 
                     <!-- lead number -->
                     <div class="d-flex align-items-center mb-1">
@@ -418,6 +420,7 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
+import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
 
 export default {
   name: 'wallboard-calls-table',
@@ -432,6 +435,7 @@ export default {
   ],
 
   components: {
+    ContactIntegrationsLinkIcons,
     BargeCommunicationButton,
     Datatable,
     InformationCircleIcon,
@@ -506,6 +510,8 @@ export default {
 
     orderedCalls () {
       let calls = this.calls
+
+      console.warn('calls', calls)
 
       return calls.sort((a, b) => {
         let condition = null

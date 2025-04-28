@@ -485,7 +485,7 @@
                     <p class="contact-name mb-1">
                       <span class="d-inline-flex cursor-pointer link-only"
                             @click="goToContact">
-                        {{ contactName }}
+                            {{ contactName | truncate(15) }}
                       </span>
                       <contact-integrations-link-icons :contact='contact' />
                     </p>
