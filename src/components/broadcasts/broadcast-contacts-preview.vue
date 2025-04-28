@@ -40,6 +40,7 @@
             <td :key="column.name"
                 v-if="column.name === 'name'">
               <name-wrapper dnc-badge
+                            opt-out-badge
                             link-path="/contacts/"
                             :resource="contact" />
             </td>
@@ -159,7 +160,8 @@ export default {
       per_page: 25,
       sort: 'last_engagement_at',
       order: 'desc',
-      force_slave: 1
+      force_slave: 1,
+      relations: ['phoneNumbers']
     },
     currentFilters: {}
   }),
