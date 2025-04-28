@@ -316,9 +316,9 @@ export default {
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
 
     // Listen to contact communications read/unread event
-    this.$VueEvent.listen('einbox_contact_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
-    this.$VueEvent.listen('einbox_contact_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
-    this.$VueEvent.listen('einbox_contact_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)
+    this.$VueEvent.listen('teaminbox_contact_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
+    this.$VueEvent.listen('teaminbox_contact_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
+    this.$VueEvent.listen('teaminbox_contact_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)
   },
 
   watch: {
@@ -358,9 +358,9 @@ export default {
     this.$VueEvent.stop('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
-    this.$VueEvent.stop('einbox_contact_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
-    this.$VueEvent.stop('einbox_contact_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
-    this.$VueEvent.stop('einbox_contact_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)
+    this.$VueEvent.stop('teaminbox_contact_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
+    this.$VueEvent.stop('teaminbox_contact_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
+    this.$VueEvent.stop('teaminbox_contact_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)
   }
 }
 </script>
