@@ -185,7 +185,21 @@ export default {
       })
     },
 
+    async loadInbox (inboxId) {
+      const response = await talk2Api.V2.inbox.inboxes.get({
+        params: {
+          inbox_ids: [inboxId]
+        }
+      })
+
+      this.setInboxes(response.data)
+    },
+
     checkInboxAccess (inboxId) {
+      if (this.inboxes.length === 0 && inboxId) {
+        this.loadInbox(inboxId)
+      }
+
       return this.inboxes.some(inbox => inbox.id === inboxId)
     }
   }

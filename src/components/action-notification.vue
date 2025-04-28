@@ -200,7 +200,9 @@ import {
   notificationMixin,
   visibilityMixin,
   aclMixin,
-  agentMixin
+  agentMixin,
+  userMixin,
+  TeamInboxMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -218,7 +220,9 @@ export default {
     mentionsMixin,
     visibilityMixin,
     aclMixin,
-    agentMixin
+    agentMixin,
+    userMixin,
+    TeamInboxMixin
   ],
 
   components: {
@@ -339,6 +343,21 @@ export default {
         return null
       }
 
+      // If TeamInbox is enabled
+      if (this.hasCompanyTeamInboxEnabled) {
+        // If the communication has a ring group id and user has access to that team inbox
+        if (this.ringGroupId && this.ringGroupId !== '' && this.checkInboxAccess(this.ringGroupId)) {
+          return {
+            path: `/team-inboxes/${this.ringGroupId}/contacts/${this.contactId}/communications`
+          }
+        }
+        // If no ring group id or no access, use regular communication page
+        return {
+          path: `/contacts/${this.contactId}/communications/${this.communicationId}`
+        }
+      }
+
+      // If TeamInbox is not enabled, use the original logic
       return {
         path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
       }
@@ -798,10 +817,10 @@ export default {
         return
       }
 
-      if (this.$route.path !== `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`) {
-        this.$router.push({
-          path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
-        })
+      // Get the path from the link computed property
+      const linkPath = this.link?.path
+      if (linkPath && this.$route.path !== linkPath) {
+        this.$router.push({ path: linkPath })
       }
     },
 
