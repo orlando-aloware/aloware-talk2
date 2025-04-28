@@ -228,7 +228,14 @@ export default {
       this.showAlertCallFinished = false
 
       do {
-        console.log('waiting for generated token', this.dialer.currentStatus, this.agentStatus)
+        if (this.dialer.currentStatus !== 'GENERATING_TOKEN') {
+          console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
+        }
+
+        if (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL) {
+          console.log('waiting for agent to become available to make the call', this.agentStatus)
+        }
+        
         await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
       } while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)
 
