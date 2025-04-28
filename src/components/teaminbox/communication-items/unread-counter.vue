@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { THREADED } from 'src/store/einbox/einbox.store'
+import { THREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapState } from 'vuex'
 
 export default {
@@ -32,7 +32,7 @@ export default {
   }),
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'viewMode'
     ]),
 

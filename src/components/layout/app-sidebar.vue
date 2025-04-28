@@ -60,26 +60,26 @@
       </span>
     </q-btn>
 
-    <q-btn :to="{ name: EINBOXES_MENU_TITLE }"
+    <q-btn :to="{ name: TEAMINBOXES_MENU_TITLE }"
            :ripple="false"
            icon="img:app-icons/menu/multi_inbox_active.svg"
            align="left"
            padding="none"
            class="nav-icons w-100"
            data-testid="communication-active-sidebar-btn"
-           v-show="isActive(EINBOXES_MENU_TITLE)"
+           v-show="isActive(TEAMINBOXES_MENU_TITLE)"
            v-if="hasCompanyTeamInboxEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{ EINBOXES_MENU_TITLE }}</span>
+        <span class="font-weight-bold text-sm">{{ TEAMINBOXES_MENU_TITLE }}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
             v-if="isSidebarExpanded">
-        {{ EINBOXES_MENU_TITLE }}
+        {{ TEAMINBOXES_MENU_TITLE }}
       </span>
 
       <!-- Temporary helper -->
@@ -88,35 +88,35 @@
         <information-circle-icon height="20"
                                  width="20"
                                  color="#FFF"
-                                 id="einbox-helper-icon" />
+                                 id="teaminbox-helper-icon" />
          <b-tooltip custom-class="talk-table__tooltip talk-table__tooltip--md"
                     placement="right"
-                    boundary="#einbox-helper-icon"
-                    target="einbox-helper-icon">
-          {{ EINBOX_TOOLTIP_TEXT }}
+                    boundary="#teaminbox-helper-icon"
+                    target="teaminbox-helper-icon">
+          {{ TEAMINBOX_TOOLTIP_TEXT }}
         </b-tooltip>
       </div>
     </q-btn>
-    <q-btn :to="{ name: EINBOXES_MENU_TITLE }"
+    <q-btn :to="{ name: TEAMINBOXES_MENU_TITLE }"
            :ripple="false"
            icon="img:app-icons/menu/multi_inbox_gray.svg"
            align="left"
            padding="10px 0px 10px 22px"
            class="nav-icons w-100"
            data-testid="communication-no-active-sidebar-btn"
-           v-show="!isActive(EINBOXES_MENU_TITLE)"
+           v-show="!isActive(TEAMINBOXES_MENU_TITLE)"
            v-if="hasCompanyTeamInboxEnabled"
            flat>
       <q-tooltip anchor="center right"
                  self="center left"
                  v-if="!isSidebarExpanded"
                  :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{ EINBOXES_MENU_TITLE }}</span>
+        <span class="font-weight-bold text-sm">{{ TEAMINBOXES_MENU_TITLE }}</span>
       </q-tooltip>
 
       <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
             v-if="isSidebarExpanded">
-        {{ EINBOXES_MENU_TITLE }}
+        {{ TEAMINBOXES_MENU_TITLE }}
       </span>
 
       <!-- Temporary helper -->
@@ -125,12 +125,12 @@
         <information-circle-icon height="20"
                                  width="20"
                                  color="#9797AE"
-                                 id="einbox-helper-icon-gray" />
+                                 id="teaminbox-helper-icon-gray" />
          <b-tooltip custom-class="talk-table__tooltip talk-table__tooltip--md"
                     placement="right"
-                    boundary="#einbox-helper-icon-gray"
-                    target="einbox-helper-icon-gray">
-          {{ EINBOX_TOOLTIP_TEXT }}
+                    boundary="#teaminbox-helper-icon-gray"
+                    target="teaminbox-helper-icon-gray">
+          {{ TEAMINBOX_TOOLTIP_TEXT }}
         </b-tooltip>
       </div>
     </q-btn>
@@ -661,13 +661,13 @@ import {
   DEFAULT_COMMUNICATIONS_ROUTE_PATH,
   INBOXES_MENU_TITLE,
   COMMUNICATIONS_MENU_TITLE,
-  EINBOXES_MENU_TITLE,
-  EINBOXES_MENU_ITEMS_TITLE,
-  EINBOXES_MENU_COMMUNICATIONS_TITLE
+  TEAMINBOXES_MENU_TITLE,
+  TEAMINBOXES_MENU_ITEMS_TITLE,
+  TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
 } from 'src/router/routes'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 
-const EINBOX_TOOLTIP_TEXT = 'Team Inboxes is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
+const TEAMINBOX_TOOLTIP_TEXT = 'Team Inboxes is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
 
 export default {
   name: 'app-sidebar',
@@ -747,10 +747,10 @@ export default {
       COMMUNICATIONS_MENU_TITLE,
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       INBOXES_MENU_TITLE,
-      EINBOX_TOOLTIP_TEXT,
-      EINBOXES_MENU_TITLE,
-      EINBOXES_MENU_ITEMS_TITLE,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE
+      TEAMINBOX_TOOLTIP_TEXT,
+      TEAMINBOXES_MENU_TITLE,
+      TEAMINBOXES_MENU_ITEMS_TITLE,
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
@@ -769,7 +769,7 @@ export default {
         return true
       }
 
-      if ([EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && name === EINBOXES_MENU_TITLE) {
+      if ([TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && name === TEAMINBOXES_MENU_TITLE) {
         return true
       }
 

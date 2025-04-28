@@ -20,6 +20,10 @@ export default function () {
     hasMoreItems: true,
     abortController: null,
     showRefreshInboxesButton: false,
-    showRefreshCommunicationsButton: false
+    showRefreshCommunicationsButton: false,
+    activeFilters: {},
+    activeSort: {},
+    currentSearch: null,
+    isInitialLoad: false
   }
 }

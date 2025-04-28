@@ -3,7 +3,7 @@ const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
 const ResetPassword = () => import('pages/ResetPassword.vue')
 const Inbox = () => import('pages/Inbox.vue')
-const EInbox = () => import('pages/EInbox.vue')
+const TeamInbox = () => import('pages/TeamInbox.vue')
 const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
 const Contact = () => import('src/pages/contacts/Contact.vue')
 const Contacts = () => import('src/pages/contacts/Contacts.vue')
@@ -52,9 +52,9 @@ export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Ch
 
 // Update the constants at the top
 export const INBOXES_MENU_TITLE = 'Inboxes'
-export const EINBOXES_MENU_TITLE = 'Team Inboxes'
-export const EINBOXES_MENU_ITEMS_TITLE = 'Team Inboxes Items'
-export const EINBOXES_MENU_COMMUNICATIONS_TITLE = 'Team Inboxes Communications'
+export const TEAMINBOXES_MENU_TITLE = 'Team Inboxes'
+export const TEAMINBOXES_MENU_ITEMS_TITLE = 'Team Inboxes Items'
+export const TEAMINBOXES_MENU_COMMUNICATIONS_TITLE = 'Team Inboxes Communications'
 export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
 export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
@@ -92,28 +92,28 @@ const routes = [
       },
       {
         path: 'team-inboxes',
-        name: EINBOXES_MENU_TITLE,
-        component: EInbox,
+        name: TEAMINBOXES_MENU_TITLE,
+        component: TeamInbox,
         meta: {
-          title: EINBOXES_MENU_TITLE,
+          title: TEAMINBOXES_MENU_TITLE,
           isInbox: true
         },
         children: [
           {
             path: ':inboxId',
-            name: EINBOXES_MENU_ITEMS_TITLE,
-            component: EInbox,
+            name: TEAMINBOXES_MENU_ITEMS_TITLE,
+            component: TeamInbox,
             meta: {
-              title: EINBOXES_MENU_TITLE,
+              title: TEAMINBOXES_MENU_TITLE,
               isInbox: true
             }
           },
           {
             path: ':inboxId/contacts/:id/communications',
-            name: EINBOXES_MENU_COMMUNICATIONS_TITLE,
+            name: TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
             component: Contact,
             meta: {
-              title: EINBOXES_MENU_TITLE,
+              title: TEAMINBOXES_MENU_TITLE,
               isInbox: true
             }
           }
