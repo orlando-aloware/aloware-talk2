@@ -3,7 +3,7 @@
        class="teaminbox-side">
     <TeamInboxNavList data-testid="teaminbox-nav-list"
                      :class="['teaminbox-side__left', {'teaminbox-side__left--mobile-hidden': $route.name !== TEAMINBOXES_MENU_TITLE}]"
-                     ref="TeaminboxNavList" />
+                     ref="teaminboxNavList" />
     <TeamInboxTab data-testid="teaminbox-tab"
                 :class="['teaminbox-side__right', {'teaminbox-side__right--mobile-hidden': $route.name !== TEAMINBOXES_MENU_ITEMS_TITLE}]"
                 :collapse-target="collapseTarget" />
@@ -34,9 +34,12 @@ export default {
   },
 
   mounted () {
-    if (this.$refs.teaminboxNavList) {
-      this.collapseTarget = this.$refs.teaminboxNavList.$el
-    }
+    // Allow DOM to fully render before accessing refs
+    this.$nextTick(() => {
+      if (this.$refs.teaminboxNavList) {
+        this.collapseTarget = this.$refs.teaminboxNavList.$el
+      }
+    })
   },
 
   computed: {
