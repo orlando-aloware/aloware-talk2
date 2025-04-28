@@ -241,11 +241,11 @@ export default {
       this.showAlertCallFinished = false
 
       do {
-        if (this.dialer.currentStatus !== 'GENERATING_TOKEN') {
+        if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
           console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
         }
 
-        if (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL) {
+        if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
           console.log('waiting for agent to become available to make the call', this.agentStatus)
         }
 
