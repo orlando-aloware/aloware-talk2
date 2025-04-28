@@ -235,10 +235,13 @@ export default {
         GROUP_CONTACT_RELEVANCE,
         GROUP_CONTACT_COMM_METADATA
       },
-      maxOuterFilters: 10, // OR (increased from 3)
-      maxInnerFilters: 10, // AND (increased from 5)
+      // OR filters
+      maxOuterFilters: 5,
+      // AND filters
+      maxInnerFilters: 10,
       tagsOptions: [],
-      filtersMemo: new Map() // Cache for generateListFilters results
+      // Cache for generateListFilters results
+      filtersMemo: new Map()
     }
   },
 
