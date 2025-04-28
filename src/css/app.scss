@@ -16791,10 +16791,15 @@ hr {
       }
     }
 
+    ul.dropdown-menu {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
     li a.dropdown-item {
       font-size: 12px;
       line-height: 1.5;
-      padding: 0.5rem 1rem;
+      padding: 5px 15px;
     }
   }
 }
