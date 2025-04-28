@@ -511,8 +511,6 @@ export default {
     orderedCalls () {
       let calls = this.calls
 
-      console.warn('calls', calls)
-
       return calls.sort((a, b) => {
         let condition = null
 
