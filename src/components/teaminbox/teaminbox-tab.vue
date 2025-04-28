@@ -55,7 +55,7 @@
                          :body="getMessageBody(item)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
-                         :unread-properties="getUnreadsProperties(item.contact)"
+                         :unread-properties="getUnreadsProperties(item.contact, item)"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                          :repeats="viewMode === UNTHREADED ? item.repeats : null"
                          :is-live-call="isLiveCall(item)" />
@@ -192,13 +192,11 @@ export default {
 
     isLiveCall,
 
-    getUnreadsProperties (contact) {
-      console.log('>>> getUnreadsProperties contact', contact)
-      if (isEmpty(contact)) {
-        return null
+    getUnreadsProperties (contact, communication) {
+      return {
+        communication_is_read: communication.is_read,
+        ...(!isEmpty(contact) ? pick(contact, ['unread_voicemail_count', 'unread_missed_call_count', 'unread_count']) : {})
       }
-
-      return pick(contact, ['unread_voicemail_count', 'unread_missed_call_count', 'unread_count'])
     },
 
     onScroll ({ target }) {

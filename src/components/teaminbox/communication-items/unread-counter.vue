@@ -5,12 +5,17 @@
              class="unread-badge"
              variant="danger"
              :key="totalUnreads"
-             v-if="totalUnreads > 0">
+             v-if="viewMode === THREADED && totalUnreads > 0">
       <span>
         <template v-if="totalUnreads <= 99">{{ totalUnreads }}</template>
         <template v-else>99<sup>+</sup></template>
       </span>
     </b-badge>
+    <b-badge pill
+             class="unread-badge unthreaded"
+             variant="danger"
+             :key="totalUnreads"
+             v-if="viewMode !== THREADED && !unreadProperties?.communication_is_read" />
   </transition>
 </template>
 
@@ -37,6 +42,8 @@ export default {
     ]),
 
     totalUnreads () {
+      console.log('>>> unreadProperties', this.unreadProperties)
+
       const unreadVoiceMail = this.unreadProperties?.unread_voicemail_count || 0
       const unreadMissedCall = this.unreadProperties?.unread_missed_call_count || 0
       const unreadCount = this.unreadProperties?.unread_count || 0
@@ -47,7 +54,7 @@ export default {
 
   watch: {
     totalUnreads (newCount, oldCount) {
-      this.isIncreasing = newCount > oldCount
+      this.isIncreasing = this.viewMode === THREADED && newCount > oldCount
     }
   }
 }
@@ -67,6 +74,14 @@ export default {
   justify-content: center;
   overflow: hidden;
   transition: all 0.3s ease-out;
+
+  &.unthreaded {
+    height: 8px;
+    width: 8px;
+    padding: 0;
+    top: 0px;
+    right: 0px;
+  }
 }
 
 .slide-vertical-enter {

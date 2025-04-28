@@ -336,7 +336,7 @@ export default {
     },
 
     parsedInboxes (parsedInboxes) {
-      const inboxIds = Object.keys(parsedInboxes).flatMap((parsedInbox) => parsedInboxes[parsedInbox].map((inbox) => inbox.id))
+      const inboxIds = Object.keys(parsedInboxes ?? {}).flatMap((parsedInbox) => parsedInboxes[parsedInbox].map((inbox) => inbox.id))
 
       if (!inboxIds.length) {
         return

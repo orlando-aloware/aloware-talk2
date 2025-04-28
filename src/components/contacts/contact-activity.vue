@@ -822,14 +822,10 @@ export default {
         const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
         if (oldTotalUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+        }
 
-          console.log('>>> data', data)
-
-          if (this.$route.params.inboxId) {
-            this.$nextTick(() => {
-              this.$VueEvent.fire('teaminbox_contact_communication_marked_as_unread', { inboxId: +this.$route.params.inboxId, contactId: data.id })
-            })
-          }
+        if (this.$route.params.inboxId) {
+          this.$VueEvent.fire('teaminbox_contact_communication_marked_as_unread', { inboxId: +this.$route.params.inboxId, contactId: data.id })
         }
       }).catch(err => {
         this.$handleErrors(err.response)
