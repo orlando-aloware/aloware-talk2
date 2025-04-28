@@ -1,32 +1,45 @@
 <template>
   <div>
-    <b-overlay class="h-100 w-100 position-absolute"
-               :show="isLoadingDialer">
+    <b-overlay
+      class="h-100 w-100 position-absolute"
+      :show="isLoadingDialer"
+    >
       <template #overlay>
-        <q-spinner-bars color="primary"
-                        size="2em" />
+        <q-spinner-bars
+          color="primary"
+          size="2em"
+        />
       </template>
     </b-overlay>
 
-    <dialer-listeners @user-logged-in="handleUserLogin"
-                      @agent-status-updated="handleAgentStatusUpdate"/>
+    <dialer-listeners
+      @user-logged-in="handleUserLogin"
+      @agent-status-updated="handleAgentStatusUpdate"
+    />
 
-    <div class="p-3"
-         v-if="criticalErrorHappened">
+    <div
+      class="p-3"
+      v-if="criticalErrorHappened"
+    >
       <p><strong>Something went wrong</strong></p>
       <hr>
       <p>For some reason we couldn’t complete the call. Please refresh the page and try again.</p>
     </div>
 
-    <div class="p-3"
-         v-else-if="showAlertAgentOnCall">
+    <div
+      class="p-3"
+      v-else-if="showAlertAgentOnCall"
+    >
       <p><strong>Call in Progress on Another Device</strong></p>
       <hr>
-      <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before initiating a new call.</p>
+      <p>You're currently engaged in another call on Aloware Talk. Please complete your current conversation before
+        initiating a new call.</p>
     </div>
 
-    <div class="p-3"
-         v-else-if="showAlertCallFinished && dialer && !dialer.parkedCall">
+    <div
+      class="p-3"
+      v-else-if="showAlertCallFinished && dialer && !dialer.parkedCall"
+    >
       <p><strong>Call Finished</strong></p>
       <hr>
       <p>Please close this window or click the back button to continue.</p>
@@ -47,16 +60,16 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
-import * as AgentStatus from 'src/constants/agent-status'
-import Webrtc from 'components/webrtc'
-import * as storage from 'src/plugins/helpers/storage'
-import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
-import { timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
+import Webrtc from 'components/webrtc'
+import * as AgentStatus from 'src/constants/agent-status'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
+import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
+import * as storage from 'src/plugins/helpers/storage'
+import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin } from 'src/plugins/mixins'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
 import CallingExtensionsManager from 'src/utils/CallingExtensionsManager'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'Dialer',
@@ -66,7 +79,7 @@ export default {
     DialerListeners
   },
 
-  mixins: [ timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin ],
+  mixins: [timezoneCheckMixin, helperMixin, agentMixin, dispositionsMixin],
 
   props: {
     apiKey: {
@@ -235,7 +248,7 @@ export default {
         if (this.agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL) {
           console.log('waiting for agent to become available to make the call', this.agentStatus)
         }
-        
+
         await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
       } while (this.dialer.currentStatus === 'GENERATING_TOKEN' || this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)
 
@@ -593,7 +606,8 @@ export default {
 </script>
 
 <style scoped>
-html, body {
+html,
+body {
   background: transparent !important;
   width: 300px;
   height: 522px;
