@@ -298,10 +298,10 @@ export default {
         if (isAscendingOrder) {
           // Oldest first (ascending)
           return dateA - dateB
-        } else {
-          // Newest first (descending, default)
-          return dateB - dateA
         }
+
+        // Newest first (descending, default)
+        return dateB - dateA
       })
     },
 
