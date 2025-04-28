@@ -274,6 +274,7 @@
                         @click="goToContact">
                     {{ contactName | truncate(15) }}
                   </span>
+                  <contact-integrations-link-icons :contact='contact' />
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
                   <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
@@ -486,6 +487,7 @@
                             @click="goToContact">
                         {{ contactName }}
                       </span>
+                      <contact-integrations-link-icons :contact='contact' />
                     </p>
                     <p class="text-sm-left contact-phone mb-1"
                        v-if="contact">
@@ -1320,11 +1322,13 @@ import {
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import * as AgentStatus from '../../constants/agent-status'
+import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
 
 export default {
   name: 'phone',
 
   components: {
+    ContactIntegrationsLinkIcons,
     HubspotActivityTypeSelector,
     ParkedCallIcon,
     MobileLiveCallBar,
