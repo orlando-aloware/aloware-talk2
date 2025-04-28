@@ -343,23 +343,23 @@ export default {
         return null
       }
 
-      // If TeamInbox is enabled
-      if (this.hasCompanyTeamInboxEnabled) {
-        // If the communication has a ring group id and user has access to that team inbox
-        if (this.ringGroupId && this.ringGroupId !== '' && this.checkInboxAccess(this.ringGroupId)) {
-          return {
-            path: `/team-inboxes/${this.ringGroupId}/contacts/${this.contactId}/communications`
-          }
-        }
-        // If no ring group id or no access, use regular communication page
+      // If TeamInbox is not enabled, use the original logic
+      if (!this.hasCompanyTeamInboxEnabled) {
         return {
-          path: `/contacts/${this.contactId}/communications/${this.communicationId}`
+          path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
         }
       }
 
-      // If TeamInbox is not enabled, use the original logic
+      // If the communication has a ring group id and user has access to that team inbox
+      if (this.ringGroupId && this.ringGroupId !== '' && this.checkInboxAccess(this.ringGroupId)) {
+        return {
+          path: `/team-inboxes/${this.ringGroupId}/contacts/${this.contactId}/communications`
+        }
+      }
+
+      // If no ring group id or no access, use regular communication page
       return {
-        path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+        path: `/contacts/${this.contactId}/communications/${this.communicationId}`
       }
     },
 
