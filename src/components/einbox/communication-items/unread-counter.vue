@@ -5,7 +5,7 @@
              class="unread-badge"
              variant="danger"
              :key="totalUnreads"
-             v-if="viewMode === THREADED && totalUnreads > 0">
+             v-if="totalUnreads > 0">
       <span>
         <template v-if="totalUnreads <= 99">{{ totalUnreads }}</template>
         <template v-else>99<sup>+</sup></template>

@@ -162,6 +162,7 @@ export default {
     isLiveCall,
 
     getUnreadsProperties (contact) {
+      console.log('>>> getUnreadsProperties contact', contact)
       if (isEmpty(contact)) {
         return null
       }

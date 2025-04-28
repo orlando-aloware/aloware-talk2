@@ -279,10 +279,26 @@ export default {
       if (show) {
         this.$generalNotification('Search requires at least 3 characters', 'error')
       }
+    },
+
+    einboxCommunicationMarkedAllAsReadListener ({ inboxId, contactId }) {
+      this.einboxCommunicationMarkedAllAsRead(inboxId, contactId)
+    },
+
+    einboxCommunicationMarkedAsReadListener ({ inboxId, contactId }) {
+      this.einboxCommunicationMarkedAsRead(inboxId, contactId)
+    },
+
+    einboxCommunicationMarkedAsUnreadListener ({ inboxId, contactId }) {
+      this.einboxCommunicationMarkedAsUnread(inboxId, contactId)
     }
   },
 
   async created () {
+    // set unread counters as loading so we don't show it if
+    // user is navigating back to the Team Inboxes page
+    this.setIsLoadingInboxesUnreadCount(true)
+
     await this.fetchInboxes()
 
     if (this.inboxes.length) {
@@ -300,8 +316,9 @@ export default {
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
 
     // Listen to contact communications read/unread event
-    this.$VueEvent.listen('einbox_contact_cleared_unread', this.einboxContactClearedUnreadListener)
-    this.$VueEvent.listen('einbox_contact_added_unread', this.einboxContactAddedUnreadListener)
+    this.$VueEvent.listen('einbox_contact_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
+    this.$VueEvent.listen('einbox_contact_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
+    this.$VueEvent.listen('einbox_contact_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)
   },
 
   watch: {
@@ -331,22 +348,6 @@ export default {
     search (val) {
       this.resetInboxes()
       this.fetchInboxes(val)
-    },
-
-    einboxContactClearedUnreadListener (contactId) {
-      try {
-        this.einboxContactClearedUnread(contactId)
-      } catch (err) {
-        console.error('aqui1', err)
-      }
-    },
-
-    einboxContactAddedUnreadListener ({ inboxId, contactId }) {
-      try {
-        this.einboxContactAddedUnread(inboxId, contactId)
-      } catch (err) {
-        console.error('aqui2', err)
-      }
     }
   },
 
@@ -357,8 +358,9 @@ export default {
     this.$VueEvent.stop('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
-    this.$VueEvent.stop('einbox_contact_cleared_unread', this.einboxContactClearedUnreadListener)
-    this.$VueEvent.stop('einbox_contact_added_unread', this.einboxContactAddedUnreadListener)
+    this.$VueEvent.stop('einbox_contact_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
+    this.$VueEvent.stop('einbox_contact_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
+    this.$VueEvent.stop('einbox_contact_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)
   }
 }
 </script>

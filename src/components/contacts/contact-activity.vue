@@ -795,12 +795,10 @@ export default {
 
         if (hasUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+        }
 
-          if (this.$route.params.inboxId) {
-            this.$nextTick(() => {
-              this.$VueEvent.fire('einbox_contact_cleared_unread', contact.id)
-            })
-          }
+        if (this.$route.params.inboxId) {
+          this.$VueEvent.fire('einbox_contact_communication_marked_as_read', { inboxId: +this.$route.params.inboxId, contactId: contact.id })
         }
       }).catch(err => {
         this.$handleErrors(err.response)
@@ -829,10 +827,7 @@ export default {
 
           if (this.$route.params.inboxId) {
             this.$nextTick(() => {
-              this.$VueEvent.fire('einbox_contact_added_unread', {
-                inboxId: parseInt(this.$route.params.inboxId),
-                contactId: data.id
-              })
+              this.$VueEvent.fire('einbox_contact_communication_marked_as_unread', { inboxId: +this.$route.params.inboxId, contactId: data.id })
             })
           }
         }

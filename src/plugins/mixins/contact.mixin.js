@@ -843,6 +843,10 @@ export default {
 
           this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
+
+          if (this.$route.params.inboxId) {
+            this.$VueEvent.fire('einbox_contact_communications_all_as_read', { inboxId: +this.$route.params.inboxId, contactId: res.data.id })
+          }
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loadingMarkAsRead = false

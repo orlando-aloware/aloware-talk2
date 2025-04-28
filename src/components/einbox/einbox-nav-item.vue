@@ -72,7 +72,7 @@ export default {
   }
 
   &:has(&__unread-count-container) {
-    padding-right: 30px;
+    padding-right: 40px;
   }
 
   &__label {
