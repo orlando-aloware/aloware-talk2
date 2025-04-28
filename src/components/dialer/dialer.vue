@@ -1050,17 +1050,10 @@ export default {
         return
       }
 
-      // If this is a whisper call to an AI agent, prevent unmuting
-      if (this.dialer.aiAgentWhisper && this.dialer.isMuted) {
-        console.log('Cannot unmute when listening to an AI agent call')
-        this.$generalNotification('Cannot unmute when listening to an AI agent call', 'info')
-        return
-      }
-
       // If this is a barge call to an AI agent and user tries to unmute, handle takeover
       if (this.dialer.aiAgentTakeover && this.dialer.isMuted) {
         console.log('Taking over the call from AI agent')
-        this.$generalNotification('You are taking over the call from the AI agent', 'info')
+        this.$generalNotification('You are taking over the call from the AloAi agent', 'info')
 
         if (this.dialer.communication) {
           // Call the drop-other-agents API when taking over

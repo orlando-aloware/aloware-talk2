@@ -67,8 +67,8 @@ export default {
   methods: {
     dialog () {
       const message = this.isAiAgentUser(this.communication.user)
-        ? 'Do you want to listen to the AI agent call? Note that you will be muted by default.'
-        : 'Do you want to whisper to the agent of this call? Note that you will be muted by default.'
+        ? `Do you want to listen to the AI agent call? Note that you cannot unmute yourself while listening to the AloAi agent.`
+        : `Do you want to whisper to the agent of this call? Note that you will be muted by default.`
 
       this.$bvModal.msgBoxConfirm(message, {
         buttonSize: 'sm',

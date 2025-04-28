@@ -1571,7 +1571,7 @@ export default {
     },
 
     isMuteDisabled () {
-      return this.isCallCompleted
+      return this.isCallCompleted || (this.dialer.aiAgentWhisper && this.dialer.isMuted)
     },
 
     isRecordingDisabled () {
