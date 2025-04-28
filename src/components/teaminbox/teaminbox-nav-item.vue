@@ -1,14 +1,19 @@
 <template>
-  <div data-testid="einbox-nav-item"
-       :class="['einbox-nav-item', { 'einbox-nav-item--active': isActive }]"
+  <div data-testid="teaminbox-nav-item"
+       :class="['teaminbox-nav-item', { 'teaminbox-nav-item--active': isActive }]"
        @click="$emit('click', value)">
-    <div class="einbox-nav-item__content d-flex align-items-center">
+    <div class="teaminbox-nav-item__content d-flex align-items-center">
       <span class="d-flex align-items-center mr-1">
         <inbox-icon width="18"
                     height="18" />
       </span>
-      <span class="einbox-nav-item__label">{{ label }}</span>
-      <div class="einbox-nav-item__unread-count-container"
+      <span class="teaminbox-nav-item__label" :id="`teaminbox-nav-item-label-${_uid}`">{{ label }}</span>
+      <b-tooltip custom-class="talk-table__tooltip"
+        :target="`teaminbox-nav-item-label-${_uid}`"
+        :delay="500">
+        {{ label }}
+      </b-tooltip>
+      <div class="teaminbox-nav-item__unread-count-container"
            v-if="isLoadingUnreadCount || unreadCount > 0">
         <q-skeleton type="text"
                     width="20px"
@@ -59,7 +64,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.einbox-nav-item {
+.teaminbox-nav-item {
   padding: 10px 16px;
   border-radius: 10px;
   transition: all 0.2s ease;
@@ -72,7 +77,7 @@ export default {
   }
 
   &:has(&__unread-count-container) {
-    padding-right: 40px;
+    padding-right: 35px;
   }
 
   &__label {
@@ -94,6 +99,10 @@ export default {
     right: 8px;
     display: flex;
     align-items: center;
+
+    .q-badge {
+      font-size: 9px;
+    }
   }
 
   &--active {

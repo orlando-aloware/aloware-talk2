@@ -20,6 +20,10 @@
             v-if="dncContactsCount > 0">
         ({{ dncContactsCount }} DNC)
       </span>
+      <span class="contacts-preview__header__counter contacts-preview__header__counter--dnc"
+            v-if="optedOutContactsCount > 0">
+        ({{ optedOutContactsCount }} Opted Out)
+      </span>
     </div>
 
     <datatable class="contacts-preview__body"
@@ -149,6 +153,7 @@ export default {
     contacts: [],
     contactsCount: 0,
     dncContactsCount: 0,
+    optedOutContactsCount: 0,
     defaultFilters: {
       page: 1,
       per_page: 25,
@@ -227,14 +232,26 @@ export default {
         }
       })
 
+      // load count with opted out
+      const countOptOutPromise = this.getContactsCount({
+        filters: {
+          is_opted_out: {
+            value: 1,
+            operator: BOOLEAN_OPERATORS.IS_EQUAL_TO
+          }
+        }
+      })
+
       Promise.all([
         contactsPromise,
         countsPromise,
-        countsDncPromise
+        countsDncPromise,
+        countOptOutPromise
       ])
         .then((promises) => {
           this.contactsCount = parseInt(promises[1].data.count)
           this.dncContactsCount = parseInt(promises[2].data.count)
+          this.optedOutContactsCount = parseInt(promises[3].data.count)
 
           this.loading = false
         })
