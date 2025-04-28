@@ -124,7 +124,7 @@ function handleDuplicatedItems (items) {
 }
 
 /**
- * Find repeated comms of a contact
+ * Find repeated comms of a contact based on specific rules
  *
  * @param {array} items
  * @param {number} startIndex
@@ -132,14 +132,39 @@ function handleDuplicatedItems (items) {
  */
 function findRepeateds (items, startIndex) {
   const repeateds = []
-  const contactId = items[startIndex].contact_id
+  const currentItem = items[startIndex]
+  const currentType = currentItem.type
+  const currentDirection = currentItem.direction
+  const currentTimestamp = new Date(currentItem.created_at).getTime()
+
+  // Time threshold in milliseconds (60 minutes = 3,600,000 ms)
+  const TIME_THRESHOLD = 60 * 60 * 1000
 
   for (let i = startIndex + 1; i < items.length; i++) {
-    if (items[i].contact_id !== contactId) {
+    const nextItem = items[i]
+
+    // Check if it's the same contact
+    if (nextItem.contact_id !== currentItem.contact_id) {
       break
     }
 
-    repeateds.push(items[i].id)
+    // Check if type matches
+    if (nextItem.type !== currentType) {
+      continue
+    }
+
+    // Check if direction matches
+    if (nextItem.direction !== currentDirection) {
+      continue
+    }
+
+    // Check if it's within the time threshold (60 minutes)
+    const nextTimestamp = new Date(nextItem.created_at).getTime()
+    const timeDiff = Math.abs(currentTimestamp - nextTimestamp)
+
+    if (timeDiff <= TIME_THRESHOLD) {
+      repeateds.push(nextItem.id)
+    }
   }
 
   return repeateds
