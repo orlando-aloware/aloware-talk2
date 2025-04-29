@@ -150,15 +150,15 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
 
-      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
+      getLineIncomingNumber (contactId, lineId, teamInbox = null) {
         if (!contactId || !lineId) {
           return null
         }
 
         const params = {}
 
-        if (fromTeamInbox) {
-          params.from_team_inbox = fromTeamInbox
+        if (teamInbox) {
+          params.from_team_inbox = teamInbox
         }
 
         return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {

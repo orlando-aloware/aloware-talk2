@@ -11,7 +11,7 @@
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{
              'contact-activity--closed': detailsOpen || contactListSidebarOpen,
-             'inbox-activity-container-wrapper': teamInbox
+             'inbox-activity-container-wrapper': teamInboxId
            }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
@@ -19,7 +19,7 @@
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
-                            :team-inbox="teamInbox"
+                            :team-inbox-id="teamInboxId"
                             v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"

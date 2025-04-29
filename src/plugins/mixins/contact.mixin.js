@@ -9,9 +9,9 @@ import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
 
 export default {
   props: {
-    teamInbox: {
-      type: Boolean,
-      default: false
+    teamInboxId: {
+      type: Number,
+      default: null
     }
   },
 
@@ -108,6 +108,10 @@ export default {
     ...mapState('inbox', { selectContact: 'selectedContact' }),
 
     ...mapState('cache', ['currentCompany']),
+
+    teamInbox () {
+      return this.teamInboxId !== null
+    },
 
     selectedCampaign () {
       if (this.campaigns) {
@@ -852,6 +856,7 @@ export default {
     markAllAsRead (count) {
       if (this.contact) {
         this.loadingMarkAsRead = true
+        const teamInboxId = this.teamInboxId
 
         this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`).then(res => {
           this.loadingMarkAsRead = false
@@ -866,7 +871,7 @@ export default {
           this.$VueEvent.fire('contact_updated', res.data)
 
           if (this.$route.params.inboxId) {
-            this.$VueEvent.fire('teaminbox_communications_all_as_read', { inboxId: +this.$route.params.inboxId, count })
+            this.$VueEvent.fire('teaminbox_communications_all_as_read', { inboxId: +teamInboxId, count })
           }
         }).catch(err => {
           this.$handleErrors(err.response)
@@ -1255,7 +1260,7 @@ export default {
   watch: {
     'selectedCampaign.id': _.debounce(function (value) {
       this.updateMessageComposer()
-      this.updateLineIncomingNumber(this.teamInbox)
+      this.updateLineIncomingNumber()
     }, 1000),
 
     contactId: function () {

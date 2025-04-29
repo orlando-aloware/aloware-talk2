@@ -7,7 +7,7 @@
 
       <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
            v-if="isContactShow">
-        <Contact :team-inbox="true" />
+        <Contact :team-inbox-id="activeInboxId" />
       </div>
     </div>
   </div>
@@ -17,7 +17,7 @@
 import Contact from 'pages/contacts/Contact'
 import TeamInboxSide from 'components/teaminbox/teaminbox-side'
 import { userMixin } from 'src/plugins/mixins'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
@@ -44,6 +44,10 @@ export default {
     ...mapGetters('auth', [
       'authenticated',
       'profile'
+    ]),
+
+    ...mapState('TeamInbox', [
+      'activeInboxId'
     ]),
 
     isMobileContactActive () {

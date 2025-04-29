@@ -2,7 +2,7 @@
   <div class="contact-activity-container w-100"
        :class="{
          'h-93': isTrialBannerVisible,
-         'inbox-activity-container-wrapper': teamInbox
+         'inbox-activity-container-wrapper': teamInboxId
        }">
     <contact-activities-header
       :label="contactName"
@@ -101,9 +101,9 @@ export default {
       type: Boolean,
       default: true
     },
-    teamInbox: {
-      type: Boolean,
-      default: false
+    teamInboxId: {
+      type: Number,
+      default: null
     }
   },
   data () {
@@ -130,6 +130,9 @@ export default {
   computed: {
     ...mapState(['isTrialBannerVisible', 'isWidget']),
     ...mapGetters('contacts', ['contact']),
+    teamInbox () {
+      return this.teamInboxId !== null
+    },
     contactName () {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
