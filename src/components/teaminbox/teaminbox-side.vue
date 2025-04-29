@@ -18,7 +18,7 @@ import { mapActions, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 
 export default {
-  name: 'teaminbox-side',
+  name: 'TeamInboxSide',
 
   components: {
     TeamInboxTab,

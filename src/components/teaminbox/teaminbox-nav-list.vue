@@ -201,7 +201,11 @@ export default {
 
       this.setActiveInboxId(parseInt(inboxId))
       this.resetItems()
-      this.fetchItems(inboxId)
+      // Pass current filters and sorting
+      const filters = this.$store.state.TeamInbox.activeFilters || {}
+      const sort = this.$store.state.TeamInbox.activeSort || {}
+      const search = this.$store.state.TeamInbox.currentSearch || null
+      this.fetchItems(inboxId, search, filters, sort)
 
       const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
 
