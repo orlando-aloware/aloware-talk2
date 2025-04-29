@@ -50,12 +50,16 @@ const talk2Api = {
         return window.axios.put(`${suffixV1}contact/${id}`, params)
       },
 
-      getPhoneNumbers (id) {
+      getPhoneNumbers (id, fromTeamInbox = false) {
         if (!id) {
           return Promise.reject(new Error('Failed to get phone numbers, missing contact id!'))
         }
 
-        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
+        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`, {
+          params: {
+            from_team_inbox: fromTeamInbox
+          }
+        })
       },
 
       getRingGroups (id) {
@@ -142,12 +146,16 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
 
-      getLineIncomingNumber (contactId, lineId) {
+      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
         if (!contactId || !lineId) {
           return null
         }
 
-        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
+        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
+          params: {
+            from_team_inbox: fromTeamInbox
+          }
+        })
       },
 
       getIntegrationData (contactId, params) {
