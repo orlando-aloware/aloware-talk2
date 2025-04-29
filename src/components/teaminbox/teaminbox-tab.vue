@@ -72,7 +72,7 @@
       <!-- Empty state -->
       <div class="text-center text-grey pt-4"
            v-else>
-        No communications found
+        No communications found in this inbox
 
         <br/>
 
