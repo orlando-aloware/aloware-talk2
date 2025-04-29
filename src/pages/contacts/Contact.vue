@@ -197,7 +197,7 @@ export default {
 
     ...mapActions(['setContactDetailsDrawer']),
 
-    fetchContact: _.debounce(function (fromTeamInbox = false) {
+    fetchContact: _.debounce(function () {
       this.selectedContactChanging(true)
 
       // OPTION: Changes selected marker on contact list, even before fetching data,
@@ -211,7 +211,7 @@ export default {
         this.setContactClone(selectedContact)
         this.resetChangedContactProperties([])
         this.selectedContactChanging(false)
-      }, true, fromTeamInbox)
+      })
     }, 1000),
 
     toggleDrawer () {
@@ -226,7 +226,7 @@ export default {
 
   mounted () {
     if (this.authenticated) {
-      this.fetchContact(this.teamInbox)
+      this.fetchContact()
     }
 
     this.contactComponentListeners.contactUpdated = (data) => {
@@ -298,7 +298,7 @@ export default {
       if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
-        this.fetchContact(this.teamInbox)
+        this.fetchContact()
         return
       }
 
