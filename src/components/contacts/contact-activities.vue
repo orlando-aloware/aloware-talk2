@@ -152,7 +152,7 @@ export default {
     },
     unreadCount () {
       if (this.$route.params.inboxId) {
-        return 99
+        return 0
       }
 
       return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
