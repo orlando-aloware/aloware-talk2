@@ -55,7 +55,7 @@
                          :body="getMessageBody(item)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
-                         :unread-properties="getUnreadsProperties(item.contact)"
+                         :unread-properties="getUnreadsProperties(item)"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                          :repeats="viewMode === UNTHREADED ? item.repeats : null"
                          :is-live-call="isLiveCall(item)" />
@@ -99,7 +99,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState, mapActions } from 'vuex'
-import { debounce, isEmpty, pick } from 'lodash'
+import { debounce } from 'lodash'
 
 export default {
   components: {
@@ -192,12 +192,16 @@ export default {
 
     isLiveCall,
 
-    getUnreadsProperties (contact) {
-      if (isEmpty(contact)) {
-        return null
+    getUnreadsProperties (communication) {
+      if (this.viewMode === UNTHREADED) {
+        return {
+          unread_count: communication.repeats > 0 ? communication.unread_repeats : (!communication.is_read ? 1 : 0)
+        }
       }
 
-      return pick(contact, ['unread_voicemail_count', 'unread_missed_call_count', 'unread_count'])
+      return {
+        unread_count: communication.inbox_unread_count
+      }
     },
 
     onScroll ({ target }) {

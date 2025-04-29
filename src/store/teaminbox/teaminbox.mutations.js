@@ -17,6 +17,12 @@ export default {
   SET_IS_LOADING_INBOXES (state, loading) {
     state.isLoadingInboxes = loading
   },
+  SET_INBOXES_UNREAD_COUNT (state, inboxesUnreadCount) {
+    state.inboxesUnreadCount = [ ...inboxesUnreadCount ]
+  },
+  SET_IS_LOADING_INBOXES_UNREAD_COUNT (state, loading) {
+    state.isLoadingInboxesUnreadCount = loading
+  },
   SET_CURRENT_INBOXES_PAGE (state, page) {
     state.currentInboxesPage = page
   },
@@ -97,7 +103,19 @@ function handleDuplicatedItems (items) {
     // try to find repeated comms for this contact
     if (repeateds.length > 0) {
       const repeatedItems = [item, ...repeateds.map(id => items.find(i => i.id === id))]
-      const liveCallItem = repeatedItems.find(i => isLiveCall(i))
+
+      let unreadRepeats = 0
+      let liveCallItem
+
+      for (const repeatedItem of repeatedItems) {
+        if (!liveCallItem && isLiveCall(repeatedItem)) {
+          liveCallItem = repeatedItem
+        }
+
+        if (!repeatedItem.is_read) {
+          unreadRepeats++
+        }
+      }
 
       if (liveCallItem) {
         repeatedItems.forEach(repeatedItem => {
@@ -112,6 +130,8 @@ function handleDuplicatedItems (items) {
         items[index].repeats = repeateds.length
         hidden.push(...repeateds)
       }
+
+      items[index].unread_repeats = unreadRepeats
     }
 
     // mark repeated comms to dont appear

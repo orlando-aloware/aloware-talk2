@@ -22,6 +22,12 @@ export default {
   setIsLoadingInboxes: ({ commit }, loading) => {
     commit('SET_IS_LOADING_INBOXES', loading)
   },
+  setInboxesUnreadCount: ({ commit }, data) => {
+    commit('SET_INBOXES_UNREAD_COUNT', data)
+  },
+  setIsLoadingInboxesUnreadCount: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_INBOXES_UNREAD_COUNT', loading)
+  },
   setHasMoreInboxes: ({ commit }, hasMore) => {
     commit('SET_HAS_MORE_INBOXES', hasMore)
   },

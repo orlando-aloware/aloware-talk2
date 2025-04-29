@@ -9,7 +9,8 @@
       <div ref="inboxesInner">
         <TeamInboxNavItem :label="inbox.name"
                          :value="inbox.id"
-                         :message-count="inbox.message_count"
+                         :is-loading-unread-count="isLoadingInboxesUnreadCount"
+                         :unread-count="getInboxUnreadCount(inbox.id)"
                          :is-active="activeInboxId === inbox.id"
                          :key="inbox.id"
                          v-for="inbox in typedInboxes"
@@ -21,6 +22,7 @@
 
 <script>
 import TeamInboxNavItem from './teaminbox-nav-item.vue'
+import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 
 export default {
   components: {
@@ -47,7 +49,11 @@ export default {
       type: Number,
       required: false
     }
-  }
+  },
+
+  mixins: [
+    TeamInboxMixin
+  ]
 }
 </script>
 
