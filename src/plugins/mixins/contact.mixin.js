@@ -828,7 +828,7 @@ export default {
       this.selectedPhoneNumber = null
     },
 
-    markAllAsRead () {
+    markAllAsRead (count) {
       if (this.contact) {
         this.loadingMarkAsRead = true
 
@@ -845,7 +845,7 @@ export default {
           this.$VueEvent.fire('contact_updated', res.data)
 
           if (this.$route.params.inboxId) {
-            this.$VueEvent.fire('teaminbox_contact_communications_all_as_read', { inboxId: +this.$route.params.inboxId, contactId: res.data.id })
+            this.$VueEvent.fire('teaminbox_communications_all_as_read', { inboxId: +this.$route.params.inboxId, count })
           }
         }).catch(err => {
           this.$handleErrors(err.response)

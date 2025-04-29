@@ -223,21 +223,23 @@ export default {
       return this.inboxesUnreadCount?.reduce((total, inbox) => inbox.ring_group_id === inboxId ? (total + inbox.unread_count) : total, 0)
     },
 
-    einboxCommunicationMarkedAllAsRead (inboxId, contactId) {
-      console.log('>>> einboxCommunicationMarkedAllAsRead', contactId)
+    einboxCommunicationMarkedAllAsRead (inboxId, count) {
       this.setInboxesUnreadCount([...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId && inbox.contact_id === contactId) {
-          inbox.unread_count = 0
+        if (inbox.ring_group_id === inboxId) {
+          inbox.unread_count -= count
+
+          if (inbox.unread_count < 0) {
+            inbox.unread_count = 0
+          }
         }
 
         return inbox
       })])
     },
 
-    einboxCommunicationMarkedAsRead (inboxId, contactId) {
-      console.log('>>> einboxCommunicationMarkedAsRead', contactId)
+    einboxCommunicationMarkedAsRead (inboxId) {
       this.setInboxesUnreadCount([...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId && inbox.contact_id === contactId) {
+        if (inbox.ring_group_id === inboxId) {
           inbox.unread_count--
         }
 
@@ -245,22 +247,20 @@ export default {
       })])
     },
 
-    einboxCommunicationMarkedAsUnread (inboxId, contactId) {
-      console.log('>>> einboxCommunicationMarkedAsUnread', inboxId, contactId)
+    einboxCommunicationMarkedAsUnread (inboxId) {
       // increment unread count for inbox/contact
       const newValue = [...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId && inbox.contact_id === contactId) {
+        if (inbox.ring_group_id === inboxId) {
           inbox.unread_count++
         }
 
         return inbox
       })]
 
-      // if contact is not found within inbox, add it since we have the inboxId
+      // if inbox is not found, add it since we have the inboxId
       if (!newValue.find((inbox) => inbox.ring_group_id === inboxId)) {
         newValue.push({
           ring_group_id: inboxId,
-          contact_id: contactId,
           unread_count: 1
         })
       }
