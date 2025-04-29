@@ -2714,7 +2714,7 @@ i.option-separator {
   background-color: $white;
   position: relative;
   
-  &.inbox-activity-wrapper {
+  &.inbox-activity-container-wrapper {
     border-radius: 8px;
   }
 
@@ -9338,7 +9338,7 @@ span.mention {
 .contact-activity-wrapper {
   width: 100%;
 
-  &.inbox-wrapper {
+  &.inbox-activity-container-wrapper { 
     padding: 10px 0;
     background: $grey-40;
   }

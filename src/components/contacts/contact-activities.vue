@@ -2,7 +2,7 @@
   <div class="contact-activity-container w-100"
        :class="{
          'h-93': isTrialBannerVisible,
-         'inbox-activity-wrapper': teamInbox
+         'inbox-activity-container-wrapper': teamInbox
        }">
     <contact-activities-header
       :label="contactName"

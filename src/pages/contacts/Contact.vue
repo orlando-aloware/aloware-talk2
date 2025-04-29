@@ -11,7 +11,7 @@
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{
              'contact-activity--closed': detailsOpen || contactListSidebarOpen,
-             'inbox-wrapper': teamInbox
+             'inbox-activity-container-wrapper': teamInbox
            }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
