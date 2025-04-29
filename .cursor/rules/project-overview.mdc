@@ -1,0 +1,32 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Aloware Talk 2 - Project Overview
+
+This is a Quasar/Vue.js based application for Aloware Agent Interface, with both web and Electron desktop builds.
+
+## Key Entry Points
+- [App.vue](mdc:src/App.vue) - The main Vue application component
+- [quasar.conf.js](mdc:quasar.conf.js) - Configuration for the Quasar framework
+- [index.template.html](mdc:src/index.template.html) - HTML template for the application
+
+## Project Structure
+- `src/` - Main application code
+  - `components/` - Reusable Vue components
+  - `pages/` - Page-level Vue components
+  - `layouts/` - Layout components
+  - `store/` - Vuex store modules
+  - `router/` - Vue router configuration
+  - `boot/` - Initialization code that runs before the app
+  - `utils/` - Helper utilities
+  - `mixins/` - Vue mixins
+  - `constants/` - Application constants
+  - `css/` - Stylesheets
+  - `assets/` - Static assets
+
+## Build and Development
+- Web app: `quasar dev` for development, `quasar build` for production
+- Electron app: `quasar dev -m electron` for development
+- See package.json for all scripts
