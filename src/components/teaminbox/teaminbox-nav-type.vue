@@ -10,7 +10,7 @@
         <TeamInboxNavItem :label="inbox.name"
                          :value="inbox.id"
                          :is-loading-unread-count="isLoadingInboxesUnreadCount"
-                         :unread-count="calcInboxUnreadCount(inbox.id)"
+                         :unread-count="getInboxUnreadCount(inbox.id)"
                          :is-active="activeInboxId === inbox.id"
                          :key="inbox.id"
                          v-for="inbox in typedInboxes"

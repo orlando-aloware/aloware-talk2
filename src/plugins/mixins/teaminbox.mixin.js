@@ -219,8 +219,8 @@ export default {
       this.setIsLoadingInboxesUnreadCount(false)
     },
 
-    calcInboxUnreadCount (inboxId) {
-      return this.inboxesUnreadCount?.reduce((total, inbox) => inbox.ring_group_id === inboxId ? (total + inbox.unread_count) : total, 0)
+    getInboxUnreadCount (inboxId) {
+      return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
     },
 
     einboxCommunicationMarkedAllAsRead (inboxId, count) {
