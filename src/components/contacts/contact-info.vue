@@ -15,14 +15,17 @@
 
       <div class="d-flex justify-content-between relative-position w-100">
         <div class="w-100 d-grid">
-          <div class="mt-1 mb-0 contact-name-wrapper">
-            <q-tooltip anchor="top middle"
-                       data-testid="contact-info-name-tooltip"
-                       self="center middle"
-                       content-class="fs-12">
-              {{ contactName }}
-            </q-tooltip>
-            <h2 class="contact-name pb-1">{{ contactName }}</h2>
+          <div class="mt-1 mb-0 d-flex align-items-center overflow-hidden">
+            <div class="contact-name-wrapper flex-grow-1 min-w-0 overflow-hidden">
+              <q-tooltip anchor="top middle"
+                         data-testid="contact-info-name-tooltip"
+                         self="center middle"
+                         content-class="fs-12">
+                {{ contactName }}
+              </q-tooltip>
+              <h2 class="contact-name pb-1 text-truncate">{{ contactName }}</h2>
+            </div>
+            <contact-integrations-link-icons class="ml-2 flex-shrink-0 mr-4" :contact='contact' />
           </div>
           <p class="contact-phone">
             <span v-if="contact.phone_number !== '0' && contact.phone_number !== null">
@@ -275,6 +278,7 @@ import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
+import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
 
 export default {
   name: 'contact-info',
@@ -293,6 +297,7 @@ export default {
   ],
 
   components: {
+    ContactIntegrationsLinkIcons,
     ContactDncActions,
     DigitalClock,
     ContactAddReminderModal,
