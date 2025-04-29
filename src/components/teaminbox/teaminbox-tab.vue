@@ -254,7 +254,7 @@ export default {
       } else {
         const index = this.itemsData.findIndex(c => c.id === communication.id)
         if (index > -1) {
-          // If the is_read property is changed, adjsut the unread counts
+          // If the is_read property is changed, adjust the unread counts
           if (this.itemsData[index]?.is_read !== communication.is_read) {
             // let unreadCount = this.itemsData[index]?.inbox_unread_count || 0
             if (this.itemsData[index]?.repeats > 0) {
