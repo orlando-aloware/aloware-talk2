@@ -1,6 +1,9 @@
 <template>
   <div class="contact-activity-container w-100"
-       :class="{ 'h-93': isTrialBannerVisible }">
+       :class="{
+         'h-93': isTrialBannerVisible,
+         'inbox-activity-wrapper': teamInbox
+       }">
     <contact-activities-header
       :label="contactName"
       :hasUnreads="hasUnreads"
@@ -97,6 +100,10 @@ export default {
     enableExport: {
       type: Boolean,
       default: true
+    },
+    teamInbox: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

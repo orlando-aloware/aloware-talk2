@@ -9,13 +9,17 @@
          :class="{ 'contact-view-wrapper-hs-widget': isWidget }"
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
-           :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
+           :class="{
+             'contact-activity--closed': detailsOpen || contactListSidebarOpen,
+             'inbox-wrapper': teamInbox
+           }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
+                            :team-inbox="teamInbox"
                             v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
@@ -122,6 +126,13 @@ export default {
     ContactDetails,
     ContactActivities,
     CompactBtn
+  },
+
+  props: {
+    teamInbox: {
+      type: Boolean,
+      default: false
+    }
   },
 
   computed: {

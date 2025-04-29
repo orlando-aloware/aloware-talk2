@@ -332,8 +332,8 @@ body,
 
 @media (min-width: 605px) {
   .contact-details-container {
-    margin-left: 15px;
-    margin-top: 15px;
+    margin-left: 10px;
+    margin-top: 10px;
   }
 }
 
@@ -2193,7 +2193,7 @@ i.option-separator {
 .contact-view-wrapper {
   overflow: hidden;
   position: relative;
-  background: $grey-50;
+  background: $grey-40;
   height: 100%;
 
   .contact-activity-wrapper.w-less-630px {
@@ -2713,6 +2713,10 @@ i.option-separator {
   height: 100%;
   background-color: $white;
   position: relative;
+  
+  &.inbox-activity-wrapper {
+    border-radius: 8px;
+  }
 
   .contact-activities {
     height: 100%;
@@ -9333,6 +9337,11 @@ span.mention {
 
 .contact-activity-wrapper {
   width: 100%;
+
+  &.inbox-wrapper {
+    padding: 10px 0;
+    background: $grey-40;
+  }
 }
 
 .contact-activities-actions {
@@ -10487,8 +10496,8 @@ screen and (max-width: 956px) {
     }
   }
   .contact-details-container.contact-details--opened {
-    padding-left: 15px;
-    padding-top: 15px;
+    padding-left: 10px;
+    padding-top: 10px;
     width: 100% !important;
     display: block !important;
     max-width: unset !important;
