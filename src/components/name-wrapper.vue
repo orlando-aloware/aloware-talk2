@@ -17,6 +17,12 @@
                      v-if="dncBadge && resource.is_dnc">
               DNC
             </b-badge>
+            <b-badge variant="danger"
+                     class="badge-phone-info ml-2"
+                     data-testid="contacts-view-contact-opted-out-badge"
+                     v-if="optOutBadge && isContactOptedOut">
+              Opt-Out
+            </b-badge>
           </template>
           <template v-else>No Name</template>
         </a>
@@ -46,6 +52,10 @@ export default {
     dncBadge: {
       type: Boolean,
       default: false
+    },
+    optOutBadge: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -68,6 +78,15 @@ export default {
       }
 
       return ''
+    },
+
+    isContactOptedOut () {
+      if (!this.resource?.phone_numbers?.length) {
+        return false
+      }
+
+      // true if all phone numbers are opted out
+      return this.resource.phone_numbers.every((phoneNumber) => phoneNumber.is_opted_out)
     }
   },
 
