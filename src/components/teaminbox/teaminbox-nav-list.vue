@@ -112,27 +112,18 @@ export default {
       const connected = []
       const watching = []
 
-      let testingInbox = null
+      this.inboxes.forEach(inbox => {
+        const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
+        const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
 
-      try {
-        this.inboxes.forEach(inbox => {
-          testingInbox = inbox
-
-          const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
-          const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
-
-          if (inbox.call_waiting && isConnected) {
-            personal.push(inbox)
-          } else if (!inbox.call_waiting && isConnected) {
-            connected.push(inbox)
-          } else if (isWatching) {
-            watching.push(inbox)
-          }
-        })
-      } catch (error) {
-        console.error(error)
-        console.log(testingInbox)
-      }
+        if (inbox.call_waiting && isConnected) {
+          personal.push(inbox)
+        } else if (!inbox.call_waiting && isConnected) {
+          connected.push(inbox)
+        } else if (isWatching) {
+          watching.push(inbox)
+        }
+      })
 
       return {
         personal,
