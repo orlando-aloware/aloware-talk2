@@ -560,13 +560,17 @@ export default {
         return
       }
 
+      const params = {}
+
+      if (this.teamInbox) {
+        params.from_team_inbox = this.teamInbox
+      }
+
       // get contact's info
       return this.$axios.get(`/api/v2/contacts/${contactIdToFetch}`,
         {
           cancelToken: this.source.token,
-          params: {
-            from_team_inbox: this.teamInbox
-          }
+          params
         })
         .then(res => {
           this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
@@ -718,12 +722,18 @@ export default {
         }
       }
 
+      const params = {}
+
+      if (this.teamInbox) {
+        params.from_team_inbox = this.teamInbox
+      }
+
       return this.$axios.get(`/api/v1/contact/${contactId}/communications`, {
         params: {
           page: this.communicationsPage,
           per_page: this.communicationsPerPage,
           last_audit_created_at: lastAuditCreatedAt,
-          from_team_inbox: this.teamInbox
+          ...params
         },
         cancelToken: this.communicationApiSource.token
       }).then(res => {
@@ -1004,10 +1014,14 @@ export default {
       if (this.contact && this.selectedCampaign) {
         this.contactIncomingNumber = null
 
+        const params = {}
+
+        if (this.teamInbox) {
+          params.from_team_inbox = this.teamInbox
+        }
+
         this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`, {
-          params: {
-            from_team_inbox: this.teamInbox
-          }
+          params
         }).then(res => {
           this.contactIncomingNumber = res.data
         }).catch(err => {

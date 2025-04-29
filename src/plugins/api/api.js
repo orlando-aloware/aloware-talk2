@@ -55,10 +55,14 @@ const talk2Api = {
           return Promise.reject(new Error('Failed to get phone numbers, missing contact id!'))
         }
 
+        const params = {}
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = fromTeamInbox
+        }
+
         return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`, {
-          params: {
-            from_team_inbox: fromTeamInbox
-          }
+          params
         })
       },
 
@@ -151,10 +155,14 @@ const talk2Api = {
           return null
         }
 
+        const params = {}
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = fromTeamInbox
+        }
+
         return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
-          params: {
-            from_team_inbox: fromTeamInbox
-          }
+          params
         })
       },
 
