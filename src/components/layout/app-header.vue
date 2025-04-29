@@ -555,7 +555,7 @@ export default {
 
     resetTeamInbox () {
       this.$router.push({
-        name: 'Team Inboxes'
+        name: TEAMINBOXES_MENU_TITLE
       })
     }
   },

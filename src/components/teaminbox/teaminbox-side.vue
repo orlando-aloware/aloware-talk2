@@ -63,7 +63,6 @@ export default {
     activeInboxId: {
       immediate: true,
       handler (inboxId) {
-        // FIXME: for now, get it from ring groups
         const inbox = this.ringGroups.find(group => group.id === inboxId) || {}
 
         this.setActiveInbox(inbox)
@@ -74,7 +73,6 @@ export default {
       immediate: true,
       handler () {
         if (isEmpty(this.activeInbox) && this.ringGroups.length) {
-          // FIXME: for now, get it from ring groups
           const inbox = this.ringGroups.find(group => group.id === this.activeInboxId) || {}
 
           this.setActiveInbox(inbox)

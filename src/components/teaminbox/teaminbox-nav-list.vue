@@ -97,6 +97,10 @@ export default {
       'showRefreshInboxesButton'
     ]),
 
+    watchedRG () {
+      return typeof this.inboxes[158] === 'object' ? this.inboxes[158] : null
+    },
+
     ...mapState('auth', ['profile']),
 
     ...mapState(['isMobile', 'teams']),
@@ -112,18 +116,27 @@ export default {
       const connected = []
       const watching = []
 
-      this.inboxes.forEach(inbox => {
-        const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
-        const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+      let testingInbox = null
 
-        if (inbox.call_waiting && isConnected) {
-          personal.push(inbox)
-        } else if (!inbox.call_waiting && isConnected) {
-          connected.push(inbox)
-        } else if (isWatching) {
-          watching.push(inbox)
-        }
-      })
+      try {
+        this.inboxes.forEach(inbox => {
+          testingInbox = inbox
+
+          const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
+          const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+
+          if (inbox.call_waiting && isConnected) {
+            personal.push(inbox)
+          } else if (!inbox.call_waiting && isConnected) {
+            connected.push(inbox)
+          } else if (isWatching) {
+            watching.push(inbox)
+          }
+        })
+      } catch (error) {
+        console.error(error)
+        console.log(testingInbox)
+      }
 
       return {
         personal,
@@ -227,8 +240,17 @@ export default {
       }
     },
 
+    allUserIds (ringGroup) {
+      const connectedUserIds = ringGroup.connected_user_ids || []
+      const watcherUserIds = ringGroup.watcher_user_ids || []
+
+      return [...connectedUserIds, ...watcherUserIds]
+    },
+
     newRingGroupListener (ringGroup) {
-      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+      console.log(ringGroup)
+
+      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
         const updatedInboxes = [...this.inboxes, ringGroup]
         this.setInboxes({ data: updatedInboxes })
         this.orderInboxes()
@@ -236,7 +258,7 @@ export default {
     },
 
     updateRingGroupListener (ringGroup) {
-      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
         const updatedInboxes = [...this.inboxes]
 
