@@ -7,7 +7,7 @@
 
       <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
            v-if="isContactShow">
-        <Contact />
+        <Contact :team-inbox="true" />
       </div>
     </div>
   </div>

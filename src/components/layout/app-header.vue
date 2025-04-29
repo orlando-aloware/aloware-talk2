@@ -554,9 +554,7 @@ export default {
     },
 
     resetTeamInbox () {
-      this.$router.push({
-        name: 'Team Inboxes'
-      })
+      this.$VueEvent.fire('resetTeamInbox')
     }
   },
 

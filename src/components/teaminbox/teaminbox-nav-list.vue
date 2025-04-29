@@ -174,22 +174,29 @@ export default {
       }
     },
 
-    onInboxSelect (inboxId, contactId = null) {
-      if (inboxId === this.activeInboxId) {
+    onInboxSelect (inboxId, contactId = null, force = false) {
+      if (inboxId === this.activeInboxId && !force) {
         return
       }
 
-      // checks if user has access to the inbox
-      if (!this.checkInboxAccess(inboxId)) {
-        this.$generalNotification('You don\'t have access to this inbox.', 'error')
-        this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
+      if (inboxId !== this.activeInboxId) {
+        // checks if user has access to the inbox
+        if (!this.checkInboxAccess(inboxId)) {
+          this.$generalNotification('You don\'t have access to this inbox.', 'error')
+          this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
 
-        return
+          return
+        }
+
+        this.setActiveInboxId(parseInt(inboxId))
       }
 
-      this.setActiveInboxId(parseInt(inboxId))
       this.resetItems()
-      this.fetchItems(inboxId)
+      // Pass current filters and sorting
+      const filters = this.$store.state.TeamInbox.activeFilters || {}
+      const sort = this.$store.state.TeamInbox.activeSort || {}
+      const search = this.$store.state.TeamInbox.currentSearch || null
+      this.fetchItems(inboxId, search, filters, sort)
 
       const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
 
@@ -228,8 +235,17 @@ export default {
       }
     },
 
+    allUserIds (ringGroup) {
+      const connectedUserIds = ringGroup.connected_user_ids || []
+      const watcherUserIds = ringGroup.watcher_user_ids || []
+
+      return [...connectedUserIds, ...watcherUserIds]
+    },
+
     newRingGroupListener (ringGroup) {
-      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+      console.log(ringGroup)
+
+      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
         const updatedInboxes = [...this.inboxes, ringGroup]
         this.setInboxes({ data: updatedInboxes })
         this.orderInboxes()
@@ -237,7 +253,7 @@ export default {
     },
 
     updateRingGroupListener (ringGroup) {
-      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
         const updatedInboxes = [...this.inboxes]
 
@@ -281,6 +297,15 @@ export default {
       }
     },
 
+    async resetTeamInbox () {
+      await this.resetInboxes()
+      await this.fetchInboxes()
+
+      if (this.activeInboxId) {
+        await this.onInboxSelect(this.activeInboxId, null, true)
+      }
+    },
+
     einboxCommunicationMarkedAllAsReadListener ({ inboxId, count }) {
       this.einboxCommunicationMarkedAllAsRead(inboxId, count)
     },
@@ -314,6 +339,8 @@ export default {
     this.$VueEvent.listen('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.listen('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
+
+    this.$VueEvent.listen('resetTeamInbox', this.resetTeamInbox)
 
     // Listen to contact communications read/unread event
     this.$VueEvent.listen('teaminbox_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
@@ -358,6 +385,8 @@ export default {
     this.$VueEvent.stop('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
+
+    this.$VueEvent.stop('resetTeamInbox', this.resetTeamInbox)
     this.$VueEvent.stop('teaminbox_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
     this.$VueEvent.stop('teaminbox_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
     this.$VueEvent.stop('teaminbox_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)

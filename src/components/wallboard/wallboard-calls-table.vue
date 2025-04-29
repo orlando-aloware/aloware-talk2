@@ -127,14 +127,18 @@
               <td class="calls__table__contact"
                   :key="`col-${colIndex}`"
                   v-if="column.name === 'lead_number'">
-                <div class="d-flex">
+                <div>
                   <div class="d-flex flex-column justify-center flex-grow-1">
-                    <!-- contact with link -->
-                    <router-link class="mb-1"
-                                 :to="{ path: `/contacts/${call.contact_id}` }"
-                                 v-if="call.contact">
-                      {{ call.contact.name | ucwords }}
-                    </router-link>
+                    <!-- contact with link and integration icons -->
+                    <div class="d-flex align-items-center mb-1">
+                      <div class="text-truncate">
+                        <router-link :to="{ path: `/contacts/${call.contact_id}` }"
+                                   v-if="call.contact">
+                          {{ call.contact.name | ucwords }}
+                        </router-link>
+                      </div>
+                      <contact-integrations-link-icons :contact='call.contact' />
+                    </div>
 
                     <!-- lead number -->
                     <div class="d-flex align-items-center mb-1">
@@ -360,7 +364,9 @@
                        v-if="call.contact">
                     <span>
                       {{ call.contact.name | capitalize }}
+                      <contact-integrations-link-icons :contact='call.contact' />
                     </span>
+
                     <span>
                       {{ call.lead_number | fixPhone }}
                     </span>
@@ -418,6 +424,7 @@ import {
   userMixin
 } from 'src/plugins/mixins'
 import { mapGetters, mapState } from 'vuex'
+import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
 
 export default {
   name: 'wallboard-calls-table',
@@ -432,6 +439,7 @@ export default {
   ],
 
   components: {
+    ContactIntegrationsLinkIcons,
     BargeCommunicationButton,
     Datatable,
     InformationCircleIcon,
