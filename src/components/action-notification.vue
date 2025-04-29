@@ -755,23 +755,9 @@ export default {
       let found = document.querySelector('.notification-body-wrapper .call-actions')
       found = !found ? document.querySelector('.notification-body-wrapper .call-fishing-actions') : found
 
-      // 07/12/2022 - Removed for now
-      // if (!found &&
-      //   this.isValidPhoneShowInfo) {
-      //   this.setShowIncomingCallNotification(false)
-      //   this.showCallFishingDataInPhone({
-      //     communication: this.communication,
-      //     contact: this.contact
-      //   }, this.id)
-      // }
-
       if (!found &&
         this.id === 'system') {
         this.$closeActionNotification(this.id)
-
-        setTimeout(() => {
-          window.location.reload()
-        }, 500)
       }
     },
 
