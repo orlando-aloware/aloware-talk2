@@ -129,17 +129,6 @@ export default {
     CompactBtn
   },
 
-  props: {
-    teamInboxId: {
-      type: Number,
-      default: null
-    },
-    teamInboxUnreadCount: {
-      type: Number,
-      default: 0
-    }
-  },
-
   computed: {
     ...mapGetters('contacts', [
       'contact',
