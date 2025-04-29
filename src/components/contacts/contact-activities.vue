@@ -158,11 +158,9 @@ export default {
         this.contact.unread_voicemails_count > 0
     },
     unreadCount () {
-      if (this.teamInboxId) {
-        return this.teamInboxUnreadCount
-      }
-
-      return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
+      return this.teamInbox
+        ? this.teamInboxUnreadCount
+        : this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     }
   },
   methods: {
