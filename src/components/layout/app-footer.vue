@@ -29,9 +29,9 @@
                    exact
                    v-if="hasCompanyTeamInboxEnabled">
         <span class="tab-icon">
-          <e-inbox-mobile-icon :color="isActive('team-inboxes') ? '#256EFF' : '#A3A3A3'" />
+          <TeamInboxMobileIcon :color="isActive('team-inboxes') ? '#256EFF' : '#A3A3A3'" />
         </span>
-        {{ EINBOXES_MENU_TITLE }}
+        {{ TEAMINBOXES_MENU_TITLE }}
       </q-route-tab>
       <q-route-tab name="communications"
                    :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
@@ -200,7 +200,7 @@
 
 <script>
 import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon'
-import EInboxMobileIcon from 'components/icons/mobile-menu/einbox-mobile-icon'
+import TeamInboxMobileIcon from 'components/icons/mobile-menu/teaminbox-mobile-icon'
 import CommunicationsMobileIcon from 'components/icons/mobile-menu/communications-mobile-icon'
 import ContactsMobileIcon from 'components/icons/mobile-menu/contacts-mobile-icon'
 import StatsMobileIcon from 'components/icons/mobile-menu/stats-mobile-icon'
@@ -217,9 +217,9 @@ import {
   COMMUNICATIONS_MENU_TITLE_MOBILE,
   DEFAULT_COMMUNICATIONS_ROUTE_PATH,
   INBOXES_MENU_TITLE,
-  EINBOXES_MENU_TITLE,
-  EINBOXES_MENU_ITEMS_TITLE,
-  EINBOXES_MENU_COMMUNICATIONS_TITLE
+  TEAMINBOXES_MENU_TITLE,
+  TEAMINBOXES_MENU_ITEMS_TITLE,
+  TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
 } from 'src/router/routes'
 import { userMixin } from 'src/plugins/mixins'
 
@@ -233,7 +233,7 @@ export default {
     StatsMobileIcon,
     ContactsMobileIcon,
     InboxMobileIcon,
-    EInboxMobileIcon,
+    TeamInboxMobileIcon,
     CommunicationsMobileIcon,
     ContactMenu,
     ContactMenuItem,
@@ -282,9 +282,9 @@ export default {
       tab: 'inbox',
       DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       INBOXES_MENU_TITLE,
-      EINBOXES_MENU_TITLE,
-      EINBOXES_MENU_ITEMS_TITLE,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE,
+      TEAMINBOXES_MENU_TITLE,
+      TEAMINBOXES_MENU_ITEMS_TITLE,
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
       COMMUNICATIONS_MENU_TITLE_MOBILE,
       parkedCallQueue: []
     }
@@ -326,9 +326,9 @@ export default {
         case 'Inbox Channel Task Status':
         case 'Inbox Contact Communication':
           return 'inbox'
-        case EINBOXES_MENU_TITLE:
-        case EINBOXES_MENU_ITEMS_TITLE:
-        case EINBOXES_MENU_COMMUNICATIONS_TITLE:
+        case TEAMINBOXES_MENU_TITLE:
+        case TEAMINBOXES_MENU_ITEMS_TITLE:
+        case TEAMINBOXES_MENU_COMMUNICATIONS_TITLE:
           return 'team-inboxes'
         case 'Contacts':
         case 'Contact':

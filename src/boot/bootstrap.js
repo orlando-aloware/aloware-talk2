@@ -576,6 +576,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     communicationId: window._.get(notificationData, 'communicationId', null),
     campaignId: window._.get(notificationData, 'campaignId', null),
     campaignName: window._.get(notificationData, 'campaignName', null),
+    ringGroupId: window._.get(notificationData, 'ringGroupId', null),
     ringGroupName: window._.get(notificationData, 'ringGroupName', null),
     phoneNumber: window._.get(notificationData, 'phoneNumber', null),
     dateTime: window._.get(notificationData, 'dateTime', this.$moment()),

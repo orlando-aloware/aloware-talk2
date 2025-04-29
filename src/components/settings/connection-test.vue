@@ -137,7 +137,7 @@
                 <strong>API Response Time</strong>
                 <span class="text-nowrap">{{ testResults.services.pingTime || '0' }} ms</span>
               </div>
-              <div class="d-flex justify-content-between py-2" v-if="!isElectron">
+              <div class="d-flex justify-content-between py-2">
                 <strong>Live Updates (WebSocket)</strong>
                 <b-badge :variant="testResults.services.soketi ? 'success' : 'danger'" pill>
                   {{ testResults.services.soketi ? 'Connected' : 'Failed' }}
@@ -197,7 +197,7 @@
                   <span class="permission-text">Notification permissions are denied</span>
                 </li>
 
-                <template v-if="!isElectron">
+                <template>
                   <li v-if="testResults.storage.localStorage && testResults.storage.cookies">
                     <span class="fa-li"><i class="fa fa-check-circle text-success"></i></span>
                     <span class="permission-text">Browser storage is working properly</span>
@@ -759,16 +759,6 @@ export default {
 
         // Test Soketi WebSocket with actual connection
         try {
-          if (this.isElectron) {
-            this.testResults.services.soketi = true
-            return
-          }
-
-          if (!window.WebSocket) {
-            this.testResults.services.soketi = false
-            return
-          }
-
           // Import helpers to get WebSocket credentials
           const { getWebSocketCredentials } = await import('src/boot/helpers')
 
@@ -784,45 +774,67 @@ export default {
           // Save the host for error messages
           this.soketiHost = WS_HOST
 
-          // Create a WebSocket connection to test Soketi
-          const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://'
-          // Standard ports: WSS typically uses 443, WS typically uses 80 or 6001 for Soketi
-          const wsPort = window.location.protocol === 'https:' ? '' : ':6001' // Empty string means default port 443 for WSS
-          const socketUrl = `${protocol}${WS_HOST}${wsPort}/app/${WS_APP_KEY}`
+          // For desktop apps, always use secure WebSockets
+          // For web browsers, determine based on current protocol
+          this.wsProtocol = this.isElectron ? 'wss://' : (window.location.protocol === 'https:' ? 'wss://' : 'ws://')
+          this.wsPort = this.isElectron ? '443' : (window.location.protocol === 'https:' ? '443' : '6001')
 
-          // Store these for error message
-          this.wsProtocol = protocol
-          this.wsPort = window.location.protocol === 'https:' ? '443' : '6001'
+          // Use Echo to test the connection instead of raw WebSocket
+          // This will work better in a desktop environment
+          if (window.Echo && window.Echo.connector && window.Echo.connector.pusher && window.Echo.connector.pusher.connection) {
+            // If Echo is already initialized and connected, use it to check
+            this.testResults.services.soketi = window.Echo.connector.pusher.connection.state === 'connected'
+          } else {
+            // If window.Echo doesn't exist or is not properly initialized, check if we can create a temporary Echo
+            const { default: Echo } = await import('laravel-echo')
+            const { local } = await import('src/plugins/helpers/storage')
 
-          let socketConnected = false
+            // Create a temporary Echo instance specifically for testing
+            const testEcho = new Echo({
+              broadcaster: 'pusher',
+              key: WS_APP_KEY,
+              wsHost: WS_HOST,
+              wssHost: WS_HOST,
+              encrypted: true,
+              forceTLS: true,
+              auth: {
+                headers: {
+                  Authorization: `Bearer ${local.getItem('api_token')}`,
+                  driver: 'soketi'
+                }
+              },
+              enabledTransports: ['ws', 'wss'],
+              disableStats: true
+            })
 
-          // Create a promise that will resolve or reject based on WebSocket connection
-          await new Promise((resolve, reject) => {
-            const socket = new WebSocket(socketUrl)
+            let socketConnected = false
 
-            // Set a timeout in case connection takes too long
-            const timeout = setTimeout(() => {
-              if (!socketConnected) {
-                socket.close()
-                reject(new Error('WebSocket connection timeout'))
-              }
-            }, 5000)
+            // Test the connection with a promise
+            await new Promise((resolve, reject) => {
+              const timeout = setTimeout(() => {
+                if (!socketConnected) {
+                  testEcho.disconnect()
+                  reject(new Error('WebSocket connection timeout'))
+                }
+              }, 5000)
 
-            socket.onopen = () => {
-              socketConnected = true
-              clearTimeout(timeout)
-              socket.close()
-              resolve()
-            }
+              testEcho.connector.pusher.connection.bind('connected', () => {
+                socketConnected = true
+                clearTimeout(timeout)
+                testEcho.disconnect()
+                resolve()
+              })
 
-            socket.onerror = (error) => {
-              clearTimeout(timeout)
-              console.error('WebSocket connection error:', error)
-              reject(error)
-            }
-          })
+              testEcho.connector.pusher.connection.bind('error', (error) => {
+                clearTimeout(timeout)
+                console.error('Echo connection error:', error)
+                testEcho.disconnect()
+                reject(error)
+              })
+            })
 
-          this.testResults.services.soketi = socketConnected
+            this.testResults.services.soketi = socketConnected
+          }
         } catch (e) {
           console.error('Soketi test error:', e)
           this.testResults.services.soketi = false
@@ -836,29 +848,48 @@ export default {
     },
 
     async testStorage () {
-      if (this.isElectron) {
-        this.testResults.services.storage = true
-        return
-      }
-
       try {
-        // Test localStorage
-        try {
-          localStorage.setItem('connectionTest', 'test')
-          const testValue = localStorage.getItem('connectionTest')
-          this.testResults.storage.localStorage = testValue === 'test'
-          localStorage.removeItem('connectionTest')
-        } catch (e) {
-          this.testResults.storage.localStorage = false
-        }
+        // In desktop environments, access to storage should be OK
+        // but the standard test might fail due to different storage implementation
+        if (this.isElectron) {
+          try {
+            // Test using the local storage helper directly when available
+            const { local } = await import('src/plugins/helpers/storage')
 
-        // Test cookies
-        try {
-          document.cookie = 'connectionTest=test; max-age=60'
-          this.testResults.storage.cookies = document.cookie.indexOf('connectionTest=test') !== -1
-          document.cookie = 'connectionTest=; max-age=0' // Clear the test cookie
-        } catch (e) {
-          this.testResults.storage.cookies = false
+            // Try to set and get a test value
+            local.setItem('connectionTest', 'test')
+            const testValue = local.getItem('connectionTest')
+            this.testResults.storage.localStorage = testValue === 'test'
+            local.removeItem('connectionTest')
+
+            // In desktop apps, cookies are less relevant, so consider them working
+            // Most Electron apps use localStorage or IndexedDB instead
+            this.testResults.storage.cookies = true
+          } catch (e) {
+            console.error('Desktop storage test error:', e)
+            this.testResults.storage.localStorage = false
+            this.testResults.storage.cookies = false
+          }
+        } else {
+          // Regular browser tests
+          // Test localStorage
+          try {
+            localStorage.setItem('connectionTest', 'test')
+            const testValue = localStorage.getItem('connectionTest')
+            this.testResults.storage.localStorage = testValue === 'test'
+            localStorage.removeItem('connectionTest')
+          } catch (e) {
+            this.testResults.storage.localStorage = false
+          }
+
+          // Test cookies
+          try {
+            document.cookie = 'connectionTest=test; max-age=60'
+            this.testResults.storage.cookies = document.cookie.indexOf('connectionTest=test') !== -1
+            document.cookie = 'connectionTest=; max-age=0' // Clear the test cookie
+          } catch (e) {
+            this.testResults.storage.cookies = false
+          }
         }
       } catch (error) {
         console.error('Storage test error:', error)
@@ -1023,13 +1054,11 @@ export default {
       return 'Good connection quality for voice calls'
     }
   },
-
   computed: {
     isElectron () {
       return this.$q.platform.is.electron
     }
   },
-
   mounted () {
     // Check if we have recent test results saved in localStorage
     try {

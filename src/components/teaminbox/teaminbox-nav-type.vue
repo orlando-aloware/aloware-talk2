@@ -1,13 +1,13 @@
 <template>
-  <div class="einbox-nav-type"
+  <div class="teaminbox-nav-type"
        v-if="typedInboxes.length">
-    <div class="einbox-nav-type__label">
+    <div class="teaminbox-nav-type__label">
       {{ label }}
     </div>
 
-    <div class="einbox-nav-type__inboxes">
+    <div class="teaminbox-nav-type__inboxes">
       <div ref="inboxesInner">
-        <einbox-nav-item :label="inbox.name"
+        <TeamInboxNavItem :label="inbox.name"
                          :value="inbox.id"
                          :message-count="inbox.message_count"
                          :is-active="activeInboxId === inbox.id"
@@ -20,11 +20,11 @@
 </template>
 
 <script>
-import EinboxNavItem from './einbox-nav-item.vue'
+import TeamInboxNavItem from './teaminbox-nav-item.vue'
 
 export default {
   components: {
-    EinboxNavItem
+    TeamInboxNavItem
   },
 
   props: {
@@ -52,7 +52,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.einbox-nav-type {
+.teaminbox-nav-type {
   display: flex;
   flex-direction: column;
   transition: all 0.5s ease;

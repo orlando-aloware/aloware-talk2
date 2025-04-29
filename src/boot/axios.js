@@ -1,7 +1,11 @@
-import Vue from 'vue'
 import axios, { AxiosError } from 'axios'
 import { Platform } from 'quasar'
 import * as storage from 'src/plugins/helpers/storage'
+import Vue from 'vue'
+
+// Threshold in milliseconds for considering a request as slow
+// Requests taking longer than this will be reported to Sentry
+const SLOW_REQUEST_THRESHOLD_MS = 10000
 
 window.axios = axios
 
@@ -26,7 +30,34 @@ if (storage.local.getItem('api_token')) {
   window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 }
 
-window.axios.interceptors.response.use(response => response, error => {
+// Add request interceptor to track request start time
+window.axios.interceptors.request.use(config => {
+  config.metadata = { startTime: new Date().getTime() }
+  return config
+})
+
+// Add response interceptor to check for slow requests
+window.axios.interceptors.response.use(response => {
+  // Check for slow requests in success cases
+  if (response?.config?.metadata?.startTime) {
+    const endTime = new Date().getTime()
+    const duration = endTime - response.config.metadata.startTime
+
+    if (duration > SLOW_REQUEST_THRESHOLD_MS && window.Sentry) {
+      window.Sentry.captureMessage('Slow request detected', {
+        level: 'warning',
+        extra: {
+          url: response?.config?.url,
+          method: response?.config?.method,
+          duration: duration,
+          status: response?.status
+        }
+      })
+    }
+  }
+
+  return response
+}, error => {
   if (error.response) {
     switch (error.response.status) {
       // 401

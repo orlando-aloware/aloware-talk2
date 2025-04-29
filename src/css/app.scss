@@ -332,8 +332,8 @@ body,
 
 @media (min-width: 605px) {
   .contact-details-container {
-    margin-left: 15px;
-    margin-top: 15px;
+    margin-left: 10px;
+    margin-top: 10px;
   }
 }
 
@@ -2193,7 +2193,7 @@ i.option-separator {
 .contact-view-wrapper {
   overflow: hidden;
   position: relative;
-  background: $grey-50;
+  background: $grey-40;
   height: 100%;
 
   .contact-activity-wrapper.w-less-630px {
@@ -2713,6 +2713,10 @@ i.option-separator {
   height: 100%;
   background-color: $white;
   position: relative;
+  
+  &.inbox-activity-container-wrapper {
+    border-radius: 8px;
+  }
 
   .contact-activities {
     height: 100%;
@@ -4406,7 +4410,7 @@ i.option-separator {
   }
 
   .phone-info {
-    width: 200px;
+    width: 230px;
     height: 150px;
 
     .add-status {
@@ -9333,6 +9337,11 @@ span.mention {
 
 .contact-activity-wrapper {
   width: 100%;
+
+  &.inbox-activity-container-wrapper { 
+    padding: 10px 0;
+    background: $grey-40;
+  }
 }
 
 .contact-activities-actions {
@@ -10487,8 +10496,8 @@ screen and (max-width: 956px) {
     }
   }
   .contact-details-container.contact-details--opened {
-    padding-left: 15px;
-    padding-top: 15px;
+    padding-left: 10px;
+    padding-top: 10px;
     width: 100% !important;
     display: block !important;
     max-width: unset !important;
@@ -16128,7 +16137,7 @@ hr {
         background-color: $light-blue !important;
       }
 
-      .actions-td {        
+      .actions-td {
         min-width: 205px !important;
       }
     }
@@ -16772,4 +16781,34 @@ hr {
 
 .overflow-visible {
   overflow: visible !important;
+}
+
+.teaminbox-filter-sort {
+  .filter-dropdown,
+  .sort-dropdown,
+  .filter-dropdown.show,
+  .sort-dropdown.show {
+    .btn {
+      border: 1px solid transparent !important;
+      background-color: transparent !important;
+      color: #040404 !important;
+
+      &:hover, &:focus {
+        border: 1px solid transparent !important;
+        background-color: transparent !important;
+        color: #040404 !important;
+      }
+    }
+
+    ul.dropdown-menu {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    li a.dropdown-item {
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 5px 15px;
+    }
+  }
 }

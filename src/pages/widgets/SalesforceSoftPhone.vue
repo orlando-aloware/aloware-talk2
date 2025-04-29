@@ -450,7 +450,8 @@ export default {
             this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
             this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
           } else if (agentStatus === AGENT_STATUS_ACCEPTING_CALLS &&
-            this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
+            this.widgetMessage !== WIDGET_MSG_SHOW_ALERT_CALL_FINISHED &&
+            !this.startDialing) {
             this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
           }
         }

@@ -1,35 +1,41 @@
 <template>
-  <div class="einbox-tab__header border-bottom">
-    <collapse-button class="einbox-tab__header__collapse-button"
+  <div class="teaminbox-tab__header">
+    <collapse-button class="teaminbox-tab__header__collapse-button"
                      :target="collapseTarget"
                      v-model="collapsed"
                      v-if="collapseTarget && !isMobile"/>
 
     <template v-if="!isSearchActive">
-      <label class="einbox-tab__header__label ellipse"
+      <label class="teaminbox-tab__header__label ellipse"
+             :id="`teaminbox-tab-header-label-${_uid}`"
              v-if="activeInbox.name">
         {{ activeInbox.name }}
+        <b-tooltip custom-class="talk-table__tooltip"
+          :target="`teaminbox-tab-header-label-${_uid}`"
+          :delay="500">
+          {{ activeInbox.name }}
+        </b-tooltip>
       </label>
       <q-space></q-space>
 
       <span class="cursor-pointer mr-2"
-            :id="`einbox-tab-open-comms-page-icon-${_uid}`"
-            @click="$router.push(DEFAULT_COMMUNICATIONS_ROUTE_PATH)">
+            :id="`teaminbox-tab-open-comms-page-icon-${_uid}`"
+            @click="openCommunicationsPage">
         <watch-icon />
         <b-tooltip custom-class="talk-table__tooltip"
-                   :target="`einbox-tab-open-comms-page-icon-${_uid}`">
+                   :target="`teaminbox-tab-open-comms-page-icon-${_uid}`">
           Open Communications Page
         </b-tooltip>
       </span>
 
       <span class="cursor-pointer"
-            :id="`einbox-tab-search-icon-${_uid}`"
+            :id="`teaminbox-tab-search-icon-${_uid}`"
             @click="onEnterSearch">
         <search-icon color="#256eff"
                      width="18"
                      height="18" />
         <b-tooltip custom-class="talk-table__tooltip"
-                   :target="`einbox-tab-search-icon-${_uid}`">
+                   :target="`teaminbox-tab-search-icon-${_uid}`">
           Click to search
         </b-tooltip>
       </span>
@@ -39,17 +45,17 @@
       <search-input no-clear-on-route-change
                     ref="search"
                     placeholder="Type ENTER to search comms..."
-                    class="einbox-tab__header__search"
+                    class="teaminbox-tab__header__search"
                     limit-search-characters
-                    :id="`einbox-tab-search-${_uid}`"
+                    :id="`teaminbox-tab-search-${_uid}`"
                     @search="$emit('search', $event)"
                     @blur="onLeaveSearch"
                     @focus="setShowSearchTooltip(true)"
                     @show-error="showLimitCharactersError"/>
       <b-tooltip custom-class="talk-table__tooltip"
                  placement="top"
-                 :boundary="`einbox-tab-search-${_uid}`"
-                 :target="`einbox-tab-search-${_uid}`"
+                 :boundary="`teaminbox-tab-search-${_uid}`"
+                 :target="`teaminbox-tab-search-${_uid}`"
                  :show="showSearchTooltip">
         Search communications by contact's name or phone number
       </b-tooltip>
@@ -58,10 +64,10 @@
 </template>
 
 <script>
-import SearchInput from 'src/components/search-input.vue'
-import WatchIcon from 'src/components/icons/watch-icon.vue'
-import SearchIcon from 'src/components/icons/search-icon.vue'
 import CollapseButton from 'src/components/collapse-button.vue'
+import SearchIcon from 'src/components/icons/search-icon.vue'
+import WatchIcon from 'src/components/icons/watch-icon.vue'
+import SearchInput from 'src/components/search-input.vue'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 import { mapState } from 'vuex'
 
@@ -93,7 +99,7 @@ export default {
   }),
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'viewMode',
       'activeInbox'
     ]),
@@ -111,6 +117,20 @@ export default {
       if (this.$refs.search) {
         this.$refs.search.$el.querySelector('input').focus()
       }
+    },
+
+    openCommunicationsPage () {
+      const route = {
+        path: DEFAULT_COMMUNICATIONS_ROUTE_PATH,
+        query: {}
+      }
+
+      // Add the inbox ID as ring_groups query parameter if available
+      if (this.activeInbox && this.activeInbox.id) {
+        route.query.ring_groups = this.activeInbox.id
+      }
+
+      this.$router.push(route)
     },
 
     onLeaveSearch () {
@@ -143,12 +163,11 @@ export default {
 </script>
 
 <style lang="scss">
-.einbox-tab__header {
+.teaminbox-tab__header {
   display: flex;
   align-items: center;
-  padding: 6px 15px;
+  padding: 14px 17px;
   width: 100%;
-  height: 45px;
 
   &__label {
     margin: 0px;

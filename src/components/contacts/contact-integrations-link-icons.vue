@@ -1,0 +1,40 @@
+<template>
+  <span v-if="hubspot_link">
+    <a
+      :href="hubspot_link"
+      target="_blank"
+      rel="noopener noreferrer"
+      title="View in HubSpot"
+      class="integration-link-icon"
+    >
+      <hubspot-icon background_color="#FFFFFF" foreground_color="#FF7A59" />
+    </a>
+  </span>
+</template>
+
+<script>
+import HubspotIcon from 'components/icons/hubspot-icon.vue'
+
+export default {
+  name: 'contact-integrations-link-icons',
+  components: { HubspotIcon },
+  props: {
+    contact: {
+      type: Object,
+      required: true
+    }
+  },
+  computed: {
+    hubspot_link () {
+      return this.contact?.integration_data?.hubspot?.link || null
+    }
+  }
+}
+</script>
+
+<style scoped>
+.integration-link-icon {
+  margin-left: 4px;
+  vertical-align: middle;
+}
+</style>
