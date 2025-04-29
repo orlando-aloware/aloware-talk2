@@ -128,13 +128,6 @@ export default {
     CompactBtn
   },
 
-  props: {
-    teamInbox: {
-      type: Boolean,
-      default: false
-    }
-  },
-
   computed: {
     ...mapGetters('contacts', [
       'contact',
