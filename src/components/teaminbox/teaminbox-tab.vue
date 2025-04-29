@@ -218,8 +218,6 @@ export default {
     },
 
     onItemClick (item) {
-      console.log('>>> onItemClick', item)
-
       this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
       const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
@@ -292,9 +290,6 @@ export default {
         // If the is_read property is changed, adjsut the unread counts
         if (this.itemsData[index]?.is_read !== communication.is_read) {
           let unreadCount = this.itemsData[index]?.inbox_unread_count || 0
-          console.log('>>> current', this.itemsData[index])
-          console.log('>>> new', communication)
-
           unreadCount += communication.is_read ? -1 : 1
           communication.inbox_unread_count = unreadCount
         }
