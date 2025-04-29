@@ -64,10 +64,10 @@
 </template>
 
 <script>
-import SearchInput from 'src/components/search-input.vue'
-import WatchIcon from 'src/components/icons/watch-icon.vue'
-import SearchIcon from 'src/components/icons/search-icon.vue'
 import CollapseButton from 'src/components/collapse-button.vue'
+import SearchIcon from 'src/components/icons/search-icon.vue'
+import WatchIcon from 'src/components/icons/watch-icon.vue'
+import SearchInput from 'src/components/search-input.vue'
 import { DEFAULT_COMMUNICATIONS_ROUTE_PATH } from 'src/router/routes'
 import { mapState } from 'vuex'
 
@@ -166,7 +166,7 @@ export default {
 .teaminbox-tab__header {
   display: flex;
   align-items: center;
-  padding: 4px 15px;
+  padding: 14px 17px;
   width: 100%;
 
   &__label {
