@@ -7,7 +7,7 @@
       title="View in HubSpot"
       class="integration-link-icon"
     >
-      <hubspot-icon background_color="#FFFFFF" foreground_color="#FF7A59" />
+      <hubspot-icon background_color="#FFFFFF" foreground_color="#FF7A59" :background_opacity="background_opacity" />
     </a>
   </span>
 </template>
@@ -22,6 +22,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    background_opacity: {
+      type: [Number, String],
+      default: 1
     }
   },
   computed: {
