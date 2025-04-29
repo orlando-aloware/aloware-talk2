@@ -86,14 +86,9 @@ export function findRepeateds (items, startIndex) {
       break
     }
 
-    // Check if type matches
-    if (nextItem.type !== currentType) {
-      continue
-    }
-
-    // Check if direction matches
-    if (nextItem.direction !== currentDirection) {
-      continue
+    // Check if type and direction match - break the sequence if they don't
+    if (nextItem.type !== currentType || nextItem.direction !== currentDirection) {
+      break
     }
 
     // Check if it's within the time threshold (60 minutes)
@@ -102,6 +97,9 @@ export function findRepeateds (items, startIndex) {
 
     if (timeDiff <= TIME_THRESHOLD) {
       repeateds.push(nextItem.id)
+    } else {
+      // Break if time threshold is exceeded
+      break
     }
   }
 
