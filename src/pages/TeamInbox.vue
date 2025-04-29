@@ -7,7 +7,8 @@
 
       <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
            v-if="isContactShow">
-        <Contact :team-inbox-id="activeInboxId" />
+        <Contact :team-inbox-id="activeInboxId"
+                :team-inbox-unread-count="currentInboxUnreadCount" />
       </div>
     </div>
   </div>
@@ -47,7 +48,9 @@ export default {
     ]),
 
     ...mapState('TeamInbox', [
-      'activeInboxId'
+      'activeInboxId',
+      'activeInbox',
+      'inboxesUnreadCount'
     ]),
 
     isMobileContactActive () {
@@ -62,6 +65,10 @@ export default {
       return {
         'mobile-contact-active': this.isMobileContactActive
       }
+    },
+
+    currentInboxUnreadCount () {
+      return this.getInboxUnreadCount(this.activeInboxId)
     }
   },
 
@@ -75,6 +82,10 @@ export default {
   methods: {
     onItemSelected (routeData) {
       this.$router.push(routeData)
+    },
+
+    getInboxUnreadCount (inboxId) {
+      return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
     }
   }
 }

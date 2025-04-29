@@ -856,7 +856,6 @@ export default {
     markAllAsRead (count) {
       if (this.contact) {
         this.loadingMarkAsRead = true
-        const teamInboxId = this.teamInboxId
 
         this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`).then(res => {
           this.loadingMarkAsRead = false
@@ -870,8 +869,8 @@ export default {
           this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
 
-          if (this.$route.params.inboxId) {
-            this.$VueEvent.fire('teaminbox_communications_all_as_read', { inboxId: +teamInboxId, count })
+          if (this.teamInboxId) {
+            this.$VueEvent.fire('teaminbox_communications_all_as_read', { inboxId: this.teamInboxId, count })
           }
         }).catch(err => {
           this.$handleErrors(err.response)
