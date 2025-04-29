@@ -552,11 +552,6 @@ export default {
     },
 
     markable () {
-      // if in Team Inbox and communication does not pertain to this inbox
-      if (this.$route.params.inboxId && this.communication.ring_group_id !== +this.$route.params.inboxId) {
-        return false
-      }
-
       // Markable if communication is SMS and the comm direction is INBOUND or
       // Markable if communication is a CALL and disposition_status2 is VOICEMAIL_NEW or MISSED_NEW
       return (this.communication.type === CommunicationTypes.SMS &&
