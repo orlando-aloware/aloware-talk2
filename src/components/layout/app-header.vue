@@ -554,9 +554,7 @@ export default {
     },
 
     resetTeamInbox () {
-      this.$router.push({
-        name: TEAMINBOXES_MENU_TITLE
-      })
+      this.$VueEvent.fire('resetTeamInbox')
     }
   },
 

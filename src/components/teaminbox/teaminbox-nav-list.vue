@@ -97,10 +97,6 @@ export default {
       'showRefreshInboxesButton'
     ]),
 
-    watchedRG () {
-      return typeof this.inboxes[158] === 'object' ? this.inboxes[158] : null
-    },
-
     ...mapState('auth', ['profile']),
 
     ...mapState(['isMobile', 'teams']),
@@ -186,20 +182,23 @@ export default {
       }
     },
 
-    onInboxSelect (inboxId, contactId = null) {
-      if (inboxId === this.activeInboxId) {
+    onInboxSelect (inboxId, contactId = null, force = false) {
+      if (inboxId === this.activeInboxId && !force) {
         return
       }
 
-      // checks if user has access to the inbox
-      if (!this.checkInboxAccess(inboxId)) {
-        this.$generalNotification('You don\'t have access to this inbox.', 'error')
-        this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
+      if (inboxId !== this.activeInboxId) {
+        // checks if user has access to the inbox
+        if (!this.checkInboxAccess(inboxId)) {
+          this.$generalNotification('You don\'t have access to this inbox.', 'error')
+          this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
 
-        return
+          return
+        }
+
+        this.setActiveInboxId(parseInt(inboxId))
       }
 
-      this.setActiveInboxId(parseInt(inboxId))
       this.resetItems()
       // Pass current filters and sorting
       const filters = this.$store.state.TeamInbox.activeFilters || {}
@@ -304,6 +303,15 @@ export default {
       if (show) {
         this.$generalNotification('Search requires at least 3 characters', 'error')
       }
+    },
+
+    async resetTeamInbox () {
+      await this.resetInboxes()
+      await this.fetchInboxes()
+
+      if (this.activeInboxId) {
+        await this.onInboxSelect(this.activeInboxId, null, true)
+      }
     }
   },
 
@@ -323,6 +331,8 @@ export default {
     this.$VueEvent.listen('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.listen('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
+
+    this.$VueEvent.listen('resetTeamInbox', this.resetTeamInbox)
   },
 
   watch: {
@@ -352,6 +362,8 @@ export default {
     this.$VueEvent.stop('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
+
+    this.$VueEvent.stop('resetTeamInbox', this.resetTeamInbox)
   }
 }
 </script>
