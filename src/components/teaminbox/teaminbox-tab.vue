@@ -218,6 +218,8 @@ export default {
     },
 
     onItemClick (item) {
+      console.log('>>> onItemClick', item)
+
       this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
       const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
@@ -254,6 +256,15 @@ export default {
       } else {
         const index = this.itemsData.findIndex(c => c.id === communication.id)
         if (index > -1) {
+          // If the is_read property is changed, adjsut the unread counts
+          if (this.itemsData[index]?.is_read !== communication.is_read) {
+            // let unreadCount = this.itemsData[index]?.inbox_unread_count || 0
+            if (this.itemsData[index]?.repeats > 0) {
+              communication.repeats = this.itemsData[index]?.repeats
+              communication.unread_repeats = this.itemsData[index].unread_repeats + (communication.is_read ? -1 : 1)
+            }
+          }
+
           this.itemsData.splice(index, 1, communication)
         }
       }
@@ -276,6 +287,16 @@ export default {
       if (index > -1) {
         if (isLiveCall(this.itemsData[index]) && communication.type !== CommunicationTypes.CALL) {
           return
+        }
+
+        // If the is_read property is changed, adjsut the unread counts
+        if (this.itemsData[index]?.is_read !== communication.is_read) {
+          let unreadCount = this.itemsData[index]?.inbox_unread_count || 0
+          console.log('>>> current', this.itemsData[index])
+          console.log('>>> new', communication)
+
+          unreadCount += communication.is_read ? -1 : 1
+          communication.inbox_unread_count = unreadCount
         }
 
         this.itemsData.splice(index, 1, communication)

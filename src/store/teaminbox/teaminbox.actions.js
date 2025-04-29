@@ -78,5 +78,8 @@ export default {
   },
   setIsInitialLoad: ({ commit }, isInitial) => {
     commit('SET_IS_INITIAL_LOAD', isInitial)
+  },
+  setActiveInboxCommunicationUnreadCount: ({ commit }, data) => {
+    commit('SET_ACTIVE_INBOX_COMMUNICATION_UNREAD_COUNT', data)
   }
 }

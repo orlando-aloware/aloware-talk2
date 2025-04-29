@@ -26,6 +26,7 @@ export default function () {
     activeFilters: {},
     activeSort: {},
     currentSearch: null,
-    isInitialLoad: false
+    isInitialLoad: false,
+    activeInboxContactUnreadCount: 0
   }
 }

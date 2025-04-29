@@ -79,6 +79,9 @@ export default {
   },
   SET_IS_INITIAL_LOAD (state, isInitial) {
     state.isInitialLoad = isInitial
+  },
+  SET_ACTIVE_INBOX_COMMUNICATION_UNREAD_COUNT (state, count) {
+    state.activeInboxContactUnreadCount = count
   }
 }
 

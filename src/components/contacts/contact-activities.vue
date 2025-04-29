@@ -142,11 +142,19 @@ export default {
       return 'No Name'
     },
     hasUnreads () {
+      if (this.$route.params.inboxId) {
+        return true
+      }
+
       return this.contact.unread_texts_count > 0 ||
         this.contact.unread_missed_calls_count > 0 ||
         this.contact.unread_voicemails_count > 0
     },
     unreadCount () {
+      if (this.$route.params.inboxId) {
+        return 99
+      }
+
       return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     }
   },
