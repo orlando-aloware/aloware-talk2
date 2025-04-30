@@ -235,9 +235,13 @@ export default {
         GROUP_CONTACT_RELEVANCE,
         GROUP_CONTACT_COMM_METADATA
       },
-      maxOuterFilters: 3, // OR
-      maxInnerFilters: 5, // AND
-      tagsOptions: []
+      // OR filters
+      maxOuterFilters: 5,
+      // AND filters
+      maxInnerFilters: 10,
+      tagsOptions: [],
+      // Cache for generateListFilters results
+      filtersMemo: new Map()
     }
   },
 
@@ -466,6 +470,12 @@ export default {
     },
 
     generateListFilters () {
+      // Check if we already processed these filters recently
+      const cacheKey = JSON.stringify(this.currentListFilters)
+      if (this.filtersMemo.has(cacheKey)) {
+        return this.filtersMemo.get(cacheKey)
+      }
+
       const filterGroups = this.$jsonClone(this.currentListFilters)
 
       for (const groupIndex in filterGroups) {
@@ -499,76 +509,121 @@ export default {
 
           // evaluate list filter's operator against its actual respective filter's operators
           if (get(filterExists, 'operators', null)) {
-            filterItems.forEach((filterItem) => {
-              // try to search for the selected option
-              const operatorData = filterExists.operators.find(item => item.value === filterItem.operator)
-              const options = operatorData ? get(operatorData, 'options', null) : null
-              const option = options ? options.find(item => item.value === filterItem.value) : null
-
-              // set values into an array
-              let trueValue = filterItem.value
-              trueValue = option ? [option.label] : trueValue
-              trueValue = typeof filterItem.value === 'string'
-                ? filterItem.value.split(',')
-                : [trueValue]
-
-              // if filter has input and select
-              if (Array.isArray(filterItem.value) && options) {
-                trueValue = [`${filterItem.value[0]} ${options.find(item => item.value === filterItem.value[1]).label}`]
-              }
-              // when 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
-              // the content in 'field' will be concatenated at the end of the string
-              let field = null
-
-              if ('field' in filterItem) {
-                field = Array.isArray(trueValue) ? trueValue[0] : trueValue
-
-                // set values into an array (but using 'field' this time)
-                trueValue = filterItem.field
-                trueValue = option ? [option.label] : trueValue
-                trueValue = typeof filterItem.field === 'string'
-                  ? filterItem.field.split(',')
-                  : [trueValue]
-              }
-
-              newFilterItems.push({
-                field,
-                key: filterKey,
-                label: filterExists.label,
-                operator: operatorData ? get(operatorData, 'label', null) : null,
-                trueValue: trueValue,
-                value: JSON.stringify((trueValue ? [trueValue.join(' and ')] : trueValue)),
-                default: filterItem.default || 0
-              })
-            })
-
+            this.processBatchedFilterOperators(filterItems, filterExists, filterKey, newFilterItems)
             filterGroups[groupIndex].filters[filterKey] = newFilterItems
-
             continue
           }
 
-          filterItems.forEach((filterItem) => {
-            newFilterItems.push({
-              key: filterKey,
-              label: filterExists.label,
-              trueValue: filterItem.value,
-              value: JSON.stringify(filterItem.value),
-              default: filterItem.default || 0
-            })
-          })
-
+          this.processBatchedFilterItems(filterItems, filterExists, filterKey, newFilterItems)
           filterGroups[groupIndex].filters[filterKey] = newFilterItems
         }
       }
 
+      // Cache the result (limit cache size to prevent memory issues)
+      if (this.filtersMemo.size > 20) {
+        // Remove oldest entry when cache gets too large
+        const firstKey = this.filtersMemo.keys().next().value
+        this.filtersMemo.delete(firstKey)
+      }
+      this.filtersMemo.set(cacheKey, filterGroups)
       return filterGroups
+    },
+
+    processBatchedFilterOperators (filterItems, filterExists, filterKey, newFilterItems) {
+      // Process in batches for large filter sets
+      const batchSize = 5
+      for (let i = 0; i < filterItems.length; i += batchSize) {
+        const batch = filterItems.slice(i, i + batchSize)
+        batch.forEach((filterItem) => {
+          // try to search for the selected option
+          const operatorData = filterExists.operators.find(item => item.value === filterItem.operator)
+          const options = operatorData ? get(operatorData, 'options', null) : null
+          const option = options ? options.find(item => item.value === filterItem.value) : null
+
+          // set values into an array
+          let trueValue = filterItem.value
+          trueValue = option ? [option.label] : trueValue
+          trueValue = typeof filterItem.value === 'string'
+            ? filterItem.value.split(',')
+            : [trueValue]
+
+          // if filter has input and select
+          if (Array.isArray(filterItem.value) && options) {
+            trueValue = [`${filterItem.value[0]} ${options.find(item => item.value === filterItem.value[1]).label}`]
+          }
+          // when 'field' is present, change values between 'field' and 'value' to make use of the current logic for the 'value' attribute
+          // the content in 'field' will be concatenated at the end of the string
+          let field = null
+
+          if ('field' in filterItem) {
+            field = Array.isArray(trueValue) ? trueValue[0] : trueValue
+
+            // set values into an array (but using 'field' this time)
+            trueValue = filterItem.field
+            trueValue = option ? [option.label] : trueValue
+            trueValue = typeof filterItem.field === 'string'
+              ? filterItem.field.split(',')
+              : [trueValue]
+          }
+
+          newFilterItems.push({
+            field,
+            key: filterKey,
+            label: filterExists.label,
+            operator: operatorData ? get(operatorData, 'label', null) : null,
+            trueValue: trueValue,
+            value: JSON.stringify((trueValue ? [trueValue.join(' and ')] : trueValue)),
+            default: filterItem.default || 0
+          })
+        })
+
+        // Allow UI to remain responsive during processing
+        if (i + batchSize < filterItems.length) {
+          setTimeout(() => {}, 0)
+        }
+      }
+    },
+
+    processBatchedFilterItems (filterItems, filterExists, filterKey, newFilterItems) {
+      // Process in batches for large filter sets
+      const batchSize = 5
+      for (let i = 0; i < filterItems.length; i += batchSize) {
+        const batch = filterItems.slice(i, i + batchSize)
+        batch.forEach((filterItem) => {
+          newFilterItems.push({
+            key: filterKey,
+            label: filterExists.label,
+            trueValue: filterItem.value,
+            value: JSON.stringify(filterItem.value),
+            default: filterItem.default || 0
+          })
+        })
+
+        // Allow UI to remain responsive during processing
+        if (i + batchSize < filterItems.length) {
+          setTimeout(() => {}, 0)
+        }
+      }
     },
 
     getFormattedFilterSummary (filter, key) {
       if (!filter.trueValue) {
         return ''
       }
-      const filterFound = this.filters.find(filter => filter.key === key)
+
+      // Memoize the filter lookup since it's used frequently
+      if (!this._filterCache) {
+        this._filterCache = new Map()
+      }
+
+      let filterFound
+      if (this._filterCache.has(key)) {
+        filterFound = this._filterCache.get(key)
+      } else {
+        filterFound = this.filters.find(filter => filter.key === key)
+        this._filterCache.set(key, filterFound)
+      }
+
       const isRelationType = filterFound && this.relationTypes.includes(filterFound.type)
       const isBoolean = filterFound && filterFound.type === 'boolean'
       const isSimpleType = filterFound && get(filterFound, 'type', null)
@@ -768,41 +823,34 @@ export default {
         await this.getFilters()
       }
 
-      // Get list of filters inside visibleListFilters
-      // We create an auxiliary array to store the objects that contain the 'tags' property
-      let tagsFilters = []
+      // Optimize tags fetch by collecting IDs directly
+      const tagsToFetch = new Set()
 
-      // We iterate over the properties of the 'visibleListFilters' object
-      for (let key in this.visibleListFilters) {
-        // We check if the 'tags' property is present in the current object
-        if (this.visibleListFilters[key].hasOwnProperty('filters') && this.visibleListFilters[key]['filters'].hasOwnProperty('tags')) {
-          // We iterate over the properties of the 'tags' object
-          for (let tagKey in this.visibleListFilters[key]['filters']['tags']) {
-            if (this.visibleListFilters[key]['filters']['tags'][tagKey]) {
-              // If the 'tags' property is present, we add the entire object to the auxiliary array
-              tagsFilters = [...tagsFilters, this.visibleListFilters[key]['filters']['tags'][tagKey]]
+      // Iterate through nested structure more efficiently
+      Object.values(this.visibleListFilters).forEach(group => {
+        if (group.filters?.tags) {
+          Object.values(group.filters.tags).forEach(tag => {
+            const trueValueArray = tag.trueValue
+            if (Array.isArray(trueValueArray) && trueValueArray.length && trueValueArray[0]) {
+              // Use Set to automatically deduplicate tag IDs
+              if (Array.isArray(trueValueArray[0])) {
+                trueValueArray[0].forEach(id => tagsToFetch.add(id))
+              } else {
+                tagsToFetch.add(trueValueArray[0])
+              }
             }
-          }
+          })
         }
-      }
+      })
 
-      if (tagsFilters.length) {
-        // We collect the tags ids in an array in order to send request to the API
-        let tagsToFetch = []
-        tagsFilters.forEach(tag => {
-          const trueValueArray = tag.trueValue
-          if (Array.isArray(trueValueArray) && trueValueArray.length && trueValueArray[0]) {
-            tagsToFetch = [...tagsToFetch, ...trueValueArray[0]]
-          }
-        })
-
+      if (tagsToFetch.size) {
         // Get the tags filter object
         let tagsFilterToUpdate = this.filters.find(filter => filter.key === 'tags')
 
         // If the tags filter object is found and there are tags to fetch
-        if (tagsFilterToUpdate && tagsToFetch.length) {
+        if (tagsFilterToUpdate) {
           // Request the tags from the API using the IDs and assign the list to the tags filter
-          await this.getTags(tagsToFetch)
+          await this.getTags([...tagsToFetch])
           tagsFilterToUpdate.options = this.tagsOptions
         }
       }
@@ -868,6 +916,16 @@ export default {
       handler: function () {
         this.step = 1
       }
+    }
+  },
+
+  beforeDestroy () {
+    // Clear cached data when component is destroyed
+    if (this.filtersMemo) {
+      this.filtersMemo.clear()
+    }
+    if (this._filterCache) {
+      this._filterCache.clear()
     }
   }
 }

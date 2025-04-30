@@ -200,7 +200,9 @@ import {
   notificationMixin,
   visibilityMixin,
   aclMixin,
-  agentMixin
+  agentMixin,
+  userMixin,
+  TeamInboxMixin
 } from 'src/plugins/mixins'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
@@ -218,7 +220,9 @@ export default {
     mentionsMixin,
     visibilityMixin,
     aclMixin,
-    agentMixin
+    agentMixin,
+    userMixin,
+    TeamInboxMixin
   ],
 
   components: {
@@ -339,8 +343,23 @@ export default {
         return null
       }
 
+      // If TeamInbox is not enabled, use the original logic
+      if (!this.hasCompanyTeamInboxEnabled) {
+        return {
+          path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+        }
+      }
+
+      // If the communication has a ring group id and user has access to that team inbox
+      if (this.ringGroupId && this.ringGroupId !== '' && this.checkInboxAccess(this.ringGroupId)) {
+        return {
+          path: `/team-inboxes/${this.ringGroupId}/contacts/${this.contactId}/communications`
+        }
+      }
+
+      // If no ring group id or no access, use regular communication page
       return {
-        path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+        path: `/contacts/${this.contactId}/communications/${this.communicationId}`
       }
     },
 
@@ -755,23 +774,9 @@ export default {
       let found = document.querySelector('.notification-body-wrapper .call-actions')
       found = !found ? document.querySelector('.notification-body-wrapper .call-fishing-actions') : found
 
-      // 07/12/2022 - Removed for now
-      // if (!found &&
-      //   this.isValidPhoneShowInfo) {
-      //   this.setShowIncomingCallNotification(false)
-      //   this.showCallFishingDataInPhone({
-      //     communication: this.communication,
-      //     contact: this.contact
-      //   }, this.id)
-      // }
-
       if (!found &&
         this.id === 'system') {
         this.$closeActionNotification(this.id)
-
-        setTimeout(() => {
-          window.location.reload()
-        }, 500)
       }
     },
 
@@ -798,10 +803,10 @@ export default {
         return
       }
 
-      if (this.$route.path !== `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`) {
-        this.$router.push({
-          path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
-        })
+      // Get the path from the link computed property
+      const linkPath = this.link?.path
+      if (linkPath && this.$route.path !== linkPath) {
+        this.$router.push({ path: linkPath })
       }
     },
 

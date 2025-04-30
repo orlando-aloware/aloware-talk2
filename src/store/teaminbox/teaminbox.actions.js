@@ -22,6 +22,12 @@ export default {
   setIsLoadingInboxes: ({ commit }, loading) => {
     commit('SET_IS_LOADING_INBOXES', loading)
   },
+  setInboxesUnreadCount: ({ commit }, data) => {
+    commit('SET_INBOXES_UNREAD_COUNT', data)
+  },
+  setIsLoadingInboxesUnreadCount: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_INBOXES_UNREAD_COUNT', loading)
+  },
   setHasMoreInboxes: ({ commit }, hasMore) => {
     commit('SET_HAS_MORE_INBOXES', hasMore)
   },
@@ -60,5 +66,17 @@ export default {
   },
   setShowRefreshCommunicationsButton: ({ commit }, show) => {
     commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
+  },
+  setActiveFilters: ({ commit }, filters) => {
+    commit('SET_ACTIVE_FILTERS', filters)
+  },
+  setActiveSort: ({ commit }, sort) => {
+    commit('SET_ACTIVE_SORT', sort)
+  },
+  setCurrentSearch: ({ commit }, search) => {
+    commit('SET_CURRENT_SEARCH', search)
+  },
+  setIsInitialLoad: ({ commit }, isInitial) => {
+    commit('SET_IS_INITIAL_LOAD', isInitial)
   }
 }

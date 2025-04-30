@@ -24,9 +24,14 @@
             Role: <b>{{ user.profile.role_name }}</b>
           </span>
           <q-separator class="my-2" />
-          <div class="custom-connection-test py-2 px-3" v-close-popup @click="goToConnectionTest">
-            <span class="text-md"><i class="fa fa-stethoscope mr-2"></i>Run Connection Test</span>
-          </div>
+          <q-btn color="primary"
+                 class="full-width text-caption"
+                 size="sm"
+                 v-close-popup
+                 @click="goToConnectionTest">
+            <i class="fa fa-stethoscope mr-1"></i>
+            RUN CONNECTION TEST
+          </q-btn>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>

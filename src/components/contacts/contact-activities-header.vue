@@ -2,7 +2,7 @@
   <div class="calls-header d-flex justify-content-between pr-3">
     <div class="calls-header__label">
       <back-button class="p-0"
-                   v-if="$q.screen.lt.md && ![EINBOXES_MENU_COMMUNICATIONS_TITLE].includes($route.name)"
+                   v-if="$q.screen.lt.md && ![TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes($route.name)"
                    data-testid="contact-activities-back-btn"
                    @click="back"/>
       <div class="contact-name">{{ label }}</div>
@@ -222,7 +222,7 @@ import Profile from 'components/profile'
 import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 import { aclMixin } from 'src/plugins/mixins'
-import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'contact-activities-header',
@@ -307,7 +307,7 @@ export default {
       isUpdatingStatus: false,
       nextStat: null,
       loading: false,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 

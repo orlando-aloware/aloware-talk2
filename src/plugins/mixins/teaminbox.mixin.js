@@ -1,12 +1,14 @@
-import { THREADED } from 'src/store/einbox/einbox.store'
+import { THREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
 export default {
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'isLoadingInboxes',
       'inboxes',
+      'inboxesUnreadCount',
+      'isLoadingInboxesUnreadCount',
       'currentInboxesPage',
       'hasMoreInboxes',
       'items',
@@ -20,9 +22,11 @@ export default {
   },
 
   methods: {
-    ...mapActions('Einbox', [
+    ...mapActions('TeamInbox', [
       'setInboxes',
       'setIsLoadingInboxes',
+      'setInboxesUnreadCount',
+      'setIsLoadingInboxesUnreadCount',
       'appendInboxes',
       'setItems',
       'appendItems',
@@ -99,15 +103,18 @@ export default {
       }
     },
 
-    async fetchItems (inboxId, search = null) {
+    async fetchItems (inboxId, search = null, filters = {}, sort = {}) {
       try {
         this.setIsLoadingItems(true)
         this.setShowRefreshCommunicationsButton(false)
 
-        const response = await this.getItemsRequest(inboxId, 1, search)
+        const response = await this.getItemsRequest(inboxId, 1, search, filters, sort)
 
         this.setItems(response.data)
         this.setIsLoadingItems(false)
+
+        // Store the fact that this is the initial load in case we need to auto-load more
+        this.$store.dispatch('TeamInbox/setIsInitialLoad', true)
 
         this.setAbortController(null)
       } catch (error) {
@@ -127,7 +134,12 @@ export default {
         this.setIsLoadingMoreItems(true)
 
         const nextPage = this.currentItemsPage + 1
-        const response = await this.getItemsRequest(inboxId, nextPage)
+        // Get current filter state from Vuex
+        const filters = this.$store.state.TeamInbox.activeFilters || {}
+        const sort = this.$store.state.TeamInbox.activeSort || {}
+        const search = this.$store.state.TeamInbox.currentSearch
+
+        const response = await this.getItemsRequest(inboxId, nextPage, search, filters, sort)
 
         this.appendItems(response.data)
 
@@ -139,13 +151,26 @@ export default {
       }
     },
 
-    getItemsRequest (inboxId, nextPage, search = null) {
+    getItemsRequest (inboxId, nextPage, search = null, filters = {}, sort = {}) {
       // abort current ongoign request
       if (this.abortController) {
         this.abortController.abort()
       }
 
       this.setAbortController(new AbortController())
+
+      // Transform filters to API parameters
+      const apiFilters = {}
+
+      // Map filter keys to API parameters
+      if (filters.unreadonly) {
+        apiFilters.unread_only = true
+      }
+
+      // Map sort keys to API parameters
+      if (sort.order) {
+        apiFilters.order = sort.order
+      }
 
       return talk2Api.V1.reports.communications.get({
         params: {
@@ -156,15 +181,91 @@ export default {
           ...(search ? {
             search_text: search,
             search_fields: ['lead_number', 'contact.name', 'campaign.name']
-          } : {})
+          } : {}),
+          ...apiFilters
         },
         headers: { 'requested-from': 'api' },
         signal: this.abortController.signal
       })
     },
 
+    async loadInbox (inboxId) {
+      const response = await talk2Api.V2.inbox.inboxes.get({
+        params: {
+          inbox_ids: [inboxId]
+        }
+      })
+
+      this.setInboxes(response.data)
+    },
+
     checkInboxAccess (inboxId) {
+      if (this.inboxes.length === 0 && inboxId) {
+        this.loadInbox(inboxId)
+      }
+
       return this.inboxes.some(inbox => inbox.id === inboxId)
+    },
+
+    async fetchInboxesUnreadCount (inboxIds) {
+      this.setIsLoadingInboxesUnreadCount(true)
+      try {
+        const { data } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds)
+        this.setInboxesUnreadCount(data)
+      } catch (error) {
+        this.setInboxesUnreadCount([])
+        console.error('[fetchInboxesUnreadCount] error', error)
+      }
+      this.setIsLoadingInboxesUnreadCount(false)
+    },
+
+    getInboxUnreadCount (inboxId) {
+      return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
+    },
+
+    einboxCommunicationMarkedAllAsRead (inboxId, count) {
+      this.setInboxesUnreadCount([...this.inboxesUnreadCount.map((inbox) => {
+        if (inbox.ring_group_id === inboxId) {
+          inbox.unread_count -= count
+
+          if (inbox.unread_count < 0) {
+            inbox.unread_count = 0
+          }
+        }
+
+        return inbox
+      })])
+    },
+
+    einboxCommunicationMarkedAsRead (inboxId) {
+      this.setInboxesUnreadCount([...this.inboxesUnreadCount.map((inbox) => {
+        if (inbox.ring_group_id === inboxId) {
+          inbox.unread_count--
+        }
+
+        return inbox
+      })])
+    },
+
+    einboxCommunicationMarkedAsUnread (inboxId) {
+      // increment unread count for inbox/contact
+      const newValue = [...this.inboxesUnreadCount.map((inbox) => {
+        if (inbox.ring_group_id === inboxId) {
+          inbox.unread_count++
+        }
+
+        return inbox
+      })]
+
+      // if inbox is not found, add it since we have the inboxId
+      if (!newValue.find((inbox) => inbox.ring_group_id === inboxId)) {
+        newValue.push({
+          ring_group_id: inboxId,
+          unread_count: 1
+        })
+      }
+
+      this.setInboxesUnreadCount(newValue)
     }
   }
 }
