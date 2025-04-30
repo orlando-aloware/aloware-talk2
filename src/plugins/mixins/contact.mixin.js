@@ -276,6 +276,10 @@ export default {
         this.updateContacts(contact)
       }
     }
+
+    this.listeners.markContactCommunicationsAllAsReadProcessed = (contact) => {
+      this.markContactCommunicationsAllAsReadProcessed(contact)
+    }
   },
 
   methods: {
@@ -287,6 +291,7 @@ export default {
       this.$VueEvent.listen('contact_audit_created', this.listeners.contactAuditCreated)
       this.$VueEvent.listen('fetch_contact_info', this.listeners.fetchContactInfo)
       this.$VueEvent.listen('update-contact-in-group', this.listeners.updateContactInGroup)
+      this.$VueEvent.listen('mark_contact_communications_all_as_read_processed', this.listeners.markContactCommunicationsAllAsReadProcessed)
     },
 
     removeListeners () {
@@ -297,6 +302,7 @@ export default {
       this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
       this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
       this.$VueEvent.stop('update-contact-in-group', this.listeners.updateContactInGroup)
+      this.$VueEvent.stop('mark_contact_communications_all_as_read_processed', this.listeners.markContactCommunicationsAllAsReadProcessed)
     },
 
     isCommOrAuditExists (communication, data) {
@@ -874,12 +880,18 @@ export default {
             }
           }
 
-          this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
-          this.$VueEvent.fire('contact_updated', res.data)
+          // No more processing.  The markContactCommunicationsAllAsReadProcessed listener will fire the event when the backend has processed the event
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loadingMarkAsRead = false
         })
+      }
+    },
+
+    markContactCommunicationsAllAsReadProcessed (contact) {
+      if (contact.id === this.contact.id) {
+        this.$VueEvent.fire('mark_contact_communications_all_as_read', contact)
+        this.$VueEvent.fire('contact_updated', contact)
       }
     },
 
@@ -1273,6 +1285,7 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
+    this.$VueEvent.stop('mark_contact_communications_all_as_read_processed', this.listeners.markContactCommunicationsAllAsReadProcessed)
     clearInterval(this.contactActivitiesInterval)
     clearInterval(this.containerElInterval)
     clearInterval(this.scrollInterval)

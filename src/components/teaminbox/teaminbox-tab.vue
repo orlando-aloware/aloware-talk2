@@ -169,6 +169,7 @@ export default {
     this.$VueEvent.listen('new_communication', this.newCommunicationListener)
     this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
     this.$VueEvent.listen('contact_updated', this.updatedContactListener)
+    this.$VueEvent.listen('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
   },
 
   beforeDestroy () {
@@ -180,6 +181,7 @@ export default {
     this.$VueEvent.stop('new_communication', this.newCommunicationListener)
     this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
     this.$VueEvent.stop('contact_updated', this.updatedContactListener)
+    this.$VueEvent.stop('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
   },
 
   methods: {
@@ -285,15 +287,19 @@ export default {
       }
     },
 
+    async getUnreadCount (ringGroupId, contactId) {
+      const response = await talk2Api.V2.inbox.inboxes.unreadCount([ringGroupId], [contactId])
+      return response.data.find(item => item.ring_group_id === ringGroupId && item.contact_id === contactId)?.unread_count || 0
+    },
+
     async handleThreadedCommunication (communication, isNew = false) {
       const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
       const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
 
+      communication.inbox_unread_count = await this.getUnreadCount(this.activeInboxId, communication.contact_id)
+
       // New communication (not in the list)
       if (index === -1) {
-        const response = await talk2Api.V2.inbox.inboxes.unreadCount([this.activeInboxId], [communication.contact_id])
-        communication.inbox_unread_count = response.data.find(item => item.ring_group_id === this.activeInboxId && item.contact_id === communication.contact_id)?.unread_count || 0
-
         // For new communications, add them at appropriate position based on sort order
         if (isAscendingOrder && !isLiveCall(communication)) {
           this.itemsData.push(communication) // Add to end for ascending order
@@ -309,14 +315,6 @@ export default {
       if (isLiveCall(this.itemsData[index]) && communication.type !== CommunicationTypes.CALL) {
         return
       }
-
-      let inboxUnreadCount = this.itemsData[index].inbox_unread_count || 0
-
-      // If the is_read property is changed or if this is a new unread communication, adjust the unread counts
-      if (this.itemsData[index]?.is_read !== communication.is_read || (isNew && !communication.is_read)) {
-        inboxUnreadCount += communication.is_read ? -1 : 1
-      }
-      communication.inbox_unread_count = inboxUnreadCount
 
       this.itemsData.splice(index, 1, communication)
     },
@@ -363,6 +361,16 @@ export default {
 
       // fetch unread count for the active inbox (from the backend)
       this.fetchInboxesUnreadCount([this.activeInboxId])
+
+      if (!this.activeId) {
+        return
+      }
+
+      // Emits the signal to update the unread count for the active inbox
+      const index = this.itemsData.findIndex(item => item.contact_id === this.activeId)
+      if (index >= 0) {
+        this.onItemClick(this.itemsData[index])
+      }
     },
 
     async newCommunicationListener (communication) {
@@ -518,6 +526,29 @@ export default {
         this.$store.commit('TeamInbox/SET_IS_LOADING_ITEMS', false)
         this.setIsInitialLoad(false)
       }
+    },
+
+    async markContactCommunicationsAllAsReadListener (data) {
+      // Check if the contact id matches the current active contact
+      if (data.id !== this.activeId) {
+        return
+      }
+
+      const item = this.itemsData.find(item => item.contact_id === this.activeId)
+
+      if (!item) {
+        return
+      }
+
+      // update the unread count for the contact
+      const unreadCount = await this.getUnreadCount(this.activeInboxId, this.activeId)
+      item.inbox_unread_count = unreadCount
+
+      // fetch unread count for the active inbox (from the backend)
+      await this.fetchInboxesUnreadCount([this.activeInboxId])
+
+      // simulate a click on the contact to update the unread count
+      this.onItemClick(item)
     }
   },
 

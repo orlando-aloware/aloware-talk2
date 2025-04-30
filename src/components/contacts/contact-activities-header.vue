@@ -93,9 +93,10 @@
           type="a"
           color="primary"
           class="text-decoration-none mr-2"
+          :disabled="processingMarkAllAsRead"
           v-if="hasUnreads"
           data-testid="contact-activities-mark-all-as-read-btn"
-          @click="$emit('markAllAsRead')">
+          @click="markAllAsRead">
           <span class="mx-2">
             Mark All as Read ({{ unreadCount }})
           </span>
@@ -307,11 +308,21 @@ export default {
       isUpdatingStatus: false,
       nextStat: null,
       loading: false,
-      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
+      processingMarkAllAsRead: false
     }
   },
 
   methods: {
+    async markAllAsRead () {
+      this.processingMarkAllAsRead = true
+      this.$emit('markAllAsRead')
+    },
+
+    markContactCommunicationsAllAsReadListener (data) {
+      this.processingMarkAllAsRead = false
+    },
+
     onUpdateTaskStatus (status) {
       this.isUpdatingStatus = true
       this.nextStat = status
@@ -369,6 +380,14 @@ export default {
       this.isUpdatingStatus = false
       this.nextStat = null
     }
+  },
+
+  created () {
+    this.$VueEvent.listen('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
   }
 }
 </script>
