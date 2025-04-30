@@ -853,7 +853,7 @@ export default {
       this.selectedPhoneNumber = null
     },
 
-    markAllAsRead (count, contactId) {
+    markAllAsRead () {
       if (this.contact) {
         this.loadingMarkAsRead = true
 
@@ -867,21 +867,17 @@ export default {
           this.loadingMarkAsRead = false
 
           for (let index in this.communicationsAndAudits) {
-            if (typeof this.communicationsAndAudits[index].is_read !== 'undefined') {
+            if (typeof this.communicationsAndAudits[index].is_read !== 'undefined' &&
+              (!this.teamInboxId || this.communicationsAndAudits[index].ring_group_id === this.teamInboxId)
+            ) {
               this.communicationsAndAudits[index].is_read = true
             }
           }
 
-          this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data, this.teamInboxId)
-          this.$VueEvent.fire('contact_updated', res.data)
+          console.log('marking as read', res.data)
 
-          if (this.teamInboxId) {
-            this.$VueEvent.fire('teaminbox_communications_all_as_read', {
-              inboxId: this.teamInboxId,
-              contactId: contactId || this.contact.id,
-              count
-            })
-          }
+          this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
+          this.$VueEvent.fire('contact_updated', res.data)
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loadingMarkAsRead = false
