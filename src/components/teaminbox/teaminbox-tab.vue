@@ -59,7 +59,7 @@
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                          :repeats="viewMode === UNTHREADED ? item.repeats : null"
                          :is-live-call="isLiveCall(item)"
-                         :is-team-inbox="true" />
+                         :team-inbox-id="activeInboxId" />
         </div>
 
         <!-- Load more indicator -->
