@@ -18,14 +18,19 @@ export default {
     campaignId: {
       type: [String, Number],
       required: true
+    },
+
+    isTeamInbox: {
+      type: Boolean,
+      default: false
     }
   },
 
   computed: {
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'teamInboxCampaigns']),
 
     campaign () {
-      return this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
+      return this.isTeamInbox ? this.teamInboxCampaigns.find(campaign => campaign.id === this.campaignId) : this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
     }
   }
 }

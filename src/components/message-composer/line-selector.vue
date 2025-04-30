@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import {
   contactMixin,
   contactV2AttributesMixin,
@@ -61,6 +61,7 @@ import {
   selectorMixin
 } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
 
 export default {
   name: 'line-selector',
@@ -95,12 +96,19 @@ export default {
       'lineIncomingNumberLoading',
       'lineIncomingNumber'
     ]),
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'teamInboxCampaigns']),
+
+    /**
+     * Returns the appropriate campaigns array based on whether we're in team inbox mode
+     */
+    campaignsToUse () {
+      return this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+    },
 
     selectedCampaign () {
-      if (this.campaigns) {
+      if (this.campaignsToUse) {
         // It returns the campaign validating the campaignId and the incoming_number
-        return this.campaigns.find(campaign => campaign.id === this.campaignId && campaign.incoming_number)
+        return this.campaignsToUse.find(campaign => campaign.id === this.campaignId && campaign.incoming_number)
       }
 
       return null
@@ -129,6 +137,48 @@ export default {
       }
 
       return linesArray.data
+    },
+
+    /**
+     * Override contactCampaignsFromCommunications from contactMixin to use campaignsToUse
+     */
+    contactCampaignsFromCommunications () {
+      if (this.contact && this.campaignsToUse.length) {
+        return this.campaignsAlphabeticalOrder
+      }
+
+      return []
+    },
+
+    /**
+     * Override otherCampaignsFromCommunications from contactMixin to use campaignsToUse
+     */
+    otherCampaignsFromCommunications () {
+      if (this.campaignsToUse && this.contactCampaignsFromCommunications) {
+        return _.difference(this.campaignsAlphabeticalOrder, this.contactCampaignsFromCommunications)
+      }
+
+      if (this.campaignsToUse) {
+        return this.campaignsAlphabeticalOrder
+      }
+
+      return []
+    },
+
+    /**
+     * Override campaignsAlphabeticalOrder from contactMixin to use campaignsToUse
+     */
+    campaignsAlphabeticalOrder () {
+      if (this.campaignsToUse) {
+        return _.clone(this.campaignsToUse).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
+
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+        })
+      }
+
+      return []
     }
   },
 
@@ -139,7 +189,8 @@ export default {
       lineOptions: this.formattedLineOptions,
       incomingNumber: null,
       isFocused: false,
-      selectWidth: 0
+      selectWidth: 0,
+      canEmail: false
     }
   },
 
@@ -153,6 +204,11 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'setLineIncomingNumberLoading',
+      'setLineIncomingNumber'
+    ]),
+
     onShowMenu () {
       this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
     },
@@ -231,6 +287,41 @@ export default {
       this.selectedLine = this.selectedCampaign
       this.incomingNumber = this.lineIncomingNumber
       this.showPlaceholder()
+    },
+
+    updateMessageComposer () {
+      if (this.selectedCampaign && this.selectedCampaign.id && this.contact && this.contact.id) {
+        this.checkEmailCapability()
+      }
+    },
+
+    /**
+     * Override checkEmailCapability from contactMixin to use our selectedCampaign
+     */
+    checkEmailCapability () {
+      const mailIntegrationEnabled = this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled
+
+      if (this.currentCompany && mailIntegrationEnabled) {
+        this.canEmail = true
+        return
+      }
+
+      this.canEmail = this.selectedCampaign.email_intake && this.selectedCampaign.email_intake_route_id
+    },
+
+    /**
+     * Override updateLineIncomingNumber from contactMixin to use our selectedCampaign
+     */
+    updateLineIncomingNumber () {
+      if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
+        this.setLineIncomingNumberLoading(true)
+
+        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
+          this.setLineIncomingNumber(response.data)
+        }).finally(() => {
+          this.setLineIncomingNumberLoading(false)
+        })
+      }
     }
   },
 

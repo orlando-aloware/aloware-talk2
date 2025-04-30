@@ -30,7 +30,8 @@
 
     <div class="communication__campaign"
          v-if="campaignId">
-      <campaign :campaign-id="campaignId" />
+      <campaign :campaign-id="campaignId"
+                :is-team-inbox="isTeamInbox" />
     </div>
 
     <div class="communication__time">
@@ -144,6 +145,11 @@ export default {
     },
 
     isLiveCall: {
+      type: Boolean,
+      default: false
+    },
+
+    isTeamInbox: {
       type: Boolean,
       default: false
     }
