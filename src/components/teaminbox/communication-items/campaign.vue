@@ -12,8 +12,11 @@
 
 <script>
 import { mapState } from 'vuex'
+import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
+  mixins: [teamInboxPropsMixin],
+
   props: {
     campaignId: {
       type: [String, Number],
@@ -22,10 +25,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'teamInboxCampaigns']),
 
     campaign () {
-      return this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
+      return this.teamInbox ? this.teamInboxCampaigns.find(campaign => campaign.id === this.campaignId) : this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
     }
   }
 }
