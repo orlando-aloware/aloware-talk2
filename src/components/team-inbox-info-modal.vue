@@ -111,8 +111,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['profile']),
-    ...mapState('TeamInbox', ['inboxAnnouncementViewed']),
-    ...mapActions('TeamInbox', ['setInboxAnnouncementViewed'])
+    ...mapState('TeamInbox', ['inboxAnnouncementViewed'])
   },
 
   created () {
@@ -131,10 +130,12 @@ export default {
   },
 
   methods: {
-    closeModal () {
+    ...mapActions('TeamInbox', ['setInboxAnnouncementViewed']),
+
+    async closeModal () {
       this.showModal = false
       this.$cookies.set(this.cookieName, this.visits + 1, '3650d')
-      this.setInboxAnnouncementViewed(true)
+      await this.setInboxAnnouncementViewed(true)
     },
 
     openModal () {
