@@ -122,7 +122,7 @@ export default {
   },
 
   beforeDestroy () {
-    this.$VueEvent.removeListener('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
+    this.$VueEvent.stop('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
   }
 }
 </script>
