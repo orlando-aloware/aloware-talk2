@@ -6,12 +6,13 @@ import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
-import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
-  mixins: [teamInboxPropsMixin],
-
   props: {
+    teamInboxId: {
+      type: Number,
+      default: null
+    }
   },
 
   data () {
@@ -107,6 +108,10 @@ export default {
     ...mapState('inbox', { selectContact: 'selectedContact' }),
 
     ...mapState('cache', ['currentCompany']),
+
+    teamInbox () {
+      return this.teamInboxId !== null
+    },
 
     selectedCampaign () {
       if (this.campaigns) {
@@ -488,7 +493,7 @@ export default {
       this.source = this.cancelToken.source()
 
       // get contact phone numbers
-      talk2Api.V1.contact.getPhoneNumbers(contactIdToFetch, this.teamInbox)
+      talk2Api.V1.contact.getPhoneNumbers(contactIdToFetch)
         .then(response => {
           this.setContactPhoneNumbers(response.data)
         }).catch(err => {
@@ -563,17 +568,10 @@ export default {
         return
       }
 
-      const params = {}
-
-      if (this.teamInbox) {
-        params.from_team_inbox = this.teamInbox
-      }
-
       // get contact's info
       return this.$axios.get(`/api/v2/contacts/${contactIdToFetch}`,
         {
-          cancelToken: this.source.token,
-          params
+          cancelToken: this.source.token
         })
         .then(res => {
           this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
@@ -725,18 +723,11 @@ export default {
         }
       }
 
-      const params = {}
-
-      if (this.teamInbox) {
-        params.from_team_inbox = this.teamInbox
-      }
-
       return this.$axios.get(`/api/v1/contact/${contactId}/communications`, {
         params: {
           page: this.communicationsPage,
           per_page: this.communicationsPerPage,
-          last_audit_created_at: lastAuditCreatedAt,
-          ...params
+          last_audit_created_at: lastAuditCreatedAt
         },
         cancelToken: this.communicationApiSource.token
       }).then(res => {
@@ -1028,15 +1019,7 @@ export default {
       if (this.contact && this.selectedCampaign) {
         this.contactIncomingNumber = null
 
-        const params = {}
-
-        if (this.teamInbox) {
-          params.from_team_inbox = this.teamInbox
-        }
-
-        this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`, {
-          params
-        }).then(res => {
+        this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
           this.contactIncomingNumber = res.data
         }).catch(err => {
           this.$handleErrors(err.response)
@@ -1067,7 +1050,7 @@ export default {
       if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
         this.setLineIncomingNumberLoading(true)
 
-        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
+        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id).then(response => {
           this.setLineIncomingNumber(response.data)
         }).finally(() => {
           this.setLineIncomingNumberLoading(false)

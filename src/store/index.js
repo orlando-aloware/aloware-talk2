@@ -64,7 +64,6 @@ export default function (/* { ssrContext } */) {
       filter: {},
       tags: [],
       campaigns: [],
-      teamInboxCampaigns: [],
       campaignsIsLoading: false,
       users: [],
       usersIsLoading: false,
@@ -472,10 +471,6 @@ export default function (/* { ssrContext } */) {
 
       setCampaigns ({ commit }, campaigns) {
         commit('SET_CAMPAIGNS', campaigns)
-      },
-
-      setTeamInboxCampaigns ({ commit }, campaigns) {
-        commit('SET_TEAM_INBOX_CAMPAIGNS', campaigns)
       },
 
       setCampaignsIsLoading ({ commit }, value) {
@@ -1150,10 +1145,6 @@ export default function (/* { ssrContext } */) {
 
       SET_CAMPAIGNS (state, campaigns) {
         state.campaigns = campaigns
-      },
-
-      SET_TEAM_INBOX_CAMPAIGNS (state, campaigns) {
-        state.teamInboxCampaigns = campaigns
       },
 
       SET_CAMPAIGNS_IS_LOADING (state, value) {
