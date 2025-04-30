@@ -86,6 +86,10 @@
         </q-btn>
       </div>
       <div class="contact-activities-actions__desktop d-flex flex-grow-1 justify-content-end">
+        <q-spinner-dots v-if="processingMarkAllAsRead"
+                        class="pl-1 pr-1"
+                        color="primary"
+                        size="40px" />
         <q-btn
           borderless
           flat
@@ -101,7 +105,6 @@
             Mark All as Read ({{ unreadCount }})
           </span>
         </q-btn>
-
         <q-btn borderless
                flat
                no-caps
@@ -379,6 +382,11 @@ export default {
       this.$VueEvent.fire('contact_task_status_updated', this.contact)
       this.isUpdatingStatus = false
       this.nextStat = null
+    },
+
+    '$route.params.id': function (value) {
+      // Reset the processingMarkAllAsRead flag when the contact id changes, for precaution
+      this.processingMarkAllAsRead = false
     }
   },
 

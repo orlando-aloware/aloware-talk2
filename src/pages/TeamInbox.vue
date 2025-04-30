@@ -94,7 +94,21 @@ export default {
       if (data && data.contactId) {
         this.currentContactUnreadCount = data.unreadCount || 0
       }
+    },
+
+    markContactCommunicationsAllAsReadProcessed (contact) {
+      // Only valid for team inbox, which are waiting for the backend to process the event
+      this.$VueEvent.fire('mark_contact_communications_all_as_read', contact)
+      this.$VueEvent.fire('contact_updated', contact)
     }
+  },
+
+  created () {
+    this.$VueEvent.listen('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.removeListener('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
   }
 }
 </script>

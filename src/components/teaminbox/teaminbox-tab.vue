@@ -300,6 +300,7 @@ export default {
 
       // New communication (not in the list)
       if (index === -1) {
+        console.log('handleThreadedCommunication - new communication', communication)
         // For new communications, add them at appropriate position based on sort order
         if (isAscendingOrder && !isLiveCall(communication)) {
           this.itemsData.push(communication) // Add to end for ascending order
@@ -312,7 +313,7 @@ export default {
 
       // Existing communication logic below (in the list)
       // Ignore live calls in threaded mode
-      if (isLiveCall(this.itemsData[index]) && communication.type !== CommunicationTypes.CALL) {
+      if (isLiveCall(this.itemsData[index])) {
         return
       }
 
@@ -356,8 +357,6 @@ export default {
       } else {
         await this.handleThreadedCommunication(communication, isNew)
       }
-
-      this.sortItems()
 
       // fetch unread count for the active inbox (from the backend)
       this.fetchInboxesUnreadCount([this.activeInboxId])
