@@ -39,6 +39,7 @@
 import UnreadMailIcon from '../../components/icons/inbox/unread-mail-icon.vue'
 import SortUpIcon from '../../components/icons/inbox/sort-up-icon.vue'
 import SortDownIcon from '../../components/icons/inbox/sort-down-icon.vue'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'TeamInboxFilterSort',
@@ -47,10 +48,17 @@ export default {
     SortUpIcon,
     SortDownIcon
   },
+  computed: {
+    ...mapState('TeamInbox', ['activeFilters', 'activeSort']),
+    filterOption () {
+      return this.activeFilters && this.activeFilters.unreadonly ? 'Unread' : 'All'
+    },
+    sortOption () {
+      return this.activeSort && this.activeSort.order === 'asc' ? 'Oldest' : 'Newest'
+    }
+  },
   data () {
     return {
-      filterOption: 'All',
-      sortOption: 'Newest',
       filters: {
         All: {},
         Unread: { unreadonly: true }
@@ -62,12 +70,13 @@ export default {
     }
   },
   methods: {
+    ...mapActions('TeamInbox', ['setActiveFilters', 'setActiveSort']),
     setFilterOption (option) {
-      this.filterOption = option
+      this.setActiveFilters(this.filters[option])
       this.$emit('filter-change', this.filters[option])
     },
     setSortOption (option) {
-      this.sortOption = option
+      this.setActiveSort(this.sorts[option])
       this.$emit('sort-change', this.sorts[option])
     }
   }
