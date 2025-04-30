@@ -31,7 +31,7 @@
     <div class="communication__campaign"
          v-if="campaignId">
       <campaign :campaign-id="campaignId"
-                :is-team-inbox="isTeamInbox" />
+                :team-inbox-id="teamInboxId" />
     </div>
 
     <div class="communication__time">
@@ -52,10 +52,12 @@ import LastCommunication from './last-communication.vue'
 import LastCommunicationDate from './last-communication-date.vue'
 import PhoneNumber from './phone-number.vue'
 import { avatarMixin } from 'src/plugins/mixins'
+import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
   mixins: [
-    avatarMixin
+    avatarMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -145,11 +147,6 @@ export default {
     },
 
     isLiveCall: {
-      type: Boolean,
-      default: false
-    },
-
-    isTeamInbox: {
       type: Boolean,
       default: false
     }
