@@ -311,8 +311,8 @@ export default {
       isUpdatingStatus: false,
       nextStat: null,
       loading: false,
-      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
-      processingMarkAllAsRead: false
+      processingMarkAllAsRead: false,
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
