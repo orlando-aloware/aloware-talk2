@@ -150,15 +150,15 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
 
-      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
+      getLineIncomingNumber (contactId, lineId, teamInbox = null) {
         if (!contactId || !lineId) {
           return null
         }
 
         const params = {}
 
-        if (fromTeamInbox) {
-          params.from_team_inbox = fromTeamInbox
+        if (teamInbox) {
+          params.from_team_inbox = teamInbox
         }
 
         return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
@@ -991,8 +991,16 @@ const talk2Api = {
           return window.axios.get(`${suffixV2}inboxes`, data)
         },
 
-        unreadCount (inboxIds) {
-          return window.axios.post(`${suffixV2}inboxes/unread-count`, { inbox_ids: inboxIds })
+        unreadCount (inboxIds, contactIds = null) {
+          const params = {
+            inbox_ids: inboxIds
+          }
+
+          if (contactIds) {
+            params.contact_ids = contactIds
+          }
+
+          return window.axios.post(`${suffixV2}inboxes/unread-count`, params)
         }
       }
     },

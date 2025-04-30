@@ -1,0 +1,48 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# ESLint Rules for Code Generation
+
+This project follows Vue.js style guide with Standard JS rules. All code generation must strictly adhere to these rules.
+
+## Key Style Rules to Follow
+
+### Spacing
+- No trailing spaces at end of lines
+- Space before function parentheses: `function ()` NOT `function()`
+- Always use spaces after commas: `foo(a, b)` NOT `foo(a,b)`
+- No spaces inside parentheses: `(foo)` NOT `( foo )`
+- Space after keywords: `if (condition)` NOT `if(condition)`
+- Space around operators: `a + b` NOT `a+b`
+- Block spacing: `function () { return true }` NOT `function (){return true}`
+- No multiple empty lines (max 1)
+
+### Indentation
+- Use 2 spaces for indentation (not tabs)
+- Proper indentation for nested structures
+- Consistent indentation in switch statements
+
+### Quotes
+- Use single quotes for strings: `'string'` NOT `"string"`
+- Use backticks for template literals only when necessary
+
+### Semicolons
+- No semicolons at the end of statements
+- Example: `const foo = 'bar'` NOT `const foo = 'bar';`
+
+### Objects and Arrays
+- Space after object keys: `{ foo: bar }` NOT `{foo:bar}`
+- Always use spaces inside curly braces: `{ foo }` NOT `{foo}`
+- No trailing commas in arrays or objects
+
+### Vue-Specific
+- Component names should be multi-word (except root App)
+- Prop definitions should be detailed (type and default)
+- Always use kebab-case for events: `this.$emit('change-value')` NOT `this.$emit('changeValue')`
+- Component attributes should use kebab-case in templates: `<custom-component data-id="foo"/>` NOT `<custom-component dataId="foo"/>`
+
+## Reference
+Full ESLint configuration: [.eslintrc.js](mdc:.eslintrc.js)
+Standard JS rules: [eslint-config-standard](mdc:https:/github.com/standard/standard/blob/master/RULES.md)

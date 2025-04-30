@@ -1,0 +1,44 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Vue Components and Structure
+
+## Vue/Quasar Framework
+This project uses:
+- Vue.js 2.x
+- Quasar Framework 1.x for UI components and app features
+- Vuex for state management
+- Vue Router for routing
+
+## Component Structure
+Components follow standard Vue.js single-file component structure:
+```vue
+<template>
+  <!-- HTML template -->
+</template>
+
+<script>
+export default {
+  // Component options
+}
+</script>
+
+<style>
+/* Component styles */
+</style>
+```
+
+## State Management
+- Vuex modules are located in [src/store](mdc:src/store)
+- ComponentState modules use vuex-map-fields for mapping fields
+
+## Routing
+- Routes are defined in [src/router](mdc:src/router)
+- Page components are located in [src/pages](mdc:src/pages)
+
+## Styles
+- Project uses both global SCSS files in [src/css](mdc:src/css)
+- Component-scoped styles
+- Quasar CSS variables and classes
