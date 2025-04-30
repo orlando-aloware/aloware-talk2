@@ -82,5 +82,8 @@ export default {
   },
   SET_ACTIVE_INBOX_COMMUNICATION_UNREAD_COUNT (state, count) {
     state.activeInboxContactUnreadCount = count
+  },
+  SET_INBOX_ANNOUNCEMENT_VIEWED (state, viewed) {
+    state.inboxAnnouncementViewed = viewed
   }
 }
