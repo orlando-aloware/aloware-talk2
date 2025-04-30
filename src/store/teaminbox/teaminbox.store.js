@@ -28,6 +28,6 @@ export default function () {
     currentSearch: null,
     isInitialLoad: false,
     activeInboxContactUnreadCount: 0,
-    teamInboxAnnouncementViewed: false
+    inboxAnnouncementViewed: false
   }
 }

@@ -82,7 +82,7 @@ export default {
   setActiveInboxCommunicationUnreadCount: ({ commit }, data) => {
     commit('SET_ACTIVE_INBOX_COMMUNICATION_UNREAD_COUNT', data)
   },
-  setTeamInboxAnnouncementViewed: ({ commit }, viewed) => {
-    commit('SET_TEAM_INBOX_ANNOUNCEMENT_VIEWED', viewed)
+  setInboxAnnouncementViewed: ({ commit }, viewed) => {
+    commit('SET_INBOX_ANNOUNCEMENT_VIEWED', viewed)
   }
 }

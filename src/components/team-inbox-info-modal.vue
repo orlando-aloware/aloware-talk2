@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import VueCookies from 'vue-cookies'
 import { mapActions, mapState } from 'vuex'
 
 export default {
@@ -88,32 +89,52 @@ export default {
     shouldShowInFirstVisit: {
       type: Boolean,
       default: true
+    },
+
+    cookieName: {
+      type: String,
+      default: 'team-inbox-announcement'
+    },
+
+    maxShows: {
+      type: Number,
+      default: 3
     }
   },
 
   data () {
     return {
-      showModal: false
+      showModal: false,
+      visits: 0
     }
   },
 
   computed: {
     ...mapState('auth', ['profile']),
-    ...mapState('TeamInbox', ['teamInboxAnnouncementViewed'])
+    ...mapState('TeamInbox', ['inboxAnnouncementViewed']),
+    ...mapActions('TeamInbox', ['setInboxAnnouncementViewed'])
   },
 
   created () {
-    if (!this.teamInboxAnnouncementViewed && this.shouldShowInFirstVisit) {
+    if (this.inboxAnnouncementViewed) {
+      return
+    }
+
+    this.$cookies = VueCookies
+    this.visits = parseInt(this.$cookies.get(this.cookieName) || 0)
+
+    console.log('visits', this.visits)
+
+    if (this.visits < this.maxShows && this.shouldShowInFirstVisit) {
       this.showModal = true
     }
   },
 
   methods: {
-    ...mapActions('TeamInbox', ['setTeamInboxAnnouncementViewed']),
     closeModal () {
-      console.log('closeModal')
       this.showModal = false
-      this.setTeamInboxAnnouncementViewed(true)
+      this.$cookies.set(this.cookieName, this.visits + 1, '3650d')
+      this.setInboxAnnouncementViewed(true)
     },
 
     openModal () {
