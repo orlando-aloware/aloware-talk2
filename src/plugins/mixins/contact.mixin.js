@@ -6,13 +6,12 @@ import * as storage from 'src/plugins/helpers/storage'
 import talk2Api from 'src/plugins/api/api'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
+import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
+  mixins: [teamInboxPropsMixin],
+
   props: {
-    teamInboxId: {
-      type: Number,
-      default: null
-    }
   },
 
   data () {
@@ -108,10 +107,6 @@ export default {
     ...mapState('inbox', { selectContact: 'selectedContact' }),
 
     ...mapState('cache', ['currentCompany']),
-
-    teamInbox () {
-      return this.teamInboxId !== null
-    },
 
     selectedCampaign () {
       if (this.campaigns) {
