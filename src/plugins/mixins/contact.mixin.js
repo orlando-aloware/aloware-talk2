@@ -874,8 +874,6 @@ export default {
             }
           }
 
-          console.log('marking as read', res.data)
-
           this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
           this.$VueEvent.fire('contact_updated', res.data)
         }).catch(err => {
