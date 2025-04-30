@@ -132,10 +132,10 @@ export default {
   methods: {
     ...mapActions('TeamInbox', ['setInboxAnnouncementViewed']),
 
-    async closeModal () {
+    closeModal () {
       this.showModal = false
       this.$cookies.set(this.cookieName, this.visits + 1, '3650d')
-      await this.setInboxAnnouncementViewed(true)
+      this.setInboxAnnouncementViewed(true)
     },
 
     openModal () {
