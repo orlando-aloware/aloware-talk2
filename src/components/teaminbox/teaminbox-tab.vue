@@ -58,8 +58,7 @@
                          :unread-properties="getUnreadsProperties(item)"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                          :repeats="viewMode === UNTHREADED ? item.repeats : null"
-                         :is-live-call="isLiveCall(item)"
-                         :team-inbox-id="activeInboxId" />
+                         :is-live-call="isLiveCall(item)" />
         </div>
 
         <!-- Load more indicator -->

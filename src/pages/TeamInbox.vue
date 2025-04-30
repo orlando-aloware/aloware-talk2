@@ -18,17 +18,15 @@
 <script>
 import Contact from 'pages/contacts/Contact'
 import TeamInboxSide from 'components/teaminbox/teaminbox-side'
-import { userMixin, aclMixin } from 'src/plugins/mixins'
-import { mapGetters, mapState, mapActions } from 'vuex'
+import { userMixin } from 'src/plugins/mixins'
+import { mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
-import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'TeamInbox',
 
   mixins: [
-    userMixin,
-    aclMixin
+    userMixin
   ],
 
   components: {
@@ -42,8 +40,7 @@ export default {
         TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
       ],
       // Store the unread count for the currently selected contact
-      currentContactUnreadCount: 0,
-      loadingTeamInboxCampaigns: false
+      currentContactUnreadCount: 0
     }
   },
 
@@ -58,10 +55,6 @@ export default {
       'activeInbox',
       'inboxesUnreadCount',
       'items'
-    ]),
-
-    ...mapState([
-      'teamInboxCampaigns'
     ]),
 
     isMobileContactActive () {
@@ -89,16 +82,9 @@ export default {
     if (!this.hasCompanyTeamInboxEnabled) {
       this.$router.push({ name: 'Inbox' })
     }
-    // Load team inbox campaigns
-    getTeamInboxCampaigns(this)
   },
 
   methods: {
-    ...mapActions([
-      'setTeamInboxCampaigns',
-      'setCampaignsIsLoading'
-    ]),
-
     onItemSelected (routeData) {
       this.$router.push(routeData)
     },

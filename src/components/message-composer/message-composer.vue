@@ -85,7 +85,6 @@
           <line-selector :campaignId="campaignId"
                          check-blocked-messaging
                          data-testid="message-composer-line-selector"
-                         :team-inbox-id="teamInboxId"
                          @change="onLineChange">
           </line-selector>
         </div>
