@@ -1,4 +1,5 @@
 import { isLiveCall } from 'src/plugins/helpers/functions'
+import { SMS } from 'src/constants/communication-types'
 
 /**
  * Handle sequenced-duplicated items for the unthreaded view
@@ -83,6 +84,11 @@ export function findRepeateds (items, startIndex) {
 
     // Check if it's the same contact
     if (nextItem.contact_id !== currentItem.contact_id) {
+      break
+    }
+
+    // Do not group SMS with anything else
+    if (nextItem.type === SMS || currentType === SMS) {
       break
     }
 
