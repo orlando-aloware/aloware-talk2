@@ -341,11 +341,6 @@ export default {
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
 
     this.$VueEvent.listen('resetTeamInbox', this.resetTeamInbox)
-
-    // Listen to contact communications read/unread event
-    this.$VueEvent.listen('teaminbox_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
-    this.$VueEvent.listen('teaminbox_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
-    this.$VueEvent.listen('teaminbox_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)
   },
 
   watch: {
@@ -387,9 +382,6 @@ export default {
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
 
     this.$VueEvent.stop('resetTeamInbox', this.resetTeamInbox)
-    this.$VueEvent.stop('teaminbox_communications_all_as_read', this.einboxCommunicationMarkedAllAsReadListener)
-    this.$VueEvent.stop('teaminbox_communication_marked_as_read', this.einboxCommunicationMarkedAsReadListener)
-    this.$VueEvent.stop('teaminbox_communication_marked_as_unread', this.einboxCommunicationMarkedAsUnreadListener)
   }
 }
 </script>

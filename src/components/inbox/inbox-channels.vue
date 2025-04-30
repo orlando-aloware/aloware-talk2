@@ -694,7 +694,7 @@ export default {
       this.pagination.total -= 1
     }
 
-    this.listeners.markContactCommunicationsAllAsRead = (data) => {
+    this.listeners.markContactCommunicationsAllAsRead = (data, teamInboxId = null) => {
       const contactId = _.get(data, 'id', null)
 
       if (!contactId) {
@@ -702,7 +702,9 @@ export default {
       }
 
       // get current contact's communications
-      const contactCommunications = this.communications.filter(communication => _.get(communication, 'contact.id', null) === contactId)
+      const contactCommunications = this.communications.filter(
+        communication => _.get(communication, 'contact.id', null) === contactId &&
+        (!teamInboxId || _.get(communication, 'ring_group_id', null) === teamInboxId))
       const index = { data: null }
 
       // iterate through and update is_read value

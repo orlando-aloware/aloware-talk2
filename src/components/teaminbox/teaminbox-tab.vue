@@ -221,6 +221,24 @@ export default {
       this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
       const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
+      // Emit the unread count for threaded communications
+      if (this.viewMode === THREADED) {
+        // Get unread count for this contact
+        const unreadCount = item.inbox_unread_count || 0
+
+        // Emit event with contact ID and unread count
+        this.$emit('contact-selected', {
+          contactId: item.contact_id,
+          unreadCount: unreadCount
+        })
+      } else {
+        // For unthreaded, we'll just emit 0 for now
+        this.$emit('contact-selected', {
+          contactId: item.contact_id,
+          unreadCount: 0
+        })
+      }
+
       // avoid redundant navigation
       if (route === this.$route.path) {
         return

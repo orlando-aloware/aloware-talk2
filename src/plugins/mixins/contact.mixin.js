@@ -853,11 +853,17 @@ export default {
       this.selectedPhoneNumber = null
     },
 
-    markAllAsRead (count) {
+    markAllAsRead (count, contactId) {
       if (this.contact) {
         this.loadingMarkAsRead = true
 
-        this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`).then(res => {
+        const params = {}
+
+        if (this.teamInbox) {
+          params.ring_group_id = this.teamInboxId
+        }
+
+        this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`, params).then(res => {
           this.loadingMarkAsRead = false
 
           for (let index in this.communicationsAndAudits) {
@@ -866,11 +872,15 @@ export default {
             }
           }
 
-          this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
+          this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data, this.teamInboxId)
           this.$VueEvent.fire('contact_updated', res.data)
 
           if (this.teamInboxId) {
-            this.$VueEvent.fire('teaminbox_communications_all_as_read', { inboxId: this.teamInboxId, count })
+            this.$VueEvent.fire('teaminbox_communications_all_as_read', {
+              inboxId: this.teamInboxId,
+              contactId: contactId || this.contact.id,
+              count
+            })
           }
         }).catch(err => {
           this.$handleErrors(err.response)

@@ -229,7 +229,7 @@ export default {
       }
     },
     markAllAsRead () {
-      this.$emit('markAllAsRead', this.unreadCount)
+      this.$emit('markAllAsRead', this.unreadCount, this.contact.id)
     },
     setSendingCommunication (message) {
       this.sendingCommunications.push(message)

@@ -3,12 +3,13 @@
        v-if="authenticated">
     <div class="teaminbox animate__animated animate__fadeIn position-relative">
       <TeamInboxSide :class="inboxSideClasses"
-                    @itemSelected="onItemSelected" />
+                    @itemSelected="onItemSelected"
+                    @contact-selected="onContactSelected" />
 
       <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
            v-if="isContactShow">
         <Contact :team-inbox-id="activeInboxId"
-                :team-inbox-unread-count="currentInboxUnreadCount" />
+                :team-inbox-unread-count="contactInboxUnreadCount" />
       </div>
     </div>
   </div>
@@ -37,7 +38,9 @@ export default {
     return {
       mobileContactScreenRoutes: [
         TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
-      ]
+      ],
+      // Store the unread count for the currently selected contact
+      currentContactUnreadCount: 0
     }
   },
 
@@ -50,7 +53,8 @@ export default {
     ...mapState('TeamInbox', [
       'activeInboxId',
       'activeInbox',
-      'inboxesUnreadCount'
+      'inboxesUnreadCount',
+      'items'
     ]),
 
     isMobileContactActive () {
@@ -67,8 +71,9 @@ export default {
       }
     },
 
-    currentInboxUnreadCount () {
-      return this.getInboxUnreadCount(this.activeInboxId)
+    contactInboxUnreadCount () {
+      // Return the stored unread count that was propagated up from the teaminbox-tab component
+      return this.currentContactUnreadCount
     }
   },
 
@@ -84,8 +89,11 @@ export default {
       this.$router.push(routeData)
     },
 
-    getInboxUnreadCount (inboxId) {
-      return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
+    onContactSelected (data) {
+      // Store the unread count for the selected contact
+      if (data && data.contactId) {
+        this.currentContactUnreadCount = data.unreadCount || 0
+      }
     }
   }
 }
