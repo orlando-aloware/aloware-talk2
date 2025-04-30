@@ -991,8 +991,16 @@ const talk2Api = {
           return window.axios.get(`${suffixV2}inboxes`, data)
         },
 
-        unreadCount (inboxIds) {
-          return window.axios.post(`${suffixV2}inboxes/unread-count`, { inbox_ids: inboxIds })
+        unreadCount (inboxIds, contactIds = null) {
+          const params = {
+            inbox_ids: inboxIds
+          }
+
+          if (contactIds) {
+            params.contact_ids = contactIds
+          }
+
+          return window.axios.post(`${suffixV2}inboxes/unread-count`, params)
         }
       }
     },
