@@ -748,10 +748,13 @@
         <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
           <div class="summary-container">
-            <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+            <ExpandableHtmlViewer
+              :content="parseMarkdown(communication.call_summary)"
+              @update:expandable="isContentExpandable = $event"/>
             <q-btn flat
                    dense
                    class="regenerate-btn"
+                   :class="{ 'mt-2': !isContentExpandable }"
                    @click="onRegenerateSummary"
                    :loading="isRegenerating"
                    :disable="isRegenerating">
@@ -1008,7 +1011,8 @@ export default {
       CommunicationCallbackStatus,
       TranscriptionStatus,
       SummaryStatus,
-      TagCategories
+      TagCategories,
+      isContentExpandable: false
     }
   },
 
@@ -1330,6 +1334,10 @@ export default {
   margin: 0;
   transition: all 0.2s ease;
   border-radius: 4px;
+}
+
+.regenerate-btn.mt-2 {
+  margin-bottom: -18px !important;
 }
 
 .regenerate-btn:hover {
