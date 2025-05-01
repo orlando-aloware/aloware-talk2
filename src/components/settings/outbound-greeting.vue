@@ -3,11 +3,11 @@
   <b-col sm="12" md="12" class="mt-2">
     <b-form-group class="mb-0" label="">
       <b-form-checkbox switch
-                        v-model="user.play_outbound_greeting"
-                        :disabled="disableOutboundGreeting"
-                        @change="eventPayload => onUpdateFields(eventPayload, 'play_outbound_greeting')">
+                       v-model="user.play_outbound_greeting"
+                       :disabled="disableOutboundGreeting"
+                       @change="eventPayload => onUpdateFields(eventPayload, 'play_outbound_greeting')">
         Enable Outbound Greeting
-        <b-badge variant="warning" v-if="disableOutboundGreeting">
+        <b-badge v-if="disableOutboundGreeting" variant="warning">
           Forced at account level
         </b-badge>
       </b-form-checkbox>
@@ -16,9 +16,8 @@
   </b-col>
 
   <b-col sm="12"
-          md="12"
-          v-if="user.play_outbound_greeting">
-    <p class="form-helper-text">You can record or upload an audio file for outgoing phone call notifications.</p>
+         md="12"
+         v-if="user.play_outbound_greeting">
 
     <q-tabs indicator-color="transparent"
             active-color="white"
@@ -52,9 +51,9 @@
           <h5 class="form-label mb-2">Recording Message</h5>
           <div class="row no-wrap">
             <b-form-input type="text"
+                          class="col h-auto"
                           v-model="user.outbound_record_tts"
-                          @input="eventPayload => onUpdateFields(eventPayload, 'outbound_record_tts')"
-                          class="col h-auto" />
+                          @input="eventPayload => onUpdateFields(eventPayload, 'outbound_record_tts')" />
             <div class="d-flex align-items-center">
               <b-button class="ml-1"
                         variant="primary"
@@ -70,8 +69,8 @@
                       :offset="[0,5]">
                 <div class="row no-wrap q-pa-md">
                   <variables always-open
-                              data-testid="outbound-greeting-variables-selected"
-                              @variableSelected="variableSelected">
+                             data-testid="outbound-greeting-variables-selected"
+                             @variableSelected="variableSelected">
                   </variables>
                 </div>
               </q-menu>
@@ -90,7 +89,8 @@
             <button
               :disabled="loadingRemoveOutbound"
               class="btn btn-sm btn-danger ml-3"
-              @click.prevent="deleteFile('outbound_recording_notices')">
+              @click.prevent="deleteFile('outbound_recording_notices')"
+            >
               <i class="fa fa-trash mr-2"/>
               <span>Remove file</span>
             </button>
@@ -278,6 +278,7 @@ export default {
             }
           }).catch(err => {
             console.log(err)
+            this.$generalNotification(err?.response || 'Failed to delete file.', 'error')
           }).finally(() => {
             this.loadingRemoveOutbound = false
           })
