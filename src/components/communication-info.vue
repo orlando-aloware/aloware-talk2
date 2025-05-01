@@ -754,10 +754,10 @@
             <q-btn flat
                    dense
                    class="regenerate-btn"
-                   :class="{ 'mt-2': !isContentExpandable }"
-                   @click="onRegenerateSummary"
+                   :class="{ 'non-expandable': !isContentExpandable }"
                    :loading="isRegenerating"
-                   :disable="isRegenerating">
+                   :disable="isRegenerating"
+                   @click="onRegenerateSummary">
               <sparkle-icon width="14"
                            height="14"
                            color="#9333EA"
@@ -1336,8 +1336,8 @@ export default {
   border-radius: 4px;
 }
 
-.regenerate-btn.mt-2 {
-  margin-bottom: -18px !important;
+.regenerate-btn.non-expandable {
+  margin-bottom: -18px;
 }
 
 .regenerate-btn:hover {
