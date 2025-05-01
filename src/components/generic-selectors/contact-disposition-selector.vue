@@ -68,15 +68,13 @@
 <script>
 import { mapState } from 'vuex'
 import { selectorMixin, dispositionsOptionsMixin } from 'src/plugins/mixins'
-import integrationMixin from 'src/plugins/mixins/integration.mixin'
 
 export default {
   name: 'contact-disposition-selector',
 
   mixins: [
     selectorMixin,
-    dispositionsOptionsMixin,
-    integrationMixin
+    dispositionsOptionsMixin
   ],
 
   props: {
@@ -169,18 +167,6 @@ export default {
   computed: {
     ...mapState(['dispositionStatuses']),
 
-    shouldFilterExternalDispositions () {
-      return this.currentCompany?.hubspot_integration_enabled === true
-    },
-
-    filteredDispositions () {
-      const dispositions = this.orderedDispositions || []
-      if (this.shouldFilterExternalDispositions) {
-        return dispositions.filter(disposition => disposition.is_external === true)
-      }
-      return dispositions
-    },
-
     placeholder () {
       if (!this.showPlaceholder) {
         return ''
@@ -226,28 +212,28 @@ export default {
   },
 
   created () {
-    this.options = this.filteredDispositions
+    this.options = this.orderedDispositions
   },
 
   methods: {
     filterFn (val, update) {
       if (this.selectedId && val === this.selectedId) {
         update(() => {
-          this.options = this.filteredDispositions.filter(contactDisposition => contactDisposition.id === this.selectedId)
+          this.options = this.orderedDispositions.filter(contactDisposition => contactDisposition.id === this.selectedId)
         })
         return
       }
 
       if (val === '') {
         update(() => {
-          this.options = this.filteredDispositions
+          this.options = this.orderedDispositions
         })
         return
       }
 
       update(() => {
         const needle = val.toLowerCase()
-        this.options = this.filteredDispositions.filter(contactDisposition => contactDisposition.name.toLowerCase().indexOf(needle) > -1)
+        this.options = this.orderedDispositions.filter(contactDisposition => contactDisposition.name.toLowerCase().indexOf(needle) > -1)
       })
     }
   },
