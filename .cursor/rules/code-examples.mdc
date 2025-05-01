@@ -1,0 +1,157 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Code Examples - Proper Formatting Standards
+
+This rule provides concrete examples of properly formatted code that follows our ESLint standards.
+
+## Vue Component Structure
+
+```vue
+<template>
+  <div class="example-component">
+    <h1>{{ title }}</h1>
+    <p v-if="showDescription">{{ description }}</p>
+    <button 
+      class="action-button"
+      @click="handleClick"
+    >
+      Click Me
+    </button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'ExampleComponent',
+  
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String,
+      default: ''
+    }
+  },
+  
+  data () {
+    return {
+      showDescription: false
+    }
+  },
+  
+  computed: {
+    computedValue () {
+      return this.title.toUpperCase()
+    }
+  },
+  
+  methods: {
+    handleClick () {
+      this.showDescription = !this.showDescription
+      this.$emit('button-clicked')
+    }
+  }
+}
+</script>
+
+<style>
+.example-component {
+  padding: 16px;
+  background-color: #f5f5f5;
+}
+
+.action-button {
+  margin-top: 8px;
+  padding: 8px 16px;
+}
+</style>
+```
+
+## JavaScript Function Examples
+
+```js
+// Good: Space before function parentheses
+function doSomething () {
+  return true
+}
+
+// Good: Proper arrow function formatting
+const arrowFunction = (param1, param2) => {
+  const result = param1 + param2
+  return result
+}
+
+// Good: Object formatting
+const user = {
+  name: 'John',
+  age: 30,
+  address: {
+    street: '123 Main St',
+    city: 'Anytown'
+  }
+}
+
+// Good: Array formatting
+const items = [
+  'item1',
+  'item2',
+  'item3'
+]
+
+// Good: Conditional statements
+if (condition) {
+  doSomething()
+} else if (otherCondition) {
+  doSomethingElse()
+} else {
+  doDefault()
+}
+
+// Good: Proper spacing in function calls
+calculateTotal(price, tax, discount)
+
+// Good: Method chaining
+const result = array
+  .filter(item => item.active)
+  .map(item => item.name)
+  .join(', ')
+```
+
+## Common Mistakes to Avoid
+
+```js
+// BAD: Missing space before function parentheses
+function badFunction() {
+  return true;
+}
+
+// BAD: Semicolons and trailing spaces  
+const value = 'example';   
+
+// BAD: Inconsistent quotes
+const mixed = "single and double quotes don't mix well";
+
+// BAD: Improper spacing around operators
+const sum=value1+value2;
+
+// BAD: No spaces inside braces
+const badObject={foo:bar};
+
+// GOOD VERSIONS:
+function goodFunction () {
+  return true
+}
+
+const value = 'example'
+
+const consistent = 'single quotes are preferred'
+
+const sum = value1 + value2
+
+const goodObject = { foo: bar }
+```

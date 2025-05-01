@@ -6,7 +6,8 @@
                      ref="teaminboxNavList" />
     <TeamInboxTab data-testid="teaminbox-tab"
                 :class="['teaminbox-side__right', {'teaminbox-side__right--mobile-hidden': $route.name !== TEAMINBOXES_MENU_ITEMS_TITLE}]"
-                :collapse-target="collapseTarget" />
+                :collapse-target="collapseTarget"
+                @contact-selected="onContactSelected" />
   </div>
 </template>
 
@@ -56,7 +57,12 @@ export default {
   methods: {
     ...mapActions('TeamInbox', [
       'setActiveInbox'
-    ])
+    ]),
+
+    onContactSelected (data) {
+      // Propagate the contact-selected event to the parent component
+      this.$emit('contact-selected', data)
+    }
   },
 
   watch: {

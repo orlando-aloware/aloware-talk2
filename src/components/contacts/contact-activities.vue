@@ -101,9 +101,13 @@ export default {
       type: Boolean,
       default: true
     },
-    teamInbox: {
-      type: Boolean,
-      default: false
+    teamInboxId: {
+      type: Number,
+      default: null
+    },
+    teamInboxUnreadCount: {
+      type: Number,
+      default: 0
     }
   },
   data () {
@@ -130,6 +134,9 @@ export default {
   computed: {
     ...mapState(['isTrialBannerVisible', 'isWidget']),
     ...mapGetters('contacts', ['contact']),
+    teamInbox () {
+      return this.teamInboxId !== null
+    },
     contactName () {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
@@ -142,12 +149,18 @@ export default {
       return 'No Name'
     },
     hasUnreads () {
+      if (this.teamInboxId) {
+        return this.teamInboxUnreadCount > 0
+      }
+
       return this.contact.unread_texts_count > 0 ||
         this.contact.unread_missed_calls_count > 0 ||
         this.contact.unread_voicemails_count > 0
     },
     unreadCount () {
-      return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
+      return this.teamInbox
+        ? this.teamInboxUnreadCount
+        : this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     }
   },
   methods: {

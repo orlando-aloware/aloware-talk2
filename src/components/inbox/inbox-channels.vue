@@ -702,7 +702,8 @@ export default {
       }
 
       // get current contact's communications
-      const contactCommunications = this.communications.filter(communication => _.get(communication, 'contact.id', null) === contactId)
+      const contactCommunications = this.communications.filter(
+        communication => _.get(communication, 'contact.id', null) === contactId)
       const index = { data: null }
 
       // iterate through and update is_read value

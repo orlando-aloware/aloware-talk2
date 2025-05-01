@@ -50,20 +50,12 @@ const talk2Api = {
         return window.axios.put(`${suffixV1}contact/${id}`, params)
       },
 
-      getPhoneNumbers (id, fromTeamInbox = false) {
+      getPhoneNumbers (id) {
         if (!id) {
           return Promise.reject(new Error('Failed to get phone numbers, missing contact id!'))
         }
 
-        const params = {}
-
-        if (fromTeamInbox) {
-          params.from_team_inbox = fromTeamInbox
-        }
-
-        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`, {
-          params
-        })
+        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
       },
 
       getRingGroups (id) {
@@ -150,20 +142,12 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
 
-      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
+      getLineIncomingNumber (contactId, lineId) {
         if (!contactId || !lineId) {
           return null
         }
 
-        const params = {}
-
-        if (fromTeamInbox) {
-          params.from_team_inbox = fromTeamInbox
-        }
-
-        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
-          params
-        })
+        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
       },
 
       getIntegrationData (contactId, params) {
@@ -991,8 +975,16 @@ const talk2Api = {
           return window.axios.get(`${suffixV2}inboxes`, data)
         },
 
-        unreadCount (inboxIds) {
-          return window.axios.post(`${suffixV2}inboxes/unread-count`, { inbox_ids: inboxIds })
+        unreadCount (inboxIds, contactIds = null) {
+          const params = {
+            inbox_ids: inboxIds
+          }
+
+          if (contactIds) {
+            params.contact_ids = contactIds
+          }
+
+          return window.axios.post(`${suffixV2}inboxes/unread-count`, params)
         }
       }
     },
