@@ -1,27 +1,27 @@
 <template>
-  <div class="einbox-nav-list"
-       data-testid="einbox-nav-list">
-    <div class="einbox-nav-list__header border-bottom d-flex flex-column justify-content-center">
-      <search-input class="einbox-nav-list__header__search"
+  <div class="teaminbox-nav-list"
+       data-testid="teaminbox-nav-list">
+    <div class="teaminbox-nav-list__header border-bottom d-flex flex-column justify-content-center">
+      <search-input class="teaminbox-nav-list__header__search"
                     placeholder="Type ENTER to search inboxes..."
-                    data-testid="einbox-search"
+                    data-testid="teaminbox-search"
                     limit-search-characters
-                    :id="`einbox-nav-list-search-${_uid}`"
+                    :id="`teaminbox-nav-list-search-${_uid}`"
                     @search="onSearch"
                     @focus="setShowSearchTooltip(true)"
                     @blur="setShowSearchTooltip(false)"
                     @show-error="showLimitCharactersError"/>
       <b-tooltip custom-class="talk-table__tooltip"
                  placement="top"
-                 :boundary="`einbox-nav-list-search-${_uid}`"
-                 :target="`einbox-nav-list-search-${_uid}`"
+                 :boundary="`teaminbox-nav-list-search-${_uid}`"
+                 :target="`teaminbox-nav-list-search-${_uid}`"
                  :show="showSearchTooltip">
         Search inboxes by name
       </b-tooltip>
     </div>
-    <div class="einbox-nav-list__content blue-scroll"
+    <div class="teaminbox-nav-list__content blue-scroll"
          @scroll="onScroll">
-      <einbox-nav-type :type="type.id"
+      <TeamInboxNavType :type="type.id"
                        :label="type.name"
                        :typed-inboxes="type.inboxes"
                        :key="type.name"
@@ -33,7 +33,7 @@
            v-if="isLoadingInboxes">
         <b-overlay rounded="sm"
                    variant="white"
-                   data-testid="einbox-nav-list-overlay"
+                   data-testid="teaminbox-nav-list-overlay"
                    :show="isLoadingInboxes">
           <template #overlay>
             <div class="text-center">
@@ -62,23 +62,23 @@
 </template>
 
 <script>
-import EinboxNavType from './einbox-nav-type.vue'
-import EinboxMixin from 'src/plugins/mixins/einbox.mixin'
+import TeamInboxNavType from './teaminbox-nav-type.vue'
+import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
-import { EINBOXES_MENU_TITLE } from 'src/router/routes'
-import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/einbox/einbox.store'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/teaminbox/teaminbox.store'
 import { mapState, mapActions } from 'vuex'
 
 export default {
   components: {
-    EinboxNavType,
+    TeamInboxNavType,
     SearchInput,
     RefreshIcon
   },
 
   mixins: [
-    EinboxMixin
+    TeamInboxMixin
   ],
 
   data () {
@@ -89,11 +89,12 @@ export default {
   },
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'inboxes',
       'activeInboxId',
       'hasMoreInboxes',
       'isLoadingInboxes',
+      'inboxesUnreadCount',
       'showRefreshInboxesButton'
     ]),
 
@@ -154,7 +155,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('Einbox', [
+    ...mapActions('TeamInbox', [
       'setActiveInboxId',
       'setActiveInbox',
       'resetInboxes',
@@ -173,22 +174,29 @@ export default {
       }
     },
 
-    onInboxSelect (inboxId, contactId = null) {
-      if (inboxId === this.activeInboxId) {
+    onInboxSelect (inboxId, contactId = null, force = false) {
+      if (inboxId === this.activeInboxId && !force) {
         return
       }
 
-      // checks if user has access to the inbox
-      if (!this.checkInboxAccess(inboxId)) {
-        this.$generalNotification('You don\'t have access to this inbox.', 'error')
-        this.$router.push({ name: EINBOXES_MENU_TITLE })
+      if (inboxId !== this.activeInboxId) {
+        // checks if user has access to the inbox
+        if (!this.checkInboxAccess(inboxId)) {
+          this.$generalNotification('You don\'t have access to this inbox.', 'error')
+          this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
 
-        return
+          return
+        }
+
+        this.setActiveInboxId(parseInt(inboxId))
       }
 
-      this.setActiveInboxId(parseInt(inboxId))
       this.resetItems()
-      this.fetchItems(inboxId)
+      // Pass current filters and sorting
+      const filters = this.$store.state.TeamInbox.activeFilters || {}
+      const sort = this.$store.state.TeamInbox.activeSort || {}
+      const search = this.$store.state.TeamInbox.currentSearch || null
+      this.fetchItems(inboxId, search, filters, sort)
 
       const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
 
@@ -223,12 +231,21 @@ export default {
       const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
 
       if (inboxId && inboxId === ringGroup.id) {
-        this.$router.push({ name: EINBOXES_MENU_TITLE })
+        this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
       }
     },
 
+    allUserIds (ringGroup) {
+      const connectedUserIds = ringGroup.connected_user_ids || []
+      const watcherUserIds = ringGroup.watcher_user_ids || []
+
+      return [...connectedUserIds, ...watcherUserIds]
+    },
+
     newRingGroupListener (ringGroup) {
-      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+      console.log(ringGroup)
+
+      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
         const updatedInboxes = [...this.inboxes, ringGroup]
         this.setInboxes({ data: updatedInboxes })
         this.orderInboxes()
@@ -236,7 +253,7 @@ export default {
     },
 
     updateRingGroupListener (ringGroup) {
-      if (ringGroup.all_user_ids?.includes(this.profile.id)) {
+      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
         const updatedInboxes = [...this.inboxes]
 
@@ -278,10 +295,35 @@ export default {
       if (show) {
         this.$generalNotification('Search requires at least 3 characters', 'error')
       }
+    },
+
+    async resetTeamInbox () {
+      await this.resetInboxes()
+      await this.fetchInboxes()
+
+      if (this.activeInboxId) {
+        await this.onInboxSelect(this.activeInboxId, null, true)
+      }
+    },
+
+    einboxCommunicationMarkedAllAsReadListener ({ inboxId, count }) {
+      this.einboxCommunicationMarkedAllAsRead(inboxId, count)
+    },
+
+    einboxCommunicationMarkedAsReadListener ({ inboxId }) {
+      this.einboxCommunicationMarkedAsRead(inboxId)
+    },
+
+    einboxCommunicationMarkedAsUnreadListener ({ inboxId }) {
+      this.einboxCommunicationMarkedAsUnread(inboxId)
     }
   },
 
   async created () {
+    // set unread counters as loading so we don't show it if
+    // user is navigating back to the Team Inboxes page
+    this.setIsLoadingInboxesUnreadCount(true)
+
     await this.fetchInboxes()
 
     if (this.inboxes.length) {
@@ -297,6 +339,8 @@ export default {
     this.$VueEvent.listen('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.listen('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
+
+    this.$VueEvent.listen('resetTeamInbox', this.resetTeamInbox)
   },
 
   watch: {
@@ -308,9 +352,19 @@ export default {
 
     '$route.name' (route) {
       // reset active inbox id when this page is opened
-      if (this.isMobile && route === EINBOXES_MENU_TITLE) {
+      if (this.isMobile && route === TEAMINBOXES_MENU_TITLE) {
         this.setActiveInboxId(null)
       }
+    },
+
+    parsedInboxes (parsedInboxes) {
+      const inboxIds = Object.keys(parsedInboxes ?? {}).flatMap((parsedInbox) => parsedInboxes[parsedInbox].map((inbox) => inbox.id))
+
+      if (!inboxIds.length) {
+        return
+      }
+
+      this.fetchInboxesUnreadCount(inboxIds)
     },
 
     search (val) {
@@ -326,12 +380,14 @@ export default {
     this.$VueEvent.stop('ring_group_created', this.newRingGroupListener)
     this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
+
+    this.$VueEvent.stop('resetTeamInbox', this.resetTeamInbox)
   }
 }
 </script>
 
 <style lang="scss">
-.einbox-nav-list {
+.teaminbox-nav-list {
   height: 100%;
   background-color: #fff;
   color: #000;

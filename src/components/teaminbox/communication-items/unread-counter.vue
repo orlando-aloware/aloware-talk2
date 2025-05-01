@@ -5,7 +5,7 @@
              class="unread-badge"
              variant="danger"
              :key="totalUnreads"
-             v-if="viewMode === THREADED && totalUnreads > 0">
+             v-if="totalUnreads > 0">
       <span>
         <template v-if="totalUnreads <= 99">{{ totalUnreads }}</template>
         <template v-else>99<sup>+</sup></template>
@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { THREADED } from 'src/store/einbox/einbox.store'
+import { THREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapState } from 'vuex'
 
 export default {
@@ -32,16 +32,12 @@ export default {
   }),
 
   computed: {
-    ...mapState('Einbox', [
+    ...mapState('TeamInbox', [
       'viewMode'
     ]),
 
     totalUnreads () {
-      const unreadVoiceMail = this.unreadProperties?.unread_voicemail_count || 0
-      const unreadMissedCall = this.unreadProperties?.unread_missed_call_count || 0
-      const unreadCount = this.unreadProperties?.unread_count || 0
-
-      return unreadVoiceMail + unreadMissedCall + unreadCount
+      return this.unreadProperties?.unread_count || 0
     }
   },
 
@@ -67,6 +63,14 @@ export default {
   justify-content: center;
   overflow: hidden;
   transition: all 0.3s ease-out;
+
+  &.unthreaded {
+    height: 8px;
+    width: 8px;
+    padding: 0;
+    top: 0px;
+    right: 0px;
+  }
 }
 
 .slide-vertical-enter {

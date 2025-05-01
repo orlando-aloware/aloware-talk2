@@ -2,7 +2,7 @@
   <div class="calls-header d-flex justify-content-between pr-3">
     <div class="calls-header__label">
       <back-button class="p-0"
-                   v-if="$q.screen.lt.md && ![EINBOXES_MENU_COMMUNICATIONS_TITLE].includes($route.name)"
+                   v-if="$q.screen.lt.md && ![TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes($route.name)"
                    data-testid="contact-activities-back-btn"
                    @click="back"/>
       <div class="contact-name">{{ label }}</div>
@@ -86,6 +86,10 @@
         </q-btn>
       </div>
       <div class="contact-activities-actions__desktop d-flex flex-grow-1 justify-content-end">
+        <q-spinner-dots v-if="processingMarkAllAsRead"
+                        class="pl-1 pr-1"
+                        color="primary"
+                        size="40px" />
         <q-btn
           borderless
           flat
@@ -93,14 +97,14 @@
           type="a"
           color="primary"
           class="text-decoration-none mr-2"
+          :disabled="processingMarkAllAsRead"
           v-if="hasUnreads"
           data-testid="contact-activities-mark-all-as-read-btn"
-          @click="$emit('markAllAsRead')">
+          @click="markAllAsRead">
           <span class="mx-2">
             Mark All as Read ({{ unreadCount }})
           </span>
         </q-btn>
-
         <q-btn borderless
                flat
                no-caps
@@ -222,7 +226,7 @@ import Profile from 'components/profile'
 import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 import { aclMixin } from 'src/plugins/mixins'
-import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'contact-activities-header',
@@ -307,11 +311,21 @@ export default {
       isUpdatingStatus: false,
       nextStat: null,
       loading: false,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE
+      processingMarkAllAsRead: false,
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
   methods: {
+    async markAllAsRead () {
+      this.processingMarkAllAsRead = true
+      this.$emit('markAllAsRead')
+    },
+
+    markContactCommunicationsAllAsReadListener (data) {
+      this.processingMarkAllAsRead = false
+    },
+
     onUpdateTaskStatus (status) {
       this.isUpdatingStatus = true
       this.nextStat = status
@@ -368,7 +382,20 @@ export default {
       this.$VueEvent.fire('contact_task_status_updated', this.contact)
       this.isUpdatingStatus = false
       this.nextStat = null
+    },
+
+    '$route.params.id': function (value) {
+      // Reset the processingMarkAllAsRead flag when the contact id changes, for precaution
+      this.processingMarkAllAsRead = false
     }
+  },
+
+  created () {
+    this.$VueEvent.listen('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
+  },
+
+  beforeDestroy () {
+    this.$VueEvent.stop('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
   }
 }
 </script>

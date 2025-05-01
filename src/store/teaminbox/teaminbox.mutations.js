@@ -1,5 +1,5 @@
-import { THREADED } from './einbox.store'
-import { isLiveCall } from 'src/plugins/helpers/functions'
+import { THREADED } from './teaminbox.store'
+import { handleDuplicatedItems } from 'src/plugins/helpers/teaminbox'
 
 export default {
   SET_ACTIVE_INBOX_ID (state, inbox) {
@@ -16,6 +16,12 @@ export default {
   },
   SET_IS_LOADING_INBOXES (state, loading) {
     state.isLoadingInboxes = loading
+  },
+  SET_INBOXES_UNREAD_COUNT (state, inboxesUnreadCount) {
+    state.inboxesUnreadCount = [ ...inboxesUnreadCount ]
+  },
+  SET_IS_LOADING_INBOXES_UNREAD_COUNT (state, loading) {
+    state.isLoadingInboxesUnreadCount = loading
   },
   SET_CURRENT_INBOXES_PAGE (state, page) {
     state.currentInboxesPage = page
@@ -61,74 +67,23 @@ export default {
   },
   SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON (state, show) {
     state.showRefreshCommunicationsButton = show
+  },
+  SET_ACTIVE_FILTERS (state, filters) {
+    state.activeFilters = filters
+  },
+  SET_ACTIVE_SORT (state, sort) {
+    state.activeSort = sort
+  },
+  SET_CURRENT_SEARCH (state, search) {
+    state.currentSearch = search
+  },
+  SET_IS_INITIAL_LOAD (state, isInitial) {
+    state.isInitialLoad = isInitial
+  },
+  SET_ACTIVE_INBOX_COMMUNICATION_UNREAD_COUNT (state, count) {
+    state.activeInboxContactUnreadCount = count
+  },
+  SET_INBOX_ANNOUNCEMENT_VIEWED (state, viewed) {
+    state.inboxAnnouncementViewed = viewed
   }
-}
-
-/**
- * Handle sequenced-duplicated items for the unthreaded view
- *
- * @param {array} items
- * @returns array
- */
-function handleDuplicatedItems (items) {
-  // first unset all props previous set
-  items.forEach((item, index) => {
-    delete items[index].repeats
-    delete items[index].hidden
-  })
-
-  const hidden = []
-
-  items.forEach((item, index) => {
-    const repeateds = findRepeateds(items, index)
-
-    // try to find repeated comms for this contact
-    if (repeateds.length > 0) {
-      const repeatedItems = [item, ...repeateds.map(id => items.find(i => i.id === id))]
-      const liveCallItem = repeatedItems.find(i => isLiveCall(i))
-
-      if (liveCallItem) {
-        repeatedItems.forEach(repeatedItem => {
-          const itemIndex = items.findIndex(i => i.id === repeatedItem.id)
-          if (repeatedItem.id !== liveCallItem.id) {
-            hidden.push(repeatedItem.id)
-          } else {
-            items[itemIndex].repeats = repeatedItems.length - 1
-          }
-        })
-      } else {
-        items[index].repeats = repeateds.length
-        hidden.push(...repeateds)
-      }
-    }
-
-    // mark repeated comms to dont appear
-    if (hidden.includes(item.id)) {
-      items[index].hidden = true
-    }
-  })
-
-  return items
-}
-
-/**
- * Find repeated comms of a contact
- *
- * @param {array} items
- * @param {number} startIndex
- * @returns array
- */
-function findRepeateds (items, startIndex) {
-  const repeateds = []
-  const contactId = items[startIndex].contact_id
-
-  for (let i = startIndex + 1; i < items.length; i++) {
-    if (items[i].contact_id !== contactId) {
-      break
-    }
-
-    repeateds.push(items[i].id)
-  }
-
-  return repeateds
 }

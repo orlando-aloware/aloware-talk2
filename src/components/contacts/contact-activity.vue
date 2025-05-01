@@ -395,7 +395,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CommunicationInfo from 'components/communication-info'
 import OutboundAvatar from 'components/avatar'
-import InboundAvatar from 'src/components/einbox/communication-items/avatar.vue'
+import InboundAvatar from 'src/components/teaminbox/communication-items/avatar.vue'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import DownloadButton from 'components/download-button'
 import { CREATOR_TYPE_MANUAL } from 'src/constants/creator-types'
@@ -791,9 +791,14 @@ export default {
 
         // if contact has no unreads anymore, refresh inbox result
         const contact = res.data.contact
-        const hasUnreads = contact.unread_texts_count + contact.unread_missed_calls_count + contact.unread_voicemails_count
+        const hasUnreads = contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count
+
         if (hasUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+        }
+
+        if (this.$route.params.inboxId) {
+          this.$VueEvent.fire('teaminbox_communication_marked_as_read', { inboxId: +this.$route.params.inboxId })
         }
       }).catch(err => {
         this.$handleErrors(err.response)
@@ -817,6 +822,10 @@ export default {
         const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
         if (oldTotalUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+        }
+
+        if (this.$route.params.inboxId) {
+          this.$VueEvent.fire('teaminbox_communication_marked_as_unread', { inboxId: +this.$route.params.inboxId })
         }
       }).catch(err => {
         this.$handleErrors(err.response)

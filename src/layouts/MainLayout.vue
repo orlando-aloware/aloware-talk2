@@ -298,7 +298,7 @@ import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
 import { FINISHED } from 'src/constants/export-status'
-import { EINBOXES_MENU_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'MyLayout',
@@ -405,7 +405,7 @@ export default {
       isFirstLoading: true,
       isSidebarExpanded: true,
       loadingInboxes: false,
-      EINBOXES_MENU_TITLE
+      TEAMINBOXES_MENU_TITLE
     }
   },
 
@@ -480,7 +480,7 @@ export default {
     pageClass () {
       const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
 
-      return pageSlug === EINBOXES_MENU_TITLE.toLowerCase() ? null : pageSlug.replace(/ /g, '_') + '-page'
+      return pageSlug === TEAMINBOXES_MENU_TITLE.toLowerCase() ? null : pageSlug.replace(/ /g, '_') + '-page'
     },
 
     isMobilePhoneClosed () {

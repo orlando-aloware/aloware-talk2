@@ -9,13 +9,18 @@
          :class="{ 'contact-view-wrapper-hs-widget': isWidget }"
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
-           :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
+           :class="{
+             'contact-activity--closed': detailsOpen || contactListSidebarOpen,
+             'inbox-activity-container-wrapper': teamInboxId
+           }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
+                            :team-inbox-id="teamInboxId"
+                            :team-inbox-unread-count="teamInboxUnreadCount"
                             v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
@@ -104,7 +109,7 @@ import {
   MIN_TABLET_WIDTH,
   MAX_TABLET_WIDTH
 } from 'src/constants/viewport-sizes'
-import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'contact',
@@ -122,6 +127,17 @@ export default {
     ContactDetails,
     ContactActivities,
     CompactBtn
+  },
+
+  props: {
+    teamInboxId: {
+      type: Number,
+      default: null
+    },
+    teamInboxUnreadCount: {
+      type: Number,
+      default: 0
+    }
   },
 
   computed: {
@@ -145,8 +161,12 @@ export default {
       'isWidget'
     ]),
 
+    teamInbox () {
+      return this.teamInboxId !== null
+    },
+
     isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
     },
 
     isEmptyContact () {
@@ -179,7 +199,7 @@ export default {
       contactComponentListeners: {},
       ContactTaskStatus,
       CommunicationDirections,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
     }
   },
 
@@ -275,7 +295,7 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
-      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE]
+      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE]
       if (validRoutes.includes(this.$route.name)) {
         this.fetchTaskCounts()
       }
@@ -291,7 +311,7 @@ export default {
 
       this.contactListSidebarOpen = false
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
@@ -306,7 +326,7 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
+      if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
         this.fetchContactCommunicationsUntilFound()
       }
     },

@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Vue-Specific Formatting Guidelines
+
+This project follows the [Vue.js Style Guide](mdc:https:/v2.vuejs.org/v2/style-guide) with an emphasis on the following rules.
+
+## Component Structure
+
+Components should follow this structure:
+1. `<template>`
+2. `<script>`
+3. `<style>`
+
+Within the `<script>` section, organize component properties in this order:
+```js
+export default {
+  name: 'ComponentName',
+  
+  components: {},
+  
+  mixins: [],
+  
+  props: {},
+  
+  data () {
+    return {}
+  },
+  
+  computed: {},
+  
+  watch: {},
+  
+  created () {},
+  
+  mounted () {},
+  
+  methods: {}
+}
+```
+
+## Component Naming
+
+- Use multi-word names for components to avoid conflicts with HTML elements
+- Use PascalCase for component definitions: `MyComponent.vue`
+- Use kebab-case in templates: `<my-component>`
+
+## Props
+
+- Always use camelCase for prop names in JavaScript
+- Use kebab-case in templates
+- Be detailed in prop definitions:
+
+```js
+props: {
+  status: {
+    type: String,
+    required: true,
+    validator: (value) => ['success', 'warning', 'error'].includes(value)
+  },
+  message: {
+    type: String,
+    default: ''
+  }
+}
+```
+
+## Events
+
+- Use kebab-case for event names: `this.$emit('item-selected')`
+- Emit a value with events when useful: `this.$emit('item-selected', item)`
+
+## Template Syntax
+
+- Use directives shorthand:
+  - `:` for `v-bind`
+  - `@` for `v-on`
+- Indent content inside template tags properly
+- Multi-line attributes should each be on their own line:
+
+```vue
+<component
+  :prop1="value1"
+  :prop2="value2"
+  @event="handleEvent"
+>
+  Content
+</component>
+```
+
+## Style Guidelines
+
+- Use scoped styles when appropriate: `<style scoped>`
+- Use SCSS when needed: `<style lang="scss">`
+- Follow BEM naming convention for CSS classes when possible
+- Consistent spacing in CSS:
+
+```css
+.my-class {
+  property: value;
+  other-property: other-value;
+}
+```
+
+## Vuex Usage
+
+- Use namespaced modules
+- Use mapState, mapGetters, mapActions, mapMutations helpers appropriately
+- Structure Vuex store properly with actions, mutations, and getters

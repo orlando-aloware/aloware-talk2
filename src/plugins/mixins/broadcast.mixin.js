@@ -761,6 +761,9 @@ export default {
             this.$VueEvent.fire('delete_contact', event.contact)
           }
         })
+        .listen('.contact.marked_all_as_read', (event) => {
+          this.$VueEvent.fire('mark_contact_communications_all_as_read_processed', event.contact)
+        })
         .listen('.contact_audit.created', (event) => {
           let contactAudit = event.audit
           if (contactAudit) {

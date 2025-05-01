@@ -10,6 +10,8 @@ export default function () {
     activeInbox: {},
     inboxes: [],
     isLoadingInboxes: false,
+    inboxesUnreadCount: [],
+    isLoadingInboxesUnreadCount: false,
     currentInboxesPage: 0,
     hasMoreInboxes: true,
     viewMode: THREADED,
@@ -20,6 +22,12 @@ export default function () {
     hasMoreItems: true,
     abortController: null,
     showRefreshInboxesButton: false,
-    showRefreshCommunicationsButton: false
+    showRefreshCommunicationsButton: false,
+    activeFilters: {},
+    activeSort: {},
+    currentSearch: null,
+    isInitialLoad: false,
+    activeInboxContactUnreadCount: 0,
+    inboxAnnouncementViewed: false
   }
 }
