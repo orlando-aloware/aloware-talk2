@@ -42,6 +42,10 @@ export function filterCalls (calls, state) {
  * @returns Boolean
  */
 export const isLiveCall = (communication) => {
+  if (!communication) {
+    return false
+  }
+
   if (communication.disposition_status2 && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
     return false
   }
