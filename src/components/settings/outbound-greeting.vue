@@ -176,12 +176,7 @@ export default {
     },
 
     outboundGreetingSettings: {
-      handler ({ outboundRecordTts, outboundRecordFile, playOutboundGreeting }) {
-        if (!playOutboundGreeting) {
-          this.setFormValidity(true)
-          return
-        }
-
+      handler ({ outboundRecordTts, outboundRecordFile }) {
         if (!outboundRecordFile && !outboundRecordTts) {
           this.setFormValidity(false)
           return
@@ -199,8 +194,7 @@ export default {
     outboundGreetingSettings () {
       return {
         outboundRecordTts: this.user.outbound_record_tts,
-        outboundRecordFile: this.user.outbound_record_file,
-        playOutboundGreeting: this.user.play_outbound_greeting
+        outboundRecordFile: this.user.outbound_record_file
       }
     },
 
