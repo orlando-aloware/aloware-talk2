@@ -43,6 +43,22 @@ export default {
     InformationCircleIcon
   },
 
+  mounted () {
+    // Initialize from URL if available
+    const urlViewMode = this.$route.query.viewMode
+    if (urlViewMode) {
+      const viewMode = urlViewMode === 'threaded' ? THREADED : UNTHREADED
+      this.setViewMode(viewMode)
+      return
+    }
+
+    // If no URL parameter, check localStorage
+    const storedViewMode = localStorage.getItem('teaminbox_view_mode')
+    if (storedViewMode) {
+      this.setViewMode(parseInt(storedViewMode))
+    }
+  },
+
   computed: {
     ...mapState('TeamInbox', [
       'viewMode'
@@ -72,7 +88,25 @@ export default {
     onChange (value) {
       this.setViewMode(value)
       this.$emit('channel', value)
+
+      // Update URL with descriptive parameter
+      const query = { ...this.$route.query }
+      query.viewMode = value === THREADED ? 'threaded' : 'unthreaded'
+      this.$router.replace({ query }).catch(err => {
+        if (err.name !== 'NavigationDuplicated') {
+          console.error(err)
+        }
+      })
     }
+  },
+
+  watch: {
+    // '$route.query.viewMode' (newValue) {
+    //   if (newValue) {
+    //     const viewMode = newValue === 'threaded' ? THREADED : UNTHREADED
+    //     this.setViewMode(viewMode)
+    //   }
+    // }
   }
 }
 </script>

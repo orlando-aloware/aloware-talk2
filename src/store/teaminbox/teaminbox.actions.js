@@ -38,6 +38,7 @@ export default {
   },
   setViewMode: ({ commit }, viewMode) => {
     commit('SET_VIEW_MODE', viewMode)
+    localStorage.setItem('teaminbox_view_mode', viewMode)
   },
   setItems: ({ commit }, data) => {
     commit('SET_ITEMS', data.data)
