@@ -282,13 +282,21 @@ export default {
       }
 
       window.axios.get('/fullstory-meta').then(({ data }) => {
+        if (this.$posthog) {
+          console.log('Identifying posthog user')
+          this.$posthog.identify(profile.id, {
+            ...data,
+            timezone_str: window.timezone
+          })
+        }
+
+        console.log('Identifying fullstory user')
         this.$FullStory.identify(profile.id, {
           ...data,
           timezone_str: window.timezone
         })
       }).catch(() => {
         console.log('Error while retrieving fullstory metadata from server. Using local variables.')
-
         this.$FullStory.identify(profile.id, {
           displayName: profile.name,
           email: profile.email,
@@ -297,6 +305,18 @@ export default {
           companyName_str: profile.company_name,
           userRoles_strs: profile.user_roles
         })
+
+        if (this.$posthog) {
+          console.log('Identifying posthog user - fallback')
+          this.$posthog.identify(profile.id, {
+            displayName: profile.name,
+            email: profile.email,
+            timezone_str: window.timezone,
+            companyId_int: profile.company_id,
+            companyName_str: profile.company_name,
+            userRoles_strs: profile.user_roles
+          })
+        }
       })
     },
 
