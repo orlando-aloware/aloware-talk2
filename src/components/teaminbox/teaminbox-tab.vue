@@ -11,85 +11,24 @@
     <!-- Items List -->
     <div class="items-list blue-scroll"
          @scroll="onScroll">
-      <!-- Initial loading state -->
-      <div :class="[isLoadingItems ? 'py-5' : 'py-4', 'relative']"
-           v-if="isLoadingItems">
-        <b-overlay rounded="sm"
-                   variant="white"
-                   data-testid="items-list-overlay"
-                   :show="isLoadingItems">
-          <template #overlay>
-            <div class="text-center">
-              <q-spinner-bars color="primary"
-                              size="2em" />
-            </div>
-          </template>
-        </b-overlay>
-      </div>
-
-      <!-- Error state -->
-      <div class="text-center text-danger py-5" v-else-if="loadError">
-        <div class="mb-3">
-          <i class="fas fa-exclamation-triangle fa-2x"></i>
-        </div>
-        <h5>We had a problem loading the inbox</h5>
-        <button class="btn btn-sm btn-primary mt-3"
-                @click.prevent="onRefreshCommunications">
-          <refresh-icon color="#fff"/> Reload
-        </button>
-      </div>
-
-      <!-- items list -->
-      <template v-else-if="itemsData.length">
-        <div :key="item.id"
-             v-for="item in itemsData"
-             @click="onItemClick(item)">
-          <communication :contact-id="item.contact_id"
-                         :contact-name="item.contact?.name"
-                         :contact-phone-number="item.contact?.phone_number || item.lead_number"
-                         :campaign-id="item.campaign_id"
-                         :disposition-status="item.disposition_status2"
-                         :type="item.type"
-                         :direction="item.direction"
-                         :callback-status="item.callback_status"
-                         :body="getMessageBody(item)"
-                         :current-status="item.current_status2"
-                         :date="item.created_at"
-                         :unread-properties="getUnreadsProperties(item)"
-                         :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
-                         :repeats="viewMode === UNTHREADED ? item.repeats : null"
-                         :is-live-call="isLiveCall(item)" />
-        </div>
-
-        <!-- Load more indicator -->
-        <div class="text-center q-pa-sm"
-             v-if="isLoadingMoreItems || isLoadingItems">
-          <q-spinner-dots color="primary"
-                          size="2em" />
-        </div>
-      </template>
-
-      <!-- Empty state -->
-      <div class="text-center text-grey pt-4"
-           v-else>
-        No communications found in this inbox
-
-        <br/>
-
-        <button class="btn btn-sm btn-primary mt-4"
-                v-if="showRefreshCommunicationsButton"
-                @click.prevent="onRefreshCommunications">
-          <refresh-icon color="#fff"/> Reload
-        </button>
-      </div>
+      <communication-list
+        :items="itemsData"
+        :is-loading-items="isLoadingItems"
+        :is-loading-more-items="isLoadingMoreItems"
+        :load-error="loadError"
+        :active-id="activeId"
+        :view-mode="viewMode"
+        :show-refresh-communications-button="showRefreshCommunicationsButton"
+        @item-click="onItemClick"
+        @refresh="onRefreshCommunications"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import Communication from 'src/components/teaminbox/communication-items/communication.vue'
+import CommunicationList from 'src/components/teaminbox/communication-items/communication-list.vue'
 import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
-import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
 import TeamInboxFilterSort from './teaminbox-filter-sort.vue'
 import { TeamInboxMixin } from 'src/plugins/mixins'
@@ -104,9 +43,8 @@ import talk2Api from 'src/plugins/api/api'
 
 export default {
   components: {
-    Communication,
+    CommunicationList,
     TeamInboxChannelToggle,
-    RefreshIcon,
     TeamInboxTabHeader,
     TeamInboxFilterSort
   },
