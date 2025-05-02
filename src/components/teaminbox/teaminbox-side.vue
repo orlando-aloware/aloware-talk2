@@ -4,7 +4,8 @@
     <TeamInboxNavList data-testid="teaminbox-nav-list"
                      :class="['teaminbox-side__left', {'teaminbox-side__left--mobile-hidden': $route.name !== TEAMINBOXES_MENU_TITLE}]"
                      ref="teaminboxNavList" />
-    <TeamInboxTab data-testid="teaminbox-tab"
+    <TeamInboxTab v-if="getConnectedInboxesLength"
+                data-testid="teaminbox-tab"
                 :class="['teaminbox-side__right', {'teaminbox-side__right--mobile-hidden': $route.name !== TEAMINBOXES_MENU_ITEMS_TITLE}]"
                 :collapse-target="collapseTarget"
                 @contact-selected="onContactSelected" />
@@ -15,7 +16,7 @@
 import TeamInboxNavList from '../teaminbox/teaminbox-nav-list.vue'
 import TeamInboxTab from '../teaminbox/teaminbox-tab.vue'
 import { isEmpty } from 'lodash'
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 
 export default {
@@ -51,6 +52,10 @@ export default {
 
     ...mapState([
       'ringGroups'
+    ]),
+
+    ...mapGetters('TeamInbox', [
+      'getConnectedInboxesLength'
     ])
   },
 
