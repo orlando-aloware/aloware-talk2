@@ -141,6 +141,11 @@ export default {
 
       // eslint-disable-next-line no-unused-expressions
       teamUsersResults?.forEach(team => {
+        // if teams.users is not an array, skip the team
+        if (!Array.isArray(team.users)) {
+          return
+        }
+
         team.users.forEach(userResult => {
           if (!seenUsers.has(userResult.model.id)) {
             userResult.model.teams_name = this.adjustTeamsNames(userResult.model.id, userResult.model.teams_name)

@@ -55,7 +55,7 @@
                          :body="getMessageBody(item)"
                          :current-status="item.current_status2"
                          :date="item.created_at"
-                         :unread-properties="getUnreadsProperties(item.contact)"
+                         :unread-properties="getUnreadsProperties(item)"
                          :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                          :repeats="viewMode === UNTHREADED ? item.repeats : null"
                          :is-live-call="isLiveCall(item)" />
@@ -99,7 +99,8 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState, mapActions } from 'vuex'
-import { debounce, isEmpty, pick } from 'lodash'
+import { debounce } from 'lodash'
+import talk2Api from 'src/plugins/api/api'
 
 export default {
   components: {
@@ -168,6 +169,7 @@ export default {
     this.$VueEvent.listen('new_communication', this.newCommunicationListener)
     this.$VueEvent.listen('update_communication', this.updatedCommunicationListener)
     this.$VueEvent.listen('contact_updated', this.updatedContactListener)
+    this.$VueEvent.listen('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
   },
 
   beforeDestroy () {
@@ -179,6 +181,7 @@ export default {
     this.$VueEvent.stop('new_communication', this.newCommunicationListener)
     this.$VueEvent.stop('update_communication', this.updatedCommunicationListener)
     this.$VueEvent.stop('contact_updated', this.updatedContactListener)
+    this.$VueEvent.stop('mark_contact_communications_all_as_read', this.markContactCommunicationsAllAsReadListener)
   },
 
   methods: {
@@ -192,12 +195,16 @@ export default {
 
     isLiveCall,
 
-    getUnreadsProperties (contact) {
-      if (isEmpty(contact)) {
-        return null
+    getUnreadsProperties (communication) {
+      if (this.viewMode === UNTHREADED) {
+        return {
+          unread_count: communication.repeats > 0 ? communication.unread_repeats : (!communication.is_read ? 1 : 0)
+        }
       }
 
-      return pick(contact, ['unread_voicemail_count', 'unread_missed_call_count', 'unread_count'])
+      return {
+        unread_count: communication.inbox_unread_count
+      }
     },
 
     onScroll ({ target }) {
@@ -217,6 +224,24 @@ export default {
       this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
       const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
+      // Emit the unread count for threaded communications
+      if (this.viewMode === THREADED) {
+        // Get unread count for this contact
+        const unreadCount = item.inbox_unread_count || 0
+
+        // Emit event with contact ID and unread count
+        this.$emit('contact-selected', {
+          contactId: item.contact_id,
+          unreadCount: unreadCount
+        })
+      } else {
+        // For unthreaded, we'll just emit 0 for now
+        this.$emit('contact-selected', {
+          contactId: item.contact_id,
+          unreadCount: 0
+        })
+      }
+
       // avoid redundant navigation
       if (route === this.$route.path) {
         return
@@ -234,48 +259,65 @@ export default {
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, this.activeSort)
     },
 
-    handleUnthreadedCommunication (communication, isNew = false) {
+    handleUnthreadedCommunication (communication) {
       const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
 
-      if (isNew) {
-        const found = this.itemsData.find(c => c.id === communication.id)
-        if (!found) {
-          // For new communications, add them at appropriate position based on sort order
-          if (isAscendingOrder && !isLiveCall(communication)) {
-            this.itemsData.push(communication) // Add to end for ascending order
-          } else {
-            this.itemsData.unshift(communication) // Add to beginning for descending order or live calls
-          }
-        }
-      } else {
-        const index = this.itemsData.findIndex(c => c.id === communication.id)
-        if (index > -1) {
-          this.itemsData.splice(index, 1, communication)
-        }
-      }
-    },
-
-    handleThreadedCommunication (communication, isNew = false) {
-      const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
-      const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
-
-      if (isNew && index === -1) {
+      const found = this.itemsData.find(c => c.id === communication.id)
+      if (!found) {
         // For new communications, add them at appropriate position based on sort order
         if (isAscendingOrder && !isLiveCall(communication)) {
           this.itemsData.push(communication) // Add to end for ascending order
         } else {
           this.itemsData.unshift(communication) // Add to beginning for descending order or live calls
         }
+      } else {
+        const index = this.itemsData.findIndex(c => c.id === communication.id)
+        if (index > -1) {
+          // If the is_read property is changed, adjust the unread counts
+          if (this.itemsData[index]?.is_read !== communication.is_read) {
+            // let unreadCount = this.itemsData[index]?.inbox_unread_count || 0
+            if (this.itemsData[index]?.repeats > 0) {
+              communication.repeats = this.itemsData[index]?.repeats
+              communication.unread_repeats = this.itemsData[index].unread_repeats + (communication.is_read ? -1 : 1)
+            }
+          }
+
+          this.itemsData.splice(index, 1, communication)
+        }
+      }
+    },
+
+    async getUnreadCount (ringGroupId, contactId) {
+      const response = await talk2Api.V2.inbox.inboxes.unreadCount([ringGroupId], [contactId])
+      return response.data.find(item => item.ring_group_id === ringGroupId && item.contact_id === contactId)?.unread_count || 0
+    },
+
+    async handleThreadedCommunication (communication, isNew = false) {
+      const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
+      const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
+
+      communication.inbox_unread_count = await this.getUnreadCount(this.activeInboxId, communication.contact_id)
+
+      // New communication (not in the list)
+      if (index === -1) {
+        console.log('handleThreadedCommunication - new communication', communication)
+        // For new communications, add them at appropriate position based on sort order
+        if (isAscendingOrder && !isLiveCall(communication)) {
+          this.itemsData.push(communication) // Add to end for ascending order
+        } else {
+          this.itemsData.unshift(communication) // Add to beginning for descending order or live calls
+        }
+
         return
       }
 
-      if (index > -1) {
-        if (isLiveCall(this.itemsData[index]) && communication.type !== CommunicationTypes.CALL) {
-          return
-        }
-
-        this.itemsData.splice(index, 1, communication)
+      // Existing communication logic below (in the list)
+      // Ignore live calls in threaded mode
+      if (isLiveCall(this.itemsData[index])) {
+        return
       }
+
+      this.itemsData.splice(index, 1, communication)
     },
 
     sortItems () {
@@ -305,26 +347,37 @@ export default {
       })
     },
 
-    processCommunication (communication, isNew = false) {
+    async processCommunication (communication, isNew = false) {
       if (!this.activeInboxId || communication.ring_group_id !== this.activeInboxId) {
         return
       }
 
       if (this.viewMode === UNTHREADED) {
-        this.handleUnthreadedCommunication(communication, isNew)
+        await this.handleUnthreadedCommunication(communication)
       } else {
-        this.handleThreadedCommunication(communication, isNew)
+        await this.handleThreadedCommunication(communication, isNew)
       }
 
-      this.sortItems()
+      // fetch unread count for the active inbox (from the backend)
+      this.fetchInboxesUnreadCount([this.activeInboxId])
+
+      if (!this.activeId) {
+        return
+      }
+
+      // Emits the signal to update the unread count for the active inbox
+      const index = this.itemsData.findIndex(item => item.contact_id === this.activeId)
+      if (index >= 0) {
+        this.onItemClick(this.itemsData[index])
+      }
     },
 
-    newCommunicationListener (communication) {
-      this.processCommunication(communication, true)
+    async newCommunicationListener (communication) {
+      await this.processCommunication(communication, true)
     },
 
-    updatedCommunicationListener (communication) {
-      this.processCommunication(communication, false)
+    async updatedCommunicationListener (communication) {
+      await this.processCommunication(communication)
     },
 
     updatedContactListener (contact) {
@@ -472,6 +525,29 @@ export default {
         this.$store.commit('TeamInbox/SET_IS_LOADING_ITEMS', false)
         this.setIsInitialLoad(false)
       }
+    },
+
+    async markContactCommunicationsAllAsReadListener (data) {
+      // Check if the contact id matches the current active contact
+      if (data.id !== this.activeId) {
+        return
+      }
+
+      const item = this.itemsData.find(item => item.contact_id === this.activeId)
+
+      if (!item) {
+        return
+      }
+
+      // update the unread count for the contact
+      const unreadCount = await this.getUnreadCount(this.activeInboxId, this.activeId)
+      item.inbox_unread_count = unreadCount
+
+      // fetch unread count for the active inbox (from the backend)
+      await this.fetchInboxesUnreadCount([this.activeInboxId])
+
+      // simulate a click on the contact to update the unread count
+      this.onItemClick(item)
     }
   },
 

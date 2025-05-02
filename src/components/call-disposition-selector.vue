@@ -103,10 +103,9 @@ import _ from 'lodash'
 import { mapState } from 'vuex'
 import { aclMixin } from 'src/plugins/mixins'
 import Multiselect from 'vue-multiselect'
-import integrationMixin from 'src/plugins/mixins/integration.mixin'
 
 export default {
-  mixins: [aclMixin, integrationMixin],
+  mixins: [aclMixin],
 
   components: {
     Multiselect
@@ -157,11 +156,6 @@ export default {
   computed: {
     ...mapState(['callDispositions']),
 
-    shouldFilterExternalDispositions () {
-      // Just check for HubSpot Integration for now
-      return this.currentCompany?.hubspot_integration_enabled === true
-    },
-
     computedCommunication () {
       if (this.communication) {
         const found = this.callDispositionsAlphabeticalOrder.find(callDisposition => callDisposition.id === this.communication.call_disposition_id)
@@ -185,15 +179,9 @@ export default {
 
     availableDispositions () {
       if (this.callDispositions) {
-        let dispositions = this.callDispositions.filter((callDisposition) => {
+        return this.callDispositions.filter((callDisposition) => {
           return callDisposition.id !== this.exclude
         })
-
-        // Add CRM filter
-        if (this.shouldFilterExternalDispositions) {
-          dispositions = dispositions.filter(disposition => disposition.is_external === true)
-        }
-        return dispositions
       }
 
       return []

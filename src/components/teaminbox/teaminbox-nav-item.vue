@@ -13,6 +13,15 @@
         :delay="500">
         {{ label }}
       </b-tooltip>
+      <div class="teaminbox-nav-item__unread-count-container"
+           v-if="isLoadingUnreadCount || unreadCount > 0">
+        <q-skeleton type="text"
+                    width="20px"
+                    v-if="isLoadingUnreadCount"/>
+        <q-badge variant="primary"
+                 rounded
+                 v-else>{{ unreadCount }}</q-badge>
+      </div>
     </div>
   </div>
 </template>
@@ -32,7 +41,12 @@ export default {
       required: true
     },
 
-    messageCount: {
+    isLoadingUnreadCount: {
+      type: Boolean,
+      default: false
+    },
+
+    unreadCount: {
       type: Number,
       default: 0
     },
@@ -62,6 +76,10 @@ export default {
     background-color: #E9F0FF;
   }
 
+  &:has(&__unread-count-container) {
+    padding-right: 35px;
+  }
+
   &__label {
     font-size: 14px;
     max-width: calc(100vw - 75px);
@@ -72,6 +90,19 @@ export default {
 
   &__content {
     width: 100%;
+  }
+
+  &__unread-count-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 8px;
+    display: flex;
+    align-items: center;
+
+    .q-badge {
+      font-size: 9px;
+    }
   }
 
   &--active {

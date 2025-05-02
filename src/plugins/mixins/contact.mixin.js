@@ -8,6 +8,13 @@ import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-
 import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
 
 export default {
+  props: {
+    teamInboxId: {
+      type: Number,
+      default: null
+    }
+  },
+
   data () {
     return {
       hasMoreCommunications: true,
@@ -101,6 +108,10 @@ export default {
     ...mapState('inbox', { selectContact: 'selectedContact' }),
 
     ...mapState('cache', ['currentCompany']),
+
+    teamInbox () {
+      return this.teamInboxId !== null
+    },
 
     selectedCampaign () {
       if (this.campaigns) {
@@ -264,6 +275,10 @@ export default {
       if (this.$route.name === 'Contact') {
         this.updateContacts(contact)
       }
+    }
+
+    this.listeners.markContactCommunicationsAllAsReadProcessed = (contact) => {
+      this.markContactCommunicationsAllAsReadProcessed(contact)
     }
   },
 
@@ -832,17 +847,28 @@ export default {
       if (this.contact) {
         this.loadingMarkAsRead = true
 
-        this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`).then(res => {
+        const params = {}
+
+        if (this.teamInbox) {
+          params.ring_group_id = this.teamInboxId
+        }
+
+        this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`, params).then(res => {
           this.loadingMarkAsRead = false
 
           for (let index in this.communicationsAndAudits) {
-            if (typeof this.communicationsAndAudits[index].is_read !== 'undefined') {
+            if (typeof this.communicationsAndAudits[index].is_read !== 'undefined' &&
+              (!this.teamInboxId || this.communicationsAndAudits[index].ring_group_id === this.teamInboxId)
+            ) {
               this.communicationsAndAudits[index].is_read = true
             }
           }
 
-          this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
-          this.$VueEvent.fire('contact_updated', res.data)
+          if (!this.teamInbox || !this.$VueEvent.hasListeners('mark_contact_communications_all_as_read_processed')) {
+            // If no team inbox or no listeners for the processed event, we need to fire the events to release the button right away
+            this.$VueEvent.fire('mark_contact_communications_all_as_read', this.contact)
+            this.$VueEvent.fire('contact_updated', this.contact)
+          }
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loadingMarkAsRead = false

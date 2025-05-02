@@ -11,7 +11,7 @@
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{
              'contact-activity--closed': detailsOpen || contactListSidebarOpen,
-             'inbox-activity-container-wrapper': teamInbox
+             'inbox-activity-container-wrapper': teamInboxId
            }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
@@ -19,7 +19,8 @@
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
-                            :team-inbox="teamInbox"
+                            :team-inbox-id="teamInboxId"
+                            :team-inbox-unread-count="teamInboxUnreadCount"
                             v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
@@ -129,9 +130,13 @@ export default {
   },
 
   props: {
-    teamInbox: {
-      type: Boolean,
-      default: false
+    teamInboxId: {
+      type: Number,
+      default: null
+    },
+    teamInboxUnreadCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -155,6 +160,10 @@ export default {
       'isMobile',
       'isWidget'
     ]),
+
+    teamInbox () {
+      return this.teamInboxId !== null
+    },
 
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)

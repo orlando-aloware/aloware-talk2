@@ -791,9 +791,14 @@ export default {
 
         // if contact has no unreads anymore, refresh inbox result
         const contact = res.data.contact
-        const hasUnreads = contact.unread_texts_count + contact.unread_missed_calls_count + contact.unread_voicemails_count
+        const hasUnreads = contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count
+
         if (hasUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+        }
+
+        if (this.$route.params.inboxId) {
+          this.$VueEvent.fire('teaminbox_communication_marked_as_read', { inboxId: +this.$route.params.inboxId })
         }
       }).catch(err => {
         this.$handleErrors(err.response)
@@ -817,6 +822,10 @@ export default {
         const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
         if (oldTotalUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+        }
+
+        if (this.$route.params.inboxId) {
+          this.$VueEvent.fire('teaminbox_communication_marked_as_unread', { inboxId: +this.$route.params.inboxId })
         }
       }).catch(err => {
         this.$handleErrors(err.response)

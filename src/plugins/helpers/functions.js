@@ -20,7 +20,7 @@ export function filterCalls (calls, state) {
     let agentName = true
 
     if (state.filters.agent) {
-      // skip this call if agent name filter is filled, but the call doesnt contain a user
+      // skip this call if agent name filter is filled, but the call doesn't contain a user
       if (!call.user_id) {
         return false
       }
@@ -42,11 +42,15 @@ export function filterCalls (calls, state) {
  * @returns Boolean
  */
 export const isLiveCall = (communication) => {
-  if (communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+  if (!communication) {
     return false
   }
 
-  if (communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) {
+  if (communication.disposition_status2 && communication.disposition_status2 !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW) {
+    return false
+  }
+
+  if (communication.current_status2 && communication.current_status2 !== CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW) {
     return false
   }
 

@@ -94,6 +94,7 @@ export default {
       'activeInboxId',
       'hasMoreInboxes',
       'isLoadingInboxes',
+      'inboxesUnreadCount',
       'showRefreshInboxesButton'
     ]),
 
@@ -303,10 +304,26 @@ export default {
       if (this.activeInboxId) {
         await this.onInboxSelect(this.activeInboxId, null, true)
       }
+    },
+
+    einboxCommunicationMarkedAllAsReadListener ({ inboxId, count }) {
+      this.einboxCommunicationMarkedAllAsRead(inboxId, count)
+    },
+
+    einboxCommunicationMarkedAsReadListener ({ inboxId }) {
+      this.einboxCommunicationMarkedAsRead(inboxId)
+    },
+
+    einboxCommunicationMarkedAsUnreadListener ({ inboxId }) {
+      this.einboxCommunicationMarkedAsUnread(inboxId)
     }
   },
 
   async created () {
+    // set unread counters as loading so we don't show it if
+    // user is navigating back to the Team Inboxes page
+    this.setIsLoadingInboxesUnreadCount(true)
+
     await this.fetchInboxes()
 
     if (this.inboxes.length) {
@@ -338,6 +355,16 @@ export default {
       if (this.isMobile && route === TEAMINBOXES_MENU_TITLE) {
         this.setActiveInboxId(null)
       }
+    },
+
+    parsedInboxes (parsedInboxes) {
+      const inboxIds = Object.keys(parsedInboxes ?? {}).flatMap((parsedInbox) => parsedInboxes[parsedInbox].map((inbox) => inbox.id))
+
+      if (!inboxIds.length) {
+        return
+      }
+
+      this.fetchInboxesUnreadCount(inboxIds)
     },
 
     search (val) {

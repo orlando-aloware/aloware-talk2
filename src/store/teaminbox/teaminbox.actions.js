@@ -22,6 +22,12 @@ export default {
   setIsLoadingInboxes: ({ commit }, loading) => {
     commit('SET_IS_LOADING_INBOXES', loading)
   },
+  setInboxesUnreadCount: ({ commit }, data) => {
+    commit('SET_INBOXES_UNREAD_COUNT', data)
+  },
+  setIsLoadingInboxesUnreadCount: ({ commit }, loading) => {
+    commit('SET_IS_LOADING_INBOXES_UNREAD_COUNT', loading)
+  },
   setHasMoreInboxes: ({ commit }, hasMore) => {
     commit('SET_HAS_MORE_INBOXES', hasMore)
   },
@@ -72,5 +78,11 @@ export default {
   },
   setIsInitialLoad: ({ commit }, isInitial) => {
     commit('SET_IS_INITIAL_LOAD', isInitial)
+  },
+  setActiveInboxCommunicationUnreadCount: ({ commit }, data) => {
+    commit('SET_ACTIVE_INBOX_COMMUNICATION_UNREAD_COUNT', data)
+  },
+  setInboxAnnouncementViewed: ({ commit }, viewed) => {
+    commit('SET_INBOX_ANNOUNCEMENT_VIEWED', viewed)
   }
 }
