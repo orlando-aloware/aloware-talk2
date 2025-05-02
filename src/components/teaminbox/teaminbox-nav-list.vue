@@ -68,7 +68,7 @@ import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/teaminbox/teaminbox.store'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -101,6 +101,8 @@ export default {
     ...mapState('auth', ['profile']),
 
     ...mapState(['isMobile', 'teams']),
+
+    ...mapGetters('TeamInbox', ['getConnectedInboxesLength']),
 
     teamsIds () {
       return this.teams
@@ -370,6 +372,19 @@ export default {
     search (val) {
       this.resetInboxes()
       this.fetchInboxes(val)
+    },
+
+    getConnectedInboxesLength (length, oldLength) {
+      if (oldLength) {
+        return
+      }
+
+      const previousActiveInboxExists = this.inboxes.findIndex(({ id }) => id === this.activeInboxId) !== -1
+
+      if (!previousActiveInboxExists) {
+        // Handles edge cases when an inbox is assigned to the user while they have the page open without any existing inboxes
+        this.setActiveInboxId(this.getFirstInboxId())
+      }
     }
   },
 
