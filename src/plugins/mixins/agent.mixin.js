@@ -19,11 +19,11 @@ export default {
     },
 
     isBargingOrWhispering () {
-      return AgentStatus.AGENT_STATUS_SENTRY === this.agentStatus
+      return this.agentStatus === AgentStatus.AGENT_STATUS_SENTRY
     },
 
     isAgentOnCall () {
-      return AgentStatus.AGENT_STATUS_ON_CALL === this.agentStatus
+      return this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
     }
   },
 
