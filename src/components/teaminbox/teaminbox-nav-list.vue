@@ -84,7 +84,8 @@ export default {
   data () {
     return {
       search: '',
-      showSearchTooltip: false
+      showSearchTooltip: false,
+      finishedInitialLoad: false
     }
   },
 
@@ -327,6 +328,7 @@ export default {
     this.setIsLoadingInboxesUnreadCount(true)
 
     await this.fetchInboxes()
+    this.finishedInitialLoad = true
 
     if (this.inboxes.length) {
       const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
@@ -375,7 +377,7 @@ export default {
     },
 
     getConnectedInboxesLength (length, oldLength) {
-      if (oldLength) {
+      if (oldLength || !this.finishedInitialLoad) {
         return
       }
 
@@ -383,7 +385,7 @@ export default {
 
       if (!previousActiveInboxExists) {
         // Handles edge cases when an inbox is assigned to the user while they have the page open without any existing inboxes
-        this.setActiveInboxId(this.getFirstInboxId())
+        this.onInboxSelect(this.getFirstInboxId())
       }
     }
   },
