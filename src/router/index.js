@@ -1,9 +1,10 @@
+import { get } from 'lodash'
+import posthog from 'posthog-js'
+import * as storage from 'src/plugins/helpers/storage'
 import Vue from 'vue'
+import VueGtagEsm from 'vue-gtag'
 import VueRouter from 'vue-router'
 import routes from './routes'
-import VueGtagEsm from 'vue-gtag'
-import * as storage from 'src/plugins/helpers/storage'
-import { get } from 'lodash'
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,7 @@ export default function ({ store }) {
   })
 
   Router.beforeEach((to, from, next) => {
+    posthog.capture('$pageleave')
     next()
     const isWidget = to.matched.some(route => route?.meta?.isWidget)
 
@@ -78,6 +80,11 @@ export default function ({ store }) {
   })
 
   Router.afterEach((to, from) => {
+    Vue.nextTick(() => {
+      console.log('Capturing pageview')
+      posthog.capture('$pageview')
+    })
+
     store.commit('SET_PREV_ROUTE', {
       fullPath: from.fullPath,
       name: from.name,
