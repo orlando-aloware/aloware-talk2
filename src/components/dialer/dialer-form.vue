@@ -465,8 +465,7 @@ export default {
           this.contactTimezone = data?.timezone
           this.lastContactCampaignId = data?.last_campaign_id
           this.loadingContact = false
-        }).catch((err) => {
-          console.error(err)
+        }).catch(_ => {
           this.loadingContact = false
         })
       }
