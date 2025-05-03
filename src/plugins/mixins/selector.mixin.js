@@ -1,5 +1,5 @@
 import _ from 'lodash'
-
+import kycMixin from 'src/plugins/mixins/kyc.mixin'
 export default {
   props: {
     forceRemoveMissingValues: {
@@ -7,6 +7,10 @@ export default {
       default: false
     }
   },
+
+  mixins: [
+    kycMixin
+  ],
 
   data () {
     return {
@@ -243,6 +247,17 @@ export default {
       }
 
       return checkBlockedMessaging && a2pBlock
+    },
+
+    getMessagingBlocked (campaign) {
+      if (campaign?.blocked_messaging_information?.reason) {
+        return campaign.blocked_messaging_information.reason
+      }
+      if (!this.shouldAllowSmsTraffic(campaign)) {
+        return 'To send messages to the US, A2P 10DLC Brand and Campaign are required.'
+      }
+
+      return 'Messaging is currently disabled.'
     }
   },
   watch: {
