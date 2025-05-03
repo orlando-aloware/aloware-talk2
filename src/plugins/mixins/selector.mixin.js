@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import kycMixin from 'src/plugins/mixins/kyc.mixin'
+
 export default {
   props: {
     forceRemoveMissingValues: {
