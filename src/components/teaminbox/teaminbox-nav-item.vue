@@ -106,7 +106,7 @@ export default {
 
   &__unread-count-container {
     position: absolute;
-    top: 10px;
+    top: 0;
     bottom: 0;
     right: 8px;
     display: flex;
