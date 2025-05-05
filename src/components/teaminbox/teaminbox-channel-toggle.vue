@@ -103,7 +103,7 @@ export default {
       // Initialize from URL if available
       const urlViewMode = this.$route.query.viewMode
       if (urlViewMode) {
-        const viewMode = urlViewMode === 'threaded' ? THREADED : UNTHREADED
+        const viewMode = urlViewMode === 'Threaded' ? THREADED : UNTHREADED
         this.onChange(viewMode)
         return
       }
@@ -122,7 +122,7 @@ export default {
       }
 
       const query = { ...this.$route.query }
-      query.viewMode = viewMode === THREADED ? 'threaded' : 'unthreaded'
+      query.viewMode = viewMode === THREADED ? 'Threaded' : 'Unthreaded'
       this.$router.replace({ query }).catch(navigationErrorHandler)
     }
   },
