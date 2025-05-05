@@ -358,6 +358,14 @@ export default {
     '$route.params.inboxId' (inboxId) {
       if (!inboxId && this.inboxes.length && !this.isMobile) {
         this.onInboxSelect(this.getFirstInboxId())
+        return
+      }
+
+      const newInboxId = parseInt(inboxId)
+
+      if (!isNaN(newInboxId) && newInboxId !== this.activeInboxId) {
+        // Handle back navigation to a different inbox
+        this.onInboxSelect(newInboxId)
       }
     },
 
