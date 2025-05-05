@@ -177,7 +177,7 @@ export default {
       }
     },
 
-    onInboxSelect (inboxId, contactId = null, force = false) {
+    async onInboxSelect (inboxId, contactId = null, force = false) {
       if (inboxId === this.activeInboxId && !force) {
         return
       }
@@ -199,12 +199,18 @@ export default {
       const filters = this.$store.state.TeamInbox.activeFilters || {}
       const sort = this.$store.state.TeamInbox.activeSort || {}
       const search = this.$store.state.TeamInbox.currentSearch || null
-      this.fetchItems(inboxId, search, filters, sort)
+      await this.fetchItems(inboxId, search, filters, sort)
 
       const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
 
       // avoid redundant navigation
       if (this.$route.path !== route) {
+        if (force) {
+          // force redirect to the first inbox to prevent the user from navigating back to the Team Inboxes page without any inboxId
+          this.$router.replace(route)
+          return
+        }
+
         this.$router.push(route)
       }
     },
@@ -335,7 +341,8 @@ export default {
       const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
       if (inboxId) {
-        this.onInboxSelect(inboxId, contactId)
+        const forceRedirectToFirstInbox = !this.$route.params.inboxId
+        this.onInboxSelect(inboxId, contactId, forceRedirectToFirstInbox)
       }
     }
 
