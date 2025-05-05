@@ -251,7 +251,6 @@ export default {
     },
 
     onChannel () {
-      console.log('onChannel', this.viewMode)
       if (!this.activeInboxId) {
         return
       }
