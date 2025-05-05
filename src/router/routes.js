@@ -59,6 +59,13 @@ export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
 export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
 
+export const navigationErrorHandler = (err) => {
+  if (err.name !== 'NavigationDuplicated') {
+    // ignore NavigationDuplicated errors when updating query params
+    console.error(err)
+  }
+}
+
 const routes = [
   {
     path: '/',
