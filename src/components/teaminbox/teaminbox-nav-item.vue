@@ -14,9 +14,18 @@
         <q-skeleton type="text"
                     width="20px"
                     v-if="isLoadingUnreadCount"/>
-        <q-badge variant="primary"
+        <q-badge pill
+                variant="danger"
+                rounded
+                v-else-if="unreadCount < 99">
+          {{ unreadCount }}
+        </q-badge>
+        <q-badge pill
+                 variant="danger"
                  rounded
-                 v-else>{{ unreadCount }}</q-badge>
+                 v-else>
+          99<sup>+</sup>
+        </q-badge>
       </div>
     </div>
     <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
@@ -97,11 +106,14 @@ export default {
 
   &__unread-count-container {
     position: absolute;
-    top: 0;
+    top: 10px;
     bottom: 0;
     right: 8px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
 
     .q-badge {
       font-size: 9px;

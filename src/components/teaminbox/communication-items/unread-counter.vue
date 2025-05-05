@@ -56,8 +56,8 @@ export default {
   right: -5px;
   font-size: 9px;
   font-weight: 500;
-  height: 18px;
-  width: 18px;
+  height: 20px;
+  width: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
