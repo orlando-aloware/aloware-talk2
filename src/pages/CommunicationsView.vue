@@ -98,7 +98,8 @@ export default {
       'setInboxFilters',
       'resetChannelChangedFilterFields',
       'setSearchQuery',
-      'setIsLoadingCommunications'
+      'setIsLoadingCommunications',
+      'reset'
     ]),
 
     setChannel (routeChanged = false) {
@@ -183,8 +184,9 @@ export default {
     window.removeEventListener('resize', this.onWindowResize)
   },
 
-  beforeDestroy () {
+  destroyed () {
     window.removeEventListener('resize', this.onWindowResize)
+    this.reset()
   },
 
   watch: {

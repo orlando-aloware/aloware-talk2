@@ -85,5 +85,21 @@ export default {
   },
   SET_INBOX_ANNOUNCEMENT_VIEWED (state, viewed) {
     state.inboxAnnouncementViewed = viewed
+  },
+  RESET (state) {
+    state.inboxes = []
+    state.isLoadingInboxes = false
+    state.inboxesUnreadCount = []
+    state.isLoadingInboxesUnreadCount = false
+    state.currentInboxesPage = 0
+    state.items = []
+    state.isLoadingItems = false
+    state.currentItemsPage = 0
+    state.abortController = null
+    state.showRefreshInboxesButton = false
+    state.showRefreshCommunicationsButton = false
+    state.currentSearch = null
+    state.isInitialLoad = false
+    state.activeInboxContactUnreadCount = 0
   }
 }
