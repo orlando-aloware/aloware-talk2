@@ -1,5 +1,6 @@
 <template>
   <div data-testid="teaminbox-nav-item"
+       :id="`teaminbox-nav-item-${_uid}`"
        :class="['teaminbox-nav-item', { 'teaminbox-nav-item--active': isActive }]"
        @click="$emit('click', value)">
     <div class="teaminbox-nav-item__content d-flex align-items-center">
@@ -8,11 +9,6 @@
                     height="18" />
       </span>
       <span class="teaminbox-nav-item__label" :id="`teaminbox-nav-item-label-${_uid}`">{{ label }}</span>
-      <b-tooltip custom-class="talk-table__tooltip"
-        :target="`teaminbox-nav-item-label-${_uid}`"
-        :delay="500">
-        {{ label }}
-      </b-tooltip>
       <div class="teaminbox-nav-item__unread-count-container"
            v-if="isLoadingUnreadCount || unreadCount > 0">
         <q-skeleton type="text"
@@ -23,6 +19,13 @@
                  v-else>{{ unreadCount }}</q-badge>
       </div>
     </div>
+    <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+        placement="right"
+        :target="`teaminbox-nav-item-${_uid}`"
+        boundary="window"
+        :delay="500">
+        {{ label }}
+    </b-tooltip>
   </div>
 </template>
 
@@ -132,5 +135,10 @@ export default {
       max-width: 180px;
     }
   }
+}
+
+:global(.teaminbox-tooltip) {
+  z-index: 9999;
+  pointer-events: none;
 }
 </style>
