@@ -157,8 +157,5 @@ export default {
   },
   setSearchQuery: ({ commit }, query) => {
     commit('SET_SEARCH_QUERY', query)
-  },
-  reset: ({ commit }) => {
-    commit('RESET')
   }
 }

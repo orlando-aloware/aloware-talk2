@@ -251,48 +251,5 @@ export default {
   },
   SET_SEARCH_QUERY: (state, query) => {
     state.searchQuery = query
-  },
-  RESET (state) {
-    state.selectedContactId = null
-    state.selectedCommunication = null
-    state.communications = []
-    state.communicationsCount = 0
-    state.communicationsCurrentPage = 0
-    state.hasMoreCommunications = true
-    state.isLoadingCommunications = false
-    state.isLoadingCommunicationsCount = false
-    state.liveContacts = []
-    state.contacts = []
-    state.contactsCurrentPage = 0
-    state.hasMoreContacts = true
-    state.isGettingTasksList = false
-    state.isFetchingContacts = false
-    state.activeChannel = null
-    state.taskCounts = {
-      open: 0,
-      pending: 0,
-      new: 0,
-      closed: 0
-    }
-    state.inboxTaskCounts = {
-      open: 0,
-      pending: 0,
-      new: 0,
-      closed: 0
-    }
-    state.isLoadingOpenTaskCount = false
-    state.isLoadingPendingTaskCount = false
-    state.inboxShowMyContacts = false
-    state.inboxShowUnreads = false
-    state.showMyContacts = InboxDefault.DEFAULT_STATE.showMyContacts
-    state.isInboxFiltersLoaded = false
-    state.isDeletingFilter = false
-    state.isUpdatingFilter = false
-    state.isEditingView = false
-    state.showViewsList = false
-    state.isInboxRefreshBtnLoading = false
-    state.paginationPage = 1
-    state.isLoadingMore = false
-    state.searchQuery = null
   }
 }

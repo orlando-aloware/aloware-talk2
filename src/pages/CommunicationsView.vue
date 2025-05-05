@@ -98,8 +98,7 @@ export default {
       'setInboxFilters',
       'resetChannelChangedFilterFields',
       'setSearchQuery',
-      'setIsLoadingCommunications',
-      'reset'
+      'setIsLoadingCommunications'
     ]),
 
     setChannel (routeChanged = false) {
@@ -142,6 +141,16 @@ export default {
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
+    },
+
+    reset () {
+      this.resetCommunications()
+      this.setChannel()
+      const filter = { ...this.channelDefaultFilterModel.filter }
+      this.setChannelClonedFilter(filter)
+      this.resetChannelChangedFilterFields()
+      this.setInboxFilters(filter)
+      this.setSearchQuery('')
     }
   },
 
@@ -195,13 +204,7 @@ export default {
   watch: {
 
     '$route.params.channel': function (newVal) {
-      this.resetCommunications()
-      this.setChannel()
-      const filter = { ...this.channelDefaultFilterModel.filter }
-      this.setChannelClonedFilter(filter)
-      this.resetChannelChangedFilterFields()
-      this.setInboxFilters(filter)
-      this.setSearchQuery('')
+      this.reset()
 
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
