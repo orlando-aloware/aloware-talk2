@@ -184,8 +184,11 @@ export default {
     window.removeEventListener('resize', this.onWindowResize)
   },
 
-  destroyed () {
+  beforeDestroy () {
     window.removeEventListener('resize', this.onWindowResize)
+  },
+
+  destroyed () {
     this.reset()
   },
 
