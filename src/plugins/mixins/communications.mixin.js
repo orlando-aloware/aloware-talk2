@@ -805,10 +805,6 @@ export default {
     },
 
     getCommunicationType () {
-      if (!this.activeChannel) {
-        return 'all'
-      }
-
       switch (this.activeChannel.value) {
         case DEFAULT_COMMUNICATIONS_CHANNEL:
         case 'my-personal-line':
