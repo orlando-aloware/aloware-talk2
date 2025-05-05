@@ -36,9 +36,9 @@ export default {
     commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
     commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
   },
-  setViewMode: ({ commit }, viewMode) => {
-    commit('SET_VIEW_MODE', viewMode)
-    localStorage.setItem('teaminbox_view_mode', viewMode)
+  setViewMode: ({ commit }, { value, storageKey }) => {
+    commit('SET_VIEW_MODE', value)
+    localStorage.setItem(storageKey, value)
   },
   setItems: ({ commit }, data) => {
     commit('SET_ITEMS', data.data)
@@ -68,13 +68,13 @@ export default {
   setShowRefreshCommunicationsButton: ({ commit }, show) => {
     commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
   },
-  setActiveFilters: ({ commit }, { value, option }) => {
+  setActiveFilters: ({ commit }, { value, option, storageKey }) => {
     commit('SET_ACTIVE_FILTERS', value)
-    localStorage.setItem('teaminbox_filter', option)
+    localStorage.setItem(storageKey, option)
   },
-  setActiveSort: ({ commit }, { value, option }) => {
+  setActiveSort: ({ commit }, { value, option, storageKey }) => {
     commit('SET_ACTIVE_SORT', value)
-    localStorage.setItem('teaminbox_sort', option)
+    localStorage.setItem(storageKey, option)
   },
   setCurrentSearch: ({ commit }, search) => {
     commit('SET_CURRENT_SEARCH', search)

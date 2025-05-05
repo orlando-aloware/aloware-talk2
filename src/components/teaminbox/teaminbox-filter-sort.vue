@@ -57,6 +57,14 @@ export default {
 
   computed: {
     ...mapState('TeamInbox', ['activeFilters', 'activeSort']),
+    ...mapState('auth', ['profile']),
+
+    localStorageCacheKeys () {
+      return {
+        filter: `teaminbox_filter_${this.profile.id}_${this.profile.company_id}`,
+        sort: `teaminbox_sort_${this.profile.id}_${this.profile.company_id}`
+      }
+    },
 
     filterOption () {
       return this.activeFilters && this.activeFilters.unreadonly ? 'Unread' : 'All'
@@ -88,7 +96,11 @@ export default {
         return
       }
 
-      this.setActiveFilters({ value: this.filters[option], option })
+      this.setActiveFilters({
+        option,
+        value: this.filters[option],
+        storageKey: this.localStorageCacheKeys.filter
+      })
       this.$emit('filter-change', this.filters[option])
       this.updateUrlParams('filter', option)
     },
@@ -98,7 +110,11 @@ export default {
         return
       }
 
-      this.setActiveSort({ value: this.sorts[option], option })
+      this.setActiveSort({
+        option,
+        value: this.sorts[option],
+        storageKey: this.localStorageCacheKeys.sort
+      })
       this.$emit('sort-change', this.sorts[option])
       this.updateUrlParams('sort', option)
     },
@@ -117,7 +133,7 @@ export default {
       }
 
       // If no URL parameter, check localStorage
-      const storedFilter = localStorage.getItem('teaminbox_filter')
+      const storedFilter = localStorage.getItem(this.localStorageCacheKeys.filter)
       if (storedFilter) {
         this.setFilterOption(storedFilter)
       }
@@ -132,7 +148,7 @@ export default {
       }
 
       // If no URL parameter, check localStorage
-      const storedSort = localStorage.getItem('teaminbox_sort')
+      const storedSort = localStorage.getItem(this.localStorageCacheKeys.sort)
       if (storedSort) {
         this.setSortOption(storedSort)
       }

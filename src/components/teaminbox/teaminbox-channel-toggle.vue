@@ -53,6 +53,12 @@ export default {
       'viewMode'
     ]),
 
+    ...mapState('auth', ['profile']),
+
+    localStorageCacheKey () {
+      return `teaminbox_view_mode_${this.profile.id}_${this.profile.company_id}`
+    },
+
     options () {
       return [
         {
@@ -85,7 +91,7 @@ export default {
         return
       }
 
-      this.setViewMode(value)
+      this.setViewMode({ value, storageKey: this.localStorageCacheKey })
       this.$emit('channel', value)
     },
 
@@ -103,7 +109,7 @@ export default {
       }
 
       // If no URL parameter, check localStorage
-      const storedViewMode = localStorage.getItem('teaminbox_view_mode')
+      const storedViewMode = localStorage.getItem(this.localStorageCacheKey)
       if (storedViewMode) {
         const viewMode = parseInt(storedViewMode)
         this.onChange(viewMode)
