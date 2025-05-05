@@ -628,7 +628,7 @@ export default {
         // check if the profile has edge locations
         let edgeLocations = this.profile.edge_locations
         // make sure it is a filled array
-        if (!Array.isArray(edgeLocations) || edgeLocations.length === 0) {
+        if (this.profile.edge_locations === undefined || !Array.isArray(edgeLocations) || edgeLocations.length === 0) {
           edgeLocations = ['umatilla', 'ashburn', 'roaming']
         }
         const options = {
