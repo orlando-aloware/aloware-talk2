@@ -37,6 +37,7 @@
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+import { navigationErrorHandler } from 'src/router/routes'
 
 export default {
   components: {
@@ -44,19 +45,7 @@ export default {
   },
 
   mounted () {
-    // Initialize from URL if available
-    const urlViewMode = this.$route.query.viewMode
-    if (urlViewMode) {
-      const viewMode = urlViewMode === 'threaded' ? THREADED : UNTHREADED
-      this.setViewMode(viewMode)
-      return
-    }
-
-    // If no URL parameter, check localStorage
-    const storedViewMode = localStorage.getItem('teaminbox_view_mode')
-    if (storedViewMode) {
-      this.setViewMode(parseInt(storedViewMode))
-    }
+    this.initializeViewModeFilter()
   },
 
   computed: {
@@ -86,27 +75,59 @@ export default {
     ...mapActions('TeamInbox', ['setViewMode']),
 
     onChange (value) {
+      this.updateUrlViewMode(value)
+
+      if (!this.validateViewMode(value)) {
+        return
+      }
+
+      if (value === this.viewMode) {
+        return
+      }
+
       this.setViewMode(value)
       this.$emit('channel', value)
+    },
 
-      // Update URL with descriptive parameter
+    validateViewMode (value) {
+      return [THREADED, UNTHREADED].includes(value)
+    },
+
+    initializeViewModeFilter () {
+      // Initialize from URL if available
+      const urlViewMode = this.$route.query.viewMode
+      if (urlViewMode) {
+        const viewMode = urlViewMode === 'threaded' ? THREADED : UNTHREADED
+        this.onChange(viewMode)
+        return
+      }
+
+      // If no URL parameter, check localStorage
+      const storedViewMode = localStorage.getItem('teaminbox_view_mode')
+      if (storedViewMode) {
+        const viewMode = parseInt(storedViewMode)
+        this.onChange(viewMode)
+      }
+    },
+
+    updateUrlViewMode (viewMode) {
+      if (!this.validateViewMode(viewMode)) {
+        return
+      }
+
       const query = { ...this.$route.query }
-      query.viewMode = value === THREADED ? 'threaded' : 'unthreaded'
-      this.$router.replace({ query }).catch(err => {
-        if (err.name !== 'NavigationDuplicated') {
-          console.error(err)
-        }
-      })
+      query.viewMode = viewMode === THREADED ? 'threaded' : 'unthreaded'
+      this.$router.replace({ query }).catch(navigationErrorHandler)
     }
   },
 
   watch: {
-    // '$route.query.viewMode' (newValue) {
-    //   if (newValue) {
-    //     const viewMode = newValue === 'threaded' ? THREADED : UNTHREADED
-    //     this.setViewMode(viewMode)
-    //   }
-    // }
+    '$route.query.viewMode' (viewMode) {
+      if (!viewMode) {
+        // if the viewMode is not set in the URL, use the current viewMode and update the URL
+        this.updateUrlViewMode(this.viewMode)
+      }
+    }
   }
 }
 </script>

@@ -68,11 +68,13 @@ export default {
   setShowRefreshCommunicationsButton: ({ commit }, show) => {
     commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
   },
-  setActiveFilters: ({ commit }, filters) => {
-    commit('SET_ACTIVE_FILTERS', filters)
+  setActiveFilters: ({ commit }, { value, option }) => {
+    commit('SET_ACTIVE_FILTERS', value)
+    localStorage.setItem('teaminbox_filter', option)
   },
-  setActiveSort: ({ commit }, sort) => {
-    commit('SET_ACTIVE_SORT', sort)
+  setActiveSort: ({ commit }, { value, option }) => {
+    commit('SET_ACTIVE_SORT', value)
+    localStorage.setItem('teaminbox_sort', option)
   },
   setCurrentSearch: ({ commit }, search) => {
     commit('SET_CURRENT_SEARCH', search)
