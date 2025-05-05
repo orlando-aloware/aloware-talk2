@@ -1,11 +1,11 @@
-import { mapState } from 'vuex'
+import { head } from 'lodash'
 import * as TranscriptionStatus from 'src/constants/transcription-status'
+import { mapState } from 'vuex'
+import * as CallbackStatus from '../../constants/callback-status'
 import * as CommunicationDirections from '../../constants/communication-direction'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
-import * as CommunicationTypes from '../../constants/communication-types'
 import * as CommunicationRejectionReasons from '../../constants/communication-rejection-reasons'
-import * as CallbackStatus from '../../constants/callback-status'
-import { head } from 'lodash'
+import * as CommunicationTypes from '../../constants/communication-types'
 
 export default {
 
@@ -220,7 +220,7 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_CONTACT_IS_NOT_TCPA_APPROVED:
           return 'Contact was non-TCPA Approved.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DISABLED:
-          return 'Company was not enabled.'
+          return 'Account is not enabled.'
         case CommunicationRejectionReasons.REJECTION_REASON_MESSAGE_EMPTY:
           return 'Message body was required.'
         case CommunicationRejectionReasons.REJECTION_REASON_NUMBER_IS_INTERNATIONAL:
@@ -256,9 +256,9 @@ export default {
         case CommunicationRejectionReasons.REJECTION_REASON_DAILY_LIMIT_EXCEEDED:
           return 'Daily outbound messages limit exceeded.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DELETED:
-          return 'Company was deleted.'
+          return 'Account is deleted.'
         case CommunicationRejectionReasons.REJECTION_REASON_COMPANY_SUSPENDED:
-          return 'Company was suspended.'
+          return 'Account is suspended.'
         case CommunicationRejectionReasons.REJECTION_REASON_LINE_IS_SPAMMING:
           return 'SPAM Detected: Stopped sending the same message multiple times from the same line.'
         case CommunicationRejectionReasons.REJECTION_REASON_SHORTCODE_TO_NON_US_NUMBER:
