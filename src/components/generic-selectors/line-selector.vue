@@ -56,7 +56,7 @@
           <q-item-section v-if="isMessagingBlocked(opt, checkBlockedMessaging, false, true)" side>
             <q-tooltip anchor="top middle"
                        self="center middle">
-              To send messages to the US, A2P 10DLC Brand and Campaign are required.
+              {{ getMessagingBlocked(opt) }}
             </q-tooltip>
             <q-badge color="blue">i</q-badge>
           </q-item-section>

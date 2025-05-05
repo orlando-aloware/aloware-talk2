@@ -19,7 +19,7 @@
                        target="dialer-popover"
                        :show.sync="blockTooltipHandler.show"
                        :task="blockTooltipHandler.task"
-                       :message="disabledComplianceMessage"
+                       :message="getMessagingBlocked(selectedCampaign)"
                        v-if="isBlockTooltipPopoverEnabled">
         </block-tooltip>
         <b-tab title="Call"
@@ -339,11 +339,15 @@ export default {
     isBlockTooltipPopoverEnabled () {
       let selectedCampaign = this.campaigns.find(campaign => campaign.id === this.selectedCampaignId)
 
+      if (this.mode !== 'text') {
+        return false
+      }
+
       if (!this.shouldAllowSmsTraffic(selectedCampaign)) {
         return true
       }
 
-      if (this.mode === 'text' && this.disabledComplianceMessage) {
+      if (this.disabledComplianceMessage) {
         return true
       }
 
@@ -461,8 +465,7 @@ export default {
           this.contactTimezone = data?.timezone
           this.lastContactCampaignId = data?.last_campaign_id
           this.loadingContact = false
-        }).catch((err) => {
-          console.error(err)
+        }).catch(_ => {
           this.loadingContact = false
         })
       }
