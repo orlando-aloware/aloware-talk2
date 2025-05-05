@@ -624,17 +624,22 @@ export default {
          * particularly noticeable in poor network conditions.
          */
         // initialize twilio client
+
+        // check if the profile has edge locations
+        let edgeLocations = this.profile.edge_locations
+        // make sure it is a filled array
+        if (this.profile.edge_locations === undefined || !Array.isArray(edgeLocations) || edgeLocations.length === 0) {
+          edgeLocations = ['umatilla', 'ashburn', 'roaming']
+        }
         const options = {
-          edge: ['umatilla', 'ashburn', 'roaming'],
+          edge: edgeLocations,
           codecPreferences: ['opus', 'pcmu']
         }
         if (this.currentCompany && this.currentCompany.twilio_debug_log) {
           options.logLevel = 1
           options.enableImprovedSignalingErrorPrecision = true
         }
-        if (this.isCompanyPartOfCustomEdgeLocations(this.currentCompany.id)) {
-          options.edge = ['ashburn', 'umatilla', 'roaming']
-        }
+        console.log('Edge locations', options.edge)
         this.device.initialize(this.dialer.token, options)
 
         console.log('Reset device', reset)
