@@ -99,12 +99,15 @@ export default {
       return [THREADED, UNTHREADED].includes(value)
     },
 
+    parseUrlViewMode (viewMode) {
+      return viewMode === 'Unthreaded' ? UNTHREADED : THREADED
+    },
+
     initializeViewModeFilter () {
       // Initialize from URL if available
       const urlViewMode = this.$route.query.viewMode
       if (urlViewMode) {
-        const viewMode = urlViewMode === 'Threaded' ? THREADED : UNTHREADED
-        this.onChange(viewMode)
+        this.onChange(this.parseUrlViewMode(urlViewMode))
         return
       }
 
@@ -132,7 +135,10 @@ export default {
       if (!viewMode) {
         // if the viewMode is not set in the URL, use the current viewMode and update the URL
         this.updateUrlViewMode(this.viewMode)
+        return
       }
+
+      this.onChange(this.parseUrlViewMode(viewMode))
     }
   }
 }

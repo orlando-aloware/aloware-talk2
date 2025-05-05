@@ -174,14 +174,20 @@ export default {
       if (!newValue) {
         // if the filter is not set in the URL, use the current filter and update the URL
         this.updateUrlParams('filter', this.filterOption)
+        return
       }
+
+      this.setFilterOption(newValue)
     },
 
     '$route.query.sort' (newValue) {
       if (!newValue) {
         // if the sort is not set in the URL, use the current sort and update the URL
         this.updateUrlParams('sort', this.sortOption)
+        return
       }
+
+      this.setSortOption(newValue)
     }
   }
 }
