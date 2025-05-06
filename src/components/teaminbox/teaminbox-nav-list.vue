@@ -256,7 +256,11 @@ export default {
     },
 
     updateRingGroupListener (ringGroup) {
-      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
+      const isUserIncluded = this.allUserIds(ringGroup)?.includes(this.profile.id)
+      const isTeamIncluded = ringGroup.team_ids?.some(id => this.teamsIds.includes(id))
+      const isWatchingTeam = ringGroup.watcher_team_ids?.some(id => this.teamsIds.includes(id))
+
+      if (isUserIncluded || isTeamIncluded || isWatchingTeam) {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
         const updatedInboxes = [...this.inboxes]
 
