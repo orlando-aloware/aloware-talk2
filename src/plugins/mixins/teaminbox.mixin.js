@@ -218,10 +218,25 @@ export default {
         const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds)
         data = newData
 
-        if (data.length === 1) {
-          this.setInboxesUnreadCountSingle(data[0])
-        } else {
-          this.setInboxesUnreadCount(data)
+        switch (data.length) {
+          case 0:
+            // If a single inbox is requested and nothing is returned, set the unread count to 0
+            if (inboxIds.length === 1) {
+              this.setInboxesUnreadCountSingle(
+                {
+                  ring_group_id: inboxIds[0],
+                  unread_count: 0
+                }
+              )
+            }
+            break
+          case 1:
+            // If a single inbox is requested and one is returned, set the unread count for that inbox
+            this.setInboxesUnreadCountSingle(data[0])
+            break
+          default:
+            // If multiple inboxes are requested and one is returned, set the unread count for each inbox
+            this.setInboxesUnreadCount(data)
         }
       } catch (error) {
         console.error('[fetchInboxesUnreadCount] error', error)

@@ -512,7 +512,12 @@ export default {
       const item = this.itemsData.find(item => item.contact_id === data.id)
       if (item) {
         const unreads = await this.fetchInboxesUnreadCount([this.activeInboxId], [data.id])
-        item.inbox_unread_count = unreads[0].ring_group_id === this.activeInboxId && unreads[0]['unread_contact_' + data.id] ? unreads[0]['unread_contact_' + data.id] : 0
+
+        if (!unreads.length) {
+          item.inbox_unread_count = 0
+        } else {
+          item.inbox_unread_count = unreads[0].ring_group_id === this.activeInboxId && unreads[0]['unread_contact_' + data.id] ? unreads[0]['unread_contact_' + data.id] : 0
+        }
       }
     }
   },
