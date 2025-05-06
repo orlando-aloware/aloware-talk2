@@ -105,10 +105,6 @@ export default {
 
     ...mapGetters('TeamInbox', ['getConnectedInboxesLength']),
 
-    localStorageCacheKey () {
-      return `teaminbox_id_${this.profile.id}_${this.profile.company_id}`
-    },
-
     teamsIds () {
       return this.teams
         .filter(team => team.users.includes(this.profile.id))
@@ -196,7 +192,6 @@ export default {
         }
 
         this.setActiveInboxId(parseInt(inboxId))
-        localStorage.setItem(this.localStorageCacheKey, inboxId)
       }
 
       this.resetItems()
@@ -342,14 +337,12 @@ export default {
     this.finishedInitialLoad = true
 
     if (this.inboxes.length) {
-      const cachedInboxId = parseInt(localStorage.getItem(this.localStorageCacheKey))
-      const existsCachedInbox = !isNaN(cachedInboxId) && this.inboxes.find(inbox => inbox.id === cachedInboxId)
       const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
       const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
-      if (existsCachedInbox) {
+      if (this.activeInboxId && this.inboxes.find(inbox => inbox.id === this.activeInboxId)) {
         // Redirect to the last opened inbox to keep persistence
-        this.onInboxSelect(cachedInboxId, contactId, true)
+        this.onInboxSelect(this.activeInboxId, contactId, true)
       } else if (inboxId) {
         const forceRedirectToFirstInbox = !this.$route.params.inboxId
         this.onInboxSelect(inboxId, contactId, forceRedirectToFirstInbox)

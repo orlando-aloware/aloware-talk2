@@ -16,6 +16,7 @@ export const DEFAULT_STATE = {
     'inbox.inboxShowUnreads',
     'TeamInbox.viewMode',
     'TeamInbox.activeFilters',
-    'TeamInbox.activeSort'
+    'TeamInbox.activeSort',
+    'TeamInbox.activeInboxId'
   ]
 }
