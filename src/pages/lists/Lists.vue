@@ -4,7 +4,7 @@
 
 <script>
 import ListsTable from 'src/components/lists/lists-table'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { userMixin } from 'src/plugins/mixins'
 
 export default {
@@ -20,6 +20,14 @@ export default {
 
   computed: {
     ...mapState('cache', ['currentCompany'])
+  },
+
+  destroyed () {
+    this.resetLists()
+  },
+
+  methods: {
+    ...mapActions('listsModule', ['resetLists'])
   }
 }
 </script>

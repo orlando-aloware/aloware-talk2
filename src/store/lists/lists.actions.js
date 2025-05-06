@@ -59,5 +59,9 @@ export default {
       console.log(err)
       return Promise.reject(err)
     }
+  },
+
+  resetLists ({ commit }) {
+    commit('RESET_LISTS')
   }
 }
