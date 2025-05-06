@@ -13,19 +13,19 @@
            v-if="isLoadingUnreadCount || unreadCount > 0">
         <q-skeleton type="text"
                     width="20px"
-                    v-if="isLoadingUnreadCount"/>
+                    v-if="isLoadingUnreadCount && !unreadCountLoaded"/>
         <q-badge pill
                 variant="danger"
                 rounded
                 v-else-if="unreadCount < 99">
           {{ unreadCount }}
         </q-badge>
-        <q-badge pill
+        <b-badge pill
                  variant="danger"
                  rounded
                  v-else>
           99<sup>+</sup>
-        </q-badge>
+        </b-badge>
       </div>
     </div>
     <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
@@ -69,8 +69,22 @@ export default {
     }
   },
 
+  data () {
+    return {
+      unreadCountLoaded: false
+    }
+  },
+
   components: {
     InboxIcon
+  },
+
+  watch: {
+    unreadCount: {
+      handler () {
+        this.unreadCountLoaded = true
+      }
+    }
   }
 }
 </script>
