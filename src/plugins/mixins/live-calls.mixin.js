@@ -373,7 +373,7 @@ export default {
 
     async fetchCurrentCommunicationIfNeeded (data = {}) {
       // Check if we need to fetch current communication
-      const needsCurrentCommunication = !this.dialer.communication && this.isAgentOnCall
+      const needsCurrentCommunication = !this.dialer.call && this.isAgentOnCall
 
       if (needsCurrentCommunication) {
         try {
