@@ -282,11 +282,7 @@ export default {
       })
     },
 
-    async processCommunication (communication, isNew = false) {
-      if (!this.activeInboxId || communication.ring_group_id !== this.activeInboxId) {
-        return
-      }
-
+    async processCommunicationInActiveInbox (communication, isNew = false) {
       // fetch unread count for the active inbox (from the backend)
       const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
       communication.inbox_unread_count = unreadCount[0] && unreadCount[0].ring_group_id === this.activeInboxId && unreadCount[0]['unread_contact_' + communication.contact_id] ? unreadCount[0]['unread_contact_' + communication.contact_id] : 0
@@ -305,6 +301,28 @@ export default {
       const index = this.itemsData.findIndex(item => item.contact_id === this.activeId)
       if (index >= 0) {
         this.onItemClick(this.itemsData[index])
+      }
+    },
+
+    async processCommunicationInOtherInbox (communication, isNew = false) {
+      const index = this.inboxes.findIndex(inbox => inbox.id === communication.ring_group_id)
+
+      if (index === -1) {
+        return
+      }
+
+      await this.fetchInboxesUnreadCount([this.inboxes[index].id])
+    },
+
+    async processCommunication (communication, isNew = false) {
+      // If the communication is in the active inbox, process it
+      if (communication.ring_group_id === this.activeInboxId) {
+        await this.processCommunicationInActiveInbox(communication, isNew)
+      }
+
+      // If the communication is not in the active inbox, process it
+      if (communication.ring_group_id !== this.activeInboxId) {
+        await this.processCommunicationInOtherInbox(communication, isNew)
       }
     },
 
