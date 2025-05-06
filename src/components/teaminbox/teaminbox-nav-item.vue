@@ -20,12 +20,12 @@
                 v-else-if="unreadCount < 99">
           {{ unreadCount }}
         </q-badge>
-        <b-badge pill
+        <q-badge pill
                  variant="danger"
                  rounded
                  v-else>
           99<sup>+</sup>
-        </b-badge>
+        </q-badge>
       </div>
     </div>
     <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
@@ -33,7 +33,7 @@
         :target="`teaminbox-nav-item-${_uid}`"
         boundary="window"
         :delay="500">
-        {{ label }}
+        {{ label }} - {{ unreadCount }} unread communications
     </b-tooltip>
   </div>
 </template>
@@ -167,10 +167,5 @@ export default {
       max-width: 180px;
     }
   }
-}
-
-:global(.teaminbox-tooltip) {
-  z-index: 9999;
-  pointer-events: none;
 }
 </style>

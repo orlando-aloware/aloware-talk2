@@ -4,6 +4,7 @@
     <b-badge pill
              class="unread-badge"
              :class="unreadClass"
+             :id="`unread-counter-${_uid}`"
              variant="danger"
              :key="totalUnreads"
              v-if="totalUnreads > 0">
@@ -12,6 +13,14 @@
         <template v-else-if="totalUnreads <= 99">{{ totalUnreads }}</template>
         <template v-else>99<sup>+</sup></template>
       </span>
+      <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+        placement="left"
+        boundary="window"
+        :target="`unread-counter-${_uid}`"
+        :delay="500"
+        v-if="totalUnreads > 99">
+        {{ totalUnreads }} unread communications
+      </b-tooltip>
     </b-badge>
   </transition>
 </template>
