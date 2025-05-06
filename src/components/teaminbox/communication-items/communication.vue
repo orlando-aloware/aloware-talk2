@@ -6,8 +6,7 @@
               :color-module-id="contactId"
               :name="contactName || defaultEmptyName">
         <unread-counter
-              :unread-properties="unreadProperties"
-              :view-mode="viewMode" />
+              :unread-properties="unreadProperties" />
       </avatar>
     </div>
 
@@ -148,11 +147,6 @@ export default {
     isLiveCall: {
       type: Boolean,
       default: false
-    },
-
-    viewMode: {
-      type: Number,
-      required: true
     }
   }
 }

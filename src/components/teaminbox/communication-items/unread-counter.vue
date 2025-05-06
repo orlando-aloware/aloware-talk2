@@ -3,6 +3,7 @@
               :name="isIncreasing ? 'slide-vertical' : 'slide-vertical-reverse'">
     <b-badge pill
              class="unread-badge"
+             :class="unreadClass"
              variant="danger"
              :key="totalUnreads"
              v-if="totalUnreads > 0">
@@ -24,10 +25,6 @@ export default {
     unreadProperties: {
       type: Object,
       required: false
-    },
-    viewMode: {
-      type: Number,
-      required: true
     }
   },
 
@@ -44,6 +41,12 @@ export default {
 
     totalUnreads () {
       return this.unreadProperties?.unread_count || 0
+    },
+
+    unreadClass () {
+      return this.viewMode === UNTHREADED && this.totalUnreads <= 1
+        ? 'unread-badge--unthreaded'
+        : ''
     }
   },
 
@@ -70,12 +73,12 @@ export default {
   overflow: hidden;
   transition: all 0.3s ease-out;
 
-  &.unthreaded {
-    height: 8px;
-    width: 8px;
+  &--unthreaded {
+    height: 13px;
+    width: 13px;
     padding: 0;
-    top: 0px;
-    right: 0px;
+    top: -3px;
+    right: -3px;
   }
 }
 
