@@ -216,7 +216,7 @@ export default {
         const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds)
         data = newData
 
-        if (contactIds && data.length === 1) {
+        if (data.length === 1) {
           this.setInboxesUnreadCountSingle(data[0])
         } else {
           this.setInboxesUnreadCount(data)
