@@ -374,7 +374,7 @@ export default {
     async fetchCurrentCommunicationIfNeeded (data = {}) {
       // Check if we need to fetch current communication
       const needsCurrentCommunication = !this.dialer.call && this.isAgentOnCall
-
+      console.log('needsCurrentCommunication', needsCurrentCommunication)
       if (needsCurrentCommunication) {
         try {
           if (this.liveCalls.length === 0) {
@@ -383,6 +383,7 @@ export default {
           const currentCommunication = this.liveCalls.find(call => {
             return call.owner_id === this.profile.id
           })
+          console.log('Current Communication', currentCommunication)
 
           if (!currentCommunication) {
             console.log('No live calls found for this agent')
