@@ -377,11 +377,9 @@ export default {
       console.log('needsCurrentCommunication', needsCurrentCommunication)
       if (needsCurrentCommunication) {
         try {
-          if (this.liveCalls.length === 0) {
-            await this.fetchLiveCalls()
-          }
-          const currentCommunication = this.liveCalls.find(call => {
-            return call.owner_id === this.profile.id
+          const response = await this.$axios.post('/api/v1/profile/get-live-calls')
+          const currentCommunication = response.data.find(call => {
+            return call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
           })
           console.log('Current Communication', currentCommunication)
 
