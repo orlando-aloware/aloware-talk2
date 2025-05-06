@@ -26,8 +26,6 @@ export default {
   SET_INBOXES_UNREAD_COUNT_SINGLE (state, data) {
     const index = state.inboxesUnreadCount.findIndex((inbox) => inbox.ring_group_id === data.ring_group_id)
 
-    console.log('setInboxesUnreadCountSingle', index, data)
-
     if (index !== -1) {
       state.inboxesUnreadCount[index] = {
         ring_group_id: data.ring_group_id,

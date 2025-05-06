@@ -204,9 +204,4 @@ export default {
     }
   }
 }
-
-:global(.teaminbox-tooltip) {
-  z-index: 9999;
-  pointer-events: none;
-}
 </style>
