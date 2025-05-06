@@ -177,7 +177,7 @@ export default {
       }
     },
 
-    async onInboxSelect (inboxId, contactId = null, force = false) {
+    onInboxSelect (inboxId, contactId = null, force = false) {
       if (inboxId === this.activeInboxId && !force) {
         return
       }
@@ -199,7 +199,7 @@ export default {
       const filters = this.$store.state.TeamInbox.activeFilters || {}
       const sort = this.$store.state.TeamInbox.activeSort || {}
       const search = this.$store.state.TeamInbox.currentSearch || null
-      await this.fetchItems(inboxId, search, filters, sort)
+      this.fetchItems(inboxId, search, filters, sort)
 
       const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
 
