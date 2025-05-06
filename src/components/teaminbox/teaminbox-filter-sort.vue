@@ -40,23 +40,33 @@ import UnreadMailIcon from '../../components/icons/inbox/unread-mail-icon.vue'
 import SortUpIcon from '../../components/icons/inbox/sort-up-icon.vue'
 import SortDownIcon from '../../components/icons/inbox/sort-down-icon.vue'
 import { mapState, mapActions } from 'vuex'
+import { navigationErrorHandler } from 'src/router/routes'
 
 export default {
   name: 'TeamInboxFilterSort',
+
   components: {
     UnreadMailIcon,
     SortUpIcon,
     SortDownIcon
   },
+
+  mounted () {
+    this.initializeFilterAndSort()
+  },
+
   computed: {
     ...mapState('TeamInbox', ['activeFilters', 'activeSort']),
+
     filterOption () {
       return this.activeFilters && this.activeFilters.unreadonly ? 'Unread' : 'All'
     },
+
     sortOption () {
       return this.activeSort && this.activeSort.order === 'asc' ? 'Oldest' : 'Newest'
     }
   },
+
   data () {
     return {
       filters: {
@@ -69,15 +79,67 @@ export default {
       }
     }
   },
+
   methods: {
     ...mapActions('TeamInbox', ['setActiveFilters', 'setActiveSort']),
+
     setFilterOption (option) {
+      if (!this.validateFilterOption(option)) {
+        return
+      }
+
       this.setActiveFilters(this.filters[option])
       this.$emit('filter-change', this.filters[option])
+      this.updateUrlParams('filter', option)
     },
+
     setSortOption (option) {
+      if (!this.validateSortOption(option)) {
+        return
+      }
+
       this.setActiveSort(this.sorts[option])
       this.$emit('sort-change', this.sorts[option])
+      this.updateUrlParams('sort', option)
+    },
+
+    initializeFilterAndSort () {
+      this.initializeFilter()
+      this.initializeSort()
+    },
+
+    initializeFilter () {
+      const urlFilter = this.$route.query.filter
+      this.setFilterOption(urlFilter || this.filterOption)
+    },
+
+    initializeSort () {
+      const urlSort = this.$route.query.sort
+      this.setSortOption(urlSort || this.sortOption)
+    },
+
+    validateFilterOption (option) {
+      return Object.keys(this.filters).includes(option)
+    },
+
+    validateSortOption (option) {
+      return Object.keys(this.sorts).includes(option)
+    },
+
+    updateUrlParams (param, value) {
+      const query = { ...this.$route.query }
+      query[param] = value
+      this.$router.replace({ query }).catch(navigationErrorHandler)
+    }
+  },
+
+  watch: {
+    '$route.query.filter' (newValue) {
+      this.setFilterOption(newValue || this.filterOption)
+    },
+
+    '$route.query.sort' (newValue) {
+      this.setSortOption(newValue || this.sortOption)
     }
   }
 }

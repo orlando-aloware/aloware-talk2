@@ -13,6 +13,10 @@ export const DEFAULT_STATE = {
     'powerDialer.isSessionRunning',
     'powerDialer.redialed',
     'inbox.inboxShowMyContacts',
-    'inbox.inboxShowUnreads'
+    'inbox.inboxShowUnreads',
+    'TeamInbox.viewMode',
+    'TeamInbox.activeFilters',
+    'TeamInbox.activeSort',
+    'TeamInbox.activeInboxId'
   ]
 }

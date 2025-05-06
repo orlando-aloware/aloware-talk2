@@ -37,10 +37,15 @@
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+import { navigationErrorHandler } from 'src/router/routes'
 
 export default {
   components: {
     InformationCircleIcon
+  },
+
+  mounted () {
+    this.initializeViewModeFilter()
   },
 
   computed: {
@@ -70,8 +75,48 @@ export default {
     ...mapActions('TeamInbox', ['setViewMode']),
 
     onChange (value) {
+      this.updateUrlViewMode(value)
+
+      if (!this.validateViewMode(value)) {
+        return
+      }
+
+      if (value === this.viewMode) {
+        return
+      }
+
       this.setViewMode(value)
       this.$emit('channel', value)
+    },
+
+    validateViewMode (value) {
+      return [THREADED, UNTHREADED].includes(value)
+    },
+
+    parseUrlViewMode (viewMode) {
+      return viewMode === 'Unthreaded' ? UNTHREADED : THREADED
+    },
+
+    initializeViewModeFilter () {
+      // Initialize from URL if available
+      const urlViewMode = this.$route.query.viewMode
+      this.onChange(urlViewMode ? this.parseUrlViewMode(urlViewMode) : this.viewMode)
+    },
+
+    updateUrlViewMode (viewMode) {
+      if (!this.validateViewMode(viewMode)) {
+        return
+      }
+
+      const query = { ...this.$route.query }
+      query.viewMode = viewMode === THREADED ? 'Threaded' : 'Unthreaded'
+      this.$router.replace({ query }).catch(navigationErrorHandler)
+    }
+  },
+
+  watch: {
+    '$route.query.viewMode' (viewMode) {
+      this.onChange(viewMode ? this.parseUrlViewMode(viewMode) : this.viewMode)
     }
   }
 }
