@@ -361,12 +361,10 @@ export default {
     },
 
     onFilterChange (filters) {
-      this.setActiveFilters(filters)
       this.fetchItems(this.activeInboxId, this.search || null, filters, this.activeSort)
     },
 
     onSortChange (sort) {
-      this.setActiveSort(sort)
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, sort)
     },
 

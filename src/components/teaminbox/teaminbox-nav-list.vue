@@ -205,6 +205,12 @@ export default {
 
       // avoid redundant navigation
       if (this.$route.path !== route) {
+        if (force) {
+          // force redirect to the first inbox to prevent the user from navigating back to the Team Inboxes page without any inboxId
+          this.$router.replace(route)
+          return
+        }
+
         this.$router.push(route)
       }
     },
@@ -322,8 +328,12 @@ export default {
       const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
       const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
 
-      if (inboxId) {
-        this.onInboxSelect(inboxId, contactId)
+      if (this.activeInboxId && this.inboxes.find(inbox => inbox.id === this.activeInboxId)) {
+        // Redirect to the last opened inbox to keep persistence
+        this.onInboxSelect(this.activeInboxId, contactId, true)
+      } else if (inboxId) {
+        const forceRedirectToFirstInbox = !this.$route.params.inboxId
+        this.onInboxSelect(inboxId, contactId, forceRedirectToFirstInbox)
       }
     }
 
@@ -339,6 +349,14 @@ export default {
     '$route.params.inboxId' (inboxId) {
       if (!inboxId && this.inboxes.length && !this.isMobile) {
         this.onInboxSelect(this.getFirstInboxId())
+        return
+      }
+
+      const newInboxId = parseInt(inboxId)
+
+      if (!isNaN(newInboxId) && newInboxId !== this.activeInboxId) {
+        // Handle back navigation to a different inbox
+        this.onInboxSelect(newInboxId)
       }
     },
 
