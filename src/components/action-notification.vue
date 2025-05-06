@@ -96,7 +96,7 @@
         </div>
 
         <div class="d-flex justify-content-center align-items-center call-actions"
-             v-if="id === 'incomingCall' || (id === 'callFishing' && dialer && !dialer.call)">
+             v-if="shouldShowCallActions">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -125,7 +125,7 @@
         </div>
         <div class="d-flex justify-content-center align-items-center call-fishing-actions"
              :class="id === 'callFishing' && getSource ? 'mt-2' : ''"
-             v-if="id === 'callFishing' && dialer && dialer.call">
+             v-if="shouldShowFishingActions">
           <q-btn class="height-32 mr-2"
                  ripple
                  round
@@ -174,14 +174,14 @@
             </template>
             <b-dropdown-item href=""
                              link-class="d-flex align-items-center"
-                             @click="answerCommunication(true, false)">
+                             @click="handleAnswerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
                               height="13"
                               color="#9B51E0"/>Park Current Call & Connect
             </b-dropdown-item>
             <b-dropdown-item href=""
-                             @click="answerCommunication(false, true)">
+                             @click="handleAnswerCommunication(false, true)">
               <hangup-icon class="icon-margin" width="13"/>Hangup Current Call & Connect
             </b-dropdown-item>
           </b-dropdown>
@@ -202,8 +202,10 @@ import {
   aclMixin,
   agentMixin,
   userMixin,
-  TeamInboxMixin
+  TeamInboxMixin,
+  liveCallsMixin
 } from 'src/plugins/mixins'
+import * as AgentStatus from '../constants/agent-status'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
 import ParkCallIcon from 'components/icons/park-call-icon'
@@ -222,7 +224,8 @@ export default {
     aclMixin,
     agentMixin,
     userMixin,
-    TeamInboxMixin
+    TeamInboxMixin,
+    liveCallsMixin
   ],
 
   components: {
@@ -252,7 +255,8 @@ export default {
       runningDateTime: null,
       runningDateTimeInterval: null,
       isValidNotification: false,
-      notificationListeners: {}
+      notificationListeners: {},
+      AgentStatus
     }
   },
 
@@ -520,14 +524,6 @@ export default {
       return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_USER
     },
 
-    isCallWaiting () {
-      if (isEmpty(this.communication)) {
-        return false
-      }
-
-      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
-    },
-
     notificationIconClasses () {
       return [
         this.id === 'system' ? 'system-update' : ''
@@ -552,6 +548,18 @@ export default {
 
     notificationQueue () {
       return this.notifications?.[this.id]?.queue
+    },
+
+    isAgentOrDialerOnCall () {
+      return this.dialer.call || this.isAgentOnCall
+    },
+
+    shouldShowCallActions () {
+      return this.id === 'incomingCall' || (this.id === 'callFishing' && this.dialer && !this.isAgentOrDialerOnCall)
+    },
+
+    shouldShowFishingActions () {
+      return this.id === 'callFishing' && this.dialer && this.isAgentOrDialerOnCall
     }
   },
 
@@ -710,7 +718,7 @@ export default {
       }
 
       if (this.id === 'callFishing') {
-        this.answerCommunication()
+        this.handleAnswerCommunication()
         return
       }
 
@@ -724,23 +732,9 @@ export default {
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
-    answerCommunication (shouldPark = false, shouldHangup = false) {
-      const data = {
-        communication: {
-          id: this.communicationId,
-          campaignId: this.campaignId,
-          contactName: this.title,
-          companyName: this.message,
-          contactId: this.contactId,
-          phoneNumber: this.phoneNumber,
-          isCallWaiting: this.isCallWaiting
-        },
-        shouldPark: shouldPark,
-        shouldHangup: shouldHangup
-      }
-      this.$VueEvent.fire('answerCallFishing', data)
+    async handleAnswerCommunication (shouldPark = false, shouldHangup = false) {
+      await this.answerCommunication(shouldPark, shouldHangup)
       this.$closeActionNotification('callFishing')
-      this.setShowPhone(true)
     },
 
     rejectCall () {
