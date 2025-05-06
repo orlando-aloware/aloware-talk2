@@ -374,14 +374,12 @@ export default {
     async fetchCurrentCommunicationIfNeeded (data = {}) {
       // Check if we need to fetch current communication
       const needsCurrentCommunication = !this.dialer.call && this.isAgentOnCall
-      console.log('needsCurrentCommunication', needsCurrentCommunication)
       if (needsCurrentCommunication) {
         try {
           const response = await this.$axios.post('/api/v1/profile/get-live-calls')
           const currentCommunication = response.data.find(call => {
             return call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
           })
-          console.log('Current Communication', currentCommunication)
 
           if (!currentCommunication) {
             console.log('No live calls found for this agent')
