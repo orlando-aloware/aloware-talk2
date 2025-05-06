@@ -90,5 +90,8 @@ export default {
   },
   reset: ({ commit }) => {
     commit('RESET')
+  },
+  setUnreadCountLoaded: ({ commit }, loaded) => {
+    commit('SET_UNREAD_COUNT_LOADED', loaded)
   }
 }

@@ -101,6 +101,9 @@ export default {
   SET_INBOX_ANNOUNCEMENT_VIEWED (state, viewed) {
     state.inboxAnnouncementViewed = viewed
   },
+  SET_UNREAD_COUNT_LOADED (state, loaded) {
+    state.unreadCountLoaded = loaded
+  },
   RESET (state) {
     state.inboxes = []
     state.isLoadingInboxes = false
@@ -116,5 +119,6 @@ export default {
     state.currentSearch = null
     state.isInitialLoad = false
     state.activeInboxContactUnreadCount = 0
+    state.unreadCountLoaded = false
   }
 }

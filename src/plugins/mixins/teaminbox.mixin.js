@@ -17,7 +17,8 @@ export default {
       'currentItemsPage',
       'hasMoreItems',
       'isLoadingMoreItems',
-      'abortController'
+      'abortController',
+      'unreadCountLoaded'
     ])
   },
 
@@ -36,7 +37,8 @@ export default {
       'setIsLoadingMoreItems',
       'setAbortController',
       'setShowRefreshInboxesButton',
-      'setShowRefreshCommunicationsButton'
+      'setShowRefreshCommunicationsButton',
+      'setUnreadCountLoaded'
     ]),
 
     async fetchInboxes (search = '') {
@@ -225,6 +227,7 @@ export default {
         console.error('[fetchInboxesUnreadCount] error', error)
       } finally {
         this.setIsLoadingInboxesUnreadCount(false)
+        this.setUnreadCountLoaded(true)
       }
 
       return data

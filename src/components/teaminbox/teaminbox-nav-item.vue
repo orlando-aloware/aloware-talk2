@@ -13,7 +13,7 @@
            v-if="isLoadingUnreadCount || unreadCount > 0">
         <q-skeleton type="text"
                     width="20px"
-                    v-if="isLoadingUnreadCount && !unreadCountLoaded"/>
+                    v-if="isLoadingUnreadCount"/>
         <q-badge pill
                 variant="danger"
                 rounded
@@ -69,22 +69,8 @@ export default {
     }
   },
 
-  data () {
-    return {
-      unreadCountLoaded: false
-    }
-  },
-
   components: {
     InboxIcon
-  },
-
-  watch: {
-    unreadCount: {
-      handler () {
-        this.unreadCountLoaded = true
-      }
-    }
   }
 }
 </script>
