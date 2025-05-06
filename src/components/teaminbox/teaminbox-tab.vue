@@ -521,6 +521,16 @@ export default {
         // Only auto-load more if this is the initial page load
         if (this.isInitialLoad) {
           this.checkAndLoadMoreIfNeeded()
+
+          if (!this.$route.params.id) {
+            return
+          }
+
+          // If the contact on the route is on the list, fake a click to emit its selection
+          const item = this.itemsData.find(item => item.contact_id === parseInt(this.$route.params.id))
+          if (item) {
+            this.onItemClick(item)
+          }
         }
       }
     }
