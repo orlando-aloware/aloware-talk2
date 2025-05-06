@@ -287,7 +287,7 @@ export default {
       this.setSelectedFilter(filter)
     },
 
-    onResetFilters () {
+    onResetFilters (destroy = false) {
       // this.filter = _.clone(Filters.DEFAULT_STATE.filter)
       sessionStorage.removeItem('date-selected-comms')
 
@@ -327,6 +327,11 @@ export default {
       this.setIsFirstLoad(true)
       this.setAppliedFilter(null)
       this.resetQueryStringFilters()
+
+      if (destroy) {
+        return
+      }
+
       this.$nextTick(() => {
         this.getCommunications(this.communicationFilters)
       })
@@ -381,7 +386,7 @@ export default {
   },
 
   beforeDestroy () {
-    this.onResetFilters()
+    this.onResetFilters(true)
     this.$VueEvent.stop('filter-communications')
     this.$VueEvent.stop('reset-communications-filters')
   }

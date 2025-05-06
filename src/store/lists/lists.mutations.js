@@ -17,5 +17,13 @@ export default {
 
   SET_SEARCH (state, search) {
     state.search = search
+  },
+
+  RESET_LISTS (state) {
+    state.lists = []
+    state.listsCount = 0
+    state.isListsLoading = false
+    state.search = null
+    state.listsImportedFromCsv = []
   }
 }

@@ -84,5 +84,8 @@ export default {
   },
   setInboxAnnouncementViewed: ({ commit }, viewed) => {
     commit('SET_INBOX_ANNOUNCEMENT_VIEWED', viewed)
+  },
+  reset: ({ commit }) => {
+    commit('RESET')
   }
 }
