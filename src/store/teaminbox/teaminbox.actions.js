@@ -36,9 +36,8 @@ export default {
     commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
     commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
   },
-  setViewMode: ({ commit }, { value, storageKey }) => {
+  setViewMode: ({ commit }, value) => {
     commit('SET_VIEW_MODE', value)
-    localStorage.setItem(storageKey, value)
   },
   setItems: ({ commit }, data) => {
     commit('SET_ITEMS', data.data)
@@ -68,13 +67,11 @@ export default {
   setShowRefreshCommunicationsButton: ({ commit }, show) => {
     commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
   },
-  setActiveFilters: ({ commit }, { value, option, storageKey }) => {
+  setActiveFilters: ({ commit }, value) => {
     commit('SET_ACTIVE_FILTERS', value)
-    localStorage.setItem(storageKey, option)
   },
-  setActiveSort: ({ commit }, { value, option, storageKey }) => {
+  setActiveSort: ({ commit }, value) => {
     commit('SET_ACTIVE_SORT', value)
-    localStorage.setItem(storageKey, option)
   },
   setCurrentSearch: ({ commit }, search) => {
     commit('SET_CURRENT_SEARCH', search)

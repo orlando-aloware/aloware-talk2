@@ -57,14 +57,6 @@ export default {
 
   computed: {
     ...mapState('TeamInbox', ['activeFilters', 'activeSort']),
-    ...mapState('auth', ['profile']),
-
-    localStorageCacheKeys () {
-      return {
-        filter: `teaminbox_filter_${this.profile.id}_${this.profile.company_id}`,
-        sort: `teaminbox_sort_${this.profile.id}_${this.profile.company_id}`
-      }
-    },
 
     filterOption () {
       return this.activeFilters && this.activeFilters.unreadonly ? 'Unread' : 'All'
@@ -96,11 +88,7 @@ export default {
         return
       }
 
-      this.setActiveFilters({
-        option,
-        value: this.filters[option],
-        storageKey: this.localStorageCacheKeys.filter
-      })
+      this.setActiveFilters(this.filters[option])
       this.$emit('filter-change', this.filters[option])
       this.updateUrlParams('filter', option)
     },
@@ -110,11 +98,7 @@ export default {
         return
       }
 
-      this.setActiveSort({
-        option,
-        value: this.sorts[option],
-        storageKey: this.localStorageCacheKeys.sort
-      })
+      this.setActiveSort(this.sorts[option])
       this.$emit('sort-change', this.sorts[option])
       this.updateUrlParams('sort', option)
     },
@@ -126,32 +110,12 @@ export default {
 
     initializeFilter () {
       const urlFilter = this.$route.query.filter
-
-      if (urlFilter) {
-        this.setFilterOption(urlFilter)
-        return
-      }
-
-      // If no URL parameter, check localStorage
-      const storedFilter = localStorage.getItem(this.localStorageCacheKeys.filter)
-      if (storedFilter) {
-        this.setFilterOption(storedFilter)
-      }
+      this.setFilterOption(urlFilter || this.filterOption)
     },
 
     initializeSort () {
       const urlSort = this.$route.query.sort
-
-      if (urlSort) {
-        this.setSortOption(urlSort)
-        return
-      }
-
-      // If no URL parameter, check localStorage
-      const storedSort = localStorage.getItem(this.localStorageCacheKeys.sort)
-      if (storedSort) {
-        this.setSortOption(storedSort)
-      }
+      this.setSortOption(urlSort || this.sortOption)
     },
 
     validateFilterOption (option) {
@@ -171,23 +135,11 @@ export default {
 
   watch: {
     '$route.query.filter' (newValue) {
-      if (!newValue) {
-        // if the filter is not set in the URL, use the current filter and update the URL
-        this.updateUrlParams('filter', this.filterOption)
-        return
-      }
-
-      this.setFilterOption(newValue)
+      this.setFilterOption(newValue || this.filterOption)
     },
 
     '$route.query.sort' (newValue) {
-      if (!newValue) {
-        // if the sort is not set in the URL, use the current sort and update the URL
-        this.updateUrlParams('sort', this.sortOption)
-        return
-      }
-
-      this.setSortOption(newValue)
+      this.setSortOption(newValue || this.sortOption)
     }
   }
 }

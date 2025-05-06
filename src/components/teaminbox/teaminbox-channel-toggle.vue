@@ -53,12 +53,6 @@ export default {
       'viewMode'
     ]),
 
-    ...mapState('auth', ['profile']),
-
-    localStorageCacheKey () {
-      return `teaminbox_view_mode_${this.profile.id}_${this.profile.company_id}`
-    },
-
     options () {
       return [
         {
@@ -91,7 +85,7 @@ export default {
         return
       }
 
-      this.setViewMode({ value, storageKey: this.localStorageCacheKey })
+      this.setViewMode(value)
       this.$emit('channel', value)
     },
 
@@ -106,17 +100,7 @@ export default {
     initializeViewModeFilter () {
       // Initialize from URL if available
       const urlViewMode = this.$route.query.viewMode
-      if (urlViewMode) {
-        this.onChange(this.parseUrlViewMode(urlViewMode))
-        return
-      }
-
-      // If no URL parameter, check localStorage
-      const storedViewMode = localStorage.getItem(this.localStorageCacheKey)
-      if (storedViewMode) {
-        const viewMode = parseInt(storedViewMode)
-        this.onChange(viewMode)
-      }
+      this.onChange(urlViewMode ? this.parseUrlViewMode(urlViewMode) : this.viewMode)
     },
 
     updateUrlViewMode (viewMode) {
@@ -132,13 +116,7 @@ export default {
 
   watch: {
     '$route.query.viewMode' (viewMode) {
-      if (!viewMode) {
-        // if the viewMode is not set in the URL, use the current viewMode and update the URL
-        this.updateUrlViewMode(this.viewMode)
-        return
-      }
-
-      this.onChange(this.parseUrlViewMode(viewMode))
+      this.onChange(viewMode ? this.parseUrlViewMode(viewMode) : this.viewMode)
     }
   }
 }
