@@ -61,12 +61,12 @@ export default {
 <style lang="scss" scoped>
 .unread-badge {
   position: absolute;
-  top: -8px;
-  right: -5px;
+  top: -10px;
+  right: -7px;
   font-size: 9px;
   font-weight: 500;
-  height: 20px;
-  width: 20px;
+  height: 21px;
+  width: 21px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -117,6 +117,12 @@ export default {
 
     .q-badge {
       font-size: 9px;
+      width: 27px;
+      height: 27px;
+      border-radius: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 
