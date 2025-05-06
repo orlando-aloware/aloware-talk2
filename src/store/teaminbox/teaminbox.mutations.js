@@ -23,6 +23,23 @@ export default {
   SET_IS_LOADING_INBOXES_UNREAD_COUNT (state, loading) {
     state.isLoadingInboxesUnreadCount = loading
   },
+  SET_INBOXES_UNREAD_COUNT_SINGLE (state, data) {
+    const index = state.inboxesUnreadCount.findIndex((inbox) => inbox.ring_group_id === data.ring_group_id)
+
+    console.log('setInboxesUnreadCountSingle', index, data)
+
+    if (index !== -1) {
+      state.inboxesUnreadCount[index] = {
+        ring_group_id: data.ring_group_id,
+        unread_count: data.unread_count
+      }
+    } else {
+      state.inboxesUnreadCount.push({
+        ring_group_id: data.ring_group_id,
+        unread_count: data.unread_count
+      })
+    }
+  },
   SET_CURRENT_INBOXES_PAGE (state, page) {
     state.currentInboxesPage = page
   },

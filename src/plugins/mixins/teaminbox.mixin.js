@@ -26,6 +26,7 @@ export default {
       'setInboxes',
       'setIsLoadingInboxes',
       'setInboxesUnreadCount',
+      'setInboxesUnreadCountSingle',
       'setIsLoadingInboxesUnreadCount',
       'appendInboxes',
       'setItems',
@@ -207,65 +208,30 @@ export default {
       return this.inboxes.some(inbox => inbox.id === inboxId)
     },
 
-    async fetchInboxesUnreadCount (inboxIds) {
+    async fetchInboxesUnreadCount (inboxIds, contactIds = null) {
+      let data = []
+
       this.setIsLoadingInboxesUnreadCount(true)
       try {
-        const { data } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds)
-        this.setInboxesUnreadCount(data)
+        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds)
+        data = newData
+
+        if (contactIds && data.length === 1) {
+          this.setInboxesUnreadCountSingle(data[0])
+        } else {
+          this.setInboxesUnreadCount(data)
+        }
       } catch (error) {
-        this.setInboxesUnreadCount([])
         console.error('[fetchInboxesUnreadCount] error', error)
+      } finally {
+        this.setIsLoadingInboxesUnreadCount(false)
       }
-      this.setIsLoadingInboxesUnreadCount(false)
+
+      return data
     },
 
     getInboxUnreadCount (inboxId) {
       return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
-    },
-
-    einboxCommunicationMarkedAllAsRead (inboxId, count) {
-      this.setInboxesUnreadCount([...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId) {
-          inbox.unread_count -= count
-
-          if (inbox.unread_count < 0) {
-            inbox.unread_count = 0
-          }
-        }
-
-        return inbox
-      })])
-    },
-
-    einboxCommunicationMarkedAsRead (inboxId) {
-      this.setInboxesUnreadCount([...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId) {
-          inbox.unread_count--
-        }
-
-        return inbox
-      })])
-    },
-
-    einboxCommunicationMarkedAsUnread (inboxId) {
-      // increment unread count for inbox/contact
-      const newValue = [...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId) {
-          inbox.unread_count++
-        }
-
-        return inbox
-      })]
-
-      // if inbox is not found, add it since we have the inboxId
-      if (!newValue.find((inbox) => inbox.ring_group_id === inboxId)) {
-        newValue.push({
-          ring_group_id: inboxId,
-          unread_count: 1
-        })
-      }
-
-      this.setInboxesUnreadCount(newValue)
     }
   }
 }

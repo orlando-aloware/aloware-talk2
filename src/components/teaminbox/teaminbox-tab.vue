@@ -234,11 +234,8 @@ export default {
       const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
       const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
 
-      communication.inbox_unread_count = await this.getUnreadCount(this.activeInboxId, communication.contact_id)
-
       // New communication (not in the list)
       if (index === -1) {
-        console.log('handleThreadedCommunication - new communication', communication)
         // For new communications, add them at appropriate position based on sort order
         if (isAscendingOrder && !isLiveCall(communication)) {
           this.itemsData.push(communication) // Add to end for ascending order
@@ -290,14 +287,15 @@ export default {
         return
       }
 
+      // fetch unread count for the active inbox (from the backend)
+      const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
+      communication.inbox_unread_count = unreadCount[0] && unreadCount[0].ring_group_id === this.activeInboxId && unreadCount[0]['unread_contact_' + communication.contact_id] ? unreadCount[0]['unread_contact_' + communication.contact_id] : 0
+
       if (this.viewMode === UNTHREADED) {
         await this.handleUnthreadedCommunication(communication)
       } else {
         await this.handleThreadedCommunication(communication, isNew)
       }
-
-      // fetch unread count for the active inbox (from the backend)
-      this.fetchInboxesUnreadCount([this.activeInboxId])
 
       if (!this.activeId) {
         return

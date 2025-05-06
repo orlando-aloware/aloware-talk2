@@ -307,18 +307,6 @@ export default {
       if (this.activeInboxId) {
         await this.onInboxSelect(this.activeInboxId, null, true)
       }
-    },
-
-    einboxCommunicationMarkedAllAsReadListener ({ inboxId, count }) {
-      this.einboxCommunicationMarkedAllAsRead(inboxId, count)
-    },
-
-    einboxCommunicationMarkedAsReadListener ({ inboxId }) {
-      this.einboxCommunicationMarkedAsRead(inboxId)
-    },
-
-    einboxCommunicationMarkedAsUnreadListener ({ inboxId }) {
-      this.einboxCommunicationMarkedAsUnread(inboxId)
     }
   },
 
