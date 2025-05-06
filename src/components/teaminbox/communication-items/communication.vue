@@ -5,7 +5,9 @@
               height="34"
               :color-module-id="contactId"
               :name="contactName || defaultEmptyName">
-        <unread-counter :unread-properties="unreadProperties" />
+        <unread-counter
+              :unread-properties="unreadProperties"
+              :view-mode="viewMode" />
       </avatar>
     </div>
 
@@ -146,6 +148,11 @@ export default {
     isLiveCall: {
       type: Boolean,
       default: false
+    },
+
+    viewMode: {
+      type: Number,
+      required: true
     }
   }
 }

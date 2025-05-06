@@ -7,7 +7,8 @@
              :key="totalUnreads"
              v-if="totalUnreads > 0">
       <span>
-        <template v-if="totalUnreads <= 99">{{ totalUnreads }}</template>
+        <template v-if="viewMode === UNTHREADED && totalUnreads <= 1">&nbsp;</template>
+        <template v-else-if="totalUnreads <= 99">{{ totalUnreads }}</template>
         <template v-else>99<sup>+</sup></template>
       </span>
     </b-badge>
@@ -15,7 +16,7 @@
 </template>
 
 <script>
-import { THREADED } from 'src/store/teaminbox/teaminbox.store'
+import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapState } from 'vuex'
 
 export default {
@@ -23,11 +24,16 @@ export default {
     unreadProperties: {
       type: Object,
       required: false
+    },
+    viewMode: {
+      type: Number,
+      required: true
     }
   },
 
   data: () => ({
     THREADED,
+    UNTHREADED,
     isIncreasing: true
   }),
 
