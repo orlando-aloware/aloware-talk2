@@ -37,7 +37,7 @@ export default {
     }
   },
   mounted () {
-    if (!this.hasPermissionTo('access contacts')) this.$router.push({ path: '/' })
+    if (!this.hasPermissionTo('access contacts')) this.$router.replace({ path: '/' })
   }
 }
 </script>
