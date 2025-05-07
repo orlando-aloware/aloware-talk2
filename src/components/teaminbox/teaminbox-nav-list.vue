@@ -166,6 +166,32 @@ export default {
       'setInboxes'
     ]),
 
+    findInboxById (id) {
+      return this.inboxes.find(inbox => inbox.id === id)
+    },
+
+    determineInboxToSelect () {
+      const defaultInboxId = this.getFirstInboxId()
+      const urlInboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId, 10) : null
+      const urlContactId = this.$route.params.id ? parseInt(this.$route.params.id, 10) : null
+
+      // Check if URL has inbox ID and inbox exists
+      if (urlInboxId && this.findInboxById(urlInboxId)) {
+        return { id: urlInboxId, contactId: urlContactId, force: true }
+      }
+
+      // Default to first inbox
+      if (defaultInboxId) {
+        return {
+          id: defaultInboxId,
+          contactId: urlContactId,
+          force: !urlInboxId // Only force redirect if no inbox ID in URL
+        }
+      }
+
+      return null
+    },
+
     onScroll ({ target }) {
       const bottomThreshold = 20
 
@@ -329,15 +355,14 @@ export default {
     this.finishedInitialLoad = true
 
     if (this.inboxes.length) {
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
-      const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
+      const inboxToSelect = this.determineInboxToSelect()
 
-      if (this.activeInboxId && this.inboxes.find(inbox => inbox.id === this.activeInboxId)) {
-        // Redirect to the last opened inbox to keep persistence
-        this.onInboxSelect(this.activeInboxId, contactId, true)
-      } else if (inboxId) {
-        const forceRedirectToFirstInbox = !this.$route.params.inboxId
-        this.onInboxSelect(inboxId, contactId, forceRedirectToFirstInbox)
+      if (inboxToSelect) {
+        this.onInboxSelect(
+          inboxToSelect.id,
+          inboxToSelect.contactId,
+          inboxToSelect.force
+        )
       }
     }
 
