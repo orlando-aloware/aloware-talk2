@@ -120,5 +120,8 @@ export default {
     state.isInitialLoad = false
     state.activeInboxContactUnreadCount = 0
     state.unreadCountLoaded = false
+    state.viewMode = THREADED
+    state.activeFilters = {}
+    state.activeSort = {}
   }
 }
