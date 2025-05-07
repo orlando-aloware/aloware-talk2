@@ -285,7 +285,10 @@ export default {
     async processCommunicationInActiveInbox (communication, isNew = false) {
       // fetch unread count for the active inbox (from the backend)
       const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
-      communication.inbox_unread_count = unreadCount[0] && unreadCount[0].ring_group_id === this.activeInboxId && unreadCount[0]['unread_contact_' + communication.contact_id] ? unreadCount[0]['unread_contact_' + communication.contact_id] : 0
+      const unreadCountData = unreadCount[0]
+      const isInActiveInbox = unreadCountData && unreadCountData.ring_group_id === this.activeInboxId
+      const unreadCountForContact = isInActiveInbox ? unreadCountData['unread_contact_' + communication.contact_id] : 0
+      communication.inbox_unread_count = unreadCountForContact || 0
 
       if (this.viewMode === UNTHREADED) {
         await this.handleUnthreadedCommunication(communication)
