@@ -8,11 +8,12 @@
 import Card from 'components/card.vue'
 import ContactsPinned from './contacts-pinned.vue'
 import { mapState } from 'vuex'
-import { userMixin } from 'src/plugins/mixins'
+import { aclMixin, userMixin } from 'src/plugins/mixins'
 
 export default {
   mixins: [
-    userMixin
+    userMixin,
+    aclMixin
   ],
   components: {
     Card,
@@ -34,6 +35,9 @@ export default {
       },
       deep: true
     }
+  },
+  mounted () {
+    if (!this.hasPermissionTo('access contacts')) this.$router.push({ path: '/' })
   }
 }
 </script>
