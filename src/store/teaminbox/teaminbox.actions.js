@@ -25,6 +25,9 @@ export default {
   setInboxesUnreadCount: ({ commit }, data) => {
     commit('SET_INBOXES_UNREAD_COUNT', data)
   },
+  setInboxesUnreadCountSingle: ({ commit }, data) => {
+    commit('SET_INBOXES_UNREAD_COUNT_SINGLE', data)
+  },
   setIsLoadingInboxesUnreadCount: ({ commit }, loading) => {
     commit('SET_IS_LOADING_INBOXES_UNREAD_COUNT', loading)
   },
@@ -84,5 +87,11 @@ export default {
   },
   setInboxAnnouncementViewed: ({ commit }, viewed) => {
     commit('SET_INBOX_ANNOUNCEMENT_VIEWED', viewed)
+  },
+  reset: ({ commit }) => {
+    commit('RESET')
+  },
+  setUnreadCountLoaded: ({ commit }, loaded) => {
+    commit('SET_UNREAD_COUNT_LOADED', loaded)
   }
 }

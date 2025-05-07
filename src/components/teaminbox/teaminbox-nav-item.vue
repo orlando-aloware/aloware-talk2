@@ -1,5 +1,6 @@
 <template>
   <div data-testid="teaminbox-nav-item"
+       :id="`teaminbox-nav-item-${_uid}`"
        :class="['teaminbox-nav-item', { 'teaminbox-nav-item--active': isActive }]"
        @click="$emit('click', value)">
     <div class="teaminbox-nav-item__content d-flex align-items-center">
@@ -8,21 +9,32 @@
                     height="18" />
       </span>
       <span class="teaminbox-nav-item__label" :id="`teaminbox-nav-item-label-${_uid}`">{{ label }}</span>
-      <b-tooltip custom-class="talk-table__tooltip"
-        :target="`teaminbox-nav-item-label-${_uid}`"
-        :delay="500">
-        {{ label }}
-      </b-tooltip>
       <div class="teaminbox-nav-item__unread-count-container"
            v-if="isLoadingUnreadCount || unreadCount > 0">
         <q-skeleton type="text"
                     width="20px"
                     v-if="isLoadingUnreadCount"/>
-        <q-badge variant="primary"
+        <q-badge pill
+                variant="danger"
+                rounded
+                v-else-if="unreadCount < 99">
+          {{ unreadCount }}
+        </q-badge>
+        <q-badge pill
+                 variant="danger"
                  rounded
-                 v-else>{{ unreadCount }}</q-badge>
+                 v-else>
+          99<sup>+</sup>
+        </q-badge>
       </div>
     </div>
+    <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+        placement="right"
+        :target="`teaminbox-nav-item-${_uid}`"
+        boundary="window"
+        :delay="500">
+        {{ label }} - {{ unreadCount }} unread communications
+    </b-tooltip>
   </div>
 </template>
 
@@ -99,9 +111,18 @@ export default {
     right: 8px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
 
     .q-badge {
       font-size: 9px;
+      width: 27px;
+      height: 27px;
+      border-radius: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
   }
 

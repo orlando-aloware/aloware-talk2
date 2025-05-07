@@ -3,19 +3,30 @@
               :name="isIncreasing ? 'slide-vertical' : 'slide-vertical-reverse'">
     <b-badge pill
              class="unread-badge"
+             :class="unreadClass"
+             :id="`unread-counter-${_uid}`"
              variant="danger"
              :key="totalUnreads"
              v-if="totalUnreads > 0">
       <span>
-        <template v-if="totalUnreads <= 99">{{ totalUnreads }}</template>
+        <template v-if="viewMode === UNTHREADED && totalUnreads <= 1">&nbsp;</template>
+        <template v-else-if="totalUnreads <= 99">{{ totalUnreads }}</template>
         <template v-else>99<sup>+</sup></template>
       </span>
+      <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+        placement="left"
+        boundary="window"
+        :target="`unread-counter-${_uid}`"
+        :delay="500"
+        v-if="totalUnreads > 99">
+        {{ totalUnreads }} unread communications
+      </b-tooltip>
     </b-badge>
   </transition>
 </template>
 
 <script>
-import { THREADED } from 'src/store/teaminbox/teaminbox.store'
+import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapState } from 'vuex'
 
 export default {
@@ -28,6 +39,7 @@ export default {
 
   data: () => ({
     THREADED,
+    UNTHREADED,
     isIncreasing: true
   }),
 
@@ -38,6 +50,12 @@ export default {
 
     totalUnreads () {
       return this.unreadProperties?.unread_count || 0
+    },
+
+    unreadClass () {
+      return this.viewMode === UNTHREADED && this.totalUnreads <= 1
+        ? 'unread-badge--unthreaded'
+        : ''
     }
   },
 
@@ -52,24 +70,24 @@ export default {
 <style lang="scss" scoped>
 .unread-badge {
   position: absolute;
-  top: -8px;
-  right: -5px;
+  top: -10px;
+  right: -7px;
   font-size: 9px;
   font-weight: 500;
-  height: 18px;
-  width: 18px;
+  height: 21px;
+  width: 21px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   transition: all 0.3s ease-out;
 
-  &.unthreaded {
-    height: 8px;
-    width: 8px;
+  &--unthreaded {
+    height: 13px;
+    width: 13px;
     padding: 0;
-    top: 0px;
-    right: 0px;
+    top: -3px;
+    right: -3px;
   }
 }
 

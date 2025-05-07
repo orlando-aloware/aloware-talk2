@@ -671,7 +671,7 @@ import {
 } from 'src/router/routes'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
 
-const TEAMINBOX_TOOLTIP_TEXT = 'Team Inboxes is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
+const TEAMINBOX_TOOLTIP_TEXT = 'Team Inboxes is a centralized workspace where Ring Groups allow multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
 
 export default {
   name: 'app-sidebar',
