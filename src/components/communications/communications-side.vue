@@ -134,7 +134,7 @@ export default {
   },
 
   mounted () {
-    if (!this.hasPermissionTo('access communications logs')) this.$router.replace({ path: '/' })
+    if (!this.hasPermissionTo('access communications logs')) this.$router.push({ path: '/' })
 
     if (this.isInboxTaskOpened && this.$q.screen.lt.md) {
       this.setShowContactsHeader(false)
