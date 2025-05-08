@@ -1064,7 +1064,7 @@ export default {
               console.log('Successfully dropped other agents from call')
               // Change agent status from SENTRY to ON_CALL after successful takeover
               if (this.agentStatus === this.AgentStatus.AGENT_STATUS_SENTRY) {
-                this.changeAgentStatus(this.AgentStatus.AGENT_STATUS_ON_CALL, false, 1, 'Talk-DropAloAiAgent')
+                this.changeAgentStatus(this.AgentStatus.AGENT_STATUS_ACCEPTING_CALLS, false, 1, 'Talk-DropAloAiAgent')
               }
             })
             .catch(err => {
