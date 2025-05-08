@@ -1,6 +1,6 @@
 <template>
-  <q-item :clickable="dialer && dialer.parkedCall && !dialer.call"
-          :disabled="dialer.call"
+  <q-item :clickable="canUnparkCall"
+          :disabled="dialer.call || isAgentOnCall"
           v-if="dialer && dialer.parkedCall"
           class="mr-3 pl-2 pr-2 parked-call cursor-pointer no-select"
           v-ripple
@@ -33,9 +33,14 @@
 
 <script>
 import { mapState } from 'vuex'
+import { agentMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'parked-call',
+
+  mixins: [
+    agentMixin
+  ],
 
   computed: {
     ...mapState(['dialer']),
@@ -46,6 +51,10 @@ export default {
       }
 
       return 'Unpark Call'
+    },
+
+    canUnparkCall () {
+      return this.dialer?.parkedCall && !(this.dialer.call || this.isAgentOnCall)
     }
   },
 

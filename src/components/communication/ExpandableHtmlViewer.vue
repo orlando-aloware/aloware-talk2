@@ -50,7 +50,24 @@ export default {
     getTruncatedContent () {
       const truncated = this.sanitizedContent.slice(0, this.truncateLength)
       this.isTruncated = this.sanitizedContent.length > this.truncateLength
+      this.$emit('update:expandable', this.isTruncated)
       return this.isTruncated ? truncated + '...' : truncated
+    }
+  },
+  mounted () {
+    // Emit initial value on mount
+    this.$nextTick(() => {
+      const isExpandable = this.sanitizedContent.length > this.truncateLength
+      this.$emit('update:expandable', isExpandable)
+    })
+  },
+  watch: {
+    content () {
+      // Re-emit when content changes
+      this.$nextTick(() => {
+        const isExpandable = this.sanitizedContent.length > this.truncateLength
+        this.$emit('update:expandable', isExpandable)
+      })
     }
   }
 }

@@ -748,13 +748,16 @@
         <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
           <div class="summary-container">
-            <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+            <ExpandableHtmlViewer
+              :content="parseMarkdown(communication.call_summary)"
+              @update:expandable="isContentExpandable = $event"/>
             <q-btn flat
                    dense
                    class="regenerate-btn"
-                   @click="onRegenerateSummary"
+                   :class="{ 'non-expandable': !isContentExpandable }"
                    :loading="isRegenerating"
-                   :disable="isRegenerating">
+                   :disable="isRegenerating"
+                   @click="onRegenerateSummary">
               <sparkle-icon width="14"
                            height="14"
                            color="#9333EA"
@@ -1008,7 +1011,8 @@ export default {
       CommunicationCallbackStatus,
       TranscriptionStatus,
       SummaryStatus,
-      TagCategories
+      TagCategories,
+      isContentExpandable: false
     }
   },
 
@@ -1330,6 +1334,10 @@ export default {
   margin: 0;
   transition: all 0.2s ease;
   border-radius: 4px;
+}
+
+.regenerate-btn.non-expandable {
+  margin-bottom: -18px;
 }
 
 .regenerate-btn:hover {
