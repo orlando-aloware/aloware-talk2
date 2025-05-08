@@ -136,7 +136,6 @@
     </q-btn>
 
     <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
-           v-if="hasCommunicationsPermission"
            :ripple="false"
            icon="img:app-icons/menu/communications_active.svg"
            align="left"
@@ -157,7 +156,6 @@
       </span>
     </q-btn>
     <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
-           v-if="hasCommunicationsPermission"
            :ripple="false"
            icon="img:app-icons/menu/communications_gray.svg"
            align="left"
@@ -179,7 +177,6 @@
     </q-btn>
 
     <q-btn :to="{ name: 'Contacts' }"
-           v-if="hasContactsPermission"
            :ripple="false"
            icon="img:app-icons/menu/contacts_active.svg"
            align="left"
@@ -202,7 +199,6 @@
       </span>
     </q-btn>
     <q-btn :to="{ name: 'Contacts' }"
-           v-if="hasContactsPermission"
            :ripple="false"
            icon="img:app-icons/menu/contacts_gray.svg"
            align="left"
@@ -710,14 +706,6 @@ export default {
     ...mapState(['statics', 'staticsLoaded']),
 
     ...mapState('cache', ['currentCompany']),
-
-    hasCommunicationsPermission () {
-      return this.hasPermissionTo('access communications logs')
-    },
-
-    hasContactsPermission () {
-      return this.hasPermissionTo('access contacts')
-    },
 
     isProd () {
       return storage.local.getItem('env') === 'production'

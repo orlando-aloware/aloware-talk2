@@ -95,20 +95,6 @@ const SettingsMap = {
     hash_keyword: 'can-barge-and-whisper-on-a-call',
     visible: true
   },
-  'can_access_communications_logs': {
-    title: 'Allow Access Communications Logs',
-    description: 'If user is allowed to access communications logs.',
-    route: '/settings/profile',
-    hash_keyword: 'can-access-communications-logs',
-    visible: true
-  },
-  'can_access_contacts': {
-    title: 'Allow Access Contacts',
-    description: 'If user is allowed to access contacts.',
-    route: '/settings/profile',
-    hash_keyword: 'can-access-contacts',
-    visible: true
-  },
   'campaign_id': {
     title: 'Personal Line',
     description: 'User\'s personal line',

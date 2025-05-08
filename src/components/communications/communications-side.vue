@@ -50,12 +50,9 @@ import BackButton from 'components/back-button'
 import Profile from 'components/profile'
 import { DEFAULT_COMMUNICATIONS_CHANNEL, DEFAULT_COMMUNICATIONS_ROUTE_NAME } from 'src/router/routes'
 import CommunicationLogsTable from './communications-table/communication-logs-table.vue'
-import { aclMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'communications-side',
-
-  mixins: [aclMixin],
 
   components: {
     BackButton,
@@ -134,8 +131,6 @@ export default {
   },
 
   mounted () {
-    if (!this.hasPermissionTo('access communications logs')) this.$router.replace({ path: '/' })
-
     if (this.isInboxTaskOpened && this.$q.screen.lt.md) {
       this.setShowContactsHeader(false)
     }
