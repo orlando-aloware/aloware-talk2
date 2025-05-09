@@ -238,21 +238,34 @@ export default {
       if (index === -1) {
         // For new communications, add them at appropriate position based on sort order
         if (isAscendingOrder && !isLiveCall(communication)) {
-          this.itemsData.push(communication) // Add to end for ascending order
+          // Add to end for ascending order
+          this.itemsData.push(communication)
         } else {
-          this.itemsData.unshift(communication) // Add to beginning for descending order or live calls
+          // Add to beginning for descending order or live calls
+          this.itemsData.unshift(communication)
         }
 
+        this.sortItems()
+
         return
       }
 
-      // Existing communication logic below (in the list)
-      // Ignore live calls in threaded mode
-      if (isLiveCall(this.itemsData[index])) {
-        return
+      // Update the communication in the list, by removing it first, then adding it back in the same position
+      this.itemsData.splice(index, 1)
+      this.itemsData.splice(index, 0, communication)
+
+      if (isNew) {
+        // Remove the communication from the list
+        this.itemsData.splice(index, 1)
+
+        if (isAscendingOrder) {
+          this.itemsData.push(communication)
+        } else {
+          this.itemsData.unshift(communication)
+        }
       }
 
-      this.itemsData.splice(index, 1, communication)
+      this.sortItems()
     },
 
     sortItems () {
@@ -318,6 +331,17 @@ export default {
     },
 
     async processCommunication (communication, isNew = false) {
+      const dateRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/
+      const dateMatch = communication.created_at.match(dateRegex)
+
+      if (dateMatch) {
+        // Convert the date to a proper UTC date
+        communication.created_at = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3] + 'T' + dateMatch[4] + ':' + dateMatch[5] + ':' + dateMatch[6] + '.000Z'
+      } else if (!dateMatch && isNew) {
+        // Use the current date and time if the date is not properly formatted (fallback)
+        communication.created_at = new Date().toISOString()
+      }
+
       // If the communication is in the active inbox, process it
       if (communication.ring_group_id === this.activeInboxId) {
         await this.processCommunicationInActiveInbox(communication, isNew)
