@@ -355,7 +355,7 @@ export default {
       }
 
       // If the communication has a ring group id and user has access to that team inbox
-      if (this.ringGroupId && this.ringGroupId !== '' && this.checkInboxAccess(this.ringGroupId)) {
+      if (this.ringGroupId && this.ringGroupId !== '' && this.checkInboxAccessFromOutside(this.ringGroupId)) {
         return {
           path: `/team-inboxes/${this.ringGroupId}/contacts/${this.contactId}/communications`
         }

@@ -216,3 +216,16 @@ export function getTopLevelDomain () {
 
   return '.' + hostParts.slice(1).join('.')
 }
+
+/**
+ * Converts a query object to a query string
+ * @param {Object} query
+ * @returns {string}
+ */
+export const getQueryString = (query) => {
+  if (!query) {
+    return ''
+  }
+
+  return `?${Object.entries(query).map(([key, value]) => `${key}=${value}`).join('&')}`
+}
