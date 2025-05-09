@@ -1,4 +1,4 @@
-import { THREADED } from 'src/store/teaminbox/teaminbox.store'
+import { THREADED, SEARCH_FIELDS } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
@@ -183,7 +183,7 @@ export default {
           ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : { inbox_type: 'unthreaded' }),
           ...(search ? {
             search_text: search,
-            search_fields: ['lead_number', 'contact.name', 'campaign.name']
+            search_fields: SEARCH_FIELDS
           } : {}),
           ...apiFilters
         },
