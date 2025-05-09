@@ -21,13 +21,8 @@
       </q-card-section>
       <q-card-section v-else data-testid="ring-group-snapshot-card-section">
         <div class="text-center text-md _400">
-          <p v-if="communication.disposition_status2 === DISPOSITION_STATUS_ABANDONED_NEW"
-             class="mb-0">
-            Abandoned calls don't have a ring group snapshot.
-          </p>
-          <p v-else
-             class="mb-0">
-            {{ !ringGroup ? 'This call does not have a ring group.' : 'This feature is not yet available on your account.' }}
+          <p class="mb-0">
+            {{ snapshotDescription }}
           </p>
         </div>
       </q-card-section>
@@ -41,6 +36,7 @@ import * as RingGroupDialMode from '../constants/ring-group-dial-modes'
 import * as AgentStatusLabels from '../constants/agent-status-labels'
 import RingGroupRoutingTable from 'components/ring-group-routing-table'
 import { DISPOSITION_STATUS_ABANDONED_NEW } from 'src/constants/communication-disposition-status'
+import { INBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
 
 export default {
@@ -104,9 +100,33 @@ export default {
 
   computed: {
     showRingGroupSnapShot () {
-      return this.communication.metadata &&
-        this.communication.metadata.ring_group_snapshot &&
-        this.ringGroup
+      return this.ringGroup &&
+        this.isInboundCall &&
+        this.hasRingGroupSnapshot
+    },
+
+    isInboundCall () {
+      return this.communication.direction === INBOUND
+    },
+
+    hasRingGroupSnapshot () {
+      return this.communication.metadata?.ring_group_snapshot
+    },
+
+    snapshotDescription () {
+      if (!this.ringGroup) {
+        return 'This call does not have a ring group.'
+      }
+
+      if (!this.isInboundCall) {
+        return 'Outbound calls don\'t have a ring group snapshot.'
+      }
+
+      if (this.communication.disposition_status2 === DISPOSITION_STATUS_ABANDONED_NEW) {
+        return 'Abandoned calls don\'t have a ring group snapshot.'
+      }
+
+      return 'This feature is not yet available on your account.'
     }
   },
 
