@@ -1,14 +1,10 @@
 <template>
   <div class="memory-monitor" :hidden="!visible">
-    <q-icon
-      name="memory"
-      :color="memoryColor"
-      size="32px"
-      class="cursor-pointer"
-    >
+    <q-icon name="memory" :color="memoryColor" size="32px" class="cursor-pointer">
       <q-tooltip>
         <div class="text-subtitle2">Memory Usage: {{ formatMB(currentMemory) }}MB</div>
-        <div v-if="memoryThreshold" class="text-caption">Threshold: {{ formatMB(memoryThreshold * 1024 * 1024) }}MB</div>
+        <div v-if="memoryThreshold" class="text-caption">Threshold: {{ formatMB(memoryThreshold * 1024 * 1024) }}MB
+        </div>
         <div v-if="detailedMemory" class="text-caption q-mt-sm">
           <div>JS Heap: {{ formatMB(detailedMemory.jsHeapSize) }}MB</div>
           <div>DOM: {{ formatMB(detailedMemory.domSize) }}MB</div>
@@ -35,7 +31,9 @@ export default {
       thresholdExceeded: false,
       supportsDetailedMemory: false,
       memoryThresholdExceededCacheArray: [],
-      cacheTimeout: null
+      cacheTimeout: null,
+      memoryMonitorEvents: [],
+      eventsCacheTimeout: null
     }
   },
 
@@ -135,7 +133,7 @@ export default {
     },
 
     handleMemoryThresholdExceeded () {
-      const extra = {
+      const data = {
         currentMemory: this.currentMemory,
         heapLimit: this.heapLimit,
         memoryPercentage: this.memoryPercentage,
@@ -144,6 +142,11 @@ export default {
       }
       // send the extra to Sentry if it's not already cached
       if (!this.memoryThresholdExceededCacheArray.some(cache => cache.url === window.location.href)) {
+        // merge the events with the data
+        const extra = {
+          ...data,
+          events: this.memoryMonitorEvents
+        }
         window.Sentry.captureMessage('Memory threshold exceeded', {
           level: 'warning',
           extra
@@ -151,8 +154,8 @@ export default {
       }
       // cache the extra for 30 seconds and send it to Sentry if it's not already cached
       if (!this.memoryThresholdExceededCacheArray.some(cache => cache.url === window.location.href)) {
-        console.log('Memory threshold exceeded', extra)
-        this.memoryThresholdExceededCacheArray.push(extra)
+        console.log('Memory threshold exceeded', data)
+        this.memoryThresholdExceededCacheArray.push(data)
         this.cacheTimeout = setTimeout(() => {
           this.removeCache(window.location.href)
         }, 30000)
@@ -161,6 +164,19 @@ export default {
 
     removeCache (url) {
       this.memoryThresholdExceededCacheArray = this.memoryThresholdExceededCacheArray.filter(cache => cache.url !== url)
+    },
+
+    removeOldEvents () {
+      this.memoryMonitorEvents = this.memoryMonitorEvents.filter(event => event.timestamp > Date.now() - 120000)
+      this.eventsCacheTimeout = setTimeout(() => {
+        this.removeOldEvents()
+      }, 1000)
+    },
+
+    listenToLiveEvents () {
+      this.$VueEvent.listen('memory_monitor', ({ event, payload }) => {
+        this.memoryMonitorEvents.push({ event, payload, timestamp: Date.now() })
+      })
     }
   },
 
@@ -178,6 +194,8 @@ export default {
     this.checkDetailedMemorySupport()
     if (this.monitoringEnabled) {
       this.startMonitoring()
+      this.listenToLiveEvents()
+      this.removeOldEvents()
     }
   },
 
@@ -186,6 +204,10 @@ export default {
     if (this.cacheTimeout) {
       clearTimeout(this.cacheTimeout)
     }
+    if (this.eventsCacheTimeout) {
+      clearTimeout(this.eventsCacheTimeout)
+    }
+    this.$VueEvent.stop('memory_monitor')
   }
 }
 </script>
