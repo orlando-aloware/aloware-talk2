@@ -199,31 +199,98 @@ export default {
     },
 
     handleUnthreadedCommunication (communication) {
-      const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
+      const isAscendingOrder = this.activeSort?.order === 'asc'
 
-      const found = this.itemsData.find(c => c.id === communication.id)
-      if (!found) {
-        // For new communications, add them at appropriate position based on sort order
-        if (isAscendingOrder && !isLiveCall(communication)) {
-          this.itemsData.push(communication) // Add to end for ascending order
-        } else {
-          this.itemsData.unshift(communication) // Add to beginning for descending order or live calls
-        }
-      } else {
-        const index = this.itemsData.findIndex(c => c.id === communication.id)
-        if (index > -1) {
-          // If the is_read property is changed, adjust the unread counts
-          if (this.itemsData[index]?.is_read !== communication.is_read) {
-            // let unreadCount = this.itemsData[index]?.inbox_unread_count || 0
-            if (this.itemsData[index]?.repeats > 0) {
-              communication.repeats = this.itemsData[index]?.repeats
-              communication.unread_repeats = this.itemsData[index].unread_repeats + (communication.is_read ? -1 : 1)
-            }
+      // Find if we have a group for this communication
+      const groupKey = this.getGroupKey(communication)
+      const existingGroup = this.itemsData.find(item => this.getGroupKey(item) === groupKey)
+
+      // Special handling for calls
+      if (communication.type === CommunicationTypes.CALL_TYPE) {
+        // If this is a live call, it should be shown separately
+        if (isLiveCall(communication)) {
+          // Remove any existing non-live call from the same group
+          const existingIndex = this.itemsData.findIndex(item =>
+            this.getGroupKey(item) === groupKey && !isLiveCall(item)
+          )
+          if (existingIndex > -1) {
+            this.itemsData.splice(existingIndex, 1)
           }
 
-          this.itemsData.splice(index, 1, communication)
+          // Add the live call at the beginning
+          this.itemsData.unshift(communication)
+          this.sortItems()
+          return
+        }
+
+        // If this is a non-live call, check if we have a live call from the same group
+        const liveCallIndex = this.itemsData.findIndex(item =>
+          this.getGroupKey(item) === groupKey && isLiveCall(item)
+        )
+
+        if (liveCallIndex > -1) {
+          // If we have a live call, update it with the completed call info
+          const liveCall = this.itemsData[liveCallIndex]
+          communication.repeats = (liveCall.repeats || 0) + 1
+          communication.unread_repeats = (liveCall.unread_repeats || 0) + (!communication.is_read ? 1 : 0)
+          this.itemsData.splice(liveCallIndex, 1, communication)
+          this.sortItems()
+          return
+        }
+
+        // If this is a non-live call and we don't have a live call, check for existing completed calls
+        const completedCallIndex = this.itemsData.findIndex(item =>
+          this.getGroupKey(item) === groupKey && !isLiveCall(item)
+        )
+
+        if (completedCallIndex > -1) {
+          // Update the existing completed call with incremented repeats
+          const existingCall = this.itemsData[completedCallIndex]
+          communication.repeats = (existingCall.repeats || 0) + 1
+          communication.unread_repeats = (existingCall.unread_repeats || 0) + (!communication.is_read ? 1 : 0)
+          this.itemsData.splice(completedCallIndex, 1, communication)
+          this.sortItems()
+          return
         }
       }
+
+      if (!existingGroup) {
+        // New group - add at appropriate position based on sort order
+        if (isAscendingOrder && !isLiveCall(communication)) {
+          this.itemsData.push(communication)
+        } else {
+          this.itemsData.unshift(communication)
+        }
+        this.sortItems()
+        return
+      }
+
+      // Update existing group
+      const index = this.itemsData.findIndex(item => this.getGroupKey(item) === groupKey)
+
+      if (index > -1) {
+        // Handle unread count updates
+        if (this.itemsData[index]?.is_read !== communication.is_read) {
+          if (this.itemsData[index]?.repeats > 0) {
+            communication.repeats = this.itemsData[index]?.repeats
+            communication.unread_repeats = this.itemsData[index].unread_repeats + (communication.is_read ? -1 : 1)
+          }
+        }
+
+        // Update the group with new communication
+        this.itemsData.splice(index, 1, communication)
+        this.sortItems()
+      }
+    },
+
+    getGroupKey (communication) {
+      // For calls, group by contact and direction
+      if (communication.type === CommunicationTypes.CALL_TYPE) {
+        return `${communication.contact_id}-${communication.direction}-call`
+      }
+
+      // For texts, don't group - each is unique
+      return `${communication.id}`
     },
 
     async getUnreadCount (ringGroupId, contactId) {
@@ -270,9 +337,32 @@ export default {
     },
 
     sortItems () {
-      const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
+      const isAscendingOrder = this.activeSort?.order === 'asc'
 
-      this.itemsData.sort((a, b) => {
+      // First, group calls by their group key
+      const groupedItems = {}
+      this.itemsData.forEach(item => {
+        if (item.type === CommunicationTypes.CALL_TYPE && !isLiveCall(item)) {
+          const groupKey = this.getGroupKey(item)
+          if (!groupedItems[groupKey]) {
+            groupedItems[groupKey] = item
+          } else {
+            // Merge with existing group
+            groupedItems[groupKey].repeats = (groupedItems[groupKey].repeats || 0) + 1
+            groupedItems[groupKey].unread_repeats = (groupedItems[groupKey].unread_repeats || 0) + (!item.is_read ? 1 : 0)
+          }
+        } else {
+          // For non-calls or live calls, keep them as individual items
+          const key = this.getGroupKey(item)
+          groupedItems[key] = item
+        }
+      })
+
+      // Convert grouped items back to array
+      const sortedItems = Object.values(groupedItems)
+
+      // Sort the items
+      sortedItems.sort((a, b) => {
         // Always prioritize live calls at the top regardless of sort order
         if (isLiveCall(a) && !isLiveCall(b)) {
           return -1
@@ -294,6 +384,9 @@ export default {
         // Newest first (descending, default)
         return dateB - dateA
       })
+
+      // Update the itemsData with the sorted and grouped items
+      this.itemsData = sortedItems
     },
 
     async processCommunicationInActiveInbox (communication, isNew = false) {
