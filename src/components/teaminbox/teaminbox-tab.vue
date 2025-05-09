@@ -255,12 +255,21 @@ export default {
       }
 
       if (!existingGroup) {
-        // New group - add at appropriate position based on sort order
-        if (isAscendingOrder && !isLiveCall(communication)) {
+        // New group - add at appropriate position based on sort order and pagination
+        if (isAscendingOrder) {
+          // For ascending order (Oldest first), only add to end if we're on the last page
+          if (this.hasMoreItems) {
+            // If there are more items to load, don't add the new communication
+            return
+          }
+
+          // Add to end for ascending order
           this.itemsData.push(communication)
         } else {
+          // For descending order (Newest first), always add to beginning
           this.itemsData.unshift(communication)
         }
+
         this.sortItems()
         return
       }
