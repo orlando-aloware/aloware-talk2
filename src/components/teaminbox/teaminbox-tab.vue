@@ -185,7 +185,10 @@ export default {
         return
       }
 
-      this.$router.push(route)
+      const query = this.$route.query
+      const queryString = Object.entries(query).map(([key, value]) => `${key}=${value}`).join('&')
+
+      this.$router.push(`${route}${queryString ? `?${queryString}` : ''}`)
     },
 
     onChannel () {
