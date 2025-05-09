@@ -1,7 +1,6 @@
 <template>
-  <div class="memory-monitor">
+  <div class="memory-monitor" :hidden="!visible">
     <q-icon
-      v-if="currentMemory > 0"
       name="memory"
       :color="memoryColor"
       size="32px"
@@ -20,8 +19,12 @@
 </template>
 
 <script>
+import { userMixin } from 'src/plugins/mixins'
+
 export default {
   name: 'MemoryMonitor',
+
+  mixins: [userMixin],
 
   data () {
     return {
@@ -64,6 +67,10 @@ export default {
       if (this.memoryPercentage >= 90) return 'negative'
       if (this.memoryPercentage >= 70) return 'warning'
       return 'positive'
+    },
+
+    visible () {
+      return !this.isProduction || this.isDemoCompany
     }
   },
 
