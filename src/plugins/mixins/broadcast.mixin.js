@@ -782,6 +782,10 @@ export default {
           this.newCallDisposition(event.call_disposition)
           this.$VueEvent.fire('call_disposition_created', event.call_disposition)
         })
+        .listen('.call_disposition.updated', (event) => {
+          this.updateCallDisposition(event.call_disposition)
+          this.$VueEvent.fire('call_disposition_updated', event.call_disposition)
+        })
         .listen('.call_disposition.deleted', (event) => {
           this.dispatchToMemoryMonitor('.call_disposition.deleted', event)
           this.deleteCallDisposition(event.call_disposition)
