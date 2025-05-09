@@ -31,7 +31,7 @@ export default {
       updateInterval: null,
       thresholdExceeded: false,
       supportsDetailedMemory: false,
-      memoryThresholdExceededCache: null,
+      memoryThresholdExceededCacheArray: [],
       cacheTimeout: null
     }
   },
@@ -136,20 +136,24 @@ export default {
         url: window.location.href
       }
       // send the extra to Sentry if it's not already cached
-      if (this.memoryThresholdExceededCache === null) {
+      if (!this.memoryThresholdExceededCacheArray.some(cache => cache.url === window.location.href)) {
         window.Sentry.captureMessage('Memory threshold exceeded', {
           level: 'warning',
           extra
         })
       }
       // cache the extra for 30 seconds and send it to Sentry if it's not already cached
-      if (this.memoryThresholdExceededCache === null) {
+      if (!this.memoryThresholdExceededCacheArray.some(cache => cache.url === window.location.href)) {
         console.log('Memory threshold exceeded', extra)
-        this.memoryThresholdExceededCache = extra
+        this.memoryThresholdExceededCacheArray.push(extra)
         this.cacheTimeout = setTimeout(() => {
-          this.memoryThresholdExceededCache = null
+          this.removeCache(window.location.href)
         }, 30000)
       }
+    },
+
+    removeCache (url) {
+      this.memoryThresholdExceededCacheArray = this.memoryThresholdExceededCacheArray.filter(cache => cache.url !== url)
     }
   },
 
