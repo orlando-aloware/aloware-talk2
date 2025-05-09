@@ -236,7 +236,6 @@ export default {
         if (force) {
           // force redirect to the first inbox to prevent the user from navigating back to the Team Inboxes page without any inboxId
           this.$router.replace(route).catch(err => {
-            console.log('error when force redirecting to the first inbox', err)
             if (err.name !== 'NavigationDuplicated' && err.name !== 'NavigationCancelled') {
               console.error(err)
             }
@@ -246,7 +245,6 @@ export default {
 
         // Catch added since we are only adding a query string
         this.$router.push(route).catch(err => {
-          console.log('error when navigating to the inbox', err)
           if (err.name !== 'NavigationDuplicated' && err.name !== 'NavigationCancelled') {
             console.error(err)
           }
