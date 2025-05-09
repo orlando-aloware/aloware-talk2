@@ -5,7 +5,7 @@ import { mapActions, mapState } from 'vuex'
 
 export default {
   data: () => ({
-    incomingCallStatuses: [
+    incomingCallNotificationStatuses: [
       CommunicationCurrentStatus.CURRENT_STATUS_RINGING_NEW,
       CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW,
       CommunicationCurrentStatus.CURRENT_STATUS_RINGALL_NEW
@@ -27,7 +27,7 @@ export default {
 
     isCallNotInProgressOrIncoming (commDispStatus, commCurrStatus) {
       return commDispStatus !== CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW ||
-        !this.incomingCallStatuses.includes(commCurrStatus)
+        !this.incomingCallNotificationStatuses.includes(commCurrStatus)
     },
 
     removeQueuedNotification (commId, commDispStatus, commCurrStatus) {

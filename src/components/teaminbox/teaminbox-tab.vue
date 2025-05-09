@@ -11,86 +11,24 @@
     <!-- Items List -->
     <div class="items-list blue-scroll"
          @scroll="onScroll">
-      <!-- Initial loading state -->
-      <div :class="[isLoadingItems ? 'py-5' : 'py-4', 'relative']"
-           v-if="isLoadingItems">
-        <b-overlay rounded="sm"
-                   variant="white"
-                   data-testid="items-list-overlay"
-                   :show="isLoadingItems">
-          <template #overlay>
-            <div class="text-center">
-              <q-spinner-bars color="primary"
-                              size="2em" />
-            </div>
-          </template>
-        </b-overlay>
-      </div>
-
-      <!-- Error state -->
-      <div class="text-center text-danger py-5" v-else-if="loadError">
-        <div class="mb-3">
-          <i class="fas fa-exclamation-triangle fa-2x"></i>
-        </div>
-        <h5>We had a problem loading the inbox</h5>
-        <button class="btn btn-sm btn-primary mt-3"
-                @click.prevent="onRefreshCommunications">
-          <refresh-icon color="#fff"/> Reload
-        </button>
-      </div>
-
-      <!-- items list -->
-      <template v-else-if="itemsData.length">
-        <div :key="item.id"
-             v-for="item in itemsData"
-             @click="onItemClick(item)">
-          <communication :contact-id="item.contact_id"
-                         :contact-name="item.contact?.name"
-                         :contact-phone-number="item.contact?.phone_number || item.lead_number"
-                         :campaign-id="item.campaign_id"
-                         :disposition-status="item.disposition_status2"
-                         :type="item.type"
-                         :direction="item.direction"
-                         :callback-status="item.callback_status"
-                         :body="getMessageBody(item)"
-                         :current-status="item.current_status2"
-                         :date="item.created_at"
-                         :unread-properties="getUnreadsProperties(item)"
-                         :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
-                         :repeats="viewMode === UNTHREADED ? item.repeats : null"
-                         :is-live-call="isLiveCall(item)"
-                         :team-inbox-id="activeInboxId" />
-        </div>
-
-        <!-- Load more indicator -->
-        <div class="text-center q-pa-sm"
-             v-if="isLoadingMoreItems || isLoadingItems">
-          <q-spinner-dots color="primary"
-                          size="2em" />
-        </div>
-      </template>
-
-      <!-- Empty state -->
-      <div class="text-center text-grey pt-4"
-           v-else>
-        No communications found in this inbox
-
-        <br/>
-
-        <button class="btn btn-sm btn-primary mt-4"
-                v-if="showRefreshCommunicationsButton"
-                @click.prevent="onRefreshCommunications">
-          <refresh-icon color="#fff"/> Reload
-        </button>
-      </div>
+      <communication-list
+        :items="itemsData"
+        :is-loading-items="isLoadingItems"
+        :is-loading-more-items="isLoadingMoreItems"
+        :load-error="loadError"
+        :active-id="activeId"
+        :view-mode="viewMode"
+        :show-refresh-communications-button="showRefreshCommunicationsButton"
+        @item-click="onItemClick"
+        @refresh="onRefreshCommunications"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import Communication from 'src/components/teaminbox/communication-items/communication.vue'
+import CommunicationList from 'src/components/teaminbox/communication-items/communication-list.vue'
 import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
-import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
 import TeamInboxFilterSort from './teaminbox-filter-sort.vue'
 import { TeamInboxMixin } from 'src/plugins/mixins'
@@ -105,9 +43,8 @@ import talk2Api from 'src/plugins/api/api'
 
 export default {
   components: {
-    Communication,
+    CommunicationList,
     TeamInboxChannelToggle,
-    RefreshIcon,
     TeamInboxTabHeader,
     TeamInboxFilterSort
   },
@@ -297,28 +234,38 @@ export default {
       const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
       const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
 
-      communication.inbox_unread_count = await this.getUnreadCount(this.activeInboxId, communication.contact_id)
-
       // New communication (not in the list)
       if (index === -1) {
-        console.log('handleThreadedCommunication - new communication', communication)
         // For new communications, add them at appropriate position based on sort order
         if (isAscendingOrder && !isLiveCall(communication)) {
-          this.itemsData.push(communication) // Add to end for ascending order
+          // Add to end for ascending order
+          this.itemsData.push(communication)
         } else {
-          this.itemsData.unshift(communication) // Add to beginning for descending order or live calls
+          // Add to beginning for descending order or live calls
+          this.itemsData.unshift(communication)
         }
 
+        this.sortItems()
+
         return
       }
 
-      // Existing communication logic below (in the list)
-      // Ignore live calls in threaded mode
-      if (isLiveCall(this.itemsData[index])) {
-        return
+      // Update the communication in the list, by removing it first, then adding it back in the same position
+      this.itemsData.splice(index, 1)
+      this.itemsData.splice(index, 0, communication)
+
+      if (isNew) {
+        // Remove the communication from the list
+        this.itemsData.splice(index, 1)
+
+        if (isAscendingOrder) {
+          this.itemsData.push(communication)
+        } else {
+          this.itemsData.unshift(communication)
+        }
       }
 
-      this.itemsData.splice(index, 1, communication)
+      this.sortItems()
     },
 
     sortItems () {
@@ -348,19 +295,19 @@ export default {
       })
     },
 
-    async processCommunication (communication, isNew = false) {
-      if (!this.activeInboxId || communication.ring_group_id !== this.activeInboxId) {
-        return
-      }
+    async processCommunicationInActiveInbox (communication, isNew = false) {
+      // fetch unread count for the active inbox (from the backend)
+      const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
+      const unreadCountData = unreadCount[0]
+      const isInActiveInbox = unreadCountData && unreadCountData.ring_group_id === this.activeInboxId
+      const unreadCountForContact = isInActiveInbox ? unreadCountData['unread_contact_' + communication.contact_id] : 0
+      communication.inbox_unread_count = unreadCountForContact || 0
 
       if (this.viewMode === UNTHREADED) {
         await this.handleUnthreadedCommunication(communication)
       } else {
         await this.handleThreadedCommunication(communication, isNew)
       }
-
-      // fetch unread count for the active inbox (from the backend)
-      this.fetchInboxesUnreadCount([this.activeInboxId])
 
       if (!this.activeId) {
         return
@@ -371,6 +318,38 @@ export default {
       if (index >= 0) {
         this.onItemClick(this.itemsData[index])
       }
+    },
+
+    async processCommunicationInOtherInbox (communication, isNew = false) {
+      const index = this.inboxes.findIndex(inbox => inbox.id === communication.ring_group_id)
+
+      if (index === -1) {
+        return
+      }
+
+      await this.fetchInboxesUnreadCount([this.inboxes[index].id])
+    },
+
+    async processCommunication (communication, isNew = false) {
+      const dateRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/
+      const dateMatch = communication.created_at.match(dateRegex)
+
+      if (dateMatch) {
+        // Convert the date to a proper UTC date
+        communication.created_at = dateMatch[1] + '-' + dateMatch[2] + '-' + dateMatch[3] + 'T' + dateMatch[4] + ':' + dateMatch[5] + ':' + dateMatch[6] + '.000Z'
+      } else if (!dateMatch && isNew) {
+        // Use the current date and time if the date is not properly formatted (fallback)
+        communication.created_at = new Date().toISOString()
+      }
+
+      // If the communication is in the active inbox, process it
+      if (communication.ring_group_id === this.activeInboxId) {
+        await this.processCommunicationInActiveInbox(communication, isNew)
+        return
+      }
+
+      // If the communication is not in the active inbox, process it
+      await this.processCommunicationInOtherInbox(communication, isNew)
     },
 
     async newCommunicationListener (communication) {
@@ -409,12 +388,10 @@ export default {
     },
 
     onFilterChange (filters) {
-      this.setActiveFilters(filters)
       this.fetchItems(this.activeInboxId, this.search || null, filters, this.activeSort)
     },
 
     onSortChange (sort) {
-      this.setActiveSort(sort)
       this.fetchItems(this.activeInboxId, this.search || null, this.activeFilters, sort)
     },
 
@@ -528,12 +505,7 @@ export default {
       }
     },
 
-    async markContactCommunicationsAllAsReadListener (data) {
-      // Check if the contact id matches the current active contact
-      if (data.id !== this.activeId) {
-        return
-      }
-
+    async markContactCommunicationsAllAsReadActiveContact (data) {
       const item = this.itemsData.find(item => item.contact_id === this.activeId)
 
       if (!item) {
@@ -549,6 +521,29 @@ export default {
 
       // simulate a click on the contact to update the unread count
       this.onItemClick(item)
+    },
+
+    async markContactCommunicationsAllAsReadListener (data) {
+      // Check if the contact id matches the current active contact
+      if (data.id === this.activeId) {
+        await this.markContactCommunicationsAllAsReadActiveContact(data)
+        return
+      }
+
+      // If not the active contact, re-count all the unread counts of all the inboxes
+      await this.fetchInboxesUnreadCount(this.inboxes.map(inbox => inbox.id))
+
+      // Now check if the contact is in the active inbox, to update its unread count
+      const item = this.itemsData.find(item => item.contact_id === data.id)
+      if (item) {
+        const unreads = await this.fetchInboxesUnreadCount([this.activeInboxId], [data.id])
+
+        if (!unreads.length) {
+          item.inbox_unread_count = 0
+        } else {
+          item.inbox_unread_count = unreads[0].ring_group_id === this.activeInboxId && unreads[0]['unread_contact_' + data.id] ? unreads[0]['unread_contact_' + data.id] : 0
+        }
+      }
     }
   },
 
@@ -586,6 +581,16 @@ export default {
         // Only auto-load more if this is the initial page load
         if (this.isInitialLoad) {
           this.checkAndLoadMoreIfNeeded()
+
+          if (!this.$route.params.id) {
+            return
+          }
+
+          // If the contact on the route is on the list, fake a click to emit its selection
+          const item = this.itemsData.find(item => item.contact_id === parseInt(this.$route.params.id))
+          if (item) {
+            this.onItemClick(item)
+          }
         }
       }
     }

@@ -5,7 +5,8 @@
               height="34"
               :color-module-id="contactId"
               :name="contactName || defaultEmptyName">
-        <unread-counter :unread-properties="unreadProperties" />
+        <unread-counter
+              :unread-properties="unreadProperties" />
       </avatar>
     </div>
 

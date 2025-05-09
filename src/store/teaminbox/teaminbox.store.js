@@ -3,6 +3,7 @@ export const UNTHREADED = 2
 export const INBOX_TYPE_PERSONAL = 'personal'
 export const INBOX_TYPE_CONNECTED = 'connected'
 export const INBOX_TYPE_WATCHING = 'watching'
+export const SEARCH_FIELDS = ['lead_number', 'contact.name', 'campaign.name']
 
 export default function () {
   return {
@@ -28,6 +29,7 @@ export default function () {
     currentSearch: null,
     isInitialLoad: false,
     activeInboxContactUnreadCount: 0,
-    inboxAnnouncementViewed: false
+    inboxAnnouncementViewed: false,
+    unreadCountLoaded: false
   }
 }

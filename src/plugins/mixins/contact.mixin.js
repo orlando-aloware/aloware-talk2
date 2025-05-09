@@ -1,12 +1,12 @@
 import _ from 'lodash'
-import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import * as InboxTaskStatus from 'src/constants/inbox-task-status'
-import * as storage from 'src/plugins/helpers/storage'
-import talk2Api from 'src/plugins/api/api'
-import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
 import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import talk2Api from 'src/plugins/api/api'
+import * as storage from 'src/plugins/helpers/storage'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   mixins: [teamInboxPropsMixin],
@@ -1214,11 +1214,10 @@ export default {
       }).catch(err => {
         getContactTry++
         // check if we have found the contact after 3 retries
-        if (getContactTry > 3) {
+        if (getContactTry > 3 || [400, 404].includes(err?.response?.status)) {
           // error
           console.log('An error occurred while getting the contact', err?.response?.data || err)
           this.loadingContact = false
-          this.$generalNotification('Contact not found, please try again.', 'error')
           return Promise.reject(err)
         } else {
           this.getContactByPhoneNumber(phoneNumber, getContactTry)

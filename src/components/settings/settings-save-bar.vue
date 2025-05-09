@@ -102,13 +102,21 @@ export default {
     onSave () {
       this.isBusy = true
 
-      return Promise.all([
-        this.saveChanges()
-      ]).finally(() => {
-        this.resetChangedUserProperties()
-        this.isBusy = false
-        this.$generalNotification('Settings have been updated successfully')
-      })
+      return this.saveChanges()
+        .then(() => {
+          this.$generalNotification('Settings have been updated successfully')
+          this.resetChangedUserProperties()
+        })
+        .catch(error => {
+          const errorMessages = error.response?.data?.errors
+            ? Object.values(error.response.data.errors).flat().join('<br>')
+            : error.response?.data?.message || 'Unknown error'
+
+          this.$generalNotification(`Failed to update settings:<br>${errorMessages}`, 'error', 5000, true)
+        })
+        .finally(() => {
+          this.isBusy = false
+        })
     },
 
     saveChanges () {

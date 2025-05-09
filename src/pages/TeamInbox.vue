@@ -99,6 +99,10 @@ export default {
       'setCampaignsIsLoading'
     ]),
 
+    ...mapActions('TeamInbox', [
+      'reset'
+    ]),
+
     onItemSelected (routeData) {
       this.$router.push(routeData)
     },
@@ -123,6 +127,10 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
+  },
+
+  destroyed () {
+    this.reset()
   }
 }
 </script>

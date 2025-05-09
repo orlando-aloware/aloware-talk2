@@ -145,6 +145,8 @@
         </b-form-row>
         <user-vm-drop-library :user="user"></user-vm-drop-library>
       </div>
+
+      <outbound-greeting :user="user" />
     </b-form>
   </b-container>
 </template>
@@ -155,6 +157,7 @@ import { mapActions, mapState } from 'vuex'
 import { aclMixin, settingsMixin, kycMixin } from 'src/plugins/mixins'
 import UserVmDropLibrary from 'components/user-vm-drop-library'
 import SettingsMap from 'components/settings/settings-map'
+import OutboundGreeting from 'components/settings/outbound-greeting.vue'
 import { required } from 'vuelidate/lib/validators'
 import {
   OUTBOUND_CALLING_MODE_SELECTOR_USER_USE_COMPANY_DEFAULT,
@@ -167,7 +170,7 @@ export default {
 
   mixins: [aclMixin, settingsMixin, kycMixin],
 
-  components: { UserVmDropLibrary, LineSelector },
+  components: { UserVmDropLibrary, LineSelector, OutboundGreeting },
 
   props: {
     user: {

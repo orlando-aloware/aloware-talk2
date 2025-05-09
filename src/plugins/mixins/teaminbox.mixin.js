@@ -1,4 +1,4 @@
-import { THREADED } from 'src/store/teaminbox/teaminbox.store'
+import { THREADED, SEARCH_FIELDS } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
@@ -17,7 +17,8 @@ export default {
       'currentItemsPage',
       'hasMoreItems',
       'isLoadingMoreItems',
-      'abortController'
+      'abortController',
+      'unreadCountLoaded'
     ])
   },
 
@@ -26,6 +27,7 @@ export default {
       'setInboxes',
       'setIsLoadingInboxes',
       'setInboxesUnreadCount',
+      'setInboxesUnreadCountSingle',
       'setIsLoadingInboxesUnreadCount',
       'appendInboxes',
       'setItems',
@@ -35,7 +37,8 @@ export default {
       'setIsLoadingMoreItems',
       'setAbortController',
       'setShowRefreshInboxesButton',
-      'setShowRefreshCommunicationsButton'
+      'setShowRefreshCommunicationsButton',
+      'setUnreadCountLoaded'
     ]),
 
     async fetchInboxes (search = '') {
@@ -180,7 +183,7 @@ export default {
           ...(this.viewMode === THREADED ? { inbox_type: 'threaded' } : { inbox_type: 'unthreaded' }),
           ...(search ? {
             search_text: search,
-            search_fields: ['lead_number', 'contact.name', 'campaign.name']
+            search_fields: SEARCH_FIELDS
           } : {}),
           ...apiFilters
         },
@@ -207,65 +210,46 @@ export default {
       return this.inboxes.some(inbox => inbox.id === inboxId)
     },
 
-    async fetchInboxesUnreadCount (inboxIds) {
+    async fetchInboxesUnreadCount (inboxIds, contactIds = null) {
+      let data = []
+
       this.setIsLoadingInboxesUnreadCount(true)
       try {
-        const { data } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds)
-        this.setInboxesUnreadCount(data)
+        const { data: newData } = await talk2Api.V2.inbox.inboxes.unreadCount(inboxIds, contactIds)
+        data = newData
+
+        switch (data.length) {
+          case 0:
+            // If a single inbox is requested and nothing is returned, set the unread count to 0
+            if (inboxIds.length === 1) {
+              this.setInboxesUnreadCountSingle(
+                {
+                  ring_group_id: inboxIds[0],
+                  unread_count: 0
+                }
+              )
+            }
+            break
+          case 1:
+            // If a single inbox is requested and one is returned, set the unread count for that inbox
+            this.setInboxesUnreadCountSingle(data[0])
+            break
+          default:
+            // If multiple inboxes are requested and one is returned, set the unread count for each inbox
+            this.setInboxesUnreadCount(data)
+        }
       } catch (error) {
-        this.setInboxesUnreadCount([])
         console.error('[fetchInboxesUnreadCount] error', error)
+      } finally {
+        this.setIsLoadingInboxesUnreadCount(false)
+        this.setUnreadCountLoaded(true)
       }
-      this.setIsLoadingInboxesUnreadCount(false)
+
+      return data
     },
 
     getInboxUnreadCount (inboxId) {
       return this.inboxesUnreadCount?.find((inbox) => inbox.ring_group_id === inboxId)?.unread_count || 0
-    },
-
-    einboxCommunicationMarkedAllAsRead (inboxId, count) {
-      this.setInboxesUnreadCount([...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId) {
-          inbox.unread_count -= count
-
-          if (inbox.unread_count < 0) {
-            inbox.unread_count = 0
-          }
-        }
-
-        return inbox
-      })])
-    },
-
-    einboxCommunicationMarkedAsRead (inboxId) {
-      this.setInboxesUnreadCount([...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId) {
-          inbox.unread_count--
-        }
-
-        return inbox
-      })])
-    },
-
-    einboxCommunicationMarkedAsUnread (inboxId) {
-      // increment unread count for inbox/contact
-      const newValue = [...this.inboxesUnreadCount.map((inbox) => {
-        if (inbox.ring_group_id === inboxId) {
-          inbox.unread_count++
-        }
-
-        return inbox
-      })]
-
-      // if inbox is not found, add it since we have the inboxId
-      if (!newValue.find((inbox) => inbox.ring_group_id === inboxId)) {
-        newValue.push({
-          ring_group_id: inboxId,
-          unread_count: 1
-        })
-      }
-
-      this.setInboxesUnreadCount(newValue)
     }
   }
 }

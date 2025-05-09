@@ -68,7 +68,7 @@ import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/teaminbox/teaminbox.store'
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -84,7 +84,8 @@ export default {
   data () {
     return {
       search: '',
-      showSearchTooltip: false
+      showSearchTooltip: false,
+      finishedInitialLoad: false
     }
   },
 
@@ -101,6 +102,8 @@ export default {
     ...mapState('auth', ['profile']),
 
     ...mapState(['isMobile', 'teams']),
+
+    ...mapGetters('TeamInbox', ['getConnectedInboxesLength']),
 
     teamsIds () {
       return this.teams
@@ -163,6 +166,32 @@ export default {
       'setInboxes'
     ]),
 
+    findInboxById (id) {
+      return this.inboxes.find(inbox => inbox.id === id)
+    },
+
+    determineInboxToSelect () {
+      const defaultInboxId = this.getFirstInboxId()
+      const urlInboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId, 10) : null
+      const urlContactId = this.$route.params.id ? parseInt(this.$route.params.id, 10) : null
+
+      // Check if URL has inbox ID and inbox exists
+      if (urlInboxId && this.findInboxById(urlInboxId)) {
+        return { id: urlInboxId, contactId: urlContactId, force: true }
+      }
+
+      // Default to first inbox
+      if (defaultInboxId) {
+        return {
+          id: defaultInboxId,
+          contactId: urlContactId,
+          force: !urlInboxId // Only force redirect if no inbox ID in URL
+        }
+      }
+
+      return null
+    },
+
     onScroll ({ target }) {
       const bottomThreshold = 20
 
@@ -202,6 +231,12 @@ export default {
 
       // avoid redundant navigation
       if (this.$route.path !== route) {
+        if (force) {
+          // force redirect to the first inbox to prevent the user from navigating back to the Team Inboxes page without any inboxId
+          this.$router.replace(route)
+          return
+        }
+
         this.$router.push(route)
       }
     },
@@ -253,7 +288,11 @@ export default {
     },
 
     updateRingGroupListener (ringGroup) {
-      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
+      const isUserIncluded = this.allUserIds(ringGroup)?.includes(this.profile.id)
+      const isTeamIncluded = ringGroup.team_ids?.some(id => this.teamsIds.includes(id))
+      const isWatchingTeam = ringGroup.watcher_team_ids?.some(id => this.teamsIds.includes(id))
+
+      if (isUserIncluded || isTeamIncluded || isWatchingTeam) {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
         const updatedInboxes = [...this.inboxes]
 
@@ -304,18 +343,6 @@ export default {
       if (this.activeInboxId) {
         await this.onInboxSelect(this.activeInboxId, null, true)
       }
-    },
-
-    einboxCommunicationMarkedAllAsReadListener ({ inboxId, count }) {
-      this.einboxCommunicationMarkedAllAsRead(inboxId, count)
-    },
-
-    einboxCommunicationMarkedAsReadListener ({ inboxId }) {
-      this.einboxCommunicationMarkedAsRead(inboxId)
-    },
-
-    einboxCommunicationMarkedAsUnreadListener ({ inboxId }) {
-      this.einboxCommunicationMarkedAsUnread(inboxId)
     }
   },
 
@@ -325,13 +352,17 @@ export default {
     this.setIsLoadingInboxesUnreadCount(true)
 
     await this.fetchInboxes()
+    this.finishedInitialLoad = true
 
     if (this.inboxes.length) {
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
-      const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
+      const inboxToSelect = this.determineInboxToSelect()
 
-      if (inboxId) {
-        this.onInboxSelect(inboxId, contactId)
+      if (inboxToSelect) {
+        this.onInboxSelect(
+          inboxToSelect.id,
+          inboxToSelect.contactId,
+          inboxToSelect.force
+        )
       }
     }
 
@@ -347,6 +378,14 @@ export default {
     '$route.params.inboxId' (inboxId) {
       if (!inboxId && this.inboxes.length && !this.isMobile) {
         this.onInboxSelect(this.getFirstInboxId())
+        return
+      }
+
+      const newInboxId = parseInt(inboxId)
+
+      if (!isNaN(newInboxId) && newInboxId !== this.activeInboxId) {
+        // Handle back navigation to a different inbox
+        this.onInboxSelect(newInboxId)
       }
     },
 
@@ -370,6 +409,19 @@ export default {
     search (val) {
       this.resetInboxes()
       this.fetchInboxes(val)
+    },
+
+    getConnectedInboxesLength (length, oldLength) {
+      if (oldLength || !this.finishedInitialLoad) {
+        return
+      }
+
+      const previousActiveInboxExists = this.inboxes.findIndex(({ id }) => id === this.activeInboxId) !== -1
+
+      if (!previousActiveInboxExists) {
+        // Handles edge cases when an inbox is assigned to the user while they have the page open without any existing inboxes
+        this.onInboxSelect(this.getFirstInboxId())
+      }
     }
   },
 

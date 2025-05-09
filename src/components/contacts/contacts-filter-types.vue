@@ -128,7 +128,7 @@
                   multiple
                   :options="filterOptions"
                   data-testid="contacts-filter-secondary-operator-value-relation-select"
-                  v-model="secondaryFilterOperatorValue"
+                  v-model="getSecondaryFilterOperatorArrayValue"
                   v-if="operator.value === filterOperator && hasSecondaryOperator"
                   @input-value="showSecondaryFilterOperationOptions"
                   @input="addSecondaryValue"/>
@@ -385,6 +385,21 @@ export default {
       return this.filterOperatorDebounceInProgress ||
         this.filterOperatorValueDebounceInProgress ||
         this.secondaryFilterOperatorValueDebounceInProgress
+    },
+
+    getSecondaryFilterOperatorArrayValue: {
+      get () {
+        // For custom attributes and chip selects, ensure we always return an array
+        if (this.filter.key === 'custom_attribute' || this.isRelationFilterType(this.filter.type, this.filter.key)) {
+          return Array.isArray(this.secondaryFilterOperatorValue)
+            ? this.secondaryFilterOperatorValue
+            : (this.secondaryFilterOperatorValue ? [this.secondaryFilterOperatorValue] : [])
+        }
+        return this.secondaryFilterOperatorValue
+      },
+      set (val) {
+        this.secondaryFilterOperatorValue = val
+      }
     }
   },
 
@@ -585,6 +600,11 @@ export default {
     },
 
     addSecondaryValue () {
+      // For custom attributes, ensure we have an array
+      if (this.filter.key === 'custom_attribute' && !Array.isArray(this.secondaryFilterOperatorValue)) {
+        this.secondaryFilterOperatorValue = []
+      }
+
       if (this.secondaryFilterOperatorValue &&
         typeof this.secondaryFilterOperatorValue[this.secondaryFilterOperatorValue.length - 1] === 'object') {
         this.secondaryFilterOperatorValue.pop()
@@ -624,13 +644,29 @@ export default {
     },
 
     showSecondaryFilterOperationOptions (event) {
-      const exists = event && this.secondaryFilterOperatorValue && this.secondaryFilterOperatorValue.includes(event)
+      // For custom attributes, ensure we have an array before checking includes
+      if (this.filter.key === 'custom_attribute') {
+        if (!Array.isArray(this.secondaryFilterOperatorValue)) {
+          this.secondaryFilterOperatorValue = []
+        }
 
-      // Dont allow addition if event is invalid or option already exists
-      if (!event || exists) {
-        this.filterOptions[0].disabled = true
-        this.filterOptions[0].label = 'Add a new option'
-        return
+        const exists = event && this.secondaryFilterOperatorValue.includes(event)
+
+        // Don't allow addition if event is invalid or option already exists
+        if (!event || exists) {
+          this.filterOptions[0].disabled = true
+          this.filterOptions[0].label = 'Add a new option'
+          return
+        }
+      } else {
+        const exists = event && this.secondaryFilterOperatorValue && this.secondaryFilterOperatorValue.includes(event)
+
+        // Don't allow addition if event is invalid or option already exists
+        if (!event || exists) {
+          this.filterOptions[0].disabled = true
+          this.filterOptions[0].label = 'Add a new option'
+          return
+        }
       }
 
       if (this.filterOptions[0].disabled) {
@@ -793,6 +829,11 @@ export default {
       */
       if (['custom_attribute'].includes(this.filter.key)) {
         attribute = 'field'
+
+        // Ensure secondaryFilterOperatorValue is an array for custom_attribute
+        if (!Array.isArray(this.secondaryFilterOperatorValue)) {
+          this.secondaryFilterOperatorValue = this.secondaryFilterOperatorValue ? [this.secondaryFilterOperatorValue] : []
+        }
 
         data.data = this.secondaryFilterOperatorValue instanceof Array
           ? this.secondaryFilterOperatorValue
@@ -985,7 +1026,13 @@ export default {
       }
 
       const options = this.filter.operators.find(operator => operator.value === this.filterOperator)?.options
-      this.secondaryFilterOperatorValue = this.expectsSelected && options ? options[0].value : ''
+
+      // For custom_attribute, ensure we initialize secondaryFilterOperatorValue as an array
+      if (this.filter.key === 'custom_attribute' && this.hasSecondaryOperator) {
+        this.secondaryFilterOperatorValue = []
+      } else {
+        this.secondaryFilterOperatorValue = this.expectsSelected && options ? options[0].value : ''
+      }
 
       if (!this.hasValue) {
         this.filterOperatorDebounceInProgress = true

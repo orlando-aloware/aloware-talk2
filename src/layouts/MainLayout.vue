@@ -1051,13 +1051,13 @@ export default {
       }
 
       if (task.export.type === TYPE_COMMUNICATION) {
-        message = `Your Contact communications export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
+        message = `Your communications export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
       }
 
       this.$generalNotification(
         message,
         'export-csv',
-        0,
+        1000 * 60 * 5, // 5 minutes
         true,
         {
           uuid: task.export.uuid,

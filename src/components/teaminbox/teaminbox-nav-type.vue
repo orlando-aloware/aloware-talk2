@@ -9,7 +9,7 @@
       <div ref="inboxesInner">
         <TeamInboxNavItem :label="inbox.name"
                          :value="inbox.id"
-                         :is-loading-unread-count="isLoadingInboxesUnreadCount"
+                         :is-loading-unread-count="isLoadingInboxesUnreadCount && !unreadCountLoaded"
                          :unread-count="getInboxUnreadCount(inbox.id)"
                          :is-active="activeInboxId === inbox.id"
                          :key="inbox.id"
