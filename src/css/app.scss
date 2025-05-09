@@ -2713,7 +2713,7 @@ i.option-separator {
   height: 100%;
   background-color: $white;
   position: relative;
-  
+
   &.inbox-activity-container-wrapper {
     border-radius: 8px;
   }
@@ -9338,7 +9338,7 @@ span.mention {
 .contact-activity-wrapper {
   width: 100%;
 
-  &.inbox-activity-container-wrapper { 
+  &.inbox-activity-container-wrapper {
     padding: 10px 0;
     background: $grey-40;
   }
@@ -16811,4 +16811,10 @@ hr {
       padding: 5px 15px;
     }
   }
+}
+
+.memory-monitor {
+  display: inline-flex;
+  margin-right: 10px;
+  align-items: center;
 }
