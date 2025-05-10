@@ -206,7 +206,8 @@ export default {
       const existingGroup = this.itemsData.find(item => this.getGroupKey(item) === groupKey)
 
       // Special handling for calls
-      if (communication.type === CommunicationTypes.CALL) {
+      if (communication.type === CommunicationTypes.CALL_TYPE) {
+        // This is still not working, communication.type is 1 so should compare with CommunicationTypes.CALL, but this is breaking the logic
         // If this is a live call, it should be shown separately
         if (isLiveCall(communication)) {
           // Remove any existing non-live call from the same group
@@ -295,6 +296,7 @@ export default {
     getGroupKey (communication) {
       // For calls, group by contact and direction
       if (communication.type === CommunicationTypes.CALL_TYPE) {
+        // This is still not working, communication.type is 1 so should compare with CommunicationTypes.CALL, but this is breaking the logic
         return `${communication.contact_id}-${communication.direction}-call`
       }
 
