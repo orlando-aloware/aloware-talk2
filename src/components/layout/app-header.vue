@@ -49,6 +49,8 @@
 
         <shared-login-menu v-if="!isElectron" />
 
+        <memory-monitor />
+
         <header-help v-if="!isTrial" />
 
         <profile :hideProfileInfo="isMobileTransitionWidth" />
@@ -147,6 +149,7 @@ import RefreshIcon from 'components/icons/refresh-icon'
 import SharedLoginMenu from 'components/shared-login-menu'
 import BackButton from 'components/back-button'
 import HeaderHelp from 'components/header-help'
+import MemoryMonitor from 'components/MemoryMonitor'
 import InboxToggleFilters from 'components/inbox/inbox-toggle-filters'
 import DialerErrorIcon from 'components/icons/dialer-error-icon'
 import DialerIcon from 'components/icons/dialer-icon'
@@ -189,7 +192,8 @@ export default {
     HeaderHelp,
     InboxToggleFilters,
     InformationCircleIcon,
-    TutorialVideoButton
+    TutorialVideoButton,
+    MemoryMonitor
   },
 
   props: {

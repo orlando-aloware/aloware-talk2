@@ -32,7 +32,7 @@ import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
 import TeamInboxFilterSort from './teaminbox-filter-sort.vue'
 import { TeamInboxMixin } from 'src/plugins/mixins'
-import { isLiveCall } from 'src/plugins/helpers/functions'
+import { getQueryString, isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
@@ -185,7 +185,8 @@ export default {
         return
       }
 
-      this.$router.push(route)
+      const queryString = getQueryString(this.$route.query)
+      this.$router.push(`${route}${queryString}`)
     },
 
     onChannel () {

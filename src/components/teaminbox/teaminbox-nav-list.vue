@@ -69,6 +69,7 @@ import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/teaminbox/teaminbox.store'
 import { mapState, mapActions, mapGetters } from 'vuex'
+import { getQueryString } from 'src/plugins/helpers/functions'
 
 export default {
   components: {
@@ -227,17 +228,27 @@ export default {
       const search = this.$store.state.TeamInbox.currentSearch || null
       this.fetchItems(inboxId, search, filters, sort)
 
-      const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
+      const queryString = getQueryString(this.$route.query)
+      const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '') + queryString
 
-      // avoid redundant navigation
-      if (this.$route.path !== route) {
+      // avoid redundant navigation (including query)
+      if (this.$route.fullPath !== route) {
         if (force) {
           // force redirect to the first inbox to prevent the user from navigating back to the Team Inboxes page without any inboxId
-          this.$router.replace(route)
+          this.$router.replace(route).catch(err => {
+            if (err.name !== 'NavigationDuplicated' && err.name !== 'NavigationCancelled') {
+              console.error(err)
+            }
+          })
           return
         }
 
-        this.$router.push(route)
+        // Catch added since we are only adding a query string
+        this.$router.push(route).catch(err => {
+          if (err.name !== 'NavigationDuplicated' && err.name !== 'NavigationCancelled') {
+            console.error(err)
+          }
+        })
       }
     },
 

@@ -192,14 +192,24 @@ export default {
       })
     },
 
-    async loadInbox (inboxId) {
+    async getInboxById (inboxId, options = {}) {
+      const { saveToStore = true, returnData = false } = options
+
       const response = await talk2Api.V2.inbox.inboxes.get({
         params: {
           inbox_ids: [inboxId]
         }
       })
 
-      this.setInboxes(response.data)
+      if (saveToStore) {
+        this.setInboxes(response.data)
+      }
+
+      return returnData ? response.data[0] : response.data
+    },
+
+    async loadInbox (inboxId) {
+      return this.getInboxById(inboxId, { saveToStore: true })
     },
 
     checkInboxAccess (inboxId) {
@@ -208,6 +218,16 @@ export default {
       }
 
       return this.inboxes.some(inbox => inbox.id === inboxId)
+    },
+
+    async loadInboxFromOutside (inboxId) {
+      return this.getInboxById(inboxId, { saveToStore: false, returnData: true })
+    },
+
+    async checkInboxAccessFromOutside (inboxId) {
+      const inbox = await this.loadInboxFromOutside(inboxId)
+
+      return inbox ? inbox.id === inboxId : false
     },
 
     async fetchInboxesUnreadCount (inboxIds, contactIds = null) {
