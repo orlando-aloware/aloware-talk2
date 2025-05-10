@@ -110,6 +110,7 @@ import {
   MAX_TABLET_WIDTH
 } from 'src/constants/viewport-sizes'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import teaminboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
   name: 'contact',
@@ -119,7 +120,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    inboxMixin
+    inboxMixin,
+    teaminboxPropsMixin
   ],
 
   components: {
@@ -189,6 +191,13 @@ export default {
       ContactTaskStatus,
       CommunicationDirections,
       TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+    }
+  },
+
+  props: {
+    teamInboxUnreadCount: {
+      type: Number,
+      default: 0
     }
   },
 
