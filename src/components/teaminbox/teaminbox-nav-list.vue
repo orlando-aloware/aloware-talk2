@@ -231,15 +231,24 @@ export default {
       const queryString = getQueryString(this.$route.query)
       const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '') + queryString
 
-      // avoid redundant navigation
-      if (this.$route.path !== route) {
+      // avoid redundant navigation (including query)
+      if (this.$route.fullPath !== route) {
         if (force) {
           // force redirect to the first inbox to prevent the user from navigating back to the Team Inboxes page without any inboxId
-          this.$router.replace(route)
+          this.$router.replace(route).catch(err => {
+            if (err.name !== 'NavigationDuplicated' && err.name !== 'NavigationCancelled') {
+              console.error(err)
+            }
+          })
           return
         }
 
-        this.$router.push(route)
+        // Catch added since we are only adding a query string
+        this.$router.push(route).catch(err => {
+          if (err.name !== 'NavigationDuplicated' && err.name !== 'NavigationCancelled') {
+            console.error(err)
+          }
+        })
       }
     },
 

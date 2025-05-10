@@ -26,6 +26,10 @@ export default {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     },
 
+    isProduction () {
+      return storage.local.getItem('env') === 'production'
+    },
+
     hasCompanyTeamInboxEnabled () {
       return this.currentCompany?.team_inbox_enabled === true
     },
