@@ -7,6 +7,8 @@
                     data-testid="teaminbox-search"
                     limit-search-characters
                     :id="`teaminbox-nav-list-search-${_uid}`"
+                    :search="search"
+                    :no-clear-on-route-change="true"
                     @search="onSearch"
                     @focus="setShowSearchTooltip(true)"
                     @blur="setShowSearchTooltip(false)"
@@ -289,8 +291,6 @@ export default {
     },
 
     newRingGroupListener (ringGroup) {
-      console.log(ringGroup)
-
       if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
         const updatedInboxes = [...this.inboxes, ringGroup]
         this.setInboxes({ data: updatedInboxes })
