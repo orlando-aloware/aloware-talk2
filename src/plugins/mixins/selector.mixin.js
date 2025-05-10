@@ -246,7 +246,7 @@ export default {
       } else {
         a2pBlock = campaign.blocked_messaging_information && campaign.blocked_messaging_information['blocked'] && (!campaign.blocked_messaging_information['automated_only'] || isAutomated)
       }
-
+      console.log('isMessagingBlocked', campaign.name, checkBlockedMessaging, campaign.blocked_messaging_information['blocked'])
       return checkBlockedMessaging && a2pBlock
     },
 

@@ -15,6 +15,7 @@
         <contact-line-selector :value="propCampaign?.id"
                                :use-groups="false"
                                :capabilities="capabilities"
+                               :check-blocked-messaging="true"
                                @select="onCampaignSelected"/>
         <broadcast-warning-note :campaign="propCampaign" />
       </div>
