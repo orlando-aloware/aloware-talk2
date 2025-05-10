@@ -256,7 +256,8 @@ export default {
       runningDateTimeInterval: null,
       isValidNotification: false,
       notificationListeners: {},
-      AgentStatus
+      AgentStatus,
+      teamInboxLink: null
     }
   },
 
@@ -354,14 +355,14 @@ export default {
         }
       }
 
-      // If the communication has a ring group id and user has access to that team inbox
-      if (this.ringGroupId && this.ringGroupId !== '' && this.checkInboxAccessFromOutside(this.ringGroupId)) {
-        return {
-          path: `/team-inboxes/${this.ringGroupId}/contacts/${this.contactId}/communications`
+      // If the communication has a ring group id, check teamInboxLink
+      if (this.ringGroupId && this.ringGroupId !== '') {
+        return this.teamInboxLink || {
+          path: `/contacts/${this.contactId}/communications/${this.communicationId}`
         }
       }
 
-      // If no ring group id or no access, use regular communication page
+      // If no ring group id, use regular communication page
       return {
         path: `/contacts/${this.contactId}/communications/${this.communicationId}`
       }
@@ -586,6 +587,13 @@ export default {
     }
   },
 
+  mounted () {
+    // Initialize teamInboxLink if ringGroupId is available on mount
+    if (this.ringGroupId && this.ringGroupId !== '') {
+      this.updateTeamInboxLink(this.ringGroupId)
+    }
+  },
+
   methods: {
     ...mapActions([
       'setNotifications',
@@ -593,6 +601,16 @@ export default {
       'clearCallFishingQueue',
       'removeFromCallFishingQueue'
     ]),
+
+    async updateTeamInboxLink (ringGroupId) {
+      if (await this.checkInboxAccess(ringGroupId)) {
+        this.teamInboxLink = {
+          path: `/team-inboxes/${ringGroupId}/contacts/${this.contactId}/communications`
+        }
+      } else {
+        this.teamInboxLink = null
+      }
+    },
 
     startNotificationListeners () {
       this.$VueEvent.listen('update_communication', this.notificationListeners[this.id].updateCommunication)
@@ -832,6 +850,16 @@ export default {
   },
 
   watch: {
+    ringGroupId: {
+      immediate: true,
+      handler: function (newRingGroupId) {
+        if (newRingGroupId && newRingGroupId !== '') {
+          this.updateTeamInboxLink(newRingGroupId)
+        } else {
+          this.teamInboxLink = null
+        }
+      }
+    },
     notificationQueue: {
       deep: true,
       handler: function (newValue, oldValue) {
