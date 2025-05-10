@@ -206,7 +206,7 @@ export default {
       const existingGroup = this.itemsData.find(item => this.getGroupKey(item) === groupKey)
 
       // Special handling for calls
-      if (communication.type === CommunicationTypes.CALL_TYPE) {
+      if (communication.type === CommunicationTypes.CALL) {
         // If this is a live call, it should be shown separately
         if (isLiveCall(communication)) {
           // Remove any existing non-live call from the same group
