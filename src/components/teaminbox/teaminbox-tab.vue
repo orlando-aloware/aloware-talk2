@@ -517,6 +517,10 @@ export default {
 
       if (index >= 0) {
         this.itemsData[index].contact = contact
+
+        if (this.viewMode === UNTHREADED) {
+          this.onItemClick(this.itemsData[index])
+        }
       }
     },
 
