@@ -238,8 +238,8 @@ export default {
       const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
       const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
 
-      // Check filters
-      if (!this.checkCommunication(communication)) {
+      // Check filters and sorting settings
+      if (!this.checkCommunication(communication, isAscendingOrder)) {
         if (index !== -1) {
           this.itemsData.splice(index, 1)
         }
@@ -285,11 +285,11 @@ export default {
 
       this.itemsData.sort((a, b) => {
         // Always prioritize live calls at the top regardless of sort order
-        if (isLiveCall(a) && !isLiveCall(b)) {
+        if (this.communicationInProgress(a) && !this.communicationInProgress(b)) {
           return -1
         }
 
-        if (!isLiveCall(a) && isLiveCall(b)) {
+        if (!this.communicationInProgress(a) && this.communicationInProgress(b)) {
           return 1
         }
 
@@ -534,6 +534,8 @@ export default {
 
       // simulate a click on the contact to update the unread count
       this.onItemClick(item)
+
+      // Check filters and sorting settings
       if (item && !this.checkCommunication(item)) {
         this.itemsData.splice(itemIndex, 1)
       }
@@ -562,10 +564,15 @@ export default {
       }
     },
 
-    checkCommunication (communication) {
+    checkCommunication (communication, sortAsc = false) {
       return (this.checkCommunicationMatchesSearch(this.search, communication) &&
-          this.checkCommunicationMatchesInboxFilters(this.activeFilters, communication, false)) ||
-          this.ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
+          this.checkCommunicationMatchesInboxFilters(this.activeFilters, communication, false) &&
+          !(sortAsc && this.hasMoreItems)) ||
+          this.communicationInProgress(communication)
+    },
+
+    communicationInProgress (communication) {
+      return this.ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
     }
   },
 
