@@ -49,6 +49,7 @@
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
+                         :team-inbox-id="teamInboxId"
                          v-if="!changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
@@ -73,6 +74,7 @@
         </compact-btn>
         <contact-details :campaign-id="selectedCampaignId"
                          :no-save-bar="isMediumScreen"
+                         :team-inbox-id="teamInboxId"
                          v-if="drawer && !changingSelectedContact && !isEmptyContact">
         </contact-details>
       </q-drawer>

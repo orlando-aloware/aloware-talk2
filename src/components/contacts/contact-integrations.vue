@@ -12,29 +12,37 @@
     </p>
     <integration-hubspot v-if="isHubspotEnabled"
                          data-testid="contact-integrations-hubspot"
-                         :contact="contact"/>
+                         :contact="contact"
+                         :team-inbox-id="teamInboxId"
+                         :is-read-only="isReadOnly"/>
 
     <integration-pipedrive v-if="isPipedriveEnabled"
                            data-testid="contact-integrations-pipedrive"
-                           :contact="contact"/>
+                           :contact="contact"
+                           :team-inbox-id="teamInboxId"/>
 
     <integration-gohighlevel v-if="isGHLEnabled"
                              data-testid="contact-integrations-gohighlevel"
-                             :contact="contact"/>
+                             :contact="contact"
+                             :team-inbox-id="teamInboxId"/>
 
     <integration-salesforce data-testid="contact-integrations-salesforce"
         :contact="contact"
+        :team-inbox-id="teamInboxId"
         v-if="isSalesforceEnabled"/>
 
     <integration-guesty data-testid='contact-integrations-guesty'
                         :contact='contact'
+                        :team-inbox-id="teamInboxId"
                         v-if='isGuestyEnabled'/>
 
     <integration-zoho data-testid='contact-integrations-zoho'
                         :contact='contact'
+                        :team-inbox-id="teamInboxId"
                         v-if='isZohoEnabled'/>
 
-    <contact-crm-links data-testid="contact-integrations-crm-links" :contact="contact"/>
+    <contact-crm-links data-testid="contact-integrations-crm-links"
+                        :contact="contact"/>
   </b-card>
 </template>
 
@@ -47,7 +55,7 @@ import IntegrationGohighlevel from 'components/integrations/integration-gohighle
 import IntegrationSalesforce from 'components/integrations/integration-salesforce.vue'
 import IntegrationGuesty from 'components/integrations/integration-guesty.vue'
 import IntegrationZoho from 'components/integrations/integration-zoho.vue'
-
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 export default {
   name: 'contact-integrations',
 
@@ -58,6 +66,12 @@ export default {
     },
 
     no_title: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       required: false,
       default: false
@@ -74,9 +88,10 @@ export default {
     IntegrationSalesforce
   },
 
+  mixins: [teamInboxPropsMixin],
+
   computed: {
     ...mapState('cache', ['currentCompany']),
-
     isIntegrationsDisabled () {
       if (!this.currentCompany) {
         return true

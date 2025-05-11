@@ -64,7 +64,10 @@
                          :is-read-only="isReadOnly"
                          v-if="contact"
                          @input="onNotesInput"/>
-          <contact-integrations data-testid="contact-details-integrations" :contact="contact"/>
+          <contact-integrations data-testid="contact-details-integrations"
+                                :contact="contact"
+                                :team-inbox-id="teamInboxId"
+                                :is-read-only="isReadOnly"/>
           <contact-reservations v-if="contact && showGuestyReservations()"
                                 data-testid="contact-details-reservations"
                                 :contact="contact"/>
@@ -111,7 +114,7 @@ import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import { aclMixin, contactMixin, contactV2AttributesMixin, userMixin, visibilityMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, contactV2AttributesMixin, userMixin, visibilityMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
@@ -140,7 +143,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    userMixin
+    userMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
