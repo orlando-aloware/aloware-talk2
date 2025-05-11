@@ -31,7 +31,7 @@ import CommunicationList from 'src/components/teaminbox/communication-items/comm
 import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
 import TeamInboxFilterSort from './teaminbox-filter-sort.vue'
-import { TeamInboxMixin } from 'src/plugins/mixins'
+import { TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
 import { getQueryString, isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
@@ -40,6 +40,7 @@ import { TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
 import { mapState, mapActions } from 'vuex'
 import { debounce } from 'lodash'
 import talk2Api from 'src/plugins/api/api'
+import { ALL_INPROGRESS_STATUSES } from 'src/constants/communication-current-status'
 
 export default {
   components: {
@@ -50,7 +51,8 @@ export default {
   },
 
   mixins: [
-    TeamInboxMixin
+    TeamInboxMixin,
+    visibilityMixin
   ],
 
   props: {
@@ -67,6 +69,7 @@ export default {
       THREADED,
       UNTHREADED,
       TEAMINBOXES_MENU_ITEMS_TITLE,
+      ALL_INPROGRESS_STATUSES,
       itemsData: [],
       CommunicationDirections,
       CommunicationTypes,
@@ -235,6 +238,14 @@ export default {
       const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
       const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
 
+      // Check filters
+      if (!this.checkCommunication(communication)) {
+        if (index !== -1) {
+          this.itemsData.splice(index, 1)
+        }
+
+        return
+      }
       // New communication (not in the list)
       if (index === -1) {
         // For new communications, add them at appropriate position based on sort order
@@ -507,7 +518,8 @@ export default {
     },
 
     async markContactCommunicationsAllAsReadActiveContact (data) {
-      const item = this.itemsData.find(item => item.contact_id === this.activeId)
+      const itemIndex = this.itemsData.findIndex(item => item.contact_id === this.activeId)
+      const item = itemIndex !== -1 ? this.itemsData[itemIndex] : null
 
       if (!item) {
         return
@@ -522,6 +534,9 @@ export default {
 
       // simulate a click on the contact to update the unread count
       this.onItemClick(item)
+      if (item && !this.checkCommunication(item)) {
+        this.itemsData.splice(itemIndex, 1)
+      }
     },
 
     async markContactCommunicationsAllAsReadListener (data) {
@@ -545,6 +560,12 @@ export default {
           item.inbox_unread_count = unreads[0].ring_group_id === this.activeInboxId && unreads[0]['unread_contact_' + data.id] ? unreads[0]['unread_contact_' + data.id] : 0
         }
       }
+    },
+
+    checkCommunication (communication) {
+      return (this.checkCommunicationMatchesSearch(this.search, communication) &&
+          this.checkCommunicationMatchesInboxFilters(this.activeFilters, communication, false)) ||
+          this.ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
     }
   },
 
