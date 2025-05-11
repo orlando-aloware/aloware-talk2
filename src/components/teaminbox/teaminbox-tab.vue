@@ -162,23 +162,14 @@ export default {
       this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
       const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
-      // Emit the unread count for threaded communications
-      if (this.viewMode === THREADED) {
-        // Get unread count for this contact
-        const unreadCount = item.inbox_unread_count || 0
+      // Get unread count for this contact
+      const unreadCount = item.inbox_unread_count || 0
 
-        // Emit event with contact ID and unread count
-        this.$emit('contact-selected', {
-          contactId: item.contact_id,
-          unreadCount: unreadCount
-        })
-      } else {
-        // For unthreaded, we'll just emit 0 for now
-        this.$emit('contact-selected', {
-          contactId: item.contact_id,
-          unreadCount: 0
-        })
-      }
+      // Emit event with contact ID and unread count
+      this.$emit('contact-selected', {
+        contactId: item.contact_id,
+        unreadCount: unreadCount
+      })
 
       // avoid redundant navigation
       if (route === this.$route.path) {
@@ -255,6 +246,8 @@ export default {
         }
       }
 
+      this.updateUnthreadedCommunicationUnreadCount(communication)
+
       if (!existingGroup) {
         // New group - add at appropriate position based on sort order and pagination
         if (isAscendingOrder) {
@@ -267,7 +260,7 @@ export default {
           // Add to end for ascending order
           this.itemsData.push(communication)
         } else {
-          // For descending order (Newest first), always add to beginning
+          // Add to beginning for descending order
           this.itemsData.unshift(communication)
         }
 
@@ -290,6 +283,26 @@ export default {
         // Update the group with new communication
         this.itemsData.splice(index, 1, communication)
         this.sortItems()
+      }
+    },
+
+    updateUnthreadedCommunicationUnreadCount (communication) {
+      // Update unread count for all communications from the same contact
+      if (!communication.is_read) {
+        this.itemsData.forEach(item => {
+          if (item.contact_id === communication.contact_id && item.id !== communication.id) {
+            item.inbox_unread_count = (item.inbox_unread_count || 0) + 1
+          }
+        })
+      }
+
+      const selectedItem = this.itemsData.find(item => item.id === this.activeId)
+      if (selectedItem?.contact_id === communication.contact_id) {
+        // Emit contact-selected event to update the Mark all as Read component
+        this.$emit('contact-selected', {
+          contactId: communication.contact_id,
+          unreadCount: selectedItem.inbox_unread_count || 0
+        })
       }
     },
 
