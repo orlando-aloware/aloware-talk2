@@ -158,17 +158,24 @@ export default {
       }
     },
 
-    onItemClick (item) {
+    async onItemClick (item) {
+      let communicationUnreadCount = item.inbox_unread_count || 0
       this.activeId = this.viewMode === THREADED ? item.contact_id : item.id
       const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
-      // Get unread count for this contact
-      const unreadCount = item.inbox_unread_count || 0
+      if (this.viewMode === UNTHREADED) {
+        // Fetch the unread count for the active communication
+        const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [item.contact_id])
+        const unreadCountData = unreadCount[0]
+        const isInActiveInbox = unreadCountData && unreadCountData.ring_group_id === this.activeInboxId
+        const unreadCountForContact = isInActiveInbox ? unreadCountData['unread_contact_' + item.contact_id] : 0
+        item.inbox_unread_count = unreadCountForContact
+        communicationUnreadCount = unreadCountForContact
+      }
 
-      // Emit event with contact ID and unread count
       this.$emit('contact-selected', {
         contactId: item.contact_id,
-        unreadCount: unreadCount
+        unreadCount: communicationUnreadCount || 0
       })
 
       // avoid redundant navigation
@@ -623,24 +630,6 @@ export default {
       }
     },
 
-    async markContactCommunicationsAllAsReadActiveContact (data) {
-      const item = this.itemsData.find(item => item.contact_id === this.activeId)
-
-      if (!item) {
-        return
-      }
-
-      // update the unread count for the contact
-      const unreadCount = await this.getUnreadCount(this.activeInboxId, this.activeId)
-      item.inbox_unread_count = unreadCount
-
-      // fetch unread count for the active inbox (from the backend)
-      await this.fetchInboxesUnreadCount([this.activeInboxId])
-
-      // simulate a click on the contact to update the unread count
-      this.onItemClick(item)
-    },
-
     async markContactCommunicationsAllAsReadListener (data) {
       // Check if the contact id matches the current active contact
       if (data.id === this.activeId) {
@@ -661,6 +650,64 @@ export default {
         } else {
           item.inbox_unread_count = unreads[0].ring_group_id === this.activeInboxId && unreads[0]['unread_contact_' + data.id] ? unreads[0]['unread_contact_' + data.id] : 0
         }
+
+        // Update all communications from this contact in the unthreaded view
+        if (this.viewMode === UNTHREADED) {
+          this.itemsData.forEach(comm => {
+            if (comm.contact_id === data.id) {
+              comm.inbox_unread_count = item.inbox_unread_count
+              comm.is_read = true
+              if (comm.repeats > 0) {
+                comm.unread_repeats = 0
+              }
+            }
+          })
+
+          // If this is the currently selected contact, emit the contact-selected event
+          if (this.itemsData.find(comm => comm.id === this.activeId)?.contact_id === data.id) {
+            this.$emit('contact-selected', {
+              contactId: data.id,
+              unreadCount: item.inbox_unread_count
+            })
+          }
+        }
+      }
+    },
+
+    async markContactCommunicationsAllAsReadActiveContact (data) {
+      const item = this.itemsData.find(item => item.contact_id === this.activeId)
+
+      if (!item) {
+        return
+      }
+
+      // update the unread count for the contact
+      const unreadCount = await this.getUnreadCount(this.activeInboxId, this.activeId)
+      item.inbox_unread_count = unreadCount
+
+      // fetch unread count for the active inbox (from the backend)
+      await this.fetchInboxesUnreadCount([this.activeInboxId])
+
+      // Update all communications from this contact in the unthreaded view
+      if (this.viewMode === UNTHREADED) {
+        this.itemsData.forEach(comm => {
+          if (comm.contact_id === this.activeId) {
+            comm.inbox_unread_count = unreadCount
+            comm.is_read = true
+            if (comm.repeats > 0) {
+              comm.unread_repeats = 0
+            }
+          }
+        })
+
+        // Emit contact-selected event to update the Mark all as Read component
+        this.$emit('contact-selected', {
+          contactId: this.activeId,
+          unreadCount: unreadCount
+        })
+      } else {
+        // For threaded view, simulate a click on the contact to update the unread count
+        this.onItemClick(item)
       }
     }
   },
