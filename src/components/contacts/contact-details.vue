@@ -19,42 +19,50 @@
           <contact-sequence class="w-100"
                             data-testid="contact-details-sequence"
                             :contact="contact"
+                            :is-read-only="isReadOnly"
                             v-if="contact && !contact.is_dnc && hasPermissionTo('update contact')"/>
           <contact-conversation-insights :contact="contact"
                                          data-testid="contact-conversation-insights"
+                                         :is-read-only="isReadOnly"
                                          v-if="contact && shouldSeeExperimentalXproAiFeatures"/>
           <contact-aloai-enrollment-control ss="w-100"
                                             data-testid="contact-aloai-enrollment-control"
                                             :contact="contact"
+                                            :is-read-only="isReadOnly"
                                             v-if="showAloAiControls"/>
           <contact-aloai-engagement-control ss="w-100"
                                             data-testid="contact-aloai-engagement-control"
                                             :contact="contact"
+                                            :is-read-only="isReadOnly"
                                             v-if="false"/>
-          <contact-phones data-testid="contact-details-contact-phones"/>
+          <contact-phones data-testid="contact-details-contact-phones"
+                         :is-read-only="isReadOnly"/>
           <contact-information data-testid="contact-details-contact-information"
-                               :first-outbound-call="communicationsSummary.first_outbound_call"/>
+                               :first-outbound-call="communicationsSummary.first_outbound_call"
+                               :is-read-only="isReadOnly"/>
           <entity-tags data-testid="contact-details-tags"
                        entity="contact"
                        entity-type="contacts"
                        label="Tags"
                        button-text="Modify Tags"
                        :entity-object="contact"
-                       :category="TagCategories.CAT_CONTACTS"/>
+                       :category="TagCategories.CAT_CONTACTS"
+                       :is-read-only="isReadOnly"/>
           <contact-lists-card data-testid="contact-details-public-lists"
                               key="contact-public-lists-card"
                               :is-public-contact-list-card="true"
                               :contact="contact"
-          />
+                              :is-read-only="isReadOnly"/>
           <contact-lists-card data-testid="contact-details-private-lists"
                               key="contact-private-lists-card"
                               :is-public-contact-list-card="false"
                               :contact="contact"
-          />
+                              :is-read-only="isReadOnly"/>
 
-          <contact-notes v-if="contact"
+          <contact-notes data-testid="contact-details-notes"
                          :contact="contact"
-                         data-testid="contact-details-notes"
+                         :is-read-only="isReadOnly"
+                         v-if="contact"
                          @input="onNotesInput"/>
           <contact-integrations data-testid="contact-details-integrations" :contact="contact"/>
           <contact-reservations v-if="contact && showGuestyReservations()"
@@ -65,11 +73,13 @@
                                          :contact="contact"/>
           <contact-scheduled-messages data-testid="contact-details-scheduled-messages"/>
           <contact-activity-counts data-testid="contact-details-activity-counts" :summary="communicationsSummary.summaries"/>
-          <contact-lines data-testid="contact-details-lines"/>
-          <contact-ring-groups data-testid="contact-details-ring-groups"/>
+          <contact-lines data-testid="contact-details-lines"
+                         :is-read-only="isReadOnly"/>
+          <contact-ring-groups data-testid="contact-details-ring-groups"
+                              :is-read-only="isReadOnly"/>
           <contact-broadcast data-testid="contact-details-broadcast"/>
         </template>
-        <contact-save-bar data-testid="contact-details-save-bar" v-if="!noSaveBar"/>
+        <contact-save-bar data-testid="contact-details-save-bar" v-if="!noSaveBar || isReadOnly"/>
       </div>
     </div>
   </div>

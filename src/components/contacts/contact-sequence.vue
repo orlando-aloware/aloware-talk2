@@ -40,6 +40,7 @@
                   variant="outline-danger"
                   size="sm"
                   data-testid="disenroll-contact-button"
+                  :disabled="isReadOnly"
                   @click="disenrollContact">
           <i class="fa fa-trash"></i> Disenroll from sequence
         </b-button>
@@ -57,7 +58,7 @@
                     block
                     data-testid="enroll-to-sequence-button"
                     @click="openSequenceModal"
-                    :disabled="!isEnabledToEnroll">
+                    :disabled="!isEnabledToEnroll || isReadOnly">
             <add-sequence-icon color="white"
                               data-testid="add-sequence-icon"
                               :height="12"
@@ -116,6 +117,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

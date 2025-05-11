@@ -5,7 +5,7 @@
                           :values="selectedId"
                           :options="activeCampaignsAlphabeticalOrder"
                           :disable="disabled"
-                          :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
+                          :canEdit="hasPermissionTo(['list campaign', 'view campaign']) && !isReadOnly"
                           v-if="genericMultiselect"
                           @valuesUpdated="onInput">
     </generic-multi-select>
@@ -226,6 +226,11 @@ export default {
     isLoading: {
       type: Boolean,
       default: false
+    },
+
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -298,7 +303,7 @@ export default {
     },
 
     disabled () {
-      return this.disable || this.campaignsIsLoading
+      return this.disable || this.campaignsIsLoading || this.isReadOnly
     },
 
     classes () {

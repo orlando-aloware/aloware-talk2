@@ -7,7 +7,7 @@
            v-if="hasPermissionTo('list user')">
         <p class="text-muted custom-input-label mb-0">Owner</p>
         <user-selector custom-class="inline-select"
-                       :disable="!hasPermissionTo('change contact ownership')"
+                       :disable="!hasPermissionTo('change contact ownership') || isReadOnly"
                        :generic-styling="false"
                        :multiple="false"
                        :use-chips="false"
@@ -23,7 +23,7 @@
            v-if="hasPermissionTo('list disposition status')">
         <p class="text-muted custom-input-label mb-0">Contact Disposition</p>
         <contact-disposition-selector custom-class="inline-select"
-                                      :disable="!hasPermissionTo('dispose contact')"
+                                      :disable="!hasPermissionTo('dispose contact') || isReadOnly"
                                       :generic-styling="false"
                                       :multiple="false"
                                       :use-chips="false"
@@ -38,7 +38,7 @@
 
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Email</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact')"
+        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
                              v-model="contact.email"
                              data-testid="contact-information-email-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'email')">
@@ -47,7 +47,7 @@
 
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Address</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact')"
+        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
                              v-model="contact.address"
                              data-testid="contact-information-address-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'address')">
@@ -56,7 +56,7 @@
 
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Company</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact')"
+        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
                              v-model="contact.company_name"
                              data-testid="contact-information-company-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'company_name')">
@@ -65,7 +65,7 @@
 
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Website</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact')"
+        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
                              v-model="contact.website"
                              data-testid="contact-information-website-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'website')">
@@ -74,7 +74,7 @@
 
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">City</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact')"
+        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
                              v-model="contact.cnam_city"
                              data-testid="contact-information-city-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_city')">
@@ -85,7 +85,7 @@
            v-if="contact.cnam_country && ['US', 'CA'].includes(contact.cnam_country)">
         <p class="text-muted custom-input-label mb-0">State</p>
         <location-state-selector :contact="contact"
-                                 :disabled="!hasPermissionTo('update contact')"
+                                 :disabled="!hasPermissionTo('update contact') || isReadOnly"
                                  v-model="contact.cnam_state"
                                  data-testid="contact-information-state-selector"
                                  @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_state')">
@@ -95,7 +95,7 @@
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Country</p>
         <location-country-selector :contact="contact"
-                                   :disabled="!hasPermissionTo('update contact')"
+                                   :disabled="!hasPermissionTo('update contact') || isReadOnly"
                                    v-model="contact.cnam_country"
                                    data-testid="contact-information-country-selector"
                                    @select="(eventPayload) => onUpdateFields(eventPayload, 'cnam_country')">
@@ -104,7 +104,7 @@
 
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Zip Code</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact')"
+        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
                              v-model="contact.cnam_zipcode"
                              data-testid="contact-information-zip-code-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'cnam_zipcode')">
@@ -113,7 +113,7 @@
 
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Timezone</p>
-        <q-timezone-selector :disabled="!isAdmin"
+        <q-timezone-selector :disabled="!isAdmin || isReadOnly"
                              v-model="contact.timezone"
                              data-testid="contact-information-timezone-selector"
                              @select="(eventPayload) => onUpdateFields(eventPayload, 'timezone')">
@@ -126,7 +126,7 @@
                               contentClass="inline-input contact-info-editable"
                               popoverClass="contact-info-popover"
                               popoverId="popover-date-picker-sync"
-                              :canEdit="hasPermissionTo('update contact')"
+                              :canEdit="hasPermissionTo('update contact') && !isReadOnly"
                               v-model="contact.date_of_birth"
                               data-testid="contact-information-date-of-birth-selector"
                               @change="(eventPayload) => onUpdateFields(eventPayload, 'date_of_birth')">
@@ -141,7 +141,7 @@
                               borderless
                               :genericStyling="false"
                               :outlined="false"
-                              :disabled="!hasPermissionTo('update contact')"
+                              :disabled="!hasPermissionTo('update contact') || isReadOnly"
                               v-model="contact.lead_source"
                               data-testid="contact-information-lead-source-selector"
                               @change="(eventPayload) => onUpdateFields(eventPayload, 'lead_source')">
@@ -157,6 +157,7 @@
                        :clearable="true"
                        :borderless="true"
                        :outlined="false"
+                       :is-read-only="isReadOnly"
                        v-model="contact.initial_campaign_id"
                        data-testid="contact-information-initial-line-selector"
                        @change="(eventPayload) => onUpdateFields(eventPayload, 'initial_campaign_id')">
@@ -165,7 +166,7 @@
 
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Custom Field 1</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact')"
+        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
                              v-model="contact.csf1"
                              data-testid="contact-information-custom-field-1-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf1')">
@@ -173,14 +174,15 @@
       </div>
       <div class="w-100">
         <p class="text-muted custom-input-label mb-0">Custom Field 2</p>
-        <contact-input-field :disabled="!hasPermissionTo('update contact')"
+        <contact-input-field :disabled="!hasPermissionTo('update contact') || isReadOnly"
                              v-model="contact.csf2"
                              data-testid="contact-information-custom-field-2-input"
                              @updateField="(eventPayload) => onUpdateFields(eventPayload, 'csf2')">
         </contact-input-field>
       </div>
-      <contact-attributes :contact="contact"
-                          data-testid="contact-information-attributes"
+      <contact-attributes data-testid="contact-information-attributes"
+                          :contact="contact"
+                          :is-read-only="isReadOnly"
                           v-if="contact.id"/>
 
       <div class="w-100">
@@ -247,6 +249,11 @@ export default {
     hasExpanded: {
       type: Boolean,
       default: true
+    },
+
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

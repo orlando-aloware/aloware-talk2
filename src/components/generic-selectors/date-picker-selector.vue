@@ -17,7 +17,8 @@
         <b-popover :show.sync="showDatePicker"
                    target="popover-date-picker-sync"
                    data-testid="date-picker-selector-popover"
-                   placement="bottom">
+                   placement="bottom"
+                   v-if="canEdit">
           <div :class="popoverClass">
             <q-date ref="datePickerSelect"
                     minimal

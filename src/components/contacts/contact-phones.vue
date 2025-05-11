@@ -9,6 +9,7 @@
           <h4>All Numbers</h4>
           <contact-phones-list-items data-testid="contact-phones-list-items"
                                      :phones="sortedPhones"
+                                     :is-read-only="isReadOnly"
                                      @edit="onEditPhone"
                                      @delete="onDeletePhone"
                                      @composerMedia="setComposerVariables"
@@ -17,6 +18,7 @@
                   href="#"
                   class="custom-link text-decoration-none"
                   data-testid="contact-phones-add-phone-button"
+                  :disabled="isReadOnly"
                   @click="onAddPhone">
             <plus-circle-icon />
             Add Phone Number
@@ -60,6 +62,10 @@ export default {
 
   props: {
     noBottomPadding: {
+      type: Boolean,
+      default: false
+    },
+    isReadOnly: {
       type: Boolean,
       default: false
     }
