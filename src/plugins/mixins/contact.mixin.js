@@ -212,10 +212,10 @@ export default {
         return false
       }
 
-      return (typeof this.contact.is_limited_campaign === 'boolean' && this.contact.is_limited_campaign) ||
-        (typeof this.contact.is_limited_owned_only === 'boolean' && this.contact.is_limited_owned_only) ||
-        (typeof this.contact.is_limited_ring_group === 'boolean' && this.contact.is_limited_ring_group) ||
-        (typeof this.contact.is_limited_ring_group_users === 'boolean' && this.contact.is_limited_ring_group_users)
+      return (typeof this.contact.is_limited_campaign === 'number' && this.contact.is_limited_campaign) ||
+        (typeof this.contact.is_limited_owned_only === 'number' && this.contact.is_limited_owned_only) ||
+        (typeof this.contact.is_limited_ring_group === 'number' && this.contact.is_limited_ring_group) ||
+        (typeof this.contact.is_limited_ring_group_users === 'number' && this.contact.is_limited_ring_group_users)
     }
   },
 
