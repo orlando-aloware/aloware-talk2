@@ -746,10 +746,19 @@ export default {
         return
       }
 
-      const communicationType = communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
-      communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
-        ? 'missed call'
-        : 'call'
+      let communicationType = 'call'
+
+      // For completed calls, determine type based on disposition status
+      if (communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW) {
+        switch (communication.disposition_status2) {
+          case CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW:
+            communicationType = 'missed call'
+            break
+          case CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW:
+            communicationType = 'abandoned call'
+            break
+        }
+      }
 
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
       if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
