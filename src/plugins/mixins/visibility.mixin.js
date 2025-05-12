@@ -250,6 +250,15 @@ export default {
         communication.workflow_id)
     },
 
+    checkCommunicationMatchesInboxFilters (filter, communication) {
+      if (filter.unreadonly !== undefined &&
+        communication.inbox_unread_count === 0) {
+        return false
+      }
+
+      return true
+    },
+
     checkCommunicationMatchesUserAccessibility (communication) {
       // check auth exists to prevent js errors
       if (!this.profile) {
