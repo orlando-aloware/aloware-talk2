@@ -86,20 +86,19 @@
                     <span class="data-value">{{ integrationData.other_phone }}</span>
                 </p>
             </q-card-section>
-          <sync-with-integration :integration_name="integrationName()"
-                                 :contact_id="contact.id"
-                                 v-if="contact?.id"
-                                 @sync-complete="afterSyncComplete"/>
+          <sync-with-integration
+            :is-read-only="isReadOnly"
+            :integration_name="integrationName()"
+            :contact_id="contact.id"
+            v-if="contact?.id"
+            @sync-complete="afterSyncComplete"/>
         </q-card>
     </div>
   </template>
 
 <script>
 import { mapState } from 'vuex'
-import {
-  integrationMixin,
-  teamInboxPropsMixin
-} from 'src/plugins/mixins'
+import { integrationMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
 import { SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 import _ from 'lodash'
@@ -120,6 +119,12 @@ export default {
     },
 
     dialerMode: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       required: false,
       default: false

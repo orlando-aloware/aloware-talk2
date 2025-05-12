@@ -45,6 +45,7 @@
         <q-card-section data-testid="integration-hubspot-card-section-3">
           <b-row>
             <b-button
+              :disabled="isReadOnly"
               class="text-white"
               size="sm"
               variant="primary"
@@ -168,15 +169,16 @@
 </template>
 
 <script>
-import IntegrationHubspotOneContact from 'components/integrations/integration-hubspot-one-contact.vue'
+import IntegrationHubspotOneContact
+from 'components/integrations/integration-hubspot-one-contact.vue'
 import _ from 'lodash'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import talk2Api from 'src/plugins/api/api'
 import {
   hubspotIntegrationMixin,
   integrationMixin,
-  whiteLabelMixin,
-  teamInboxPropsMixin
+  teamInboxPropsMixin,
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 

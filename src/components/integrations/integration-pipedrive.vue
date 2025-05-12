@@ -76,6 +76,7 @@
       <q-card-section data-testid="integration-pipedrive-card-section-2">
         <b-row>
           <b-button
+            :disabled="isReadOnly"
             class="text-white"
             size="sm"
             variant="primary"
@@ -122,8 +123,8 @@ import talk2Api from 'src/plugins/api/api'
 import {
   integrationMixin,
   pipedriveIntegrationMixin,
-  whiteLabelMixin,
-  teamInboxPropsMixin
+  teamInboxPropsMixin,
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -146,6 +147,12 @@ export default {
     },
 
     dialer_mode: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       required: false,
       default: false
