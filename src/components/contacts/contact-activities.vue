@@ -5,7 +5,7 @@
          'inbox-activity-container-wrapper': teamInbox
        }">
     <contact-activities-header
-    data-testid="contact-activities-header"
+      data-testid="contact-activities-header"
       :label="contactName"
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
