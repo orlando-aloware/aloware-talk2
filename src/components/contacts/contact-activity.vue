@@ -214,7 +214,8 @@
                                 :communication="communication"
                                 :contact="contact"
                                 :activityMode="true"
-                                :campaignId="campaignId">
+                                :campaignId="campaignId"
+                                :team-inbox-id="teamInboxId">
             </communication-info>
           </div>
         </div>
@@ -385,7 +386,8 @@ import _ from 'lodash'
 import {
   aclMixin,
   avatarMixin,
-  userMixin
+  userMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import { mapState, mapGetters } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
@@ -404,7 +406,8 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    userMixin
+    userMixin,
+    teamInboxPropsMixin
   ],
 
   components: {

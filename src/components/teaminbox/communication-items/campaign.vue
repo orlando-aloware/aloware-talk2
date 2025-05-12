@@ -12,7 +12,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 
 export default {
   mixins: [teamInboxPropsMixin],

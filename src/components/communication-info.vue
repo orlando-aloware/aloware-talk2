@@ -847,7 +847,18 @@ import { marked } from 'marked'
 import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, userMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  avatarMixin,
+  classicMixin,
+  communicationInfoMixin,
+  dateMixin,
+  liveCallsMixin,
+  mentionsMixin,
+  notificationMixin,
+  userMixin,
+  teamInboxPropsMixin
+} from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
@@ -874,7 +885,8 @@ export default {
     notificationMixin,
     liveCallsMixin,
     mentionsMixin,
-    classicMixin
+    classicMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -1134,7 +1146,10 @@ export default {
       if (!communicationIncomingNumber) {
         return null
       }
-      const found = this.campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
+
+      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+
+      const found = campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
       if (found) {
         return found.name
       }

@@ -99,7 +99,8 @@ import {
   contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
-  inboxMixin
+  inboxMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -112,7 +113,6 @@ import {
   MAX_TABLET_WIDTH
 } from 'src/constants/viewport-sizes'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
-import teaminboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
   name: 'contact',
@@ -123,7 +123,7 @@ export default {
     aclMixin,
     visibilityMixin,
     inboxMixin,
-    teaminboxPropsMixin
+    teamInboxPropsMixin
   ],
 
   components: {

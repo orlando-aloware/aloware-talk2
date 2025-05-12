@@ -52,8 +52,7 @@ import ContactName from './contact-name.vue'
 import LastCommunication from './last-communication.vue'
 import LastCommunicationDate from './last-communication-date.vue'
 import PhoneNumber from './phone-number.vue'
-import { avatarMixin } from 'src/plugins/mixins'
-import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
+import { avatarMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 
 export default {
   mixins: [

@@ -225,13 +225,16 @@ import BackButton from 'components/back-button'
 import Profile from 'components/profile'
 import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 
 export default {
   name: 'contact-activities-header',
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    teamInboxPropsMixin
+  ],
 
   components: {
     Profile,
@@ -367,7 +370,7 @@ export default {
       this.loading = true
 
       try {
-        await talk2Api.V2.contacts.exportCommunications(this.contact.id)
+        await talk2Api.V2.contacts.exportCommunications(this.contact.id, this.teamInbox)
         this.$generalNotification('Contact communications export request has been successfully submitted and is queued for processing.')
       } catch (error) {
         console.log(error)
