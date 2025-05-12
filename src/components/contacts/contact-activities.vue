@@ -37,7 +37,8 @@
                               :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
                               :communication="communication"
                               :contact="contact"
-                              :campaignId="campaignId">
+                              :campaignId="campaignId"
+                              :team-inbox-id="teamInboxId">
             </contact-activity>
             <contact-activity v-for="(communication, index) in sendingCommunications"
                               data-testid="contact-activities-activity-2"
@@ -45,7 +46,8 @@
                               ref="communication-0"
                               :communication="communication"
                               :contact="contact"
-                              :campaignId="communication.campaignId">
+                              :campaignId="communication.campaignId"
+                              :team-inbox-id="teamInboxId">
             </contact-activity>
           </div>
         </div>
