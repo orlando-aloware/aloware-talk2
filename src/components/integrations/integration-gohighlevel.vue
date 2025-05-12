@@ -107,6 +107,7 @@
             block
             data-testid="integration-gohighlevel-sync-button"
             @click="syncGHL"
+            :disabled="isReadOnly"
           >
             <i
               class="fa fa-sync-alt"
@@ -145,8 +146,8 @@ import talk2Api from 'src/plugins/api/api'
 import {
   gohighlevelIntegrationMixin,
   integrationMixin,
-  whiteLabelMixin,
-  teamInboxPropsMixin
+  teamInboxPropsMixin,
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -169,6 +170,12 @@ export default {
     },
 
     dialer_mode: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       required: false,
       default: false
