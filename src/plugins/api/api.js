@@ -149,7 +149,9 @@ const talk2Api = {
           return null
         }
 
-        params.from_team_inbox = fromTeamInbox
+        if (fromTeamInbox) {
+          params.from_team_inbox = true
+        }
 
         return window.axios.post(`${suffixV1}calendar/events/contact/${id}/create`, params)
       },
