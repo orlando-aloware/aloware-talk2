@@ -78,7 +78,7 @@ import ContactActivitiesHeader from 'src/components/contacts/contact-activities-
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import teaminboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-activities',
@@ -88,7 +88,7 @@ export default {
     ContactActivity
   },
   mixins: [
-    teaminboxPropsMixin
+    teamInboxPropsMixin
   ],
   props: {
     communications: {

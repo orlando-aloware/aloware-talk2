@@ -225,16 +225,15 @@ import BackButton from 'components/back-button'
 import Profile from 'components/profile'
 import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
-import { aclMixin } from 'src/plugins/mixins'
+import { aclMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
-import teaminboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
   name: 'contact-activities-header',
 
   mixins: [
     aclMixin,
-    teaminboxPropsMixin
+    teamInboxPropsMixin
   ],
 
   components: {
