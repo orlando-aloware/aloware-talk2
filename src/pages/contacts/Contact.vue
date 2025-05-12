@@ -49,6 +49,7 @@
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
+                         :team-inbox-id="teamInboxId"
                          v-if="!changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
@@ -73,6 +74,7 @@
         </compact-btn>
         <contact-details :campaign-id="selectedCampaignId"
                          :no-save-bar="isMediumScreen"
+                         :team-inbox-id="teamInboxId"
                          v-if="drawer && !changingSelectedContact && !isEmptyContact">
         </contact-details>
       </q-drawer>
@@ -110,6 +112,7 @@ import {
   MAX_TABLET_WIDTH
 } from 'src/constants/viewport-sizes'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import teaminboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
   name: 'contact',
@@ -119,7 +122,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    inboxMixin
+    inboxMixin,
+    teaminboxPropsMixin
   ],
 
   components: {
@@ -127,17 +131,6 @@ export default {
     ContactDetails,
     ContactActivities,
     CompactBtn
-  },
-
-  props: {
-    teamInboxId: {
-      type: Number,
-      default: null
-    },
-    teamInboxUnreadCount: {
-      type: Number,
-      default: 0
-    }
   },
 
   computed: {
@@ -200,6 +193,13 @@ export default {
       ContactTaskStatus,
       CommunicationDirections,
       TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+    }
+  },
+
+  props: {
+    teamInboxUnreadCount: {
+      type: Number,
+      default: 0
     }
   },
 

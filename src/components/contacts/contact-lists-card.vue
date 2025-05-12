@@ -65,7 +65,7 @@
           </div>
           <b-link class="self-center trash-icon custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
                   href="#"
-                  v-if="canEditList(list) && !isRemoving">
+                  v-if="canEditList(list) && !isRemoving && !isReadOnly">
             <slot name="button">
               <span class='aloicons trash-icon'
                     :style="'color:' + iconColor + '!important'"
@@ -85,7 +85,7 @@
       <remove-contact-list-item-confirmation :dialogId="dialogId"
                                              :contact="contact"
                                              :list="selectedList"
-                                             v-if="contact && selectedList"
+                                             v-if="contact && selectedList && !isReadOnly"
                                              @deleting="onDeleting"
                                              @deleted="onDeleted"
                                              @finally="onFinally"/>
@@ -101,7 +101,7 @@
       <div class="generic-multi-select">
         <div class="list-wrapper">
           <div class="w-100 mt-1"
-               v-if="!showAvailableLists">
+               v-if="!showAvailableLists && !isReadOnly">
             <b-link href="#"
                     class="custom-link text-decoration-none btn-tag-edit d-flex align-items-center"
                     @click="addToList">
@@ -169,7 +169,7 @@
             <b-button type="button"
                       size="sm"
                       variant="primary"
-                      :disabled="isAdding"
+                      :disabled="isAdding || isReadOnly"
                       @click="addContactListItems">
               <b-spinner class="pull-right self-center custom-link text-decoration-none"
                          variant="warning"
@@ -216,6 +216,10 @@ export default {
     isPublicContactListCard: {
       required: true,
       type: Boolean
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

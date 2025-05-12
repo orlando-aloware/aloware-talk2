@@ -51,8 +51,9 @@
           <b-button class="btn-bg-transparent btn-b-0 line-height-1"
                     size="sm"
                     variant="light"
-                    v-if="hasPermissionTo('update contact')"
                     data-testid="contact-phones-list-items-edit"
+                    :disabled="isReadOnly"
+                    v-if="hasPermissionTo('update contact')"
                     @click="onEdit(phone)">
             <pencil-o-icon width="12"
                            height="12"
@@ -91,7 +92,7 @@
             </b-dropdown-item>
             <b-dropdown-item class="phone-actions"
                              data-testid="contact-phones-list-items-delete-item"
-                             v-if="phoneCanBeDeleted(phone)"
+                             v-if="phoneCanBeDeleted(phone) && !isReadOnly"
                              @click="onDelete(phone)">
               <trash-icon color="#62666E"
                           width="13"
@@ -133,6 +134,10 @@ export default {
     phones: {
       type: Array,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

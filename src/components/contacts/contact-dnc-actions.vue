@@ -5,6 +5,7 @@
               size="sm"
               class="custom-action-button"
               data-testid="contact-dnc-actions-button"
+              :disabled="disabled"
               @click="dncContact">
       <q-tooltip anchor="bottom middle"
                  data-testid="contact-dnc-actions-tooltip"
@@ -27,7 +28,7 @@
               variant="light"
               size="sm"
               class="custom-action-button"
-              :disabled="isProcessingDNC"
+              :disabled="isProcessingDNC || disabled"
               data-testid="contact-undnc-actions-button"
               @click="onShowUnDncModal">
       <q-tooltip v-if="contact.is_dnc"
@@ -70,6 +71,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
 

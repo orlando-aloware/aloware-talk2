@@ -145,7 +145,8 @@ import talk2Api from 'src/plugins/api/api'
 import {
   gohighlevelIntegrationMixin,
   integrationMixin,
-  whiteLabelMixin
+  whiteLabelMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -157,7 +158,8 @@ export default {
   mixins: [
     gohighlevelIntegrationMixin,
     integrationMixin,
-    whiteLabelMixin
+    whiteLabelMixin,
+    teamInboxPropsMixin
   ],
 
   props: {
@@ -217,7 +219,7 @@ export default {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
     getData () {
-      return this.getIntegrationData(this.contact, 'gohighlevel')
+      return this.getIntegrationData(this.contact, 'gohighlevel', null, this.teamInbox)
         .then(response => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true
