@@ -5,8 +5,14 @@ import qs from 'qs'
 import * as AloAi from 'src/constants/aloai'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
-const exportCommunications = async (contactId) => {
-  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
+const exportCommunications = async (contactId, fromTeamInbox) => {
+  const params = {}
+
+  if (fromTeamInbox) {
+    params.from_team_inbox = fromTeamInbox
+  }
+
+  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`, { params })
 }
 
 const talk2Api = {

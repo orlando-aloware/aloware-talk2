@@ -5,12 +5,13 @@
          'inbox-activity-container-wrapper': teamInbox
        }">
     <contact-activities-header
+    data-testid="contact-activities-header"
       :label="contactName"
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
       :contact="contact"
       :enable-export="enableExport"
-      data-testid="contact-activities-header"
+      :team-inbox-id="teamInboxId"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
@@ -77,6 +78,7 @@ import ContactActivitiesHeader from 'src/components/contacts/contact-activities-
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import teaminboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
   name: 'contact-activities',
@@ -85,6 +87,9 @@ export default {
     ContactActivitiesHeader,
     ContactActivity
   },
+  mixins: [
+    teaminboxPropsMixin
+  ],
   props: {
     communications: {
       required: true,
@@ -101,10 +106,6 @@ export default {
     enableExport: {
       type: Boolean,
       default: true
-    },
-    teamInboxId: {
-      type: Number,
-      default: null
     },
     teamInboxUnreadCount: {
       type: Number,

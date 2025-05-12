@@ -227,11 +227,15 @@ import { mapState, mapGetters } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 import { aclMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import teaminboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
 
 export default {
   name: 'contact-activities-header',
 
-  mixins: [aclMixin],
+  mixins: [
+    aclMixin,
+    teaminboxPropsMixin
+  ],
 
   components: {
     Profile,
@@ -367,7 +371,7 @@ export default {
       this.loading = true
 
       try {
-        await talk2Api.V2.contacts.exportCommunications(this.contact.id)
+        await talk2Api.V2.contacts.exportCommunications(this.contact.id, this.teamInbox)
         this.$generalNotification('Contact communications export request has been successfully submitted and is queued for processing.')
       } catch (error) {
         console.log(error)
