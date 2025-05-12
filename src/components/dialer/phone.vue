@@ -568,8 +568,12 @@
                 <div class="d-flex flex-grow-1">
                   <template-selector class="w-100"
                                      v-model="templateId"
+                                     :disable=isMessagingBlocked(getCampaign(dialer.communication.campaign_id,true),true)
                                      @change="changeTemplate">
                   </template-selector>
+                  <q-tooltip v-if="isMessagingBlocked(getCampaign(dialer.communication.campaign_id,true),true)">
+                    {{ getMessagingBlocked(getCampaign(dialer.communication.campaign_id,true)) }}
+                  </q-tooltip>
                 </div>
                 <div class="d-flex flex-shrink-0 ml-2">
                   <b-button variant="primary"
@@ -1317,7 +1321,8 @@ import {
   dialerCommunicationMixin,
   dispositionsMixin,
   notificationMixin,
-  sessionCallStatusMixin
+  sessionCallStatusMixin,
+  selectorMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
@@ -1381,7 +1386,8 @@ export default {
     dispositionsMixin,
     agentMixin,
     dialerCommunicationMixin,
-    sessionCallStatusMixin
+    sessionCallStatusMixin,
+    selectorMixin
   ],
 
   props: {

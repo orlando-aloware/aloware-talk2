@@ -76,6 +76,7 @@
       <div class="broadcast-add__schedule__row__fields">
         <contact-line-selector :value="propCampaign?.id"
                                :use-groups="false"
+                               :check-blocked-messaging="true"
                                @select="onCampaignSelected"/>
         <broadcast-warning-note :campaign="propCampaign"/>
       </div>
