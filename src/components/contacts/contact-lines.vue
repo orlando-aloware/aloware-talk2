@@ -1,8 +1,9 @@
 <template>
   <b-card class="border-0 contact-lines-wrapper" data-testid="contact-lines-card">
-    <line-selector :value="lineValues"
+    <line-selector data-testid="contact-lines-selector"
+                   :value="lineValues"
                    :multiple="true"
-                   data-testid="contact-lines-selector"
+                   :is-read-only="isReadOnly"
                    @change="submitLines"/>
   </b-card>
 </template>
@@ -20,6 +21,13 @@ export default {
 
   components: {
     LineSelector
+  },
+
+  props: {
+    isReadOnly: {
+      type: Boolean,
+      default: false
+    }
   },
 
   computed: {

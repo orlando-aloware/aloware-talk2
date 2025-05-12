@@ -5,12 +5,12 @@
     <h4 v-if="!no_title">Notes</h4>
     <div class="notes mt-1"
          style="min-height: 15px;"
-         v-if="!isEdit"
+         v-if="!isEdit && !isReadOnly"
          v-html="notes"
          data-testid="contact-edit-notes"
          @click="onEditNotes">
     </div>
-    <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit"
+    <div v-if="(!contact.notes || contact.notes.length < 1) && !isEdit && !isReadOnly"
          class="notes-empty-placeholder"
          data-testid="contact-notes-add-notes"
          @click="onEditNotes">
@@ -51,6 +51,11 @@ export default {
     no_title: {
       type: Boolean,
       required: false,
+      default: false
+    },
+
+    isReadOnly: {
+      type: Boolean,
       default: false
     }
   },

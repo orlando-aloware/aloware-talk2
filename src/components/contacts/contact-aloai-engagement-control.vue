@@ -21,6 +21,7 @@
         class="btn-aloai-engagement-control"
         block
         data-testid="aloai-engagement-control-button"
+        :disabled="isReadOnly"
         @click="openEngagementControlModal"
       >
         <settings-mobile-icon
@@ -50,6 +51,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

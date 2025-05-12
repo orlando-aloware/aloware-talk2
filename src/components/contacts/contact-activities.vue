@@ -62,6 +62,7 @@
 
     <div class="composer-container-wrapper">
       <message-composer :campaignId="campaignId"
+                        :team-inbox-id="teamInboxId"
                         data-testid="contact-activities-message-composer"
                         @message-sent="setSendingCommunication">
       </message-composer>

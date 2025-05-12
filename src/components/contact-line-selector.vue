@@ -14,21 +14,37 @@
                      :preselect-first="preselectFirst"
                      v-model="line"
                      data-testid="contact-line-selector"
-                     @select="onSelect"/>
+                     @select="onSelect">
+      <template v-slot:option="props">
+        <div class="row flex-nowrap">
+          <q-item-section>
+            <q-item-label>{{ props.option.name }}</q-item-label>
+          </q-item-section>
+          <q-item-section v-if="isMessagingBlocked(props.option, checkBlockedMessaging, false, true)" side>
+            <q-tooltip anchor="top middle"
+                       self="center middle">
+              {{ getMessagingBlocked(props.option) }}
+            </q-tooltip>
+            <q-badge color="blue">i</q-badge>
+          </q-item-section>
+        </div>
+      </template>
+    </vue-multiselect>
   </div>
 </template>
 
 <script>
 import VueMultiselect from 'vue-multiselect'
 import LinesMixins from 'src/plugins/mixins/lines.mixin'
-import { aclMixin } from 'src/boot/mixins'
+import { aclMixin, selectorMixin } from 'src/boot/mixins'
 
 export default {
   name: 'contact-line-selector',
 
   mixins: [
     aclMixin,
-    LinesMixins
+    LinesMixins,
+    selectorMixin
   ],
 
   components: {
@@ -59,6 +75,11 @@ export default {
     capabilities: {
       type: Array,
       default: null
+    },
+
+    checkBlockedMessaging: {
+      type: Boolean,
+      default: false
     }
   },
 

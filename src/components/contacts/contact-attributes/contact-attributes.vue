@@ -9,7 +9,7 @@
       <attribute-type-date-picker
         v-if="attribute.type === ContactAttributetTypeEnum.DATE_PICKER"
         :attribute="attribute"
-        :disabled="!hasPermissionTo('update contact')"
+        :disabled="!hasPermissionTo('update contact') || isReadOnly"
         :timezone="contactTimezone"
         data-testid="contact-attributes-type-date-picker"
         @updateField="(eventPayload) => onUpdateFields(eventPayload, attribute.name)"
@@ -19,7 +19,7 @@
       <attribute-type-text
         v-else
         :attribute="attribute"
-        :disabled="!hasPermissionTo('update contact')"
+        :disabled="!hasPermissionTo('update contact') || isReadOnly"
         data-testid="contact-attributes-type-text"
         @updateField="(eventPayload) => onUpdateFields(eventPayload, attribute.name)"
       />
@@ -48,6 +48,11 @@ export default {
     contact: {
       required: true,
       type: Object
+    },
+
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

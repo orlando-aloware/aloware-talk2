@@ -299,6 +299,7 @@ import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
 import { FINISHED } from 'src/constants/export-status'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'MyLayout',
@@ -353,6 +354,7 @@ export default {
     return {
       loading: true,
       loadingCampaigns: false,
+      loadingTeamInboxCampaigns: false,
       loadingRingGroups: false,
       loadingTeams: false,
       loadingContactLists: false,
@@ -418,6 +420,7 @@ export default {
     ...mapState([
       'dialer',
       'campaigns',
+      'teamInboxCampaigns',
       'isMobile',
       'ringGroups',
       'notifications',
@@ -1589,7 +1592,7 @@ export default {
     initAuth () {
       let fetchingStatics = false
       this.loading = true
-      this.setCampaignsIsLoading(true)
+      setCampaignsIsLoading(this, true)
 
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
@@ -1629,7 +1632,8 @@ export default {
         this.getContactLists()
         this.getBroadcasts()
         this.getTemplates()
-        this.getCampaigns()
+        getCampaigns(this)
+        getTeamInboxCampaigns(this)
         this.getWorkflows()
         this.getDispositionStatuses()
         this.getCallDispositions()
@@ -1711,33 +1715,6 @@ export default {
 
           return Promise.reject()
         })
-    },
-
-    getCampaigns () {
-      if (this.hasPermissionTo('list campaign')) {
-        this.loadingCampaigns = true
-
-        return this.$axios
-          .get('/api/v1/campaign', {
-            mode: 'no-cors',
-            params: {
-              is_lite: true
-            }
-          })
-          .then((res) => {
-            this.setCampaigns(res.data)
-            this.loadingCampaigns = false
-            this.setCampaignsIsLoading(false)
-
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingCampaigns = false
-
-            return Promise.reject()
-          })
-      }
     },
 
     getRingGroups () {

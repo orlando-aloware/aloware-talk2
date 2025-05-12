@@ -1,8 +1,9 @@
 <template>
   <b-card class="border-0 contact-ring-groups-wrapper" data-testid="contact-ring-groups-wrapper">
-    <ring-group-selector :value="ringGroupValues"
+    <ring-group-selector data-testid="contact-ring-groups-selector"
+                         :value="ringGroupValues"
                          :multiple="true"
-                         data-testid="contact-ring-groups-selector"
+                         :is-read-only="isReadOnly"
                          @change="submit"/>
   </b-card>
 </template>
@@ -19,6 +20,12 @@ export default {
     RingGroupSelector
   },
 
+  props: {
+    isReadOnly: {
+      type: Boolean,
+      default: false
+    }
+  },
   computed: {
     ...mapGetters('contacts', ['contact']),
     ringGroupValues () {

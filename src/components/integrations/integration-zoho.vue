@@ -79,7 +79,8 @@
 <script>
 import { mapState } from 'vuex'
 import {
-  integrationMixin
+  integrationMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
 import { ZOHO_INTEGRATION } from 'src/constants/integrations'
@@ -89,7 +90,8 @@ export default {
   components: { SyncWithIntegration },
 
   mixins: [
-    integrationMixin
+    integrationMixin,
+    teamInboxPropsMixin
   ],
 
   props: {
@@ -144,7 +146,7 @@ export default {
     getData () {
       this.contactIntegrationDataLoaded = false
 
-      return this.getIntegrationData(this.contact, ZOHO_INTEGRATION)
+      return this.getIntegrationData(this.contact, ZOHO_INTEGRATION, null, this.teamInbox)
         .then(response => {
           if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
             this.integrationData = response.data

@@ -48,6 +48,7 @@
                        :is-active="activeId === (viewMode === THREADED ? item.contact_id : item.id)"
                        :repeats="viewMode === UNTHREADED ? item.repeats : null"
                        :is-live-call="isLiveCall(item)"
+                       :team-inbox-id="activeInboxId"
                        :view-mode="viewMode" />
       </div>
 
@@ -82,7 +83,7 @@ import { isLiveCall } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
-
+import { mapState } from 'vuex'
 export default {
   components: {
     Communication,
@@ -127,6 +128,10 @@ export default {
       CommunicationDirections,
       CommunicationTypes
     }
+  },
+
+  computed: {
+    ...mapState('TeamInbox', ['activeInboxId'])
   },
 
   methods: {

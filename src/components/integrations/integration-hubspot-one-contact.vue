@@ -59,6 +59,7 @@
         <div v-if="isPrimary"
              class="absolute edit-btn-pos">
           <b-link :class="canUpdateLifecycleStage ? 'clickable' : 'not-clickable'"
+                  :disabled="isReadOnly"
                   @click="onShowEditLifecycleStageMenu">
             <pencil-o-icon />
             <q-tooltip anchor="top middle" self="center middle"
@@ -203,6 +204,11 @@ export default {
     contactId: {
       type: [String, Number],
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   components: {

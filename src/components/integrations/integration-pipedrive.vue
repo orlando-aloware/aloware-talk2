@@ -122,7 +122,8 @@ import talk2Api from 'src/plugins/api/api'
 import {
   integrationMixin,
   pipedriveIntegrationMixin,
-  whiteLabelMixin
+  whiteLabelMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -134,7 +135,8 @@ export default {
   mixins: [
     pipedriveIntegrationMixin,
     integrationMixin,
-    whiteLabelMixin
+    whiteLabelMixin,
+    teamInboxPropsMixin
   ],
 
   props: {
@@ -194,7 +196,7 @@ export default {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
     getData () {
-      return this.getIntegrationData(this.contact, 'pipedrive')
+      return this.getIntegrationData(this.contact, 'pipedrive', null, this.teamInbox)
         .then(response => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true

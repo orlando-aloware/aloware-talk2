@@ -88,6 +88,7 @@
                   size="sm"
                   variant="light"
                   data-testid="contact-info-edit-button"
+                  :disabled="isReadOnly"
                   @click="onOpenEditForm">
           <pencil-o-icon/>
         </b-button>
@@ -122,7 +123,7 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="isProcessingBlock"
+                :disabled="isProcessingBlock || isReadOnly"
                 v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
                 data-testid="contact-info-block-button"
                 @click="blockContact">
@@ -144,7 +145,7 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="isProcessingBlock"
+                :disabled="isProcessingBlock || isReadOnly"
                 v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
                 data-testid="contact-info-unblock-button"
                 @click="unBlockContact">
@@ -165,12 +166,13 @@
 
       <contact-dnc-actions class="mr-2 my-1"
                            data-testid="contact-info-dnc-actions"
-                           :contact="contact"></contact-dnc-actions>
+                           :contact="contact"
+                           :disabled="isReadOnly"></contact-dnc-actions>
 
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="contact.is_dnc"
+                :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-appointment-button"
                 @click="addAppointmentOpen(true)">
         <q-tooltip anchor="bottom middle"
@@ -184,7 +186,7 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="contact.is_dnc"
+                :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-reminder-button"
                 @click="addReminderOpen(true)">
         <q-tooltip anchor="bottom middle"
@@ -199,6 +201,7 @@
                 size="sm"
                 class="custom-action-button my-1"
                 data-testid="contact-info-add-power-dialer-button"
+                :disabled="isReadOnly"
                 @click="openPowerDialerModal">
         <q-tooltip anchor="bottom middle"
                    data-testid="contact-info-add-power-dialer-tooltip"
@@ -212,7 +215,7 @@
                 size="sm"
                 class="custom-action-button my-1"
                 data-testid="contact-info-remove-power-dialer-button"
-                :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists"
+                :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists || isReadOnly"
                 @click="removeContactFromPowerDialerLists">
         <q-tooltip anchor="bottom middle"
                    data-testid="contact-info-remove-power-dialer-tooltip"
@@ -226,7 +229,7 @@
                 size="sm"
                 class="custom-action-button my-1"
                 data-testid="contact-info-merge-button"
-                v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled"
+                v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled && !isReadOnly"
                 @click="openMergeContactModal">
         <q-tooltip anchor="bottom middle"
                    data-testid="contact-info-merge-tooltip"
