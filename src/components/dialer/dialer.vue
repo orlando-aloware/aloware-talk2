@@ -24,6 +24,7 @@ import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
 import talk2Api from 'src/plugins/api/api'
+import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry-types'
 
 export default {
   name: 'dialer',
@@ -787,8 +788,8 @@ export default {
 
       // Make sure that phone number is string in this part before proceeding
       currentNumber = currentNumber.toString()
-      const isWhisperCall = currentNumber.includes('whisper')
-      const isBargeCall = currentNumber.includes('barge')
+      const isWhisperCall = currentNumber.includes(COMMUNICATION_SENTRY_TYPE.WHISPER)
+      const isBargeCall = currentNumber.includes(COMMUNICATION_SENTRY_TYPE.BARGE)
 
       // Force mute for whisper/barge calls
       if (isBargeCall || isWhisperCall) {
@@ -797,15 +798,7 @@ export default {
         if (isWhisperCall) {
           const commId = currentNumber.split(':')[1]
           if (commId) {
-            this.$axios.get(`/api/v1/communication/${commId}`)
-              .then(res => {
-                if (res.data && this.isAiAgentUser(res.data.user)) {
-                  this.setDialerAiAgentWhisper(true)
-                }
-              })
-              .catch(err => {
-                console.error('Error fetching communication details:', err)
-              })
+            this.fetchAndSetAiAgentCallMode(commId, COMMUNICATION_SENTRY_TYPE.WHISPER)
           }
         }
 
@@ -813,16 +806,7 @@ export default {
         if (isBargeCall) {
           const commId = currentNumber.split(':')[1]
           if (commId) {
-            this.$axios.get(`/api/v1/communication/${commId}`)
-              .then(res => {
-                if (res.data && this.isAiAgentUser(res.data.user)) {
-                  // Only set the state without calling the API
-                  this.setDialerAiAgentTakeover(true)
-                }
-              })
-              .catch(err => {
-                console.error('Error fetching communication details:', err)
-              })
+            this.fetchAndSetAiAgentCallMode(commId, COMMUNICATION_SENTRY_TYPE.BARGE)
           }
         }
       }
@@ -1900,6 +1884,21 @@ export default {
       this.$VueEvent.fire('onNextTask')
 
       return true
+    },
+
+    fetchAndSetAiAgentCallMode (commId, type = null) {
+      return talk2Api.V1.communication.get(commId)
+        .then(res => {
+          if (type === COMMUNICATION_SENTRY_TYPE.WHISPER && this.isAiAgentUser(res.data.user)) {
+            this.setDialerAiAgentWhisper(true)
+          } else if (type === COMMUNICATION_SENTRY_TYPE.BARGE && this.isAiAgentUser(res.data.user)) {
+            this.setDialerAiAgentTakeover(true)
+          }
+          return res.data
+        })
+        .catch(err => {
+          console.error('Error fetching communication details:', err)
+        })
     },
 
     ...mapActions([
