@@ -49,7 +49,9 @@
                        :repeats="viewMode === UNTHREADED ? item.repeats : null"
                        :is-live-call="isLiveCall(item)"
                        :team-inbox-id="activeInboxId"
-                       :view-mode="viewMode" />
+                       :view-mode="viewMode"
+                       :communication="getCommunicationItem(item)"
+                       :contact="item.contact" />
       </div>
 
       <!-- Load more indicator -->
@@ -167,6 +169,19 @@ export default {
 
     onRefresh () {
       this.$emit('refresh')
+    },
+
+    getCommunicationItem (communication) {
+      return {
+        id: communication.id,
+        type: communication.type,
+        direction: communication.direction,
+        campaign_id: communication.campaign_id,
+        ring_group_id: this.activeInboxId,
+        current_status2: communication.current_status2,
+        disposition_status2: communication.disposition_status2,
+        last_call_source: communication.last_call_source
+      }
     }
   }
 }
