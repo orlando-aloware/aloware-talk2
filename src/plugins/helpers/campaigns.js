@@ -38,7 +38,9 @@ export const getCampaignsData = function (context, options = {}) {
       params
     })
     .then((res) => {
-      context[setAction](res.data)
+      if (typeof context[setAction] === 'function') {
+        context[setAction](res.data)
+      }
       context[loadingFlag] = false
       // Reset loading state
       if (typeof context[setLoadingAction] === 'function') {

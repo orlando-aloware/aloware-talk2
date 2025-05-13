@@ -453,6 +453,10 @@ export default {
       'liveContacts'
     ]),
 
+    ...mapState('TeamInbox', [
+      'activeInboxId'
+    ]),
+
     ...mapState('powerDialer', [
       'ongoingSession',
       'countdownTimer'
@@ -1642,7 +1646,6 @@ export default {
         this.getBroadcasts()
         this.getTemplates()
         getCampaigns(this)
-        getTeamInboxCampaigns(this)
         this.getWorkflows()
         this.getDispositionStatuses()
         this.getCallDispositions()
@@ -1650,6 +1653,11 @@ export default {
         this.getLeadSources()
         this.getAttributeDictionaries()
         this.getMyQueueList()
+
+        // Load team inbox campaigns (no visibility limits) only if a team inbox is active
+        if (this.activeInboxId) {
+          getTeamInboxCampaigns(this)
+        }
       })
     },
 
