@@ -32,7 +32,7 @@ import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
 import TeamInboxFilterSort from './teaminbox-filter-sort.vue'
 import { TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
-import { getQueryString, isLiveCall } from 'src/plugins/helpers/functions'
+import { getQueryString } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { THREADED, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
@@ -134,8 +134,6 @@ export default {
       'setIsLoadingMoreItems'
     ]),
 
-    isLiveCall,
-
     getUnreadsProperties (communication) {
       if (this.viewMode === UNTHREADED) {
         return {
@@ -209,10 +207,10 @@ export default {
       // Special handling for calls
       if (communication.type === CommunicationTypes.CALL) {
         // If this is a live call, it should be shown separately
-        if (isLiveCall(communication)) {
+        if (this.communicationInProgress(communication)) {
           // Remove any existing non-live call from the same group
           const existingIndex = this.itemsData.findIndex(item =>
-            this.getGroupKey(item) === groupKey && !isLiveCall(item)
+            this.getGroupKey(item) === groupKey && !this.communicationInProgress(item)
           )
           if (existingIndex > -1) {
             this.itemsData.splice(existingIndex, 1)
@@ -226,7 +224,7 @@ export default {
 
         // If this is a non-live call, check if we have a live call from the same group
         const liveCallIndex = this.itemsData.findIndex(item =>
-          this.getGroupKey(item) === groupKey && isLiveCall(item)
+          this.getGroupKey(item) === groupKey && this.communicationInProgress(item)
         )
 
         if (liveCallIndex > -1) {
@@ -241,7 +239,7 @@ export default {
 
         // If this is a non-live call and we don't have a live call, check for existing completed calls
         const completedCallIndex = this.itemsData.findIndex(item =>
-          this.getGroupKey(item) === groupKey && !isLiveCall(item)
+          this.getGroupKey(item) === groupKey && !this.communicationInProgress(item)
         )
 
         if (completedCallIndex > -1) {
@@ -354,7 +352,7 @@ export default {
       // New communication (not in the list)
       if (index === -1) {
         // For new communications, add them at appropriate position based on sort order
-        if (isAscendingOrder && !isLiveCall(communication)) {
+        if (isAscendingOrder && !this.communicationInProgress(communication)) {
           // Add to end for ascending order
           this.itemsData.push(communication)
         } else {
@@ -395,7 +393,7 @@ export default {
       let lastCallIndex = -1
 
       this.itemsData.forEach((item, index) => {
-        if (item.type === CommunicationTypes.CALL && !this.isLiveCall(item)) {
+        if (item.type === CommunicationTypes.CALL && !this.communicationInProgress(item)) {
           // Check if this call is subsequent to the last call and has the same direction and contact
           const isSubsequent = lastCallContactId === item.contact_id &&
                              lastCallDirection === item.direction &&
