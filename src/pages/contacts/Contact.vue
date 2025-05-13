@@ -336,15 +336,14 @@ export default {
 
     activeCommunicationId (value) {
       if (this.changingSelectedContact) {
-        console.log('changingSelectedContact', value)
         return
       }
 
       // For Team Inboxes, use activeCommunicationId from the store, because it's not in the route params
       // const isTeamInbox = this.$route.name === TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
-      const isUnthreaded = this.viewMode === UNTHREADED
-      console.log('activeCommunicationId', value, this.teamInbox, isUnthreaded)
-      if (value && this.teamInbox && isUnthreaded) {
+      const isUnthreaded = this.teamInbox && this.viewMode === UNTHREADED
+
+      if (value && isUnthreaded) {
         this.fetchContactCommunicationsUntilFound()
       }
     },

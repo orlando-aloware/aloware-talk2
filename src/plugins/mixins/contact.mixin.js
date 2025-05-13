@@ -780,7 +780,6 @@ export default {
     },
 
     fetchContactCommunicationsUntilFound (tryCount = 1) {
-      console.log('fetchContactCommunicationsUntilFound', tryCount)
       if (tryCount > 10) {
         this.loadingContactCommunications = false
         this.$generalNotification('Communication is too old for automatic scrolling', 'error')
@@ -792,14 +791,11 @@ export default {
 
       // we found the activity, scroll to it
       if (this.isCommunicationFound()) {
-        alert('communication found')
         this.scrollIntoActivity()
         this.loadingContactCommunications = false
 
         return
       }
-
-      alert('communication not found')
 
       // fetch communications until we found the activity id
       this.fetchContactCommunications(this.contactId).then(res => {
@@ -918,11 +914,11 @@ export default {
     },
 
     hasCommunication () {
-      return this.$route.params.communicationId
+      return !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
     },
 
     isCommunicationFound () {
-      const communicationId = this.$route.params.communicationId || this.activeCommunicationId
+      const communicationId = !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
       return communicationId &&
         !!this.communicationsAndAudits.find(communication => 'type' in communication &&
           communication.id.toString() === communicationId.toString())
@@ -965,7 +961,7 @@ export default {
     },
 
     scrollIntoActivity () {
-      const communicationId = this.$route.params.communicationId || this.activeCommunicationId
+      const communicationId = !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
       const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === communicationId.toString())
       const ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
       let count = 0
