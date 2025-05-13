@@ -1029,7 +1029,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
+    ...mapState(['campaigns', 'teamInboxCampaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('inbox', ['liveContacts', 'contacts']),
     ...mapState('broadcast', ['broadcasts']),

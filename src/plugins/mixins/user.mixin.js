@@ -1,6 +1,5 @@
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../../constants/answer-types'
-import * as User from '../../constants/user'
 import { get, isEmpty } from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 
@@ -65,10 +64,6 @@ export default {
         id: id,
         name: ''
       }
-    },
-
-    isAiAgentUser (user) {
-      return user && user.type === User.TYPE_AI_AGENT
     },
 
     getUserName (user) {
