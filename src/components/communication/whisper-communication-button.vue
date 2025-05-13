@@ -13,14 +13,14 @@
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-whisper-${_uid}`"
                v-else>
-      {{ isAiAgentUser(communication.user) ? 'Listen' : 'Whisper' }}
+      Whisper
     </b-tooltip>
   </span>
 </template>
 
 <script>
 import EarIcon from 'src/components/icons/ear-icon.vue'
-import { aclMixin, agentMixin, communicationMixin, userMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'whisper-communication-button',
@@ -28,8 +28,7 @@ export default {
   mixins: [
     aclMixin,
     agentMixin,
-    communicationMixin,
-    userMixin
+    communicationMixin
   ],
 
   components: {
@@ -66,11 +65,7 @@ export default {
 
   methods: {
     dialog () {
-      const message = this.isAiAgentUser(this.communication.user)
-        ? `Do you want to listen to the AI agent call? Note that you cannot unmute yourself while listening to the AloAi agent.`
-        : `Do you want to whisper to the agent of this call? Note that you will be muted by default.`
-
-      this.$bvModal.msgBoxConfirm(message, {
+      this.$bvModal.msgBoxConfirm('Do you want to whisper to the agent of this call? Note that you will be muted by default.', {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',
