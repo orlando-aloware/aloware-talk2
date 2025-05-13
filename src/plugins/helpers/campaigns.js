@@ -10,10 +10,9 @@
  * @param {Function} options.setLoadingAction - Vuex action to set the loading state
  * @param {Boolean} options.loadingFlag - Reference to the loading flag in the component
  * @param {Object} options.params - Additional parameters for the API call
- * @param {Boolean} fromTeamInbox - Whether the campaigns are being fetched from a team inbox
  * @returns {Promise} - Promise that resolves when campaigns are loaded
  */
-export const getCampaignsData = function (context, options = {}, fromTeamInbox = false) {
+export const getCampaignsData = function (context, options = {}) {
   const {
     setAction = 'setCampaigns',
     setLoadingAction = 'setCampaignsIsLoading',
@@ -21,9 +20,8 @@ export const getCampaignsData = function (context, options = {}, fromTeamInbox =
     params = { is_lite: true }
   } = options
 
-  if (fromTeamInbox) {
-    params.from_team_inbox = true
-  }
+  // Fixing it in case the default value is overridden
+  params.is_lite = true
 
   if (!context.hasPermissionTo('list campaign')) {
     return Promise.resolve()
@@ -92,8 +90,11 @@ export const getTeamInboxCampaigns = function (context) {
   return getCampaignsData(context, {
     setAction: 'setTeamInboxCampaigns',
     setLoadingAction: 'setCampaignsIsLoading',
-    loadingFlag: 'loadingTeamInboxCampaigns'
-  }, true)
+    loadingFlag: 'loadingTeamInboxCampaigns',
+    params: {
+      from_team_inbox: true
+    }
+  })
 }
 
 /**
