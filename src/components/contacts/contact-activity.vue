@@ -4,7 +4,8 @@
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
     <div class="d-flex flex-row align-items-center position-relative"
          v-if="communication.property === undefined">
-      <q-badge class="is-dot unread-dot mx-1 blue position-absolute"
+      <q-badge class="is-dot unread-dot mx-1 position-absolute"
+               color="red"
                rounded
                data-testid="contact-activity-unread-dot-badget"
                v-if="(markable || (communication.type === CommunicationTypes.SMS ||
