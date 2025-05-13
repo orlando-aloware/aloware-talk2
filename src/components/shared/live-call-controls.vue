@@ -192,7 +192,7 @@ export default {
     }
   },
 
-  methods: {
+  computed: {
     isIncomingCall () {
       const isCallFishing = this.isCallFishingMode && this.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
       const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
