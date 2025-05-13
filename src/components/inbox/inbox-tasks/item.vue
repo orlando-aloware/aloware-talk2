@@ -91,10 +91,8 @@
       </span>
 
       <div v-if="contact.last_communication && isLiveCall">
-        <live-call-controls
-          :communication="contact.last_communication"
-          :contact="contact"
-        />
+        <live-call-controls :communication="contact.last_communication"
+                            :contact="contact" />
       </div>
     </div>
 

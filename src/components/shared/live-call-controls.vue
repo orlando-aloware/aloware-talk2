@@ -186,11 +186,6 @@ export default {
       default: null
     },
 
-    currentStatus: {
-      type: [String, Number],
-      required: false
-    },
-
     contact: {
       type: Object,
       default: null

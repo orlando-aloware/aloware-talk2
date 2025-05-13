@@ -1,5 +1,5 @@
 <template>
-  <div :class="['communication', 'd-flex', 'flex-row', { active: isActive, 'live-call-item': isLiveCall}]">
+  <div :class="['communication', 'd-flex', 'flex-row', { active: isActive, 'live-call-item': isLiveCall }]">
     <div class="communication__avatar pr-3">
       <avatar width="34"
               height="34"
@@ -41,11 +41,10 @@
                                :last-communication-current-status="currentStatus"
                                v-if="date" />
     </div>
-    <div class="d-flex align-items-center pr-2" v-if="isLiveCall">
-      <live-call-controls
-        :communication="communication"
-        :contact="contact"
-      />
+    <div class="d-flex align-items-center pr-2"
+         v-if="isLiveCall">
+      <live-call-controls :communication="communication"
+                          :contact="contact" />
     </div>
   </div>
 </template>

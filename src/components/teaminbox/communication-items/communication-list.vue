@@ -51,7 +51,7 @@
                        :team-inbox-id="activeInboxId"
                        :view-mode="viewMode"
                        :communication="getCommunicationItem(item)"
-                       :contact="item.contact"/>
+                       :contact="item.contact" />
       </div>
 
       <!-- Load more indicator -->
