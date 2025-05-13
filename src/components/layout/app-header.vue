@@ -514,7 +514,7 @@ export default {
         this.resetCommunications(this.communicationFilters)
         this.getCommunications(this.communicationFilters)
       } else if (this.isTeamInboxPage) {
-        this.resetTeamInbox()
+        this.refreshTeamInbox()
       }
     },
 
@@ -557,8 +557,8 @@ export default {
       this.$VueEvent.fire('fetchPowerDialerListItems')
     },
 
-    resetTeamInbox () {
-      this.$VueEvent.fire('resetTeamInbox')
+    refreshTeamInbox () {
+      this.$VueEvent.fire('refreshTeamInbox')
     }
   },
 
