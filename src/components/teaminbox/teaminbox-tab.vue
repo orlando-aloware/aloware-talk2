@@ -183,7 +183,7 @@ export default {
         unreadCount: communicationUnreadCount || 0
       })
 
-      !isThreaded && this.setActiveCommunicationId(item.id)
+      this.setActiveCommunicationId(isThreaded ? null : item.id)
 
       // avoid redundant navigation
       if (route === this.$route.path) {
