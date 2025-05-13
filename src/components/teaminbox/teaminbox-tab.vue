@@ -131,7 +131,8 @@ export default {
       'setActiveSort',
       'setCurrentSearch',
       'setIsInitialLoad',
-      'setIsLoadingMoreItems'
+      'setIsLoadingMoreItems',
+      'setActiveCommunicationId'
     ]),
 
     isLiveCall,
@@ -167,6 +168,8 @@ export default {
       const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
 
       if (this.viewMode === UNTHREADED) {
+        this.setActiveCommunicationId(item.id)
+
         // Fetch the unread count for the active communication
         const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [item.contact_id])
         const unreadCountData = unreadCount[0]

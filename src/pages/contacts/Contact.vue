@@ -113,6 +113,7 @@ import {
   MAX_TABLET_WIDTH
 } from 'src/constants/viewport-sizes'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'contact',
@@ -142,6 +143,8 @@ export default {
     ]),
 
     ...mapGetters('auth', ['authenticated']),
+
+    ...mapState('TeamInbox', ['activeCommunicationId', 'viewMode']),
 
     ...mapState([
       'contactDetailsDrawer',
@@ -327,6 +330,21 @@ export default {
 
     '$route.params.communicationId': function (value) {
       if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
+        this.fetchContactCommunicationsUntilFound()
+      }
+    },
+
+    activeCommunicationId (value) {
+      if (this.changingSelectedContact) {
+        console.log('changingSelectedContact', value)
+        return
+      }
+
+      // For Team Inboxes, use activeCommunicationId from the store, because it's not in the route params
+      // const isTeamInbox = this.$route.name === TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+      const isUnthreaded = this.viewMode === UNTHREADED
+      console.log('activeCommunicationId', value, this.teamInbox, isUnthreaded)
+      if (value && this.teamInbox && isUnthreaded) {
         this.fetchContactCommunicationsUntilFound()
       }
     },
