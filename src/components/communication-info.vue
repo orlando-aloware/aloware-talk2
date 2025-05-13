@@ -1149,7 +1149,7 @@ export default {
 
       const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
 
-      const found = campaigns?.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
+      const found = campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
       if (found) {
         return found.name
       }
