@@ -914,13 +914,14 @@ export default {
     },
 
     hasCommunication () {
-      return this.$route.params.communicationId
+      return !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
     },
 
     isCommunicationFound () {
-      return this.$route.params.communicationId &&
+      const communicationId = !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
+      return communicationId &&
         !!this.communicationsAndAudits.find(communication => 'type' in communication &&
-          communication.id.toString() === this.$route.params.communicationId.toString())
+          communication.id.toString() === communicationId.toString())
     },
 
     isHashActivityType () {
@@ -960,7 +961,8 @@ export default {
     },
 
     scrollIntoActivity () {
-      const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      const communicationId = !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
+      const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === communicationId.toString())
       const ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
       let count = 0
       let communicationActivity = null
