@@ -127,7 +127,6 @@ export default {
 .last-communication {
   font-size: 14px;
   font-weight: 500;
-  width: 195px;
 
   &__label {
     font-size: 12px;
