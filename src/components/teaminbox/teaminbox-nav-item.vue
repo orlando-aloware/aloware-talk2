@@ -15,13 +15,13 @@
                     width="20px"
                     v-if="isLoadingUnreadCount"/>
         <q-badge pill
-                variant="danger"
+                color="danger"
                 rounded
                 v-else-if="unreadCount < 99">
           {{ unreadCount }}
         </q-badge>
         <q-badge pill
-                 variant="danger"
+                 color="danger"
                  rounded
                  v-else>
           99<sup>+</sup>
