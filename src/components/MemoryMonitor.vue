@@ -68,7 +68,7 @@ export default {
     },
 
     visible () {
-      return !this.isProduction || this.isDemoCompany
+      return this.monitoringEnabled
     }
   },
 

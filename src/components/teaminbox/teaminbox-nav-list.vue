@@ -347,9 +347,9 @@ export default {
       }
     },
 
-    async resetTeamInbox () {
+    async refreshTeamInbox () {
       await this.resetInboxes()
-      await this.fetchInboxes()
+      await this.fetchInboxes(this.search)
 
       if (this.activeInboxId) {
         await this.onInboxSelect(this.activeInboxId, null, true)
@@ -382,7 +382,7 @@ export default {
     this.$VueEvent.listen('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
 
-    this.$VueEvent.listen('resetTeamInbox', this.resetTeamInbox)
+    this.$VueEvent.listen('refreshTeamInbox', this.refreshTeamInbox)
   },
 
   watch: {
@@ -444,7 +444,7 @@ export default {
     this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
 
-    this.$VueEvent.stop('resetTeamInbox', this.resetTeamInbox)
+    this.$VueEvent.stop('refreshTeamInbox', this.refreshTeamInbox)
   }
 }
 </script>
