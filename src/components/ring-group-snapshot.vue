@@ -38,6 +38,7 @@ import RingGroupRoutingTable from 'components/ring-group-routing-table'
 import { DISPOSITION_STATUS_ABANDONED_NEW } from 'src/constants/communication-disposition-status'
 import { INBOUND } from 'src/constants/communication-direction'
 import { userMixin } from 'src/plugins/mixins'
+import { CREATOR_TYPE_WORKFLOW } from 'src/constants/creator-types'
 
 export default {
   name: 'ring-group-snapshot',
@@ -101,8 +102,8 @@ export default {
   computed: {
     showRingGroupSnapShot () {
       return this.ringGroup &&
-        this.isInboundCall &&
-        this.hasRingGroupSnapshot
+        this.hasRingGroupSnapshot &&
+        (this.isInboundCall || this.isCreatedFromSequence)
     },
 
     isInboundCall () {
@@ -111,6 +112,10 @@ export default {
 
     hasRingGroupSnapshot () {
       return this.communication.metadata?.ring_group_snapshot
+    },
+
+    isCreatedFromSequence () {
+      return this.communication.creator_type === CREATOR_TYPE_WORKFLOW
     },
 
     snapshotDescription () {
@@ -126,7 +131,7 @@ export default {
         return 'Abandoned calls don\'t have a ring group snapshot.'
       }
 
-      return 'This feature is not yet available on your account.'
+      return 'This communication does not have a snapshot.'
     }
   },
 

@@ -66,7 +66,9 @@
 
         <message-composer-note @message-sent="onMessageSent"
                                data-testid="message-composer-note"
-                               v-if="messageComposer.mode === 'note'"/>
+                               v-if="messageComposer.mode === 'note'"
+                               :team-inbox-id="teamInboxId"
+        />
       </div>
     </div>
     <div class="composer-footer d-flex justify-content-between pt-1"
@@ -98,12 +100,12 @@
 import MessageComposerSms from 'components/message-composer/message-composer-sms'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
+  aclMixin,
   contactMixin,
   contactV2AttributesMixin,
-  aclMixin,
-  visibilityMixin,
+  kycMixin,
   selectorMixin,
-  kycMixin
+  visibilityMixin
 } from 'src/plugins/mixins'
 import ContactPhoneNumberSelector from 'components/message-composer/contact-phone-number-selector'
 import LineSelector from 'components/message-composer/line-selector'
