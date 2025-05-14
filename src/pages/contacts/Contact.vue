@@ -340,7 +340,6 @@ export default {
       }
 
       // For Team Inboxes, use activeCommunicationId from the store, because it's not in the route params
-      // const isTeamInbox = this.$route.name === TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
       const isUnthreaded = this.teamInbox && this.viewMode === UNTHREADED
 
       if (value && isUnthreaded) {
