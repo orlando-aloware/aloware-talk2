@@ -1,6 +1,17 @@
 <template>
-  <div class="calls-header d-flex justify-content-between pr-3">
-    <div class="calls-header__label">
+  <div class="calls-header d-flex justify-content-between pr-3 flex-wrap">
+    <talk-alert-banner
+      class="cursor-pointer col-12 pr-0 pb-2"
+      v-if="isReadOnly"
+      tooltip="You can view this contact and take basic actions like calling or replying,
+      but editing, tagging, or adding to Lists, as well as enrolling in Sequences,
+      AloAI Agents, or syncing to your CRM, is restricted."
+    >
+      <div class="d-flex align-items-center text-center justify-content-center" style="gap: .25rem">
+        <lock-icon /> <span class="text-bold text-dark">Limited Access</span>
+      </div>
+    </talk-alert-banner>
+    <div class="calls-header__label d-flex">
       <back-button class="p-0"
                    v-if="$q.screen.lt.md && ![TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes($route.name)"
                    data-testid="contact-activities-back-btn"
@@ -13,20 +24,7 @@
         {{ contact.task_status | fixTaskStatusName }}
       </b-badge>
     </div>
-    <div>
-      <talk-alert-banner
-        class="cursor-pointer"
-        v-if="isReadOnly"
-        tooltip="You can view this contact and take basic actions like calling or replying,
-        but editing, tagging, or adding to Lists, as well as enrolling in Sequences,
-        AloAI Agents, or syncing to your CRM, is restricted."
-      >
-        <div class="row align-items-center" style="gap: .25rem">
-          <lock-icon /> <span class="text-bold text-dark">Limited Access</span>
-        </div>
-      </talk-alert-banner>
-    </div>
-    <div class="contact-activities-actions text-nowrap">
+    <div class="contact-activities-actions text-nowrap d-flex">
       <div class="contact-activities-actions__mobile align-items-center flex-grow-1 justify-content-end">
         <b-dropdown no-caret
                     right
