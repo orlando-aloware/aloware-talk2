@@ -13,6 +13,19 @@
         {{ contact.task_status | fixTaskStatusName }}
       </b-badge>
     </div>
+    <div>
+      <talk-alert-banner
+        class="cursor-pointer"
+        v-if="isReadOnly"
+        tooltip="You can view this contact and take basic actions like calling or replying,
+        but editing, tagging, or adding to Lists, as well as enrolling in Sequences,
+        AloAI Agents, or syncing to your CRM, is restricted."
+      >
+        <div class="row align-items-center" style="gap: .25rem">
+          <lock-icon /> <span class="text-bold text-dark">Limited Access</span>
+        </div>
+      </talk-alert-banner>
+    </div>
     <div class="contact-activities-actions text-nowrap">
       <div class="contact-activities-actions__mobile align-items-center flex-grow-1 justify-content-end">
         <b-dropdown no-caret
@@ -223,10 +236,12 @@ import EllipsisIcon from 'components/icons/ellipsis-icon'
 import ExportIcon from '../icons/export-icon.vue'
 import BackButton from 'components/back-button'
 import Profile from 'components/profile'
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 import { aclMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import TalkAlertBanner from 'components/common/talk-alert-banner.vue'
+import LockIcon from 'components/icons/inbox/lock-icon.vue'
 
 export default {
   name: 'contact-activities-header',
@@ -237,6 +252,8 @@ export default {
   ],
 
   components: {
+    LockIcon,
+    TalkAlertBanner,
     Profile,
     InboxOIcon,
     CheckOIcon,
@@ -310,6 +327,19 @@ export default {
     inPowerDialerPage () {
       const previousPage = this.$route?.query?.previousPage
       return previousPage === 'Power Dialer'
+    },
+
+    isReadOnly () {
+      if (!this.contact) {
+        return false
+      }
+
+      return Boolean(
+        (typeof this.contact.is_limited_campaign === 'number' && this.contact.is_limited_campaign) ||
+        (typeof this.contact.is_limited_owned_only === 'number' && this.contact.is_limited_owned_only) ||
+        (typeof this.contact.is_limited_ring_group === 'number' && this.contact.is_limited_ring_group) ||
+        (typeof this.contact.is_limited_ring_group_users === 'number' && this.contact.is_limited_ring_group_users)
+      )
     }
   },
   data () {
