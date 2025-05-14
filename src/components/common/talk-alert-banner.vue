@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-content-center" v-b-tooltip.hover="{ customClass: 'tooltip-dark'}" :title="tooltip">
     <div
-      class="alert alert-warning border-warning p-2 mb-0"
+      class="alert alert-warning border-warning p-2 mb-0 w-100"
     >
       <slot />
     </div>
