@@ -9,7 +9,7 @@
               :unread-properties="unreadProperties" />
       </avatar>
     </div>
-    <div class="d-flex flex-column flex-grow-1">
+    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
       <div>
         <contact-name :name="contactName || defaultEmptyName"
                       :repeats="repeats" />
