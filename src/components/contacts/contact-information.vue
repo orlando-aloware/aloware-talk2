@@ -126,9 +126,9 @@
                               contentClass="inline-input contact-info-editable"
                               popoverClass="contact-info-popover"
                               popoverId="popover-date-picker-sync"
-                              :canEdit="hasPermissionTo('update contact') && !isReadOnly"
                               v-model="contact.date_of_birth"
                               data-testid="contact-information-date-of-birth-selector"
+                              :can-edit="hasPermissionTo('update contact') && !isReadOnly"
                               @change="(eventPayload) => onUpdateFields(eventPayload, 'date_of_birth')">
         </date-picker-selector>
       </div>
@@ -141,7 +141,7 @@
                               borderless
                               :genericStyling="false"
                               :outlined="false"
-                              :disabled="!hasPermissionTo('update contact') || isReadOnly"
+                              :disable="!hasPermissionTo('update contact') || isReadOnly"
                               v-model="contact.lead_source"
                               data-testid="contact-information-lead-source-selector"
                               @change="(eventPayload) => onUpdateFields(eventPayload, 'lead_source')">

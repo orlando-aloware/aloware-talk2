@@ -6,6 +6,7 @@
       v-model="defaultDate"
       :format="momentDateFormat"
       :formatted="momentDateFormat"
+      :disabled="disabled"
       @dateSelected="saveDateValue"
     />
 

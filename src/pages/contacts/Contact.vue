@@ -21,6 +21,7 @@
                             :loadingCommunications="loadingContactCommunications"
                             :team-inbox-id="teamInboxId"
                             :team-inbox-unread-count="teamInboxUnreadCount"
+                            :is-read-only="isReadOnly"
                             v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"

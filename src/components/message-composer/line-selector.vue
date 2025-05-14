@@ -119,7 +119,8 @@ export default {
      * Returns the active campaigns
      */
     activeCampaigns () {
-      return this.campaigns.filter(campaign => this.activeCampaignsIds.includes(campaign.id))
+      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+      return campaigns.filter(campaign => this.activeCampaignsIds.includes(campaign.id))
     },
 
     selectedCampaign () {
