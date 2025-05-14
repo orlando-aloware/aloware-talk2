@@ -271,11 +271,15 @@
               </b-col>
               <b-col cols="7">
                 <router-link
-                  :to="getContactRouteLink(communication)"
                   data-testid="comm-details-contact-router-link"
+                  :to="getContactRouteLink(communication)"
+                  v-if="!isContactReadOnly"
                 >
                   {{ communication.contact.name | fixContactName }}
                 </router-link>
+                <span v-else>
+                  {{ communication.contact.name | fixContactName }}
+                </span>
               </b-col>
             </b-form-row>
             <hr />
@@ -325,7 +329,9 @@
                   class="d-flex align-items-center"
                   v-if="communication.direction === CommunicationDirections.INBOUND && communication.type !== CommunicationTypes.EMAIL"
                 >
-                  <div>
+                  <div
+                    v-if="!isContactReadOnly"
+                  >
                     <div
                       class="flex items-center mr-1 h-100"
                       v-if="communication?.contact"
@@ -343,6 +349,18 @@
                       </span>
                     </div>
                     {{ communication.lead_number | fixPhone }}
+                  </div>
+                  <div v-else>
+                    <div>
+                      <span>
+                        {{ communication.contact.name | fixContactName }}
+                      </span>
+                    </div>
+                    <div>
+                      <span>
+                        {{ communication.lead_number | fixPhone }}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div
@@ -480,7 +498,9 @@
                   class="d-flex align-items-center"
                   v-else
                 >
-                  <div>
+                  <div
+                    v-if="!isContactReadOnly"
+                  >
                     <div
                       class="flex items-center mr-1 h-100"
                       v-if="communication?.contact"
@@ -498,6 +518,18 @@
                       </span>
                     </div>
                     {{ communication.lead_number | fixPhone }}
+                  </div>
+                  <div v-else>
+                    <div>
+                      <span>
+                        {{ communication.contact.name | fixContactName }}
+                      </span>
+                    </div>
+                    <div>
+                      <span>
+                        {{ communication.lead_number | fixPhone }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </b-col>
@@ -1377,6 +1409,7 @@
                     :category="TagCategories.CAT_COMMUNICATIONS"
                     :use-card="false"
                     :use-add-icon="true"
+                    :is-read-only="isContactReadOnly"
                   />
                 </div>
               </b-col>
@@ -1587,6 +1620,11 @@ export default {
     },
 
     mobileView: {
+      type: Boolean,
+      default: false
+    },
+
+    isContactReadOnly: {
       type: Boolean,
       default: false
     }

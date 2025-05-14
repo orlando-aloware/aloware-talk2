@@ -1,11 +1,12 @@
 <template>
   <label class="w-100 position-relative"
     :class="wrapperClass">
-    <q-input :class="contentClass"
+    <q-input data-testid="date-picker-selector-input"
+             v-model="selectedId"
+             :class="contentClass"
              :mask="inputMask"
              :disabled="!canEdit"
-             v-model="selectedId"
-             data-testid="date-picker-selector-input"
+             :readonly="!canEdit"
              @input="onInput">
       <template v-slot:append>
         <b-button variant="info"
@@ -123,6 +124,11 @@ export default {
       this.selectedId = val === null ? '' : val
     },
     showDatePicker (value) {
+      if (!this.canEdit) {
+        this.showDatePicker = false
+        return
+      }
+
       if (value) {
         this.datePickerReference = this.$refs.datePickerSelect
         return

@@ -8,6 +8,7 @@
                :opacity="0.85">
       <communication-details :verbose="true"
                              :communication="communication"
+                             :is-contact-read-only="isContactReadOnly"
                              data-testid="comm-communication-details"
                              v-if="!hasError && communication">
       </communication-details>
@@ -47,9 +48,14 @@
 import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
 import CommunicationDetails from 'components/communication-details'
-
+import { userMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
 export default {
   name: 'Communication',
+
+  mixins: [
+    userMixin
+  ],
 
   components: {
     CommunicationDetails
@@ -64,12 +70,40 @@ export default {
     }
   },
 
+  computed: {
+    ...mapState('cache', ['currentCompany']),
+
+    contactReadOnlyLimits () {
+      return this.currentCompany.team_inbox_enabled
+        ? this.communication?.contact_read_only_limits
+        : null
+    },
+
+    isContactReadOnly () {
+      return Boolean(this.contactReadOnlyLimits &&
+        (
+          this.contactReadOnlyLimits.is_limited_campaign ||
+          this.contactReadOnlyLimits.is_limited_owned_only ||
+          this.contactReadOnlyLimits.is_limited_ring_group ||
+          this.contactReadOnlyLimits.is_limited_ring_group_users
+        )
+      )
+    }
+  },
+
   methods: {
     getCommunication (id) {
       this.isLoadingCommunication = true
       this.hasError = false
 
-      talk2Api.V1.communication.get(id)
+      const params = {
+      }
+
+      if (this.hasCompanyTeamInboxEnabled) {
+        params.from_team_inbox = true
+      }
+
+      talk2Api.V1.communication.get(id, params)
         .then(res => {
           this.communication = res.data
         }).catch(err => {

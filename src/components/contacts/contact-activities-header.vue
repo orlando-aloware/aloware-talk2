@@ -43,7 +43,7 @@
           </b-dropdown-item>
 
           <b-dropdown-item href="#"
-                           :disable="isUpdatingStatus"
+                           :disable="isUpdatingStatus || isReadOnly"
                            v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
                            data-testid="contact-activities-move-to-pending-item"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
@@ -52,14 +52,14 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contact-activities-close-item"
-                           :disable="isUpdatingStatus"
+                           :disable="isUpdatingStatus || isReadOnly"
                            v-if="shouldDisplayContact"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
             <check-o-icon class="dropdown-icon"></check-o-icon>
             Close
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           :disable="isUpdatingStatus"
+                           :disable="isUpdatingStatus || isReadOnly"
                            v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
                            data-testid="contact-activities-reopen-item"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
@@ -138,7 +138,7 @@
           type="a"
           color="primary"
           class="text-decoration-none"
-          :disable="isUpdatingStatus"
+          :disable="isUpdatingStatus || isReadOnly"
           data-testid="contact-activities-move-to-pending-btn"
           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
           <q-tooltip anchor="top middle"
@@ -161,7 +161,7 @@
                type="a"
                color="primary"
                class="text-decoration-none"
-               :disable="isUpdatingStatus"
+               :disable="isUpdatingStatus || isReadOnly"
                data-testid="contact-activities-reopen-btn"
                @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)"
                v-if="shouldDisplayClosedOrPendingContact">
@@ -186,7 +186,7 @@
           type="a"
           color="primary"
           class="text-decoration-none"
-          :disable="isUpdatingStatus"
+          :disable="isUpdatingStatus || isReadOnly"
           data-testid="contact-activities-close-btn"
           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)"
           v-if="shouldDisplayContact">
@@ -270,6 +270,10 @@ export default {
     enableExport: {
       type: Boolean,
       default: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 
