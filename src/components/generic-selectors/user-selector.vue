@@ -61,7 +61,15 @@
           </q-item-label>
           <q-item-label caption
                         v-else>
-            <div>{{ getLabel(scope.opt) }}</div>
+            <span v-if="scope.opt.type === User.TYPE_AI_AGENT"
+                  class="ai-effect-gradient-text">
+              <sparkle-icon :width="12"
+                            :height="12" />
+              {{ getLabel(scope.opt) }}
+            </span>
+            <span v-else>
+              {{ getLabel(scope.opt) }}
+            </span>
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -99,6 +107,7 @@ import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as User from 'src/constants/user'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import SparkleIcon from 'components/icons/ai/sparkle-icon'
 import { selectorMixin, userMixin } from 'src/plugins/mixins'
 
 export default {
@@ -106,7 +115,7 @@ export default {
 
   mixins: [selectorMixin, userMixin],
 
-  components: { RemoveTagIcon },
+  components: { RemoveTagIcon, SparkleIcon },
 
   props: {
     value: {
@@ -221,7 +230,8 @@ export default {
       selectedId: this.value,
       userOptions: [],
       reference: 'userSelect',
-      fullOptionsProperty: 'formattedOptions'
+      fullOptionsProperty: 'formattedOptions',
+      User
     }
   },
 
@@ -365,6 +375,9 @@ export default {
 
       switch (user.answer_by) {
         case AnswerTypes.BY_PHONE_NUMBER:
+          if (user.type === User.TYPE_AI_AGENT) {
+            return 'AloAi Agent'
+          }
           return 'Phone Number (' + user.phone_number + ')'
         case AnswerTypes.BY_BROWSER:
           return 'Apps'
