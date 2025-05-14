@@ -527,13 +527,19 @@ export default {
         return Promise.resolve()
       }
 
+      const params = {
+        sid: sid,
+        phone_number: from,
+        live: true
+      }
+
+      if (this.currentCompany.team_inbox_enabled) {
+        params.from_team_inbox = true
+      }
+
       this.loadingCommunication = true
       return this.$axios.get('/api/v1/communication/info', {
-        params: {
-          sid: sid,
-          phone_number: from,
-          live: true
-        }
+        params
       }).then(res => {
         if (this.dialer.communication && !force) {
           return Promise.resolve()

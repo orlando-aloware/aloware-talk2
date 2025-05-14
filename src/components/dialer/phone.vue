@@ -156,6 +156,7 @@
                        icon="o_info"
                        flat
                        round
+                       :disabled="isContactReadOnly"
                        @click="goToContact">
                 </q-btn>
               </q-item-label>
@@ -271,9 +272,11 @@
                 <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                               v-if="contact">
                   <span class="d-inline-flex cursor-pointer link-only"
-                        @click="goToContact">
+                        @click="goToContact"
+                        v-if="!isContactReadOnly">
                     {{ contactName | truncate(15) }}
                   </span>
+                  <span v-else>{{ contactName | truncate(15) }}</span>
                   <contact-integrations-link-icons :contact='contact' />
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
@@ -419,6 +422,7 @@
                 <span>Notes</span>
               </button>
               <button class="phone-buttons elevated btn"
+                      :disabled="isContactReadOnly"
                       @click="openExpansion('tags')">
                 <tags-icon :width="iconSizes.tags.width"
                            :height="iconSizes.tags.height">
@@ -554,6 +558,7 @@
                                              :highlighted="isHighlightedContactDisposition"
                                              :required="isHighlightedContactDisposition"
                                              :contact="contact"
+                                             :is-read-only="isContactReadOnly"
                                              @change="onContactDisposed">
                 </contact-disposition-wrapper>
               </div>
@@ -657,7 +662,8 @@
                              :entity-object="dialer.communication"
                              :category="TagCategories.CAT_COMMUNICATIONS"
                              :use-card="false"
-                             :use-add-icon="true" />
+                             :use-add-icon="true"
+                             :is-read-only="isContactReadOnly" />
               </div>
             </div>
 
@@ -784,6 +790,8 @@
               <q-card-section class="height-240">
                 <contact-integrations :contact="contact"
                                       :no_title="true"
+                                      :team-inbox-id="forceTeamInboxId"
+                                      :is-read-only="isContactReadOnly"
                                       v-show="expanded">
                 </contact-integrations>
               </q-card-section>
@@ -1960,6 +1968,30 @@ export default {
 
     shouldDisableCallBackButton () {
       return this.isNotDisposed || this.isNotOnWrapUp || this.isCallBackButtonDisabled
+    },
+
+    /**
+     * If the current company has team inbox enabled, force the team inbox id to 1 simply to force the integration to show as urrestricted because of visibility limits
+     */
+    forceTeamInboxId () {
+      return this.currentCompany.team_inbox_enabled ? 1 : null
+    },
+
+    contactReadOnlyLimits () {
+      return this.currentCompany.team_inbox_enabled
+        ? this.dialer?.communication?.contact_read_only_limits
+        : null
+    },
+
+    isContactReadOnly () {
+      return Boolean(this.contactReadOnlyLimits &&
+        (
+          this.contactReadOnlyLimits.is_limited_campaign ||
+          this.contactReadOnlyLimits.is_limited_owned_only ||
+          this.contactReadOnlyLimits.is_limited_ring_group ||
+          this.contactReadOnlyLimits.is_limited_ring_group_users
+        )
+      )
     }
   },
 
@@ -2066,7 +2098,7 @@ export default {
     },
 
     goToContact () {
-      if (!this.contact) {
+      if (!this.contact || this.isContactReadOnly) {
         return
       }
 
