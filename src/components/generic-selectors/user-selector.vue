@@ -207,6 +207,11 @@ export default {
     showAnswerType: {
       type: Boolean,
       default: true
+    },
+
+    includeAloAiUsers: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -259,8 +264,7 @@ export default {
       if (!_.isEmpty(this.availableUsers)) {
         if (this.allAnswerTypes) {
           return this.availableUsers.filter((user) =>
-            !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access) &&
-            user.type !== User.TYPE_AI_AGENT
+            !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access)
           )
         }
 
@@ -291,11 +295,17 @@ export default {
       const usersArray = { data: normalUsers }
 
       if (!this.hideExtensions && this.extensionUsers && this.extensionUsers.length > 0) {
-        const extensionUsers = [...this.extensionUsers]
+        let extensionUsers = [...this.extensionUsers]
         extensionUsers.unshift({
           group: 'Extensions',
           disable: true
         })
+
+        // If AloAi users should not be included, filter them out
+        if (!this.includeAloAiUsers) {
+          extensionUsers = extensionUsers.filter((user) => user.type !== User.TYPE_AI_AGENT)
+        }
+
         usersArray.data = [...normalUsers, ...extensionUsers]
       }
 

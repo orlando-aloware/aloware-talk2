@@ -110,11 +110,17 @@ export default {
       const usersArray = { data: nUsers }
 
       if (!this.hideExtensions && this.extensionUsers && this.extensionUsers.length > 0) {
-        const eUsers = [...this.extensionUsers]
+        let eUsers = [...this.extensionUsers]
         eUsers.unshift({
           group: 'Extensions',
           disable: true
         })
+
+        // If AloAi users should not be included, filter them out
+        if (!this.includeAloAiUsers) {
+          eUsers = eUsers.filter((user) => user.type !== User.TYPE_AI_AGENT)
+        }
+
         usersArray.data = [...nUsers, ...eUsers]
       }
 
