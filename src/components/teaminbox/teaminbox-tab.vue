@@ -413,9 +413,19 @@ export default {
           } else {
             // Merge with the last group
             const lastKey = this.getGroupKey(this.itemsData[lastCallIndex])
-            groupedItems[lastKey].repeats = (groupedItems[lastKey].repeats || 0) + 1
-            groupedItems[lastKey].unread_repeats = (groupedItems[lastKey].unread_repeats || 0) + (!item.is_read ? 1 : 0)
-            lastCallIndex = index
+            if (groupedItems[lastKey]) {
+              // Merge with the last group
+              groupedItems[lastKey].repeats = (groupedItems[lastKey].repeats || 0) + 1
+              groupedItems[lastKey].unread_repeats = (groupedItems[lastKey].unread_repeats || 0) + (!item.is_read ? 1 : 0)
+              lastCallIndex = index
+            } else {
+              // If can't merge, treat it as a new group
+              const key = this.getGroupKey(item)
+              groupedItems[key] = item
+              lastCallContactId = item.contact_id
+              lastCallDirection = item.direction
+              lastCallIndex = index
+            }
           }
         } else {
           // For non-calls or live calls, keep them as individual items
