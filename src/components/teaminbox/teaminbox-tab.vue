@@ -684,35 +684,40 @@ export default {
 
       // Now check if the contact is in the active inbox, to update its unread count
       const item = this.itemsData.find(item => item.contact_id === data.id)
-      if (item) {
-        const unreads = await this.fetchInboxesUnreadCount([this.activeInboxId], [data.id])
+      if (!item) {
+        return
+      }
 
-        if (!unreads.length) {
-          item.inbox_unread_count = 0
-        } else {
-          item.inbox_unread_count = unreads[0].ring_group_id === this.activeInboxId && unreads[0]['unread_contact_' + data.id] ? unreads[0]['unread_contact_' + data.id] : 0
-        }
+      const unreads = await this.fetchInboxesUnreadCount([this.activeInboxId], [data.id])
 
-        // Update all communications from this contact in the unthreaded view
-        if (this.viewMode === UNTHREADED) {
-          this.itemsData.forEach(comm => {
-            if (comm.contact_id === data.id) {
-              comm.inbox_unread_count = item.inbox_unread_count
-              comm.is_read = true
-              if (comm.repeats > 0) {
-                comm.unread_repeats = 0
-              }
+      if (!unreads.length) {
+        item.inbox_unread_count = 0
+      } else {
+        item.inbox_unread_count = unreads[0].ring_group_id === this.activeInboxId && unreads[0]['unread_contact_' + data.id] ? unreads[0]['unread_contact_' + data.id] : 0
+      }
+
+      // Update all communications from this contact in the unthreaded view
+      if (this.viewMode === UNTHREADED) {
+        this.itemsData.forEach(comm => {
+          if (comm.contact_id === data.id) {
+            comm.inbox_unread_count = item.inbox_unread_count
+            comm.is_read = true
+            if (comm.repeats > 0) {
+              comm.unread_repeats = 0
             }
-          })
-
-          // If this is the currently selected contact, emit the contact-selected event
-          if (this.itemsData.find(comm => comm.id === this.activeId)?.contact_id === data.id) {
-            this.$emit('contact-selected', {
-              contactId: data.id,
-              unreadCount: item.inbox_unread_count
-            })
           }
+        })
+
+        // If this is the currently selected contact, emit the contact-selected event
+        if (this.itemsData.find(comm => comm.id === this.activeId)?.contact_id === data.id) {
+          this.$emit('contact-selected', {
+            contactId: data.id,
+            unreadCount: item.inbox_unread_count
+          })
         }
+      } else {
+        // Update communication to reflect updated value
+        this.itemsData.splice(this.itemsData.indexOf(item), 1, item)
       }
     },
 
@@ -752,9 +757,12 @@ export default {
         // For threaded view, simulate a click on the contact to update the unread count
         this.onItemClick(item)
 
-        // Check filters and sorting settings
-        if (item && !this.checkCommunication(item)) {
+        if (!this.checkCommunication(item)) {
+          // Remove communication if it doesn't match filters and sorting settings
           this.itemsData.splice(itemIndex, 1)
+        } else {
+          // Update communication to reflect updated value
+          this.itemsData.splice(itemIndex, 1, item)
         }
       }
     },
