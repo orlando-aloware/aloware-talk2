@@ -325,6 +325,11 @@ export default {
     },
 
     getGroupKey (communication) {
+      if (this.viewMode === THREADED) {
+        // For threaded mode, group by contact ID
+        return `${communication.contact_id}`
+      }
+
       // For calls, group by contact, direction, and a sequence number
       if (communication.type === CommunicationTypes.CALL) {
         // Include the communication ID in the key to ensure uniqueness
@@ -366,6 +371,11 @@ export default {
 
         this.sortItems()
 
+        return
+      }
+
+      if (this.communicationInProgress(this.itemsData[index])) {
+        // If the last communication is a live call, don't add the new one
         return
       }
 
