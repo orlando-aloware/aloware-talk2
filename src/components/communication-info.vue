@@ -856,8 +856,8 @@ import {
   liveCallsMixin,
   mentionsMixin,
   notificationMixin,
-  userMixin,
-  teamInboxPropsMixin
+  teamInboxPropsMixin,
+  userMixin
 } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
@@ -1307,6 +1307,18 @@ export default {
         .finally(() => {
           this.isRegenerating = false
         })
+    },
+
+    handleRingGroupClick (ringGroupId, e) {
+      const url = this.getRingGroupURL(ringGroupId)
+      if (window && window.process && window.process.type === 'renderer') {
+        if (e) e.preventDefault()
+
+        this.$router.push(url)
+        return true
+      }
+
+      return false
     }
   },
 
