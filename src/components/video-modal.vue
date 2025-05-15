@@ -32,12 +32,21 @@
           >✖
           </button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body animated position-relative">
+          <div
+            v-if="isLoading"
+            class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
+          >
+            <i class="fa fa-spinner fa-spin fa-3x"></i>
+          </div>
           <iframe
+            :class="{ show: !isLoading}"
             :src="videoUrl"
             allowfullscreen
+            class="fade animated"
             frameborder="0"
-          />
+            @load="onIframeLoad"
+          ></iframe>
         </div>
         <div
           v-if="notes"
@@ -108,7 +117,8 @@ export default {
 
   data () {
     return {
-      showModal: false
+      showModal: false,
+      isLoading: false
     }
   },
 
@@ -140,7 +150,14 @@ export default {
 
     openModal () {
       this.showModal = true
+    },
+
+    onIframeLoad () {
+      this.isLoading = false
     }
+  },
+  mounted () {
+    this.isLoading = true
   }
 }
 </script>
