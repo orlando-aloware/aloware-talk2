@@ -174,7 +174,7 @@ export default {
         this.$router.push(route, () => {
           this.$VueEvent.fire('callContact', callData)
         }, () => {
-          if (this.$route.name === 'Phone') {
+          if (['Phone', 'Contact'].includes(this.$route.name)) {
             this.$VueEvent.fire('callContact', callData)
           }
         })
