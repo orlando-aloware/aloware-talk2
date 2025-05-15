@@ -181,6 +181,10 @@ export default {
         return false
       }
 
+      if (this.communication.type !== CommunicationTypes.CALL) {
+        return false
+      }
+
       return this.liveCallStatuses.includes(this.communication.current_status2)
     },
 
