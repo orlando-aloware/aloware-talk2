@@ -184,6 +184,7 @@ export default {
 
       // avoid redundant navigation
       if (route === this.$route.path) {
+        console.log('avoid redundant navigation')
         return
       }
 
@@ -803,6 +804,24 @@ export default {
       if (this.isMobile && route === TEAMINBOXES_MENU_ITEMS_TITLE) {
         this.activeId = null
       }
+    },
+
+    '$route.params.communicationId' (communicationId) {
+      if (!communicationId) {
+        return
+      }
+
+      if (this.viewMode === THREADED) {
+        return
+      }
+
+      const communication = this.itemsData.find(item => item.id === parseInt(communicationId))
+
+      if (!communication) {
+        return
+      }
+
+      this.onItemClick(communication)
     },
 
     search (search) {
