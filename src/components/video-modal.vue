@@ -1,39 +1,67 @@
 <template>
   <div class="video-modal-section d-flex align-items-center">
-    <q-btn class="activator-outline__button height-35 mr-2"
-           color="primary"
-           outline
-           no-caps
-           @click="openModal"
-           v-if="shouldShowDefaultActivator">
+    <q-btn
+      v-if="shouldShowDefaultActivator"
+      class="activator-outline__button height-35 mr-2"
+      color="primary"
+      no-caps
+      outline
+      @click="openModal"
+    >
       Open Tutorial Video 🤩
     </q-btn>
-    <slot name="activator"
-          v-else
-          @click="openModal" />
-    <div class="video-modal"
-         v-if="showModal">
-      <div class="overlay"
-           @click="closeModal"/>
+    <slot
+      v-else
+      name="activator"
+      @click="openModal"
+    />
+    <div
+      v-if="showModal"
+      class="video-modal"
+    >
+      <div
+        class="overlay"
+        @click="closeModal"
+      />
       <div class="modal-content">
         <div class="modal-header">
           <h3 v-if="title">{{ title }}</h3>
-          <button class="close-button"
-                  @click="closeModal">✖</button>
+          <button
+            class="close-button"
+            @click="closeModal"
+          >✖
+          </button>
         </div>
-        <div class="modal-body">
-          <iframe frameborder="0"
-                  allowfullscreen
-                  :src="videoUrl"/>
+        <div class="modal-body animated position-relative">
+          <div
+            v-if="isLoading"
+            class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
+          >
+            <i class="fa fa-spinner fa-spin fa-3x"></i>
+          </div>
+          <iframe
+            :class="{ show: !isLoading}"
+            :src="videoUrl"
+            allowfullscreen
+            class="fade animated"
+            frameborder="0"
+            @load="onIframeLoad"
+          ></iframe>
         </div>
-        <div class="modal-notes"
-              v-if="notes">
+        <div
+          v-if="notes"
+          class="modal-notes"
+        >
           <p v-html="notes" />
-          <div class="modal-link"
-               v-if="learnMoreLink">
-            <a target="_blank"
-               rel="noopener noreferrer"
-               :href="learnMoreLink">
+          <div
+            v-if="learnMoreLink"
+            class="modal-link"
+          >
+            <a
+              :href="learnMoreLink"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               Learn more
             </a>
           </div>
@@ -89,7 +117,8 @@ export default {
 
   data () {
     return {
-      showModal: false
+      showModal: false,
+      isLoading: false
     }
   },
 
@@ -121,7 +150,14 @@ export default {
 
     openModal () {
       this.showModal = true
+    },
+
+    onIframeLoad () {
+      this.isLoading = false
     }
+  },
+  mounted () {
+    this.isLoading = true
   }
 }
 </script>
