@@ -61,7 +61,15 @@
           </q-item-label>
           <q-item-label caption
                         v-else>
-            <div>{{ getLabel(scope.opt) }}</div>
+            <span v-if="scope.opt.type === User.TYPE_AI_AGENT"
+                  class="ai-effect-gradient-text">
+              <sparkle-icon :width="12"
+                            :height="12" />
+              {{ getLabel(scope.opt) }}
+            </span>
+            <span v-else>
+              {{ getLabel(scope.opt) }}
+            </span>
           </q-item-label>
         </q-item-section>
       </q-item>
@@ -99,6 +107,7 @@ import { mapState } from 'vuex'
 import * as AnswerTypes from 'src/constants/answer-types'
 import * as User from 'src/constants/user'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import SparkleIcon from 'components/icons/ai/sparkle-icon'
 import { selectorMixin, userMixin } from 'src/plugins/mixins'
 
 export default {
@@ -106,7 +115,7 @@ export default {
 
   mixins: [selectorMixin, userMixin],
 
-  components: { RemoveTagIcon },
+  components: { RemoveTagIcon, SparkleIcon },
 
   props: {
     value: {
@@ -207,6 +216,11 @@ export default {
     showAnswerType: {
       type: Boolean,
       default: true
+    },
+
+    includeAloAiUsers: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -216,7 +230,8 @@ export default {
       selectedId: this.value,
       userOptions: [],
       reference: 'userSelect',
-      fullOptionsProperty: 'formattedOptions'
+      fullOptionsProperty: 'formattedOptions',
+      User
     }
   },
 
@@ -259,8 +274,7 @@ export default {
       if (!_.isEmpty(this.availableUsers)) {
         if (this.allAnswerTypes) {
           return this.availableUsers.filter((user) =>
-            !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access) &&
-            user.type !== User.TYPE_AI_AGENT
+            !((typeof user.role_names === 'undefined' || user.role_names.length === 1) && user.read_only_access)
           )
         }
 
@@ -291,11 +305,17 @@ export default {
       const usersArray = { data: normalUsers }
 
       if (!this.hideExtensions && this.extensionUsers && this.extensionUsers.length > 0) {
-        const extensionUsers = [...this.extensionUsers]
+        let extensionUsers = [...this.extensionUsers]
         extensionUsers.unshift({
           group: 'Extensions',
           disable: true
         })
+
+        // If AloAi users should not be included, filter them out
+        if (!this.includeAloAiUsers) {
+          extensionUsers = extensionUsers.filter((user) => user.type !== User.TYPE_AI_AGENT)
+        }
+
         usersArray.data = [...normalUsers, ...extensionUsers]
       }
 
@@ -355,6 +375,9 @@ export default {
 
       switch (user.answer_by) {
         case AnswerTypes.BY_PHONE_NUMBER:
+          if (user.type === User.TYPE_AI_AGENT) {
+            return 'AloAi Agent'
+          }
           return 'Phone Number (' + user.phone_number + ')'
         case AnswerTypes.BY_BROWSER:
           return 'Apps'

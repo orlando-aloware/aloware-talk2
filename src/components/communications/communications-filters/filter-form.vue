@@ -449,6 +449,7 @@
                                :use-chips="true"
                                :with-unassigned="isACallTypeChannel"
                                :highlighted="isChanged('users')"
+                               :include-alo-ai-users="true"
                                data-testid="filter-form-user-selector"
                                v-model="filter.users"
                                @change="eventPayload => onFilterChange(eventPayload, 'users')" />
