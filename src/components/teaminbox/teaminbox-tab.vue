@@ -781,6 +781,10 @@ export default {
     },
 
     communicationInProgress (communication) {
+      if (communication.type !== CommunicationTypes.CALL) {
+        return false
+      }
+
       return this.ALL_INPROGRESS_STATUSES.includes(communication.current_status2)
     }
   },

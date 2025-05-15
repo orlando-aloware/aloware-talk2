@@ -164,6 +164,11 @@ export default {
         return `${item.direction === CommunicationDirections.INBOUND ? CommunicationDirections.INBOUND_STRING : CommunicationDirections.OUTBOUND_STRING} ${CommunicationTypes.MMS_TYPE}`
       }
 
+      if (item.type === CommunicationTypes.RVM) {
+        const direction = item.direction === CommunicationDirections.INBOUND ? CommunicationDirections.INBOUND_STRING : CommunicationDirections.OUTBOUND_STRING
+        return `${direction} ${CommunicationTypes.RVM_TYPE}`
+      }
+
       return ''
     },
 
