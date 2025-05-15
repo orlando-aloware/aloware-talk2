@@ -914,11 +914,11 @@ export default {
     },
 
     hasCommunication () {
-      return !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
+      return this.$route.params.communicationId
     },
 
     isCommunicationFound () {
-      const communicationId = !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
+      const communicationId = this.$route.params.communicationId
       return communicationId &&
         !!this.communicationsAndAudits.find(communication => 'type' in communication &&
           communication.id.toString() === communicationId.toString())
@@ -961,7 +961,7 @@ export default {
     },
 
     scrollIntoActivity () {
-      const communicationId = !this.teamInbox ? this.$route.params.communicationId : this.activeCommunicationId
+      const communicationId = this.$route.params.communicationId
       const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === communicationId.toString())
       const ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
       let count = 0

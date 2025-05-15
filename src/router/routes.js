@@ -123,6 +123,15 @@ const routes = [
               title: TEAMINBOXES_MENU_TITLE,
               isInbox: true
             }
+          },
+          {
+            path: ':inboxId/contacts/:id/communications/:communicationId',
+            name: TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
+            component: Contact,
+            meta: {
+              title: TEAMINBOXES_MENU_TITLE,
+              isInbox: true
+            }
           }
         ]
       },

@@ -104,9 +104,6 @@ export default {
   SET_UNREAD_COUNT_LOADED (state, loaded) {
     state.unreadCountLoaded = loaded
   },
-  SET_ACTIVE_COMMUNICATION_ID (state, id) {
-    state.activeCommunicationId = id
-  },
   RESET (state) {
     state.inboxes = []
     state.isLoadingInboxes = false
@@ -126,6 +123,5 @@ export default {
     state.viewMode = THREADED
     state.activeFilters = {}
     state.activeSort = {}
-    state.activeCommunicationId = null
   }
 }
