@@ -30,7 +30,6 @@ export default function () {
     isInitialLoad: false,
     activeInboxContactUnreadCount: 0,
     inboxAnnouncementViewed: false,
-    unreadCountLoaded: false,
-    activeCommunicationId: null
+    unreadCountLoaded: false
   }
 }

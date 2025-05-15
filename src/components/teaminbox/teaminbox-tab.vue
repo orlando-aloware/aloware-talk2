@@ -131,8 +131,7 @@ export default {
       'setActiveSort',
       'setCurrentSearch',
       'setIsInitialLoad',
-      'setIsLoadingMoreItems',
-      'setActiveCommunicationId'
+      'setIsLoadingMoreItems'
     ]),
 
     getUnreadsProperties (communication) {
@@ -164,7 +163,9 @@ export default {
       let communicationUnreadCount = item.inbox_unread_count || 0
       const isThreaded = this.viewMode === THREADED
       this.activeId = isThreaded ? item.contact_id : item.id
-      const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications`
+
+      const communicationRouteId = isThreaded ? '' : `/${item.id}`
+      const route = `/team-inboxes/${this.activeInboxId}/contacts/${item.contact_id}/communications${communicationRouteId}`
 
       if (!isThreaded) {
         // Fetch the unread count for the active communication (for unthreaded view)
@@ -180,8 +181,6 @@ export default {
         contactId: item.contact_id,
         unreadCount: communicationUnreadCount || 0
       })
-
-      this.setActiveCommunicationId(isThreaded ? null : item.id)
 
       // avoid redundant navigation
       if (route === this.$route.path) {
