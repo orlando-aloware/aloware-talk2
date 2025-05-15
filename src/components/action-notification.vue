@@ -212,6 +212,8 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
+import { getQueryString } from 'src/plugins/helpers/functions'
+import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'action-notification',
@@ -357,7 +359,16 @@ export default {
 
       // If the communication has a ring group id, check teamInboxLink
       if (this.ringGroupId && this.ringGroupId !== '') {
-        return this.teamInboxLink || {
+        if (this.teamInboxLink) {
+          const queryString = getQueryString(this.$route.query)
+          const communicationRouteId = this.viewMode === UNTHREADED ? `/${this.communicationId}` : ''
+
+          return {
+            path: `${this.teamInboxLink.path}${communicationRouteId}${queryString}`
+          }
+        }
+
+        return {
           path: `/contacts/${this.contactId}/communications/${this.communicationId}`
         }
       }
@@ -857,6 +868,14 @@ export default {
           this.updateTeamInboxLink(newRingGroupId)
         } else {
           this.teamInboxLink = null
+        }
+      }
+    },
+    contactId: {
+      immediate: true,
+      handler: function (contactId) {
+        if (contactId && this.ringGroupId) {
+          this.updateTeamInboxLink(this.ringGroupId)
         }
       }
     },
