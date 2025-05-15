@@ -69,7 +69,7 @@ import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
-import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/teaminbox/teaminbox.store'
+import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
 
@@ -95,6 +95,7 @@ export default {
   computed: {
     ...mapState('TeamInbox', [
       'inboxes',
+      'viewMode',
       'activeInboxId',
       'hasMoreInboxes',
       'isLoadingInboxes',
@@ -231,7 +232,9 @@ export default {
       this.fetchItems(inboxId, search, filters, sort)
 
       const queryString = getQueryString(this.$route.query)
-      const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '') + queryString
+      const contactRouteId = contactId ? `/contacts/${contactId}/communications` : ''
+      const communicationRouteId = this.viewMode === UNTHREADED && contactRouteId ? `/${this.$route.params.communicationId}` : ''
+      const route = `/team-inboxes/${inboxId}` + contactRouteId + communicationRouteId + queryString
 
       // avoid redundant navigation (including query)
       if (this.$route.fullPath !== route) {
