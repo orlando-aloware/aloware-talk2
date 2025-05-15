@@ -536,7 +536,8 @@ export default {
       'activeTask',
       'hubspot',
       'redialedTasksCount',
-      'redialedTask'
+      'redialedTask',
+      'redialedTasks'
     ]),
 
     ...mapState([
@@ -1058,6 +1059,7 @@ export default {
       this.activeTask = {}
       this.taskToCall = {}
       this.hasActiveTask = false
+      this.redialedTasks = []
       this.sessionCallStatuses = {
         pause: false,
         end: false,
@@ -1551,6 +1553,10 @@ export default {
       this.onPhoneExpansionReset()
 
       this.incrementRedialedTaskCount(this.activeTask.id)
+      this.redialedTasks.push({
+        ...this.activeTask,
+        communication: this.dialer.communication
+      })
 
       let task = null
       if (redial) {
