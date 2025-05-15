@@ -112,7 +112,7 @@
           v-if="hasUnreads"
           data-testid="contact-activities-mark-all-as-read-btn"
           @click="markAllAsRead">
-          <span class="mx-2">
+          <span v-b-tooltip.html="{customClass: 'tooltip-dark'}" :title="markAllAsReadTooltip" class="mx-2">
             Mark All as Read ({{ unreadCount }})
           </span>
         </q-btn>
@@ -325,6 +325,11 @@ export default {
     inPowerDialerPage () {
       const previousPage = this.$route?.query?.previousPage
       return previousPage === 'Power Dialer'
+    },
+
+    markAllAsReadTooltip () {
+      return `<b class="text-nowrap">Marks all unread items for this contact in this Team Inbox.</b>
+      <br/><span class="text-nowrap">Does not affect other inboxes where this contact appears.</span>`
     }
   },
   data () {
@@ -421,3 +426,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.tooltip-dark::v-deep(.tooltip-inner)
+{
+  min-width: fit-content;
+  font-size: 14px !important;
+  background-color: #000 !important;
+  color: #fff !important;
+}
+</style>
