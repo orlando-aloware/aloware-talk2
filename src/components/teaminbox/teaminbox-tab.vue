@@ -326,8 +326,9 @@ export default {
 
     getGroupKey (communication) {
       if (this.viewMode === THREADED) {
-        // For threaded mode, group by contact ID
-        return `${communication.contact_id}`
+        // For threaded mode, group by contact ID or communication ID if no contact ID
+        const groupId = communication.contact_id || communication.id
+        return `${groupId}`
       }
 
       // For calls, group by contact, direction, and a sequence number
