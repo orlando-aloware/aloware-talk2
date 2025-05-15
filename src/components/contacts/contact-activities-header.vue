@@ -1,6 +1,17 @@
 <template>
-  <div class="calls-header d-flex justify-content-between pr-3">
-    <div class="calls-header__label">
+  <div class="calls-header d-flex justify-content-between pr-3 flex-wrap">
+    <talk-alert-banner
+      class="cursor-pointer col-12 pr-0 pb-2"
+      v-if="isReadOnly"
+      tooltip="You can view this contact and take basic actions like calling or replying,
+      but editing, tagging, or adding to Lists, as well as enrolling in Sequences,
+      AloAI Agents, or syncing to your CRM, is restricted."
+    >
+      <div class="d-flex align-items-center text-center justify-content-center" style="gap: .25rem">
+        <lock-icon /> <span class="text-bold text-dark">Limited Access</span>
+      </div>
+    </talk-alert-banner>
+    <div class="calls-header__label d-flex">
       <back-button class="p-0"
                    v-if="$q.screen.lt.md && ![TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes($route.name)"
                    data-testid="contact-activities-back-btn"
@@ -13,7 +24,7 @@
         {{ contact.task_status | fixTaskStatusName }}
       </b-badge>
     </div>
-    <div class="contact-activities-actions text-nowrap">
+    <div class="contact-activities-actions text-nowrap d-flex">
       <div class="contact-activities-actions__mobile align-items-center flex-grow-1 justify-content-end">
         <b-dropdown no-caret
                     right
@@ -43,7 +54,7 @@
           </b-dropdown-item>
 
           <b-dropdown-item href="#"
-                           :disable="isUpdatingStatus"
+                           :disable="isUpdatingStatus || isReadOnly"
                            v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
                            data-testid="contact-activities-move-to-pending-item"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
@@ -52,14 +63,14 @@
           </b-dropdown-item>
           <b-dropdown-item href="#"
                            data-testid="contact-activities-close-item"
-                           :disable="isUpdatingStatus"
+                           :disable="isUpdatingStatus || isReadOnly"
                            v-if="shouldDisplayContact"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)">
             <check-o-icon class="dropdown-icon"></check-o-icon>
             Close
           </b-dropdown-item>
           <b-dropdown-item href="#"
-                           :disable="isUpdatingStatus"
+                           :disable="isUpdatingStatus || isReadOnly"
                            v-if="[ContactTaskStatus.STATUS_CLOSED, ContactTaskStatus.STATUS_PENDING].includes(contact.task_status)"
                            data-testid="contact-activities-reopen-item"
                            @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)">
@@ -138,7 +149,7 @@
           type="a"
           color="primary"
           class="text-decoration-none"
-          :disable="isUpdatingStatus"
+          :disable="isUpdatingStatus || isReadOnly"
           data-testid="contact-activities-move-to-pending-btn"
           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_PENDING)">
           <q-tooltip anchor="top middle"
@@ -161,7 +172,7 @@
                type="a"
                color="primary"
                class="text-decoration-none"
-               :disable="isUpdatingStatus"
+               :disable="isUpdatingStatus || isReadOnly"
                data-testid="contact-activities-reopen-btn"
                @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_OPEN)"
                v-if="shouldDisplayClosedOrPendingContact">
@@ -186,7 +197,7 @@
           type="a"
           color="primary"
           class="text-decoration-none"
-          :disable="isUpdatingStatus"
+          :disable="isUpdatingStatus || isReadOnly"
           data-testid="contact-activities-close-btn"
           @click="onUpdateTaskStatus(ContactTaskStatus.STATUS_CLOSED)"
           v-if="shouldDisplayContact">
@@ -223,10 +234,12 @@ import EllipsisIcon from 'components/icons/ellipsis-icon'
 import ExportIcon from '../icons/export-icon.vue'
 import BackButton from 'components/back-button'
 import Profile from 'components/profile'
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 import { aclMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import TalkAlertBanner from 'components/common/talk-alert-banner.vue'
+import LockIcon from 'components/icons/inbox/lock-icon.vue'
 
 export default {
   name: 'contact-activities-header',
@@ -237,6 +250,8 @@ export default {
   ],
 
   components: {
+    LockIcon,
+    TalkAlertBanner,
     Profile,
     InboxOIcon,
     CheckOIcon,
@@ -270,6 +285,10 @@ export default {
     enableExport: {
       type: Boolean,
       default: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

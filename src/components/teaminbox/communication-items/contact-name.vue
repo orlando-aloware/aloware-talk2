@@ -38,7 +38,6 @@ export default {
 .contact-name {
   font-size: 14px;
   font-weight: 500;
-  width: 195px;
 
   &__repeat-counter {
     color: #256eff;

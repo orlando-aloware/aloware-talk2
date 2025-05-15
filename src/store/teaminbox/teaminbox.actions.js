@@ -93,5 +93,8 @@ export default {
   },
   setUnreadCountLoaded: ({ commit }, loaded) => {
     commit('SET_UNREAD_COUNT_LOADED', loaded)
+  },
+  setActiveCommunicationId: ({ commit }, id) => {
+    commit('SET_ACTIVE_COMMUNICATION_ID', id)
   }
 }

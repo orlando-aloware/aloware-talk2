@@ -5379,7 +5379,7 @@ i.option-separator {
 }
 
 .calls-header {
-  height: 45px;
+  min-height: 45px;
   display: flex;
   align-items: center;
   border-bottom: solid 1px $grey-light3;
@@ -10550,7 +10550,7 @@ screen and (max-width: 956px) {
     bottom: 49px;
   }
   .calls-header {
-    height: 58px;
+    min-height: 58px;
     padding-right: 15px !important;
   }
   .calls-header {

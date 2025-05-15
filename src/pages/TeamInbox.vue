@@ -1,15 +1,22 @@
 <template>
-  <div class="h-100"
-       v-if="authenticated">
-    <div class="teaminbox animate__animated animate__fadeIn position-relative">
-      <TeamInboxSide :class="inboxSideClasses"
-                    @itemSelected="onItemSelected"
-                    @contact-selected="onContactSelected" />
+  <div v-if="authenticated" class="h-100">
+    <teaminbox-tutorial-video />
 
-      <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
-           v-if="isContactShow">
-        <Contact :team-inbox-id="activeInboxId"
-                :team-inbox-unread-count="contactInboxUnreadCount" />
+    <div class="teaminbox animate__animated animate__fadeIn position-relative">
+      <TeamInboxSide
+        :class="inboxSideClasses"
+        @itemSelected="onItemSelected"
+        @contact-selected="onContactSelected"
+      />
+
+      <div
+        v-if="isContactShow"
+        :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
+      >
+        <Contact
+          :team-inbox-id="activeInboxId"
+          :team-inbox-unread-count="contactInboxUnreadCount"
+        />
       </div>
     </div>
   </div>
@@ -18,10 +25,11 @@
 <script>
 import Contact from 'pages/contacts/Contact'
 import TeamInboxSide from 'components/teaminbox/teaminbox-side'
-import { userMixin, aclMixin } from 'src/plugins/mixins'
-import { mapGetters, mapState, mapActions } from 'vuex'
+import { aclMixin, userMixin } from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
+import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
 
 export default {
   name: 'TeamInbox',
@@ -32,6 +40,7 @@ export default {
   ],
 
   components: {
+    teaminboxTutorialVideo,
     Contact,
     TeamInboxSide
   },

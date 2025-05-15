@@ -453,6 +453,10 @@ export default {
       'liveContacts'
     ]),
 
+    ...mapState('TeamInbox', [
+      'activeInboxId'
+    ]),
+
     ...mapState('powerDialer', [
       'ongoingSession',
       'countdownTimer'
@@ -1642,7 +1646,6 @@ export default {
         this.getBroadcasts()
         this.getTemplates()
         getCampaigns(this)
-        getTeamInboxCampaigns(this)
         this.getWorkflows()
         this.getDispositionStatuses()
         this.getCallDispositions()
@@ -1650,6 +1653,11 @@ export default {
         this.getLeadSources()
         this.getAttributeDictionaries()
         this.getMyQueueList()
+
+        // Load team inbox campaigns (no visibility limits) only if a team inbox is active
+        if (this.hasCompanyTeamInboxEnabled) {
+          getTeamInboxCampaigns(this)
+        }
       })
     },
 
@@ -1698,7 +1706,8 @@ export default {
         return null
       }
 
-      const found = this.campaigns.find((campaign) => campaign.id === id)
+      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+      const found = campaigns.find((campaign) => campaign.id === id)
 
       if (found) {
         return found
@@ -2699,6 +2708,7 @@ export default {
       'resetVuex',
       'setUsage',
       'setCampaigns',
+      'setTeamInboxCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
       'setRingGroupsIsLoading',

@@ -20,6 +20,9 @@ export const getCampaignsData = function (context, options = {}) {
     params = { is_lite: true }
   } = options
 
+  // Fixing it in case the default value is overridden
+  params.is_lite = true
+
   if (!context.hasPermissionTo('list campaign')) {
     return Promise.resolve()
   }
@@ -38,7 +41,9 @@ export const getCampaignsData = function (context, options = {}) {
       params
     })
     .then((res) => {
-      context[setAction](res.data)
+      if (typeof context[setAction] === 'function') {
+        context[setAction](res.data)
+      }
       context[loadingFlag] = false
       // Reset loading state
       if (typeof context[setLoadingAction] === 'function') {
@@ -98,5 +103,7 @@ export const getTeamInboxCampaigns = function (context) {
  * @param {Boolean} value - Loading state value
  */
 export const setCampaignsIsLoading = function (context, value) {
-  context.setCampaignsIsLoading(value)
+  if (typeof context.setCampaignsIsLoading === 'function') {
+    context.setCampaignsIsLoading(value)
+  }
 }

@@ -493,8 +493,8 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}communication/${id}/force-dequeue`)
       },
 
-      get (id) {
-        return window.axios.get(`${suffixV1}communication/${id}`)
+      get (id, params = {}) {
+        return window.axios.get(`${suffixV1}communication/${id}`, { params })
       },
 
       delete (id) {

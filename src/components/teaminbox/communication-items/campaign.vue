@@ -1,6 +1,6 @@
 <template>
   <div class="campaign">
-    <span v-if="campaign.name">
+    <span v-if="campaign && campaign.name">
       {{ campaign.name }}
     </span>
     <q-skeleton type="text"

@@ -97,12 +97,30 @@ export default {
       'lineIncomingNumber'
     ]),
     ...mapState(['campaigns', 'teamInboxCampaigns']),
+    ...mapState('TeamInbox', ['activeInbox']),
 
     /**
      * Returns the appropriate campaigns array based on whether we're in team inbox mode
      */
     campaignsToUse () {
-      return this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+      return this.teamInbox ? this.activeCampaigns : this.campaigns
+    },
+
+    /**
+     * Returns the active campaigns ids
+     */
+    activeCampaignsIds () {
+      return this.activeInbox?.campaign_id_as_call_waiting_ring_group
+        ? this.activeInbox?.campaign_ids.concat([this.activeInbox?.campaign_id_as_call_waiting_ring_group])
+        : this.activeInbox?.campaign_ids
+    },
+
+    /**
+     * Returns the active campaigns
+     */
+    activeCampaigns () {
+      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+      return campaigns.filter(campaign => this.activeCampaignsIds?.includes(campaign.id))
     },
 
     selectedCampaign () {
@@ -214,7 +232,7 @@ export default {
     },
     onFocus () {
       this.isFocused = true
-      this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : 'Select line'
+      this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : this.getPlaceholderText()
       this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
       if (this.selectedLine) {
         this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
@@ -230,9 +248,13 @@ export default {
       }
     },
 
+    getPlaceholderText () {
+      return this.formattedLineOptions.length > 0 ? 'Select line' : 'No lines are available'
+    },
+
     showPlaceholder () {
       if (!this.selectedLine) {
-        this.$el.querySelector('.inline-select .q-field__input').placeholder = 'Select line'
+        this.$el.querySelector('.inline-select .q-field__input').placeholder = this.getPlaceholderText()
         this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
       } else {
         this.$el.querySelector('.inline-select .q-field__input').style.display = 'none'
@@ -269,7 +291,7 @@ export default {
 
     getIncomingNumber () {
       this.isBusy = true
-      return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id).then(response => {
+      return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id, this.teamInbox).then(response => {
         this.incomingNumber = response.data
       }).finally(() => {
         this.isBusy = false

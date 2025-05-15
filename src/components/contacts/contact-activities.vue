@@ -12,6 +12,7 @@
       :contact="contact"
       :enable-export="enableExport"
       :team-inbox-id="teamInboxId"
+      :is-read-only="isReadOnly"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
@@ -112,6 +113,10 @@ export default {
     teamInboxUnreadCount: {
       type: Number,
       default: 0
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
