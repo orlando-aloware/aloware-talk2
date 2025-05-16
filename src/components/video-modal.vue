@@ -140,12 +140,7 @@ export default {
     },
 
     openModal () {
-      this.$cookies = VueCookies
-
-      if (!this.$cookies.get(this.parsedCookieName) && this.shouldShowInFirstVisit) {
-        this.showModal = true
-        return this.setIsIntroVideoVisible(true)
-      }
+      this.showModal = true
     },
 
     onIframeLoad () {
@@ -154,7 +149,13 @@ export default {
   },
   mounted () {
     this.isLoading = true
-    this.openModal()
+
+    this.$cookies = VueCookies
+
+    if (!this.$cookies.get(this.parsedCookieName) && this.shouldShowInFirstVisit) {
+      this.showModal = true
+      return this.setIsIntroVideoVisible(true)
+    }
   }
 }
 </script>
