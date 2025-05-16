@@ -113,13 +113,23 @@
           data-testid="contact-activities-mark-all-as-read-btn"
           @click="markAllAsRead">
           <span
-            v-if="activeInboxId"
-            v-b-tooltip.html="activeInboxId ? {customClass: 'tooltip-dark'} : undefined"
-            :title="markAllAsReadTooltip" class="mx-2"
+            v-if="teamInbox"
+            class="mx-2 d-flex align-items-center"
           >
-            Mark all as read ({{ unreadCount }})
+            <span v-b-tooltip.html="activeInboxId ? {customClass: 'tooltip-dark'} : undefined"
+                 :title="markAllAsReadTooltip">
+              Mark all as read ({{ unreadCount }})
+            </span>
+            <information-circle-icon
+              class="ml-1 cursor-pointer"
+              width="16"
+              height="16"
+              v-b-tooltip.html="{customClass: 'tooltip-dark'}"
+              :title="markAllAsReadTooltip" />
           </span>
-          <span v-else> Mark all as read ({{ unreadCount }}) </span>
+          <span v-else class="mx-2 d-flex align-items-center">
+            <span>Mark all as read ({{ unreadCount }})</span>
+          </span>
         </q-btn>
         <q-btn borderless
                flat
@@ -334,8 +344,8 @@ export default {
     },
 
     markAllAsReadTooltip () {
-      return `<b class="text-nowrap">Marks all unread items for this contact in this Team Inbox.</b>
-      <br/><span class="text-nowrap">Does not affect other inboxes where this contact appears.</span>`
+      return `<b class="text-nowrap">This will mark all communications for this contact as read in this Team Inbox only.</b>
+      <br/><span class="text-nowrap">This does not affect the contact's unread calls or messages in other inboxes.</span>`
     }
   },
   data () {
