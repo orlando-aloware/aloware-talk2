@@ -348,11 +348,13 @@ export default {
     },
 
     async handleThreadedCommunication (communication, isNew = false) {
+      console.log('----handle theraded communication----')
       const isAscendingOrder = this.activeSort && this.activeSort.order === 'asc'
       const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
 
       // Check filters and sorting settings
       if (!this.checkCommunication(communication, isAscendingOrder)) {
+        console.log('check communication', index)
         if (index !== -1) {
           this.itemsData.splice(index, 1)
         }
@@ -372,11 +374,6 @@ export default {
 
         this.sortItems()
 
-        return
-      }
-
-      if (this.communicationInProgress(this.itemsData[index])) {
-        // If the last communication is a live call, don't add the new one
         return
       }
 
@@ -480,6 +477,7 @@ export default {
     },
 
     async processCommunicationInActiveInbox (communication, isNew = false) {
+      console.log('process communication in active inbox')
       // fetch unread count for the active inbox (from the backend)
       const unreadCount = await this.fetchInboxesUnreadCount([this.activeInboxId], [communication.contact_id])
       const unreadCountData = unreadCount[0]
@@ -505,6 +503,7 @@ export default {
     },
 
     async processCommunicationInOtherInbox (communication, isNew = false) {
+      console.log('process communication in other inbox...')
       const index = this.inboxes.findIndex(inbox => inbox.id === communication.ring_group_id)
 
       if (index === -1) {
@@ -515,6 +514,7 @@ export default {
     },
 
     async processCommunication (communication, isNew = false) {
+      console.log('processCommunication...')
       const dateRegex = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/
       const dateMatch = communication.created_at.match(dateRegex)
 
@@ -525,7 +525,7 @@ export default {
         // Use the current date and time if the date is not properly formatted (fallback)
         communication.created_at = new Date().toISOString()
       }
-
+      console.log('communication', communication.ring_group_id, this.activeInboxId)
       // If the communication is in the active inbox, process it
       if (communication.ring_group_id === this.activeInboxId) {
         await this.processCommunicationInActiveInbox(communication, isNew)
@@ -537,10 +537,12 @@ export default {
     },
 
     async newCommunicationListener (communication) {
+      console.log('new communication listener...')
       await this.processCommunication(communication, true)
     },
 
     async updatedCommunicationListener (communication) {
+      console.log('updated communication listener...')
       await this.processCommunication(communication)
     },
 
