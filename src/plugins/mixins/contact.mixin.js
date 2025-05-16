@@ -635,13 +635,12 @@ export default {
 
       // 2. if contact has communications select last communication campaign
       if (!this.selectedCampaignId && this.communicationsAndAudits.length) {
-        const isTeamInbox = this.teamInbox
         const communicationTypes = [CommunicationTypes.SMS, CommunicationTypes.CALL]
 
         // Get the latest communication that is either SMS or CALL
         const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
           const matchCommunicationType = communicationTypes.includes(item.type)
-          const matchRingGroupId = isTeamInbox ? item.ring_group_id === this.teamInboxId : true
+          const matchRingGroupId = this.teamInbox ? item.ring_group_id === this.teamInboxId : true
           return matchCommunicationType && matchRingGroupId
         })
 
