@@ -22,9 +22,7 @@ export default {
     ])
   },
   mounted () {
-    console.log(this.$store.state.TeamInbox)
     this.setTeamInboxTutorialComponent(this.$refs.teamInboxTutorialComponent)
-    console.log(this.$store.state.TeamInbox)
   }
 }
 </script>
