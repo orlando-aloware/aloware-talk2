@@ -80,14 +80,7 @@ export default {
     },
 
     isContactReadOnly () {
-      return Boolean(this.contactReadOnlyLimits &&
-        (
-          this.contactReadOnlyLimits.is_limited_campaign ||
-          this.contactReadOnlyLimits.is_limited_owned_only ||
-          this.contactReadOnlyLimits.is_limited_ring_group ||
-          this.contactReadOnlyLimits.is_limited_ring_group_users
-        )
-      )
+      return Boolean(this.is_read_only) || false
     }
   },
 
