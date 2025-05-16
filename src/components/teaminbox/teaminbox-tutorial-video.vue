@@ -1,5 +1,6 @@
 <template>
   <video-modal
+    ref="teamInboxTutorialComponent"
     :should-show-default-activator="false"
     :should-show-in-first-visit="true"
     class="pl-2"
@@ -10,9 +11,20 @@
 </template>
 <script>
 import VideoModal from 'components/video-modal.vue'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'teaminbox-tutorial-video',
-  components: { VideoModal }
+  components: { VideoModal },
+  methods: {
+    ...mapActions('TeamInbox', [
+      'setTeamInboxTutorialComponent'
+    ])
+  },
+  mounted () {
+    console.log(this.$store.state.TeamInbox)
+    this.setTeamInboxTutorialComponent(this.$refs.teamInboxTutorialComponent)
+    console.log(this.$store.state.TeamInbox)
+  }
 }
 </script>

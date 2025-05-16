@@ -93,5 +93,8 @@ export default {
   },
   setUnreadCountLoaded: ({ commit }, loaded) => {
     commit('SET_UNREAD_COUNT_LOADED', loaded)
+  },
+  setTeamInboxTutorialComponent: ({ commit }, ref) => {
+    commit('SET_TEAM_INBOX_TUTORIAL_COMPONENT', ref)
   }
 }
