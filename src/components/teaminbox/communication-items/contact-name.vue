@@ -3,9 +3,6 @@
        :id="`contact-name-${_uid}`">
     <div class="contact-name ellipse">
       {{ name }}
-      <span class="contact-name__repeat-counter">
-        {{ repeats ? `(${repeats + 1})` : '' }}
-      </span>
     </div>
 
     <b-popover triggers="hover"
