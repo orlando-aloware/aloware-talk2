@@ -1,7 +1,7 @@
 <template>
-  <div class="calls-header d-flex justify-content-between pr-3 flex-wrap">
+  <div class="calls-header d-flex justify-content-between flex-wrap">
     <talk-alert-banner
-      class="cursor-pointer col-12 pr-0 pb-2"
+      class="cursor-pointer col-12 pl-0 pr-0 pb-2"
       v-if="isReadOnly"
       tooltip="You can view this contact and take basic actions like calling or replying,
       but editing, tagging, or adding to Lists, as well as enrolling in Sequences,
@@ -24,7 +24,7 @@
         {{ contact.task_status | fixTaskStatusName }}
       </b-badge>
     </div>
-    <div class="contact-activities-actions text-nowrap d-flex">
+    <div class="contact-activities-actions mr-3 text-nowrap d-flex">
       <div class="contact-activities-actions__mobile align-items-center flex-grow-1 justify-content-end">
         <b-dropdown no-caret
                     right
@@ -238,23 +238,23 @@
 </template>
 
 <script>
-import TimerOIcon from 'components/icons/timer-o-icon'
+import BackButton from 'components/back-button'
+import TalkAlertBanner from 'components/common/talk-alert-banner.vue'
 import CheckOIcon from 'components/icons/check-o-icon'
-import * as ContactTaskStatus from 'src/constants/contact-task-status.js'
+import EllipsisIcon from 'components/icons/ellipsis-icon'
 import InboxOIcon from 'components/icons/inbox-o-icon'
-import talk2Api from 'src/plugins/api/api'
+import LockIcon from 'components/icons/inbox/lock-icon.vue'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import MailOpenIcon from 'components/icons/mail-open-icon'
-import EllipsisIcon from 'components/icons/ellipsis-icon'
-import ExportIcon from '../icons/export-icon.vue'
-import BackButton from 'components/back-button'
+import TimerOIcon from 'components/icons/timer-o-icon'
 import Profile from 'components/profile'
-import { mapGetters, mapState } from 'vuex'
+import * as ContactTaskStatus from 'src/constants/contact-task-status.js'
+import talk2Api from 'src/plugins/api/api'
 import { cloneDeep } from 'src/plugins/helpers/functions'
 import { aclMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
-import TalkAlertBanner from 'components/common/talk-alert-banner.vue'
-import LockIcon from 'components/icons/inbox/lock-icon.vue'
+import { mapGetters, mapState } from 'vuex'
+import ExportIcon from '../icons/export-icon.vue'
 
 export default {
   name: 'contact-activities-header',
