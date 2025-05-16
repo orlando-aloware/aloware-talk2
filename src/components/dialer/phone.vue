@@ -1985,7 +1985,7 @@ export default {
     },
 
     isContactReadOnly () {
-      return Boolean(this.is_read_only) || false
+      return Boolean(this.contact?.is_read_only) || false
     }
   },
 
