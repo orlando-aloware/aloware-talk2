@@ -526,7 +526,7 @@ export default {
         communication.created_at = new Date().toISOString()
       }
 
-      // If the communication is in the active inbox or  the contact is present, process it
+      // If the communication is in the active inbox, process it
       if (communication.ring_group_id === this.activeInboxId) {
         await this.processCommunicationInActiveInbox(communication, isNew)
         return
