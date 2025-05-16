@@ -159,11 +159,6 @@ export default {
       default: 'No Name'
     },
 
-    communication: {
-      type: Object,
-      default: null
-    },
-
     contact: {
       type: Object,
       default: null
@@ -181,7 +176,7 @@ export default {
         id: this.communicationId,
         type: this.type,
         direction: this.direction,
-        campaign_id: communication.campaign_id,
+        campaign_id: this.campaignId,
         ring_group_id: this.teamInboxId,
         current_status2: this.currentStatus,
         disposition_status2: this.dispositionStatus,
