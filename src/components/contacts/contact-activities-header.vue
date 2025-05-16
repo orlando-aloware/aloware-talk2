@@ -112,9 +112,14 @@
           v-if="hasUnreads"
           data-testid="contact-activities-mark-all-as-read-btn"
           @click="markAllAsRead">
-          <span v-b-tooltip.html="{customClass: 'tooltip-dark'}" :title="markAllAsReadTooltip" class="mx-2">
+          <span
+            v-if="activeInboxId"
+            v-b-tooltip.html="activeInboxId ? {customClass: 'tooltip-dark'} : undefined"
+            :title="markAllAsReadTooltip" class="mx-2"
+          >
             Mark all as read ({{ unreadCount }})
           </span>
+          <span v-else> Mark all as read ({{ unreadCount }}) </span>
         </q-btn>
         <q-btn borderless
                flat
@@ -294,6 +299,7 @@ export default {
 
   computed: {
     ...mapState(['isMobile', 'isWidget']),
+    ...mapState('TeamInbox', ['activeInboxId']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
     resolveVariant () {
       switch (this.contact.task_status) {
