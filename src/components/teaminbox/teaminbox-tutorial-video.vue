@@ -5,7 +5,7 @@
     class="pl-2"
     cookie-name="team-inbox"
     title="Explore Aloware Team Inboxes"
-    video-url="https://www.loom.com/embed/e7e94a839e544e058100e36cacbb0eb7?sid=1c7e9418-80a8-4582-a35f-5eb27995f9e9"
+    video-url="https://www.loom.com/embed/652f7476d7414d329e855da6ae3e387d?sid=64064e95-2401-4dc7-85bd-82cc84123916"
   />
 </template>
 <script>
