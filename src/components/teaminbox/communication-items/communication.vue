@@ -42,7 +42,7 @@
                                v-if="date" />
     </div>
     <div class="d-flex align-items-center pr-2"
-         v-if="showLiveCallControls">
+         v-if="isLiveCall">
       <live-call-controls :communication="communication"
                           :contact="contact" />
     </div>
@@ -187,10 +187,6 @@ export default {
         disposition_status2: this.dispositionStatus,
         last_call_source: this.lastCallSource
       }
-    },
-
-    showLiveCallControls () {
-      return this.isLiveCall && this.communication.ring_group_id === this.teamInboxId
     }
   }
 }
