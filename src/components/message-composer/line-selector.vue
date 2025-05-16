@@ -110,9 +110,15 @@ export default {
      * Returns the active campaigns ids
      */
     activeCampaignsIds () {
-      return this.activeInbox?.campaign_id_as_call_waiting_ring_group
-        ? this.activeInbox?.campaign_ids.concat([this.activeInbox?.campaign_id_as_call_waiting_ring_group])
-        : this.activeInbox?.campaign_ids
+      const callWaitingIds = Array.isArray(this.activeInbox?.campaign_ids_as_call_waiting_ring_group)
+        ? this.activeInbox.campaign_ids_as_call_waiting_ring_group
+        : this.activeInbox?.campaign_ids_as_call_waiting_ring_group
+          ? [this.activeInbox.campaign_ids_as_call_waiting_ring_group]
+          : []
+
+      return this.activeInbox?.campaign_ids
+        ? [...this.activeInbox.campaign_ids, ...callWaitingIds]
+        : callWaitingIds
     },
 
     /**
