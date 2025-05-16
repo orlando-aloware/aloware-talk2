@@ -58,7 +58,6 @@ import LastCommunication from './last-communication.vue'
 import LastCommunicationDate from './last-communication-date.vue'
 import PhoneNumber from './phone-number.vue'
 import { avatarMixin, liveCallsMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import LiveCallControls from 'components/shared/live-call-controls'
 
 export default {
@@ -81,6 +80,11 @@ export default {
 
   props: {
     contactId: {
+      type: [Number, String],
+      default: 0
+    },
+
+    communicationId: {
       type: [Number, String],
       default: 0
     },
@@ -155,23 +159,29 @@ export default {
       default: 'No Name'
     },
 
-    communication: {
+    contact: {
       type: Object,
       default: null
     },
 
-    contact: {
-      type: Object,
+    lastCallSource: {
+      type: String,
       default: null
     }
   },
 
-  methods: {
-    isIncomingCall () {
-      const isCallFishing = this.isCallFishingMode && this.currentStatus === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-      const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
-
-      return isCallFishing || isIncomingCall
+  computed: {
+    communication () {
+      return {
+        id: this.communicationId,
+        type: this.type,
+        direction: this.direction,
+        campaign_id: this.campaignId,
+        ring_group_id: this.teamInboxId,
+        current_status2: this.currentStatus,
+        disposition_status2: this.dispositionStatus,
+        last_call_source: this.lastCallSource
+      }
     }
   }
 }

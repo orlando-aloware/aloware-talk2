@@ -375,11 +375,6 @@ export default {
         return
       }
 
-      if (this.communicationInProgress(this.itemsData[index])) {
-        // If the last communication is a live call, don't add the new one
-        return
-      }
-
       // Update the communication in the list, by removing it first, then adding it back in the same position
       this.itemsData.splice(index, 1)
       this.itemsData.splice(index, 0, communication)
