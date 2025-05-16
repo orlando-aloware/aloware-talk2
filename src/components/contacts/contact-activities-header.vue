@@ -40,7 +40,7 @@
                            data-testid="contact-activities-mark-all-as-read-item"
                            @click="$emit('markAllAsRead')">
             <mail-open-icon class="mark-all-as-read-icon dropdown-icon"/>
-            Mark All as Read ({{ unreadCount }})
+            Mark all as read ({{ unreadCount }})
           </b-dropdown-item>
 
           <b-dropdown-item href=""
@@ -112,9 +112,14 @@
           v-if="hasUnreads"
           data-testid="contact-activities-mark-all-as-read-btn"
           @click="markAllAsRead">
-          <span class="mx-2">
-            Mark All as Read ({{ unreadCount }})
+          <span
+            v-if="activeInboxId"
+            v-b-tooltip.html="activeInboxId ? {customClass: 'tooltip-dark'} : undefined"
+            :title="markAllAsReadTooltip" class="mx-2"
+          >
+            Mark all as read ({{ unreadCount }})
           </span>
+          <span v-else> Mark all as read ({{ unreadCount }}) </span>
         </q-btn>
         <q-btn borderless
                flat
@@ -294,6 +299,7 @@ export default {
 
   computed: {
     ...mapState(['isMobile', 'isWidget']),
+    ...mapState('TeamInbox', ['activeInboxId']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
     resolveVariant () {
       switch (this.contact.task_status) {
@@ -325,6 +331,11 @@ export default {
     inPowerDialerPage () {
       const previousPage = this.$route?.query?.previousPage
       return previousPage === 'Power Dialer'
+    },
+
+    markAllAsReadTooltip () {
+      return `<b class="text-nowrap">Marks all unread items for this contact in this Team Inbox.</b>
+      <br/><span class="text-nowrap">Does not affect other inboxes where this contact appears.</span>`
     }
   },
   data () {
@@ -421,3 +432,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.tooltip-dark::v-deep(.tooltip-inner)
+{
+  min-width: fit-content;
+  font-size: 14px !important;
+  background-color: #000 !important;
+  color: #fff !important;
+}
+</style>
