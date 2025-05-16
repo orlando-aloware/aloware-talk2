@@ -84,6 +84,11 @@ export default {
       default: 0
     },
 
+    communicationId: {
+      type: [Number, String],
+      default: 0
+    },
+
     contactName: {
       type: String,
       default: null
@@ -162,10 +167,28 @@ export default {
     contact: {
       type: Object,
       default: null
+    },
+
+    lastCallSource: {
+      type: String,
+      default: null
     }
   },
 
   computed: {
+    communication () {
+      return {
+        id: this.communicationId,
+        type: this.type,
+        direction: this.direction,
+        campaign_id: communication.campaign_id,
+        ring_group_id: this.teamInboxId,
+        current_status2: this.currentStatus,
+        disposition_status2: this.dispositionStatus,
+        last_call_source: this.lastCallSource
+      }
+    },
+
     showLiveCallControls () {
       return this.isLiveCall && this.communication.ring_group_id === this.teamInboxId
     }

@@ -526,9 +526,8 @@ export default {
         communication.created_at = new Date().toISOString()
       }
 
-      const index = this.itemsData.findIndex(c => c.contact_id === communication.contact_id)
       // If the communication is in the active inbox or  the contact is present, process it
-      if (communication.ring_group_id === this.activeInboxId || index !== -1) {
+      if (communication.ring_group_id === this.activeInboxId) {
         await this.processCommunicationInActiveInbox(communication, isNew)
         return
       }
