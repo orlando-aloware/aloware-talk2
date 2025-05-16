@@ -40,7 +40,7 @@
                            data-testid="contact-activities-mark-all-as-read-item"
                            @click="$emit('markAllAsRead')">
             <mail-open-icon class="mark-all-as-read-icon dropdown-icon"/>
-            Mark All as Read ({{ unreadCount }})
+            Mark all as read ({{ unreadCount }})
           </b-dropdown-item>
 
           <b-dropdown-item href=""
@@ -113,7 +113,7 @@
           data-testid="contact-activities-mark-all-as-read-btn"
           @click="markAllAsRead">
           <span v-b-tooltip.html="{customClass: 'tooltip-dark'}" :title="markAllAsReadTooltip" class="mx-2">
-            Mark All as Read ({{ unreadCount }})
+            Mark all as read ({{ unreadCount }})
           </span>
         </q-btn>
         <q-btn borderless
