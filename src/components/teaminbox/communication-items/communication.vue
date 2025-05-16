@@ -42,7 +42,7 @@
                                v-if="date" />
     </div>
     <div class="d-flex align-items-center pr-2"
-         v-if="isLiveCall">
+         v-if="showLiveCallControls">
       <live-call-controls :communication="communication"
                           :contact="contact" />
     </div>
@@ -58,7 +58,6 @@ import LastCommunication from './last-communication.vue'
 import LastCommunicationDate from './last-communication-date.vue'
 import PhoneNumber from './phone-number.vue'
 import { avatarMixin, liveCallsMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import LiveCallControls from 'components/shared/live-call-controls'
 
 export default {
@@ -166,12 +165,9 @@ export default {
     }
   },
 
-  methods: {
-    isIncomingCall () {
-      const isCallFishing = this.isCallFishingMode && this.currentStatus === CommunicationCurrentStatus.CURRENT_STATUS_QUEUED_NEW
-      const isIncomingCall = !this.isCallFishingMode && this.isIncomingLiveCall
-
-      return isCallFishing || isIncomingCall
+  computed: {
+    showLiveCallControls () {
+      return this.isLiveCall && this.communication.ring_group_id === this.teamInboxId
     }
   }
 }
