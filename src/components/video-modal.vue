@@ -25,9 +25,9 @@
       />
       <div class="modal-content">
         <div class="modal-header">
-          <h3 v-if="title">{{ title }}</h3>
+          <h3 v-if="title" class="d-none d-md-flex">{{ title }}</h3>
           <button
-            class="close-button"
+            class="close-button ml-auto"
             @click="closeModal"
           >✖
           </button>

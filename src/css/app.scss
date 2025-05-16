@@ -15357,6 +15357,12 @@ h1.contact-list-name-label {
     padding: 40px
   }
 
+  @media (max-width: 768px) {
+    .video-modal {
+      padding: 20px
+    }
+  }
+
   .overlay {
     position: absolute;
     top: 0;
@@ -15369,7 +15375,7 @@ h1.contact-list-name-label {
 
   .modal-content {
     position: relative;
-    width: 80%;
+    width: 100%;
     max-width: 800px;
     background: #fff;
     border-radius: 8px;
