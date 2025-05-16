@@ -49,6 +49,7 @@
                        :repeats="viewMode === UNTHREADED ? item.repeats : null"
                        :is-live-call="isLiveCall(item)"
                        :team-inbox-id="activeInboxId"
+                       :from-team-inbox="fromTeamInbox"
                        :view-mode="viewMode"
                        :communication-id="item.id"
                        :last_call_source="item.last_call_source"

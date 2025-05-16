@@ -791,6 +791,7 @@
                 <contact-integrations :contact="contact"
                                       :no_title="true"
                                       :team-inbox-id="forceTeamInboxId"
+                                      :from-team-inbox="false"
                                       :is-read-only="isContactReadOnly"
                                       v-show="expanded">
                 </contact-integrations>

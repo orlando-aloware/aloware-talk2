@@ -16,6 +16,7 @@
         <Contact
           :team-inbox-id="activeInboxId"
           :team-inbox-unread-count="contactInboxUnreadCount"
+          :from-team-inbox="true"
         />
       </div>
     </div>

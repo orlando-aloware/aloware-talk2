@@ -31,7 +31,8 @@
 
       <div v-if="campaignId">
         <campaign :campaign-id="campaignId"
-                  :team-inbox-id="teamInboxId" />
+                  :team-inbox-id="teamInboxId"
+                  :from-team-inbox="fromTeamInbox" />
       </div>
     </div>
     <div class="pr-2"

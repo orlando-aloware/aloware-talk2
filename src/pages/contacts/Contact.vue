@@ -20,6 +20,7 @@
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
                             :team-inbox-id="teamInboxId"
+                            :from-team-inbox="fromTeamInbox"
                             :team-inbox-unread-count="teamInboxUnreadCount"
                             :is-read-only="isReadOnly"
                             v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
@@ -51,6 +52,7 @@
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
                          :team-inbox-id="teamInboxId"
+                         :from-team-inbox="fromTeamInbox"
                          v-if="!changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
@@ -76,6 +78,7 @@
         <contact-details :campaign-id="selectedCampaignId"
                          :no-save-bar="isMediumScreen"
                          :team-inbox-id="teamInboxId"
+                         :from-team-inbox="fromTeamInbox"
                          v-if="drawer && !changingSelectedContact && !isEmptyContact">
         </contact-details>
       </q-drawer>

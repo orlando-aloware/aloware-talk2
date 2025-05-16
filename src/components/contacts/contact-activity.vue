@@ -216,7 +216,8 @@
                                 :contact="contact"
                                 :activityMode="true"
                                 :campaignId="campaignId"
-                                :team-inbox-id="teamInboxId">
+                                :team-inbox-id="teamInboxId"
+                                :from-team-inbox="fromTeamInbox">
             </communication-info>
           </div>
         </div>
