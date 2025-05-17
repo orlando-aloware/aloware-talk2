@@ -333,6 +333,8 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
+      this.resetScrollIntervals()
+
       if (!value) {
         return
       }
