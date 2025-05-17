@@ -847,7 +847,18 @@ import { marked } from 'marked'
 import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, userMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  avatarMixin,
+  classicMixin,
+  communicationInfoMixin,
+  dateMixin,
+  liveCallsMixin,
+  mentionsMixin,
+  notificationMixin,
+  teamInboxPropsMixin,
+  userMixin
+} from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
@@ -874,7 +885,8 @@ export default {
     notificationMixin,
     liveCallsMixin,
     mentionsMixin,
-    classicMixin
+    classicMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -1017,7 +1029,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
+    ...mapState(['campaigns', 'teamInboxCampaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('inbox', ['liveContacts', 'contacts']),
     ...mapState('broadcast', ['broadcasts']),
@@ -1134,7 +1146,10 @@ export default {
       if (!communicationIncomingNumber) {
         return null
       }
-      const found = this.campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
+
+      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+
+      const found = campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
       if (found) {
         return found.name
       }
@@ -1292,6 +1307,18 @@ export default {
         .finally(() => {
           this.isRegenerating = false
         })
+    },
+
+    handleRingGroupClick (ringGroupId, e) {
+      const url = this.getRingGroupURL(ringGroupId)
+      if (window && window.process && window.process.type === 'renderer') {
+        if (e) e.preventDefault()
+
+        this.$router.push(url)
+        return true
+      }
+
+      return false
     }
   },
 

@@ -212,6 +212,8 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
+import { getQueryString } from 'src/plugins/helpers/functions'
+import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'action-notification',
@@ -256,7 +258,8 @@ export default {
       runningDateTimeInterval: null,
       isValidNotification: false,
       notificationListeners: {},
-      AgentStatus
+      AgentStatus,
+      teamInboxLink: null
     }
   },
 
@@ -354,14 +357,23 @@ export default {
         }
       }
 
-      // If the communication has a ring group id and user has access to that team inbox
-      if (this.ringGroupId && this.ringGroupId !== '' && this.checkInboxAccess(this.ringGroupId)) {
+      // If the communication has a ring group id, check teamInboxLink
+      if (this.ringGroupId && this.ringGroupId !== '') {
+        if (this.teamInboxLink) {
+          const queryString = getQueryString(this.$route.query)
+          const communicationRouteId = this.viewMode === UNTHREADED ? `/${this.communicationId}` : ''
+
+          return {
+            path: `${this.teamInboxLink.path}${communicationRouteId}${queryString}`
+          }
+        }
+
         return {
-          path: `/team-inboxes/${this.ringGroupId}/contacts/${this.contactId}/communications`
+          path: `/contacts/${this.contactId}/communications/${this.communicationId}`
         }
       }
 
-      // If no ring group id or no access, use regular communication page
+      // If no ring group id, use regular communication page
       return {
         path: `/contacts/${this.contactId}/communications/${this.communicationId}`
       }
@@ -586,6 +598,13 @@ export default {
     }
   },
 
+  mounted () {
+    // Initialize teamInboxLink if ringGroupId is available on mount
+    if (this.ringGroupId && this.ringGroupId !== '') {
+      this.updateTeamInboxLink(this.ringGroupId)
+    }
+  },
+
   methods: {
     ...mapActions([
       'setNotifications',
@@ -593,6 +612,16 @@ export default {
       'clearCallFishingQueue',
       'removeFromCallFishingQueue'
     ]),
+
+    async updateTeamInboxLink (ringGroupId) {
+      if (await this.checkInboxAccess(ringGroupId)) {
+        this.teamInboxLink = {
+          path: `/team-inboxes/${ringGroupId}/contacts/${this.contactId}/communications`
+        }
+      } else {
+        this.teamInboxLink = null
+      }
+    },
 
     startNotificationListeners () {
       this.$VueEvent.listen('update_communication', this.notificationListeners[this.id].updateCommunication)
@@ -832,6 +861,24 @@ export default {
   },
 
   watch: {
+    ringGroupId: {
+      immediate: true,
+      handler: function (newRingGroupId) {
+        if (newRingGroupId && newRingGroupId !== '') {
+          this.updateTeamInboxLink(newRingGroupId)
+        } else {
+          this.teamInboxLink = null
+        }
+      }
+    },
+    contactId: {
+      immediate: true,
+      handler: function (contactId) {
+        if (contactId && this.ringGroupId) {
+          this.updateTeamInboxLink(this.ringGroupId)
+        }
+      }
+    },
     notificationQueue: {
       deep: true,
       handler: function (newValue, oldValue) {

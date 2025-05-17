@@ -5,7 +5,7 @@
                           :values="selectedId"
                           :options="ringGroupsAlphabeticalOrder"
                           :disable="disable"
-                          :canEdit="hasPermissionTo(['list ring group', 'view ring group'])"
+                          :canEdit="hasPermissionTo(['list ring group', 'view ring group']) && !isReadOnly"
                           v-if="genericMultiselect"
                           data-testid="ring-group-selector-generic-multi-select"
                           @valuesUpdated="updateRingGroups">
@@ -30,7 +30,7 @@
               :options="options"
               :multiple="multiple"
               :placeholder="placeholder"
-              :disable="disable"
+              :disable="disable || isReadOnly"
               :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '', isGenericSelectorStyle ? 'generic-selector': '']"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               v-model="selectedId"
@@ -163,6 +163,11 @@ export default {
     },
 
     splitByQueued: {
+      type: Boolean,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       default: false
     }

@@ -38,12 +38,14 @@
           :integration-data="integrationData"
           :lifecycle-stages-options="lifecycleStagesOptions"
           :contact-id="contact.id"
+          :is-read-only="isReadOnly"
         />
         <!-- End Duplicate Contacts Section -->
         <!-- Start Sync Button -->
         <q-card-section data-testid="integration-hubspot-card-section-3">
           <b-row>
             <b-button
+              :disabled="isReadOnly"
               class="text-white"
               size="sm"
               variant="primary"
@@ -94,6 +96,7 @@
               tabindex="0"
               data-testid="integration-hubspot-enroll-button"
               @click="onEnrollToWorkflow"
+              :disabled="isReadOnly"
             >
               <i class="fa fa-user-plus"></i>
               Enroll to Workflow
@@ -119,7 +122,7 @@
               size="sm"
               variant="primary"
               data-testid="integration-hubspot-enroll-button"
-              :disabled="isEnrolling || !isWorkflowValid"
+              :disabled="isEnrolling || !isWorkflowValid || isReadOnly"
               @click.prevent="enrollToWorkflow"
             >
               <q-spinner-bars
@@ -144,6 +147,7 @@
                 :integrationData="duplicate"
                 :lifecycle-stages-options="lifecycleStagesOptions"
                 :contact-id="contact.id"
+                :is-read-only="isReadOnly"
               />
             </div>
           </div>
@@ -165,13 +169,15 @@
 </template>
 
 <script>
-import IntegrationHubspotOneContact from 'components/integrations/integration-hubspot-one-contact.vue'
+import IntegrationHubspotOneContact
+from 'components/integrations/integration-hubspot-one-contact.vue'
 import _ from 'lodash'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import talk2Api from 'src/plugins/api/api'
 import {
   hubspotIntegrationMixin,
   integrationMixin,
+  teamInboxPropsMixin,
   whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
@@ -184,7 +190,8 @@ export default {
   mixins: [
     hubspotIntegrationMixin,
     integrationMixin,
-    whiteLabelMixin
+    whiteLabelMixin,
+    teamInboxPropsMixin
   ],
 
   props: {
@@ -194,6 +201,12 @@ export default {
     },
 
     dialer_mode: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       required: false,
       default: false
@@ -272,7 +285,7 @@ export default {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
     getData () {
-      return this.getIntegrationData(this.contact, 'hubspot')
+      return this.getIntegrationData(this.contact, 'hubspot', null, this.teamInbox)
         .then(response => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true

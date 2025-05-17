@@ -152,7 +152,7 @@
                 size="sm"
                 variant="dark"
                 tabindex="0"
-                :disabled="isAddingNote"
+                :disabled="isAddingNote || isReadOnly"
                 @click="createNote"
               >
                 <q-spinner-bars
@@ -188,7 +188,7 @@
               variant="warning"
               tabindex="0"
               block
-              :disabled="isGenerating"
+              :disabled="isGenerating || isReadOnly"
               @click="handleRegenerate"
             >
               {{ !isGenerating ? '🧙‍♂️️🪄 Regenerate Insights' : '' }}
@@ -373,6 +373,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

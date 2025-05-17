@@ -5,8 +5,14 @@ import qs from 'qs'
 import * as AloAi from 'src/constants/aloai'
 import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
-const exportCommunications = async (contactId) => {
-  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
+const exportCommunications = async (contactId, fromTeamInbox) => {
+  const params = {}
+
+  if (fromTeamInbox) {
+    params.from_team_inbox = fromTeamInbox
+  }
+
+  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`, { params })
 }
 
 const talk2Api = {
@@ -50,12 +56,20 @@ const talk2Api = {
         return window.axios.put(`${suffixV1}contact/${id}`, params)
       },
 
-      getPhoneNumbers (id) {
+      getPhoneNumbers (id, fromTeamInbox = false) {
         if (!id) {
           return Promise.reject(new Error('Failed to get phone numbers, missing contact id!'))
         }
 
-        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
+        const params = {}
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = fromTeamInbox
+        }
+
+        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`, {
+          params
+        })
       },
 
       getRingGroups (id) {
@@ -130,9 +144,13 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}contact/${id}/send-email`, params)
       },
 
-      addEngagement (id, params) {
+      addEngagement (id, params, fromTeamInbox) {
         if (!id) {
           return null
+        }
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = true
         }
 
         return window.axios.post(`${suffixV1}calendar/events/contact/${id}/create`, params)
@@ -142,12 +160,20 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
 
-      getLineIncomingNumber (contactId, lineId) {
+      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
         if (!contactId || !lineId) {
           return null
         }
 
-        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
+        const params = {}
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = fromTeamInbox
+        }
+
+        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
+          params
+        })
       },
 
       getIntegrationData (contactId, params) {
@@ -467,8 +493,8 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}communication/${id}/force-dequeue`)
       },
 
-      get (id) {
-        return window.axios.get(`${suffixV1}communication/${id}`)
+      get (id, params = {}) {
+        return window.axios.get(`${suffixV1}communication/${id}`, { params })
       },
 
       delete (id) {

@@ -156,6 +156,7 @@
                        icon="o_info"
                        flat
                        round
+                       :disabled="isContactReadOnly"
                        @click="goToContact">
                 </q-btn>
               </q-item-label>
@@ -271,9 +272,11 @@
                 <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                               v-if="contact">
                   <span class="d-inline-flex cursor-pointer link-only"
-                        @click="goToContact">
+                        @click="goToContact"
+                        v-if="!isContactReadOnly">
                     {{ contactName | truncate(15) }}
                   </span>
+                  <span v-else>{{ contactName | truncate(15) }}</span>
                   <contact-integrations-link-icons :contact='contact' />
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
@@ -554,6 +557,7 @@
                                              :highlighted="isHighlightedContactDisposition"
                                              :required="isHighlightedContactDisposition"
                                              :contact="contact"
+                                             :is-read-only="isContactReadOnly"
                                              @change="onContactDisposed">
                 </contact-disposition-wrapper>
               </div>
@@ -568,8 +572,12 @@
                 <div class="d-flex flex-grow-1">
                   <template-selector class="w-100"
                                      v-model="templateId"
+                                     :disable=isMessagingBlocked(getCampaign(dialer.communication.campaign_id,true),true)
                                      @change="changeTemplate">
                   </template-selector>
+                  <q-tooltip v-if="isMessagingBlocked(getCampaign(dialer.communication.campaign_id,true),true)">
+                    {{ getMessagingBlocked(getCampaign(dialer.communication.campaign_id,true)) }}
+                  </q-tooltip>
                 </div>
                 <div class="d-flex flex-shrink-0 ml-2">
                   <b-button variant="primary"
@@ -780,6 +788,9 @@
               <q-card-section class="height-240">
                 <contact-integrations :contact="contact"
                                       :no_title="true"
+                                      :team-inbox-id="forceTeamInboxId"
+                                      :from-team-inbox="false"
+                                      :is-read-only="isContactReadOnly"
                                       v-show="expanded">
                 </contact-integrations>
               </q-card-section>
@@ -1317,7 +1328,8 @@ import {
   dialerCommunicationMixin,
   dispositionsMixin,
   notificationMixin,
-  sessionCallStatusMixin
+  sessionCallStatusMixin,
+  selectorMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
@@ -1381,7 +1393,8 @@ export default {
     dispositionsMixin,
     agentMixin,
     dialerCommunicationMixin,
-    sessionCallStatusMixin
+    sessionCallStatusMixin,
+    selectorMixin
   ],
 
   props: {
@@ -1954,6 +1967,23 @@ export default {
 
     shouldDisableCallBackButton () {
       return this.isNotDisposed || this.isNotOnWrapUp || this.isCallBackButtonDisabled
+    },
+
+    /**
+     * If the current company has team inbox enabled, force the team inbox id to 1 simply to force the integration to show as urrestricted because of visibility limits
+     */
+    forceTeamInboxId () {
+      return this.currentCompany.team_inbox_enabled ? 1 : null
+    },
+
+    contactReadOnlyLimits () {
+      return this.currentCompany.team_inbox_enabled
+        ? this.dialer?.communication?.contact_read_only_limits
+        : null
+    },
+
+    isContactReadOnly () {
+      return Boolean(this.contact?.is_read_only) || false
     }
   },
 
@@ -2060,7 +2090,7 @@ export default {
     },
 
     goToContact () {
-      if (!this.contact) {
+      if (!this.contact || this.isContactReadOnly) {
         return
       }
 

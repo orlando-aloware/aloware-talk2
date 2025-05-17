@@ -5,12 +5,15 @@
          'inbox-activity-container-wrapper': teamInbox
        }">
     <contact-activities-header
+      data-testid="contact-activities-header"
       :label="contactName"
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
       :contact="contact"
       :enable-export="enableExport"
-      data-testid="contact-activities-header"
+      :team-inbox-id="teamInboxId"
+      :from-team-inbox="fromTeamInbox"
+      :is-read-only="isReadOnly"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
@@ -36,7 +39,9 @@
                               :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
                               :communication="communication"
                               :contact="contact"
-                              :campaignId="campaignId">
+                              :campaignId="campaignId"
+                              :team-inbox-id="teamInboxId"
+                              :from-team-inbox="fromTeamInbox">
             </contact-activity>
             <contact-activity v-for="(communication, index) in sendingCommunications"
                               data-testid="contact-activities-activity-2"
@@ -44,7 +49,9 @@
                               ref="communication-0"
                               :communication="communication"
                               :contact="contact"
-                              :campaignId="communication.campaignId">
+                              :campaignId="communication.campaignId"
+                              :team-inbox-id="teamInboxId"
+                              :from-team-inbox="fromTeamInbox">
             </contact-activity>
           </div>
         </div>
@@ -62,6 +69,8 @@
 
     <div class="composer-container-wrapper">
       <message-composer :campaignId="campaignId"
+                        :team-inbox-id="teamInboxId"
+                        :from-team-inbox="fromTeamInbox"
                         data-testid="contact-activities-message-composer"
                         @message-sent="setSendingCommunication">
       </message-composer>
@@ -76,6 +85,7 @@ import ContactActivitiesHeader from 'src/components/contacts/contact-activities-
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-activities',
@@ -84,6 +94,9 @@ export default {
     ContactActivitiesHeader,
     ContactActivity
   },
+  mixins: [
+    teamInboxPropsMixin
+  ],
   props: {
     communications: {
       required: true,
@@ -101,13 +114,13 @@ export default {
       type: Boolean,
       default: true
     },
-    teamInboxId: {
-      type: Number,
-      default: null
-    },
     teamInboxUnreadCount: {
       type: Number,
       default: 0
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

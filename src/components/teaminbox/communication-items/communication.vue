@@ -1,43 +1,51 @@
 <template>
-  <div :class="['communication', { active: isActive, 'live-call-item': isLiveCall }]">
-    <div class="communication__avatar">
+  <div :class="['communication', 'd-flex', 'flex-row', { active: isActive, 'live-call-item': isLiveCall }]">
+    <div class="communication__avatar pr-3">
       <avatar width="34"
               height="34"
               :color-module-id="contactId"
               :name="contactName || defaultEmptyName">
-        <unread-counter :unread-properties="unreadProperties" />
+        <unread-counter
+              :unread-properties="unreadProperties" />
       </avatar>
     </div>
+    <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+      <div>
+        <contact-name :name="contactName || defaultEmptyName"
+                      :repeats="repeats" />
+      </div>
 
-    <div class="communication__contact-name">
-      <contact-name :name="contactName || defaultEmptyName"
-                    :repeats="repeats" />
+      <div>
+        <phone-number :phone-number="contactPhoneNumber" />
+      </div>
+
+      <div>
+        <last-communication :disposition-status="dispositionStatus"
+                            :type="type"
+                            :direction="direction"
+                            :callback-status="callbackStatus"
+                            :body="body"
+                            :is-live-call-item="isLiveCall"
+                            v-if="type" />
+      </div>
+
+      <div v-if="campaignId">
+        <campaign :campaign-id="campaignId"
+                  :team-inbox-id="teamInboxId"
+                  :from-team-inbox="fromTeamInbox" />
+      </div>
     </div>
-
-    <div class="communication__phone-number">
-      <phone-number :phone-number="contactPhoneNumber" />
-    </div>
-
-    <div class="communication__communication-type">
-      <last-communication :disposition-status="dispositionStatus"
-                          :type="type"
-                          :direction="direction"
-                          :callback-status="callbackStatus"
-                          :body="body"
-                          :is-live-call-item="isLiveCall"
-                          v-if="type" />
-    </div>
-
-    <div class="communication__campaign"
-         v-if="campaignId">
-      <campaign :campaign-id="campaignId" />
-    </div>
-
-    <div class="communication__time">
+    <div class="pr-2"
+         v-if="!isLiveCall">
       <last-communication-date :date="date"
                                :last-communication-type="type"
                                :last-communication-current-status="currentStatus"
                                v-if="date" />
+    </div>
+    <div class="d-flex align-items-center pr-2"
+         v-if="isLiveCall">
+      <live-call-controls :communication="communication"
+                          :contact="contact" />
     </div>
   </div>
 </template>
@@ -50,11 +58,14 @@ import ContactName from './contact-name.vue'
 import LastCommunication from './last-communication.vue'
 import LastCommunicationDate from './last-communication-date.vue'
 import PhoneNumber from './phone-number.vue'
-import { avatarMixin } from 'src/plugins/mixins'
+import { avatarMixin, liveCallsMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
+import LiveCallControls from 'components/shared/live-call-controls'
 
 export default {
   mixins: [
-    avatarMixin
+    avatarMixin,
+    liveCallsMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -64,11 +75,17 @@ export default {
     ContactName,
     LastCommunication,
     LastCommunicationDate,
-    PhoneNumber
+    PhoneNumber,
+    LiveCallControls
   },
 
   props: {
     contactId: {
+      type: [Number, String],
+      default: 0
+    },
+
+    communicationId: {
       type: [Number, String],
       default: 0
     },
@@ -143,9 +160,29 @@ export default {
       default: 'No Name'
     },
 
-    isLiveCall: {
-      type: Boolean,
-      default: false
+    contact: {
+      type: Object,
+      default: null
+    },
+
+    lastCallSource: {
+      type: String,
+      default: null
+    }
+  },
+
+  computed: {
+    communication () {
+      return {
+        id: this.communicationId,
+        type: this.type,
+        direction: this.direction,
+        campaign_id: this.campaignId,
+        ring_group_id: this.teamInboxId,
+        current_status2: this.currentStatus,
+        disposition_status2: this.dispositionStatus,
+        last_call_source: this.lastCallSource
+      }
     }
   }
 }
@@ -153,16 +190,6 @@ export default {
 
 <style lang="scss" scoped>
 .communication {
-  display: grid;
-  grid-template-columns: 0.5fr 2.2fr 0.3fr;
-  grid-template-rows: 1fr 1fr 1fr; // only 3 because campaign can be null
-  gap: 0px 5px;
-  grid-template-areas:
-    "communication__avatar communication__contact-name communication__time"
-    "communication__avatar communication__phone-number communication__time"
-    "communication__avatar communication__communication-type communication__time"
-    "communication__avatar communication__campaign communication__time";
-
   padding: 8px 8px 8px 8px;
   min-height: 64px;
   border-bottom: 1px solid #eeeeee;
@@ -173,26 +200,6 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  &__contact-name {
-    grid-area: communication__contact-name;
-  }
-
-  &__communication-type {
-    grid-area: communication__communication-type;
-  }
-
-  &__time {
-    grid-area: communication__time;
-  }
-
-  &__phone-number {
-    grid-area: communication__phone-number;
-  }
-
-  &__campaign {
-    grid-area: communication__campaign;
   }
 
   &.active {

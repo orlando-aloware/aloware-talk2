@@ -7,6 +7,8 @@
                     data-testid="teaminbox-search"
                     limit-search-characters
                     :id="`teaminbox-nav-list-search-${_uid}`"
+                    :search="search"
+                    :no-clear-on-route-change="true"
                     @search="onSearch"
                     @focus="setShowSearchTooltip(true)"
                     @blur="setShowSearchTooltip(false)"
@@ -67,8 +69,9 @@ import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
-import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING } from 'src/store/teaminbox/teaminbox.store'
-import { mapState, mapActions } from 'vuex'
+import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
+import { mapState, mapActions, mapGetters } from 'vuex'
+import { getQueryString } from 'src/plugins/helpers/functions'
 
 export default {
   components: {
@@ -84,13 +87,15 @@ export default {
   data () {
     return {
       search: '',
-      showSearchTooltip: false
+      showSearchTooltip: false,
+      finishedInitialLoad: false
     }
   },
 
   computed: {
     ...mapState('TeamInbox', [
       'inboxes',
+      'viewMode',
       'activeInboxId',
       'hasMoreInboxes',
       'isLoadingInboxes',
@@ -101,6 +106,8 @@ export default {
     ...mapState('auth', ['profile']),
 
     ...mapState(['isMobile', 'teams']),
+
+    ...mapGetters('TeamInbox', ['getConnectedInboxesLength']),
 
     teamsIds () {
       return this.teams
@@ -163,6 +170,32 @@ export default {
       'setInboxes'
     ]),
 
+    findInboxById (id) {
+      return this.inboxes.find(inbox => inbox.id === id)
+    },
+
+    determineInboxToSelect () {
+      const defaultInboxId = this.getFirstInboxId()
+      const urlInboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId, 10) : null
+      const urlContactId = this.$route.params.id ? parseInt(this.$route.params.id, 10) : null
+
+      // Check if URL has inbox ID and inbox exists
+      if (urlInboxId && this.findInboxById(urlInboxId)) {
+        return { id: urlInboxId, contactId: urlContactId, force: true }
+      }
+
+      // Default to first inbox
+      if (defaultInboxId) {
+        return {
+          id: defaultInboxId,
+          contactId: urlContactId,
+          force: !urlInboxId // Only force redirect if no inbox ID in URL
+        }
+      }
+
+      return null
+    },
+
     onScroll ({ target }) {
       const bottomThreshold = 20
 
@@ -198,11 +231,29 @@ export default {
       const search = this.$store.state.TeamInbox.currentSearch || null
       this.fetchItems(inboxId, search, filters, sort)
 
-      const route = `/team-inboxes/${inboxId}` + (contactId ? `/contacts/${contactId}/communications` : '')
+      const queryString = getQueryString(this.$route.query)
+      const contactRouteId = contactId ? `/contacts/${contactId}/communications` : ''
+      const communicationRouteId = this.viewMode === UNTHREADED && contactRouteId ? `/${this.$route.params.communicationId}` : ''
+      const route = `/team-inboxes/${inboxId}` + contactRouteId + communicationRouteId + queryString
 
-      // avoid redundant navigation
-      if (this.$route.path !== route) {
-        this.$router.push(route)
+      // avoid redundant navigation (including query)
+      if (this.$route.fullPath !== route) {
+        if (force) {
+          // force redirect to the first inbox to prevent the user from navigating back to the Team Inboxes page without any inboxId
+          this.$router.replace(route).catch(err => {
+            if (err.name !== 'NavigationDuplicated' && err.name !== 'NavigationCancelled') {
+              console.error(err)
+            }
+          })
+          return
+        }
+
+        // Catch added since we are only adding a query string
+        this.$router.push(route).catch(err => {
+          if (err.name !== 'NavigationDuplicated' && err.name !== 'NavigationCancelled') {
+            console.error(err)
+          }
+        })
       }
     },
 
@@ -243,8 +294,6 @@ export default {
     },
 
     newRingGroupListener (ringGroup) {
-      console.log(ringGroup)
-
       if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
         const updatedInboxes = [...this.inboxes, ringGroup]
         this.setInboxes({ data: updatedInboxes })
@@ -253,7 +302,11 @@ export default {
     },
 
     updateRingGroupListener (ringGroup) {
-      if (this.allUserIds(ringGroup)?.includes(this.profile.id)) {
+      const isUserIncluded = this.allUserIds(ringGroup)?.includes(this.profile.id)
+      const isTeamIncluded = ringGroup.team_ids?.some(id => this.teamsIds.includes(id))
+      const isWatchingTeam = ringGroup.watcher_team_ids?.some(id => this.teamsIds.includes(id))
+
+      if (isUserIncluded || isTeamIncluded || isWatchingTeam) {
         const index = this.inboxes.findIndex(inbox => inbox.id === ringGroup.id)
         const updatedInboxes = [...this.inboxes]
 
@@ -297,25 +350,13 @@ export default {
       }
     },
 
-    async resetTeamInbox () {
+    async refreshTeamInbox () {
       await this.resetInboxes()
-      await this.fetchInboxes()
+      await this.fetchInboxes(this.search)
 
       if (this.activeInboxId) {
         await this.onInboxSelect(this.activeInboxId, null, true)
       }
-    },
-
-    einboxCommunicationMarkedAllAsReadListener ({ inboxId, count }) {
-      this.einboxCommunicationMarkedAllAsRead(inboxId, count)
-    },
-
-    einboxCommunicationMarkedAsReadListener ({ inboxId }) {
-      this.einboxCommunicationMarkedAsRead(inboxId)
-    },
-
-    einboxCommunicationMarkedAsUnreadListener ({ inboxId }) {
-      this.einboxCommunicationMarkedAsUnread(inboxId)
     }
   },
 
@@ -325,13 +366,17 @@ export default {
     this.setIsLoadingInboxesUnreadCount(true)
 
     await this.fetchInboxes()
+    this.finishedInitialLoad = true
 
     if (this.inboxes.length) {
-      const inboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : this.getFirstInboxId()
-      const contactId = this.$route.params.id && inboxId ? parseInt(this.$route.params.id) : null
+      const inboxToSelect = this.determineInboxToSelect()
 
-      if (inboxId) {
-        this.onInboxSelect(inboxId, contactId)
+      if (inboxToSelect) {
+        this.onInboxSelect(
+          inboxToSelect.id,
+          inboxToSelect.contactId,
+          inboxToSelect.force
+        )
       }
     }
 
@@ -340,13 +385,21 @@ export default {
     this.$VueEvent.listen('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.listen('ring_group_deleted', this.deleteRingGroupListener)
 
-    this.$VueEvent.listen('resetTeamInbox', this.resetTeamInbox)
+    this.$VueEvent.listen('refreshTeamInbox', this.refreshTeamInbox)
   },
 
   watch: {
     '$route.params.inboxId' (inboxId) {
       if (!inboxId && this.inboxes.length && !this.isMobile) {
         this.onInboxSelect(this.getFirstInboxId())
+        return
+      }
+
+      const newInboxId = parseInt(inboxId)
+
+      if (!isNaN(newInboxId) && newInboxId !== this.activeInboxId) {
+        // Handle back navigation to a different inbox
+        this.onInboxSelect(newInboxId)
       }
     },
 
@@ -370,6 +423,19 @@ export default {
     search (val) {
       this.resetInboxes()
       this.fetchInboxes(val)
+    },
+
+    getConnectedInboxesLength (length, oldLength) {
+      if (oldLength || !this.finishedInitialLoad) {
+        return
+      }
+
+      const previousActiveInboxExists = this.inboxes.findIndex(({ id }) => id === this.activeInboxId) !== -1
+
+      if (!previousActiveInboxExists) {
+        // Handles edge cases when an inbox is assigned to the user while they have the page open without any existing inboxes
+        this.onInboxSelect(this.getFirstInboxId())
+      }
     }
   },
 
@@ -381,7 +447,7 @@ export default {
     this.$VueEvent.stop('ring_group_updated', this.updateRingGroupListener)
     this.$VueEvent.stop('ring_group_deleted', this.deleteRingGroupListener)
 
-    this.$VueEvent.stop('resetTeamInbox', this.resetTeamInbox)
+    this.$VueEvent.stop('refreshTeamInbox', this.refreshTeamInbox)
   }
 }
 </script>

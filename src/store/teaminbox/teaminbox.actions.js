@@ -25,6 +25,9 @@ export default {
   setInboxesUnreadCount: ({ commit }, data) => {
     commit('SET_INBOXES_UNREAD_COUNT', data)
   },
+  setInboxesUnreadCountSingle: ({ commit }, data) => {
+    commit('SET_INBOXES_UNREAD_COUNT_SINGLE', data)
+  },
   setIsLoadingInboxesUnreadCount: ({ commit }, loading) => {
     commit('SET_IS_LOADING_INBOXES_UNREAD_COUNT', loading)
   },
@@ -36,8 +39,8 @@ export default {
     commit('SET_HAS_MORE_INBOXES', data.next_page_url !== null)
     commit('SET_CURRENT_INBOXES_PAGE', data.current_page)
   },
-  setViewMode: ({ commit }, viewMode) => {
-    commit('SET_VIEW_MODE', viewMode)
+  setViewMode: ({ commit }, value) => {
+    commit('SET_VIEW_MODE', value)
   },
   setItems: ({ commit }, data) => {
     commit('SET_ITEMS', data.data)
@@ -67,11 +70,11 @@ export default {
   setShowRefreshCommunicationsButton: ({ commit }, show) => {
     commit('SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON', show)
   },
-  setActiveFilters: ({ commit }, filters) => {
-    commit('SET_ACTIVE_FILTERS', filters)
+  setActiveFilters: ({ commit }, value) => {
+    commit('SET_ACTIVE_FILTERS', value)
   },
-  setActiveSort: ({ commit }, sort) => {
-    commit('SET_ACTIVE_SORT', sort)
+  setActiveSort: ({ commit }, value) => {
+    commit('SET_ACTIVE_SORT', value)
   },
   setCurrentSearch: ({ commit }, search) => {
     commit('SET_CURRENT_SEARCH', search)
@@ -84,5 +87,14 @@ export default {
   },
   setInboxAnnouncementViewed: ({ commit }, viewed) => {
     commit('SET_INBOX_ANNOUNCEMENT_VIEWED', viewed)
+  },
+  reset: ({ commit }) => {
+    commit('RESET')
+  },
+  setUnreadCountLoaded: ({ commit }, loaded) => {
+    commit('SET_UNREAD_COUNT_LOADED', loaded)
+  },
+  setTeamInboxTutorialComponent: ({ commit }, ref) => {
+    commit('SET_TEAM_INBOX_TUTORIAL_COMPONENT', ref)
   }
 }

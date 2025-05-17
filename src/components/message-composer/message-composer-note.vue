@@ -71,12 +71,12 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 
 import Avatar from 'components/avatar'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { mentionsMixin } from 'src/plugins/mixins'
+import { mentionsMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import At from 'vue-at'
 
 export default {
   name: 'message-composer-note',
-  mixins: [mentionsMixin],
+  mixins: [mentionsMixin, teamInboxPropsMixin],
   components: { Avatar, At },
   computed: {
     ...mapGetters('contacts', ['contact', 'messageComposer', 'selectedLine']),
@@ -116,7 +116,7 @@ export default {
         type: CommunicationTypes.NOTE
       })
 
-      talk2Api.V1.contact.addEngagement(this.contact.id, message)
+      talk2Api.V1.contact.addEngagement(this.contact.id, message, this.teamInbox)
         .then(response => {
           this.resetMessageComposerNote()
           this.$generalNotification('Note has been added.')

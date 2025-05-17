@@ -5,10 +5,11 @@ import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { agentMixin } from 'src/plugins/mixins/index'
+import { agentMixin, notificationMixin } from 'src/plugins/mixins/index'
 export default {
   mixins: [
-    agentMixin
+    agentMixin,
+    notificationMixin
   ],
 
   data () {
@@ -177,6 +178,10 @@ export default {
 
     isLiveCall () {
       if (!this.communication) {
+        return false
+      }
+
+      if (this.communication.type !== CommunicationTypes.CALL) {
         return false
       }
 

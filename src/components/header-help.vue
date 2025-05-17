@@ -32,6 +32,14 @@
             <i class="fa fa-stethoscope mr-1"></i>
             RUN CONNECTION TEST
           </q-btn>
+          <q-btn color="primary"
+                 v-if="$route.path.startsWith('/team-inboxes')"
+                 class="full-width text-caption mt-1"
+                 size="sm"
+                 v-close-popup
+                 @click="watchTeamInboxTutorial">
+            WATCH TUTORIAL
+          </q-btn>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
@@ -41,6 +49,7 @@
 <script>
 import * as Roles from 'src/constants/roles'
 import { mapGetters, mapState } from 'vuex'
+import VueCookies from 'vue-cookies'
 
 export default {
   data () {
@@ -63,6 +72,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['user']),
     ...mapState(['statics']),
+    ...mapState('auth', ['profile']),
 
     isMobileSize () {
       return this.windowSize <= 425
@@ -82,6 +92,13 @@ export default {
 
     goToConnectionTest () {
       this.$router.push('/settings/connection-test')
+    },
+
+    watchTeamInboxTutorial () {
+      const cookies = VueCookies
+      cookies.remove(`team-inbox-${this.profile?.id}`)
+
+      this.$store.state.TeamInbox.teamInboxTutorialComponent.openModal()
     }
   },
 

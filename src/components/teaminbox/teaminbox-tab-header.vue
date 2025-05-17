@@ -10,8 +10,10 @@
              :id="`teaminbox-tab-header-label-${_uid}`"
              v-if="activeInbox.name">
         {{ activeInbox.name }}
-        <b-tooltip custom-class="talk-table__tooltip"
+        <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+          placement="right"
           :target="`teaminbox-tab-header-label-${_uid}`"
+          boundary="window"
           :delay="500">
           {{ activeInbox.name }}
         </b-tooltip>
@@ -22,7 +24,9 @@
             :id="`teaminbox-tab-open-comms-page-icon-${_uid}`"
             @click="openCommunicationsPage">
         <watch-icon />
-        <b-tooltip custom-class="talk-table__tooltip"
+        <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+                   placement="right"
+                   boundary="window"
                    :target="`teaminbox-tab-open-comms-page-icon-${_uid}`">
           Open Communications Page
         </b-tooltip>
@@ -34,7 +38,9 @@
         <search-icon color="#256eff"
                      width="18"
                      height="18" />
-        <b-tooltip custom-class="talk-table__tooltip"
+        <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+                   placement="right"
+                   boundary="window"
                    :target="`teaminbox-tab-search-icon-${_uid}`">
           Click to search
         </b-tooltip>
@@ -52,9 +58,9 @@
                     @blur="onLeaveSearch"
                     @focus="setShowSearchTooltip(true)"
                     @show-error="showLimitCharactersError"/>
-      <b-tooltip custom-class="talk-table__tooltip"
-                 placement="top"
-                 :boundary="`teaminbox-tab-search-${_uid}`"
+      <b-tooltip custom-class="talk-table__tooltip teaminbox-tooltip"
+                 placement="right"
+                 boundary="window"
                  :target="`teaminbox-tab-search-${_uid}`"
                  :show="showSearchTooltip">
         Search communications by contact's name or phone number

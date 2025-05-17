@@ -1,5 +1,4 @@
 import { THREADED } from './teaminbox.store'
-import { handleDuplicatedItems } from 'src/plugins/helpers/teaminbox'
 
 export default {
   SET_ACTIVE_INBOX_ID (state, inbox) {
@@ -23,6 +22,21 @@ export default {
   SET_IS_LOADING_INBOXES_UNREAD_COUNT (state, loading) {
     state.isLoadingInboxesUnreadCount = loading
   },
+  SET_INBOXES_UNREAD_COUNT_SINGLE (state, data) {
+    const index = state.inboxesUnreadCount.findIndex((inbox) => inbox.ring_group_id === data.ring_group_id)
+
+    if (index !== -1) {
+      state.inboxesUnreadCount[index] = {
+        ring_group_id: data.ring_group_id,
+        unread_count: data.unread_count
+      }
+    } else {
+      state.inboxesUnreadCount.push({
+        ring_group_id: data.ring_group_id,
+        unread_count: data.unread_count
+      })
+    }
+  },
   SET_CURRENT_INBOXES_PAGE (state, page) {
     state.currentInboxesPage = page
   },
@@ -36,7 +50,7 @@ export default {
     state.viewMode = viewMode
   },
   SET_ITEMS (state, items) {
-    state.items = state.viewMode === THREADED ? items : handleDuplicatedItems(items)
+    state.items = items
   },
   SET_IS_LOADING_ITEMS (state, loading) {
     state.isLoadingItems = loading
@@ -54,7 +68,7 @@ export default {
   },
   APPEND_ITEMS (state, items) {
     const allItems = [...state.items, ...items]
-    state.items = state.viewMode === THREADED ? allItems : handleDuplicatedItems(allItems)
+    state.items = allItems
   },
   SET_IS_LOADING_MORE_ITEMS (state, loading) {
     state.isLoadingMoreItems = loading
@@ -85,5 +99,32 @@ export default {
   },
   SET_INBOX_ANNOUNCEMENT_VIEWED (state, viewed) {
     state.inboxAnnouncementViewed = viewed
+  },
+  SET_UNREAD_COUNT_LOADED (state, loaded) {
+    state.unreadCountLoaded = loaded
+  },
+  SET_TEAM_INBOX_TUTORIAL_COMPONENT (state, ref) {
+    state.teamInboxTutorialComponent = ref
+  },
+  RESET (state) {
+    state.inboxes = []
+    state.isLoadingInboxes = false
+    state.inboxesUnreadCount = []
+    state.isLoadingInboxesUnreadCount = false
+    state.currentInboxesPage = 0
+    state.items = []
+    state.isLoadingItems = false
+    state.currentItemsPage = 0
+    state.abortController = null
+    state.showRefreshInboxesButton = false
+    state.showRefreshCommunicationsButton = false
+    state.currentSearch = null
+    state.isInitialLoad = false
+    state.activeInboxContactUnreadCount = 0
+    state.unreadCountLoaded = false
+    state.viewMode = THREADED
+    state.activeFilters = {}
+    state.activeSort = {}
+    state.teamInboxTutorialComponent = null
   }
 }

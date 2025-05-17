@@ -31,7 +31,7 @@
           <q-item-section v-if="isMessagingBlocked(scope.opt, checkBlockedMessaging, false, true)" side>
             <q-tooltip anchor="top middle"
                        self="center middle">
-              To send messages to the US, A2P 10DLC Brand and Campaign are required.
+              {{ getMessagingBlocked(scope.opt) }}
             </q-tooltip>
             <q-badge color="blue">i</q-badge>
           </q-item-section>
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import {
   contactMixin,
   contactV2AttributesMixin,
@@ -61,6 +61,7 @@ import {
   selectorMixin
 } from 'src/plugins/mixins'
 import talk2Api from 'src/plugins/api/api'
+import _ from 'lodash'
 
 export default {
   name: 'line-selector',
@@ -95,12 +96,43 @@ export default {
       'lineIncomingNumberLoading',
       'lineIncomingNumber'
     ]),
-    ...mapState(['campaigns']),
+    ...mapState(['campaigns', 'teamInboxCampaigns']),
+    ...mapState('TeamInbox', ['activeInbox']),
+
+    /**
+     * Returns the appropriate campaigns array based on whether we're in team inbox mode
+     */
+    campaignsToUse () {
+      return this.teamInbox ? this.activeCampaigns : this.campaigns
+    },
+
+    /**
+     * Returns the active campaigns ids
+     */
+    activeCampaignsIds () {
+      const callWaitingIds = Array.isArray(this.activeInbox?.campaign_ids_as_call_waiting_ring_group)
+        ? this.activeInbox.campaign_ids_as_call_waiting_ring_group
+        : this.activeInbox?.campaign_ids_as_call_waiting_ring_group
+          ? [this.activeInbox.campaign_ids_as_call_waiting_ring_group]
+          : []
+
+      return this.activeInbox?.campaign_ids
+        ? [...this.activeInbox.campaign_ids, ...callWaitingIds]
+        : callWaitingIds
+    },
+
+    /**
+     * Returns the active campaigns
+     */
+    activeCampaigns () {
+      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+      return campaigns.filter(campaign => this.activeCampaignsIds?.includes(campaign.id))
+    },
 
     selectedCampaign () {
-      if (this.campaigns) {
+      if (this.campaignsToUse) {
         // It returns the campaign validating the campaignId and the incoming_number
-        return this.campaigns.find(campaign => campaign.id === this.campaignId && campaign.incoming_number)
+        return this.campaignsToUse.find(campaign => campaign.id === this.campaignId && campaign.incoming_number)
       }
 
       return null
@@ -129,6 +161,48 @@ export default {
       }
 
       return linesArray.data
+    },
+
+    /**
+     * Override contactCampaignsFromCommunications from contactMixin to use campaignsToUse
+     */
+    contactCampaignsFromCommunications () {
+      if (this.contact && this.campaignsToUse.length) {
+        return this.campaignsAlphabeticalOrder
+      }
+
+      return []
+    },
+
+    /**
+     * Override otherCampaignsFromCommunications from contactMixin to use campaignsToUse
+     */
+    otherCampaignsFromCommunications () {
+      if (this.campaignsToUse && this.contactCampaignsFromCommunications) {
+        return _.difference(this.campaignsAlphabeticalOrder, this.contactCampaignsFromCommunications)
+      }
+
+      if (this.campaignsToUse) {
+        return this.campaignsAlphabeticalOrder
+      }
+
+      return []
+    },
+
+    /**
+     * Override campaignsAlphabeticalOrder from contactMixin to use campaignsToUse
+     */
+    campaignsAlphabeticalOrder () {
+      if (this.campaignsToUse) {
+        return _.clone(this.campaignsToUse).sort((a, b) => {
+          const textA = a.name.toUpperCase()
+          const textB = b.name.toUpperCase()
+
+          return (textA < textB) ? -1 : (textA > textB) ? 1 : 0
+        })
+      }
+
+      return []
     }
   },
 
@@ -139,7 +213,8 @@ export default {
       lineOptions: this.formattedLineOptions,
       incomingNumber: null,
       isFocused: false,
-      selectWidth: 0
+      selectWidth: 0,
+      canEmail: false
     }
   },
 
@@ -153,12 +228,17 @@ export default {
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'setLineIncomingNumberLoading',
+      'setLineIncomingNumber'
+    ]),
+
     onShowMenu () {
       this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
     },
     onFocus () {
       this.isFocused = true
-      this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : 'Select line'
+      this.$el.querySelector('.inline-select .q-field__input').placeholder = this.selectedLine ? this.selectedLine.name : this.getPlaceholderText()
       this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
       if (this.selectedLine) {
         this.$el.querySelector('.inline-select .selected-option-container').style.display = 'none'
@@ -174,9 +254,13 @@ export default {
       }
     },
 
+    getPlaceholderText () {
+      return this.formattedLineOptions.length > 0 ? 'Select line' : 'No lines are available'
+    },
+
     showPlaceholder () {
       if (!this.selectedLine) {
-        this.$el.querySelector('.inline-select .q-field__input').placeholder = 'Select line'
+        this.$el.querySelector('.inline-select .q-field__input').placeholder = this.getPlaceholderText()
         this.$el.querySelector('.inline-select .q-field__input').style.display = 'block'
       } else {
         this.$el.querySelector('.inline-select .q-field__input').style.display = 'none'
@@ -213,7 +297,7 @@ export default {
 
     getIncomingNumber () {
       this.isBusy = true
-      return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id).then(response => {
+      return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id, this.teamInbox).then(response => {
         this.incomingNumber = response.data
       }).finally(() => {
         this.isBusy = false
@@ -231,6 +315,41 @@ export default {
       this.selectedLine = this.selectedCampaign
       this.incomingNumber = this.lineIncomingNumber
       this.showPlaceholder()
+    },
+
+    updateMessageComposer () {
+      if (this.selectedCampaign && this.selectedCampaign.id && this.contact && this.contact.id) {
+        this.checkEmailCapability()
+      }
+    },
+
+    /**
+     * Override checkEmailCapability from contactMixin to use our selectedCampaign
+     */
+    checkEmailCapability () {
+      const mailIntegrationEnabled = this.currentCompany.sendgrid_integration_enabled || this.currentCompany.mailgun_integration_enabled
+
+      if (this.currentCompany && mailIntegrationEnabled) {
+        this.canEmail = true
+        return
+      }
+
+      this.canEmail = this.selectedCampaign.email_intake && this.selectedCampaign.email_intake_route_id
+    },
+
+    /**
+     * Override updateLineIncomingNumber from contactMixin to use our selectedCampaign
+     */
+    updateLineIncomingNumber () {
+      if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
+        this.setLineIncomingNumberLoading(true)
+
+        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
+          this.setLineIncomingNumber(response.data)
+        }).finally(() => {
+          this.setLineIncomingNumberLoading(false)
+        })
+      }
     }
   },
 

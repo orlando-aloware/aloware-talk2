@@ -1,5 +1,7 @@
 export default {
   getNavListItems: state => [state.navListItems[0]],
   getInboxesFirstPage: state => state.inboxesFirstPage,
-  getInboxAnnouncementViewed: state => state.inboxAnnouncementViewed
+  getConnectedInboxesLength: state => state.inboxes.length,
+  getInboxAnnouncementViewed: state => state.inboxAnnouncementViewed,
+  getUnreadCountLoaded: state => state.unreadCountLoaded
 }

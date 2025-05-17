@@ -20,7 +20,9 @@
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
                             :team-inbox-id="teamInboxId"
+                            :from-team-inbox="fromTeamInbox"
                             :team-inbox-unread-count="teamInboxUnreadCount"
+                            :is-read-only="isReadOnly"
                             v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
@@ -49,6 +51,8 @@
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
+                         :team-inbox-id="teamInboxId"
+                         :from-team-inbox="fromTeamInbox"
                          v-if="!changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
@@ -73,6 +77,8 @@
         </compact-btn>
         <contact-details :campaign-id="selectedCampaignId"
                          :no-save-bar="isMediumScreen"
+                         :team-inbox-id="teamInboxId"
+                         :from-team-inbox="fromTeamInbox"
                          v-if="drawer && !changingSelectedContact && !isEmptyContact">
         </contact-details>
       </q-drawer>
@@ -97,7 +103,8 @@ import {
   contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
-  inboxMixin
+  inboxMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -110,6 +117,7 @@ import {
   MAX_TABLET_WIDTH
 } from 'src/constants/viewport-sizes'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { THREADED } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'contact',
@@ -119,7 +127,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    inboxMixin
+    inboxMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -127,17 +136,6 @@ export default {
     ContactDetails,
     ContactActivities,
     CompactBtn
-  },
-
-  props: {
-    teamInboxId: {
-      type: Number,
-      default: null
-    },
-    teamInboxUnreadCount: {
-      type: Number,
-      default: 0
-    }
   },
 
   computed: {
@@ -149,6 +147,8 @@ export default {
     ]),
 
     ...mapGetters('auth', ['authenticated']),
+
+    ...mapState('TeamInbox', ['viewMode']),
 
     ...mapState([
       'contactDetailsDrawer',
@@ -200,6 +200,13 @@ export default {
       ContactTaskStatus,
       CommunicationDirections,
       TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+    }
+  },
+
+  props: {
+    teamInboxUnreadCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -326,9 +333,24 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
-        this.fetchContactCommunicationsUntilFound()
+      if (!value) {
+        return
       }
+
+      if (this.changingSelectedContact) {
+        return
+      }
+
+      if (!['Inbox Contact', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
+        return
+      }
+
+      if (this.teamInbox && this.viewMode === THREADED) {
+        // Threaded view don't have communicationId in the route params
+        return
+      }
+
+      this.fetchContactCommunicationsUntilFound()
     },
 
     contactDetailsDrawer () {

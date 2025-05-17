@@ -299,6 +299,7 @@ import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
 import { FINISHED } from 'src/constants/export-status'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'MyLayout',
@@ -353,6 +354,7 @@ export default {
     return {
       loading: true,
       loadingCampaigns: false,
+      loadingTeamInboxCampaigns: false,
       loadingRingGroups: false,
       loadingTeams: false,
       loadingContactLists: false,
@@ -418,6 +420,7 @@ export default {
     ...mapState([
       'dialer',
       'campaigns',
+      'teamInboxCampaigns',
       'isMobile',
       'ringGroups',
       'notifications',
@@ -448,6 +451,10 @@ export default {
     ...mapState('inbox', [
       'selectedContact',
       'liveContacts'
+    ]),
+
+    ...mapState('TeamInbox', [
+      'activeInboxId'
     ]),
 
     ...mapState('powerDialer', [
@@ -743,10 +750,19 @@ export default {
         return
       }
 
-      const communicationType = communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
-      communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
-        ? 'missed call'
-        : 'call'
+      let communicationType = 'call'
+
+      // For completed calls, determine type based on disposition status
+      if (communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW) {
+        switch (communication.disposition_status2) {
+          case CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW:
+            communicationType = 'missed call'
+            break
+          case CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW:
+            communicationType = 'abandoned call'
+            break
+        }
+      }
 
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
       if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
@@ -1589,7 +1605,7 @@ export default {
     initAuth () {
       let fetchingStatics = false
       this.loading = true
-      this.setCampaignsIsLoading(true)
+      setCampaignsIsLoading(this, true)
 
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
@@ -1629,7 +1645,7 @@ export default {
         this.getContactLists()
         this.getBroadcasts()
         this.getTemplates()
-        this.getCampaigns()
+        getCampaigns(this)
         this.getWorkflows()
         this.getDispositionStatuses()
         this.getCallDispositions()
@@ -1637,6 +1653,11 @@ export default {
         this.getLeadSources()
         this.getAttributeDictionaries()
         this.getMyQueueList()
+
+        // Load team inbox campaigns (no visibility limits) only if a team inbox is active
+        if (this.hasCompanyTeamInboxEnabled) {
+          getTeamInboxCampaigns(this)
+        }
       })
     },
 
@@ -1685,7 +1706,8 @@ export default {
         return null
       }
 
-      const found = this.campaigns.find((campaign) => campaign.id === id)
+      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+      const found = campaigns.find((campaign) => campaign.id === id)
 
       if (found) {
         return found
@@ -1711,33 +1733,6 @@ export default {
 
           return Promise.reject()
         })
-    },
-
-    getCampaigns () {
-      if (this.hasPermissionTo('list campaign')) {
-        this.loadingCampaigns = true
-
-        return this.$axios
-          .get('/api/v1/campaign', {
-            mode: 'no-cors',
-            params: {
-              is_lite: true
-            }
-          })
-          .then((res) => {
-            this.setCampaigns(res.data)
-            this.loadingCampaigns = false
-            this.setCampaignsIsLoading(false)
-
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingCampaigns = false
-
-            return Promise.reject()
-          })
-      }
     },
 
     getRingGroups () {
@@ -2713,6 +2708,7 @@ export default {
       'resetVuex',
       'setUsage',
       'setCampaigns',
+      'setTeamInboxCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
       'setRingGroupsIsLoading',

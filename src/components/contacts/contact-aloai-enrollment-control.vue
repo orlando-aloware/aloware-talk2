@@ -127,6 +127,7 @@
             variant="outline-danger"
             size="sm"
             data-testid="disenroll-single-bot-contact-button"
+            :disabled="isReadOnly"
           >
             <i class="fa fa-trash"/> Disenroll from agent
           </b-button>
@@ -141,6 +142,7 @@
           size="sm"
           block
           data-testid="disenroll-contact-button"
+          :disabled="isReadOnly"
         >
           <i class="fa fa-trash"/> Disenroll from agent
         </b-button>
@@ -155,6 +157,7 @@
           block
           variant="outline-primary"
           data-testid="aloai-enrollment-control-button"
+          :disabled="isReadOnly"
         >
           <aloai-icon
             class="mr-1"
@@ -223,6 +226,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

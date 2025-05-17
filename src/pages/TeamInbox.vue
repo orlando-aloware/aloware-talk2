@@ -1,15 +1,23 @@
 <template>
-  <div class="h-100"
-       v-if="authenticated">
-    <div class="teaminbox animate__animated animate__fadeIn position-relative">
-      <TeamInboxSide :class="inboxSideClasses"
-                    @itemSelected="onItemSelected"
-                    @contact-selected="onContactSelected" />
+  <div v-if="authenticated" class="h-100">
+    <teaminbox-tutorial-video />
 
-      <div :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
-           v-if="isContactShow">
-        <Contact :team-inbox-id="activeInboxId"
-                :team-inbox-unread-count="contactInboxUnreadCount" />
+    <div class="teaminbox animate__animated animate__fadeIn position-relative">
+      <TeamInboxSide
+        :class="inboxSideClasses"
+        @itemSelected="onItemSelected"
+        @contact-selected="onContactSelected"
+      />
+
+      <div
+        v-if="isContactShow"
+        :class="['d-flex', 'flex-grow-1', { 'mobile-contact-active' : isMobileContactActive }]"
+      >
+        <Contact
+          :team-inbox-id="activeInboxId"
+          :team-inbox-unread-count="contactInboxUnreadCount"
+          :from-team-inbox="true"
+        />
       </div>
     </div>
   </div>
@@ -18,18 +26,22 @@
 <script>
 import Contact from 'pages/contacts/Contact'
 import TeamInboxSide from 'components/teaminbox/teaminbox-side'
-import { userMixin } from 'src/plugins/mixins'
-import { mapGetters, mapState } from 'vuex'
+import { aclMixin, userMixin } from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
+import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
 
 export default {
   name: 'TeamInbox',
 
   mixins: [
-    userMixin
+    userMixin,
+    aclMixin
   ],
 
   components: {
+    teaminboxTutorialVideo,
     Contact,
     TeamInboxSide
   },
@@ -40,7 +52,8 @@ export default {
         TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
       ],
       // Store the unread count for the currently selected contact
-      currentContactUnreadCount: 0
+      currentContactUnreadCount: 0,
+      loadingTeamInboxCampaigns: false
     }
   },
 
@@ -55,6 +68,10 @@ export default {
       'activeInbox',
       'inboxesUnreadCount',
       'items'
+    ]),
+
+    ...mapState([
+      'teamInboxCampaigns'
     ]),
 
     isMobileContactActive () {
@@ -82,9 +99,20 @@ export default {
     if (!this.hasCompanyTeamInboxEnabled) {
       this.$router.push({ name: 'Inbox' })
     }
+    // Load team inbox campaigns
+    getTeamInboxCampaigns(this)
   },
 
   methods: {
+    ...mapActions([
+      'setTeamInboxCampaigns',
+      'setCampaignsIsLoading'
+    ]),
+
+    ...mapActions('TeamInbox', [
+      'reset'
+    ]),
+
     onItemSelected (routeData) {
       this.$router.push(routeData)
     },
@@ -109,6 +137,10 @@ export default {
 
   beforeDestroy () {
     this.$VueEvent.stop('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
+  },
+
+  destroyed () {
+    this.reset()
   }
 }
 </script>

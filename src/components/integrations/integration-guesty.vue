@@ -62,18 +62,19 @@
           <span class="data-value">{{ integrationData.phone }}</span>
         </p>
       </q-card-section>
-      <sync-with-integration :integration_name='integrationName()'
-                             :contact_id='contact.id'
-                             @sync-complete="afterSyncComplete"/>
+      <sync-with-integration
+        :is-read-only="isReadOnly"
+        :integration_name='integrationName()'
+        :contact_id='contact.id'
+        @sync-complete="afterSyncComplete"
+      />
     </q-card>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import {
-  integrationMixin
-} from 'src/plugins/mixins'
+import { integrationMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
 import { GUESTY_INTEGRATION } from 'src/constants/integrations'
 
@@ -82,13 +83,20 @@ export default {
   components: { SyncWithIntegration },
 
   mixins: [
-    integrationMixin
+    integrationMixin,
+    teamInboxPropsMixin
   ],
 
   props: {
     contact: {
       type: Object,
       required: true
+    },
+
+    isReadOnly: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
@@ -124,7 +132,7 @@ export default {
     getData () {
       this.contactIntegrationDataLoaded = false
 
-      return this.getIntegrationData(this.contact, GUESTY_INTEGRATION)
+      return this.getIntegrationData(this.contact, GUESTY_INTEGRATION, null, this.teamInbox)
         .then(response => {
           if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
             this.integrationData = response.data

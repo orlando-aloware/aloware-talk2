@@ -285,6 +285,16 @@ export default {
             ringGroupId: communication.ring_group_id
           }
           break
+        case 'abandoned call':
+          params.data = {
+            title: name.data,
+            message: 'Abandoned Call',
+            type: 'call',
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            ringGroupId: communication.ring_group_id
+          }
+          break
         case 'call':
           // don't show fishing mode notifs to other users of the ring group if the REPEAT_CONTACT_ROUTE_TO_OWNER_ONLY_STRICT option is selected
           if (ringGroup &&

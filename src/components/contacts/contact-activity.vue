@@ -4,7 +4,8 @@
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
     <div class="d-flex flex-row align-items-center position-relative"
          v-if="communication.property === undefined">
-      <q-badge class="is-dot unread-dot mx-1 blue position-absolute"
+      <q-badge class="is-dot unread-dot mx-1 position-absolute"
+               color="red"
                rounded
                data-testid="contact-activity-unread-dot-badget"
                v-if="(markable || (communication.type === CommunicationTypes.SMS ||
@@ -214,7 +215,9 @@
                                 :communication="communication"
                                 :contact="contact"
                                 :activityMode="true"
-                                :campaignId="campaignId">
+                                :campaignId="campaignId"
+                                :team-inbox-id="teamInboxId"
+                                :from-team-inbox="fromTeamInbox">
             </communication-info>
           </div>
         </div>
@@ -385,7 +388,8 @@ import _ from 'lodash'
 import {
   aclMixin,
   avatarMixin,
-  userMixin
+  userMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import { mapState, mapGetters } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
@@ -404,7 +408,8 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    userMixin
+    userMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -503,7 +508,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
+    ...mapState(['campaigns', 'teamInboxCampaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     ...mapState('inbox', [
@@ -755,7 +760,8 @@ export default {
       }
 
       id = parseInt(id)
-      const found = this.campaigns.find(campaign => campaign.id === id)
+      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+      const found = campaigns.find(campaign => campaign.id === id)
 
       if (found) {
         return found
