@@ -50,7 +50,9 @@ export default {
     state.viewMode = viewMode
   },
   SET_ITEMS (state, items) {
-    state.items = items
+    // Look for all the items and don't add the ones that do not have a contact.id
+    const itemsWithContactId = items.filter((item) => item.contact.id)
+    state.items = itemsWithContactId
   },
   SET_IS_LOADING_ITEMS (state, loading) {
     state.isLoadingItems = loading
@@ -67,7 +69,9 @@ export default {
     state.hasMoreItems = true
   },
   APPEND_ITEMS (state, items) {
-    const allItems = [...state.items, ...items]
+    // Look for all the items and don't add the ones that do not have a contact.id
+    const itemsWithContactId = items.filter((item) => item.contact.id)
+    const allItems = [...state.items, ...itemsWithContactId]
     state.items = allItems
   },
   SET_IS_LOADING_MORE_ITEMS (state, loading) {
