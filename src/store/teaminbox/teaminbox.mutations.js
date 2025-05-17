@@ -104,6 +104,9 @@ export default {
   SET_UNREAD_COUNT_LOADED (state, loaded) {
     state.unreadCountLoaded = loaded
   },
+  SET_TEAM_INBOX_TUTORIAL_COMPONENT (state, ref) {
+    state.teamInboxTutorialComponent = ref
+  },
   RESET (state) {
     state.inboxes = []
     state.isLoadingInboxes = false
@@ -123,5 +126,6 @@ export default {
     state.viewMode = THREADED
     state.activeFilters = {}
     state.activeSort = {}
+    state.teamInboxTutorialComponent = null
   }
 }

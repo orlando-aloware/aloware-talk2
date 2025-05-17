@@ -130,21 +130,12 @@ export default {
     }
   },
 
-  created () {
-    this.$cookies = VueCookies
-
-    if (!this.$cookies.get(this.parsedCookieName) && this.shouldShowInFirstVisit) {
-      this.showModal = true
-      return this.setIsIntroVideoVisible(true)
-    }
-  },
-
   methods: {
     ...mapActions(['setIsIntroVideoVisible']),
 
     closeModal () {
       this.showModal = false
-      this.$cookies.set(this.parsedCookieName, 'viewed', 3650) // Set cookie to expire in 10 years
+      this.$cookies.set(this.parsedCookieName, 'viewed', '3650d') // Set cookie to expire in 10 years
       this.setIsIntroVideoVisible(null)
     },
 
@@ -158,6 +149,13 @@ export default {
   },
   mounted () {
     this.isLoading = true
+
+    this.$cookies = VueCookies
+
+    if (!this.$cookies.get(this.parsedCookieName) && this.shouldShowInFirstVisit) {
+      this.showModal = true
+      return this.setIsIntroVideoVisible(true)
+    }
   }
 }
 </script>
