@@ -21,6 +21,7 @@ export default {
       loadingContactCommunications: false,
       loadingSendMessage: false,
       loadingMarkAsRead: false,
+      isScrolling: false,
       selectedContact: {
         id: null,
         first_name: null,
@@ -301,6 +302,12 @@ export default {
       this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
       this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
       this.$VueEvent.stop('update-contact-in-group', this.listeners.updateContactInGroup)
+    },
+
+    resetScrollIntervals () {
+      clearInterval(this.scrollInterval)
+      clearInterval(this.containerElInterval)
+      this.isScrolling = false
     },
 
     isCommOrAuditExists (communication, data) {
@@ -779,10 +786,14 @@ export default {
     },
 
     fetchContactCommunicationsUntilFound (tryCount = 1) {
+      if (tryCount === 1) {
+        this.resetScrollIntervals()
+      }
+
       if (tryCount > 10) {
         this.loadingContactCommunications = false
         this.$generalNotification('Communication is too old for automatic scrolling', 'error')
-
+        this.resetScrollIntervals()
         return
       }
 
@@ -817,6 +828,7 @@ export default {
         }
       }).catch(() => {
         this.loadingContactCommunications = false
+        this.resetScrollIntervals()
       })
     },
 
@@ -895,6 +907,8 @@ export default {
     },
 
     scrollMessages () {
+      if (this.isScrolling) return
+
       const counter = { data: 0 }
       clearInterval(this.contactActivitiesInterval)
 
@@ -960,14 +974,23 @@ export default {
     },
 
     scrollIntoActivity () {
+      if (this.isScrolling) return
+      this.isScrolling = true
+
       const communicationId = this.$route.params.communicationId
       const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === communicationId.toString())
+
+      if (!communication) {
+        this.isScrolling = false
+        return
+      }
+
       const ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
       let count = 0
       let communicationActivity = null
 
-      // scroll to activity
       clearInterval(this.scrollInterval)
+
       this.scrollInterval = setInterval(() => {
         communicationActivity = (this.$refs.contactActivities)
           ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null)
@@ -982,12 +1005,14 @@ export default {
           // highlight the activity
           this.highlightActivity(communicationActivity)
           clearInterval(this.scrollInterval)
+          this.isScrolling = false
         }
 
         // if we've been waiting for too long to load,
         // clear this interval
         if (count >= 120) {
           clearInterval(this.scrollInterval)
+          this.isScrolling = false
         }
 
         count++
@@ -1001,16 +1026,35 @@ export default {
         return
       }
 
+      // Clear any existing highlight
+      const highlighted = document.querySelector('.shine')
+      if (highlighted) {
+        highlighted.classList.remove('shine')
+      }
+
+      // Add new highlight
+      element.classList.add('shine')
+
+      // Remove highlight after 5 seconds
+      setTimeout(() => {
+        element.classList.remove('shine')
+      }, 5000)
+
       if (!_.isEmpty(commActivity.$refs) && commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
         commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
         let counter = 0
         let containerEl = null
 
+        // Clear any existing container interval
+        clearInterval(this.containerElInterval)
+
         this.containerElInterval = setInterval(() => {
           containerEl = document.querySelector('.contact-activities .scrollbar-white')
 
           if (containerEl) {
-            containerEl.scrollTop = element.offsetTop
+            if (!this.isScrolling) {
+              containerEl.scrollTop = element.offsetTop
+            }
             clearInterval(this.containerElInterval)
           }
 
@@ -1021,18 +1065,6 @@ export default {
           }
         }, 500)
       }
-
-      const highlighted = document.querySelector('.shine')
-
-      if (highlighted) {
-        highlighted.classList.remove('shine')
-      }
-
-      element.classList.add('shine')
-
-      setTimeout(() => {
-        element.classList.remove('shine')
-      }, 5000)
     },
 
     fetchIncomingNumber: _.debounce(function () {
@@ -1288,5 +1320,6 @@ export default {
     clearInterval(this.contactActivitiesInterval)
     clearInterval(this.containerElInterval)
     clearInterval(this.scrollInterval)
+    this.isScrolling = false
   }
 }
