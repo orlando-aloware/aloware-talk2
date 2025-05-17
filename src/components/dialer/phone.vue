@@ -422,7 +422,6 @@
                 <span>Notes</span>
               </button>
               <button class="phone-buttons elevated btn"
-                      :disabled="isContactReadOnly"
                       @click="openExpansion('tags')">
                 <tags-icon :width="iconSizes.tags.width"
                            :height="iconSizes.tags.height">
@@ -662,8 +661,7 @@
                              :entity-object="dialer.communication"
                              :category="TagCategories.CAT_COMMUNICATIONS"
                              :use-card="false"
-                             :use-add-icon="true"
-                             :is-read-only="isContactReadOnly" />
+                             :use-add-icon="true" />
               </div>
             </div>
 
@@ -791,6 +789,7 @@
                 <contact-integrations :contact="contact"
                                       :no_title="true"
                                       :team-inbox-id="forceTeamInboxId"
+                                      :from-team-inbox="false"
                                       :is-read-only="isContactReadOnly"
                                       v-show="expanded">
                 </contact-integrations>
@@ -1984,7 +1983,7 @@ export default {
     },
 
     isContactReadOnly () {
-      return Boolean(this.is_read_only) || false
+      return Boolean(this.contact?.is_read_only) || false
     }
   },
 

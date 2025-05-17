@@ -15,6 +15,7 @@
         data-testid="contact-integrations-hubspot"
         :contact="contact"
         :team-inbox-id="teamInboxId"
+        :from-team-inbox="fromTeamInbox"
         :is-read-only="isReadOnly"
     />
 
@@ -23,6 +24,7 @@
         data-testid="contact-integrations-pipedrive"
         :contact="contact"
         :team-inbox-id="teamInboxId"
+        :from-team-inbox="fromTeamInbox"
         :is-read-only="isReadOnly"
     />
 
@@ -31,6 +33,7 @@
         data-testid="contact-integrations-gohighlevel"
         :contact="contact"
         :team-inbox-id="teamInboxId"
+        :from-team-inbox="fromTeamInbox"
         :is-read-only="isReadOnly"
     />
 
@@ -39,6 +42,7 @@
         data-testid="contact-integrations-salesforce"
         :contact="contact"
         :team-inbox-id="teamInboxId"
+        :from-team-inbox="fromTeamInbox"
         :is-read-only="isReadOnly"
     />
 
@@ -47,6 +51,7 @@
       data-testid='contact-integrations-guesty'
       :contact='contact'
       :team-inbox-id="teamInboxId"
+      :from-team-inbox="fromTeamInbox"
       :is-read-only="isReadOnly"
     />
 
@@ -55,6 +60,7 @@
       data-testid='contact-integrations-zoho'
       :contact='contact'
       :team-inbox-id="teamInboxId"
+      :from-team-inbox="fromTeamInbox"
       :is-read-only="isReadOnly"
     />
 

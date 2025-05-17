@@ -240,28 +240,6 @@ export default {
           this.sortItems()
           return
         }
-
-        // If this is a non-live call and we don't have a live call, check for existing completed calls
-        const completedCallIndex = this.itemsData.findIndex(item =>
-          this.getGroupKey(item) === groupKey && !this.communicationInProgress(item)
-        )
-
-        if (completedCallIndex > -1) {
-          // Check if the calls are subsequent and have the same direction
-          const existingCall = this.itemsData[completedCallIndex]
-          const isSubsequent = completedCallIndex > 0 &&
-                             this.itemsData[completedCallIndex - 1].type === CommunicationTypes.CALL &&
-                             existingCall.direction === communication.direction
-
-          if (isSubsequent) {
-            // Update the existing completed call with incremented repeats
-            communication.repeats = (existingCall.repeats || 0) + 1
-            communication.unread_repeats = (existingCall.unread_repeats || 0) + (!communication.is_read ? 1 : 0)
-            this.itemsData.splice(completedCallIndex, 1, communication)
-            this.sortItems()
-            return
-          }
-        }
       }
 
       this.updateUnthreadedCommunicationUnreadCount(communication)
@@ -396,51 +374,12 @@ export default {
     sortItems () {
       const isAscendingOrder = this.activeSort?.order === 'asc'
 
-      // First, group calls by their position and direction
+      // First, group calls by their position in the list
       const groupedItems = {}
-      let lastCallContactId = null
-      let lastCallDirection = null
-      let lastCallIndex = -1
 
       this.itemsData.forEach((item, index) => {
-        if (item.type === CommunicationTypes.CALL && !this.communicationInProgress(item)) {
-          // Check if this call is subsequent to the last call and has the same direction and contact
-          const isSubsequent = lastCallContactId === item.contact_id &&
-                             lastCallDirection === item.direction &&
-                             index === lastCallIndex + 1
-
-          if (!isSubsequent) {
-            // Start a new group
-            const key = this.getGroupKey(item)
-            groupedItems[key] = item
-            lastCallContactId = item.contact_id
-            lastCallDirection = item.direction
-            lastCallIndex = index
-          } else {
-            // Merge with the last group
-            const lastKey = this.getGroupKey(this.itemsData[lastCallIndex])
-            if (groupedItems[lastKey]) {
-              // Merge with the last group
-              groupedItems[lastKey].repeats = (groupedItems[lastKey].repeats || 0) + 1
-              groupedItems[lastKey].unread_repeats = (groupedItems[lastKey].unread_repeats || 0) + (!item.is_read ? 1 : 0)
-              lastCallIndex = index
-            } else {
-              // If can't merge, treat it as a new group
-              const key = this.getGroupKey(item)
-              groupedItems[key] = item
-              lastCallContactId = item.contact_id
-              lastCallDirection = item.direction
-              lastCallIndex = index
-            }
-          }
-        } else {
-          // For non-calls or live calls, keep them as individual items
-          const key = this.getGroupKey(item)
-          groupedItems[key] = item
-          lastCallContactId = null
-          lastCallDirection = null
-          lastCallIndex = -1
-        }
+        const key = this.getGroupKey(item)
+        groupedItems[key] = item
       })
 
       // Convert grouped items back to array
@@ -710,16 +649,6 @@ export default {
 
       // Update all communications from this contact in the unthreaded view
       if (this.viewMode === UNTHREADED) {
-        this.itemsData.forEach(comm => {
-          if (comm.contact_id === data.id) {
-            comm.inbox_unread_count = item.inbox_unread_count
-            comm.is_read = true
-            if (comm.repeats > 0) {
-              comm.unread_repeats = 0
-            }
-          }
-        })
-
         // If this is the currently selected contact, emit the contact-selected event
         if (this.itemsData.find(comm => comm.id === this.activeId)?.contact_id === data.id) {
           this.$emit('contact-selected', {

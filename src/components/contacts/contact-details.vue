@@ -67,6 +67,7 @@
           <contact-integrations data-testid="contact-details-integrations"
                                 :contact="contact"
                                 :team-inbox-id="teamInboxId"
+                                :from-team-inbox="fromTeamInbox"
                                 :is-read-only="isReadOnly"/>
           <contact-reservations v-if="contact && showGuestyReservations()"
                                 data-testid="contact-details-reservations"

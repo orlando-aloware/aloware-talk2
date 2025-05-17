@@ -68,6 +68,7 @@
                                data-testid="message-composer-note"
                                v-if="messageComposer.mode === 'note'"
                                :team-inbox-id="teamInboxId"
+                               :from-team-inbox="fromTeamInbox"
         />
       </div>
     </div>
@@ -88,6 +89,7 @@
                          check-blocked-messaging
                          data-testid="message-composer-line-selector"
                          :team-inbox-id="teamInboxId"
+                         :from-team-inbox="fromTeamInbox"
                          @change="onLineChange">
           </line-selector>
         </div>

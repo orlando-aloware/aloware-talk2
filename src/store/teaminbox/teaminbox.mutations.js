@@ -1,5 +1,4 @@
 import { THREADED } from './teaminbox.store'
-import { handleDuplicatedItems } from 'src/plugins/helpers/teaminbox'
 
 export default {
   SET_ACTIVE_INBOX_ID (state, inbox) {
@@ -51,7 +50,7 @@ export default {
     state.viewMode = viewMode
   },
   SET_ITEMS (state, items) {
-    state.items = state.viewMode === THREADED ? items : handleDuplicatedItems(items)
+    state.items = items
   },
   SET_IS_LOADING_ITEMS (state, loading) {
     state.isLoadingItems = loading
@@ -69,7 +68,7 @@ export default {
   },
   APPEND_ITEMS (state, items) {
     const allItems = [...state.items, ...items]
-    state.items = state.viewMode === THREADED ? allItems : handleDuplicatedItems(allItems)
+    state.items = allItems
   },
   SET_IS_LOADING_MORE_ITEMS (state, loading) {
     state.isLoadingMoreItems = loading

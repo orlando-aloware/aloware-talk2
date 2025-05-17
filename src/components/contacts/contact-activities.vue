@@ -12,6 +12,7 @@
       :contact="contact"
       :enable-export="enableExport"
       :team-inbox-id="teamInboxId"
+      :from-team-inbox="fromTeamInbox"
       :is-read-only="isReadOnly"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
@@ -39,7 +40,8 @@
                               :communication="communication"
                               :contact="contact"
                               :campaignId="campaignId"
-                              :team-inbox-id="teamInboxId">
+                              :team-inbox-id="teamInboxId"
+                              :from-team-inbox="fromTeamInbox">
             </contact-activity>
             <contact-activity v-for="(communication, index) in sendingCommunications"
                               data-testid="contact-activities-activity-2"
@@ -48,7 +50,8 @@
                               :communication="communication"
                               :contact="contact"
                               :campaignId="communication.campaignId"
-                              :team-inbox-id="teamInboxId">
+                              :team-inbox-id="teamInboxId"
+                              :from-team-inbox="fromTeamInbox">
             </contact-activity>
           </div>
         </div>
@@ -67,6 +70,7 @@
     <div class="composer-container-wrapper">
       <message-composer :campaignId="campaignId"
                         :team-inbox-id="teamInboxId"
+                        :from-team-inbox="fromTeamInbox"
                         data-testid="contact-activities-message-composer"
                         @message-sent="setSendingCommunication">
       </message-composer>
