@@ -140,6 +140,7 @@ export default {
     },
 
     openModal () {
+      this.isLoading = true
       this.showModal = true
     },
 
