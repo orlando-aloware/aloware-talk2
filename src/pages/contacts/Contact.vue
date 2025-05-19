@@ -161,10 +161,6 @@ export default {
       'isWidget'
     ]),
 
-    teamInbox () {
-      return this.teamInboxId !== null
-    },
-
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
     },
@@ -249,6 +245,8 @@ export default {
 
   mounted () {
     if (this.authenticated) {
+      console.log('debug:teaminbox - fetching contact')
+      console.log('debug:teaminbox - this.teamInbox', this.teamInbox, 'this.fromTeamInbox', this.fromTeamInbox, 'this.teamInboxId', this.teamInboxId, 'this.$route.meta?.isTeamInbox', this.$route.meta?.isTeamInbox)
       this.fetchContact()
     }
 
