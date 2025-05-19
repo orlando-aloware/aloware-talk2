@@ -1976,12 +1976,6 @@ export default {
       return this.currentCompany.team_inbox_enabled ? 1 : null
     },
 
-    contactReadOnlyLimits () {
-      return this.currentCompany.team_inbox_enabled
-        ? this.dialer?.communication?.contact_read_only_limits
-        : null
-    },
-
     isContactReadOnly () {
       return Boolean(this.contact?.is_read_only) || false
     }
