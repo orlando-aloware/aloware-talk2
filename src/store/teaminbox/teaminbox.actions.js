@@ -96,5 +96,13 @@ export default {
   },
   setTeamInboxTutorialComponent: ({ commit }, ref) => {
     commit('SET_TEAM_INBOX_TUTORIAL_COMPONENT', ref)
+  },
+  setContactsLastUsedLines: ({ commit }, { inboxId, data }) => {
+    for (const item of data) {
+      const { last_line_used: lastLineUsed, contact_id: contactId } = item
+      if (lastLineUsed) {
+        commit('SET_CONTACTS_LAST_USED_LINE', { inboxId, contactId, lastLineUsed })
+      }
+    }
   }
 }
