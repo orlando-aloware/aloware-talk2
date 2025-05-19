@@ -147,9 +147,7 @@ export default {
   computed: {
     ...mapState(['isTrialBannerVisible', 'isWidget']),
     ...mapGetters('contacts', ['contact']),
-    teamInbox () {
-      return this.teamInboxId !== null
-    },
+
     contactName () {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
