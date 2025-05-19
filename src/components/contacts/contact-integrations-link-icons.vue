@@ -30,7 +30,8 @@ export default {
   },
   computed: {
     hubspot_link () {
-      return this.contact?.integration_data?.hubspot?.link || null
+      // If the link for an HS contact object exists, use it, use the company link if it does not
+      return (this.contact?.integration_data?.hubspot?.link || this.contact?.integration_data?.hubspot?.company_link) || null
     }
   }
 }

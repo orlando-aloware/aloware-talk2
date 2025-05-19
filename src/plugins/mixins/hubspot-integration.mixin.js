@@ -22,10 +22,12 @@ export default {
   methods: {
     getHubspotContactLink (contact, useEmbed) {
       if (useEmbed) {
-        return contact?.integration_data?.hubspot?.embed_link
+        // If the link for an HS contact object if it exists, use the company embed link if it does not
+        return contact?.integration_data?.hubspot?.embed_link || contact?.integration_data?.hubspot?.company_link
       }
 
-      return contact?.integration_data?.hubspot?.link
+      // Return the contact link, or if it does not exists, the company link
+      return contact?.integration_data?.hubspot?.link || contact?.integration_data?.hubspot?.company_link
     }
   }
 }

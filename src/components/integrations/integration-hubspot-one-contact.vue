@@ -43,36 +43,36 @@
           }}</span>
       </p>
       <!-- Start Lifecycle Stage Section -->
-      <div class="row justify-between align-center relative" data-testid="integration-hubspot-lifecycle-stage">
-        <p class="mb-0 no-wrap-block">
-          <span class="data-icon-label">Lifecycle Stage: </span>
-          <span class="data-value">
-            {{ truncatedDisplayedLifecycleStage }}
-          </span>
-          <!-- Start Tooltip for full text lifecycle stage if truncated -->
-          <q-tooltip v-if="truncatedDisplayedLifecycleStage !== displayedLifecycleStage" anchor="top middle"
-                     self="center middle">
-            {{ displayedLifecycleStage }}
-          </q-tooltip>
-          <!-- End Tooltip for full text lifecycle stage if truncated -->
-        </p>
-        <div v-if="isPrimary"
-             class="absolute edit-btn-pos">
-          <b-link :class="canUpdateLifecycleStage ? 'clickable' : 'not-clickable'"
-                  :disabled="isReadOnly"
-                  @click="onShowEditLifecycleStageMenu">
-            <pencil-o-icon />
-            <q-tooltip anchor="top middle" self="center middle"
-                       :offset="isWidget ? [0, 50] : [0, 30]">
-              <div :class="{ 'small-text': isWidget }">
-                <span v-if="canUpdateLifecycleStage">Update Lifecycle Stage</span>
-                <template v-if="!canUpdateLifecycleStage">
-                  <p class="font-weight-bold mb-0">Update Lifecycle Stage is disabled</p>
-                  <p class="mt-1 mb-0">Enable contact information updates in HubSpot's integration settings.</p>
-                </template>
-              </div>
+      <div class="lifecycle-stage-container" data-testid="integration-hubspot-lifecycle-stage">
+        <div class="d-flex justify-content-between align-items-center">
+          <p class="mb-0 no-wrap-block">
+            <span class="data-icon-label">Lifecycle Stage: </span>
+            <span class="data-value">
+              {{ truncatedDisplayedLifecycleStage }}
+            </span>
+            <!-- Start Tooltip for full text lifecycle stage if truncated -->
+            <q-tooltip v-if="truncatedDisplayedLifecycleStage !== displayedLifecycleStage" anchor="top middle"
+                       self="center middle">
+              {{ displayedLifecycleStage }}
             </q-tooltip>
-          </b-link>
+            <!-- End Tooltip for full text lifecycle stage if truncated -->
+          </p>
+          <div v-if="isPrimary">
+            <b-link :class="canUpdateLifecycleStage ? 'clickable' : 'not-clickable'"
+                    :disabled="isReadOnly" @click="onShowEditLifecycleStageMenu">
+              <pencil-o-icon />
+              <q-tooltip anchor="top middle" self="center middle"
+                         :offset="isWidget ? [0, 50] : [0, 30]">
+                <div :class="{ 'small-text': isWidget }">
+                  <span v-if="canUpdateLifecycleStage">Update Lifecycle Stage</span>
+                  <template v-if="!canUpdateLifecycleStage">
+                    <p class="font-weight-bold mb-0">Update Lifecycle Stage is disabled</p>
+                    <p class="mt-1 mb-0">Enable contact information updates in HubSpot's integration settings.</p>
+                  </template>
+                </div>
+              </q-tooltip>
+            </b-link>
+          </div>
         </div>
       </div>
       <!-- Start Lifecycle Stage Menu -->
@@ -120,61 +120,74 @@
         <!-- End Lifecycle Stage Menu -->
       </template>
       <!-- End Lifecycle Stage Section -->
-    </q-card-section>
-
-    <q-card-section class='pt-0'
-                    data-testid='integration-hubspot-card-section-2'
-                    :class='isPrimary ? "pb-0" : "pb-16"'
-                    v-if='integrationData.properties'>
-      <q-card class='deals mb-1'
-              v-for='(deal, index) in integrationData.deals'
-              :key='index'
-              flat bordered>
-        <q-card-section>
-          <q-card-section class='p-0'>
-            <h6 class='mb-2'>
-              <b-link class='deals-title ml-0'
-                      :href="deal.link"
-                      data-testid='integration-hubspot-deal-link'
-                      target='_blank'>
-                {{ deal.properties.dealname }}
-              </b-link>
-            </h6>
-            <p class='mb-1 d-flex' data-testid='integration-hubspot-amount'>
-              <span class='data-icon-label'>Amount: </span>
-              <span class='data-value ml-1'
-                    v-if='deal.properties && deal.properties.amount'>
-                  <q-tooltip anchor='top middle'
-                             self='center middle'>
+      <!-- Start Deals Section -->
+      <div v-if="integrationData.deals && integrationData.deals.length > 0" class="mt-2">
+        <q-card class='deals mb-1'
+                v-for='(deal, index) in integrationData.deals'
+                :key='index'
+                flat bordered>
+          <q-card-section>
+            <q-card-section class='p-0'>
+              <h6 class='mb-2'>
+                <b-link class='deals-title ml-0'
+                        :href="deal.link"
+                        data-testid='integration-hubspot-deal-link'
+                        target='_blank'>
+                  {{ deal.properties.dealname }}
+                </b-link>
+              </h6>
+              <p class='mb-1 d-flex' data-testid='integration-hubspot-amount'>
+                <span class='data-icon-label'>Amount: </span>
+                <span class='data-value ml-1'
+                      v-if='deal.properties && deal.properties.amount'>
+                    <q-tooltip anchor='top middle'
+                               self='center middle'>
+                      {{ deal.properties.amount | toCurrency }}
+                    </q-tooltip>
                     {{ deal.properties.amount | toCurrency }}
-                  </q-tooltip>
-                  {{ deal.properties.amount | toCurrency }}
-                </span>
-            </p>
-            <p class='mb-1 d-flex' data-testid='integration-hubspot-pipeline'>
-              <span class='data-icon-label'>Pipeline: </span>
-              <span class='data-value ml-1'>
-                  <q-tooltip anchor='top middle'
-                             self='center middle'>
+                  </span>
+              </p>
+              <p class='mb-1 d-flex' data-testid='integration-hubspot-pipeline'>
+                <span class='data-icon-label'>Pipeline: </span>
+                <span class='data-value ml-1'>
+                    <q-tooltip anchor='top middle'
+                               self='center middle'>
+                      {{ deal.pipeline_label }}
+                    </q-tooltip>
                     {{ deal.pipeline_label }}
-                  </q-tooltip>
-                  {{ deal.pipeline_label }}
-                </span>
-            </p>
-            <p class='mb-1 d-flex' data-testid='integration-hubspot-stage'>
-              <span class='data-icon-label'>Stage: </span>
-              <span class='data-value ml-1'>
-                  <q-tooltip anchor='top middle'
-                             self='center middle'>
+                  </span>
+              </p>
+              <p class='mb-1 d-flex' data-testid='integration-hubspot-stage'>
+                <span class='data-icon-label'>Stage: </span>
+                <span class='data-value ml-1'>
+                    <q-tooltip anchor='top middle'
+                               self='center middle'>
+                      {{ deal.dealstage_label }}
+                    </q-tooltip>
                     {{ deal.dealstage_label }}
-                  </q-tooltip>
-                  {{ deal.dealstage_label }}
-                </span>
-            </p>
+                  </span>
+              </p>
+            </q-card-section>
           </q-card-section>
-        </q-card-section>
-      </q-card>
+        </q-card>
+      </div>
+      <!-- End Deals Section -->
     </q-card-section>
+    <!-- Start See All Matches Link -->
+    <b-button
+      v-if="hasDuplicates"
+      size="sm"
+      variant="link"
+      tabindex="0"
+      block
+      class="see-all-matches"
+      @click="$emit('toggle-duplicates')"
+    >
+      {{ showDuplicates ? 'See less contact matches' : 'See all contact matches' }}
+    </b-button>
+    <!-- End See All Matches Link -->
+    <slot name="duplicates-section"></slot>
+    <slot name="company-section"></slot>
   </div>
 </template>
 <script>
@@ -208,6 +221,10 @@ export default {
     isReadOnly: {
       type: Boolean,
       required: false,
+      default: false
+    },
+    showDuplicates: {
+      type: Boolean,
       default: false
     }
   },
@@ -340,12 +357,12 @@ export default {
   overflow: hidden;
 }
 
-.edit-btn-pos {
-  right: 10px;
-  bottom: 18px;
-}
-
 .lifecycle-stage-form {
   width: 220px;
+}
+
+.see-all-matches {
+  margin-top: -8px;
+  margin-bottom: 8px;
 }
 </style>
