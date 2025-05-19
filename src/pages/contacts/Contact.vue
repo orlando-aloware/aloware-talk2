@@ -245,8 +245,6 @@ export default {
 
   mounted () {
     if (this.authenticated) {
-      console.log('debug:teaminbox - fetching contact')
-      console.log('debug:teaminbox - this.teamInbox', this.teamInbox, 'this.fromTeamInbox', this.fromTeamInbox, 'this.teamInboxId', this.teamInboxId, 'this.$route.meta?.isTeamInbox', this.$route.meta?.isTeamInbox)
       this.fetchContact()
     }
 
