@@ -161,10 +161,6 @@ export default {
       'isWidget'
     ]),
 
-    teamInbox () {
-      return this.teamInboxId !== null
-    },
-
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
     },

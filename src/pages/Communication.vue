@@ -73,14 +73,8 @@ export default {
   computed: {
     ...mapState('cache', ['currentCompany']),
 
-    contactReadOnlyLimits () {
-      return this.currentCompany.team_inbox_enabled
-        ? this.communication?.contact_read_only_limits
-        : null
-    },
-
     isContactReadOnly () {
-      return Boolean(this.is_read_only) || false
+      return Boolean(this.communication?.contact?.is_read_only) || false
     }
   },
 
