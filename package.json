@@ -63,7 +63,6 @@
     "moment-duration-format": "^2.3.2",
     "moment-timezone": "^0.5.45",
     "numeral": "^2.0.6",
-    "posthog-js": "^1.239.0",
     "push.js": "^1.0.9",
     "pusher": "^4.0.2",
     "qs": "^6.12.0",
