@@ -16,7 +16,7 @@ export const template = [
         click: () => checkForUpdates({ silent: false })
       },
       {
-        label: 'Open DevTools',
+        label: 'Toggle Developer Tools',
         accelerator: 'Alt+CmdOrCtrl+I',
         click: function (item, focusedWindow) {
           if (focusedWindow) {
