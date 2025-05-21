@@ -41,7 +41,7 @@
                             v-if="(!isMobile || !$q.screen.lt.md) && isInInboxPage" />
     </div>
 
-    <tutorial-video-button />
+    <tutorial-video-button v-if="!isMobile" />
 
     <!--div class="ml-auto d-none d-lg-block h-100"-->
     <div class="ml-auto d-block h-100">
