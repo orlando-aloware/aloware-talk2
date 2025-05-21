@@ -32,7 +32,6 @@ import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
 import { Vuelidate } from 'vuelidate'
 import HighchartsThemes from './HighchartsTheme'
-import PosthogPlugin from './posthog.js'
 
 Screen.setSizes({
   sm: 300,
@@ -86,9 +85,6 @@ Vue.use(VueWaveSurfer)
 Vue.use(Vuelidate)
 Vue.use(BusinessHours)
 Vue.use(VueHighcharts, { Highcharts })
-
-Vue.config.productionTip = false
-Vue.use(PosthogPlugin)
 
 window.Bowser = Bowser
 window.timezone = 'Intl' in window
