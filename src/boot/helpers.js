@@ -8,10 +8,10 @@ export const getWebSocketCredentials = (driver) => {
     }
   }
 
-  // Use Pusher as the default driver
+  // Use Soketi as the default driver
   return {
-    WS_APP_KEY: process.env.PUSHER_APP_KEY,
-    WS_CLUSTER: process.env.PUSHER_CLUSTER,
-    WS_HOST: ''
+    WS_APP_KEY: process.env.SOKETI_APP_KEY,
+    WS_CLUSTER: process.env.SOKETI_CLUSTER,
+    WS_HOST: process.env.SOKETI_HOST
   }
 }
