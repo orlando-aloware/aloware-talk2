@@ -59,7 +59,7 @@ export default {
       window.Echo = this.initEcho(broadcastDriver)
       this.broadcastListen()
 
-      // This is a stress test for soketi server, should be removed in the future
+      // This needs to be cleaned up when we depreacate everything related to pusher
       if (broadcastDriver === 'pusher' && process.env.SOKETI_APP_KEY) {
         window.secondEchoDriver = this.initEcho('soketi')
         this.broadcastListenSecondDriver()
