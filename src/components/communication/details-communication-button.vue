@@ -20,6 +20,7 @@
 
 <script>
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+import { Platform } from 'quasar'
 
 export default {
   name: 'details-communication-button',
@@ -57,7 +58,12 @@ export default {
         return
       }
 
-      window.open(`/contacts/${this.communication.contact_id}/communications/${this.communication.id}`, '_blank')
+      const route = `/contacts/${this.communication.contact_id}/communications/${this.communication.id}`
+      if (Platform.is.electron) {
+        this.$router.push(route)
+      } else {
+        window.open(route, '_blank')
+      }
     }
   }
 }
