@@ -1,5 +1,7 @@
 <template>
   <div v-if="authenticated" class="h-100">
+    <teaminbox-tutorial-video v-if="!isMobile"/>
+
     <div class="teaminbox animate__animated animate__fadeIn position-relative">
       <TeamInboxSide
         :class="inboxSideClasses"
