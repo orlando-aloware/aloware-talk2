@@ -1,9 +1,7 @@
 import * as storage from 'src/plugins/helpers/storage'
 import { get } from 'lodash'
-import { setRouterType } from 'src/router/composables/useRolesSystem'
 
-const check = async (authModule, payload, skipSetAuthenticated) => {
-  const { commit } = authModule
+const check = async ({ commit }, payload, skipSetAuthenticated) => {
   const preventLogout = get(payload, 'preventLogout', false)
 
   try {
@@ -26,7 +24,6 @@ const check = async (authModule, payload, skipSetAuthenticated) => {
     }
 
     commit('SET_PROFILE', response.data.user)
-    setRouterType(authModule)
     commit('SET_LOADING', false)
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
