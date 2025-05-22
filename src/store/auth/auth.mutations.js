@@ -54,9 +54,5 @@ export default {
 
     // else, perform state reset
     state = Object.assign({}, AuthDefault.DEFAULT_STATE)
-  },
-
-  SET_FOCUSED_POWER_DIALER (state, value) {
-    state.is_focused_power_dialer = value
   }
 }
