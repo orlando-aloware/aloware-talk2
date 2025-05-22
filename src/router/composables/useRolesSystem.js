@@ -1,4 +1,4 @@
-const focusedPowerDialerUserIds = [69563]
+const focusedPowerDialerUserIds = []
 const focusedPowerDialerCompanyIds = []
 
 export const allowedRoutes = {
@@ -27,7 +27,7 @@ export const allowedRoutes = {
 export const setRouterType = (authModule) => {
   // TODO - MOVE TO BACKEND FLAG IF PoC IS SUCCESSFUL
 
-  if (focusedPowerDialerUserIds.includes(authModule.state.profile.id) || focusedPowerDialerCompanyIds.includes(authModule.state.profile.company_id)) {
+  if (!focusedPowerDialerUserIds.includes(authModule.state.profile.id) || !focusedPowerDialerCompanyIds.includes(authModule.state.profile.company_id)) {
     authModule.commit('SET_FOCUSED_POWER_DIALER', true)
   }
 }
