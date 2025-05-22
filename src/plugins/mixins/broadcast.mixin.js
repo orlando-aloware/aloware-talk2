@@ -56,22 +56,6 @@ export default {
        */
       window.Echo = this.initEcho('soketi')
       this.broadcastListen()
-
-      // If error to connect, retry connection with the same driver
-      window.Echo.connector.pusher.connection.unbind('error')
-      window.Echo.connector.pusher.connection.bind('error', (err) => {
-        console.error('Error connecting to WebSocket server', err)
-        if (window.reconnectAttempted) {
-          console.log('Reconnect already attempted')
-          return
-        }
-        window.reconnectAttempted = true
-        console.log('Retrying connection with Soketi')
-
-        // Try to reconnect
-        window.Echo = this.initEcho('soketi')
-        this.broadcastListen()
-      })
     },
     initEcho (broadcastDriver) {
       console.log('broadcast initiated with ' + broadcastDriver)
