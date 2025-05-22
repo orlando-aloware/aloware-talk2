@@ -22,6 +22,7 @@
 import ReplyIcon from 'components/icons/reply-icon.vue'
 import { aclMixin } from 'src/plugins/mixins'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { Platform } from 'quasar'
 
 export default {
   name: 'reply-communication-button',
@@ -52,7 +53,8 @@ export default {
 
   methods: {
     goToContactPage () {
-      window.open(`/contacts/${this.communication.contact_id}`, '_blank')
+      const route = `/contacts/${this.communication.contact_id}`
+      if (Platform.is.electron) { this.$router.push(route) } else window.open(route, '_blank')
     }
   }
 }
