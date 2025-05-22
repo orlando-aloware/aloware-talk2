@@ -72,8 +72,8 @@
 </template>
 
 <script>
-import VueCookies from 'vue-cookies'
 import { mapActions, mapState } from 'vuex'
+import { Platform } from 'quasar'
 
 export default {
   name: 'video-modal',
@@ -135,7 +135,11 @@ export default {
 
     closeModal () {
       this.showModal = false
-      this.$cookies.set(this.parsedCookieName, 'viewed', '3650d') // Set cookie to expire in 10 years
+      if (Platform.is.electron) {
+        localStorage.setItem(this.parsedCookieName, 'viewed')
+      } else {
+        this.$cookies.set(this.parsedCookieName, 'viewed', '3650d') // Set cookie to expire in 10 years
+      }
       this.setIsIntroVideoVisible(null)
     },
 
@@ -150,10 +154,10 @@ export default {
   },
   mounted () {
     this.isLoading = true
+    const wasShown = Platform.is.electron ? localStorage.getItem(this.parsedCookieName) : this.$cookies.get(this.parsedCookieName)
+    if (wasShown) { return }
 
-    this.$cookies = VueCookies
-
-    if (!this.$cookies.get(this.parsedCookieName) && this.shouldShowInFirstVisit) {
+    if (this.shouldShowInFirstVisit) {
       this.showModal = true
       return this.setIsIntroVideoVisible(true)
     }
