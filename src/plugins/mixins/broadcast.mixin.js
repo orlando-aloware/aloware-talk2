@@ -75,7 +75,7 @@ export default {
     },
     initEcho (broadcastDriver) {
       console.log('broadcast initiated with ' + broadcastDriver)
-      const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials(broadcastDriver)
+      const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials()
       return new Echo({
         authEndpoint: `${process.env.API_URL}/broadcasting/auth`,
         broadcaster: 'pusher',
