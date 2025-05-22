@@ -7,7 +7,7 @@
       <span>This screen size is not supported.</span>
     </div>
     <div class="h-100 d-flex flex-column">
-      <template v-if="isAuthenticated && !loading && companyHasTrialStatus && !isWidget">
+      <template v-if="isAuthenticated && !loading && companyHasTrialStatus && !isWidget && !isMobile">
         <trial-expired-modal v-if="isTrialExpired"/>
         <cancelled-account-modal v-else-if="isCancelledAccount"/>
         <trial-banner v-else-if="isTrial"/>

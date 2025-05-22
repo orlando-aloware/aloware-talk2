@@ -15,6 +15,19 @@ export const template = [
         enabled: true,
         click: () => checkForUpdates({ silent: false })
       },
+      {
+        label: 'Toggle Developer Tools',
+        accelerator: 'Alt+CmdOrCtrl+I',
+        click: function (item, focusedWindow) {
+          if (focusedWindow) {
+            if (focusedWindow.webContents.isDevToolsOpened()) {
+              focusedWindow.webContents.closeDevTools()
+            } else {
+              focusedWindow.webContents.openDevTools()
+            }
+          }
+        }
+      },
       { type: 'separator' },
       { role: 'services' },
       { type: 'separator' },

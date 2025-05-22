@@ -31,6 +31,7 @@ export default function () {
     activeInboxContactUnreadCount: 0,
     inboxAnnouncementViewed: false,
     unreadCountLoaded: false,
-    teamInboxTutorialComponent: null
+    teamInboxTutorialComponent: null,
+    contactsLastUsedLines: new Map()
   }
 }

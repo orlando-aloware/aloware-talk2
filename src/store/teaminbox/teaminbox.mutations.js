@@ -110,6 +110,9 @@ export default {
   SET_TEAM_INBOX_TUTORIAL_COMPONENT (state, ref) {
     state.teamInboxTutorialComponent = ref
   },
+  SET_CONTACTS_LAST_USED_LINE (state, { inboxId, contactId, lastLineUsed }) {
+    state.contactsLastUsedLines.set(`${inboxId}-${contactId}`, lastLineUsed)
+  },
   RESET (state) {
     state.inboxes = []
     state.isLoadingInboxes = false
@@ -130,5 +133,6 @@ export default {
     state.activeFilters = {}
     state.activeSort = {}
     state.teamInboxTutorialComponent = null
+    state.contactsLastUsedLines = new Map()
   }
 }

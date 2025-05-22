@@ -80,7 +80,8 @@ function createWindow () {
       nodeIntegrationInWorker: process.env.QUASAR_NODE_INTEGRATION,
       contextIsolation: false,
       enableRemoteModule: true,
-      devTools: (process.env.APP_DEBUG === 'true' || process.env.NODE_ENV !== 'production')
+      // Allow DevTools in production builds
+      devTools: true
 
       // More info: /quasar-cli/developing-electron-apps/electron-preload-script
       // preload: path.resolve(__dirname, 'electron-preload.js')
@@ -149,7 +150,7 @@ if (gotTheLock) {
     // Someone tried to run a second instance, we should focus our window.
 
     // Protocol handler for win32
-    // argv: An array of the second instance’s (command line / deep linked) arguments
+    // argv: An array of the second instance's (command line / deep linked) arguments
     if (process.platform === 'win32') {
       let cleanArg = argv.filter(arg => !arg.startsWith('--') && (arg.startsWith('alowaretalk') || arg.startsWith('tel') || arg.startsWith('callto')))
 
@@ -317,6 +318,22 @@ function setTray () {
         click: function () {
           mainWindow.show()
           mainWindow.focus()
+        }
+      },
+      {
+        label: 'Open DevTools',
+        click: function () {
+          if (mainWindow.webContents.isDevToolsOpened()) {
+            mainWindow.webContents.closeDevTools()
+          } else {
+            mainWindow.webContents.openDevTools()
+          }
+        }
+      },
+      {
+        label: 'Check for updates',
+        click: function () {
+          checkForUpdates({ silent: false })
         }
       },
       {

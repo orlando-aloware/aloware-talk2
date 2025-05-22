@@ -24,6 +24,7 @@ import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
 import talk2Api from 'src/plugins/api/api'
+import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry-types'
 
 export default {
   name: 'dialer',
@@ -793,9 +794,27 @@ export default {
 
       // Make sure that phone number is string in this part before proceeding
       currentNumber = currentNumber.toString()
-      // force mute
-      if (currentNumber.includes('barge') || currentNumber.includes('whisper')) {
+      const isWhisperCall = currentNumber.includes(COMMUNICATION_SENTRY_TYPE.WHISPER)
+      const isBargeCall = currentNumber.includes(COMMUNICATION_SENTRY_TYPE.BARGE)
+
+      // Force mute for whisper/barge calls
+      if (isBargeCall || isWhisperCall) {
         this.forceMute()
+        // If it's a whisper call to an AI agent, disable unmute functionality
+        if (isWhisperCall) {
+          const commId = currentNumber.split(':')[1]
+          if (commId) {
+            this.fetchAndSetAiAgentCallMode(commId, COMMUNICATION_SENTRY_TYPE.WHISPER)
+          }
+        }
+
+        // If it's a barge call to an AI agent, drop other agents
+        if (isBargeCall) {
+          const commId = currentNumber.split(':')[1]
+          if (commId) {
+            this.fetchAndSetAiAgentCallMode(commId, COMMUNICATION_SENTRY_TYPE.BARGE)
+          }
+        }
       }
     },
 
@@ -940,7 +959,23 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      this.connection.hangup()
+      // If we're in an AI agent takeover mode and still muted, make sure we drop the AI agent
+      if (this.dialer.aiAgentTakeover && this.dialer.isMuted && this.dialer.communication) {
+        console.log('Dropping AI agent before hanging up')
+        this.$axios.post('/api/v1/dialer/drop-aloai-agent', {
+          communication_id: this.dialer.communication.id
+        })
+          .then(response => {
+            console.log('Successfully dropped AI agent during hangup')
+            this.connection.hangup()
+          })
+          .catch(err => {
+            console.error('Error dropping AI agent during hangup:', err)
+            this.connection.hangup()
+          })
+      } else {
+        this.connection.hangup()
+      }
 
       this.setIsCallBackButtonDisabled(true)
       setTimeout(() => {
@@ -1018,6 +1053,49 @@ export default {
 
     toggleMute () {
       if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+        return
+      }
+
+      // If this is a barge call to an AI agent and user tries to unmute, handle takeover
+      if (this.dialer.aiAgentTakeover && this.dialer.isMuted) {
+        console.log('Taking over the call from AI agent')
+        this.$generalNotification('You are taking over the call from the AloAi agent', 'info')
+
+        if (this.dialer.communication) {
+          // Call the drop-other-agents API when taking over
+          this.$axios.post('/api/v1/dialer/drop-aloai-agent', {
+            communication_id: this.dialer.communication.id
+          })
+            .then(response => {
+              console.log('Successfully dropped other agents from call')
+
+              // After successfully dropping AI agent, unmute and update state
+              if (this.connection) {
+                this.connection.mute(false)
+              }
+              this.setDialerIsMuted(false)
+              this.setDialerAiAgentTakeover(false)
+            })
+            .catch(err => {
+              console.error('Error dropping other agents from call:', err)
+              // Even if there's an error, we should still unmute for better UX
+              if (this.connection) {
+                this.connection.mute(false)
+              }
+              this.setDialerIsMuted(false)
+              this.setDialerAiAgentTakeover(false)
+            })
+
+          return
+        }
+
+        // Unmute the call and update the state
+        if (this.connection) {
+          this.connection.mute(false)
+        }
+        this.setDialerIsMuted(false)
+        this.setDialerAiAgentTakeover(false)
+
         return
       }
 
@@ -1476,6 +1554,8 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(false)
+      this.setDialerAiAgentWhisper(false)
+      this.setDialerAiAgentTakeover(false)
     },
 
     countCallDuration () {
@@ -1839,6 +1919,21 @@ export default {
       return true
     },
 
+    fetchAndSetAiAgentCallMode (commId, type = null) {
+      return talk2Api.V1.communication.get(commId)
+        .then(res => {
+          if (type === COMMUNICATION_SENTRY_TYPE.WHISPER && this.isAiAgentUser(res.data.user)) {
+            this.setDialerAiAgentWhisper(true)
+          } else if (type === COMMUNICATION_SENTRY_TYPE.BARGE && this.isAiAgentUser(res.data.user)) {
+            this.setDialerAiAgentTakeover(true)
+          }
+          return res.data
+        })
+        .catch(err => {
+          console.error('Error fetching communication details:', err)
+        })
+    },
+
     ...mapActions([
       'setDialerToken',
       'setDialerCall',
@@ -1871,7 +1966,9 @@ export default {
       'setDialerError',
       'setDialerErrorDefault',
       'removeParkedCall',
-      'setIsCallBackButtonDisabled'
+      'setIsCallBackButtonDisabled',
+      'setDialerAiAgentWhisper',
+      'setDialerAiAgentTakeover'
     ])
   },
 

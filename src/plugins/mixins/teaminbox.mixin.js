@@ -38,7 +38,8 @@ export default {
       'setAbortController',
       'setShowRefreshInboxesButton',
       'setShowRefreshCommunicationsButton',
-      'setUnreadCountLoaded'
+      'setUnreadCountLoaded',
+      'setContactsLastUsedLines'
     ]),
 
     async fetchInboxes (search = '') {
@@ -112,6 +113,11 @@ export default {
         this.setShowRefreshCommunicationsButton(false)
 
         const response = await this.getItemsRequest(inboxId, 1, search, filters, sort)
+
+        this.setContactsLastUsedLines({
+          inboxId,
+          data: response.data.data
+        })
 
         this.setItems(response.data)
         this.setIsLoadingItems(false)
