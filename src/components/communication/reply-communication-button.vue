@@ -54,7 +54,11 @@ export default {
   methods: {
     goToContactPage () {
       const route = `/contacts/${this.communication.contact_id}`
-      if (Platform.is.electron) { this.$router.push(route) } else window.open(route, '_blank')
+      if (Platform.is.electron) {
+        this.$router.push(route)
+      } else {
+        window.open(route, '_blank')
+      }
     }
   }
 }

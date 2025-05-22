@@ -159,7 +159,7 @@ export default {
 
     if (this.shouldShowInFirstVisit) {
       this.showModal = true
-      return this.setIsIntroVideoVisible(true)
+      this.setIsIntroVideoVisible(true)
     }
   }
 }
