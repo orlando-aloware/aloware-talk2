@@ -3,8 +3,8 @@ import _ from 'lodash'
 import { getWebSocketCredentials } from 'src/boot/helpers'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as storage from 'src/plugins/helpers/storage'
-import { mapActions, mapState } from 'vuex'
 import userMixin from 'src/plugins/mixins/user.mixin'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   mixins: [userMixin],
@@ -58,23 +58,6 @@ export default {
 
       window.Echo = this.initEcho(broadcastDriver)
       this.broadcastListen()
-
-      // If error to connect, try to connect with other driver as fallback
-      window.Echo.connector.pusher.connection.unbind('error')
-      window.Echo.connector.pusher.connection.bind('error', (err) => {
-        console.error('Error to connect to ws driver', err)
-        if (window.fallbackDriver) {
-          console.log('Fallback driver already started', window.fallbackDriver)
-          return
-        }
-        // Define the fallback driver, only pusher and soketi exists today
-        window.fallbackDriver = broadcastDriver === 'pusher' ? 'soketi' : 'pusher'
-        console.log('Error to connect to: ' + broadcastDriver, 'Connecting to fallback driver: ' + window.fallbackDriver, err)
-
-        // Try to connect with fallback driver
-        window.Echo = this.initEcho(window.fallbackDriver)
-        this.broadcastListen()
-      })
     },
     initEcho (broadcastDriver) {
       console.log('broadcast initiated with ' + broadcastDriver)
