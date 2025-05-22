@@ -883,10 +883,6 @@ export default {
         return
       }
 
-      if (window.secondEchoDriver) {
-        window.secondEchoDriver.disconnect()
-      }
-
       if (this.profile) {
         window.Echo.leave('user-' + this.profile.id)
         window.Echo.leave('company-' + this.profile.company_id)
