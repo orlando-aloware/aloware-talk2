@@ -959,7 +959,23 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      this.connection.hangup()
+      // If we're in an AI agent takeover mode and still muted, make sure we drop the AI agent
+      if (this.dialer.aiAgentTakeover && this.dialer.isMuted && this.dialer.communication) {
+        console.log('Dropping AI agent before hanging up')
+        this.$axios.post('/api/v1/dialer/drop-aloai-agent', {
+          communication_id: this.dialer.communication.id
+        })
+          .then(response => {
+            console.log('Successfully dropped AI agent during hangup')
+            this.connection.hangup()
+          })
+          .catch(err => {
+            console.error('Error dropping AI agent during hangup:', err)
+            this.connection.hangup()
+          })
+      } else {
+        this.connection.hangup()
+      }
 
       this.setIsCallBackButtonDisabled(true)
       setTimeout(() => {
@@ -1052,10 +1068,25 @@ export default {
           })
             .then(response => {
               console.log('Successfully dropped other agents from call')
+
+              // After successfully dropping AI agent, unmute and update state
+              if (this.connection) {
+                this.connection.mute(false)
+              }
+              this.setDialerIsMuted(false)
+              this.setDialerAiAgentTakeover(false)
             })
             .catch(err => {
               console.error('Error dropping other agents from call:', err)
+              // Even if there's an error, we should still unmute for better UX
+              if (this.connection) {
+                this.connection.mute(false)
+              }
+              this.setDialerIsMuted(false)
+              this.setDialerAiAgentTakeover(false)
             })
+
+          return
         }
 
         // Unmute the call and update the state
