@@ -400,6 +400,22 @@ const talk2Api = {
         }
       },
 
+      /**
+       * Get Available lifecycle stages
+       *
+       * {axios.AxiosResponse<{success: boolean, data: <{lifecycle_stages: <string>, can_update_lifecycle_stages: boolean}>}>}
+       */
+      async getLifecycleStages () {
+        let response = null
+        try {
+          response = await window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
+        } catch (error) {
+          response = error.response
+        }
+
+        return response
+      },
+
       zoho: {
         getViews () {
           return window.axios.get(`${suffixV1}integration/zoho/views`)

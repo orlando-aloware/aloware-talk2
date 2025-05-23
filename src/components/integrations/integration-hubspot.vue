@@ -23,7 +23,7 @@
       <!-- End Skeleton Loader -->
 
       <!-- Start JIT Card Main Content -->
-      <template v-if="contactIntegrationDataLoaded">
+      <template v-if="contactIntegrationDataLoaded && forceComponentReloadFlag">
         <!-- Start Duplicate Contacts Section -->
         <q-card-section
           class='duplicateContactPhoneNumberMessage'
@@ -33,6 +33,7 @@
         </q-card-section>
         <q-separator v-if='hasDuplicates' />
         <integration-hubspot-one-contact
+          ref="hubspotOneContact"
           v-if='integrationData'
           is-primary
           :integration-data="integrationData"
@@ -274,6 +275,8 @@ export default {
     lifecycleStagesOptions () {
       // transform from an object to a list of objects with label and value properties
       // example: [{ label: 'Subscriber', value: 'subscriber' }, { label: 'Lead', value: 'lead' }, { label: 'Customer', value: 'customer' }]
+      console.log('in computed integration data', this.integrationData)
+      console.log('in computed lifecycle stages', this.integrationData.lifecycle_stages)
       return this.integrationData?.lifecycle_stages
         ? Object.entries(this.integrationData.lifecycle_stages).map(([label, value]) => ({ label, value }))
         : []
@@ -289,15 +292,23 @@ export default {
         email: null,
         id: null
       },
-      integrationData: null,
+      integrationData: {},
       contactIntegrationDataLoaded: false,
-      showDuplicates: false
+      showDuplicates: false,
+      isLoadingLifecycleStages: false,
+      forceComponentReloadFlag: true
     }
   },
 
   async mounted () {
     if (this.contact && this.contact.id) {
+      // Load the contact information first
       await this.getData()
+
+      // Load the rest of the sections
+      await this.setLifecycleStagesSection()
+      console.log('this.integrationData', this.integrationData)
+      console.log('this.lifecycleStagesOptions', this.lifecycleStagesOptions)
     }
   },
 
@@ -310,6 +321,24 @@ export default {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true
         })
+    },
+
+    async setLifecycleStagesSection () {
+      this.isLoadingLifecycleStages = true
+      const response = await this.getLifecycleStages()
+
+      // Create a new object with all the current properties and the new ones
+      // This ensures Vue's reactivity system detects the change
+      this.integrationData = {
+        ...this.integrationData,
+        lifecycle_stages: response.data.data.lifecycle_stages,
+        can_update_lifecycle_stages: response.data.data.can_update_lifecycle_stages
+      }
+
+      this.forceRerenderHubspotOneComponent()
+      this.isLoadingLifecycleStages = false
+
+      console.log('this.integrationData - setLifecycleStages', this.integrationData)
     },
 
     onWorkflowSelected (workflowId) {
@@ -355,6 +384,14 @@ export default {
 
     toggleDuplicates () {
       this.showDuplicates = !this.showDuplicates
+    },
+
+    forceRerenderHubspotOneComponent () {
+      this.forceComponentReloadFlag = false
+      // Force re-render of the hubspot-one-contact component
+      this.$nextTick(() => {
+        this.forceComponentReloadFlag = true
+      })
     }
   },
 
