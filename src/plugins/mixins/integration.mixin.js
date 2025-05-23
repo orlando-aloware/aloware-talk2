@@ -83,8 +83,13 @@ export default {
         params
       })
     },
+
     async getLifecycleStages () {
       return talk2Api.V1.integrations.getLifecycleStages()
+    },
+
+    async getContactCompanyAssociation (contactId) {
+      return talk2Api.V1.integrations.getContactCompanyAssociation(contactId)
     }
   }
 }

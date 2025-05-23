@@ -401,14 +401,30 @@ const talk2Api = {
       },
 
       /**
-       * Get Available lifecycle stages
+       * Get the available lifecycle stages
        *
-       * {axios.AxiosResponse<{success: boolean, data: <{lifecycle_stages: <string>, can_update_lifecycle_stages: boolean}>}>}
+       * @returns {axios.AxiosResponse<{success: boolean, data: {lifecycle_stages: Object, can_update_lifecycle_stages: boolean}}>}
        */
       async getLifecycleStages () {
         let response = null
         try {
           response = await window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
+        } catch (error) {
+          response = error.response
+        }
+
+        return response
+      },
+
+      /**
+       *
+       * @param contactId
+       * @returns {axios.AxiosResponse<{success: boolean, data: object>}
+       */
+      async getContactCompanyAssociation (contactId) {
+        let response = null
+        try {
+          response = await window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
         } catch (error) {
           response = error.response
         }

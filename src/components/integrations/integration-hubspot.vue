@@ -296,6 +296,7 @@ export default {
       contactIntegrationDataLoaded: false,
       showDuplicates: false,
       isLoadingLifecycleStages: false,
+      isLoadingCompanyAssociation: false,
       forceComponentReloadFlag: true
     }
   },
@@ -306,7 +307,7 @@ export default {
       await this.getData()
 
       // Load the rest of the sections
-      await this.setLifecycleStagesSection()
+      await Promise.all([this.setLifecycleStagesSection(), this.setCompanyAssociationSection(this.contact.id)])
       console.log('this.integrationData', this.integrationData)
       console.log('this.lifecycleStagesOptions', this.lifecycleStagesOptions)
     }
@@ -339,6 +340,23 @@ export default {
       this.isLoadingLifecycleStages = false
 
       console.log('this.integrationData - setLifecycleStages', this.integrationData)
+    },
+
+    async setCompanyAssociationSection (contactId) {
+      this.isLoadingCompanyAssociation = true
+      const response = await this.getContactCompanyAssociation(contactId)
+
+      // Create a new object with all the current properties and the new ones
+      // This ensures Vue's reactivity system detects the change
+      this.integrationData = {
+        ...this.integrationData,
+        associated_company: response.data.associated_company
+      }
+
+      this.forceRerenderHubspotOneComponent()
+      this.isLoadingCompanyAssociation = false
+
+      console.log('this.integrationData - setCompanyAssociation', this.integrationData)
     },
 
     onWorkflowSelected (workflowId) {
@@ -386,6 +404,9 @@ export default {
       this.showDuplicates = !this.showDuplicates
     },
 
+    /**
+     * Re-render the Hubspot One component to refresh the updated state
+     */
     forceRerenderHubspotOneComponent () {
       this.forceComponentReloadFlag = false
       // Force re-render of the hubspot-one-contact component
