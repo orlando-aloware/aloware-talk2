@@ -5,7 +5,8 @@ import { mapActions, mapState } from 'vuex'
 export default {
   data () {
     return {
-      dialerCallFishingInterval: null
+      dialerCallFishingInterval: null,
+      notificationSoundUserActionModalId: 'notification-sound-user-action-modal'
     }
   },
 
@@ -51,6 +52,7 @@ export default {
 
     playAudio (shouldPlayFishingNotificationSound = false) {
       if (!this.enableAudio) {
+        this.showMediaPlaybackRequiresUserGestureModal()
         return
       }
 
@@ -65,6 +67,7 @@ export default {
         promise.catch(err => {
           // Auto-play was prevented
           // Show a UI element to let the user manually start playback
+          this.showMediaPlaybackRequiresUserGestureModal()
           console.log(err)
         })
       }
@@ -76,6 +79,10 @@ export default {
       }
 
       this.fishingModeNotificationAudio.pause()
+    },
+
+    showMediaPlaybackRequiresUserGestureModal () {
+      this.$bvModal.show(this.notificationSoundUserActionModalId)
     },
 
     processRemoveFromNotification (communication) {
