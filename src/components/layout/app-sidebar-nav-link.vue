@@ -27,7 +27,6 @@
         class="text-size-lg font-weight-bold text-regular text-white ml-2"
       >
         {{ title }}
-        <slot name="badge" />
     </span>
 
       <slot name="icon" />

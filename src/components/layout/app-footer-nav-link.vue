@@ -7,11 +7,11 @@
     :ripple="false"
     :to="to.path || to"
     active-class="tab-active"
-    no-caps
     exact
+    no-caps
   >
     <span class="tab-icon">
-      <slot :active="isActive" name="icon"></slot>
+      <slot :active="isActive" name="icon" />
     </span>
     {{ title }}
   </q-route-tab>

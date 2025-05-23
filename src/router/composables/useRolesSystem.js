@@ -4,10 +4,9 @@ const focusedPowerDialerUserIds = isProductionEnvironment
   ? []
   : [
     69563,
-    76035,
-    76774
+    76035
   ]
-// All Frank and Tito accounts
+
 const focusedPowerDialerCompanyIds = isProductionEnvironment
   ? []
   : []
