@@ -335,7 +335,6 @@ export default {
   },
 
   mounted () {
-    console.log('mounted - one', this.integrationData)
     // Set the initial value of the select box to 'None (Unset)' if the lifecycle stage is not set
     if (!this.integrationData?.properties?.lifecyclestage) this.selectedLifecycleStage = this.lifecycleStagesOptionsWithClear.find(stage => stage.value === null) || null
     else this.selectedLifecycleStage = this.lifecycleStagesOptionsWithClear.find(stage => stage.value === this.integrationData?.properties?.lifecyclestage) || null

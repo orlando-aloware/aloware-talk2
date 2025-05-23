@@ -311,8 +311,6 @@ export default {
     lifecycleStagesOptions () {
       // transform from an object to a list of objects with label and value properties
       // example: [{ label: 'Subscriber', value: 'subscriber' }, { label: 'Lead', value: 'lead' }, { label: 'Customer', value: 'customer' }]
-      console.log('in computed integration data', this.integrationData)
-      console.log('in computed lifecycle stages', this.integrationData.lifecycle_stages)
       return this.integrationData?.lifecycle_stages
         ? Object.entries(this.integrationData.lifecycle_stages).map(([label, value]) => ({ label, value }))
         : []
@@ -328,7 +326,7 @@ export default {
         email: null,
         id: null
       },
-      integrationData: {},
+      integrationData: null,
       contactIntegrationDataLoaded: false,
       showDuplicates: false,
       isLoadingLifecycleStages: false,
@@ -337,10 +335,10 @@ export default {
     }
   },
 
-  mounted () {
+  async mounted () {
     if (this.contact && this.contact.id) {
       // Load the contact information first
-      this.getData()
+      await this.getData()
     }
   },
 
