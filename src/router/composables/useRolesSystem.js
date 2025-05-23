@@ -1,11 +1,8 @@
 import { isProductionEnvironment } from 'src/shared/composables/useEnvironmentComposable'
 
 const focusedPowerDialerUserIds = isProductionEnvironment
-  ? []
-  : [
-    69563,
-    76035
-  ]
+  ? [69563]
+  : [76035]
 
 const focusedPowerDialerCompanyIds = isProductionEnvironment
   ? []
