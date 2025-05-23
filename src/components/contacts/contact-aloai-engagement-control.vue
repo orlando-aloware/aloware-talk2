@@ -1,5 +1,5 @@
 <template>
-  <b-card class="border-0 position-relative contact-about-wrapper" v-if="profile?.company?.aloai_enabled">
+  <b-card class="border-0 position-relative contact-about-wrapper" v-if="profile?.company?.aloai_text_agents_enabled || profile?.company?.aloai_voice_inbound_agents_enabled || profile?.company?.aloai_voice_outbound_agents_enabled">
     <h4>AloAi Agent Engagement</h4>
 
     <b-card-text class="fs-14 mt-2">
@@ -37,10 +37,10 @@
 </template>
 
 <script>
-import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
 import AloaiEngagementControlModal from 'components/aloai-engagement-control-modal.vue'
-import { mapGetters } from 'vuex'
+import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
 import BlockTooltip from 'components/kyc/block-tooltip'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'contact-aloai-engagement-control',

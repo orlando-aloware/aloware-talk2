@@ -13,7 +13,7 @@
     </template>
 
     <b-card
-      v-if="profile?.company?.aloai_enabled"
+      v-if="profile?.company?.aloai_text_agents_enabled || profile?.company?.aloai_voice_inbound_agents_enabled || profile?.company?.aloai_voice_outbound_agents_enabled"
       class="border-0 position-relative contact-about-wrapper"
     >
       <h4>AloAi Agent Enrollments</h4>
@@ -206,14 +206,14 @@
 </template>
 
 <script>
-import talk2Api from 'src/plugins/api/api'
-import AloaiIcon from 'components/icons/aloai-icon'
 import AloaiEnrollmentControlModal from 'components/aloai-enrollment-control-modal.vue'
 import ConfirmDialog from 'components/confirm-dialog.vue'
-import { mapGetters } from 'vuex'
-import { aloaiMixin } from 'src/plugins/mixins'
-import * as AloAi from 'src/constants/aloai'
+import AloaiIcon from 'components/icons/aloai-icon'
 import _ from 'lodash'
+import * as AloAi from 'src/constants/aloai'
+import talk2Api from 'src/plugins/api/api'
+import { aloaiMixin } from 'src/plugins/mixins'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'contact-aloai-enrollment-control',

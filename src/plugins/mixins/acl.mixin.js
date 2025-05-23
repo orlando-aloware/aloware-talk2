@@ -1,8 +1,8 @@
 import _ from 'lodash'
+import * as storage from 'src/plugins/helpers/storage'
+import { mapActions, mapState } from 'vuex'
 import * as Roles from '../../constants/roles'
 import goBackMixin from './goback.mixin'
-import { mapActions, mapState } from 'vuex'
-import * as storage from 'src/plugins/helpers/storage'
 
 export default _.merge({
   methods: {
@@ -288,7 +288,9 @@ export default _.merge({
      * @return {boolean}
      */
     shouldShowAloAi () {
-      if (this.currentCompany.aloai_enabled) {
+      const aloai_enabled = this.currentCompany.aloai_text_agents_enabled || this.currentCompany.aloai_voice_inbound_agents_enabled || this.currentCompany.aloai_voice_outbound_agents_enabled
+
+      if (aloai_enabled) {
         return true
       }
 
