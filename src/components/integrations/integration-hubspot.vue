@@ -8,6 +8,26 @@
       data-testid="integration-hubspot-card"
       flat
     >
+    <!-- Loading Indicator -->
+      <div v-if="isLoading" class="loading-indicator">
+        <span class="loading-text text-caption">Loading {{ loadedSections }}/3</span>
+        <div class="loading-details">
+          <div class="loading-item">
+            <i :class="contactIntegrationDataLoaded ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
+            Contact Information
+          </div>
+          <div class="loading-item">
+            <i :class="contactIntegrationDataLoaded && !isLoadingLifecycleStages ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
+            Lifecycle Stage
+          </div>
+          <div class="loading-item">
+            <i :class="contactIntegrationDataLoaded && !isLoadingCompanyAssociation ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
+            Associated Company
+          </div>
+        </div>
+      </div>
+      <!-- End Loading Indicator -->
+
       <q-item class="p-0">
         <span class='integration-jit-card-header'>
           <i class="fab fa-hubspot hubspot-icon"></i>
@@ -239,6 +259,22 @@ export default {
 
     ...mapState(['statics', 'isWidget']),
 
+    isLoading () {
+      return !this.contactIntegrationDataLoaded || this.isLoadingLifecycleStages || this.isLoadingCompanyAssociation
+    },
+
+    loadedSections () {
+      let count = 0
+      if (this.contactIntegrationDataLoaded) {
+        count++
+
+        // Only count these if contact info is loaded
+        if (!this.isLoadingLifecycleStages) count++
+        if (!this.isLoadingCompanyAssociation) count++
+      }
+      return count
+    },
+
     isWorkflowValid () {
       return this.workflow.id
     },
@@ -301,15 +337,10 @@ export default {
     }
   },
 
-  async mounted () {
+  mounted () {
     if (this.contact && this.contact.id) {
       // Load the contact information first
-      await this.getData()
-
-      // Load the rest of the sections
-      await Promise.all([this.setLifecycleStagesSection(), this.setCompanyAssociationSection(this.contact.id)])
-      console.log('this.integrationData', this.integrationData)
-      console.log('this.lifecycleStagesOptions', this.lifecycleStagesOptions)
+      this.getData()
     }
   },
 
@@ -324,6 +355,10 @@ export default {
         .then(response => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true
+
+          // Load the other sections
+          this.setLifecycleStagesSection()
+          this.setCompanyAssociationSection(this.contact.id)
         })
     },
 
@@ -344,8 +379,6 @@ export default {
 
       this.forceRerenderHubspotOneComponent()
       this.isLoadingLifecycleStages = false
-
-      console.log('this.integrationData - setLifecycleStages', this.integrationData)
     },
 
     /**
@@ -366,8 +399,6 @@ export default {
 
       this.forceRerenderHubspotOneComponent()
       this.isLoadingCompanyAssociation = false
-
-      console.log('this.integrationData - setCompanyAssociation', this.integrationData)
     },
 
     onWorkflowSelected (workflowId) {
@@ -440,5 +471,81 @@ export default {
 <style scoped>
 .small-text {
   font-size: 12px;
+}
+
+.loading-indicator {
+  background-color: #FF7A59;
+  padding: 0 8px;
+  color: white;
+  position: relative;
+  cursor: help;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+}
+
+.loading-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.loading-details {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  z-index: 10;
+  min-width: 200px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.loading-indicator:hover .loading-details {
+  display: block;
+}
+
+.loading-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+  color: #333;
+  font-size: 11px;
+}
+
+.loading-item i {
+  width: 16px;
+  text-align: center;
+}
+
+.loading-item i.fa-check {
+  color: #28a745;
+}
+
+.loading-item i.fa-spinner {
+  color: #666;
 }
 </style>
