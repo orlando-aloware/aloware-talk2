@@ -195,9 +195,9 @@ export default {
     },
 
     showAloAiControls () {
-      const aloai_enabled = this.currentCompany.aloai_text_agents_enabled || this.currentCompany.aloai_voice_inbound_agents_enabled || this.currentCompany.aloai_voice_outbound_agents_enabled
+      const aloaiEnabled = this.currentCompany.aloai_text_agents_enabled || this.currentCompany.aloai_voice_inbound_agents_enabled || this.currentCompany.aloai_voice_outbound_agents_enabled
 
-      return aloai_enabled &&
+      return aloaiEnabled &&
         this.contact && !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
     }
