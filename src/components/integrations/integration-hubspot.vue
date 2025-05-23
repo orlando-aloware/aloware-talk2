@@ -316,6 +316,9 @@ export default {
   methods: {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
+    /**
+     * Load the main contact information and duplicates section
+     */
     getData () {
       return this.getIntegrationData(this.contact, 'hubspot', null, this.teamInbox)
         .then(response => {
@@ -324,6 +327,9 @@ export default {
         })
     },
 
+    /**
+     * Load the lifecycle stages section
+     */
     async setLifecycleStagesSection () {
       this.isLoadingLifecycleStages = true
       const response = await this.getLifecycleStages()
@@ -342,6 +348,11 @@ export default {
       console.log('this.integrationData - setLifecycleStages', this.integrationData)
     },
 
+    /**
+     * Load the company association section
+     *
+     * @param contactId
+     */
     async setCompanyAssociationSection (contactId) {
       this.isLoadingCompanyAssociation = true
       const response = await this.getContactCompanyAssociation(contactId)
