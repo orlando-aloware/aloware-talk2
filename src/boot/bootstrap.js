@@ -227,7 +227,7 @@ window.guessLocale = function (phoneNumber) {
 }
 
 window._ = require('lodash')
-// Import the pusher-js library for WebSocket functionality
+// Import the pusher-js library for WebSocket functionality (live updates)
 window.Pusher = require('pusher-js')
 
 window.paceOptions = {
@@ -333,7 +333,7 @@ console.log(
 )
 
 Vue.prototype.$moment = window.moment
-// Keep the Pusher reference for compatibility, but used with Soketi
+// Keep the Pusher reference for compatibility, but used with Soketi (live updates)
 Vue.prototype.$Pusher = window.Pusher
 Vue.prototype.$Sentry = window.Sentry
 
