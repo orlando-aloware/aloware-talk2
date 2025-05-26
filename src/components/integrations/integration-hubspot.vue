@@ -39,7 +39,55 @@
           :lifecycle-stages-options="lifecycleStagesOptions"
           :contact-id="contact.id"
           :is-read-only="isReadOnly"
-        />
+          :show-duplicates="showDuplicates"
+          @toggle-duplicates="toggleDuplicates"
+        >
+          <template #duplicates-section>
+            <!-- Start Duplicate Contacts Section -->
+            <template v-if="hasDuplicates && showDuplicates">
+              <div
+                v-for="duplicate in integrationData.duplicates"
+                :key="duplicate.id"
+              >
+                <q-separator data-testid="integration-hubspot-separator" />
+                <integration-hubspot-one-contact
+                  :integrationData="duplicate"
+                  :lifecycle-stages-options="lifecycleStagesOptions"
+                  :contact-id="contact.id"
+                  :is-read-only="isReadOnly"
+                />
+              </div>
+            </template>
+            <!-- End Duplicate Contacts Section -->
+          </template>
+          <template #company-section>
+            <!-- Start Company Association -->
+            <template v-if="integrationData.associated_company">
+              <q-separator v-if="integrationData.properties" />
+              <q-card-section class="text-muted">
+                {{ integrationData.properties ? 'This contact is also associated with a HubSpot company' : 'This contact is associated with a HubSpot company' }}
+              </q-card-section>
+              <q-separator />
+              <q-card-section data-testid="integration-hubspot-company-section">
+                <p class="text-bold mb-0">{{ integrationData.associated_company.name || 'No Name Set' }}</p>
+                <a class="external-contact-integration-link-icon color-primary"
+                   target='_blank'
+                   :href="integrationData.associated_company.link">
+                  <i class="fa fa-external-link" aria-hidden="true"/>
+                </a>
+                <p class='mb-0'>
+                  <span class='data-icon-label'>Domain: </span>
+                  <span class='data-value'>{{ integrationData.associated_company.domain || '--' }}</span>
+                </p>
+                <p class='mb-0'>
+                  <span class='data-icon-label'>Phone: </span>
+                  <span class='data-value'>{{ integrationData.associated_company.phone || '--' }}</span>
+                </p>
+              </q-card-section>
+            </template>
+            <!-- End Company Association -->
+          </template>
+        </integration-hubspot-one-contact>
         <!-- End Duplicate Contacts Section -->
         <!-- Start Sync Button -->
         <q-card-section data-testid="integration-hubspot-card-section-3">
@@ -135,33 +183,6 @@
           </div>
         </q-menu>
         <!-- End Workflow Section -->
-        <!-- Start Duplicate Contacts Section -->
-        <div v-if='hasDuplicates'>
-          <div v-if="showDuplicates">
-            <div
-              v-for="duplicate in this.integrationData.duplicates"
-              :key="duplicate.id"
-            >
-              <q-separator data-testid="integration-hubspot-separator" />
-              <integration-hubspot-one-contact
-                :integrationData="duplicate"
-                :lifecycle-stages-options="lifecycleStagesOptions"
-                :contact-id="contact.id"
-                :is-read-only="isReadOnly"
-              />
-            </div>
-          </div>
-          <b-button
-            size="sm"
-            variant="link"
-            tabindex="0"
-            block
-            @click="toggleDuplicates"
-          >
-            {{ showDuplicates ? 'See less matches' : 'See all matches' }}
-          </b-button>
-        </div>
-        <!-- End Duplicate Contacts Section -->
       </template>
       <!-- End JIT Card Main Content -->
     </q-card>
@@ -169,8 +190,7 @@
 </template>
 
 <script>
-import IntegrationHubspotOneContact
-from 'components/integrations/integration-hubspot-one-contact.vue'
+import IntegrationHubspotOneContact from 'src/components/integrations/integration-hubspot-one-contact.vue'
 import _ from 'lodash'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import talk2Api from 'src/plugins/api/api'

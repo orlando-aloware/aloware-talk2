@@ -72,7 +72,8 @@ export default {
         dialer_mode: dialerMode ? 1 : 0,
         force: true,
         with_duplicates: true,
-        with_lifecycle_stages: true
+        with_lifecycle_stages: true,
+        with_company_association: true
       }
 
       if (fromTeamInbox) {

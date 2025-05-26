@@ -3,8 +3,8 @@ import _ from 'lodash'
 import { getWebSocketCredentials } from 'src/boot/helpers'
 import * as ChannelType from 'src/constants/inbox-channels'
 import * as storage from 'src/plugins/helpers/storage'
-import { mapActions, mapState } from 'vuex'
 import userMixin from 'src/plugins/mixins/user.mixin'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   mixins: [userMixin],
@@ -54,7 +54,9 @@ export default {
        * for events that are broadcast by Laravel. Echo and event broadcasting
        * allows your team to easily build robust real-time web applications.
        */
-      window.Echo = this.initEcho('soketi')
+      const broadcastDriver = 'soketi'
+
+      window.Echo = this.initEcho(broadcastDriver)
       this.broadcastListen()
     },
     initEcho (broadcastDriver) {
@@ -867,10 +869,6 @@ export default {
     broadcastLeave () {
       if (!window.Echo) {
         return
-      }
-
-      if (window.secondEchoDriver) {
-        window.secondEchoDriver.disconnect()
       }
 
       if (this.profile) {
