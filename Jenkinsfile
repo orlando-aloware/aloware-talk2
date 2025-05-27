@@ -452,17 +452,19 @@ pipeline {
                 stage('Sonar Analysis') {
                     stages {
                         stage('SonarQube') {
+                            /*
                             when {
                                 anyOf {
                                     branch 'master';
                                     branch 'develop'
                                 }
                             }
+                            */
                             steps {
                                 script {
                                     sh 'git rev-parse --abbrev-ref HEAD'
                                     def scannerHome = tool 'SonarQube Tool';
-                                    withSonarQubeEnv('Sonar') {
+                                    withSonarQubeEnv('Sonarqube') {
                                         sh "${scannerHome}/bin/sonar-scanner"
                                     }
                                 }
