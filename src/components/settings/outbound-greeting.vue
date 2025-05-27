@@ -251,10 +251,7 @@ export default {
 
     onFileUploaded ({ file_name: fileName }) {
       this.user.outbound_record_file = fileName
-      this.updateChangedUserProperties({
-        name: 'outbound_greeting_option',
-        value: OUTBOUND_GREETING_PLAY_MY_OWN_GREETING
-      })
+      this.user.outbound_greeting_option = OUTBOUND_GREETING_PLAY_MY_OWN_GREETING
       this.resetChangedUserProperties()
       this.$generalNotification('File uploaded successfully.', 'success')
     },
@@ -285,6 +282,7 @@ export default {
           .$axios
           .delete(`/api/v1/user/${this.user.id}/outbound-greeting`)
           .then(() => {
+            this.activeTab = 'tts'
             this.user.outbound_record_file = null
             this.$generalNotification('File deleted successfully.', 'success')
 
