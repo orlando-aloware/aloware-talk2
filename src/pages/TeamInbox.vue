@@ -107,7 +107,7 @@ export default {
     if (!this.hasCompanyTeamInboxEnabled) {
       if (this.$store.state.auth.is_focused_power_dialer) {
         this.$router.replace(
-          this.currentCompany.auto_dialer_enabled ? 'power-dialer' : 'stats'
+          this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
         )
       } else {
         this.$router.push({ name: 'Inbox' })
