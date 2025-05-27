@@ -28,12 +28,12 @@
 import InboxSide from 'components/inbox/inbox-side'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import {
+  aclMixin,
   contactMixin,
   contactV2AttributesMixin,
   inboxMixin,
-  aclMixin,
-  visibilityMixin,
-  userMixin
+  userMixin,
+  visibilityMixin
 } from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
 import TeamInboxInfoModal from 'components/team-inbox-info-modal'
@@ -65,6 +65,10 @@ export default {
 
     ...mapState('inbox', [
       'navListItems'
+    ]),
+
+    ...mapState('cache', [
+      'currentCompany'
     ]),
 
     isMobileContactActive () {
@@ -171,6 +175,13 @@ export default {
   },
 
   mounted () {
+    if (this.$store.state.auth.is_focused_power_dialer) {
+      this.$router.replace(
+        this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
+      )
+    } else {
+      this.$router.push({ name: 'Inbox' })
+    }
     // when the user tries to access the channel directly but without a personal line
     if (this.$route.params?.channel === 'my-personal-line' && !this.profile.campaign_id) {
       this.$router.push({ name: 'Inbox' })

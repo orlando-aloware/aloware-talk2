@@ -1,6 +1,6 @@
 <template>
   <div v-if="authenticated" class="h-100">
-    <teaminbox-tutorial-video />
+    <teaminbox-tutorial-video v-if="!isMobile"/>
 
     <div class="teaminbox animate__animated animate__fadeIn position-relative">
       <TeamInboxSide
@@ -70,8 +70,16 @@ export default {
       'items'
     ]),
 
+    ...mapState('cache', [
+      'currentCompany'
+    ]),
+
     ...mapState([
       'teamInboxCampaigns'
+    ]),
+
+    ...mapState([
+      'isMobile'
     ]),
 
     isMobileContactActive () {
@@ -97,7 +105,13 @@ export default {
   mounted () {
     // block direct access from non demo companies
     if (!this.hasCompanyTeamInboxEnabled) {
-      this.$router.push({ name: 'Inbox' })
+      if (this.$store.state.auth.is_focused_power_dialer) {
+        this.$router.replace(
+          this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
+        )
+      } else {
+        this.$router.push({ name: 'Inbox' })
+      }
     }
     // Load team inbox campaigns
     getTeamInboxCampaigns(this)

@@ -1,176 +1,125 @@
 <template>
   <div>
-    <q-tabs active-color="positive"
-            indicator-color="transparent"
-            align="justify"
-            class="light text-grey footer-tabs"
-            content-class="q-tabs__content--align-justify"
-            :breakpoint="600"
-            dense
-            v-model="tab">
-      <q-route-tab name="inbox"
-                   to="/"
-                   :content-class="tab === 'inbox' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'inbox'"
-                   no-caps
-                   exact>
-        <span class="tab-icon">
-          <inbox-mobile-icon :color="isActive('inbox') ? '#256EFF' : '#A3A3A3'" />
-        </span>
-        {{ INBOXES_MENU_TITLE }}
-      </q-route-tab>
-      <q-route-tab name="team-inboxes"
-                   to="/team-inboxes"
-                   :content-class="tab === 'team-inboxes' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'team-inboxes'"
-                   no-caps
-                   exact
-                   v-if="hasCompanyTeamInboxEnabled">
-        <span class="tab-icon">
-          <TeamInboxMobileIcon :color="isActive('team-inboxes') ? '#256EFF' : '#A3A3A3'" />
-        </span>
-        {{ TEAMINBOXES_MENU_TITLE }}
-      </q-route-tab>
-      <q-route-tab name="communications"
-                   :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
-                   :content-class="tab === 'communications' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'communications'"
-                   no-caps
-                   exact>
-        <span class="tab-icon">
-          <communications-mobile-icon :color="isActive('communications') ? '#256EFF' : '#A3A3A3'" />
-        </span>
-        {{ COMMUNICATIONS_MENU_TITLE_MOBILE }}
-      </q-route-tab>
-      <q-route-tab name="contacts"
-                   to="/contacts"
-                   :content-class="tab === 'contacts' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'contacts'"
-                   no-caps
-                   exact>
-        <span class="tab-icon">
-          <contacts-mobile-icon
-            :color="tab === 'contacts' ? '#256EFF' : '#A3A3A3'"/>
-        </span>
-        Contacts
-      </q-route-tab>
-      <q-route-tab name="phone"
-                   class="phone-tab"
-                   :class="inProgressAndParkedCallClass"
-                   to="/phone"
-                   :content-class="tab === 'phone' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'phone'"
-                   no-caps
-                   exact>
-        <span class="tab-icon">
-          <mobile-phone-icon
-            :color="tab === 'phone' ? 'primary' : 'grey-30'"/>
-        </span>
-        Phone
-      </q-route-tab>
-      <template v-if="false">
-        <q-route-tab name="power-dialer-disabled"
-                     content-class="tab-icons xs-text text-grey-5"
-                     :ripple="false"
-                     no-caps
-                     v-if="!profile.auto_dialer_enabled">
-          <span class="tab-icon"
-                @click="toggleProFeatureDialog(true)">
-            <q-badge floating
-                     rounded
-                     color="orange">
-            </q-badge>
-            <power-dialer-mobile-icon
-              color="#BDBDBD"/>
-          </span>
-          Power Dialer
-        </q-route-tab>
-        <q-route-tab name="power-dialer"
-                     to="/power-dialer"
-                     :content-class="tab === 'power-dialer' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                     :ripple="false"
-                     :active="tab === 'power-dialer'"
-                     no-caps
-                     exact
-                     v-else>
-          <span class="tab-icon">
-            <q-badge floating
-                     rounded
-                     color="orange">
-            </q-badge>
-            <power-dialer-mobile-icon
-              :color="tab === 'power-dialer' ? '#256EFF' : '#A3A3A3'"/>
-          </span>
-          Power Dialer
-        </q-route-tab>
-        <q-route-tab name="calendar-disabled"
-                     content-class="tab-icons xs-text text-grey-5"
-                     :ripple="false"
-                     no-caps>
-          <span class="tab-icon"
-                @click="toggleProFeatureDialog(true)">
-            <q-badge floating
-                     rounded
-                     color="orange">
-            </q-badge>
-            <calendar-mobile-icon color="#BDBDBD"/>
-          </span>
-          Calendar
-        </q-route-tab>
-      </template>
-      <q-route-tab name="stats"
-                   to="/stats"
-                   :content-class="tab === 'stats' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'stats'"
-                   no-caps
-                   exact>
-        <span class="tab-icon">
-          <stats-mobile-icon
-            :color="tab === 'stats' ? '#256EFF' : '#A3A3A3'"/>
-        </span>
-        Stats
-      </q-route-tab>
-      <q-route-tab name="settings"
-                   to="/settings"
-                   :content-class="tab === 'settings' ? 'tab-icons xs-text tab-active' : 'tab-icons xs-text text-grey'"
-                   :ripple="false"
-                   :active="tab === 'settings'"
-                   no-caps
-                   exact>
-        <span class="tab-icon">
-          <settings-mobile-icon
-            width="22"
-            height="22"
-            :color="tab === 'settings' ? '#256EFF' : '#A3A3A3'"/>
-        </span>
-        Settings
-      </q-route-tab>
-      <q-tab name="more"
-             :content-class="moreContentClass"
-             :ripple="false"
-             :active="isMoreActive"
-             exact
-             no-caps
-             v-show="false"
-             :id="'mobile-menu-item-more'">
+    <q-tabs
+      v-model="tab"
+      :breakpoint="600"
+      active-color="positive"
+      align="justify"
+      class="light text-grey footer-tabs"
+      content-class="q-tabs__content--align-justify"
+      dense
+      indicator-color="transparent"
+    >
+
+      <app-footer-nav-link
+        :isActive="tab === 'inbox'"
+        :title="INBOXES_MENU_TITLE" :to="{name: 'Inbox'}"
+      >
+        <template v-slot:icon="{active}">
+          <inbox-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
+        </template>
+      </app-footer-nav-link>
+
+      <app-footer-nav-link
+        v-if="hasCompanyTeamInboxEnabled"
+        :isActive="tab === 'team-inboxes'"
+        :title="TEAMINBOXES_MENU_TITLE" :to="{name: 'Team Inboxes'}"
+      >
+        <template v-slot:icon="{active}">
+          <team-inbox-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
+        </template>
+      </app-footer-nav-link>
+
+      <app-footer-nav-link
+        :isActive="tab === 'communications'"
+        :title="COMMUNICATIONS_MENU_TITLE_MOBILE"
+        :to="{name: 'Communications', path: DEFAULT_COMMUNICATIONS_ROUTE_PATH}"
+      >
+        <template v-slot:icon="{active}">
+          <communications-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
+        </template>
+      </app-footer-nav-link>
+
+      <app-footer-nav-link
+        :isActive="tab === 'contacts'"
+        :to="{name: 'Contacts'}" title="Contacts"
+      >
+        <template v-slot:icon="{active}">
+          <contacts-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
+        </template>
+      </app-footer-nav-link>
+
+      <app-footer-nav-link
+        :isActive="tab === 'phone'"
+        :to="{name: 'Phone'}" title="Phone"
+      >
+        <template v-slot:icon="{active}">
+          <mobile-phone-icon :color="active ? 'primary' : 'grey-30'" />
+        </template>
+      </app-footer-nav-link>
+
+      <app-footer-nav-link
+        v-if="$store.state.auth.is_focused_power_dialer"
+        :isActive="tab === 'power-dialer'"
+        :to="{name: 'Power Dialer'}" title="Power Dialer"
+      >
+        <template v-slot:icon="{active}">
+          <power-dialer-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
+        </template>
+      </app-footer-nav-link>
+
+      <app-footer-nav-link
+        v-if="false"
+        :isActive="tab === 'calendar'"
+        :to="{name: 'Calendar'}" title="Calendar"
+      >
+        <template v-slot:icon="{active}">
+          <calendar-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
+        </template>
+      </app-footer-nav-link>
+
+      <app-footer-nav-link
+        :isActive="tab === 'stats'"
+        :to="{name: 'Stats'}" title="Stats"
+      >
+        <template v-slot:icon="{active}">
+          <stats-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" />
+        </template>
+      </app-footer-nav-link>
+
+      <app-footer-nav-link
+        :isActive="tab === 'settings'"
+        :to="{name: 'Settings'}" title="Settings"
+      >
+        <template v-slot:icon="{active}">
+          <settings-mobile-icon :color="active ? '#256EFF' : '#A3A3A3'" height="22" width="22" />
+        </template>
+      </app-footer-nav-link>
+
+      <q-tab
+        v-show="false"
+        :id="'mobile-menu-item-more'"
+        :active="isMoreActive"
+        :content-class="moreContentClass"
+        :ripple="false"
+        exact
+        name="more"
+        no-caps
+      >
         <span class="tab-icon">
           <more-mobile-icon />
         </span>
         More
       </q-tab>
+
     </q-tabs>
+
     <b-popover
-      target="mobile-menu-item-more"
-      triggers="click blur"
-      placement="bottomright"
       boundary="window"
       custom-class="contact-popover mobile-more-dropdown"
+      placement="bottomright"
+      target="mobile-menu-item-more"
+      triggers="click blur"
       @hidden="onCloseDropdown"
       @show="tab='more'"
     >
@@ -199,7 +148,6 @@
 </template>
 
 <script>
-import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon'
 import TeamInboxMobileIcon from 'components/icons/mobile-menu/teaminbox-mobile-icon'
 import CommunicationsMobileIcon from 'components/icons/mobile-menu/communications-mobile-icon'
 import ContactsMobileIcon from 'components/icons/mobile-menu/contacts-mobile-icon'
@@ -217,22 +165,25 @@ import {
   COMMUNICATIONS_MENU_TITLE_MOBILE,
   DEFAULT_COMMUNICATIONS_ROUTE_PATH,
   INBOXES_MENU_TITLE,
-  TEAMINBOXES_MENU_TITLE,
+  TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
   TEAMINBOXES_MENU_ITEMS_TITLE,
-  TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+  TEAMINBOXES_MENU_TITLE
 } from 'src/router/routes'
 import { userMixin } from 'src/plugins/mixins'
+import AppFooterNavLink from 'components/layout/app-footer-nav-link.vue'
+import InboxMobileIcon from 'components/icons/mobile-menu/inbox-mobile-icon.vue'
 
 export default {
   name: 'app-footer',
   components: {
+    InboxMobileIcon,
+    AppFooterNavLink,
     SettingsMobileIcon,
     MobilePhoneIcon,
     PowerDialerMobileIcon,
     MoreMobileIcon,
     StatsMobileIcon,
     ContactsMobileIcon,
-    InboxMobileIcon,
     TeamInboxMobileIcon,
     CommunicationsMobileIcon,
     ContactMenu,
