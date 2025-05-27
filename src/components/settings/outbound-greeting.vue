@@ -18,10 +18,7 @@
     </b-form-group>
   </b-col>
 
-  <b-col sm="12"
-         md="12"
-         v-if="showOutboundGreetingOptions">
-
+  <b-col sm="12" v-if="showOutboundGreetingOptions">
     <q-tabs indicator-color="transparent"
             active-color="white"
             active-bg-color="primary"
@@ -82,9 +79,9 @@
         </div>
       </q-tab-panel>
 
-      <q-tab-panel name="upload">
+      <q-tab-panel name="upload" class="outbound-greeting-upload-tab">
         <b-form-row v-if="user.outbound_record_file !== null">
-          <b-col sm="12" class="d-flex justify-content-start align-items-center">
+          <b-col sm="12">
             <audio controls>
                 <source :src="recordedAudioSource">
                 Your browser does not support the audio element.
@@ -301,3 +298,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.outbound-greeting-upload-tab {
+  padding: 0 !important;
+}
+</style>
