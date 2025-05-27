@@ -71,8 +71,7 @@ export default {
         integration_name: integrationName,
         dialer_mode: dialerMode ? 1 : 0,
         force: true,
-        with_duplicates: true,
-        with_company_association: true
+        with_duplicates: true
       }
 
       if (fromTeamInbox) {
