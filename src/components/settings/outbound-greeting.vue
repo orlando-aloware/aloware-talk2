@@ -1,23 +1,26 @@
 <template>
 <b-form-row class="mt-4">
-  <b-col sm="12" md="12" class="mt-2">
-    <b-form-group class="mb-0" label="">
-      <b-form-checkbox switch
-                       v-model="user.play_outbound_greeting"
-                       :disabled="disableOutboundGreeting"
-                       @change="eventPayload => onUpdateFields(eventPayload, 'play_outbound_greeting')">
-        Enable Outbound Greeting
-        <b-badge v-if="disableOutboundGreeting" variant="warning">
-          Forced at account level
-        </b-badge>
-      </b-form-checkbox>
-      <p class="form-helper-text">Add a record or text to speech greeting message to be played on all your outbound calls.</p>
+  <b-col sm="12">
+    <p class="text-bold fs-12">
+      Outbound Greeting: <b-badge variant="warning" v-if="disableOutboundGreeting">Forced at account level</b-badge>
+    </p>
+    <b-form-group label="" v-slot="{ ariaDescribedby }">
+      <b-form-radio-group
+        triggers="manual"
+        :options="options"
+        :aria-describedby="ariaDescribedby"
+        :disabled="disableOutboundGreeting"
+        :title="outboundGreetingTooltipTitle"
+        v-b-tooltip.hover.bottom
+        v-model="user.outbound_greeting_option"
+        @change="(eventPayload) => onUpdateFields(eventPayload, 'outbound_greeting_option')">
+      </b-form-radio-group>
     </b-form-group>
   </b-col>
 
   <b-col sm="12"
          md="12"
-         v-if="user.play_outbound_greeting">
+         v-if="showOutboundGreetingOptions">
 
     <q-tabs indicator-color="transparent"
             active-color="white"
@@ -133,6 +136,7 @@ import Variables from 'components/message-composer/options/variables'
 import AudioRecorder from 'components/audio-recorder'
 import FileUploader from 'components/file-uploader'
 import { mapActions, mapGetters, mapState } from 'vuex'
+import { OUTBOUND_GREETING_COMPANY_DEFAULT, OUTBOUND_GREETING_OPTIONS, OUTBOUND_GREETING_PLAY_MY_OWN_GREETING } from 'src/constants/user-outbound-greeting-options'
 
 export default {
   name: 'outbound-greeting',
@@ -153,7 +157,7 @@ export default {
   created () {
     if (this.disableOutboundGreeting) {
       // disable user outbound greeting if forced at account level
-      this.user.play_outbound_greeting = false
+      this.user.outbound_greeting_option = OUTBOUND_GREETING_COMPANY_DEFAULT
     }
   },
 
@@ -161,7 +165,8 @@ export default {
     return {
       activeTab: this.user?.outbound_record_file ? 'upload' : 'tts',
       showVariableSelector: false,
-      loadingRemoveOutbound: false
+      loadingRemoveOutbound: false,
+      options: OUTBOUND_GREETING_OPTIONS
     }
   },
 
@@ -176,8 +181,12 @@ export default {
     },
 
     outboundGreetingSettings: {
-      handler ({ outboundRecordTts, outboundRecordFile }) {
-        if (!outboundRecordFile && !outboundRecordTts) {
+      handler ({ outboundRecordTts, outboundRecordFile, outboundGreetingOption }) {
+        if (
+          outboundGreetingOption === OUTBOUND_GREETING_PLAY_MY_OWN_GREETING &&
+          !outboundRecordFile &&
+          !outboundRecordTts
+        ) {
           this.setFormValidity(false)
           return
         }
@@ -194,12 +203,13 @@ export default {
     outboundGreetingSettings () {
       return {
         outboundRecordTts: this.user.outbound_record_tts,
-        outboundRecordFile: this.user.outbound_record_file
+        outboundRecordFile: this.user.outbound_record_file,
+        outboundGreetingOption: this.user.outbound_greeting_option
       }
     },
 
     disableOutboundGreeting () {
-      return !this.currentCompany?.play_outbound_greeting
+      return this.currentCompany?.force_outbound_greeting
     },
 
     recordedAudioSource () {
@@ -208,6 +218,14 @@ export default {
 
     outboundGreetingUploadUrl () {
       return `/api/v1/user/${this.user.id}/outbound-greeting`
+    },
+
+    outboundGreetingTooltipTitle () {
+      return this.disableOutboundGreeting ? 'Outbound greeting settings are disabled because it is forced at the account level' : ''
+    },
+
+    showOutboundGreetingOptions () {
+      return this.user.outbound_greeting_option === OUTBOUND_GREETING_PLAY_MY_OWN_GREETING
     }
   },
 
@@ -232,8 +250,12 @@ export default {
     },
 
     onFileUploaded ({ file_name: fileName }) {
-      this.resetChangedUserProperties()
       this.user.outbound_record_file = fileName
+      this.updateChangedUserProperties({
+        name: 'outbound_greeting_option',
+        value: OUTBOUND_GREETING_PLAY_MY_OWN_GREETING
+      })
+      this.resetChangedUserProperties()
       this.$generalNotification('File uploaded successfully.', 'success')
     },
 
@@ -267,8 +289,8 @@ export default {
             this.$generalNotification('File deleted successfully.', 'success')
 
             if (!this.user.outbound_record_tts) {
-              // if no TTS is set, disable the outbound greeting
-              this.user.play_outbound_greeting = false
+              // if no TTS is set, set the outbound greeting option to the company default
+              this.user.outbound_greeting_option = OUTBOUND_GREETING_COMPANY_DEFAULT
             }
           }).catch(err => {
             console.log(err)
