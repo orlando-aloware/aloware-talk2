@@ -1,15 +1,17 @@
 <template>
-  <vue-bootstrap-autocomplete :serializer="(item) => item.phone_number"
-                              :screen-reader-text-serializer="(item) => this.getContactName(item)"
-                              :data="phoneNumbers"
-                              :minMatchingChars="3"
-                              :showAllResults="true"
-                              ref="searchField"
-                              v-model="query"
-                              class="important search-form contact-phone-number-search"
-                              placeholder="Name or phone number"
-                              @input="lookupPhoneNumber"
-                              @hit="changePhoneNumber">
+  <vue-bootstrap-autocomplete
+    ref="searchField"
+    v-model="query"
+    :data="phoneNumbers"
+    :minMatchingChars="3"
+    :screen-reader-text-serializer="(item) => this.getContactName(item)"
+    :serializer="(item) => item.phone_number"
+    :showAllResults="true"
+    class="important search-form contact-phone-number-search"
+    placeholder="Name or phone number"
+    @hit="changePhoneNumber"
+    @input="lookupPhoneNumber"
+  >
     <!-- htmlText is bound to the matched text derived from the serializer function -->
     <!-- data is bound to the matching array element in the data prop -->
     <template slot="suggestion" slot-scope="{ data }">
@@ -32,7 +34,7 @@ import { helperMixin } from 'src/plugins/mixins'
 export default {
   name: 'contact-phone-number-search',
 
-  mixins: [ helperMixin ],
+  mixins: [helperMixin],
 
   props: {
     value: {
@@ -94,6 +96,8 @@ export default {
     },
 
     getPhoneNumbers (search) {
+      if (this.$store.state.auth.is_focused_power_dialer) return
+
       if (!search) {
         this.phoneNumbers = []
         return
