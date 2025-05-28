@@ -1556,7 +1556,7 @@ export default {
       }
     },
 
-    unsubscribeFromPusher () {
+    unsubscribeFromLiveUpdates () {
       if (this.authenticated) {
         // just leave the channels
         this.broadcastLeave()
@@ -2692,7 +2692,7 @@ export default {
     beforeUnload () {
       this.stopElectronEvents()
       this.stopMainEvents()
-      this.unsubscribeFromPusher()
+      this.unsubscribeFromLiveUpdates()
       this.resetVuex([
         'contacts',
         'inbox',

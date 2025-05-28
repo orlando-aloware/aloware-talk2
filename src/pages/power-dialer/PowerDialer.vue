@@ -234,12 +234,12 @@ export default {
     this.stopPDEvents()
 
     this.powerDialerListeners.metricSessionsUpdate = (sessionMetrics) => {
-      // console.log(` %c PUSHER caught: metric_sessions_update `, 'background:black;color:yellow;', sessionMetrics)
+      // console.log(` %c LIVE UPDATE caught: metric_sessions_update `, 'background:black;color:yellow;', sessionMetrics)
       this.activeMetrics = sessionMetrics.session_metrics_calculations
     }
 
     this.powerDialerListeners.contactListItemCreated = async (task) => {
-      // console.log(` %c PUSHER caught: contact_list_item_created `, 'background:black;color:yellow;', task)
+      // console.log(` %c LIVE UPDATE caught: contact_list_item_created `, 'background:black;color:yellow;', task)
       // console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
       if (this.hasSessions) {
         await this.fetchInQueueTasks(task)
@@ -247,7 +247,7 @@ export default {
     }
 
     this.powerDialerListeners.contactListItemUpdated = (task) => {
-      // console.log(` %c PUSHER caught: contact_list_item_updated `, 'background:black;color:yellow;', task)
+      // console.log(` %c LIVE UPDATE caught: contact_list_item_updated `, 'background:black;color:yellow;', task)
       if (this.hasSessions) {
         this.updateTaskStatus(task)
       }
