@@ -115,7 +115,7 @@ import ContactScheduledMessages from 'src/components/contacts/contact-scheduled-
 import { INBOUND, OUTBOUND } from 'src/constants/communication-direction'
 import { CALL, SMS } from 'src/constants/communication-types'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import { aclMixin, contactMixin, contactV2AttributesMixin, teamInboxPropsMixin, userMixin, visibilityMixin } from 'src/plugins/mixins'
+import { aclMixin, aloaiMixin, contactMixin, contactV2AttributesMixin, teamInboxPropsMixin, userMixin, visibilityMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
@@ -140,6 +140,7 @@ export default {
   },
 
   mixins: [
+    aloaiMixin,
     contactMixin,
     contactV2AttributesMixin,
     aclMixin,
@@ -195,9 +196,7 @@ export default {
     },
 
     showAloAiControls () {
-      const aloaiEnabled = this.currentCompany.aloai_text_agents_enabled || this.currentCompany.aloai_voice_inbound_agents_enabled || this.currentCompany.aloai_voice_outbound_agents_enabled
-
-      return aloaiEnabled &&
+      return isAloaiEnabled(this.currentCompany) &&
         this.contact && !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
     }

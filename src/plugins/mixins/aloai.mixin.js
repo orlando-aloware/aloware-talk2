@@ -3,6 +3,9 @@ import * as AloAi from '../../constants/aloai'
 
 export default _.merge({
   methods: {
+    isAloaiEnabled (company) {
+      return company.aloai_text_agents_enabled || company.aloai_voice_inbound_agents_enabled || company.aloai_voice_outbound_agents_enabled
+    },
     formatDirection (direction) {
       switch (direction) {
         case AloAi.DIRECTION_INBOUND:

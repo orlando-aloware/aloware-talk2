@@ -13,7 +13,7 @@
     </template>
 
     <b-card
-      v-if="profile?.company?.aloai_text_agents_enabled || profile?.company?.aloai_voice_inbound_agents_enabled || profile?.company?.aloai_voice_outbound_agents_enabled"
+      v-if="isAloaiEnabled(profile?.company)"
       class="border-0 position-relative contact-about-wrapper"
     >
       <h4>AloAi Agent Enrollments</h4>
