@@ -403,33 +403,20 @@ const talk2Api = {
       /**
        * Get the available lifecycle stages
        *
-       * @returns {axios.AxiosResponse<{success: boolean, data: {lifecycle_stages: Object, can_update_lifecycle_stages: boolean}}>}
+       * @returns Promise<axios.AxiosResponse<{success: boolean, data: {lifecycle_stages: Object, can_update_lifecycle_stages: boolean}}>>
        */
       async getLifecycleStages () {
-        let response = null
-        try {
-          response = await window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
-        } catch (error) {
-          response = error.response
-        }
-
-        return response
+        return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
       },
 
       /**
+       * Get the company association of the contact
        *
        * @param contactId
-       * @returns {axios.AxiosResponse<{success: boolean, data: object>}
+       * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
        */
-      async getContactCompanyAssociation (contactId) {
-        let response = null
-        try {
-          response = await window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
-        } catch (error) {
-          response = error.response
-        }
-
-        return response
+      getContactCompanyAssociation (contactId) {
+        return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
       },
 
       zoho: {

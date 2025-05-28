@@ -365,18 +365,23 @@ export default {
      */
     async setLifecycleStagesSection () {
       this.isLoadingLifecycleStages = true
-      const response = await this.getLifecycleStages()
 
-      // Create a new object with all the current properties and the new ones
-      // This ensures Vue's reactivity system detects the change
-      this.integrationData = {
-        ...this.integrationData,
-        lifecycle_stages: response.data.data.lifecycle_stages,
-        can_update_lifecycle_stages: response.data.data.can_update_lifecycle_stages
+      try {
+        const response = await this.getLifecycleStages()
+
+        // Create a new object with all the current properties and the new ones
+        // This ensures Vue's reactivity system detects the change
+        this.integrationData = {
+          ...this.integrationData,
+          lifecycle_stages: response.data.data.lifecycle_stages,
+          can_update_lifecycle_stages: response.data.data.can_update_lifecycle_stages
+        }
+        this.forceRerenderHubspotOneComponent()
+      } catch (error) {
+        this.$handleErrors(error.response)
+      } finally {
+        this.isLoadingLifecycleStages = false
       }
-
-      this.forceRerenderHubspotOneComponent()
-      this.isLoadingLifecycleStages = false
     },
 
     /**
@@ -386,17 +391,22 @@ export default {
      */
     async setCompanyAssociationSection (contactId) {
       this.isLoadingCompanyAssociation = true
-      const response = await this.getContactCompanyAssociation(contactId)
 
-      // Create a new object with all the current properties and the new ones
-      // This ensures Vue's reactivity system detects the change
-      this.integrationData = {
-        ...this.integrationData,
-        associated_company: response.data.associated_company
+      try {
+        const response = await this.getContactCompanyAssociation(contactId)
+
+        // Create a new object with all the current properties and the new ones
+        // This ensures Vue's reactivity system detects the change
+        this.integrationData = {
+          ...this.integrationData,
+          associated_company: response.data.associated_company
+        }
+        this.forceRerenderHubspotOneComponent()
+      } catch (error) {
+        this.$handleErrors(error.response)
+      } finally {
+        this.isLoadingCompanyAssociation = false
       }
-
-      this.forceRerenderHubspotOneComponent()
-      this.isLoadingCompanyAssociation = false
     },
 
     onWorkflowSelected (workflowId) {
