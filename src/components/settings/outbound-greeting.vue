@@ -7,6 +7,7 @@
     <b-form-group label="" v-slot="{ ariaDescribedby }">
       <b-form-radio-group
         triggers="manual"
+        class="outbound-greeting-selector"
         :options="options"
         :aria-describedby="ariaDescribedby"
         :disabled="disableOutboundGreeting"
@@ -302,5 +303,9 @@ export default {
 <style>
 .outbound-greeting-upload-tab {
   padding: 0 !important;
+}
+
+.outbound-greeting-selector {
+  max-width: 580px !important;
 }
 </style>
