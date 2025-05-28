@@ -6,7 +6,7 @@ export default {
   data () {
     return {
       dialerCallFishingInterval: null,
-      notificationSoundUserActionModalId: 'notification-sound-user-action-modal'
+      notificationSoundUserActionToastId: 'notification-sound-user-action-toast'
     }
   },
 
@@ -52,7 +52,7 @@ export default {
 
     playAudio (shouldPlayFishingNotificationSound = false) {
       if (!this.enableAudio) {
-        this.showMediaPlaybackRequiresUserGestureModal()
+        this.showMediaPlaybackRequiresUserGestureToast()
         return
       }
 
@@ -67,7 +67,7 @@ export default {
         promise.catch(err => {
           // Auto-play was prevented
           // Show a UI element to let the user manually start playback
-          this.showMediaPlaybackRequiresUserGestureModal()
+          this.showMediaPlaybackRequiresUserGestureToast()
           console.log(err)
         })
       }
@@ -81,8 +81,8 @@ export default {
       this.fishingModeNotificationAudio.pause()
     },
 
-    showMediaPlaybackRequiresUserGestureModal () {
-      this.$bvModal.show(this.notificationSoundUserActionModalId)
+    showMediaPlaybackRequiresUserGestureToast () {
+      this.$bvToast.show(this.notificationSoundUserActionToastId)
     },
 
     processRemoveFromNotification (communication) {

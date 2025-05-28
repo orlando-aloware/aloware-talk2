@@ -1204,7 +1204,7 @@ export default {
     }
   },
 
-  async mounted () {
+  mounted () {
     if (this.authenticated) {
       this.sidebarVisible = true
     }
@@ -1233,13 +1233,7 @@ export default {
       }, checkInterval)
     }
 
-    if (await this.mediaPlaybackRequiresUserGesture()) {
-      window.addEventListener('keydown', this.removeBehaviorsRestrictions)
-      window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
-      window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
-    } else {
-      this.setEnableAudio(true)
-    }
+    this.checkMediaPlaybackRequiresUserGesture()
 
     console.log('Push permission: ' + window.Push.Permission.get())
 
@@ -1262,6 +1256,16 @@ export default {
   },
 
   methods: {
+    async checkMediaPlaybackRequiresUserGesture () {
+      if (await this.mediaPlaybackRequiresUserGesture()) {
+        window.addEventListener('keydown', this.removeBehaviorsRestrictions)
+        window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
+        window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
+      } else {
+        this.setEnableAudio(true)
+      }
+    },
+
     processUrl (url) {
       // New format: expected url like "contact-<phoneNumber>" or "contact-<phoneNumber>?first=...&last=...&isCompany=..."
       let cleaned = url.replace(/contact[:-]/, '')

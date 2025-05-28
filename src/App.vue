@@ -15,7 +15,7 @@
                  v-if="cookieValidated" />
     <portal-target name="app"
                    multiple />
-    <notification-sound-user-action-modal />
+    <notification-sound-user-action-toast />
     <action-notification id="system"
                          v-if="!isWidget" />
     <action-notification id="sms"
@@ -42,7 +42,7 @@ import { mapActions, mapState } from 'vuex'
 import Intercom from 'components/intercom'
 import HeaderNotification from 'components/header-notification'
 import { accessMixin } from 'src/plugins/mixins'
-import NotificationSoundUserActionModal from 'components/notification-sound-user-action-modal'
+import NotificationSoundUserActionToast from 'components/notification-sound-user-action-toast'
 
 export default {
   name: 'App',
@@ -55,7 +55,7 @@ export default {
     HeaderNotification,
     Intercom,
     ActionNotification,
-    NotificationSoundUserActionModal
+    NotificationSoundUserActionToast
   },
 
   data () {
