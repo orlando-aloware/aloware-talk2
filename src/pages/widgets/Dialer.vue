@@ -400,12 +400,13 @@ export default {
         return
       }
 
-      const contactData = {
+      const params = {
         timezone: this.contactTimezone,
-        name: this.contactName
+        name: this.contactName,
+        calls_notifications_settings: this.currentCompany.calls_notifications_settings
       }
 
-      this.checkContactTimezone(contactData, this.makeCall, this.onCancelCall)
+      this.checkContactTimezone(params, this.makeCall, this.onCancelCall)
       this.isDialed = true
     },
 

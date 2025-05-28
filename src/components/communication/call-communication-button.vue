@@ -82,12 +82,13 @@ export default {
     },
 
     callContact () {
-      let contact = {
+      const params = {
         timezone: this.communication.contact.timezone,
-        name: this.communication.contact.name
+        name: this.communication.contact.name,
+        calls_notifications_settings: this.$store.state.cache.currentCompany.calls_notifications_settings
       }
 
-      this.checkContactTimezone(contact, this.initiateCall)
+      this.checkContactTimezone(params, this.initiateCall)
     }
   }
 }

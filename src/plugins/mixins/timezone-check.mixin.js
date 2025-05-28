@@ -8,28 +8,28 @@ export default {
   },
   methods: {
     // Checks if it's within contact daytime. If not, promps alert to user.
-    checkContactTimezone (contact, makeCall, onCancelCall = null) {
+    checkContactTimezone (params, makeCall, onCancelCall = null) {
       // if the modal is already open, we skip the next steps
       if (this.isModalOpen) {
         return
       }
 
-      let { timezone, name } = contact
-
+      let { timezone, name } = params
+      const openTime = params.calls_notifications_settings.open_time
+      const closeTime = params.calls_notifications_settings.close_time
       // check contact has timezone or not
       if (timezone) {
-        // if have timezone check is it day time?
-        const startDay = moment()
-          .tz(timezone)
-          .hour(8)
-          .minute(0)
-          .second(0)
-        const endDay = moment()
-          .tz(timezone)
-          .hour(18)
-          .minute(0)
-          .second(0)
-        const contactLocalTime = moment().tz(contact.timezone)
+        const contactLocalTime = moment().tz(timezone)
+        const startDay = moment.tz(
+          `${contactLocalTime.format('YYYY-MM-DD')} ${openTime}`,
+          'YYYY-MM-DD HH:mm',
+          timezone
+        )
+        const endDay = moment.tz(
+          `${contactLocalTime.format('YYYY-MM-DD')} ${closeTime}`,
+          'YYYY-MM-DD HH:mm',
+          timezone
+        )
 
         if (!contactLocalTime.isBetween(startDay, endDay)) {
           this.isModalOpen = true

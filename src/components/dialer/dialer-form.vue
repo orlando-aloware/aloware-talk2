@@ -209,11 +209,11 @@ import {
   contactMixin,
   contactV2AttributesMixin,
   kycMixin,
-  selectorMixin,
-  timezoneCheckMixin,
-  visibilityMixin,
   outboundCallingModesMixin,
-  settingsMixin
+  selectorMixin,
+  settingsMixin,
+  timezoneCheckMixin,
+  visibilityMixin
 } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
@@ -540,11 +540,12 @@ export default {
     },
 
     onCall () {
-      let contact = {
+      const params = {
         timezone: this.contactTimezone,
-        name: this.contactName
+        name: this.contactName,
+        calls_notifications_settings: this.currentCompany.calls_notifications_settings
       }
-      this.checkContactTimezone(contact, this.makeCall)
+      this.checkContactTimezone(params, this.makeCall)
     },
 
     makeCall () {

@@ -57,22 +57,22 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as AgentStatus from 'src/constants/agent-status'
+import { AGENT_STATUS_ACCEPTING_CALLS, AGENT_STATUS_ON_CALL, AGENT_STATUS_ON_WRAP_UP } from 'src/constants/agent-status'
 import Webrtc from 'components/webrtc'
 import * as storage from 'src/plugins/helpers/storage'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import {
-  timezoneCheckMixin,
-  helperMixin,
   agentMixin,
   dispositionsMixin,
-  visibilityMixin,
-  notificationMixin
+  helperMixin,
+  notificationMixin,
+  timezoneCheckMixin,
+  visibilityMixin
 } from 'src/plugins/mixins'
 import DialerListeners from 'components/dialer-listeners.vue'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
 import { CURRENT_STATUS_COMPLETED_NEW } from 'src/constants/communication-current-status'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
-import { AGENT_STATUS_ACCEPTING_CALLS, AGENT_STATUS_ON_CALL, AGENT_STATUS_ON_WRAP_UP } from 'src/constants/agent-status'
 
 const WIDGET_MSG_HIDE = 1
 const WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL = 2
@@ -420,12 +420,13 @@ export default {
         return
       }
 
-      const contactData = {
-        timezone: this.contactTimezone,
-        name: this.contactName
+      const params = {
+        timezone: this.contact.timezone,
+        name: this.contact.name,
+        calls_notifications_settings: this.currentCompany.calls_notifications_settings
       }
 
-      this.checkContactTimezone(contactData, this.makeCall, this.cancelCall)
+      this.checkContactTimezone(params, this.makeCall, this.cancelCall)
     },
 
     cancelCall () {

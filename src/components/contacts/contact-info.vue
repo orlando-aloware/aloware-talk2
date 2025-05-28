@@ -275,7 +275,7 @@ import ContactAddReminderModal from 'src/components/contacts/contact-add-reminde
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
-import { aclMixin, timezoneCheckMixin, integrationMixin, contactMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
@@ -450,12 +450,13 @@ export default {
     },
 
     callContact () {
-      let contact = {
+      const params = {
         timezone: this.contact.timezone,
-        name: this.contact.name
+        name: this.contact.name,
+        calls_notifications_settings: this.currentCompany.calls_notifications_settings
       }
 
-      this.checkContactTimezone(contact, this.initiateCall)
+      this.checkContactTimezone(params, this.initiateCall)
     },
 
     blockContact () {
