@@ -763,7 +763,7 @@ export default {
           const { getWebSocketCredentials } = await import('src/boot/helpers')
 
           // Get credentials for soketi
-          const { WS_APP_KEY, WS_HOST } = getWebSocketCredentials('soketi')
+          const { WS_APP_KEY, WS_HOST } = getWebSocketCredentials()
 
           if (!WS_APP_KEY || !WS_HOST) {
             console.error('Missing Soketi configuration')

@@ -131,7 +131,7 @@ export default {
       this.$VueEvent.stop('agent_status_updated', this.mainListeners.agentStatusUpdated)
     },
 
-    unsubscribeFromPusher () {
+    unsubscribeFromLiveUpdates () {
       if (this.authenticated) {
         this.broadcastLeave()
       }
@@ -175,7 +175,7 @@ export default {
 
   beforeDestroy () {
     this.stopMainEvents()
-    this.unsubscribeFromPusher()
+    this.unsubscribeFromLiveUpdates()
   }
 }
 </script>

@@ -61,7 +61,7 @@ export default {
     },
     initEcho (broadcastDriver) {
       console.log('broadcast initiated with ' + broadcastDriver)
-      const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials(broadcastDriver)
+      const { WS_APP_KEY, WS_CLUSTER, WS_HOST } = getWebSocketCredentials()
       return new Echo({
         authEndpoint: `${process.env.API_URL}/broadcasting/auth`,
         broadcaster: 'pusher',
@@ -480,18 +480,6 @@ export default {
           this.dispatchToMemoryMonitor('.power_dialer_contact.removed', event)
           window.VueEvent.fire('power_dialer_contact_removed', event.contact_id)
         })
-        // .listen('.export.created', (event) => {
-        //   console.log('created export event :>> ', event)
-        //   window.VueEvent.fire('export_event_updates', event)
-        // })
-        // .listen('.export.updated', (event) => {
-        //   console.log('updated export event :>> ', event)
-        //   window.VueEvent.fire('export_event_updates', event)
-        // })
-        // .listen('.export.deleted', (event) => {
-        //   console.log('deleted export event :>> ', event)
-        //   window.VueEvent.fire('export_event_updates', event)
-        // })
         /**
          * End of Power Dialer Session Tasks
          */
