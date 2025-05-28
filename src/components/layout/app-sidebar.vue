@@ -80,7 +80,7 @@
       icon="lists"
       padding="10px 20px"
       title="Lists"
-      to="lists-management"
+      to="/lists-management"
     />
 
     <app-sidebar-nav-link
