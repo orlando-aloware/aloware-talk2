@@ -762,12 +762,12 @@ export default {
 
           listItems.forEach(li => {
             li.addEventListener('click', () => {
-              sessionStorage.setItem('date-selected-comms', li.getAttribute('data-range-key'))
+              this.filter.date_range = li.getAttribute('data-range-key')
             })
 
             li.classList.remove('active')
 
-            if (li.getAttribute('data-range-key') === sessionStorage.getItem('date-selected-comms')) {
+            if (li.getAttribute('data-range-key') === this.filter.date_range) {
               li.classList.add('active')
             }
           })
@@ -776,7 +776,7 @@ export default {
     },
 
     onFinishSelection (dateRange) {
-      sessionStorage.setItem('date-selected-comms', 'custom')
+      this.filter.date_range = 'custom'
     },
 
     onFilterChange (value, prop) {
@@ -858,10 +858,7 @@ export default {
     if (this.isFirstLoad && !viewId) {
       this.setIsFirstLoad(false)
 
-      if (!this.selectedFilter) {
-        sessionStorage.setItem('date-selected-comms', this.defaultDateRangeBasedOnCompanyPreferences)
-      }
-
+      this.filter.date_range = this.defaultDateRangeBasedOnCompanyPreferences
       this.dateRange.startDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][0]
       this.dateRange.endDate = this.ranges[this.defaultDateRangeBasedOnCompanyPreferences][1]
     } else {
