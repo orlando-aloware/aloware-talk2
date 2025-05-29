@@ -110,7 +110,18 @@ export default {
           this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
         )
       } else {
-        this.$router.push({ name: 'Inbox' })
+        const { id: contactId, communicationId } = this.$route.params
+
+        if (contactId) {
+          const contactRoute = !communicationId
+            ? `/contacts/${contactId}`
+            : `/contacts/${contactId}/communications/${communicationId}`
+
+          this.$router.replace(contactRoute)
+          return
+        }
+
+        this.$router.replace({ name: 'Inbox' })
       }
     }
     // Load team inbox campaigns
