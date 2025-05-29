@@ -1498,6 +1498,7 @@
           :class="isWidget || mobileView ? 'my-1' : 'mb-1'"
           :communication="communication"
           :ring-group="usedRingGroup"
+          :key="communication.id"
           v-if="usedRingGroup"
         />
         <network-logs-display
@@ -1530,13 +1531,7 @@ import TranscriptionModal from 'src/components/communication/transcription-modal
 import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import talk2Api from 'src/plugins/api/api'
-import {
-  aclMixin,
-  classicMixin,
-  communicationInfoMixin,
-  goBackMixin,
-  userMixin
-} from 'src/plugins/mixins'
+import { aclMixin, classicMixin, communicationInfoMixin, goBackMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
