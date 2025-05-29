@@ -35,6 +35,10 @@ export default {
       return this.currentCompany?.team_inbox_enabled === true
     },
 
+    hasCompanyLegacyInboxEnabled () {
+      return this.currentCompany?.enable_legacy_inbox === true
+    },
+
     shouldSeeExperimentalAiFeatures () {
       return this.isDemoCompany || this.currentCompany?.plan?.ai_plan === true
     },
