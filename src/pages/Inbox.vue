@@ -231,6 +231,13 @@ export default {
 
       // get counts for inbox
       this.fetchInboxTaskCounts()
+    },
+
+    hasCompanyLegacyInboxEnabled (enabled) {
+      if (!enabled) {
+        // Handle live updates when legacy inbox is disabled
+        this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
+      }
     }
   }
 }

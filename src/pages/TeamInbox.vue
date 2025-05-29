@@ -145,6 +145,15 @@ export default {
     }
   },
 
+  watch: {
+    hasCompanyTeamInboxEnabled (enabled) {
+      // Handle live updates when team inbox is disabled
+      if (!enabled) {
+        this.$router.replace({ name: 'Inbox' })
+      }
+    }
+  },
+
   created () {
     this.$VueEvent.listen('mark_contact_communications_all_as_read_processed', this.markContactCommunicationsAllAsReadProcessed)
   },
