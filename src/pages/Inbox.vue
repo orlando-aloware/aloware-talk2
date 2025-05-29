@@ -182,6 +182,17 @@ export default {
     }
 
     if (!this.hasCompanyLegacyInboxEnabled) {
+      const { id: contactId, communicationId } = this.$route.params
+
+      if (contactId) {
+        const contactRoute = !communicationId
+          ? `/contacts/${contactId}`
+          : `/contacts/${contactId}/communications/${communicationId}`
+
+        this.$router.replace(contactRoute)
+        return
+      }
+
       this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
       return
     }
