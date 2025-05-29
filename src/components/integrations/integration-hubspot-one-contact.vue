@@ -43,7 +43,7 @@
           }}</span>
       </p>
       <!-- Start Lifecycle Stage Section -->
-      <div class="lifecycle-stage-container" data-testid="integration-hubspot-lifecycle-stage">
+      <div v-if="lifecycleStagesOptions.length > 1" class="lifecycle-stage-container" data-testid="integration-hubspot-lifecycle-stage">
         <div class="d-flex justify-content-between align-items-center">
           <p class="mb-0 no-wrap-block">
             <span class="data-icon-label">Lifecycle Stage: </span>

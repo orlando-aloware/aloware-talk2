@@ -70,9 +70,6 @@ jobs:
           ENV_APP_DEBUG: ${{ secrets.app_debug }}
           ENV_API_URL: ${{ secrets.api_url }}
           ENV_API_REPORTING_URL: ${{ secrets.api_reporting_url }}
-          ENV_BROADCAST_DRIVER: ${{ secrets.broadcast_driver }}
-          ENV_PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
-          ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
           ENV_SOKETI_APP_KEY: ${{ secrets.soketi_app_key }}
           ENV_SOKETI_CLUSTER: ${{ secrets.soketi_cluster }}
           ENV_SOKETI_HOST: ${{ secrets.soketi_host }}
@@ -98,22 +95,16 @@ jobs:
           ENV_BETA_FEATURES_COMPANY_IDS: ${{ secrets.beta_features_company_ids }}
           file-name: .env.prod
 
-      - name: Build/release Electron win app
+      - name: Build/release Electron Windows app
         run: quasar build -d -m electron -T win -b builder -P always
         env:
+          # Global info
           NODE_OPTIONS: --openssl-legacy-provider
           APP_NAME: ${{ secrets.app_name }}
           APP_ENV: ${{ secrets.app_env }}
           APP_DEBUG: ${{ secrets.app_debug }}
           API_URL: ${{ secrets.api_url }}
           API_REPORTING_URL: ${{ secrets.api_reporting_url }}
-
-          # soketi or pusher
-          BROADCAST_DRIVER: ${{ secrets.broadcast_driver }}
-
-          # Pusher Configuration
-          PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
-          PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
 
           # Soketi credentials
           SOKETI_APP_KEY: ${{ secrets.soketi_app_key }}

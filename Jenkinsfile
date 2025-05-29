@@ -462,7 +462,7 @@ pipeline {
                                 script {
                                     sh 'git rev-parse --abbrev-ref HEAD'
                                     def scannerHome = tool 'SonarQube Tool';
-                                    withSonarQubeEnv('Sonar') {
+                                    withSonarQubeEnv('Sonarqube') {
                                         sh "${scannerHome}/bin/sonar-scanner"
                                     }
                                 }

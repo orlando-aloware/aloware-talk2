@@ -1961,7 +1961,7 @@ export default {
     },
 
     // to ensure that the "Finish Call" button in the Wrap-up Form is disabled until the changeAgentStatus job event, executed from the backend,
-    // arrives via Pusher at the frontend and changes the agent's status to wrap-up, at which point the button becomes enabled.
+    // arrives via Live Update at the frontend and changes the agent's status to wrap-up, at which point the button becomes enabled.
     // it includes "ParkingCalls" conditionals.
     isNotOnWrapUp () {
       return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked)
