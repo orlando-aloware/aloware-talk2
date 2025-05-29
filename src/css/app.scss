@@ -8277,6 +8277,10 @@ button.grey-90 {
       }
     }
 
+    &.extended-width {
+      width: 330px !important;
+    }
+
     .toast-header {
       .close {
         position: absolute;
