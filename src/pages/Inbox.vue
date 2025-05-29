@@ -37,7 +37,7 @@ import {
 } from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
 import TeamInboxInfoModal from 'components/team-inbox-info-modal'
-import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'inbox',
@@ -179,6 +179,11 @@ export default {
       this.$router.replace(
         this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
       )
+    }
+
+    if (!this.hasCompanyLegacyInboxEnabled) {
+      this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
+      return
     }
 
     // when the user tries to access the channel directly but without a personal line
