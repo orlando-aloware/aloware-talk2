@@ -288,7 +288,7 @@ export default _.merge({
      * @return {boolean}
      */
     shouldShowAloAi () {
-      if (this.isAloAiEnabled()) {
+      if (this.currentCompany.aloai_text_agents_enabled || this.currentCompany.aloai_voice_inbound_agents_enabled || this.currentCompany.aloai_voice_outbound_agents_enabled) {
         return true
       }
 
