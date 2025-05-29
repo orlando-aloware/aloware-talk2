@@ -196,7 +196,7 @@ export default {
     },
 
     showAloAiControls () {
-      return isAloaiEnabled(this.currentCompany) &&
+      return this.isAloAiEnabled() &&
         this.contact && !this.contact.is_dnc &&
         this.hasPermissionTo('update contact')
     }

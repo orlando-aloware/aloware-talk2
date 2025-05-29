@@ -288,7 +288,7 @@ export default _.merge({
      * @return {boolean}
      */
     shouldShowAloAi () {
-      if (isAloaiEnabled(this.currentCompany)) {
+      if (this.isAloAiEnabled()) {
         return true
       }
 

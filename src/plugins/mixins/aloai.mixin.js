@@ -1,10 +1,14 @@
 import _ from 'lodash'
+import { mapState } from 'vuex'
 import * as AloAi from '../../constants/aloai'
 
 export default _.merge({
+  computed: {
+    ...mapState('cache', ['currentCompany'])
+  },
   methods: {
-    isAloaiEnabled (company) {
-      return company.aloai_text_agents_enabled || company.aloai_voice_inbound_agents_enabled || company.aloai_voice_outbound_agents_enabled
+    isAloAiEnabled () {
+      return this.currentCompany.aloai_text_agents_enabled || this.currentCompany.aloai_voice_inbound_agents_enabled || this.currentCompany.aloai_voice_outbound_agents_enabled
     },
     formatDirection (direction) {
       switch (direction) {

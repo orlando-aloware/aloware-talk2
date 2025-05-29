@@ -1,5 +1,5 @@
 <template>
-  <b-card class="border-0 position-relative contact-about-wrapper" v-if="isAloaiEnabled(profile?.company)">
+  <b-card class="border-0 position-relative contact-about-wrapper" v-if="isAloAiEnabled()">
     <h4>AloAi Agent Engagement</h4>
 
     <b-card-text class="fs-14 mt-2">
