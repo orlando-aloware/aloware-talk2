@@ -179,9 +179,8 @@ export default {
       this.$router.replace(
         this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
       )
-    } else {
-      this.$router.push({ name: 'Inbox' })
     }
+
     // when the user tries to access the channel directly but without a personal line
     if (this.$route.params?.channel === 'my-personal-line' && !this.profile.campaign_id) {
       this.$router.push({ name: 'Inbox' })
