@@ -2,6 +2,7 @@ import { mapActions, mapState } from 'vuex'
 import store from '../../store'
 import * as storage from 'src/plugins/helpers/storage'
 import { get } from 'lodash'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   data () {
@@ -17,7 +18,8 @@ export default {
   },
 
   computed: {
-    ...mapState(['statics', 'staticsLoaded'])
+    ...mapState(['statics', 'staticsLoaded']),
+    ...mapState('cache', ['currentCompany'])
   },
 
   methods: {
@@ -79,7 +81,7 @@ export default {
 
   beforeRouteEnter (to, from, next) {
     store().dispatch('auth/check').then(() => {
-      next({ name: 'Inbox' })
+      next({ name: this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE })
     }).catch(() => {
       next()
     })

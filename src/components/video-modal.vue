@@ -74,6 +74,7 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import { Platform } from 'quasar'
+import VueCookies from 'vue-cookies'
 
 export default {
   name: 'video-modal',
@@ -154,6 +155,8 @@ export default {
   },
   mounted () {
     this.isLoading = true
+    this.$cookies = VueCookies
+
     const wasShown = Platform.is.electron ? localStorage.getItem(this.parsedCookieName) : this.$cookies.get(this.parsedCookieName)
     if (wasShown) { return }
 

@@ -235,23 +235,23 @@
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
+  accessMixin,
   aclMixin,
+  agentMixin,
+  broadcastMixin,
+  broadcastsMixin,
+  contactV2AttributesMixin,
+  dispositionsMixin,
   htmlMixin,
-  webrtcMixin,
+  kycMixin,
   notificationMixin,
   notificationQueueMixin,
-  broadcastMixin,
   parkCallMixin,
-  visibilityMixin,
-  unownedContactTaskMixin,
-  agentMixin,
-  contactV2AttributesMixin,
-  kycMixin,
-  userMixin,
   settingsMixin,
-  broadcastsMixin,
-  accessMixin,
-  dispositionsMixin
+  unownedContactTaskMixin,
+  userMixin,
+  visibilityMixin,
+  webrtcMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -263,13 +263,14 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as CommunicationDirection from 'src/constants/communication-direction'
+import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import {
-  CURRENT_STATUS_HOLD_NEW,
-  CURRENT_STATUS_INPROGRESS_NEW,
-  CURRENT_STATUS_COMPLETED_NEW,
-  INCOMING_STATUSES,
   ALL_INPROGRESS_STATUSES,
   COMPLETED_STATUSES,
+  CURRENT_STATUS_COMPLETED_NEW,
+  CURRENT_STATUS_HOLD_NEW,
+  CURRENT_STATUS_INPROGRESS_NEW,
+  INCOMING_STATUSES,
   INPROGRESS_UNCONNECTED_STATUSES
 } from 'src/constants/communication-current-status'
 import _ from 'lodash'
@@ -277,21 +278,18 @@ import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
-import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import KycFillDialog from 'components/kyc-fill-dialog.vue'
 import KycReloadDialog from 'components/kyc-reload-dialog.vue'
 import store from 'src/store'
 import {
-  TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
+  TYPE_COMMUNICATION,
   TYPE_EXPORT_CONTACT_LIST_ITEMS,
-  TYPE_COMMUNICATION
+  TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
 import talk2Api from 'src/plugins/api/api'
-import {
-  MAX_SCREEN_WIDTH_MOBILE_HEADER
-} from 'src/constants/viewport-sizes'
+import { MAX_SCREEN_WIDTH_MOBILE_HEADER } from 'src/constants/viewport-sizes'
 import TrialBanner from 'components/trial-banner.vue'
 import * as TrialStatus from 'src/constants/trial-account-status'
 import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
@@ -437,7 +435,8 @@ export default {
 
     ...mapState('auth', [
       'profile',
-      'authenticated'
+      'authenticated',
+      'is_focused_power_dialer'
     ]),
 
     ...mapState('stats', [
@@ -1234,13 +1233,7 @@ export default {
       }, checkInterval)
     }
 
-    if (this.mediaPlaybackRequiresUserGesture()) {
-      window.addEventListener('keydown', this.removeBehaviorsRestrictions)
-      window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
-      window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
-    } else {
-      this.setEnableAudio(true)
-    }
+    this.checkMediaPlaybackRequiresUserGesture()
 
     console.log('Push permission: ' + window.Push.Permission.get())
 
@@ -1263,6 +1256,16 @@ export default {
   },
 
   methods: {
+    async checkMediaPlaybackRequiresUserGesture () {
+      if (await this.mediaPlaybackRequiresUserGesture()) {
+        window.addEventListener('keydown', this.removeBehaviorsRestrictions)
+        window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
+        window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
+      } else {
+        this.setEnableAudio(true)
+      }
+    },
+
     processUrl (url) {
       // New format: expected url like "contact-<phoneNumber>" or "contact-<phoneNumber>?first=...&last=...&isCompany=..."
       let cleaned = url.replace(/contact[:-]/, '')
@@ -1542,7 +1545,7 @@ export default {
       }
     },
 
-    unsubscribeFromPusher () {
+    unsubscribeFromLiveUpdates () {
       if (this.authenticated) {
         // just leave the channels
         this.broadcastLeave()
@@ -1583,22 +1586,21 @@ export default {
       this.setEnableAudio(true)
     },
 
-    mediaPlaybackRequiresUserGesture () {
+    async mediaPlaybackRequiresUserGesture () {
       // test if play() is ignored when not called from an input event handler
       const audio = document.createElement('audio')
-      const promise = audio.play()
 
-      if (promise !== undefined) {
-        promise
-          .catch(() => {
-            // Auto-play was prevented
-            // Show a UI element to let the user manually start playback
-            return true
-          })
-          .then(() => {
-            // Auto-play started
-            return audio.paused
-          })
+      try {
+        await audio.play()
+        // Auto-play started successfully
+        // No user gesture required
+        return audio.paused
+      } catch (error) {
+        // Auto-play was prevented
+        // User gesture is required
+        return true
+      } finally {
+        audio.remove()
       }
     },
 
@@ -2678,7 +2680,7 @@ export default {
     beforeUnload () {
       this.stopElectronEvents()
       this.stopMainEvents()
-      this.unsubscribeFromPusher()
+      this.unsubscribeFromLiveUpdates()
       this.resetVuex([
         'contacts',
         'inbox',
@@ -2786,6 +2788,16 @@ export default {
       if (!value) {
         this.mobilePhoneDrawer = false
         this.onCloseMobilePhone()
+      }
+    },
+
+    is_focused_power_dialer (to) {
+      if (to) {
+        this.$router.replace(
+          this.currentCompany.auto_dialer_enabled ? '/power-dialer' : '/stats'
+        ).catch(() => {
+          // We need it to avoid navigation error
+        })
       }
     },
 
@@ -2939,7 +2951,8 @@ export default {
       }
 
       if (!val && this.$route.name === 'Phone') {
-        this.$router.replace({ name: 'Inbox' })
+        const name = this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE
+        this.$router.replace({ name })
       }
 
       if (val) {

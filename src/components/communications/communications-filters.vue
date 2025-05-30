@@ -288,9 +288,6 @@ export default {
     },
 
     onResetFilters (destroy = false) {
-      // this.filter = _.clone(Filters.DEFAULT_STATE.filter)
-      sessionStorage.removeItem('date-selected-comms')
-
       this.filter = { ...this.channelDefaultFilterModel.filter }
 
       this.filter.per_page = 20

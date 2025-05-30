@@ -928,7 +928,7 @@ export default {
     this.setPDListSource(this.pdViewCancelToken.source())
 
     this.pdViewListeners.contactListItemDeleting = (task) => {
-      // console.log(` %c PUSHER caught: contact_list_item_deleting `, 'background:black;color:yellow;', task)
+      // console.log(` %c LIVE UPDATE caught: contact_list_item_deleting `, 'background:black;color:yellow;', task)
       // console.log(' %c TASK was DELETED : ', 'background: green; color: #000;', task)
     }
 

@@ -1,0 +1,9 @@
+export const OUTBOUND_GREETING_COMPANY_DEFAULT = 1
+export const OUTBOUND_GREETING_PLAY_MY_OWN_GREETING = 2
+export const OUTBOUND_GREETING_DO_NOT_PLAY_ANY_GREETING = 3
+
+export const OUTBOUND_GREETING_OPTIONS = [
+  { text: 'Use Company Default', value: OUTBOUND_GREETING_COMPANY_DEFAULT },
+  { text: 'Play My Own Greeting', value: OUTBOUND_GREETING_PLAY_MY_OWN_GREETING },
+  { text: 'Do Not Play Any Greeting', value: OUTBOUND_GREETING_DO_NOT_PLAY_ANY_GREETING }
+]
