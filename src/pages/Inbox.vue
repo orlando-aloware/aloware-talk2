@@ -37,7 +37,7 @@ import {
 } from 'src/plugins/mixins'
 import Contact from 'pages/contacts/Contact'
 import TeamInboxInfoModal from 'components/team-inbox-info-modal'
-import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'inbox',
@@ -181,6 +181,22 @@ export default {
       )
     }
 
+    if (!this.hasCompanyLegacyInboxEnabled) {
+      const { id: contactId, communicationId } = this.$route.params
+
+      if (contactId) {
+        const contactRoute = !communicationId
+          ? `/contacts/${contactId}`
+          : `/contacts/${contactId}/communications/${communicationId}`
+
+        this.$router.replace(contactRoute)
+        return
+      }
+
+      this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
+      return
+    }
+
     // when the user tries to access the channel directly but without a personal line
     if (this.$route.params?.channel === 'my-personal-line' && !this.profile.campaign_id) {
       this.$router.push({ name: 'Inbox' })
@@ -226,6 +242,13 @@ export default {
 
       // get counts for inbox
       this.fetchInboxTaskCounts()
+    },
+
+    hasCompanyLegacyInboxEnabled (enabled) {
+      if (!enabled) {
+        // Handle live updates when legacy inbox is disabled
+        this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
+      }
     }
   }
 }
