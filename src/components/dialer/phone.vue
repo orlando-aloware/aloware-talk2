@@ -1270,6 +1270,7 @@ import Avatar from 'components/avatar'
 import CommunicationAudio from 'components/communication-audio'
 import CommunicationNote from 'components/communication-note'
 import ContactIntegrations from 'components/contacts/contact-integrations'
+import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import AvailableUserSelector from 'components/generic-selectors/available-user-selector'
 import CommunicationTags from 'components/generic-selectors/communication-tags'
@@ -1328,13 +1329,12 @@ import {
   dialerCommunicationMixin,
   dispositionsMixin,
   notificationMixin,
-  sessionCallStatusMixin,
-  selectorMixin
+  selectorMixin,
+  sessionCallStatusMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import * as AgentStatus from '../../constants/agent-status'
-import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
 
 export default {
   name: 'phone',
@@ -2853,7 +2853,7 @@ export default {
     this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
     clearInterval(this.$options.holdInterval)
-    
+
     // Clean up global drag event listeners to prevent errors when component is destroyed
     document.onmouseup = null
     document.onmousemove = null
