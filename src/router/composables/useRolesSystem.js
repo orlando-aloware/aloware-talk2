@@ -9,7 +9,7 @@ const focusedPowerDialerUserIds = isProductionEnvironment
     92429,
     47770
   ]
-  : [76035]
+  : [76035, 76585]
 
 const focusedPowerDialerCompanyIds = isProductionEnvironment
   ? []
@@ -44,5 +44,7 @@ export const setRouterType = (authModule) => {
 
   if (focusedPowerDialerUserIds.includes(authModule.state.profile.id) || focusedPowerDialerCompanyIds.includes(authModule.state.profile.company_id)) {
     authModule.commit('SET_FOCUSED_POWER_DIALER', true)
+  } else {
+    authModule.commit('SET_FOCUSED_POWER_DIALER', false)
   }
 }
