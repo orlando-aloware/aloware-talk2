@@ -1,6 +1,6 @@
 export const DEFAULT_STATE = {
   filter: {
-    date_range: 'Last 7 Days',
+    date_range: 'Last 30 Days',
     from_date: null,
     to_date: null,
     type: 'all',
