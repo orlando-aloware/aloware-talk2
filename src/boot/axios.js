@@ -35,7 +35,7 @@ window.axios.interceptors.request.use(config => {
   config.metadata = { startTime: new Date().getTime() }
   // Set up timer to check duration
   config.metadata.thresholdTimer = setTimeout(() => {
-    // Check if we're in a widget route by checking the current route's meta
+    // Check if we're in a widget mode
     const isWidget = Vue.prototype.$storage?.local?.getItem('isWidget') === 'true'
     if (isWidget) {
       Vue.prototype.$generalNotification('Request is taking longer than expected', 'warning', 3000)
