@@ -683,7 +683,9 @@ export default {
 
         console.log('Reset device', reset)
         if (!reset) {
-          this.device.register()
+          if (this.device.state === WebrtcEvents.UNREGISTERED) {
+            this.device.register()
+          }
         } else {
           this.device.updateToken(this.dialer.token)
         }
