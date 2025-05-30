@@ -157,7 +157,7 @@ export default {
         agentStatusUpdated: null
       },
       // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
-      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY']
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', null]
     }
   },
 
