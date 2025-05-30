@@ -163,7 +163,9 @@ export default {
     this.dialerListeners.reconnectDialer = () => {
       this.getDesktopToken(true)
         .then(() => {
-          this.device.register()
+          if (this.device && this.device.state === 'unregistered') {
+            this.device.register()
+          }
           this.rebootPhone()
         })
     }
