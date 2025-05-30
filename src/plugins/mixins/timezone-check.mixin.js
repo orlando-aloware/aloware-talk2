@@ -15,8 +15,8 @@ export default {
       }
 
       let { timezone, name } = params
-      const openTime = params.calls_notifications_settings.open_time
-      const closeTime = params.calls_notifications_settings.close_time
+      const openTime = params.calls_notifications_open_time || '08:00'
+      const closeTime = params.calls_notifications_close_time || '18:00'
       // check contact has timezone or not
       if (timezone) {
         const contactLocalTime = moment().tz(timezone)

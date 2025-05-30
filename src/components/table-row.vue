@@ -479,7 +479,8 @@ export default {
       const params = {
         timezone: this.contact.timezone,
         name: this.contact.name,
-        calls_notifications_settings: this.$store.state.cache.currentCompany.calls_notifications_settings
+        calls_notifications_open_time: this.$store.state.cache.currentCompany.calls_notifications_open_time,
+        calls_notifications_close_time: this.$store.state.cache.currentCompany.calls_notifications_close_time
       }
 
       this.checkContactTimezone(params, this.makeCall)
