@@ -157,7 +157,7 @@ export default {
         agentStatusUpdated: null
       },
       // Adding the READY state to display a loading indicator during the Dialer's white screen loading phase.
-      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY']
+      isLoadingDialerStatuses: ['GENERATING_TOKEN', 'TOKEN_GENERATED', 'READY', null]
     }
   },
 
@@ -202,6 +202,8 @@ export default {
   },
 
   async mounted () {
+    let probableError = null
+
     try {
       // init of CallingExtensions has to be once and do not repeat when, for instance, login page was called
       // otherwise we lose connection with parent window
@@ -210,6 +212,16 @@ export default {
     } catch (error) {
       // there may iframe issue like "Blocked a frame with origin" but we don't want to break the whole app, it is still usable
       console.log('Error during CallingExtensions init', error)
+      probableError = error
+    }
+
+    if (!this.extensions) {
+      window.Sentry.captureMessage('HubSpot SDK was not initiated', {
+        level: 'warning',
+        extra: {
+          error: probableError
+        }
+      })
     }
 
     CallingExtensionsManager.subscribe(this.callSdkOptions.eventHandlers)
@@ -590,7 +602,7 @@ export default {
       if (this.extensionsVisibility) {
         this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
       } else {
-        this.showAlertCallFinished = false
+        this.showAlertCallFinished = true
         // if hidden, reset HubSpot dial number
         this.setHubspotDialNumber(null)
       }
