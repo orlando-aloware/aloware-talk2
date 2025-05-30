@@ -1,6 +1,6 @@
 <template>
   <div class="full-height">
-    <template v-if="!loading">
+    <template v-if="!isLoading">
       <h1>HubSpot Inbox</h1>
     </template>
     <div v-else class="flex flex-center full-height">
@@ -14,12 +14,12 @@ import { aclMixin } from 'src/plugins/mixins'
 import { mapState, mapActions } from 'vuex'
 
 export default {
-  name: 'HubSpot Inbox',
+  name: 'HubSpotInboxConnect',
   mixins: [aclMixin],
 
   data () {
     return {
-      loading: true
+      isLoading: false
     }
   },
 
@@ -32,13 +32,13 @@ export default {
 
     async handleAuthRedirect () {
       if (this.authenticated) {
-        this.loading = false
         return
       }
 
+      this.isLoading = true
+
       try {
         await this.check()
-        this.loading = false
       } catch (error) {
         this.$router.push({
           name: 'Login',
@@ -46,7 +46,13 @@ export default {
             redirect: this.$route.fullPath
           }
         })
+      } finally {
+        this.isLoading = false
       }
+    },
+
+    async getSmsCampaigns () {
+
     }
   },
 

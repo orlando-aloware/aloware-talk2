@@ -83,12 +83,12 @@ export default {
       })
     },
 
-    async getLifecycleStages () {
-      return talk2Api.V1.integrations.getLifecycleStages()
+    async getHubspotLifecycleStages () {
+      return talk2Api.V1.integrations.hubspot.getLifecycleStages()
     },
 
-    async getContactCompanyAssociation (contactId) {
-      return talk2Api.V1.integrations.getContactCompanyAssociation(contactId)
+    async getHubspotContactCompanyAssociation (contactId) {
+      return talk2Api.V1.integrations.hubspot.getContactCompanyAssociation(contactId)
     }
   }
 }

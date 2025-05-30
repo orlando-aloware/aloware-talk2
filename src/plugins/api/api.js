@@ -397,26 +397,26 @@ const talk2Api = {
           }
 
           return response
+        },
+
+        /**
+         * Get the available lifecycle stages
+         *
+         * @returns Promise<axios.AxiosResponse<{success: boolean, data: {lifecycle_stages: Object, can_update_lifecycle_stages: boolean}}>>
+         */
+        async getLifecycleStages () {
+          return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
+        },
+
+        /**
+         * Get the company association of the contact
+         *
+         * @param contactId
+         * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
+         */
+        getContactCompanyAssociation (contactId) {
+          return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
         }
-      },
-
-      /**
-       * Get the available lifecycle stages
-       *
-       * @returns Promise<axios.AxiosResponse<{success: boolean, data: {lifecycle_stages: Object, can_update_lifecycle_stages: boolean}}>>
-       */
-      async getLifecycleStages () {
-        return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
-      },
-
-      /**
-       * Get the company association of the contact
-       *
-       * @param contactId
-       * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
-       */
-      getContactCompanyAssociation (contactId) {
-        return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
       },
 
       zoho: {

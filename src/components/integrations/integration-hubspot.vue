@@ -367,7 +367,7 @@ export default {
       this.isLoadingLifecycleStages = true
 
       try {
-        const response = await this.getLifecycleStages()
+        const response = await this.getHubspotLifecycleStages()
 
         // Create a new object with all the current properties and the new ones
         // This ensures Vue's reactivity system detects the change
@@ -393,7 +393,7 @@ export default {
       this.isLoadingCompanyAssociation = true
 
       try {
-        const response = await this.getContactCompanyAssociation(contactId)
+        const response = await this.getHubspotContactCompanyAssociation(contactId)
 
         // Create a new object with all the current properties and the new ones
         // This ensures Vue's reactivity system detects the change
