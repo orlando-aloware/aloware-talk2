@@ -2853,6 +2853,10 @@ export default {
     this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
     clearInterval(this.$options.holdInterval)
+    
+    // Clean up global drag event listeners to prevent errors when component is destroyed
+    document.onmouseup = null
+    document.onmousemove = null
   }
 }
 </script>
