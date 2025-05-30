@@ -1,13 +1,13 @@
+import { get } from 'lodash'
+import * as storage from 'src/plugins/helpers/storage'
 import Vue from 'vue'
+import VueGtagEsm from 'vue-gtag'
 import VueRouter from 'vue-router'
 import routes from './routes'
-import VueGtagEsm from 'vue-gtag'
-import * as storage from 'src/plugins/helpers/storage'
-import { get } from 'lodash'
 
 // Override Vue Router's push method to handle navigation duplications gracefully
 const originalPush = VueRouter.prototype.push
-VueRouter.prototype.push = function push(location) {
+VueRouter.prototype.push = function push (location) {
   return originalPush.call(this, location).catch(err => {
     // Only ignore NavigationDuplicated errors, rethrow others
     if (err.name !== 'NavigationDuplicated') {
