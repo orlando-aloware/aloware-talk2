@@ -30,28 +30,15 @@ if (storage.local.getItem('api_token')) {
   window.axios.defaults.headers.common['Authorization'] = 'Bearer ' + storage.local.getItem('api_token')
 }
 
-// Add request interceptor to track request start time and set up threshold warning
+// Add request interceptor to track request start time
 window.axios.interceptors.request.use(config => {
   config.metadata = { startTime: new Date().getTime() }
-  // Set up timer to check duration
-  config.metadata.thresholdTimer = setTimeout(() => {
-    // Check if we're in a widget mode
-    const isWidget = Vue.prototype.$storage?.local?.getItem('isWidget') === 'true'
-    if (isWidget) {
-      Vue.prototype.$generalNotification('Request is taking longer than expected', 'warning', 3000)
-    }
-  }, SLOW_REQUEST_THRESHOLD_MS)
 
   return config
 })
 
 // Add response interceptor to check for slow requests
 window.axios.interceptors.response.use(response => {
-  // Clear the threshold timer
-  if (response?.config?.metadata?.thresholdTimer) {
-    clearTimeout(response.config.metadata.thresholdTimer)
-  }
-
   // Check for slow requests in success cases
   if (response?.config?.metadata?.startTime) {
     const endTime = new Date().getTime()
@@ -72,11 +59,6 @@ window.axios.interceptors.response.use(response => {
 
   return response
 }, error => {
-  // Clear the threshold timer in case of error
-  if (error?.config?.metadata?.thresholdTimer) {
-    clearTimeout(error.config.metadata.thresholdTimer)
-  }
-
   if (error.response) {
     switch (error.response.status) {
       // 401

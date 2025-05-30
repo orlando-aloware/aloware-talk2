@@ -845,6 +845,3 @@ Vue.prototype.$electronLog = (value) => {
   log.transports.file.maxSize = 5 * 1024 * 1024
   log.info(value)
 }
-
-// Add storage to Vue prototype
-Vue.prototype.$storage = storage
