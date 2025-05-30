@@ -1,5 +1,5 @@
 <template>
-  <b-card class="integrations-wrapper border-0" v-if="!isEmpty(reservations)" data-testid="contact-reservations-wrapper">
+  <b-card class="integrations-wrapper border-0" v-if="!isEmpty(reservations?.reservations)" data-testid="contact-reservations-wrapper">
     <h4 class="mb-2">
       Guesty Reservations
     </h4>
