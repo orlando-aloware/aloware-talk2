@@ -355,8 +355,13 @@ export default {
       await this.fetchInboxes(this.search)
 
       if (this.activeInboxId) {
-        await this.onInboxSelect(this.activeInboxId, null, true)
+        this.onInboxSelect(this.activeInboxId, null, true)
       }
+    },
+
+    checkUrlInboxIdPermission () {
+      const urlInboxId = this.$route.params.inboxId ? parseInt(this.$route.params.inboxId) : null
+      return !urlInboxId || this.findInboxById(urlInboxId)
     }
   },
 
@@ -367,6 +372,11 @@ export default {
 
     await this.fetchInboxes()
     this.finishedInitialLoad = true
+
+    if (!this.checkUrlInboxIdPermission()) {
+      this.$generalNotification('You don\'t have access to this inbox.', 'error')
+      return this.$router.replace({ name: TEAMINBOXES_MENU_TITLE })
+    }
 
     if (this.inboxes.length) {
       const inboxToSelect = this.determineInboxToSelect()
