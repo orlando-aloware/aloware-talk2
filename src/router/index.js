@@ -5,6 +5,19 @@ import VueGtagEsm from 'vue-gtag'
 import * as storage from 'src/plugins/helpers/storage'
 import { get } from 'lodash'
 
+// Override Vue Router's push method to handle navigation duplications gracefully
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => {
+    // Only ignore NavigationDuplicated errors, rethrow others
+    if (err.name !== 'NavigationDuplicated') {
+      throw err
+    }
+    // Return a resolved promise for the current location
+    return Promise.resolve(this.currentRoute)
+  })
+}
+
 Vue.use(VueRouter)
 
 // This listener will execute before router.beforeEach only if registered
