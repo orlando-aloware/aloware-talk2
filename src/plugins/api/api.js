@@ -416,6 +416,14 @@ const talk2Api = {
          */
         getContactCompanyAssociation (contactId) {
           return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
+        },
+
+        /**
+         * Get HubSpot Inbox Configuration Data
+         * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
+         */
+        getInboxSetupData () {
+          return window.axios.get(`${suffixV1}/integrations/hubspot/inbox`)
         }
       },
 
