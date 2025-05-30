@@ -16,6 +16,12 @@
               data-testid="contact-reservations-link"
               :href="reservation.reservation_link">
         <q-card-section data-testid="contact-reservations-card-section">
+          <div class="text-subtitle2" data-testid="contact-reservations-number">
+            Reservation number:
+            <div class='text-caption'>
+              {{ reservation.reservation_id }}
+            </div>
+          </div>
           <div class="text-subtitle2" data-testid="contact-reservations-confirmation-code">
             Confirmation Code:
             <div class='text-caption'>
