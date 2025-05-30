@@ -497,6 +497,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns']),
+    ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', [
       'isBroadcastsLoading'
     ]),
@@ -826,14 +827,27 @@ export default {
     async showBroadcastActivity (broadcasts) {
       this.contextMenuOpen = false
       this.popupOpen = false
+      const broadcastIds = broadcasts.map(broadcast => broadcast.id)
+
+      if (this.currentCompany?.enable_legacy_inbox) {
+        return this.$router.push({
+          name: 'Inbox Channel',
+          params: {
+            channel: 'all-communications'
+          },
+          query: {
+            broadcastIds
+          }
+        })
+      }
 
       this.$router.push({
-        name: 'Inbox Channel',
-        params: {
-          channel: 'all-communications'
-        },
+        path: '/communications/all',
         query: {
-          broadcastIds: broadcasts.map(broadcast => broadcast.id)
+          to_date: 'null',
+          from_date: 'null',
+          date_range: 'All Time',
+          broadcasts: broadcastIds.join(',')
         }
       })
     },
