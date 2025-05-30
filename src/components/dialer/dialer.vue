@@ -4,6 +4,7 @@
 
 <script>
 import _ from 'lodash'
+import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
@@ -20,11 +21,10 @@ import {
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
+import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry-types'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
-import talk2Api from 'src/plugins/api/api'
-import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry-types'
 
 export default {
   name: 'dialer',
