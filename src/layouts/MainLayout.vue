@@ -2951,7 +2951,8 @@ export default {
       }
 
       if (!val && this.$route.name === 'Phone') {
-        this.$router.replace({ name: 'Inbox' })
+        const name = this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE
+        this.$router.replace({ name })
       }
 
       if (val) {

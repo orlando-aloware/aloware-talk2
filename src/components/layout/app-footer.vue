@@ -12,6 +12,7 @@
     >
 
       <app-footer-nav-link
+        v-if="hasCompanyLegacyInboxEnabled"
         :isActive="tab === 'inbox'"
         :title="INBOXES_MENU_TITLE" :to="{name: 'Inbox'}"
       >

@@ -19,6 +19,7 @@
     </div>
 
     <app-sidebar-nav-link
+      v-if="hasCompanyLegacyInboxEnabled"
       :isActive="isActive('Inbox')"
       :isSidebarExpanded="isSidebarExpanded"
       :title="INBOXES_MENU_TITLE"

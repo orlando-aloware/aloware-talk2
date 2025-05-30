@@ -110,7 +110,18 @@ export default {
           this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
         )
       } else {
-        this.$router.push({ name: 'Inbox' })
+        const { id: contactId, communicationId } = this.$route.params
+
+        if (contactId) {
+          const contactRoute = !communicationId
+            ? `/contacts/${contactId}`
+            : `/contacts/${contactId}/communications/${communicationId}`
+
+          this.$router.replace(contactRoute)
+          return
+        }
+
+        this.$router.replace({ name: 'Inbox' })
       }
     }
     // Load team inbox campaigns
@@ -142,6 +153,15 @@ export default {
       // Only valid for team inbox, which are waiting for the backend to process the event
       this.$VueEvent.fire('mark_contact_communications_all_as_read', contact)
       this.$VueEvent.fire('contact_updated', contact)
+    }
+  },
+
+  watch: {
+    hasCompanyTeamInboxEnabled (enabled) {
+      // Handle live updates when team inbox is disabled
+      if (!enabled) {
+        this.$router.replace({ name: 'Inbox' })
+      }
     }
   },
 
