@@ -49,6 +49,7 @@ export default {
 
   computed: {
     ...mapState(['broadcasts']),
+    ...mapState('cache', ['currentCompany']),
 
     broadcast () {
       return this.broadcasts.find(broadcast => broadcast.id === this.value) || {}
@@ -59,13 +60,27 @@ export default {
     },
 
     broadcastActivityParams () {
+      const broadcastIds = this.value ? [this.value] : []
+
+      if (this.currentCompany?.enable_legacy_inbox) {
+        return {
+          name: 'Inbox Channel',
+          params: {
+            channel: 'all-communications'
+          },
+          query: {
+            broadcastIds
+          }
+        }
+      }
+
       return {
-        name: 'Inbox Channel',
-        params: {
-          channel: 'all-communications'
-        },
+        path: '/communications/all',
         query: {
-          broadcastIds: this.value
+          to_date: 'null',
+          from_date: 'null',
+          date_range: 'All Time',
+          broadcasts: broadcastIds.join(',')
         }
       }
     }
