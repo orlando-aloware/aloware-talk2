@@ -424,6 +424,15 @@ const talk2Api = {
          */
         getInboxSetupData () {
           return window.axios.get(`${suffixV1}/integrations/hubspot/inbox`)
+        },
+
+        /**
+         * Connect HubSpot Inbox to a company
+         * @param params
+         * @returns {Promise<axios.AxiosResponse<any>>}
+         */
+        connectInbox (params) {
+          return window.axios.post(`${suffixV1}/integrations/hubspot/inbox/connect`, params)
         }
       },
 
