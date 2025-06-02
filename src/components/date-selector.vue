@@ -14,6 +14,7 @@
                               :no-value-to-custom-elem="noValueToCustomElem"
                               :no-clear-button="noClearButton"
                               :only-time="onlyTime"
+                              :disabled="disabled"
                               data-testid="date-select-time-picker"
                               no-keyboard
                               v-model="date"
@@ -101,6 +102,10 @@ export default {
       default: false
     },
     onlyTime: {
+      type: Boolean,
+      default: false
+    },
+    disabled: {
       type: Boolean,
       default: false
     }

@@ -1,7 +1,7 @@
 import _ from 'lodash'
-import * as LrnTypes from '../../constants/lrn-types'
 import * as ContactTaskStatus from '../../constants/contact-task-status'
 import * as InboxTaskStatus from '../../constants/inbox-task-status'
+import * as LrnTypes from '../../constants/lrn-types'
 
 /**
  * Fix count format to have k suffix
@@ -145,6 +145,8 @@ const fixLrnType = (lrnType) => {
         return 'Other'
       case LrnTypes.LRN_NOT_PERFORMED:
         return 'LRN not performed'
+      case LrnTypes.LRN_NOT_AVAILABLE:
+        return 'LRN not available'
       default:
         return ''
     }

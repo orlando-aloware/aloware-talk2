@@ -19,7 +19,7 @@
                        target="dialer-popover"
                        :show.sync="blockTooltipHandler.show"
                        :task="blockTooltipHandler.task"
-                       :message="disabledComplianceMessage"
+                       :message="getMessagingBlocked(selectedCampaign)"
                        v-if="isBlockTooltipPopoverEnabled">
         </block-tooltip>
         <b-tab title="Call"
@@ -209,11 +209,11 @@ import {
   contactMixin,
   contactV2AttributesMixin,
   kycMixin,
-  selectorMixin,
-  timezoneCheckMixin,
-  visibilityMixin,
   outboundCallingModesMixin,
-  settingsMixin
+  selectorMixin,
+  settingsMixin,
+  timezoneCheckMixin,
+  visibilityMixin
 } from 'src/plugins/mixins'
 import * as AgentStatus from 'src/constants/agent-status'
 import useContactApi from 'src/shared/composables/use-contact-api.composable'
@@ -339,11 +339,15 @@ export default {
     isBlockTooltipPopoverEnabled () {
       let selectedCampaign = this.campaigns.find(campaign => campaign.id === this.selectedCampaignId)
 
+      if (this.mode !== 'text') {
+        return false
+      }
+
       if (!this.shouldAllowSmsTraffic(selectedCampaign)) {
         return true
       }
 
-      if (this.mode === 'text' && this.disabledComplianceMessage) {
+      if (this.disabledComplianceMessage) {
         return true
       }
 
@@ -461,8 +465,7 @@ export default {
           this.contactTimezone = data?.timezone
           this.lastContactCampaignId = data?.last_campaign_id
           this.loadingContact = false
-        }).catch((err) => {
-          console.error(err)
+        }).catch(_ => {
           this.loadingContact = false
         })
       }
@@ -537,11 +540,13 @@ export default {
     },
 
     onCall () {
-      let contact = {
+      const params = {
         timezone: this.contactTimezone,
-        name: this.contactName
+        name: this.contactName,
+        calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
+        calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
       }
-      this.checkContactTimezone(contact, this.makeCall)
+      this.checkContactTimezone(params, this.makeCall)
     },
 
     makeCall () {

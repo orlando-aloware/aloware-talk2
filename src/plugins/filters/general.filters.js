@@ -514,10 +514,16 @@ const fixPhone = (
     }
   }
 
-  const locale = window.guessLocale(phoneNumber)
+  let locale = window.guessLocale(phoneNumber)
 
   if (!locale) {
-    return force ? '-' : false
+    // Phone numbers with +1555 are allowed, but nothing else
+    if (!phoneNumber.startsWith('+1555')) {
+      return force ? '-' : false
+    }
+
+    // +1555 numbers are allowed
+    locale = 'US'
   }
 
   const localesUS = ['US', 'CA']

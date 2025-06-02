@@ -1,8 +1,8 @@
 import _ from 'lodash'
+import * as storage from 'src/plugins/helpers/storage'
+import { mapActions, mapState } from 'vuex'
 import * as Roles from '../../constants/roles'
 import goBackMixin from './goback.mixin'
-import { mapActions, mapState } from 'vuex'
-import * as storage from 'src/plugins/helpers/storage'
 
 export default _.merge({
   methods: {
@@ -169,10 +169,6 @@ export default _.merge({
       }
     },
 
-    shouldShowUpgradeNow () {
-      return !this.isSimpSocial()
-    },
-
     hideMenu () {
       if (this.$refs && this.$refs.menu) {
         this.$refs.menu.hide()
@@ -270,10 +266,6 @@ export default _.merge({
         return false
       }
 
-      if (this.currentCompany && this.currentCompany.reseller_id === 357 && !this.hasRole('Billing Admin')) {
-        return false
-      }
-
       return true
     },
 
@@ -296,7 +288,7 @@ export default _.merge({
      * @return {boolean}
      */
     shouldShowAloAi () {
-      if (this.currentCompany.aloai_enabled) {
+      if (this.currentCompany.aloai_text_agents_enabled || this.currentCompany.aloai_voice_inbound_agents_enabled || this.currentCompany.aloai_voice_outbound_agents_enabled) {
         return true
       }
 

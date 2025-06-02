@@ -144,19 +144,24 @@
                 </div>
             </div>
             <div id="message-sms-input">
-              <q-input class="q-input-composer"
-                       borderless
-                       autogrow
-                       ref="smsMessageBody"
-                       input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
-                       type="textarea"
-                       placeholder="Type your message"
-                       v-model="messageComposer.sms.body"
-                       data-testid="sms-message-body-input"
-                       :disable="isSendTextInputDisabled"
-                       @input="imposeCharactersLimit"
-                       @keydown="onKeyDown">
-              </q-input>
+                <q-input class="q-input-composer"
+                         borderless
+                         autogrow
+                         ref="smsMessageBody"
+                         input-class="q-input-pl-0 q-input-pr-0 pt-0 pb-0"
+                         type="textarea"
+                         placeholder="Type your message"
+                         v-model="messageComposer.sms.body"
+                         data-testid="sms-message-body-input"
+                         :disable="isSendTextInputDisabled"
+                         @input="imposeCharactersLimit"
+                         @keydown="onKeyDown">
+                </q-input>
+                <q-tooltip anchor="top middle"
+                           self="center middle"
+                           v-if="isSendTextInputDisabled">
+                  {{ getSmsDisabledReason }}
+                </q-tooltip>
             </div>
 
             <q-dialog v-model="urlShortenerDialog"
@@ -272,12 +277,13 @@ import ApplicationPlaceholder from 'components/message-composer/file-placeholder
 import AudioPlaceholder from 'components/message-composer/file-placeholders/audio-placeholder'
 import MessageComposerOptions from 'components/message-composer/message-composer-options'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { kycMixin } from 'src/plugins/mixins'
+import { kycMixin, selectorMixin } from 'src/plugins/mixins'
 export default {
   name: 'message-composer-sms',
 
   mixins: [
-    kycMixin
+    kycMixin,
+    selectorMixin
   ],
 
   components: {
@@ -387,6 +393,20 @@ export default {
         return true
       }
       return this.isTCPAApprovedTextNotAuthorized || this.generatingShortUrl || this.isDisabled
+    },
+
+    getSmsDisabledReason () {
+      if (this.isTCPAApprovedTextNotAuthorized) {
+        return 'Contact was non-TCPA Approved.'
+      }
+      if (this.generatingShortUrl) {
+        return 'Please wait while generating short URL.'
+      }
+      if (this.isDisabled) {
+        return this.disabledMessage || 'Messaging is currently disabled.'
+      }
+
+      return this.getMessagingBlocked(this.selectedLine)
     }
   },
 

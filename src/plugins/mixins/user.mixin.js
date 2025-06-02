@@ -1,5 +1,6 @@
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../../constants/answer-types'
+import * as User from '../../constants/user'
 import { get, isEmpty } from 'lodash'
 import * as storage from 'src/plugins/helpers/storage'
 
@@ -26,8 +27,16 @@ export default {
       return this.isCompanyPartOfAlowareDemoCompanies(this.currentCompany?.id)
     },
 
-    isTeamInboxDemoCompany () {
-      return this.isCompanyPartOfTeamInboxDemoCompanies(this.currentCompany?.id)
+    isProduction () {
+      return storage.local.getItem('env') === 'production'
+    },
+
+    hasCompanyTeamInboxEnabled () {
+      return this.currentCompany?.team_inbox_enabled === true
+    },
+
+    hasCompanyLegacyInboxEnabled () {
+      return this.currentCompany?.enable_legacy_inbox === true
     },
 
     shouldSeeExperimentalAiFeatures () {
@@ -60,6 +69,10 @@ export default {
         id: id,
         name: ''
       }
+    },
+
+    isAiAgentUser (user) {
+      return user && user.type === User.TYPE_AI_AGENT
     },
 
     getUserName (user) {
@@ -107,10 +120,6 @@ export default {
       return storage.local.getItem('aloware_demo_companies') && storage.local.getItem('aloware_demo_companies').split(',').includes(String(companyId))
     },
 
-    isCompanyPartOfTeamInboxDemoCompanies (companyId) {
-      return storage.local.getItem('aloware_team_inbox_demo_companies') && storage.local.getItem('aloware_team_inbox_demo_companies').split(',').includes(String(companyId))
-    },
-
     // Temporary function to check if company is part of new inbox filters
     // should be removed once all companies are migrated to new inbox filters
     isCompanyPartOfNewInboxFilters (companyId) {
@@ -120,10 +129,6 @@ export default {
       // const demoCompanies = storage.local.getItem('aloware_demo_companies') ? storage.local.getItem('aloware_demo_companies').split(',') : []
       // demoCompanies.push('568') // Quill & Arrow account
       // return demoCompanies.includes(String(companyId))
-    },
-
-    isCompanyPartOfCustomEdgeLocations (companyId) {
-      return storage.local.getItem('custom_edge_location_companies') && storage.local.getItem('custom_edge_location_companies').split(',').includes(String(companyId))
     },
 
     // Filters users by excluding those with read-only access and a single/undefined role,

@@ -115,12 +115,10 @@
             <li>
               To avoid compliance risks, we recommend reviewing your contact
               lists before importing them.
-              <span v-if="!isSimpSocial">
-                For more information, refer to our
-                <a href="https://support.aloware.com/en/articles/9032126-understanding-the-dnc-do-not-call-list" target="_blank">
-                  DNC Knowledge Base article
-                </a>.
-              </span>
+              For more information, refer to our
+              <a href="https://support.aloware.com/en/articles/9032126-understanding-the-dnc-do-not-call-list" target="_blank">
+                DNC Knowledge Base article
+              </a>.
             </li>
           </ul>
         </div>
@@ -430,7 +428,6 @@ import { mapGetters } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
   aclMixin,
-  simpsocialMixin,
   selectorMixin,
   classicMixin,
   formValidationMixin,
@@ -446,7 +443,6 @@ import { STEPS, contactFields } from 'src/constants/lists/import-contacts-modal'
 export default {
   mixins: [
     aclMixin,
-    simpsocialMixin,
     selectorMixin,
     classicMixin,
     formValidationMixin,
@@ -555,7 +551,7 @@ export default {
     },
 
     apiUrl () {
-      return this.getClassicURL(this.isSimpSocial)
+      return this.getClassicURL()
     }
   },
 

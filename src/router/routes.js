@@ -3,7 +3,7 @@ const Login = () => import('pages/Login.vue')
 const ForgotPassword = () => import('pages/ForgotPassword.vue')
 const ResetPassword = () => import('pages/ResetPassword.vue')
 const Inbox = () => import('pages/Inbox.vue')
-const EInbox = () => import('pages/EInbox.vue')
+const TeamInbox = () => import('pages/TeamInbox.vue')
 const CommunicationsView = () => import('src/pages/CommunicationsView.vue')
 const Contact = () => import('src/pages/contacts/Contact.vue')
 const Contacts = () => import('src/pages/contacts/Contacts.vue')
@@ -28,10 +28,6 @@ const Communication = () => import('pages/Communication.vue')
 const Phone = () => import('pages/Phone.vue')
 const Error404 = () => import('pages/Error404.vue')
 const Messenger = () => import('pages/Messenger.vue')
-const DMSEquity = () => import('pages/DMSEquity.vue')
-const DigitalLeadWar = () => import('pages/DigitalLeadWar.vue')
-const EmailBlast = () => import('pages/EmailBlast.vue')
-const SoldReport = () => import('pages/SoldReport.vue')
 const Broadcasts = () => import('pages/broadcast/Broadcasts.vue')
 const BroadcastAdd = () => import('pages/broadcast/BroadcastAdd.vue')
 const AccountRegistration = () => import('pages/account-registration/AccountRegistration.vue')
@@ -56,12 +52,19 @@ export const COMUNICATIONS_CHANNELS_TASKS_STATUS_ROUTE_NAME = 'Communications Ch
 
 // Update the constants at the top
 export const INBOXES_MENU_TITLE = 'Inboxes'
-export const EINBOXES_MENU_TITLE = 'Team Inboxes'
-export const EINBOXES_MENU_ITEMS_TITLE = 'Team Inboxes Items'
-export const EINBOXES_MENU_COMMUNICATIONS_TITLE = 'Team Inboxes Communications'
+export const TEAMINBOXES_MENU_TITLE = 'Team Inboxes'
+export const TEAMINBOXES_MENU_ITEMS_TITLE = 'Team Inboxes Items'
+export const TEAMINBOXES_MENU_COMMUNICATIONS_TITLE = 'Team Inboxes Communications'
 export const NEW_INBOX_MENU_TITLE = 'New Inbox'
 export const COMMUNICATIONS_MENU_TITLE = 'Communications'
 export const COMMUNICATIONS_MENU_TITLE_MOBILE = 'Comms.'
+
+export const navigationErrorHandler = (err) => {
+  if (err.name !== 'NavigationDuplicated') {
+    // ignore NavigationDuplicated errors when updating query params
+    console.error(err)
+  }
+}
 
 const routes = [
   {
@@ -96,28 +99,37 @@ const routes = [
       },
       {
         path: 'team-inboxes',
-        name: EINBOXES_MENU_TITLE,
-        component: EInbox,
+        name: TEAMINBOXES_MENU_TITLE,
+        component: TeamInbox,
         meta: {
-          title: EINBOXES_MENU_TITLE,
+          title: TEAMINBOXES_MENU_TITLE,
           isInbox: true
         },
         children: [
           {
             path: ':inboxId',
-            name: EINBOXES_MENU_ITEMS_TITLE,
-            component: EInbox,
+            name: TEAMINBOXES_MENU_ITEMS_TITLE,
+            component: TeamInbox,
             meta: {
-              title: EINBOXES_MENU_TITLE,
+              title: TEAMINBOXES_MENU_TITLE,
               isInbox: true
             }
           },
           {
             path: ':inboxId/contacts/:id/communications',
-            name: EINBOXES_MENU_COMMUNICATIONS_TITLE,
+            name: TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
             component: Contact,
             meta: {
-              title: EINBOXES_MENU_TITLE,
+              title: TEAMINBOXES_MENU_TITLE,
+              isInbox: true
+            }
+          },
+          {
+            path: ':inboxId/contacts/:id/communications/:communicationId',
+            name: TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
+            component: Contact,
+            meta: {
+              title: TEAMINBOXES_MENU_TITLE,
               isInbox: true
             }
           }
@@ -590,11 +602,6 @@ const routes = [
         component: Account
       },
       {
-        path: 'ring-group-activity/:ringGroupId',
-        name: 'Ring Group Activity',
-        component: Account
-      },
-      {
         path: 'sequence-activity/:sequenceId',
         name: 'Sequence Activity',
         component: Account
@@ -632,35 +639,6 @@ const routes = [
           title: 'Messenger'
         },
         component: Messenger
-      },
-      {
-        path: 'dms-equity',
-        name: 'DMS Equity',
-        meta: {
-          title: 'DMS Equity'
-        },
-        component: DMSEquity
-      },
-      {
-        path: 'digital-lead',
-        name: 'Digital Lead War',
-        meta: {
-          title: 'Digital Lead War'
-        },
-        component: DigitalLeadWar
-      },
-      {
-        path: 'email-blast/:id',
-        name: 'Email Blast',
-        meta: {
-          title: 'Email'
-        },
-        component: EmailBlast
-      },
-      {
-        path: 'sold-report',
-        name: 'Sold Report',
-        component: SoldReport
       },
       {
         path: '/account-registration/:verification_token?',

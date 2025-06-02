@@ -66,16 +66,29 @@ export default {
   },
 
   methods: {
-    getIntegrationData (contact, integrationName, dialerMode) {
+    getIntegrationData (contact, integrationName, dialerMode, fromTeamInbox) {
+      const params = {
+        integration_name: integrationName,
+        dialer_mode: dialerMode ? 1 : 0,
+        force: true,
+        with_duplicates: true
+      }
+
+      if (fromTeamInbox) {
+        params.from_team_inbox = fromTeamInbox
+      }
+
       return talk2Api.V1.contact.getIntegrationData(contact.id, {
-        params: {
-          integration_name: integrationName,
-          dialer_mode: dialerMode ? 1 : 0,
-          force: true,
-          with_duplicates: true,
-          with_lifecycle_stages: true
-        }
+        params
       })
+    },
+
+    async getLifecycleStages () {
+      return talk2Api.V1.integrations.getLifecycleStages()
+    },
+
+    async getContactCompanyAssociation (contactId) {
+      return talk2Api.V1.integrations.getContactCompanyAssociation(contactId)
     }
   }
 }

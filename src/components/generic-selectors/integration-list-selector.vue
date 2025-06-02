@@ -239,11 +239,12 @@ export default {
       }).then(response => {
         const result = response.data
         if (offset === 0) {
-          this.options = result
+          this.options = result.lists
         } else {
-          this.options.push(...result)
+          this.options.push(...result.lists)
         }
-        this.hasMore = result.length >= 25
+        this.hasMore = result.hasMore
+        this.limit = result.lists.length
         this.isLoading = false
       }).catch((err) => {
         this.isLoading = false

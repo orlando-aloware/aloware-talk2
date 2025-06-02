@@ -152,7 +152,7 @@
                 size="sm"
                 variant="dark"
                 tabindex="0"
-                :disabled="isAddingNote"
+                :disabled="isAddingNote || isReadOnly"
                 @click="createNote"
               >
                 <q-spinner-bars
@@ -188,7 +188,7 @@
               variant="warning"
               tabindex="0"
               block
-              :disabled="isGenerating"
+              :disabled="isGenerating || isReadOnly"
               @click="handleRegenerate"
             >
               {{ !isGenerating ? '🧙‍♂️️🪄 Regenerate Insights' : '' }}
@@ -373,6 +373,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -448,6 +452,12 @@ export default {
         }
       }).then(response => {
         this.insights = response.data
+        // Filter out key_topics that are objects or empty
+        if (this.insights?.summary?.key_topics && Array.isArray(this.insights.summary.key_topics)) {
+          this.insights.summary.key_topics = this.insights.summary.key_topics.filter(topic =>
+            typeof topic === 'string' && topic.trim() !== ''
+          )
+        }
       }).finally(() => {
         this.insightsLoaded = true
       })
@@ -471,7 +481,7 @@ export default {
      * @returns {string}
      */
     parseMarkdown (text) {
-      if (!text) return ''
+      if (typeof text !== 'string') return ''
       let renderer = new marked.Renderer()
       renderer.link = function (href, title, text) {
         var link = marked.Renderer.prototype.link.apply(this, arguments)

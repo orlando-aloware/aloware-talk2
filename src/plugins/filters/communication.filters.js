@@ -1,10 +1,10 @@
+import * as CommunicationResolution from 'src/constants/communication-resolution'
+import { ALL_CREATOR_TYPES } from 'src/constants/creator-types'
+import { LRN_NOT_AVAILABLE, LRN_NOT_PERFORMED, LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS } from 'src/constants/lrn-types'
+import * as CallbackStatus from '../../constants/callback-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
-import * as CallbackStatus from '../../constants/callback-status'
-import * as CommunicationResolution from 'src/constants/communication-resolution'
 import * as CommunicationTransferTypes from '../../constants/communication-transfer-types'
-import { LRN_TYPE_LANDLINE, LRN_TYPE_OTHER, LRN_TYPE_VOIP, LRN_TYPE_WIRELESS, LRN_NOT_PERFORMED } from 'src/constants/lrn-types'
-import { ALL_CREATOR_TYPES } from 'src/constants/creator-types'
 
 /**
  * Fix comm direction
@@ -210,6 +210,8 @@ const fixLrnTypeBadge = (type) => {
       return 'blue-3'
     case LRN_TYPE_VOIP:
       return 'purple-2'
+    case LRN_NOT_AVAILABLE:
+      return 'red'
     case LRN_TYPE_OTHER:
     default:
       return 'green-3'

@@ -1,13 +1,19 @@
 <template>
   <div class="contact-activity-container w-100"
-       :class="{ 'h-93': isTrialBannerVisible }">
+       :class="{
+         'h-93': isTrialBannerVisible,
+         'inbox-activity-container-wrapper': teamInbox
+       }">
     <contact-activities-header
+      data-testid="contact-activities-header"
       :label="contactName"
       :hasUnreads="hasUnreads"
       :unreadCount="unreadCount"
       :contact="contact"
       :enable-export="enableExport"
-      data-testid="contact-activities-header"
+      :team-inbox-id="teamInboxId"
+      :from-team-inbox="fromTeamInbox"
+      :is-read-only="isReadOnly"
       @markAllAsRead="markAllAsRead"
       @toggleDrawer="$emit('toggleDrawer')"
       @toggleDetails="$emit('toggleDetails')"/>
@@ -33,7 +39,9 @@
                               :ref="(communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id"
                               :communication="communication"
                               :contact="contact"
-                              :campaignId="campaignId">
+                              :campaignId="campaignId"
+                              :team-inbox-id="teamInboxId"
+                              :from-team-inbox="fromTeamInbox">
             </contact-activity>
             <contact-activity v-for="(communication, index) in sendingCommunications"
                               data-testid="contact-activities-activity-2"
@@ -41,7 +49,9 @@
                               ref="communication-0"
                               :communication="communication"
                               :contact="contact"
-                              :campaignId="communication.campaignId">
+                              :campaignId="communication.campaignId"
+                              :team-inbox-id="teamInboxId"
+                              :from-team-inbox="fromTeamInbox">
             </contact-activity>
           </div>
         </div>
@@ -59,6 +69,8 @@
 
     <div class="composer-container-wrapper">
       <message-composer :campaignId="campaignId"
+                        :team-inbox-id="teamInboxId"
+                        :from-team-inbox="fromTeamInbox"
                         data-testid="contact-activities-message-composer"
                         @message-sent="setSendingCommunication">
       </message-composer>
@@ -73,6 +85,7 @@ import ContactActivitiesHeader from 'src/components/contacts/contact-activities-
 import ContactActivity from 'src/components/contacts/contact-activity'
 import MessageComposer from 'src/components/message-composer/message-composer'
 import * as CommunicationTypes from 'src/constants/communication-types'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-activities',
@@ -81,6 +94,9 @@ export default {
     ContactActivitiesHeader,
     ContactActivity
   },
+  mixins: [
+    teamInboxPropsMixin
+  ],
   props: {
     communications: {
       required: true,
@@ -97,6 +113,14 @@ export default {
     enableExport: {
       type: Boolean,
       default: true
+    },
+    teamInboxUnreadCount: {
+      type: Number,
+      default: 0
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -123,6 +147,7 @@ export default {
   computed: {
     ...mapState(['isTrialBannerVisible', 'isWidget']),
     ...mapGetters('contacts', ['contact']),
+
     contactName () {
       if (this.contact && this.contact.name) {
         return _.get(this.contact, 'name', '')
@@ -135,12 +160,18 @@ export default {
       return 'No Name'
     },
     hasUnreads () {
+      if (this.teamInboxId) {
+        return this.teamInboxUnreadCount > 0
+      }
+
       return this.contact.unread_texts_count > 0 ||
         this.contact.unread_missed_calls_count > 0 ||
         this.contact.unread_voicemails_count > 0
     },
     unreadCount () {
-      return this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
+      return this.teamInbox
+        ? this.teamInboxUnreadCount
+        : this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
     }
   },
   methods: {

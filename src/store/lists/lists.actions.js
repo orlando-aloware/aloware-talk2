@@ -54,12 +54,14 @@ export default {
         from_admin_list: true
       }
 
-      await API.V2.contactList.update(id, params)
-
-      return Promise.resolve()
+      return API.V2.contactList.update(id, params)
     } catch (err) {
       console.log(err)
-      this._vm.$handleErrors(err.response)
+      return Promise.reject(err)
     }
+  },
+
+  resetLists ({ commit }) {
+    commit('RESET_LISTS')
   }
 }

@@ -11,7 +11,7 @@ import carrierFee from './carrier-fee'
 import communications from './communications'
 import contacts from './contacts'
 import inbox from './inbox'
-import Einbox from './einbox'
+import TeamInbox from './teaminbox'
 import stats from './stats'
 import powerDialer from './power-dialer'
 import transcriptions from './transcriptions'
@@ -44,7 +44,7 @@ export default function (/* { ssrContext } */) {
       communications,
       contacts,
       inbox,
-      Einbox,
+      TeamInbox,
       stats,
       powerDialer,
       transcriptions,
@@ -64,10 +64,12 @@ export default function (/* { ssrContext } */) {
       filter: {},
       tags: [],
       campaigns: [],
+      teamInboxCampaigns: [],
       campaignsIsLoading: false,
       users: [],
       usersIsLoading: false,
       ringGroups: [],
+      ringGroupsIsLoading: false,
       teams: [],
       contactLists: [],
       inboxes: [],
@@ -111,7 +113,9 @@ export default function (/* { ssrContext } */) {
         error: {
           message: '',
           code: null
-        }
+        },
+        aiAgentWhisper: false,
+        aiAgentTakeover: false
       },
       warnings: [],
       shouldIntroduce: false,
@@ -134,6 +138,7 @@ export default function (/* { ssrContext } */) {
           communicationId: '',
           campaignId: '',
           campaignName: '',
+          ringGroupId: '',
           ringGroupName: '',
           phoneNumber: '',
           communication: null,
@@ -149,6 +154,7 @@ export default function (/* { ssrContext } */) {
           communicationId: '',
           campaignId: '',
           campaignName: '',
+          ringGroupId: '',
           ringGroupName: '',
           phoneNumber: '',
           communication: null,
@@ -164,6 +170,7 @@ export default function (/* { ssrContext } */) {
           communicationId: '',
           campaignId: '',
           campaignName: '',
+          ringGroupId: '',
           ringGroupName: '',
           phoneNumber: '',
           communication: null,
@@ -179,6 +186,7 @@ export default function (/* { ssrContext } */) {
           communicationId: '',
           campaignId: '',
           campaignName: '',
+          ringGroupId: '',
           ringGroupName: '',
           phoneNumber: '',
           communication: null,
@@ -194,6 +202,7 @@ export default function (/* { ssrContext } */) {
           communicationId: '',
           campaignId: '',
           campaignName: '',
+          ringGroupId: '',
           ringGroupName: '',
           phoneNumber: '',
           communication: null,
@@ -209,6 +218,7 @@ export default function (/* { ssrContext } */) {
           communicationId: '',
           campaignId: '',
           campaignName: '',
+          ringGroupId: '',
           ringGroupName: '',
           phoneNumber: '',
           communication: null,
@@ -224,6 +234,7 @@ export default function (/* { ssrContext } */) {
           communicationId: '',
           campaignId: '',
           campaignName: '',
+          ringGroupId: '',
           ringGroupName: '',
           phoneNumber: '',
           communication: null,
@@ -239,6 +250,7 @@ export default function (/* { ssrContext } */) {
           communicationId: '',
           campaignId: '',
           campaignName: '',
+          ringGroupId: '',
           ringGroupName: '',
           phoneNumber: '',
           communication: null,
@@ -464,6 +476,10 @@ export default function (/* { ssrContext } */) {
         commit('SET_CAMPAIGNS', campaigns)
       },
 
+      setTeamInboxCampaigns ({ commit }, campaigns) {
+        commit('SET_TEAM_INBOX_CAMPAIGNS', campaigns)
+      },
+
       setCampaignsIsLoading ({ commit }, value) {
         commit('SET_CAMPAIGNS_IS_LOADING', value)
       },
@@ -558,6 +574,10 @@ export default function (/* { ssrContext } */) {
 
       setRingGroups ({ commit }, ringGroups) {
         commit('SET_RING_GROUPS', ringGroups)
+      },
+
+      setRingGroupsIsLoading ({ commit }, loading) {
+        commit('SET_RING_GROUPS_IS_LOADING', loading)
       },
 
       setTeams ({ commit }, teams) {
@@ -974,6 +994,14 @@ export default function (/* { ssrContext } */) {
 
       setAccesses ({ commit }, accesses) {
         commit('SET_ACCESSES', accesses)
+      },
+
+      setDialerAiAgentWhisper ({ commit }, value) {
+        commit('SET_DIALER_AI_AGENT_WHISPER', value)
+      },
+
+      setDialerAiAgentTakeover ({ commit }, value) {
+        commit('SET_DIALER_AI_AGENT_TAKEOVER', value)
       }
     },
 
@@ -1132,6 +1160,10 @@ export default function (/* { ssrContext } */) {
 
       SET_CAMPAIGNS (state, campaigns) {
         state.campaigns = campaigns
+      },
+
+      SET_TEAM_INBOX_CAMPAIGNS (state, campaigns) {
+        state.teamInboxCampaigns = campaigns
       },
 
       SET_CAMPAIGNS_IS_LOADING (state, value) {
@@ -1343,6 +1375,10 @@ export default function (/* { ssrContext } */) {
         if (found) {
           state.ringGroups.splice(state.ringGroups.indexOf(found), 1)
         }
+      },
+
+      SET_RING_GROUPS_IS_LOADING (state, loading) {
+        state.ringGroupsIsLoading = loading
       },
 
       SET_RING_GROUPS (state, ringGroups) {
@@ -1819,6 +1855,14 @@ export default function (/* { ssrContext } */) {
 
       SET_ACCESSES (state, accesses) {
         state.accesses = accesses
+      },
+
+      SET_DIALER_AI_AGENT_WHISPER (state, value) {
+        state.dialer.aiAgentWhisper = value
+      },
+
+      SET_DIALER_AI_AGENT_TAKEOVER (state, value) {
+        state.dialer.aiAgentTakeover = value
       },
 
       updateField

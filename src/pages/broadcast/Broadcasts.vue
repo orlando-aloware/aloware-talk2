@@ -378,7 +378,7 @@
                       title-text="Broadcast"
                       kb-link="https://support.aloware.com/en/articles/9034203-exploring-aloware-talk-s-broadcast"
                       class="mt-5"
-                      v-if="!shouldShowBroadcast && shouldShowUpgradeNow && !isSimpSocial">
+                      v-if="!shouldShowBroadcast">
     </upgrade-now-page>
   </div>
 </template>
@@ -398,7 +398,7 @@ import UpgradeNowPage from 'components/upgrade-now-page.vue'
 import * as BroadcastStatuses from 'src/constants/broadcast-statuses.js'
 import { COLUMNS } from 'src/constants/broadcast/home-columns'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import { aclMixin, kycMixin, simpsocialMixin, dataTableMixin, broadcastsMixin } from 'src/plugins/mixins'
+import { aclMixin, kycMixin, dataTableMixin, broadcastsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'broadcasts',
@@ -419,7 +419,6 @@ export default {
   mixins: [
     aclMixin,
     kycMixin,
-    simpsocialMixin,
     dataTableMixin,
     broadcastsMixin
   ],
@@ -498,6 +497,7 @@ export default {
 
   computed: {
     ...mapState(['campaigns']),
+    ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', [
       'isBroadcastsLoading'
     ]),
@@ -827,14 +827,27 @@ export default {
     async showBroadcastActivity (broadcasts) {
       this.contextMenuOpen = false
       this.popupOpen = false
+      const broadcastIds = broadcasts.map(broadcast => broadcast.id)
+
+      if (this.currentCompany?.enable_legacy_inbox) {
+        return this.$router.push({
+          name: 'Inbox Channel',
+          params: {
+            channel: 'all-communications'
+          },
+          query: {
+            broadcastIds
+          }
+        })
+      }
 
       this.$router.push({
-        name: 'Inbox Channel',
-        params: {
-          channel: 'all-communications'
-        },
+        path: '/communications/all',
         query: {
-          broadcastIds: broadcasts.map(broadcast => broadcast.id)
+          to_date: 'null',
+          from_date: 'null',
+          date_range: 'All Time',
+          broadcasts: broadcastIds.join(',')
         }
       })
     },

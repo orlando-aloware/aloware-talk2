@@ -219,7 +219,9 @@ export default {
               field: field.name,
               align: field.align,
               headerStyle: field.headerStyle,
-              columnStyle: field.columnStyle
+              columnStyle: field.columnStyle,
+              resizable: field.resizable,
+              draggable: field.draggable
             }
           }
           return null

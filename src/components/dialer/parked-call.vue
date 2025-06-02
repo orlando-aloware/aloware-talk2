@@ -34,7 +34,6 @@
 <script>
 import { mapState } from 'vuex'
 import { agentMixin } from 'src/plugins/mixins'
-import { AGENT_STATUS_ON_CALL } from 'src/constants/agent-status'
 
 export default {
   name: 'parked-call',
@@ -42,12 +41,6 @@ export default {
   mixins: [
     agentMixin
   ],
-
-  data () {
-    return {
-      AGENT_STATUS_ON_CALL
-    }
-  },
 
   computed: {
     ...mapState(['dialer']),
@@ -61,7 +54,7 @@ export default {
     },
 
     canUnparkCall () {
-      return this.dialer?.parkedCall && !this.dialer.call && !this.isAgentOnCall
+      return this.dialer?.parkedCall && !(this.dialer.call || this.isAgentOnCall)
     }
   },
 

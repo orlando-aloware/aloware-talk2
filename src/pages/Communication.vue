@@ -8,6 +8,7 @@
                :opacity="0.85">
       <communication-details :verbose="true"
                              :communication="communication"
+                             :is-contact-read-only="isContactReadOnly"
                              data-testid="comm-communication-details"
                              v-if="!hasError && communication">
       </communication-details>
@@ -47,9 +48,14 @@
 import _ from 'lodash'
 import talk2Api from 'src/plugins/api/api'
 import CommunicationDetails from 'components/communication-details'
-
+import { userMixin } from 'src/plugins/mixins'
+import { mapState } from 'vuex'
 export default {
   name: 'Communication',
+
+  mixins: [
+    userMixin
+  ],
 
   components: {
     CommunicationDetails
@@ -64,12 +70,27 @@ export default {
     }
   },
 
+  computed: {
+    ...mapState('cache', ['currentCompany']),
+
+    isContactReadOnly () {
+      return Boolean(this.communication?.contact?.is_read_only) || false
+    }
+  },
+
   methods: {
     getCommunication (id) {
       this.isLoadingCommunication = true
       this.hasError = false
 
-      talk2Api.V1.communication.get(id)
+      const params = {
+      }
+
+      if (this.hasCompanyTeamInboxEnabled) {
+        params.from_team_inbox = true
+      }
+
+      talk2Api.V1.communication.get(id, params)
         .then(res => {
           this.communication = res.data
         }).catch(err => {

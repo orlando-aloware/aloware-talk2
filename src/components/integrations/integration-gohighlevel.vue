@@ -107,6 +107,7 @@
             block
             data-testid="integration-gohighlevel-sync-button"
             @click="syncGHL"
+            :disabled="isReadOnly"
           >
             <i
               class="fa fa-sync-alt"
@@ -145,7 +146,8 @@ import talk2Api from 'src/plugins/api/api'
 import {
   gohighlevelIntegrationMixin,
   integrationMixin,
-  simpsocialMixin
+  teamInboxPropsMixin,
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -157,7 +159,8 @@ export default {
   mixins: [
     gohighlevelIntegrationMixin,
     integrationMixin,
-    simpsocialMixin
+    whiteLabelMixin,
+    teamInboxPropsMixin
   ],
 
   props: {
@@ -167,6 +170,12 @@ export default {
     },
 
     dialer_mode: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       required: false,
       default: false
@@ -217,7 +226,7 @@ export default {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
     getData () {
-      return this.getIntegrationData(this.contact, 'gohighlevel')
+      return this.getIntegrationData(this.contact, 'gohighlevel', null, this.teamInbox)
         .then(response => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true

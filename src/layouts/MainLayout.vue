@@ -7,7 +7,7 @@
       <span>This screen size is not supported.</span>
     </div>
     <div class="h-100 d-flex flex-column">
-      <template v-if="isAuthenticated && !loading && companyHasTrialStatus && !isWidget">
+      <template v-if="isAuthenticated && !loading && companyHasTrialStatus && !isWidget && !isMobile">
         <trial-expired-modal v-if="isTrialExpired"/>
         <cancelled-account-modal v-else-if="isCancelledAccount"/>
         <trial-banner v-else-if="isTrial"/>
@@ -235,24 +235,23 @@
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
+  accessMixin,
   aclMixin,
+  agentMixin,
+  broadcastMixin,
+  broadcastsMixin,
+  contactV2AttributesMixin,
+  dispositionsMixin,
   htmlMixin,
-  webrtcMixin,
+  kycMixin,
   notificationMixin,
   notificationQueueMixin,
-  broadcastMixin,
   parkCallMixin,
-  visibilityMixin,
-  unownedContactTaskMixin,
-  agentMixin,
-  contactV2AttributesMixin,
-  kycMixin,
-  simpsocialMixin,
-  userMixin,
   settingsMixin,
-  broadcastsMixin,
-  accessMixin,
-  dispositionsMixin
+  unownedContactTaskMixin,
+  userMixin,
+  visibilityMixin,
+  webrtcMixin
 } from 'src/boot/mixins'
 import AppHeader from 'src/components/layout/app-header'
 import AppFooter from 'src/components/layout/app-footer'
@@ -264,13 +263,14 @@ import * as CommunicationDispositionStatus from 'src/constants/communication-dis
 import * as MetricOptionGroups from 'src/constants/metric-option-groups'
 import * as AppDefaultLogin from 'src/constants/user-default-login'
 import * as CommunicationDirection from 'src/constants/communication-direction'
+import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import {
-  CURRENT_STATUS_HOLD_NEW,
-  CURRENT_STATUS_INPROGRESS_NEW,
-  CURRENT_STATUS_COMPLETED_NEW,
-  INCOMING_STATUSES,
   ALL_INPROGRESS_STATUSES,
   COMPLETED_STATUSES,
+  CURRENT_STATUS_COMPLETED_NEW,
+  CURRENT_STATUS_HOLD_NEW,
+  CURRENT_STATUS_INPROGRESS_NEW,
+  INCOMING_STATUSES,
   INPROGRESS_UNCONNECTED_STATUSES
 } from 'src/constants/communication-current-status'
 import _ from 'lodash'
@@ -278,28 +278,26 @@ import DialerForm from 'components/dialer/dialer-form'
 import Phone from 'components/dialer/phone'
 import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
 import * as storage from 'src/plugins/helpers/storage'
-import { ALL_DIRECTIONS } from 'src/constants/communication-direction'
 import ProFeatureDialog from 'components/pro-feature-dialog.vue'
 import KycFillDialog from 'components/kyc-fill-dialog.vue'
 import KycReloadDialog from 'components/kyc-reload-dialog.vue'
 import store from 'src/store'
 import {
-  TYPE_EXPORT_POWER_DIALER_LIST_ITEMS,
+  TYPE_COMMUNICATION,
   TYPE_EXPORT_CONTACT_LIST_ITEMS,
-  TYPE_COMMUNICATION
+  TYPE_EXPORT_POWER_DIALER_LIST_ITEMS
 } from 'src/constants/export-types-default'
 import Modal from 'components/modal.vue'
 import talk2Api from 'src/plugins/api/api'
-import {
-  MAX_SCREEN_WIDTH_MOBILE_HEADER
-} from 'src/constants/viewport-sizes'
+import { MAX_SCREEN_WIDTH_MOBILE_HEADER } from 'src/constants/viewport-sizes'
 import TrialBanner from 'components/trial-banner.vue'
 import * as TrialStatus from 'src/constants/trial-account-status'
 import TrialExpiredModal from 'src/components/trial-expired-modal.vue'
 import CancelledAccountModal from 'src/components/cancelled-account-modal.vue'
 import AccountSelector from 'src/components/account-selector.vue'
 import { FINISHED } from 'src/constants/export-status'
-import { EINBOXES_MENU_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
+import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
 
 export default {
   name: 'MyLayout',
@@ -343,7 +341,6 @@ export default {
     agentMixin,
     contactV2AttributesMixin,
     kycMixin,
-    simpsocialMixin,
     userMixin,
     settingsMixin,
     broadcastsMixin,
@@ -355,6 +352,7 @@ export default {
     return {
       loading: true,
       loadingCampaigns: false,
+      loadingTeamInboxCampaigns: false,
       loadingRingGroups: false,
       loadingTeams: false,
       loadingContactLists: false,
@@ -407,7 +405,7 @@ export default {
       isFirstLoading: true,
       isSidebarExpanded: true,
       loadingInboxes: false,
-      EINBOXES_MENU_TITLE
+      TEAMINBOXES_MENU_TITLE
     }
   },
 
@@ -420,6 +418,7 @@ export default {
     ...mapState([
       'dialer',
       'campaigns',
+      'teamInboxCampaigns',
       'isMobile',
       'ringGroups',
       'notifications',
@@ -436,7 +435,8 @@ export default {
 
     ...mapState('auth', [
       'profile',
-      'authenticated'
+      'authenticated',
+      'is_focused_power_dialer'
     ]),
 
     ...mapState('stats', [
@@ -450,6 +450,10 @@ export default {
     ...mapState('inbox', [
       'selectedContact',
       'liveContacts'
+    ]),
+
+    ...mapState('TeamInbox', [
+      'activeInboxId'
     ]),
 
     ...mapState('powerDialer', [
@@ -482,7 +486,7 @@ export default {
     pageClass () {
       const pageSlug = _.get(this.$route.meta, 'title', this.$route.name).toLowerCase()
 
-      return pageSlug === EINBOXES_MENU_TITLE.toLowerCase() ? null : pageSlug.replace(/ /g, '_') + '-page'
+      return pageSlug === TEAMINBOXES_MENU_TITLE.toLowerCase() ? null : pageSlug.replace(/ /g, '_') + '-page'
     },
 
     isMobilePhoneClosed () {
@@ -745,10 +749,19 @@ export default {
         return
       }
 
-      const communicationType = communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW &&
-      communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW
-        ? 'missed call'
-        : 'call'
+      let communicationType = 'call'
+
+      // For completed calls, determine type based on disposition status
+      if (communication.current_status2 === CURRENT_STATUS_COMPLETED_NEW) {
+        switch (communication.disposition_status2) {
+          case CommunicationDispositionStatus.DISPOSITION_STATUS_MISSED_NEW:
+            communicationType = 'missed call'
+            break
+          case CommunicationDispositionStatus.DISPOSITION_STATUS_ABANDONED_NEW:
+            communicationType = 'abandoned call'
+            break
+        }
+      }
 
       // ignore call notifications if the call is not fishing mode and the user is in sleep mode
       if ((isFishingMode || communication.is_call_waiting) || !this.profile.sleep_mode) {
@@ -997,7 +1010,7 @@ export default {
     }
 
     this.mainListeners.kycStatusUpdated = (company) => {
-      if (this.isTrial && !this.isSimpSocial && !this.isModGen) {
+      if (this.isTrial && !this.isModGen) {
         this.setShowedKycReloadDialog(true)
       }
     }
@@ -1050,13 +1063,13 @@ export default {
       }
 
       if (task.export.type === TYPE_COMMUNICATION) {
-        message = `Your Contact communications export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
+        message = `Your communications export is now available.<a id="${task.export.uuid}" href="${task.export.url}" style="opacity: 0; height: 0; width: 0;" download target="_blank"></a>`
       }
 
       this.$generalNotification(
         message,
         'export-csv',
-        0,
+        1000 * 60 * 5, // 5 minutes
         true,
         {
           uuid: task.export.uuid,
@@ -1220,13 +1233,7 @@ export default {
       }, checkInterval)
     }
 
-    if (this.mediaPlaybackRequiresUserGesture()) {
-      window.addEventListener('keydown', this.removeBehaviorsRestrictions)
-      window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
-      window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
-    } else {
-      this.setEnableAudio(true)
-    }
+    this.checkMediaPlaybackRequiresUserGesture()
 
     console.log('Push permission: ' + window.Push.Permission.get())
 
@@ -1249,6 +1256,16 @@ export default {
   },
 
   methods: {
+    async checkMediaPlaybackRequiresUserGesture () {
+      if (await this.mediaPlaybackRequiresUserGesture()) {
+        window.addEventListener('keydown', this.removeBehaviorsRestrictions)
+        window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
+        window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
+      } else {
+        this.setEnableAudio(true)
+      }
+    },
+
     processUrl (url) {
       // New format: expected url like "contact-<phoneNumber>" or "contact-<phoneNumber>?first=...&last=...&isCompany=..."
       let cleaned = url.replace(/contact[:-]/, '')
@@ -1528,7 +1545,7 @@ export default {
       }
     },
 
-    unsubscribeFromPusher () {
+    unsubscribeFromLiveUpdates () {
       if (this.authenticated) {
         // just leave the channels
         this.broadcastLeave()
@@ -1569,29 +1586,28 @@ export default {
       this.setEnableAudio(true)
     },
 
-    mediaPlaybackRequiresUserGesture () {
+    async mediaPlaybackRequiresUserGesture () {
       // test if play() is ignored when not called from an input event handler
       const audio = document.createElement('audio')
-      const promise = audio.play()
 
-      if (promise !== undefined) {
-        promise
-          .catch(() => {
-            // Auto-play was prevented
-            // Show a UI element to let the user manually start playback
-            return true
-          })
-          .then(() => {
-            // Auto-play started
-            return audio.paused
-          })
+      try {
+        await audio.play()
+        // Auto-play started successfully
+        // No user gesture required
+        return audio.paused
+      } catch (error) {
+        // Auto-play was prevented
+        // User gesture is required
+        return true
+      } finally {
+        audio.remove()
       }
     },
 
     initAuth () {
       let fetchingStatics = false
       this.loading = true
-      this.setCampaignsIsLoading(true)
+      setCampaignsIsLoading(this, true)
 
       if (['Stats'].includes(this.$route.name)) {
         this.setMetricLoader(true)
@@ -1631,7 +1647,7 @@ export default {
         this.getContactLists()
         this.getBroadcasts()
         this.getTemplates()
-        this.getCampaigns()
+        getCampaigns(this)
         this.getWorkflows()
         this.getDispositionStatuses()
         this.getCallDispositions()
@@ -1639,6 +1655,11 @@ export default {
         this.getLeadSources()
         this.getAttributeDictionaries()
         this.getMyQueueList()
+
+        // Load team inbox campaigns (no visibility limits) only if a team inbox is active
+        if (this.hasCompanyTeamInboxEnabled) {
+          getTeamInboxCampaigns(this)
+        }
       })
     },
 
@@ -1687,7 +1708,8 @@ export default {
         return null
       }
 
-      const found = this.campaigns.find((campaign) => campaign.id === id)
+      const campaigns = this.hasCompanyTeamInboxEnabled ? this.teamInboxCampaigns : this.campaigns
+      const found = campaigns.find((campaign) => campaign.id === id)
 
       if (found) {
         return found
@@ -1715,36 +1737,11 @@ export default {
         })
     },
 
-    getCampaigns () {
-      if (this.hasPermissionTo('list campaign')) {
-        this.loadingCampaigns = true
-
-        return this.$axios
-          .get('/api/v1/campaign', {
-            mode: 'no-cors',
-            params: {
-              is_lite: true
-            }
-          })
-          .then((res) => {
-            this.setCampaigns(res.data)
-            this.loadingCampaigns = false
-            this.setCampaignsIsLoading(false)
-
-            return Promise.resolve()
-          })
-          .catch((err) => {
-            console.log(err)
-            this.loadingCampaigns = false
-
-            return Promise.reject()
-          })
-      }
-    },
-
     getRingGroups () {
       if (this.hasPermissionTo('list ring group')) {
         this.loadingRingGroups = true
+
+        this.setRingGroupsIsLoading(true)
 
         return this.$axios
           .get('/api/v1/ring-group', {
@@ -1753,12 +1750,14 @@ export default {
           .then((res) => {
             this.setRingGroups(res.data)
             this.loadingRingGroups = false
+            this.setRingGroupsIsLoading(false)
 
             return Promise.resolve()
           })
           .catch((err) => {
             console.log(err)
             this.loadingRingGroups = false
+            this.setRingGroupsIsLoading(false)
 
             return Promise.reject()
           })
@@ -2681,7 +2680,7 @@ export default {
     beforeUnload () {
       this.stopElectronEvents()
       this.stopMainEvents()
-      this.unsubscribeFromPusher()
+      this.unsubscribeFromLiveUpdates()
       this.resetVuex([
         'contacts',
         'inbox',
@@ -2711,8 +2710,10 @@ export default {
       'resetVuex',
       'setUsage',
       'setCampaigns',
+      'setTeamInboxCampaigns',
       'setCampaignsIsLoading',
       'setRingGroups',
+      'setRingGroupsIsLoading',
       'setTeams',
       'setContactLists',
       'setUsers',
@@ -2787,6 +2788,16 @@ export default {
       if (!value) {
         this.mobilePhoneDrawer = false
         this.onCloseMobilePhone()
+      }
+    },
+
+    is_focused_power_dialer (to) {
+      if (to) {
+        this.$router.replace(
+          this.currentCompany.auto_dialer_enabled ? '/power-dialer' : '/stats'
+        ).catch(() => {
+          // We need it to avoid navigation error
+        })
       }
     },
 
@@ -2940,7 +2951,8 @@ export default {
       }
 
       if (!val && this.$route.name === 'Phone') {
-        this.$router.replace({ name: 'Inbox' })
+        const name = this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE
+        this.$router.replace({ name })
       }
 
       if (val) {

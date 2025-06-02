@@ -174,14 +174,14 @@
             </template>
             <b-dropdown-item href=""
                              link-class="d-flex align-items-center"
-                             @click="answerCommunication(true, false)">
+                             @click="handleAnswerCommunication(true, false)">
               <park-call-icon class="icon-margin"
                               width="13"
                               height="13"
                               color="#9B51E0"/>Park Current Call & Connect
             </b-dropdown-item>
             <b-dropdown-item href=""
-                             @click="answerCommunication(false, true)">
+                             @click="handleAnswerCommunication(false, true)">
               <hangup-icon class="icon-margin" width="13"/>Hangup Current Call & Connect
             </b-dropdown-item>
           </b-dropdown>
@@ -200,7 +200,10 @@ import {
   notificationMixin,
   visibilityMixin,
   aclMixin,
-  agentMixin
+  agentMixin,
+  userMixin,
+  TeamInboxMixin,
+  liveCallsMixin
 } from 'src/plugins/mixins'
 import * as AgentStatus from '../constants/agent-status'
 import CancelCallIcon from 'components/icons/cancel-call-icon'
@@ -209,6 +212,8 @@ import ParkCallIcon from 'components/icons/park-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
+import { getQueryString } from 'src/plugins/helpers/functions'
+import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'action-notification',
@@ -219,7 +224,10 @@ export default {
     mentionsMixin,
     visibilityMixin,
     aclMixin,
-    agentMixin
+    agentMixin,
+    userMixin,
+    TeamInboxMixin,
+    liveCallsMixin
   ],
 
   components: {
@@ -250,7 +258,8 @@ export default {
       runningDateTimeInterval: null,
       isValidNotification: false,
       notificationListeners: {},
-      AgentStatus
+      AgentStatus,
+      teamInboxLink: null
     }
   },
 
@@ -341,8 +350,32 @@ export default {
         return null
       }
 
+      // If TeamInbox is not enabled, use the original logic
+      if (!this.hasCompanyTeamInboxEnabled) {
+        return {
+          path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+        }
+      }
+
+      // If the communication has a ring group id, check teamInboxLink
+      if (this.ringGroupId && this.ringGroupId !== '') {
+        if (this.teamInboxLink) {
+          const queryString = getQueryString(this.$route.query)
+          const communicationRouteId = this.viewMode === UNTHREADED ? `/${this.communicationId}` : ''
+
+          return {
+            path: `${this.teamInboxLink.path}${communicationRouteId}${queryString}`
+          }
+        }
+
+        return {
+          path: `/contacts/${this.contactId}/communications/${this.communicationId}`
+        }
+      }
+
+      // If no ring group id, use regular communication page
       return {
-        path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
+        path: `/contacts/${this.contactId}/communications/${this.communicationId}`
       }
     },
 
@@ -503,14 +536,6 @@ export default {
       return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_COLD_USER
     },
 
-    isCallWaiting () {
-      if (isEmpty(this.communication)) {
-        return false
-      }
-
-      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
-    },
-
     notificationIconClasses () {
       return [
         this.id === 'system' ? 'system-update' : ''
@@ -541,16 +566,12 @@ export default {
       return this.dialer.call || this.isAgentOnCall
     },
 
-    isCallFishingWithDialer () {
-      return this.id === 'callFishing' && this.dialer
-    },
-
     shouldShowCallActions () {
-      return this.id === 'incomingCall' || (this.isCallFishingWithDialer && !this.isAgentOrDialerOnCall)
+      return this.id === 'incomingCall' || (this.id === 'callFishing' && this.dialer && !this.isAgentOrDialerOnCall)
     },
 
     shouldShowFishingActions () {
-      return this.isCallFishingWithDialer && this.isAgentOrDialerOnCall
+      return this.id === 'callFishing' && this.dialer && this.isAgentOrDialerOnCall
     }
   },
 
@@ -577,14 +598,30 @@ export default {
     }
   },
 
+  mounted () {
+    // Initialize teamInboxLink if ringGroupId is available on mount
+    if (this.ringGroupId && this.ringGroupId !== '') {
+      this.updateTeamInboxLink(this.ringGroupId)
+    }
+  },
+
   methods: {
     ...mapActions([
       'setNotifications',
       'setShowPhone',
       'clearCallFishingQueue',
-      'removeFromCallFishingQueue',
-      'setDialerCommunication'
+      'removeFromCallFishingQueue'
     ]),
+
+    async updateTeamInboxLink (ringGroupId) {
+      if (await this.checkInboxAccess(ringGroupId)) {
+        this.teamInboxLink = {
+          path: `/team-inboxes/${ringGroupId}/contacts/${this.contactId}/communications`
+        }
+      } else {
+        this.teamInboxLink = null
+      }
+    },
 
     startNotificationListeners () {
       this.$VueEvent.listen('update_communication', this.notificationListeners[this.id].updateCommunication)
@@ -710,7 +747,7 @@ export default {
       }
 
       if (this.id === 'callFishing') {
-        this.answerCommunication()
+        this.handleAnswerCommunication()
         return
       }
 
@@ -724,44 +761,9 @@ export default {
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
-    async answerCommunication (shouldPark = false, shouldHangup = false) {
-      const data = {
-        communication: {
-          id: this.communicationId,
-          campaignId: this.campaignId,
-          contactName: this.title,
-          companyName: this.message,
-          contactId: this.contactId,
-          phoneNumber: this.phoneNumber,
-          isCallWaiting: this.isCallWaiting
-        },
-        shouldPark: shouldPark,
-        shouldHangup: shouldHangup
-      }
-
-      // Check if we need to fetch current communication
-      const needsCurrentCommunication = !this.dialer.communication &&
-        this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL
-
-      if (needsCurrentCommunication) {
-        try {
-          const response = await this.$axios.post('/api/v1/profile/get-live-calls')
-          const currentCommunication = response.data[0]
-
-          if (!currentCommunication) {
-            console.log('No live calls found for this agent')
-            return
-          }
-
-          this.setDialerCommunication(currentCommunication)
-        } catch (err) {
-          console.log(err)
-        }
-      }
-
-      this.$VueEvent.fire('answerCallFishing', data)
+    async handleAnswerCommunication (shouldPark = false, shouldHangup = false) {
+      await this.answerCommunication(shouldPark, shouldHangup)
       this.$closeActionNotification('callFishing')
-      this.setShowPhone(true)
     },
 
     rejectCall () {
@@ -795,23 +797,9 @@ export default {
       let found = document.querySelector('.notification-body-wrapper .call-actions')
       found = !found ? document.querySelector('.notification-body-wrapper .call-fishing-actions') : found
 
-      // 07/12/2022 - Removed for now
-      // if (!found &&
-      //   this.isValidPhoneShowInfo) {
-      //   this.setShowIncomingCallNotification(false)
-      //   this.showCallFishingDataInPhone({
-      //     communication: this.communication,
-      //     contact: this.contact
-      //   }, this.id)
-      // }
-
       if (!found &&
         this.id === 'system') {
         this.$closeActionNotification(this.id)
-
-        setTimeout(() => {
-          window.location.reload()
-        }, 500)
       }
     },
 
@@ -838,10 +826,10 @@ export default {
         return
       }
 
-      if (this.$route.path !== `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`) {
-        this.$router.push({
-          path: `/channels/inbox/open/contacts/${this.contactId}/communications/${this.communicationId}`
-        })
+      // Get the path from the link computed property
+      const linkPath = this.link?.path
+      if (linkPath && this.$route.path !== linkPath) {
+        this.$router.push({ path: linkPath })
       }
     },
 
@@ -873,6 +861,24 @@ export default {
   },
 
   watch: {
+    ringGroupId: {
+      immediate: true,
+      handler: function (newRingGroupId) {
+        if (newRingGroupId && newRingGroupId !== '') {
+          this.updateTeamInboxLink(newRingGroupId)
+        } else {
+          this.teamInboxLink = null
+        }
+      }
+    },
+    contactId: {
+      immediate: true,
+      handler: function (contactId) {
+        if (contactId && this.ringGroupId) {
+          this.updateTeamInboxLink(this.ringGroupId)
+        }
+      }
+    },
     notificationQueue: {
       deep: true,
       handler: function (newValue, oldValue) {

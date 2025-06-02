@@ -156,6 +156,7 @@
                        icon="o_info"
                        flat
                        round
+                       :disabled="isContactReadOnly"
                        @click="goToContact">
                 </q-btn>
               </q-item-label>
@@ -271,9 +272,12 @@
                 <q-item-label class="text-size-xxl _600 mt-2 d-flex align-items-center justify-content-center"
                               v-if="contact">
                   <span class="d-inline-flex cursor-pointer link-only"
-                        @click="goToContact">
+                        @click="goToContact"
+                        v-if="!isContactReadOnly">
                     {{ contactName | truncate(15) }}
                   </span>
+                  <span v-else>{{ contactName | truncate(15) }}</span>
+                  <contact-integrations-link-icons :contact='contact' />
                 </q-item-label>
                 <q-item-label class="text-size-sm _400 mt-1 d-flex align-items-center justify-content-center">
                   <span class="d-inline-flex">{{ dialer.communication.lead_number | fixPhone }}</span>
@@ -484,8 +488,9 @@
                     <p class="contact-name mb-1">
                       <span class="d-inline-flex cursor-pointer link-only"
                             @click="goToContact">
-                        {{ contactName }}
+                            {{ contactName | truncate(15) }}
                       </span>
+                      <contact-integrations-link-icons :contact='contact' />
                     </p>
                     <p class="text-sm-left contact-phone mb-1"
                        v-if="contact">
@@ -542,7 +547,8 @@
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="contact">
               <label class="form-control-label text-grey-90">
                 Contact Disposition
               </label>
@@ -551,12 +557,14 @@
                                              :highlighted="isHighlightedContactDisposition"
                                              :required="isHighlightedContactDisposition"
                                              :contact="contact"
+                                             :is-read-only="isContactReadOnly"
                                              @change="onContactDisposed">
                 </contact-disposition-wrapper>
               </div>
             </div>
 
-            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom">
+            <div class="d-flex flex-column pt-2 pb-2 w-100 border-bottom"
+                 v-if="dialer.communication">
               <label class="form-control-label text-grey-90">
                 Send Message
               </label>
@@ -564,8 +572,12 @@
                 <div class="d-flex flex-grow-1">
                   <template-selector class="w-100"
                                      v-model="templateId"
+                                     :disable=isMessagingBlocked(getCampaign(dialer.communication.campaign_id,true),true)
                                      @change="changeTemplate">
                   </template-selector>
+                  <q-tooltip v-if="isMessagingBlocked(getCampaign(dialer.communication.campaign_id,true),true)">
+                    {{ getMessagingBlocked(getCampaign(dialer.communication.campaign_id,true)) }}
+                  </q-tooltip>
                 </div>
                 <div class="d-flex flex-shrink-0 ml-2">
                   <b-button variant="primary"
@@ -776,6 +788,9 @@
               <q-card-section class="height-240">
                 <contact-integrations :contact="contact"
                                       :no_title="true"
+                                      :team-inbox-id="forceTeamInboxId"
+                                      :from-team-inbox="false"
+                                      :is-read-only="isContactReadOnly"
                                       v-show="expanded">
                 </contact-integrations>
               </q-card-section>
@@ -1251,78 +1266,81 @@
 </style>
 
 <script>
-import _ from 'lodash'
-import { mapActions, mapState } from 'vuex'
-import { mapFields } from 'vuex-map-fields'
-import {
-  communicationInfoMixin,
-  notificationMixin,
-  dispositionsMixin,
-  agentMixin,
-  dialerCommunicationMixin,
-  sessionCallStatusMixin
-} from 'src/plugins/mixins'
-import CancelCallIcon from 'components/icons/cancel-call-icon'
-import AcceptCallIcon from 'components/icons/accept-call-icon'
-import PersonIcon from 'components/icons/person-icon'
 import Avatar from 'components/avatar'
-import RecordIcon from 'components/icons/record-icon'
+import CommunicationAudio from 'components/communication-audio'
+import CommunicationNote from 'components/communication-note'
+import ContactIntegrations from 'components/contacts/contact-integrations'
+import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
+import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
+import AvailableUserSelector from 'components/generic-selectors/available-user-selector'
+import CommunicationTags from 'components/generic-selectors/communication-tags'
+import DeviceSelector from 'components/generic-selectors/device-selector'
+import EntityTags from 'components/generic-selectors/entity-tags'
+import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
+import ScriptSelector from 'components/generic-selectors/script-selector'
+import TemplateSelector from 'components/generic-selectors/template-selector'
+import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
+import CallDispositionWrapper from 'components/generic-wrappers/call-disposition-wrapper'
+import ContactDispositionWrapper from 'components/generic-wrappers/contact-disposition-wrapper'
+import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
+import AcceptCallIcon from 'components/icons/accept-call-icon'
+import AddIcon from 'components/icons/add-icon'
+import CancelCallIcon from 'components/icons/cancel-call-icon'
+import ContactIcon from 'components/icons/contact-icon'
+import CopyIcon from 'components/icons/copy-icon'
 import DialpadIcon from 'components/icons/dialpad-icon'
+import DropParticipantIcon from 'components/icons/drop-participant-icon'
 import HoldIcon from 'components/icons/hold-icon'
+import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import IntegrationsIcon from 'components/icons/integrations-icon'
+import MergeIcon from 'components/icons/merge-icon'
+import MoreIcon from 'components/icons/more-icon'
 import MuteIcon from 'components/icons/mute-icon'
 import NotesIcon from 'components/icons/notes-icon'
-import TagsIcon from 'components/icons/tags-icon'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import ParkedCallIcon from 'components/icons/parked-call-icon'
+import ParticipantsIcon from 'components/icons/participants-icon'
+import PauseRecordIcon from 'components/icons/pause-record-icon'
+import PersonIcon from 'components/icons/person-icon'
+import ReadyIcon from 'components/icons/ready-icon'
+import RecordIcon from 'components/icons/record-icon'
 import ScriptsIcon from 'components/icons/scripts-icon'
-import ContactIntegrations from 'components/contacts/contact-integrations'
-import AddIcon from 'components/icons/add-icon'
-import MoreIcon from 'components/icons/more-icon'
+import TagsIcon from 'components/icons/tags-icon'
 import TransferIcon from 'components/icons/transfer-icon'
 import UnholdIcon from 'components/icons/unhold-icon'
 import UnmuteIcon from 'components/icons/unmute-icon'
-import PauseRecordIcon from 'components/icons/pause-record-icon'
-import IntegrationsIcon from 'components/icons/integrations-icon'
 import VmDropIcon from 'components/icons/vm-drop-icon'
-import CommunicationAudio from 'components/communication-audio'
-import CommunicationNote from 'components/communication-note'
-import CommunicationTags from 'components/generic-selectors/communication-tags'
-import CallDispositionWrapper from 'components/generic-wrappers/call-disposition-wrapper'
-import ContactDispositionWrapper from 'components/generic-wrappers/contact-disposition-wrapper'
-import TemplateSelector from 'components/generic-selectors/template-selector'
-import ParkCallIcon from 'components/icons/park-call-icon'
-import ContactIcon from 'components/icons/contact-icon'
-import ScriptSelector from 'components/generic-selectors/script-selector'
-import VmDropSelector from 'components/generic-selectors/vm-drop-selector'
-import RingGroupSelector from 'components/generic-selectors/ring-group-selector'
-import AvailableUserSelector from 'components/generic-selectors/available-user-selector'
-import ParticipantsIcon from 'components/icons/participants-icon'
-import ReadyIcon from 'components/icons/ready-icon'
-import DropParticipantIcon from 'components/icons/drop-participant-icon'
 import WaitingIcon from 'components/icons/waiting-icon'
-import MergeIcon from 'components/icons/merge-icon'
+import _ from 'lodash'
+import * as AnswerTypes from 'src/constants/answer-types'
+import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationStatus from 'src/constants/communication-status'
-import * as CommunicationCurrentStatus from 'src/constants/communication-current-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
-import * as AnswerTypes from 'src/constants/answer-types'
 import * as InboundCallRecordingModes from 'src/constants/inbound-call-recording-modes'
 import * as OutboundCallRecordingModes from 'src/constants/outbound-call-recording-modes'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
-import CopyIcon from 'components/icons/copy-icon'
-import IgnoreCallIcon from 'components/icons/ignore-call-icon'
-import MobileLiveCallBar from 'components/dialer/mobile-live-call-bar'
-import DeviceSelector from 'components/generic-selectors/device-selector'
-import ParkedCallIcon from 'components/icons/parked-call-icon'
+import * as UploadedFileTypes from 'src/constants/uploaded-file-types'
 import API from 'src/plugins/api/api'
-import HubspotActivityTypeSelector from 'components/hubspot-activity-type-selector'
-import EntityTags from 'components/generic-selectors/entity-tags'
+import {
+  agentMixin,
+  communicationInfoMixin,
+  dialerCommunicationMixin,
+  dispositionsMixin,
+  notificationMixin,
+  selectorMixin,
+  sessionCallStatusMixin
+} from 'src/plugins/mixins'
+import { mapActions, mapState } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import * as AgentStatus from '../../constants/agent-status'
 
 export default {
   name: 'phone',
 
   components: {
+    ContactIntegrationsLinkIcons,
     HubspotActivityTypeSelector,
     ParkedCallIcon,
     MobileLiveCallBar,
@@ -1375,7 +1393,8 @@ export default {
     dispositionsMixin,
     agentMixin,
     dialerCommunicationMixin,
-    sessionCallStatusMixin
+    sessionCallStatusMixin,
+    selectorMixin
   ],
 
   props: {
@@ -1548,6 +1567,8 @@ export default {
         this.loadingHold ||
         this.loadingUnhold ||
         this.isCallCompleted ||
+        this.dialer.aiAgentWhisper ||
+        this.dialer.aiAgentTakeover ||
         (this.currentCompany && !this.currentCompany.conferencing_enabled) ||
         (this.dialer.communication.legc_uuid && [CommunicationStatus.STATUS_INPROGRESS_NEW, CommunicationStatus.STATUS_RINGING_NEW].includes(this.dialer.communication.legc_status)) ||
         (this.dialer.communication.legz_uuid && this.dialer.call.callSid === this.dialer.communication.legz_uuid))
@@ -1565,7 +1586,7 @@ export default {
     },
 
     isMuteDisabled () {
-      return this.isCallCompleted
+      return this.isCallCompleted || (this.dialer.aiAgentWhisper && this.dialer.isMuted)
     },
 
     isRecordingDisabled () {
@@ -1935,19 +1956,30 @@ export default {
     },
 
     // there is no parked call, but there is a call in-progress.
-    hasCallInProgressNoParkedCall () {
+    hasCallInProgressNotParked () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
     // to ensure that the "Finish Call" button in the Wrap-up Form is disabled until the changeAgentStatus job event, executed from the backend,
-    // arrives via Pusher at the frontend and changes the agent's status to wrap-up, at which point the button becomes enabled.
+    // arrives via Live Update at the frontend and changes the agent's status to wrap-up, at which point the button becomes enabled.
     // it includes "ParkingCalls" conditionals.
     isNotOnWrapUp () {
-      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall)
+      return this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_WRAP_UP && !(this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNotParked)
     },
 
     shouldDisableCallBackButton () {
       return this.isNotDisposed || this.isNotOnWrapUp || this.isCallBackButtonDisabled
+    },
+
+    /**
+     * If the current company has team inbox enabled, force the team inbox id to 1 simply to force the integration to show as urrestricted because of visibility limits
+     */
+    forceTeamInboxId () {
+      return this.currentCompany.team_inbox_enabled ? 1 : null
+    },
+
+    isContactReadOnly () {
+      return Boolean(this.contact?.is_read_only) || false
     }
   },
 
@@ -2054,7 +2086,7 @@ export default {
     },
 
     goToContact () {
-      if (!this.contact) {
+      if (!this.contact || this.isContactReadOnly) {
         return
       }
 
@@ -2821,6 +2853,10 @@ export default {
     this.clearDialerCallFishing()
     clearInterval(this.$options.localTimeInterval)
     clearInterval(this.$options.holdInterval)
+
+    // Clean up global drag event listeners to prevent errors when component is destroyed
+    document.onmouseup = null
+    document.onmousemove = null
   }
 }
 </script>

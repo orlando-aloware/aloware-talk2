@@ -47,7 +47,7 @@ export const REJECTION_REASONS = [
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DISABLED,
-    message: 'The company account is currently disabled'
+    message: 'The account is currently disabled'
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_MESSAGE_EMPTY,
@@ -123,11 +123,11 @@ export const REJECTION_REASONS = [
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_COMPANY_DELETED,
-    message: 'The associated company has been deleted; unable to make the call'
+    message: 'The associated account has been deleted; unable to make the call'
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_COMPANY_SUSPENDED,
-    message: 'The call cannot proceed as the company has been suspended'
+    message: 'The call cannot proceed as the account has been suspended'
   },
   {
     type: CommunicationRejectionReasons.REJECTION_REASON_CALL_TO_SELF_NUMBER,

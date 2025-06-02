@@ -4,9 +4,14 @@ import * as CommunicationCurrentStatus from 'src/constants/communication-current
 import * as CommunicationDirection from 'src/constants/communication-direction'
 import * as CommunicationDispositionStatus from 'src/constants/communication-disposition-status'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import { mapActions, mapState } from 'vuex'
-
+import { mapActions, mapGetters, mapState } from 'vuex'
+import { agentMixin, notificationMixin } from 'src/plugins/mixins/index'
 export default {
+  mixins: [
+    agentMixin,
+    notificationMixin
+  ],
+
   data () {
     return {
       showIncomingCallMenu: false,
@@ -31,6 +36,10 @@ export default {
     ...mapState('auth', ['profile']),
 
     ...mapState('inbox', ['liveContacts']),
+
+    ...mapGetters('wallboard', {
+      liveCalls: 'getLiveCalls'
+    }),
 
     shouldShowIncomingCallMenu () {
       if (this.isIncomingLiveCall &&
@@ -172,6 +181,10 @@ export default {
         return false
       }
 
+      if (this.communication.type !== CommunicationTypes.CALL) {
+        return false
+      }
+
       return this.liveCallStatuses.includes(this.communication.current_status2)
     },
 
@@ -196,6 +209,18 @@ export default {
 
     isShowCancelCallIcon () {
       return this.isIncomingLiveCall && !this.isCallFishing
+    },
+
+    isDialerOrAgentOnCall () {
+      return this.isDialerConnected || this.isAgentOnCall
+    },
+
+    isCallWaiting () {
+      if (isEmpty(this.communication)) {
+        return false
+      }
+
+      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
     }
   },
 
@@ -204,14 +229,17 @@ export default {
       'setShowPhone',
       'removeFromCallFishingQueue',
       'setDialerParkedCall',
-      'setShowIncomingCallNotification'
+      'setShowIncomingCallNotification',
+      'setDialerCommunication'
     ]),
     ...mapActions('inbox', ['setLiveContacts']),
+    ...mapActions('wallboard', ['fetchLiveCalls']),
+
     getRingGroup (id) {
       return id ? this.ringGroups.find(item => item.id === id) : null
     },
     onAcceptCall (e) {
-      if (this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
+      if ((this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') || this.isAgentOnCall) {
         this.showIncomingCallMenu = true
         e.stopImmediatePropagation()
         return
@@ -286,7 +314,7 @@ export default {
       e.stopImmediatePropagation()
     },
     onUnparkCall (e) {
-      if (this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') {
+      if ((this.dialer.call && this.dialer.currentStatus === 'CALL_CONNECTED') || this.isAgentOnCall) {
         this.showParkedCallMenu = true
         e.stopImmediatePropagation()
         return
@@ -327,14 +355,7 @@ export default {
       this.showIncomingCallMenu = false
       this.answerCommunication(false, true)
     },
-    isCallWaiting () {
-      if (isEmpty(this.communication)) {
-        return false
-      }
-
-      return this.communication.last_call_source === CommunicationSourceCallTypes.SOURCE_CALL_WAITING
-    },
-    answerCommunication (shouldPark = false, shouldHangup = false) {
+    async answerCommunication (shouldPark = false, shouldHangup = false) {
       const data = {
         communication: {
           id: this.communication.id,
@@ -348,8 +369,39 @@ export default {
         shouldPark: shouldPark,
         shouldHangup: shouldHangup
       }
+
+      await this.fetchCurrentCommunicationIfNeeded(data)
+
       this.$VueEvent.fire('answerCallFishing', data)
       this.setShowPhone(true)
+    },
+
+    async fetchCurrentCommunicationIfNeeded (data = {}) {
+      // Check if we need to fetch current communication
+      const needsCurrentCommunication = !this.dialer.call && this.isAgentOnCall
+      if (needsCurrentCommunication) {
+        try {
+          const response = await this.$axios.post('/api/v1/profile/get-live-calls')
+          const currentCommunication = response.data.find(call => {
+            return call.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_INPROGRESS_NEW
+          })
+
+          if (!currentCommunication) {
+            console.log('No live calls found for this agent')
+            return data
+          }
+
+          this.setDialerCommunication(currentCommunication)
+
+          data['parkFromAnotherTab'] = true
+
+          return data
+        } catch (err) {
+          console.log(err)
+        }
+      }
+
+      return data
     }
   }
 }

@@ -1,13 +1,17 @@
 import _ from 'lodash'
-import { mapState, mapActions } from 'vuex'
 import * as CommunicationTypes from 'src/constants/communication-types'
-import * as InboxTaskStatus from 'src/constants/inbox-task-status'
-import * as storage from 'src/plugins/helpers/storage'
-import talk2Api from 'src/plugins/api/api'
-import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import { CONTACTS_ACCESS_EVERYONE } from 'src/constants/contact-access-types'
+import teamInboxPropsMixin from 'src/plugins/mixins/teaminbox.props.mixin'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
+import * as InboxTaskStatus from 'src/constants/inbox-task-status'
+import talk2Api from 'src/plugins/api/api'
+import * as storage from 'src/plugins/helpers/storage'
+import { mapActions, mapState } from 'vuex'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
+  mixins: [teamInboxPropsMixin],
+
   data () {
     return {
       hasMoreCommunications: true,
@@ -18,6 +22,7 @@ export default {
       loadingContactCommunications: false,
       loadingSendMessage: false,
       loadingMarkAsRead: false,
+      isScrolling: false,
       selectedContact: {
         id: null,
         first_name: null,
@@ -101,6 +106,8 @@ export default {
     ...mapState('inbox', { selectContact: 'selectedContact' }),
 
     ...mapState('cache', ['currentCompany']),
+
+    ...mapState('TeamInbox', ['contactsLastUsedLines']),
 
     selectedCampaign () {
       if (this.campaigns) {
@@ -202,6 +209,14 @@ export default {
 
     addTemporaryCommunication (communication) {
       this.communicationsAndAudits = [...this.communicationsAndAudits, communication]
+    },
+
+    isReadOnly () {
+      if (!this.contact) {
+        return false
+      }
+
+      return Boolean(this.contact.is_read_only) || false
     }
   },
 
@@ -265,6 +280,10 @@ export default {
         this.updateContacts(contact)
       }
     }
+
+    this.listeners.markContactCommunicationsAllAsReadProcessed = (contact) => {
+      this.markContactCommunicationsAllAsReadProcessed(contact)
+    }
   },
 
   methods: {
@@ -286,6 +305,12 @@ export default {
       this.$VueEvent.stop('contact_audit_created', this.listeners.contactAuditCreated)
       this.$VueEvent.stop('fetch_contact_info', this.listeners.fetchContactInfo)
       this.$VueEvent.stop('update-contact-in-group', this.listeners.updateContactInGroup)
+    },
+
+    resetScrollIntervals () {
+      clearInterval(this.scrollInterval)
+      clearInterval(this.containerElInterval)
+      this.isScrolling = false
     },
 
     isCommOrAuditExists (communication, data) {
@@ -456,7 +481,7 @@ export default {
           return
         }
 
-        this.$router.push({ name: 'inbox' })
+        this.$router.push({ name: this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE })
         return
       }
 
@@ -478,7 +503,7 @@ export default {
       this.source = this.cancelToken.source()
 
       // get contact phone numbers
-      talk2Api.V1.contact.getPhoneNumbers(contactIdToFetch)
+      talk2Api.V1.contact.getPhoneNumbers(contactIdToFetch, this.teamInbox)
         .then(response => {
           this.setContactPhoneNumbers(response.data)
         }).catch(err => {
@@ -553,10 +578,17 @@ export default {
         return
       }
 
+      const params = {}
+
+      if (this.teamInbox) {
+        params.from_team_inbox = this.teamInbox
+      }
+
       // get contact's info
       return this.$axios.get(`/api/v2/contacts/${contactIdToFetch}`,
         {
-          cancelToken: this.source.token
+          cancelToken: this.source.token,
+          params
         })
         .then(res => {
           this.$VueEvent.fire('contact_activity_clear_change_from_fetch')
@@ -596,47 +628,83 @@ export default {
     showContactInfo (contactId, forceClearLoading = false) {
       this.mapCommunicationsData()
 
-      // 1. if contact has initial campaign and there were no communications select initial campaign
-      if (!this.communicationsAndAudits.length && this.contact && this.contact.initial_campaign_id) {
-        this.selectedCampaignId = this.contact.initial_campaign_id
-      }
+      if (this.teamInbox) {
+        const key = `${this.teamInboxId}-${contactId}`
 
-      // 2. if contact has communications select last communication campaign
-      if (!this.selectedCampaignId && this.communicationsAndAudits.length) {
-        // Get the latest communication that is either SMS or CALL
-        const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
-          return item.type === CommunicationTypes.SMS || item.type === CommunicationTypes.CALL
-        })
-
-        if (latestCommunication) {
-          this.selectedCampaignId = latestCommunication.campaign_id
+        if (this.contactsLastUsedLines.has(key)) {
+          this.selectedCampaignId = this.contactsLastUsedLines.get(key)
         }
-      }
+      } else {
+        // 1. if contact has initial campaign and there were no communications select initial campaign
+        if (!this.communicationsAndAudits.length && this.contact && this.contact.initial_campaign_id) {
+          console.log('selectedCampaignId - condition 1', {
+            contact_id_param: contactId,
+            contact_id: this.contact.id,
+            contact_initial_campaign_id: this.contact.initial_campaign_id
+          })
+          this.selectedCampaignId = this.contact.initial_campaign_id
+        }
 
-      // 3. if user has a personal line and contact does not have an initial line
-      const userCampaignId = _.get(this.profile, 'campaign_id', null)
+        // 2. if contact has communications select last communication campaign
+        if (!this.selectedCampaignId && this.communicationsAndAudits.length) {
+          const communicationTypes = [CommunicationTypes.SMS, CommunicationTypes.CALL]
 
-      if (!this.selectedCampaignId && userCampaignId) {
-        this.selectedCampaignId = userCampaignId
-      }
+          // Get the latest communication that is either SMS or CALL
+          const latestCommunication = _.find(_.orderBy(this.communicationsAndAudits, item => item.created_at, ['desc']), item => {
+            return communicationTypes.includes(item.type)
+          })
 
-      // 4. if contact doesn't have situation 1 and 2 and selected_contact_campaigns has one campaign select the campaign
-      const selectedContactFirstCampaignId = _.get(this.selectedContactCampaigns, '[0].id', null)
+          if (latestCommunication) {
+            console.log('selectedCampaignId - condition 2', {
+              contact_id: contactId,
+              communication_id: latestCommunication.id,
+              communication_campaign_id: latestCommunication.campaign_id
+            })
+            this.selectedCampaignId = latestCommunication.campaign_id
+          }
+        }
 
-      if (!this.selectedCampaignId && selectedContactFirstCampaignId) {
-        this.selectedCampaignId = selectedContactFirstCampaignId
-      }
+        // 3. if user has a personal line and contact does not have an initial line
+        const userCampaignId = _.get(this.profile, 'campaign_id', null)
 
-      // 5. if contact doesn't have situation 1 and 2 and 3 and company has one campaign select that campaign
-      const firstCampaignId = _.get(this.campaigns, '[0].id', null)
+        if (!this.selectedCampaignId && userCampaignId) {
+          console.log('selectedCampaignId - condition 3', {
+            contact_id: contactId,
+            user_campaign_id: userCampaignId
+          })
+          this.selectedCampaignId = userCampaignId
+        }
 
-      if (!this.selectedCampaignId && !selectedContactFirstCampaignId && firstCampaignId) {
-        this.selectedCampaignId = firstCampaignId
-      }
+        // 4. if contact doesn't have situation 1 and 2 and selected_contact_campaigns has one campaign select the campaign
+        const selectedContactFirstCampaignId = _.get(this.selectedContactCampaigns, '[0].id', null)
 
-      // 6. if contact doesn't have situation 1 and 2 and 3 and 4 and company has more then one campaign select the first one
-      if (!this.selectedCampaignId && firstCampaignId) {
-        this.selectedCampaignId = firstCampaignId
+        if (!this.selectedCampaignId && selectedContactFirstCampaignId) {
+          console.log('selectedCampaignId - condition 4', {
+            contact_id: contactId,
+            selected_contact_first_campaign_id: selectedContactFirstCampaignId
+          })
+          this.selectedCampaignId = selectedContactFirstCampaignId
+        }
+
+        // 5. if contact doesn't have situation 1 and 2 and 3 and company has one campaign select that campaign
+        const firstCampaignId = _.get(this.campaigns, '[0].id', null)
+
+        if (!this.selectedCampaignId && !selectedContactFirstCampaignId && firstCampaignId) {
+          console.log('selectedCampaignId - condition 5', {
+            contact_id: contactId,
+            first_campaign_id: firstCampaignId
+          })
+          this.selectedCampaignId = firstCampaignId
+        }
+
+        // 6. if contact doesn't have situation 1 and 2 and 3 and 4 and company has more then one campaign select the first one
+        if (!this.selectedCampaignId && firstCampaignId) {
+          console.log('selectedCampaignId - condition 6', {
+            contact_id: contactId,
+            first_campaign_id: firstCampaignId
+          })
+          this.selectedCampaignId = firstCampaignId
+        }
       }
 
       this.selectedPhoneNumber = this.contact ? this.contact.phoneNumber : this.selectedPhoneNumber
@@ -682,11 +750,18 @@ export default {
         }
       }
 
+      const params = {}
+
+      if (this.teamInbox) {
+        params.from_team_inbox = this.teamInbox
+      }
+
       return this.$axios.get(`/api/v1/contact/${contactId}/communications`, {
         params: {
           page: this.communicationsPage,
           per_page: this.communicationsPerPage,
-          last_audit_created_at: lastAuditCreatedAt
+          last_audit_created_at: lastAuditCreatedAt,
+          ...params
         },
         cancelToken: this.communicationApiSource.token
       }).then(res => {
@@ -720,10 +795,14 @@ export default {
     },
 
     fetchContactCommunicationsUntilFound (tryCount = 1) {
+      if (tryCount === 1) {
+        this.resetScrollIntervals()
+      }
+
       if (tryCount > 10) {
         this.loadingContactCommunications = false
         this.$generalNotification('Communication is too old for automatic scrolling', 'error')
-
+        this.resetScrollIntervals()
         return
       }
 
@@ -758,6 +837,7 @@ export default {
         }
       }).catch(() => {
         this.loadingContactCommunications = false
+        this.resetScrollIntervals()
       })
     },
 
@@ -806,17 +886,28 @@ export default {
       if (this.contact) {
         this.loadingMarkAsRead = true
 
-        this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`).then(res => {
+        const params = {}
+
+        if (this.teamInbox) {
+          params.ring_group_id = this.teamInboxId
+        }
+
+        this.$axios.post(`/api/v1/contact/${this.contact.id}/mark-as-read`, params).then(res => {
           this.loadingMarkAsRead = false
 
           for (let index in this.communicationsAndAudits) {
-            if (typeof this.communicationsAndAudits[index].is_read !== 'undefined') {
+            if (typeof this.communicationsAndAudits[index].is_read !== 'undefined' &&
+              (!this.teamInboxId || this.communicationsAndAudits[index].ring_group_id === this.teamInboxId)
+            ) {
               this.communicationsAndAudits[index].is_read = true
             }
           }
 
-          this.$VueEvent.fire('mark_contact_communications_all_as_read', res.data)
-          this.$VueEvent.fire('contact_updated', res.data)
+          if (!this.teamInbox || !this.$VueEvent.hasListeners('mark_contact_communications_all_as_read_processed')) {
+            // If no team inbox or no listeners for the processed event, we need to fire the events to release the button right away
+            this.$VueEvent.fire('mark_contact_communications_all_as_read', this.contact)
+            this.$VueEvent.fire('contact_updated', this.contact)
+          }
         }).catch(err => {
           this.$handleErrors(err.response)
           this.loadingMarkAsRead = false
@@ -825,6 +916,8 @@ export default {
     },
 
     scrollMessages () {
+      if (this.isScrolling) return
+
       const counter = { data: 0 }
       clearInterval(this.contactActivitiesInterval)
 
@@ -847,9 +940,10 @@ export default {
     },
 
     isCommunicationFound () {
-      return this.$route.params.communicationId &&
+      const communicationId = this.$route.params.communicationId
+      return communicationId &&
         !!this.communicationsAndAudits.find(communication => 'type' in communication &&
-          communication.id.toString() === this.$route.params.communicationId.toString())
+          communication.id.toString() === communicationId.toString())
     },
 
     isHashActivityType () {
@@ -889,13 +983,23 @@ export default {
     },
 
     scrollIntoActivity () {
-      const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === this.$route.params.communicationId.toString())
+      if (this.isScrolling) return
+      this.isScrolling = true
+
+      const communicationId = this.$route.params.communicationId
+      const communication = this.communicationsAndAudits.find(communication => communication.id.toString() === communicationId.toString())
+
+      if (!communication) {
+        this.isScrolling = false
+        return
+      }
+
       const ref = (communication.type !== undefined ? 'communication-' : 'contact-audit-') + communication.id
       let count = 0
       let communicationActivity = null
 
-      // scroll to activity
       clearInterval(this.scrollInterval)
+
       this.scrollInterval = setInterval(() => {
         communicationActivity = (this.$refs.contactActivities)
           ? _.get(this.$refs.contactActivities.$refs, `${ref}.0`, null)
@@ -910,12 +1014,14 @@ export default {
           // highlight the activity
           this.highlightActivity(communicationActivity)
           clearInterval(this.scrollInterval)
+          this.isScrolling = false
         }
 
         // if we've been waiting for too long to load,
         // clear this interval
         if (count >= 120) {
           clearInterval(this.scrollInterval)
+          this.isScrolling = false
         }
 
         count++
@@ -929,16 +1035,35 @@ export default {
         return
       }
 
+      // Clear any existing highlight
+      const highlighted = document.querySelector('.shine')
+      if (highlighted) {
+        highlighted.classList.remove('shine')
+      }
+
+      // Add new highlight
+      element.classList.add('shine')
+
+      // Remove highlight after 5 seconds
+      setTimeout(() => {
+        element.classList.remove('shine')
+      }, 5000)
+
       if (!_.isEmpty(commActivity.$refs) && commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem) {
         commActivity.$refs.communicationInfo.$refs.communicationInfoExpansionItem.show()
         let counter = 0
         let containerEl = null
 
+        // Clear any existing container interval
+        clearInterval(this.containerElInterval)
+
         this.containerElInterval = setInterval(() => {
           containerEl = document.querySelector('.contact-activities .scrollbar-white')
 
           if (containerEl) {
-            containerEl.scrollTop = element.offsetTop
+            if (!this.isScrolling) {
+              containerEl.scrollTop = element.offsetTop
+            }
             clearInterval(this.containerElInterval)
           }
 
@@ -949,25 +1074,21 @@ export default {
           }
         }, 500)
       }
-
-      const highlighted = document.querySelector('.shine')
-
-      if (highlighted) {
-        highlighted.classList.remove('shine')
-      }
-
-      element.classList.add('shine')
-
-      setTimeout(() => {
-        element.classList.remove('shine')
-      }, 5000)
     },
 
     fetchIncomingNumber: _.debounce(function () {
       if (this.contact && this.selectedCampaign) {
         this.contactIncomingNumber = null
 
-        this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`).then(res => {
+        const params = {}
+
+        if (this.teamInbox) {
+          params.from_team_inbox = this.teamInbox
+        }
+
+        this.$axios.get(`/api/v1/contact/${this.contact.id}/campaign/${this.selectedCampaign.id}/get-incoming-number`, {
+          params
+        }).then(res => {
           this.contactIncomingNumber = res.data
         }).catch(err => {
           this.$handleErrors(err.response)
@@ -998,7 +1119,7 @@ export default {
       if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
         this.setLineIncomingNumberLoading(true)
 
-        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id).then(response => {
+        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
           this.setLineIncomingNumber(response.data)
         }).finally(() => {
           this.setLineIncomingNumberLoading(false)
@@ -1148,11 +1269,10 @@ export default {
       }).catch(err => {
         getContactTry++
         // check if we have found the contact after 3 retries
-        if (getContactTry > 3) {
+        if (getContactTry > 3 || [400, 404].includes(err?.response?.status)) {
           // error
           console.log('An error occurred while getting the contact', err?.response?.data || err)
           this.loadingContact = false
-          this.$generalNotification('Contact not found, please try again.', 'error')
           return Promise.reject(err)
         } else {
           this.getContactByPhoneNumber(phoneNumber, getContactTry)
@@ -1196,7 +1316,7 @@ export default {
   watch: {
     'selectedCampaign.id': _.debounce(function (value) {
       this.updateMessageComposer()
-      this.updateLineIncomingNumber()
+      this.updateLineIncomingNumber(this.teamInbox)
     }, 1000),
 
     contactId: function () {
@@ -1209,5 +1329,6 @@ export default {
     clearInterval(this.contactActivitiesInterval)
     clearInterval(this.containerElInterval)
     clearInterval(this.scrollInterval)
+    this.isScrolling = false
   }
 }

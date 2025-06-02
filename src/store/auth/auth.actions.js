@@ -1,7 +1,9 @@
 import * as storage from 'src/plugins/helpers/storage'
 import { get } from 'lodash'
+import { setRouterType } from 'src/router/composables/useRolesSystem'
 
-const check = async ({ commit }, payload, skipSetAuthenticated) => {
+const check = async (authModule, payload, skipSetAuthenticated) => {
+  const { commit } = authModule
   const preventLogout = get(payload, 'preventLogout', false)
 
   try {
@@ -24,6 +26,7 @@ const check = async ({ commit }, payload, skipSetAuthenticated) => {
     }
 
     commit('SET_PROFILE', response.data.user)
+    setRouterType(authModule)
     commit('SET_LOADING', false)
     commit('SET_USAGE', response.data.user.usage, { root: true })
     commit('SET_USER_STATUS', response.data.user.enabled, { root: true })
@@ -41,7 +44,7 @@ const check = async ({ commit }, payload, skipSetAuthenticated) => {
   }
 }
 
-const login = async ({ commit }, {
+const login = async (authModule, {
   email,
   password,
   rememberMe,
@@ -51,6 +54,7 @@ const login = async ({ commit }, {
   requestedFrom = null,
   skipSetAuthenticated = false
 }) => {
+  const { commit } = authModule
   const config = {}
 
   const params = {
@@ -89,7 +93,7 @@ const login = async ({ commit }, {
 
     commit('SET_LOADING', false)
 
-    await check({ commit }, {}, skipSetAuthenticated)
+    await check(authModule, {}, skipSetAuthenticated)
     return response
   } catch (err) {
     commit('SET_LOADING', false)
@@ -114,7 +118,9 @@ const getSharedCookie = () => {
   return null
 }
 
-const getCookieUser = async ({ commit }) => {
+const getCookieUser = async (authModule) => {
+  const { commit } = authModule
+
   try {
     commit('SET_LOADING', true)
 
@@ -140,7 +146,7 @@ const getCookieUser = async ({ commit }) => {
 
     commit('SET_LOADING', false)
 
-    await check({ commit }, {})
+    await check(authModule, {})
 
     return response
   } catch (err) {

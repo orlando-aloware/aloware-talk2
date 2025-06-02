@@ -21,6 +21,7 @@ import {
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
+import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry-types'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
@@ -60,14 +61,16 @@ export default {
       AgentStatus,
       WebrtcEvents,
       CommunicationDispositionStatus,
-      taskRedialed: false
+      taskRedialed: false,
+      hungFromAnotherTab: false,
+      parkFromAnotherTab: false
     }
   },
 
   computed: {
     ...mapState('cache', ['currentCompany', 'profile']),
 
-    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups', 'parkedCalls']),
+    ...mapState(['dialer', 'dialerFormStatus', 'isMobile', 'ringGroups']),
 
     ...mapState('auth', ['profile', 'authenticated']),
 
@@ -94,7 +97,7 @@ export default {
       return this.dialer.parkedCall && this.dialer.call
     },
 
-    hasCallInProgressNoParkedCall () {
+    hasCallInProgressNotParked () {
       return !this.dialer.parkedCall && this.dialer.call
     },
 
@@ -104,10 +107,6 @@ export default {
 
     isOnPowerDialerSessionRoute () {
       return this.$route?.meta?.id === 'power-dialer-session'
-    },
-
-    isCallInProgress () {
-      return this.dialer.call && ['connected', 'open'].includes(this.dialer.call.state)
     }
   },
 
@@ -164,7 +163,11 @@ export default {
     this.dialerListeners.reconnectDialer = () => {
       this.getDesktopToken(true)
         .then(() => {
-          this.device.register()
+          try {
+            this.device.register()
+          } catch (err) {
+            console.error('[Reconnect Device] Can not register device. Error: ' + err, this.device.state)
+          }
           this.rebootPhone()
         })
     }
@@ -268,7 +271,7 @@ export default {
 
     this.dialerListeners.answerCallFishing = (data) => {
       console.log('dialerListeners.answerCallFishing', data)
-      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup)
+      this.answerCallFishing(data.communication, data.shouldPark, data.shouldHangup, data.parkFromAnotherTab)
     }
 
     this.dialerListeners.setInputDevice = (inputDevice) => {
@@ -285,6 +288,29 @@ export default {
 
     this.dialerListeners.initializeSettings = () => {
       this.initializeSettings()
+    }
+
+    this.dialerListeners.handleCallParkedFromOtherTab = (data) => {
+      console.log('Call parked from other tab', data, this.dialer.communication)
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('callEnded')
+        return
+      }
+      // If we have the same communication open
+      if (this.dialer.communication && this.dialer.communication.id === data.communicationId && this.dialer.call) {
+        this.parkFromAnotherTab = true
+      }
+    }
+    this.dialerListeners.handleCallHungUpFromOtherTab = (data) => {
+      console.log('Call hung up from other tab', data, this.dialer.communication)
+      if (this.dialer.currentStatus === 'WRAP_UP') {
+        this.$VueEvent.fire('callEnded')
+        return
+      }
+      // If we have the same communication open
+      if (this.dialer.communication && this.dialer.communication.id === data.communicationId && this.dialer.call) {
+        this.hungFromAnotherTab = true
+      }
     }
 
     this.startDialerEvents()
@@ -392,26 +418,6 @@ export default {
       this.$closeActionNotification('incomingCall')
     })
 
-    this.device.on(WebrtcEvents.DISCONNECT, (call) => { // On hangup
-      console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-
-      if (this.dialer.communication) {
-        this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-      }
-
-      this.removeUnownedLiveContactTask()
-      this.stopCallTimer()
-      this.connection = null
-      this.setDialerCurrentStatus('CALL_DISCONNECTED')
-
-      if (this.hasNoParkedAndInprogressCall || this.hasParkedAndInprogressCall || this.hasCallInProgressNoParkedCall) {
-        this.startWrapUpTimer()
-        return
-      }
-
-      this.backToDial('Talk-Device.OnDisconnect')
-    })
-
     this.getDesktopToken()
 
     // ping getDesktopToken every 24 hours
@@ -424,7 +430,7 @@ export default {
 
   methods: {
     checkForcedStatus () {
-      if (!this.profile.last_call || (this.isImpersonate && this.isAgentOnCall)) {
+      if (!this.profile.last_call || (this.isImpersonate && this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL)) {
         return
       }
 
@@ -436,12 +442,6 @@ export default {
         this.forceStartOnWrapUp()
       }
     },
-
-    callParkedFromAnotherTab () {
-      const found = this.parkedCalls.find(parkedCall => parkedCall.id === this.dialer.communication.id)
-      return found || (this.dialer.communication.current_status2 === CommunicationCurrentStatus.CURRENT_STATUS_HOLD_NEW && this.dialer.communication.disposition_status2 === CommunicationDispositionStatus.DISPOSITION_STATUS_INPROGRESS_NEW)
-    },
-
     forceStartOnWrapUp () {
       const wrapUpTimer = this.currentCompany && this.currentCompany.force_wrap_up
         ? this.currentCompany.wrap_up_seconds
@@ -484,6 +484,8 @@ export default {
       this.$VueEvent.listen('setOutputDevice', this.dialerListeners.setOutputDevice)
       this.$VueEvent.listen('testOutputDevice', this.dialerListeners.testOutputDevice)
       this.$VueEvent.listen('initializeSettings', this.dialerListeners.initializeSettings)
+      this.$VueEvent.listen('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
+      this.$VueEvent.listen('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
     },
 
     stopDialerEvents () {
@@ -515,6 +517,8 @@ export default {
       this.$VueEvent.stop('setOutputDevice', this.dialerListeners.setOutputDevice)
       this.$VueEvent.stop('testOutputDevice', this.dialerListeners.testOutputDevice)
       this.$VueEvent.stop('initializeSettings', this.dialerListeners.initializeSettings)
+      this.$VueEvent.stop('call_parked_from_another_tab', this.dialerListeners.handleCallParkedFromOtherTab)
+      this.$VueEvent.stop('call_hung_up_from_another_tab', this.dialerListeners.handleCallHungUpFromOtherTab)
     },
 
     forceRefreshCommunication () {
@@ -528,13 +532,19 @@ export default {
         return Promise.resolve()
       }
 
+      const params = {
+        sid: sid,
+        phone_number: from,
+        live: true
+      }
+
+      if (this.currentCompany.team_inbox_enabled) {
+        params.from_team_inbox = true
+      }
+
       this.loadingCommunication = true
       return this.$axios.get('/api/v1/communication/info', {
-        params: {
-          sid: sid,
-          phone_number: from,
-          live: true
-        }
+        params
       }).then(res => {
         if (this.dialer.communication && !force) {
           return Promise.resolve()
@@ -544,8 +554,8 @@ export default {
 
         // If the communication was rejected by app then move it to skipped list
         if (res.data?.rejected_by_app) {
-          const skipedAndActive = this.getSkippedAndActiveTasks()
-          const tempSet = new Set(skipedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          const skippedAndActive = this.getSkippedAndActiveTasks()
+          const tempSet = new Set(skippedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
           this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
 
           const rejectionReason = REJECTION_REASONS.find(rejectionReason => rejectionReason.type === res.data.rejected_by_app)
@@ -584,9 +594,9 @@ export default {
         // with the communication's contact id
         // else, set the contact.
         if ((routeTitle &&
-            this.activeTask &&
-            routeTitle === 'Power Dialer Sessions' &&
-            parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
+          this.activeTask &&
+          routeTitle === 'Power Dialer Sessions' &&
+          parseInt(this.activeTask.id) === parseInt(res.data.contact_id)) ||
           (routeTitle !== 'Power Dialer Sessions' &&
             this.dialer.communication.contact)) {
           this.setDialerContact(this.dialer.communication.contact)
@@ -607,8 +617,8 @@ export default {
           this.loadingCommunication = false
 
           // Move task to skipped list
-          const skipedAndActive = this.getSkippedAndActiveTasks()
-          const tempSet = new Set(skipedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
+          const skippedAndActive = this.getSkippedAndActiveTasks()
+          const tempSet = new Set(skippedAndActive.map(JSON.stringify)) // Convert each element to JSON to ensure correct comparison
           this.powerDialerTasks.skipped = Array.from(tempSet).map(JSON.parse) // Convert elements back to their original types
 
           return Promise.reject(err)
@@ -655,22 +665,31 @@ export default {
          * particularly noticeable in poor network conditions.
          */
         // initialize twilio client
+
+        // check if the profile has edge locations
+        let edgeLocations = this.profile.edge_locations
+        // make sure it is a filled array
+        if (this.profile.edge_locations === undefined || !Array.isArray(edgeLocations) || edgeLocations.length === 0) {
+          edgeLocations = ['umatilla', 'ashburn', 'roaming']
+        }
         const options = {
-          edge: ['umatilla', 'ashburn', 'roaming'],
+          edge: edgeLocations,
           codecPreferences: ['opus', 'pcmu']
         }
         if (this.currentCompany && this.currentCompany.twilio_debug_log) {
           options.logLevel = 1
           options.enableImprovedSignalingErrorPrecision = true
         }
-        if (this.isCompanyPartOfCustomEdgeLocations(this.currentCompany.id)) {
-          options.edge = ['ashburn', 'umatilla', 'roaming']
-        }
+        console.log('Edge locations', options.edge)
         this.device.initialize(this.dialer.token, options)
 
         console.log('Reset device', reset)
         if (!reset) {
-          this.device.register()
+          try {
+            this.device.register()
+          } catch (err) {
+            console.error('[Reset Device] Can not register device. Error: ' + err, this.device.state)
+          }
         } else {
           this.device.updateToken(this.dialer.token)
         }
@@ -783,9 +802,27 @@ export default {
 
       // Make sure that phone number is string in this part before proceeding
       currentNumber = currentNumber.toString()
-      // force mute
-      if (currentNumber.includes('barge') || currentNumber.includes('whisper')) {
+      const isWhisperCall = currentNumber.includes(COMMUNICATION_SENTRY_TYPE.WHISPER)
+      const isBargeCall = currentNumber.includes(COMMUNICATION_SENTRY_TYPE.BARGE)
+
+      // Force mute for whisper/barge calls
+      if (isBargeCall || isWhisperCall) {
         this.forceMute()
+        // If it's a whisper call to an AI agent, disable unmute functionality
+        if (isWhisperCall) {
+          const commId = currentNumber.split(':')[1]
+          if (commId) {
+            this.fetchAndSetAiAgentCallMode(commId, COMMUNICATION_SENTRY_TYPE.WHISPER)
+          }
+        }
+
+        // If it's a barge call to an AI agent, drop other agents
+        if (isBargeCall) {
+          const commId = currentNumber.split(':')[1]
+          if (commId) {
+            this.fetchAndSetAiAgentCallMode(commId, COMMUNICATION_SENTRY_TYPE.BARGE)
+          }
+        }
       }
     },
 
@@ -840,7 +877,7 @@ export default {
         this.dialerCallPrep(call)
         this.startCallTimer()
         this.setDialerCurrentStatus('CALL_CONNECTED')
-        this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber)
+        this.getCommunication(this.dialer.call.callSid, this.dialer.currentNumber, 1, true)
           .catch((err) => {
             console.log(err)
           })
@@ -866,54 +903,59 @@ export default {
       })
 
       this.connection.on(WebrtcEvents.CONNECTION_DISCONNECT, (call) => { // On hangup
-        if (this.dialer.communication) {
-          this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
-        }
-
-        console.log('Call ended', call, this.dialer.parkedCall, this.dialer.call)
-
-        // Common disconnect handling steps
-        const handleDisconnect = () => {
-          this.removeUnownedLiveContactTask()
-          this.stopCallTimer()
-          this.connection = null
-          this.setDialerCurrentStatus('CALL_DISCONNECTED')
-          this.handlePostDisconnect()
-        }
-
-        // First refresh communication if there's an active call
-        if (this.dialer.call) {
-          this.forceRefreshCommunication()
-            .then(handleDisconnect)
-            .catch(err => {
-              console.error('Error refreshing communication:', err)
-              handleDisconnect()
-            })
-        } else {
-          handleDisconnect()
-        }
+        this.handleCallDisconnected(call, WebrtcEvents.CONNECTION_DISCONNECT)
       })
     },
 
-    handlePostDisconnect () {
-      // Check if we should start wrap up timer
-      const shouldStartWrapUp = this.hasNoParkedAndInprogressCall ||
-        this.hasParkedAndInprogressCall ||
-        (this.hasCallInProgressNoParkedCall && !this.callParkedFromAnotherTab())
+    handleCallDisconnected (call, event) {
+      console.log('Call ended event', event)
+      console.log('Call ended', call)
+      console.log('** Parked call', this.dialer.parkedCall)
+      console.log('** Dialer call', this.dialer.call)
 
-      if (shouldStartWrapUp) {
-        this.startWrapUpTimer()
-        return
+      // don't do anything if there is no communication
+      if (!this.dialer.communication) {
+        console.log('No dialer communication found')
+      } else {
+        console.log('Dialer communication found', this.dialer.communication)
+      }
+
+      if (this.dialer.communication) {
+        this.$VueEvent.fire('callDisconnected', this.dialer.communication.id)
+      }
+
+      this.removeUnownedLiveContactTask()
+      this.stopCallTimer()
+      this.connection = null
+      this.setDialerCurrentStatus('CALL_DISCONNECTED')
+
+      // only start wrap up timer if there is a communication
+      if (this.dialer.communication) {
+        const shouldStartWrapUp = (this.hasNoParkedAndInprogressCall ||
+                                  this.hasParkedAndInprogressCall ||
+                                  this.hasCallInProgressNotParked) &&
+                                  !(this.parkFromAnotherTab || this.hungFromAnotherTab)
+
+        if (shouldStartWrapUp) {
+          this.startWrapUpTimer()
+          return
+        }
       }
 
       // Handle parked call from another tab
-      if (this.callParkedFromAnotherTab()) {
+      if (this.parkFromAnotherTab) {
         this.setDialerParkedCall(this.dialer.communication)
-        this.resetCall('Talk-Connection.OnDisconnect')
+      }
+
+      if (this.hungFromAnotherTab || this.parkFromAnotherTab) {
+        this.resetCall('Talk-Device.OnDisconnect')
+        this.hungFromAnotherTab = false
+        this.parkFromAnotherTab = false
+
         return
       }
 
-      this.backToDial('Talk-Connection.OnDisconnect')
+      this.backToDial('Talk-Device.OnDisconnect')
     },
 
     hangupCall () {
@@ -925,7 +967,23 @@ export default {
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
-      this.connection.hangup()
+      // If we're in an AI agent takeover mode and still muted, make sure we drop the AI agent
+      if (this.dialer.aiAgentTakeover && this.dialer.isMuted && this.dialer.communication) {
+        console.log('Dropping AI agent before hanging up')
+        this.$axios.post('/api/v1/dialer/drop-aloai-agent', {
+          communication_id: this.dialer.communication.id
+        })
+          .then(response => {
+            console.log('Successfully dropped AI agent during hangup')
+            this.connection.hangup()
+          })
+          .catch(err => {
+            console.error('Error dropping AI agent during hangup:', err)
+            this.connection.hangup()
+          })
+      } else {
+        this.connection.hangup()
+      }
 
       this.setIsCallBackButtonDisabled(true)
       setTimeout(() => {
@@ -992,8 +1050,8 @@ export default {
       }
 
       // set agent status to busy if it's an answer by browser/apps user
-      // @custom for HutchBug, Cardone Capital: rejecting a call should still keep the agent on the previous status
-      if (this.currentCompany && ![379, 892].includes(this.currentCompany.id) &&
+      // @custom for Cardone Capital: rejecting a call should still keep the agent on the previous status
+      if (this.currentCompany?.id === 892 &&
         !this.currentCompany.force_users_always_available) {
         this.changeAgentStatus(AgentStatus.AGENT_STATUS_NOT_ACCEPTING_CALLS, false, 1, 'Talk-RejectCall')
       }
@@ -1002,7 +1060,50 @@ export default {
     },
 
     toggleMute () {
-      if (!this.isCallInProgress) {
+      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
+        return
+      }
+
+      // If this is a barge call to an AI agent and user tries to unmute, handle takeover
+      if (this.dialer.aiAgentTakeover && this.dialer.isMuted) {
+        console.log('Taking over the call from AI agent')
+        this.$generalNotification('You are taking over the call from the AloAi agent', 'info')
+
+        if (this.dialer.communication) {
+          // Call the drop-other-agents API when taking over
+          this.$axios.post('/api/v1/dialer/drop-aloai-agent', {
+            communication_id: this.dialer.communication.id
+          })
+            .then(response => {
+              console.log('Successfully dropped other agents from call')
+
+              // After successfully dropping AI agent, unmute and update state
+              if (this.connection) {
+                this.connection.mute(false)
+              }
+              this.setDialerIsMuted(false)
+              this.setDialerAiAgentTakeover(false)
+            })
+            .catch(err => {
+              console.error('Error dropping other agents from call:', err)
+              // Even if there's an error, we should still unmute for better UX
+              if (this.connection) {
+                this.connection.mute(false)
+              }
+              this.setDialerIsMuted(false)
+              this.setDialerAiAgentTakeover(false)
+            })
+
+          return
+        }
+
+        // Unmute the call and update the state
+        if (this.connection) {
+          this.connection.mute(false)
+        }
+        this.setDialerIsMuted(false)
+        this.setDialerAiAgentTakeover(false)
+
         return
       }
 
@@ -1092,7 +1193,7 @@ export default {
     },
 
     toggleHold () {
-      if (!this.isCallInProgress) {
+      if (!this.dialer.call || !['connected', 'open'].includes(this.dialer.call.state)) {
         return
       }
 
@@ -1189,7 +1290,7 @@ export default {
       }
     },
 
-    parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
+    parkCallCombo (shouldAnswer = false, shouldUnpark = false, data = null, parkFromAnotherTab = false) {
       if (this.isNotInProgressCall || (!shouldUnpark && this.dialer.parkedCall)) {
         return
       }
@@ -1197,7 +1298,8 @@ export default {
       this.loadingPark = true
       this.setDialerParkedCall(this.dialer.communication)
       const params = {
-        communication_id: this.dialer.communication.id
+        communication_id: this.dialer.communication.id,
+        call_parked_from_another_tab: parkFromAnotherTab
       }
 
       this.$axios.post('/api/v1/dialer/park', params).then(() => {
@@ -1229,18 +1331,17 @@ export default {
 
     hangupCallCombo (shouldAnswer = false, shouldUnpark = false, data = null) {
       if (this.isAgentOnCall && !this.dialer.call && this.dialer.communication) {
-        talk2Api.V1.communication.forceTerminate(this.dialer.communication.id)
+        talk2Api.V1.communication.agentForceTerminate(this.dialer.communication.id)
           .then(res => {
             this.hangUpInterval(shouldAnswer, shouldUnpark, data)
           })
+      }
 
+      if (!this.dialer.call) {
         return
       }
 
       console.log('Hanging up call')
-      if (!this.dialer.call) {
-        return
-      }
 
       this.setDialerCurrentStatus('HANGING_UP_CALL')
 
@@ -1250,7 +1351,6 @@ export default {
 
       // hangup an incoming call
       this.connection.hangup()
-
       this.hangUpInterval(shouldAnswer, shouldUnpark, data)
     },
 
@@ -1462,6 +1562,8 @@ export default {
       this.setDialerRecordingStatus('in-progress')
       this.setDialerCurrentStatus('READY')
       this.setShowIncomingCallNotification(false)
+      this.setDialerAiAgentWhisper(false)
+      this.setDialerAiAgentTakeover(false)
     },
 
     countCallDuration () {
@@ -1717,7 +1819,7 @@ export default {
       this.setDialerCurrentStatus('READY')
     },
 
-    answerCallFishing (communication, shouldPark = false, shouldHangup = false) {
+    answerCallFishing (communication, shouldPark = false, shouldHangup = false, parkFromAnotherTab = false) {
       this.setShowIncomingCallNotification(false)
 
       if (this.shouldPushPhoneRoute) {
@@ -1731,13 +1833,13 @@ export default {
 
       // answer the incoming call then park the in-progress call
       if (shouldPark && !parkedCall) {
-        this.parkCallCombo(true, false, communication)
+        this.parkCallCombo(true, false, communication, parkFromAnotherTab)
         return
       }
 
       // park the in-progress call and unpark the parked call
       if (shouldPark && parkedCall) {
-        this.parkCallCombo(false, true, parkedCall)
+        this.parkCallCombo(false, true, parkedCall, parkFromAnotherTab)
         return
       }
 
@@ -1825,6 +1927,21 @@ export default {
       return true
     },
 
+    fetchAndSetAiAgentCallMode (commId, type = null) {
+      return talk2Api.V1.communication.get(commId)
+        .then(res => {
+          if (type === COMMUNICATION_SENTRY_TYPE.WHISPER && this.isAiAgentUser(res.data.user)) {
+            this.setDialerAiAgentWhisper(true)
+          } else if (type === COMMUNICATION_SENTRY_TYPE.BARGE && this.isAiAgentUser(res.data.user)) {
+            this.setDialerAiAgentTakeover(true)
+          }
+          return res.data
+        })
+        .catch(err => {
+          console.error('Error fetching communication details:', err)
+        })
+    },
+
     ...mapActions([
       'setDialerToken',
       'setDialerCall',
@@ -1857,7 +1974,9 @@ export default {
       'setDialerError',
       'setDialerErrorDefault',
       'removeParkedCall',
-      'setIsCallBackButtonDisabled'
+      'setIsCallBackButtonDisabled',
+      'setDialerAiAgentWhisper',
+      'setDialerAiAgentTakeover'
     ])
   },
 

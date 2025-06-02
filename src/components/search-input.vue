@@ -1,6 +1,6 @@
 <template>
   <div class="position-relative">
-    <q-input :class="[{ 'input-error': hasError}, border ? 'form-control' : 'border-0']"
+    <q-input :class="[{ 'input-error': hasError && inputErrorBorder}, border ? 'form-control' : 'border-0']"
              :placeholder="placeholder"
              :disabled="disabled"
              class="form-control-search"
@@ -56,6 +56,11 @@ export default {
       default: false
     },
 
+    inputErrorBorder: {
+      type: Boolean,
+      default: false
+    },
+
     searchOnInput: {
       type: Boolean,
       default: false
@@ -64,6 +69,12 @@ export default {
     noClearOnRouteChange: {
       type: Boolean,
       default: false
+    }
+  },
+
+  computed: {
+    showLimitCharactersError () {
+      return this.limitSearchCharacters && this.hasError
     }
   },
 
@@ -83,12 +94,17 @@ export default {
       if (!this.searchValue) {
         this.searchValue = ''
       }
-      this.$emit('search', this.searchValue)
+
       if (this.limitSearchCharacters && this.searchValue && this.searchValue.trim().length < 3) {
         this.hasError = true
       } else {
         this.hasError = false
       }
+
+      if (!this.hasError) {
+        this.$emit('search', this.searchValue)
+      }
+
       this.$emit('show-error', this.hasError)
     }, 500),
 
@@ -128,3 +144,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.input-error {
+  border: 1px solid red;
+  border-radius: 4px;
+}
+</style>

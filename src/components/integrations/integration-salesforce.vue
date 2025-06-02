@@ -86,18 +86,19 @@
                     <span class="data-value">{{ integrationData.other_phone }}</span>
                 </p>
             </q-card-section>
-          <sync-with-integration :integration_name='integrationName()'
-                                 :contact_id='contact.id'
-                                 @sync-complete="afterSyncComplete"/>
+          <sync-with-integration
+            :is-read-only="isReadOnly"
+            :integration_name="integrationName()"
+            :contact_id="contact.id"
+            v-if="contact?.id"
+            @sync-complete="afterSyncComplete"/>
         </q-card>
     </div>
   </template>
 
 <script>
 import { mapState } from 'vuex'
-import {
-  integrationMixin
-} from 'src/plugins/mixins'
+import { integrationMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import SyncWithIntegration from 'components/integrations/sync-with-integration.vue'
 import { SALESFORCE_INTEGRATION } from 'src/constants/integrations'
 import _ from 'lodash'
@@ -107,7 +108,8 @@ export default {
   components: { SyncWithIntegration },
 
   mixins: [
-    integrationMixin
+    integrationMixin,
+    teamInboxPropsMixin
   ],
 
   props: {
@@ -117,6 +119,12 @@ export default {
     },
 
     dialerMode: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       required: false,
       default: false
@@ -175,7 +183,7 @@ export default {
     getData () {
       this.contactIntegrationDataLoaded = false
 
-      return this.getIntegrationData(this.contact, SALESFORCE_INTEGRATION)
+      return this.getIntegrationData(this.contact, SALESFORCE_INTEGRATION, null, this.teamInbox)
         .then(response => {
           if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
             this.integrationData = response.data

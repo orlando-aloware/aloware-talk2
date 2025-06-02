@@ -5,7 +5,7 @@
                           :values="selectedId"
                           :options="activeCampaignsAlphabeticalOrder"
                           :disable="disabled"
-                          :canEdit="hasPermissionTo(['list campaign', 'view campaign'])"
+                          :canEdit="hasPermissionTo(['list campaign', 'view campaign']) && !isReadOnly"
                           v-if="genericMultiselect"
                           @valuesUpdated="onInput">
     </generic-multi-select>
@@ -56,7 +56,7 @@
           <q-item-section v-if="isMessagingBlocked(opt, checkBlockedMessaging, false, true)" side>
             <q-tooltip anchor="top middle"
                        self="center middle">
-              To send messages to the US, A2P 10DLC Brand and Campaign are required.
+              {{ getMessagingBlocked(opt) }}
             </q-tooltip>
             <q-badge color="blue">i</q-badge>
           </q-item-section>
@@ -226,6 +226,11 @@ export default {
     isLoading: {
       type: Boolean,
       default: false
+    },
+
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -298,7 +303,7 @@ export default {
     },
 
     disabled () {
-      return this.disable || this.campaignsIsLoading
+      return this.disable || this.campaignsIsLoading || this.isReadOnly
     },
 
     classes () {

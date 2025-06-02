@@ -1,954 +1,205 @@
 <template>
   <div class="d-flex align-items-start flex-column h-100 w-100">
     <div class="w-100">
-      <q-btn size="1.1rem"
+      <q-btn v-if="staticsLoaded"
+             :icon="appLogo"
              align="center"
-             to="/"
              class="app-logo w-100 p-2"
              flat
-             :icon="appLogo"
-             v-if="staticsLoaded">
+             size="1.1rem"
+             to="/">
       </q-btn>
-      <div class="w-100 d-flex align-items-center justify-center px-1 flex-column"
-           style="height: 61px;"
-           v-else>
+      <div v-else
+           class="w-100 d-flex align-items-center justify-center px-1 flex-column"
+           style="height: 61px;">
         <q-spinner-bars color="white"
                         size="18px">
         </q-spinner-bars>
       </div>
     </div>
-    <q-btn :to="{ name: 'Inbox' }"
-           :ripple="false"
-           icon="img:app-icons/menu/inbox_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           data-testid="communication-active-sidebar-btn"
-           flat
-           v-show="isActive('Inbox')">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{ INBOXES_MENU_TITLE }}</span>
-      </q-tooltip>
 
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        {{ INBOXES_MENU_TITLE }}
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Inbox' }"
-           :ripple="false"
-           icon="img:app-icons/menu/inbox_gray.svg"
-           align="left"
-           padding="10px 21px"
-           class="nav-icons w-100"
-           data-testid="communication-no-active-sidebar-btn"
-           v-show="!isActive('Inbox')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{ INBOXES_MENU_TITLE }}</span>
-      </q-tooltip>
+    <app-sidebar-nav-link
+      v-if="hasCompanyLegacyInboxEnabled"
+      :isActive="isActive('Inbox')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :title="INBOXES_MENU_TITLE"
+      :to="{ name: 'Inbox' }"
+      icon="inbox"
+    />
 
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        {{ INBOXES_MENU_TITLE }}
-      </span>
-    </q-btn>
+    <app-sidebar-nav-link
+      v-if="hasCompanyTeamInboxEnabled"
+      :isActive="isActive(TEAMINBOXES_MENU_TITLE)"
+      :isSidebarExpanded="isSidebarExpanded"
+      :title="TEAMINBOXES_MENU_TITLE"
+      :to="{ name: TEAMINBOXES_MENU_TITLE }"
+      icon="multi_inbox"
+      padding="10px 0px 10px 22px"
+    >
+      <template v-slot:icon>
+        <div
+          v-if="isSidebarExpanded"
+          class="ml-auto mr-3"
+        >
+          <information-circle-icon
+            id="teaminbox-helper-icon"
+            :color="isActive('Team Inboxes') ? '#FFF' : '#9797AE'"
+            height="20"
+            width="20"
+          />
+          <b-tooltip
+            boundary="#teaminbox-helper-icon"
+            custom-class="talk-table__tooltip talk-table__tooltip--md"
+            placement="right"
+            target="teaminbox-helper-icon"
+          >
+            {{ TEAMINBOX_TOOLTIP_TEXT }}
+          </b-tooltip>
+        </div>
+      </template>
+    </app-sidebar-nav-link>
 
-    <q-btn :to="{ name: EINBOXES_MENU_TITLE }"
-           :ripple="false"
-           icon="img:app-icons/menu/multi_inbox_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           data-testid="communication-active-sidebar-btn"
-           v-show="isActive(EINBOXES_MENU_TITLE)"
-           v-if="isDemoCompany || isTeamInboxDemoCompany"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{ EINBOXES_MENU_TITLE }}</span>
-      </q-tooltip>
+    <app-sidebar-nav-link
+      :isActive="isActive(COMMUNICATIONS_MENU_TITLE)"
+      :isSidebarExpanded="isSidebarExpanded"
+      :title="COMMUNICATIONS_MENU_TITLE"
+      :to="{name: DEFAULT_COMMUNICATIONS_ROUTE_NAME}"
+      icon="communications"
+    />
 
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        {{ EINBOXES_MENU_TITLE }}
-      </span>
+    <app-sidebar-nav-link
+      :isActive="isActive('Contacts')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'Contacts'}"
+      icon="contacts"
+      title="Contacts"
+    />
 
-      <!-- Temporary helper -->
-      <div class="ml-auto mr-3"
-           v-if="isSidebarExpanded">
-        <information-circle-icon height="20"
-                                 width="20"
-                                 color="#FFF"
-                                 id="einbox-helper-icon" />
-         <b-tooltip custom-class="talk-table__tooltip talk-table__tooltip--md"
-                    placement="right"
-                    boundary="#einbox-helper-icon"
-                    target="einbox-helper-icon">
-          {{ EINBOX_TOOLTIP_TEXT }}
-        </b-tooltip>
-      </div>
-    </q-btn>
-    <q-btn :to="{ name: EINBOXES_MENU_TITLE }"
-           :ripple="false"
-           icon="img:app-icons/menu/multi_inbox_gray.svg"
-           align="left"
-           padding="10px 0px 10px 22px"
-           class="nav-icons w-100"
-           data-testid="communication-no-active-sidebar-btn"
-           v-show="!isActive(EINBOXES_MENU_TITLE)"
-           v-if="isDemoCompany || isTeamInboxDemoCompany"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">{{ EINBOXES_MENU_TITLE }}</span>
-      </q-tooltip>
+    <app-sidebar-nav-link
+      :isActive="isActive('Lists')"
+      :isSidebarExpanded="isSidebarExpanded"
+      icon="lists"
+      padding="10px 20px"
+      title="Lists"
+      to="/lists-management"
+    />
 
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        {{ EINBOXES_MENU_TITLE }}
-      </span>
+    <app-sidebar-nav-link
+      v-if="profile.auto_dialer_enabled"
+      :isActive="isActive('Power Dialer')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'Power Dialer'}"
+      icon="power_dialer"
+      title="Power Dialer"
+    />
 
-      <!-- Temporary helper -->
-      <div class="ml-auto mr-3"
-           v-if="isSidebarExpanded">
-        <information-circle-icon height="20"
-                                 width="20"
-                                 color="#9797AE"
-                                 id="einbox-helper-icon-gray" />
-         <b-tooltip custom-class="talk-table__tooltip talk-table__tooltip--md"
-                    placement="right"
-                    boundary="#einbox-helper-icon-gray"
-                    target="einbox-helper-icon-gray">
-          {{ EINBOX_TOOLTIP_TEXT }}
-        </b-tooltip>
-      </div>
-    </q-btn>
+    <app-sidebar-nav-link
+      :isActive="isActive('Wallboard')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'Wallboard'}"
+      icon="wallboard"
+      padding="10px 22px"
+      title="Wallboard"
+    />
 
-    <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
-           :ripple="false"
-           icon="img:app-icons/menu/communications_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           data-testid="communication-active-sidebar-btn"
-           flat
-           v-show="isActive('Communications')">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 :offset="[-5, 0]"
-                 v-if="!isSidebarExpanded">
-        <span class="font-weight-bold text-sm">{{ COMMUNICATIONS_MENU_TITLE }}</span>
-      </q-tooltip>
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        {{ COMMUNICATIONS_MENU_TITLE }}
-      </span>
-    </q-btn>
-    <q-btn :to="DEFAULT_COMMUNICATIONS_ROUTE_PATH"
-           :ripple="false"
-           icon="img:app-icons/menu/communications_gray.svg"
-           align="left"
-           padding="10px 21px"
-           class="nav-icons w-100"
-           data-testid="communication-no-active-sidebar-btn"
-           flat
-           v-show="!isActive('Communications')">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 :offset="[-5, 0]"
-                 v-if="!isSidebarExpanded">
-        <span class="font-weight-bold text-sm">{{ COMMUNICATIONS_MENU_TITLE }}</span>
-      </q-tooltip>
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        {{ COMMUNICATIONS_MENU_TITLE }}
-      </span>
-    </q-btn>
+    <app-sidebar-nav-link
+      :isActive="isActive('Calendar')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'Calendar', query: { view: 'month' }}"
+      icon="calendar"
+      padding="10px 22px"
+      title="Calendar"
+    />
 
-    <q-btn :to="{ name: 'Contacts' }"
-           :ripple="false"
-           icon="img:app-icons/menu/contacts_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           data-testid="contacts-sidebar-btn"
-           v-show="isActive('Contacts')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 data-testid="contacts-sidebar-tooltip"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Contacts</span>
-      </q-tooltip>
+    <app-sidebar-nav-link
+      :isActive="isActive('Tags')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'Tags'}"
+      icon="tags"
+      padding="10px 22px"
+      title="Tags"
+    />
 
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Contacts
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Contacts' }"
-           :ripple="false"
-           icon="img:app-icons/menu/contacts_gray.svg"
-           align="left"
-           padding="10px 21px"
-           class="nav-icons w-100"
-           data-testid="contacts-no-active-sidebar-btn"
-           v-show="!isActive('Contacts')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Contacts</span>
-      </q-tooltip>
+    <app-sidebar-nav-link
+      :isActive="isActive('Stats')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'Stats'}"
+      icon="stats"
+      title="Stats"
+    />
 
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Contacts
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ path: '/lists-management' }"
-           :ripple="false"
-           icon="img:app-icons/menu/lists_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Lists')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Lists</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Lists
-      </span>
-    </q-btn>
-    <q-btn :to="{ path: '/lists-management' }"
-           :ripple="false"
-           icon="img:app-icons/menu/lists_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           v-show="!isActive('Lists')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Lists</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Lists
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ path: '/power-dialer' }"
-           :ripple="false"
-           icon="img:app-icons/menu/power_dialer_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Power Dialer') && profile.auto_dialer_enabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Power Dialer</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Power Dialer
-      </span>
-    </q-btn>
-    <q-btn :to="{ path: '/power-dialer' }"
-           :ripple="false"
-           icon="img:app-icons/menu/power_dialer_gray.svg"
-           align="left"
-           padding="10px 21px"
-           class="nav-icons w-100"
-           v-show="(!isActive('Power Dialer') && profile.auto_dialer_enabled) || !profile.auto_dialer_enabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Power Dialer</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Power Dialer
-      </span>
-    </q-btn>
-
-    <q-btn icon="img:app-icons/menu/wallboard_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           flat
-           :to="{ name: 'Wallboard' }"
-           :ripple="false"
-           v-show="isActive('Wallboard')">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Wallboard</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Wallboard
-      </span>
-    </q-btn>
-    <q-btn icon="img:app-icons/menu/wallboard_grey.svg"
-           align="left"
-           padding="10px 22px"
-           class="nav-icons w-100"
-           flat
-           :to="{ name: 'Wallboard' }"
-           :ripple="false"
-           v-show="!isActive('Wallboard')">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Wallboard</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Wallboard
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ path: '/calendar', query: { view: 'month' } }"
-           :ripple="false"
-           icon="img:app-icons/menu/calendar_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Calendar')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Calendar</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Calendar
-      </span>
-    </q-btn>
-    <q-btn :to="{ path: '/calendar', query: { view: 'month' } }"
-           :ripple="false"
-           icon="img:app-icons/menu/calendar_gray.svg"
-           align="left"
-           padding="10px 22px"
-           class="nav-icons w-100"
-           v-show="!isActive('Calendar')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Calendar</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Calendar
-      </span>
-    </q-btn>
-
-    <q-btn class="nav-icons w-100"
-           padding="none"
-           align="left"
-           icon="img:app-icons/menu/tags_active.svg"
-           flat
-           :to="{ name: 'Tags' }"
-           :ripple="false"
-           v-show="isActive('Tags')">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Tags</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Tags
-      </span>
-    </q-btn>
-    <q-btn icon="img:app-icons/menu/tags_gray.svg"
-           align="left"
-           padding="10px 22px"
-           class="nav-icons w-100"
-           :to="{ name: 'Tags' }"
-           :ripple="false"
-           v-show="!isActive('Tags')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Tags</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Tags
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ name: 'Stats' }"
-           :ripple="false"
-           icon="img:app-icons/menu/stats_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Stats')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Stats</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Stats
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Stats' }"
-           :ripple="false"
-           icon="img:app-icons/menu/stats_gray.svg"
-           align="left"
-           padding="10px 21px"
-           class="nav-icons w-100"
-           v-show="!isActive('Stats')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Stats</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Stats
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ name: 'Messenger' }"
-           :ripple="false"
-           icon="img:app-icons/menu/messenger_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Messenger')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Messenger</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Messenger
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Messenger' }"
-           :ripple="false"
-           icon="img:app-icons/menu/messenger_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           v-show="!isActive('Messenger')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Messenger</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Messenger
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ name: 'DMS Equity' }"
-           :ripple="false"
-           icon="img:app-icons/menu/dms_equity_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('DMS Equity')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">DMS Equity</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        DMS Equity
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'DMS Equity' }"
-           :ripple="false"
-           icon="img:app-icons/menu/dms_equity_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           v-show="!isActive('DMS Equity')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">DMS Equity</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        DMS Equity
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ name: 'Digital Lead War' }"
-           :ripple="false"
-           icon="img:app-icons/menu/digital_lead_war_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Digital Lead War')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Digital Lead War</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Digital Lead War
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Digital Lead War' }"
-           :ripple="false"
-           icon="img:app-icons/menu/digital_lead_war_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           v-show="!isActive('Digital Lead War')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Digital Lead War</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Digital Lead War
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ name: 'Email Blast' }"
-           :ripple="false"
-           icon="img:app-icons/menu/email_blast_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Email Blast')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Email Blast</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Email Blast
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Email Blast' }"
-           :ripple="false"
-           icon="img:app-icons/menu/email_blast_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           v-show="!isActive('Email Blast')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Email Blast</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Email Blast
-      </span>
-    </q-btn>
-    <q-btn icon="img:app-icons/menu/training_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           flat
-           :ripple="false"
-           v-show="isActive('Training')"
-           v-if="isSimpSocialIntegrationEnabled"
-           @click="openTrainingPage">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Training</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Training
-      </span>
-    </q-btn>
-    <q-btn icon="img:app-icons/menu/training_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           flat
-           :ripple="false"
-           v-show="!isActive('Training')"
-           v-if="isSimpSocialIntegrationEnabled"
-           @click="openTrainingPage">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Training</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Training
-      </span>
-    </q-btn>
-
-    <q-btn icon="img:app-icons/menu/sold_report_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           flat
-           :to="{ name: 'Sold Report' }"
-           :ripple="false"
-           v-show="isActive('Sold Report')"
-           v-if="isSimpSocialIntegrationEnabled">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Sold Report</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Sold Report
-      </span>
-    </q-btn>
-    <q-btn icon="img:app-icons/menu/sold_report_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           flat
-           :to="{ name: 'Sold Report' }"
-           :ripple="false"
-           v-show="!isActive('Sold Report')"
-           v-if="isSimpSocialIntegrationEnabled">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Sold Report</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Sold Report
-      </span>
-    </q-btn>
-
-    <!--q-btn :to="{ name: 'Dealer Profile' }"
-           :ripple="false"
-           icon="img:app-icons/menu/dealer_profile_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Dealer Profile')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Dealer Profile</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Dealer Profile
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Dealer Profile' }"
-           :ripple="false"
-           icon="img:app-icons/menu/dealer_profile_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           v-show="!isActive('Dealer Profile')"
-           v-if="isSimpSocialIntegrationEnabled"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Dealer Profile</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Dealer Profile
-      </span>
-    </q-btn-->
-
-    <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
-           align="left"
-           padding="10px 21px"
-           class="nav-icons w-100 disabled"
-           flat
-           :ripple="false"
-           v-show="!isActive('Broadcasts') && !canUseBroadcast"
-           @click="toggleProFeatureDialog(true)">
-      <q-badge rounded
-               floating
-               color="orange"
-               style="top:-5px; right: -5px"
-               v-if="!isSidebarExpanded"
-      />
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Broadcasts</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Broadcasts
-        <q-badge rounded
-                 class="mb-2"
-                 color="orange"
+    <app-sidebar-nav-link
+      :className="{'disabled': !canUseBroadcast}"
+      :isActive="isActive('Broadcasts')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'Broadcasts'}"
+      icon="broadcast"
+      title="Broadcasts"
+      @click="handleBroadcastsClick"
+    >
+      <template v-slot:badge-expanded>
+        <q-badge
+          v-show="!canUseBroadcast"
+          class="mb-2"
+          color="orange"
+          rounded
         />
-      </span>
-    </q-btn>
-    <q-btn icon="img:app-icons/menu/broadcast_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           flat
-           :to="{ path: '/broadcasts' }"
-           :ripple="false"
-           v-show="isActive('Broadcasts') && canUseBroadcast">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Broadcasts</span>
-      </q-tooltip>
+      </template>
+      <template v-slot:badge>
+        <q-badge
+          v-show="!canUseBroadcast"
+          color="orange"
+          floating
+          rounded
+          style="top:-5px; right: -5px"
+        />
+      </template>
+    </app-sidebar-nav-link>
 
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Broadcasts
-      </span>
-    </q-btn>
-    <q-btn icon="img:app-icons/menu/broadcast_gray.svg"
-           align="left"
-           padding="10px 21px"
-           class="nav-icons w-100"
-           flat
-           :to="{ path: '/broadcasts' }"
-           :ripple="false"
-           v-show="!isActive('Broadcasts') && canUseBroadcast">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Broadcasts</span>
-      </q-tooltip>
+    <app-sidebar-nav-link
+      :isActive="isActive('AloAi')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'AloAi'}"
+      icon="aloai"
+      padding="10px 20px"
+      title="AloAi"
+    />
 
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Broadcasts
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ name: 'AloAi' }"
-           :ripple="false"
-           icon="img:app-icons/menu/aloai_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           data-testid="contacts-sidebar-btn"
-           v-show="isActive('AloAi')"
-           flat
-           v-if="!isSimpSocial">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 data-testid="contacts-sidebar-tooltip"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">AloAi</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        AloAi
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'AloAi' }"
-           :ripple="false"
-           icon="img:app-icons/menu/aloai_gray.svg"
-           align="left"
-           padding="10px 20px"
-           class="nav-icons w-100"
-           data-testid="contacts-no-active-sidebar-btn"
-           v-show="!isActive('AloAi')"
-           flat
-           v-if="!isSimpSocial">
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">AloAi</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        AloAi
-      </span>
-    </q-btn>
-
-    <q-btn :to="{ name: 'Settings' }"
-           :ripple="false"
-           icon="img:app-icons/menu/settings_active.svg"
-           align="left"
-           padding="none"
-           class="nav-icons w-100"
-           v-show="isActive('Settings')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Settings</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-white ml-2"
-            v-if="isSidebarExpanded">
-        Settings
-      </span>
-    </q-btn>
-    <q-btn :to="{ name: 'Settings' }"
-           :ripple="false"
-           icon="img:app-icons/menu/settings_gray.svg"
-           align="left"
-           padding="10px 21px"
-           class="nav-icons w-100"
-           v-show="!isActive('Settings')"
-           flat>
-      <q-tooltip anchor="center right"
-                 self="center left"
-                 v-if="!isSidebarExpanded"
-                 :offset="[-5, 0]">
-        <span class="font-weight-bold text-sm">Settings</span>
-      </q-tooltip>
-
-      <span class="text-size-lg font-weight-bold text-regular text-menu-purple ml-2"
-            v-if="isSidebarExpanded">
-        Settings
-      </span>
-    </q-btn>
+    <app-sidebar-nav-link
+      :isActive="isActive('Settings')"
+      :isSidebarExpanded="isSidebarExpanded"
+      :to="{name: 'Settings'}"
+      icon="settings"
+      title="Settings"
+    />
 
     <div class="mt-auto w-100">
       <div class="width-40 margin-auto position-relative">
         <q-separator class="separator-blur mt-1"
-                     color="white"/>
+                     color="white" />
       </div>
-      <q-btn :icon="modeIcon"
+      <q-btn v-if="false"
+             :icon="modeIcon"
              :ripple="false"
-             padding="none"
-             size="0.75rem"
              align="center"
              class="nav-icons w-100"
-             v-if="false"
-             @click="$emit('toggleMode')"/>
-
-      <q-btn :icon="sidebarIcon"
-             :ripple="false"
-             :padding="isSidebarExpanded ? '10px 20px' : 'none'"
+             padding="none"
              size="0.75rem"
-             :align="isSidebarExpanded ? 'right' : 'center'"
+             @click="$emit('toggleMode')" />
+
+      <q-btn :align="isSidebarExpanded ? 'right' : 'center'"
+             :icon="sidebarIcon"
+             :padding="isSidebarExpanded ? '10px 20px' : 'none'"
+             :ripple="false"
              class="nav-icons w-100 text-menu-purple custom-rotate-90 bordered-menu-icon"
+             size="0.75rem"
              @click="toggleSidebar">
-        <q-tooltip anchor="center right"
-                   self="center left"
-                   :offset="[-5, 0]">
-          <span class="font-weight-bold text-sm">{{ isSidebarExpanded ? 'Collapse the navigation' : 'Expand the navigation' }}</span>
+        <q-tooltip :offset="[-5, 0]"
+                   anchor="center right"
+                   self="center left">
+          <span
+            class="font-weight-bold text-sm">{{ isSidebarExpanded ? 'Collapse the navigation' : 'Expand the navigation'
+            }}</span>
         </q-tooltip>
       </q-btn>
     </div>
@@ -958,23 +209,25 @@
 <script>
 import { mapActions, mapState } from 'vuex'
 import * as storage from 'src/plugins/helpers/storage'
-import { broadcastsMixin, kycMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import { broadcastsMixin, kycMixin, userMixin } from 'src/plugins/mixins'
 import {
-  DEFAULT_COMMUNICATIONS_ROUTE_PATH,
-  INBOXES_MENU_TITLE,
   COMMUNICATIONS_MENU_TITLE,
-  EINBOXES_MENU_TITLE,
-  EINBOXES_MENU_ITEMS_TITLE,
-  EINBOXES_MENU_COMMUNICATIONS_TITLE
+  DEFAULT_COMMUNICATIONS_ROUTE_NAME,
+  INBOXES_MENU_TITLE,
+  TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
+  TEAMINBOXES_MENU_ITEMS_TITLE,
+  TEAMINBOXES_MENU_TITLE
 } from 'src/router/routes'
 import InformationCircleIcon from 'components/icons/information-circle-icon.vue'
+import AppSidebarNavLink from 'components/layout/app-sidebar-nav-link.vue'
 
-const EINBOX_TOOLTIP_TEXT = 'Team Inboxes is a centralized workspace where Ring Groups allows multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
+const TEAMINBOX_TOOLTIP_TEXT = 'Team Inboxes is a centralized workspace where Ring Groups allow multiple agents to view and respond to conversations, ensuring faster replies, better collaboration, and no missed messages.'
 
 export default {
   name: 'app-sidebar',
 
   components: {
+    AppSidebarNavLink,
     InformationCircleIcon
   },
 
@@ -997,7 +250,6 @@ export default {
   },
 
   mixins: [
-    simpsocialMixin,
     kycMixin,
     broadcastsMixin,
     userMixin
@@ -1048,16 +300,23 @@ export default {
     return {
       modeIcon: 'img:app-icons/menu/mode_gray.svg',
       COMMUNICATIONS_MENU_TITLE,
-      DEFAULT_COMMUNICATIONS_ROUTE_PATH,
       INBOXES_MENU_TITLE,
-      EINBOX_TOOLTIP_TEXT,
-      EINBOXES_MENU_TITLE,
-      EINBOXES_MENU_ITEMS_TITLE,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE
+      TEAMINBOX_TOOLTIP_TEXT,
+      TEAMINBOXES_MENU_TITLE,
+      TEAMINBOXES_MENU_ITEMS_TITLE,
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE,
+      DEFAULT_COMMUNICATIONS_ROUTE_NAME
     }
   },
 
   methods: {
+    handleBroadcastsClick (e) {
+      if (!this.canUseBroadcast) {
+        e.preventDefault()
+        this.toggleProFeatureDialog(true)
+      }
+    },
+
     isActive (name) {
       if (this.$route.name === 'Contact' && name === 'Contacts') {
         return true
@@ -1072,7 +331,7 @@ export default {
         return true
       }
 
-      if ([EINBOXES_MENU_ITEMS_TITLE, EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && name === EINBOXES_MENU_TITLE) {
+      if ([TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && name === TEAMINBOXES_MENU_TITLE) {
         return true
       }
 
@@ -1110,10 +369,6 @@ export default {
 
     toggleSidebar () {
       this.$emit('toggleSidebarExpansion', this.isSidebarExpanded)
-    },
-
-    openTrainingPage () {
-      window.open('https://calendly.com/training-2652', '_blank')
     },
 
     ...mapActions(['toggleProFeatureDialog']),

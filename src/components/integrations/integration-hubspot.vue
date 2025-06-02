@@ -8,6 +8,26 @@
       data-testid="integration-hubspot-card"
       flat
     >
+    <!-- Loading Indicator -->
+      <div v-if="isLoading" class="loading-indicator">
+        <span class="loading-text text-caption">Loading {{ loadedSections }}/3</span>
+        <div class="loading-details">
+          <div class="loading-item">
+            <i :class="contactIntegrationDataLoaded ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
+            Contact Information
+          </div>
+          <div class="loading-item">
+            <i :class="contactIntegrationDataLoaded && !isLoadingLifecycleStages ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
+            Lifecycle Stage
+          </div>
+          <div class="loading-item">
+            <i :class="contactIntegrationDataLoaded && !isLoadingCompanyAssociation ? 'fas fa-check' : 'fas fa-spinner fa-spin'" />
+            Associated Company
+          </div>
+        </div>
+      </div>
+      <!-- End Loading Indicator -->
+
       <q-item class="p-0">
         <span class='integration-jit-card-header'>
           <i class="fab fa-hubspot hubspot-icon"></i>
@@ -23,7 +43,7 @@
       <!-- End Skeleton Loader -->
 
       <!-- Start JIT Card Main Content -->
-      <template v-if="contactIntegrationDataLoaded">
+      <template v-if="contactIntegrationDataLoaded && forceComponentReloadFlag">
         <!-- Start Duplicate Contacts Section -->
         <q-card-section
           class='duplicateContactPhoneNumberMessage'
@@ -33,17 +53,68 @@
         </q-card-section>
         <q-separator v-if='hasDuplicates' />
         <integration-hubspot-one-contact
+          ref="hubspotOneContact"
           v-if='integrationData'
           is-primary
           :integration-data="integrationData"
           :lifecycle-stages-options="lifecycleStagesOptions"
           :contact-id="contact.id"
-        />
+          :is-read-only="isReadOnly"
+          :show-duplicates="showDuplicates"
+          @toggle-duplicates="toggleDuplicates"
+        >
+          <template #duplicates-section>
+            <!-- Start Duplicate Contacts Section -->
+            <template v-if="hasDuplicates && showDuplicates">
+              <div
+                v-for="duplicate in integrationData.duplicates"
+                :key="duplicate.id"
+              >
+                <q-separator data-testid="integration-hubspot-separator" />
+                <integration-hubspot-one-contact
+                  :integrationData="duplicate"
+                  :lifecycle-stages-options="lifecycleStagesOptions"
+                  :contact-id="contact.id"
+                  :is-read-only="isReadOnly"
+                />
+              </div>
+            </template>
+            <!-- End Duplicate Contacts Section -->
+          </template>
+          <template #company-section>
+            <!-- Start Company Association -->
+            <template v-if="integrationData.associated_company">
+              <q-separator v-if="integrationData.properties" />
+              <q-card-section class="text-muted">
+                {{ integrationData.properties ? 'This contact is also associated with a HubSpot company' : 'This contact is associated with a HubSpot company' }}
+              </q-card-section>
+              <q-separator />
+              <q-card-section data-testid="integration-hubspot-company-section">
+                <p class="text-bold mb-0">{{ integrationData.associated_company.name || 'No Name Set' }}</p>
+                <a class="external-contact-integration-link-icon color-primary"
+                   target='_blank'
+                   :href="integrationData.associated_company.link">
+                  <i class="fa fa-external-link" aria-hidden="true"/>
+                </a>
+                <p class='mb-0'>
+                  <span class='data-icon-label'>Domain: </span>
+                  <span class='data-value'>{{ integrationData.associated_company.domain || '--' }}</span>
+                </p>
+                <p class='mb-0'>
+                  <span class='data-icon-label'>Phone: </span>
+                  <span class='data-value'>{{ integrationData.associated_company.phone || '--' }}</span>
+                </p>
+              </q-card-section>
+            </template>
+            <!-- End Company Association -->
+          </template>
+        </integration-hubspot-one-contact>
         <!-- End Duplicate Contacts Section -->
         <!-- Start Sync Button -->
         <q-card-section data-testid="integration-hubspot-card-section-3">
           <b-row>
             <b-button
+              :disabled="isReadOnly"
               class="text-white"
               size="sm"
               variant="primary"
@@ -94,6 +165,7 @@
               tabindex="0"
               data-testid="integration-hubspot-enroll-button"
               @click="onEnrollToWorkflow"
+              :disabled="isReadOnly"
             >
               <i class="fa fa-user-plus"></i>
               Enroll to Workflow
@@ -119,7 +191,7 @@
               size="sm"
               variant="primary"
               data-testid="integration-hubspot-enroll-button"
-              :disabled="isEnrolling || !isWorkflowValid"
+              :disabled="isEnrolling || !isWorkflowValid || isReadOnly"
               @click.prevent="enrollToWorkflow"
             >
               <q-spinner-bars
@@ -132,32 +204,6 @@
           </div>
         </q-menu>
         <!-- End Workflow Section -->
-        <!-- Start Duplicate Contacts Section -->
-        <div v-if='hasDuplicates'>
-          <div v-if="showDuplicates">
-            <div
-              v-for="duplicate in this.integrationData.duplicates"
-              :key="duplicate.id"
-            >
-              <q-separator data-testid="integration-hubspot-separator" />
-              <integration-hubspot-one-contact
-                :integrationData="duplicate"
-                :lifecycle-stages-options="lifecycleStagesOptions"
-                :contact-id="contact.id"
-              />
-            </div>
-          </div>
-          <b-button
-            size="sm"
-            variant="link"
-            tabindex="0"
-            block
-            @click="toggleDuplicates"
-          >
-            {{ showDuplicates ? 'See less matches' : 'See all matches' }}
-          </b-button>
-        </div>
-        <!-- End Duplicate Contacts Section -->
       </template>
       <!-- End JIT Card Main Content -->
     </q-card>
@@ -165,14 +211,15 @@
 </template>
 
 <script>
-import IntegrationHubspotOneContact from 'components/integrations/integration-hubspot-one-contact.vue'
+import IntegrationHubspotOneContact from 'src/components/integrations/integration-hubspot-one-contact.vue'
 import _ from 'lodash'
 import WorkflowSelector from 'src/components/integrations/workflow-selector'
 import talk2Api from 'src/plugins/api/api'
 import {
   hubspotIntegrationMixin,
   integrationMixin,
-  simpsocialMixin
+  teamInboxPropsMixin,
+  whiteLabelMixin
 } from 'src/plugins/mixins'
 import { mapActions, mapState } from 'vuex'
 
@@ -184,7 +231,8 @@ export default {
   mixins: [
     hubspotIntegrationMixin,
     integrationMixin,
-    simpsocialMixin
+    whiteLabelMixin,
+    teamInboxPropsMixin
   ],
 
   props: {
@@ -197,6 +245,12 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+
+    isReadOnly: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
 
@@ -204,6 +258,22 @@ export default {
     ...mapState('cache', ['currentCompany']),
 
     ...mapState(['statics', 'isWidget']),
+
+    isLoading () {
+      return !this.contactIntegrationDataLoaded || this.isLoadingLifecycleStages || this.isLoadingCompanyAssociation
+    },
+
+    loadedSections () {
+      let count = 0
+      if (this.contactIntegrationDataLoaded) {
+        count++
+
+        // Only count these if contact info is loaded
+        if (!this.isLoadingLifecycleStages) count++
+        if (!this.isLoadingCompanyAssociation) count++
+      }
+      return count
+    },
 
     isWorkflowValid () {
       return this.workflow.id
@@ -258,12 +328,16 @@ export default {
       },
       integrationData: null,
       contactIntegrationDataLoaded: false,
-      showDuplicates: false
+      showDuplicates: false,
+      isLoadingLifecycleStages: false,
+      isLoadingCompanyAssociation: false,
+      forceComponentReloadFlag: true
     }
   },
 
   async mounted () {
     if (this.contact && this.contact.id) {
+      // Load the contact information first
       await this.getData()
     }
   },
@@ -271,12 +345,68 @@ export default {
   methods: {
     ...mapActions('contacts', ['setContact', 'setContactClone']),
 
+    /**
+     * Load the main contact information and duplicates section
+     */
     getData () {
-      return this.getIntegrationData(this.contact, 'hubspot')
+      return this.getIntegrationData(this.contact, 'hubspot', null, this.teamInbox)
         .then(response => {
           this.integrationData = response.data
           this.contactIntegrationDataLoaded = true
+
+          // Load the other sections
+          this.setLifecycleStagesSection()
+          this.setCompanyAssociationSection(this.contact.id)
         })
+    },
+
+    /**
+     * Load the lifecycle stages section
+     */
+    async setLifecycleStagesSection () {
+      this.isLoadingLifecycleStages = true
+
+      try {
+        const response = await this.getLifecycleStages()
+
+        // Create a new object with all the current properties and the new ones
+        // This ensures Vue's reactivity system detects the change
+        this.integrationData = {
+          ...this.integrationData,
+          lifecycle_stages: response.data.data.lifecycle_stages,
+          can_update_lifecycle_stages: response.data.data.can_update_lifecycle_stages
+        }
+        this.forceRerenderHubspotOneComponent()
+      } catch (error) {
+        this.$handleErrors(error.response)
+      } finally {
+        this.isLoadingLifecycleStages = false
+      }
+    },
+
+    /**
+     * Load the company association section
+     *
+     * @param contactId
+     */
+    async setCompanyAssociationSection (contactId) {
+      this.isLoadingCompanyAssociation = true
+
+      try {
+        const response = await this.getContactCompanyAssociation(contactId)
+
+        // Create a new object with all the current properties and the new ones
+        // This ensures Vue's reactivity system detects the change
+        this.integrationData = {
+          ...this.integrationData,
+          associated_company: response.data.associated_company
+        }
+        this.forceRerenderHubspotOneComponent()
+      } catch (error) {
+        this.$handleErrors(error.response)
+      } finally {
+        this.isLoadingCompanyAssociation = false
+      }
     },
 
     onWorkflowSelected (workflowId) {
@@ -322,6 +452,17 @@ export default {
 
     toggleDuplicates () {
       this.showDuplicates = !this.showDuplicates
+    },
+
+    /**
+     * Re-render the Hubspot One component to refresh the updated state
+     */
+    forceRerenderHubspotOneComponent () {
+      this.forceComponentReloadFlag = false
+      // Force re-render of the hubspot-one-contact component
+      this.$nextTick(() => {
+        this.forceComponentReloadFlag = true
+      })
     }
   },
 
@@ -338,5 +479,81 @@ export default {
 <style scoped>
 .small-text {
   font-size: 12px;
+}
+
+.loading-indicator {
+  background-color: #FF7A59;
+  padding: 0 8px;
+  color: white;
+  position: relative;
+  cursor: help;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+}
+
+.loading-text {
+  display: inline-block;
+  white-space: nowrap;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.loading-details {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  z-index: 10;
+  min-width: 200px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.loading-indicator:hover .loading-details {
+  display: block;
+}
+
+.loading-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+  color: #333;
+  font-size: 11px;
+}
+
+.loading-item i {
+  width: 16px;
+  text-align: center;
+}
+
+.loading-item i.fa-check {
+  color: #28a745;
+}
+
+.loading-item i.fa-spinner {
+  color: #666;
 }
 </style>

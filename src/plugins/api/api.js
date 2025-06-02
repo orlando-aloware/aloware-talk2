@@ -2,11 +2,17 @@ const suffixV1 = '/api/v1/'
 const suffixV2 = '/api/v2/'
 import _ from 'lodash'
 import qs from 'qs'
-import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 import * as AloAi from 'src/constants/aloai'
+import { DEFAULT_PINNED_LIST } from 'src/constants/contacts-list-default-pinned-list'
 
-const exportCommunications = async (contactId) => {
-  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`)
+const exportCommunications = async (contactId, fromTeamInbox) => {
+  const params = {}
+
+  if (fromTeamInbox) {
+    params.from_team_inbox = fromTeamInbox
+  }
+
+  return window.axios.get(`${suffixV2}contacts/${contactId}/export-communications`, { params })
 }
 
 const talk2Api = {
@@ -50,12 +56,20 @@ const talk2Api = {
         return window.axios.put(`${suffixV1}contact/${id}`, params)
       },
 
-      getPhoneNumbers (id) {
+      getPhoneNumbers (id, fromTeamInbox = false) {
         if (!id) {
           return Promise.reject(new Error('Failed to get phone numbers, missing contact id!'))
         }
 
-        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`)
+        const params = {}
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = fromTeamInbox
+        }
+
+        return window.axios.get(`${suffixV1}contact/${id}/phone-numbers`, {
+          params
+        })
       },
 
       getRingGroups (id) {
@@ -130,9 +144,13 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}contact/${id}/send-email`, params)
       },
 
-      addEngagement (id, params) {
+      addEngagement (id, params, fromTeamInbox) {
         if (!id) {
           return null
+        }
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = true
         }
 
         return window.axios.post(`${suffixV1}calendar/events/contact/${id}/create`, params)
@@ -142,12 +160,20 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}calendar/events/contact/${contactId}/update/${eventId}`, params)
       },
 
-      getLineIncomingNumber (contactId, lineId) {
+      getLineIncomingNumber (contactId, lineId, fromTeamInbox = false) {
         if (!contactId || !lineId) {
           return null
         }
 
-        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`)
+        const params = {}
+
+        if (fromTeamInbox) {
+          params.from_team_inbox = fromTeamInbox
+        }
+
+        return window.axios.get(`${suffixV1}contact/${contactId}/campaign/${lineId}/get-incoming-number`, {
+          params
+        })
       },
 
       getIntegrationData (contactId, params) {
@@ -206,14 +232,6 @@ const talk2Api = {
         }
 
         return window.axios.get(`${suffixV1}contact/${contactId}/communications-summary`)
-      },
-
-      pushToCrm (contactId) {
-        if (!contactId) {
-          return null
-        }
-
-        return window.axios.post(`${suffixV1}contact/${contactId}/push-to-crm`)
       }
     },
 
@@ -382,54 +400,23 @@ const talk2Api = {
         }
       },
 
-      simpsocial: {
-        messenger: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/messenger-source`)
-          }
-        },
+      /**
+       * Get the available lifecycle stages
+       *
+       * @returns Promise<axios.AxiosResponse<{success: boolean, data: {lifecycle_stages: Object, can_update_lifecycle_stages: boolean}}>>
+       */
+      async getLifecycleStages () {
+        return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/lifecycle-stages`)
+      },
 
-        dmsEquity: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/dms-equity-source`)
-          }
-        },
-
-        digitalLeadWar: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/digital-lead-war-source`)
-          }
-        },
-
-        emailBlast: {
-          get () {
-            return window.axios.get(`/integrations/simpsocial/email-source`)
-          }
-        },
-
-        videoConference: {
-          send (contactId = null, campaignId = null) {
-            if (contactId === null || campaignId === null) {
-              return null
-            }
-
-            return window.axios.post(`/integrations/simpsocial/video-conference-to-contact/${contactId}`, {
-              campaign_id: campaignId
-            })
-          }
-        },
-
-        creditApplication: {
-          send (contactId = null, campaignId = null) {
-            if (contactId === null || campaignId === null) {
-              return null
-            }
-
-            return window.axios.post(`/integrations/simpsocial/credit-application-to-contact/${contactId}`, {
-              campaign_id: campaignId
-            })
-          }
-        }
+      /**
+       * Get the company association of the contact
+       *
+       * @param contactId
+       * @returns Promise<axios.AxiosResponse<{success: boolean, data: object>>
+       */
+      getContactCompanyAssociation (contactId) {
+        return window.axios.get(`${suffixV1}integrations/hubspot/jit-card/company-association/${contactId}`)
       },
 
       zoho: {
@@ -517,12 +504,16 @@ const talk2Api = {
         return window.axios.post(`${suffixV1}communication/${id}/force-terminate`)
       },
 
+      agentForceTerminate (id) {
+        return window.axios.post(`${suffixV1}agent/communication/${id}/terminate`)
+      },
+
       forceDequeue (id) {
         return window.axios.post(`${suffixV1}communication/${id}/force-dequeue`)
       },
 
-      get (id) {
-        return window.axios.get(`${suffixV1}communication/${id}`)
+      get (id, params = {}) {
+        return window.axios.get(`${suffixV1}communication/${id}`, { params })
       },
 
       delete (id) {
@@ -1031,6 +1022,18 @@ const talk2Api = {
       inboxes: {
         async get (data) {
           return window.axios.get(`${suffixV2}inboxes`, data)
+        },
+
+        unreadCount (inboxIds, contactIds = null) {
+          const params = {
+            inbox_ids: inboxIds
+          }
+
+          if (contactIds) {
+            params.contact_ids = contactIds
+          }
+
+          return window.axios.post(`${suffixV2}inboxes/unread-count`, params)
         }
       }
     },

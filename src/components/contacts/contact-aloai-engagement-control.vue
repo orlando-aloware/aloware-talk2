@@ -1,5 +1,5 @@
 <template>
-  <b-card class="border-0 position-relative contact-about-wrapper" v-if="profile?.company?.aloai_enabled">
+  <b-card class="border-0 position-relative contact-about-wrapper" v-if="isAloAiEnabled()">
     <h4>AloAi Agent Engagement</h4>
 
     <b-card-text class="fs-14 mt-2">
@@ -21,6 +21,7 @@
         class="btn-aloai-engagement-control"
         block
         data-testid="aloai-engagement-control-button"
+        :disabled="isReadOnly"
         @click="openEngagementControlModal"
       >
         <settings-mobile-icon
@@ -36,10 +37,11 @@
 </template>
 
 <script>
-import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
 import AloaiEngagementControlModal from 'components/aloai-engagement-control-modal.vue'
-import { mapGetters } from 'vuex'
+import SettingsMobileIcon from 'components/icons/mobile-menu/settings-mobile-icon'
 import BlockTooltip from 'components/kyc/block-tooltip'
+import { aloaiMixin } from 'src/plugins/mixins'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'contact-aloai-engagement-control',
@@ -50,8 +52,14 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
+
+  mixins: [aloaiMixin],
 
   computed: {
     ...mapGetters('auth', ['profile'])

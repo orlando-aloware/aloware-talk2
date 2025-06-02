@@ -10,7 +10,7 @@
                         :values="tagIds"
                         :options="combinedTags"
                         :current="currentTags"
-                        :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                        :canEdit="hasPermissionTo(['list tag', 'view tag']) && !isReadOnly"
                         :options-is-grouped="true"
                         :height="height"
                         :category="category"
@@ -41,7 +41,7 @@
                         :values="tagIds"
                         :options="combinedTags"
                         :current="currentTags"
-                        :canEdit="hasPermissionTo(['list tag', 'view tag'])"
+                        :canEdit="hasPermissionTo(['list tag', 'view tag']) && !isReadOnly"
                         :options-is-grouped="true"
                         :height="height"
                         :category="category"
@@ -163,6 +163,11 @@ export default {
     },
 
     startEditing: {
+      type: Boolean,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       default: false
     }

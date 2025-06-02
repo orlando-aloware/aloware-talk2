@@ -261,7 +261,6 @@ export default {
         for (const range in this.ranges) {
           const hasDatesValues = view.filter.filter && view.filter.filter.from_date && view.filter.filter.to_date
           if (hasDatesValues && view.filter.filter.from_date === this.ranges[range][0] && view.filter.filter.to_date === this.ranges[range][1]) {
-            sessionStorage.setItem('date-selected-comms', range)
             sessionStorage.setItem('view-selected', viewId)
             break
           }
@@ -300,11 +299,11 @@ export default {
       return this.isShowActive && this.activeChannel && this.activeChannel.value === value
     },
 
-    async onSelectSavedFilter (filter) {
+    onSelectSavedFilter (filter) {
       filter = cloneDeep(filter)
 
       // Skip showing filter dialog
-      let personalFilterObject = filter.filter
+      let savedFilterObject = filter.filter
 
       if (this.isFirstLoad) {
         // apply query properties to this filter
@@ -324,25 +323,34 @@ export default {
 
       this.setSelectedFilter(filter)
 
-      const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
+      const formattedDates = this.formatDates(savedFilterObject.from_date, savedFilterObject.to_date)
+      savedFilterObject.from_date = formattedDates.from_date
+      savedFilterObject.to_date = formattedDates.to_date
 
-      personalFilterObject.from_date = formattedDates.from_date
-      personalFilterObject.to_date = formattedDates.to_date
+      if (savedFilterObject.date_range && !['All Time', 'custom'].includes(savedFilterObject.date_range)) {
+        // if not all time or custom, set the date for the specific range
+        const range = this.ranges[savedFilterObject.date_range]
+        const formattedDates = this.formatDates(range[0], range[1])
+        savedFilterObject.from_date = formattedDates.from_date
+        savedFilterObject.to_date = formattedDates.to_date
+      } else {
+        const formattedDates = this.formatDates(savedFilterObject.from_date, savedFilterObject.to_date)
+        savedFilterObject.from_date = formattedDates.from_date
+        savedFilterObject.to_date = formattedDates.to_date
 
-      // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
-      // set the range to the key of the range
-      let inRange = false
-      for (const range in this.ranges) {
-        const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
-        if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
-          sessionStorage.setItem('date-selected-comms', range)
-          inRange = true
-          break
+        let dateRange = !savedFilterObject.from_date && !savedFilterObject.to_date ? 'All Time' : 'custom'
+
+        // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+        // set the range to the key of the range
+        for (const range in this.ranges) {
+          const hasDatesValues = savedFilterObject && savedFilterObject.from_date && savedFilterObject.to_date
+          if (hasDatesValues && savedFilterObject.from_date === this.ranges[range][0] && savedFilterObject.to_date === this.ranges[range][1]) {
+            dateRange = range
+            break
+          }
         }
-      }
 
-      if (!inRange) {
-        sessionStorage.setItem('date-selected-comms', 'custom')
+        savedFilterObject.date_range = dateRange
       }
 
       // Reset any existing filter changes
@@ -353,49 +361,49 @@ export default {
       // Update channel changed filter fields for each property in the filter
       const loadedDefaultFilterModel = this.channelDefaultFilterModel
 
-      for (const item in personalFilterObject) {
+      for (const item in savedFilterObject) {
         const defaultModelHasField = loadedDefaultFilterModel.filter.hasOwnProperty(item)
 
         // for boolean fields change tracking
         if (this.booleanFields.includes(item) &&
-          +personalFilterObject[item] !== +loadedDefaultFilterModel.filter[item] &&
+          +savedFilterObject[item] !== +loadedDefaultFilterModel.filter[item] &&
           defaultModelHasField) {
           this.updateChannelChangedFilterFields({
             name: item,
-            value: +personalFilterObject[item]
+            value: +savedFilterObject[item]
           })
 
           continue
         }
 
         // for non-boolean fields change tracking
-        const filterItem = JSON.stringify(personalFilterObject[item])
+        const filterItem = JSON.stringify(savedFilterObject[item])
         const loadedFilterItem = JSON.stringify(loadedDefaultFilterModel.filter[item])
 
         // Special handling for date
         if (item === 'to_date' && filterItem && loadedFilterItem && filterItem === loadedFilterItem) {
           this.updateChannelChangedFilterFields({
             name: item,
-            value: personalFilterObject[item][item]
+            value: savedFilterObject[item][item]
           })
         } else if (defaultModelHasField) {
           // Update other filter fields
           this.updateChannelChangedFilterFields({
             name: item,
-            value: personalFilterObject[item]
+            value: savedFilterObject[item]
           })
         }
       }
 
       // Apply the filter
       this.setAppliedFilter(filter)
-      this.setChannelClonedFilter(personalFilterObject)
+      this.setChannelClonedFilter(savedFilterObject)
 
       this.setIsFirstLoad(false)
 
       // Get communications with the new filter
       this.$nextTick(() => {
-        this.getCommunications(personalFilterObject)
+        this.getCommunications(savedFilterObject)
       })
     },
 

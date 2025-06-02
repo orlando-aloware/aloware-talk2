@@ -94,7 +94,8 @@ export default {
     ...mapFields('powerDialer', [
       'sessionPaused',
       'activeTask',
-      'tasksSentSmsTemplates'
+      'tasksSentSmsTemplates',
+      'redialedTasks'
     ]),
 
     ...mapState('auth', [
@@ -190,6 +191,8 @@ export default {
           call_disposition_id: data.id
         }
       }).then(res => {
+        this.handleRedialedTasksWithoutCallDisposition(data.id)
+
         if (res?.id) {
           this.selectedCallDisposition = res?.call_disposition_id
         }
@@ -375,6 +378,27 @@ export default {
       if (this.isContactNotDisposed) {
         this.$VueEvent.fire('pauseWrapUp', true)
       }
+    },
+
+    // Update Call Disposition for redialed task (with created communication) that didnt't have its disposition set
+    handleRedialedTasksWithoutCallDisposition (callDispositionId) {
+      if (!this.activeTask?.id) {
+        return
+      }
+
+      const redialedTask = this.redialedTasks.find((t) => t.id === this.activeTask?.id && t.communication?.id && !t.communication.call_disposition_id)
+      if (!redialedTask) {
+        return
+      }
+
+      this.updateCallDisposition({
+        id: redialedTask.communication.id,
+        params: {
+          call_disposition_id: callDispositionId
+        }
+      }).catch((err) => {
+        console.error('failed to update disposition for redialed task', err)
+      })
     }
   },
 

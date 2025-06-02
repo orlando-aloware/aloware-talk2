@@ -9,13 +9,20 @@
          :class="{ 'contact-view-wrapper-hs-widget': isWidget }"
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
-           :class="{ 'contact-activity--closed': detailsOpen || contactListSidebarOpen }"
+           :class="{
+             'contact-activity--closed': detailsOpen || contactListSidebarOpen,
+             'inbox-activity-container-wrapper': teamInboxId
+           }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
                             :class="{ 'contact-activity--closed': detailsOpen }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
+                            :team-inbox-id="teamInboxId"
+                            :from-team-inbox="fromTeamInbox"
+                            :team-inbox-unread-count="teamInboxUnreadCount"
+                            :is-read-only="isReadOnly"
                             v-if="!loadingContact && !changingSelectedContact && !isEmptyContact"
                             @markAllAsRead="markAllAsRead"
                             @toggleDrawer="toggleDrawer"
@@ -44,6 +51,8 @@
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
+                         :team-inbox-id="teamInboxId"
+                         :from-team-inbox="fromTeamInbox"
                          v-if="!changingSelectedContact && !isEmptyContact"
                          @back="toggleDetails">
         </contact-details>
@@ -68,6 +77,8 @@
         </compact-btn>
         <contact-details :campaign-id="selectedCampaignId"
                          :no-save-bar="isMediumScreen"
+                         :team-inbox-id="teamInboxId"
+                         :from-team-inbox="fromTeamInbox"
                          v-if="drawer && !changingSelectedContact && !isEmptyContact">
         </contact-details>
       </q-drawer>
@@ -92,7 +103,8 @@ import {
   contactV2AttributesMixin,
   aclMixin,
   visibilityMixin,
-  inboxMixin
+  inboxMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import CompactBtn from 'src/components/compact-btn'
 import { mapActions, mapGetters, mapState } from 'vuex'
@@ -104,7 +116,8 @@ import {
   MIN_TABLET_WIDTH,
   MAX_TABLET_WIDTH
 } from 'src/constants/viewport-sizes'
-import { EINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
+import { THREADED } from 'src/store/teaminbox/teaminbox.store'
 
 export default {
   name: 'contact',
@@ -114,7 +127,8 @@ export default {
     contactV2AttributesMixin,
     aclMixin,
     visibilityMixin,
-    inboxMixin
+    inboxMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -134,6 +148,8 @@ export default {
 
     ...mapGetters('auth', ['authenticated']),
 
+    ...mapState('TeamInbox', ['viewMode']),
+
     ...mapState([
       'contactDetailsDrawer',
       'campaignsIsLoading',
@@ -146,7 +162,7 @@ export default {
     ]),
 
     isInbox () {
-      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
+      return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
     },
 
     isEmptyContact () {
@@ -179,7 +195,14 @@ export default {
       contactComponentListeners: {},
       ContactTaskStatus,
       CommunicationDirections,
-      EINBOXES_MENU_COMMUNICATIONS_TITLE
+      TEAMINBOXES_MENU_COMMUNICATIONS_TITLE
+    }
+  },
+
+  props: {
+    teamInboxUnreadCount: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -275,7 +298,7 @@ export default {
       if (this.contact.id === contact.id) {
         this.setContact(contact)
       }
-      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE]
+      const validRoutes = ['Contact', 'Inbox Contact', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE]
       if (validRoutes.includes(this.$route.name)) {
         this.fetchTaskCounts()
       }
@@ -291,7 +314,7 @@ export default {
 
       this.contactListSidebarOpen = false
 
-      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
+      if (['Contact', 'Inbox Contact', 'Inbox Contact Task', 'Inbox View Contact Task', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name) && this.contactId !== value) {
         this.resetSelectedContact()
         this.contactId = value
         this.fetchContact()
@@ -306,9 +329,26 @@ export default {
     },
 
     '$route.params.communicationId': function (value) {
-      if (!this.changingSelectedContact && ['Inbox Contact', 'Inbox Contact Communication', EINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
-        this.fetchContactCommunicationsUntilFound()
+      this.resetScrollIntervals()
+
+      if (!value) {
+        return
       }
+
+      if (this.changingSelectedContact) {
+        return
+      }
+
+      if (!['Inbox Contact', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)) {
+        return
+      }
+
+      if (this.teamInbox && this.viewMode === THREADED) {
+        // Threaded view don't have communicationId in the route params
+        return
+      }
+
+      this.fetchContactCommunicationsUntilFound()
     },
 
     contactDetailsDrawer () {

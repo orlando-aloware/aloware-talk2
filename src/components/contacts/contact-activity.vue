@@ -4,7 +4,8 @@
        :class="[ communication.direction === CommunicationDirection.INBOUND ? 'flex-row' : 'flex-row-reverse' ]">
     <div class="d-flex flex-row align-items-center position-relative"
          v-if="communication.property === undefined">
-      <q-badge class="is-dot unread-dot mx-1 blue position-absolute"
+      <q-badge class="is-dot unread-dot mx-1 position-absolute"
+               color="red"
                rounded
                data-testid="contact-activity-unread-dot-badget"
                v-if="(markable || (communication.type === CommunicationTypes.SMS ||
@@ -214,7 +215,9 @@
                                 :communication="communication"
                                 :contact="contact"
                                 :activityMode="true"
-                                :campaignId="campaignId">
+                                :campaignId="campaignId"
+                                :team-inbox-id="teamInboxId"
+                                :from-team-inbox="fromTeamInbox">
             </communication-info>
           </div>
         </div>
@@ -385,7 +388,8 @@ import _ from 'lodash'
 import {
   aclMixin,
   avatarMixin,
-  userMixin
+  userMixin,
+  teamInboxPropsMixin
 } from 'src/plugins/mixins'
 import { mapState, mapGetters } from 'vuex'
 import * as CommunicationDirection from 'src/constants/communication-direction'
@@ -395,7 +399,7 @@ import * as CommunicationTypes from 'src/constants/communication-types'
 import * as ContactTaskStatus from 'src/constants/contact-task-status'
 import CommunicationInfo from 'components/communication-info'
 import OutboundAvatar from 'components/avatar'
-import InboundAvatar from 'src/components/einbox/communication-items/avatar.vue'
+import InboundAvatar from 'src/components/teaminbox/communication-items/avatar.vue'
 import InformationCircleIcon from 'components/icons/information-circle-icon'
 import DownloadButton from 'components/download-button'
 import { CREATOR_TYPE_MANUAL } from 'src/constants/creator-types'
@@ -404,7 +408,8 @@ export default {
   mixins: [
     aclMixin,
     avatarMixin,
-    userMixin
+    userMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -503,7 +508,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
+    ...mapState(['campaigns', 'teamInboxCampaigns', 'workflows', 'dispositionStatuses', 'leadSources', 'isWidget']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('broadcast', ['broadcasts']),
     ...mapState('inbox', [
@@ -755,7 +760,8 @@ export default {
       }
 
       id = parseInt(id)
-      const found = this.campaigns.find(campaign => campaign.id === id)
+      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+      const found = campaigns.find(campaign => campaign.id === id)
 
       if (found) {
         return found
@@ -791,9 +797,14 @@ export default {
 
         // if contact has no unreads anymore, refresh inbox result
         const contact = res.data.contact
-        const hasUnreads = contact.unread_texts_count + contact.unread_missed_calls_count + contact.unread_voicemails_count
+        const hasUnreads = contact.unread_count + contact.unread_missed_call_count + contact.unread_voicemail_count
+
         if (hasUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+        }
+
+        if (this.$route.params.inboxId) {
+          this.$VueEvent.fire('teaminbox_communication_marked_as_read', { inboxId: +this.$route.params.inboxId })
         }
       }).catch(err => {
         this.$handleErrors(err.response)
@@ -817,6 +828,10 @@ export default {
         const oldTotalUnreads = this.contact.unread_texts_count + this.contact.unread_missed_calls_count + this.contact.unread_voicemails_count
         if (oldTotalUnreads < 1) {
           this.$VueEvent.fire('fetchInbox')
+        }
+
+        if (this.$route.params.inboxId) {
+          this.$VueEvent.fire('teaminbox_communication_marked_as_unread', { inboxId: +this.$route.params.inboxId })
         }
       }).catch(err => {
         this.$handleErrors(err.response)

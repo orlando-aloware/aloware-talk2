@@ -23,6 +23,23 @@
                 @click="noClose($event)">
             Role: <b>{{ user.profile.role_name }}</b>
           </span>
+          <q-separator class="my-2" />
+          <q-btn color="primary"
+                 class="full-width text-caption"
+                 size="sm"
+                 v-close-popup
+                 @click="goToConnectionTest">
+            <i class="fa fa-stethoscope mr-1"></i>
+            RUN CONNECTION TEST
+          </q-btn>
+          <q-btn color="primary"
+                 v-if="$route.path.startsWith('/team-inboxes')"
+                 class="full-width text-caption mt-1"
+                 size="sm"
+                 v-close-popup
+                 @click="watchTeamInboxTutorial">
+            WATCH TUTORIAL
+          </q-btn>
         </q-list>
       </q-btn-dropdown>
     </q-item-section>
@@ -32,6 +49,7 @@
 <script>
 import * as Roles from 'src/constants/roles'
 import { mapGetters, mapState } from 'vuex'
+import VueCookies from 'vue-cookies'
 
 export default {
   data () {
@@ -54,6 +72,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['user']),
     ...mapState(['statics']),
+    ...mapState('auth', ['profile']),
 
     isMobileSize () {
       return this.windowSize <= 425
@@ -69,6 +88,17 @@ export default {
       if (event) {
         event.stopPropagation()
       }
+    },
+
+    goToConnectionTest () {
+      this.$router.push('/settings/connection-test')
+    },
+
+    watchTeamInboxTutorial () {
+      const cookies = VueCookies
+      cookies.remove(`team-inbox-${this.profile?.id}`)
+
+      this.$store.state.TeamInbox.teamInboxTutorialComponent.openModal()
     }
   },
 
@@ -77,3 +107,33 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.no-hover {
+  &:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  &.q-item--clickable:hover,
+  &.q-item--active:hover,
+  &.q-hoverable:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  &::after {
+    content: none !important;
+    opacity: 0 !important;
+  }
+}
+
+.custom-connection-test {
+  cursor: pointer;
+
+  &:hover, &:active, &:focus {
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+}
+</style>

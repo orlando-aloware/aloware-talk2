@@ -13,7 +13,7 @@
     </template>
 
     <b-card
-      v-if="profile?.company?.aloai_enabled"
+      v-if="isAloAiEnabled()"
       class="border-0 position-relative contact-about-wrapper"
     >
       <h4>AloAi Agent Enrollments</h4>
@@ -127,6 +127,7 @@
             variant="outline-danger"
             size="sm"
             data-testid="disenroll-single-bot-contact-button"
+            :disabled="isReadOnly"
           >
             <i class="fa fa-trash"/> Disenroll from agent
           </b-button>
@@ -141,6 +142,7 @@
           size="sm"
           block
           data-testid="disenroll-contact-button"
+          :disabled="isReadOnly"
         >
           <i class="fa fa-trash"/> Disenroll from agent
         </b-button>
@@ -155,6 +157,7 @@
           block
           variant="outline-primary"
           data-testid="aloai-enrollment-control-button"
+          :disabled="isReadOnly"
         >
           <aloai-icon
             class="mr-1"
@@ -203,14 +206,14 @@
 </template>
 
 <script>
-import talk2Api from 'src/plugins/api/api'
-import AloaiIcon from 'components/icons/aloai-icon'
 import AloaiEnrollmentControlModal from 'components/aloai-enrollment-control-modal.vue'
 import ConfirmDialog from 'components/confirm-dialog.vue'
-import { mapGetters } from 'vuex'
-import { aloaiMixin } from 'src/plugins/mixins'
-import * as AloAi from 'src/constants/aloai'
+import AloaiIcon from 'components/icons/aloai-icon'
 import _ from 'lodash'
+import * as AloAi from 'src/constants/aloai'
+import talk2Api from 'src/plugins/api/api'
+import { aloaiMixin } from 'src/plugins/mixins'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'contact-aloai-enrollment-control',
@@ -223,6 +226,10 @@ export default {
     contact: {
       type: Object,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 

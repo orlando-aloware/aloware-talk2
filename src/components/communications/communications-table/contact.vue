@@ -3,19 +3,22 @@
        data-testid="duration-row">
     <div class="ellipse"
          v-if="row.contact">
-      <router-link class="text-primary"
+      <div class="d-flex align-items-center">
+        <router-link class="text-primary text-truncate"
                    :id="`comm-contact-${_uid}`"
                    @click.native="handleContactClick"
                    target="_blank"
                    :to="{ path: `/contacts/${row.contact.id}`}">
-        <external-link-icon color="#1976D2"/>
-        {{ row.contact.name | fixContactName }}
+          <external-link-icon color="#1976D2"/>
+          {{ row.contact.name | fixContactName }}
 
-        <b-tooltip custom-class="talk-table__tooltip"
-                   :target="`comm-contact-${_uid}`">
-          Click to go to contact's page
-        </b-tooltip>
-      </router-link>
+          <b-tooltip custom-class="talk-table__tooltip"
+                     :target="`comm-contact-${_uid}`">
+            Click to go to contact's page
+          </b-tooltip>
+        </router-link>
+        <contact-integrations-link-icons :contact='row.contact' class="ml-1 flex-shrink-0" background_opacity="0" />
+      </div>
     </div>
     <div class="deleted"
          v-else>
@@ -31,11 +34,13 @@
 <script>
 import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 import communicationsMixin from 'src/plugins/mixins/communications.mixin'
+import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
 
 export default {
   name: 'Contact',
 
   components: {
+    ContactIntegrationsLinkIcons,
     ExternalLinkIcon
   },
 

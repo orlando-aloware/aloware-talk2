@@ -7,8 +7,10 @@ import * as ContactAccessTypes from 'src/constants/contact-access-types'
 import * as CommunicationTypes from 'src/constants/communication-types'
 import * as CommunicationDirections from 'src/constants/communication-direction'
 import { ANY_COMMUNICATION_ANSWER_STATUS, STATUS_ABANDONED, STATUS_DEADEND, STATUS_FAILED, STATUS_HOLD, STATUS_INPROGRESS, STATUS_LIVE, STATUS_MISSED, STATUS_QUEUED, STATUS_UNANSWERED, STATUS_VOICEMAIL } from 'src/constants/communication-status'
+import userMixin from 'src/plugins/mixins/user.mixin'
 
 export default {
+  mixins: [userMixin],
   data () {
     return {
       searchFields: ['contact.phone_number', 'contact.name']
@@ -250,10 +252,24 @@ export default {
         communication.workflow_id)
     },
 
+    checkCommunicationMatchesInboxFilters (filter, communication) {
+      if (filter.unreadonly !== undefined &&
+        communication.inbox_unread_count === 0) {
+        return false
+      }
+
+      return true
+    },
+
     checkCommunicationMatchesUserAccessibility (communication) {
       // check auth exists to prevent js errors
       if (!this.profile) {
         return false
+      }
+
+      // if team inbox is enabled, visibility limits are not observed
+      if (this.hasCompanyTeamInboxEnabled) {
+        return true
       }
 
       // checks if accessible_campaigns is available and then looks for communication campaign_id in that array

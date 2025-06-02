@@ -145,21 +145,6 @@
                              @change="onFetchMyContacts">
             </b-form-checkbox>
           </div>
-          <div>
-            <compact-btn borderless
-                         variant="outlined-light"
-                         customClass="pr-0 pl-0 fs-14 _500 position-relative primary not-focusable filter-toggle-button d-flex align-items-center"
-                         v-if="isSimpSocial"
-                         data-testid="contacts-view-simp-social-compact-button"
-                         @clicked="onMessengerClick">
-              <iframe id="ss-messenger-button"
-                      frameborder="0"
-                      style=""
-                      data-testid="contacts-view-simp-social-iframe"
-                      :src="simpsocialMessengerIframeLink">
-              </iframe>
-            </compact-btn>
-          </div>
         </div>
       </div>
       <div class="col-lg-6 px-0 d-flex align-items-center pr-2">
@@ -795,6 +780,7 @@
 <script>
 import _ from 'lodash'
 import * as ContactListTypes from 'src/constants/contacts-list-types'
+import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import BulkActionMenu from 'src/components/bulk-action-menu'
 import CompactBtn from 'src/components/compact-btn.vue'
@@ -822,14 +808,13 @@ import BackButton from 'components/back-button'
 import extractErrorMessage from 'src/plugins/helpers/extract-error-message'
 import { ALL_COLUMNS } from 'src/constants/contacts-columns'
 import {
-  avatarMixin,
-  timezoneCheckMixin,
   aclMixin,
-  viewMixin,
+  avatarMixin,
   contactsListFiltersMixin,
-  simpsocialMixin,
   kycMixin,
-  userMixin
+  timezoneCheckMixin,
+  userMixin,
+  viewMixin
 } from 'src/plugins/mixins'
 import RefreshIcon from 'components/icons/contacts/refresh-icon'
 import { OPERATORS } from 'src/constants/contacts-filter-operators'
@@ -838,7 +823,6 @@ import TagContactsWorkflowEnroller from 'components/tags/tag-contacts-workflow-e
 import AddSequenceIcon from 'src/components/icons/add-sequence-icon.vue'
 import AloaiEnrollmentControlModal from 'src/components/aloai-enrollment-control-modal.vue'
 import AssignContactsModal from 'src/components/assign-contacts-modal.vue'
-import { CONTACTS_STRING_KEYS } from 'src/constants/contacts-list-types'
 import ContactListTypeIcon from 'components/contacts/contact-list-type-icon.vue'
 import AlAlert from 'components/alert/index.vue'
 import FolderDynamicIcon from 'components/icons/folder-dynamic-icon.vue'
@@ -855,7 +839,6 @@ export default {
     aclMixin,
     viewMixin,
     contactsListFiltersMixin,
-    simpsocialMixin,
     kycMixin,
     userMixin
   ],
@@ -1193,10 +1176,6 @@ export default {
         !this.listContactsLoaded ||
         this.list.show_in_public_folder ||
         this.list.type === this.ContactListTypes.DYNAMIC_REMOTE_LIST
-    },
-
-    simpsocialMessengerIframeLink () {
-      return `https://dealer.simpsocial.com/${this.currentCompany.id}/messenger/unread/count`
     },
 
     cleanedCurrentListFilters () {
@@ -1941,7 +1920,14 @@ export default {
     },
 
     onCall (contact) {
-      this.checkContactTimezone(contact, () => { this.makeCall(contact) })
+      const params = {
+        timezone: contact.timezone,
+        name: contact.name,
+        calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
+        calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
+      }
+
+      this.checkContactTimezone(params, () => { this.makeCall(contact) })
     },
 
     makeCall (contact) {
@@ -2027,12 +2013,6 @@ export default {
 
       const owner = this.users.find(user => user.id === userId)
       return owner ? owner.name : ''
-    },
-
-    onMessengerClick () {
-      this.$router.push({
-        name: 'Messenger'
-      })
     },
 
     onBackToListsRedirect () {

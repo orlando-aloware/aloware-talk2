@@ -10,31 +10,64 @@
        class="status-notice fs-12 text-muted mb-0">
       Enable your favorite CRM integration to see more details directly from the CRM.
     </p>
-    <integration-hubspot v-if="isHubspotEnabled"
-                         data-testid="contact-integrations-hubspot"
-                         :contact="contact"/>
-
-    <integration-pipedrive v-if="isPipedriveEnabled"
-                           data-testid="contact-integrations-pipedrive"
-                           :contact="contact"/>
-
-    <integration-gohighlevel v-if="isGHLEnabled"
-                             data-testid="contact-integrations-gohighlevel"
-                             :contact="contact"/>
-
-    <integration-salesforce data-testid="contact-integrations-salesforce"
+    <integration-hubspot
+        v-if="isHubspotEnabled"
+        data-testid="contact-integrations-hubspot"
         :contact="contact"
-        v-if="isSalesforceEnabled"/>
+        :team-inbox-id="teamInboxId"
+        :from-team-inbox="fromTeamInbox"
+        :is-read-only="isReadOnly"
+    />
 
-    <integration-guesty data-testid='contact-integrations-guesty'
-                        :contact='contact'
-                        v-if='isGuestyEnabled'/>
+    <integration-pipedrive
+        v-if="isPipedriveEnabled"
+        data-testid="contact-integrations-pipedrive"
+        :contact="contact"
+        :team-inbox-id="teamInboxId"
+        :from-team-inbox="fromTeamInbox"
+        :is-read-only="isReadOnly"
+    />
 
-    <integration-zoho data-testid='contact-integrations-zoho'
-                        :contact='contact'
-                        v-if='isZohoEnabled'/>
+    <integration-gohighlevel
+        v-if="isGHLEnabled"
+        data-testid="contact-integrations-gohighlevel"
+        :contact="contact"
+        :team-inbox-id="teamInboxId"
+        :from-team-inbox="fromTeamInbox"
+        :is-read-only="isReadOnly"
+    />
 
-    <contact-crm-links data-testid="contact-integrations-crm-links" :contact="contact"/>
+    <integration-salesforce
+        v-if="isSalesforceEnabled"
+        data-testid="contact-integrations-salesforce"
+        :contact="contact"
+        :team-inbox-id="teamInboxId"
+        :from-team-inbox="fromTeamInbox"
+        :is-read-only="isReadOnly"
+    />
+
+    <integration-guesty
+      v-if='isGuestyEnabled'
+      data-testid='contact-integrations-guesty'
+      :contact='contact'
+      :team-inbox-id="teamInboxId"
+      :from-team-inbox="fromTeamInbox"
+      :is-read-only="isReadOnly"
+    />
+
+    <integration-zoho
+      v-if='isZohoEnabled'
+      data-testid='contact-integrations-zoho'
+      :contact='contact'
+      :team-inbox-id="teamInboxId"
+      :from-team-inbox="fromTeamInbox"
+      :is-read-only="isReadOnly"
+    />
+
+    <contact-crm-links
+      data-testid="contact-integrations-crm-links"
+      :contact="contact"
+    />
   </b-card>
 </template>
 
@@ -47,6 +80,7 @@ import IntegrationGohighlevel from 'components/integrations/integration-gohighle
 import IntegrationSalesforce from 'components/integrations/integration-salesforce.vue'
 import IntegrationGuesty from 'components/integrations/integration-guesty.vue'
 import IntegrationZoho from 'components/integrations/integration-zoho.vue'
+import { teamInboxPropsMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'contact-integrations',
@@ -58,6 +92,12 @@ export default {
     },
 
     no_title: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       required: false,
       default: false
@@ -74,9 +114,10 @@ export default {
     IntegrationSalesforce
   },
 
+  mixins: [teamInboxPropsMixin],
+
   computed: {
     ...mapState('cache', ['currentCompany']),
-
     isIntegrationsDisabled () {
       if (!this.currentCompany) {
         return true

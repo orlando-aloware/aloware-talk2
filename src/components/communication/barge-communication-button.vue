@@ -2,26 +2,26 @@
   <span class="cursor-pointer"
         data-testid="comm-barge-comm-button-dialog-click"
         :id="`action-barge-${_uid}`"
-        @click="dialog"
-        v-if="userCanBargeAndWhisper(communication)">
+        v-if="userCanBargeAndWhisper(communication)"
+        @click="dialog">
     <volume-high-icon data-testid="comm-barge-comm-button-volume-high-icon-2"
                       :height="iconHeight"
                       :width="iconWidth"/>
-
+    <span class="ml-1"
+          v-if="showButtonText">
+      Barge
+    </span>
     <b-tooltip custom-class="talk-table__tooltip"
                :target="`action-barge-${_uid}`"
-               v-if="blackTooltip">
-      Barge
+               v-else>
+      {{ isAiAgentUser(communication.user) ? 'Take over' : 'Barge' }}
     </b-tooltip>
-    <q-tooltip v-else>
-      Barge
-    </q-tooltip>
   </span>
 </template>
 
 <script>
 import VolumeHighIcon from 'src/components/icons/volume-high-icon.vue'
-import { aclMixin, agentMixin, communicationMixin, simpsocialMixin } from 'src/plugins/mixins'
+import { aclMixin, agentMixin, communicationMixin, userMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'barge-communication-button',
@@ -30,7 +30,7 @@ export default {
     aclMixin,
     agentMixin,
     communicationMixin,
-    simpsocialMixin
+    userMixin
   ],
 
   components: {
@@ -59,7 +59,7 @@ export default {
       default: 22
     },
 
-    blackTooltip: {
+    showButtonText: {
       type: Boolean,
       default: false
     }
@@ -67,7 +67,11 @@ export default {
 
   methods: {
     dialog () {
-      this.$bvModal.msgBoxConfirm('Do you want to barge into this call? You\'ll be muted by default. If you unmute yourself, both parties will hear you.', {
+      const message = this.isAiAgentUser(this.communication.user)
+        ? 'Do you want to take over this AI agent call? You\'ll be muted by default. If you unmute yourself, AI agent will be dropped from the call completely.'
+        : 'Do you want to barge into this call? You\'ll be muted by default. If you unmute yourself, both parties will hear you.'
+
+      this.$bvModal.msgBoxConfirm(message, {
         buttonSize: 'sm',
         okTitle: 'Yes',
         cancelTitle: 'Cancel',

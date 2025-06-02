@@ -5,7 +5,8 @@ import { mapActions, mapState } from 'vuex'
 export default {
   data () {
     return {
-      dialerCallFishingInterval: null
+      dialerCallFishingInterval: null,
+      notificationSoundUserActionToastId: 'notification-sound-user-action-toast'
     }
   },
 
@@ -52,6 +53,7 @@ export default {
 
     playAudio (shouldPlayFishingNotificationSound = false) {
       if (!this.enableAudio) {
+        this.showMediaPlaybackRequiresUserGestureToast()
         return
       }
 
@@ -66,6 +68,7 @@ export default {
         promise.catch(err => {
           // Auto-play was prevented
           // Show a UI element to let the user manually start playback
+          this.showMediaPlaybackRequiresUserGestureToast()
           console.log(err)
         })
       }
@@ -77,6 +80,10 @@ export default {
       }
 
       this.fishingModeNotificationAudio.pause()
+    },
+
+    showMediaPlaybackRequiresUserGestureToast () {
+      this.$bvToast.show(this.notificationSoundUserActionToastId)
     },
 
     processRemoveFromNotification (communication) {
@@ -210,6 +217,7 @@ export default {
           communicationId: callFishingFirstQueue.data.communicationId,
           campaignId: callFishingFirstQueue.data.campaignId,
           campaignName: callFishingFirstQueue.data.campaignName,
+          ringGroupId: callFishingFirstQueue.data.ringGroupId,
           ringGroupName: callFishingFirstQueue.data.ringGroupName,
           phoneNumber: callFishingFirstQueue.data.phoneNumber
         }
@@ -252,7 +260,8 @@ export default {
             type: 'sms',
             contactId: communication.contact.id,
             communicationId: communication.id,
-            campaignId: campaignId.data
+            campaignId: campaignId.data,
+            ringGroupId: communication.ring_group_id
           }
           break
         case 'missed voicemail':
@@ -263,7 +272,8 @@ export default {
             type: 'call',
             contactId: communication.contact.id,
             communicationId: communication.id,
-            campaignId: campaignId.data
+            campaignId: campaignId.data,
+            ringGroupId: communication.ring_group_id
           }
           break
         case 'mention':
@@ -276,7 +286,8 @@ export default {
             message: message.data,
             type: 'mention',
             contactId: contactId.data,
-            communicationId: communicationId.data
+            communicationId: communicationId.data,
+            ringGroupId: communication.ring_group_id
           }
           break
         case 'missed call':
@@ -285,7 +296,18 @@ export default {
             message: 'Missed Call',
             type: 'call',
             contactId: communication.contact.id,
-            communicationId: communication.id
+            communicationId: communication.id,
+            ringGroupId: communication.ring_group_id
+          }
+          break
+        case 'abandoned call':
+          params.data = {
+            title: name.data,
+            message: 'Abandoned Call',
+            type: 'call',
+            contactId: communication.contact.id,
+            communicationId: communication.id,
+            ringGroupId: communication.ring_group_id
           }
           break
         case 'call':
@@ -310,6 +332,7 @@ export default {
 
           const callType = (ringGroup && ringGroup.should_queue && ringGroup.fishing_mode) || communication.is_call_waiting ? 'callFishing' : 'incomingCall'
           const campaignName = _.get(communication, 'campaign.name', null)
+          const ringGroupId = communication.ring_group_id
           const ringGroupName = _.get(communication, 'ring_group.name', null)
           const phoneNumber = _.get(communication, 'contact.phone_number', null)
 
@@ -320,6 +343,7 @@ export default {
             communicationId: communication.id,
             campaignId: campaignId.data,
             campaignName: campaignName,
+            ringGroupId: ringGroupId,
             ringGroupName: ringGroupName,
             phoneNumber: phoneNumber,
             communication: communication,
@@ -333,7 +357,7 @@ export default {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
           console.log('processActionNotification - params.data', params.data)
 
-          if (this.isOnPowerDialerSessionRoute && ringGroup.experimental_fishing_mode_repeat_call_routing) {
+          if (this.isOnPowerDialerSessionRoute && ringGroup?.experimental_fishing_mode_repeat_call_routing) {
             const contactWithCommunication = {
               ...params.data.contact,
               'communication_id': params.data.communicationId

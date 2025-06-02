@@ -9,6 +9,7 @@
         block
         data-testid="integration-sync-button"
         @click="syncIntegration"
+        :disabled="isReadOnly"
       >
         <i
           class="fa fa-sync-alt"
@@ -40,17 +41,19 @@
   </q-card-section>
 </template>
 <script>
-import { GUESTY_INTEGRATION, SALESFORCE_INTEGRATION, ZOHO_INTEGRATION } from 'src/constants/integrations'
-import talk2Api from 'src/plugins/api/api'
 import {
-  simpsocialMixin
-} from 'src/plugins/mixins'
+  GUESTY_INTEGRATION,
+  SALESFORCE_INTEGRATION,
+  ZOHO_INTEGRATION
+} from 'src/constants/integrations'
+import talk2Api from 'src/plugins/api/api'
+import { whiteLabelMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 
 export default {
   name: 'sync-with-integration',
   mixins: [
-    simpsocialMixin
+    whiteLabelMixin
   ],
   props: {
     integration_title: {
@@ -64,6 +67,11 @@ export default {
     contact_id: {
       type: Number,
       required: true
+    },
+    isReadOnly: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data () {

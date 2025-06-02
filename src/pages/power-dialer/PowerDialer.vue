@@ -60,7 +60,7 @@
                       title-text="Power Dialer"
                       kb-link="https://support.aloware.com/en/articles/9037581-power-up-your-outbound-calls-with-aloware-talk-s-power-dialer"
                       class="mt-5"
-                      v-if="!shouldShowPowerDialer && shouldShowUpgradeNow && !isSimpSocial">
+                      v-if="!shouldShowPowerDialer">
     </upgrade-now-page>
   </div>
 </template>
@@ -88,8 +88,7 @@ import {
   aclMixin,
   visibilityMixin,
   contactListCountMixin,
-  mainViewMixin,
-  simpsocialMixin
+  mainViewMixin
 } from 'src/plugins/mixins'
 import * as ContactsListRemoveFromTypes from 'src/constants/contacts-list-remove-from-types'
 import { DEFAULT_FILTER_LIST } from 'src/constants/power-dialer/power-dialer-list'
@@ -121,8 +120,7 @@ export default {
     aclMixin,
     visibilityMixin,
     contactListCountMixin,
-    mainViewMixin,
-    simpsocialMixin
+    mainViewMixin
   ],
 
   data () {
@@ -236,12 +234,12 @@ export default {
     this.stopPDEvents()
 
     this.powerDialerListeners.metricSessionsUpdate = (sessionMetrics) => {
-      // console.log(` %c PUSHER caught: metric_sessions_update `, 'background:black;color:yellow;', sessionMetrics)
+      // console.log(` %c LIVE UPDATE caught: metric_sessions_update `, 'background:black;color:yellow;', sessionMetrics)
       this.activeMetrics = sessionMetrics.session_metrics_calculations
     }
 
     this.powerDialerListeners.contactListItemCreated = async (task) => {
-      // console.log(` %c PUSHER caught: contact_list_item_created `, 'background:black;color:yellow;', task)
+      // console.log(` %c LIVE UPDATE caught: contact_list_item_created `, 'background:black;color:yellow;', task)
       // console.log(' %c TASK was CREATED : ', 'background: green; color: #000;', task)
       if (this.hasSessions) {
         await this.fetchInQueueTasks(task)
@@ -249,7 +247,7 @@ export default {
     }
 
     this.powerDialerListeners.contactListItemUpdated = (task) => {
-      // console.log(` %c PUSHER caught: contact_list_item_updated `, 'background:black;color:yellow;', task)
+      // console.log(` %c LIVE UPDATE caught: contact_list_item_updated `, 'background:black;color:yellow;', task)
       if (this.hasSessions) {
         this.updateTaskStatus(task)
       }

@@ -45,158 +45,7 @@
               {{ communication.duration | fixDuration }}
             </span>
         </q-item-section>
-        <q-item-section class="text-lt pl-2 pr-2 text-left" data-testid="communication-info-incoming-call-section">
-          <!-- Incoming Call-->
-          <div class="text-grey-90 d-flex flex-row justify-center"
-               v-if="shouldShowIncomingCallMenu">
-            <div class="pl-0">
-              <b-button variant="light"
-                        size="sm"
-                        class="bg-transparent no-border no-box-shadow p-0"
-                        v-if="isShowIgnoreCallIcon || isShowCancelCallIcon"
-                        data-testid="communication-info-ignore-call"
-                        @click="onRejectCall">
-                <ignore-call-icon v-if="isShowIgnoreCallIcon"
-                                  data-testid="communication-info-ignore-call-icon"
-                                  height="24"
-                                  width="24"/>
-                <q-tooltip anchor="top middle"
-                           self="center middle">
-                  {{ isShowIgnoreCallIcon ? 'Ignore' : 'Decline' }}
-                </q-tooltip>
-                <cancel-call-icon v-if="isShowCancelCallIcon" data-testid="communication-info-cancel-call-icon"/>
-              </b-button>
-            </div>
-            <div class="pl-1 pr-0"
-                 v-if="isCallFishingMode || (!isCallFishingMode && isIncomingLiveCall)">
-              <b-button variant="light"
-                        size="sm"
-                        class="bg-transparent no-border no-box-shadow p-0"
-                        data-testid="communication-info-accept-call"
-                        @click="onAcceptCall">
-                <q-tooltip anchor="top middle"
-                           self="center middle"
-                           data-testid="communication-info-answer-call"
-                           v-if="!showIncomingCallMenu">
-                  Answer
-                </q-tooltip>
-                <accept-call-icon/>
-              </b-button>
-            </div>
-          </div>
-
-          <!-- Answered / In Progress Call-->
-          <div class="text-grey-90 d-flex flex-row justify-center"
-               v-if="shouldShowAnsweredCallMenu">
-            <div class="pl-0">
-              <b-button variant="light"
-                        size="sm"
-                        class="bg-transparent no-border no-box-shadow p-0"
-                        data-testid="communication-info-hangup-call"
-                        @click="onHangUpCall">
-                <q-tooltip anchor="top middle"
-                           data-testid="communication-info-hangup-call-tooltip"
-                           self="center middle">
-                  Hang up
-                </q-tooltip>
-                <cancel-call-icon/>
-              </b-button>
-            </div>
-          </div>
-
-          <!-- Parked Call-->
-          <div class="text-grey-90 d-flex flex-row justify-center"
-               v-if="shouldShowParkedCallMenu">
-            <b-button variant="light"
-                      size="sm"
-                      class="bg-transparent no-border no-box-shadow p-0"
-                      data-testid="communication-info-unpark-call"
-                      @click="onUnparkCall">
-              <q-tooltip anchor="top middle"
-                         self="center middle"
-                         data-testid="communication-info-unpark-call-tooltip"
-                         v-if="!showParkedCallMenu">
-                Unpark
-              </q-tooltip>
-              <parked-call-icon/>
-            </b-button>
-          </div>
-        </q-item-section>
       </q-item>
-      <q-menu v-if="isDialerConnected"
-              fit
-              content-class="live-call-options"
-              anchor="top right"
-              self="top left"
-              v-model="showIncomingCallMenu"
-              :offset="[5, -4]"
-              data-testid="communication-info-incoming-call-menu"
-              @hide="showIncomingCallMenu = false">
-        <q-list>
-          <q-item clickable
-                  v-close-popup
-                  data-testid="communication-info-park-call-and-answer"
-                  @click="onParkCurrentCallAndAnswer">
-            <q-item-section class="d-inline-flex">
-              <park-call-icon color="#9B51E0"
-                              class="park-call-icon"
-                              width="11.7"
-                              data-testid="communication-info-park-call-and-answer-icon"
-                              height="12.35"></park-call-icon>
-              <span>Park Current Call &amp; Answer</span>
-            </q-item-section>
-          </q-item>
-          <q-item clickable
-                  v-close-popup
-                  data-testid="communication-info-hangup-call-and-answer"
-                  @click="onHangUpCurrentCallAndAnswer">
-            <q-item-section>
-              <hangup-icon width="16"
-                           height="16"
-                           data-testid="communication-info-hangup-call-and-answer-icon"
-                           class="hangup-icon"></hangup-icon>
-              <span>Hang up Current Call &amp; Answer</span>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-menu>
-      <q-menu v-if="isDialerConnected"
-              fit
-              content-class="live-call-options"
-              anchor="top right"
-              self="top left"
-              v-model="showParkedCallMenu"
-              :offset="[5, -4]"
-              data-testid="communication-info-parked-call-menu"
-              @hide="showParkedCallMenu = false">
-        <q-list>
-          <q-item clickable
-                  v-close-popup
-                  data-testid="communication-info-park-call-and-connect"
-                  @click="onParkCurrentCallAndConnect">
-            <q-item-section class="d-inline-flex">
-              <park-call-icon color="#9B51E0"
-                              class="park-call-icon"
-                              width="11.7"
-                              data-testid="communication-info-park-call-and-connect-icon"
-                              height="12.35"></park-call-icon>
-              <span>Park Current Call &amp; Connect</span>
-            </q-item-section>
-          </q-item>
-          <q-item clickable
-                  v-close-popup
-                  data-testid="communication-info-hangup-call-and-connect"
-                  @click="onHangupCurrentCallAndConnect">
-            <q-item-section>
-              <hangup-icon width="16"
-                           height="16"
-                           data-testid="communication-info-hangup-call-and-connect-icon"
-                           class="hangup-icon"></hangup-icon>
-              <span>Hang up Current Call &amp; Connect</span>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-menu>
     </q-list>
 
     <q-list class="rounded-contact-activity"
@@ -376,19 +225,24 @@
                  v-if="communication.type === CommunicationTypes.CALL && communication.direction === CommunicationDirections.INBOUND && getRingGroup(communication.ring_group_id)">
               <div class="w-100">
                 <label class="form-control-label mb-1">Ring Group</label>
-                <router-link
-                  :to="{ name: 'Ring Group Activity', params: { ring_group_id: communication.ring_group_id }}"
-                  v-if="!getRingGroup(communication.ring_group_id).call_waiting">
-                  <!-- we are only showing this section if the ring group is available-->
-                  <q-tooltip anchor="top left"
-                             self="top left">
-                    Click For More Info
-                    <span class="text-dark-greenish">
-                      {{ getRingGroup(communication.ring_group_id, true) }}
-                    </span>
-                  </q-tooltip>
-                </router-link>
-                <template v-else>
+                <a class="cursor-pointer"
+                  target="_blank"
+                  :href="getRingGroupURL(communication.ring_group_id)"
+                  :id="`comm-ring-group-${_uid}`"
+                  v-if="communication.ring_group_id && (this.hasCompanyTeamInboxEnabled || !getRingGroup(communication.ring_group_id).call_waiting)"
+                  @click="handleRingGroupClick(communication.ring_group_id, $event)">
+                  <span class="text-blue cursor-pointer"
+                        :title="getRingGroup(communication.ring_group_id).name">
+                    <q-tooltip anchor="top middle"
+                                self="bottom middle"
+                                max-width="150px"
+                                data-testid="comm-details-ring-group-tooltip">
+                        Click For More Info
+                    </q-tooltip>
+                    {{ getRingGroup(communication.ring_group_id).name }}
+                  </span>
+                </a>
+                <template v-else-if="!this.hasCompanyTeamInboxEnabled && communication.ring_group_id">
                   Call waiting Queue
                 </template>
                 <target-users-tree class="w-100"
@@ -894,13 +748,16 @@
         <div class="text-left-align text-13 relative"
              v-if="communication.call_summary">
           <div class="summary-container">
-            <ExpandableHtmlViewer :content="parseMarkdown(communication.call_summary)"/>
+            <ExpandableHtmlViewer
+              :content="parseMarkdown(communication.call_summary)"
+              @update:expandable="isContentExpandable = $event"/>
             <q-btn flat
                    dense
                    class="regenerate-btn"
-                   @click="onRegenerateSummary"
+                   :class="{ 'non-expandable': !isContentExpandable }"
                    :loading="isRegenerating"
-                   :disable="isRegenerating">
+                   :disable="isRegenerating"
+                   @click="onRegenerateSummary">
               <sparkle-icon width="14"
                            height="14"
                            color="#9333EA"
@@ -990,7 +847,18 @@ import { marked } from 'marked'
 import UserDisplay from 'src/components/user-display.vue'
 import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import API from 'src/plugins/api/api'
-import { aclMixin, avatarMixin, classicMixin, communicationInfoMixin, dateMixin, liveCallsMixin, mentionsMixin, notificationMixin, simpsocialMixin, userMixin } from 'src/plugins/mixins'
+import {
+  aclMixin,
+  avatarMixin,
+  classicMixin,
+  communicationInfoMixin,
+  dateMixin,
+  liveCallsMixin,
+  mentionsMixin,
+  notificationMixin,
+  teamInboxPropsMixin,
+  userMixin
+} from 'src/plugins/mixins'
 import { mapState } from 'vuex'
 import * as AnswerTypes from '../constants/answer-types'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
@@ -1017,8 +885,8 @@ export default {
     notificationMixin,
     liveCallsMixin,
     mentionsMixin,
-    simpsocialMixin,
-    classicMixin
+    classicMixin,
+    teamInboxPropsMixin
   ],
 
   components: {
@@ -1155,12 +1023,13 @@ export default {
       CommunicationCallbackStatus,
       TranscriptionStatus,
       SummaryStatus,
-      TagCategories
+      TagCategories,
+      isContentExpandable: false
     }
   },
 
   computed: {
-    ...mapState(['campaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
+    ...mapState(['campaigns', 'teamInboxCampaigns', 'workflows', 'ringGroups', 'callDispositions', 'dialer', 'notifications']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('inbox', ['liveContacts', 'contacts']),
     ...mapState('broadcast', ['broadcasts']),
@@ -1192,7 +1061,6 @@ export default {
 
     conditionForShowPoweredByAloAiBox () {
       return (
-        !this.isSimpSocial &&
         this.currentCompany?.transcription_enabled &&
         this.communication.type === CommunicationTypes.CALL &&
         this.fileUuid && this.isMigrated
@@ -1278,7 +1146,10 @@ export default {
       if (!communicationIncomingNumber) {
         return null
       }
-      const found = this.campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
+
+      const campaigns = this.teamInbox ? this.teamInboxCampaigns : this.campaigns
+
+      const found = campaigns.find(campaign => campaign.id === _.get(this.communication, 'campaign_id', null))
       if (found) {
         return found.name
       }
@@ -1327,7 +1198,7 @@ export default {
     },
 
     getClassicUrlUserActivity (userId) {
-      return `${this.getClassicURL(this.isSimpSocial)}/users/${userId}/activity`
+      return `${this.getClassicURL()}/users/${userId}/activity`
     },
 
     dispose (dispositionStatus) {
@@ -1436,6 +1307,18 @@ export default {
         .finally(() => {
           this.isRegenerating = false
         })
+    },
+
+    handleRingGroupClick (ringGroupId, e) {
+      const url = this.getRingGroupURL(ringGroupId)
+      if (window && window.process && window.process.type === 'renderer') {
+        if (e) e.preventDefault()
+
+        this.$router.push(url)
+        return true
+      }
+
+      return false
     }
   },
 
@@ -1478,6 +1361,10 @@ export default {
   margin: 0;
   transition: all 0.2s ease;
   border-radius: 4px;
+}
+
+.regenerate-btn.non-expandable {
+  margin-bottom: -18px;
 }
 
 .regenerate-btn:hover {

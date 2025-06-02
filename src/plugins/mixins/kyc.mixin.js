@@ -6,7 +6,6 @@ export default _.merge({
   computed: {
     ...mapState('auth', ['profile']),
     ...mapState('cache', ['currentCompany']),
-    ...mapState('contacts', ['selectedLine']),
 
     currentKycStatus () {
       return this.currentCompany?.kyc_status

@@ -5,7 +5,7 @@
                           :values="selectedId"
                           :options="ringGroupsAlphabeticalOrder"
                           :disable="disable"
-                          :canEdit="hasPermissionTo(['list ring group', 'view ring group'])"
+                          :canEdit="hasPermissionTo(['list ring group', 'view ring group']) && !isReadOnly"
                           v-if="genericMultiselect"
                           data-testid="ring-group-selector-generic-multi-select"
                           @valuesUpdated="updateRingGroups">
@@ -30,7 +30,7 @@
               :options="options"
               :multiple="multiple"
               :placeholder="placeholder"
-              :disable="disable"
+              :disable="disable || isReadOnly"
               :class="[ prepend ? 'with-prepend' : '', highlighted ? highlightedClass : '', isGenericSelectorStyle ? 'generic-selector': '']"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
               v-model="selectedId"
@@ -93,7 +93,7 @@
 import { mapState } from 'vuex'
 import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
-import { aclMixin, selectorMixin } from 'src/plugins/mixins'
+import { aclMixin, selectorMixin, userMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
 
 export default {
@@ -101,7 +101,8 @@ export default {
 
   mixins: [
     aclMixin,
-    selectorMixin
+    selectorMixin,
+    userMixin
   ],
 
   components: {
@@ -164,6 +165,11 @@ export default {
     splitByQueued: {
       type: Boolean,
       default: false
+    },
+
+    isReadOnly: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -182,7 +188,9 @@ export default {
     }),
 
     filteredRingGroups () {
-      return this.allRingGroups.filter(ringGroup => !ringGroup.call_waiting)
+      return this.hasCompanyTeamInboxEnabled
+        ? this.allRingGroups
+        : this.allRingGroups.filter(ringGroup => !ringGroup.call_waiting)
     },
 
     placeholder () {

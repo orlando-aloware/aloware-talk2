@@ -15,14 +15,17 @@
 
       <div class="d-flex justify-content-between relative-position w-100">
         <div class="w-100 d-grid">
-          <div class="mt-1 mb-0 contact-name-wrapper">
-            <q-tooltip anchor="top middle"
-                       data-testid="contact-info-name-tooltip"
-                       self="center middle"
-                       content-class="fs-12">
-              {{ contactName }}
-            </q-tooltip>
-            <h2 class="contact-name pb-1">{{ contactName }}</h2>
+          <div class="mt-1 mb-0 d-flex align-items-center overflow-hidden">
+            <div class="contact-name-wrapper flex-grow-1 min-w-0 overflow-hidden">
+              <q-tooltip anchor="top middle"
+                         data-testid="contact-info-name-tooltip"
+                         self="center middle"
+                         content-class="fs-12">
+                {{ contactName }}
+              </q-tooltip>
+              <h2 class="contact-name pb-1 text-truncate">{{ contactName }}</h2>
+            </div>
+            <contact-integrations-link-icons class="ml-2 flex-shrink-0 mr-4" :contact='contact' />
           </div>
           <p class="contact-phone">
             <span v-if="contact.phone_number !== '0' && contact.phone_number !== null">
@@ -85,6 +88,7 @@
                   size="sm"
                   variant="light"
                   data-testid="contact-info-edit-button"
+                  :disabled="isReadOnly"
                   @click="onOpenEditForm">
           <pencil-o-icon/>
         </b-button>
@@ -119,7 +123,7 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="isProcessingBlock"
+                :disabled="isProcessingBlock || isReadOnly"
                 v-if="hasPermissionTo('toggle block contact') && !contact.is_blocked"
                 data-testid="contact-info-block-button"
                 @click="blockContact">
@@ -141,7 +145,7 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="isProcessingBlock"
+                :disabled="isProcessingBlock || isReadOnly"
                 v-if="hasPermissionTo('toggle block contact') && contact.is_blocked"
                 data-testid="contact-info-unblock-button"
                 @click="unBlockContact">
@@ -162,12 +166,13 @@
 
       <contact-dnc-actions class="mr-2 my-1"
                            data-testid="contact-info-dnc-actions"
-                           :contact="contact"></contact-dnc-actions>
+                           :contact="contact"
+                           :disabled="isReadOnly"></contact-dnc-actions>
 
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="contact.is_dnc"
+                :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-appointment-button"
                 @click="addAppointmentOpen(true)">
         <q-tooltip anchor="bottom middle"
@@ -181,7 +186,7 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="contact.is_dnc"
+                :disabled="contact.is_dnc || isReadOnly"
                 data-testid="contact-info-add-reminder-button"
                 @click="addReminderOpen(true)">
         <q-tooltip anchor="bottom middle"
@@ -196,6 +201,7 @@
                 size="sm"
                 class="custom-action-button my-1"
                 data-testid="contact-info-add-power-dialer-button"
+                :disabled="isReadOnly"
                 @click="openPowerDialerModal">
         <q-tooltip anchor="bottom middle"
                    data-testid="contact-info-add-power-dialer-tooltip"
@@ -209,7 +215,7 @@
                 size="sm"
                 class="custom-action-button my-1"
                 data-testid="contact-info-remove-power-dialer-button"
-                :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists"
+                :disabled="isRemovingFromPowerDialerLists || !hasPowerDialerLists || isReadOnly"
                 @click="removeContactFromPowerDialerLists">
         <q-tooltip anchor="bottom middle"
                    data-testid="contact-info-remove-power-dialer-tooltip"
@@ -222,38 +228,8 @@
       <b-button variant="light"
                 size="sm"
                 class="custom-action-button my-1"
-                :disabled="!isSimpSocialIntegrationEnabled"
-                v-if="isSimpSocial"
-                data-testid="contact-info-email-button"
-                @click="openEmailBlast">
-        <q-tooltip anchor="bottom middle"
-                   data-testid="contact-info-email-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
-          Email
-        </q-tooltip>
-        <email-icon width="16"/>
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
-                :disabled="isVideoConferenceLinkSending"
-                v-if="isSimpSocial"
-                data-testid="contact-info-video-conference-button"
-                @click="openVideoConference">
-        <q-tooltip anchor="bottom middle"
-                   data-testid="contact-info-video-conference-tooltip"
-                   self="center middle"
-                   content-class="fs-12">
-          Video Conference
-        </q-tooltip>
-        <video-conference-icon data-testid="contact-info-video-conference-icon" width="16"/>
-      </b-button>
-      <b-button variant="light"
-                size="sm"
-                class="custom-action-button my-1"
                 data-testid="contact-info-merge-button"
-                v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled"
+                v-if="hasRole('Company Admin') && !hasCompanyIntegrationsEnabled && !isReadOnly"
                 @click="openMergeContactModal">
         <q-tooltip anchor="bottom middle"
                    data-testid="contact-info-merge-tooltip"
@@ -286,7 +262,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import ContactNameForm from 'src/components/forms/contact-name-form'
-import Avatar from 'src/components/einbox/communication-items/avatar.vue'
+import Avatar from 'src/components/teaminbox/communication-items/avatar.vue'
 import TimerIcon from 'src/components/icons/timer-icon'
 import CalendarIcon from 'src/components/icons/calendar-icon'
 import CallIcon from 'src/components/icons/call-icon'
@@ -299,14 +275,13 @@ import ContactAddReminderModal from 'src/components/contacts/contact-add-reminde
 import PowerDialerAddModal from 'src/components/power-dialer/power-dialer-add-modal.vue'
 import ContactRemoveFromListsConfirmation from 'src/components/contacts/contact-remove-from-lists-confirmation.vue'
 import MergeContactModal from 'src/components/contacts/merge-contact-modal.vue'
-import { aclMixin, simpsocialMixin, timezoneCheckMixin, integrationMixin, contactMixin } from 'src/plugins/mixins'
+import { aclMixin, contactMixin, integrationMixin, timezoneCheckMixin } from 'src/plugins/mixins'
 import DigitalClock from 'components/digital-clock'
 import talk2Api from 'src/plugins/api/api'
 import ContactDncActions from 'components/contacts/contact-dnc-actions'
-import EmailIcon from 'components/icons/email-icon'
-import VideoConferenceIcon from 'components/icons/video-conference-icon'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
+import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
 
 export default {
   name: 'contact-info',
@@ -319,15 +294,13 @@ export default {
 
   mixins: [
     aclMixin,
-    simpsocialMixin,
     timezoneCheckMixin,
     integrationMixin,
     contactMixin
   ],
 
   components: {
-    VideoConferenceIcon,
-    EmailIcon,
+    ContactIntegrationsLinkIcons,
     ContactDncActions,
     DigitalClock,
     ContactAddReminderModal,
@@ -431,31 +404,6 @@ export default {
       this.addMergeContactOpen(true)
     },
 
-    openEmailBlast () {
-      this.$router.push({
-        name: 'Email Blast',
-        params: {
-          id: this.contact.id
-        }
-      })
-    },
-
-    openVideoConference () {
-      if (this.isVideoConferenceLinkSending) {
-        return
-      }
-
-      this.isVideoConferenceLinkSending = true
-
-      talk2Api.V1.integrations.simpsocial.videoConference.send(this.contact.id, this.campaignId)
-        .then(res => {
-          this.isVideoConferenceLinkSending = false
-        }).catch(err => {
-          this.isVideoConferenceLinkSending = false
-          this.$handleErrors(err.response)
-        })
-    },
-
     onOpenEditForm () {
       this.showEditForm = true
     },
@@ -502,12 +450,14 @@ export default {
     },
 
     callContact () {
-      let contact = {
+      const params = {
         timezone: this.contact.timezone,
-        name: this.contact.name
+        name: this.contact.name,
+        calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
+        calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
       }
 
-      this.checkContactTimezone(contact, this.initiateCall)
+      this.checkContactTimezone(params, this.initiateCall)
     },
 
     blockContact () {

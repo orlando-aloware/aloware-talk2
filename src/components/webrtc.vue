@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
 import Dialer from 'components/dialer/dialer'
+import ParkedCall from 'components/dialer/parked-call.vue'
 import Phone from 'components/dialer/phone'
 import SelectCampaignDialog from 'components/dialer/select-campaign-dialog.vue'
 import {
@@ -27,7 +27,7 @@ import {
   broadcastMixin,
   dialerDataMixin
 } from 'src/boot/mixins'
-import ParkedCall from 'components/dialer/parked-call.vue'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   components: { ParkedCall, Dialer, Phone, SelectCampaignDialog },
@@ -90,7 +90,7 @@ export default {
         return false
       }
 
-      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL', 'ANSWERING_CALL', 'CALL_CONNECTED']
+      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       return this.startDialing &&
         (this.isAlwaysAskModeEnabled ? true : !this.campaignId) &&
@@ -131,7 +131,7 @@ export default {
       this.$VueEvent.stop('agent_status_updated', this.mainListeners.agentStatusUpdated)
     },
 
-    unsubscribeFromPusher () {
+    unsubscribeFromLiveUpdates () {
       if (this.authenticated) {
         this.broadcastLeave()
       }
@@ -175,7 +175,7 @@ export default {
 
   beforeDestroy () {
     this.stopMainEvents()
-    this.unsubscribeFromPusher()
+    this.unsubscribeFromLiveUpdates()
   }
 }
 </script>

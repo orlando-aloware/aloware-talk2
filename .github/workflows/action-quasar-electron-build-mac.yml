@@ -76,9 +76,6 @@ jobs:
           ENV_APP_DEBUG: ${{ secrets.app_debug }}
           ENV_API_URL: ${{ secrets.api_url }}
           ENV_API_REPORTING_URL: ${{ secrets.api_reporting_url }}
-          ENV_BROADCAST_DRIVER: ${{ secrets.broadcast_driver }}
-          ENV_PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
-          ENV_PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
           ENV_SOKETI_APP_KEY: ${{ secrets.soketi_app_key }}
           ENV_SOKETI_CLUSTER: ${{ secrets.soketi_cluster }}
           ENV_SOKETI_HOST: ${{ secrets.soketi_host }}
@@ -103,7 +100,6 @@ jobs:
           ENV_XMAS_ENABLED: ${{ secrets.xmas_enabled }}
           ENV_XMAS_BANNERS_ENABLED: ${{ secrets.xmas_banners_enabled }}
           ENV_URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
-          ENV_CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
           ENV_BETA_FEATURES_COMPANY_IDS: ${{ secrets.beta_features_company_ids }}
           file-name: .env.prod
 
@@ -116,13 +112,6 @@ jobs:
           APP_DEBUG: ${{ secrets.app_debug }}
           API_URL: ${{ secrets.api_url }}
           API_REPORTING_URL: ${{ secrets.api_reporting_url }}
-
-          # soketi or pusher
-          BROADCAST_DRIVER: ${{ secrets.broadcast_driver }}
-
-          # Pusher Configuration
-          PUSHER_APP_KEY: ${{ secrets.pusher_app_key }}
-          PUSHER_CLUSTER: ${{ secrets.pusher_cluster }}
 
           # Soketi credentials
           SOKETI_APP_KEY: ${{ secrets.soketi_app_key }}
@@ -176,9 +165,6 @@ jobs:
 
           # Read Reviews
           URL_READ_REVIEWS: ${{ secrets.url_read_reviews }}
-
-          # Custom Edge Location
-          CUSTOM_EDGE_LOCATION_COMPANY_IDS: ${{ secrets.custom_edge_location_company_ids }}
 
           # Company IDs with beta features enabled
           BETA_FEATURES_COMPANY_IDS: ${{ secrets.beta_features_company_ids }}

@@ -1,38 +1,37 @@
-import Vue from 'vue'
-import 'highlight.js/styles/github.css'
-import googlePhone from 'google-libphonenumber'
-import moment from 'moment'
-import 'moment-timezone'
-import momentDurationFormatSetup from 'moment-duration-format'
-import Bowser from 'bowser'
 import * as Sentry from '@sentry/vue'
+import { AxiosError } from 'axios'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import Bowser from 'bowser'
+import CountriesAndTimezones from 'countries-and-timezones'
+import log from 'electron-log'
+import googlePhone from 'google-libphonenumber'
+import Highcharts from 'highcharts'
+import More from 'highcharts/highcharts-more'
+import loadDrilldown from 'highcharts/modules/drilldown'
+import loadExportData from 'highcharts/modules/export-data'
+import loadExporting from 'highcharts/modules/exporting'
+import loadMap from 'highcharts/modules/map'
+import HighchartsNoData from 'highcharts/modules/no-data-to-display'
+import loadOfflineExporting from 'highcharts/modules/offline-exporting'
+import loadStock from 'highcharts/modules/stock'
+import loadSunburst from 'highcharts/modules/sunburst'
+import 'highlight.js/styles/github.css'
+import momentDurationFormatSetup from 'moment-duration-format'
+import moment from 'moment-timezone'
 import PortalVue from 'portal-vue'
+import { Platform, Screen } from 'quasar'
+import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
+import { VALID_ENG_COUNTRIES, VALID_NA_COUNTRIES } from 'src/constants/valid-countries'
+import { cloneDeep } from 'src/plugins/helpers/functions'
+import * as storage from 'src/plugins/helpers/storage'
+import Vue from 'vue'
+import BusinessHours from 'vue-business-hours'
+import VueHighcharts from 'vue-highcharts'
+import infiniteScroll from 'vue-infinite-scroll'
 import 'vue-popperjs/dist/vue-popper.css'
 import VueWaveSurfer from 'vue-wave-surfer'
-import * as storage from 'src/plugins/helpers/storage'
-import CountriesAndTimezones from 'countries-and-timezones'
-import infiniteScroll from 'vue-infinite-scroll'
-import loadStock from 'highcharts/modules/stock'
-import loadExporting from 'highcharts/modules/exporting'
-import loadExportData from 'highcharts/modules/export-data'
-import loadOfflineExporting from 'highcharts/modules/offline-exporting'
-import loadSunburst from 'highcharts/modules/sunburst'
-import loadMap from 'highcharts/modules/map'
-import loadDrilldown from 'highcharts/modules/drilldown'
-import More from 'highcharts/highcharts-more'
-import HighchartsNoData from 'highcharts/modules/no-data-to-display'
-import VueHighcharts from 'vue-highcharts'
-import Highcharts from 'highcharts'
-import HighchartsThemes from './HighchartsTheme'
-import { Platform, Screen } from 'quasar'
-import BusinessHours from 'vue-business-hours'
 import { Vuelidate } from 'vuelidate'
-import { VALID_ENG_COUNTRIES, VALID_NA_COUNTRIES } from 'src/constants/valid-countries'
-import log from 'electron-log'
-import { NOTIFICATION_CONFIGURATION } from 'src/constants/bootstrap-default'
-import { cloneDeep } from 'src/plugins/helpers/functions'
-import { AxiosError } from 'axios'
+import HighchartsThemes from './HighchartsTheme'
 
 Screen.setSizes({
   sm: 300,
@@ -77,8 +76,6 @@ storage.local.setItem('api_reporting_url', process.env.API_REPORTING_URL)
 
 storage.local.setItem('sentry_dsn_public', process.env.MIX_SENTRY_DSN_PUBLIC)
 storage.local.setItem('aloware_demo_companies', Object.values(process.env.DEMO_COMPANY_IDS).join(','))
-storage.local.setItem('aloware_team_inbox_demo_companies', Object.values(process.env.TEAM_INBOX_DEMO_COMPANY_IDS).join(','))
-storage.local.setItem('custom_edge_location_companies', Object.values(process.env.CUSTOM_EDGE_LOCATION_COMPANY_IDS).join(','))
 
 Vue.use(infiniteScroll)
 Vue.use(BootstrapVue)
@@ -230,6 +227,7 @@ window.guessLocale = function (phoneNumber) {
 }
 
 window._ = require('lodash')
+// Import the pusher-js library for WebSocket functionality (live updates)
 window.Pusher = require('pusher-js')
 
 window.paceOptions = {
@@ -335,6 +333,7 @@ console.log(
 )
 
 Vue.prototype.$moment = window.moment
+// Keep the Pusher reference for compatibility, but used with Soketi (live updates)
 Vue.prototype.$Pusher = window.Pusher
 Vue.prototype.$Sentry = window.Sentry
 
@@ -578,6 +577,7 @@ Vue.prototype.$actionNotification = window._.debounce(function (notificationData
     communicationId: window._.get(notificationData, 'communicationId', null),
     campaignId: window._.get(notificationData, 'campaignId', null),
     campaignName: window._.get(notificationData, 'campaignName', null),
+    ringGroupId: window._.get(notificationData, 'ringGroupId', null),
     ringGroupName: window._.get(notificationData, 'ringGroupName', null),
     phoneNumber: window._.get(notificationData, 'phoneNumber', null),
     dateTime: window._.get(notificationData, 'dateTime', this.$moment()),

@@ -2,6 +2,7 @@
   <contact-disposition-selector :highlighted="highlighted"
                                 :highlighted-class="highlightedClass"
                                 :required="required"
+                                :disable="isReadOnly"
                                 v-model="dispositionStatusId"
                                 @change="changeContactDisposition">
   </contact-disposition-selector>
@@ -32,6 +33,11 @@ export default {
     },
 
     required: {
+      type: Boolean,
+      default: false
+    },
+
+    isReadOnly: {
       type: Boolean,
       default: false
     }

@@ -274,10 +274,10 @@ export const fixDateTime = (dt) => {
   }
 
   if (window.timezone) {
-    return window.moment.utc(dt).tz(window.timezone).format('MM/DD/YYYY h:mm:ssa')
+    return window.moment.utc(dt).tz(window.timezone).format('MM/DD/YYYY h:mm:ssa z')
   }
 
-  return window.moment.utc(dt).local().format('MM/DD/YYYY h:mma')
+  return window.moment.utc(dt).local().format('MM/DD/YYYY h:mma z')
 }
 
 /**
@@ -292,6 +292,26 @@ export const fixFullDateTime = (dt) => {
         return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD h:mm:ssa') + ' MNL'
       }
       return window.moment.utc(dt).tz(window.timezone).format('YYYY-MM-DD h:mm:ssa')
+    } else {
+      return window.moment.utc(dt).local().format('YYYY-MM-DD h:mm:ssa')
+    }
+  } else {
+    return '-'
+  }
+}
+
+/**
+ * Fix date time for Company Timezone
+ * @param {date|string|Moment} dt
+ * @returns {string|*}
+ */
+export const fixFullDateTimeCompany = (dt, store = null) => {
+  if (dt) {
+    if (store?.state?.currentTimezone) {
+      if (store.state.currentTimezone === 'Asia/Manila') {
+        return window.moment.utc(dt).tz(store.state.currentTimezone).format('YYYY-MM-DD h:mm:ssa') + ' MNL'
+      }
+      return window.moment.utc(dt).tz(store.state.currentTimezone).format('YYYY-MM-DD h:mm:ssa')
     } else {
       return window.moment.utc(dt).local().format('YYYY-MM-DD h:mm:ssa')
     }
@@ -542,12 +562,12 @@ export const fixCommunicationDateTime = (dt, duration = 0) => {
   if (dt) {
     if (window.timezone) {
       if (window.timezone === 'Asia/Manila') {
-        return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mm A') + ' MNL'
+        return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mma') + ' MNL'
       }
 
-      return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mm A z')
+      return window.moment.utc(dt).tz(window.timezone).add(duration, 'seconds').format('MM/DD h:mma z')
     } else {
-      return window.moment.utc(dt).local().add(duration, 'seconds').format('MM/DD h:mm A z')
+      return window.moment.utc(dt).local().add(duration, 'seconds').format('MM/DD h:mma z')
     }
   } else {
     return '-'
@@ -598,6 +618,7 @@ export default ({ Vue }) => {
     fixDate,
     fixDateTime,
     fixFullDateTime,
+    fixFullDateTimeCompany,
     fixFullDate,
     fixTime,
     fixTimeLocal,
