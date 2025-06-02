@@ -1,7 +1,5 @@
 <template>
   <div v-if="authenticated" class="h-100">
-    <teaminbox-tutorial-video v-if="!isMobile"/>
-
     <div class="teaminbox animate__animated animate__fadeIn position-relative">
       <TeamInboxSide
         :class="inboxSideClasses"
@@ -30,7 +28,6 @@ import { aclMixin, userMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
-import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
 
 export default {
   name: 'TeamInbox',
@@ -41,7 +38,6 @@ export default {
   ],
 
   components: {
-    teaminboxTutorialVideo,
     Contact,
     TeamInboxSide
   },
