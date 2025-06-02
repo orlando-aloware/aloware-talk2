@@ -247,9 +247,21 @@ export default {
     async connectInbox () {
       this.isConnecting = true
       try {
-        await talk2Api.V1.integrations.hubspot.connectInbox({
-          'query_params': this.$route.query
+        console.log('selectedCampaign', this.selectedCampaign)
+        const response = await talk2Api.V1.integrations.hubspot.connectInbox({
+          'account_token': this.$route.query.accountToken,
+          'channel_id': this.$route.query.channelId,
+          'inbox_id': this.$route.query.inboxId,
+          'user_id': this.$route.query.userId,
+          'portal_id': this.$route.query.portalId,
+          'redirect_url': this.$route.query.redirectUrl,
+          'campaign_id': this.selectedCampaign.id
         })
+
+        // Redirect to HubSpot's success page
+        if (response.status === 200) {
+          window.location.href = decodeURIComponent(this.$route.query.redirectUrl)
+        }
       } catch (error) {
         this.$handleErrors(error.response)
       } finally {
