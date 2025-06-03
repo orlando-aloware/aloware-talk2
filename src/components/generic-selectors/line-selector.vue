@@ -90,6 +90,9 @@
           </div>
         </q-chip>
       </template>
+      <template v-slot:hint v-if="showLineInboxName">
+        Inbox: {{ lineInboxName }}
+      </template>
     </q-select>
   </div>
 </template>
@@ -100,6 +103,7 @@ import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import { aclMixin, selectorMixin } from 'src/plugins/mixins'
 import RemoveTagIcon from 'components/icons/contact-activity/remove-tag-icon'
+import { COMPANY_AGENT } from 'src/constants/roles'
 
 export default {
   name: 'line-selector',
@@ -317,6 +321,14 @@ export default {
 
     selectedLine () {
       return this.campaigns.find(campaign => campaign.id === this.selectedId)
+    },
+
+    lineInboxName () {
+      return this.selectedLine?.ring_group?.name || 'Personal Inbox'
+    },
+
+    showLineInboxName () {
+      return this.selectedId && this.hasRole(COMPANY_AGENT)
     }
   },
 
