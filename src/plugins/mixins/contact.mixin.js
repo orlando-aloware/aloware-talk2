@@ -7,6 +7,7 @@ import * as InboxTaskStatus from 'src/constants/inbox-task-status'
 import talk2Api from 'src/plugins/api/api'
 import * as storage from 'src/plugins/helpers/storage'
 import { mapActions, mapState } from 'vuex'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   mixins: [teamInboxPropsMixin],
@@ -480,7 +481,7 @@ export default {
           return
         }
 
-        this.$router.push({ name: 'inbox' })
+        this.$router.push({ name: this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE })
         return
       }
 
