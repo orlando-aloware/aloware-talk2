@@ -294,7 +294,7 @@ export default {
 
             this.inProgressFetchTasks[taskType] = false
           })
-        console.log('fetch tasks AFTER', this.powerDialerTasks.in_queue)
+
         return
       }
 
@@ -313,7 +313,7 @@ export default {
           this.powerDialerTaskFilters[stat] = res.data
         })
       })
-      console.log('fetch tasks AFTER 2', this.powerDialerTasks.in_queue)
+
     },
 
     async fetchCurrentList () {
