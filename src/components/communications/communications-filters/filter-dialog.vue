@@ -193,6 +193,7 @@ export default {
         'workflows',
         'contact_owner',
         'my_contact',
+        'date_range',
         'from_date',
         'to_date',
         'creator_type',
@@ -437,7 +438,6 @@ export default {
           ...this.filterModel.filter,
           ..._.pick(personalFilterObject, this.filterFields)
         }
-        sessionStorage.removeItem('date-selected-comms')
         this.setIsFirstLoad(true)
       } else if (this.appliedFilter) {
         this.filter = { ...this.appliedFilter.filter }
@@ -475,7 +475,6 @@ export default {
       const useFilter = this.selectedFilter ? this.selectedFilter.filter : this.filterModel.filter
 
       this.reset = true
-      sessionStorage.removeItem('date-selected-comms')
       this.setIsFirstLoad(true)
 
       for (const item in useFilter) {
@@ -621,26 +620,30 @@ export default {
       }
       this.setIsFirstLoad(false)
 
-      const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
+      if (personalFilterObject.date_range && !['All Time', 'custom'].includes(personalFilterObject.date_range)) {
+        // if not all time or custom, set the date for the specific range
+        const range = this.ranges[personalFilterObject.date_range]
+        const formattedDates = this.formatDates(range[0], range[1])
+        personalFilterObject.from_date = formattedDates.from_date
+        personalFilterObject.to_date = formattedDates.to_date
+      } else {
+        const formattedDates = this.formatDates(personalFilterObject.from_date, personalFilterObject.to_date)
+        personalFilterObject.from_date = formattedDates.from_date
+        personalFilterObject.to_date = formattedDates.to_date
 
-      personalFilterObject.from_date = formattedDates.from_date
-      personalFilterObject.to_date = formattedDates.to_date
+        let dateRange = !personalFilterObject.from_date && !personalFilterObject.to_date ? 'All Time' : 'custom'
 
-      // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
-      // set the range to the key of the range
-      let inRange = false
-
-      for (const range in this.ranges) {
-        const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
-        if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
-          sessionStorage.setItem('date-selected-comms', range)
-          inRange = true
-          break
+        // Loop through ranges and if view.filter.filter.from_date === range[0] and view.filter.filter.to_date === range[1]
+        // set the range to the key of the range
+        for (const range in this.ranges) {
+          const hasDatesValues = personalFilterObject && personalFilterObject.from_date && personalFilterObject.to_date
+          if (hasDatesValues && personalFilterObject.from_date === this.ranges[range][0] && personalFilterObject.to_date === this.ranges[range][1]) {
+            dateRange = range
+            break
+          }
         }
-      }
 
-      if (!inRange) {
-        sessionStorage.setItem('date-selected-comms', 'custom')
+        personalFilterObject.date_range = dateRange
       }
 
       // First apply the filter to populate values

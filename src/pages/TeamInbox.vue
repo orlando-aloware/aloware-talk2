@@ -1,7 +1,5 @@
 <template>
   <div v-if="authenticated" class="h-100">
-    <teaminbox-tutorial-video v-if="!isMobile"/>
-
     <div class="teaminbox animate__animated animate__fadeIn position-relative">
       <TeamInboxSide
         :class="inboxSideClasses"
@@ -30,7 +28,6 @@ import { aclMixin, userMixin } from 'src/plugins/mixins'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
-import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
 
 export default {
   name: 'TeamInbox',
@@ -41,7 +38,6 @@ export default {
   ],
 
   components: {
-    teaminboxTutorialVideo,
     Contact,
     TeamInboxSide
   },
@@ -110,7 +106,18 @@ export default {
           this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
         )
       } else {
-        this.$router.push({ name: 'Inbox' })
+        const { id: contactId, communicationId } = this.$route.params
+
+        if (contactId) {
+          const contactRoute = !communicationId
+            ? `/contacts/${contactId}`
+            : `/contacts/${contactId}/communications/${communicationId}`
+
+          this.$router.replace(contactRoute)
+          return
+        }
+
+        this.$router.replace({ name: 'Inbox' })
       }
     }
     // Load team inbox campaigns
@@ -142,6 +149,15 @@ export default {
       // Only valid for team inbox, which are waiting for the backend to process the event
       this.$VueEvent.fire('mark_contact_communications_all_as_read', contact)
       this.$VueEvent.fire('contact_updated', contact)
+    }
+  },
+
+  watch: {
+    hasCompanyTeamInboxEnabled (enabled) {
+      // Handle live updates when team inbox is disabled
+      if (!enabled) {
+        this.$router.replace({ name: 'Inbox' })
+      }
     }
   },
 

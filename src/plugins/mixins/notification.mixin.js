@@ -5,7 +5,8 @@ import { mapActions, mapState } from 'vuex'
 export default {
   data () {
     return {
-      dialerCallFishingInterval: null
+      dialerCallFishingInterval: null,
+      notificationSoundUserActionToastId: 'notification-sound-user-action-toast'
     }
   },
 
@@ -51,6 +52,7 @@ export default {
 
     playAudio (shouldPlayFishingNotificationSound = false) {
       if (!this.enableAudio) {
+        this.showMediaPlaybackRequiresUserGestureToast()
         return
       }
 
@@ -65,6 +67,7 @@ export default {
         promise.catch(err => {
           // Auto-play was prevented
           // Show a UI element to let the user manually start playback
+          this.showMediaPlaybackRequiresUserGestureToast()
           console.log(err)
         })
       }
@@ -76,6 +79,10 @@ export default {
       }
 
       this.fishingModeNotificationAudio.pause()
+    },
+
+    showMediaPlaybackRequiresUserGestureToast () {
+      this.$bvToast.show(this.notificationSoundUserActionToastId)
     },
 
     processRemoveFromNotification (communication) {
@@ -342,7 +349,7 @@ export default {
         if (['callFishing', 'incomingCall'].includes(params.data.type)) {
           console.log('processActionNotification - params.data', params.data)
 
-          if (this.isOnPowerDialerSessionRoute && ringGroup.experimental_fishing_mode_repeat_call_routing) {
+          if (this.isOnPowerDialerSessionRoute && ringGroup?.experimental_fishing_mode_repeat_call_routing) {
             const contactWithCommunication = {
               ...params.data.contact,
               'communication_id': params.data.communicationId

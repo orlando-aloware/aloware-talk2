@@ -33,6 +33,7 @@ if (storage.local.getItem('api_token')) {
 // Add request interceptor to track request start time
 window.axios.interceptors.request.use(config => {
   config.metadata = { startTime: new Date().getTime() }
+
   return config
 })
 

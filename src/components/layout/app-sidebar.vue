@@ -19,6 +19,7 @@
     </div>
 
     <app-sidebar-nav-link
+      v-if="hasCompanyLegacyInboxEnabled"
       :isActive="isActive('Inbox')"
       :isSidebarExpanded="isSidebarExpanded"
       :title="INBOXES_MENU_TITLE"
@@ -80,7 +81,7 @@
       icon="lists"
       padding="10px 20px"
       title="Lists"
-      to="lists-management"
+      to="/lists-management"
     />
 
     <app-sidebar-nav-link

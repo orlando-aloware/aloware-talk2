@@ -24,6 +24,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import BusinessInformationForm from 'src/components/account-registration/business-information-form.vue'
 import Banner from 'src/components/account-registration/banner.vue'
 import API from 'src/plugins/api/api'
+import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 
 export default {
   name: 'BusinessInformation',
@@ -58,7 +59,7 @@ export default {
     },
 
     onBackToPreviousRoute () {
-      this.$router.push({ name: 'Inbox' })
+      this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
     },
 
     onSubmit () {
@@ -78,7 +79,7 @@ export default {
           this.isSubmitted = true
 
           this.$generalNotification('The Business information has been submitted.')
-          this.$router.push({ name: 'Inbox' })
+          this.$router.push({ name: TEAMINBOXES_MENU_TITLE })
         })
         .catch((err) => {
           if (err.response && err.response.data && err.response.data.errors) {

@@ -8277,6 +8277,10 @@ button.grey-90 {
       }
     }
 
+    &.extended-width {
+      width: 330px !important;
+    }
+
     .toast-header {
       .close {
         position: absolute;
@@ -13184,6 +13188,10 @@ h1.contact-list-name-label {
 
 .overflow-x-auto {
   overflow-x: auto;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
 }
 
 .h-93 {

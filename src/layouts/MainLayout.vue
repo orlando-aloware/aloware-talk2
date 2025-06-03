@@ -7,10 +7,11 @@
       <span>This screen size is not supported.</span>
     </div>
     <div class="h-100 d-flex flex-column">
-      <template v-if="isAuthenticated && !loading && companyHasTrialStatus && !isWidget && !isMobile">
-        <trial-expired-modal v-if="isTrialExpired"/>
-        <cancelled-account-modal v-else-if="isCancelledAccount"/>
-        <trial-banner v-else-if="isTrial"/>
+      <template v-if="isAuthenticated && !loading && !isMobile">
+        <trial-expired-modal v-if="showTrialExpiredModal"/>
+        <cancelled-account-modal v-else-if="showCancelledAccountModal"/>
+        <trial-banner v-else-if="showIsTrialBanner"/>
+        <teaminbox-tutorial-video v-else-if="showTeamInboxTutorialVideo"/>
       </template>
       <div class="h-100"
            :class="{ 'page': !isWidget }">
@@ -298,6 +299,7 @@ import AccountSelector from 'src/components/account-selector.vue'
 import { FINISHED } from 'src/constants/export-status'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
+import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
 
 export default {
   name: 'MyLayout',
@@ -325,7 +327,8 @@ export default {
     TrialBanner,
     TrialExpiredModal,
     CancelledAccountModal,
-    AccountSelector
+    AccountSelector,
+    teaminboxTutorialVideo
   },
 
   mixins: [
@@ -471,12 +474,24 @@ export default {
       return _.get(this.$route.meta, 'isGuest', false)
     },
 
-    isTrialExpired () {
-      return this.currentCompany && [TrialStatus.TRIAL_STATUS_EXPIRED, TrialStatus.TRIAL_STATUS_PURGE_ELIGIBLE].includes(this.currentCompany.trial_status)
+    showTrialExpiredModal () {
+      return !this.isWidget &&
+      this.companyHasTrialStatus &&
+      [TrialStatus.TRIAL_STATUS_EXPIRED, TrialStatus.TRIAL_STATUS_PURGE_ELIGIBLE].includes(this.currentCompany?.trial_status)
     },
 
-    isCancelledAccount () {
-      return this.currentCompany && this.currentCompany.subscription?.status === 'cancelled' && !this.currentCompany.is_whitelabel
+    showCancelledAccountModal () {
+      return !this.isWidget &&
+      this.companyHasTrialStatus &&
+      this.currentCompany?.subscription?.status === 'cancelled' && !this.currentCompany?.is_whitelabel
+    },
+
+    showIsTrialBanner () {
+      return this.isTrial && this.companyHasTrialStatus && !this.isWidget
+    },
+
+    showTeamInboxTutorialVideo () {
+      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE)
     },
 
     companyHasTrialStatus () {
@@ -1233,13 +1248,7 @@ export default {
       }, checkInterval)
     }
 
-    if (this.mediaPlaybackRequiresUserGesture()) {
-      window.addEventListener('keydown', this.removeBehaviorsRestrictions)
-      window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
-      window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
-    } else {
-      this.setEnableAudio(true)
-    }
+    this.checkMediaPlaybackRequiresUserGesture()
 
     console.log('Push permission: ' + window.Push.Permission.get())
 
@@ -1262,6 +1271,16 @@ export default {
   },
 
   methods: {
+    async checkMediaPlaybackRequiresUserGesture () {
+      if (await this.mediaPlaybackRequiresUserGesture()) {
+        window.addEventListener('keydown', this.removeBehaviorsRestrictions)
+        window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
+        window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
+      } else {
+        this.setEnableAudio(true)
+      }
+    },
+
     processUrl (url) {
       // New format: expected url like "contact-<phoneNumber>" or "contact-<phoneNumber>?first=...&last=...&isCompany=..."
       let cleaned = url.replace(/contact[:-]/, '')
@@ -1582,22 +1601,21 @@ export default {
       this.setEnableAudio(true)
     },
 
-    mediaPlaybackRequiresUserGesture () {
+    async mediaPlaybackRequiresUserGesture () {
       // test if play() is ignored when not called from an input event handler
       const audio = document.createElement('audio')
-      const promise = audio.play()
 
-      if (promise !== undefined) {
-        promise
-          .catch(() => {
-            // Auto-play was prevented
-            // Show a UI element to let the user manually start playback
-            return true
-          })
-          .then(() => {
-            // Auto-play started
-            return audio.paused
-          })
+      try {
+        await audio.play()
+        // Auto-play started successfully
+        // No user gesture required
+        return audio.paused
+      } catch (error) {
+        // Auto-play was prevented
+        // User gesture is required
+        return true
+      } finally {
+        audio.remove()
       }
     },
 
@@ -2948,7 +2966,8 @@ export default {
       }
 
       if (!val && this.$route.name === 'Phone') {
-        this.$router.replace({ name: 'Inbox' })
+        const name = this.hasCompanyLegacyInboxEnabled ? 'Inbox' : TEAMINBOXES_MENU_TITLE
+        this.$router.replace({ name })
       }
 
       if (val) {
