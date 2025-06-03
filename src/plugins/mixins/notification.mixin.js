@@ -27,8 +27,7 @@ export default {
     ...mapState('cache', ['currentCompany']),
     ...mapState(['isWidget', 'isSalesforceWidget']),
     ...mapState('powerDialer', [
-      'powerDialerTasks',
-      'activeTask'
+      'powerDialerTasks'
     ])
   },
 
