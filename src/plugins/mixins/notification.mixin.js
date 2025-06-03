@@ -96,7 +96,6 @@ export default {
     },
 
     closeCallNotifications (type = 'incomingCall', communicationId = null, forceClose = false) {
-      console.log('CLOSE CALL NOTIFICATIONS', communicationId, this.powerDialerTasks.in_queue)
       if (!communicationId ||
         !['incomingCall', 'callFishing'].includes(type)) {
         return
@@ -105,10 +104,8 @@ export default {
       if (this.isOnPowerDialerSessionRoute) {
         const index = this.powerDialerTasks.in_queue.findIndex(pdTask => pdTask.communication_id === communicationId)
         if (index !== -1) {
-          console.log('Removed notification from power dialer tasks***********', communicationId)
           this.powerDialerTasks.in_queue.splice(index, 1)
         }
-        console.log('Closed', this.powerDialerTasks.in_queue, this.activeTask.forcedRedial)
       }
 
       // for incoming call
@@ -117,7 +114,6 @@ export default {
       if (type === 'incomingCall' &&
         notificationCommId.data === communicationId &&
         this.dialer.currentStatus !== 'RECEIVED_CALL_INVITE') {
-        console.log('removed notification 1 ', this.powerDialerTasks.in_queue)
         this.$closeActionNotification(type)
         this.closeDesktopNotification(communicationId, 'communication')
         return
@@ -154,7 +150,6 @@ export default {
       if (notificationCommId.data === communicationId &&
         type === 'callFishing' &&
         document.getElementById('callFishing')) {
-        console.log('removed notification 3 ', this.powerDialerTasks.in_queue)
         this.switchCallFishingFromQueue()
         this.closeDesktopNotification(communicationId, 'communication')
         return
@@ -162,7 +157,6 @@ export default {
 
       if (type === 'callFishing' &&
         communicationId) {
-        console.log('removed notification 4 ', this.powerDialerTasks.in_queue)
         this.removeFromCallFishingNotificationQueue(communicationId)
         this.removeFromCallFishingQueue(communicationId)
         this.closeDesktopNotification(communicationId, 'communication')

@@ -431,7 +431,6 @@ export default {
     },
 
     async moveTask (item = {}, direction = this.moveDirection.top) {
-      console.log('move task BEFORE', this.powerDialerTasks.in_queue)
       this.isMoving = true
 
       const res = await this.moveContactItems({
@@ -480,7 +479,6 @@ export default {
 
         this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
         this.isMoving = false
-        console.log('move task AFTER', this.powerDialerTasks.in_queue)
         return
       }
 
@@ -517,7 +515,6 @@ export default {
     },
 
     async loadMore (taskType) {
-      console.log('load more BEFORE', this.powerDialerTasks.in_queue)
       this.filterDisabled[taskType] = true
 
       // If there is a next page, increment the page number

@@ -1566,7 +1566,7 @@ export default {
         // get the next task
         task = get(this.powerDialerTasks.in_queue, '0', null)
       }
-      console.log(this.powerDialerTasks.in_queue, task)
+
       this.taskToCall = cloneDeep(task)
 
       // end session if no more tasks
@@ -1587,7 +1587,6 @@ export default {
 
       this.redialTask(this.activeTask, redial, forcedRedial).then(() => {
         // hang-up call if still in a call
-        console.log('REDIAL TASK: ', this.powerDialerTasks.in_queue)
         if (this.dialer.currentStatus === 'CALL_CONNECTED') {
           this.$VueEvent.fire('hangupCall')
         }
@@ -1681,7 +1680,6 @@ export default {
 
     'powerDialerTasks.in_queue': {
       handler (tasks) {
-        console.log('WATCH POWER DIALER TASK IN QUEUE', tasks)
         // end the session if:
         // there's no tasks in queue
         // and there's no active task

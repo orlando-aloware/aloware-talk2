@@ -313,7 +313,6 @@ export default {
           this.powerDialerTaskFilters[stat] = res.data
         })
       })
-
     },
 
     async fetchCurrentList () {
