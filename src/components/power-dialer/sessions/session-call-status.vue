@@ -1566,7 +1566,6 @@ export default {
         // get the next task
         task = get(this.powerDialerTasks.in_queue, '0', null)
       }
-
       this.taskToCall = cloneDeep(task)
 
       // end session if no more tasks

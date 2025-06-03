@@ -59,6 +59,7 @@ export default {
       if (isEmpty(task)) {
         return
       }
+
       // Re-assign new items for IN QUEUE and exclude the current task
       this.powerDialerTasks.in_queue = this.powerDialerTasks.in_queue.filter(lst => lst.contact_list_item_id !== task.id)
     },

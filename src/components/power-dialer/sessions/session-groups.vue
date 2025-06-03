@@ -479,6 +479,7 @@ export default {
 
         this.$generalNotification(`Task has been successfully moved to ${direction === this.moveDirection.top ? 'top' : 'bottom'}.`, 'success')
         this.isMoving = false
+
         return
       }
 
@@ -551,7 +552,6 @@ export default {
         }
       }
       this.filterDisabled[taskType] = false
-      console.log('load more AFTER', this.powerDialerTasks.in_queue)
     },
 
     chipped (data) {

@@ -141,7 +141,6 @@ export default {
           type === 'callFishing' &&
           !callFishingQueue.data) ||
         forceClose) {
-        console.log('removed notification 2 ', this.powerDialerTasks.in_queue)
         this.$closeActionNotification(type)
         this.closeDesktopNotification(communicationId, 'communication')
         return
