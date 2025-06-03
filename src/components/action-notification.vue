@@ -26,7 +26,7 @@
                  pill>
           {{ queueCount }}
         </b-badge>
-        <div class="mr-2 notification-icon"
+        <div class="notification-icon"
              :class="notificationIconClasses"
              @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
