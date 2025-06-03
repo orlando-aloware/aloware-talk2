@@ -1701,7 +1701,6 @@ export default {
             this.start()
           }
         }
-        console.log('Finished handle watch', this.powerDialerTasks.in_queue)
       },
       deep: true
     },
