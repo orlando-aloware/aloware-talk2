@@ -104,13 +104,18 @@
           <div class="text-right q-mt-sm">
             <q-btn
               label="Connect with HubSpot"
-              :disable="!selectedCampaign"
+              :disable="!selectedCampaign || isConnecting"
+              :loading="isConnecting"
               class="connect-btn"
               style="background: #FF7A59; color: white"
               no-caps
               unelevated
               @click="connectInbox"
-            />
+            >
+              <template v-slot:loading>
+                <q-spinner-dots color="white" />
+              </template>
+            </q-btn>
           </div>
         </template>
 
@@ -120,7 +125,16 @@
             <q-icon name="error" size="48px" color="negative" />
             <h2 class="text-h6 text-negative q-mt-md q-mb-xs">Aloware Connection Error</h2>
             <p class="text-body2 text-grey-6">Please contact your administrator</p>
-            <pre style="background: #f5f5f5; border: 1px solid #eee; border-radius: 4px; padding: 16px; margin-top: 24px; margin-bottom: 8px; max-width: 600px; width: 100%; overflow-x: auto; font-family: monospace; font-size: 12px; text-align: left; color: #476582; white-space: pre-wrap; word-break: break-word;"><code>{{ setupErrorMessage }}</code></pre>
+            <pre class="error-code"><code>{{ setupErrorMessage }}</code></pre>
+            <q-btn
+              label="Retry"
+              icon="refresh"
+              color="primary"
+              no-caps
+              unelevated
+              @click="reloadPage"
+              style="min-width: 120px"
+            />
           </div>
         </template>
       </div>
@@ -220,6 +234,10 @@ export default {
 
   methods: {
     ...mapActions('auth', ['check']),
+
+    reloadPage () {
+      window.location.reload()
+    },
 
     async handleAuthRedirect () {
       if (this.authenticated) return
@@ -432,5 +450,23 @@ export default {
 .error-container p {
   max-width: 400px;
   margin: 0 auto;
+}
+
+.error-code {
+  background: #f5f5f5;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 16px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  max-width: 600px;
+  width: 100%;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 12px;
+  text-align: left;
+  color: #476582;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 </style>
