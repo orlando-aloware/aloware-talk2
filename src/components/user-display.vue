@@ -33,7 +33,12 @@ export default {
   props: {
     userId: {
       type: [Number, String],
-      required: true
+      required: false,
+      default: null
+    },
+    user: {
+      type: Object,
+      default: null
     },
     iconSize: {
       type: [Number, String],
@@ -50,16 +55,25 @@ export default {
   },
 
   computed: {
-    user () {
-      return this.getUser(this.userId)
+    displayUser () {
+      if (this.user) {
+        return this.user
+      }
+      if (this.userId) {
+        return this.getUser(this.userId)
+      }
+      return null
     },
 
     userName () {
-      return this.getUserName(this.user)
+      if (!this.displayUser) {
+        return '-'
+      }
+      return this.getUserName(this.displayUser)
     },
 
     isAiAgent () {
-      return this.user && this.user.type === User.TYPE_AI_AGENT
+      return this.displayUser && this.displayUser.type === User.TYPE_AI_AGENT
     }
   }
 }
