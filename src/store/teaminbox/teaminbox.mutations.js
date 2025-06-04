@@ -86,8 +86,11 @@ export default {
   SET_SHOW_REFRESH_COMMUNICATIONS_BUTTON (state, show) {
     state.showRefreshCommunicationsButton = show
   },
-  SET_ACTIVE_FILTERS (state, filters) {
-    state.activeFilters = filters
+  SET_ACTIVE_FILTERS (state, { field, value }) {
+    state.activeFilters = {
+      ...state.activeFilters,
+      [field]: value
+    }
   },
   SET_ACTIVE_SORT (state, sort) {
     state.activeSort = sort

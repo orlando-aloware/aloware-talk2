@@ -172,8 +172,16 @@ export default {
       const apiFilters = {}
 
       // Map filter keys to API parameters
-      if (filters.unreadonly) {
+      if (filters.unread_only) {
         apiFilters.unread_only = true
+      }
+
+      if (filters.types?.length) {
+        apiFilters.types = filters.types
+      }
+
+      if (filters.direction) {
+        apiFilters.direction = filters.direction
       }
 
       // Map sort keys to API parameters

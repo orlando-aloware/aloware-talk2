@@ -16801,7 +16801,10 @@ hr {
   overflow: visible !important;
 }
 
-.teaminbox-filter-sort {
+.teaminbox-filters {  
+  padding: 2px 16px;
+  background-color: white;
+
   .filter-dropdown,
   .sort-dropdown,
   .filter-dropdown.show,
