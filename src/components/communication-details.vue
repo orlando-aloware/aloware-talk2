@@ -600,7 +600,7 @@
                         >
                           Click For More Info
                         </q-tooltip>
-                        <user-display :user-id="communication.user_id" />
+                        <user-display :user-id="communication.user_id" :user="communication.user" />
                       </span>
                     </div>
                   </div>
