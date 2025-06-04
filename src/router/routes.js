@@ -300,7 +300,17 @@ const routes = [
         component: Contacts,
         meta: {
           title: 'Contact'
-        }
+        },
+        children: [
+          {
+            path: 'mentions/:communicationId',
+            name: 'Contacts',
+            component: Contact,
+            meta: {
+              title: 'Mentions'
+            }
+          }
+        ]
       },
       {
         path: 'lists-management',
