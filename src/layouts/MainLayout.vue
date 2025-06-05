@@ -1234,6 +1234,7 @@ export default {
     // check auth every 5 minutes
     const checkInterval = 5 * 60 * 1000
 
+    // Handled outdated company info which caused the fixed the refresh loop
     if (!this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled) {
       this.$axios.get('/api/v1/company/' + this.profile.company_id)
         .then((res) => {
