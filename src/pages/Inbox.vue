@@ -112,8 +112,6 @@ export default {
       'setIsInboxRefreshBtnLoading'
     ]),
 
-    ...mapActions('cache', ['setCurrentCompany']),
-
     setChannel (routeChanged = false) {
       if (this.inboxChannelRoutes.includes(this.$route.name)) {
         let channel = null
@@ -176,18 +174,11 @@ export default {
     }
   },
 
-  async mounted () {
+  mounted () {
     if (this.$store.state.auth.is_focused_power_dialer) {
       this.$router.replace(
         this.currentCompany?.auto_dialer_enabled ? 'power-dialer' : 'stats'
       )
-    }
-
-    if (!this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled) {
-      await this.$axios.get('/api/v1/company/' + this.profile.company_id)
-        .then((res) => {
-          this.setCurrentCompany(res.data)
-        })
     }
 
     if (!this.hasCompanyLegacyInboxEnabled) {
@@ -201,12 +192,6 @@ export default {
           : `/contacts/${contactId}/${routeChannel}/${communicationId}`
 
         this.$router.replace(contactRoute)
-        return
-      }
-
-      // If no option is enabled, redirect to a safe route
-      if (!this.hasCompanyTeamInboxEnabled) {
-        this.$router.replace({ name: 'Communications' })
         return
       }
 

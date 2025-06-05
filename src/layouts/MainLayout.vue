@@ -1234,6 +1234,13 @@ export default {
     // check auth every 5 minutes
     const checkInterval = 5 * 60 * 1000
 
+    if (!this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled) {
+      this.$axios.get('/api/v1/company/' + this.profile.company_id)
+        .then((res) => {
+          this.setCurrentCompany(res.data)
+        })
+    }
+
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
         const now = new Date().getTime()
