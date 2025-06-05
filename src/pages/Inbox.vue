@@ -191,12 +191,14 @@ export default {
     }
 
     if (!this.hasCompanyLegacyInboxEnabled) {
-      const { id: contactId, communicationId } = this.$route.params
+      const { id: contactId, communicationId, channel } = this.$route.params
 
       if (contactId) {
+        const routeChannel = channel === 'mentions' ? 'mentions' : 'communications'
+
         const contactRoute = !communicationId
           ? `/contacts/${contactId}`
-          : `/contacts/${contactId}/communications/${communicationId}`
+          : `/contacts/${contactId}/${routeChannel}/${communicationId}`
 
         this.$router.replace(contactRoute)
         return

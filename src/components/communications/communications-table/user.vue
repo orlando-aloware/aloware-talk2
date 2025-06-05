@@ -26,7 +26,7 @@
        v-if="row.user_id"
        :class="{ 'deleted': userName === 'Deleted User' }"
        @click.prevent="filter">
-      <user-display :user-id="row.user_id" />
+      <user-display :user-id="row.user_id" :user="row.user" />
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-user-${_uid}`">
         Click to filter by this user
@@ -71,6 +71,9 @@ export default {
 
   computed: {
     userName () {
+      if (this.row.user) {
+        return this.getUserName(this.row.user)
+      }
       return this.getUserName(this.getUser(this.row.user_id))
     }
   }
