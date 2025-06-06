@@ -1222,6 +1222,17 @@ export default {
   mounted () {
     if (this.authenticated) {
       this.sidebarVisible = true
+
+      // Check if profile and company_id exist before making the request
+      if (this.profile?.company_id && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled) {
+        this.$axios.get('/api/v1/company/' + this.profile.company_id)
+          .then((res) => {
+            this.setCurrentCompany(res.data)
+          })
+          .catch(err => {
+            console.error('Error fetching company info:', err)
+          })
+      }
     }
 
     // using the negative because the default should be expanded, so whenever the value is falsy means expanded
@@ -2831,6 +2842,10 @@ export default {
       }
 
       this.checkDebounce()
+
+      if (this.profile?.company && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled) {
+        this.setCurrentCompany(this.profile.company)
+      }
 
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length
