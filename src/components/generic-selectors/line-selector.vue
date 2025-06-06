@@ -90,7 +90,7 @@
           </div>
         </q-chip>
       </template>
-      <template v-slot:hint v-if="selectedId">
+      <template v-slot:hint v-if="selectedId && lineInboxName">
         Inbox: {{ lineInboxName }}
       </template>
     </q-select>
@@ -323,8 +323,8 @@ export default {
     },
 
     lineInboxName () {
-      const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = this.selectedLine
-      return ringGroup?.name || personalInbox?.name || ''
+      const { ring_group: ringGroup, call_waiting_ring_group: personalInbox } = this.selectedLine || {}
+      return ringGroup?.name || personalInbox?.name
     }
   },
 
