@@ -73,19 +73,38 @@
                           :val="row"
                           color="primary"
                           dense
-                          :disable="!row.incoming_number"
+                          :disable="!row.incoming_number || getCapabilities(row).find(cap => cap.sms === false)"
                         />
                       </div>
                     </template>
-                    <template v-else-if="col.name === 'ring_group'">
-                      <div class="flex justify-center items-center">
-                        <ring-group :ring-group-id="col.field(row)" />
+                    <template v-else-if="col.name === 'capabilities'">
+                      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 0;">
+                        <div
+                          v-for="capability in getCapabilities(row)"
+                          :key="Object.keys(capability)[0]"
+                          :class="[
+                            'custom-chip',
+                            capability[Object.keys(capability)[0]] ? 'chip-enabled' : 'chip-disabled'
+                          ]"
+                        >
+                          <q-tooltip
+                            v-if="capability[Object.keys(capability)[0]]"
+                            :offset="[10, 10]"
+                            class="bg-grey-8"
+                          >
+                            {{ getCapabilityTooltip(Object.keys(capability)[0]) }}
+                          </q-tooltip>
+                          <q-icon
+                            :name="!capability[Object.keys(capability)[0]] ? 'close' : getCapabilityIcon(Object.keys(capability)[0])"
+                            size="12px"
+                            class="q-mr-xs"
+                          />
+                          {{ getCapabilityLabel(Object.keys(capability)[0]) }}
+                        </div>
                       </div>
                     </template>
                     <template v-else>
-                      <div class="flex justify-center items-center">
-                        <span :class="['ellipsis', { 'text-grey-6': !row.incoming_number }]">{{ col.field(row) }}</span>
-                      </div>
+                      <span :class="['ellipsis', { 'text-grey-6': !row.incoming_number }]" style="display: block; text-align: center; width: 100%; margin: 0 auto;">{{ col.field(row) }}</span>
                     </template>
                   </td>
                 </tr>
@@ -146,15 +165,13 @@
 import { mapState, mapActions } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 import Datatable from 'src/components/datatable.vue'
-import RingGroup from 'src/components/communications/communications-table/ring-group.vue'
 import { dialerDataMixin } from 'src/plugins/mixins'
 
 export default {
   name: 'HubSpotInboxConnect',
 
   components: {
-    Datatable,
-    RingGroup
+    Datatable
   },
 
   mixins: [
@@ -180,6 +197,14 @@ export default {
           sortable: false
         },
         {
+          name: 'id',
+          required: true,
+          label: 'ID',
+          align: 'center',
+          field: row => row.id,
+          sortable: false
+        },
+        {
           name: 'name',
           required: true,
           label: 'Name',
@@ -188,27 +213,11 @@ export default {
           sortable: false
         },
         {
-          name: 'phone',
+          name: 'capabilities',
           required: true,
-          label: 'Number',
+          label: 'Capabilities',
           align: 'center',
-          field: row => this.getPhoneNumber(row),
-          sortable: false
-        },
-        {
-          name: 'ring_group',
-          required: true,
-          label: 'Ring Group',
-          align: 'center',
-          field: row => row.ring_group_id,
-          sortable: false
-        },
-        {
-          name: 'type',
-          required: true,
-          label: 'Type',
-          align: 'center',
-          field: row => this.getLineType(row),
+          field: row => row,
           sortable: false
         }
       ]
@@ -297,8 +306,54 @@ export default {
       return campaign.incoming_number ?? '-'
     },
 
+    getCapabilities (campaign) {
+      // Return array of capability objects based on campaign data
+      // For demo purposes, randomizing some capabilities
+      const smsCapable = campaign.id % 3 !== 0 // Most lines have SMS
+      const callingCapable = campaign.id % 2 === 0 // Half have calling
+      const faxCapable = campaign.id % 5 === 0 // Few have fax
+      const mmsCapable = campaign.id % 4 !== 0 // Most have MMS
+
+      return [
+        { sms: smsCapable },
+        { calling: callingCapable },
+        { fax: faxCapable },
+        { mms: mmsCapable }
+      ]
+    },
+
+    getCapabilityLabel (capability) {
+      const labels = {
+        sms: 'SMS',
+        calling: 'Calling',
+        fax: 'Fax',
+        mms: 'MMS'
+      }
+      return labels[capability] || capability
+    },
+
+    getCapabilityIcon (capability) {
+      const icons = {
+        sms: 'sms',
+        calling: 'phone',
+        fax: 'fax',
+        mms: 'mms'
+      }
+      return icons[capability] || 'help'
+    },
+
+    getCapabilityTooltip (capability) {
+      const tooltips = {
+        sms: 'Send and Receive SMS',
+        calling: 'Make and Receive Calls',
+        fax: 'Send and Receive Fax',
+        mms: 'Send and Receive MMS'
+      }
+      return tooltips[capability] || capability
+    },
+
     handleRowClick (row) {
-      if (!row.incoming_number) return
+      if (!row.incoming_number || this.getCapabilities(row).find(cap => cap.sms === false)) return
       this.selectedCampaign = row.id === this.selectedCampaign?.id ? null : row
     }
   },
@@ -399,6 +454,8 @@ export default {
   font-size: 13px;
   padding: 16px;
   height: 60px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .numbers-table :deep(td .flex) {
@@ -468,5 +525,28 @@ export default {
   color: #476582;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.custom-chip {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  color: white;
+  text-align: center;
+  line-height: 1.2;
+  margin: 2px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+
+.chip-enabled {
+  background-color: #4caf50;
+}
+
+.chip-disabled {
+  background-color: #9e9e9e;
 }
 </style>
