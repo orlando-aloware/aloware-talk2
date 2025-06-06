@@ -180,8 +180,6 @@ export default {
   top: 0;
   z-index: 10;
   background-color: #ffffff;
-  border-bottom: 1px solid #e3e6ea;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   margin: 0;
 }
 </style>
