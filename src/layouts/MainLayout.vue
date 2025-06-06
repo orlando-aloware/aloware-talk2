@@ -1235,7 +1235,7 @@ export default {
     const checkInterval = 5 * 60 * 1000
 
     // Handled outdated company info which caused the refresh loop problem
-    if (this.profile?.company_id && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled) {
+    if (this.profile?.company_id && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
       this.$axios.get('/api/v1/company/' + this.profile.company_id)
         .then((res) => {
           this.setCurrentCompany(res.data)
@@ -2832,7 +2832,7 @@ export default {
 
       this.checkDebounce()
 
-      if (this.profile?.company && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled) {
+      if (this.profile?.company && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
         this.setCurrentCompany(this.profile.company)
       }
 
