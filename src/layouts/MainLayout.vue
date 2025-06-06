@@ -1256,7 +1256,13 @@ export default {
       }, checkInterval)
     }
 
-    this.checkMediaPlaybackRequiresUserGesture()
+    if (this.mediaPlaybackRequiresUserGesture()) {
+      window.addEventListener('keydown', this.removeBehaviorsRestrictions)
+      window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
+      window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
+    } else {
+      this.setEnableAudio(true)
+    }
 
     console.log('Push permission: ' + window.Push.Permission.get())
 
@@ -1279,16 +1285,6 @@ export default {
   },
 
   methods: {
-    async checkMediaPlaybackRequiresUserGesture () {
-      if (await this.mediaPlaybackRequiresUserGesture()) {
-        window.addEventListener('keydown', this.removeBehaviorsRestrictions)
-        window.addEventListener('mousedown', this.removeBehaviorsRestrictions)
-        window.addEventListener('touchstart', this.removeBehaviorsRestrictions)
-      } else {
-        this.setEnableAudio(true)
-      }
-    },
-
     processUrl (url) {
       // New format: expected url like "contact-<phoneNumber>" or "contact-<phoneNumber>?first=...&last=...&isCompany=..."
       let cleaned = url.replace(/contact[:-]/, '')
@@ -1609,21 +1605,22 @@ export default {
       this.setEnableAudio(true)
     },
 
-    async mediaPlaybackRequiresUserGesture () {
+    mediaPlaybackRequiresUserGesture () {
       // test if play() is ignored when not called from an input event handler
       const audio = document.createElement('audio')
+      const promise = audio.play()
 
-      try {
-        await audio.play()
-        // Auto-play started successfully
-        // No user gesture required
-        return audio.paused
-      } catch (error) {
-        // Auto-play was prevented
-        // User gesture is required
-        return true
-      } finally {
-        audio.remove()
+      if (promise !== undefined) {
+        promise
+          .catch(() => {
+            // Auto-play was prevented
+            // Show a UI element to let the user manually start playback
+            return true
+          })
+          .then(() => {
+            // Auto-play started
+            return audio.paused
+          })
       }
     },
 
