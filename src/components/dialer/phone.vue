@@ -110,7 +110,7 @@
     </div>
     <div
       v-if="lineInboxName && !isCallCompleted"
-      class="d-flex justify-center text-white text-xxs mt-n2 bg-blue-80"
+      class="d-flex justify-center text-grey-82 text-xxs mt-n2 bg-blue-80"
     >
       {{ lineInboxName }}
     </div>
