@@ -59,7 +59,14 @@
               @row-click="handleRowClick"
             >
               <template #tbody>
-                <tr v-for="row in filteredCampaigns" :key="row.id">
+                <tr
+                  v-for="row in filteredCampaigns"
+                  :key="row.id"
+                  :class="{
+                    'disabled-row': !row.is_selectable,
+                    'selectable-row': row.is_selectable
+                  }"
+                >
                   <td
                     v-for="col in columns"
                     :key="col.name"
@@ -73,38 +80,48 @@
                           :val="row"
                           color="primary"
                           dense
-                          :disable="!row.incoming_number || getCapabilities(row).find(cap => cap.sms === false)"
+                          :disable="!row.is_selectable"
                         />
                       </div>
                     </template>
                     <template v-else-if="col.name === 'capabilities'">
-                      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px 0;">
+                      <div class="capabilities-container">
                         <div
-                          v-for="capability in getCapabilities(row)"
-                          :key="Object.keys(capability)[0]"
+                          v-for="(value, key) in row.capabilities"
+                          :key="key"
                           :class="[
                             'custom-chip',
-                            capability[Object.keys(capability)[0]] ? 'chip-enabled' : 'chip-disabled'
+                            value ? 'chip-enabled' : 'chip-disabled'
                           ]"
                         >
                           <q-tooltip
-                            v-if="capability[Object.keys(capability)[0]]"
+                            v-if="value"
                             :offset="[10, 10]"
                             class="bg-grey-8"
                           >
-                            {{ getCapabilityTooltip(Object.keys(capability)[0]) }}
+                            {{ getCapabilityTooltip(key) }}
                           </q-tooltip>
                           <q-icon
-                            :name="!capability[Object.keys(capability)[0]] ? 'close' : getCapabilityIcon(Object.keys(capability)[0])"
+                            :name="!value ? 'close' : getCapabilityIcon(key)"
                             size="12px"
                             class="q-mr-xs"
                           />
-                          {{ getCapabilityLabel(Object.keys(capability)[0]) }}
+                          {{ getCapabilityLabel(key) }}
                         </div>
                       </div>
                     </template>
                     <template v-else>
-                      <span :class="['ellipsis', { 'text-grey-6': !row.incoming_number }]" style="display: block; text-align: center; width: 100%; margin: 0 auto;">{{ col.field(row) }}</span>
+                      <span
+                        :class="[
+                          'ellipsis',
+                          'cell-text',
+                          {
+                            'text-grey-6': !row.incoming_number,
+                            'disabled-text': !row.is_selectable,
+                            'selectable-text': row.is_selectable
+                          }
+                        ]"
+                      >{{ col.field(row) }}</span>
                     </template>
                   </td>
                 </tr>
@@ -234,9 +251,8 @@ export default {
       const query = this.searchQuery.trim().toLowerCase()
       return this.campaigns.filter(campaign => {
         const name = campaign.name?.toLowerCase() || ''
-        const number = this.getPhoneNumber(campaign).toLowerCase()
-
-        return name.includes(query) || number.includes(query)
+        const id = String(campaign.id)
+        return name.includes(query) || id.includes(query)
       })
     }
   },
@@ -296,36 +312,14 @@ export default {
       }
     },
 
-    getLineType (campaign) {
-      if (campaign.has_tollfree_pn) return 'Toll-free'
-      if (campaign.has_local_pn) return 'Local'
-      return 'Unknown'
-    },
-
     getPhoneNumber (campaign) {
       return campaign.incoming_number ?? '-'
-    },
-
-    getCapabilities (campaign) {
-      // Return array of capability objects based on campaign data
-      // For demo purposes, randomizing some capabilities
-      const smsCapable = campaign.id % 3 !== 0 // Most lines have SMS
-      const callingCapable = campaign.id % 2 === 0 // Half have calling
-      const faxCapable = campaign.id % 5 === 0 // Few have fax
-      const mmsCapable = campaign.id % 4 !== 0 // Most have MMS
-
-      return [
-        { sms: smsCapable },
-        { calling: callingCapable },
-        { fax: faxCapable },
-        { mms: mmsCapable }
-      ]
     },
 
     getCapabilityLabel (capability) {
       const labels = {
         sms: 'SMS',
-        calling: 'Calling',
+        call: 'Calling',
         fax: 'Fax',
         mms: 'MMS'
       }
@@ -335,7 +329,7 @@ export default {
     getCapabilityIcon (capability) {
       const icons = {
         sms: 'sms',
-        calling: 'phone',
+        call: 'phone',
         fax: 'fax',
         mms: 'mms'
       }
@@ -345,7 +339,7 @@ export default {
     getCapabilityTooltip (capability) {
       const tooltips = {
         sms: 'Send and Receive SMS',
-        calling: 'Make and Receive Calls',
+        call: 'Make and Receive Calls',
         fax: 'Send and Receive Fax',
         mms: 'Send and Receive MMS'
       }
@@ -353,7 +347,7 @@ export default {
     },
 
     handleRowClick (row) {
-      if (!row.incoming_number || this.getCapabilities(row).find(cap => cap.sms === false)) return
+      if (!row.is_selectable) return
       this.selectedCampaign = row.id === this.selectedCampaign?.id ? null : row
     }
   },
@@ -528,7 +522,6 @@ export default {
 }
 
 .custom-chip {
-  display: inline-block;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 10px;
@@ -548,5 +541,83 @@ export default {
 
 .chip-disabled {
   background-color: #9e9e9e;
+}
+
+/* Style for disabled rows */
+.numbers-table :deep(tr.disabled-row),
+tr.disabled-row {
+  background-color: #ffebee !important;
+  pointer-events: none !important;
+}
+
+/* Style for selectable rows */
+.numbers-table :deep(tr.selectable-row),
+tr.selectable-row {
+  background-color: white;
+}
+
+.numbers-table :deep(tr.disabled-row td),
+tr.disabled-row td {
+  color: #666 !important;
+  opacity: 0.4 !important;
+}
+
+.numbers-table :deep(tr.disabled-row td *),
+tr.disabled-row td * {
+  opacity: 0.4 !important;
+  color: #666 !important;
+}
+
+.numbers-table :deep(tr.disabled-row span),
+tr.disabled-row span {
+  opacity: 0.4 !important;
+  color: #666 !important;
+}
+
+.numbers-table :deep(tr.disabled-row:hover),
+tr.disabled-row:hover {
+  background-color: #ffebee !important;
+  cursor: not-allowed;
+}
+
+/* More aggressive targeting for disabled text */
+.numbers-table :deep(tr.disabled-row) span,
+.numbers-table tr.disabled-row span {
+  color: #666 !important;
+  opacity: 0.4 !important;
+}
+
+/* Force override any text color classes */
+.numbers-table :deep(tr.disabled-row) .ellipsis,
+.numbers-table tr.disabled-row .ellipsis {
+  color: #666 !important;
+  opacity: 0.4 !important;
+}
+
+/* Text styling classes */
+.cell-text {
+  display: block;
+  text-align: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.selectable-text {
+  color: #333 !important;
+  opacity: 1 !important;
+}
+
+.disabled-text {
+  color: #666 !important;
+  opacity: 0.4 !important;
+}
+
+/* Capabilities container */
+.capabilities-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 0;
 }
 </style>
