@@ -1120,18 +1120,6 @@ export default {
       }
     },
 
-    updateLineIncomingNumber () {
-      if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
-        this.setLineIncomingNumberLoading(true)
-
-        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
-          this.setLineIncomingNumber(response.data)
-        }).finally(() => {
-          this.setLineIncomingNumberLoading(false)
-        })
-      }
-    },
-
     fetchContact: _.debounce(function (shouldShowLoading = true) {
       if (shouldShowLoading) {
         this.selectedContactChanging(true)
@@ -1307,8 +1295,6 @@ export default {
       'setContactPhoneNumbers',
       'setSequenceInfoLoading',
       'setSequenceInfo',
-      'setLineIncomingNumberLoading',
-      'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
       'setIsContactMixinUsed',
@@ -1321,7 +1307,6 @@ export default {
   watch: {
     'selectedCampaign.id': _.debounce(function (value) {
       this.updateMessageComposer()
-      this.updateLineIncomingNumber(this.teamInbox)
     }, 1000),
 
     contactId: function () {
