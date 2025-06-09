@@ -82,6 +82,13 @@
                           dense
                           :disable="!row.is_selectable"
                         />
+                        <q-tooltip
+                          v-if="!row.is_selectable && row.not_selectable_reason"
+                          :offset="[10, 10]"
+                          class="bg-grey-8"
+                        >
+                          {{ row.not_selectable_reason }}
+                        </q-tooltip>
                       </div>
                     </template>
                     <template v-else-if="col.name === 'capabilities'">
@@ -290,7 +297,6 @@ export default {
     async connectInbox () {
       this.isConnecting = true
       try {
-        console.log('selectedCampaign', this.selectedCampaign)
         const response = await talk2Api.V1.integrations.hubspot.connectInbox({
           'account_token': this.$route.query.accountToken,
           'channel_id': this.$route.query.channelId,
@@ -306,14 +312,11 @@ export default {
           window.location.href = decodeURIComponent(this.$route.query.redirectUrl)
         }
       } catch (error) {
+        console.log('err_res', error.response)
         this.$handleErrors(error.response)
       } finally {
         this.isConnecting = false
       }
-    },
-
-    getPhoneNumber (campaign) {
-      return campaign.incoming_number ?? '-'
     },
 
     getCapabilityLabel (capability) {
