@@ -110,6 +110,9 @@ export default {
   SET_TEAM_INBOX_TUTORIAL_COMPONENT (state, ref) {
     state.teamInboxTutorialComponent = ref
   },
+  SET_TEAM_INBOX_EMPTY_STATE_VIDEO_COMPONENT (state, ref) {
+    state.teamInboxEmptyStateVideoComponent = ref
+  },
   SET_CONTACTS_LAST_USED_LINE (state, { inboxId, contactId, lastLineUsed }) {
     state.contactsLastUsedLines.set(`${inboxId}-${contactId}`, lastLineUsed)
   },

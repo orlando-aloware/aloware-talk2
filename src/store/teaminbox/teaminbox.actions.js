@@ -97,6 +97,9 @@ export default {
   setTeamInboxTutorialComponent: ({ commit }, ref) => {
     commit('SET_TEAM_INBOX_TUTORIAL_COMPONENT', ref)
   },
+  setTeamInboxEmptyStateVideoComponent: ({ commit }, ref) => {
+    commit('SET_TEAM_INBOX_EMPTY_STATE_VIDEO_COMPONENT', ref)
+  },
   setContactsLastUsedLines: ({ commit }, { inboxId, data }) => {
     for (const item of data) {
       const { last_line_used: lastLineUsed, contact_id: contactId } = item

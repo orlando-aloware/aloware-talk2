@@ -1,5 +1,6 @@
 <template>
   <div class="teaminbox-nav-list"
+       :class="{ 'teaminbox-nav-list--empty': !inboxes.length && isMobile }"
        data-testid="teaminbox-nav-list">
     <div class="teaminbox-nav-list__header border-bottom d-flex flex-column justify-content-center">
       <search-input class="teaminbox-nav-list__header__search"
@@ -22,6 +23,7 @@
       </b-tooltip>
     </div>
     <div class="teaminbox-nav-list__content blue-scroll"
+         :class="{ 'teaminbox-nav-list__content--empty': !inboxes.length && isMobile }"
          @scroll="onScroll">
       <TeamInboxNavType :type="type.id"
                        :label="type.name"
@@ -46,18 +48,26 @@
         </b-overlay>
       </div>
 
-      <!-- Empty state -->
-      <div class="text-center q-pa-md text-grey"
+      <div
+        :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']"
            v-else-if="!inboxes.length">
-        No Inboxes
+        <img v-if="isMobile"
+             src="/images/teaminbox-request-line-instruction.png"
+             alt="How to request a line and ring group from admin"
+             class="mobile-empty-state-image"/>
 
-        <br/>
+        <template v-else>
+          No Inboxes
 
-        <button class="btn btn-sm btn-primary mt-4"
-                v-if="showRefreshInboxesButton"
-                @click.prevent="onRefreshInboxes">
-          <refresh-icon color="#fff"/> Refresh
-        </button>
+          <br/>
+
+          <button class="btn btn-sm btn-primary mt-4"
+                  v-if="showRefreshInboxesButton"
+                  @click.prevent="onRefreshInboxes">
+            <refresh-icon color="#fff"/>
+            Refresh
+          </button>
+        </template>
       </div>
     </div>
   </div>
@@ -469,6 +479,10 @@ export default {
   color: #000;
   padding: 7px 0 7px 7px;
 
+  &--empty {
+    padding-left: 0;
+  }
+
   &__header {
     width: 100%;
     height: 45px;
@@ -487,6 +501,37 @@ export default {
     row-gap: 10px;
     padding: 10px 0px 10px 10px;
     overflow-y: auto;
+    box-sizing: border-box;
+
+    &--empty {
+      padding-left: 0;
+    }
+
+    .mobile-empty-state-image {
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+      display: block;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &__empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+
+    .mobile-empty-state-image {
+      max-width: calc(100% - 20px);
+      max-height: 80vh;
+      object-fit: contain;
+      box-sizing: border-box;
+    }
   }
 }
 </style>
