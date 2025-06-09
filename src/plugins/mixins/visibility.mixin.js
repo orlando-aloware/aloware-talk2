@@ -258,6 +258,28 @@ export default {
         return false
       }
 
+      if (filter.types?.length) {
+        const selectedTypesMap = {
+          [CommunicationTypes.CALL_TYPE]: CommunicationTypes.CALL,
+          [CommunicationTypes.SMS_TYPE]: CommunicationTypes.SMS,
+          'rvm': CommunicationTypes.RVM
+        }
+        // checks if communication type is present in the selected types
+        if (!filter.types.some((type) => selectedTypesMap[type] === communication.type)) {
+          return false
+        }
+      }
+
+      if (filter.direction === 'inbound' &&
+        communication.direction !== CommunicationDirections.INBOUND) {
+        return false
+      }
+
+      if (filter.direction === 'outbound' &&
+        communication.direction !== CommunicationDirections.OUTBOUND) {
+        return false
+      }
+
       return true
     },
 

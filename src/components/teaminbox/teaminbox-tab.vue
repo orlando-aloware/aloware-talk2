@@ -208,6 +208,11 @@ export default {
       const groupKey = this.getGroupKey(communication)
       const existingGroup = this.itemsData.find(item => this.getGroupKey(item) === groupKey)
 
+      // Check filters and sorting settings
+      if (!this.checkCommunication(communication, isAscendingOrder)) {
+        return
+      }
+
       // Special handling for calls
       if (communication.type === CommunicationTypes.CALL) {
         // If this is a live call, it should be shown separately
