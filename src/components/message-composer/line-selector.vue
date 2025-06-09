@@ -43,8 +43,8 @@
         </q-item>
       </template>
       <template v-if="selectedLine && Object.keys(selectedLine).length > 0" v-slot:selected>
-        <div class="selected-option-container"
-             v-html="getSelectedLineLabel()">
+        <div class="selected-option-container">
+          <span class="selected-option">{{ getSelectedLineLabel() }}</span>
         </div>
       </template>
     </q-select>
@@ -277,7 +277,7 @@ export default {
       if (!this.selectedLine && Object.keys(this.selectedLine).length < 1) {
         return 'Select line...'
       }
-      return `<span class="selected-option">${this.selectedLine.name}</span>`
+      return this.selectedLine.name
     },
 
     setDefaultLine () {
