@@ -6619,6 +6619,7 @@ table.datatable {
 
 .templates-list-wrapper {
   max-height: 250px;
+  min-width: 450px;
   overflow: auto;
   padding-right: 5px;
 
@@ -8275,10 +8276,6 @@ button.grey-90 {
       .toast-header {
         display: none;
       }
-    }
-
-    &.extended-width {
-      width: 330px !important;
     }
 
     .toast-header {

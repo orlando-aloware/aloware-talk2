@@ -1,5 +1,22 @@
 <template>
   <div class="templates-list-wrapper" data-testid="message-templates-wrapper">
+    <!-- Search Bar -->
+    <div class="search-wrapper p-2">
+      <q-input
+        ref="searchInput"
+        v-model="searchQuery"
+        placeholder="Search SMS templates..."
+        dense
+        clearable
+        data-testid="message-templates-search-input"
+        debounce="300"
+      >
+        <template #prepend>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+    </div>
+
     <div class="list-group-title d-flex justify-content-between p-2">
       <span>Agent Templates</span>
       <b-link class="action-links"
@@ -11,6 +28,7 @@
       </b-link>
     </div>
     <message-templates-list template_scope="user"
+                            :search-query="searchQuery"
                             data-testid="message-agent-templates-list"
                             @templateSelected="templateSelected"
                             @templateDeleted="onDelete" ></message-templates-list>
@@ -27,6 +45,7 @@
       </b-link>
     </div>
     <message-templates-list template_scope="company"
+                            :search-query="searchQuery"
                             data-testid="message-account-templates-list"
                             @templateSelected="templateSelected"
                             @templateDeleted="onDelete" ></message-templates-list>
@@ -69,12 +88,12 @@
 
 <script>
 
-import MessageTemplatesList from 'components/message-composer/options/message-templates-list'
 import AddIconCircle from 'components/icons/add-icon-circle'
-import { mapActions } from 'vuex'
-import talk2Api from 'src/plugins/api/api'
+import MessageTemplatesList from 'components/message-composer/options/message-templates-list'
 import * as Roles from 'src/constants/roles'
+import talk2Api from 'src/plugins/api/api'
 import { aclMixin } from 'src/plugins/mixins'
+import { mapActions } from 'vuex'
 export default {
   name: 'message-templates',
 
@@ -92,8 +111,18 @@ export default {
     return {
       selectedTemplate: {},
       showDeleteConfirmation: false,
-      isDeleting: false
+      isDeleting: false,
+      searchQuery: ''
     }
+  },
+
+  mounted () {
+    // Auto-focus the search input when component is mounted
+    this.$nextTick(() => {
+      if (this.$refs.searchInput) {
+        this.$refs.searchInput.focus()
+      }
+    })
   },
 
   methods: {
@@ -144,3 +173,13 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.search-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #ffffff;
+  margin: 0;
+}
+</style>

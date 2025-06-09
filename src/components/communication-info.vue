@@ -268,17 +268,17 @@
                       {{ rejectionTooltipData(communication.rejected_by_app, communication.type) }}
                     </q-tooltip>
                   </q-icon>
-                  <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
+                  <div v-else-if="communication.user_id || communication.user">
                     <div @click="onOpenUserInClassicClicked(communication?.user_id)">
                       <span class="text-black cursor-pointer"
-                            :title="getUserName(getUser(communication.user_id))">
+                            :title="getUserName(communication.user || getUser(communication.user_id))">
                         <q-tooltip class="item"
                                    content-class="bg-grey-light11"
                                    anchor="top left"
                                    self="center middle">
                           Click For More Info
                         </q-tooltip>
-                        <user-display :user-id="communication.user_id" />
+                        <user-display :user-id="communication.user_id" :user="communication.user" />
                       </span>
                     </div>
                   </div>
@@ -320,17 +320,17 @@
                                :name="rejectionToIcon(communication.rejected_by_app)">
                     </component>
                   </q-tooltip-->
-                  <div v-else-if="getUser(communication.user_id) && getUser(communication.user_id).id">
+                  <div v-else-if="communication.user_id || communication.user">
                     <div @click="onOpenUserInClassicClicked(communication?.user_id)">
                       <span class="text-black cursor-pointer"
-                            :title="getUserName(getUser(communication.user_id))">
+                            :title="getUserName(communication.user || getUser(communication.user_id))">
                         <q-tooltip class="item"
                                    content-class="bg-grey-light11"
                                    anchor="top left"
                                    self="center left">
                           Click For More Info
                         </q-tooltip>
-                        <user-display :user-id="communication.user_id" />
+                        <user-display :user-id="communication.user_id" :user="communication.user" />
                       </span>
                     </div>
                   </div>
