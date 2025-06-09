@@ -8304,10 +8304,6 @@ button.grey-90 {
       text-decoration: none;
       padding: 0 0 !important;
 
-      > div {
-        padding: 12px 12px 15px 12px;
-      }
-
       .title {
         @include font-size($f-size-h5, 600, true);
         line-height: 18px;
@@ -8323,8 +8319,16 @@ button.grey-90 {
         padding-top: 1px;
       }
 
+      .call-fishing-queue-badge {
+        margin-left: 34px;
+      }
+
       .notification-icon {
-        padding-top: 2px;
+        padding: 14px 12px 15px 12px;
+      }
+
+      .notification-details, .call-actions, .call-fishing-actions {
+        padding: 12px 12px 15px 0;
       }
 
       .message-body {

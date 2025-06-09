@@ -21,12 +21,12 @@
          @click="onNotificationClick">
       <div class="d-flex flex-row align-items-center">
         <b-badge v-if="id === 'callFishing' && queueCount > 1"
-                 class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute ml-4"
+                 class="call-fishing-queue-badge d-flex justify-center align-items-center position-absolute"
                  variant="danger"
                  pill>
           {{ queueCount }}
         </b-badge>
-        <div class="mr-2 notification-icon"
+        <div class="notification-icon"
              :class="notificationIconClasses"
              @click="toInbox">
           <system-update-icon v-if="id === 'system'"/>
