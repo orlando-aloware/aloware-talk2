@@ -180,8 +180,12 @@ export default {
         apiFilters.types = filters.types
       }
 
-      if (filters.direction) {
-        apiFilters.direction = filters.direction
+      if (filters.directions) {
+        apiFilters.directions = filters.directions
+      }
+
+      if (filters.my_contact) {
+        apiFilters.my_contact = filters.my_contact
       }
 
       // Map sort keys to API parameters

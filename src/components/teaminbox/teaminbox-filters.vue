@@ -1,44 +1,85 @@
 <template>
   <div class="teaminbox-filters">
-    <div class="mb-1">
-      <q-badge class="px-2 py-1 mr-1 no-select cursor-pointer"
-               rounded
-               data-test="teaminbox-type-filter-badge"
-               :key="option.value"
-               :color="communicationTypeColor(option.value)"
-               v-for="option of communicationTypeOptions"
-               @click="toggleCommunicationTypeFilter(option.value)">
-        {{ option.label }}
-      </q-badge>
-    </div>
-    <div>
-      <q-badge class="px-2 py-1 mr-1 no-select cursor-pointer"
-               rounded
-               data-test="teaminbox-direction-filter-badge"
-               :key="option.value"
-               :color="directionColor(option.value)"
-               v-for="option of directionOptions"
-               @click="toggleDirectionFilter(option.value)">
-        {{ option.label }}
-      </q-badge>
-    </div>
     <div class="d-flex justify-content-between align-items-center">
-      <div class="teaminbox-filter">
-        <b-dropdown variant="outline-primary" size="sm" class="filter-dropdown">
+      <div class="teaminbox-filter flex-grow-1 overflow-hidden">
+        <b-dropdown variant="outline-primary"
+                    no-caret
+                    no-flip
+                    size="sm"
+                    class="filter-dropdown mw-100"
+                    toggle-class="ellipse"
+                    menu-class="shadow-sm"
+                    boundary="window">
           <template #button-content>
-            <span v-if="!activeFilters?.unread_only">All</span>
-            <span v-else>
-              <unread-mail-icon class="mr-1" /> Unread
+            <span>Filter by</span>
+            <span class="text-grey-90">
+              {{ activeFiltersPlaceholder }}
             </span>
           </template>
-          <b-dropdown-item :active="!activeFilters?.unread_only" @click="setUnreadFilter(false)">All</b-dropdown-item>
-          <b-dropdown-item :active="activeFilters?.unread_only" @click="setUnreadFilter(true)">
-            <unread-mail-icon class="mr-2" /> Unread
-          </b-dropdown-item>
+          <div class="filter-group">
+            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Channels</h5>
+            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0"
+                          v-for="option in typeOptions"
+                          :key="option.value">
+              <b-form-checkbox :value="option.value"
+                               v-model="activeFilters.types"
+                               @change="onFilterChange">
+                {{ option.label }}
+              </b-form-checkbox>
+            </b-form-group>
+          </div>
+          <div class="filter-group">
+            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Direction</h5>
+            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0"
+                          v-for="option in directionOptions"
+                          :key="option.value">
+              <b-form-checkbox :value="option.value"
+                            v-model="activeFilters.directions"
+                            @change="onFilterChange">
+                {{ option.label }}
+              </b-form-checkbox>
+            </b-form-group>
+          </div>
+          <div class="filter-group">
+            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Ownership</h5>
+            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+              <b-form-checkbox v-model="activeFilters.my_contact"
+                               :value="true"
+                               @change="onFilterChange">
+                My contacts only
+              </b-form-checkbox>
+            </b-form-group>
+          </div>
+          <div class="filter-group">
+            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Task Status</h5>
+            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0"
+                          v-for="option in taskStatusOptions"
+                          :key="option.value">
+              <b-form-checkbox :value="option.value"
+                               v-model="activeFilters.task_status"
+                               @change="onFilterChange">
+                {{ option.label }}
+              </b-form-checkbox>
+            </b-form-group>
+          </div>
+          <div class="filter-group">
+            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Mention</h5>
+            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+              <b-form-checkbox v-model="activeFilters.mention"
+                               :value="true"
+                               @change="onFilterChange">
+                Mentions
+              </b-form-checkbox>
+            </b-form-group>
+          </div>
         </b-dropdown>
       </div>
-      <div class="teaminbox-sort">
-        <b-dropdown variant="outline-primary" size="sm" class="sort-dropdown" right>
+      <div class="teaminbox-sort flex-even flex-shrink-0">
+        <b-dropdown variant="outline-primary"
+                    size="sm"
+                    class="sort-dropdown"
+                    right
+                    boundary="window">
           <template #button-content>
             <span v-if="sortOption === 'Newest'">
               <sort-up-icon class="mr-1" /> Newest
@@ -60,19 +101,17 @@
 </template>
 
 <script>
-import UnreadMailIcon from '../../components/icons/inbox/unread-mail-icon.vue'
 import SortUpIcon from '../../components/icons/inbox/sort-up-icon.vue'
 import SortDownIcon from '../../components/icons/inbox/sort-down-icon.vue'
 import { mapState, mapActions } from 'vuex'
+import { mapFields } from 'vuex-map-fields'
 import { navigationErrorHandler } from 'src/router/routes'
-import { CALL_TYPE, SMS_TYPE } from 'src/constants/communication-types'
-import { isArray } from 'lodash'
+import * as CommunicationTypes from 'src/constants/communication-types'
 
 export default {
   name: 'TeamInboxFilterSort',
 
   components: {
-    UnreadMailIcon,
     SortUpIcon,
     SortDownIcon
   },
@@ -82,97 +121,74 @@ export default {
   },
 
   computed: {
-    ...mapState('TeamInbox', ['activeFilters', 'activeSort']),
+    ...mapState('TeamInbox', ['activeSort']),
+
+    ...mapFields('TeamInbox', [
+      'activeFilters'
+    ]),
 
     sortOption () {
       return this.activeSort && this.activeSort.order === 'asc' ? 'Oldest' : 'Newest'
+    },
+
+    activeFiltersPlaceholder () {
+      console.log('>>> this.activeFilters', JSON.stringify(this.activeFilters))
+      let placeholder = ''
+      if (this.activeFilters.types.length) {
+        placeholder += this.activeFilters.types.map(type =>
+          this.typeOptions.find((option) => option.value === type)?.label
+        ).join(', ') + ' '
+      }
+      return placeholder ? '/ ' + placeholder : ''
     }
   },
 
   data () {
     return {
-      filters: {
-        unread_only: false,
-        types: [],
-        direction: 'all'
-      },
-      sorts: {
-        Newest: {},
-        Oldest: { order: 'asc' }
-      },
-      communicationTypeOptions: [
-        { label: 'Calls', value: CALL_TYPE },
-        { label: 'Messages', value: SMS_TYPE },
+      typeOptions: [
+        { label: 'Calls', value: CommunicationTypes.CALL_TYPE },
+        { label: 'Messages', value: CommunicationTypes.SMS_TYPE },
         { label: 'Voicemails', value: 'rvm' }
       ],
       directionOptions: [
         { label: 'Inbound', value: 'inbound' },
         { label: 'Outbound', value: 'outbound' }
-      ]
+      ],
+      taskStatusOptions: [
+        { label: 'Open', value: 'open' },
+        { label: 'Pending', value: 'pending' },
+        { label: 'Close', value: 'close' }
+      ],
+      sorts: {
+        Newest: {},
+        Oldest: { order: 'asc' }
+      }
     }
   },
 
   methods: {
-    ...mapActions('TeamInbox', ['setActiveFilters', 'setActiveSort']),
+    ...mapActions('TeamInbox', ['setActiveSort']),
 
-    setFilter (field, value) {
-      // if (!this.validateFilter(field, value)) {
-      //   return
-      // }
-
-      this.setActiveFilters({ field, value })
+    onFilterChange () {
       this.$emit('filter-change', this.activeFilters)
-
-      const urlValue = isArray(value) ? value.join(',') : value
-      this.updateUrlParams(field, urlValue)
-    },
-
-    setUnreadFilter (unreadOnly) {
-      this.setFilter('unread_only', Boolean(unreadOnly))
     },
 
     setSortOption (option) {
       if (!this.validateSortOption(option)) {
         return
       }
-
       this.setActiveSort(this.sorts[option])
       this.$emit('sort-change', this.sorts[option])
       this.updateUrlParams('sort', option)
     },
 
     initializeFiltersAndSort () {
-      this.initializeFilters()
       this.initializeSort()
-    },
-
-    initializeFilters () {
-      const unreadOnly = this.$route.query.unread_only
-      if (unreadOnly) {
-        this.setFilter('unread_only', Boolean(unreadOnly))
-      }
-
-      const types = this.$route.query.types
-      if (types) {
-        this.setFilter('types', types.split(',').filter((type) => this.communicationTypeOptions.some((option) => option.value === type)))
-      }
     },
 
     initializeSort () {
       const urlSort = this.$route.query.sort
       this.setSortOption(urlSort || this.sortOption)
-    },
-
-    validateFilter (field, value) {
-      if (field === 'types') {
-        return this.communicationTypeOptions.some((option) => option.value === value)
-      }
-
-      if (field === 'direction') {
-        return this.directionOptions.some((option) => option.value === value)
-      }
-
-      return true
     },
 
     validateSortOption (option) {
@@ -187,52 +203,28 @@ export default {
         query[param] = value
       }
       this.$router.replace({ query }).catch(navigationErrorHandler)
-    },
-
-    toggleCommunicationTypeFilter (type) {
-      let value = this.activeFilters.types ?? []
-      if (!value.includes(type)) {
-        value.push(type)
-      } else {
-        value = value.filter((item) => item !== type)
-      }
-      this.setFilter('types', value)
-    },
-
-    toggleDirectionFilter (direction) {
-      let value = direction
-      if (this.activeFilters.direction === value) {
-        value = undefined
-      }
-      this.setFilter('direction', value)
-    },
-
-    communicationTypeColor (communicationType) {
-      if (this.activeFilters.types?.length &&
-        this.activeFilters.types.includes(communicationType)) {
-        return 'primary'
-      }
-
-      return 'grey'
-    },
-
-    directionColor (direction) {
-      if (this.activeFilters.direction === direction) {
-        return 'primary'
-      }
-
-      return 'grey'
-    }
-  },
-
-  watch: {
-    '$route.query.unread_only' (newValue) {
-      this.setFilter('unread_only', newValue === 'true')
-    },
-
-    '$route.query.sort' (newValue) {
-      this.setSortOption(newValue || this.sortOption)
     }
   }
 }
 </script>
+
+<style scoped>
+.filter-group .form-label {
+  font-weight: 400;
+  font-size: 14px;
+  color: #222;
+  margin-bottom: 0.25rem;
+}
+
+.filter-group .b-form-checkbox {
+  font-weight: 500;
+  font-size: 15px;
+  color: #222;
+}
+
+.filter-group .b-form-group {
+  margin-bottom: 2px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+</style>
