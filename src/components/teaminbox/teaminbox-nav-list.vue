@@ -49,10 +49,20 @@
       <div
         :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']"
            v-else-if="!inboxes.length">
-        <img v-if="isMobile"
-             src="/images/teaminbox-request-line-instruction.png"
-             alt="How to request a line and ring group from admin"
-             class="mobile-empty-state-image"/>
+        <div v-if="isMobile" class="empty-state-aloai-style-mobile">
+          <div class="empty-state-header">
+            <h3 class="title-text">Build Your Team's Command Center!</h3>
+          </div>
+          <div class="empty-state-image-container">
+            <img src="/images/teaminbox-request-line-instruction.png"
+                 alt="How to request a line and ring group from admin"/>
+          </div>
+          <div class="empty-state-footer">
+            <p class="info-text">
+              Ready to see the full picture? Contact your administrator and ask them to set up this Team Inbox to connect your entire team today!
+            </p>
+          </div>
+        </div>
 
         <template v-else>
           No Inboxes
@@ -502,13 +512,56 @@ export default {
     overflow-y: auto;
     box-sizing: border-box;
 
-    .mobile-empty-state-image {
-      max-width: 100%;
-      height: auto;
-      margin: 0 auto;
-      display: block;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    .empty-state-aloai-style-mobile {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      background: url('/assets/images/fomo/Gradient.png') no-repeat center center;
+      background-size: cover;
+      background-position: center;
+
+      .empty-state-header {
+        text-align: center;
+        padding: 15px 10px 10px;
+
+        .title-text {
+          color: #000;
+          font-size: 18px;
+          font-weight: 700;
+          margin: 0;
+          line-height: 1.2;
+        }
+      }
+
+      .empty-state-image-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+        padding: 10px;
+
+        img {
+          max-width: 90%;
+          max-height: 100%;
+          object-fit: contain;
+          border-radius: 4px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      .empty-state-footer {
+        padding: 10px 15px 15px;
+        text-align: center;
+
+        .info-text {
+          margin: 0;
+          font-size: 14px;
+          line-height: 1.4;
+          color: #333;
+        }
+      }
     }
   }
 
