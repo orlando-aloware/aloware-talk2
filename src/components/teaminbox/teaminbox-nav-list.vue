@@ -1,6 +1,5 @@
 <template>
   <div class="teaminbox-nav-list"
-       :class="{ 'teaminbox-nav-list--empty': !inboxes.length && isMobile }"
        data-testid="teaminbox-nav-list">
     <div class="teaminbox-nav-list__header border-bottom d-flex flex-column justify-content-center">
       <search-input class="teaminbox-nav-list__header__search"
@@ -23,7 +22,6 @@
       </b-tooltip>
     </div>
     <div class="teaminbox-nav-list__content blue-scroll"
-         :class="{ 'teaminbox-nav-list__content--empty': !inboxes.length && isMobile }"
          @scroll="onScroll">
       <TeamInboxNavType :type="type.id"
                        :label="type.name"
@@ -79,8 +77,13 @@ import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
-import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
-import { mapState, mapActions, mapGetters } from 'vuex'
+import {
+  INBOX_TYPE_CONNECTED,
+  INBOX_TYPE_PERSONAL,
+  INBOX_TYPE_WATCHING,
+  UNTHREADED
+} from 'src/store/teaminbox/teaminbox.store'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
 
 export default {
@@ -477,11 +480,7 @@ export default {
   height: 100%;
   background-color: #fff;
   color: #000;
-  padding: 7px 0 7px 7px;
-
-  &--empty {
-    padding-left: 0;
-  }
+  padding: 7px 0 7px 0;
 
   &__header {
     width: 100%;
@@ -499,13 +498,9 @@ export default {
     display: flex;
     flex-direction: column;
     row-gap: 10px;
-    padding: 10px 0px 10px 10px;
+    padding: 10px;
     overflow-y: auto;
     box-sizing: border-box;
-
-    &--empty {
-      padding-left: 0;
-    }
 
     .mobile-empty-state-image {
       max-width: 100%;
