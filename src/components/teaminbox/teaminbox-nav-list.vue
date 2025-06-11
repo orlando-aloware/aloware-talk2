@@ -46,18 +46,36 @@
         </b-overlay>
       </div>
 
-      <!-- Empty state -->
-      <div class="text-center q-pa-md text-grey"
+      <div
+        :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']"
            v-else-if="!inboxes.length">
-        No Inboxes
+        <div v-if="isMobile" class="empty-state-aloai-style-mobile">
+          <div class="empty-state-header">
+            <h3 class="title-text">Build Your Team's Command Center!</h3>
+          </div>
+          <div class="empty-state-image-container">
+            <img src="/images/teaminbox-request-line-instruction.png"
+                 alt="How to request a line and ring group from admin"/>
+          </div>
+          <div class="empty-state-footer">
+            <p class="info-text">
+              Ready to see the full picture? Contact your administrator and ask them to set up this Team Inbox to connect your entire team today!
+            </p>
+          </div>
+        </div>
 
-        <br/>
+        <template v-else>
+          No Inboxes
 
-        <button class="btn btn-sm btn-primary mt-4"
-                v-if="showRefreshInboxesButton"
-                @click.prevent="onRefreshInboxes">
-          <refresh-icon color="#fff"/> Refresh
-        </button>
+          <br/>
+
+          <button class="btn btn-sm btn-primary mt-4"
+                  v-if="showRefreshInboxesButton"
+                  @click.prevent="onRefreshInboxes">
+            <refresh-icon color="#fff"/>
+            Refresh
+          </button>
+        </template>
       </div>
     </div>
   </div>
@@ -69,8 +87,13 @@ import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
-import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
-import { mapState, mapActions, mapGetters } from 'vuex'
+import {
+  INBOX_TYPE_CONNECTED,
+  INBOX_TYPE_PERSONAL,
+  INBOX_TYPE_WATCHING,
+  UNTHREADED
+} from 'src/store/teaminbox/teaminbox.store'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
 
 export default {
@@ -467,7 +490,7 @@ export default {
   height: 100%;
   background-color: #fff;
   color: #000;
-  padding: 7px 0 7px 7px;
+  padding: 7px 0 7px 0;
 
   &__header {
     width: 100%;
@@ -485,8 +508,78 @@ export default {
     display: flex;
     flex-direction: column;
     row-gap: 10px;
-    padding: 10px 0px 10px 10px;
+    padding: 10px;
     overflow-y: auto;
+    box-sizing: border-box;
+
+    .empty-state-aloai-style-mobile {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+      background: url('/assets/images/fomo/Gradient.png') no-repeat center center;
+      background-size: cover;
+      background-position: center;
+
+      .empty-state-header {
+        text-align: center;
+        padding: 15px 10px 10px;
+
+        .title-text {
+          color: #000;
+          font-size: 18px;
+          font-weight: 700;
+          margin: 0;
+          line-height: 1.2;
+        }
+      }
+
+      .empty-state-image-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+        padding: 10px;
+
+        img {
+          max-width: 90%;
+          max-height: 100%;
+          object-fit: contain;
+          border-radius: 4px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      .empty-state-footer {
+        padding: 10px 15px 15px;
+        text-align: center;
+
+        .info-text {
+          margin: 0;
+          font-size: 14px;
+          line-height: 1.4;
+          color: #333;
+        }
+      }
+    }
+  }
+
+  &__empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+
+    .mobile-empty-state-image {
+      max-width: calc(100% - 20px);
+      max-height: 80vh;
+      object-fit: contain;
+      box-sizing: border-box;
+    }
   }
 }
 </style>

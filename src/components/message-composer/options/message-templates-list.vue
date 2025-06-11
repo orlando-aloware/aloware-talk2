@@ -1,8 +1,11 @@
 <template>
   <div ref="templateWrapper" data-testid="messages-templates-list-wrapper">
-    <ul class="pl-0">
+    <div v-if="filteredTemplates.length === 0 && searchQuery" class="no-results p-3 text-center text-muted">
+      <small>No templates found matching "{{ searchQuery }}"</small>
+    </div>
+    <ul class="pl-0" v-else>
       <li class="d-flex justify-content-between"
-          v-for="template in templates"
+          v-for="template in filteredTemplates"
           :key="template.id">
         <div class="template-title ellipsis">{{ template.name }}</div>
         <div class="d-flex justify-content-between template-actions">
@@ -64,13 +67,13 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
-import PencilOIcon from 'components/icons/pencil-o-icon'
 import AddIconSquare from 'components/icons/add-icon-square'
 import EyeIcon from 'components/icons/eye-icon'
+import PencilOIcon from 'components/icons/pencil-o-icon'
 import TrashOIcon from 'components/icons/trash-o-icon'
-import { aclMixin } from 'src/plugins/mixins'
 import * as Roles from 'src/constants/roles'
+import { aclMixin } from 'src/plugins/mixins'
+import { mapActions, mapGetters, mapState } from 'vuex'
 export default {
   name: 'sms-templates-list',
 
@@ -84,6 +87,10 @@ export default {
       validator: function (value) {
         return ['user', 'company'].indexOf(value) !== -1
       }
+    },
+    searchQuery: {
+      type: String,
+      default: ''
     }
   },
 
@@ -98,6 +105,21 @@ export default {
     },
     templates () {
       return this.template_scope === 'user' ? this.agentTemplates : this.accountTemplates
+    },
+    filteredTemplates () {
+      if (!this.searchQuery || this.searchQuery.trim() === '') {
+        return this.templates
+      }
+
+      const query = this.searchQuery.toLowerCase().trim()
+      return this.templates.filter(template => {
+        const nameMatch = template.name && template.name.toLowerCase().includes(query)
+
+        // Word matching for body content
+        const bodyMatch = template.body && this.matchWords(template.body.toLowerCase(), query)
+
+        return nameMatch || bodyMatch
+      })
     },
 
     isCompanyAdmin () {
@@ -115,6 +137,18 @@ export default {
     ...mapActions('contacts', ['setSmsTemplateModal']),
     templateSelected (template) {
       this.$emit('templateSelected', template)
+    },
+
+    matchWords (text, query) {
+      // Split query into individual words
+      const queryWords = query.split(/\s+/).filter(word => word.length > 0)
+
+      // Check if all query words exist as complete words in the text
+      return queryWords.every(queryWord => {
+        // Use word boundary regex to match complete words only
+        const wordRegex = new RegExp(`\\b${queryWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+        return wordRegex.test(text)
+      })
     },
 
     canEdit (template) {
@@ -181,4 +215,8 @@ ul {
   }
 }
 
+.no-results {
+  font-style: italic;
+  color: #888;
+}
 </style>

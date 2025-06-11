@@ -33,12 +33,20 @@
             RUN CONNECTION TEST
           </q-btn>
           <q-btn color="primary"
-                 v-if="$route.path.startsWith('/team-inboxes')"
+                 v-if="shouldShowTeamInboxTutorial"
                  class="full-width text-caption mt-1"
                  size="sm"
                  v-close-popup
                  @click="watchTeamInboxTutorial">
             WATCH TUTORIAL
+          </q-btn>
+          <q-btn color="primary"
+                 v-if="shouldShowTeamInboxEmptyVideo"
+                 class="full-width text-caption mt-1"
+                 size="sm"
+                 v-close-popup
+                 @click="watchTeamInboxEmptyVideo">
+            SHOW VIDEO
           </q-btn>
         </q-list>
       </q-btn-dropdown>
@@ -74,8 +82,25 @@ export default {
     ...mapState(['statics']),
     ...mapState('auth', ['profile']),
 
+    ...mapGetters('TeamInbox', [
+      'isTeamInboxesLoaded',
+      'hasTeamInboxes'
+    ]),
+
     isMobileSize () {
       return this.windowSize <= 425
+    },
+
+    shouldShowTeamInboxTutorial () {
+      return this.$route.path.startsWith('/team-inboxes') &&
+        this.isTeamInboxesLoaded &&
+        this.hasTeamInboxes
+    },
+
+    shouldShowTeamInboxEmptyVideo () {
+      return this.$route.path.startsWith('/team-inboxes') &&
+        this.isTeamInboxesLoaded &&
+        !this.hasTeamInboxes
     }
   },
 
@@ -99,6 +124,13 @@ export default {
       cookies.remove(`team-inbox-${this.profile?.id}`)
 
       this.$store.state.TeamInbox.teamInboxTutorialComponent.openModal()
+    },
+
+    watchTeamInboxEmptyVideo () {
+      const cookies = VueCookies
+      cookies.remove(`team-inbox-empty-state-${this.profile?.id}`)
+
+      this.$store.state.TeamInbox.teamInboxEmptyStateVideoComponent.openModal()
     }
   },
 

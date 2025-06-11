@@ -350,12 +350,6 @@ export default {
   setSequenceInfoLoading: ({ commit }, value) => {
     commit('SET_SEQUENCE_INFO_LOADING', value)
   },
-  setLineIncomingNumber: ({ commit }, payload) => {
-    commit('SET_LINE_INCOMING_NUMBER', payload)
-  },
-  setLineIncomingNumberLoading: ({ commit }, value) => {
-    commit('SET_LINE_INCOMING_NUMBER_LOADING', value)
-  },
   setIsContactMixinUsed: ({ commit }, value) => {
     commit('SET_IS_CONTACT_MIXIN_USED', value)
   },

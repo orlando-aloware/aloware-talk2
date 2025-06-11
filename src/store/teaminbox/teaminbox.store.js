@@ -32,6 +32,7 @@ export default function () {
     inboxAnnouncementViewed: false,
     unreadCountLoaded: false,
     teamInboxTutorialComponent: null,
+    teamInboxEmptyStateVideoComponent: null,
     contactsLastUsedLines: new Map()
   }
 }
