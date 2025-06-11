@@ -25,10 +25,10 @@ export default {
   },
 
   computed: {
-    ...mapState(['campaigns', 'teamInboxCampaigns']),
+    ...mapState(['campaigns']),
 
     campaign () {
-      return this.teamInbox ? this.teamInboxCampaigns.find(campaign => campaign.id === this.campaignId) : this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
+      return this.campaigns.find(campaign => campaign.id === this.campaignId) || {}
     }
   }
 }
