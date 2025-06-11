@@ -12,65 +12,72 @@
                     boundary="window">
           <template #button-content>
             <span>Filter by</span>
-            <span class="text-grey-90">
+            <span class="text-sm text-grey-90">
               {{ activeFiltersPlaceholder }}
             </span>
           </template>
           <div class="filter-group">
-            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Channels</h5>
-            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0"
-                          v-for="option in typeOptions"
-                          :key="option.value">
+            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Channels</h5>
+            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
+                             :key="option.value"
+                             v-for="option in typeOptions"
+                             @click="toggleChannelFilter(option.value)">
               <b-form-checkbox :value="option.value"
-                               v-model="activeFilters.types"
-                               @change="onFilterChange">
+                               v-model="activeFilters.types">
                 {{ option.label }}
               </b-form-checkbox>
-            </b-form-group>
+            </b-dropdown-item>
           </div>
           <div class="filter-group">
-            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Direction</h5>
-            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0"
-                          v-for="option in directionOptions"
-                          :key="option.value">
+            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Direction</h5>
+            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
+                           :key="option.value"
+                           v-for="option in directionOptions"
+                           @click="toggleDirectionFilter(option.value)">
               <b-form-checkbox :value="option.value"
-                            v-model="activeFilters.directions"
-                            @change="onFilterChange">
+                             v-model="activeFilters.directions">
                 {{ option.label }}
               </b-form-checkbox>
-            </b-form-group>
+            </b-dropdown-item>
           </div>
           <div class="filter-group">
-            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Ownership</h5>
-            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Visibility</h5>
+            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
+                           @click="toggleMyContactsFilter">
               <b-form-checkbox v-model="activeFilters.my_contact"
-                               :value="true"
-                               @change="onFilterChange">
-                My contacts only
+                             :value="true">
+                My Contacts only
               </b-form-checkbox>
-            </b-form-group>
+            </b-dropdown-item>
+            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
+                           @click="toggleUnreadFilter">
+              <b-form-checkbox v-model="activeFilters.unread_only"
+                             :value="true">
+                Unread
+              </b-form-checkbox>
+            </b-dropdown-item>
           </div>
           <div class="filter-group">
-            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Task Status</h5>
-            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0"
-                          v-for="option in taskStatusOptions"
-                          :key="option.value">
+            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Task Status</h5>
+            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
+                           :key="option.value"
+                           v-for="option in taskStatusOptions"
+                           @click="toggleTaskStatusFilter(option.value)">
               <b-form-checkbox :value="option.value"
-                               v-model="activeFilters.task_status"
-                               @change="onFilterChange">
+                             v-model="activeFilters.task_status">
                 {{ option.label }}
               </b-form-checkbox>
-            </b-form-group>
+            </b-dropdown-item>
           </div>
           <div class="filter-group">
-            <h5 class="form-label text-grey mx-2 mt-2 mb-1">Mention</h5>
-            <b-form-group class="px-2 d-flex align-items-center cursor-pointer w-100 text-sm mb-0">
+            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Mention</h5>
+            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
+                           @click="toggleMentionFilter">
               <b-form-checkbox v-model="activeFilters.mention"
-                               :value="true"
-                               @change="onFilterChange">
+                             :value="true">
                 Mentions
               </b-form-checkbox>
-            </b-form-group>
+            </b-dropdown-item>
           </div>
         </b-dropdown>
       </div>
@@ -132,14 +139,30 @@ export default {
     },
 
     activeFiltersPlaceholder () {
-      console.log('>>> this.activeFilters', JSON.stringify(this.activeFilters))
-      let placeholder = ''
+      const selectedFilters = []
       if (this.activeFilters.types.length) {
-        placeholder += this.activeFilters.types.map(type =>
-          this.typeOptions.find((option) => option.value === type)?.label
-        ).join(', ') + ' '
+        const selectedOptions = this.typeOptions.filter((option) => this.activeFilters.types.includes(option.value))
+        selectedFilters.push(...selectedOptions.map((option) => option.label))
       }
-      return placeholder ? '/ ' + placeholder : ''
+      if (this.activeFilters.directions.length) {
+        const selectedOptions = this.directionOptions.filter((option) => this.activeFilters.directions.includes(option.value))
+        selectedFilters.push(...selectedOptions.map((option) => option.label))
+      }
+      if (this.activeFilters.my_contact) {
+        selectedFilters.push('My Contacts')
+      }
+      if (this.activeFilters.unread_only) {
+        selectedFilters.push('Unread')
+      }
+      if (this.activeFilters.task_status.length) {
+        const selectedOptions = this.taskStatusOptions.filter((option) => this.activeFilters.task_status.includes(option.value))
+        selectedFilters.push(...selectedOptions.map((option) => option.label))
+      }
+      if (this.activeFilters.mention) {
+        selectedFilters.push('Mentions')
+      }
+
+      return '/ ' + (!selectedFilters.length ? 'All' : selectedFilters.join(', '))
     }
   },
 
@@ -168,6 +191,15 @@ export default {
 
   methods: {
     ...mapActions('TeamInbox', ['setActiveSort']),
+
+    toggleChannelFilter (type) {
+      if (this.activeFilters.types.includes(type)) {
+        this.activeFilters.types = this.activeFilters.types.filter((t) => t !== type)
+      } else {
+        this.activeFilters.types.push(type)
+      }
+      this.onFilterChange()
+    },
 
     onFilterChange () {
       this.$emit('filter-change', this.activeFilters)
@@ -203,6 +235,39 @@ export default {
         query[param] = value
       }
       this.$router.replace({ query }).catch(navigationErrorHandler)
+    },
+
+    toggleDirectionFilter (value) {
+      if (this.activeFilters.directions.includes(value)) {
+        this.activeFilters.directions = this.activeFilters.directions.filter((v) => v !== value)
+      } else {
+        this.activeFilters.directions.push(value)
+      }
+      this.onFilterChange()
+    },
+
+    toggleMyContactsFilter () {
+      this.activeFilters.my_contact = !this.activeFilters.my_contact
+      this.onFilterChange()
+    },
+
+    toggleUnreadFilter () {
+      this.activeFilters.unread_only = !this.activeFilters.unread_only
+      this.onFilterChange()
+    },
+
+    toggleTaskStatusFilter (value) {
+      if (this.activeFilters.task_status.includes(value)) {
+        this.activeFilters.task_status = this.activeFilters.task_status.filter((v) => v !== value)
+      } else {
+        this.activeFilters.task_status.push(value)
+      }
+      this.onFilterChange()
+    },
+
+    toggleMentionFilter () {
+      this.activeFilters.mention = !this.activeFilters.mention
+      this.onFilterChange()
     }
   }
 }

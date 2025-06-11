@@ -185,7 +185,15 @@ export default {
       }
 
       if (filters.my_contact) {
-        apiFilters.my_contact = filters.my_contact
+        apiFilters.my_contact = true
+      }
+
+      if (filters?.task_status.length) {
+        apiFilters.task_status = filters.task_status
+      }
+
+      if (filters.mention) {
+        apiFilters.has_mention = true
       }
 
       // Map sort keys to API parameters

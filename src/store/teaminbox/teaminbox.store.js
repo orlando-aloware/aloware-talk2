@@ -8,6 +8,7 @@ export const DEFAULT_FILTERS = {
   types: [],
   directions: [],
   my_contact: false,
+  unread_only: false,
   task_status: [],
   mention: false
 }
