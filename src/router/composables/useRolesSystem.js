@@ -9,7 +9,7 @@ const focusedPowerDialerUserIds = isProductionEnvironment
     92429,
     47770
   ]
-  : [76035, 76585]
+  : [76035]
 
 const focusedPowerDialerCompanyIds = isProductionEnvironment
   ? []
