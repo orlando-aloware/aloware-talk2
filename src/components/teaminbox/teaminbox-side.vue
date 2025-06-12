@@ -17,12 +17,12 @@
           <h3 class="title-text">Build Your Team's Command Center!</h3>
         </div>
         <div class="empty-state-image-container">
-          <img src="/images/teaminbox-request-line-instruction.png"
+          <img :src="teamInboxImage"
                alt="How to request a line and ring group from admin"/>
         </div>
         <div class="empty-state-footer">
           <p class="info-text">
-            Your new Team Inbox is ready to bring everyone together. This Team Inbox is designed to give you, your teammates, and your managers a single place to collaborate with full visibility.
+            Your new Team Inbox is ready to bring everyone together. This <strong>Team Inbox</strong> is designed to give you, your teammates, and your managers a single place to collaborate with full visibility.
           </p>
           <p class="info-text">
             When your administrator configures it, this empty space transforms into a powerful, multi-layered view. It works by bringing together:
@@ -33,7 +33,7 @@
             <li><strong>Personal Inboxes:</strong> Unify the communications from everyone's direct lines into one shared, organized space so you can stop guessing and start working together.</li>
           </ul>
           <p class="info-text">
-            Ready to see the full picture? Contact your administrator and ask them to set up this Team Inbox to connect your entire team today!
+            Ready to see the full picture? <strong>Contact your administrator</strong> and ask them to set up this Team Inbox to connect your entire team today!
           </p>
         </div>
       </div>
@@ -47,6 +47,7 @@ import TeamInboxTab from '../teaminbox/teaminbox-tab.vue'
 import { isEmpty } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
+import teamInboxImage from 'src/assets/teaminbox-request-line-instruction.jpg'
 
 export default {
   name: 'TeamInboxSide',
@@ -60,7 +61,8 @@ export default {
     return {
       collapseTarget: null,
       TEAMINBOXES_MENU_TITLE,
-      TEAMINBOXES_MENU_ITEMS_TITLE
+      TEAMINBOXES_MENU_ITEMS_TITLE,
+      teamInboxImage
     }
   },
 
@@ -210,12 +212,12 @@ export default {
 
       .empty-state-header {
         flex: 0 0 auto;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
 
         .title-text {
           color: #000;
           font-family: Inter;
-          font-size: 22px;
+          font-size: 20px;
           font-weight: 700;
           margin: 0;
         }
@@ -227,7 +229,7 @@ export default {
         align-items: center;
         justify-content: center;
         min-height: 0;
-        padding: 10px 0;
+        padding: 5px 0;
 
         img {
           max-width: 90%;
@@ -246,15 +248,13 @@ export default {
 
       .empty-state-footer {
         flex: 0 0 auto;
-        padding: 10px 20px 0;
+        padding: 5px 20px 0;
         text-align: left;
-        max-width: 800px;
-        margin: 0 auto;
 
         .info-text {
-          margin: 10px 0;
-          font-size: 14px;
-          line-height: 1.5;
+          margin: 8px 0;
+          font-size: 13px;
+          line-height: 1.4;
           color: #333;
 
           &:last-child {
@@ -263,13 +263,13 @@ export default {
         }
 
         .info-list {
-          margin: 12px 0;
+          margin: 10px 0;
           padding-left: 20px;
 
           li {
-            margin: 6px 0;
-            font-size: 14px;
-            line-height: 1.5;
+            margin: 5px 0;
+            font-size: 13px;
+            line-height: 1.4;
             color: #333;
           }
         }
