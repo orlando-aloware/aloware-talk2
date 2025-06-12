@@ -18,66 +18,63 @@
           </template>
           <div class="filter-group">
             <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Channels</h5>
-            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="option.value"
                              :key="option.value"
+                             v-model="activeFilters.types"
                              v-for="option in typeOptions"
-                             @click="toggleChannelFilter(option.value)">
-              <b-form-checkbox :value="option.value"
-                               v-model="activeFilters.types">
-                {{ option.label }}
-              </b-form-checkbox>
-            </b-dropdown-item>
+                             @change="onFilterChange">
+              {{ option.label }}
+            </b-form-checkbox>
           </div>
           <div class="filter-group">
             <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Direction</h5>
-            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
-                           :key="option.value"
-                           v-for="option in directionOptions"
-                           @click="toggleDirectionFilter(option.value)">
-              <b-form-checkbox :value="option.value"
-                             v-model="activeFilters.directions">
-                {{ option.label }}
-              </b-form-checkbox>
-            </b-dropdown-item>
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="option.value"
+                             :key="option.value"
+                             v-model="activeFilters.directions"
+                             v-for="option in directionOptions"
+                             @change="onFilterChange">
+              {{ option.label }}
+            </b-form-checkbox>
           </div>
           <div class="filter-group">
-            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Visibility</h5>
-            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
-                           @click="toggleMyContactsFilter">
-              <b-form-checkbox v-model="activeFilters.my_contact"
-                             :value="true">
-                My Contacts only
-              </b-form-checkbox>
-            </b-dropdown-item>
-            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
-                           @click="toggleUnreadFilter">
-              <b-form-checkbox v-model="activeFilters.unread_only"
-                             :value="true">
-                Unread
-              </b-form-checkbox>
-            </b-dropdown-item>
+            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Contact</h5>
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="true"
+                             v-model="activeFilters.my_contact"
+                             @change="onFilterChange">
+              My Contacts
+            </b-form-checkbox>
+          </div>
+          <div class="filter-group">
+            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Status</h5>
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="true"
+                             v-model="activeFilters.unread_only"
+                             @change="onFilterChange">
+              Unread
+            </b-form-checkbox>
           </div>
           <div class="filter-group">
             <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Task Status</h5>
-            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
-                           :key="option.value"
-                           v-for="option in taskStatusOptions"
-                           @click="toggleTaskStatusFilter(option.value)">
-              <b-form-checkbox :value="option.value"
-                             v-model="activeFilters.task_status">
-                {{ option.label }}
-              </b-form-checkbox>
-            </b-dropdown-item>
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="option.value"
+                             :key="option.value"
+                             v-model="activeFilters.task_status"
+                             v-for="option in taskStatusOptions"
+                             @change="onFilterChange">
+              {{ option.label }}
+            </b-form-checkbox>
           </div>
           <div class="filter-group">
-            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Mention</h5>
-            <b-dropdown-item link-class="d-flex align-items-center px-2 py-0 text-sm mb-0"
-                           @click="toggleMentionFilter">
-              <b-form-checkbox v-model="activeFilters.mention"
-                             :value="true">
-                Mentions
-              </b-form-checkbox>
-            </b-dropdown-item>
+            <h5 class="form-label text-sm text-grey mx-2 mt-2 mb-1">Mentions</h5>
+            <b-form-checkbox class="team-inbox-filter-checkbox-control text-sm"
+                             :value="true"
+                             v-model="activeFilters.mention"
+                             @change="onFilterChange">
+              Where I'm mentioned
+            </b-form-checkbox>
           </div>
         </b-dropdown>
       </div>
@@ -191,15 +188,6 @@ export default {
 
   methods: {
     ...mapActions('TeamInbox', ['setActiveSort']),
-
-    toggleChannelFilter (type) {
-      if (this.activeFilters.types.includes(type)) {
-        this.activeFilters.types = this.activeFilters.types.filter((t) => t !== type)
-      } else {
-        this.activeFilters.types.push(type)
-      }
-      this.onFilterChange()
-    },
 
     onFilterChange () {
       this.$emit('filter-change', this.activeFilters)

@@ -16805,7 +16805,7 @@ hr {
   background-color: white;
 
   .teaminbox-filter .dropdown-toggle {
-    margin: 2px 2px 2px 16px;    
+    margin: 3px 3px 3px 16px;    
   }
   
   .teaminbox-sort .dropdown-toggle {
@@ -16837,6 +16837,24 @@ hr {
       font-size: 12px;
       line-height: 1.5;
       padding: 5px 15px;
+    }
+  }
+
+  .team-inbox-filter-checkbox-control {
+    padding-left: 32px;
+    padding-right: 10px;
+
+    label {
+      width: 100%;
+    }
+
+    &:hover {
+      background-color: $grey-60;
+    }
+
+    &:active, &:focus {
+      background-color: $primary;
+      color: $white;
     }
   }
 }
