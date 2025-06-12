@@ -144,7 +144,10 @@ export default {
       const watching = []
 
       this.inboxes.forEach(inbox => {
-        const isConnected = inbox.user_ids.includes(this.profile.id) || inbox.team_ids.some(id => this.teamsIds.includes(id))
+        const isConnected = inbox.user_ids.includes(this.profile.id) ||
+          inbox.team_ids.some(id => this.teamsIds.includes(id)) ||
+          inbox.teams.some(team => team.users.some(user => user.id === this.profile.id))
+
         const isWatching = inbox.watcher_user_ids.includes(this.profile.id) || inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
 
         if (inbox.call_waiting && isConnected) {
@@ -312,8 +315,9 @@ export default {
     allUserIds (ringGroup) {
       const connectedUserIds = ringGroup.connected_user_ids || []
       const watcherUserIds = ringGroup.watcher_user_ids || []
+      const usersConnectedToTeams = ringGroup.teams.map(team => team.users.map(user => user.id)).flat()
 
-      return [...connectedUserIds, ...watcherUserIds]
+      return [...connectedUserIds, ...watcherUserIds, ...usersConnectedToTeams]
     },
 
     newRingGroupListener (ringGroup) {
