@@ -46,7 +46,7 @@ import TeamInboxNavList from '../teaminbox/teaminbox-nav-list.vue'
 import TeamInboxTab from '../teaminbox/teaminbox-tab.vue'
 import { isEmpty } from 'lodash'
 import { mapActions, mapGetters, mapState } from 'vuex'
-import { TEAMINBOXES_MENU_TITLE, TEAMINBOXES_MENU_ITEMS_TITLE } from 'src/router/routes'
+import { TEAMINBOXES_MENU_ITEMS_TITLE, TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import teamInboxImage from 'src/assets/teaminbox-request-line-instruction.jpg'
 
 export default {
@@ -137,8 +137,6 @@ export default {
 .teaminbox-side {
   background-color: #F9F9FB;
   display: flex;
-  width: 100%;
-  height: 100%;
 
   @media(min-width: 785px) {
     padding: 10px;
