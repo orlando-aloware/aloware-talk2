@@ -59,6 +59,11 @@ export default {
       default: true,
       type: Boolean,
       required: false
+    },
+    initBroadcast: {
+      default: true,
+      type: Boolean,
+      required: false
     }
   },
 
@@ -108,7 +113,10 @@ export default {
     ...mapActions('auth', ['setAgentStatus']),
 
     initAuth () {
-      this.broadcastInit()
+      if (this.initBroadcast) {
+        this.broadcastInit()
+      }
+
       this.getUsers()
       this.getDispositionStatuses()
       this.getCallDispositions()
