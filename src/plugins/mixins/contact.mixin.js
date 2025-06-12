@@ -635,6 +635,11 @@ export default {
           this.selectedCampaignId = this.contactsLastUsedLines.get(key)
         }
       } else {
+        // sanity check and clear
+        if (this.selectedCampaignId) {
+          this.selectedCampaignId = null
+        }
+
         // 1. if contact has initial campaign and there were no communications select initial campaign
         if (!this.communicationsAndAudits.length && this.contact && this.contact.initial_campaign_id) {
           console.log('selectedCampaignId - condition 1', {
@@ -1115,18 +1120,6 @@ export default {
       }
     },
 
-    updateLineIncomingNumber () {
-      if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
-        this.setLineIncomingNumberLoading(true)
-
-        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
-          this.setLineIncomingNumber(response.data)
-        }).finally(() => {
-          this.setLineIncomingNumberLoading(false)
-        })
-      }
-    },
-
     fetchContact: _.debounce(function (shouldShowLoading = true) {
       if (shouldShowLoading) {
         this.selectedContactChanging(true)
@@ -1302,8 +1295,6 @@ export default {
       'setContactPhoneNumbers',
       'setSequenceInfoLoading',
       'setSequenceInfo',
-      'setLineIncomingNumberLoading',
-      'setLineIncomingNumber',
       'setCommunicationSummary',
       'setContactAttributes',
       'setIsContactMixinUsed',
@@ -1316,7 +1307,6 @@ export default {
   watch: {
     'selectedCampaign.id': _.debounce(function (value) {
       this.updateMessageComposer()
-      this.updateLineIncomingNumber(this.teamInbox)
     }, 1000),
 
     contactId: function () {

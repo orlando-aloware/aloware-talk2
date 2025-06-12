@@ -1,4 +1,4 @@
-import { THREADED, SEARCH_FIELDS } from 'src/store/teaminbox/teaminbox.store'
+import { SEARCH_FIELDS, THREADED } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapState } from 'vuex'
 import talk2Api from 'src/plugins/api/api'
 
