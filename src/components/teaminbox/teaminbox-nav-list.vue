@@ -54,12 +54,27 @@
             <h3 class="title-text">Build Your Team's Command Center!</h3>
           </div>
           <div class="empty-state-image-container">
-            <img src="/images/teaminbox-request-line-instruction.png"
+            <img :src="teamInboxImage"
                  alt="How to request a line and ring group from admin"/>
           </div>
           <div class="empty-state-footer">
             <p class="info-text">
-              Ready to see the full picture? Contact your administrator and ask them to set up this Team Inbox to connect your entire team today!
+              Your new Team Inbox is ready to bring everyone together. This <strong>Team Inbox</strong> is designed to give you, your teammates, and your managers a single place to collaborate with full visibility.
+            </p>
+            <p class="info-text">
+              When your administrator configures it, this empty space transforms into a powerful, multi-layered view. It works by bringing together:
+            </p>
+            <p class="info-text">
+              <strong>Connected Inboxes:</strong> See and collaborate on the real-time calls and messages being handled by every active member of this team.
+            </p>
+            <p class="info-text">
+              <strong>Watching Inboxes:</strong> Give managers and supervisors a bird's-eye view of all communications for coaching, quality, and to ensure no customer is left behind.
+            </p>
+            <p class="info-text">
+              <strong>Personal Inboxes:</strong> Unify the communications from everyone's direct lines into one shared, organized space so you can stop guessing and start working together.
+            </p>
+            <p class="info-text">
+              Ready to see the full picture? <strong>Contact your administrator</strong> and ask them to set up this Team Inbox to connect your entire team today!
             </p>
           </div>
         </div>
@@ -95,6 +110,7 @@ import {
 } from 'src/store/teaminbox/teaminbox.store'
 import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
+import teamInboxImage from 'src/assets/teaminbox-request-line-instruction.jpg'
 
 export default {
   components: {
@@ -111,7 +127,8 @@ export default {
     return {
       search: '',
       showSearchTooltip: false,
-      finishedInitialLoad: false
+      finishedInitialLoad: false,
+      teamInboxImage
     }
   },
 
@@ -553,13 +570,25 @@ export default {
 
       .empty-state-footer {
         padding: 10px 15px 15px;
-        text-align: center;
+        text-align: left;
 
         .info-text {
-          margin: 0;
-          font-size: 14px;
+          margin: 8px 0;
+          font-size: 13px;
           line-height: 1.4;
           color: #333;
+
+          &:first-child {
+            margin-top: 0;
+          }
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          strong {
+            font-weight: 600;
+          }
         }
       }
     }
