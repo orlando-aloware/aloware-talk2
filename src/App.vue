@@ -281,8 +281,9 @@ export default {
           ...data,
           timezone_str: window.timezone
         })
+        window.FS('start')
       }).catch(() => {
-        console.log('Error while retrieving fullstory metadata from server. Using local variables.')
+        console.log('Error while retrieving fullstory metadata from server')
       })
     },
 
