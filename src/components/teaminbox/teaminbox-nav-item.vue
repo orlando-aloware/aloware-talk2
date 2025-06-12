@@ -115,9 +115,10 @@ export default {
 
     .q-badge {
       font-size: 10px;
+      line-height: 11px;
       font-weight: bold;
-      width: 24px;
-      height: 24px;
+      width: 21px;
+      height: 21px;
       border-radius: 100px;
       display: flex;
       justify-content: center;
