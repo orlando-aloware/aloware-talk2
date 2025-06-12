@@ -15,13 +15,11 @@
                     width="20px"
                     v-if="isLoadingUnreadCount"/>
         <q-badge pill
-                color="danger"
                 rounded
                 v-else-if="unreadCount < 99">
           {{ unreadCount }}
         </q-badge>
         <q-badge pill
-                 color="danger"
                  rounded
                  v-else>
           99<sup>+</sup>
@@ -116,13 +114,15 @@ export default {
     transition: all 0.3s ease-out;
 
     .q-badge {
-      font-size: 9px;
-      width: 27px;
-      height: 27px;
+      font-size: 10px;
+      font-weight: bold;
+      width: 24px;
+      height: 24px;
       border-radius: 100px;
       display: flex;
       justify-content: center;
       align-items: center;
+      background-color: #f44336;
     }
   }
 

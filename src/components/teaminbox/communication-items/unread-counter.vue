@@ -5,7 +5,6 @@
              class="unread-badge"
              :class="unreadClass"
              :id="`unread-counter-${_uid}`"
-             variant="danger"
              :key="totalUnreads"
              v-if="totalUnreads > 0">
       <span>
@@ -72,15 +71,16 @@ export default {
   position: absolute;
   top: -10px;
   right: -7px;
-  font-size: 9px;
-  font-weight: 500;
-  height: 21px;
-  width: 21px;
+  font-size: 10px;
+  font-weight: bold;
+  height: 20px;
+  width: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   transition: all 0.3s ease-out;
+  background-color: #f44336;
 
   &--unthreaded {
     height: 13px;
