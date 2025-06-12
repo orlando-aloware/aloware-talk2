@@ -35,12 +35,12 @@
   </div>
 </template>
 <script>
-import * as storage from 'src/plugins/helpers/storage'
 import ActionNotification from 'components/action-notification'
-import { mapActions, mapState } from 'vuex'
-import Intercom from 'components/intercom'
 import HeaderNotification from 'components/header-notification'
+import Intercom from 'components/intercom'
+import * as storage from 'src/plugins/helpers/storage'
 import { accessMixin } from 'src/plugins/mixins'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'App',
@@ -283,15 +283,6 @@ export default {
         })
       }).catch(() => {
         console.log('Error while retrieving fullstory metadata from server. Using local variables.')
-
-        this.$FullStory.identify(profile.id, {
-          displayName: profile.name,
-          email: profile.email,
-          timezone_str: window.timezone,
-          companyId_int: profile.company_id,
-          companyName_str: profile.company_name,
-          userRoles_strs: profile.user_roles
-        })
       })
     },
 
