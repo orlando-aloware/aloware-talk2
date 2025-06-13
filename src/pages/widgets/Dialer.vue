@@ -53,6 +53,7 @@
       :class="[small ? 'small' : '']"
       :isAlwaysAskModeEnabled="isAlwaysAskModeEnabled()"
       :init-broadcast='false'
+      :start-dialing="startDialing"
       v-show='widgetMessage === WIDGET_MSG_HIDE'
       v-if="allowed"
       @callConnected="handleCallConnectedEvent"
@@ -107,6 +108,7 @@ export default {
       widgetMessage: WIDGET_MSG_SHOW_ALERT_CALL_FINISHED,
       isFirstLoading: true,
       isDialed: false,
+      startDialing: false,
       loading: false,
       small: false,
       initialized: false,
@@ -142,6 +144,11 @@ export default {
           onDialNumber: async (event) => {
             // this.criticalErrorHappened = false
             this.widgetMessage = WIDGET_MSG_HIDE
+
+            if (this.initialized) {
+              await this.init()
+            }
+
             this.setHubspotDialNumber(event)
 
             // do not continue if we not logged-in or we already dialing
@@ -196,7 +203,7 @@ export default {
     },
 
     isLoadingDialer () {
-      console.log('isLoadingDialer', this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus), this.dialer?.parkedCall, this.widgetMessage === WIDGET_MSG_HIDE)
+      console.log('isLoadingDialer', this.dialer?.currentStatus, this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus), this.dialer?.parkedCall, this.widgetMessage === WIDGET_MSG_HIDE)
 
       return this.isLoadingDialerStatuses.includes(this.dialer?.currentStatus) &&
         !this.dialer?.parkedCall &&
@@ -277,11 +284,22 @@ export default {
       // this.showAlertCallFinished = false
       // @todo check if correct
       this.widgetMessage = WIDGET_MSG_HIDE
+      // this.$bvModal.hide('daytime-hours-confirmation')
 
       do {
-        if (this.checkAgentHasActiveCallInAnotherDevice()) {
+        if (this.agentHasActiveCallDevice()) {
           // this.showAlertAgentOnCall = true
-          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+          if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ? true : !this.checkForceDisposition) {
+            this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+          }
+
+          console.log('agentHasActiveCallDevice dddddd', this.profile?.last_call, this.checkForceDisposition)
+
+          return
+        }
+
+        if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition)) {
+          console.log('RRRRRRRRRRRR')
           return
         }
 
@@ -296,7 +314,12 @@ export default {
         await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
       } while (this.dialer.currentStatus === 'GENERATING_TOKEN')
 
-      this.checkAndResetCallDisposition()
+      // if (!this.checkForceDisposition) {
+      //   this.$VueEvent.fire('resetCall')
+      // }
+
+      this.startDialing = true
+
       await this.getContact()
 
       await this.findDefaultOutboundCampaign()
@@ -328,12 +351,6 @@ export default {
           this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
         }
       })
-    },
-
-    checkAndResetCallDisposition () {
-      if (!this.checkForceDisposition) {
-        this.$VueEvent.fire('resetCall')
-      }
     },
 
     setContactDetails (contact) {
@@ -372,20 +389,41 @@ export default {
     async handleDialNumber () {
       console.warn('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
-      if (this.checkAgentHasActiveCallInAnotherDevice()) {
+      if (this.agentHasActiveCallDevice()) {
         console.log('checkAgentHasActiveCallInAnotherDevice')
         // this.showAlertAgentOnCall = true
-        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+        if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ? true : !this.checkForceDisposition) {
+          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+        }
         return
       }
 
+      // const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+      //
+      // // if there's a call in progress or in wrap up, we omit the call
+      // if (isCallInProgressOrWrapUp.includes(this.dialer?.currentStatus)) {
+      //   // this.showAlertAgentOnCall = true
+      //   this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+      //   return
+      // }
+
       // stop if modal is disabled
       if (!this.extensionsVisibility) {
+        this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
         console.log('extensionsVisibility')
         return
       }
 
-      console.log('last_call', this.profile?.last_call, this.dialer?.communication, this.agentStatus, this.checkForceDisposition)
+      console.log(
+        'last_call',
+        this.profile?.last_call,
+        this.dialer?.communication,
+        this.agentStatus,
+        this.checkForceDisposition,
+        this.authProfile,
+        this.initialized,
+        this.defaultCampaignInitialized
+      )
 
       // if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition) {
       //   console.log('fire showPhone')
@@ -411,6 +449,10 @@ export default {
         }, 1000)
       } else {
         console.log('isReady', this.dialer?.isReady)
+
+        if (this.widgetMessage === WIDGET_MSG_HIDE && !this.allowed) {
+          this.widgetMessage = WIDGET_MSG_CRITICAL_ERROR_HAPPENED
+        }
       }
     },
 
@@ -443,8 +485,11 @@ export default {
         this.extensions.callEnded()
 
         // @todo check if correct
-        if (!this.dialer.parkedCall && !skipCallFinished) {
-          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
+        if (!this.dialer.parkedCall) {
+          if (!skipCallFinished) {
+            this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
+          }
+          this.startDialing = false
         }
 
         // this.showAlertCallFinished = !this.dialer.parkedCall && !skipCallFinished
@@ -511,7 +556,7 @@ export default {
         const agentStatus = data.agent_status
         this.setAgentStatus(agentStatus)
 
-        console.log('widgetMessage 2', this.widgetMessage, this.isFirstLoading, agentStatus === AgentStatus.AGENT_STATUS_ON_CALL, !this.isDialed, !this.checkAgentHasActiveCallInAnotherDevice(), agentStatus, previousStatus)
+        console.log('widgetMessage 2', this.widgetMessage, this.isFirstLoading, agentStatus === AgentStatus.AGENT_STATUS_ON_CALL, !this.isDialed, agentStatus, previousStatus)
 
         // if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.showAlertAgentOnCall && !this.isDialed) {
         //   this.showAlertCallFinished = true
@@ -543,12 +588,12 @@ export default {
         if (this.isDialed && !this.dialer.call && !this.dialer.communication && this.dialer.parkedCall && agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
           this.isDialed = false
           this.onCancelCall()
-          return
+          // return
         }
 
-        if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
-          this.handleDialNumber()
-        }
+        // if (agentStatus !== AgentStatus.AGENT_STATUS_ON_CALL && agentStatus !== AgentStatus.AGENT_STATUS_ON_WRAP_UP) {
+        //   this.handleDialNumber()
+        // }
       }
     },
 
@@ -557,6 +602,15 @@ export default {
         return
       }
 
+      if (this.agentHasActiveCallDevice()) {
+        // this.showAlertAgentOnCall = true
+        if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ? true : !this.checkForceDisposition) {
+          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+        }
+        return
+      }
+
+      this.widgetMessage = WIDGET_MSG_HIDE
       this.$VueEvent.fire('makeCall', {
         currentNumber: this.$options.filters.fixPhone(this.hubspotDialNumber?.phoneNumber),
         outboundCampaignId: this.campaignId.toString(),
@@ -580,7 +634,8 @@ export default {
       }
 
       if (this.defaultOutboundCampaignId) {
-        this.setCampaignIdAndDialNumber()
+        this.campaignId = this.defaultOutboundCampaignId
+        this.handleDialNumber()
       }
 
       this.defaultCampaignInitialized = true
@@ -609,11 +664,6 @@ export default {
         this.authProfile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT
     },
 
-    setCampaignIdAndDialNumber () {
-      this.campaignId = this.defaultOutboundCampaignId
-      this.handleDialNumber()
-    },
-
     canHandleDialNumber () {
       console.log(
         'needsExtensions', this.needsExtensions,
@@ -639,19 +689,28 @@ export default {
         (this.agentStatus === AgentStatus.AGENT_STATUS_ON_WRAP_UP ? !this.checkForceDisposition : true)
     },
 
-    checkAgentHasActiveCallInAnotherDevice () {
+    agentHasActiveCallDevice () {
       const statuses = [
         'MAKING_CALL',
         'CALL_CONNECTED',
         'HANGING_UP_CALL',
         'CALL_DISCONNECTED',
-        'WRAP_UP'
+        'WRAP_UP',
+        'ANSWERING_CALL'
       ]
 
-      return this.dialer &&
-        this.profile &&
-        this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
-        !statuses.includes(this.dialer?.currentStatus)
+      console.warn('checkAgentHasActiveCallInAnotherDevice', this.profile.agent_status, this.dialer?.currentStatus)
+
+      if (statuses.includes(this.dialer?.currentStatus)) {
+        return true
+      }
+
+      return this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+
+      // return this.dialer &&
+      //   this.profile &&
+      //   this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
+      //   !statuses.includes(this.dialer?.currentStatus)
     },
 
     endActiveCall () {
@@ -677,9 +736,9 @@ export default {
         this.$VueEvent.fire('hangupCall')
       }
 
-      if (!this.checkForceDisposition) {
-        this.$VueEvent.fire('resetCall')
-      }
+      // if (!this.checkForceDisposition) {
+      this.$VueEvent.fire('resetCall')
+      // }
 
       this.handleCallCompletedEvent(true)
     },
@@ -704,8 +763,8 @@ export default {
         })
       }
     },
-    widgetMessage (from, to) {
-      console.warn('changed widgetMessage', from, to)
+    widgetMessage (to, from) {
+      console.warn('changed widgetMessage', from + ' => ' + to)
     },
     extensionsVisibility () {
       if (this.extensionsVisibility) {
@@ -715,16 +774,18 @@ export default {
         // this.showAlertAgentOnCall = this.authProfile && this.authProfile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
       } else {
         // this.showAlertCallFinished = true
-        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
+        // this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
         // if hidden, reset HubSpot dial number
         this.setHubspotDialNumber(null)
       }
     },
 
-    'dialer.currentStatus' () {
+    'dialer.currentStatus' (to, from) {
       if (this.isLoadingDialer) {
         return
       }
+
+      console.warn('dialer.currentStatus', from + '=>' + to, this.profile.agent_status, this.checkForceDisposition)
 
       const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
       if (isCallInProgress?.includes(this.dialer?.currentStatus) &&

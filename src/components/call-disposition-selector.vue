@@ -241,6 +241,7 @@ export default {
 
     changeCallDisposition () {
       this.loadingCallDisposition = true
+      console.warn('updateCallDisposition 2')
       this.$axios.post('/api/v1/communication/' + this.communication.id + '/dispose-call', {
         call_disposition_id: this.selectCallDisposition(this.callDispositionId, true)
       }).then((res) => {

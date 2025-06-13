@@ -132,7 +132,7 @@ const talk2Api = {
         if (!id) {
           return null
         }
-
+        console.warn('dispose 1')
         return window.axios.post(`${suffixV1}contact/${id}/dispose`, params)
       },
 

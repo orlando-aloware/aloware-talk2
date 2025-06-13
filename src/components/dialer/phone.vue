@@ -1752,6 +1752,7 @@ export default {
       if (this.dialer.call && this.dialer.call.direction === 'INCOMING' &&
         this.dialer.currentStatus === 'RECEIVED_CALL_INVITE' &&
         this.showIncomingCallNotification) {
+        console.warn('this.dialer', this.dialer)
         return false
       }
 
@@ -1759,7 +1760,11 @@ export default {
         return true
       }
 
-      return this.dialer && !_.isEmpty(this.dialer.communication)
+      let res = this.dialer && !_.isEmpty(this.dialer.communication)
+
+      console.warn('shouldShow', res, this.dialer)
+
+      return res
     },
 
     iconSizes () {

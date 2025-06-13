@@ -112,6 +112,8 @@ export default {
 
   created () {
     this.dialerListeners.updateCommunication = (data) => {
+      console.warn('updateCommunication this.dialer', this.dialer)
+
       // check data matches dialer communication
       if (this.dialer.communication && this.dialer.communication.id === data.id) {
         data = _.merge(this.dialer.communication, data)
@@ -1542,6 +1544,7 @@ export default {
     },
 
     resetCall () {
+      console.warn('resetCall')
       if (this.shouldProcessRedial()) {
         return
       }
@@ -1999,7 +2002,7 @@ export default {
     clearInterval(this.unownedContact.interval)
 
     // Destroy the Twilio device to avoid having multiple Twilio device instances.
-    console.log('Destroying Twilio device')
+    console.warn('Destroying Twilio device')
     this.device.destroy()
   }
 }

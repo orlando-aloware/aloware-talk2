@@ -90,31 +90,37 @@ export default {
     },
 
     checkForceDisposition () {
-      if (this.currentCompany?.force_call_disposition) {
-        if (this.dialer.communication) {
-          if (!this.dialer.communication.call_disposition_id) {
-            return true
-          }
-        } else {
-          if (!this.profile?.last_call?.call_disposition_id) {
-            return true
-          }
-        }
-      }
+      const shouldForceContactDisposition = this.currentCompany?.force_contact_disposition &&
+        !this.profile?.last_call?.contact?.disposition_status_id
+      const shouldForceCallDisposition = this.currentCompany?.force_call_disposition &&
+        !this.profile?.last_call?.call_disposition_id
 
-      if (this.currentCompany?.force_contact_disposition) {
-        if (this.dialer.contact) {
-          if (!this.dialer.contact.disposition_status_id) {
-            return true
-          }
-        } else {
-          if (!this.profile?.last_call?.call_disposition_id) {
-            return true
-          }
-        }
-      }
-
-      return false
+      return shouldForceContactDisposition || shouldForceCallDisposition
+      // if (this.currentCompany?.force_call_disposition) {
+      //   if (this.dialer.communication) {
+      //     if (!this.dialer.communication.call_disposition_id) {
+      //       return true
+      //     }
+      //   } else {
+      //     if (!this.profile?.last_call?.call_disposition_id) {
+      //       return true
+      //     }
+      //   }
+      // }
+      //
+      // if (this.currentCompany?.force_contact_disposition) {
+      //   if (this.dialer.contact) {
+      //     if (!this.dialer.contact.disposition_status_id) {
+      //       return true
+      //     }
+      //   } else {
+      //     if (!this.profile?.last_call?.disposition_status_id) {
+      //       return true
+      //     }
+      //   }
+      // }
+      //
+      // return false
     },
 
     isOnPowerDialerSessionRoute () {
