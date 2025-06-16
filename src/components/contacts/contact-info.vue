@@ -247,7 +247,7 @@
         check-blocked-messaging
         :generic-multiselect="false"
         :use-only-actives="true"
-        :pre-select-line-id="contactLastLineUsedId"
+        :pre-selected-team-inbox-line-id="contactLastLineUsedId"
         @change="onLineChange"
       >
       </line-selector>
@@ -493,12 +493,13 @@ export default {
     },
 
     onCallClick () {
-      if (this.isFromTeamInbox) {
-        if (this.isAlwaysAskEnabled || this.defaultOutboundCampaignId) {
+      const showLineSelectorDropdown = this.isAlwaysAskEnabled ||
+        (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
+
+      if (this.isFromTeamInbox && showLineSelectorDropdown) {
         // Wait for the user to select and confirm the campaign before initiating the call
-          this.showLineSelectorDropdown = !this.showLineSelectorDropdown
-          return
-        }
+        this.showLineSelectorDropdown = !this.showLineSelectorDropdown
+        return
       }
 
       this.callContact()

@@ -233,7 +233,7 @@ export default {
       default: false
     },
 
-    preSelectLineId: {
+    preSelectedTeamInboxLineId: {
       type: Number,
       default: null
     }
@@ -296,7 +296,7 @@ export default {
         const campaigns = _.clone(this.campaignsAlphabeticalOrder)
           .filter(campaign => campaign.active === true)
 
-        return !this.preSelectLineId
+        return !this.preSelectedTeamInboxLineId
           ? campaigns
           : campaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id))
       }
@@ -331,7 +331,7 @@ export default {
     },
 
     noResultsText () {
-      return !this.preSelectLineId
+      return !this.preSelectedTeamInboxLineId
         ? 'No results'
         : 'No lines found in this inbox'
     }
@@ -348,8 +348,9 @@ export default {
   mounted () {
     this.loadPlaceholder()
 
-    if (this.preSelectLineId) {
-      const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectLineId)
+    if (this.preSelectedTeamInboxLineId) {
+      // Line stickiness from the team inbox. Pre-select the last used line for the contact
+      const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectedTeamInboxLineId)
       line && this.selectOption(line)
     }
   },
