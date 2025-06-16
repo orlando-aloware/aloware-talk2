@@ -43,8 +43,8 @@
         </q-item>
       </template>
       <template v-if="selectedLine && Object.keys(selectedLine).length > 0" v-slot:selected>
-        <div class="selected-option-container">
-          <span class="selected-option">{{ getSelectedLineLabel() }}</span>
+        <div class="selected-option-container"
+             v-html="getSelectedLineLabel()">
         </div>
       </template>
     </q-select>
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import {
   contactMixin,
   contactV2AttributesMixin,
@@ -60,6 +60,7 @@ import {
   visibilityMixin,
   selectorMixin
 } from 'src/plugins/mixins'
+import talk2Api from 'src/plugins/api/api'
 import _ from 'lodash'
 
 export default {
@@ -91,6 +92,10 @@ export default {
 
   computed: {
     ...mapGetters('contacts', ['contact']),
+    ...mapState('contacts', [
+      'lineIncomingNumberLoading',
+      'lineIncomingNumber'
+    ]),
     ...mapState(['campaigns', 'teamInboxCampaigns']),
     ...mapState('TeamInbox', ['activeInbox']),
 
@@ -206,6 +211,7 @@ export default {
       isBusy: false,
       selectedLine: null,
       lineOptions: this.formattedLineOptions,
+      incomingNumber: null,
       isFocused: false,
       selectWidth: 0,
       canEmail: false
@@ -217,10 +223,16 @@ export default {
 
     if (this.contact && this.contact.id) {
       this.lineOptions = this.formattedLineOptions
+      this.setIncomingNumber()
     }
   },
 
   methods: {
+    ...mapActions('contacts', [
+      'setLineIncomingNumberLoading',
+      'setLineIncomingNumber'
+    ]),
+
     onShowMenu () {
       this.selectWidth = this.$refs.lineSelector.$el.offsetWidth
     },
@@ -257,6 +269,7 @@ export default {
 
     onInput (value) {
       this.$el.querySelector('.inline-select .q-field__input').blur()
+      this.getIncomingNumber()
       this.$emit('change', value)
     },
 
@@ -277,11 +290,31 @@ export default {
       if (!this.selectedLine && Object.keys(this.selectedLine).length < 1) {
         return 'Select line...'
       }
-      return this.selectedLine.name
+      const title = this.incomingNumber ? this.$options.filters.fixPhone(this.incomingNumber.phone_number) : ''
+      const titleText = title && title.length > 0 ? `<i class="fa fa-circle selected-option-separator"></i> <span class="selected-option-title">${title}</span>` : ''
+      return `<span class="selected-option">${this.selectedLine.name}</span> ${titleText}`
+    },
+
+    getIncomingNumber () {
+      this.isBusy = true
+      return talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedLine.id, this.teamInbox).then(response => {
+        this.incomingNumber = response.data
+      }).finally(() => {
+        this.isBusy = false
+      })
     },
 
     setDefaultLine () {
       this.selectedLine = this.selectedCampaign
+      if (this.selectedLine && this.contact.id) {
+        this.getIncomingNumber()
+      }
+    },
+
+    setIncomingNumber () {
+      this.selectedLine = this.selectedCampaign
+      this.incomingNumber = this.lineIncomingNumber
+      this.showPlaceholder()
     },
 
     updateMessageComposer () {
@@ -302,6 +335,21 @@ export default {
       }
 
       this.canEmail = this.selectedCampaign.email_intake && this.selectedCampaign.email_intake_route_id
+    },
+
+    /**
+     * Override updateLineIncomingNumber from contactMixin to use our selectedCampaign
+     */
+    updateLineIncomingNumber () {
+      if (this.contact && this.contact.id && !_.isEmpty(this.selectedCampaign)) {
+        this.setLineIncomingNumberLoading(true)
+
+        talk2Api.V1.contact.getLineIncomingNumber(this.contact.id, this.selectedCampaign.id, this.teamInbox).then(response => {
+          this.setLineIncomingNumber(response.data)
+        }).finally(() => {
+          this.setLineIncomingNumberLoading(false)
+        })
+      }
     }
   },
 
@@ -319,6 +367,15 @@ export default {
       if (value && this.contact && this.contact.id) {
         this.setDefaultLine()
         this.showPlaceholder()
+      }
+    },
+    lineIncomingNumberLoading (value) {
+      this.isBusy = value
+    },
+    lineIncomingNumber: {
+      deep: true,
+      handler: function (value) {
+        this.setIncomingNumber()
       }
     }
   }
