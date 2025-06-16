@@ -15,6 +15,7 @@
 
 <script>
 import CollapseIcon from 'src/components/icons/collapse-icon.vue'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'collapse-button',
@@ -39,13 +40,15 @@ export default {
     this.prepareTarget()
   },
 
+  computed: {
+    ...mapFields('settings', [
+      'isTeamInboxNavListCollapsed'
+    ])
+  },
+
   methods: {
     toggle () {
-      if (this.value) {
-        this.target.classList.remove('no-max-width-collapse-button')
-      } else {
-        this.target.classList.add('no-max-width-collapse-button')
-      }
+      this.isTeamInboxNavListCollapsed = !this.value
 
       this.$emit('input', !this.value)
       this.$refs.tooltip.$emit('close')

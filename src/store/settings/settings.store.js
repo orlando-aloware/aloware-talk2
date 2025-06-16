@@ -69,6 +69,9 @@ export default function () {
     user: null,
     userClone: null,
     changedUserProperties: [],
-    formIsValid: true
+    formIsValid: true,
+    isSidebarCollapsed: undefined,
+    isTeamInboxNavListCollapsed: undefined,
+    isContactDetailsDrawerCollapsed: false
   }
 }

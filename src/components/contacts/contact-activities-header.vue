@@ -155,6 +155,18 @@
                           size="20px"
           />
         </q-btn>
+        <q-btn flat
+               color="primary"
+               class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
+               @click="$emit('toggleDetails')">
+          <phone-card-icon width="21" height="21" />
+          <q-tooltip anchor="top middle"
+                     self="center middle">
+            <div style="white-space: nowrap;">{{ isContactDetailsDrawerCollapsed ? 'Show contact details' : 'Hide contact details' }}</div>
+          </q-tooltip>
+          <i class="ml-1 fa"
+             :class="[isContactDetailsDrawerCollapsed ? 'fa-chevron-left' : 'fa-chevron-right']"></i>
+        </q-btn>
 
         <q-btn
           v-if="contact.task_status === ContactTaskStatus.STATUS_OPEN && isContactStatusControlEnabled"
@@ -255,6 +267,8 @@ import { aclMixin, teamInboxPropsMixin } from 'src/plugins/mixins'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { mapGetters, mapState } from 'vuex'
 import ExportIcon from '../icons/export-icon.vue'
+import PhoneCardIcon from 'components/icons/phone-card-icon.vue'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'contact-activities-header',
@@ -275,7 +289,8 @@ export default {
     MailOpenIcon,
     EllipsisIcon,
     BackButton,
-    ExportIcon
+    ExportIcon,
+    PhoneCardIcon
   },
 
   props: {
@@ -311,6 +326,7 @@ export default {
     ...mapState(['isMobile', 'isWidget']),
     ...mapState('TeamInbox', ['activeInboxId']),
     ...mapGetters('cache', ['isContactStatusControlEnabled']),
+    ...mapFields('settings', ['isContactDetailsDrawerCollapsed']),
     resolveVariant () {
       switch (this.contact.task_status) {
         case ContactTaskStatus.STATUS_OPEN:

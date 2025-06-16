@@ -10,12 +10,12 @@
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{
-             'contact-activity--closed': detailsOpen || contactListSidebarOpen,
+             'contact-activity--closed': isContactDetailsDrawerCollapsed || contactListSidebarOpen,
              'inbox-activity-container-wrapper': teamInboxId
            }"
            v-if="isShowContactActivities">
         <contact-activities ref="contactActivities"
-                            :class="{ 'contact-activity--closed': detailsOpen }"
+                            :class="{ 'contact-activity--closed': isContactDetailsDrawerCollapsed }"
                             :communications="filteredCommunications"
                             :campaignId="selectedCampaignId"
                             :loadingCommunications="loadingContactCommunications"
@@ -47,7 +47,7 @@
         </contact-activities>
       </div>
       <div class="contact-details-container"
-           :class="{ 'contact-details--opened': detailsOpen }"
+           :class="{ 'contact-details--opened': !isContactDetailsDrawerCollapsed, 'hidden': !isWidget && !isContactDetailsDrawerCollapsed }"
            v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
@@ -118,6 +118,7 @@ import {
 } from 'src/constants/viewport-sizes'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { THREADED } from 'src/store/teaminbox/teaminbox.store'
+import { mapFields } from 'vuex-map-fields'
 
 export default {
   name: 'contact',
@@ -161,6 +162,8 @@ export default {
       'isWidget'
     ]),
 
+    ...mapFields('settings', ['isContactDetailsDrawerCollapsed']),
+
     isInbox () {
       return ['Inbox Contact', 'Inbox Contact Task', 'Inbox', 'Inbox Contact Communication', TEAMINBOXES_MENU_COMMUNICATIONS_TITLE].includes(this.$route.name)
     },
@@ -189,7 +192,6 @@ export default {
       title: 'Contact',
       totalContacts: 0,
       drawer: false,
-      detailsOpen: false,
       contactListSidebarOpen: false,
       leaving: false,
       contactComponentListeners: {},
@@ -239,7 +241,7 @@ export default {
     },
 
     toggleDetails () {
-      this.detailsOpen = !this.detailsOpen
+      this.isContactDetailsDrawerCollapsed = !this.isContactDetailsDrawerCollapsed
     }
   },
 
@@ -378,8 +380,8 @@ export default {
       })
     },
 
-    detailsOpen (value) {
-      if (!value && this.isMobile) {
+    isContactDetailsDrawerCollapsed (value) {
+      if (value && this.isMobile) {
         this.$VueEvent.fire('hide_mobile_footer', false)
       }
     }

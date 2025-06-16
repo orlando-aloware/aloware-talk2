@@ -483,6 +483,10 @@ export default {
       'sessionPaused'
     ]),
 
+    ...mapFields('settings', [
+      'isSidebarCollapsed'
+    ]),
+
     isGuest () {
       return _.get(this.$route.meta, 'isGuest', false)
     },
@@ -1247,11 +1251,11 @@ export default {
       this.sidebarVisible = true
     }
 
-    // using the negative because the default should be expanded, so whenever the value is falsy means expanded
-    const isSidebarCollapsed = localStorage.getItem('isSidebarCollapsed')
-
-    if (isSidebarCollapsed === 'true') {
-      this.isSidebarExpanded = false
+    if (this.isSidebarCollapsed !== undefined) {
+      // if user has collapsed the sidebar, keep it collapsed
+      this.isSidebarExpanded = !this.isSidebarCollapsed
+    } else {
+      this.isSidebarExpanded = window?.innerWidth && window.innerWidth > 1366
     }
 
     // check auth every 5 minutes
@@ -1560,8 +1564,7 @@ export default {
 
     toggleSidebarExpansion () {
       this.isSidebarExpanded = !this.isSidebarExpanded
-
-      localStorage.setItem('isSidebarCollapsed', !this.isSidebarExpanded)
+      this.isSidebarCollapsed = !this.isSidebarExpanded
     },
 
     toggleSidebar () {
