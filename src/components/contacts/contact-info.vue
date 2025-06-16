@@ -109,7 +109,7 @@
                 size="sm"
                 class="custom-action-button my-1"
                 data-testid="contact-info-call-button"
-                @click="callContact">
+                @click="onCallClick">
         <q-tooltip anchor="bottom middle"
                    data-testid="contact-info-call-tooltip"
                    self="center middle"
@@ -261,7 +261,7 @@
         flat
         :ripple="true"
         :disable="!selectedLine"
-        @click="onCall">
+        @click="callContact">
       </q-btn>
     </div>
     <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"></appointment-form-modal>
@@ -404,6 +404,10 @@ export default {
     contactLastLineUsedId () {
       const key = `${this.activeInboxId}-${this.contact.id}`
       return this.contactsLastUsedLines.get(key)
+    },
+
+    isFromTeamInbox () {
+      return !!this.activeInboxId
     }
   },
 
@@ -475,13 +479,29 @@ export default {
         return
       }
 
-      if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
-        data.outboundCampaignId = this.defaultOutboundCampaignId
-        this.$VueEvent.fire('makeCall', data)
-        return
+      if (!this.isFromTeamInbox) {
+        if (!this.isAlwaysAskEnabled && this.defaultOutboundCampaignId) {
+          // If the outbound calling mode is not always ask and there is a default outbound campaign id, use it
+          data.outboundCampaignId = this.defaultOutboundCampaignId
+        }
+      } else {
+        // If the call is being placed from the team inbox, use the selected line or the default outbound campaign id
+        data.outboundCampaignId = this.selectedLine || this.defaultOutboundCampaignId
       }
 
-      this.$VueEvent.fire('callContact', data)
+      this.$VueEvent.fire('makeCall', data)
+    },
+
+    onCallClick () {
+      if (this.isFromTeamInbox) {
+        if (this.isAlwaysAskEnabled || this.defaultOutboundCampaignId) {
+        // Wait for the user to select and confirm the campaign before initiating the call
+          this.showLineSelectorDropdown = !this.showLineSelectorDropdown
+          return
+        }
+      }
+
+      this.callContact()
     },
 
     callContact () {
@@ -490,11 +510,6 @@ export default {
         name: this.contact.name,
         calls_notifications_open_time: this.currentCompany.calls_notifications_open_time,
         calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
-      }
-
-      if (!this.showLineSelectorDropdown) {
-        this.showLineSelectorDropdown = true
-        return
       }
 
       this.checkContactTimezone(params, this.initiateCall)
@@ -551,10 +566,6 @@ export default {
       }
 
       this.$handleErrors(error?.response, 'error')
-    },
-
-    onCall () {
-
     },
 
     onLineChange (line) {

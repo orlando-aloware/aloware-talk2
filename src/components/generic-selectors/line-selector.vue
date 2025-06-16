@@ -349,7 +349,7 @@ export default {
     this.loadPlaceholder()
 
     if (this.preSelectLineId) {
-      const line = this.campaigns.find(campaign => campaign.id === this.preSelectLineId)
+      const line = this.activeCampaignsAlphabeticalOrder.find(campaign => campaign.id === this.preSelectLineId)
       line && this.selectOption(line)
     }
   },
