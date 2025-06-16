@@ -10686,28 +10686,6 @@ screen and (max-width: 956px) {
       }
     }
   }
-
-  // Specific fixes for incoming call notifications
-  #incomingCall__toast_outer {
-    .action-notification {
-      .notification-details {
-        max-width: 240px !important;
-        overflow: hidden;
-      }
-
-      .title {
-        max-width: 220px !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-      }
-
-      .call-actions {
-        flex-shrink: 0;
-        min-width: 84px;
-      }
-    }
-  }
 }
 
 @media screen and (max-width: 399px) {
