@@ -40,11 +40,6 @@ export default {
   ],
 
   props: {
-    carrierName: {
-      required: true,
-      type: String
-    },
-
     campaignId: {
       type: Number,
       required: false
