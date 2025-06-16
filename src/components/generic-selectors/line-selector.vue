@@ -68,7 +68,7 @@
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="no-results text-grey">
-            No results
+            {{ noResultsText }}
           </q-item-section>
         </q-item>
       </template>
@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import _ from 'lodash'
 import GenericMultiSelect from 'components/generic-selectors/generic-multi-select'
 import { aclMixin, selectorMixin } from 'src/plugins/mixins'
@@ -231,6 +231,11 @@ export default {
     isReadOnly: {
       type: Boolean,
       default: false
+    },
+
+    preSelectLineId: {
+      type: Number,
+      default: null
     }
   },
 
@@ -248,6 +253,8 @@ export default {
     ...mapState(['campaigns', 'campaignsIsLoading']),
     ...mapState('cache', ['currentCompany']),
     ...mapState('auth', ['profile']),
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInbox']),
+    ...mapGetters('TeamInbox', ['activeInboxCampaignIds']),
 
     placeholder () {
       if (this.customPlaceholder) {
@@ -286,8 +293,12 @@ export default {
 
     activeCampaignsAlphabeticalOrder () {
       if (this.campaignsAlphabeticalOrder.length) {
-        return _.clone(this.campaignsAlphabeticalOrder)
+        const campaigns = _.clone(this.campaignsAlphabeticalOrder)
           .filter(campaign => campaign.active === true)
+
+        return !this.preSelectLineId
+          ? campaigns
+          : campaigns.filter(campaign => this.activeInboxCampaignIds.includes(campaign.id))
       }
 
       return []
@@ -317,6 +328,12 @@ export default {
 
     selectedLine () {
       return this.campaigns.find(campaign => campaign.id === this.selectedId)
+    },
+
+    noResultsText () {
+      return !this.preSelectLineId
+        ? 'No results'
+        : 'No lines found in this inbox'
     }
   },
 
@@ -330,6 +347,11 @@ export default {
 
   mounted () {
     this.loadPlaceholder()
+
+    if (this.preSelectLineId) {
+      const line = this.campaigns.find(campaign => campaign.id === this.preSelectLineId)
+      line && this.selectOption(line)
+    }
   },
 
   methods: {

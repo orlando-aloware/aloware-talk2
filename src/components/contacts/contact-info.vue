@@ -240,6 +240,30 @@
         <merge-contact-icon/>
       </b-button>
     </div>
+    <div v-if="showLineSelectorDropdown" class="d-flex">
+      <line-selector
+        class="line-selector flex-grow-1"
+        prepend="From:"
+        check-blocked-messaging
+        :generic-multiselect="false"
+        :use-only-actives="true"
+        :pre-select-line-id="contactLastLineUsedId"
+        @change="onLineChange"
+      >
+      </line-selector>
+      <q-btn
+        icon="img:app-icons/dialer/call_btn.svg"
+        size="32px"
+        class="icon-btn auto-size height-32 ml-1 mt-1"
+        align="right"
+        padding="none"
+        rounded
+        flat
+        :ripple="true"
+        :disable="!selectedLine"
+        @click="onCall">
+      </q-btn>
+    </div>
     <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"></appointment-form-modal>
     <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
     <power-dialer-add-modal :params="addPowerDialerParams"
@@ -282,6 +306,7 @@ import ContactDncActions from 'components/contacts/contact-dnc-actions'
 import * as UserOutboundCallingModes from 'src/constants/user-outbound-calling-modes'
 import { LRN_NOT_PERFORMED } from '../../constants/lrn-types'
 import ContactIntegrationsLinkIcons from 'components/contacts/contact-integrations-link-icons.vue'
+import LineSelector from 'components/generic-selectors/line-selector'
 
 export default {
   name: 'contact-info',
@@ -316,7 +341,8 @@ export default {
     TimerIcon,
     MergeContactIcon,
     Avatar,
-    ContactNameForm
+    ContactNameForm,
+    LineSelector
   },
 
   computed: {
@@ -327,6 +353,8 @@ export default {
     ...mapState('contacts', ['isMergeContactOpen']),
 
     ...mapState('auth', ['profile']),
+
+    ...mapState('TeamInbox', ['contactsLastUsedLines', 'activeInboxId']),
 
     ...mapGetters('contacts', [
       'contact',
@@ -371,6 +399,11 @@ export default {
       }
 
       return null
+    },
+
+    contactLastLineUsedId () {
+      const key = `${this.activeInboxId}-${this.contact.id}`
+      return this.contactsLastUsedLines.get(key)
     }
   },
 
@@ -381,6 +414,8 @@ export default {
       isProcessingBlock: false,
       isVideoConferenceLinkSending: false,
       isRemovingFromPowerDialerLists: false,
+      selectedLine: null,
+      showLineSelectorDropdown: false,
       LRN_NOT_PERFORMED
     }
   },
@@ -457,6 +492,11 @@ export default {
         calls_notifications_close_time: this.currentCompany.calls_notifications_close_time
       }
 
+      if (!this.showLineSelectorDropdown) {
+        this.showLineSelectorDropdown = true
+        return
+      }
+
       this.checkContactTimezone(params, this.initiateCall)
     },
 
@@ -511,6 +551,14 @@ export default {
       }
 
       this.$handleErrors(error?.response, 'error')
+    },
+
+    onCall () {
+
+    },
+
+    onLineChange (line) {
+      this.selectedLine = line
     }
   }
 }
