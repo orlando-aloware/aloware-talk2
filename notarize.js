@@ -12,7 +12,6 @@ exports.default = async function notarizing (context) {
   const appName = context.packager.appInfo.productFilename
 
   const notarizeParams = {
-    appBundleId: `${appName}`,
     appPath: `${appOutDir}/${appName}.app`,
     appleApiKey: process.env.API_KEY_FILE, // Path to the .p8 API key file
     appleApiKeyId: process.env.API_KEY_ID, // Key ID
@@ -21,5 +20,5 @@ exports.default = async function notarizing (context) {
 
   await notarize(notarizeParams)
 
-  console.log(`Notarized com.aloware.talk2`)
+  console.log(`Notarized ${appName}`)
 }
