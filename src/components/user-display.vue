@@ -1,14 +1,15 @@
 <template>
   <div class="user-display d-inline-flex align-items-center">
     <span class="ai-effect-gradient-text"
-          v-if="isAiAgent">
+          v-if="isAiAgent"
+          :class="{ 'deleted-user': isDeletedUser }">
       <sparkle-icon :width="iconSize"
                     :height="iconSize"
                     :color="iconColor"
       />
       {{ userName }}
     </span>
-    <span v-else>
+    <span v-else :class="{ 'deleted-user': isDeletedUser }">
       {{ userName }}
     </span>
   </div>
@@ -18,6 +19,7 @@
 import SparkleIcon from 'components/icons/ai/sparkle-bold-icon.vue'
 import * as User from 'src/constants/user'
 import { userMixin } from 'src/plugins/mixins'
+import { isDeleted, removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 
 export default {
   name: 'UserDisplay',
@@ -69,7 +71,13 @@ export default {
       if (!this.displayUser) {
         return '-'
       }
-      return this.getUserName(this.displayUser)
+      const name = this.getUserName(this.displayUser)
+      // Clean up deleted suffix from user names
+      return removeDeletedSuffix(name)
+    },
+
+    isDeletedUser () {
+      return isDeleted(this.displayUser)
     },
 
     isAiAgent () {
@@ -83,5 +91,10 @@ export default {
 .user-display {
   display: inline-flex;
   align-items: center;
+}
+
+.deleted-user {
+  opacity: 0.6;
+  font-style: italic;
 }
 </style>

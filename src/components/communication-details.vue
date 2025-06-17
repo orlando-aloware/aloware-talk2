@@ -389,7 +389,7 @@
                         Click for more info
                       </q-tooltip>
                       <span class="text-blue cursor-pointer">
-                        {{ usedCampaign?.name }}
+                        {{ removeDeletedSuffix(usedCampaign?.name) }}
                       </span>
                     </div>
                     {{ communication.incoming_number }}
@@ -413,7 +413,7 @@
                         Click for more info
                       </q-tooltip>
                       <span class="text-blue cursor-pointer">
-                        {{ usedCampaign?.name }}
+                        {{ removeDeletedSuffix(usedCampaign?.name) }}
                       </span>
                     </div>
                     {{ communication.incoming_number | fixPhone }}
@@ -457,7 +457,7 @@
                         Click for more info
                       </q-tooltip>
                       <span class="text-blue cursor-pointer">
-                        {{ usedCampaign?.name }}
+                        {{ removeDeletedSuffix(usedCampaign?.name) }}
                       </span>
                     </div>
                     {{ communication.incoming_number | fixPhone }}
@@ -482,7 +482,7 @@
                         Click for more info
                       </q-tooltip>
                       <span class="text-blue cursor-pointer">
-                        {{ usedCampaign?.name }}
+                        {{ removeDeletedSuffix(usedCampaign?.name) }}
                       </span>
                     </div>
                     {{ communication.incoming_number }}
@@ -862,7 +862,7 @@
                                  data-testid="comm-details-ring-group-tooltip">
                         Click For More Info
                       </q-tooltip>
-                      {{ usedRingGroup.name }}
+                      {{ removeDeletedSuffix(usedRingGroup.name) }}
                     </span>
                   </div>
                   <span v-else-if="ringGroups.length > 0">
@@ -1533,6 +1533,7 @@ import { TAG_CATEGORIES as TagCategories } from 'src/constants/tag-categories'
 import talk2Api from 'src/plugins/api/api'
 import { aclMixin, classicMixin, communicationInfoMixin, goBackMixin, userMixin } from 'src/plugins/mixins'
 import { mapState } from 'vuex'
+import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 import * as CommunicationCallbackStatus from '../constants/callback-status'
 import * as CommunicationCurrentStatus from '../constants/communication-current-status'
 import * as CommunicationDirections from '../constants/communication-direction'
@@ -1729,6 +1730,8 @@ export default {
   },
 
   methods: {
+    removeDeletedSuffix,
+
     fetchSmartTranscriptionData () {
       const audioRef = this.communication.has_voicemail ? this.$refs.voicemailRecording : this.$refs.callRecording
       if (audioRef?.$refs?.transcriptionModal) {
