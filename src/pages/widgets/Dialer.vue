@@ -114,7 +114,7 @@ export default {
       isFirstLoading: true,
       isDialed: false,
       startDialing: false,
-      loading: false,
+      // loading: false,
       small: false,
       initialized: false,
       needsExtensions: false,
@@ -336,19 +336,19 @@ export default {
       if (this.apiKey) {
         storage.local.setItem('api_token', this.apiKey)
       }
-      this.loading = true
+      // this.loading = true
 
       await this.check().then((res) => {
         storage.local.setItem('company_id', res.data.user.company.id)
         this.setCurrentCompany(res.data.user.company)
         this.resetVuex(['all'])
-        this.loading = false
+        // this.loading = false
         this.initialized = true
         this.handleUserLogin()
       }).catch((err) => {
         console.log('Error: api key is not valid', err)
         this.$handleErrors(err.response)
-        this.loading = false
+        // this.loading = false
         if (this.$route.name !== 'Login') {
           this.$router.push({ name: 'Login', query: { redirect: this.$route.fullPath } })
         }
@@ -516,15 +516,20 @@ export default {
     },
 
     handleCall () {
-      this.loading = true
-      const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+      // this.loading = true
+      // const isCallInProgressOrWrapUp = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
 
       console.warn('handleCall', this.dialer?.currentStatus)
 
+      // @todo reformat
       // if there's a call in progress or in wrap up, we omit the call
-      if (isCallInProgressOrWrapUp.includes(this.dialer?.currentStatus)) {
-        // this.showAlertAgentOnCall = true
-        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+      // if (isCallInProgressOrWrapUp.includes(this.dialer?.currentStatus)) {
+      //   // this.showAlertAgentOnCall = true
+      //   this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+      //   return
+      // }
+
+      if (this.validateActiveCallStatus()) {
         return
       }
 
@@ -574,7 +579,7 @@ export default {
         if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
           this.widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
           !this.isDialed) {
-          console.warn('handleAgentStatusUpdate WIDGET_MSG_SHOW_ALERT_CALL_FINISHED 2')
+          console.warn('handleAgentStatusUpdate WIDGET_MSG_SHOW_ALERT_CALL_FINISHED 2', this.profile?.last_call, this.dialer?.communication)
           this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
           // this.showAlertCallFinished = true
           // this.showAlertAgentOnCall = false
@@ -690,13 +695,20 @@ export default {
         status = true
       }
 
+      // @todo check if this position is correct
+      // define last call values to track useful updates if needed
+      if (status && lastCall) {
+        this.setDialerCommunication(lastCall)
+        this.setDialerContact(lastCall?.contact)
+      }
+
       // do not show a widget message when force disposition, in this case, the dialer will appear with wrap-up page
       if (status &&
         lastCall &&
+        // the last call should not be held
+        lastCall.current_status2 !== CURRENT_STATUS_HOLD_NEW &&
         this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
         this.checkForceDisposition) {
-        this.setDialerCommunication(lastCall)
-        this.setDialerContact(lastCall?.contact)
         this.setDialerCurrentStatus('WRAP_UP')
       } else {
         this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
