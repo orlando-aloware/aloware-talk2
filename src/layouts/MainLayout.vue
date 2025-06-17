@@ -11,6 +11,7 @@
         <trial-expired-modal v-if="showTrialExpiredModal"/>
         <cancelled-account-modal v-else-if="showCancelledAccountModal"/>
         <trial-banner v-else-if="showIsTrialBanner"/>
+        <teaminbox-empty-state-video v-else-if="showTeamInboxEmptyStateVideo"/>
         <teaminbox-tutorial-video v-else-if="showTeamInboxTutorialVideo"/>
       </template>
       <div class="h-100"
@@ -233,7 +234,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
   accessMixin,
@@ -300,6 +301,7 @@ import { FINISHED } from 'src/constants/export-status'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
 import { getCampaigns, getTeamInboxCampaigns, setCampaignsIsLoading } from 'src/plugins/helpers/campaigns'
 import teaminboxTutorialVideo from 'components/teaminbox/teaminbox-tutorial-video.vue'
+import teaminboxEmptyStateVideo from 'components/teaminbox/teaminbox-empty-state-video.vue'
 
 export default {
   name: 'MyLayout',
@@ -328,7 +330,8 @@ export default {
     TrialExpiredModal,
     CancelledAccountModal,
     AccountSelector,
-    teaminboxTutorialVideo
+    teaminboxTutorialVideo,
+    teaminboxEmptyStateVideo
   },
 
   mixins: [
@@ -418,6 +421,16 @@ export default {
       'timezones'
     ]),
 
+    ...mapState('TeamInbox', {
+      teamInboxStoreInboxes: 'inboxes',
+      isLoadingTeamInboxes: 'isLoadingInboxes'
+    }),
+
+    ...mapGetters('TeamInbox', [
+      'isTeamInboxesLoaded',
+      'hasTeamInboxes'
+    ]),
+
     ...mapState([
       'dialer',
       'campaigns',
@@ -490,8 +503,18 @@ export default {
       return this.isTrial && this.companyHasTrialStatus && !this.isWidget
     },
 
+    showTeamInboxEmptyStateVideo () {
+      // Show empty state video when on Team Inbox route AND user has no inboxes
+      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE) &&
+        this.isTeamInboxesLoaded &&
+        !this.hasTeamInboxes
+    },
+
     showTeamInboxTutorialVideo () {
-      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE)
+      // Show tutorial video when on Team Inbox route AND user has inboxes
+      return this.$route.name.includes(TEAMINBOXES_MENU_TITLE) &&
+        this.isTeamInboxesLoaded &&
+        this.hasTeamInboxes
     },
 
     companyHasTrialStatus () {
@@ -1233,6 +1256,17 @@ export default {
 
     // check auth every 5 minutes
     const checkInterval = 5 * 60 * 1000
+
+    // Handled outdated company info which caused the refresh loop problem
+    if (this.profile?.company_id && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
+      this.$axios.get('/api/v1/company/' + this.profile.company_id)
+        .then((res) => {
+          this.setCurrentCompany(res.data)
+        })
+        .catch(err => {
+          console.error('Error fetching company info:', err)
+        })
+    }
 
     if (!window.sessionIntervalId) {
       window.sessionIntervalId = setInterval(() => {
@@ -2820,6 +2854,10 @@ export default {
       }
 
       this.checkDebounce()
+
+      if (this.profile?.company && !this.hasCompanyLegacyInboxEnabled && !this.hasCompanyTeamInboxEnabled && !this.loading) {
+        this.setCurrentCompany(this.profile.company)
+      }
 
       const toDepth = to.path.split('/').length
       const fromDepth = from.path.split('/').length

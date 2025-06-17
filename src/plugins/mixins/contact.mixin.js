@@ -635,6 +635,11 @@ export default {
           this.selectedCampaignId = this.contactsLastUsedLines.get(key)
         }
       } else {
+        // sanity check and clear
+        if (this.selectedCampaignId) {
+          this.selectedCampaignId = null
+        }
+
         // 1. if contact has initial campaign and there were no communications select initial campaign
         if (!this.communicationsAndAudits.length && this.contact && this.contact.initial_campaign_id) {
           console.log('selectedCampaignId - condition 1', {

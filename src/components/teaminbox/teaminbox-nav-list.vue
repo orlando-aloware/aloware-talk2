@@ -46,18 +46,38 @@
         </b-overlay>
       </div>
 
-      <!-- Empty state -->
-      <div class="text-center q-pa-md text-grey"
+      <div
+        :class="['text-center text-grey teaminbox-nav-list__empty-state', isMobile ? '' : 'q-pa-md']"
            v-else-if="!inboxes.length">
-        No Inboxes
+        <team-inbox-empty-state v-if="isMobile">
+          <template #list-content>
+            <p class="info-text">
+              <strong>Connected Inboxes:</strong> See and collaborate on the real-time calls and messages being handled
+              by every active member of this team.
+            </p>
+            <p class="info-text">
+              <strong>Watching Inboxes:</strong> Give managers and supervisors a bird's-eye view of all communications
+              for coaching, quality, and to ensure no customer is left behind.
+            </p>
+            <p class="info-text">
+              <strong>Personal Inboxes:</strong> Unify the communications from everyone's direct lines into one shared,
+              organized space so you can stop guessing and start working together.
+            </p>
+          </template>
+        </team-inbox-empty-state>
 
-        <br/>
+        <template v-else>
+          No Inboxes
 
-        <button class="btn btn-sm btn-primary mt-4"
-                v-if="showRefreshInboxesButton"
-                @click.prevent="onRefreshInboxes">
-          <refresh-icon color="#fff"/> Refresh
-        </button>
+          <br/>
+
+          <button class="btn btn-sm btn-primary mt-4"
+                  v-if="showRefreshInboxesButton"
+                  @click.prevent="onRefreshInboxes">
+            <refresh-icon color="#fff"/>
+            Refresh
+          </button>
+        </template>
       </div>
     </div>
   </div>
@@ -65,17 +85,24 @@
 
 <script>
 import TeamInboxNavType from './teaminbox-nav-type.vue'
+import TeamInboxEmptyState from './teaminbox-empty-state.vue'
 import TeamInboxMixin from 'src/plugins/mixins/teaminbox.mixin'
 import SearchInput from 'src/components/search-input.vue'
 import RefreshIcon from 'src/components/icons/refresh-icon.vue'
 import { TEAMINBOXES_MENU_TITLE } from 'src/router/routes'
-import { INBOX_TYPE_PERSONAL, INBOX_TYPE_CONNECTED, INBOX_TYPE_WATCHING, UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
-import { mapState, mapActions, mapGetters } from 'vuex'
+import {
+  INBOX_TYPE_CONNECTED,
+  INBOX_TYPE_PERSONAL,
+  INBOX_TYPE_WATCHING,
+  UNTHREADED
+} from 'src/store/teaminbox/teaminbox.store'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { getQueryString } from 'src/plugins/helpers/functions'
 
 export default {
   components: {
     TeamInboxNavType,
+    TeamInboxEmptyState,
     SearchInput,
     RefreshIcon
   },
@@ -467,7 +494,7 @@ export default {
   height: 100%;
   background-color: #fff;
   color: #000;
-  padding: 7px 0 7px 7px;
+  padding: 7px 0 7px 0;
 
   &__header {
     width: 100%;
@@ -485,8 +512,26 @@ export default {
     display: flex;
     flex-direction: column;
     row-gap: 10px;
-    padding: 10px 0px 10px 10px;
+    padding: 10px;
     overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  &__empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+
+    .mobile-empty-state-image {
+      max-width: calc(100% - 20px);
+      max-height: 80vh;
+      object-fit: contain;
+      box-sizing: border-box;
+    }
   }
 }
 </style>
