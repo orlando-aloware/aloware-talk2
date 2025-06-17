@@ -401,9 +401,8 @@ export default {
       return null
     },
 
-    contactLastLineUsedId () {
-      const key = `${this.activeInboxId}-${this.contact.id}`
-      return this.contactsLastUsedLines.get(key)
+    contactLastLineUsedKey () {
+      return `${this.activeInboxId}-${this.contact.id}`
     },
 
     isFromTeamInbox () {
@@ -420,7 +419,8 @@ export default {
       isRemovingFromPowerDialerLists: false,
       selectedLine: null,
       showLineSelectorDropdown: false,
-      LRN_NOT_PERFORMED
+      LRN_NOT_PERFORMED,
+      contactLastLineUsedId: null
     }
   },
 
@@ -498,6 +498,7 @@ export default {
 
       if (this.isFromTeamInbox && showLineSelectorDropdown) {
         // Wait for the user to select and confirm the campaign before initiating the call
+        this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
         this.showLineSelectorDropdown = !this.showLineSelectorDropdown
         return
       }
@@ -506,6 +507,8 @@ export default {
     },
 
     callContact () {
+      this.showLineSelectorDropdown = false
+
       const params = {
         timezone: this.contact.timezone,
         name: this.contact.name,
