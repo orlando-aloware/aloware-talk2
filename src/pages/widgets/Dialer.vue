@@ -25,7 +25,7 @@
     >
       <p><strong>Something went wrong</strong></p>
       <hr>
-      <p>For some reason we couldn’t complete the call. Please refresh the page and try again.</p>
+      <p>For some reason we couldn't complete the call. Please refresh the page and try again.</p>
     </div>
 
     <div
@@ -72,6 +72,7 @@ import * as storage from 'src/plugins/helpers/storage'
 import { agentMixin, dispositionsMixin, helperMixin, timezoneCheckMixin } from 'src/plugins/mixins'
 import CallingExtensionsManager from 'src/utils/CallingExtensionsManager'
 import { mapActions, mapState } from 'vuex'
+import { CURRENT_STATUS_HOLD_NEW } from 'src/constants/communication-current-status'
 
 const WIDGET_MSG_HIDE = 1
 const WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL = 2
@@ -102,7 +103,7 @@ export default {
       WIDGET_MSG_SHOW_ALERT_CALL_FINISHED,
       WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED,
       WIDGET_MSG_CRITICAL_ERROR_HAPPENED,
-      widgetMessage: WIDGET_MSG_SHOW_ALERT_CALL_FINISHED,
+      widgetMessage: WIDGET_MSG_HIDE,
       isFirstLoading: true,
       isDialed: false,
       startDialing: false,
@@ -299,24 +300,14 @@ export default {
 
       await this.getContact()
 
-      if (this.agentHasActiveCallDevice()) {
-        // this.showAlertAgentOnCall = true
-        if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ? true : !this.checkForceDisposition) {
-          // do not show a widget message when force disposition, int this case, the dialer will appear with wrap-up page
-          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
-        }
-
+      if (this.validateActiveCallStatus()) {
         console.log('agentHasActiveCallDevice dddddd', this.profile?.last_call, this.checkForceDisposition)
         this.isPreparingToCall = false
 
         return
       }
 
-      // if (!this.checkForceDisposition) {
-      // @todo check reset call when redial
       this.$VueEvent.fire('resetCall')
-      // }
-
       this.isPreparingToCall = false
 
       if (!this.isAlwaysAskModeEnabled()) {
@@ -355,11 +346,10 @@ export default {
 
     async getContact () {
       const withLastUsedCallLine = this.isAlwaysAskModeEnabled()
-      const withLastCall = !this.checkForceDisposition
       await this.$axios.post('/api/v1/integrations/hubspot/find-contact', {
         params: this.hubspotDialNumber,
         with_last_used_call_line: withLastUsedCallLine,
-        with_last_call: withLastCall
+        with_last_call: true
       }).then(res => {
         const contact = res?.data?.contact
         this.contactDetails.contactName = this.getContactName(contact)
@@ -370,15 +360,10 @@ export default {
         if (withLastUsedCallLine) {
           this.campaignId = res?.data?.last_used_call_line
         }
-        if (withLastCall) {
-          this.setDialerCommunication(res?.data?.last_call)
-          this.setDialerContact(res?.data?.last_call?.contact)
-          const profile = {
-            'last_call': res?.data?.last_call
-          }
-          this.setProfile(profile)
+        const profile = {
+          'last_call': res?.data?.last_call
         }
-        this.$emit('change', this.$emit('change', this.contactDetails))
+        this.setProfile(profile)
       }).catch(err => {
         this.$handleErrors(err.response)
         // this.criticalErrorHappened = true
@@ -393,21 +378,8 @@ export default {
       console.warn('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition)) {
-        console.log('RRRRRRRRRRRR change to WRAP_UP', this.profile, this.dialer)
-        this.setDialerCurrentStatus('WRAP_UP')
-        return
-      }
-
-      if (this.agentHasActiveCallDevice()) {
+      if (this.validateActiveCallStatus()) {
         console.log('checkAgentHasActiveCallInAnotherDevice')
-        // this.showAlertAgentOnCall = true
-        if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ? true : !this.checkForceDisposition) {
-          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
-        } else {
-          console.log('change to WRAP_UP')
-          this.setDialerCurrentStatus('WRAP_UP')
-        }
         return
       }
 
@@ -576,7 +548,7 @@ export default {
         const agentStatus = data.agent_status
         this.setAgentStatus(agentStatus)
 
-        console.log('widgetMessage 2', this.widgetMessage, this.isFirstLoading, agentStatus === AgentStatus.AGENT_STATUS_ON_CALL, !this.isDialed, agentStatus, previousStatus)
+        console.log('widgetMessage 2 ==> ', this.widgetMessage, this.isFirstLoading, agentStatus === AgentStatus.AGENT_STATUS_ON_CALL, !this.isDialed, agentStatus, previousStatus)
 
         // if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS && this.showAlertAgentOnCall && !this.isDialed) {
         //   this.showAlertCallFinished = true
@@ -588,7 +560,7 @@ export default {
         if (agentStatus === AgentStatus.AGENT_STATUS_ACCEPTING_CALLS &&
           this.widgetMessage === WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL &&
           !this.isDialed) {
-          console.warn('WIDGET_MSG_SHOW_ALERT_CALL_FINISHED 2')
+          console.warn('handleAgentStatusUpdate WIDGET_MSG_SHOW_ALERT_CALL_FINISHED 2')
           this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_FINISHED
           // this.showAlertCallFinished = true
           // this.showAlertAgentOnCall = false
@@ -598,6 +570,7 @@ export default {
           !this.isDialed) {
           // this.showAlertCallFinished = false
           // @todo check if this correct
+          console.warn('handleAgentStatusUpdate WIDGET_MSG_HIDE 2')
           this.widgetMessage = WIDGET_MSG_HIDE
         }
 
@@ -625,12 +598,7 @@ export default {
         return
       }
 
-      if (this.agentHasActiveCallDevice()) {
-        // this.showAlertAgentOnCall = true
-        if (this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ? true : !this.checkForceDisposition) {
-          // do not show a widget message when force disposition, int this case, the dialer will appear with wrap-up page
-          this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
-        }
+      if (this.validateActiveCallStatus()) {
         return
       }
 
@@ -677,7 +645,17 @@ export default {
         this.profile?.outbound_calling_mode === UserOutboundCallingModes.OUTBOUND_CALLING_MODE_ACCOUNT_DEFAULT
     },
 
-    agentHasActiveCallDevice () {
+    // status validates before starting dialing
+    validateActiveCallStatus () {
+      let status = false
+
+      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
+        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition)) {
+        status = true
+      }
+
+      console.warn('checkAgentHasActiveCallInAnotherDevice', this.profile.agent_status, this.dialer?.currentStatus)
+
       const statuses = [
         'MAKING_CALL',
         'CALL_CONNECTED',
@@ -687,22 +665,30 @@ export default {
         'ANSWERING_CALL'
       ]
 
-      if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && this.checkForceDisposition)) {
-
-      }
-
-      console.warn('checkAgentHasActiveCallInAnotherDevice', this.profile.agent_status, this.dialer?.currentStatus)
-
       if (statuses.includes(this.dialer?.currentStatus)) {
-        return true
+        status = true
       }
 
-      return this.profile?.agent_status === AgentStatus.AGENT_STATUS_ON_CALL
+      const lastCall = this.profile?.last_call
 
-      // return this.dialer &&
-      //   this.profile &&
-      //   this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL &&
-      //   !statuses.includes(this.dialer?.currentStatus)
+      // check if there is no last communication on hold
+      if (lastCall && lastCall.current_status2 === CURRENT_STATUS_HOLD_NEW) {
+        status = true
+      }
+
+      // do not show a widget message when force disposition, in this case, the dialer will appear with wrap-up page
+      if (status &&
+        lastCall &&
+        this.profile.agent_status !== AgentStatus.AGENT_STATUS_ON_CALL &&
+        this.checkForceDisposition) {
+        this.setDialerCommunication(lastCall)
+        this.setDialerContact(lastCall?.contact)
+        this.setDialerCurrentStatus('WRAP_UP')
+      } else {
+        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+      }
+
+      return status
     },
 
     endActiveCall () {
@@ -771,18 +757,18 @@ export default {
     'dialer.currentStatus' (to, from) {
       console.warn('dialer.currentStatus', from + '=>' + to, this.profile.agent_status, this.checkForceDisposition)
 
-      if (this.isLoadingDialer) {
-        return
-      }
-
-      const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
-      if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
-        (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) &&
-        !this.isDialed) {
-        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
-        // this.showAlertAgentOnCall = true
-        // this.showAlertCallFinished = false
-      }
+      // if (this.isLoadingDialer) {
+      //   return
+      // }
+      //
+      // const isCallInProgress = ['CALL_CONNECTED', 'WRAP_UP', 'MAKING_CALL']
+      // if (isCallInProgress?.includes(this.dialer?.currentStatus) &&
+      //   (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL || (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_WRAP_UP && !this.checkForceDisposition)) &&
+      //   !this.isDialed) {
+      //   this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
+      //   // this.showAlertAgentOnCall = true
+      //   // this.showAlertCallFinished = false
+      // }
     }
   }
 }
