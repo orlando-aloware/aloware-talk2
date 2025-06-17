@@ -9,8 +9,7 @@
                           v-if="genericMultiselect"
                           @valuesUpdated="onInput">
     </generic-multi-select>
-    <q-select style="word-break: break-all;"
-              ref="lineSelect"
+    <q-select ref="lineSelect"
               options-selected-class="text-primary"
               class="q-basic-selector"
               color="primary"
@@ -33,7 +32,9 @@
               :multiple="multiple"
               :use-chips="useChips"
               :popup-content-style="`width: ${selectWidth}px; word-break: break-all;`"
+              :style="{ 'word-break': 'break-all', width }"
               :behavior="behavior"
+              :hide-bottom-space="hideBottomSpace"
               v-else
               v-model="selectedId"
               @popup-show="onShowMenu"
@@ -236,6 +237,16 @@ export default {
     preSelectedTeamInboxLineId: {
       type: Number,
       default: null
+    },
+
+    hideBottomSpace: {
+      type: Boolean,
+      default: false
+    },
+
+    width: {
+      type: String,
+      default: undefined
     }
   },
 

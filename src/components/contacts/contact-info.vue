@@ -118,6 +118,35 @@
         </q-tooltip>
         <call-icon width="14"
                    height="14"/>
+        <q-popup-proxy v-model="showLineSelectorPopup"
+                       no-parent-event>
+          <div class="d-flex line-selector-wrapper">
+            <line-selector
+              class="line-selector flex-grow-1"
+              prepend="From:"
+              check-blocked-messaging
+              hide-bottom-space
+              :width="lineSelectorWidth"
+              :generic-multiselect="false"
+              :use-only-actives="true"
+              :pre-selected-team-inbox-line-id="contactLastLineUsedId"
+              @change="onLineChange"
+            >
+            </line-selector>
+            <q-btn
+              icon="img:app-icons/dialer/call_btn.svg"
+              size="32px"
+              class="icon-btn auto-size height-32 ml-1 mt-1"
+              align="right"
+              padding="none"
+              rounded
+              flat
+              :ripple="true"
+              :disable="!selectedLine"
+              @click="callContact">
+            </q-btn>
+          </div>
+        </q-popup-proxy>
       </b-button>
 
       <b-button variant="light"
@@ -240,30 +269,6 @@
         <merge-contact-icon/>
       </b-button>
     </div>
-    <div v-if="showLineSelectorDropdown" class="d-flex">
-      <line-selector
-        class="line-selector flex-grow-1"
-        prepend="From:"
-        check-blocked-messaging
-        :generic-multiselect="false"
-        :use-only-actives="true"
-        :pre-selected-team-inbox-line-id="contactLastLineUsedId"
-        @change="onLineChange"
-      >
-      </line-selector>
-      <q-btn
-        icon="img:app-icons/dialer/call_btn.svg"
-        size="32px"
-        class="icon-btn auto-size height-32 ml-1 mt-1"
-        align="right"
-        padding="none"
-        rounded
-        flat
-        :ripple="true"
-        :disable="!selectedLine"
-        @click="callContact">
-      </q-btn>
-    </div>
     <appointment-form-modal data-testid="contact-info-appointment-form-modal" :contact="contact"></appointment-form-modal>
     <contact-add-reminder-modal data-testid="contact-info-add-reminder-modal"></contact-add-reminder-modal>
     <power-dialer-add-modal :params="addPowerDialerParams"
@@ -363,6 +368,10 @@ export default {
       'changingSelectedContact'
     ]),
 
+    lineSelectorWidth () {
+      return this.$q.screen.width <= 1366 ? '200px' : '220px'
+    },
+
     contactName () {
       if (this.contact) {
         return this.contact.name || 'No Name'
@@ -418,7 +427,7 @@ export default {
       isVideoConferenceLinkSending: false,
       isRemovingFromPowerDialerLists: false,
       selectedLine: null,
-      showLineSelectorDropdown: false,
+      showLineSelectorPopup: false,
       LRN_NOT_PERFORMED,
       contactLastLineUsedId: null
     }
@@ -493,21 +502,22 @@ export default {
     },
 
     onCallClick () {
-      const showLineSelectorDropdown = this.isAlwaysAskEnabled ||
+      const showLineSelectorPopup = this.isAlwaysAskEnabled ||
         (this.defaultOutboundCampaignId && this.defaultOutboundCampaignId !== this.contactLastLineUsedId)
 
-      if (this.isFromTeamInbox && showLineSelectorDropdown) {
-        // Wait for the user to select and confirm the campaign before initiating the call
+      if (this.isFromTeamInbox && showLineSelectorPopup) {
+        // Show popup and wait for user to select line
         this.contactLastLineUsedId = this.contactsLastUsedLines.get(this.contactLastLineUsedKey)
-        this.showLineSelectorDropdown = !this.showLineSelectorDropdown
+        this.showLineSelectorPopup = !this.showLineSelectorPopup
         return
       }
 
+      // If we don't need to show the line selector popup, directly call the contact
       this.callContact()
     },
 
     callContact () {
-      this.showLineSelectorDropdown = false
+      this.showLineSelectorPopup = false
 
       const params = {
         timezone: this.contact.timezone,
@@ -578,3 +588,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.line-selector-wrapper {
+  padding: 8px;
+}
+</style>
