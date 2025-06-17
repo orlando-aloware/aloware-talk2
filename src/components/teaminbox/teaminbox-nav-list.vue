@@ -148,17 +148,27 @@ export default {
       const watching = []
 
       this.inboxes.forEach(inbox => {
-        const isConnected = inbox.user_ids.includes(this.profile.id) ||
-          inbox.team_ids.some(id => this.teamsIds.includes(id)) ||
-          inbox.teams.some(team => team.users.some(user => user.id === this.profile.id))
+        const {
+          teams,
+          call_waiting: callWaiting,
+          user_ids: userIds,
+          team_ids: teamIds,
+          watcher_user_ids: watcherUserIds,
+          watcher_team_user_ids: watcherTeamUserIds,
+          watcher_team_ids: watcherTeamIds
+        } = inbox
 
-        const isWatching = inbox.watcher_user_ids.includes(this.profile.id) ||
-          inbox.watcher_team_user_ids.includes(this.profile.id) ||
-          inbox.watcher_team_ids.some(id => this.teamsIds.includes(id))
+        const isConnected = userIds?.includes(this.profile.id) ||
+          teamIds?.some(id => this.teamsIds.includes(id)) ||
+          teams?.some(team => team.users?.some(user => user.id === this.profile.id))
 
-        if (inbox.call_waiting && isConnected) {
+        const isWatching = watcherUserIds?.includes(this.profile.id) ||
+          watcherTeamUserIds?.includes(this.profile.id) ||
+          watcherTeamIds?.some(id => this.teamsIds.includes(id))
+
+        if (callWaiting && isConnected) {
           personal.push(inbox)
-        } else if (!inbox.call_waiting && isConnected) {
+        } else if (!callWaiting && isConnected) {
           connected.push(inbox)
         } else if (isWatching) {
           watching.push(inbox)
