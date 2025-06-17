@@ -13,7 +13,7 @@ export const CREATOR_TYPE_SMS_REMINDER = 6
 // Communication that initiated from app notifications
 export const CREATOR_TYPE_APP_NOTIFICATIONS = 7
 // Communication that initiated from HubSpot
-export const CREATOR_TYPE_HUBSPOT = 8
+export const CREATOR_TYPE_HUBSPOT_WORKFLOW = 8
 // Communication that initiated from Zapier
 export const CREATOR_TYPE_ZAPIER = 9
 // Communication that initiated from AlohaBot
@@ -22,6 +22,8 @@ export const CREATOR_TYPE_ALOHABOT = 10 // Deprecated
 export const CREATOR_TYPE_GOHIGHLEVEL = 11
 // Communication that initiated from AloAi
 export const CREATOR_TYPE_ALOAI = 12
+// Communication that initiated from HubSpot Inbox Conversation
+export const CREATOR_TYPE_HUBSPOT_INBOX_CONVERSATION = 13
 
 export const ALL_CREATOR_TYPES = [
   {
@@ -53,7 +55,7 @@ export const ALL_CREATOR_TYPES = [
     label: 'App Notifications'
   },
   {
-    id: CREATOR_TYPE_HUBSPOT,
+    id: CREATOR_TYPE_HUBSPOT_WORKFLOW,
     label: 'HubSpot Workflow'
   },
   {
@@ -71,5 +73,9 @@ export const ALL_CREATOR_TYPES = [
   {
     id: CREATOR_TYPE_ALOAI,
     label: 'AloAi'
+  },
+  {
+    id: CREATOR_TYPE_HUBSPOT_INBOX_CONVERSATION,
+    label: 'HubSpot Inbox'
   }
 ]
