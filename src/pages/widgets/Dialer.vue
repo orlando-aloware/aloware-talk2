@@ -47,6 +47,13 @@
       <p>Please close this window or click the back button to continue.</p>
     </div>
 
+    <div class="p-3"
+         v-else-if="widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED">
+      <p><strong>Phone number is not chosen</strong></p>
+      <hr>
+      <p>Please click to a phone number to start dialing.</p>
+    </div>
+
     <webrtc
       :campaignId="campaignId"
       :class="[small ? 'small' : '']"
@@ -280,35 +287,39 @@ export default {
       // this.showAlertCallFinished = false
       // this.$bvModal.hide('daytime-hours-confirmation')
       this.isPreparingToCall = true
-      // @todo check if correct
-      this.widgetMessage = WIDGET_MSG_HIDE
-      // if (this.widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
-      //   this.widgetMessage = WIDGET_MSG_HIDE
-      // }
 
-      do {
-        if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
-          console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
-        }
-
-        // if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
-        console.log('waiting for agent to become available to make the call', this.dialer.currentStatus)
+      try {
+        // @todo check if correct
+        this.widgetMessage = WIDGET_MSG_HIDE
+        // if (this.widgetMessage === WIDGET_MSG_SHOW_ALERT_CALL_FINISHED) {
+        //   this.widgetMessage = WIDGET_MSG_HIDE
         // }
 
-        await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
-      } while (this.dialer.currentStatus === 'GENERATING_TOKEN')
+        do {
+          if (this.dialer.currentStatus === 'GENERATING_TOKEN') {
+            console.log('waiting for dialer token to be generated', this.dialer.currentStatus)
+          }
 
-      await this.getContact()
+          // if (this.agentStatus === AgentStatus.AGENT_STATUS_ON_CALL) {
+          console.log('waiting for agent to become available to make the call', this.dialer.currentStatus)
+          // }
 
-      if (this.validateActiveCallStatus()) {
-        console.log('agentHasActiveCallDevice dddddd', this.profile?.last_call, this.checkForceDisposition)
-        this.isPreparingToCall = false
+          await new Promise(resolve => setTimeout(resolve, 500)) // Check every 0.5sec
+        } while (this.dialer.currentStatus === 'GENERATING_TOKEN')
 
+        await this.getContact()
+
+        if (this.validateActiveCallStatus()) {
+          console.log('agentHasActiveCallDevice dddddd', this.profile?.last_call, this.checkForceDisposition)
+          return
+        }
+
+        this.$VueEvent.fire('resetCall')
+      } catch {
         return
+      } finally {
+        this.isPreparingToCall = false
       }
-
-      this.$VueEvent.fire('resetCall')
-      this.isPreparingToCall = false
 
       if (!this.isAlwaysAskModeEnabled()) {
         this.defineDefaultOutboundCampaignId()
@@ -371,6 +382,8 @@ export default {
         if (this.extensions) {
           this.extensions.callEnded()
         }
+
+        throw err
       })
     },
 
@@ -471,6 +484,7 @@ export default {
       // if empty then onDialNumber event was not called - skip calling,
       // if not empty then dialer was called, and we are here after login page so we must dial the number
       if (!this.hubspotDialNumber) {
+        this.widgetMessage = WIDGET_MSG_SHOW_ALERT_CALL_NOT_STARTED
         return
       }
 
