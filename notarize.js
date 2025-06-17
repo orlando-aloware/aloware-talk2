@@ -18,7 +18,12 @@ exports.default = async function notarizing (context) {
     appleApiIssuer: process.env.API_KEY_ISSUER_ID // Issuer ID
   }
 
-  await notarize(notarizeParams)
+  try {
+    await notarize(notarizeParams)
+  } catch (error) {
+    console.error('Notarization failed:', error)
+    throw error
+  }
 
   console.log(`Notarized ${appName}`)
 }
