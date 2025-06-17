@@ -54,7 +54,9 @@ export default {
   },
 
   mounted () {
-    this.isNavListCollapsed = this.isTeamInboxNavListCollapsed ?? (window.innerWidth < 1367)
+    if (!this.isMobile) {
+      this.isNavListCollapsed = this.isTeamInboxNavListCollapsed ?? (window.innerWidth < 1367)
+    }
 
     // Allow DOM to fully render before accessing refs
     this.$nextTick(() => {

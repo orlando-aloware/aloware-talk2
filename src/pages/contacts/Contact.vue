@@ -10,7 +10,7 @@
          v-if="!leaving">
       <div class="contact-activity-wrapper flex-grow-1"
            :class="{
-             'contact-activity--closed': isContactDetailsDrawerCollapsed || contactListSidebarOpen,
+             'contact-activity--closed': isContactActivityWrapperClosed,
              'inbox-activity-container-wrapper': teamInboxId
            }"
            v-if="isShowContactActivities">
@@ -48,7 +48,7 @@
       </div>
       <div class="contact-details-container"
            :class="{ 'contact-details--opened': !isContactDetailsDrawerCollapsed, 'hidden': !isWidget && !isContactDetailsDrawerCollapsed }"
-           v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
+           v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget && !isMobile">
         <contact-details :campaign-id="selectedCampaignId"
                          :save-bar-only="isMediumScreen"
                          :team-inbox-id="teamInboxId"
@@ -65,7 +65,7 @@
                 :breakpoint="0"
                 :width="300"
                 v-model="drawer"
-                v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && !isWidget">
+                v-if="!campaignsIsLoading && !usersIsLoading && campaigns && users && (!isWidget || isMobile)">
         <compact-btn customClass="mt-1 contact-details-container-drawer__close d-flex justify-content-center"
                      variant="outlined-light"
                      borderless
@@ -184,6 +184,10 @@ export default {
 
     isMediumScreen () {
       return this.$q.screen.width >= MIN_TABLET_WIDTH && this.$q.screen.width <= MAX_TABLET_WIDTH
+    },
+
+    isContactActivityWrapperClosed () {
+      return (this.isContactDetailsDrawerCollapsed && !this.isMobile) || this.contactListSidebarOpen
     }
   },
 

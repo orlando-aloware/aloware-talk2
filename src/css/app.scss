@@ -10281,9 +10281,6 @@ screen and (max-width: 956px) {
   .profile-menu {
     padding-right: 0 !important;
   }
-  .mobile-header {
-    display: flex !important;
-  }
   .inbox-page {
     .page-header {
       display: none;
@@ -10312,15 +10309,6 @@ screen and (max-width: 956px) {
   }
   .sidebar-active .q-header {
     justify-content: flex-start;
-  }
-  .contact-activities-actions {
-    &__drawer_btn {
-      display: none;
-    }
-
-    &__mobile_btn {
-      display: flex !important;
-    }
   }
   .inbox {
     overflow-x: hidden;

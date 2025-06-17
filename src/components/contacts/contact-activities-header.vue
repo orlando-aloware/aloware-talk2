@@ -82,18 +82,9 @@
                flat
                class="contact-activities-actions__drawer_btn"
                data-testid="contact-activities-drawer-btn"
-               v-if='!isWidget'
+               v-if="!isWidget || isMobile"
                @click="$emit('toggleDrawer')">
           <information-circle-icon/>
-        </q-btn>
-        <q-btn borderless
-               flat
-               class="contact-activities-actions__mobile_btn"
-               data-testid="contact-activities-details-mobile-btn"
-               v-if='!isWidget'
-               @click="$emit('toggleDetails')">
-          <information-circle-icon width="33"
-                                   height="33"/>
         </q-btn>
       </div>
       <div class="contact-activities-actions__desktop d-flex flex-grow-1 justify-content-end">
@@ -139,12 +130,10 @@
                class="text-decoration-none"
                data-testid="contact-activities-export-communications-btn"
                :disabled="loading"
+               v-b-tooltip.html="{customClass: 'tooltip-dark'}"
+               title="Export Communications"
                v-if="isAdmin && !isWidget && enableExport && !inPowerDialerPage"
                @click="handleExportCommunications">
-          <q-tooltip anchor="top middle"
-                     self="center middle">
-            Export Communications
-          </q-tooltip>
           <span v-if="!loading"
                 class="mx-2">
             <export-icon />
@@ -158,14 +147,12 @@
         <q-btn flat
                color="primary"
                class="open-contact-details-btn d-flex align-items-center justify-content-center px-2"
+               v-b-tooltip.html="{customClass: 'tooltip-dark'}"
+               :title="!isContactDetailsDrawerCollapsed ? 'Show contact details' : 'Hide contact details'"
                @click="$emit('toggleDetails')">
           <phone-card-icon width="21" height="21" />
-          <q-tooltip anchor="top middle"
-                     self="center middle">
-            <div style="white-space: nowrap;">{{ isContactDetailsDrawerCollapsed ? 'Show contact details' : 'Hide contact details' }}</div>
-          </q-tooltip>
           <i class="ml-1 fa"
-             :class="[isContactDetailsDrawerCollapsed ? 'fa-chevron-left' : 'fa-chevron-right']"></i>
+             :class="[isContactDetailsDrawerCollapsed ? 'fa-chevron-right' : 'fa-chevron-left']"></i>
         </q-btn>
 
         <q-btn
@@ -244,7 +231,7 @@
         </q-btn>
       </div>
     </div>
-    <profile v-if="isMobile && $q.screen.lt.md && !isWidget"
+    <profile v-if="!isMobile && $q.screen.lt.md && !isWidget"
       :hideProfileInfo="true"></profile>
   </div>
 </template>
