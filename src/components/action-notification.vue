@@ -192,28 +192,28 @@
 </template>
 
 <script>
-import { get, isEmpty } from 'lodash'
-import { mapActions, mapState } from 'vuex'
-import {
-  mentionsMixin,
-  notificationQueueMixin,
-  notificationMixin,
-  visibilityMixin,
-  aclMixin,
-  agentMixin,
-  userMixin,
-  TeamInboxMixin,
-  liveCallsMixin
-} from 'src/plugins/mixins'
-import * as AgentStatus from '../constants/agent-status'
-import CancelCallIcon from 'components/icons/cancel-call-icon'
 import AcceptCallIcon from 'components/icons/accept-call-icon'
-import ParkCallIcon from 'components/icons/park-call-icon'
+import CancelCallIcon from 'components/icons/cancel-call-icon'
 import HangupIcon from 'components/icons/hangup-icon'
 import IgnoreCallIcon from 'components/icons/ignore-call-icon'
+import ParkCallIcon from 'components/icons/park-call-icon'
+import { get, isEmpty } from 'lodash'
 import * as CommunicationSourceCallTypes from 'src/constants/communication-call-source-types'
 import { getQueryString } from 'src/plugins/helpers/functions'
+import {
+  TeamInboxMixin,
+  aclMixin,
+  agentMixin,
+  liveCallsMixin,
+  mentionsMixin,
+  notificationMixin,
+  notificationQueueMixin,
+  userMixin,
+  visibilityMixin
+} from 'src/plugins/mixins'
 import { UNTHREADED } from 'src/store/teaminbox/teaminbox.store'
+import { mapActions, mapState } from 'vuex'
+import * as AgentStatus from '../constants/agent-status'
 
 export default {
   name: 'action-notification',
@@ -757,7 +757,7 @@ export default {
 
     ignoreFishing () {
       this.$closeActionNotification('callFishing')
-      console.log('Communication when event closeCallNotifications : ', this.communication)
+      console.log('[Action 1] Communication when event closeCallNotifications : ', this.communication)
       this.closeCallNotifications(this.id, this.communicationId)
     },
 
@@ -773,7 +773,7 @@ export default {
             (this.queue && !this.queue.length))
         )
       ) {
-        console.log('Communication when event closeCallNotifications : ', this.communication)
+        console.log('[Action 2] Communication when event closeCallNotifications : ', this.communication)
         this.closeCallNotifications(this.id, this.communicationId, true)
       }
 
