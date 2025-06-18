@@ -29,6 +29,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import { TEAMINBOXES_MENU_COMMUNICATIONS_TITLE } from 'src/router/routes'
 import { getTeamInboxCampaigns } from 'src/plugins/helpers/campaigns'
 import { mapFields } from 'vuex-map-fields'
+import { debounce } from 'lodash'
 
 export default {
   name: 'TeamInbox',
@@ -155,7 +156,7 @@ export default {
       this.$VueEvent.fire('contact_updated', contact)
     },
 
-    resizeHandler () {
+    resizeHandler: debounce(function () {
       const width = this.$q.screen.width
 
       if (width >= 1366) {
@@ -168,7 +169,7 @@ export default {
         this.isContactDetailsCollapsed = true
         this.isSidebarCollapsed = true
       }
-    }
+    }, 100)
   },
 
   watch: {
