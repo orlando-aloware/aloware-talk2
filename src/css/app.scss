@@ -7634,6 +7634,7 @@ table.datatable {
   min-height: 71px;
 
   .contact-unread-badge {
+    background-color: $red-95;
     left: 38px;
     top: -8px;
     height: 20px;
@@ -13694,7 +13695,7 @@ h1.contact-list-name-label {
 }
 
 .compliance-badge {
-  background-color: #f44336;
+  background-color: $red-95;
   color: white;
   padding: 8px;
   border-radius: 8px;

@@ -15,13 +15,11 @@
                     width="20px"
                     v-if="isLoadingUnreadCount"/>
         <q-badge pill
-                color="danger"
                 rounded
                 v-else-if="unreadCount < 99">
           {{ unreadCount }}
         </q-badge>
         <q-badge pill
-                 color="danger"
                  rounded
                  v-else>
           99<sup>+</sup>
@@ -76,6 +74,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import 'src/css/variables.scss';
 .teaminbox-nav-item {
   padding: 10px 16px;
   border-radius: 10px;
@@ -116,13 +115,16 @@ export default {
     transition: all 0.3s ease-out;
 
     .q-badge {
-      font-size: 9px;
-      width: 27px;
-      height: 27px;
+      font-size: 10px;
+      line-height: 11px;
+      font-weight: bold;
+      width: 21px;
+      height: 21px;
       border-radius: 100px;
       display: flex;
       justify-content: center;
       align-items: center;
+      background-color: $red-95;
     }
   }
 
