@@ -29,8 +29,9 @@
                             v-if="type" />
       </div>
 
-      <div v-if="campaignId">
+      <div v-if="campaignId || campaign">
         <campaign :campaign-id="campaignId"
+                  :campaign="campaign"
                   :team-inbox-id="teamInboxId"
                   :from-team-inbox="fromTeamInbox" />
       </div>
@@ -102,6 +103,11 @@ export default {
 
     campaignId: {
       type: [Number, String],
+      default: null
+    },
+
+    campaign: {
+      type: Object,
       default: null
     },
 

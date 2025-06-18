@@ -25,6 +25,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 
 export default {
   name: 'IncomingNumber',
@@ -49,7 +50,10 @@ export default {
     },
 
     campaignName () {
-      return this.campaign.id && !this.campaign.name ? 'Deleted Line' : this.campaign.name
+      if (this.campaign.id && !this.campaign.name) {
+        return 'Deleted Line'
+      }
+      return removeDeletedSuffix(this.campaign.name)
     }
   },
 
