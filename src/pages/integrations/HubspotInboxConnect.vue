@@ -31,7 +31,7 @@
           <div class="search-container q-mb-sm">
             <q-input
               v-model="searchQuery"
-              placeholder="Search a specific number"
+              placeholder="Search a specific line"
               outlined
               dense
               class="search-input"
@@ -292,6 +292,8 @@ export default {
 
         if (error.response && error.response.status === 403) {
           this.setupErrorMessage = "You don't have enough permissions to connect an Aloware SMS channel. Please make sure you have access to both HubSpot's Integration Settings and Campaign Lines in Aloware."
+        } else if (error.response && error.response.status === 400) {
+          this.setupErrorMessage = 'You are missing the required HubSpot OAuth scopes. Please re-authenticate in the Integration Settings to acquire these scopes.'
         } else {
           this.setupErrorMessage = error.response.data
         }
