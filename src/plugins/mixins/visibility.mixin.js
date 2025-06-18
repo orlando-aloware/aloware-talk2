@@ -262,7 +262,7 @@ export default {
         const selectedTypesMap = {
           [CommunicationTypes.CALL_TYPE]: CommunicationTypes.CALL,
           [CommunicationTypes.SMS_TYPE]: CommunicationTypes.SMS,
-          'rvm': CommunicationTypes.RVM
+          [CommunicationTypes.RVM_TYPE]: CommunicationTypes.RVM
         }
         // checks if communication type is present in the selected types
         if (!filter.types.some((type) => selectedTypesMap[type] === communication.type)) {
