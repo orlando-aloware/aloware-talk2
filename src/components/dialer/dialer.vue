@@ -418,12 +418,10 @@ export default {
       this.$closeActionNotification('incomingCall')
     })
 
-    this.getDesktopToken()
-
     // ping getDesktopToken every 24 hours
     this.$options.webrtcTokenRegenerateInterval = setInterval(() => {
       if (this.authenticated) {
-        this.getDesktopToken()
+        this.getDesktopToken(true)
       }
     }, 24 * 60 * 60 * 1000)
   },
