@@ -70,10 +70,6 @@ export default {
       'currentCompany'
     ]),
 
-    ...mapState([
-      'teamInboxCampaigns'
-    ]),
-
     ...mapFields('settings', [
       'isTeamInboxNavListCollapsed',
       'isContactDetailsCollapsed',
