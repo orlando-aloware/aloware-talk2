@@ -223,39 +223,6 @@ export default {
         query[param] = value
       }
       this.$router.replace({ query }).catch(navigationErrorHandler)
-    },
-
-    toggleDirectionFilter (value) {
-      if (this.activeFilters.directions.includes(value)) {
-        this.activeFilters.directions = this.activeFilters.directions.filter((v) => v !== value)
-      } else {
-        this.activeFilters.directions.push(value)
-      }
-      this.onFilterChange()
-    },
-
-    toggleMyContactsFilter () {
-      this.activeFilters.my_contact = !this.activeFilters.my_contact
-      this.onFilterChange()
-    },
-
-    toggleUnreadFilter () {
-      this.activeFilters.unread_only = !this.activeFilters.unread_only
-      this.onFilterChange()
-    },
-
-    toggleTaskStatusFilter (value) {
-      if (this.activeFilters.task_status.includes(value)) {
-        this.activeFilters.task_status = this.activeFilters.task_status.filter((v) => v !== value)
-      } else {
-        this.activeFilters.task_status.push(value)
-      }
-      this.onFilterChange()
-    },
-
-    toggleMentionFilter () {
-      this.activeFilters.mention = !this.activeFilters.mention
-      this.onFilterChange()
     }
   }
 }
