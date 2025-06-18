@@ -6,7 +6,7 @@
 
     <TeamInboxChannelToggle @channel="onChannel"/>
 
-    <TeamInboxFilterSort @filter-change="onFilterChange" @sort-change="onSortChange" />
+    <TeamInboxFilters @filter-change="onFilterChange" @sort-change="onSortChange" />
 
     <!-- Items List -->
     <div class="items-list blue-scroll"
@@ -30,7 +30,7 @@
 import CommunicationList from 'src/components/teaminbox/communication-items/communication-list.vue'
 import TeamInboxChannelToggle from './teaminbox-channel-toggle.vue'
 import TeamInboxTabHeader from './teaminbox-tab-header.vue'
-import TeamInboxFilterSort from './teaminbox-filter-sort.vue'
+import TeamInboxFilters from './teaminbox-filters.vue'
 import { TeamInboxMixin, visibilityMixin } from 'src/plugins/mixins'
 import { getQueryString } from 'src/plugins/helpers/functions'
 import * as CommunicationDirections from 'src/constants/communication-direction'
@@ -47,7 +47,7 @@ export default {
     CommunicationList,
     TeamInboxChannelToggle,
     TeamInboxTabHeader,
-    TeamInboxFilterSort
+    TeamInboxFilters
   },
 
   mixins: [
@@ -208,6 +208,11 @@ export default {
       // Find if we have a group for this communication
       const groupKey = this.getGroupKey(communication)
       const existingGroup = this.itemsData.find(item => this.getGroupKey(item) === groupKey)
+
+      // Check filters and sorting settings
+      if (!this.checkCommunication(communication, isAscendingOrder)) {
+        return
+      }
 
       // Special handling for calls
       if (communication.type === CommunicationTypes.CALL) {
