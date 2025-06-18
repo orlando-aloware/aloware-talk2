@@ -11,7 +11,7 @@
        v-else-if="ringGroup.id && !isAgent"
        @click="handleRingGroupClick(ringGroupId, $event)">
       <external-link-icon color="#1976D2"/>
-      {{ ringGroup.name }}
+      {{ removeDeletedSuffix(ringGroup.name) }}
 
       <b-tooltip custom-class="talk-table__tooltip"
                  :target="`comm-ring-group-${_uid}`">
@@ -20,7 +20,7 @@
     </a>
 
     <span v-else-if="ringGroup.id && isAgent">
-      {{ ringGroup.name }}
+      {{ removeDeletedSuffix(ringGroup.name) }}
     </span>
 
     <span class="deleted"
@@ -39,6 +39,7 @@ import ExternalLinkIcon from 'components/icons/external-link-icon.vue'
 import { aclMixin, classicMixin, userMixin } from 'src/plugins/mixins'
 import communicationsMixin from 'src/plugins/mixins/communications.mixin'
 import { mapState } from 'vuex'
+import { removeDeletedSuffix } from 'src/plugins/helpers/deleted-entities'
 
 export default {
   name: 'RingGroup',
@@ -72,6 +73,8 @@ export default {
   },
 
   methods: {
+    removeDeletedSuffix,
+
     handleRingGroupClick (ringGroupId, e) {
       const url = this.getRingGroupURL(ringGroupId)
       // Only handle navigation in Electron, let browser handle it normally
