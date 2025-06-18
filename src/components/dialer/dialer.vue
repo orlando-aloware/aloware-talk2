@@ -4,6 +4,7 @@
 
 <script>
 import _ from 'lodash'
+import talk2Api from 'src/plugins/api/api'
 import { mapActions, mapState } from 'vuex'
 import { mapFields } from 'vuex-map-fields'
 import {
@@ -20,11 +21,10 @@ import {
 import * as AgentStatus from '../../constants/agent-status'
 import * as CommunicationCurrentStatus from '../../constants/communication-current-status'
 import * as CommunicationDispositionStatus from '../../constants/communication-disposition-status'
+import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry-types'
 import { REJECTION_REASONS } from '../../constants/rejection-reason-messages'
 import * as WebrtcEvents from '../../constants/webrtc-events'
 import TwilioDevice from '../communication/twilio/device'
-import talk2Api from 'src/plugins/api/api'
-import * as COMMUNICATION_SENTRY_TYPE from '../../constants/communication-sentry-types'
 
 export default {
   name: 'dialer',
@@ -63,7 +63,12 @@ export default {
       CommunicationDispositionStatus,
       taskRedialed: false,
       hungFromAnotherTab: false,
-      parkFromAnotherTab: false
+      parkFromAnotherTab: false,
+      // Token retry tracking
+      tokenRetryCount: 0,
+      tokenRetryTimeout: null,
+      maxTokenRetries: 3,
+      baseRetryDelay: 1000 // 1 second base delay
     }
   },
 
@@ -161,6 +166,9 @@ export default {
     }
 
     this.dialerListeners.reconnectDialer = () => {
+      // Reset retry count for manual reconnection
+      this.resetTokenRetryState()
+
       this.getDesktopToken(true)
         .then(() => {
           this.device.register()
@@ -639,6 +647,20 @@ export default {
     },
 
     getDesktopToken (reset = false) {
+      // Check if we're already in the process of getting a token (universal protection)
+      if (this.tokenRetryTimeout) {
+        console.log('Token request already in progress, skipping')
+        return Promise.reject(new Error('Token request already in progress'))
+      }
+
+      // Check if we've exceeded the maximum retry attempts (company-specific)
+      if (this.currentCompany?.id === 7113 && this.tokenRetryCount >= this.maxTokenRetries) {
+        console.log('Maximum token retry attempts reached for company 7113')
+        this.setDialerIsReady(false)
+        this.setDialerCurrentStatus('OFFLINE')
+        return Promise.reject(new Error('Maximum token retry attempts reached'))
+      }
+
       console.log('Generating desktop token')
 
       this.setDialerCurrentStatus('GENERATING_TOKEN')
@@ -652,6 +674,10 @@ export default {
         this.setDialerToken(res.data)
         this.setDialerCurrentStatus('TOKEN_GENERATED')
         console.log('Twilio token', this.dialer.token)
+
+        // Reset retry count on successful token generation
+        this.resetTokenRetryState()
+
         // setup twilio client
 
         /**
@@ -693,6 +719,10 @@ export default {
       }).catch(err => {
         this.loading = false
         console.log(err)
+
+        // Clear the timeout on error
+        this.tokenRetryTimeout = null
+
         return Promise.reject(err)
       })
     },
@@ -1790,7 +1820,34 @@ export default {
         this.$Sentry.captureException(err)
       }
 
-      // Request new token if error
+      // Apply retry mechanism only to 31009 error (No transport available) for company ID 7113
+      if (err.code === 31009 && this.currentCompany?.id === 7113) {
+        // Increment retry count
+        this.tokenRetryCount++
+
+        // Calculate exponential backoff delay: baseDelay * 2^(retryCount - 1)
+        const delay = this.baseRetryDelay * Math.pow(2, this.tokenRetryCount - 1)
+
+        console.log(`Token retry attempt ${this.tokenRetryCount}/${this.maxTokenRetries} with ${delay}ms delay for error 31009 (Company ID: ${this.currentCompany.id})`)
+
+        // Set timeout to prevent multiple simultaneous requests
+        this.tokenRetryTimeout = setTimeout(() => {
+          this.tokenRetryTimeout = null
+          this.getDesktopToken(true)
+            .catch(retryErr => {
+              console.error('Token retry failed:', retryErr)
+              if (this.tokenRetryCount >= this.maxTokenRetries) {
+                this.setDialerIsReady(false)
+                this.setDialerCurrentStatus('OFFLINE')
+                this.$generalNotification('Failed to reconnect after multiple attempts. Please refresh the page.', 'error', 10000)
+              }
+            })
+        }, delay)
+
+        return
+      }
+
+      // Request new token immediately for other token-related errors (original behavior)
       if ([20101, 31102, 31204, 31205, 31207, 31009].includes(err.code)) {
         return this.getDesktopToken(true)
       }
@@ -1803,6 +1860,8 @@ export default {
 
       if (login) {
         this.setDialerCurrentStatus('RESTARTING')
+        // Reset retry count for manual reboot
+        this.resetTokenRetryState()
         this.getDesktopToken()
         return
       }
@@ -1969,7 +2028,16 @@ export default {
       'setIsCallBackButtonDisabled',
       'setDialerAiAgentWhisper',
       'setDialerAiAgentTakeover'
-    ])
+    ]),
+
+    // Helper method to reset token retry state
+    resetTokenRetryState () {
+      this.tokenRetryCount = 0
+      if (this.tokenRetryTimeout) {
+        clearTimeout(this.tokenRetryTimeout)
+        this.tokenRetryTimeout = null
+      }
+    }
   },
 
   watch: {
@@ -1989,6 +2057,9 @@ export default {
     clearInterval(this.$options.webrtcTokenRegenerateInterval)
     clearInterval(this.$options.hangupInterval)
     clearInterval(this.unownedContact.interval)
+
+    // Clear token retry timeout
+    this.resetTokenRetryState()
 
     // Destroy the Twilio device to avoid having multiple Twilio device instances.
     console.log('Destroying Twilio device')
