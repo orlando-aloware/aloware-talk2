@@ -309,7 +309,7 @@ export default {
 
         await this.getContact()
 
-        if (this.validateActiveCallStatus()) {
+        if (this.validateHasActiveCallStatus()) {
           console.log('agentHasActiveCallDevice dddddd', this.profile?.last_call, this.checkForceDisposition)
           return
         }
@@ -391,7 +391,7 @@ export default {
       console.warn('Handle')
       console.log('CurrentStatus:', this.dialer?.currentStatus)
 
-      if (this.validateActiveCallStatus()) {
+      if (this.validateHasActiveCallStatus()) {
         console.log('checkAgentHasActiveCallInAnotherDevice')
         return
       }
@@ -521,15 +521,8 @@ export default {
 
       console.warn('handleCall', this.dialer?.currentStatus)
 
-      // @todo reformat
       // if there's a call in progress or in wrap up, we omit the call
-      // if (isCallInProgressOrWrapUp.includes(this.dialer?.currentStatus)) {
-      //   // this.showAlertAgentOnCall = true
-      //   this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
-      //   return
-      // }
-
-      if (this.validateActiveCallStatus()) {
+      if (this.validateHasActiveCallStatus()) {
         return
       }
 
@@ -617,7 +610,7 @@ export default {
         return
       }
 
-      if (this.validateActiveCallStatus()) {
+      if (this.validateHasActiveCallStatus()) {
         return
       }
 
@@ -665,7 +658,7 @@ export default {
     },
 
     // status validates before starting dialing
-    validateActiveCallStatus () {
+    validateHasActiveCallStatus () {
       let status = false
 
       if (this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL ||
@@ -726,13 +719,14 @@ export default {
       console.log(
         'CHECK WRAP_UP',
         this.dialer?.currentStatus,
+        this.checkDialerForceDisposition,
         this.checkForceDisposition,
         this.currentCompany?.force_call_disposition,
         this.profile?.last_call?.call_disposition_id,
         this.profile?.last_call
       )
 
-      if (this.dialer?.currentStatus === 'WRAP_UP' && !this.checkForceDisposition) {
+      if (this.dialer?.currentStatus === 'WRAP_UP' && !this.checkDialerForceDisposition) {
         console.log('endWrapUp')
         this.$VueEvent.fire('endWrapUp')
       }
@@ -742,7 +736,7 @@ export default {
         this.$VueEvent.fire('hangupCall')
       }
 
-      if (!this.checkForceDisposition) {
+      if (!this.checkDialerForceDisposition) {
         console.log('resetCall')
         this.$VueEvent.fire('resetCall')
       }
@@ -768,6 +762,8 @@ export default {
     },
     extensionsVisibility () {
       if (this.extensionsVisibility) {
+        // @todo check if this needed
+        console.warn('extensionsVisibility changed to true', this.profile?.agent_status)
         if (this.profile && this.profile.agent_status === AgentStatus.AGENT_STATUS_ON_CALL) {
           this.widgetMessage = WIDGET_MSG_SHOW_ALERT_AGENT_ON_CALL
         }
